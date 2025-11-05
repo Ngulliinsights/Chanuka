@@ -14,11 +14,11 @@ export interface SubmitVerificationCommand { user_id: string;
   }
 
 export interface EndorseVerificationCommand { user_id: string;
-  verificationId: string;
+  verification_id: string;
  }
 
 export interface DisputeVerificationCommand { user_id: string;
-  verificationId: string;
+  verification_id: string;
   reason: string;
  }
 
@@ -139,7 +139,7 @@ export class VerificationOperationsUseCase {
 
       // Endorse verification through domain service
       const endorseResult = await this.verificationDomainService.endorseVerification(
-        command.verificationId,
+        command.verification_id,
         command.user_id
       );
 
@@ -151,7 +151,7 @@ export class VerificationOperationsUseCase {
       }
 
       // Log endorsement
-      this.logVerificationActivity(command.user_id, 'verification_endorsed', command.verificationId);
+      this.logVerificationActivity(command.user_id, 'verification_endorsed', command.verification_id);
 
       return {
         success: true,
@@ -187,7 +187,7 @@ export class VerificationOperationsUseCase {
 
       // Dispute verification through domain service
       const disputeResult = await this.verificationDomainService.disputeVerification(
-        command.verificationId,
+        command.verification_id,
         command.user_id,
         command.reason
       );
@@ -200,7 +200,7 @@ export class VerificationOperationsUseCase {
       }
 
       // Log dispute
-      this.logVerificationActivity(command.user_id, 'verification_disputed', command.verificationId);
+      this.logVerificationActivity(command.user_id, 'verification_disputed', command.verification_id);
 
       return {
         success: true,
@@ -301,7 +301,7 @@ export class VerificationOperationsUseCase {
       errors.push('User ID is required');
     }
 
-    if (!command.verificationId || !command.verificationId.trim()) {
+    if (!command.verification_id || !command.verification_id.trim()) {
       errors.push('Verification ID is required');
     }
 
@@ -318,7 +318,7 @@ export class VerificationOperationsUseCase {
       errors.push('User ID is required');
     }
 
-    if (!command.verificationId || !command.verificationId.trim()) {
+    if (!command.verification_id || !command.verification_id.trim()) {
       errors.push('Verification ID is required');
     }
 

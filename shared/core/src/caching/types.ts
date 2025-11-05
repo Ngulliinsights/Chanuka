@@ -5,6 +5,8 @@
  * Based on consolidation of existing implementations and refined_cross_cutting.ts patterns
  */
 
+import type { CacheMetrics, CacheHealthStatus } from './core/interfaces';
+
 // Core cache service interface
 export interface CacheService {
   get<T>(key: string): Promise<T | null>;
@@ -22,32 +24,8 @@ export interface CacheService {
   invalidateByTags?(tags: string[]): Promise<number>;
 }
 
-// Cache metrics for performance monitoring
-export interface CacheMetrics {
-  hits: number;
-  misses: number;
-  hitRate: number;
-  operations: number;
-  avgResponseTime: number;
-  errors: number;
-  totalSize?: number;
-  totalEntries?: number;
-  l1Stats?: CacheTierStats;
-  l2Stats?: CacheTierStats;
-}
-
-// Cache tier statistics for multi-tier cache
-export interface CacheTierStats {
-  hits: number;
-  misses: number;
-  sets: number;
-  deletes: number;
-  errors: number;
-  hitRate: number;
-  avgResponseTime: number;
-  totalSize: number;
-  totalEntries: number;
-}
+// Re-export unified interfaces from core
+export type { CacheMetrics, CacheTierStats } from './core/interfaces';
 
 // Cache entry with metadata
 export interface CacheEntry<T = any> {
@@ -116,14 +94,7 @@ export interface CacheAdapter extends CacheService {
   warmUp?(entries: Array<{ key: string; value: any; options?: CacheOptions }>): Promise<void>;
 }
 
-// Cache health status
-export interface CacheHealthStatus {
-  connected: boolean;
-  latency: number;
-  memory?: any;
-  stats: CacheMetrics;
-  errors?: string[];
-}
+// Cache health status (using the one from core/interfaces)
 
 // Cache event types for monitoring
 export type CacheEventType = 

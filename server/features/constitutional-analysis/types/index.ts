@@ -3,14 +3,14 @@
 // ============================================================================
 // Shared types and interfaces for the constitutional analysis feature
 
-import { ConstitutionalProvision, LegalPrecedent, ConstitutionalAnalysis } from '../../../shared/schema/index.js';
+import { ConstitutionalProvision, LegalPrecedent, ConstitutionalAnalysis } from '@shared/schema/index.js';
 
 // ============================================================================
 // Analysis Request & Response Types
 // ============================================================================
 
 export interface AnalysisRequest {
-  billId: string;
+  bill_id: string;
   billTitle: string;
   billContent: string;
   billType?: string;
@@ -18,7 +18,7 @@ export interface AnalysisRequest {
 }
 
 export interface AnalysisResult {
-  billId: string;
+  bill_id: string;
   overallRisk: 'low' | 'medium' | 'high' | 'critical';
   overallConfidence: number; // 0-100
   analyses: ConstitutionalAnalysis[];
@@ -85,8 +85,8 @@ export interface PrecedentSearchCriteria {
 // ============================================================================
 
 export interface ExpertReviewFlag {
-  analysisId: string;
-  billId: string;
+  analysis_id: string;
+  bill_id: string;
   flagReason: 'low_confidence' | 'high_risk' | 'complex_precedents' | 'novel_issue' | 'conflicting_analysis';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   estimatedReviewTime: number; // minutes

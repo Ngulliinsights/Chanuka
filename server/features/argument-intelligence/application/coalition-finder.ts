@@ -3,7 +3,7 @@
 // ============================================================================
 // Identifies potential coalitions based on shared concerns and compatible positions
 
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { SimilarityCalculator } from '../infrastructure/nlp/similarity-calculator.js';
 
 export interface CoalitionMatch {
@@ -45,7 +45,7 @@ export interface CoalitionOpportunity {
   feasibilityScore: number;
   recommendedStrategy: CoalitionStrategy;
   identifiedAt: Date;
-  billId: string;
+  bill_id: string;
 }
 
 export interface CoalitionStrategy {
@@ -118,13 +118,13 @@ export class CoalitionFinderService {
    * Discover coalition opportunities for a bill
    */
   async discoverCoalitionOpportunities(
-    billId: string,
+    bill_id: string,
     stakeholderProfiles: StakeholderProfile[]
   ): Promise<CoalitionOpportunity[]> {
     try {
       logger.info(`🔍 Discovering coalition opportunities`, {
         component: 'CoalitionFinder',
-        billId,
+        bill_id,
         stakeholderCount: stakeholderProfiles.length
       });
 
@@ -139,7 +139,7 @@ export class CoalitionFinderService {
       // Create coalition opportunities
       for (const alignment of alignedGroups) {
         const opportunity = await this.createCoalitionOpportunity(
-          billId,
+          bill_id,
           alignment.stakeholders,
           'unified_position',
           alignment.sharedObjectives
@@ -149,7 +149,7 @@ export class CoalitionFinderService {
 
       for (const complement of complementaryGroups) {
         const opportunity = await this.createCoalitionOpportunity(
-          billId,
+          bill_id,
           complement.stakeholders,
           'complementary_concerns',
           complement.sharedObjectives
@@ -164,7 +164,7 @@ export class CoalitionFinderService {
 
       logger.info(`✅ Coalition opportunity discovery completed`, {
         component: 'CoalitionFinder',
-        billId,
+        bill_id,
         opportunitiesFound: rankedOpportunities.length
       });
 
@@ -173,7 +173,7 @@ export class CoalitionFinderService {
     } catch (error) {
       logger.error(`❌ Coalition opportunity discovery failed`, {
         component: 'CoalitionFinder',
-        billId,
+        bill_id,
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -388,7 +388,7 @@ export class CoalitionFinderService {
   }
 
   private calculateParticipationLevel(arguments: any[]): number {
-    const uniqueUsers = new Set(arguments.map(arg => arg.userId)).size;
+    const uniqueUsers = new Set(arguments.map(arg => arg.user_id)).size;
     const totalArguments = arguments.length;
     
     // Normalize participation level (0-100)
@@ -637,7 +637,7 @@ export class CoalitionFinderService {
   }
 
   private async createCoalitionOpportunity(
-    billId: string,
+    bill_id: string,
     stakeholders: StakeholderProfile[],
     approachType: CoalitionStrategy['approachType'],
     sharedObjectives: string[]
@@ -655,7 +655,7 @@ export class CoalitionFinderService {
       feasibilityScore,
       recommendedStrategy: strategy,
       identifiedAt: new Date(),
-      billId
+      bill_id
     };
   }
 

@@ -3,7 +3,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { createHash } from "crypto";
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // ✅ FIXED INTERFACES - Added missing properties
 interface APICall {
@@ -111,7 +111,7 @@ interface AnalysisReport {
     readonly highRisk: number;
     readonly mediumRisk: number;
     readonly lowRisk: number;
-    readonly riskScore: number;
+    readonly risk_score: number;
     readonly averageConfidence: number;
     readonly analysisTime: number;
   };
@@ -532,7 +532,7 @@ export class EnhancedAPIRaceConditionDetector {
     };
 
     // Calculate risk score (weighted average)
-    const riskScore =
+    const risk_score =
       (riskCounts.critical * 4 +
         riskCounts.high * 3 +
         riskCounts.medium * 2 +
@@ -545,7 +545,7 @@ export class EnhancedAPIRaceConditionDetector {
       highRisk: riskCounts.high,
       mediumRisk: riskCounts.medium,
       lowRisk: riskCounts.low,
-      riskScore: Math.round(riskScore * 100) / 100,
+      risk_score: Math.round(risk_score * 100) / 100,
       averageConfidence:
         allApiCalls.reduce((sum, call) => sum + call.confidence, 0) /
           allApiCalls.length || 0,

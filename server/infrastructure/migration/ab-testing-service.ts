@@ -8,7 +8,7 @@
  * - Real-time metrics collection and analysis
  */
 
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { 
   AsyncServiceResult, 
   withResultHandling 
@@ -20,8 +20,8 @@ export interface ABTestConfig {
   name: string;
   description: string;
   hypothesis: string;
-  startDate: Date;
-  endDate?: Date;
+  start_date: Date;
+  end_date?: Date;
   trafficAllocation: {
     control: number; // Percentage (0-100)
     treatment: number; // Percentage (0-100)
@@ -35,23 +35,23 @@ export interface ABTestConfig {
 }
 
 export interface UserCohort {
-  userId: string;
+  user_id: string;
   cohortType: 'control' | 'treatment';
   assignmentTimestamp: Date;
   userHash: string;
-  sessionId?: string;
+  session_id?: string;
   metadata: Record<string, any>;
 }
 
 export interface MetricEvent {
   eventId: string;
-  userId: string;
+  user_id: string;
   cohortType: 'control' | 'treatment';
   testId: string;
   metricName: string;
   value: number;
   timestamp: Date;
-  sessionId?: string;
+  session_id?: string;
   metadata: Record<string, any>;
 }
 
@@ -141,8 +141,8 @@ export interface ABTestResults {
 
 export interface UserBehaviorEvent {
   eventId: string;
-  userId: string;
-  sessionId: string;
+  user_id: string;
+  session_id: string;
   eventType: 'page_view' | 'click' | 'form_submit' | 'error' | 'conversion' | 'task_completion';
   eventData: Record<string, any>;
   timestamp: Date;
@@ -211,7 +211,7 @@ export class ABTestingService {
       }
 
       test.status = 'running';
-      test.startDate = new Date();
+      test.start_date = new Date();
 
       logger.info('A/B test started', {
         component: 'ABTestingService',
@@ -226,8 +226,8 @@ export class ABTestingService {
    */
   async assignUserToCohort(
     testId: string, 
-    userId: string, 
-    sessionId?: string,
+    user_id: string, 
+    session_id?: string,
     metadata: Record<string, any> = {}
   ): AsyncServiceResult<UserCohort> {
     return withResultHandling(async () => {
@@ -237,13 +237,13 @@ export class ABTestingService {
       }
 
       // Check if user is already assigned
-      const existingCohort = this.userCohorts.get(`${testId}_${userId}`);
+      const existingCohort = this.userCohorts.get(`${testId}_${user_id}`);
       if (existingCohort) {
         return existingCohort;
       }
 
       // Generate consistent hash for user
-      const userHash = this.generateUserHash(userId, testId);
+      const userHash = this.generateUserHash(user_id, testId);
       const hashValue = parseInt(userHash.substring(0, 8), 16) % 100;
 
       // Assign to cohort based on traffic allocation
@@ -252,20 +252,20 @@ export class ABTestingService {
         : 'treatment';
 
       const cohort: UserCohort = {
-        userId,
+        user_id,
         cohortType,
         assignmentTimestamp: new Date(),
         userHash,
-        sessionId,
+        session_id,
         metadata
       };
 
-      this.userCohorts.set(`${testId}_${userId}`, cohort);
+      this.userCohorts.set(`${testId}_${user_id}`, cohort);
 
       logger.debug('User assigned to cohort', {
         component: 'ABTestingService',
         testId,
-        userId,
+        user_id,
         cohortType,
         userHash
       });
@@ -279,13 +279,13 @@ export class ABTestingService {
    */
   async trackMetricEvent(
     testId: string,
-    userId: string,
+    user_id: string,
     metricName: string,
     value: number,
     metadata: Record<string, any> = {}
   ): AsyncServiceResult<void> {
     return withResultHandling(async () => {
-      const cohort = this.userCohorts.get(`${testId}_${userId}`);
+      const cohort = this.userCohorts.get(`${testId}_${user_id}`);
       if (!cohort) {
         // User not in test, skip tracking
         return;
@@ -293,13 +293,13 @@ export class ABTestingService {
 
       const event: MetricEvent = {
         eventId: this.generateEventId(),
-        userId,
+        user_id,
         cohortType: cohort.cohortType,
         testId,
         metricName,
         value,
         timestamp: new Date(),
-        sessionId: cohort.sessionId,
+        session_id: cohort.session_id,
         metadata
       };
 
@@ -309,7 +309,7 @@ export class ABTestingService {
       logger.debug('Metric event tracked', {
         component: 'ABTestingService',
         testId,
-        userId,
+        user_id,
         metricName,
         value,
         cohortType: cohort.cohortType
@@ -321,8 +321,8 @@ export class ABTestingService {
    * Track user behavior event
    */
   async trackBehaviorEvent(
-    userId: string,
-    sessionId: string,
+    user_id: string,
+    session_id: string,
     eventType: UserBehaviorEvent['eventType'],
     eventData: Record<string, any> = {},
     testId?: string
@@ -331,14 +331,14 @@ export class ABTestingService {
       let cohortType: 'control' | 'treatment' | undefined;
       
       if (testId) {
-        const cohort = this.userCohorts.get(`${testId}_${userId}`);
+        const cohort = this.userCohorts.get(`${testId}_${user_id}`);
         cohortType = cohort?.cohortType;
       }
 
       const event: UserBehaviorEvent = {
         eventId: this.generateEventId(),
-        userId,
-        sessionId,
+        user_id,
+        session_id,
         eventType,
         eventData,
         timestamp: new Date(),
@@ -351,8 +351,8 @@ export class ABTestingService {
 
       logger.debug('Behavior event tracked', {
         component: 'ABTestingService',
-        userId,
-        sessionId,
+        user_id,
+        session_id,
         eventType,
         cohortType,
         testId
@@ -407,8 +407,8 @@ export class ABTestingService {
         test
       );
 
-      const duration = test.startDate ? 
-        (Date.now() - test.startDate.getTime()) / (1000 * 60 * 60 * 24) : 0;
+      const duration = test.start_date ? 
+        (Date.now() - test.start_date.getTime()) / (1000 * 60 * 60 * 24) : 0;
 
       const results: ABTestResults = {
         testId,
@@ -437,7 +437,7 @@ export class ABTestingService {
    */
   async trackCohortMetrics(
     testId: string,
-    userId: string,
+    user_id: string,
     metrics: {
       responseTime?: number;
       errorRate?: number;
@@ -450,7 +450,7 @@ export class ABTestingService {
       // Track each metric as separate events
       for (const [metricName, value] of Object.entries(metrics)) {
         if (value !== undefined) {
-          await this.trackMetricEvent(testId, userId, metricName, value);
+          await this.trackMetricEvent(testId, user_id, metricName, value);
         }
       }
     }, { service: 'ABTestingService', operation: 'trackCohortMetrics' });
@@ -492,7 +492,7 @@ export class ABTestingService {
       
       // Calculate conversion rate
       const conversionEvents = testEvents.filter(event => event.eventType === 'conversion');
-      const uniqueUsers = new Set(testEvents.map(event => event.userId)).size;
+      const uniqueUsers = new Set(testEvents.map(event => event.user_id)).size;
       const conversionRate = uniqueUsers > 0 ? conversionEvents.length / uniqueUsers : 0;
 
       // Calculate task completion rate
@@ -530,7 +530,7 @@ export class ABTestingService {
       }
 
       test.status = 'completed';
-      test.endDate = new Date();
+      test.end_date = new Date();
 
       logger.info('A/B test stopped', {
         component: 'ABTestingService',
@@ -561,9 +561,9 @@ export class ABTestingService {
     }
   }
 
-  private generateUserHash(userId: string, testId: string): string {
+  private generateUserHash(user_id: string, testId: string): string {
     // Simple hash function for consistent user assignment
-    const input = `${userId}_${testId}`;
+    const input = `${ user_id }_${testId}`;
     let hash = 0;
     for (let i = 0; i < input.length; i++) {
       const char = input.charCodeAt(i);
@@ -637,7 +637,7 @@ export class ABTestingService {
 
     // Calculate conversion metrics
     const conversionEvents = behaviorEvents.filter(event => event.eventType === 'conversion');
-    const uniqueUsers = new Set(behaviorEvents.map(event => event.userId));
+    const uniqueUsers = new Set(behaviorEvents.map(event => event.user_id));
     
     const conversionMetrics = {
       conversionRate: uniqueUsers.size > 0 ? conversionEvents.length / uniqueUsers.size : 0,
@@ -648,18 +648,18 @@ export class ABTestingService {
     // Calculate behavior metrics
     const sessionDurations = behaviorEvents
       .reduce((sessions, event) => {
-        if (!sessions[event.sessionId]) {
-          sessions[event.sessionId] = { start: event.timestamp, end: event.timestamp };
+        if (!sessions[event.session_id]) {
+          sessions[event.session_id] = { start: event.timestamp, end: event.timestamp };
         } else {
-          if (event.timestamp < sessions[event.sessionId].start) {
-            sessions[event.sessionId].start = event.timestamp;
+          if (event.timestamp < sessions[event.session_id].start) {
+            sessions[event.session_id].start = event.timestamp;
           }
-          if (event.timestamp > sessions[event.sessionId].end) {
-            sessions[event.sessionId].end = event.timestamp;
+          if (event.timestamp > sessions[event.session_id].end) {
+            sessions[event.session_id].end = event.timestamp;
           }
         }
         return sessions;
-      }, {} as { [sessionId: string]: { start: Date; end: Date } });
+      }, {} as { [session_id: string]: { start: Date; end: Date } });
 
     const avgSessionDuration = Object.values(sessionDurations).length > 0
       ? Object.values(sessionDurations)
@@ -891,10 +891,10 @@ export class ABTestingService {
 
     // Group events by session
     events.forEach(event => {
-      if (!userSessions.has(event.sessionId)) {
-        userSessions.set(event.sessionId, []);
+      if (!userSessions.has(event.session_id)) {
+        userSessions.set(event.session_id, []);
       }
-      userSessions.get(event.sessionId)!.push(event);
+      userSessions.get(event.session_id)!.push(event);
     });
 
     // Analyze sequences within sessions

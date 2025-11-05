@@ -1,10 +1,10 @@
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@shared/database';
 import { users, user_profiles, comments, notifications, sessions } from '@shared/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from './encryption-service.js';
 import { securityAuditService } from './security-audit-service.js';
 import { Request } from 'express';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface DataExportRequest { user_id: string;
   requestedBy: string;

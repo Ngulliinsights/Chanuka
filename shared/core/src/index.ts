@@ -30,11 +30,13 @@ export type {
 export type {
   CacheOptions,
   CacheMetrics,
-  CacheHealthStatus,
   CacheEvent,
   SingleFlightOptions,
   CacheService
 } from './caching/types';
+export type {
+  CacheHealthStatus
+} from './caching/core/interfaces';
 export {
   MemoryAdapter
 } from './caching';
@@ -79,6 +81,15 @@ export type {
 
 // Primitives module
 export * from './primitives';
+
+// Types module
+export type {
+  FeatureFlagsService,
+  FeatureFlagConfig
+} from './types/feature-flags';
+export {
+  MockFeatureFlagsService
+} from './types/feature-flags';
 
 // Validation module (primary for validation-related exports)
 export type {

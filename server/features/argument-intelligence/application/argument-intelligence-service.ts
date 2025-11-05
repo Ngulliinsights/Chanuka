@@ -1,4 +1,4 @@
-import { db } from '../../../../shared/database/pool.js';
+import { db } from '@shared/database/pool.js';
 import {
   argumentTable as arguments,
   claims,
@@ -14,14 +14,14 @@ import {
   type SynthesisJob
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, count, inArray, like, or, isNotNull } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
 export interface BillArgumentSynthesis {
-  billId: string;
+  bill_id: string;
   majorClaims: SynthesizedClaim[];
   evidenceBase: EvidenceAssessment[];
   stakeholderPositions: StakeholderPosition[];
@@ -58,7 +58,7 @@ export interface StakeholderPosition {
 
 export interface StoredBrief {
   id: string;
-  billId: string;
+  bill_id: string;
   briefType: string;
   targetAudience: string;
   executiveSummary: string;
@@ -69,7 +69,7 @@ export interface StoredBrief {
   appendices: string;
   metadata: string;
   generatedAt: Date;
-  updatedAt?: Date;
+  updated_at?: Date;
 }
 
 // ============================================================================
@@ -125,11 +125,11 @@ export class ArgumentIntelligenceService {
   /**
    * Get arguments for a specific bill
    */
-  async getArgumentsForBill(billId: string): Promise<Argument[]> {
+  async getArgumentsForBill(bill_id: string): Promise<Argument[]> {
     const logContext = { 
       component: 'ArgumentIntelligenceService', 
       operation: 'getArgumentsForBill', 
-      billId 
+      bill_id 
     };
     logger.debug('Fetching arguments for bill', logContext);
 
@@ -137,7 +137,7 @@ export class ArgumentIntelligenceService {
       const results = await this.database
         .select()
         .from(arguments)
-        .where(eq(arguments.bill_id, billId))
+        .where(eq(arguments.bill_id, bill_id))
         .orderBy(desc(arguments.created_at));
 
       logger.debug('✅ Arguments retrieved', { ...logContext, count: results.length });
@@ -355,11 +355,11 @@ export class ArgumentIntelligenceService {
   /**
    * Get briefs for a specific bill
    */
-  async getBriefsForBill(billId: string): Promise<LegislativeBrief[]> {
+  async getBriefsForBill(bill_id: string): Promise<LegislativeBrief[]> {
     const logContext = { 
       component: 'ArgumentIntelligenceService', 
       operation: 'getBriefsForBill', 
-      billId 
+      bill_id 
     };
     logger.debug('Fetching briefs for bill', logContext);
 
@@ -367,7 +367,7 @@ export class ArgumentIntelligenceService {
       const results = await this.database
         .select()
         .from(legislative_briefs)
-        .where(eq(legislative_briefs.bill_id, billId))
+        .where(eq(legislative_briefs.bill_id, bill_id))
         .orderBy(desc(legislative_briefs.created_at));
 
       logger.debug('✅ Briefs retrieved', { ...logContext, count: results.length });
@@ -418,7 +418,7 @@ export class ArgumentIntelligenceService {
     const logContext = { 
       component: 'ArgumentIntelligenceService', 
       operation: 'storeBillSynthesis',
-      billId: synthesis.billId 
+      bill_id: synthesis.bill_id 
     };
     logger.debug('Storing bill synthesis', logContext);
 
@@ -427,8 +427,8 @@ export class ArgumentIntelligenceService {
       await this.database
         .insert(synthesis_jobs)
         .values({
-          id: `synthesis_${synthesis.billId}_${Date.now()}`,
-          bill_id: synthesis.billId,
+          id: `synthesis_${synthesis.bill_id}_${Date.now()}`,
+          bill_id: synthesis.bill_id,
           job_type: 'bill_synthesis',
           status: 'completed',
           input_data: JSON.stringify({
@@ -454,11 +454,11 @@ export class ArgumentIntelligenceService {
   /**
    * Get bill argument synthesis
    */
-  async getBillSynthesis(billId: string): Promise<BillArgumentSynthesis | null> {
+  async getBillSynthesis(bill_id: string): Promise<BillArgumentSynthesis | null> {
     const logContext = { 
       component: 'ArgumentIntelligenceService', 
       operation: 'getBillSynthesis',
-      billId 
+      bill_id 
     };
     logger.debug('Fetching bill synthesis', logContext);
 
@@ -468,7 +468,7 @@ export class ArgumentIntelligenceService {
         .from(synthesis_jobs)
         .where(
           and(
-            eq(synthesis_jobs.bill_id, billId),
+            eq(synthesis_jobs.bill_id, bill_id),
             eq(synthesis_jobs.job_type, 'bill_synthesis'),
             eq(synthesis_jobs.status, 'completed')
           )
@@ -484,7 +484,7 @@ export class ArgumentIntelligenceService {
       const inputData = this.parseJson(synthesis.input_data, {});
       
       return {
-        billId: synthesis.bill_id,
+        bill_id: synthesis.bill_id,
         majorClaims: inputData.majorClaims || [],
         evidenceBase: inputData.evidenceBase || [],
         stakeholderPositions: inputData.stakeholderPositions || [],
@@ -583,11 +583,11 @@ export class ArgumentIntelligenceService {
   /**
    * Get argument statistics for a bill
    */
-  async getArgumentStatistics(billId: string): Promise<any> {
+  async getArgumentStatistics(bill_id: string): Promise<any> {
     const logContext = { 
       component: 'ArgumentIntelligenceService', 
       operation: 'getArgumentStatistics',
-      billId 
+      bill_id 
     };
     logger.debug('Calculating argument statistics', logContext);
 
@@ -599,7 +599,7 @@ export class ArgumentIntelligenceService {
           avgSentimentScore: sql<number>`AVG(${arguments.sentiment_score})`
         })
         .from(arguments)
-        .where(eq(arguments.bill_id, billId));
+        .where(eq(arguments.bill_id, bill_id));
 
       const [claimStats] = await this.database
         .select({
@@ -607,7 +607,7 @@ export class ArgumentIntelligenceService {
         })
         .from(claims)
         .innerJoin(arguments, eq(claims.argument_id, arguments.id))
-        .where(eq(arguments.bill_id, billId));
+        .where(eq(arguments.bill_id, bill_id));
 
       const [evidenceStats] = await this.database
         .select({
@@ -617,7 +617,7 @@ export class ArgumentIntelligenceService {
         .from(evidence)
         .innerJoin(claims, eq(evidence.claim_id, claims.id))
         .innerJoin(arguments, eq(claims.argument_id, arguments.id))
-        .where(eq(arguments.bill_id, billId));
+        .where(eq(arguments.bill_id, bill_id));
 
       const statistics = {
         arguments: {

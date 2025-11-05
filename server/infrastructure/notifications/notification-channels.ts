@@ -1,8 +1,8 @@
 import { getEmailService } from './email-service';
 import { webSocketService } from '../websocket.js';
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { Notification } from '../../features/notifications/domain/entities/notification';
-import { database as db } from '../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { notifications, users, user_profiles } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
@@ -369,9 +369,9 @@ export class NotificationChannelService {
 
       // TODO: Phone numbers not yet implemented in user schema
       // For now, we'll use a mock phone number or throw an appropriate error
-      const phoneNumber = process.env.NODE_ENV === 'development' ? '+254700000000' : null;
+      const phone_number = process.env.NODE_ENV === 'development' ? '+254700000000' : null;
 
-      if (!phoneNumber) {
+      if (!phone_number) {
         throw new Error(`Phone number functionality not yet implemented. User: ${request.user_id}`);
       }
 
@@ -382,13 +382,13 @@ export class NotificationChannelService {
       let messageId: string;
       switch (this.smsConfig.provider) {
         case 'twilio':
-          messageId = await this.sendViaTwilio(phoneNumber, message);
+          messageId = await this.sendViaTwilio(phone_number, message);
           break;
         case 'aws-sns':
-          messageId = await this.sendViaAWSSNS(phoneNumber, message);
+          messageId = await this.sendViaAWSSNS(phone_number, message);
           break;
         case 'mock':
-          messageId = this.sendViaMockSMS(phoneNumber, message);
+          messageId = this.sendViaMockSMS(phone_number, message);
           break;
         default:
           throw new Error(`Unsupported SMS provider: ${this.smsConfig.provider}`);
@@ -611,30 +611,30 @@ export class NotificationChannelService {
 
   // Provider-specific implementations
 
-  private async sendViaTwilio(phoneNumber: string, message: string): Promise<string> {
+  private async sendViaTwilio(phone_number: string, message: string): Promise<string> {
     // TODO: Implement actual Twilio integration
     // const twilio = require('twilio');
     // const client = twilio(this.smsConfig.accountSid, this.smsConfig.authToken);
     // const result = await client.messages.create({
     //   body: message,
     //   from: this.smsConfig.fromNumber,
-    //   to: phoneNumber
+    //   to: phone_number
     // });
     // return result.sid;
 
-    logger.info(`[TWILIO SMS] To: ${phoneNumber}, Message: ${message}`, { component: 'ChannelService' });
+    logger.info(`[TWILIO SMS] To: ${phone_number}, Message: ${message}`, { component: 'ChannelService' });
     return `twilio-${Date.now()}`;
   }
 
-  private async sendViaAWSSNS(phoneNumber: string, message: string): Promise<string> {
+  private async sendViaAWSSNS(phone_number: string, message: string): Promise<string> {
     // This method is now implemented in the NotificationService class
     // For backward compatibility, we'll use the enhanced implementation
     const { notificationService } = await import('./notification-service.js');
-    return notificationService['sendViaAWSSNS'](phoneNumber, message);
+    return notificationService['sendViaAWSSNS'](phone_number, message);
   }
 
-  private sendViaMockSMS(phoneNumber: string, message: string): string {
-    logger.info(`[MOCK SMS] To: ${phoneNumber}, Message: ${message}`, { component: 'ChannelService' });
+  private sendViaMockSMS(phone_number: string, message: string): string {
+    logger.info(`[MOCK SMS] To: ${phone_number}, Message: ${message}`, { component: 'ChannelService' });
     return `mock-sms-${Date.now()}`;
   }
 

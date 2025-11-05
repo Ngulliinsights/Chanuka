@@ -1,20 +1,20 @@
 // cspell:words upvotes Upvotes downvotes Downvotes commenters Commenters
 import { Router } from 'express';
-import { databaseService } from '../../../infrastructure/database/database-service';
-import { database as db } from '../../../../shared/database/connection';
+import { databaseService } from '@/infrastructure/database/database-service';
+import { database as db } from '@shared/database';
 // FIXED: Import plural table names and correct type references
 import { comments, users, user_profiles, bills, comment_votes } from '@shared/citizen_participation';
 import { bill_engagement } from '@shared/citizen_participation';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 // FIXED: Import cacheKeys from the correct location
-import { cache, cacheKeys  } from '../../../../shared/core/src/index.js';
-import { buildTimeThreshold } from '../../../utils/db-helpers';
-import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
-import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse  } from '../../../../shared/core/src/index.js';
-import { ApiResponseWrapper  } from '../../../../shared/core/src/utils/api-utils.js';
-import { logger  } from '../../../../shared/core/src/index.js';
-import { errorTracker } from '../../../core/errors/error-tracker.js';
+import { cache, cacheKeys  } from '@shared/core/index.js';
+import { buildTimeThreshold } from '@/utils/db-helpers';
+import { authenticateToken, AuthenticatedRequest } from '@/middleware/auth.js';
+import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse  } from '@shared/core/index.js';
+import { ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
+import { logger  } from '@shared/core/index.js';
+import { errorTracker } from '@/core/errors/error-tracker.js';
 import { z } from 'zod';
 import type {
   UserEngagementMetrics,

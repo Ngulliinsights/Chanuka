@@ -154,7 +154,7 @@ describe('AuthService', () => {
       expect(result.success).toBe(true);
       expect(result.user).toBeDefined();
       expect(result.token).toBe('access-token');
-      expect(result.refreshToken).toBe('refresh-token');
+      expect(result.refresh_token).toBe('refresh-token');
       expect(result.requiresVerification).toBe(true);
     });
 
@@ -239,7 +239,7 @@ describe('AuthService', () => {
       expect(result.success).toBe(true);
       expect(result.user).toBeDefined();
       expect(result.token).toBe('access-token');
-      expect(result.refreshToken).toBe('refresh-token');
+      expect(result.refresh_token).toBe('refresh-token');
     });
 
     it('should fail login for non-existent user', async () => {
@@ -358,7 +358,7 @@ describe('AuthService', () => {
     });
   });
 
-  describe('refreshToken', () => { const mockSession = {
+  describe('refresh_token', () => { const mockSession = {
       id: 'session-id',
       user_id: 'user-id',
       refresh_token_hash: 'mock-hash',
@@ -390,11 +390,11 @@ describe('AuthService', () => {
         .mockReturnValueOnce('new-access-token')
         .mockReturnValueOnce('new-refresh-token');
 
-      const result = await authService.refreshToken('valid-refresh-token');
+      const result = await authService.refresh_token('valid-refresh-token');
 
       expect(result.success).toBe(true);
       expect(result.token).toBe('new-access-token');
-      expect(result.refreshToken).toBe('new-refresh-token');
+      expect(result.refresh_token).toBe('new-refresh-token');
       expect(mockDb.update).toHaveBeenCalled();
     });
 
@@ -403,7 +403,7 @@ describe('AuthService', () => {
         throw new Error('Invalid token');
       });
 
-      const result = await authService.refreshToken('invalid-token');
+      const result = await authService.refresh_token('invalid-token');
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Token refresh failed');
@@ -412,7 +412,7 @@ describe('AuthService', () => {
     it('should fail refresh for non-existent session', async () => { mockJwtVerify.mockReturnValue({ user_id: 'user-id'  });
       mockDb.limit.mockResolvedValueOnce([]); // No session found
 
-      const result = await authService.refreshToken('valid-refresh-token');
+      const result = await authService.refresh_token('valid-refresh-token');
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Invalid refresh token');
@@ -427,7 +427,7 @@ describe('AuthService', () => {
       
       mockDb.limit.mockResolvedValueOnce([expiredSession]);
 
-      const result = await authService.refreshToken('expired-refresh-token');
+      const result = await authService.refresh_token('expired-refresh-token');
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Refresh token expired');

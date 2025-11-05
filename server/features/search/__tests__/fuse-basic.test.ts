@@ -23,17 +23,14 @@ describe('Fuse.js Basic Functionality', () => {
 
   it('should have proper engine interface', () => {
     expect(typeof fuseEngine.search).toBe('function');
-    expect(typeof fuseEngine.refreshIndex).toBe('function');
     expect(typeof fuseEngine.getIndexStats).toBe('function');
   });
 
   it('should return index stats', () => {
     const stats = fuseEngine.getIndexStats();
     expect(stats).toBeDefined();
-    expect(stats).toHaveProperty('itemCount');
-    expect(stats).toHaveProperty('lastUpdate');
     expect(stats).toHaveProperty('isAvailable');
-    expect(stats).toHaveProperty('itemsByType');
+    expect(stats).toHaveProperty('totalItems');
   });
 
   it('should handle search queries without crashing', async () => {

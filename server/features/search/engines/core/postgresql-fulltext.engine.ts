@@ -7,12 +7,12 @@
 // - Query expansion with synonyms and stemming
 // - Performance monitoring and analytics
 
-import { database } from '@shared/database/connection';
+import { database } from '@shared/database';
 import { bills, sponsors, comments, users } from '@shared/schema';
 import { sql, desc } from 'drizzle-orm';
 import { SearchQuery, SearchResult } from '../types/search.types.js';
-import { logger } from '../../../../../shared/core/src/index.js';
-import { databaseService } from '../../../../infrastructure/database/database-service';
+import { logger } from '@shared/core/index.js';
+import { databaseService } from '@/infrastructure/database/database-service';
 
 interface QueryExpansionOptions {
   enableSynonyms: boolean;
@@ -166,7 +166,7 @@ export class PostgreSQLFullTextEngine {
         billNumber: bill.bill_number,
         status: bill.status,
         chamber: bill.chamber,
-        createdAt: bill.created_at
+        created_at: bill.created_at
       },
       highlights: this.generateHighlights(
         `${bill.title} ${bill.summary || ''}`,
@@ -303,9 +303,9 @@ export class PostgreSQLFullTextEngine {
       summary: this.truncateText(comment.content, 200),
       relevanceScore: Number(comment.relevance_score) || 0,
       metadata: {
-        billId: comment.bill_id,
+        bill_id: comment.bill_id,
         userName: comment.user_name,
-        createdAt: comment.created_at
+        created_at: comment.created_at
       },
       highlights: this.generateHighlights(comment.content, searchTerms)
     }));

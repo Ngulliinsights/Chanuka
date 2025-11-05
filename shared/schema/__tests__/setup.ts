@@ -54,9 +54,9 @@ export const generateTestData = {
     title: `Test Bill ${Date.now()}`,
     summary: 'This is a test bill for testing purposes',
     full_text: 'Full text of the test bill...',
-    status: 'introduced',
-    chamber: 'national_assembly',
-    affected_counties: ['nairobi', 'kiambu'],
+    status: 'introduced' as const,
+    chamber: 'national_assembly' as const,
+    affected_counties: ['nairobi', 'kiambu'] as const,
     impact_areas: ['healthcare', 'education'],
     ...overrides
   }),

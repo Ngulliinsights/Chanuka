@@ -1,6 +1,6 @@
 import { unifiedAlertPreferenceService, AlertPreference, AlertType, Priority } from '../../domain/services/unified-alert-preference-service';
-import { logger  } from '../../../../../shared/core/src/index.js';
-import { cacheService } from '../../../../infrastructure/cache';
+import { logger  } from '@shared/core/index.js';
+import { cacheService } from '@/infrastructure/cache';
 
 /**
  * Alert System Utilities and Helper Functions
@@ -174,7 +174,7 @@ function migrateChannelConfigs(channelConfigs: any): AlertChannel[] {
       type: 'email',
       enabled: true,
       config: {
-        email: channelConfigs.email.emailAddress,
+        email: channelConfigs.email.email_address,
         verified: channelConfigs.email.verified || false
       },
       priority: 'normal'
@@ -204,7 +204,7 @@ function migrateChannelConfigs(channelConfigs: any): AlertChannel[] {
       type: 'sms',
       enabled: true,
       config: {
-        phoneNumber: channelConfigs.sms.phoneNumber,
+        phone_number: channelConfigs.sms.phone_number,
         verified: channelConfigs.sms.verified || false
       },
       priority: 'urgent'
@@ -594,11 +594,11 @@ export async function generateUserAlertReport(
   channelPerformance: any[];
   recommendations: string[];
 }> { try {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+    const start_date = new Date();
+    startDate.setDate(start_date.getDate() - days);
 
     const logs = await unifiedAlertPreferenceService.getAlertDeliveryLogs(user_id, {
-      startDate,
+      start_date,
       limit: 1000
      });
 

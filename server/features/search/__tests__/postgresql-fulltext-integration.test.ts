@@ -281,9 +281,9 @@ describe('PostgreSQL Full-Text Search Integration Tests', () => {
       // Verify comment-specific metadata
       results.forEach(result => {
         if (result.type === 'comment') {
-          expect(result.metadata).toHaveProperty('billId');
+          expect(result.metadata).toHaveProperty('bill_id');
           expect(result.metadata).toHaveProperty('userName');
-          expect(result.metadata).toHaveProperty('createdAt');
+          expect(result.metadata).toHaveProperty('created_at');
         }
       });
     });
@@ -573,16 +573,16 @@ describe('PostgreSQL Full-Text Search Integration Tests', () => {
     });
 
     it('should properly apply date range filters', async () => {
-      const startDate = new Date('2024-01-01');
-      const endDate = new Date('2024-12-31');
+      const start_date = new Date('2024-01-01');
+      const end_date = new Date('2024-12-31');
       
       const query: SearchQuery = {
         query: 'policy',
         filters: {
           type: ['comments'],
           dateRange: {
-            start: startDate,
-            end: endDate
+            start: start_date,
+            end: end_date
           }
         },
         pagination: { limit: 30 }
@@ -591,11 +591,11 @@ describe('PostgreSQL Full-Text Search Integration Tests', () => {
       const results = await searchEngine.search(query);
 
       results.forEach(result => {
-        if (result.type === 'comment' && result.metadata?.createdAt) {
-          const createdAt = new Date(result.metadata.createdAt);
-          expect(createdAt).toBeInstanceOf(Date);
-          expect(createdAt.getTime()).toBeGreaterThanOrEqual(startDate.getTime());
-          expect(createdAt.getTime()).toBeLessThanOrEqual(endDate.getTime());
+        if (result.type === 'comment' && result.metadata?.created_at) {
+          const created_at = new Date(result.metadata.created_at);
+          expect(created_at).toBeInstanceOf(Date);
+          expect(created_at.getTime()).toBeGreaterThanOrEqual(start_date.getTime());
+          expect(created_at.getTime()).toBeLessThanOrEqual(end_date.getTime());
         }
       });
     });

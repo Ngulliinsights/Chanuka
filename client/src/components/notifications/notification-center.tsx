@@ -60,8 +60,8 @@ const NotificationCenter = () => {
   });
 
   const markAsReadMutation = useMutation({
-    mutationFn: async (notificationId: number) => {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
+    mutationFn: async (notification_id: number) => {
+      const response = await fetch(`/api/notifications/${notification_id}/read`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

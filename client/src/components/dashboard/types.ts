@@ -11,7 +11,7 @@ export interface ActionItem { id: string;
   title: string;
   description: string;
   priority: ActionPriority;
-  dueDate?: Date;
+  due_date?: Date;
   category?: string;
   bill_id?: string;
   completed?: boolean;

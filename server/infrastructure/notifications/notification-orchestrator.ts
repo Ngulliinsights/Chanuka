@@ -1,10 +1,10 @@
-import { database as db, readDatabase } from '@shared/database/connection';
+import { database as db, readDatabase } from '@shared/database';
 import { notifications, users, bill_tracking_preferences, bills } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
 import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 /**
  * Unified Notification Orchestrator Service
@@ -78,7 +78,7 @@ export interface RateLimitState {
 
 export interface NotificationResult {
   success: boolean;
-  notificationId?: string;
+  notification_id?: string;
   filtered: boolean;
   filterReason?: string;
   batched: boolean;
@@ -900,7 +900,7 @@ export class NotificationOrchestratorService {
         filtered: false,
         batched: false,
         deliveryResults,
-        notificationId: deliveryResults.find(r => r.success)?.messageId
+        notification_id: deliveryResults.find(r => r.success)?.messageId
       };
 
     } catch (error) { logger.error('Unhandled error during immediate delivery:', {
@@ -1120,7 +1120,7 @@ export class NotificationOrchestratorService {
    * Groups notifications by type and creates both plain text and HTML versions.
    * Limits individual type sections to 5 items to keep digests readable.
    */
-  private createDigestContent(notifications: NotificationRequest[]): {
+  private createDigestContent(notification: NotificationRequest[]): {
     title: string;
     message: string;
     htmlMessage?: string;

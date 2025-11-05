@@ -126,7 +126,7 @@ export interface SearchAnalytics {
   resultCount: number;
   timestamp: Date;
   user_id?: string;
-  sessionId?: string;
+  session_id?: string;
   clickedResults?: number[];
   totalSearches?: number;
   uniqueQueries?: number;

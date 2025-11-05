@@ -109,7 +109,7 @@ export interface ObservabilityContext { correlationId: string;
   traceId?: string;
   spanId?: string;
   user_id?: string;
-  sessionId?: string;
+  session_id?: string;
   requestId?: string;
   metadata?: Record<string, any>;
  }

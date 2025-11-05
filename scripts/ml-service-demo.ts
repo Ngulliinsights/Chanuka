@@ -51,12 +51,12 @@ async function runMLServiceDemo() {
     console.log('3. Testing A/B routing with different users:');
     const testUsers = ['user1', 'user2', 'user3', 'user4', 'user5'];
     
-    for (const userId of testUsers) {
+    for (const user_id of testUsers) {
       const startTime = Date.now();
-      const result = await MLServiceAdapter.analyzeStakeholderInfluence(testBillContent, userId);
+      const result = await MLServiceAdapter.analyzeStakeholderInfluence(testBillContent, user_id);
       const responseTime = Date.now() - startTime;
       
-      console.log(`   User ${userId}: ${result.metadata?.serviceUsed} service (${responseTime}ms, confidence: ${result.confidence.toFixed(3)})`);
+      console.log(`   User ${user_id}: ${result.metadata?.serviceUsed} service (${responseTime}ms, confidence: ${result.confidence.toFixed(3)})`);
     }
 
     // Show service health

@@ -8,7 +8,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as Boom from '@hapi/boom';
 import { ZodError } from 'zod';
-import { logger } from '../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { errorAdapter } from '../infrastructure/errors/error-adapter.js';
 import { ErrorResponse } from '../infrastructure/errors/error-standardization.js';
 
@@ -50,7 +50,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          userId: (req as any).user?.id
+          user_id: (req as any).user?.id
         }
       );
       
@@ -85,7 +85,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          userId: (req as any).user?.id
+          user_id: (req as any).user?.id
         }
       );
       
@@ -105,7 +105,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          userId: (req as any).user?.id
+          user_id: (req as any).user?.id
         }
       );
       
@@ -126,7 +126,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          userId: (req as any).user?.id
+          user_id: (req as any).user?.id
         }
       );
       
@@ -146,7 +146,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          userId: (req as any).user?.id
+          user_id: (req as any).user?.id
         }
       );
       
@@ -165,7 +165,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          userId: (req as any).user?.id
+          user_id: (req as any).user?.id
         }
       );
       
@@ -210,7 +210,7 @@ export function boomErrorMiddleware(
         code: errorResponse.error.code,
         path: req.path,
         method: req.method,
-        userId: (req as any).user?.id,
+        user_id: (req as any).user?.id,
         requestId: req.headers['x-request-id']
       });
     }
@@ -299,7 +299,7 @@ function logError(boomError: Boom.Boom, req: Request, originalError: any): void 
     statusCode,
     path: req.path,
     method: req.method,
-    userId: (req as any).user?.id,
+    user_id: (req as any).user?.id,
     requestId: req.headers['x-request-id'],
     userAgent: req.headers['user-agent'],
     ip: req.ip,

@@ -1,38 +1,50 @@
 import { sponsorService } from '../../sponsors/application/sponsor-service-direct.js';
 import { sponsorConflictAnalysisService } from '../../sponsors/application/sponsor-conflict-analysis.service.js';
-import { readDatabase } from '@shared/database/connection';
-// Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
-const db = new Proxy({}, {
-  get(_target, prop: string | symbol) {
-    const d = readDatabase;
-    if (!d) {
-      return (..._args: any[]) => { throw new Error('Database not initialized'); };
-    }
-    return (d as any)[prop as any];
-  }
-}) as any;
-import { billSectionConflict } from '@shared/schema';
-import { eq } from 'drizzle-orm';
-import { NotFoundError  } from '../../../../shared/core/src/index.js';
-import { logger  } from '../../../../shared/core/src/index.js';
-
-/**
- * SponsorshipAnalysisService - Bill-Centric Presentation Layer
- * 
- * This service focuses specifically on analyzing the relationship between
- * bills and their sponsors. It DELEGATES conflict detection to the conflict
- * analysis service and data access to the sponsor service.
- */
+// readDatabase import removed - not used in this service after refactor
+import { getSponsorshipsByBill, getSponsorAffiliations, getSectionConflictsForBill } from '../repositories/sponsorship-repository.js';
+import { logger } from '@shared/core/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS FOR BILL-CENTRIC ANALYSIS
 // ============================================================================
 
+interface SponsorAffiliation {
+  id: number;
+  sponsor_id: number;
+  organization: string;
+  role: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  type: string | null;
+  conflictType?: string;
+}
+
+interface SponsorTransparencyData {
+  disclosure: string;
+  lastUpdated: string | null;
+  publicStatements: number;
+}
+
 interface SponsorshipData {
-  sponsorship: any;
-  sponsor: any;
-  transparency: any;
-  affiliations: unknown; // Changed from any[] to match actual return type
+  sponsorship: {
+    id: number;
+    bill_id: number;
+    sponsor_id: number;
+    type: string;
+    joinedDate: string | null;
+  };
+  sponsor: {
+    id: number;
+    name: string;
+    role: string;
+    party: string;
+    constituency: string;
+    conflictLevel: string;
+    financialExposure: number | string;
+    votingAlignment: number | string;
+  };
+  transparency: SponsorTransparencyData | null;
+  affiliations: SponsorAffiliation[];
 }
 
 interface FormattedSponsor {
@@ -41,10 +53,10 @@ interface FormattedSponsor {
   role: string;
   party: string;
   constituency: string;
-  conflict_level: string;
-  financial_exposure: number;
-  affiliations: any[];
-  voting_alignment: number;
+  conflictLevel: string;
+  financialExposure: number;
+  affiliations: SponsorAffiliation[];
+  votingAlignment: number;
   transparency: {
     disclosure: string;
     lastUpdated: string;
@@ -52,7 +64,8 @@ interface FormattedSponsor {
   };
 }
 
-interface ComprehensiveAnalysis { bill_id: number;
+interface ComprehensiveAnalysis {
+  bill_id: number;
   title: string;
   number: string;
   introduced: string;
@@ -67,7 +80,7 @@ interface ComprehensiveAnalysis { bill_id: number;
     coSponsorsTotal: number;
     industryContributions: number;
     totalExposure: number;
-   };
+  };
   timeline: any[];
   methodology: any;
   analysisMetadata: {
@@ -92,7 +105,16 @@ interface NetworkEdge {
   weight: number;
 }
 
-export class SponsorshipAnalysisService { // Industry categorization for financial analysis
+/**
+ * SponsorshipAnalysisService - Bill-Centric Presentation Layer
+ * 
+ * Refactored to use Drizzle ORM directly instead of repository pattern.
+ * This service focuses on analyzing relationships between bills and sponsors,
+ * delegating conflict detection to the conflict analysis service.
+ */
+export class SponsorshipAnalysisService {
+
+  // Industry categorization for financial analysis
   private readonly industryCategories = new Map([
     ['pharmaceutical', 'Pharmaceutical'],
     ['medicine', 'Pharmaceutical'],
@@ -112,35 +134,74 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
   ]);
 
   // ============================================================================
+  // DATA ACCESS LAYER - Direct Drizzle ORM Queries
+  // ============================================================================
+
+  /**
+   * Fetches comprehensive sponsorship data for a bill using Drizzle ORM joins
+   */
+  private async getSponsorshipDataForBill(bill_id: number, sponsorshipType?: 'primary' | 'co-sponsor'): Promise<SponsorshipData[]> {
+    // Delegate DB access to the repository which returns normalized DTOs
+    try {
+      const rows = await getSponsorshipsByBill(bill_id, sponsorshipType);
+      return rows as SponsorshipData[];
+    } catch (error) {
+      logger.error('Error delegating getSponsorshipDataForBill to repository', { bill_id, sponsorshipType }, error as Record<string, any>);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches affiliations for multiple sponsors efficiently
+   */
+  // Data access moved to repository: getSponsorshipsByBill, getSponsorAffiliations, getSectionConflictsForBill
+
+  /**
+   * Fetches affiliations for a single sponsor
+   */
+  private async getSponsorAffiliations(sponsor_id: number): Promise<SponsorAffiliation[]> {
+    return await getSponsorAffiliations(sponsor_id);
+  }
+
+  /**
+   * Fetches section conflicts for a bill
+   */
+  private async getSectionConflicts(bill_id: number) {
+    return await getSectionConflictsForBill(bill_id);
+  }
+
+  // ============================================================================
   // PUBLIC API METHODS - BILL-CENTRIC ANALYSIS
   // ============================================================================
 
   /**
    * Generates comprehensive analysis for a bill's sponsorship
-   * This is the main entry point for understanding who sponsors a bill and their interests
    */
   async getComprehensiveAnalysis(bill_id: number): Promise<ComprehensiveAnalysis> {
     try {
       // Validate input
       if (!bill_id || bill_id <= 0) {
         throw new Error('Invalid bill ID provided');
-       }
+      }
 
       // Get bill information
-      const bill = await sponsorService.getBillsByIds([bill_id]).then(bills => bills[0]);
-      if (!bill) { throw new NotFoundError(`Bill with ID ${bill_id } not found`);
+      const billData = await sponsorService.getBillsByIds([bill_id]);
+      const bill = billData[0];
+      
+      if (!bill) {
+        throw new Error(`Bill with ID ${bill_id} not found`);
       }
 
       // Get sponsorship data with all joins
-      const sponsorshipData = await sponsorRepository.getSponsorshipDataForBill(bill_id);
+      const sponsorshipData = await this.getSponsorshipDataForBill(bill_id);
       const sectionConflicts = await this.getSectionConflicts(bill_id);
 
       // Categorize sponsors
       const primarySponsor = sponsorshipData.find(
-        s => s.sponsorship?.sponsorshipType === 'primary'
+        s => s.sponsorship?.type === 'primary'
       );
       const coSponsors = sponsorshipData.filter(
-        s => s.sponsorship?.sponsorshipType === 'co-sponsor'
+        s => s.sponsorship?.type === 'co-sponsor'
       );
 
       // Calculate financial metrics
@@ -150,17 +211,18 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
       // Generate bill number
       const bill_number = this.generateBillNumber(bill);
 
-      // Determine overall risk level using conflict analysis service
+      // Determine overall risk level
       const riskLevel = await this.determineOverallRiskLevel(bill_id, sponsorshipData);
 
-      return { bill_id,
-        title: bills.title,
+      return {
+        bill_id,
+        title: bill.title,
         number: bill_number,
-        introduced: this.formatDate(bills.introduced_date),
-        status: bills.status,
+        introduced: this.formatDate(bill.introduced_date),
+        status: bill.status,
         primarySponsor: primarySponsor ? this.formatSponsor(primarySponsor) : null,
         coSponsors: coSponsors.map(s => this.formatSponsor(s)).filter(Boolean) as FormattedSponsor[],
-        totalFinancialExposure,
+    totalFinancialExposure,
         industryAlignment,
         sections: this.formatSectionConflicts(sectionConflicts),
         financialBreakdown: this.calculateFinancialBreakdown(primarySponsor, coSponsors),
@@ -171,37 +233,37 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
           sponsorCount: sponsorshipData.length,
           conflictSections: sectionConflicts.length,
           riskLevel
-         }
+        }
       };
-    } catch (error) { logger.error('Error in comprehensive analysis', { bill_id  }, error as Record<string, any>);
-      throw new Error(`Failed to generate analysis for bill ${ bill_id }: ${(error as Error).message}`);
+    } catch (error) {
+      logger.error('Error in comprehensive analysis', { bill_id }, error as Record<string, any>);
+      throw new Error(`Failed to generate analysis for bill ${bill_id}: ${(error as Error).message}`);
     }
   }
 
   /**
    * Analyzes the primary sponsor in detail for a specific bill
-   * Delegates conflict detection to the conflict analysis service
    */
-  async getPrimarySponsorAnalysis(bill_id: number) { try {
-      const sponsorshipData = await sponsorRepository.getSponsorshipDataForBill(bill_id, 'primary');
+  async getPrimarySponsorAnalysis(bill_id: number) {
+    try {
+      const sponsorshipData = await this.getSponsorshipDataForBill(bill_id, 'primary');
 
       if (!sponsorshipData.length) {
-        throw new NotFoundError(`Primary sponsor not found for bill ${bill_id }`);
+        throw new Error(`Primary sponsor not found for bill ${bill_id}`);
       }
 
-      const sponsorData = sponsorshipData[0];
+  const sponsorData = sponsorshipData[0] as SponsorshipData;
 
-      // Ensure sponsor exists before proceeding
-      if (!sponsorData.sponsor) { throw new NotFoundError(`Sponsor data incomplete for bill ${bill_id }`);
+      if (!sponsorData.sponsor) {
+        throw new Error(`Sponsor data incomplete for bill ${bill_id}`);
       }
 
-      const sponsor_id = sponsorData.sponsors.id;
+  const sponsor_id = sponsorData.sponsor.id;
 
-      // Use conflict analysis service for conflict detection
+      // Use conflict analysis service
       const conflicts = await sponsorConflictAnalysisService.detectConflicts(sponsor_id);
       const billConflicts = conflicts.filter(c => c.affectedBills.includes(bill_id));
 
-      // Use conflict analysis service for risk profile
       const riskProfile = await sponsorConflictAnalysisService.generateRiskProfile(sponsor_id);
 
       // Calculate bill-specific impact
@@ -216,8 +278,8 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
           detectedConflicts: billConflicts.length,
           directConflicts: billConflicts.filter(c => c.conflictType === 'financial_direct').length,
           indirectConflicts: billConflicts.filter(c => c.conflictType === 'financial_indirect').length,
-          totalExposure: this.parseNumeric(sponsorData.sponsors.financial_exposure),
-          riskScore: riskProfile.overallScore,
+    totalExposure: this.parseNumeric(sponsorData.sponsor.financialExposure),
+          risk_score: riskProfile.overallScore,
           conflictDetails: billConflicts.map(c => ({
             type: c.conflictType,
             severity: c.severity,
@@ -230,7 +292,8 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
         riskProfile,
         recommendations: riskProfile.recommendations
       };
-    } catch (error) { logger.error('Error analyzing primary sponsor', { bill_id  }, error as Record<string, any>);
+    } catch (error) {
+      logger.error('Error analyzing primary sponsor', { bill_id }, error as Record<string, any>);
       throw new Error(`Failed to analyze primary sponsor: ${(error as Error).message}`);
     }
   }
@@ -238,8 +301,9 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
   /**
    * Analyzes co-sponsor patterns and relationships for a bill
    */
-  async getCoSponsorsAnalysis(bill_id: number) { try {
-      const coSponsorships = await sponsorRepository.getSponsorshipDataForBill(bill_id, 'co-sponsor');
+  async getCoSponsorsAnalysis(bill_id: number) {
+    try {
+      const coSponsorships = await this.getSponsorshipDataForBill(bill_id, 'co-sponsor');
 
       // Analyze patterns in parallel
       const [patterns, crossAnalysis] = await Promise.all([
@@ -249,7 +313,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
 
       const riskDistribution = this.calculateRiskDistribution(coSponsorships);
       const totalExposure = coSponsorships.reduce(
-        (sum, s) => sum + this.parseNumeric(s.sponsor?.financial_exposure),
+        (sum, s) => sum + this.parseNumeric(s.sponsor?.financialExposure),
         0
       );
 
@@ -261,19 +325,20 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
           total: coSponsorships.length,
           ...riskDistribution,
           totalExposure
-         }
+        }
       };
-    } catch (error) { logger.error('Error analyzing co-sponsors', { bill_id  }, error as Record<string, any>);
+    } catch (error) {
+      logger.error('Error analyzing co-sponsors', { bill_id }, error as Record<string, any>);
       throw new Error(`Failed to analyze co-sponsors: ${(error as Error).message}`);
     }
   }
 
   /**
    * Creates financial network visualization for a bill's sponsors
-   * Shows how sponsors are connected through organizations
    */
-  async getFinancialNetworkAnalysis(bill_id: number) { try {
-      const sponsorships = await sponsorRepository.getSponsorshipDataForBill(bill_id);
+  async getFinancialNetworkAnalysis(bill_id: number) {
+    try {
+      const sponsorships = await this.getSponsorshipDataForBill(bill_id);
 
       // Build network components
       const [networkGraph, industryAnalysis, corporateConnections] = await Promise.all([
@@ -289,8 +354,9 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
         industryAnalysis,
         corporateConnections,
         metrics
-       };
-    } catch (error) { logger.error('Error analyzing financial network', { bill_id  }, error as Record<string, any>);
+      };
+    } catch (error) {
+      logger.error('Error analyzing financial network', { bill_id }, error as Record<string, any>);
       throw new Error(`Failed to analyze financial network: ${(error as Error).message}`);
     }
   }
@@ -299,28 +365,19 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
   // PRIVATE HELPER METHODS - DATA FORMATTING AND CALCULATION
   // ============================================================================
 
-  private async getSectionConflicts(bill_id: number) { try {
-      return await db.select()
-        .from(billSectionConflict)
-        .where(eq(billSectionConflict.bill_id, bill_id));
-     } catch (error) { logger.error('Error fetching section conflicts', { bill_id  }, error as Record<string, any>);
-      return [];
-    }
-  }
-
   private formatSponsor(sponsorData: SponsorshipData): FormattedSponsor | null {
     if (!sponsorData?.sponsor) return null;
 
     return {
-      id: sponsorData.sponsors.id,
-      name: sponsorData.sponsors.name,
-      role: sponsorData.sponsors.role,
-      party: sponsorData.sponsors.party,
-      constituency: sponsorData.sponsors.constituency,
-      conflict_level: sponsorData.sponsors.conflict_level,
-      financial_exposure: this.parseNumeric(sponsorData.sponsors.financial_exposure),
-      affiliations: Array.isArray(sponsorData.affiliations) ? sponsorData.affiliations : [],
-      voting_alignment: this.parseNumeric(sponsorData.sponsors.voting_alignment),
+      id: sponsorData.sponsor.id,
+      name: sponsorData.sponsor.name,
+      role: sponsorData.sponsor.role,
+      party: sponsorData.sponsor.party,
+      constituency: sponsorData.sponsor.constituency,
+      conflictLevel: sponsorData.sponsor.conflictLevel,
+      financialExposure: this.parseNumeric(sponsorData.sponsor.financialExposure),
+      affiliations: sponsorData.affiliations || [],
+      votingAlignment: this.parseNumeric(sponsorData.sponsor.votingAlignment),
       transparency: {
         disclosure: sponsorData.transparency?.disclosure || 'partial',
         lastUpdated: this.formatDate(sponsorData.transparency?.lastUpdated),
@@ -331,7 +388,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
 
   private calculateTotalFinancialExposure(sponsorships: SponsorshipData[]): number {
     return sponsorships.reduce(
-      (total, s) => total + this.parseNumeric(s.sponsor?.financial_exposure),
+      (total, s) => total + this.parseNumeric(s.sponsor?.financialExposure),
       0
     );
   }
@@ -340,7 +397,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
     if (sponsorships.length === 0) return 0;
 
     const total = sponsorships.reduce(
-      (sum, s) => sum + this.parseNumeric(s.sponsor?.voting_alignment),
+      (sum, s) => sum + this.parseNumeric(s.sponsor?.votingAlignment),
       0
     );
 
@@ -348,35 +405,34 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
   }
 
   private generateBillNumber(bill: any): string {
-    // Generate a realistic bill number based on bill characteristics
-    const year = new Date(bills.introduced_date || bills.created_at).getFullYear();
-    const title = bills.title || '';
+    const year = new Date(bill.introduced_date || bill.introducedDate || bill.created_at || bill.createdAt).getFullYear();
+    const title = bill.title || '';
 
     if (title.toLowerCase().includes('finance')) return `FB${year}`;
     if (title.toLowerCase().includes('health')) return `NHRA${year}`;
     if (title.toLowerCase().includes('education')) return `EDA${year}`;
     if (title.toLowerCase().includes('environment')) return `EPA${year}`;
 
-    return `BILL${year}/${bills.id}`;
+    return `BILL${year}/${bill.id}`;
   }
 
   private formatSectionConflicts(sectionConflicts: any[]) {
     return sectionConflicts.map(section => ({
       number: section.sectionNumber,
-      title: section.sectionNumber || section.description || 'Untitled Section', // Use sectionNumber as title since sectionTitle doesn't exist
-      conflict_level: section.severity || 'unknown', // Map severity to conflict_level
-      affectedSponsors: [], // Initialize as empty array since this field doesn't exist in schema
+      title: section.sectionNumber || section.description || 'Untitled Section',
+      conflictLevel: section.severity || 'unknown',
+      affectedSponsors: [],
       description: section.description || ''
     }));
   }
 
   private calculateFinancialBreakdown(primarySponsor: any, coSponsors: any[]) {
     const primaryExposure = primarySponsor
-      ? this.parseNumeric(primarySponsor.sponsor?.financial_exposure)
+      ? this.parseNumeric(primarySponsor.sponsor?.financialExposure)
       : 0;
 
     const coSponsorsTotal = coSponsors.reduce(
-      (total, s) => total + this.parseNumeric(s.sponsor?.financial_exposure),
+      (total, s) => total + this.parseNumeric(s.sponsor?.financialExposure),
       0
     );
 
@@ -385,7 +441,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
     return {
       primarySponsor: primaryExposure,
       coSponsorsTotal,
-      industryContributions: Math.round(totalExposure * 0.6), // Estimated industry portion
+      industryContributions: Math.round(totalExposure * 0.6),
       totalExposure
     };
   }
@@ -393,8 +449,8 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
   private async determineOverallRiskLevel(
     bill_id: number,
     sponsorships: SponsorshipData[]
-  ): Promise<string> { try {
-      // Get conflicts for all sponsors on this bill
+  ): Promise<string> {
+    try {
       const sponsor_ids = sponsorships.map(s => s.sponsor?.id).filter(Boolean);
       const allConflicts = await Promise.all(
         sponsor_ids.map(id => sponsorConflictAnalysisService.detectConflicts(id))
@@ -404,7 +460,6 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
         c.affectedBills.includes(bill_id)
       );
 
-      // Determine risk level based on conflicts
       const criticalCount = billConflicts.filter(c => c.severity === 'critical').length;
       const highCount = billConflicts.filter(c => c.severity === 'high').length;
 
@@ -413,24 +468,21 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
       if (highCount > 0 || billConflicts.length > 3) return 'medium';
 
       return 'low';
-     } catch (error) { logger.error('Error determining risk level', { bill_id  }, error as Record<string, any>);
+    } catch (error) {
+      logger.error('Error determining risk level', { bill_id }, error as Record<string, any>);
       return 'unknown';
     }
   }
 
   private generateTimeline(bill: any, sponsorships: SponsorshipData[]) {
     const timeline: any[] = [];
-    const billDate = new Date(bills.introduced_date || bills.created_at);
+    const billDate = new Date(bill.introduced_date || bill.created_at);
 
-    // Add pre-bill events based on affiliations
-    const allAffiliations = sponsorships.flatMap(s =>
-      Array.isArray(s.affiliations) ? s.affiliations : []
-    );
+    const allAffiliations = sponsorships.flatMap(s => s.affiliations || []);
 
-    // Find earliest affiliation start date
     const earliestAffiliation = allAffiliations
-      .filter(a => a.startDate)
-      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0];
+      .filter(a => a.start_date)
+      .sort((a, b) => new Date(a.start_date!).getTime() - new Date(b.start_date!).getTime())[0];
 
     if (earliestAffiliation) {
       timeline.push({
@@ -440,25 +492,23 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
       });
     }
 
-    // Add recent affiliations (within 6 months of bill)
     const sixMonthsBefore = new Date(billDate);
     sixMonthsBefore.setMonth(sixMonthsBefore.getMonth() - 6);
 
     const recentAffiliations = allAffiliations.filter(a => {
       if (!a.startDate) return false;
-      const startDate = new Date(a.startDate);
-      return startDate > sixMonthsBefore && startDate < billDate;
+      const start_date = new Date(a.startDate);
+      return start_date > sixMonthsBefore && start_date < billDate;
     });
 
     if (recentAffiliations.length > 0) {
       timeline.push({
-        date: this.formatDate(recentAffiliations[0].startDate),
+        date: this.formatDate(recentAffiliations[0]?.start_date),
         event: `${recentAffiliations.length} new affiliation(s) established`,
         type: 'governance'
       });
     }
 
-    // Add bill introduction
     timeline.push({
       date: this.formatDate(billDate),
       event: 'Bill introduced in Parliament',
@@ -533,30 +583,23 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
     };
   }
 
-  private async calculateBillImpact(bill_id: number, sponsor: any) { const exposure = this.parseNumeric(sponsors.financial_exposure);
-    const alignment = this.parseNumeric(sponsors.voting_alignment);
+  private async calculateBillImpact(bill_id: number, sponsor: any) {
+    const exposure = this.parseNumeric(sponsor.financialExposure);
+    const alignment = this.parseNumeric(sponsor.votingAlignment);
 
-    // Get section conflicts to identify affected areas
     const sectionConflicts = await this.getSectionConflicts(bill_id);
 
-    // Filter sections that affect this sponsor (with safe property access)
-    const affectedSections = sectionConflicts
-      .filter(s => {
-        // Since affectedSponsors doesn't exist in the schema, we'll assume all sections affect all sponsors
-        // or implement logic based on other criteria if needed
-        return true; // For now, include all sections
-       })
-      .map(s => ({
-        section: s.sectionNumber,
-        description: s.sectionNumber || s.description || 'Untitled',
-        impact: s.severity || 'medium'
-      }));
+    const affectedSections = sectionConflicts.map((s: any) => ({
+      section: s.sectionNumber,
+      description: s.sectionNumber || s.description || 'Untitled',
+      impact: s.severity || 'medium'
+    }));
 
     return {
       affectedSections: affectedSections.length > 0 ? affectedSections : [
         { section: 'Multiple', description: 'Various provisions', impact: 'medium' }
       ],
-      benefitEstimate: Math.round(exposure * 0.15), // Estimated benefit
+      benefitEstimate: Math.round(exposure * 0.15),
       alignmentScore: Math.round(alignment),
       potentialInfluence: this.calculatePotentialInfluence(exposure, alignment)
     };
@@ -571,10 +614,8 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
 
   private async calculateNetworkConnections(sponsor_id: number) {
     try {
-      // Get sponsor's affiliations
-      const affiliations = await sponsorRepository.getSponsorAffiliations(sponsor_id);
+      const affiliations = await this.getSponsorAffiliations(sponsor_id);
 
-      // Calculate metrics based on affiliations
       const directConnections = affiliations.length;
       const leadershipRoles = affiliations.filter(a =>
         a.role && ['director', 'board', 'executive'].some(r =>
@@ -582,7 +623,6 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
         )
       ).length;
 
-      // Influence score based on connections and roles
       const influenceScore = Math.min(
         (directConnections * 0.1) + (leadershipRoles * 0.2),
         1.0
@@ -590,7 +630,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
 
       return {
         directConnections,
-        indirectConnections: Math.floor(directConnections * 1.5), // Estimated
+        indirectConnections: Math.floor(directConnections * 1.5),
         influenceScore: Math.round(influenceScore * 100) / 100,
         centralityRank: Math.max(1, Math.floor(10 - influenceScore * 9))
       };
@@ -613,7 +653,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
     };
 
     coSponsorships.forEach(sponsorship => {
-      const conflict_level = sponsorship.sponsor?.conflict_level;
+      const conflict_level = sponsorship.sponsor?.conflictLevel;
       if (conflict_level === 'high' || conflict_level === 'critical') {
         distribution.highRisk++;
       } else if (conflict_level === 'medium') {
@@ -645,13 +685,10 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
   private calculateSharedConnections(sponsorships: SponsorshipData[]) {
     const orgMap = new Map<string, number>();
 
-    // Count how many sponsors are affiliated with each organization
     sponsorships.forEach(sponsorship => {
-      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations)
-        ? sponsorship.sponsors.affiliations
-        : [];
+      const affiliations = sponsorship.affiliations || [];
 
-      affiliations.forEach((affiliation: any) => {
+      affiliations.forEach((affiliation) => {
         const org = affiliation.organization;
         if (org) {
           orgMap.set(org, (orgMap.get(org) || 0) + 1);
@@ -659,7 +696,6 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
       });
     });
 
-    // Return only organizations shared by multiple sponsors
     return Array.from(orgMap.entries())
       .filter(([_, count]) => count > 1)
       .map(([org, count]) => ({
@@ -671,14 +707,14 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
 
   private calculateContributionPatterns(sponsorships: SponsorshipData[]) {
     const highExposureSponsors = sponsorships.filter(s =>
-      this.parseNumeric(s.sponsor?.financial_exposure) > 1000000
+      this.parseNumeric(s.sponsor?.financialExposure) > 1000000
     );
 
     return {
       averageExposure: sponsorships.length > 0
         ? Math.round(
           sponsorships.reduce((sum, s) =>
-            sum + this.parseNumeric(s.sponsor?.financial_exposure), 0
+            sum + this.parseNumeric(s.sponsor?.financialExposure), 0
           ) / sponsorships.length
         )
         : 0,
@@ -691,7 +727,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
 
   private calculateVotingAlignment(sponsorships: SponsorshipData[]) {
     const alignments = sponsorships.map(s =>
-      this.parseNumeric(s.sponsor?.voting_alignment)
+      this.parseNumeric(s.sponsor?.votingAlignment)
     );
     const validAlignments = alignments.filter(a => a > 0);
 
@@ -747,18 +783,16 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
 
       // Add sponsor node
       nodes.push({
-        id: `sponsor_${sponsorship.sponsors.id}`,
+        id: `sponsor_${sponsorship.sponsor.id}`,
         type: 'sponsor',
-        name: sponsorship.sponsors.name || 'Unknown',
-        size: Math.log(this.parseNumeric(sponsorship.sponsors.financial_exposure) + 1) * 2
+        name: sponsorship.sponsor.name || 'Unknown',
+        size: Math.log(this.parseNumeric(sponsorship.sponsor.financialExposure) + 1) * 2
       });
 
       // Add organization nodes and edges
-      const affiliations = Array.isArray(sponsorship.sponsors.affiliations)
-        ? sponsorship.sponsors.affiliations
-        : [];
+      const affiliations = sponsorship.affiliations || [];
 
-      affiliations.forEach((affiliation: any) => {
+      affiliations.forEach((affiliation) => {
         if (!affiliation.organization) return;
 
         const orgId = `org_${affiliation.organization.replace(/\s+/g, '_').toLowerCase()}`;
@@ -776,7 +810,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
 
         // Add edge between sponsor and organization
         edges.push({
-          source: `sponsor_${sponsorship.sponsors.id}`,
+          source: `sponsor_${sponsorship.sponsor.id}`,
           target: orgId,
           type: affiliation.type || 'unknown',
           weight: affiliation.conflictType === 'direct' ? 3 : 1
@@ -840,7 +874,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
     const dominantSector = breakdown.length > 0
       ? breakdown.reduce((max, sector) =>
         sector.percentage > max.percentage ? sector : max,
-        breakdown[0]
+        breakdown[0] as any
       )
       : { sector: 'None', percentage: 0, amount: 0 };
 
@@ -855,15 +889,13 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
     const industries = new Map<string, number>();
 
     sponsorships.forEach(sponsorship => {
-      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations)
-        ? sponsorship.sponsors.affiliations
-        : [];
+      const affiliations = sponsorship.affiliations || [];
 
-      affiliations.forEach((affiliation: any) => {
+      affiliations.forEach((affiliation) => {
         if (!affiliation.organization) return;
 
         const sector = this.categorizeIndustry(affiliation.organization);
-        const exposure = this.parseNumeric(sponsorship.sponsor?.financial_exposure);
+  const exposure = this.parseNumeric(sponsorship.sponsor?.financialExposure);
 
         industries.set(sector, (industries.get(sector) || 0) + exposure);
       });
@@ -914,15 +946,13 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
     const connections = new Map<string, any>();
 
     sponsorships.forEach(sponsorship => {
-      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations)
-        ? sponsorship.sponsors.affiliations
-        : [];
+      const affiliations = sponsorship.affiliations || [];
 
-      affiliations.forEach((affiliation: any) => {
+      affiliations.forEach((affiliation) => {
         if (!affiliation.organization) return;
 
         const key = affiliation.organization;
-        const exposure = this.parseNumeric(sponsorship.sponsor?.financial_exposure);
+  const exposure = this.parseNumeric(sponsorship.sponsor?.financialExposure);
 
         if (connections.has(key)) {
           const existing = connections.get(key);
@@ -961,55 +991,25 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
   }
 
   private formatDate(date: any): string {
-    if (!date) return new Date().toISOString().split('T')[0];
-    if (date instanceof Date) return date.toISOString().split('T')[0];
+    // Normalize input and always return a string (guarding against TS indexing string[] -> possibly undefined)
+    const toIsoDatePart = (d: Date) => {
+      const iso = d.toISOString();
+      // split returns string[]; index 0 exists but TS marks it possibly undefined - assert non-null
+      return iso.split('T')[0]!;
+    };
+
+    if (!date) return toIsoDatePart(new Date());
+    if (date instanceof Date) return toIsoDatePart(date);
     if (typeof date === 'string') {
       try {
-        return new Date(date).toISOString().split('T')[0];
+        return toIsoDatePart(new Date(date));
       } catch {
-        return new Date().toISOString().split('T')[0];
+        return toIsoDatePart(new Date());
       }
     }
-    return new Date().toISOString().split('T')[0];
+
+    return toIsoDatePart(new Date());
   }
 }
 
 export const sponsorshipAnalysisService = new SponsorshipAnalysisService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

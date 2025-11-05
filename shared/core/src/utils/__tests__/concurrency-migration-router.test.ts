@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { ConcurrencyMigrationRouter, getConcurrencyRouter, setConcurrencyRouter } from '../concurrency-migration-router';
-import type { FeatureFlagsService } from '../../../../server/infrastructure/migration/feature-flags.service';
+import type { FeatureFlagsService } from '../types/feature-flags.js';
 
 // Mock feature flags service
 const createMockFeatureFlagsService = (shouldUseMigration = false): FeatureFlagsService => ({

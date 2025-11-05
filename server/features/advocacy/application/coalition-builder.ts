@@ -6,7 +6,7 @@
 import { AdvocacyEventPublisher, CoalitionOpportunityIdentifiedEvent, CoalitionFormedEvent } from '../domain/events/advocacy-events.js';
 import { CoalitionOpportunity } from '../types/index.js';
 import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export interface CoalitionProposal {
   id: string;
@@ -16,8 +16,8 @@ export interface CoalitionProposal {
   proposedActions: string[];
   estimatedImpact: number;
   status: 'proposed' | 'accepted' | 'rejected' | 'expired';
-  createdAt: Date;
-  expiresAt: Date;
+  created_at: Date;
+  expires_at: Date;
 }
 
 export interface Coalition {
@@ -28,8 +28,8 @@ export interface Coalition {
   sharedObjectives: string[];
   coordinatedActions: string[];
   status: 'active' | 'paused' | 'dissolved';
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export class CoalitionBuilder {
@@ -42,20 +42,20 @@ export class CoalitionBuilder {
   /**
    * Identifies potential coalition opportunities for a campaign
    */
-  async identifyCoalitionOpportunities(campaignId: string): Promise<CoalitionOpportunity[]> {
+  async identifyCoalitionOpportunities(campaign_id: string): Promise<CoalitionOpportunity[]> {
     try {
-      const campaign = await this.campaignRepository.findById(campaignId);
+      const campaign = await this.campaignRepository.findById(campaign_id);
       if (!campaign) {
-        throw AdvocacyErrors.campaignNotFound(campaignId);
+        throw AdvocacyErrors.campaignNotFound(campaign_id);
       }
 
       // Find potential coalition partners
-      const potentialCoalitions = await this.campaignRepository.findPotentialCoalitions(campaignId);
+      const potentialCoalitions = await this.campaignRepository.findPotentialCoalitions(campaign_id);
       
       const opportunities: CoalitionOpportunity[] = [];
 
       for (const coalition of potentialCoalitions) {
-        const partnerCampaign = await this.campaignRepository.findById(coalition.campaignId);
+        const partnerCampaign = await this.campaignRepository.findById(coalition.campaign_id);
         if (!partnerCampaign) continue;
 
         // Analyze compatibility
@@ -63,11 +63,11 @@ export class CoalitionBuilder {
         
         if (compatibility.alignmentScore >= 0.6) {
           const opportunity: CoalitionOpportunity = {
-            id: `coalition-opp-${campaignId}-${coalition.campaignId}`,
-            billId: campaign.billId,
+            id: `coalition-opp-${ campaign_id }-${coalition.campaign_id}`,
+            bill_id: campaign.bill_id,
             sharedConcerns: compatibility.sharedConcerns,
             potentialPartners: [{
-              userId: partnerCampaign.organizerId,
+              user_id: partnerCampaign.organizerId,
               organizationName: partnerCampaign.organizationName,
               alignmentScore: compatibility.alignmentScore,
               complementaryStrengths: compatibility.complementaryStrengths
@@ -80,8 +80,8 @@ export class CoalitionBuilder {
 
           // Publish event for potential coalition
           await this.eventPublisher.publish(new CoalitionOpportunityIdentifiedEvent(
-            campaignId,
-            coalition.campaignId,
+            campaign_id,
+            coalition.campaign_id,
             compatibility.alignmentScore,
             compatibility.sharedConcerns
           ));
@@ -92,7 +92,7 @@ export class CoalitionBuilder {
       opportunities.sort((a, b) => b.estimatedImpact - a.estimatedImpact);
 
       logger.info('Coalition opportunities identified', { 
-        campaignId,
+        campaign_id,
         opportunityCount: opportunities.length,
         component: 'CoalitionBuilder' 
       });
@@ -100,7 +100,7 @@ export class CoalitionBuilder {
       return opportunities;
     } catch (error) {
       logger.error('Failed to identify coalition opportunities', error, { 
-        campaignId,
+        campaign_id,
         component: 'CoalitionBuilder' 
       });
       throw error;
@@ -166,8 +166,8 @@ export class CoalitionBuilder {
         proposedActions: await this.generateCoordinatedActions(initiatingCampaign, targetCampaigns),
         estimatedImpact: Math.round(averageCompatibility * 100),
         status: 'proposed',
-        createdAt: new Date(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+        created_at: new Date(),
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
       };
 
       // Store proposal (this would be in a coalition_proposals table)
@@ -211,8 +211,8 @@ export class CoalitionBuilder {
         sharedObjectives: [],
         coordinatedActions: [],
         status: 'active',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       };
 
       // Publish coalition formed event
@@ -241,14 +241,14 @@ export class CoalitionBuilder {
   /**
    * Gets active coalitions for a campaign
    */
-  async getCampaignCoalitions(campaignId: string): Promise<Coalition[]> {
+  async getCampaignCoalitions(campaign_id: string): Promise<Coalition[]> {
     try {
       // In a real implementation, this would query the coalitions table
       // For now, return empty array
       return [];
     } catch (error) {
       logger.error('Failed to get campaign coalitions', error, { 
-        campaignId,
+        campaign_id,
         component: 'CoalitionBuilder' 
       });
       throw error;
@@ -305,7 +305,7 @@ export class CoalitionBuilder {
     const suggestedActions: string[] = [];
 
     // Same bill = high alignment
-    if (campaign1.billId === campaign2.billId) {
+    if (campaign1.bill_id === campaign2.bill_id) {
       alignmentScore += 0.4;
       sharedConcerns.push('Same legislation');
       suggestedActions.push('Coordinate messaging', 'Joint committee testimony');
@@ -385,7 +385,7 @@ export class CoalitionBuilder {
     impact += compatibility.suggestedActions.length * 2;
 
     // Same bill = higher impact potential
-    if (campaign1.billId === campaign2.billId) {
+    if (campaign1.bill_id === campaign2.bill_id) {
       impact += 20;
     }
 
@@ -429,7 +429,7 @@ export class CoalitionBuilder {
     actions.push('Plan joint advocacy events');
     
     // Bill-specific actions
-    if (targetCampaigns.some(c => c.billId === initiatingCampaign.billId)) {
+    if (targetCampaigns.some(c => c.bill_id === initiatingCampaign.bill_id)) {
       actions.push('Prepare joint committee testimony');
       actions.push('Coordinate legislative meetings');
       actions.push('Develop shared position paper');

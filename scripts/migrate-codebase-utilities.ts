@@ -495,11 +495,11 @@ import {
   UnifiedApiResponse, 
   ApiResponse, 
   ErrorResponse 
-} from '@shared/core/src/utils/api'-utils';
+} from '@shared/core/utils/api'-utils';
 
 console.warn(
   '[DEPRECATED] server/utils/api-response.ts is deprecated. ' +
-  'Please import from '@shared/core/src/utils/api'-utils instead.'
+  'Please import from '@shared/core/utils/api'-utils instead.'
 );
 
 export const ApiResponseWrapper = UnifiedApiResponse;
@@ -596,9 +596,9 @@ export default logger;
 
 ### New Unified API
 \`\`\`typescript
-import { UnifiedApiResponse } from '@shared/core/src/utils/api'-utils';
+import { UnifiedApiResponse } from '@shared/core/utils/api'-utils';
 import { logger } from '@shared/core/observability/logging';
-import { UnifiedPerformanceMonitor } from '@shared/core/src/utils/performance-utils';
+import { UnifiedPerformanceMonitor } from '@shared/core/utils/performance-utils';
 
 // API responses
 const response = UnifiedApiResponse.success(data);
@@ -615,8 +615,8 @@ UnifiedPerformanceMonitor.endTimer('operation');
 ### Legacy Compatibility
 Existing imports continue to work with deprecation warnings:
 \`\`\`typescript
-import { ApiResponseWrapper } from '@shared/core/src/utils/api'-response'; // Still works
-import { logger } from '@shared/core/src/utils/browser-logger''; // Still works
+import { ApiResponseWrapper } from '@shared/core/utils/api'-response'; // Still works
+import { logger } from '@shared/core/utils/browser-logger''; // Still works
 \`\`\`
 
 ## Next Steps

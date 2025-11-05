@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { cn } from '../../../lib/utils';
+import { cn } from '@/lib/utils';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { AuthInputProps } from '../types';

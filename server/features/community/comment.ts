@@ -1,13 +1,13 @@
 
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { database as db } from '../../../shared/database/connection';
-import { comments } from '../../../shared/schema/citizen_participation';
-import { users, user_profiles } from '../../../shared/schema/foundation';
-import { bills } from '../../../shared/schema/foundation';
+import { database as db } from '@shared/database';
+import { comments } from '@shared/schema/citizen_participation';
+import { users, user_profiles } from '@shared/schema/foundation';
+import { bills } from '@shared/schema/foundation';
 import { eq, and, desc, asc, sql, count, isNull, or, inArray } from 'drizzle-orm';
 import { cacheService } from '../../infrastructure/cache/cache-service';
-import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
-import { logger } from '../../../shared/core';
+import { cacheKeys } from '@shared/core/caching/key-generator';
+import { logger } from '@/shared/core';
 
 // Types for comment operations
 export interface CommentWithUser {
@@ -340,7 +340,7 @@ export class CommentService {
   /**
    * Load replies for multiple comments efficiently
    */
-  private async loadRepliesForComments(comments: CommentWithUser[]): Promise<void> {
+  private async loadRepliesForComments(comment: CommentWithUser[]): Promise<void> {
     const loadPromises = comments.map(comment =>
       this.getCommentReplies(comment.id, { limit: 5 })
         .then(replies => {

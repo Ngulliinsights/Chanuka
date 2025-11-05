@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 import { ApiValidationError, ApiError, ApiSuccess } from './api-response.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 
 /**
@@ -44,8 +44,8 @@ export type ControllerHandler<
  * @example
  * ```typescript
  * const getMetricsSchema = z.object({
- *   startDate: z.string().datetime().optional(),
- *   endDate: z.string().datetime().optional(),
+ *   start_date: z.string().datetime().optional(),
+ *   end_date: z.string().datetime().optional(),
  *   limit: z.string().transform(val => parseInt(val)).optional()
  * });
  *

@@ -2,8 +2,8 @@
  * Sanitization utilities for secure input handling
  */
 
-import DOMPurify from 'dompurify';
-import escape from 'sql-template-tag';
+import * as DOMPurify from 'dompurify';
+import * as sqlTemplate from 'sql-template-tag';
 import { logger } from '../observability/logging';
 
 /**
@@ -17,7 +17,7 @@ export function sanitizeHtml(html: string): string {
  * Sanitize SQL input to prevent injection
  */
 export function sanitizeSql(input: string): string {
-  return escape([input]).text;
+  return sqlTemplate.default([input]).text;
 }
 
 /**

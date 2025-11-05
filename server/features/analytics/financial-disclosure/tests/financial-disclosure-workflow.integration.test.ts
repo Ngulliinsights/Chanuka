@@ -58,7 +58,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       organization: 'Professional Association',
       type: 'professional' as const,
       is_active: true,
-      startDate: '2023-01-01',
+      start_date: '2023-01-01',
       conflictType: null
     }
   ];
@@ -278,7 +278,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
         sponsor_id: mockSponsorId,
         sponsorName: 'Test Sponsor',
         anomalies: expect.any(Array),
-        riskScore: expect.any(Number),
+        risk_score: expect.any(Number),
         detectionDate: expect.any(Date)
       });
 
@@ -331,14 +331,14 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
               recommendation: 'Review'
             }
           ],
-          riskScore: 75,
+          risk_score: 75,
           detectionDate: new Date()
         })
         .mockResolvedValueOnce({
           sponsor_id: 2,
           sponsorName: 'Sponsor 2',
           anomalies: [],
-          riskScore: 0,
+          risk_score: 0,
           detectionDate: new Date()
         })
         .mockResolvedValueOnce({
@@ -355,7 +355,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
               recommendation: 'Verify'
             }
           ],
-          riskScore: 45,
+          risk_score: 45,
           detectionDate: new Date()
         });
 
@@ -424,7 +424,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
           sponsor_id: mockSponsorId,
           sponsorName: 'Test Sponsor',
           anomalies: [],
-          riskScore: 25,
+          risk_score: 25,
           detectionDate: new Date()
         });
 

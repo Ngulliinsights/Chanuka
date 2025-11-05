@@ -8,7 +8,7 @@
  * - Integration with A/B testing framework
  */
 
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { 
   AsyncServiceResult, 
   withResultHandling 
@@ -23,8 +23,8 @@ export interface FeatureFlag {
   targetingRules: TargetingRule[];
   variants: FlagVariant[];
   defaultVariant: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
   createdBy: string;
   status: 'active' | 'inactive' | 'archived';
   tags: string[];
@@ -55,8 +55,8 @@ export interface FlagVariant {
 }
 
 export interface UserContext {
-  userId: string;
-  sessionId?: string;
+  user_id: string;
+  session_id?: string;
   userAgent?: string;
   ipAddress?: string;
   country?: string;
@@ -157,12 +157,12 @@ export class FeatureFlagsService {
   /**
    * Create a new feature flag
    */
-  async createFlag(flagData: Omit<FeatureFlag, 'createdAt' | 'updatedAt'>): AsyncServiceResult<FeatureFlag> {
+  async createFlag(flagData: Omit<FeatureFlag, 'created_at' | 'updated_at'>): AsyncServiceResult<FeatureFlag> {
     return withResultHandling(async () => {
       const flag: FeatureFlag = {
         ...flagData,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       };
 
       this.validateFlag(flag);
@@ -192,7 +192,7 @@ export class FeatureFlagsService {
       const updatedFlag: FeatureFlag = {
         ...existingFlag,
         ...updates,
-        updatedAt: new Date()
+        updated_at: new Date()
       };
 
       this.validateFlag(updatedFlag);
@@ -225,7 +225,7 @@ export class FeatureFlagsService {
       // Check targeting rules first (highest priority)
       for (const rule of flag.targetingRules.sort((a, b) => b.priority - a.priority)) {
         if (rule.enabled && this.evaluateTargetingRule(rule, userContext)) {
-          const shouldInclude = this.shouldIncludeUser(userContext.userId, rule.rolloutPercentage);
+          const shouldInclude = this.shouldIncludeUser(userContext.user_id, rule.rolloutPercentage);
           if (shouldInclude) {
             const variant = flag.variants.find(v => v.name === rule.variant);
             const evaluation = {
@@ -246,13 +246,13 @@ export class FeatureFlagsService {
       }
 
       // Check general rollout percentage
-      const shouldInclude = this.shouldIncludeUser(userContext.userId, flag.rolloutPercentage);
+      const shouldInclude = this.shouldIncludeUser(userContext.user_id, flag.rolloutPercentage);
       if (!shouldInclude) {
         return this.createDefaultEvaluation(flagName, userContext, 'not_in_rollout');
       }
 
       // Select variant based on weights
-      const selectedVariant = this.selectVariant(flag.variants, userContext.userId);
+      const selectedVariant = this.selectVariant(flag.variants, userContext.user_id);
       const evaluation = {
         flagName,
         enabled: true,
@@ -443,7 +443,7 @@ export class FeatureFlagsService {
       const existingMetrics = this.metrics.get(flagName);
       const evaluations = this.evaluationHistory.filter(e => e.flagName === flagName);
       
-      const uniqueUsers = new Set(evaluations.map(e => e.userContext.userId)).size;
+      const uniqueUsers = new Set(evaluations.map(e => e.userContext.user_id)).size;
       const variantDistribution: { [variant: string]: number } = {};
       
       evaluations.forEach(evaluation => {
@@ -494,8 +494,8 @@ export class FeatureFlagsService {
           { name: 'treatment', value: true, description: 'New direct Drizzle implementation' }
         ],
         defaultVariant: 'control',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
         createdBy: 'system',
         status: 'active',
         tags: ['repository-migration', 'phase-4'],
@@ -533,7 +533,7 @@ export class FeatureFlagsService {
   private getAttributeValue(userContext: UserContext, attribute: string): any {
     switch (attribute) {
       case 'userId':
-        return userContext.userId;
+        return userContext.user_id;
       case 'userType':
         return userContext.userType;
       case 'country':
@@ -572,20 +572,20 @@ export class FeatureFlagsService {
     }
   }
 
-  private shouldIncludeUser(userId: string, percentage: number): boolean {
+  private shouldIncludeUser(user_id: string, percentage: number): boolean {
     if (percentage === 0) return false;
     if (percentage === 100) return true;
 
     // Use consistent hashing to determine inclusion
-    const hash = this.hashUserId(userId);
+    const hash = this.hashUserId(user_id);
     const hashValue = parseInt(hash.substring(0, 8), 16) % 100;
     return hashValue < percentage;
   }
 
-  private hashUserId(userId: string): string {
+  private hashUserId(user_id: string): string {
     // Simple hash function for consistent user assignment
     let hash = 0;
-    for (let i = 0; i < userId.length; i++) {
+    for (let i = 0; i < user_id.length; i++) {
       const char = userId.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash; // Convert to 32-bit integer
@@ -593,7 +593,7 @@ export class FeatureFlagsService {
     return Math.abs(hash).toString(16).padStart(8, '0');
   }
 
-  private selectVariant(variants: FlagVariant[], userId: string): FlagVariant {
+  private selectVariant(variants: FlagVariant[], user_id: string): FlagVariant {
     if (variants.length === 1) {
       return variants[0];
     }
@@ -602,7 +602,7 @@ export class FeatureFlagsService {
     const totalWeight = variants.reduce((sum, variant) => sum + (variant.weight || 1), 0);
     
     // Generate consistent random value for user
-    const hash = this.hashUserId(userId);
+    const hash = this.hashUserId(user_id);
     const randomValue = (parseInt(hash.substring(0, 8), 16) % 1000) / 1000; // 0-1
     
     // Select variant based on weights

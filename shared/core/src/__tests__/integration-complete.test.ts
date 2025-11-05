@@ -15,9 +15,9 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
-import { Logger } from '@shared/core/src/observability/logging';
-import { ValidationService } from '../validation/validation-service';
-import { HealthChecker } from '../observability/health/health-checker';
+// import { Logger } from '@shared/core/src/observability/logging'; // Using logger instance instead
+import { ValidationAdapter } from '../validation/core/interfaces';
+import { HealthOrchestrator } from '../observability/health/health-orchestrator';
 import { configManager } from '../config';
 import { logger } from '@shared/core/src/observability/logging';
 

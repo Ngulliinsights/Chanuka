@@ -9,10 +9,10 @@ import { app } from '../../../index.js';
 
 // Mock data for testing
 const mockCommentProcessingRequest = {
-  commentId: 'comment-001',
-  billId: 'bill-001',
+  comment_id: 'comment-001',
+  bill_id: 'bill-001',
   commentText: 'I strongly support this bill because it will improve healthcare access for rural communities. Studies show that 60% of rural areas lack adequate medical facilities.',
-  userId: 'user-001',
+  user_id: 'user-001',
   userDemographics: {
     county: 'Turkana',
     ageGroup: '25-34',
@@ -22,13 +22,13 @@ const mockCommentProcessingRequest = {
   submissionContext: {
     submissionMethod: 'web' as const,
     timestamp: new Date(),
-    sessionId: 'session-001'
+    session_id: 'session-001'
   }
 };
 
 const mockStructureExtractionRequest = {
   text: 'This bill will negatively impact small businesses. According to recent data, 70% of SMEs are already struggling with compliance costs.',
-  billId: 'bill-001',
+  bill_id: 'bill-001',
   userContext: {
     county: 'Nairobi',
     occupation: 'business_owner'
@@ -42,14 +42,14 @@ const mockClusteringRequest = {
       text: 'Healthcare access is a major concern',
       normalizedText: 'healthcare access major concern',
       confidence: 0.85,
-      userId: 'user-001'
+      user_id: 'user-001'
     },
     {
       id: 'arg-002', 
       text: 'Medical facilities are inadequate in rural areas',
       normalizedText: 'medical facilities inadequate rural areas',
       confidence: 0.90,
-      userId: 'user-002'
+      user_id: 'user-002'
     }
   ],
   config: {
@@ -88,8 +88,8 @@ describe('Argument Intelligence API', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toBeDefined();
-      expect(response.body.data.commentId).toBe(mockCommentProcessingRequest.commentId);
-      expect(response.body.data.billId).toBe(mockCommentProcessingRequest.billId);
+      expect(response.body.data.comment_id).toBe(mockCommentProcessingRequest.comment_id);
+      expect(response.body.data.bill_id).toBe(mockCommentProcessingRequest.bill_id);
       expect(response.body.data.extractedArguments).toBeInstanceOf(Array);
       expect(response.body.data.processingMetrics).toBeDefined();
     });
@@ -121,7 +121,7 @@ describe('Argument Intelligence API', () => {
       expect(response.body.data.extractionMetrics).toBeDefined();
     });
 
-    it('should return 400 for missing text or billId', async () => {
+    it('should return 400 for missing text or bill_id', async () => {
       const invalidRequest = { ...mockStructureExtractionRequest };
       delete invalidRequest.text;
 
@@ -142,7 +142,7 @@ describe('Argument Intelligence API', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toBeDefined();
-      expect(response.body.data.billId).toBe('bill-001');
+      expect(response.body.data.bill_id).toBe('bill-001');
       expect(response.body.data.majorClaims).toBeInstanceOf(Array);
       expect(response.body.data.stakeholderPositions).toBeInstanceOf(Array);
     });
@@ -247,7 +247,7 @@ describe('Argument Intelligence API', () => {
         claimType: 'statistical',
         citedSources: ['https://example.com/health-study'],
         confidence: 0.8,
-        userId: 'user-001',
+        user_id: 'user-001',
         submittedAt: new Date()
       };
 
@@ -268,7 +268,7 @@ describe('Argument Intelligence API', () => {
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.billId).toBe('bill-001');
+      expect(response.body.data.bill_id).toBe('bill-001');
       expect(response.body.data.evidenceBase).toBeInstanceOf(Array);
       expect(response.body.data.overallCredibility).toBeGreaterThanOrEqual(0);
     });
@@ -277,7 +277,7 @@ describe('Argument Intelligence API', () => {
   describe('Brief Generation', () => {
     it('should generate legislative brief', async () => {
       const briefRequest = {
-        billId: 'bill-001',
+        bill_id: 'bill-001',
         majorClaims: [
           {
             claimText: 'Healthcare access needs improvement',
@@ -302,14 +302,14 @@ describe('Argument Intelligence API', () => {
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.billId).toBe('bill-001');
+      expect(response.body.data.bill_id).toBe('bill-001');
       expect(response.body.data.executiveSummary).toBeDefined();
       expect(response.body.data.keyFindings).toBeInstanceOf(Array);
     });
 
     it('should generate public summary', async () => {
       const briefRequest = {
-        billId: 'bill-001',
+        bill_id: 'bill-001',
         majorClaims: [
           {
             claimText: 'Healthcare access needs improvement',
@@ -332,7 +332,7 @@ describe('Argument Intelligence API', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.summary).toBeDefined();
-      expect(response.body.data.billId).toBe('bill-001');
+      expect(response.body.data.bill_id).toBe('bill-001');
     });
   });
 
@@ -359,7 +359,7 @@ describe('Argument Intelligence API', () => {
           {
             id: 'arg-001',
             text: 'Rural healthcare needs improvement',
-            userId: 'user-001',
+            user_id: 'user-001',
             submissionTime: new Date(),
             userDemographics: { occupation: 'farmer' }
           }
@@ -381,13 +381,13 @@ describe('Argument Intelligence API', () => {
         {
           id: 'arg-001',
           text: 'This bill is terrible and will destroy our economy',
-          userId: 'user-001',
+          user_id: 'user-001',
           submissionTime: new Date('2024-01-01T10:00:00Z')
         },
         {
           id: 'arg-002',
           text: 'This bill is terrible and will destroy our economy',
-          userId: 'user-002',
+          user_id: 'user-002',
           submissionTime: new Date('2024-01-01T10:01:00Z')
         }
       ];
@@ -424,7 +424,7 @@ describe('Argument Intelligence API', () => {
         .get('/api/argument-intelligence/search')
         .query({
           q: 'healthcare',
-          billId: 'bill-001',
+          bill_id: 'bill-001',
           limit: 20
         })
         .expect(200);
@@ -448,7 +448,7 @@ describe('Argument Intelligence API', () => {
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.billId).toBe('bill-001');
+      expect(response.body.data.bill_id).toBe('bill-001');
       expect(response.body.data.totalArguments).toBeGreaterThanOrEqual(0);
       expect(response.body.data.argumentsByType).toBeDefined();
     });
@@ -493,10 +493,10 @@ describe('Argument Intelligence API', () => {
   describe('Input Validation', () => {
     it('should validate comment processing request fields', async () => {
       const testCases = [
-        { field: 'commentId', value: null },
-        { field: 'billId', value: null },
+        { field: 'comment_id', value: null },
+        { field: 'bill_id', value: null },
         { field: 'commentText', value: null },
-        { field: 'userId', value: null }
+        { field: 'user_id', value: null }
       ];
 
       for (const testCase of testCases) {

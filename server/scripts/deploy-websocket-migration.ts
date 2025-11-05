@@ -9,9 +9,9 @@ import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
 import { Server as HttpServer } from 'http';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 import { database as db } from '../../shared/database/connection.js';
-import { users } from '../../shared/schema/foundation.js';
+import { users } from '@shared/schema/foundation.js';
 import { eq } from 'drizzle-orm';
 import * as jwt from 'jsonwebtoken';
 

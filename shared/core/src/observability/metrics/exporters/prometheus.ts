@@ -1,5 +1,5 @@
 import { Metric, MetricsExporter, PrometheusConfig } from '../types';
-import { Result, Ok, Err } from '../../../primitives/types/result';
+import { Result, Ok, Err } from '@/primitives/types/result';
 
 // ==================== Enhanced Prometheus Exporter ====================
 

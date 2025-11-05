@@ -11,7 +11,7 @@ vi.mock('../../../services/api', () => ({
   register: vi.fn(),
   logout: vi.fn(),
   getCurrentUser: vi.fn(),
-  refreshToken: vi.fn()
+  refresh_token: vi.fn()
 }));
 
 // Mock localStorage
@@ -114,7 +114,7 @@ describe('useAuth Hook', () => {
         data: {
           user: mockUser,
           token: 'new-token',
-          refreshToken: 'refresh-token'
+          refresh_token: 'refresh-token'
         }
       };
 
@@ -193,7 +193,7 @@ describe('useAuth Hook', () => {
         data: {
           user: mockUser,
           token: 'new-token',
-          refreshToken: 'refresh-token',
+          refresh_token: 'refresh-token',
           requiresVerification: true
         }
       };
@@ -325,12 +325,12 @@ describe('useAuth Hook', () => {
         .mockReturnValueOnce('valid-refresh-token');
 
       (api.getCurrentUser as any).mockRejectedValueOnce(new Error('Token expired'));
-      (api.refreshToken as any).mockResolvedValue({
+      (api.refresh_token as any).mockResolvedValue({
         success: true,
         data: {
           user: mockUser,
           token: 'new-token',
-          refreshToken: 'new-refresh-token'
+          refresh_token: 'new-refresh-token'
         }
       });
 
@@ -351,7 +351,7 @@ describe('useAuth Hook', () => {
         .mockReturnValueOnce('expired-refresh-token');
 
       (api.getCurrentUser as any).mockRejectedValue(new Error('Token expired'));
-      (api.refreshToken as any).mockRejectedValue(new Error('Refresh token expired'));
+      (api.refresh_token as any).mockRejectedValue(new Error('Refresh token expired'));
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 

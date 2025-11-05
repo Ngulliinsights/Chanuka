@@ -1,4 +1,4 @@
-import { db } from '../../../../shared/database/pool.js';
+import { db } from '@shared/database/pool.js';
 import {
   users,
   notifications,
@@ -7,7 +7,7 @@ import {
   type Notification
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, count, inArray, like, or, gte, lte, isNotNull } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -115,7 +115,7 @@ export class AlertPreferencesService {
     const logContext = { 
       component: 'AlertPreferencesService', 
       operation: 'savePreference',
-      userId: preference.user_id,
+      user_id: preference.user_id,
       preferenceId: preference.id 
     };
     logger.debug('Saving alert preference', logContext);
@@ -171,17 +171,17 @@ export class AlertPreferencesService {
   /**
    * Find alert preference by ID and user ID
    */
-  async findPreferenceByIdAndUserId(id: string, userId: string): Promise<AlertPreference | null> {
+  async findPreferenceByIdAndUserId(id: string, user_id: string): Promise<AlertPreference | null> {
     const logContext = { 
       component: 'AlertPreferencesService', 
       operation: 'findPreferenceByIdAndUserId',
       id,
-      userId 
+      user_id 
     };
     logger.debug('Finding alert preference by ID and user ID', logContext);
 
     try {
-      const preferences = await this.findPreferencesByUserId(userId);
+      const preferences = await this.findPreferencesByUserId(user_id);
       const preference = preferences.find(p => p.id === id) || null;
 
       logger.debug('Alert preference lookup completed', { 
@@ -199,11 +199,11 @@ export class AlertPreferencesService {
   /**
    * Find all alert preferences for a user
    */
-  async findPreferencesByUserId(userId: string): Promise<AlertPreference[]> {
+  async findPreferencesByUserId(user_id: string): Promise<AlertPreference[]> {
     const logContext = { 
       component: 'AlertPreferencesService', 
       operation: 'findPreferencesByUserId',
-      userId 
+      user_id 
     };
     logger.debug('Finding alert preferences for user', logContext);
 
@@ -211,7 +211,7 @@ export class AlertPreferencesService {
       const [user] = await this.database
         .select({ preferences: users.preferences })
         .from(users)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, user_id))
         .limit(1);
 
       if (!user) {
@@ -261,12 +261,12 @@ export class AlertPreferencesService {
   /**
    * Delete an alert preference
    */
-  async deletePreference(id: string, userId: string): Promise<void> {
+  async deletePreference(id: string, user_id: string): Promise<void> {
     const logContext = { 
       component: 'AlertPreferencesService', 
       operation: 'deletePreference',
       id,
-      userId 
+      user_id 
     };
     logger.debug('Deleting alert preference', logContext);
 
@@ -274,11 +274,11 @@ export class AlertPreferencesService {
       const [user] = await this.database
         .select({ preferences: users.preferences })
         .from(users)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, user_id))
         .limit(1);
 
       if (!user) {
-        throw new Error(`User ${userId} not found`);
+        throw new Error(`User ${user_id} not found`);
       }
 
       const currentPreferences = (user.preferences as any) || {};
@@ -297,7 +297,7 @@ export class AlertPreferencesService {
           },
           updated_at: new Date()
         })
-        .where(eq(users.id, userId));
+        .where(eq(users.id, user_id));
 
       logger.info('✅ Alert preference deleted successfully', logContext);
     } catch (error) {
@@ -309,17 +309,17 @@ export class AlertPreferencesService {
   /**
    * Check if alert preference exists
    */
-  async preferenceExists(id: string, userId: string): Promise<boolean> {
+  async preferenceExists(id: string, user_id: string): Promise<boolean> {
     const logContext = { 
       component: 'AlertPreferencesService', 
       operation: 'preferenceExists',
       id,
-      userId 
+      user_id 
     };
     logger.debug('Checking if alert preference exists', logContext);
 
     try {
-      const preference = await this.findPreferenceByIdAndUserId(id, userId);
+      const preference = await this.findPreferenceByIdAndUserId(id, user_id);
       const exists = preference !== null;
 
       logger.debug('Alert preference existence check completed', { 
@@ -345,7 +345,7 @@ export class AlertPreferencesService {
     const logContext = { 
       component: 'AlertPreferencesService', 
       operation: 'saveDeliveryLog',
-      userId: log.user_id,
+      user_id: log.user_id,
       status: log.status 
     };
     logger.debug('Saving delivery log', logContext);
@@ -385,14 +385,14 @@ export class AlertPreferencesService {
    * Find delivery logs by user ID with pagination
    */
   async findDeliveryLogsByUserId(
-    userId: string,
+    user_id: string,
     options: {
       page?: number;
       limit?: number;
       alertType?: string;
       status?: string;
-      startDate?: Date;
-      endDate?: Date;
+      start_date?: Date;
+      end_date?: Date;
     } = {}
   ): Promise<{
     logs: AlertDeliveryLog[];
@@ -404,7 +404,7 @@ export class AlertPreferencesService {
     const logContext = { 
       component: 'AlertPreferencesService', 
       operation: 'findDeliveryLogsByUserId',
-      userId,
+      user_id,
       options 
     };
     logger.debug('Finding delivery logs for user', logContext);
@@ -414,18 +414,18 @@ export class AlertPreferencesService {
       const offset = (page - 1) * limit;
 
       // Build query conditions
-      let conditions = [eq(notifications.user_id, userId)];
+      let conditions = [eq(notifications.user_id, user_id)];
 
       if (options.alertType) {
         conditions.push(eq(notifications.type, options.alertType));
       }
 
-      if (options.startDate) {
-        conditions.push(gte(notifications.created_at, options.startDate));
+      if (options.start_date) {
+        conditions.push(gte(notifications.created_at, options.start_date));
       }
 
-      if (options.endDate) {
-        conditions.push(lte(notifications.created_at, options.endDate));
+      if (options.end_date) {
+        conditions.push(lte(notifications.created_at, options.end_date));
       }
 
       // Get total count
@@ -484,7 +484,7 @@ export class AlertPreferencesService {
   /**
    * Get delivery statistics for a user
    */
-  async getDeliveryStatsByUserId(userId: string): Promise<{
+  async getDeliveryStatsByUserId(user_id: string): Promise<{
     totalLogs: number;
     successfulDeliveries: number;
     failedDeliveries: number;
@@ -497,7 +497,7 @@ export class AlertPreferencesService {
     const logContext = { 
       component: 'AlertPreferencesService', 
       operation: 'getDeliveryStatsByUserId',
-      userId 
+      user_id 
     };
     logger.debug('Getting delivery statistics for user', logContext);
 
@@ -511,7 +511,7 @@ export class AlertPreferencesService {
           filtered: sql<number>`COUNT(*) FILTER (WHERE (data->>'status')::text = 'filtered')`
         })
         .from(notifications)
-        .where(eq(notifications.user_id, userId));
+        .where(eq(notifications.user_id, user_id));
 
       // Get channel statistics
       const channelResults = await this.database
@@ -521,7 +521,7 @@ export class AlertPreferencesService {
           successful: sql<number>`COUNT(*) FILTER (WHERE (data->>'status')::text = 'sent')`
         })
         .from(notifications)
-        .where(eq(notifications.user_id, userId))
+        .where(eq(notifications.user_id, user_id))
         .groupBy(sql`(data->>'channel')::text`);
 
       const channelStats: Record<string, { deliveries: number; successRate: number }> = {};

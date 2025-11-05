@@ -14,7 +14,7 @@ export interface ConstitutionalProvision {
   rightsCategory?: string;
   keywords: string[];
   hierarchyPath: string;
-  isActive: boolean;
+  is_active: boolean;
 }
 
 export interface LegalPrecedent {
@@ -33,7 +33,7 @@ export interface LegalPrecedent {
 
 export interface ConstitutionalAnalysis {
   id: string;
-  billId: string;
+  bill_id: string;
   provisionId: string;
   analysisType: 'potential_conflict' | 'requires_compliance' | 'empowers' | 'restricts' | 'clarifies';
   confidencePercentage: number; // 0-100
@@ -47,18 +47,18 @@ export interface ConstitutionalAnalysis {
   expertReviewed: boolean;
   analysisMethod: string;
   analysisVersion: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export class ConstitutionalAnalysisAggregate {
   constructor(
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly analyses: ConstitutionalAnalysis[],
     public readonly overallRisk: 'low' | 'medium' | 'high' | 'critical',
     public readonly confidence: number,
     public readonly requiresExpertReview: boolean,
-    public readonly createdAt: Date = new Date()
+    public readonly created_at: Date = new Date()
   ) {}
 
   // Business logic methods

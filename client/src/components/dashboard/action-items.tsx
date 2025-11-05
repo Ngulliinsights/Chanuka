@@ -96,8 +96,8 @@ export const ActionItems: React.FC<DashboardComponentProps> = ({
     }
   };
 
-  const formatDueDate = (dueDate?: Date) => {
-    if (!dueDate) return null;
+  const formatDueDate = (due_date?: Date) => {
+    if (!due_date) return null;
     
     const now = new Date();
     const diffMs = dueDate.getTime() - now.getTime();
@@ -209,7 +209,7 @@ export const ActionItems: React.FC<DashboardComponentProps> = ({
         ) : filteredActionItems.length > 0 ? (
           <div className="space-y-3">
             {filteredActionItems.map((item) => {
-              const dueDateInfo = formatDueDate(item.dueDate);
+              const dueDateInfo = formatDueDate(item.due_date);
               
               return (
                 <div 

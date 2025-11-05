@@ -4,8 +4,8 @@ import { sponsorConflictAnalysisService } from '../application/sponsor-conflict-
 // Note: Validation schemas need to be created in the new schema structure
 // import { insertSponsorSchema } from '@shared/schema/validation';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '../../../../shared/core/src/utils/api-utils.js';
-import { logger } from '../../../../shared/core/src/observability/logging/index.js';
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '@shared/core/utils/api-utils.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 const router = express.Router();
 
@@ -236,8 +236,8 @@ router.post('/:id/affiliations', async (req: express.Request, res, next) => {
             type: req.body.type,
             role: req.body.role,
             conflictType: req.body.conflictType,
-            startDate: req.body.startDate ? new Date(req.body.startDate) : undefined,
-            endDate: req.body.endDate ? new Date(req.body.endDate) : undefined,
+            start_date: req.body.start_date ? new Date(req.body.start_date) : undefined,
+            end_date: req.body.end_date ? new Date(req.body.end_date) : undefined,
             is_active: req.body.is_active,
         };
 
@@ -277,8 +277,8 @@ router.put('/:id/affiliations/:affiliationId', async (req: express.Request, res,
         const updateData = getRequestBody(req);
 
         // Parse date strings into Date objects
-        if (updateData.startDate) updateData.startDate = new Date(updateData.startDate);
-        if (updateData.endDate) updateData.endDate = new Date(updateData.endDate);
+        if (updateData.start_date) updateData.start_date = new Date(updateData.start_date);
+        if (updateData.end_date) updateData.end_date = new Date(updateData.end_date);
 
         const updatedAffiliation = await sponsorService.updateAffiliation(affiliationId, updateData);
 
@@ -299,12 +299,12 @@ router.put('/:id/affiliations/:affiliationId', async (req: express.Request, res,
 router.delete('/:id/affiliations/:affiliationId', async (req: express.Request, res, next) => {
     try {
         const affiliationId = parseIntParam(req.params.affiliationId, 'Affiliation ID');
-        const endDate = req.body.endDate ? new Date(req.body.endDate) : undefined;
+        const end_date = req.body.end_date ? new Date(req.body.end_date) : undefined;
 
         const deactivatedAffiliation = await sponsorService.setAffiliationActiveStatus(
             affiliationId,
             false,
-            endDate
+            end_date
         );
 
         if (!deactivatedAffiliation) {
@@ -474,7 +474,7 @@ router.get('/:id/conflict-trends', async (req, res, next) => {
             timeframe: `${timeframe} months`,
             conflictCount: 0,
             severityTrend: 'stable',
-            riskScore: 0,
+            risk_score: 0,
             predictions: []
         };
 

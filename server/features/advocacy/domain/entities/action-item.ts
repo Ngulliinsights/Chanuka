@@ -6,8 +6,8 @@ import { ActionTemplate } from '../../types/index.js';
 
 export interface ActionItem {
   id: string;
-  campaignId: string;
-  userId: string;
+  campaign_id: string;
+  user_id: string;
   
   // Action details
   actionType: 'contact_representative' | 'attend_hearing' | 'submit_comment' | 'share_content' | 'organize_meeting' | 'petition_signature';
@@ -21,7 +21,7 @@ export interface ActionItem {
   
   // Timeline
   assignedAt: Date;
-  dueDate?: Date;
+  due_date?: Date;
   startedAt?: Date;
   completedAt?: Date;
   
@@ -58,19 +58,19 @@ export interface ActionItem {
   };
   
   // Metadata
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface NewActionItem {
-  campaignId: string;
-  userId: string;
+  campaign_id: string;
+  user_id: string;
   actionType: ActionItem['actionType'];
   title: string;
   description: string;
   instructions: string;
   priority?: ActionItem['priority'];
-  dueDate?: Date;
+  due_date?: Date;
   template?: ActionTemplate;
   customizedContent?: ActionItem['customizedContent'];
   targetRepresentative?: string;
@@ -85,13 +85,13 @@ export class ActionItemEntity {
 
   // Getters
   get id(): string { return this.actionItem.id; }
-  get campaignId(): string { return this.actionItem.campaignId; }
-  get userId(): string { return this.actionItem.userId; }
+  get campaignId(): string { return this.actionItem.campaign_id; }
+  get userId(): string { return this.actionItem.user_id; }
   get actionType(): ActionItem['actionType'] { return this.actionItem.actionType; }
   get title(): string { return this.actionItem.title; }
   get status(): ActionItem['status'] { return this.actionItem.status; }
   get priority(): ActionItem['priority'] { return this.actionItem.priority; }
-  get dueDate(): Date | undefined { return this.actionItem.dueDate; }
+  get dueDate(): Date | undefined { return this.actionItem.due_date; }
   get estimatedTimeMinutes(): number { return this.actionItem.estimatedTimeMinutes; }
   get difficulty(): ActionItem['difficulty'] { return this.actionItem.difficulty; }
   get outcome(): ActionItem['outcome'] { return this.actionItem.outcome; }
@@ -102,7 +102,7 @@ export class ActionItemEntity {
   isCompleted(): boolean { return this.actionItem.status === 'completed'; }
   isSkipped(): boolean { return this.actionItem.status === 'skipped'; }
   isOverdue(): boolean {
-    return this.actionItem.dueDate ? new Date() > this.actionItem.dueDate && !this.isCompleted() : false;
+    return this.actionItem.due_date ? new Date() > this.actionItem.due_date && !this.isCompleted() : false;
   }
   isUrgent(): boolean { return this.actionItem.priority === 'urgent'; }
 
@@ -125,7 +125,7 @@ export class ActionItemEntity {
     }
     this.actionItem.status = 'in_progress';
     this.actionItem.startedAt = new Date();
-    this.actionItem.updatedAt = new Date();
+    this.actionItem.updated_at = new Date();
   }
 
   complete(outcome?: ActionItem['outcome'], actualTimeMinutes?: number): void {
@@ -134,7 +134,7 @@ export class ActionItemEntity {
     }
     this.actionItem.status = 'completed';
     this.actionItem.completedAt = new Date();
-    this.actionItem.updatedAt = new Date();
+    this.actionItem.updated_at = new Date();
     
     if (outcome) {
       this.actionItem.outcome = outcome;
@@ -150,7 +150,7 @@ export class ActionItemEntity {
       throw new Error('Action item cannot be skipped in current status');
     }
     this.actionItem.status = 'skipped';
-    this.actionItem.updatedAt = new Date();
+    this.actionItem.updated_at = new Date();
     
     if (reason) {
       this.actionItem.outcome = {
@@ -162,7 +162,7 @@ export class ActionItemEntity {
 
   updateCustomizedContent(content: ActionItem['customizedContent']): void {
     this.actionItem.customizedContent = { ...this.actionItem.customizedContent, ...content };
-    this.actionItem.updatedAt = new Date();
+    this.actionItem.updated_at = new Date();
   }
 
   addFeedback(feedback: ActionItem['userFeedback']): void {
@@ -170,20 +170,20 @@ export class ActionItemEntity {
       throw new Error('Feedback can only be added to completed actions');
     }
     this.actionItem.userFeedback = feedback;
-    this.actionItem.updatedAt = new Date();
+    this.actionItem.updated_at = new Date();
   }
 
   updatePriority(priority: ActionItem['priority']): void {
     this.actionItem.priority = priority;
-    this.actionItem.updatedAt = new Date();
+    this.actionItem.updated_at = new Date();
   }
 
   extendDueDate(newDueDate: Date): void {
     if (this.isCompleted()) {
       throw new Error('Cannot extend due date for completed actions');
     }
-    this.actionItem.dueDate = newDueDate;
-    this.actionItem.updatedAt = new Date();
+    this.actionItem.due_date = newDueDate;
+    this.actionItem.updated_at = new Date();
   }
 
   calculateEfficiency(): number | null {
@@ -194,9 +194,9 @@ export class ActionItemEntity {
   }
 
   getDaysUntilDue(): number | null {
-    if (!this.actionItem.dueDate) return null;
+    if (!this.actionItem.due_date) return null;
     const now = new Date();
-    const diffTime = this.actionItem.dueDate.getTime() - now.getTime();
+    const diffTime = this.actionItem.due_date.getTime() - now.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
@@ -216,8 +216,8 @@ export class ActionItemEntity {
       priority: data.priority || 'medium',
       difficulty: data.difficulty || 'medium',
       assignedAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     };
 
     return new ActionItemEntity(actionItem);

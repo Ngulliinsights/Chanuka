@@ -3,10 +3,10 @@
 // ============================================================================
 // Generates structured legislative briefs from synthesized citizen arguments
 
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export interface BriefGenerationRequest {
-  billId: string;
+  bill_id: string;
   majorClaims: SynthesizedClaim[];
   evidenceBase: EvidenceAssessment[];
   stakeholderPositions: StakeholderPosition[];
@@ -43,7 +43,7 @@ export interface StakeholderPosition {
 
 export interface GeneratedBrief {
   id: string;
-  billId: string;
+  bill_id: string;
   briefType: string;
   targetAudience: string;
   executiveSummary: string;
@@ -125,7 +125,7 @@ export class BriefGeneratorService {
     try {
       logger.info(`📄 Generating legislative brief`, {
         component: 'BriefGenerator',
-        billId: request.billId,
+        bill_id: request.bill_id,
         briefType: request.briefType || 'committee',
         targetAudience: request.targetAudience || 'legislators'
       });
@@ -153,7 +153,7 @@ export class BriefGeneratorService {
 
       const brief: GeneratedBrief = {
         id: crypto.randomUUID(),
-        billId: request.billId,
+        bill_id: request.bill_id,
         briefType: request.briefType || 'committee',
         targetAudience: request.targetAudience || 'legislators',
         executiveSummary,
@@ -168,7 +168,7 @@ export class BriefGeneratorService {
 
       logger.info(`✅ Legislative brief generated successfully`, {
         component: 'BriefGenerator',
-        billId: request.billId,
+        bill_id: request.bill_id,
         briefLength: executiveSummary.length,
         keyFindings: keyFindings.length,
         processingTime: metadata.processingTime
@@ -179,7 +179,7 @@ export class BriefGeneratorService {
     } catch (error) {
       logger.error(`❌ Brief generation failed`, {
         component: 'BriefGenerator',
-        billId: request.billId,
+        bill_id: request.bill_id,
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;

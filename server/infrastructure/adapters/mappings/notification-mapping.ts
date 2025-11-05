@@ -6,7 +6,7 @@
  */
 
 import { notifications } from '@shared/schema';
-import { Notification } from '../../../features/notifications/domain/entities/notification';
+import { Notification } from '@/features/notifications/domain/entities/notification';
 import { EntityMapping } from '../drizzle-adapter';
 
 type NotificationRow = typeof notifications.$inferSelect;

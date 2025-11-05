@@ -221,11 +221,11 @@ describe('Error Handling Deployment Integration', () => {
     });
 
     it('should determine user cohorts consistently', async () => {
-      const userId = 'test-user-123';
+      const user_id = 'test-user-123';
       const component = 'error-handling-boom';
 
-      const cohort1 = featureFlagsService.getUserCohort(userId, component);
-      const cohort2 = featureFlagsService.getUserCohort(userId, component);
+      const cohort1 = featureFlagsService.getUserCohort(user_id, component);
+      const cohort2 = featureFlagsService.getUserCohort(user_id, component);
 
       // Same user should always get same cohort
       expect(cohort1).toBe(cohort2);

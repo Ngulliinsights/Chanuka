@@ -5,8 +5,8 @@ import { User } from '../domain/entities/user';
 import { UserProfile, UserInterest } from '../domain/entities/user-profile';
 import { CitizenVerification } from '../domain/entities/citizen-verification';
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
-import { databaseService } from '../../../infrastructure/database/database-service';
-import { logger } from '../../../../shared/core/src/index.js';
+import { databaseService } from '@/infrastructure/database/database-service';
+import { logger } from '@shared/core/index.js';
 
 /**
  * UserService - Direct Drizzle implementation replacing UserRepository
@@ -108,9 +108,9 @@ export class UserService {
 
       await db.insert(users).values(insertPayload);
       
-      logger.info('User saved successfully', { userId: userData.id });
+      logger.info('User saved successfully', { user_id: userData.id });
     } catch (error) {
-      logger.error('Error saving user', { userId: user.id, error });
+      logger.error('Error saving user', { user_id: user.id, error });
       throw error;
     }
   }
@@ -131,9 +131,9 @@ export class UserService {
         })
         .where(eq(users.id, userData.id));
 
-      logger.info('User updated successfully', { userId: userData.id });
+      logger.info('User updated successfully', { user_id: userData.id });
     } catch (error) {
-      logger.error('Error updating user', { userId: user.id, error });
+      logger.error('Error updating user', { user_id: user.id, error });
       throw error;
     }
   }
@@ -141,9 +141,9 @@ export class UserService {
   async delete(id: string): Promise<void> {
     try {
       await db.delete(users).where(eq(users.id, id));
-      logger.info('User deleted successfully', { userId: id });
+      logger.info('User deleted successfully', { user_id: id });
     } catch (error) {
-      logger.error('Error deleting user', { userId: id, error });
+      logger.error('Error deleting user', { user_id: id, error });
       throw error;
     }
   }
@@ -191,9 +191,9 @@ export class UserService {
 
       await db.insert(user_profiles).values(insertPayload);
       
-      logger.info('User profile saved successfully', { userId: profileData.user_id });
+      logger.info('User profile saved successfully', { user_id: profileData.user_id });
     } catch (error) {
-      logger.error('Error saving user profile', { userId: profile.user_id, error });
+      logger.error('Error saving user profile', { user_id: profile.user_id, error });
       throw error;
     }
   }
@@ -220,9 +220,9 @@ export class UserService {
         })
         .where(eq(user_profiles.user_id, profileData.user_id));
 
-      logger.info('User profile updated successfully', { userId: profileData.user_id });
+      logger.info('User profile updated successfully', { user_id: profileData.user_id });
     } catch (error) {
-      logger.error('Error updating user profile', { userId: profile.user_id, error });
+      logger.error('Error updating user profile', { user_id: profile.user_id, error });
       throw error;
     }
   }
@@ -247,11 +247,11 @@ export class UserService {
 
   async findUsersByVerificationStatus(status: string): Promise<User[]> {
     try {
-      const isVerified = status === 'verified';
+      const is_verified = status === 'verified';
       const results = await db
         .select()
         .from(users)
-        .where(eq(users.is_verified, isVerified));
+        .where(eq(users.is_verified, is_verified));
 
       return results.map(result => this.mapToUser(result));
     } catch (error) {

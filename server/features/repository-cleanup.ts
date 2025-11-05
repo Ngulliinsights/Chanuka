@@ -127,7 +127,7 @@ async function replaceRepositoryReferences(content: string): Promise<string> {
 async function simplifyServiceImplementation(content: string, filePath: string): Promise<string> {
   if (filePath.includes('ExpertVerificationService.ts')) {
     // Create a simplified version of ExpertVerificationService
-    return `import { logger } from '../../../../shared/core/src/index.js';
+    return `import { logger } from '@shared/core/index.js';
 
 export enum VerificationStatus {
   PENDING = 'pending',
@@ -164,7 +164,7 @@ export interface Analysis {
 
 export interface ExtendedVerificationTask {
   id: string;
-  analysisId: string;
+  analysis_id: string;
   expertId: string;
   status: VerificationStatus;
   assignedAt: Date;
@@ -222,18 +222,18 @@ export class ExpertVerificationService {
    * Simplified expert verification submission
    */
   async submitExpertVerification(
-    analysisId: string,
+    analysis_id: string,
     expertId: string,
     verdict: string,
     confidence: number,
     reasoning: string
   ): Promise<void> {
     try {
-      this.logger.info(\`Expert \${expertId} submitted verification for analysis \${analysisId}\`);
+      this.logger.info(\`Expert \${expertId} submitted verification for analysis \${analysis_id}\`);
       
       // Simplified implementation - just log the submission
       this.logger.debug('Verification details:', {
-        analysisId,
+        analysis_id,
         expertId,
         verdict,
         confidence,
@@ -249,7 +249,7 @@ export class ExpertVerificationService {
   /**
    * Get analysis status (simplified)
    */
-  async getAnalysisStatus(analysisId: string): Promise<VerificationStatus> {
+  async getAnalysisStatus(analysis_id: string): Promise<VerificationStatus> {
     try {
       // Simplified implementation - return pending status
       return VerificationStatus.PENDING;

@@ -105,12 +105,12 @@ export interface OAuthProvider {
 export interface SocialProfile { id: string;
   user_id: string;
   provider: string;
-  profileId: string;
+  profile_id: string;
   username?: string;
   display_name?: string;
   avatar_url?: string;
-  accessToken?: string;
-  refreshToken?: string;
+  access_token?: string;
+  refresh_token?: string;
   tokenExpiresAt?: Date;
   created_at: Date;
   updated_at: Date;

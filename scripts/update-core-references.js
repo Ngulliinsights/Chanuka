@@ -25,17 +25,17 @@ class CoreReferencesUpdater {
       // Utilities consolidation - utilities/* -> utils/*
       {
         pattern: /from ['"]@shared\/core\/utilities\/api['"]/g,
-        replacement: "from '@shared/core/src/utils/api-utils'",
+        replacement: "from '@shared/core/utils/api-utils'",
         description: 'Update utilities/api to utils/api-utils'
       },
       {
         pattern: /from ['"]@shared\/core\/utilities\/cache['"]/g,
-        replacement: "from '@shared/core/src/utils/cache-utils'",
+        replacement: "from '@shared/core/utils/cache-utils'",
         description: 'Update utilities/cache to utils/cache-utils'
       },
       {
         pattern: /from ['"]@shared\/core\/utilities\/performance['"]/g,
-        replacement: "from '@shared/core/src/utils/performance-utils'",
+        replacement: "from '@shared/core/utils/performance-utils'",
         description: 'Update utilities/performance to utils/performance-utils'
       },
       {

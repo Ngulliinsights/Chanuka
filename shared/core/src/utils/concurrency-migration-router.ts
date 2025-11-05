@@ -4,7 +4,7 @@
  * Routes between legacy and new concurrency implementations based on feature flags
  */
 
-import type { FeatureFlagsService } from '../../../server/infrastructure/migration/feature-flags.service.js';
+import type { FeatureFlagsService } from '../types/feature-flags.js';
 import { ConcurrencyAdapter, Mutex as NewMutex, Semaphore as NewSemaphore } from './concurrency-adapter.js';
 import { 
   Mutex as LegacyMutex, 
@@ -44,8 +44,8 @@ export class ConcurrencyMigrationRouter {
   /**
    * Get mutex instance based on feature flag
    */
-  async getMutex(type: 'global' | 'api' | 'cache' = 'global', userId?: string): Promise<NewMutex | LegacyMutex> {
-    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', userId);
+  async getMutex(type: 'global' | 'api' | 'cache' = 'global', user_id?: string): Promise<NewMutex | LegacyMutex> {
+    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', user_id);
     
     if (shouldUseMigration) {
       switch (type) {
@@ -65,8 +65,8 @@ export class ConcurrencyMigrationRouter {
   /**
    * Get semaphore instance based on feature flag
    */
-  async getSemaphore(type: 'api' | 'file' = 'api', userId?: string): Promise<NewSemaphore | LegacySemaphore> {
-    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', userId);
+  async getSemaphore(type: 'api' | 'file' = 'api', user_id?: string): Promise<NewSemaphore | LegacySemaphore> {
+    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', user_id);
     
     if (shouldUseMigration) {
       switch (type) {
@@ -87,14 +87,14 @@ export class ConcurrencyMigrationRouter {
   async withMutexLock<T>(
     fn: () => Promise<T>, 
     type: 'global' | 'api' | 'cache' = 'global',
-    userId?: string
+    user_id?: string
   ): Promise<T> {
     const startTime = Date.now();
-    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', userId);
+    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', user_id);
     const implementation = shouldUseMigration ? 'new' : 'legacy';
     
     try {
-      const mutex = await this.getMutex(type, userId);
+      const mutex = await this.getMutex(type, user_id);
       const result = await mutex.withLock(fn);
       
       this.recordMetrics({
@@ -125,14 +125,14 @@ export class ConcurrencyMigrationRouter {
   async withSemaphorePermit<T>(
     fn: () => Promise<T>, 
     type: 'api' | 'file' = 'api',
-    userId?: string
+    user_id?: string
   ): Promise<T> {
     const startTime = Date.now();
-    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', userId);
+    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', user_id);
     const implementation = shouldUseMigration ? 'new' : 'legacy';
     
     try {
-      const semaphore = await this.getSemaphore(type, userId);
+      const semaphore = await this.getSemaphore(type, user_id);
       const result = await semaphore.withPermit(fn);
       
       this.recordMetrics({
@@ -160,8 +160,8 @@ export class ConcurrencyMigrationRouter {
   /**
    * Get concurrency adapter with feature flag routing
    */
-  async getConcurrencyAdapter(userId?: string): Promise<ConcurrencyAdapter> {
-    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', userId);
+  async getConcurrencyAdapter(user_id?: string): Promise<ConcurrencyAdapter> {
+    const shouldUseMigration = await this.shouldUseMigration('utilities-concurrency-adapter', user_id);
     
     if (shouldUseMigration) {
       return this.concurrencyAdapter;
@@ -184,13 +184,13 @@ export class ConcurrencyMigrationRouter {
   /**
    * Check if migration should be used based on feature flags
    */
-  private async shouldUseMigration(flagName: string, userId?: string): Promise<boolean> {
+  private async shouldUseMigration(flagName: string, user_id?: string): Promise<boolean> {
     if (!this.featureFlagsService) {
       return false; // Default to legacy if no feature flags service
     }
     
     try {
-      return await this.featureFlagsService.shouldUseMigration(flagName, userId);
+      return await this.featureFlagsService.shouldUseMigration(flagName, user_id);
     } catch (error) {
       console.error(`Error checking feature flag ${flagName}:`, error);
       return false; // Default to legacy on error

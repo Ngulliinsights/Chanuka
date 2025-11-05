@@ -14,7 +14,7 @@ export const ActionItemSchema = z.object({ id: z.string().min(1, 'Action item ID
   title: z.string().min(1, 'Title cannot be empty').max(200, 'Title too long'),
   description: z.string().min(1, 'Description cannot be empty').max(1000, 'Description too long'),
   priority: ActionPrioritySchema,
-  dueDate: z.date().optional(),
+  due_date: z.date().optional(),
   category: z.string().max(100, 'Category too long').optional(),
   bill_id: z.string().optional(),
   completed: z.boolean().optional(),

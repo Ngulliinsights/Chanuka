@@ -89,7 +89,7 @@ describe('Dashboard Utilities', () => {
         title: 'Review Healthcare Bill',
         description: 'This is a very long description that should be truncated when it exceeds the maximum length limit for display purposes in the user interface.',
         priority: 'High',
-        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+        due_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
         created_at: new Date('2024-01-10T10:00:00Z'),
         updated_at: new Date('2024-01-12T15:30:00Z')
       };
@@ -100,7 +100,7 @@ describe('Dashboard Utilities', () => {
         expect(formatted.title).toBe('Review Healthcare Bill');
         expect(formatted.priority).toBe('High');
         expect(formatted.priorityColor).toContain('red');
-        expect(formatted.dueDate).toContain('Due in 2 days');
+        expect(formatted.due_date).toContain('Due in 2 days');
         expect(formatted.dueDateColor).toBe('text-slate-600');
         expect(formatted.isOverdue).toBe(false);
       });
@@ -115,12 +115,12 @@ describe('Dashboard Utilities', () => {
       it('should handle overdue items', () => {
         const overdueItem = {
           ...mockActionItem,
-          dueDate: new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 day ago
+          due_date: new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 day ago
         };
 
         const formatted = formatActionItem(overdueItem);
 
-        expect(formatted.dueDate).toContain('overdue');
+        expect(formatted.due_date).toContain('overdue');
         expect(formatted.dueDateColor).toBe('text-red-600');
         expect(formatted.isOverdue).toBe(true);
       });
@@ -128,24 +128,24 @@ describe('Dashboard Utilities', () => {
       it('should handle items due today', () => {
         const todayItem = {
           ...mockActionItem,
-          dueDate: new Date() // Today
+          due_date: new Date() // Today
         };
 
         const formatted = formatActionItem(todayItem);
 
-        expect(formatted.dueDate).toBe('Due today');
+        expect(formatted.due_date).toBe('Due today');
         expect(formatted.dueDateColor).toBe('text-orange-600');
       });
 
       it('should handle items without due date', () => {
         const noDueDateItem = {
           ...mockActionItem,
-          dueDate: undefined
+          due_date: undefined
         };
 
         const formatted = formatActionItem(noDueDateItem);
 
-        expect(formatted.dueDate).toBeNull();
+        expect(formatted.due_date).toBeNull();
         expect(formatted.isOverdue).toBe(false);
       });
 

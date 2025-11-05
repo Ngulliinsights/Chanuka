@@ -3,7 +3,7 @@
 
 // ---------- Enhanced Types ----------
 import { config } from '../../config/index.js';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // ---------- Security Utilities ----------
 const escapeHtml = (unsafe: string): string => {

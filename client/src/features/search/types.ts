@@ -45,7 +45,7 @@ export interface SearchMetadata { bill_id?: string;
   category?: string;
   view_count?: number;
   comment_count?: number;
-  voteCount?: number;
+  vote_count?: number;
   }
 
 export interface SearchHighlight {

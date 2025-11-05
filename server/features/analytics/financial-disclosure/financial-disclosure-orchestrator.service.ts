@@ -2,7 +2,7 @@
 // Main service that orchestrates the decomposed financial disclosure services
 // Maintains backward compatibility with the original API
 
-import { readDatabase } from '@shared/database/connection';
+import { readDatabase } from '@shared/database';
 import { sponsors } from "@shared/foundation";
 import { eq, desc } from "drizzle-orm";
 import { cache, logger, DatabaseError } from '@shared/core';
@@ -264,7 +264,7 @@ export class FinancialDisclosureOrchestratorService {
 
     const completenessRisk = riskScores[completeness.riskAssessment];
     const relationshipRisk = riskScores[relationships.riskAssessment];
-    const anomalyRisk = anomalies.riskScore > 75 ? 4 : anomalies.riskScore > 50 ? 3 : anomalies.riskScore > 25 ? 2 : 1;
+    const anomalyRisk = anomalies.risk_score > 75 ? 4 : anomalies.risk_score > 50 ? 3 : anomalies.risk_score > 25 ? 2 : 1;
 
     // Calculate weighted average (completeness 40%, relationships 35%, anomalies 25%)
     const overallScore = (completenessRisk * 0.4) + (relationshipRisk * 0.35) + (anomalyRisk * 0.25);
@@ -297,7 +297,7 @@ export class FinancialDisclosureOrchestratorService {
     }
 
     // Anomaly insights
-    if (analysis.anomalyDetection.riskScore > 50) {
+    if (analysis.anomalyDetection.risk_score > 50) {
       insights.push('Unusual patterns detected in financial disclosures - review recommended.');
     }
 

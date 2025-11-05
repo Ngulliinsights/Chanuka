@@ -44,7 +44,7 @@ describe('DrizzlePatternDetector', () => {
     it('should detect missing Drizzle imports', () => {
       const sourceCode = `
         const user = db.select().from(users).where(
-          eq(users.id, userId)
+          eq(users.id, user_id)
         );
       `;
 
@@ -91,7 +91,7 @@ describe('DrizzlePatternDetector', () => {
         import { and } from 'drizzle-orm';
         
         const user = db.select().from(users).where(
-          and(eq(users.id, userId)) // Missing second condition
+          and(eq(users.id, user_id)) // Missing second condition
         );
       `;
 
@@ -163,7 +163,7 @@ describe('DrizzlePatternDetector', () => {
         import { between } from 'drizzle-orm';
         
         const users = db.select().from(users).where(
-          between(users.created_at, startDate) // Missing max argument
+          between(users.created_at, start_date) // Missing max argument
         );
       `;
 
@@ -254,7 +254,7 @@ describe('DrizzlePatternDetector', () => {
               ),
               inArray(users.id, [1, 2, 3]),
               like(users.email, '%@example.com'),
-              between(users.created_at, startDate, endDate)
+              between(users.created_at, start_date, end_date)
             )
           );
       `;

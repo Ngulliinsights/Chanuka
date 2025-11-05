@@ -3,7 +3,7 @@
 // ============================================================================
 // Provides consistent error handling patterns across all services
 
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 
 export enum ErrorCategory {
   VALIDATION = 'validation',
@@ -26,7 +26,7 @@ export enum ErrorSeverity {
 }
 
 export interface ErrorContext {
-  userId?: string;
+  user_id?: string;
   requestId?: string;
   correlationId?: string;
   service: string;
@@ -517,7 +517,7 @@ export class StandardizedErrorHandler {
       severity: error.severity,
       service: error.context.service,
       operation: error.context.operation,
-      userId: error.context.userId,
+      user_id: error.context.user_id,
       requestId: error.context.requestId,
       correlationId: error.context.correlationId,
       retryable: error.retryable,

@@ -127,7 +127,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
     // Generate user report
     const recoveryOptions = this.userReporter.generateRecoveryOptions(enhancedError);
     const report = this.userReporter.generateReport(enhancedError, { user_id: 'unknown', // Would come from context/user auth
-      metadata: { sessionId: 'unknown'  } // Would come from session management
+      metadata: { session_id: 'unknown'  } // Would come from session management
     }, recoveryOptions);
 
     // Attempt automatic recovery if enabled
@@ -615,8 +615,8 @@ export function withEnhancedErrorBoundary<P extends object>(
     </EnhancedErrorBoundary>
   );
 
-  WithEnhancedErrorBoundaryComponent.display_name =
-    `withEnhancedErrorBoundary(${WrappedComponent.display_name || WrappedComponent.name})`;
+  WithEnhancedErrorBoundaryComponent.displayName =
+    `withEnhancedErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
 
   return WithEnhancedErrorBoundaryComponent;
 }

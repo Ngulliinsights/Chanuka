@@ -8,7 +8,7 @@ import { StringUtils } from '../../utils/string-utils';
 import { NumberUtils } from '../../utils/number-utils';
 import { RegexPatterns } from '../../utils/regex-patterns';
 import { TypeGuards } from '../../utils/type-guards';
-import { Logger } from '../../logging';
+import { Logger } from '../../observability/logging';
 import { logger } from '../../observability/logging';
 
 export interface ValidationErrorDetail {

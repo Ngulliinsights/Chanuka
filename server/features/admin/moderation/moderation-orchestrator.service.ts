@@ -5,7 +5,7 @@
  * This service acts as the primary interface for moderation operations.
  */
 
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { 
   ContentModerationFilters, 
   ModerationItem, 
@@ -75,7 +75,7 @@ export class ModerationOrchestratorService {
   ): Promise<{ 
     success: boolean; 
     message: string; 
-    reportId?: number;
+    report_id?: number;
     analysis?: ContentAnalysisResult;
   }> {
     try {
@@ -148,7 +148,7 @@ export class ModerationOrchestratorService {
    * Reviews a content report and applies moderation action
    */
   async reviewReport(
-    reportId: number,
+    report_id: number,
     moderatorId: string,
     decision: 'resolve' | 'dismiss' | 'escalate',
     actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight',
@@ -160,7 +160,7 @@ export class ModerationOrchestratorService {
   }> {
     try {
       return await moderationDecisionService.reviewReport(
-        reportId,
+        report_id,
         moderatorId,
         decision,
         actionType,
@@ -231,8 +231,8 @@ export class ModerationOrchestratorService {
    * Retrieves comprehensive moderation statistics
    */
   async getModerationStats(
-    startDate: Date,
-    endDate: Date
+    start_date: Date,
+    end_date: Date
   ): Promise<{
     reportsCreated: number;
     reportsResolved: number;
@@ -250,7 +250,7 @@ export class ModerationOrchestratorService {
     severityBreakdown: { severity: string; count: number }[];
   }> {
     try {
-      return await moderationAnalyticsService.getModerationStats(startDate, endDate);
+      return await moderationAnalyticsService.getModerationStats(start_date, end_date);
     } catch (error) {
       logger.error('Error in moderation orchestrator - getModerationStats:', {
         component: 'ModerationOrchestrator',
@@ -289,7 +289,7 @@ export class ModerationOrchestratorService {
     approved: boolean;
     requiresReview: boolean;
     analysis: ContentAnalysisResult;
-    reportId?: number;
+    report_id?: number;
   }> {
     try {
       // Analyze the content
@@ -313,7 +313,7 @@ export class ModerationOrchestratorService {
           approved: false,
           requiresReview: true,
           analysis,
-          reportId: reportResult.reportId
+          report_id: reportResult.report_id
         };
       }
 
@@ -335,7 +335,7 @@ export class ModerationOrchestratorService {
    * Handles escalated moderation decisions
    */
   async handleEscalation(
-    reportId: number,
+    report_id: number,
     escalationReason: string,
     escalatedBy: string
   ): Promise<{
@@ -351,7 +351,7 @@ export class ModerationOrchestratorService {
 
       logger.info('Moderation escalation handled:', {
         component: 'ModerationOrchestrator',
-        reportId,
+        report_id,
         escalationReason,
         escalatedBy
       });

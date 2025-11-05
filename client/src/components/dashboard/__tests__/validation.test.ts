@@ -66,7 +66,7 @@ describe('Dashboard Validation', () => {
 
     it('should validate optional fields', () => { const itemWithOptionals = {
         ...validActionItem,
-        dueDate: new Date(),
+        due_date: new Date(),
         category: 'Legislative',
         bill_id: 'bill-123',
         completed: true

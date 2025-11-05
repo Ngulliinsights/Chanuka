@@ -3,8 +3,8 @@ import pg from 'pg';
 const { Pool } = pg;
 import { errorTracker } from '../../core/errors/error-tracker.js';
 import { config } from '../../config/index.js';
-import { logger } from '../../../shared/core/src/index.js';
-import { users, bills, sponsors, User, Bill, Sponsor, comments, notifications, bill_engagement, bill_tracking_preferences } from '../../../shared/schema/index.js';
+import { logger } from '@shared/core/index.js';
+import { users, bills, sponsors, User, Bill, Sponsor, comments, notifications, bill_engagement, bill_tracking_preferences } from '@shared/schema/index.js';
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================

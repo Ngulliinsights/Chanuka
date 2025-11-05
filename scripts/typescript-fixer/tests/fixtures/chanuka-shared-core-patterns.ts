@@ -3,13 +3,13 @@
 
 // Missing logger usage
 function handleUserRegistration(userData: any) {
-  logger.info('User registration started', { userId: userData.id });
+  logger.info('User registration started', { user_id: userData.id });
   
   try {
     // Process registration
     logger.debug('Processing user data', userData);
   } catch (error) {
-    logger.error('Registration failed', { userId: userData.id }, error);
+    logger.error('Registration failed', { user_id: userData.id }, error);
     throw error;
   }
 }
@@ -33,24 +33,24 @@ export async function createUser(req: Request, res: Response) {
 }
 
 // Missing cache utilities
-export async function getUserProfile(userId: string) {
+export async function getUserProfile(user_id: string) {
   // Missing cacheKeys import
-  const cacheKey = cacheKeys.USER_PROFILE(userId);
+  const cacheKey = cacheKeys.USER_PROFILE(user_id);
   
   // Missing cache import
   return cache.getOrSetCache(cacheKey, 300, async () => {
-    return await userService.getProfile(userId);
+    return await userService.getProfile(user_id);
   });
 }
 
 // Missing performance utilities
-export async function processLargeBill(billId: number) {
+export async function processLargeBill(bill_id: number) {
   // Missing Performance import
   const timer = Performance.startTimer('bill-processing');
   
   try {
     const result = await Performance.measure('bill-calculation', async () => {
-      return await billService.calculateComplexBill(billId);
+      return await billService.calculateComplexBill(bill_id);
     });
     
     timer.end();
@@ -157,9 +157,9 @@ export async function handleApiRequest(req: Request, res: Response) {
 }
 
 // Legacy cache keys usage (should also be detected)
-export function getLegacyCacheKey(userId: string) {
+export function getLegacyCacheKey(user_id: string) {
   // Missing CACHE_KEYS import (legacy pattern)
-  return CACHE_KEYS.USER_PROFILE(userId);
+  return CACHE_KEYS.USER_PROFILE(user_id);
 }
 
 // Configuration utilities
@@ -207,7 +207,7 @@ export class UserService {
       const cacheKey = cacheKeys.USER_PROFILE(user.id);
       await cache.set(cacheKey, user, 300);
       
-      logger.info('User created successfully', { userId: user.id });
+      logger.info('User created successfully', { user_id: user.id });
       
       return new ApiSuccess(user, 'User created', 201);
     } catch (error) {

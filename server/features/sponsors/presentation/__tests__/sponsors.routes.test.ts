@@ -67,7 +67,7 @@ describe('Sponsors API Routes', () => {
         // Reset mocks for analysis service methods
         (sponsorConflictAnalysisService.detectConflicts as vi.Mock).mockResolvedValue([mockConflictResult]);
         (sponsorConflictAnalysisService.generateRiskProfile as vi.Mock).mockResolvedValue(mockRiskProfile);
-        (sponsorConflictAnalysisService.analyzeConflictTrends as vi.Mock).mockResolvedValue([{ sponsor_id: 1, conflictCount: 1, severityTrend: 'stable', riskScore: 50, predictions: [] }]);
+        (sponsorConflictAnalysisService.analyzeConflictTrends as vi.Mock).mockResolvedValue([{ sponsor_id: 1, conflictCount: 1, severityTrend: 'stable', risk_score: 50, predictions: [] }]);
          (sponsorConflictAnalysisService.createConflictMapping as vi.Mock).mockResolvedValue({ nodes: [], edges: [], clusters: [], metrics: {} });
     });
 

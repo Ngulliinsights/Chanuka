@@ -3,8 +3,8 @@
 // ============================================================================
 // Comprehensive search with multiple engines, fallbacks, and performance optimization
 
-import { logger, cache } from '../../../shared/core/index.js';
-import { database } from '@shared/database/connection';
+import { logger, cache } from '@shared/core/index.js';
+import { database } from '@shared/database';
 import { bills, sponsors } from '@shared/schema';
 import { sql } from 'drizzle-orm';
 import {

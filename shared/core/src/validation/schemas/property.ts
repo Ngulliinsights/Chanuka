@@ -365,7 +365,7 @@ export const propertyValuationSchema = z.object({
 export const propertyReportSchema = z.object({
   propertyId: uuidSchema,
   reportType: z.enum(['inspection', 'appraisal', 'environmental', 'survey', 'title']),
-  reportDate: z.coerce.date(),
+  report_date: z.coerce.date(),
   inspector: z.string().max(100),
   inspectorLicense: z.string().max(50).optional(),
   findings: z.array(z.object({

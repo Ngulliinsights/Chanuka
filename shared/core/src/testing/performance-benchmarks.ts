@@ -269,7 +269,7 @@ export class PerformanceBenchmarks extends EventEmitter {
         `value-${i}`,
         300
       ]);
-      await cache.mset!(entries);
+      await cache.mset!(entries.map(([key, value, ttl]) => ({ key, value, ttl: ttl || 300 })));
     }, {
       iterations: this.config.iterations?.cache?.batchSet || 500,
       warmupIterations: 50
@@ -895,7 +895,7 @@ export class PerformanceBenchmarks extends EventEmitter {
   }
 
   private generateSummary(results: BenchmarkResult[]): BenchmarkSummary {
-    const categories = [...new Set(results.map(r => r.category))];
+    const categories = Array.from(new Set(results.map(r => r.category)));
     const categoryStats: Record<string, CategoryStats> = {};
 
     for (const category of categories) {

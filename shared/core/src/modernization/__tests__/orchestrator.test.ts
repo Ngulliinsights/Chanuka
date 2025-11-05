@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ModernizationOrchestrator } from '../orchestrator';
 import { ModernizationTask, ModernizationPhase, TaskPriority, TaskStatus } from '@shared/core/src/types';
-import { Logger } from '../../logging';
+import { Logger } from '../../observability/logging';
 import { logger } from '@shared/core/src/observability/logging';
 
 // Mock the dependencies

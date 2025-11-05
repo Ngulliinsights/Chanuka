@@ -8,8 +8,8 @@ import { bill as bills, users as users, comments as comments, user_profiles as u
   type SponsorTransparency, type BillSectionConflict
  } from '../shared/schema';
 import { eq, desc, and, or, like, count, asc, sql } from "drizzle-orm";
-import { readDatabase } from '@shared/database/connection';
-import { logger  } from '../../../shared/core/src/index.js';
+import { readDatabase } from '@shared/database';
+import { logger  } from '@shared/core/index.js';
 
 // Enhanced engagement statistics interface with more detailed metrics
 export interface BillEngagementStats {
@@ -392,7 +392,7 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
         eq(sponsorAffiliations.sponsor_id, sponsor_id),
         eq(sponsorAffiliations.is_active, true)
       ))
-      .orderBy(desc(sponsorAffiliations.startDate));
+      .orderBy(desc(sponsorAffiliations.start_date));
   }
 
   async getBillConflicts(bill_id: number): Promise<BillSectionConflict[]> { return await readDatabase.select().from(billSectionConflicts)

@@ -4,7 +4,7 @@
  * Handles queue management, filtering, pagination, and report creation.
  */
 
-import { database as db } from '../../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { bill, 
   comments, 
   users, 
@@ -12,7 +12,7 @@ import { bill,
   sponsor 
  } from '../shared/schema';
 import { eq, count, desc, sql, and, gte, SQL } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { ContentModerationFilters, ModerationItem, PaginationInfo } from './types.js';
 import { contentAnalysisService } from './content-analysis.service.js';
 
@@ -119,7 +119,7 @@ export class ModerationQueueService {
     reportedBy: string,
     autoDetected = false,
     description?: string
-  ): Promise<{ success: boolean; message: string; reportId?: number }> {
+  ): Promise<{ success: boolean; message: string; report_id?: number }> {
     try {
       // Check if there's already a pending report for this content
       const [existingReport] = await db
@@ -152,7 +152,7 @@ export class ModerationQueueService {
         return { 
           success: true, 
           message: 'Existing report updated',
-          reportId: existingReport.id
+          report_id: existingReport.id
         };
       } else {
         // Create new report
@@ -174,7 +174,7 @@ export class ModerationQueueService {
         return { 
           success: true, 
           message: 'Content reported successfully',
-          reportId: newReport.id
+          report_id: newReport.id
         };
       }
     } catch (error) {
@@ -189,12 +189,12 @@ export class ModerationQueueService {
   /**
    * Gets a specific report by ID
    */
-  async getReportById(reportId: number): Promise<ModerationItem | null> {
+  async getReportById(report_id: number): Promise<ModerationItem | null> {
     try {
       const [report] = await db
         .select()
         .from(content_report)
-        .where(eq(content_report.id, reportId));
+        .where(eq(content_report.id, report_id));
 
       if (!report) {
         return null;
@@ -212,7 +212,7 @@ export class ModerationQueueService {
     } catch (error) {
       logger.error('Error fetching report by ID:', {
         component: 'ModerationQueue',
-        reportId,
+        report_id,
         error: error instanceof Error ? error.message : String(error)
       });
       return null;

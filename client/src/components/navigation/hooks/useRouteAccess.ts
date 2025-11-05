@@ -1,5 +1,5 @@
-import { useAuth } from '../../../hooks/use-auth';
-import { useUnifiedNavigation } from '../../../hooks/use-unified-navigation';
+import { useAuth } from '@/hooks/use-auth';
+import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
 import { checkRouteAccess } from '../utils/route-access';
 import { validateNavigationPath, validateUserRole } from '../validation';
 import { NavigationValidationError, NavigationAccessDeniedError } from '../errors';

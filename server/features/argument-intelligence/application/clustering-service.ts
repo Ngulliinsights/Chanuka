@@ -3,7 +3,7 @@
 // ============================================================================
 // Clusters similar arguments using semantic similarity to reveal patterns
 
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { SimilarityCalculator } from '../infrastructure/nlp/similarity-calculator.js';
 
 export interface ArgumentCluster {
@@ -25,7 +25,7 @@ export interface ClusteredArgument {
   text: string;
   normalizedText: string;
   confidence: number;
-  userId: string;
+  user_id: string;
   userDemographics?: UserDemographics;
   similarityScore: number; // Similarity to cluster representative
   isRepresentative: boolean;
@@ -500,7 +500,7 @@ export class ClusteringService {
     const stakeholderGroups = this.aggregateStakeholderGroups(arguments);
     const averageConfidence = this.calculateAverageConfidence(arguments);
     const evidenceStrength = this.calculateEvidenceStrength(arguments);
-    const participantCount = new Set(arguments.map(arg => arg.userId)).size;
+    const participantCount = new Set(arguments.map(arg => arg.user_id)).size;
     const geographicDistribution = this.calculateGeographicDistribution(arguments);
     const demographicBreakdown = this.calculateDemographicBreakdown(arguments);
 

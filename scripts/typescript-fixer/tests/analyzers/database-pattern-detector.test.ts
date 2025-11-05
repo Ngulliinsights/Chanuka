@@ -57,7 +57,7 @@ import { db } from '@shared/database/connection';
 import { eq, desc } from 'drizzle-orm';
 
 export async function getUsers() {
-  const users = await db.select().from(usersTable).orderBy(desc(usersTable.createdAt));
+  const users = await db.select().from(usersTable).orderBy(desc(usersTable.created_at));
   return users;
 }
 
@@ -91,13 +91,13 @@ export async function complexQuery() {
       totalViews: sum(posts.views),
     })
     .from(users)
-    .leftJoin(posts, eq(users.id, posts.userId))
+    .leftJoin(posts, eq(users.id, posts.user_id))
     .where(
       and(
-        eq(users.isActive, true),
+        eq(users.is_active, true),
         or(
           eq(posts.status, 'published'),
-          sql\`\${posts.createdAt} > NOW() - INTERVAL '30 days'\`
+          sql\`\${posts.created_at} > NOW() - INTERVAL '30 days'\`
         )
       )
     )

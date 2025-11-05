@@ -5,7 +5,7 @@
  * Handles edge cases and data validation during migration transition.
  */
 
-import { User } from '../../../features/users/domain/entities/user';
+import { User } from '@/features/users/domain/entities/user';
 import { users } from '@shared/schema';
 import { EntityMapping } from '../drizzle-adapter';
 

@@ -3,8 +3,8 @@
 
 import { authenticateToken, requireRole } from './auth';
 import { createRateLimit, apiRateLimit, authRateLimit, searchRateLimit, legacySponsorRateLimit, legacyPasswordResetRateLimit, legacyRegistrationRateLimit } from './rate-limiter';
-// import { createMiddlewareMigrationAdapter  } from '../../shared/core/src/index.js';
-import { logger  } from '../../shared/core/src/index.js';
+// import { createMiddlewareMigrationAdapter  } from '@shared/core/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Legacy middleware factory interface
 interface LegacyMiddlewareFactory {

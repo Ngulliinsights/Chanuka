@@ -10,10 +10,10 @@ import { ConcurrencyMigrationRouter } from '../concurrency-migration-router';
 
 // Mock FeatureFlagsService interface
 interface FeatureFlagsService {
-  shouldUseMigration(flagName: string, userId?: string): Promise<boolean>;
+  shouldUseMigration(flagName: string, user_id?: string): Promise<boolean>;
   updateFlag(flagName: string, updates: any): void;
   getFlag(flagName: string): any;
-  getUserCohort(userId: string, component: string): 'control' | 'treatment';
+  getUserCohort(user_id: string, component: string): 'control' | 'treatment';
   recordMetrics(metrics: any): Promise<void>;
   enableGradualRollout(flagName: string, targetPercentage: number): Promise<void>;
   rollbackFeature(flagName: string): Promise<void>;
@@ -32,14 +32,14 @@ class MockFeatureFlagsService implements FeatureFlagsService {
     });
   }
 
-  async shouldUseMigration(flagName: string, userId?: string): Promise<boolean> {
+  async shouldUseMigration(flagName: string, user_id?: string): Promise<boolean> {
     const flag = this.flags.get(flagName);
     if (!flag || !flag.enabled) {
       return false;
     }
 
-    if (userId) {
-      const userHash = this.hashUser(userId);
+    if (user_id) {
+      const userHash = this.hashUser(user_id);
       return userHash % 100 < flag.rolloutPercentage;
     }
 
@@ -55,8 +55,8 @@ class MockFeatureFlagsService implements FeatureFlagsService {
     return this.flags.get(flagName);
   }
 
-  getUserCohort(userId: string, component: string): 'control' | 'treatment' {
-    return this.hashUser(userId) % 2 === 0 ? 'control' : 'treatment';
+  getUserCohort(user_id: string, component: string): 'control' | 'treatment' {
+    return this.hashUser(user_id) % 2 === 0 ? 'control' : 'treatment';
   }
 
   async recordMetrics(metrics: any): Promise<void> {
@@ -77,9 +77,9 @@ class MockFeatureFlagsService implements FeatureFlagsService {
     });
   }
 
-  private hashUser(userId: string): number {
+  private hashUser(user_id: string): number {
     let hash = 0;
-    for (let i = 0; i < userId.length; i++) {
+    for (let i = 0; i < user_id.length; i++) {
       const char = userId.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
@@ -143,7 +143,7 @@ describe('Concurrency Migration Integration', () => {
       const results: string[] = [];
       const userIds = Array.from({ length: 100 }, (_, i) => `user-${i}`);
 
-      for (const userId of userIds) {
+      for (const user_id of userIds) {
         const result = await router.withMutexLock(async () => {
           return 'test-result';
         }, 'global', userId);
@@ -171,7 +171,7 @@ describe('Concurrency Migration Integration', () => {
         rolloutPercentage: 50
       });
 
-      const userId = 'consistent-user';
+      const user_id = 'consistent-user';
       const implementations: string[] = [];
 
       // Make multiple calls with same user
@@ -267,7 +267,7 @@ describe('Concurrency Migration Integration', () => {
     });
 
     it('should handle gradual rollout increase', async () => {
-      const userId = 'gradual-user';
+      const user_id = 'gradual-user';
 
       // Start with 0% rollout
       featureFlagsService.updateFlag('utilities-concurrency-adapter', {

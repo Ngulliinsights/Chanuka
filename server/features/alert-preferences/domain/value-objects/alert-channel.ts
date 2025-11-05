@@ -103,7 +103,7 @@ export class AlertChannel {
 export interface ChannelConfig {
   email?: string;
   pushToken?: string;
-  phoneNumber?: string;
+  phone_number?: string;
   webhookUrl?: string;
   webhookSecret?: string;
   verified: boolean;

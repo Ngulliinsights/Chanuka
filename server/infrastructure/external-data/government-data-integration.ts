@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@shared/database';
 import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@shared/schema';
 import { eq, and, or } from 'drizzle-orm';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Data source configuration
 interface DataSourceConfig {
@@ -57,8 +57,8 @@ const GovernmentSponsorSchema = z.object({
     organization: z.string(),
     role: z.string().optional(),
     type: z.string(),
-    startDate: z.string().optional(),
-    endDate: z.string().optional()
+    start_date: z.string().optional(),
+    end_date: z.string().optional()
   })).optional(),
   source: z.string(),
   sourceUrl: z.string().optional(),
@@ -469,7 +469,7 @@ export class GovernmentDataIntegrationService {
       if (!sponsorInfo.name) continue; // Skip if name is missing
 
       // Find or create sponsor
-      let sponsor = await db.select()
+      let sponsors = await db.select()
         .from(sponsors)
         .where(eq(sponsors.name, sponsorInfo.name))
         .limit(1);
@@ -528,9 +528,9 @@ export class GovernmentDataIntegrationService {
           organization: affiliation.organization,
           role: affiliation.role || null,
           type: affiliation.type,
-          startDate: affiliation.startDate ? new Date(affiliation.startDate) : null,
-          endDate: affiliation.endDate ? new Date(affiliation.endDate) : null,
-          is_active: !affiliation.endDate,
+          start_date: affiliation.start_date ? new Date(affiliation.start_date) : null,
+          end_date: affiliation.end_date ? new Date(affiliation.end_date) : null,
+          is_active: !affiliation.end_date,
           created_at: new Date()
         });
       }

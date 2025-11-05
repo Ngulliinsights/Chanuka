@@ -7,8 +7,8 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { EventEmitter } from 'events';
-import { logger  } from '../../../shared/core/src/index.js';
-import { httpUtils } from '../../../shared/core/src/utils/http-utils';
+import { logger  } from '@shared/core/index.js';
+import { httpUtils } from '@shared/core/utils/http-utils';
 import {
   DataSource,
   ApiEndpoint,

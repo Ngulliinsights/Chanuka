@@ -17,7 +17,7 @@ export interface LogContext { component?: string | undefined;
   user_id?: string | undefined;
   traceId?: string | undefined;
   requestId?: string | undefined;
-  sessionId?: string | undefined;
+  session_id?: string | undefined;
   correlationId?: string | undefined;
   [key: string]: unknown;
  }
@@ -77,7 +77,7 @@ export interface SecurityEventLogData { event: string;
   ip?: string;
   details?: Record<string, unknown>;
   user_agent?: string;
-  sessionId?: string;
+  session_id?: string;
  }
 
 export interface BusinessEventLogData { event: string;
@@ -85,7 +85,7 @@ export interface BusinessEventLogData { event: string;
   entity_id?: string;
   metadata?: Record<string, unknown>;
   user_id?: string;
-  sessionId?: string;
+  session_id?: string;
  }
 
 export interface PerformanceLogData {
@@ -108,7 +108,7 @@ export interface StoredLogEntry { timestamp: Date;
   traceId?: string | undefined;
   requestId?: string | undefined;
   user_id?: string | undefined;
-  sessionId?: string | undefined;
+  session_id?: string | undefined;
   ip_address?: string | undefined;
   user_agent?: string | undefined;
   component?: string | undefined;
@@ -269,7 +269,7 @@ export const logContextSchema = z.object({ component: z.string().optional(),
   user_id: z.string().optional(),
   traceId: z.string().optional(),
   requestId: z.string().optional(),
-  sessionId: z.string().optional(),
+  session_id: z.string().optional(),
   correlationId: z.string().optional(),
  }).catchall(z.unknown());
 
@@ -339,8 +339,8 @@ export const SENSITIVE_PATHS = [
   '*.key',
   '*.apiKey',
   '*.privateKey',
-  '*.accessToken',
-  '*.refreshToken',
+  '*.access_token',
+  '*.refresh_token',
   'req.headers.authorization',
   'req.headers.cookie',
   'res.headers["set-cookie"]',

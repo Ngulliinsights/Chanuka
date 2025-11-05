@@ -116,58 +116,58 @@ export class BillSummary {
  */
 export class EngagementMetrics {
   constructor(
-    private readonly viewCount: number = 0,
-    private readonly commentCount: number = 0,
+    private readonly view_count: number = 0,
+    private readonly comment_count: number = 0,
     private readonly voteCountFor: number = 0,
     private readonly voteCountAgainst: number = 0,
-    private readonly shareCount: number = 0,
-    private readonly engagementScore: number = 0
+    private readonly share_count: number = 0,
+    private readonly engagement_score: number = 0
   ) {
     this.validateCounts();
   }
 
   private validateCounts(): void {
-    if (this.viewCount < 0 || this.commentCount < 0 ||
+    if (this.view_count < 0 || this.comment_count < 0 ||
         this.voteCountFor < 0 || this.voteCountAgainst < 0 ||
-        this.shareCount < 0) {
+        this.share_count < 0) {
       throw new Error('Engagement counts cannot be negative');
     }
 
-    if (this.engagementScore < 0) {
+    if (this.engagement_score < 0) {
       throw new Error('Engagement score cannot be negative');
     }
   }
 
   incrementViews(): EngagementMetrics {
     return new EngagementMetrics(
-      this.viewCount + 1,
-      this.commentCount,
+      this.view_count + 1,
+      this.comment_count,
       this.voteCountFor,
       this.voteCountAgainst,
-      this.shareCount,
-      this.calculateEngagementScore(this.viewCount + 1, this.commentCount, this.voteCountFor + this.voteCountAgainst, this.shareCount)
+      this.share_count,
+      this.calculateEngagementScore(this.view_count + 1, this.comment_count, this.voteCountFor + this.voteCountAgainst, this.share_count)
     );
   }
 
   incrementComments(): EngagementMetrics {
     return new EngagementMetrics(
-      this.viewCount,
-      this.commentCount + 1,
+      this.view_count,
+      this.comment_count + 1,
       this.voteCountFor,
       this.voteCountAgainst,
-      this.shareCount,
-      this.calculateEngagementScore(this.viewCount, this.commentCount + 1, this.voteCountFor + this.voteCountAgainst, this.shareCount)
+      this.share_count,
+      this.calculateEngagementScore(this.view_count, this.comment_count + 1, this.voteCountFor + this.voteCountAgainst, this.share_count)
     );
   }
 
   incrementShares(): EngagementMetrics {
     return new EngagementMetrics(
-      this.viewCount,
-      this.commentCount,
+      this.view_count,
+      this.comment_count,
       this.voteCountFor,
       this.voteCountAgainst,
-      this.shareCount + 1,
-      this.calculateEngagementScore(this.viewCount, this.commentCount, this.voteCountFor + this.voteCountAgainst, this.shareCount + 1)
+      this.share_count + 1,
+      this.calculateEngagementScore(this.view_count, this.comment_count, this.voteCountFor + this.voteCountAgainst, this.share_count + 1)
     );
   }
 
@@ -176,12 +176,12 @@ export class EngagementMetrics {
     const newAgainst = voteType === 'oppose' ? this.voteCountAgainst + 1 : this.voteCountAgainst;
 
     return new EngagementMetrics(
-      this.viewCount,
-      this.commentCount,
+      this.view_count,
+      this.comment_count,
       newFor,
       newAgainst,
-      this.shareCount,
-      this.calculateEngagementScore(this.viewCount, this.commentCount, newFor + newAgainst, this.shareCount)
+      this.share_count,
+      this.calculateEngagementScore(this.view_count, this.comment_count, newFor + newAgainst, this.share_count)
     );
   }
 
@@ -190,21 +190,21 @@ export class EngagementMetrics {
     return (views * 0.1) + (comments * 2) + (votes * 1.5) + (shares * 3);
   }
 
-  getViewCount(): number { return this.viewCount; }
-  getCommentCount(): number { return this.commentCount; }
+  getViewCount(): number { return this.view_count; }
+  getCommentCount(): number { return this.comment_count; }
   getVoteCountFor(): number { return this.voteCountFor; }
   getVoteCountAgainst(): number { return this.voteCountAgainst; }
-  getShareCount(): number { return this.shareCount; }
-  getEngagementScore(): number { return this.engagementScore; }
+  getShareCount(): number { return this.share_count; }
+  getEngagementScore(): number { return this.engagement_score; }
 
   toJSON() {
     return {
-      viewCount: this.viewCount,
-      commentCount: this.commentCount,
+      view_count: this.view_count,
+      comment_count: this.comment_count,
       voteCountFor: this.voteCountFor,
       voteCountAgainst: this.voteCountAgainst,
-      shareCount: this.shareCount,
-      engagementScore: this.engagementScore
+      share_count: this.share_count,
+      engagement_score: this.engagement_score
     };
   }
 }
@@ -220,8 +220,8 @@ export class Bill {
   private summary: BillSummary;
   private status: BillStatus;
   private engagementMetrics: EngagementMetrics;
-  private readonly createdAt: Date;
-  private updatedAt: Date;
+  private readonly created_at: Date;
+  private updated_at: Date;
 
   // Optional fields
   private sponsorId?: string;
@@ -250,8 +250,8 @@ export class Bill {
     summary: BillSummary,
     status: BillStatus = 'drafted',
     engagementMetrics: EngagementMetrics = new EngagementMetrics(),
-    sponsorId?: string,
-    introducedDate?: Date,
+    sponsor_id?: string,
+    introduced_date?: Date,
     lastActionDate?: Date,
     tags: string[] = [],
     affectedCounties: string[] = [],
@@ -264,8 +264,8 @@ export class Bill {
     urgencyLevel: 'low' | 'medium' | 'high' | 'critical' = 'low',
     publicParticipationRequired: boolean = false,
     impactAreas: string[] = [],
-    createdAt?: Date,
-    updatedAt?: Date
+    created_at?: Date,
+    updated_at?: Date
   ) {
     this.id = id;
     this.billNumber = billNumber;
@@ -273,8 +273,8 @@ export class Bill {
     this.summary = summary;
     this.status = status;
     this.engagementMetrics = engagementMetrics;
-    this.sponsorId = sponsorId;
-    this.introducedDate = introducedDate;
+    this.sponsor_id = sponsorId;
+    this.introduced_date = introducedDate;
     this.lastActionDate = lastActionDate;
     this.tags = [...tags];
     this.affectedCounties = [...affectedCounties];
@@ -287,20 +287,20 @@ export class Bill {
     this.urgencyLevel = urgencyLevel;
     this.publicParticipationRequired = publicParticipationRequired;
     this.impactAreas = [...impactAreas];
-    this.createdAt = createdAt || new Date();
-    this.updatedAt = updatedAt || new Date();
+    this.created_at = created_at || new Date();
+    this.updated_at = updated_at || new Date();
 
     this.validateBusinessRules();
   }
 
   private validateBusinessRules(): void {
     // Business rule: Introduced bills must have an introduction date
-    if (this.status !== 'drafted' && !this.introducedDate) {
+    if (this.status !== 'drafted' && !this.introduced_date) {
       throw new Error('Bills that have been introduced must have an introduction date');
     }
 
     // Business rule: Last action date cannot be before introduction date
-    if (this.introducedDate && this.lastActionDate && this.lastActionDate < this.introducedDate) {
+    if (this.introduced_date && this.lastActionDate && this.lastActionDate < this.introduced_date) {
       throw new Error('Last action date cannot be before introduction date');
     }
 
@@ -321,7 +321,7 @@ export class Bill {
     billNumber: BillNumber;
     title: BillTitle;
     summary?: BillSummary;
-    sponsorId?: string;
+    sponsor_id?: string;
     tags?: string[];
     affectedCounties?: string[];
   }): Bill {
@@ -332,7 +332,7 @@ export class Bill {
       params.summary || new BillSummary(null),
       'drafted',
       new EngagementMetrics(),
-      params.sponsorId,
+      params.sponsor_id,
       undefined,
       undefined,
       params.tags || [],
@@ -347,9 +347,9 @@ export class Bill {
     }
 
     this.status = 'introduced';
-    this.introducedDate = new Date();
+    this.introduced_date = new Date();
     this.lastActionDate = new Date();
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   updateStatus(newStatus: BillStatus): void {
@@ -358,7 +358,7 @@ export class Bill {
 
     this.status = newStatus;
     this.lastActionDate = new Date();
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   private validateStatusTransition(from: BillStatus, to: BillStatus): void {
@@ -391,22 +391,22 @@ export class Bill {
         this.engagementMetrics = this.engagementMetrics.incrementShares();
         break;
     }
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   recordVote(voteType: BillVoteType): void {
     this.engagementMetrics = this.engagementMetrics.addVote(voteType);
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   updateTitle(newTitle: BillTitle): void {
     this.title = newTitle;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   updateSummary(newSummary: BillSummary): void {
     this.summary = newSummary;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   addTag(tag: string): void {
@@ -419,7 +419,7 @@ export class Bill {
     }
 
     this.tags.push(tag);
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   removeTag(tag: string): void {
@@ -429,65 +429,65 @@ export class Bill {
     }
 
     this.tags.splice(index, 1);
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   // Advocacy integration methods
   updateCampaignMetrics(activeCampaigns: number, totalParticipants: number): void {
     this.activeCampaignsCount = activeCampaigns;
     this.totalCampaignParticipants = totalParticipants;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   updateTrackingCount(count: number): void {
     this.trackingCount = Math.max(0, count);
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   flagForConstitutionalAnalysis(): void {
     this.needsConstitutionalAnalysis = true;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   clearConstitutionalAnalysisFlag(): void {
     this.needsConstitutionalAnalysis = false;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   flagForStakeholderAnalysis(): void {
     this.needsStakeholderAnalysis = true;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   clearStakeholderAnalysisFlag(): void {
     this.needsStakeholderAnalysis = false;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   flagTransparencyConcerns(): void {
     this.hasTransparencyConcerns = true;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   clearTransparencyConcerns(): void {
     this.hasTransparencyConcerns = false;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   updateUrgencyLevel(level: 'low' | 'medium' | 'high' | 'critical'): void {
     this.urgencyLevel = level;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   setPublicParticipationRequired(required: boolean): void {
     this.publicParticipationRequired = required;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   addImpactArea(area: string): void {
     if (!this.impactAreas.includes(area)) {
       this.impactAreas.push(area);
-      this.updatedAt = new Date();
+      this.updated_at = new Date();
     }
   }
 
@@ -495,7 +495,7 @@ export class Bill {
     const index = this.impactAreas.indexOf(area);
     if (index !== -1) {
       this.impactAreas.splice(index, 1);
-      this.updatedAt = new Date();
+      this.updated_at = new Date();
     }
   }
 
@@ -558,8 +558,8 @@ export class Bill {
   getSummary(): BillSummary { return this.summary; }
   getStatus(): BillStatus { return this.status; }
   getEngagementMetrics(): EngagementMetrics { return this.engagementMetrics; }
-  getSponsorId(): string | undefined { return this.sponsorId; }
-  getIntroducedDate(): Date | undefined { return this.introducedDate; }
+  getSponsorId(): string | undefined { return this.sponsor_id; }
+  getIntroducedDate(): Date | undefined { return this.introduced_date; }
   getLastActionDate(): Date | undefined { return this.lastActionDate; }
   getTags(): string[] { return [...this.tags]; }
   getAffectedCounties(): string[] { return [...this.affectedCounties]; }
@@ -572,8 +572,8 @@ export class Bill {
   getUrgencyLevel(): 'low' | 'medium' | 'high' | 'critical' { return this.urgencyLevel; }
   getPublicParticipationRequired(): boolean { return this.publicParticipationRequired; }
   getImpactAreas(): string[] { return [...this.impactAreas]; }
-  getCreatedAt(): Date { return this.createdAt; }
-  getUpdatedAt(): Date { return this.updatedAt; }
+  getCreatedAt(): Date { return this.created_at; }
+  getUpdatedAt(): Date { return this.updated_at; }
 
   // Check if bill can be modified
   canBeModified(): boolean {
@@ -594,8 +594,8 @@ export class Bill {
       summary: this.summary.getValue(),
       status: this.status,
       engagementMetrics: this.engagementMetrics.toJSON(),
-      sponsorId: this.sponsorId,
-      introducedDate: this.introducedDate?.toISOString(),
+      sponsor_id: this.sponsor_id,
+      introduced_date: this.introduced_date?.toISOString(),
       lastActionDate: this.lastActionDate?.toISOString(),
       tags: this.tags,
       affectedCounties: this.affectedCounties,
@@ -609,8 +609,8 @@ export class Bill {
       publicParticipationRequired: this.publicParticipationRequired,
       impactAreas: this.impactAreas,
       advocacyScore: this.calculateAdvocacyScore(),
-      createdAt: this.createdAt.toISOString(),
-      updatedAt: this.updatedAt.toISOString()
+      created_at: this.created_at.toISOString(),
+      updated_at: this.updated_at.toISOString()
     };
   }
 }

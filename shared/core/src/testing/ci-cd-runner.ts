@@ -2,10 +2,10 @@ import { execSync, spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { EventEmitter } from 'events';
-import { PerformanceBenchmarks } from './benchmarks/performance-benchmarks';
-import { StressTests } from './stress-tests/stress-tests';
-import { IntegrationTests } from './integration/integration-tests';
-import { DependencyValidator } from './validation/dependency-validator';
+import { PerformanceBenchmarks } from './performance-benchmarks';
+import { StressTests } from './stress-tests';
+import { IntegrationTests } from './integration-tests';
+import { DependencyValidator } from './dependency-validator';
 import { CoverageReporter } from './coverage-reporter';
 
 /**

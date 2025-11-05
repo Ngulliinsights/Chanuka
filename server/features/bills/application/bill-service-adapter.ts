@@ -6,16 +6,14 @@
  * This allows gradual migration while preserving existing API contracts.
  */
 
-import { BillService, BillFilters, PaginationOptions, PaginatedBillResponse, BillWithEngagement, BillStats } from './bill-service.js';
-import { Bill, InsertBill } from '../../../../shared/schema/foundation.js';
-import { ResultAdapter } from '../../../infrastructure/errors/result-adapter.js';
-import { logger } from '../../../../shared/core/src/index.js';
+import { CachedBillService, BillFilters, PaginationOptions, PaginatedBills, BillWithEngagement, BillStats } from './bill-service.js';
+import { ResultAdapter } from '@/infrastructure/errors/result-adapter.js';
 
 export class BillServiceAdapter {
-  private billService: BillService;
+  private billService: CachedBillService;
 
   constructor() {
-    this.billService = new BillService();
+    this.billService = new CachedBillService();
   }
 
   /**
@@ -24,7 +22,7 @@ export class BillServiceAdapter {
   async getAllBills(
     filters: BillFilters = {},
     pagination: PaginationOptions = { page: 1, limit: 10 }
-  ): Promise<PaginatedBillResponse> {
+  ): Promise<PaginatedBills> {
     const result = await this.billService.getAllBills(filters, pagination);
     
     if (result.isErr()) {
@@ -38,7 +36,7 @@ export class BillServiceAdapter {
   /**
    * Legacy-compatible getBillById method
    */
-  async getBillById(id: number): Promise<BillWithEngagement | null> {
+  async getBillById(id: string): Promise<BillWithEngagement | null> {
     const result = await this.billService.getBillById(id);
     
     if (result.isErr()) {
@@ -52,7 +50,7 @@ export class BillServiceAdapter {
   /**
    * Legacy-compatible createBill method
    */
-  async createBill(billData: InsertBill): Promise<Bill> {
+  async createBill(billData: any): Promise<any> {
     const result = await this.billService.createBill(billData);
     
     if (result.isErr()) {
@@ -66,7 +64,7 @@ export class BillServiceAdapter {
   /**
    * Legacy-compatible updateBill method
    */
-  async updateBill(id: number, updates: Partial<InsertBill>): Promise<Bill | null> {
+  async updateBill(id: string, updates: Partial<any>): Promise<any | null> {
     const result = await this.billService.updateBill(id, updates);
     
     if (result.isErr()) {
@@ -80,7 +78,7 @@ export class BillServiceAdapter {
   /**
    * Legacy-compatible updateBillStatus method
    */
-  async updateBillStatus(id: number, newStatus: string, user_id?: string): Promise<void> {
+  async updateBillStatus(id: string, newStatus: string, user_id?: string): Promise<void> {
     const result = await this.billService.updateBillStatus(id, newStatus, user_id);
     
     if (result.isErr()) {
@@ -109,7 +107,7 @@ export class BillServiceAdapter {
    * Legacy-compatible recordEngagement method
    */
   async recordEngagement(
-    bill_id: number,
+    bill_id: string,
     user_id: string,
     engagement_type: 'view' | 'comment' | 'share'
   ): Promise<void> {
@@ -126,7 +124,7 @@ export class BillServiceAdapter {
   /**
    * Get the underlying Result-based service for new code
    */
-  getResultBasedService(): BillService {
+  getResultBasedService(): CachedBillService {
     return this.billService;
   }
 }

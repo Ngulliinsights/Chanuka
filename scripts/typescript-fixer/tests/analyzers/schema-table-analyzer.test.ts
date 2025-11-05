@@ -134,7 +134,7 @@ describe('SchemaTableAnalyzer', () => {
     it('should identify required imports', () => {
       const sourceCode = `
         const user = users.findFirst({
-          where: eq(users.id, userId)
+          where: eq(users.id, user_id)
         });
       `;
 
@@ -158,7 +158,7 @@ describe('SchemaTableAnalyzer', () => {
         import { users } from '@shared/schema/foundation';
         
         const user = users.findFirst({
-          where: eq(users.id, userId)
+          where: eq(users.id, user_id)
         });
       `;
 

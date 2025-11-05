@@ -1,5 +1,7 @@
 {
-  "include": ["**/*"],
+  "include": [
+    "**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist",
@@ -18,7 +20,11 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ES2022",
-    "lib": ["ES2022", "dom", "dom.iterable"],
+    "lib": [
+      "ES2022",
+      "dom",
+      "dom.iterable"
+    ],
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
@@ -54,23 +60,95 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": false,
     "experimentalDecorators": true,
-  "emitDecoratorMetadata": true,
-  "baseUrl": ".",
-  "ignoreDeprecations": "6.0",
+    "emitDecoratorMetadata": true,
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
-    "types": ["node", "vite/client", "vitest/globals"],
+    "types": [
+      "node",
+      "vite/client",
+      "vitest/globals"
+    ],
     "paths": {
-      "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"],
-      "@server/*": ["./server/*"],
-      "@db": ["./db/index.ts"],
-      "@db/*": ["./db/*"],
-      "@shared/core": ["./shared/core/src/index.ts"],
-      "@shared/core/*": ["./shared/core/src/*"],
-      "@shared/schema": ["./shared/schema/index.ts"],
-      "@shared/schema/*": ["./shared/schema/*"]
+      "@/*": [
+        "./client/src/*"
+      ],
+      "@/components/*": [
+        "./client/src/components/*"
+      ],
+      "@/hooks/*": [
+        "./client/src/hooks/*"
+      ],
+      "@/pages/*": [
+        "./client/src/pages/*"
+      ],
+      "@/services/*": [
+        "./client/src/services/*"
+      ],
+      "@/utils/*": [
+        "./client/src/utils/*"
+      ],
+      "@/types/*": [
+        "./client/src/types/*"
+      ],
+      "@/styles/*": [
+        "./client/src/styles/*"
+      ],
+      "@/lib/*": [
+        "./client/src/lib/*"
+      ],
+      "@server/*": [
+        "./server/*"
+      ],
+      "@server/features/*": [
+        "./server/features/*"
+      ],
+      "@server/infrastructure/*": [
+        "./server/infrastructure/*"
+      ],
+      "@server/core/*": [
+        "./server/core/*"
+      ],
+      "@server/utils/*": [
+        "./server/utils/*"
+      ],
+      "@server/middleware/*": [
+        "./server/middleware/*"
+      ],
+      "@shared/*": [
+        "./shared/*"
+      ],
+      "@shared/core": [
+        "./shared/core/src/index.ts"
+      ],
+      "@shared/core/*": [
+        "./shared/core/src/*"
+      ],
+      "@shared/schema": [
+        "./shared/schema/index.ts"
+      ],
+      "@shared/schema/*": [
+        "./shared/schema/*"
+      ],
+      "@shared/database": [
+        "./shared/database/index.ts"
+      ],
+      "@shared/database/*": [
+        "./shared/database/*"
+      ],
+      "@db": [
+        "./db/index.ts"
+      ],
+      "@db/*": [
+        "./db/*"
+      ],
+      "@scripts/*": [
+        "./scripts/*"
+      ],
+      "~/*": [
+        "./*"
+      ]
     }
   }
 }
- 

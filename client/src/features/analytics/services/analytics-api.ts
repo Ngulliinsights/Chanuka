@@ -1,4 +1,4 @@
-import { api } from '../../../services/api';
+import { api } from '@/services/api';
 import type {
   BillAnalytics,
   AnalyticsFilters,
@@ -22,8 +22,8 @@ export const analyticsApi = {
     const params = new URLSearchParams();
 
     if (filters?.dateRange) {
-      params.append('startDate', filters.dateRange.start);
-      params.append('endDate', filters.dateRange.end);
+      params.append('start_date', filters.dateRange.start);
+      params.append('end_date', filters.dateRange.end);
     }
 
     if (filters?.billStatus?.length) {
@@ -40,8 +40,8 @@ export const analyticsApi = {
     const params = new URLSearchParams();
 
     if (filters?.dateRange) {
-      params.append('startDate', filters.dateRange.start);
-      params.append('endDate', filters.dateRange.end);
+      params.append('start_date', filters.dateRange.start);
+      params.append('end_date', filters.dateRange.end);
     }
 
     return api.get(`/api/analytics/summary?${params.toString()}`);
@@ -54,8 +54,8 @@ export const analyticsApi = {
     const params = new URLSearchParams();
 
     if (filters?.dateRange) {
-      params.append('startDate', filters.dateRange.start);
-      params.append('endDate', filters.dateRange.end);
+      params.append('start_date', filters.dateRange.start);
+      params.append('end_date', filters.dateRange.end);
     }
 
     return api.get(`/api/analytics/bills/${ bill_id }?${params.toString()}`);
@@ -68,8 +68,8 @@ export const analyticsApi = {
     const params = new URLSearchParams();
 
     if (filters?.dateRange) {
-      params.append('startDate', filters.dateRange.start);
-      params.append('endDate', filters.dateRange.end);
+      params.append('start_date', filters.dateRange.start);
+      params.append('end_date', filters.dateRange.end);
     }
 
     return api.get(`/api/analytics/bills/${ bill_id }/engagement?${params.toString()}`);
@@ -91,8 +91,8 @@ export const analyticsApi = {
      }
 
     if (filters?.dateRange) {
-      params.append('startDate', filters.dateRange.start);
-      params.append('endDate', filters.dateRange.end);
+      params.append('start_date', filters.dateRange.start);
+      params.append('end_date', filters.dateRange.end);
     }
 
     return api.get(`/api/analytics/users/activity?${params.toString()}`);
@@ -106,8 +106,8 @@ export const analyticsApi = {
     params.append('limit', limit.toString());
 
     if (filters?.dateRange) {
-      params.append('startDate', filters.dateRange.start);
-      params.append('endDate', filters.dateRange.end);
+      params.append('start_date', filters.dateRange.start);
+      params.append('end_date', filters.dateRange.end);
     }
 
     if (filters?.billStatus?.length) {
@@ -153,8 +153,8 @@ export const analyticsApi = {
     params.append('format', format);
 
     if (filters?.dateRange) {
-      params.append('startDate', filters.dateRange.start);
-      params.append('endDate', filters.dateRange.end);
+      params.append('start_date', filters.dateRange.start);
+      params.append('end_date', filters.dateRange.end);
     }
 
     return api.get(`/api/analytics/export?${params.toString()}`);

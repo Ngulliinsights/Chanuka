@@ -2,10 +2,10 @@
 // Uses shared/core caching system for consistency and reduced duplication
 
 // Re-export from shared caching system
-export * from '../../../shared/core/src/caching';
+export * from '@shared/core/caching';
 
 // Legacy compatibility - create default cache service
-import { createCacheService } from '../../../shared/core/src/caching';
+import { createCacheService } from '@shared/core/caching';
 
 // Create default cache instance for backward compatibility with memory pressure monitoring
 const defaultCacheConfig = {

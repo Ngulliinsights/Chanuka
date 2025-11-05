@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { billService, BillNotFoundError, CommentNotFoundError, ValidationError } from '../application/bills.js';
-import { authenticateToken } from '../../../middleware/auth.js';
-import type { AuthenticatedRequest } from '../../../middleware/auth.js';
-import { ApiResponse, ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '../../../../shared/core/src/utils/api-utils.js';
+import { authenticateToken } from '@/middleware/auth.js';
+import type { AuthenticatedRequest } from '@/middleware/auth.js';
+import { ApiResponse, ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '@shared/core/utils/api-utils.js';
 // Temporary logger import - will be fixed when shared/core is properly configured
 const logger = {
   error: (message: string, context?: any, error?: any) => {
@@ -13,7 +13,7 @@ const logger = {
   }
 };
 import { securityAuditService } from '../../security/security-audit-service.js';
-import type { Bill, BillComment } from '../../../../shared/schema';
+import type { Bill, BillComment } from '@/shared/schema';
 
 const router = Router();
 

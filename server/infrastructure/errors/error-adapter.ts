@@ -6,7 +6,7 @@
 
 import Boom from '@hapi/boom';
 import { Result, ok, err } from 'neverthrow';
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { 
   ErrorCategory, 
   ErrorSeverity, 
@@ -485,7 +485,7 @@ export class ErrorAdapter {
       severity: severity,
       service: context.service || 'legislative-platform',
       operation: context.operation || 'unknown',
-      userId: context.userId,
+      user_id: context.user_id,
       requestId: context.requestId,
       correlationId: context.correlationId,
       retryable: data.retryable || false,

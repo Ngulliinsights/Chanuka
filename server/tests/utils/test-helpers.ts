@@ -1,10 +1,10 @@
-import { database as db } from '../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { users, bills, sponsors } from '@shared/schema/foundation';
 import { notifications, comments, bill_engagement } from '@shared/schema/citizen_participation';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface TestUser {
   id: string;

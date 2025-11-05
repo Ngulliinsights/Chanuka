@@ -42,20 +42,20 @@ export function formatActionItem(item: ActionItem): {
   description: string;
   priority: ActionPriority;
   priorityColor: string;
-  dueDate: string | null;
+  due_date: string | null;
   dueDateColor: string;
   isOverdue: boolean;
   createdText: string;
   updatedText: string;
 } {
-  const dueDateInfo = item.dueDate ? formatDueDate(item.dueDate) : null;
+  const dueDateInfo = item.due_date ? formatDueDate(item.due_date) : null;
   
   return {
     title: item.title,
     description: truncateText(item.description, 100),
     priority: item.priority,
     priorityColor: getPriorityColor(item.priority),
-    dueDate: dueDateInfo?.text || null,
+    due_date: dueDateInfo?.text || null,
     dueDateColor: dueDateInfo?.color || 'text-slate-600',
     isOverdue: dueDateInfo?.isOverdue || false,
     createdText: formatRelativeTime(item.created_at),
@@ -139,7 +139,7 @@ function formatRelativeTime(date: Date): string {
   }
 }
 
-function formatDueDate(dueDate: Date): {
+function formatDueDate(due_date: Date): {
   text: string;
   color: string;
   isOverdue: boolean;

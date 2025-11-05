@@ -4,7 +4,7 @@
 // Implements intelligent message batching for WebSocket connections
 // Provides memory-aware batching with automatic optimization and backpressure handling
 
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // cSpell:ignore Batchable BatchableMessage
 
@@ -14,7 +14,7 @@ export interface BatchableMessage {
   priority?: number;
   timestamp?: number;
   messageId?: string;
-  userId?: string;
+  user_id?: string;
 }
 
 export interface BatchingConfig {
@@ -204,7 +204,7 @@ class MessageCompressor {
       .replace(/"data":/g, '"d":')
       .replace(/"timestamp":/g, '"ts":')
       .replace(/"messageId":/g, '"id":')
-      .replace(/"userId":/g, '"u":')
+      .replace(/"user_id":/g, '"u":')
       .replace(/"priority":/g, '"p":')
       .replace(/\s+/g, ''); // Remove all whitespace
   }
@@ -218,7 +218,7 @@ class MessageCompressor {
       .replace(/"d":/g, '"data":')
       .replace(/"ts":/g, '"timestamp":')
       .replace(/"id":/g, '"messageId":')
-      .replace(/"u":/g, '"userId":')
+      .replace(/"u":/g, '"user_id":')
       .replace(/"p":/g, '"priority":');
 
     return JSON.parse(decompressed);
@@ -386,14 +386,14 @@ export class BatchingService {
    * Returns false if queue is full, allowing caller to handle backpressure
    */
   queueMessage(
-    userId: string, 
+    user_id: string, 
     message: BatchableMessage, 
     deliveryCallback: (batch: BatchableMessage[]) => Promise<void>
   ): boolean {
     if (this.isShuttingDown) {
       logger.warn('Rejected message during shutdown', {
         component: 'BatchingService',
-        userId
+        user_id
       });
       return false;
     }
@@ -405,17 +405,17 @@ export class BatchingService {
     }
 
     // Get or create message queue for this user
-    let queue = this.messageQueues.get(userId);
+    let queue = this.messageQueues.get(user_id);
     if (!queue) {
       queue = new MessageQueue(this.config.maxQueueSize);
-      this.messageQueues.set(userId, queue);
+      this.messageQueues.set(user_id, queue);
     }
 
     const priority = message.priority ?? 1;
 
     // High-priority messages bypass batching for immediate delivery
     if (priority >= this.config.priorityThreshold) {
-      this.sendImmediately(userId, message, deliveryCallback, queueEntryTime);
+      this.sendImmediately(user_id, message, deliveryCallback, queueEntryTime);
       return true;
     }
 
@@ -425,7 +425,7 @@ export class BatchingService {
       this.metrics.droppedMessages++;
       logger.warn('Message dropped - queue full', {
         component: 'BatchingService',
-        userId,
+        user_id,
         queueSize: queue.length,
         maxQueueSize: this.config.maxQueueSize
       });
@@ -436,17 +436,17 @@ export class BatchingService {
     this.updateQueueDepth();
 
     // Set up batch timer if not already running for this user
-    if (!this.batchTimers.has(userId)) {
+    if (!this.batchTimers.has(user_id)) {
       const timer = setTimeout(() => {
-        this.processBatch(userId, deliveryCallback);
+        this.processBatch(user_id, deliveryCallback);
       }, this.config.maxBatchDelay);
 
-      this.batchTimers.set(userId, timer);
+      this.batchTimers.set(user_id, timer);
     }
 
     // Trigger immediate batch if we've reached the size threshold
     if (queue.length >= this.config.maxBatchSize) {
-      this.processBatch(userId, deliveryCallback);
+      this.processBatch(user_id, deliveryCallback);
     }
 
     return true;
@@ -457,7 +457,7 @@ export class BatchingService {
    * Used for urgent messages that can't wait for batch accumulation
    */
   private async sendImmediately(
-    userId: string, 
+    user_id: string, 
     message: BatchableMessage, 
     deliveryCallback: (batch: BatchableMessage[]) => Promise<void>,
     queueEntryTime: number
@@ -471,7 +471,7 @@ export class BatchingService {
 
       logger.debug('High-priority message sent immediately', {
         component: 'BatchingService',
-        userId,
+        user_id,
         messageType: message.type,
         latency: Date.now() - queueEntryTime
       });
@@ -479,7 +479,7 @@ export class BatchingService {
       this.metrics.failedBatches++;
       logger.error('Failed to send immediate message', {
         component: 'BatchingService',
-        userId,
+        user_id,
         error: error instanceof Error ? error.message : String(error)
       });
       throw error; // Re-throw to allow caller to handle
@@ -491,17 +491,17 @@ export class BatchingService {
    * Includes compression optimization and failure recovery
    */
   private async processBatch(
-    userId: string, 
+    user_id: string, 
     deliveryCallback: (batch: BatchableMessage[]) => Promise<void>
   ): Promise<void> {
     // Clear the pending timer since we're processing now
-    const timer = this.batchTimers.get(userId);
+    const timer = this.batchTimers.get(user_id);
     if (timer) {
       clearTimeout(timer);
-      this.batchTimers.delete(userId);
+      this.batchTimers.delete(user_id);
     }
 
-    const queue = this.messageQueues.get(userId);
+    const queue = this.messageQueues.get(user_id);
     if (!queue || queue.length === 0) {
       return;
     }
@@ -527,7 +527,7 @@ export class BatchingService {
           
           logger.debug('Batch compressed', {
             component: 'BatchingService',
-            userId,
+            user_id,
             originalSize: compressionResult.originalSize,
             compressedSize: compressionResult.compressedSize,
             savingsPercent: ((1 - compressionResult.compressedSize / compressionResult.originalSize) * 100).toFixed(1)
@@ -548,7 +548,7 @@ export class BatchingService {
 
       logger.debug('Batch processed successfully', {
         component: 'BatchingService',
-        userId,
+        user_id,
         batchSize: batch.length,
         queueRemaining: queue.length,
         processingTime: Date.now() - batchStartTime
@@ -565,7 +565,7 @@ export class BatchingService {
 
       logger.error('Failed to process batch - messages re-queued', {
         component: 'BatchingService',
-        userId,
+        user_id,
         batchSize: batch.length,
         queueSize: queue.length,
         error: error instanceof Error ? error.message : String(error)
@@ -578,21 +578,21 @@ export class BatchingService {
    * Used during shutdown or when forcing immediate delivery
    */
   async flushAll(
-    deliveryCallback: (userId: string, batch: BatchableMessage[]) => Promise<void>
+    deliveryCallback: (user_id: string, batch: BatchableMessage[]) => Promise<void>
   ): Promise<void> {
     const flushPromises: Promise<void>[] = [];
     const userIds = Array.from(this.messageQueues.keys());
 
-    for (const userId of userIds) {
-      const queue = this.messageQueues.get(userId);
+    for (const user_id of userIds) {
+      const queue = this.messageQueues.get(user_id);
       if (queue && queue.length > 0) {
         const batch = queue.getBatch(queue.length);
         if (batch.length > 0) {
           flushPromises.push(
-            deliveryCallback(userId, batch).catch(error => {
+            deliveryCallback(user_id, batch).catch(error => {
               logger.error('Failed to flush batch', {
                 component: 'BatchingService',
-                userId,
+                user_id,
                 batchSize: batch.length,
                 error: error instanceof Error ? error.message : String(error)
               });
@@ -602,10 +602,10 @@ export class BatchingService {
       }
 
       // Clear timer for this user
-      const timer = this.batchTimers.get(userId);
+      const timer = this.batchTimers.get(user_id);
       if (timer) {
         clearTimeout(timer);
-        this.batchTimers.delete(userId);
+        this.batchTimers.delete(user_id);
       }
     }
 
@@ -673,24 +673,24 @@ export class BatchingService {
     let totalRemoved = 0;
     const emptyQueues: string[] = [];
 
-    for (const [userId, queue] of this.messageQueues.entries()) {
+    for (const [user_id, queue] of this.messageQueues.entries()) {
       const removed = queue.removeStaleMessages(this.config.staleMessageAge);
       totalRemoved += removed;
 
       // Mark empty queues for removal
       if (queue.length === 0) {
-        emptyQueues.push(userId);
+        emptyQueues.push(user_id);
       }
     }
 
     // Remove empty queues and their timers
-    for (const userId of emptyQueues) {
-      this.messageQueues.delete(userId);
+    for (const user_id of emptyQueues) {
+      this.messageQueues.delete(user_id);
       
-      const timer = this.batchTimers.get(userId);
+      const timer = this.batchTimers.get(user_id);
       if (timer) {
         clearTimeout(timer);
-        this.batchTimers.delete(userId);
+        this.batchTimers.delete(user_id);
       }
     }
 

@@ -1,7 +1,7 @@
 // Anomaly Detection Service
 // Handles detection of anomalies and unusual patterns in financial disclosure data
 
-import { readDatabase } from '@shared/database/connection';
+import { readDatabase } from '@shared/database';
 import { sponsors, sponsorTransparency } from "@shared/foundation";
 import { eq, desc, and, sql, count } from "drizzle-orm";
 import { cache, logger, DatabaseError } from '@shared/core';
@@ -16,7 +16,7 @@ export interface AnomalyDetectionResult {
   sponsor_id: number;
   sponsorName: string;
   anomalies: FinancialAnomaly[];
-  riskScore: number;
+  risk_score: number;
   detectionDate: Date;
 }
 
@@ -68,13 +68,13 @@ export class AnomalyDetectionService {
           anomalies.push(...await this.detectTemporalInconsistencies(disclosures));
 
           // Calculate overall risk score based on anomalies
-          const riskScore = this.calculateAnomalyRiskScore(anomalies);
+          const risk_score = this.calculateAnomalyRiskScore(anomalies);
 
           return {
             sponsor_id,
             sponsorName: sponsorInfo.name,
             anomalies,
-            riskScore,
+            risk_score,
             detectionDate: new Date()
           };
         }
@@ -407,7 +407,7 @@ export class AnomalyDetectionService {
           if (result.anomalies.length > 0) {
             sponsorsWithAnomalies++;
             allAnomalies.push(...result.anomalies);
-            riskScores.push(result.riskScore);
+            riskScores.push(result.risk_score);
           }
         } catch {
           // Skip sponsors that error out

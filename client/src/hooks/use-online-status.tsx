@@ -2,12 +2,9 @@ import { useState, useEffect } from 'react';
 import { logger } from '../utils/browser-logger';
 
 export function useOnlineStatus() {
-  const [isOnline, setIsOnline] = useState<boolean | undefined>(undefined);
+  const [isOnline, setIsOnline] = useState<boolean>(() => navigator.onLine);
 
   useEffect(() => {
-    // Set initial status
-    setIsOnline(navigator.onLine);
-
     // Create event listeners
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);

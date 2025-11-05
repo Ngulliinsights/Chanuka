@@ -1,12 +1,12 @@
 
 import { Router, Request, Response } from "express";
 import { authService, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema } from "./auth-service.js";
-import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized  } from '../../../shared/core/src/utils/api-utils.js';
-import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '../../../shared/core/src/utils/api-utils.js';
+import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized  } from '@shared/core/utils/api-utils.js';
+import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from "../../middleware/rate-limiter.js";
 import { z } from "zod";
 import { errorTracker } from '../errors/error-tracker.js';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 
 export const router = Router();
@@ -38,7 +38,7 @@ router.post("/register", registrationRateLimit, async (req: Request, res: Respon
 
     const response = {
       token: result.token!,
-      refreshToken: result.refreshToken!,
+      refresh_token: result.refresh_token!,
       user: result.user!,
       requiresVerification: result.requiresVerification
     };
@@ -113,7 +113,7 @@ router.post("/login", authRateLimit, async (req: Request, res: Response) => {
 
     const response = {
       token: result.token!,
-      refreshToken: result.refreshToken!,
+      refresh_token: result.refresh_token!,
       user: result.user!
     };
 
@@ -175,16 +175,16 @@ router.post("/refresh", async (req: Request, res: Response) => {
   const startTime = Date.now();
 
   try {
-    const { refreshToken } = req.body;
+    const { refresh_token } = req.body;
 
-    if (!refreshToken) {
+    if (!refresh_token) {
       return ApiValidationError(res, {
-        field: 'refreshToken',
+        field: 'refresh_token',
         message: 'Refresh token is required'
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
 
-    const result = await authService.refreshToken(refreshToken);
+    const result = await authService.refresh_token(refresh_token);
 
     if (!result.success) {
       return ApiUnauthorized(res, result.error || "Token refresh failed",
@@ -193,7 +193,7 @@ router.post("/refresh", async (req: Request, res: Response) => {
 
     const response = {
       token: result.token!,
-      refreshToken: result.refreshToken!,
+      refresh_token: result.refresh_token!,
       user: result.user!
     };
 

@@ -279,7 +279,7 @@ export class ModernizationOrchestrator extends EventEmitter {
       await this.backupManager.restore();
       
       // Update task statuses
-      for (const task of this.tasks.values()) {
+      for (const task of Array.from(this.tasks.values())) {
         if (task.status === TaskStatus.COMPLETED || task.status === TaskStatus.IN_PROGRESS) {
           task.status = TaskStatus.ROLLED_BACK;
         }
@@ -398,7 +398,7 @@ export class ModernizationOrchestrator extends EventEmitter {
           priority: recommendation.priority,
           status: TaskStatus.PENDING,
           metadata: { 
-            analysisId: result.id,
+            analysis_id: result.id,
             recommendationId: recommendation.id,
             action: recommendation.action
           }

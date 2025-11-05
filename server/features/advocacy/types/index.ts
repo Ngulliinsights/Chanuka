@@ -4,22 +4,22 @@
 
 export interface CampaignFilters {
   status?: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
-  billId?: string;
+  bill_id?: string;
   organizerId?: string;
   category?: string;
   county?: string;
-  startDate?: Date;
-  endDate?: Date;
+  start_date?: Date;
+  end_date?: Date;
   minParticipants?: number;
   maxParticipants?: number;
 }
 
 export interface ActionFilters {
-  campaignId?: string;
-  userId?: string;
+  campaign_id?: string;
+  user_id?: string;
   status?: 'pending' | 'in_progress' | 'completed' | 'skipped';
   actionType?: 'contact_representative' | 'attend_hearing' | 'submit_comment' | 'share_content' | 'organize_meeting' | 'petition_signature';
-  dueDate?: Date;
+  due_date?: Date;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
@@ -59,10 +59,10 @@ export interface ActionTemplate {
 
 export interface CoalitionOpportunity {
   id: string;
-  billId: string;
+  bill_id: string;
   sharedConcerns: string[];
   potentialPartners: {
-    userId: string;
+    user_id: string;
     organizationName?: string;
     alignmentScore: number;
     complementaryStrengths: string[];
@@ -93,8 +93,8 @@ export interface RepresentativeContact {
 }
 
 export interface ImpactAssessment {
-  campaignId: string;
-  billId: string;
+  campaign_id: string;
+  bill_id: string;
   outcomes: {
     billAmended: boolean;
     committeeFeedback: boolean;

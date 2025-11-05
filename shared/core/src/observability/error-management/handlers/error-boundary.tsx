@@ -209,8 +209,8 @@ export function withErrorBoundary<P extends object>(
     </ErrorBoundary>
   );
 
-  WithErrorBoundaryComponent.display_name = 
-    `withErrorBoundary(${WrappedComponent.display_name || WrappedComponent.name})`;
+  WithErrorBoundaryComponent.displayName =
+    `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
 
   return WithErrorBoundaryComponent;
 }

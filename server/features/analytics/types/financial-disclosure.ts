@@ -20,8 +20,8 @@ export interface FinancialRelationship {
   relationshipType: 'investment' | 'ownership' | 'business_partner' | 'employment' | 'family';
   strength: number; // 0-100
   financialValue?: number;
-  startDate?: Date;
-  endDate?: Date;
+  start_date?: Date;
+  end_date?: Date;
   is_active: boolean;
   conflictPotential: 'low' | 'medium' | 'high' | 'critical';
 }
@@ -111,8 +111,8 @@ export interface SponsorAffiliation {
   organization?: string;
   type: 'economic' | 'professional' | 'ownership' | 'family';
   is_active?: boolean;
-  startDate?: string;
-  endDate?: string;
+  start_date?: string;
+  end_date?: string;
   conflictType?: 'financial' | 'ownership' | null;
 }
 

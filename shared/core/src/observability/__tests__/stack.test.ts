@@ -47,7 +47,7 @@ describe('AsyncCorrelationManager', () => {
     it('should preserve provided context fields', () => { const inputContext = {
         correlationId: 'test-corr-id',
         user_id: 'user-123',
-        sessionId: 'session-456',
+        session_id: 'session-456',
         metadata: { key: 'value'  }
       };
       
@@ -55,7 +55,7 @@ describe('AsyncCorrelationManager', () => {
       
       expect(context.correlationId).toBe(inputContext.correlationId);
       expect(context.user_id).toBe(inputContext.user_id);
-      expect(context.sessionId).toBe(inputContext.sessionId);
+      expect(context.session_id).toBe(inputContext.session_id);
       expect(context.metadata).toEqual(inputContext.metadata);
     });
   });

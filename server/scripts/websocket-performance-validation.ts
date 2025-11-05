@@ -12,7 +12,7 @@ import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 import { Server } from 'http';
 import { io as SocketIOClient, Socket as ClientSocket } from 'socket.io-client';
 import * as jwt from 'jsonwebtoken';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 import { BatchingService } from '../infrastructure/batching-service.js';
 import { webSocketService } from '../infrastructure/websocket.js';
 

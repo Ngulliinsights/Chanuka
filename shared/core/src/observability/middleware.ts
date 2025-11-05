@@ -119,8 +119,8 @@ export function createCorrelationMiddleware(
       if (context.user_id) {
         res.setHeader('x-user-id', context.user_id);
       }
-      if (context.sessionId) {
-        res.setHeader('x-session-id', context.sessionId);
+      if (context.session_id) {
+        res.setHeader('x-session-id', context.session_id);
       }
 
       // Execute request with correlation context
@@ -172,7 +172,7 @@ export function createRequestLoggingMiddleware(
       traceId: correlationContext?.traceId,
       requestId: correlationContext?.requestId,
       user_id: correlationContext?.user_id,
-      sessionId: correlationContext?.sessionId,
+      session_id: correlationContext?.session_id,
       statusCode: undefined,
       duration: undefined,
       tags: ['http', 'request']
@@ -338,7 +338,7 @@ export function createErrorTrackingMiddleware(
       traceId: correlationContext?.traceId,
       requestId: correlationContext?.requestId,
       user_id: correlationContext?.user_id,
-      sessionId: correlationContext?.sessionId,
+      session_id: correlationContext?.session_id,
       errorCode: err instanceof BaseError ? err.code : 'UNKNOWN_ERROR',
       tags: ['http', 'error']
      };

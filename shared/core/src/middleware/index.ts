@@ -16,6 +16,7 @@ export type {
 
 // Enhanced middleware factory
 export { MiddlewareFactory } from './factory';
+import { MiddlewareFactory } from './factory';
 export { MiddlewareRegistry } from './registry';
 
 // Individual middleware providers
@@ -35,7 +36,7 @@ export { applyMiddleware } from './registry';
 // Re-export specific middleware from core utilities
 export { rateLimitMiddleware } from '../rate-limiting';
 export { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
-export { createHealthEndpoints } from '../observability/health/health-checker';
+// export { createHealthEndpoints } from '../observability/health/health-checker'; // TODO: Fix missing export
 
 // Convenience functions for common middleware setups
 export function createBasicMiddlewareStack(services: {

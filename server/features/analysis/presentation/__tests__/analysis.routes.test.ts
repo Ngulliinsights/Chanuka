@@ -49,7 +49,7 @@ app.use('/api/analysis', analysisRouter); // Mount the new router
 // --- Test Data ---
 const mockBillId = 1;
 const mockAnalysisId = `comp_analysis_${mockBillId}_${Date.now()}`;
-const mockComprehensiveResult = { bill_id: mockBillId, analysisId: mockAnalysisId, timestamp: new Date(),
+const mockComprehensiveResult = { bill_id: mockBillId, analysis_id: mockAnalysisId, timestamp: new Date(),
     constitutionalAnalysis: { constitutionalityScore: 70, concerns: [], precedents: [], riskAssessment: 'low' as const  },
     conflictAnalysisSummary: { overallRisk: 'low' as const, affectedSponsorsCount: 0, totalFinancialExposureEstimate: 0, directConflictCount: 0, indirectConflictCount: 0 },
     stakeholderImpact: { primaryBeneficiaries: [], negativelyAffected: [], affectedPopulations: [], economicImpact: { estimatedCost: 0, estimatedBenefit: 0, netImpact: 0, timeframe: 'N/A', confidence: 50 }, socialImpact: { equityEffect: 0, accessibilityEffect: 0, publicHealthEffect: 0, environmentalEffect: 0 } },
@@ -58,7 +58,7 @@ const mockComprehensiveResult = { bill_id: mockBillId, analysisId: mockAnalysisI
     recommendedActions: ['Recommendation 1'], overallConfidence: 85, version: '1.0', status: 'completed' as const
 };
 const mockHistoryDbRecord: schema.Analysis = { id: 101, bill_id: mockBillId, analysis_type: 'comprehensive_v1.0',
-    results: { analysisId: 'old_id_123', version: '1.0', timestamp: new Date(Date.now() - 86400000).toISOString(), status: 'completed', publicInterestScore: { score: 70  } /* other results data */ },
+    results: { analysis_id: 'old_id_123', version: '1.0', timestamp: new Date(Date.now() - 86400000).toISOString(), status: 'completed', publicInterestScore: { score: 70  } /* other results data */ },
     confidence: '80.0000', created_at: new Date(Date.now() - 86400000), updated_at: new Date(Date.now() - 86400000),
     is_approved: false, approved_by: null, model_version: null, metadata: null
 };
@@ -79,7 +79,7 @@ describe('Analysis API Routes', () => {
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('success');
       expect(response.body.data.bill_id).toBe(mockBillId);
-      expect(response.body.data.analysisId).toEqual(mockComprehensiveResult.analysisId);
+      expect(response.body.data.analysis_id).toEqual(mockComprehensiveResult.analysis_id);
       expect(billComprehensiveAnalysisService.analyzeBill).toHaveBeenCalledWith(mockBillId);
     });
 
@@ -149,7 +149,7 @@ describe('Analysis API Routes', () => {
    describe('GET /api/analysis/bills/:bill_id/history', () => {
         it('should return 200 and formatted analysis history', async () => {
             // Arrange
-            const historyData = [mockHistoryDbRecord, { ...mockHistoryDbRecord, id: 102, confidence: '75.0000', results: { analysisId: 'old_id_456'} }];
+            const historyData = [mockHistoryDbRecord, { ...mockHistoryDbRecord, id: 102, confidence: '75.0000', results: { analysis_id: 'old_id_456'} }];
             (analysisRepository.findHistoryByBillId as vi.Mock).mockResolvedValue(historyData);
 
             // Act
@@ -163,7 +163,7 @@ describe('Analysis API Routes', () => {
              // Check transformation
              expect(response.body.data.history[0]).toEqual({
                  dbId: 101,
-                 analysisId: 'old_id_123',
+                 analysis_id: 'old_id_123',
                  timestamp: historyData[0].created_at,
                  version: 'comprehensive_v1.0',
                  overallConfidence: 80,
@@ -172,7 +172,7 @@ describe('Analysis API Routes', () => {
              });
               expect(response.body.data.history[1]).toEqual(expect.objectContaining({
                   dbId: 102,
-                  analysisId: 'old_id_456',
+                  analysis_id: 'old_id_456',
                   overallConfidence: 75,
               }));
              expect(analysisRepository.findHistoryByBillId).toHaveBeenCalledWith(mockBillId, 5);

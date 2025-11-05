@@ -11,7 +11,7 @@ import {
   globalMutex,
   apiSemaphore 
 } from '../concurrency-adapter';
-import { FeatureFlagsService } from '../../../server/infrastructure/migration/feature-flags.service';
+import { FeatureFlagsService, MockFeatureFlagsService } from '../types/feature-flags.js';
 
 // Example 1: Direct usage of new concurrency utilities
 export async function directUsageExample() {
@@ -59,7 +59,7 @@ export async function migrationRouterExample() {
   console.log('\n=== Migration Router Example ===');
   
   // Setup feature flags service
-  const featureFlagsService = new FeatureFlagsService();
+  const featureFlagsService = new MockFeatureFlagsService();
   
   // Get the migration router
   const router = getConcurrencyRouter(featureFlagsService);
@@ -70,14 +70,14 @@ export async function migrationRouterExample() {
   // Simulate different users
   const users = ['user1', 'user2', 'user3', 'user4', 'user5'];
   
-  for (const userId of users) {
+  for (const user_id of users) {
     const result = await router.withMutexLock(async () => {
-      console.log(`Processing for ${userId}`);
+      console.log(`Processing for ${user_id}`);
       await new Promise(resolve => setTimeout(resolve, 10));
-      return `processed-${userId}`;
+      return `processed-${ user_id }`;
     }, 'global', userId);
     
-    console.log(`Result for ${userId}:`, result);
+    console.log(`Result for ${user_id}:`, result);
   }
   
   // Get performance summary
@@ -89,7 +89,7 @@ export async function migrationRouterExample() {
 export async function gradualRolloutExample() {
   console.log('\n=== Gradual Rollout Example ===');
   
-  const featureFlagsService = new FeatureFlagsService();
+  const featureFlagsService = new MockFeatureFlagsService();
   const router = getConcurrencyRouter(featureFlagsService);
   
   // Simulate gradual rollout phases
@@ -112,9 +112,9 @@ export async function gradualRolloutExample() {
     const testUsers = Array.from({ length: 20 }, (_, i) => `test-user-${i}`);
     let newImplementationCount = 0;
     
-    for (const userId of testUsers) {
+    for (const user_id of testUsers) {
       await router.withMutexLock(async () => {
-        return `test-${userId}`;
+        return `test-${ user_id }`;
       }, 'global', userId);
     }
     
@@ -133,7 +133,7 @@ export async function gradualRolloutExample() {
 export async function errorHandlingExample() {
   console.log('\n=== Error Handling Example ===');
   
-  const featureFlagsService = new FeatureFlagsService();
+  const featureFlagsService = new MockFeatureFlagsService();
   const router = getConcurrencyRouter(featureFlagsService);
   
   // Enable new implementation
@@ -182,7 +182,7 @@ export async function errorHandlingExample() {
 export async function performanceComparisonExample() {
   console.log('\n=== Performance Comparison Example ===');
   
-  const featureFlagsService = new FeatureFlagsService();
+  const featureFlagsService = new MockFeatureFlagsService();
   const router = getConcurrencyRouter(featureFlagsService);
   
   // Test legacy implementation

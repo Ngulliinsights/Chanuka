@@ -8,11 +8,11 @@ import { logger } from '../utils/browser-logger';
 /**
  * Hook for tracking user journeys and analytics
  */
-export function useJourneyTracker(sessionId?: string, user_id?: string) {
+export function useJourneyTracker(session_id?: string, user_id?: string) {
   const location = useLocation();
   const navigation = useNavigation();
   const tracker = useRef(UserJourneyTracker.getInstance());
-  const sessionIdRef = useRef(sessionId || generateSessionId());
+  const sessionIdRef = useRef(session_id || generateSessionId());
   const lastPageRef = useRef<string>('');
   const pageStartTimeRef = useRef<Date>(new Date());
 
@@ -72,21 +72,21 @@ export function useJourneyTracker(sessionId?: string, user_id?: string) {
    * Get journey analytics
    */
   const getAnalytics = useCallback((
-    startDate?: Date,
-    endDate?: Date,
+    start_date?: Date,
+    end_date?: Date,
     user_role?: UserRole
   ): JourneyAnalytics => {
-    return tracker.current.getJourneyAnalytics(startDate, endDate, user_role);
+    return tracker.current.getJourneyAnalytics(start_date, end_date, user_role);
   }, []);
 
   /**
    * Get optimization recommendations
    */
   const getOptimizations = useCallback((
-    startDate?: Date,
-    endDate?: Date
+    start_date?: Date,
+    end_date?: Date
   ): JourneyOptimization[] => {
-    return tracker.current.getOptimizationRecommendations(startDate, endDate);
+    return tracker.current.getOptimizationRecommendations(start_date, end_date);
   }, []);
 
   /**
@@ -177,7 +177,7 @@ export function useJourneyTracker(sessionId?: string, user_id?: string) {
   }, [endJourney]);
 
   return {
-    sessionId: sessionIdRef.current,
+    session_id: sessionIdRef.current,
     startJourney,
     trackPageVisit,
     trackConversion,
@@ -205,18 +205,18 @@ export function useJourneyAnalytics() {
   const tracker = useRef(UserJourneyTracker.getInstance());
 
   const getAnalytics = useCallback((
-    startDate?: Date,
-    endDate?: Date,
+    start_date?: Date,
+    end_date?: Date,
     user_role?: UserRole
   ): JourneyAnalytics => {
-    return tracker.current.getJourneyAnalytics(startDate, endDate, user_role);
+    return tracker.current.getJourneyAnalytics(start_date, end_date, user_role);
   }, []);
 
   const getOptimizations = useCallback((
-    startDate?: Date,
-    endDate?: Date
+    start_date?: Date,
+    end_date?: Date
   ): JourneyOptimization[] => {
-    return tracker.current.getOptimizationRecommendations(startDate, endDate);
+    return tracker.current.getOptimizationRecommendations(start_date, end_date);
   }, []);
 
   const getGoalCompletionRate = useCallback((goalName: string): number => {

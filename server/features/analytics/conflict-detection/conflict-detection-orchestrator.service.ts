@@ -5,14 +5,14 @@
  * This service acts as the primary interface for conflict detection operations.
  */
 
-import { database as db } from '../../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import {
   sponsors, sponsorAffiliations, sponsorTransparency, bills,
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
-} from '../../../../shared/schema';
+} from '@/shared/schema';
 import { eq } from 'drizzle-orm';
-import { getDefaultCache } from '../../../../shared/core/src/caching/index.js';
-import { logger } from '../../../../shared/core/index.js';
+import { getDefaultCache } from '@shared/core/caching/index.js';
+import { logger } from '@shared/core/index.js';
 import {
   ConflictAnalysis,
   ConflictDetectionError,

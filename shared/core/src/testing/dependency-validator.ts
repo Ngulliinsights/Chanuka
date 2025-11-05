@@ -172,7 +172,7 @@ export class DependencyValidator extends EventEmitter {
 
       const dependencies = this.dependencyGraph.get(node);
       if (dependencies) {
-        for (const dep of dependencies) {
+        for (const dep of Array.from(dependencies)) {
           if (dfs(dep, [...path, node])) {
             return true;
           }
@@ -183,7 +183,7 @@ export class DependencyValidator extends EventEmitter {
       return false;
     };
 
-    for (const node of this.dependencyGraph.keys()) {
+    for (const node of Array.from(this.dependencyGraph.keys())) {
       if (!visited.has(node)) {
         dfs(node, []);
       }
@@ -198,10 +198,10 @@ export class DependencyValidator extends EventEmitter {
   private detectLayerViolations(): LayerViolation[] {
     const violations: LayerViolation[] = [];
 
-    for (const [file, dependencies] of this.dependencyGraph.entries()) {
+    for (const [file, dependencies] of Array.from(this.dependencyGraph.entries())) {
       const fileLayer = this.getFileLayer(file);
 
-      for (const dep of dependencies) {
+      for (const dep of Array.from(dependencies)) {
         const depLayer = this.getFileLayer(dep);
 
         if (fileLayer && depLayer) {
@@ -278,8 +278,8 @@ export class DependencyValidator extends EventEmitter {
   private async detectMissingDependencies(): Promise<HygieneIssue[]> {
     const issues: HygieneIssue[] = [];
 
-    for (const [file, dependencies] of this.dependencyGraph.entries()) {
-      for (const dep of dependencies) {
+    for (const [file, dependencies] of Array.from(this.dependencyGraph.entries())) {
+      for (const dep of Array.from(dependencies)) {
         if (dep.startsWith('@') || dep.includes('/')) {
           // External dependency
           if (!await this.isExternalDependencyInstalled(dep)) {
@@ -428,8 +428,8 @@ export class DependencyValidator extends EventEmitter {
 
   private async isDependencyUsed(dep: string): Promise<boolean> {
     // Simple check - look for imports in source files
-    for (const [file, dependencies] of this.dependencyGraph.entries()) {
-      for (const fileDep of dependencies) {
+    for (const [file, dependencies] of Array.from(this.dependencyGraph.entries())) {
+      for (const fileDep of Array.from(dependencies)) {
         if (fileDep.includes(dep)) {
           return true;
         }
@@ -450,7 +450,7 @@ export class DependencyValidator extends EventEmitter {
 
   private serializeDependencyGraph(): Record<string, string[]> {
     const result: Record<string, string[]> = {};
-    for (const [file, deps] of this.dependencyGraph.entries()) {
+    for (const [file, deps] of Array.from(this.dependencyGraph.entries())) {
       result[file] = Array.from(deps);
     }
     return result;

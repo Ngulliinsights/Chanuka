@@ -1,5 +1,5 @@
 
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@shared/database';
 import { users, user_verification } from '@shared/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 
@@ -114,25 +114,25 @@ export class CitizenVerificationService {
     return verification;
   }
 
-  async endorseVerification(verificationId: string, citizenId: string): Promise<void> {
+  async endorseVerification(verification_id: string, citizenId: string): Promise<void> {
     // Validate endorser eligibility
     await this.validateCitizenEligibility(citizenId);
 
     // Check if citizen already endorsed
-    const existingEndorsement = await this.checkExistingEndorsement(verificationId, citizenId);
+    const existingEndorsement = await this.checkExistingEndorsement(verification_id, citizenId);
     if (existingEndorsement) {
       throw new Error('Citizen has already endorsed this verification');
     }
 
     // Record endorsement
-    await this.recordEndorsement(verificationId, citizenId);
+    await this.recordEndorsement(verification_id, citizenId);
 
     // Update verification confidence
-    await this.recalculateVerificationConfidence(verificationId);
+    await this.recalculateVerificationConfidence(verification_id);
   }
 
   async disputeVerification(
-    verificationId: string,
+    verification_id: string,
     citizenId: string,
     reason: string,
     counterEvidence?: Evidence[]
@@ -140,10 +140,10 @@ export class CitizenVerificationService {
     await this.validateCitizenEligibility(citizenId);
 
     // Record dispute
-    await this.recordDispute(verificationId, citizenId, reason, counterEvidence);
+    await this.recordDispute(verification_id, citizenId, reason, counterEvidence);
 
     // Update verification status
-    await this.updateVerificationStatus(verificationId);
+    await this.updateVerificationStatus(verification_id);
   }
 
   async getVerificationSummary(bill_id: number): Promise<VerificationSummary> {
@@ -353,9 +353,9 @@ export class CitizenVerificationService {
     return false;
   }
 
-  private async recordEndorsement(verificationId: string, _citizenId: string): Promise<void> {
+  private async recordEndorsement(verification_id: string, _citizenId: string): Promise<void> {
     // Increment endorsements counter stored in verification_data JSONB
-    const row = await db.select().from(user_verification).where(eq(user_verification.id, verificationId));
+    const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
     const data = (existing as any).verification_data || {};
@@ -365,17 +365,17 @@ export class CitizenVerificationService {
     await db
       .update(user_verification)
       .set({ verification_data: data, updated_at: new Date() })
-      .where(eq(user_verification.id, verificationId));
+      .where(eq(user_verification.id, verification_id));
   }
 
   private async recordDispute(
-    verificationId: string,
+    verification_id: string,
     _citizenId: string,
     _reason: string,
     counterEvidence?: Evidence[]
   ): Promise<void> {
     // Record dispute and update count
-    const row = await db.select().from(user_verification).where(eq(user_verification.id, verificationId));
+    const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
     const data = (existing as any).verification_data || {};
@@ -389,11 +389,11 @@ export class CitizenVerificationService {
     await db
       .update(user_verification)
       .set({ verification_data: data, updated_at: new Date() })
-      .where(eq(user_verification.id, verificationId));
+      .where(eq(user_verification.id, verification_id));
   }
 
-  private async recalculateVerificationConfidence(verificationId: string): Promise<void> {
-    const row = await db.select().from(user_verification).where(eq(user_verification.id, verificationId));
+  private async recalculateVerificationConfidence(verification_id: string): Promise<void> {
+    const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
     const data = (existing as any).verification_data || {};
@@ -412,11 +412,11 @@ export class CitizenVerificationService {
     await db
       .update(user_verification)
       .set({ verification_data: data, updated_at: new Date() })
-      .where(eq(user_verification.id, verificationId));
+      .where(eq(user_verification.id, verification_id));
   }
 
-  private async updateVerificationStatus(verificationId: string): Promise<void> {
-    const row = await db.select().from(user_verification).where(eq(user_verification.id, verificationId));
+  private async updateVerificationStatus(verification_id: string): Promise<void> {
+    const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
     const data = (existing as any).verification_data || {};
@@ -425,7 +425,7 @@ export class CitizenVerificationService {
       await db
         .update(user_verification)
         .set({ verification_status: 'disputed', updated_at: new Date() })
-        .where(eq(user_verification.id, verificationId));
+        .where(eq(user_verification.id, verification_id));
     }
   }
 
@@ -518,8 +518,8 @@ export class CitizenVerificationService {
     );
   }
 
-  private async calculateClaimConsensus(verificationId: string): Promise<number> {
-    const verification = await this.getVerificationById(verificationId);
+  private async calculateClaimConsensus(verification_id: string): Promise<number> {
+    const verification = await this.getVerificationById(verification_id);
     if (!verification) return 0;
 
     const totalInteractions = verification.endorsements + verification.disputes;
@@ -581,11 +581,11 @@ export class CitizenVerificationService {
     });
   }
 
-  private async getVerificationById(verificationId: string): Promise<CitizenVerification | null> {
+  private async getVerificationById(verification_id: string): Promise<CitizenVerification | null> {
     const result = await db
       .select()
       .from(user_verification)
-      .where(eq(user_verification.id, verificationId));
+      .where(eq(user_verification.id, verification_id));
 
     return result[0] || null;
   }

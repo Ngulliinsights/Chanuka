@@ -5,7 +5,7 @@
 // - users, bills from '@shared/schema/foundation'
 // - eq, and, desc from 'drizzle-orm'
 
-export async function getUserBills(userId: string) {
+export async function getUserBills(user_id: string) {
   // Missing schema table imports
   const userBills = await db
     .select({
@@ -21,7 +21,7 @@ export async function getUserBills(userId: string) {
     .leftJoin(users, eq(bills.sponsor_id, users.id))
     .where(
       and(
-        eq(users.id, userId),
+        eq(users.id, user_id),
         eq(bills.status, 'active')
       )
     )
@@ -30,12 +30,12 @@ export async function getUserBills(userId: string) {
   return userBills;
 }
 
-export async function getUserComments(userId: string) {
+export async function getUserComments(user_id: string) {
   // Missing comments import from citizen_participation schema
   const userComments = await db
     .select()
     .from(comments)
-    .where(eq(comments.user_id, userId))
+    .where(eq(comments.user_id, user_id))
     .orderBy(desc(comments.created_at));
 
   return userComments;

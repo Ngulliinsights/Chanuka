@@ -3,8 +3,8 @@
 // ============================================================================
 // Main service that orchestrates constitutional analysis of bills
 
-import { logger } from '../../../../shared/core/index.js';
-import { ConstitutionalProvision, LegalPrecedent, ConstitutionalAnalysis } from '../../../shared/schema/index.js';
+import { logger } from '@shared/core/index.js';
+import { ConstitutionalProvision, LegalPrecedent, ConstitutionalAnalysis } from '@shared/schema/index.js';
 import { ProvisionMatcherService } from './provision-matcher.js';
 import { PrecedentFinderService } from './precedent-finder.js';
 import { ExpertFlaggingService } from './expert-flagging-service.js';
@@ -13,7 +13,7 @@ import { LegalPrecedentsRepository } from '../infrastructure/repositories/legal-
 import { ConstitutionalAnalysesRepository } from '../infrastructure/repositories/constitutional-analyses-repository.js';
 
 export interface AnalysisRequest {
-  billId: string;
+  bill_id: string;
   billTitle: string;
   billContent: string;
   billType?: string;
@@ -21,7 +21,7 @@ export interface AnalysisRequest {
 }
 
 export interface AnalysisResult {
-  billId: string;
+  bill_id: string;
   overallRisk: 'low' | 'medium' | 'high' | 'critical';
   overallConfidence: number; // 0-100
   analyses: ConstitutionalAnalysis[];
@@ -52,9 +52,9 @@ export class ConstitutionalAnalyzer {
     const startTime = Date.now();
     
     try {
-      logger.info(`🏛️ Starting constitutional analysis for bill ${request.billId}`, {
+      logger.info(`🏛️ Starting constitutional analysis for bill ${request.bill_id}`, {
         component: 'ConstitutionalAnalyzer',
-        billId: request.billId,
+        bill_id: request.bill_id,
         urgent: request.urgentAnalysis
       });
 
@@ -65,8 +65,8 @@ export class ConstitutionalAnalyzer {
       );
 
       if (relevantProvisions.length === 0) {
-        logger.info(`No constitutional provisions identified for bill ${request.billId}`);
-        return this.createMinimalResult(request.billId, startTime);
+        logger.info(`No constitutional provisions identified for bill ${request.bill_id}`);
+        return this.createMinimalResult(request.bill_id, startTime);
       }
 
       // Step 2: Analyze each provision against the bill
@@ -96,7 +96,7 @@ export class ConstitutionalAnalyzer {
       const summary = this.generateSummary(analyses);
 
       const result: AnalysisResult = {
-        billId: request.billId,
+        bill_id: request.bill_id,
         overallRisk,
         overallConfidence,
         analyses,
@@ -105,9 +105,9 @@ export class ConstitutionalAnalyzer {
         processingTime: Date.now() - startTime
       };
 
-      logger.info(`✅ Constitutional analysis completed for bill ${request.billId}`, {
+      logger.info(`✅ Constitutional analysis completed for bill ${request.bill_id}`, {
         component: 'ConstitutionalAnalyzer',
-        billId: request.billId,
+        bill_id: request.bill_id,
         overallRisk,
         overallConfidence,
         analysisCount: analyses.length,
@@ -117,9 +117,9 @@ export class ConstitutionalAnalyzer {
       return result;
 
     } catch (error) {
-      logger.error(`❌ Constitutional analysis failed for bill ${request.billId}`, {
+      logger.error(`❌ Constitutional analysis failed for bill ${request.bill_id}`, {
         component: 'ConstitutionalAnalyzer',
-        billId: request.billId,
+        bill_id: request.bill_id,
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined
       });
@@ -191,7 +191,7 @@ export class ConstitutionalAnalyzer {
 
       const analysis: ConstitutionalAnalysis = {
         id: crypto.randomUUID(),
-        bill_id: request.billId,
+        bill_id: request.bill_id,
         provision_id: provision.id,
         analysis_type: analysisType,
         confidence_percentage: confidence,
@@ -212,7 +212,7 @@ export class ConstitutionalAnalyzer {
       return analysis;
 
     } catch (error) {
-      logger.error(`Failed to analyze provision ${provision.id} for bill ${request.billId}`, {
+      logger.error(`Failed to analyze provision ${provision.id} for bill ${request.bill_id}`, {
         component: 'ConstitutionalAnalyzer',
         provisionId: provision.id,
         error: error instanceof Error ? error.message : String(error)
@@ -467,9 +467,9 @@ export class ConstitutionalAnalyzer {
     };
   }
 
-  private createMinimalResult(billId: string, startTime: number): AnalysisResult {
+  private createMinimalResult(bill_id: string, startTime: number): AnalysisResult {
     return {
-      billId,
+      bill_id,
       overallRisk: 'low',
       overallConfidence: 95,
       analyses: [],

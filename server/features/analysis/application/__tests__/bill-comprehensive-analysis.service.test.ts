@@ -72,7 +72,7 @@ describe('BillComprehensiveAnalysisService', () => {
     const result = await service.analyzeBill(mockBillId);
 
     expect(result.bill_id).toBe(mockBillId);
-    expect(result.analysisId).toMatch(/^comp_analysis_1_\d+$/);
+    expect(result.analysis_id).toMatch(/^comp_analysis_1_\d+$/);
     expect(result.constitutionalAnalysis).toBe(mockConstitutionalResult);
     expect(result.stakeholderImpact).toBe(mockStakeholderResult);
      // Check aggregated conflict summary
@@ -108,7 +108,7 @@ describe('BillComprehensiveAnalysisService', () => {
     expect(analysisRepository.save).toHaveBeenCalledTimes(1);
     expect(analysisRepository.save).toHaveBeenCalledWith(expect.objectContaining({
       bill_id: mockBillId,
-      analysisId: expect.stringMatching(/^comp_analysis_1_\d+$/),
+      analysis_id: expect.stringMatching(/^comp_analysis_1_\d+$/),
       constitutionalAnalysis: mockConstitutionalResult,
        conflictAnalysisSummary: expect.objectContaining({ overallRisk: 'low'  }),
       stakeholderImpact: mockStakeholderResult,

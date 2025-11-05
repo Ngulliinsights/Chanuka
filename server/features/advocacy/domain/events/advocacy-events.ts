@@ -18,54 +18,54 @@ export abstract class AdvocacyDomainEvent {
 // Campaign Events
 export class CampaignCreatedEvent extends AdvocacyDomainEvent {
   constructor(
-    public readonly campaignId: string,
+    public readonly campaign_id: string,
     public readonly title: string,
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly organizerId: string
   ) {
-    super(campaignId, 'CampaignCreated');
+    super(campaign_id, 'CampaignCreated');
   }
 }
 
 export class CampaignStatusChangedEvent extends AdvocacyDomainEvent {
   constructor(
-    public readonly campaignId: string,
+    public readonly campaign_id: string,
     public readonly previousStatus: string,
     public readonly newStatus: string,
     public readonly changedBy: string
   ) {
-    super(campaignId, 'CampaignStatusChanged');
+    super(campaign_id, 'CampaignStatusChanged');
   }
 }
 
 export class ParticipantJoinedEvent extends AdvocacyDomainEvent {
   constructor(
-    public readonly campaignId: string,
-    public readonly userId: string,
+    public readonly campaign_id: string,
+    public readonly user_id: string,
     public readonly participantCount: number
   ) {
-    super(campaignId, 'ParticipantJoined');
+    super(campaign_id, 'ParticipantJoined');
   }
 }
 
 export class ParticipantLeftEvent extends AdvocacyDomainEvent {
   constructor(
-    public readonly campaignId: string,
-    public readonly userId: string,
+    public readonly campaign_id: string,
+    public readonly user_id: string,
     public readonly participantCount: number
   ) {
-    super(campaignId, 'ParticipantLeft');
+    super(campaign_id, 'ParticipantLeft');
   }
 }
 
 export class CampaignMilestoneReachedEvent extends AdvocacyDomainEvent {
   constructor(
-    public readonly campaignId: string,
+    public readonly campaign_id: string,
     public readonly milestone: string,
     public readonly value: number,
     public readonly target: number
   ) {
-    super(campaignId, 'CampaignMilestoneReached');
+    super(campaign_id, 'CampaignMilestoneReached');
   }
 }
 
@@ -73,8 +73,8 @@ export class CampaignMilestoneReachedEvent extends AdvocacyDomainEvent {
 export class ActionCreatedEvent extends AdvocacyDomainEvent {
   constructor(
     public readonly actionId: string,
-    public readonly campaignId: string,
-    public readonly userId: string,
+    public readonly campaign_id: string,
+    public readonly user_id: string,
     public readonly actionType: string
   ) {
     super(actionId, 'ActionCreated');
@@ -84,8 +84,8 @@ export class ActionCreatedEvent extends AdvocacyDomainEvent {
 export class ActionStartedEvent extends AdvocacyDomainEvent {
   constructor(
     public readonly actionId: string,
-    public readonly campaignId: string,
-    public readonly userId: string
+    public readonly campaign_id: string,
+    public readonly user_id: string
   ) {
     super(actionId, 'ActionStarted');
   }
@@ -94,8 +94,8 @@ export class ActionStartedEvent extends AdvocacyDomainEvent {
 export class ActionCompletedEvent extends AdvocacyDomainEvent {
   constructor(
     public readonly actionId: string,
-    public readonly campaignId: string,
-    public readonly userId: string,
+    public readonly campaign_id: string,
+    public readonly user_id: string,
     public readonly successful: boolean,
     public readonly completionTime?: number
   ) {
@@ -106,8 +106,8 @@ export class ActionCompletedEvent extends AdvocacyDomainEvent {
 export class ActionSkippedEvent extends AdvocacyDomainEvent {
   constructor(
     public readonly actionId: string,
-    public readonly campaignId: string,
-    public readonly userId: string,
+    public readonly campaign_id: string,
+    public readonly user_id: string,
     public readonly reason?: string
   ) {
     super(actionId, 'ActionSkipped');
@@ -117,12 +117,12 @@ export class ActionSkippedEvent extends AdvocacyDomainEvent {
 // Coalition Events
 export class CoalitionOpportunityIdentifiedEvent extends AdvocacyDomainEvent {
   constructor(
-    public readonly campaignId: string,
+    public readonly campaign_id: string,
     public readonly potentialPartnerCampaignId: string,
     public readonly alignmentScore: number,
     public readonly sharedObjectives: string[]
   ) {
-    super(campaignId, 'CoalitionOpportunityIdentified');
+    super(campaign_id, 'CoalitionOpportunityIdentified');
   }
 }
 
@@ -139,12 +139,12 @@ export class CoalitionFormedEvent extends AdvocacyDomainEvent {
 // Impact Events
 export class ImpactAchievedEvent extends AdvocacyDomainEvent {
   constructor(
-    public readonly campaignId: string,
+    public readonly campaign_id: string,
     public readonly impactType: 'bill_amended' | 'committee_feedback' | 'media_attention' | 'legislative_response',
     public readonly description: string,
     public readonly attribution: number
   ) {
-    super(campaignId, 'ImpactAchieved');
+    super(campaign_id, 'ImpactAchieved');
   }
 }
 

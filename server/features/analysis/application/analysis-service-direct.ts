@@ -1,22 +1,24 @@
-import { db } from '../../../../shared/database/pool.js';
+import { db } from '@shared/database/pool.js';
 import {
   bills,
   sponsors,
   comments,
   bill_engagement,
+  constitutional_analyses,
   type Bill,
   type Sponsor,
-  type Comment
+  type Comment,
+  type ConstitutionalAnalysis
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, count, inArray, like, or, gte, lte, isNotNull } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
 export interface ComprehensiveAnalysis {
-  analysisId: string;
+  analysis_id: string;
   bill_id: number;
   constitutionalAnalysis: any;
   conflictAnalysisSummary: any;
@@ -43,7 +45,7 @@ export interface AnalysisResult {
 
 export interface BillAnalysisMetrics {
   totalEngagement: number;
-  commentCount: number;
+  comment_count: number;
   averageSentiment: number;
   stakeholderDiversity: number;
   controversyScore: number;
@@ -93,64 +95,124 @@ export class AnalysisService {
   /**
    * Save a comprehensive analysis result
    */
-  async saveAnalysis(analysis: ComprehensiveAnalysis): Promise<AnalysisResult> {
+  async saveAnalysis(analysis: ComprehensiveAnalysis): Promise<ConstitutionalAnalysis> {
     const logContext = { 
       component: 'AnalysisService', 
       operation: 'saveAnalysis',
-      billId: analysis.bill_id,
-      analysisId: analysis.analysisId 
+      bill_id: analysis.bill_id,
+      analysis_id: analysis.analysis_id 
     };
     logger.debug('Saving comprehensive analysis', logContext);
 
     try {
-      const now = new Date();
-      
-      // Structure data according to the schema
-      const dataToStore = {
-        analysisId: analysis.analysisId,
-        constitutionalAnalysis: analysis.constitutionalAnalysis,
-        conflictAnalysisSummary: analysis.conflictAnalysisSummary,
-        stakeholderImpact: analysis.stakeholderImpact,
-        transparency_score: analysis.transparency_score,
-        publicInterestScore: analysis.publicInterestScore,
-        overallConfidence: analysis.overallConfidence,
-        recommendations: analysis.recommendedActions,
-        version: analysis.version,
-        status: analysis.status,
-        timestamp: analysis.timestamp
-      };
-
-      // Check if analysis already exists for this bill and type
-      const analysisType = `comprehensive_v${analysis.version}`;
-      const [existing] = await this.database
+      // Check if bill exists
+      const [bill] = await this.database
         .select()
-        .from(bills) // Using bills table as base - adjust based on actual schema
+        .from(bills)
         .where(eq(bills.id, analysis.bill_id))
         .limit(1);
 
-      if (!existing) {
+      if (!bill) {
         throw new Error(`Bill ${analysis.bill_id} not found`);
       }
 
-      // For now, create a simple analysis record structure
-      // This would need to be adjusted based on your actual analysis table schema
-      const analysisRecord = {
-        id: analysis.analysisId,
-        bill_id: analysis.bill_id,
-        analysis_type: analysisType,
-        results: dataToStore,
-        confidence: analysis.overallConfidence.toString(),
-        is_approved: false,
-        created_at: analysis.timestamp,
-        updated_at: now
-      };
+      // Check if analysis already exists (supersede if needed)
+      const [existing] = await this.database
+        .select()
+        .from(constitutional_analyses)
+        .where(
+          and(
+            eq(constitutional_analyses.bill_id, analysis.bill_id),
+            eq(constitutional_analyses.analysis_type, `comprehensive_v${analysis.version}`),
+            sql`${constitutional_analyses.superseded_by} IS NULL`
+          )
+        )
+        .limit(1);
+
+      let savedAnalysis: ConstitutionalAnalysis;
+
+      if (existing) {
+        // Create new analysis and mark old one as superseded
+        const [newAnalysis] = await this.database
+          .insert(constitutional_analyses)
+          .values({
+            id: analysis.analysis_id,
+            bill_id: analysis.bill_id,
+            analysis_type: `comprehensive_v${analysis.version}`,
+            confidence_score: analysis.overallConfidence / 100, // Convert to 0-1 scale
+            constitutional_provisions_cited: [],
+            potential_violations: {
+              violations: analysis.constitutionalAnalysis?.violations || [],
+              concerns: analysis.constitutionalAnalysis?.concerns || []
+            },
+            constitutional_alignment: this.determineAlignment(analysis.overallConfidence),
+            executive_summary: `Comprehensive analysis of Bill ${analysis.bill_id}`,
+            detailed_analysis: JSON.stringify({
+              constitutionalAnalysis: analysis.constitutionalAnalysis,
+              conflictAnalysisSummary: analysis.conflictAnalysisSummary,
+              stakeholderImpact: analysis.stakeholderImpact,
+              transparency_score: analysis.transparency_score,
+              publicInterestScore: analysis.publicInterestScore
+            }),
+            recommendations: analysis.recommendedActions.join('\n'),
+            requires_expert_review: analysis.overallConfidence < 75,
+            analysis_version: analysis.version,
+            created_at: analysis.timestamp,
+            updated_at: new Date()
+          })
+          .returning();
+
+        // Mark old analysis as superseded
+        await this.database
+          .update(constitutional_analyses)
+          .set({
+            superseded_by: newAnalysis.id,
+            updated_at: new Date()
+          })
+          .where(eq(constitutional_analyses.id, existing.id));
+
+        savedAnalysis = newAnalysis;
+      } else {
+        // Create new analysis
+        const [newAnalysis] = await this.database
+          .insert(constitutional_analyses)
+          .values({
+            id: analysis.analysis_id,
+            bill_id: analysis.bill_id,
+            analysis_type: `comprehensive_v${analysis.version}`,
+            confidence_score: analysis.overallConfidence / 100,
+            constitutional_provisions_cited: [],
+            potential_violations: {
+              violations: analysis.constitutionalAnalysis?.violations || [],
+              concerns: analysis.constitutionalAnalysis?.concerns || []
+            },
+            constitutional_alignment: this.determineAlignment(analysis.overallConfidence),
+            executive_summary: `Comprehensive analysis of Bill ${analysis.bill_id}`,
+            detailed_analysis: JSON.stringify({
+              constitutionalAnalysis: analysis.constitutionalAnalysis,
+              conflictAnalysisSummary: analysis.conflictAnalysisSummary,
+              stakeholderImpact: analysis.stakeholderImpact,
+              transparency_score: analysis.transparency_score,
+              publicInterestScore: analysis.publicInterestScore
+            }),
+            recommendations: analysis.recommendedActions.join('\n'),
+            requires_expert_review: analysis.overallConfidence < 75,
+            analysis_version: analysis.version,
+            created_at: analysis.timestamp,
+            updated_at: new Date()
+          })
+          .returning();
+
+        savedAnalysis = newAnalysis;
+      }
 
       logger.info('✅ Analysis saved successfully', { 
         ...logContext, 
-        confidence: analysis.overallConfidence 
+        confidence: analysis.overallConfidence,
+        analysis_id: savedAnalysis.id
       });
 
-      return analysisRecord;
+      return savedAnalysis;
     } catch (error) {
       logger.error('Failed to save analysis', { ...logContext, error });
       throw error;
@@ -160,30 +222,34 @@ export class AnalysisService {
   /**
    * Find the latest analysis for a bill
    */
-  async findLatestAnalysisByBillId(billId: number): Promise<AnalysisResult | null> {
+  async findLatestAnalysisByBillId(bill_id: number): Promise<ConstitutionalAnalysis | null> {
     const logContext = { 
       component: 'AnalysisService', 
       operation: 'findLatestAnalysisByBillId',
-      billId 
+      bill_id 
     };
     logger.debug('Finding latest analysis for bill', logContext);
 
     try {
-      // This would need to query your actual analysis table
-      // For now, return a placeholder structure
-      const bill = await this.database
+      const [analysis] = await this.database
         .select()
-        .from(bills)
-        .where(eq(bills.id, billId))
+        .from(constitutional_analyses)
+        .where(
+          and(
+            eq(constitutional_analyses.bill_id, bill_id),
+            sql`${constitutional_analyses.superseded_by} IS NULL`
+          )
+        )
+        .orderBy(desc(constitutional_analyses.created_at))
         .limit(1);
 
-      if (!bill.length) {
-        logger.debug('Bill not found', logContext);
+      if (!analysis) {
+        logger.debug('No analysis found for bill', logContext);
         return null;
       }
 
-      // Placeholder - would need actual analysis table query
-      return null;
+      logger.debug('Latest analysis retrieved', { ...logContext, analysis_id: analysis.id });
+      return analysis;
     } catch (error) {
       logger.error('Failed to find latest analysis', { ...logContext, error });
       throw error;
@@ -191,13 +257,41 @@ export class AnalysisService {
   }
 
   /**
+   * Find historical analysis runs for a bill (matching original repository functionality)
+   */
+  async findHistoryByBillId(bill_id: number, limit: number = 10): Promise<ConstitutionalAnalysis[]> {
+    const logContext = { 
+      component: 'AnalysisService', 
+      operation: 'findHistoryByBillId',
+      bill_id,
+      limit 
+    };
+    logger.debug('Finding analysis history for bill', logContext);
+
+    try {
+      const analyses = await this.database
+        .select()
+        .from(constitutional_analyses)
+        .where(eq(constitutional_analyses.bill_id, bill_id))
+        .orderBy(desc(constitutional_analyses.created_at))
+        .limit(limit);
+
+      logger.debug('Analysis history retrieved', { ...logContext, count: analyses.length });
+      return analyses;
+    } catch (error) {
+      logger.error('Failed to find analysis history', { ...logContext, error });
+      throw error;
+    }
+  }
+
+  /**
    * Find analysis by unique analysis ID
    */
-  async findAnalysisById(analysisId: string): Promise<AnalysisResult | null> {
+  async findAnalysisById(analysis_id: string): Promise<AnalysisResult | null> {
     const logContext = { 
       component: 'AnalysisService', 
       operation: 'findAnalysisById',
-      analysisId 
+      analysis_id 
     };
     logger.debug('Finding analysis by ID', logContext);
 
@@ -218,11 +312,11 @@ export class AnalysisService {
   /**
    * Calculate comprehensive metrics for a bill
    */
-  async calculateBillMetrics(billId: number): Promise<BillAnalysisMetrics> {
+  async calculateBillMetrics(bill_id: number): Promise<BillAnalysisMetrics> {
     const logContext = { 
       component: 'AnalysisService', 
       operation: 'calculateBillMetrics',
-      billId 
+      bill_id 
     };
     logger.debug('Calculating bill analysis metrics', logContext);
 
@@ -238,19 +332,19 @@ export class AnalysisService {
             ELSE 1 END)`
         })
         .from(bill_engagement)
-        .where(eq(bill_engagement.bill_id, billId));
+        .where(eq(bill_engagement.bill_id, bill_id));
 
       // Get comment metrics
       const [commentStats] = await this.database
         .select({
-          commentCount: count(),
+          comment_count: count(),
           avgSentiment: sql<number>`AVG(CASE 
             WHEN ${comments.content} ILIKE '%support%' OR ${comments.content} ILIKE '%agree%' THEN 1
             WHEN ${comments.content} ILIKE '%oppose%' OR ${comments.content} ILIKE '%disagree%' THEN -1
             ELSE 0 END)`
         })
         .from(comments)
-        .where(eq(comments.bill_id, billId));
+        .where(eq(comments.bill_id, bill_id));
 
       // Calculate stakeholder diversity (unique users engaging)
       const [diversityStats] = await this.database
@@ -258,11 +352,11 @@ export class AnalysisService {
           uniqueUsers: sql<number>`COUNT(DISTINCT ${bill_engagement.user_id})`
         })
         .from(bill_engagement)
-        .where(eq(bill_engagement.bill_id, billId));
+        .where(eq(bill_engagement.bill_id, bill_id));
 
       // Calculate controversy score based on engagement patterns
       const controversyScore = this.calculateControversyScore(
-        commentStats.commentCount || 0,
+        commentStats.comment_count || 0,
         commentStats.avgSentiment || 0,
         engagementStats.totalEngagement || 0
       );
@@ -275,7 +369,7 @@ export class AnalysisService {
 
       const metrics: BillAnalysisMetrics = {
         totalEngagement: engagementStats.totalEngagement || 0,
-        commentCount: commentStats.commentCount || 0,
+        comment_count: commentStats.comment_count || 0,
         averageSentiment: Math.round((commentStats.avgSentiment || 0) * 100) / 100,
         stakeholderDiversity: diversityStats.uniqueUsers || 0,
         controversyScore,
@@ -297,11 +391,11 @@ export class AnalysisService {
   /**
    * Perform comprehensive stakeholder analysis
    */
-  async performStakeholderAnalysis(billId: number): Promise<StakeholderAnalysis> {
+  async performStakeholderAnalysis(bill_id: number): Promise<StakeholderAnalysis> {
     const logContext = { 
       component: 'AnalysisService', 
       operation: 'performStakeholderAnalysis',
-      billId 
+      bill_id 
     };
     logger.debug('Performing stakeholder analysis', logContext);
 
@@ -309,12 +403,12 @@ export class AnalysisService {
       // Get comments with user information for stakeholder grouping
       const stakeholderData = await this.database
         .select({
-          userId: comments.user_id,
+          user_id: comments.user_id,
           content: comments.content,
-          createdAt: comments.created_at
+          created_at: comments.created_at
         })
         .from(comments)
-        .where(eq(comments.bill_id, billId))
+        .where(eq(comments.bill_id, bill_id))
         .orderBy(desc(comments.created_at));
 
       // Group stakeholders by engagement patterns
@@ -351,11 +445,11 @@ export class AnalysisService {
   /**
    * Calculate transparency score for a bill
    */
-  async calculateTransparencyScore(billId: number): Promise<number> {
+  async calculateTransparencyScore(bill_id: number): Promise<number> {
     const logContext = { 
       component: 'AnalysisService', 
       operation: 'calculateTransparencyScore',
-      billId 
+      bill_id 
     };
     logger.debug('Calculating transparency score', logContext);
 
@@ -364,11 +458,11 @@ export class AnalysisService {
       const [bill] = await this.database
         .select()
         .from(bills)
-        .where(eq(bills.id, billId))
+        .where(eq(bills.id, bill_id))
         .limit(1);
 
       if (!bill) {
-        throw new Error(`Bill ${billId} not found`);
+        throw new Error(`Bill ${bill_id} not found`);
       }
 
       let score = 0;
@@ -397,18 +491,18 @@ export class AnalysisService {
       const [engagementCount] = await this.database
         .select({ count: count() })
         .from(bill_engagement)
-        .where(eq(bill_engagement.bill_id, billId));
+        .where(eq(bill_engagement.bill_id, bill_id));
 
       const engagement = engagementCount.count || 0;
       if (engagement > 100) score += 30;
       else if (engagement > 50) score += 20;
       else if (engagement > 10) score += 10;
 
-      const transparencyScore = Math.min(score, maxScore);
+      const transparency_score = Math.min(score, maxScore);
 
       logger.debug('✅ Transparency score calculated', { 
         ...logContext, 
-        score: transparencyScore 
+        score: transparency_score 
       });
 
       return transparencyScore;
@@ -426,16 +520,16 @@ export class AnalysisService {
    * Calculate controversy score based on engagement patterns
    */
   private calculateControversyScore(
-    commentCount: number, 
+    comment_count: number, 
     avgSentiment: number, 
     totalEngagement: number
   ): number {
     // High comment count with mixed sentiment indicates controversy
     const sentimentVariance = Math.abs(avgSentiment);
-    const engagementRatio = commentCount / Math.max(totalEngagement, 1);
+    const engagementRatio = comment_count / Math.max(totalEngagement, 1);
     
     // Controversy increases with more comments and neutral/mixed sentiment
-    let controversyScore = (commentCount * 0.1) + ((1 - sentimentVariance) * 50) + (engagementRatio * 30);
+    let controversyScore = (comment_count * 0.1) + ((1 - sentimentVariance) * 50) + (engagementRatio * 30);
     
     return Math.min(Math.max(controversyScore, 0), 100);
   }
@@ -605,4 +699,97 @@ export class AnalysisService {
 /**
  * Singleton instance of AnalysisService for application-wide use.
  */
-export const analysisService = new AnalysisService();
+export const analysisService = new AnalysisService();  
+/**
+   * Find analysis by unique analysis ID (matching original repository functionality)
+   */
+  async findAnalysisById(analysis_id: string): Promise<ConstitutionalAnalysis | null> {
+    const logContext = { 
+      component: 'AnalysisService', 
+      operation: 'findAnalysisById',
+      analysis_id 
+    };
+    logger.debug('Finding analysis by ID', logContext);
+
+    try {
+      const [analysis] = await this.database
+        .select()
+        .from(constitutional_analyses)
+        .where(eq(constitutional_analyses.id, analysis_id))
+        .limit(1);
+
+      if (!analysis) {
+        logger.debug('Analysis not found', logContext);
+        return null;
+      }
+
+      logger.debug('Analysis found by ID', logContext);
+      return analysis;
+    } catch (error) {
+      logger.error('Failed to find analysis by ID', { ...logContext, error });
+      throw error;
+    }
+  }
+
+  /**
+   * Record a failed analysis attempt (matching original repository functionality)
+   */
+  async recordFailedAnalysis(bill_id: number, errorDetails: any): Promise<void> {
+    const logContext = { 
+      component: 'AnalysisService', 
+      operation: 'recordFailedAnalysis',
+      bill_id 
+    };
+    logger.warn('Recording failed analysis attempt', logContext);
+
+    try {
+      const errorMessage = errorDetails instanceof Error ? errorDetails.message : String(errorDetails);
+      const errorStack = errorDetails instanceof Error ? errorDetails.stack : undefined;
+
+      await this.database
+        .insert(constitutional_analyses)
+        .values({
+          id: crypto.randomUUID(),
+          bill_id: bill_id,
+          analysis_type: 'comprehensive_failed',
+          confidence_score: 0,
+          constitutional_provisions_cited: [],
+          potential_violations: {
+            error: errorMessage,
+            stack: errorStack,
+            timestamp: new Date().toISOString()
+          },
+          constitutional_alignment: 'unknown',
+          executive_summary: `Analysis failed for Bill ${ bill_id }`,
+          detailed_analysis: JSON.stringify({
+            error: errorMessage,
+            stack: errorStack,
+            failureTime: new Date()
+          }),
+          recommendations: 'Manual review required due to analysis failure',
+          requires_expert_review: true,
+          expert_reviewed: false,
+          analysis_version: 1,
+          created_at: new Date(),
+          updated_at: new Date()
+        });
+
+      logger.info('Failed analysis recorded', logContext);
+    } catch (error) {
+      logger.error('Failed to record failed analysis', { ...logContext, error });
+      // Don't throw error here, as this is for logging failures
+    }
+  }
+
+  // ============================================================================
+  // UTILITY METHODS
+  // ============================================================================
+
+  /**
+   * Determine constitutional alignment based on confidence score
+   */
+  private determineAlignment(confidence: number): string {
+    if (confidence >= 80) return 'aligned';
+    if (confidence >= 60) return 'concerning';
+    return 'violates';
+  }

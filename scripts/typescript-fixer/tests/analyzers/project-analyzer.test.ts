@@ -34,13 +34,13 @@ export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }).notNull(),
-  isActive: boolean('is_active').default(true),
-  createdAt: timestamp('created_at').defaultNow(),
+  is_active: boolean('is_active').default(true),
+  created_at: timestamp('created_at').defaultNow(),
 });
 
 export const userProfiles = pgTable('user_profiles', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => users.id),
+  user_id: uuid('user_id').references(() => users.id),
   bio: varchar('bio', { length: 1000 }),
   avatarUrl: varchar('avatar_url', { length: 500 }),
 });
@@ -215,7 +215,7 @@ export const organizations = pgTable('organizations', {
   id: integer('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   status: statusEnum('status').default('active'),
-  createdAt: timestamp('created_at').defaultNow(),
+  created_at: timestamp('created_at').defaultNow(),
 });
 
 export const organizationsRelations = relations(organizations, ({ many }) => ({

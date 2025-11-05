@@ -1,9 +1,9 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
-import { ApiSuccess, ApiValidationError, ApiResponseWrapper  } from '../../../shared/core/src/utils/api';
+import { ApiSuccess, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
 import { contentModerationService } from "./content-moderation.js";
 import { authenticateToken, requireRole } from "../../middleware/auth.js";
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export const router = Router();
 
@@ -144,23 +144,23 @@ router.get("/stats", async (req: Request, res: Response) => {
     }
 
     // Calculate date range based on timeframe
-    const endDate = new Date();
-    const startDate = new Date();
+    const end_date = new Date();
+    const start_date = new Date();
 
     switch (timeframe) {
       case '24h':
-        startDate.setHours(startDate.getHours() - 24);
+        startDate.setHours(start_date.getHours() - 24);
         break;
       case '7d':
-        startDate.setDate(startDate.getDate() - 7);
+        startDate.setDate(start_date.getDate() - 7);
         break;
       case '30d':
-        startDate.setDate(startDate.getDate() - 30);
+        startDate.setDate(start_date.getDate() - 30);
         break;
     }
 
     // Fetch statistics from the moderation service
-    const stats = await contentModerationService.getModerationStats(startDate, endDate);
+    const stats = await contentModerationService.getModerationStats(start_date, end_date);
     
     const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
     return ApiSuccess(res, stats, metadata);

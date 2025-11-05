@@ -4,7 +4,7 @@
  * Adapter for Joi validation library implementing the core validation interfaces
  */
 
-import Joi from 'joi';
+import * as Joi from 'joi';
 import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
   ISchemaAdapter,

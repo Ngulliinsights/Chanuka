@@ -8,13 +8,13 @@ import { Separator } from '../ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { 
   MessageSquare, 
-  ArrowUp, 
-  ArrowDown, 
+  ChevronUp as ArrowUp, 
+  ChevronDown as ArrowDown, 
   BarChart3, 
   Reply, 
   Flag, 
   Award, 
-  CheckCircle2, 
+  CheckCircle as CheckCircle2, 
   Users, 
   Clock, 
   TrendingUp, 

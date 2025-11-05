@@ -1,10 +1,10 @@
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@shared/database';
 import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
-import { bills } from '../../../shared/schema/foundation';
-import { argumentTable } from '../../../shared/schema/argument_intelligence';
-import { evaluations, departments } from '../../../shared/schema/platform_operations';
-import type { DepartmentStat, RadarDatum } from '../../../shared/schema/platform_operations';
-import { logger  } from '../../../shared/core/src/index.js';
+import { bills } from '@shared/schema/foundation';
+import { argumentTable } from '@shared/schema/argument_intelligence';
+import { evaluations, departments } from '@shared/schema/platform_operations';
+import type { DepartmentStat, RadarDatum } from '@shared/schema/platform_operations';
+import { logger  } from '@shared/core/index.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 
 // Security Services

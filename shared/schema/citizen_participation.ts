@@ -26,6 +26,38 @@ import {
 import { users, bills } from "./foundation";
 
 // ============================================================================
+// USER INTERESTS - Strategic table for personalized recommendations
+// ============================================================================
+// This table is STRATEGIC because:
+// 1. Core recommendation system depends on explicit user interests
+// 2. Smart notification filtering uses interests for relevance
+// 3. Solves cold start problem for new users
+// 4. Allows users to express interests without behavioral tracking
+// 5. Behavioral derivation alone is insufficient for quality recommendations
+
+export const user_interests = pgTable("user_interests", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  interest: varchar("interest", { length: 100 }).notNull(),
+  
+  // Interest metadata for better recommendations
+  interest_strength: integer("interest_strength").notNull().default(5), // 1-10 scale
+  interest_source: varchar("interest_source", { length: 50 }).notNull().default("user_selected"), // "user_selected", "inferred", "imported"
+  
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  // Unique constraint to prevent duplicate interests per user
+  userInterestUnique: unique("user_interests_user_interest_unique").on(table.user_id, table.interest),
+  // Index for efficient lookups by user
+  userIdIdx: index("idx_user_interests_user_id").on(table.user_id),
+  // Index for finding users by interest
+  interestIdx: index("idx_user_interests_interest").on(table.interest),
+  // Composite index for recommendation queries
+  userStrengthIdx: index("idx_user_interests_user_strength").on(table.user_id, table.interest_strength),
+}));
+
+// ============================================================================
 // SESSIONS - User session management with security considerations
 // ============================================================================
 
@@ -417,6 +449,13 @@ export const user_contact_methods = pgTable("user_contact_methods", {
 // ============================================================================
 // RELATIONSHIPS - Define Drizzle ORM relations for type-safe queries
 // ============================================================================
+
+export const userInterestsRelations = relations(user_interests, ({ one }) => ({
+  user: one(users, {
+    fields: [user_interests.user_id],
+    references: [users.id],
+  }),
+}));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, {

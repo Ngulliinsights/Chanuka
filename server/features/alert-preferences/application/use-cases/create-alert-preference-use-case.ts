@@ -80,7 +80,7 @@ export class CreateAlertPreferenceUseCase {
     const config = {
       email: command.config.email,
       pushToken: command.config.pushToken,
-      phoneNumber: command.config.phoneNumber,
+      phone_number: command.config.phone_number,
       webhookUrl: command.config.webhookUrl,
       webhookSecret: command.config.webhookSecret,
       verified: command.config.verified

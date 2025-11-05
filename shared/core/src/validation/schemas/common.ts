@@ -185,10 +185,10 @@ export const secureUrlSchema = urlSchema.refine(
  * Ensures chronological ordering and reasonable date boundaries
  */
 export const dateRangeSchema = z.object({
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date(),
+  start_date: z.coerce.date(),
+  end_date: z.coerce.date(),
 }).refine(
-  (data) => data.startDate <= data.endDate,
+  (data) => data.start_date <= data.end_date,
   {
     message: 'Start date must be before or equal to end date',
     path: ['endDate'],
@@ -655,7 +655,7 @@ export const auditTrailSchema = z.object({ id: uuidSchema,
   metadata: z.record(z.string(), z.unknown()).optional(),
   ip_address: z.string().ip().optional(),
   user_agent: z.string().max(500).optional(),
-  sessionId: z.string().optional(),
+  session_id: z.string().optional(),
 });
 
 /**

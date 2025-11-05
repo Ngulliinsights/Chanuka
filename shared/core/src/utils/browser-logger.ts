@@ -33,7 +33,7 @@ export interface UnifiedLoggerConfig {
   environment: EnvironmentConfig;
   featureFlags: FeatureFlags;
   baseUrl?: string;
-  sessionId?: string;
+  session_id?: string;
   user_id?: string;
   correlationId?: string;
   enableAutoFlush?: boolean;
@@ -50,7 +50,7 @@ export interface UnifiedLoggerConfig {
 export class BrowserLogger implements LoggerChild {
   private config: UnifiedLoggerConfig;
   private baseUrl: string;
-  private sessionId: string;
+  private session_id: string;
   private user_id: string | undefined;
   private correlationId: string | undefined;
   private buffer: Array<{
@@ -72,7 +72,7 @@ export class BrowserLogger implements LoggerChild {
     this.legacyLogger = config.legacyLogger;
 
     this.baseUrl = config.baseUrl || '/api/logs';
-    this.sessionId = config.sessionId || this.generateSessionId();
+    this.session_id = config.session_id || this.generateSessionId();
     this.user_id = config.user_id;
     this.correlationId = config.correlationId;
 
@@ -137,7 +137,7 @@ export class BrowserLogger implements LoggerChild {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Session-ID': this.sessionId,
+          'X-Session-ID': this.session_id,
           ...(this.user_id && { 'X-User-ID': this.user_id }),
           ...(this.correlationId && { 'X-Correlation-ID': this.correlationId }),
         },
@@ -145,7 +145,7 @@ export class BrowserLogger implements LoggerChild {
           logs: logs.map(log => ({
             ...log,
             timestamp: log.timestamp.toISOString(),
-            sessionId: this.sessionId,
+            session_id: this.session_id,
             user_id: this.user_id,
             correlationId: this.correlationId,
             user_agent: navigator.userAgent,
@@ -182,7 +182,7 @@ export class BrowserLogger implements LoggerChild {
         logs: logs.map(log => ({
           ...log,
           timestamp: log.timestamp.toISOString(),
-          sessionId: this.sessionId,
+          session_id: this.session_id,
           user_id: this.user_id,
           correlationId: this.correlationId,
           user_agent: navigator.userAgent,
@@ -221,7 +221,7 @@ export class BrowserLogger implements LoggerChild {
       message,
       context,
       metadata,
-      sessionId: this.sessionId,
+      session_id: this.session_id,
       user_id: this.user_id,
       correlationId: this.correlationId,
     };
@@ -467,7 +467,7 @@ export class BrowserLogger implements LoggerChild {
    * Get current session ID
    */
   getSessionId(): string {
-    return this.sessionId;
+    return this.session_id;
   }
 
   /**

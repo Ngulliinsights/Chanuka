@@ -6,14 +6,14 @@ import { BillStatus, EngagementType, BillVoteType } from '@shared/schema';
 export abstract class BillDomainEvent {
   public readonly eventId: string;
   public readonly eventType: string;
-  public readonly billId: string;
+  public readonly bill_id: string;
   public readonly occurredAt: Date;
   public readonly eventVersion: number = 1;
 
-  constructor(billId: string, eventType: string) {
+  constructor(bill_id: string, eventType: string) {
     this.eventId = crypto.randomUUID();
     this.eventType = eventType;
-    this.billId = billId;
+    this.bill_id = billId;
     this.occurredAt = new Date();
   }
 }
@@ -23,12 +23,12 @@ export abstract class BillDomainEvent {
  */
 export class BillCreatedEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly billNumber: string,
     public readonly title: string,
-    public readonly sponsorId?: string
+    public readonly sponsor_id?: string
   ) {
-    super(billId, 'BillCreated');
+    super(bill_id, 'BillCreated');
   }
 }
 
@@ -37,12 +37,12 @@ export class BillCreatedEvent extends BillDomainEvent {
  */
 export class BillStatusChangedEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly previousStatus: BillStatus,
     public readonly newStatus: BillStatus,
     public readonly changedBy?: string
   ) {
-    super(billId, 'BillStatusChanged');
+    super(bill_id, 'BillStatusChanged');
   }
 }
 
@@ -51,12 +51,12 @@ export class BillStatusChangedEvent extends BillDomainEvent {
  */
 export class BillEngagedEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly engagementType: EngagementType,
-    public readonly userId: string,
+    public readonly user_id: string,
     public readonly metadata?: Record<string, any>
   ) {
-    super(billId, 'BillEngaged');
+    super(bill_id, 'BillEngaged');
   }
 }
 
@@ -65,12 +65,12 @@ export class BillEngagedEvent extends BillDomainEvent {
  */
 export class BillVotedEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly voteType: BillVoteType,
-    public readonly userId: string,
+    public readonly user_id: string,
     public readonly previousVote?: BillVoteType
   ) {
-    super(billId, 'BillVoted');
+    super(bill_id, 'BillVoted');
   }
 }
 
@@ -79,14 +79,14 @@ export class BillVotedEvent extends BillDomainEvent {
  */
 export class BillCommentedEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
-    public readonly commentId: string,
-    public readonly userId: string,
+    public readonly bill_id: string,
+    public readonly comment_id: string,
+    public readonly user_id: string,
     public readonly commentText: string,
     public readonly isReply: boolean = false,
-    public readonly parentCommentId?: string
+    public readonly parent_comment_id?: string
   ) {
-    super(billId, 'BillCommented');
+    super(bill_id, 'BillCommented');
   }
 }
 
@@ -95,12 +95,12 @@ export class BillCommentedEvent extends BillDomainEvent {
  */
 export class BillStakeholderAddedEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly stakeholderId: string,
     public readonly stakeholderType: 'sponsor' | 'co_sponsor' | 'committee_member',
     public readonly addedBy: string
   ) {
-    super(billId, 'BillStakeholderAdded');
+    super(bill_id, 'BillStakeholderAdded');
   }
 }
 
@@ -109,8 +109,8 @@ export class BillStakeholderAddedEvent extends BillDomainEvent {
  */
 export class BillTrackingStartedEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
-    public readonly userId: string,
+    public readonly bill_id: string,
+    public readonly user_id: string,
     public readonly notificationPreferences: {
       statusChanges: boolean;
       newComments: boolean;
@@ -118,7 +118,7 @@ export class BillTrackingStartedEvent extends BillDomainEvent {
       committeeReports: boolean;
     }
   ) {
-    super(billId, 'BillTrackingStarted');
+    super(bill_id, 'BillTrackingStarted');
   }
 }
 
@@ -127,12 +127,12 @@ export class BillTrackingStartedEvent extends BillDomainEvent {
  */
 export class BillDeadlineApproachingEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly deadlineType: 'committee_review' | 'second_reading' | 'third_reading' | 'assent',
     public readonly deadlineDate: Date,
     public readonly daysRemaining: number
   ) {
-    super(billId, 'BillDeadlineApproaching');
+    super(bill_id, 'BillDeadlineApproaching');
   }
 }
 
@@ -141,12 +141,12 @@ export class BillDeadlineApproachingEvent extends BillDomainEvent {
  */
 export class BillRequiresAttentionEvent extends BillDomainEvent {
   constructor(
-    public readonly billId: string,
+    public readonly bill_id: string,
     public readonly reason: 'no_recent_activity' | 'stalled_in_committee' | 'public_deadline_approaching',
     public readonly severity: 'low' | 'medium' | 'high',
     public readonly details?: Record<string, any>
   ) {
-    super(billId, 'BillRequiresAttention');
+    super(bill_id, 'BillRequiresAttention');
   }
 }
 

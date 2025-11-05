@@ -115,7 +115,7 @@ export interface AnalysisMetrics {
     buildTime: number;
     complexity: number;
   };
-  riskScore: number;
+  risk_score: number;
 }
 
 // Backup types

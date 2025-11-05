@@ -182,7 +182,7 @@ export class AnalysisEngine extends EventEmitter {
           buildTime: this.calculateBuildTimeSavings(findings),
           complexity: findings.length * 0.1
         },
-        riskScore: this.calculateRiskScore(findings)
+        risk_score: this.calculateRiskScore(findings)
       }
     };
   }
@@ -417,7 +417,7 @@ export class AnalysisEngine extends EventEmitter {
           buildTime: 0,
           complexity: -findings.length * 0.2 // AI integration adds complexity
         },
-        riskScore: this.calculateRiskScore(findings)
+        risk_score: this.calculateRiskScore(findings)
       }
     };
   }
@@ -477,7 +477,7 @@ export class AnalysisEngine extends EventEmitter {
           buildTime: findings.length * 0.1, // Small build time improvement
           complexity: findings.length * 0.3 // Complexity reduction
         },
-        riskScore: this.calculateRiskScore(findings)
+        risk_score: this.calculateRiskScore(findings)
       }
     };
   }
@@ -545,7 +545,7 @@ export class AnalysisEngine extends EventEmitter {
           buildTime: findings.length * 0.5,
           complexity: findings.length * 0.2
         },
-        riskScore: this.calculateRiskScore(findings)
+        risk_score: this.calculateRiskScore(findings)
       }
     };
   }
@@ -595,7 +595,7 @@ export class AnalysisEngine extends EventEmitter {
           buildTime: findings.length * 2, // Assume 2 seconds saved per optimization
           complexity: 0
         },
-        riskScore: this.calculateRiskScore(findings)
+        risk_score: this.calculateRiskScore(findings)
       }
     };
   }

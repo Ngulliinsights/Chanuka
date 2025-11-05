@@ -132,10 +132,10 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
 
   const sortByDueDate = useCallback((): ActionItem[] => {
     return [...actions].sort((a, b) => {
-      if (!a.dueDate && !b.dueDate) return 0;
-      if (!a.dueDate) return 1;
-      if (!b.dueDate) return -1;
-      return a.dueDate.getTime() - b.dueDate.getTime();
+      if (!a.due_date && !b.due_date) return 0;
+      if (!a.due_date) return 1;
+      if (!b.due_date) return -1;
+      return a.due_date.getTime() - b.due_date.getTime();
     });
   }, [actions]);
 

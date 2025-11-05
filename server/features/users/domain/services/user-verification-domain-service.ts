@@ -4,7 +4,7 @@ import { Evidence, ExpertiseLevel } from '../entities/value-objects';
 import { UserAggregate } from '../aggregates/user-aggregate';
 import { ProfileDomainService } from './profile-domain-service';
 import { UserService } from '../../application/user-service-direct';
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@shared/database';
 import { user_verification } from '@shared/schema';
 import { eq, sql, desc } from 'drizzle-orm';
 
@@ -196,7 +196,7 @@ export class UserVerificationDomainService {
    * You may need to add these methods to CitizenVerificationService.
    */
   async updateVerification(
-    verificationId: string,
+    verification_id: string,
     citizenId: string,
     updates: {
       evidence?: EvidenceData[];
@@ -207,7 +207,7 @@ export class UserVerificationDomainService {
     const verificationRow = await db
       .select()
       .from(user_verification)
-      .where(eq(user_verification.id, verificationId))
+      .where(eq(user_verification.id, verification_id))
       .limit(1);
 
     if (!verificationRow.length) {
@@ -276,7 +276,7 @@ export class UserVerificationDomainService {
       await db
         .update(user_verification)
         .set({ verification_data: updatedData, updated_at: new Date() })
-        .where(eq(user_verification.id, verificationId));
+        .where(eq(user_verification.id, verification_id));
 
       const updatedVerification = CitizenVerification.create({
         id: verificationRow[0].id,
@@ -308,11 +308,11 @@ export class UserVerificationDomainService {
    * Implements business rules: users cannot endorse their own verifications
    * or endorse the same verification multiple times.
    */
-  async endorseVerification(verificationId: string, endorserId: string): Promise<{ success: boolean; errors: string[] }> {
+  async endorseVerification(verification_id: string, endorserId: string): Promise<{ success: boolean; errors: string[] }> {
     const verificationRow = await db
       .select()
       .from(user_verification)
-      .where(eq(user_verification.id, verificationId))
+      .where(eq(user_verification.id, verification_id))
       .limit(1);
 
     if (!verificationRow.length) {
@@ -339,7 +339,7 @@ export class UserVerificationDomainService {
           verification_data: { ...verificationData, endorsements: updatedEndorsements },
           updated_at: new Date()
         })
-        .where(eq(user_verification.id, verificationId));
+        .where(eq(user_verification.id, verification_id));
 
       return { success: true, errors: [] };
     } catch (error) {
@@ -355,14 +355,14 @@ export class UserVerificationDomainService {
    * Disputes help maintain verification quality through community oversight.
    */
   async disputeVerification(
-    verificationId: string,
+    verification_id: string,
     disputerId: string,
     reason: string
   ): Promise<{ success: boolean; errors: string[] }> {
     const verificationRow = await db
       .select()
       .from(user_verification)
-      .where(eq(user_verification.id, verificationId))
+      .where(eq(user_verification.id, verification_id))
       .limit(1);
 
     if (!verificationRow.length) {
@@ -372,7 +372,7 @@ export class UserVerificationDomainService {
     const verificationData = verificationRow[0].verification_data as any;
     const disputes = verificationData.disputes || [];
 
-    if (disputes.some((d: any) => d.userId === disputerId)) {
+    if (disputes.some((d: any) => d.user_id === disputerId)) {
       return { success: false, errors: ['Already disputed this verification'] };
     }
 
@@ -381,7 +381,7 @@ export class UserVerificationDomainService {
     }
 
     try {
-      const newDispute = { userId: disputerId, reason: reason.trim(), timestamp: new Date() };
+      const newDispute = { user_id: disputerId, reason: reason.trim(), timestamp: new Date() };
       const updatedDisputes = [...disputes, newDispute];
 
       await db
@@ -390,7 +390,7 @@ export class UserVerificationDomainService {
           verification_data: { ...verificationData, disputes: updatedDisputes },
           updated_at: new Date()
         })
-        .where(eq(user_verification.id, verificationId));
+        .where(eq(user_verification.id, verification_id));
 
       return { success: true, errors: [] };
     } catch (error) {
@@ -405,11 +405,11 @@ export class UserVerificationDomainService {
    * Validates a verification for approval based on multiple criteria:
    * evidence quality, expertise level, community consensus, and dispute ratio.
    */
-  async validateVerificationForApproval(verificationId: string): Promise<VerificationValidationResult> {
+  async validateVerificationForApproval(verification_id: string): Promise<VerificationValidationResult> {
     const verificationRow = await db
       .select()
       .from(user_verification)
-      .where(eq(user_verification.id, verificationId))
+      .where(eq(user_verification.id, verification_id))
       .limit(1);
 
     if (!verificationRow.length) {

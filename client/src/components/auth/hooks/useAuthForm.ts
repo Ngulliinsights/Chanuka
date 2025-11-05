@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { z } from 'zod';
-import { useAuth } from '../../../hooks/use-auth';
+import { useAuth } from '@/hooks/use-auth';
 import { 
   AuthMode, 
   FormData, 
@@ -238,8 +238,8 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormResult
     const hasRequiredFields = mode === 'login' 
       ? formData.email && formData.password
       : formData.email && formData.password && 
-        ('first_name' in formData ? formData.first_name : false) && 
-        ('last_name' in formData ? formData.last_name : false) && 
+        ('first_name' in formData ? formData.first_name: false) && 
+        ('last_name' in formData ? formData.last_name: false) && 
         ('confirmPassword' in formData ? formData.confirmPassword : false);
     
     return !hasErrors && Boolean(hasRequiredFields);

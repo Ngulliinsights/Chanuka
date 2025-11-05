@@ -58,13 +58,13 @@ export const submitVerificationSchema = z.object({ body: z.object({
 
 export const endorseVerificationSchema = z.object({
   params: z.object({
-    verificationId: z.string().min(1, 'Verification ID is required')
+    verification_id: z.string().min(1, 'Verification ID is required')
   })
 });
 
 export const disputeVerificationSchema = z.object({
   params: z.object({
-    verificationId: z.string().min(1, 'Verification ID is required')
+    verification_id: z.string().min(1, 'Verification ID is required')
   }),
   body: z.object({
     reason: z.string().min(1, 'Dispute reason is required').max(500, 'Reason must be 500 characters or less')

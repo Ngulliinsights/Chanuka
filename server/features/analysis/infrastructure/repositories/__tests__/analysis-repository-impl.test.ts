@@ -34,7 +34,7 @@ const mockAnalysisEntity = new ComprehensiveAnalysis(
 );
 
 const mockDbRecord = { id: 101, bill_id: 1, analysis_type: 'comprehensive_v1.0',
-    results: { analysisId: mockAnalysisEntity.analysisId, /* ... other results */  },
+    results: { analysis_id: mockAnalysisEntity.analysis_id, /* ... other results */  },
     confidence: '85', created_at: new Date(), updated_at: new Date(), is_approved: false, approved_by: null
 } as schema.Analysis;
 
@@ -60,7 +60,7 @@ describe('AnalysisRepositoryImpl', () => {
       expect(mockDb.values).toHaveBeenCalledWith(expect.objectContaining({
         bill_id: mockAnalysisEntity.bill_id,
         analysis_type: `comprehensive_v${mockAnalysisEntity.version }`,
-        results: expect.objectContaining({ analysisId: mockAnalysisEntity.analysisId }),
+        results: expect.objectContaining({ analysis_id: mockAnalysisEntity.analysis_id }),
         confidence: mockAnalysisEntity.overallConfidence.toString(),
       }));
        expect(mockDb.onConflictDoUpdate).toHaveBeenCalled(); // Verify upsert logic is called

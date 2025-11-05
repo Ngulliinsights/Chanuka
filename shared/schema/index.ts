@@ -48,6 +48,7 @@ export {
 // CITIZEN PARTICIPATION SCHEMA
 // ============================================================================
 export {
+  user_interests,
   sessions,
   comments,
   comment_votes,
@@ -57,6 +58,7 @@ export {
   notifications,
   alert_preferences,
   user_contact_methods,
+  userInterestsRelations,
   sessionsRelations,
   commentsRelations,
   commentVotesRelations,
@@ -72,7 +74,8 @@ export {
 // SCHEMA OBJECT - For backward compatibility
 // ============================================================================
 import { users as usersTable, user_profiles as userProfilesTable, sponsors as sponsorsTable, committees as committeesTable, committee_members as committeeMembersTable, parliamentary_sessions as parliamentarySessionsTable, parliamentary_sittings as parliamentarySittingsTable, bills as billsTable } from "./foundation";
-import { bill_engagement as billEngagementTable, comments as commentsTable } from "./citizen_participation";
+import { user_interests as userInterestsTable, bill_engagement as billEngagementTable, comments as commentsTable } from "./citizen_participation";
+import { analysis as analysisTable } from "./analysis";
 
 export const schema = {
   users: usersTable,
@@ -83,8 +86,10 @@ export const schema = {
   parliamentary_sessions: parliamentarySessionsTable,
   parliamentary_sittings: parliamentarySittingsTable,
   bills: billsTable,
+  user_interests: userInterestsTable,
   bill_engagement: billEngagementTable,
-  comments: commentsTable
+  comments: commentsTable,
+  analysis: analysisTable
 };
 
 // ============================================================================
@@ -282,6 +287,11 @@ export {
 } from "./platform_operations";
 
 // ============================================================================
+// ANALYSIS SCHEMA
+// ============================================================================
+export { analysis } from "./analysis";
+
+// ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 
@@ -356,6 +366,9 @@ export type {
   ContentPerformance,
   NewContentPerformance
 } from "./platform_operations";
+
+// Analysis types
+export type { Analysis, NewAnalysis } from "./analysis";
 
 // Enum types
 export type {

@@ -99,7 +99,7 @@ export interface ConstitutionalConcern {
   // This entity represents the complete analysis result for a bills.
   export class ComprehensiveAnalysis { constructor(
       public readonly bill_id: number,
-      public readonly analysisId: string,
+      public readonly analysis_id: string,
       public readonly timestamp: Date,
       public constitutionalAnalysis: ConstitutionalAnalysisResult,
       public conflictAnalysisSummary: ConflictSummary,

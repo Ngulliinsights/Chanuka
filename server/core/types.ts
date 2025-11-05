@@ -6,7 +6,7 @@ import type {
   UserProgress as SharedUserProgress,
   InsertUserProgress as SharedInsertUserProgress,
   UserSocialProfile as SharedUserSocialProfile,
-} from '../../shared/schema/types';
+} from '@shared/schema/types';
 
 export type User = SharedUser;
 export type InsertUser = SharedInsertUser;
@@ -29,7 +29,7 @@ export interface Bill {
   stakeholderIds: number[] | null;
   view_count?: number;
   share_count?: number;
-  dueDate?: Date | null;
+  due_date?: Date | null;
   requiresAction?: boolean | null;
   urgency?: string | null;
   created_at: Date;

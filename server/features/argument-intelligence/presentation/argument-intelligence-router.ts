@@ -4,7 +4,7 @@
 // Complete REST API for argument intelligence operations
 
 import { Router } from 'express';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { ArgumentProcessor } from '../application/argument-processor.js';
 import { StructureExtractorService } from '../application/structure-extractor.js';
 import { ClusteringService } from '../application/clustering-service.js';
@@ -16,7 +16,7 @@ import { argumentIntelligenceService } from '../application/argument-intelligenc
 import { SentenceClassifier } from '../infrastructure/nlp/sentence-classifier.js';
 import { EntityExtractor } from '../infrastructure/nlp/entity-extractor.js';
 import { SimilarityCalculator } from '../infrastructure/nlp/similarity-calculator.js';
-import { db } from '../../../shared/core/index.js';
+import { db } from '@shared/core/index.js';
 
 export const router = Router();
 
@@ -52,20 +52,20 @@ const argumentProcessor = new ArgumentProcessor(
  */
 router.post('/process-comment', async (req, res) => {
   try {
-    const { commentId, billId, commentText, userId, userDemographics, submissionContext } = req.body;
+    const { comment_id, bill_id, commentText, user_id, userDemographics, submissionContext } = req.body;
 
-    if (!commentId || !billId || !commentText || !userId) {
+    if (!comment_id || !bill_id || !commentText || !user_id) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['commentId', 'billId', 'commentText', 'userId']
+        required: ['comment_id', 'bill_id', 'commentText', 'user_id']
       });
     }
 
     const request = {
-      commentId,
-      billId,
+      comment_id,
+      bill_id,
       commentText,
-      userId,
+      user_id,
       userDemographics,
       submissionContext
     };
@@ -97,17 +97,17 @@ router.post('/process-comment', async (req, res) => {
  */
 router.post('/extract-structure', async (req, res) => {
   try {
-    const { text, billId, userContext, submissionContext } = req.body;
+    const { text, bill_id, userContext, submissionContext } = req.body;
 
-    if (!text || !billId) {
+    if (!text || !bill_id) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['text', 'billId']
+        required: ['text', 'bill_id']
       });
     }
 
     const context = {
-      billId,
+      bill_id,
       userContext,
       submissionContext
     };
@@ -149,11 +149,11 @@ router.post('/extract-structure', async (req, res) => {
  * Synthesize arguments for a bill
  * POST /api/argument-intelligence/synthesize-bill/:billId
  */
-router.post('/synthesize-bill/:billId', async (req, res) => {
+router.post('/synthesize-bill/:bill_id', async (req, res) => {
   try {
-    const { billId } = req.params;
+    const { bill_id } = req.params;
 
-    const synthesis = await argumentProcessor.synthesizeBillArguments(billId);
+    const synthesis = await argumentProcessor.synthesizeBillArguments(bill_id);
 
     res.json({
       success: true,
@@ -164,7 +164,7 @@ router.post('/synthesize-bill/:billId', async (req, res) => {
   } catch (error) {
     logger.error('Bill synthesis failed', {
       component: 'ArgumentIntelligenceRouter',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
     });
 
@@ -179,11 +179,11 @@ router.post('/synthesize-bill/:billId', async (req, res) => {
  * Get argument map for bill visualization
  * GET /api/argument-intelligence/argument-map/:billId
  */
-router.get('/argument-map/:billId', async (req, res) => {
+router.get('/argument-map/:bill_id', async (req, res) => {
   try {
-    const { billId } = req.params;
+    const { bill_id } = req.params;
 
-    const argumentMap = await argumentProcessor.getArgumentMap(billId);
+    const argumentMap = await argumentProcessor.getArgumentMap(bill_id);
 
     res.json({
       success: true,
@@ -194,7 +194,7 @@ router.get('/argument-map/:billId', async (req, res) => {
   } catch (error) {
     logger.error('Argument map retrieval failed', {
       component: 'ArgumentIntelligenceRouter',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
     });
 
@@ -333,15 +333,15 @@ router.post('/find-coalitions', async (req, res) => {
  * Discover coalition opportunities for a bill
  * GET /api/argument-intelligence/coalition-opportunities/:billId
  */
-router.get('/coalition-opportunities/:billId', async (req, res) => {
+router.get('/coalition-opportunities/:bill_id', async (req, res) => {
   try {
-    const { billId } = req.params;
+    const { bill_id } = req.params;
 
     // Get stakeholder profiles from args
-    const args = await argumentRepo.getArgumentsByBill(billId);
+    const args = await argumentRepo.getArgumentsByBill(bill_id);
     const stakeholderProfiles = await coalitionFinder.buildStakeholderProfiles(args);
 
-    const opportunities = await coalitionFinder.discoverCoalitionOpportunities(billId, stakeholderProfiles);
+    const opportunities = await coalitionFinder.discoverCoalitionOpportunities(bill_id, stakeholderProfiles);
 
     res.json({
       success: true,
@@ -355,7 +355,7 @@ router.get('/coalition-opportunities/:billId', async (req, res) => {
   } catch (error) {
     logger.error('Coalition opportunity discovery failed', {
       component: 'ArgumentIntelligenceRouter',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
     });
 
@@ -409,18 +409,18 @@ router.post('/validate-evidence', async (req, res) => {
  * Assess evidence base for a bill
  * GET /api/argument-intelligence/evidence-assessment/:billId
  */
-router.get('/evidence-assessment/:billId', async (req, res) => {
+router.get('/evidence-assessment/:bill_id', async (req, res) => {
   try {
-    const { billId } = req.params;
+    const { bill_id } = req.params;
 
-    const args = await argumentRepo.getArgumentsByBill(billId);
+    const args = await argumentRepo.getArgumentsByBill(bill_id);
     const assessment = await evidenceValidator.assessEvidenceBase(args);
 
     res.json({
       success: true,
       data: {
         ...assessment,
-        billId
+        bill_id
       },
       message: `Evidence assessment completed for ${assessment.evidenceBase.length} claims`
     });
@@ -428,7 +428,7 @@ router.get('/evidence-assessment/:billId', async (req, res) => {
   } catch (error) {
     logger.error('Evidence assessment failed', {
       component: 'ArgumentIntelligenceRouter',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
     });
 
@@ -451,7 +451,7 @@ router.post('/generate-brief', async (req, res) => {
   try {
     const briefRequest = req.body;
 
-    if (!briefRequest.billId) {
+    if (!briefRequest.bill_id) {
       return res.status(400).json({
         error: 'Bill ID is required'
       });
@@ -462,7 +462,7 @@ router.post('/generate-brief', async (req, res) => {
     // Store the brief
     const storedBrief = {
       id: brief.id,
-      billId: brief.billId,
+      bill_id: brief.bill_id,
       briefType: brief.briefType,
       targetAudience: brief.targetAudience,
       executiveSummary: brief.executiveSummary,
@@ -504,7 +504,7 @@ router.post('/generate-public-summary', async (req, res) => {
   try {
     const briefRequest = req.body;
 
-    if (!briefRequest.billId) {
+    if (!briefRequest.bill_id) {
       return res.status(400).json({
         error: 'Bill ID is required'
       });
@@ -516,7 +516,7 @@ router.post('/generate-public-summary', async (req, res) => {
       success: true,
       data: {
         summary,
-        billId: briefRequest.billId
+        bill_id: briefRequest.bill_id
       },
       message: 'Public summary generated successfully'
     });
@@ -623,9 +623,9 @@ router.post('/detect-astroturfing', async (req, res) => {
  * Get arguments for a bill
  * GET /api/argument-intelligence/arguments/:billId
  */
-router.get('/arguments/:billId', async (req, res) => {
+router.get('/arguments/:bill_id', async (req, res) => {
   try {
-    const { billId } = req.params;
+    const { bill_id } = req.params;
     const { 
       argumentType, 
       position, 
@@ -646,7 +646,7 @@ router.get('/arguments/:billId', async (req, res) => {
       sortOrder: sortOrder as any
     };
 
-    const args = await argumentRepo.getArgumentsByBill(billId, options);
+    const args = await argumentRepo.getArgumentsByBill(bill_id, options);
 
     res.json({
       success: true,
@@ -663,7 +663,7 @@ router.get('/arguments/:billId', async (req, res) => {
   } catch (error) {
     logger.error('Arguments retrieval failed', {
       component: 'ArgumentIntelligenceRouter',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
     });
 
@@ -680,7 +680,7 @@ router.get('/arguments/:billId', async (req, res) => {
  */
 router.get('/search', async (req, res) => {
   try {
-    const { q: query, billId, limit = 20 } = req.query;
+    const { q: query, bill_id, limit = 20 } = req.query;
 
     if (!query) {
       return res.status(400).json({
@@ -690,7 +690,7 @@ router.get('/search', async (req, res) => {
 
     const args = await argumentRepo.searchArgumentsByText(
       query as string,
-      billId as string,
+      bill_id as string,
       parseInt(limit as string)
     );
 
@@ -720,24 +720,24 @@ router.get('/search', async (req, res) => {
  * Get argument statistics
  * GET /api/argument-intelligence/statistics/:billId
  */
-router.get('/statistics/:billId', async (req, res) => {
+router.get('/statistics/:bill_id', async (req, res) => {
   try {
-    const { billId } = req.params;
+    const { bill_id } = req.params;
 
-    const statistics = await argumentRepo.getArgumentStatistics(billId);
+    const statistics = await argumentRepo.getArgumentStatistics(bill_id);
 
     res.json({
       success: true,
       data: {
         ...statistics,
-        billId
+        bill_id
       }
     });
 
   } catch (error) {
     logger.error('Statistics retrieval failed', {
       component: 'ArgumentIntelligenceRouter',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
     });
 
@@ -752,13 +752,13 @@ router.get('/statistics/:billId', async (req, res) => {
  * Get briefs for a bill
  * GET /api/argument-intelligence/briefs/:billId
  */
-router.get('/briefs/:billId', async (req, res) => {
+router.get('/briefs/:bill_id', async (req, res) => {
   try {
-    const { billId } = req.params;
+    const { bill_id } = req.params;
     const { briefType, limit = 10 } = req.query;
 
     const briefs = await briefRepo.getBriefsByBill(
-      billId,
+      bill_id,
       briefType as string,
       parseInt(limit as string)
     );
@@ -774,7 +774,7 @@ router.get('/briefs/:billId', async (req, res) => {
   } catch (error) {
     logger.error('Briefs retrieval failed', {
       component: 'ArgumentIntelligenceRouter',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
     });
 

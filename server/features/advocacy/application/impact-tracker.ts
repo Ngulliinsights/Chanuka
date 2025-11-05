@@ -5,12 +5,12 @@
 // Repository interfaces removed - using direct service calls
 import { AdvocacyEventPublisher, ImpactAchievedEvent } from '../domain/events/advocacy-events.js';
 import { ImpactAssessment } from '../types/index.js';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export interface ImpactMetric {
   id: string;
-  campaignId: string;
-  billId: string;
+  campaign_id: string;
+  bill_id: string;
   metricType: 'bill_amended' | 'committee_feedback' | 'media_attention' | 'legislative_response' | 'public_awareness';
   value: number;
   description: string;
@@ -22,7 +22,7 @@ export interface ImpactMetric {
 }
 
 export interface OutcomeTracking {
-  billId: string;
+  bill_id: string;
   originalText: string;
   amendments: Array<{
     amendmentId: string;
@@ -33,9 +33,9 @@ export interface OutcomeTracking {
     attributionScore: number;
   }>;
   committeeReports: Array<{
-    reportId: string;
+    report_id: string;
     committee: string;
-    reportDate: Date;
+    report_date: Date;
     mentionsCitizenInput: boolean;
     relatedCampaigns: string[];
   }>;
@@ -45,7 +45,7 @@ export interface OutcomeTracking {
     publishedAt: Date;
     headline: string;
     mentionsCampaign: boolean;
-    campaignId?: string;
+    campaign_id?: string;
   }>;
   legislativeResponses: Array<{
     responseId: string;
@@ -67,7 +67,7 @@ export class ImpactTracker {
    * Records an impact metric for a campaign
    */
   async recordImpact(
-    campaignId: string,
+    campaign_id: string,
     impactType: ImpactMetric['metricType'],
     value: number,
     description: string,
@@ -75,18 +75,18 @@ export class ImpactTracker {
     recordedBy: string
   ): Promise<ImpactMetric> {
     try {
-      const campaign = await this.campaignRepository.findById(campaignId);
+      const campaign = await this.campaignRepository.findById(campaign_id);
       if (!campaign) {
-        throw new Error(`Campaign ${campaignId} not found`);
+        throw new Error(`Campaign ${campaign_id} not found`);
       }
 
       // Calculate attribution score based on campaign activity and timing
-      const attributionScore = await this.calculateAttributionScore(campaignId, impactType);
+      const attributionScore = await this.calculateAttributionScore(campaign_id, impactType);
 
       const impact: ImpactMetric = {
         id: `impact-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         campaignId,
-        billId: campaign.billId,
+        bill_id: campaign.bill_id,
         metricType: impactType,
         value,
         description,
@@ -99,7 +99,7 @@ export class ImpactTracker {
       // For now, we'll just log it
       logger.info('Impact metric recorded', { 
         impactId: impact.id,
-        campaignId,
+        campaign_id,
         impactType,
         value,
         attributionScore,
@@ -108,19 +108,19 @@ export class ImpactTracker {
 
       // Publish impact achieved event
       await this.eventPublisher.publish(new ImpactAchievedEvent(
-        campaignId,
+        campaign_id,
         impactType,
         description,
         attributionScore
       ));
 
       // Update campaign impact score
-      await this.updateCampaignImpactScore(campaignId);
+      await this.updateCampaignImpactScore(campaign_id);
 
       return impact;
     } catch (error) {
       logger.error('Failed to record impact', error, { 
-        campaignId,
+        campaign_id,
         impactType,
         component: 'ImpactTracker' 
       });
@@ -132,13 +132,13 @@ export class ImpactTracker {
    * Tracks bill outcomes and amendments
    */
   async trackBillOutcome(
-    billId: string,
+    bill_id: string,
     outcomeType: 'amendment' | 'committee_report' | 'media_coverage' | 'legislative_response',
     outcomeData: any
   ): Promise<void> {
     try {
       // Find all campaigns related to this bill
-      const relatedCampaigns = await this.campaignRepository.findByBillId(billId);
+      const relatedCampaigns = await this.campaignRepository.findByBillId(bill_id);
 
       for (const campaign of relatedCampaigns) {
         // Calculate how much this campaign likely contributed to the outcome
@@ -157,14 +157,14 @@ export class ImpactTracker {
       }
 
       logger.info('Bill outcome tracked', { 
-        billId,
+        bill_id,
         outcomeType,
         relatedCampaigns: relatedCampaigns.length,
         component: 'ImpactTracker' 
       });
     } catch (error) {
       logger.error('Failed to track bill outcome', error, { 
-        billId,
+        bill_id,
         outcomeType,
         component: 'ImpactTracker' 
       });
@@ -175,38 +175,38 @@ export class ImpactTracker {
   /**
    * Generates comprehensive impact assessment for a campaign
    */
-  async generateImpactAssessment(campaignId: string): Promise<ImpactAssessment> {
+  async generateImpactAssessment(campaign_id: string): Promise<ImpactAssessment> {
     try {
-      const campaign = await this.campaignRepository.findById(campaignId);
+      const campaign = await this.campaignRepository.findById(campaign_id);
       if (!campaign) {
-        throw new Error(`Campaign ${campaignId} not found`);
+        throw new Error(`Campaign ${campaign_id} not found`);
       }
 
       // Get campaign metrics and actions
       const [metrics, actionSummary] = await Promise.all([
-        this.campaignRepository.getMetrics(campaignId),
-        this.actionRepository.getCampaignActionSummary(campaignId)
+        this.campaignRepository.getMetrics(campaign_id),
+        this.actionRepository.getCampaignActionSummary(campaign_id)
       ]);
 
       // Analyze outcomes
-      const outcomes = await this.analyzeCampaignOutcomes(campaignId);
+      const outcomes = await this.analyzeCampaignOutcomes(campaign_id);
       
       // Calculate attribution
-      const attribution = await this.calculateOverallAttribution(campaignId);
+      const attribution = await this.calculateOverallAttribution(campaign_id);
 
       // Get participant feedback
-      const participantFeedback = await this.getParticipantFeedback(campaignId);
+      const participantFeedback = await this.getParticipantFeedback(campaign_id);
 
       const assessment: ImpactAssessment = {
-        campaignId,
-        billId: campaign.billId,
+        campaign_id,
+        bill_id: campaign.bill_id,
         outcomes,
         attribution,
         participantFeedback
       };
 
       logger.info('Impact assessment generated', { 
-        campaignId,
+        campaign_id,
         outcomes,
         attribution,
         component: 'ImpactTracker' 
@@ -215,7 +215,7 @@ export class ImpactTracker {
       return assessment;
     } catch (error) {
       logger.error('Failed to generate impact assessment', error, { 
-        campaignId,
+        campaign_id,
         component: 'ImpactTracker' 
       });
       throw error;
@@ -225,14 +225,14 @@ export class ImpactTracker {
   /**
    * Gets impact metrics for a campaign
    */
-  async getCampaignImpactMetrics(campaignId: string): Promise<ImpactMetric[]> {
+  async getCampaignImpactMetrics(campaign_id: string): Promise<ImpactMetric[]> {
     try {
       // In real implementation, this would query the impact_metrics table
       // For now, return mock data
       return [];
     } catch (error) {
       logger.error('Failed to get campaign impact metrics', error, { 
-        campaignId,
+        campaign_id,
         component: 'ImpactTracker' 
       });
       throw error;
@@ -243,7 +243,7 @@ export class ImpactTracker {
    * Gets aggregated impact statistics
    */
   async getImpactStatistics(filters?: {
-    billId?: string;
+    bill_id?: string;
     dateRange?: { start: Date; end: Date };
     impactType?: ImpactMetric['metricType'];
   }): Promise<{
@@ -251,7 +251,7 @@ export class ImpactTracker {
     impactsByType: Record<string, number>;
     averageAttribution: number;
     topPerformingCampaigns: Array<{
-      campaignId: string;
+      campaign_id: string;
       campaignTitle: string;
       totalImpactScore: number;
       impactCount: number;
@@ -309,7 +309,7 @@ export class ImpactTracker {
   /**
    * Tracks long-term outcomes of campaigns
    */
-  async trackLongTermOutcomes(campaignId: string): Promise<{
+  async trackLongTermOutcomes(campaign_id: string): Promise<{
     billImplementationStatus: string;
     policyChanges: string[];
     ongoingInfluence: number;
@@ -325,7 +325,7 @@ export class ImpactTracker {
       };
     } catch (error) {
       logger.error('Failed to track long-term outcomes', error, { 
-        campaignId,
+        campaign_id,
         component: 'ImpactTracker' 
       });
       throw error;
@@ -338,17 +338,17 @@ export class ImpactTracker {
    * Calculates attribution score for a campaign's impact
    */
   private async calculateAttributionScore(
-    campaignId: string,
+    campaign_id: string,
     impactType: ImpactMetric['metricType']
   ): Promise<number> {
     try {
-      const campaign = await this.campaignRepository.findById(campaignId);
+      const campaign = await this.campaignRepository.findById(campaign_id);
       if (!campaign) return 0;
 
       let score = 0;
 
       // Base score from campaign activity
-      const actionSummary = await this.actionRepository.getCampaignActionSummary(campaignId);
+      const actionSummary = await this.actionRepository.getCampaignActionSummary(campaign_id);
       if (actionSummary) {
         // Higher completion rate = higher attribution
         score += actionSummary.completionRate * 0.3;
@@ -367,7 +367,7 @@ export class ImpactTracker {
 
       // Timing factor - recent campaigns get higher attribution
       const daysSinceStart = Math.floor(
-        (new Date().getTime() - campaign.startDate.getTime()) / (1000 * 60 * 60 * 24)
+        (new Date().getTime() - campaign.start_date.getTime()) / (1000 * 60 * 60 * 24)
       );
       const timingFactor = Math.max(0.1, 1 - (daysSinceStart / 365)); // Decay over a year
       score *= timingFactor;
@@ -380,7 +380,7 @@ export class ImpactTracker {
       return Math.min(score, 1.0);
     } catch (error) {
       logger.error('Failed to calculate attribution score', error, { 
-        campaignId,
+        campaign_id,
         impactType,
         component: 'ImpactTracker' 
       });
@@ -392,7 +392,7 @@ export class ImpactTracker {
    * Calculates how much a campaign contributed to a specific outcome
    */
   private async calculateOutcomeAttribution(
-    campaignId: string,
+    campaign_id: string,
     outcomeType: string,
     outcomeData: any
   ): Promise<number> {
@@ -400,7 +400,7 @@ export class ImpactTracker {
       // This would analyze the relationship between campaign actions and outcomes
       // For now, return a simple calculation based on campaign activity
       
-      const campaign = await this.campaignRepository.findById(campaignId);
+      const campaign = await this.campaignRepository.findById(campaign_id);
       if (!campaign) return 0;
 
       let attribution = 0;
@@ -410,7 +410,7 @@ export class ImpactTracker {
       
       // Timing - outcomes closer to campaign activity get higher attribution
       const daysSinceStart = Math.floor(
-        (new Date().getTime() - campaign.startDate.getTime()) / (1000 * 60 * 60 * 24)
+        (new Date().getTime() - campaign.start_date.getTime()) / (1000 * 60 * 60 * 24)
       );
       
       if (daysSinceStart <= 30) {
@@ -444,7 +444,7 @@ export class ImpactTracker {
       return Math.min(attribution, 1.0);
     } catch (error) {
       logger.error('Failed to calculate outcome attribution', error, { 
-        campaignId,
+        campaign_id,
         outcomeType,
         component: 'ImpactTracker' 
       });
@@ -455,7 +455,7 @@ export class ImpactTracker {
   /**
    * Analyzes campaign outcomes
    */
-  private async analyzeCampaignOutcomes(campaignId: string): Promise<ImpactAssessment['outcomes']> {
+  private async analyzeCampaignOutcomes(campaign_id: string): Promise<ImpactAssessment['outcomes']> {
     try {
       // In real implementation, this would analyze actual outcomes
       return {
@@ -479,7 +479,7 @@ export class ImpactTracker {
   /**
    * Calculates overall attribution for a campaign
    */
-  private async calculateOverallAttribution(campaignId: string): Promise<ImpactAssessment['attribution']> {
+  private async calculateOverallAttribution(campaign_id: string): Promise<ImpactAssessment['attribution']> {
     try {
       // This would aggregate all attribution scores for the campaign
       return {
@@ -499,7 +499,7 @@ export class ImpactTracker {
   /**
    * Gets participant feedback for impact assessment
    */
-  private async getParticipantFeedback(campaignId: string): Promise<ImpactAssessment['participantFeedback']> {
+  private async getParticipantFeedback(campaign_id: string): Promise<ImpactAssessment['participantFeedback']> {
     try {
       // This would survey participants about their experience and perceived impact
       return {
@@ -519,24 +519,24 @@ export class ImpactTracker {
   /**
    * Updates campaign impact score based on recorded impacts
    */
-  private async updateCampaignImpactScore(campaignId: string): Promise<void> {
+  private async updateCampaignImpactScore(campaign_id: string): Promise<void> {
     try {
       // Calculate new impact score based on all recorded impacts
       const impactScore = 50; // Placeholder calculation
       
-      await this.campaignRepository.update(campaignId, {
+      await this.campaignRepository.update(campaign_id, {
         impactScore,
-        updatedAt: new Date()
+        updated_at: new Date()
       } as any);
 
       logger.info('Campaign impact score updated', { 
-        campaignId,
+        campaign_id,
         impactScore,
         component: 'ImpactTracker' 
       });
     } catch (error) {
       logger.error('Failed to update campaign impact score', error, { 
-        campaignId,
+        campaign_id,
         component: 'ImpactTracker' 
       });
     }

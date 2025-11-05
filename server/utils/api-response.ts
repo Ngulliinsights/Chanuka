@@ -6,7 +6,7 @@ import { UnifiedApiResponse,
   ApiResponse,
   ErrorResponse,
   sendApiResponse
- } from '../../shared/core/src/utils/api-utils';
+ } from '@shared/core/utils/api-utils';
 
 console.warn(
   '[DEPRECATED] server/utils/api-response.ts is deprecated. ' +

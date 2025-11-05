@@ -1,15 +1,17 @@
 import { logger } from '../core/src/observability/logging';
 import { monitorPoolHealth, checkPoolHealth } from './pool.js';
 
-// Dynamic import to avoid circular dependencies
+// Performance monitoring is optional and loaded dynamically
 let performanceMonitoring: any = null;
 const getPerformanceMonitoring = async () => {
   if (!performanceMonitoring) {
     try {
-      const { performanceMonitoring: pm } = await import('../../server/services/performance-monitoring.js');
-      performanceMonitoring = pm;
+      // Note: Performance monitoring service is not available in shared context
+      // This would be injected from the server layer when needed
+      logger.debug('Performance monitoring not available in shared context');
     } catch (error) {
       // Performance monitoring not available, continue without it
+      logger.debug('Performance monitoring service not found');
     }
   }
   return performanceMonitoring;

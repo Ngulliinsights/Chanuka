@@ -127,8 +127,8 @@ describe('ConnectionMigrator', () => {
     it('should capture connection states from legacy service', async () => {
       const mockUsers = ['user1', 'user2', 'user3'];
       (webSocketService.getAllConnectedUsers as Mock).mockReturnValue(mockUsers);
-      (webSocketService.getUserSubscriptions as Mock).mockImplementation((userId) => {
-        return userId === 'user1' ? [1, 2, 3] : [4, 5];
+      (webSocketService.getUserSubscriptions as Mock).mockImplementation((user_id) => {
+        return user_id === 'user1' ? [1, 2, 3] : [4, 5];
       });
       (webSocketService.getConnectionCount as Mock).mockReturnValue(1);
 
@@ -413,11 +413,11 @@ describe('ConnectionMigrator', () => {
       const mockSubscriptions = { user1: [1, 2, 3], user2: [4, 5] };
 
       (webSocketService.getAllConnectedUsers as Mock).mockReturnValue(mockUsers);
-      (webSocketService.getUserSubscriptions as Mock).mockImplementation((userId) => mockSubscriptions[userId] || []);
+      (webSocketService.getUserSubscriptions as Mock).mockImplementation((user_id) => mockSubscriptions[userId] || []);
       (webSocketService.getConnectionCount as Mock).mockReturnValue(1);
 
       // Mock Socket.IO service returning same subscriptions
-      (socketIOService.getUserSubscriptions as Mock).mockImplementation((userId) => mockSubscriptions[userId] || []);
+      (socketIOService.getUserSubscriptions as Mock).mockImplementation((user_id) => mockSubscriptions[userId] || []);
 
       await connectionMigrator.startBlueGreenMigration();
 

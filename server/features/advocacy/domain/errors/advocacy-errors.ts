@@ -15,14 +15,14 @@ export class AdvocacyDomainError extends Error {
 
 // Campaign Errors
 export class CampaignNotFoundError extends AdvocacyDomainError {
-  constructor(campaignId: string) {
-    super(`Campaign with ID ${campaignId} not found`, 'CAMPAIGN_NOT_FOUND', 404);
+  constructor(campaign_id: string) {
+    super(`Campaign with ID ${campaign_id} not found`, 'CAMPAIGN_NOT_FOUND', 404);
   }
 }
 
 export class CampaignAccessDeniedError extends AdvocacyDomainError {
-  constructor(campaignId: string, userId: string) {
-    super(`User ${userId} does not have access to campaign ${campaignId}`, 'CAMPAIGN_ACCESS_DENIED', 403);
+  constructor(campaign_id: string, user_id: string) {
+    super(`User ${user_id} does not have access to campaign ${campaign_id}`, 'CAMPAIGN_ACCESS_DENIED', 403);
   }
 }
 
@@ -33,14 +33,14 @@ export class CampaignStatusError extends AdvocacyDomainError {
 }
 
 export class CampaignCapacityError extends AdvocacyDomainError {
-  constructor(campaignId: string) {
-    super(`Campaign ${campaignId} has reached maximum participant capacity`, 'CAMPAIGN_CAPACITY_EXCEEDED', 400);
+  constructor(campaign_id: string) {
+    super(`Campaign ${campaign_id} has reached maximum participant capacity`, 'CAMPAIGN_CAPACITY_EXCEEDED', 400);
   }
 }
 
 export class DuplicateCampaignError extends AdvocacyDomainError {
-  constructor(billId: string, organizerId: string) {
-    super(`User ${organizerId} already has an active campaign for bill ${billId}`, 'DUPLICATE_CAMPAIGN', 409);
+  constructor(bill_id: string, organizerId: string) {
+    super(`User ${organizerId} already has an active campaign for bill ${bill_id}`, 'DUPLICATE_CAMPAIGN', 409);
   }
 }
 
@@ -64,8 +64,8 @@ export class ActionStatusError extends AdvocacyDomainError {
 }
 
 export class ActionAssignmentError extends AdvocacyDomainError {
-  constructor(actionId: string, userId: string) {
-    super(`Action ${actionId} is not assigned to user ${userId}`, 'ACTION_ASSIGNMENT_ERROR', 403);
+  constructor(actionId: string, user_id: string) {
+    super(`Action ${actionId} is not assigned to user ${user_id}`, 'ACTION_ASSIGNMENT_ERROR', 403);
   }
 }
 
@@ -89,20 +89,20 @@ export class ParticipationError extends AdvocacyDomainError {
 }
 
 export class AlreadyParticipatingError extends AdvocacyDomainError {
-  constructor(campaignId: string, userId: string) {
-    super(`User ${userId} is already participating in campaign ${campaignId}`, 'ALREADY_PARTICIPATING', 409);
+  constructor(campaign_id: string, user_id: string) {
+    super(`User ${user_id} is already participating in campaign ${campaign_id}`, 'ALREADY_PARTICIPATING', 409);
   }
 }
 
 export class NotParticipatingError extends AdvocacyDomainError {
-  constructor(campaignId: string, userId: string) {
-    super(`User ${userId} is not participating in campaign ${campaignId}`, 'NOT_PARTICIPATING', 400);
+  constructor(campaign_id: string, user_id: string) {
+    super(`User ${user_id} is not participating in campaign ${campaign_id}`, 'NOT_PARTICIPATING', 400);
   }
 }
 
 export class OrganizerCannotLeaveError extends AdvocacyDomainError {
-  constructor(campaignId: string) {
-    super(`Campaign organizer cannot leave campaign ${campaignId}`, 'ORGANIZER_CANNOT_LEAVE', 400);
+  constructor(campaign_id: string) {
+    super(`Campaign organizer cannot leave campaign ${campaign_id}`, 'ORGANIZER_CANNOT_LEAVE', 400);
   }
 }
 
@@ -186,21 +186,21 @@ export function isAdvocacyDomainError(error: any): error is AdvocacyDomainError 
 // Error factory functions
 export const AdvocacyErrors = {
   campaignNotFound: (id: string) => new CampaignNotFoundError(id),
-  campaignAccessDenied: (campaignId: string, userId: string) => new CampaignAccessDeniedError(campaignId, userId),
+  campaignAccessDenied: (campaign_id: string, user_id: string) => new CampaignAccessDeniedError(campaign_id, user_id),
   campaignStatus: (status: string, action: string) => new CampaignStatusError(status, action),
   campaignCapacity: (id: string) => new CampaignCapacityError(id),
-  duplicateCampaign: (billId: string, organizerId: string) => new DuplicateCampaignError(billId, organizerId),
+  duplicateCampaign: (bill_id: string, organizerId: string) => new DuplicateCampaignError(bill_id, organizerId),
   campaignValidation: (field: string, reason: string) => new CampaignValidationError(field, reason),
   
   actionNotFound: (id: string) => new ActionNotFoundError(id),
   actionStatus: (status: string, action: string) => new ActionStatusError(status, action),
-  actionAssignment: (actionId: string, userId: string) => new ActionAssignmentError(actionId, userId),
+  actionAssignment: (actionId: string, user_id: string) => new ActionAssignmentError(actionId, user_id),
   actionDeadline: (id: string) => new ActionDeadlineError(id),
   actionValidation: (field: string, reason: string) => new ActionValidationError(field, reason),
   
-  alreadyParticipating: (campaignId: string, userId: string) => new AlreadyParticipatingError(campaignId, userId),
-  notParticipating: (campaignId: string, userId: string) => new NotParticipatingError(campaignId, userId),
-  organizerCannotLeave: (campaignId: string) => new OrganizerCannotLeaveError(campaignId),
+  alreadyParticipating: (campaign_id: string, user_id: string) => new AlreadyParticipatingError(campaign_id, user_id),
+  notParticipating: (campaign_id: string, user_id: string) => new NotParticipatingError(campaign_id, user_id),
+  organizerCannotLeave: (campaign_id: string) => new OrganizerCannotLeaveError(campaign_id),
   
   templateNotFound: (id: string) => new TemplateNotFoundError(id),
   templateValidation: (field: string, reason: string) => new TemplateValidationError(field, reason),

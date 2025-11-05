@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../../shared/core/src/index.js';
-import { ApiValidationError } from '../../../shared/core/src/utils/api-utils';
+import { logger } from '@shared/core/index.js';
+import { ApiValidationError } from '@shared/core/utils/api-utils';
 
 /**
  * Centralized Input Validation Service

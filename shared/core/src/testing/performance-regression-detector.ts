@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { EventEmitter } from 'events';
-import { PerformanceBenchmarks } from './benchmarks/performance-benchmarks';
+import { PerformanceBenchmarks } from './performance-benchmarks';
 
 /**
  * Performance regression detection system
@@ -260,7 +260,7 @@ export class PerformanceRegressionDetector extends EventEmitter {
 
     // Calculate averages
     const result: PerformanceBaseline[] = [];
-    for (const [name, group] of aggregated.entries()) {
+    for (const [name, group] of Array.from(aggregated.entries())) {
       const avgOps = group.reduce((sum, b) => sum + b.operationsPerSecond, 0) / group.length;
       const avgTime = group.reduce((sum, b) => sum + b.averageTimeMs, 0) / group.length;
       const avgMemory = group.reduce((sum, b) => sum + b.memoryUsage, 0) / group.length;

@@ -3,9 +3,9 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { billComprehensiveAnalysisService } from '../application/bill-comprehensive-analysis.service.js';
 // Import repository for fetching historical data
 import { analysisService } from '../application/analysis-service-direct.js';
-import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js'; // Use if auth needed
-import { ApiSuccess, ApiError, ApiValidationError  } from '../../../../shared/core/src/utils/api';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { authenticateToken, AuthenticatedRequest } from '@/middleware/auth.js'; // Use if auth needed
+import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api';
+import { logger  } from '@shared/core/index.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -99,14 +99,14 @@ router.get('/bills/:bill_id/history', async (req: Request, res: Response, next: 
 
 
         // Use the new analysis service for historical data
-        const historyRecords = await analysisService.findLatestAnalysisByBillId(bill_id);
+        const historyRecords = await analysisService.findHistoryByBillId(bill_id, limit);
 
         // Transform results for frontend consumption, extracting key info from JSONB
         const historyResults = historyRecords.map(record => {
             const resultsData = record.results as any; // Cast to access potential fields
             return {
                 dbId: record.id, // Include DB record ID
-                analysisId: resultsData?.analysisId,
+                analysis_id: resultsData?.analysis_id,
                 timestamp: record.created_at, // Use DB creation time
                 version: resultsData?.version || record.analysis_type,
                 overallConfidence: parseFloat(record.confidence ?? '0'),

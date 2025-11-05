@@ -64,6 +64,11 @@ export interface CacheHealthStatus {
   connectionStatus?: 'connected' | 'disconnected' | 'connecting';
   lastError?: string;
   uptime?: number;
+  // Additional properties for multi-tier support
+  connected?: boolean;
+  errors?: string[];
+  memory?: any; // Can be number or object
+  timestamp?: number;
 }
 
 export interface CacheMetrics {
@@ -77,6 +82,28 @@ export interface CacheMetrics {
   avgLatency: number;
   maxLatency: number;
   minLatency: number;
+  // Additional properties for compatibility
+  avgResponseTime: number;
+  totalSize?: number;
+  totalEntries?: number;
+  l1Stats?: CacheTierStats;
+  l2Stats?: CacheTierStats;
+}
+
+export interface CacheTierStats {
+  hits: number;
+  misses: number;
+  sets: number;
+  deletes: number;
+  errors: number;
+  hitRate: number;
+  avgResponseTime: number;
+  totalSize: number;
+  totalEntries: number;
+  // Additional properties
+  tier?: string;
+  memoryUsage?: number;
+  keyCount?: number;
 }
 
 export interface CacheEntry<T = any> {
@@ -205,15 +232,7 @@ export interface EvictionOptions {
   checkInterval?: number;
 }
 
-// Statistics and monitoring
-export interface CacheTierStats {
-  tier: 'l1' | 'l2';
-  hits: number;
-  misses: number;
-  hitRate: number;
-  memoryUsage: number;
-  keyCount: number;
-}
+// Statistics and monitoring (removed duplicate - using the one above)
 
 export interface CacheStatsAggregation {
   total: CacheMetrics;

@@ -123,17 +123,17 @@ export function useOnlyLogger() {
 
 // Edge Case 8: Unused variables in async/await patterns
 export const unusedVariablesInAsync = `
-import { databaseService } from '@shared/database/connection';
+import { databaseService } from '@shared/database';
 import { logger, PerformanceMonitor } from '@shared/core';
 
-export async function complexAsyncOperation(userId: string) {
+export async function complexAsyncOperation(user_id: string) {
   const monitor = new PerformanceMonitor(); // Unused
   const startTime = Date.now(); // Unused
   
   try {
-    const user = await databaseService.findUser(userId);
-    const permissions = await databaseService.getUserPermissions(userId); // Unused
-    const settings = await databaseService.getUserSettings(userId); // Unused
+    const user = await databaseService.findUser(user_id);
+    const permissions = await databaseService.getUserPermissions(user_id); // Unused
+    const settings = await databaseService.getUserSettings(user_id); // Unused
     
     logger.info('User found', user);
     return user;

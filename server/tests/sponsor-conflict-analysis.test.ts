@@ -247,15 +247,15 @@ describe('SponsorConflictAnalysisService', () => {
         expect(trend).toHaveProperty('timeframe');
         expect(trend).toHaveProperty('conflictCount');
         expect(trend).toHaveProperty('severityTrend');
-        expect(trend).toHaveProperty('riskScore');
+        expect(trend).toHaveProperty('risk_score');
         expect(trend).toHaveProperty('predictions');
         
         // Validate severity trend direction
         expect(VALID_SEVERITY_TRENDS).toContain(trend.severityTrend);
         
         // Validate risk score is within valid percentage range
-        expect(trend.riskScore).toBeGreaterThanOrEqual(MIN_RISK_SCORE);
-        expect(trend.riskScore).toBeLessThanOrEqual(MAX_RISK_SCORE);
+        expect(trend.risk_score).toBeGreaterThanOrEqual(MIN_RISK_SCORE);
+        expect(trend.risk_score).toBeLessThanOrEqual(MAX_RISK_SCORE);
         
         // Validate predictions structure
         expect(Array.isArray(trend.predictions)).toBe(true);

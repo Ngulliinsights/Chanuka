@@ -18,7 +18,7 @@ export interface UnifiedPerformanceMetric extends PerformanceMetric {
   /** Instance identifier */
   instanceId: string;
   /** User session ID (client-side) */
-  sessionId?: string;
+  session_id?: string;
   /** Request ID (server-side) */
   requestId?: string;
 }
@@ -186,14 +186,14 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
   /**
    * Record a client-side performance metric
    */
-  recordClientMetric(metric: Omit<PerformanceMetric, 'timestamp'>, sessionId?: string): void {
+  recordClientMetric(metric: Omit<PerformanceMetric, 'timestamp'>, session_id?: string): void {
     const unifiedMetric: UnifiedPerformanceMetric = {
       ...metric,
       timestamp: Date.now(),
       source: 'client',
       environment: this.config.environment,
       instanceId: this.config.instanceId,
-      sessionId,
+      session_id,
     };
 
     this.metrics.push(unifiedMetric);
@@ -472,7 +472,7 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
     });
 
     // Remove duplicates and limit to top 5
-    return [...new Set(recommendations)].slice(0, 5);
+    return Array.from(new Set(recommendations)).slice(0, 5);
   }
 
   /**

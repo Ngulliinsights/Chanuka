@@ -90,11 +90,7 @@ describe('Fuse.js Relevance Scoring Comparison', () => {
     simpleEngine = new SimpleMatchingEngine();
 
     // Warm up engines by building indexes
-    try {
-      await fuseEngine.refreshIndex();
-    } catch (error) {
-      console.warn('Could not refresh Fuse.js index:', error);
-    }
+    // Fuse.js doesn't need index refresh as it loads data dynamically
   });
 
   afterAll(() => {

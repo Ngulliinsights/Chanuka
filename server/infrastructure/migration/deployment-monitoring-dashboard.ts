@@ -1,6 +1,6 @@
 import { DeploymentStatus, DeploymentOrchestrator } from './deployment-orchestrator.js';
 import { ValidationResult, StatisticalAnalysisResult, CrossPhaseValidationResult } from './repository-deployment-validator.js';
-import { logger } from '../../../shared/core';
+import { logger } from '@/shared/core';
 import {
   AsyncServiceResult,
   withResultHandling

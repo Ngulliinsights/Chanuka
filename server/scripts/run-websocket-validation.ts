@@ -14,7 +14,7 @@
 import { WebSocketPerformanceValidator } from './websocket-performance-validation.js';
 import { FinalMigrationValidator } from './final-migration-validation.js';
 import { LegacyWebSocketCleanup } from './legacy-websocket-cleanup.js';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 interface ValidationSummary {
   performance: {

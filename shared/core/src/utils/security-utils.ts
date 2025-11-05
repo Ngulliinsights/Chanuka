@@ -9,7 +9,7 @@
  * into a unified, framework-agnostic interface.
  */
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { logger } from '../observability/logging';
 
 // ==================== Type Definitions ====================

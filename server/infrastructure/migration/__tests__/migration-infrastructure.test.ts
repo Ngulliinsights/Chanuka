@@ -36,9 +36,9 @@ describe('Migration Infrastructure', () => {
       });
 
       // Test with consistent user ID (should always return same result)
-      const userId = 'test-user-123';
-      const result1 = await featureFlagsService.shouldUseMigration('utilities-concurrency-adapter', userId);
-      const result2 = await featureFlagsService.shouldUseMigration('utilities-concurrency-adapter', userId);
+      const user_id = 'test-user-123';
+      const result1 = await featureFlagsService.shouldUseMigration('utilities-concurrency-adapter', user_id);
+      const result2 = await featureFlagsService.shouldUseMigration('utilities-concurrency-adapter', user_id);
       
       expect(result1).toBe(result2); // Should be consistent
     });
@@ -69,11 +69,11 @@ describe('Migration Infrastructure', () => {
 
   describe('A/B Testing Service', () => {
     it('should assign users to consistent cohorts', () => {
-      const userId = 'test-user-456';
+      const user_id = 'test-user-456';
       const component = 'concurrency-adapter';
       
-      const cohort1 = featureFlagsService.getUserCohort(userId, component);
-      const cohort2 = featureFlagsService.getUserCohort(userId, component);
+      const cohort1 = featureFlagsService.getUserCohort(user_id, component);
+      const cohort2 = featureFlagsService.getUserCohort(user_id, component);
       
       expect(cohort1).toBe(cohort2);
       expect(['control', 'treatment']).toContain(cohort1);
@@ -82,7 +82,7 @@ describe('Migration Infrastructure', () => {
     it('should track cohort metrics', async () => {
       const metrics = {
         component: 'concurrency-adapter',
-        userId: 'test-user-789',
+        user_id: 'test-user-789',
         cohort: 'treatment' as const,
         metrics: {
           responseTime: 150,
@@ -95,7 +95,7 @@ describe('Migration Infrastructure', () => {
       // Should not throw
       await expect(abTestingService.trackCohortMetrics(
         metrics.component, 
-        metrics.userId, 
+        metrics.user_id, 
         metrics.metrics
       )).resolves.not.toThrow();
     });

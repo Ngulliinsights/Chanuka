@@ -3,13 +3,13 @@
 // ============================================================================
 // Extracts argumentative structure from informal citizen comments
 
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { SentenceClassifier } from '../infrastructure/nlp/sentence-classifier.js';
 import { EntityExtractor } from '../infrastructure/nlp/entity-extractor.js';
 import { SimilarityCalculator } from '../infrastructure/nlp/similarity-calculator.js';
 
 export interface ExtractionContext {
-  billId: string;
+  bill_id: string;
   userContext?: {
     county?: string;
     ageGroup?: string;
@@ -19,7 +19,7 @@ export interface ExtractionContext {
   submissionContext?: {
     submissionMethod: 'web' | 'ussd' | 'ambassador' | 'api';
     timestamp: Date;
-    sessionId?: string;
+    session_id?: string;
   };
 }
 
@@ -62,7 +62,7 @@ export class StructureExtractorService {
     try {
       logger.info(`🔍 Extracting arguments from comment`, {
         component: 'StructureExtractor',
-        billId: context.billId,
+        bill_id: context.bill_id,
         textLength: commentText.length
       });
 
@@ -90,7 +90,7 @@ export class StructureExtractorService {
 
       logger.info(`✅ Argument extraction completed`, {
         component: 'StructureExtractor',
-        billId: context.billId,
+        bill_id: context.bill_id,
         argumentsExtracted: enhancedArguments.length,
         chains: argumentChains.length
       });
@@ -100,7 +100,7 @@ export class StructureExtractorService {
     } catch (error) {
       logger.error('Failed to extract arguments', error, {
         component: 'StructureExtractor',
-        billId: context.billId
+        bill_id: context.bill_id
       });
       throw error;
     }
@@ -191,7 +191,7 @@ export class StructureExtractorService {
       }
 
       // Determine position (support/oppose/neutral)
-      const position = await this.determinePosition(sentence.text, context.billId);
+      const position = await this.determinePosition(sentence.text, context.bill_id);
       
       // Extract topic tags and affected groups
       const topicTags = this.extractTopicTags(sentence.text, entities);
@@ -289,7 +289,7 @@ export class StructureExtractorService {
 
     for (const argument of arguments) {
       // Calculate similarity to existing arguments for deduplication
-      const similarityScore = await this.calculateSimilarityToExisting(argument, context.billId);
+      const similarityScore = await this.calculateSimilarityToExisting(argument, context.bill_id);
       
       // Enhance with user context
       const enhancedArgument = {
@@ -311,7 +311,7 @@ export class StructureExtractorService {
 
   // Helper methods for argument processing
 
-  private async determinePosition(text: string, billId: string): Promise<'support' | 'oppose' | 'neutral' | 'conditional'> {
+  private async determinePosition(text: string, bill_id: string): Promise<'support' | 'oppose' | 'neutral' | 'conditional'> {
     // Simple keyword-based position detection (would be enhanced with ML)
     const supportKeywords = ['support', 'agree', 'good', 'beneficial', 'positive', 'approve', 'favor'];
     const opposeKeywords = ['oppose', 'disagree', 'bad', 'harmful', 'negative', 'reject', 'against'];
@@ -448,7 +448,7 @@ export class StructureExtractorService {
            argument.topicTags.some(tag => mainClaim.topicTags.includes(tag));
   }
 
-  private async calculateSimilarityToExisting(argument: ExtractedArgument, billId: string): Promise<number> {
+  private async calculateSimilarityToExisting(argument: ExtractedArgument, bill_id: string): Promise<number> {
     // This would use the similarity calculator to compare with existing arguments
     // For now, return a placeholder value
     return 0.5;

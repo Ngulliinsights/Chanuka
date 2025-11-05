@@ -1,5 +1,5 @@
-// Re-export database service from the infrastructure layer
-export { databaseService } from '@server/infrastructure/database/database-service';
+// Note: Database service is available from server infrastructure when needed
+// export { databaseService } from '@server/infrastructure/database/database-service';
 
 // Re-export connection utilities
 export { database, readDatabase, writeDatabase, pool } from './connection';

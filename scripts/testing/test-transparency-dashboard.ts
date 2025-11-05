@@ -32,18 +32,18 @@ async function testTransparencyDashboard() {
     logger.info('📋 Test 2: Comprehensive Transparency Report Generation', { component: 'Chanuka' });
     logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
-    const startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 90 days ago
-    const endDate = new Date();
+    const start_date = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 90 days ago
+    const end_date = new Date();
     
     const report = await transparencyDashboardService.generateTransparencyReport(
-      startDate,
-      endDate
+      start_date,
+      end_date
     );
     
     console.log(`✅ Transparency report generated successfully`);
     console.log(`   - Report ID: ${report.id}`);
     console.log(`   - Title: ${report.title}`);
-    console.log(`   - Period: ${report.reportPeriod.startDate.toLocaleDateString()} to ${report.reportPeriod.endDate.toLocaleDateString()}`);
+    console.log(`   - Period: ${report.reportPeriod.start_date.toLocaleDateString()} to ${report.reportPeriod.end_date.toLocaleDateString()}`);
     console.log(`   - Generated At: ${report.generatedAt.toLocaleString()}`);
     
     logger.info('\n📊 Executive Summary:', { component: 'Chanuka' });

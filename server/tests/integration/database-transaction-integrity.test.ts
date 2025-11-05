@@ -322,11 +322,11 @@ describe('Database Transaction Integrity Tests', () => {
         .from(bill_sponsorships)
         .where(eq(bill_sponsorships.id, result.sponsorship.id));
       
-      const engagement = await db.select()
+      const engagements = await db.select()
         .from(bill_engagement)
         .where(eq(bill_engagement.id, result.engagement.id));
       
-      const comment = await db.select()
+      const comments = await db.select()
         .from(comments)
         .where(eq(comments.id, result.comment.id));
 
@@ -433,14 +433,14 @@ describe('Database Transaction Integrity Tests', () => {
         share_count: 0
         }).returning();
 
-      const engagementId = initialEngagement[0].id;
+      const engagement_id = initialEngagement[0].id;
 
       // Concurrent updates to the same record
       const concurrentUpdates = Array(10).fill(null).map(async () => {
         return withTransaction(async (tx) => {
           const current = await tx.select()
             .from(bill_engagement)
-            .where(eq(bill_engagement.id, engagementId));
+            .where(eq(bill_engagement.id, engagement_id));
 
           if (current.length > 0) {
             await tx.update(bill_engagement)
@@ -448,7 +448,7 @@ describe('Database Transaction Integrity Tests', () => {
                 view_count: current[0].view_count + 1,
                 updated_at: new Date()
               })
-              .where(eq(bill_engagement.id, engagementId));
+              .where(eq(bill_engagement.id, engagement_id));
           }
         });
       });
@@ -458,13 +458,13 @@ describe('Database Transaction Integrity Tests', () => {
       // Verify final count is correct
       const finalEngagement = await db.select()
         .from(bill_engagement)
-        .where(eq(bill_engagement.id, engagementId));
+        .where(eq(bill_engagement.id, engagement_id));
 
       expect(finalEngagement).toHaveLength(1);
       expect(finalEngagement[0].view_count).toBe(10);
 
       // Cleanup
-      await db.delete(bill_engagement).where(eq(bill_engagement.id, engagementId));
+      await db.delete(bill_engagement).where(eq(bill_engagement.id, engagement_id));
     });
   });
 

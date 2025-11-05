@@ -1,13 +1,13 @@
 import { Request } from 'express';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import {
   ErrorTrackingIntegrationManager,
   createConsoleIntegration,
   BaseErrorTrackingIntegration,
   IntegrationConfig
-} from '../../../shared/core/src/observability/error-management/integrations/error-tracking-integration.js';
-import { BaseError } from '../../../shared/core/src/observability/error-management/errors/base-error.js';
-import { ErrorContext as SharedErrorContext } from '../../../shared/core/src/observability/error-management/types.js';
+} from '@shared/core/observability/error-management/integrations/error-tracking-integration.js';
+import { BaseError } from '@shared/core/observability/error-management/errors/base-error.js';
+import { ErrorContext as SharedErrorContext } from '@shared/core/observability/error-management/types.js';
 
 export interface ErrorContext { traceId?: string;
   user_id?: string;
@@ -878,7 +878,7 @@ class ErrorTracker {
           const sharedContext: SharedErrorContext = { correlationId: context.traceId,
             user_id: context.user_id,
             metadata: {
-              sessionId: context.traceId,
+              session_id: context.traceId,
               ...context
              }
           };

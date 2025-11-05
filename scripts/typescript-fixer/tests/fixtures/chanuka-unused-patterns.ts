@@ -6,8 +6,8 @@
 // Example 1: Unused shared/core imports
 export const unusedSharedCoreImports = `
 import { logger, ApiSuccess, cacheKeys } from '@shared/core';
-import { ValidationError } from '@shared/core/src/validation';
-import { PerformanceMonitor } from '@shared/core/src/performance';
+import { ValidationError } from '@shared/core/validation';
+import { PerformanceMonitor } from '@shared/core/performance';
 
 export function handleRequest(req: any, res: any) {
   // Only using ApiSuccess, logger and others are unused
@@ -41,7 +41,7 @@ export function processData(data: any) {
 
 // Example 3: Unused database service imports
 export const unusedDatabaseImports = `
-import { databaseService } from '@shared/database/connection';
+import { databaseService } from '@shared/database';
 import { eq, and, desc } from 'drizzle-orm';
 import { users, bills } from '@shared/schema';
 
@@ -72,16 +72,16 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
 // Example 5: Unused variables in service functions
 export const unusedVariablesInServices = `
 import { logger } from '@shared/core';
-import { databaseService } from '@shared/database/connection';
+import { databaseService } from '@shared/database';
 
-export async function getUserProfile(userId: string) {
+export async function getUserProfile(user_id: string) {
   const startTime = Date.now(); // Unused variable
-  const cacheKey = \`user_profile_\${userId}\`; // Unused variable
+  const cacheKey = \`user_profile_\${ user_id }\`; // Unused variable
   const metadata = { source: 'database', timestamp: Date.now() }; // Unused variable
   
-  logger.info(\`Fetching user profile for \${userId}\`);
+  logger.info(\`Fetching user profile for \${user_id}\`);
   
-  const user = await databaseService.query('SELECT * FROM users WHERE id = ?', [userId]);
+  const user = await databaseService.query('SELECT * FROM users WHERE id = ?', [user_id]);
   return user;
 }
 `;
@@ -93,7 +93,7 @@ import {
   validateRequest, 
   ValidationService,
   createValidator 
-} from '@shared/core/src/validation';
+} from '@shared/core/validation';
 import { Request, Response, NextFunction } from 'express';
 
 export function simpleValidation(req: Request, res: Response, next: NextFunction) {
@@ -113,7 +113,7 @@ import {
   ApiValidationError,
   ApiNotFound,
   ApiResponseWrapper 
-} from '@shared/core/src/utils/api';
+} from '@shared/core/utils/api';
 
 export function getUser(req: any, res: any) {
   const user = { id: 1, name: 'John' };
@@ -134,7 +134,7 @@ import {
   CacheFactory, 
   cacheKeys,
   CACHE_KEYS 
-} from '@shared/core/src/caching';
+} from '@shared/core/caching';
 import { logger } from '@shared/core';
 
 export function simpleFunction() {
@@ -150,7 +150,7 @@ import {
   PerformanceMonitor, 
   measurePerformance,
   PerformanceMetrics 
-} from '@shared/core/src/performance';
+} from '@shared/core/performance';
 import { logger } from '@shared/core';
 
 export function quickOperation() {
@@ -162,20 +162,20 @@ export function quickOperation() {
 
 // Example 10: Complex nested imports with mixed usage
 export const complexNestedImports = `
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core/observability/logging';
 import { 
   ErrorHandler, 
   ErrorBoundary, 
   createErrorHandler 
-} from '@shared/core/src/observability/error-management';
+} from '@shared/core/observability/error-management';
 import { 
   MetricsCollector, 
   PerformanceMetrics 
-} from '@shared/core/src/observability/metrics';
+} from '@shared/core/observability/metrics';
 import { 
   HealthChecker, 
   HealthStatus 
-} from '@shared/core/src/observability/health';
+} from '@shared/core/observability/health';
 
 export class ServiceManager {
   private errorHandler: ErrorHandler;

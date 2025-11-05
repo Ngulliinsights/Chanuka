@@ -264,8 +264,8 @@ export class FinancialAnalysisService {
       relatedEntity: affiliation.organization || 'Unknown Organization',
       relationshipType: typeMapping[affiliation.type] || 'business_partner',
       strength: this.calculateAffiliationStrength(affiliation),
-      startDate: affiliation.startDate ? new Date(affiliation.startDate) : undefined,
-      endDate: affiliation.endDate ? new Date(affiliation.endDate) : undefined,
+      start_date: affiliation.start_date ? new Date(affiliation.start_date) : undefined,
+      end_date: affiliation.end_date ? new Date(affiliation.end_date) : undefined,
       is_active: Boolean(affiliation.is_active),
       conflictPotential: this.assessAffiliationConflict(affiliation)
     };

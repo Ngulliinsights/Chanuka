@@ -69,8 +69,8 @@ export class CacheKeys implements CacheKeyGenerator {
     return this.formatKey(`user:profile:${id}`);
   }
 
-  userSession(sessionId: string): string {
-    return this.formatKey(`user:session:${sessionId}`);
+  userSession(session_id: string): string {
+    return this.formatKey(`user:session:${session_id}`);
   }
 
   userPermissions(id: number): string {
@@ -163,8 +163,8 @@ export class CacheKeys implements CacheKeyGenerator {
     return this.formatKey(`dashboard:${dashboard}:${ user_id }`);
   }
 
-  reportData(reportId: string): string {
-    return this.formatKey(`report:${reportId}`);
+  reportData(report_id: string): string {
+    return this.formatKey(`report:${report_id}`);
   }
 
   /**

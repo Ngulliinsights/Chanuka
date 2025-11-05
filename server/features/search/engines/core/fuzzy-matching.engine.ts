@@ -3,7 +3,7 @@
 // ============================================================================
 // Typo-tolerant search using PostgreSQL's pg_trgm extension for similarity matching
 
-import { database } from '@shared/database/connection';
+import { database } from '@shared/database';
 import { bills } from '@shared/schema';
 import { sql, desc } from 'drizzle-orm';
 import { SearchQuery, SearchResult } from '../types/search.types.js';

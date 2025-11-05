@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../../../shared/core/index.js';
-import { performanceMonitor } from '../../../../shared/core/src/performance/index.js';
+import { logger } from '@shared/core/index.js';
+import { performanceMonitor } from '@shared/core/performance/index.js';
 import { analyticsConfig } from '../config/analytics.config.js';
-import { AuthenticatedRequest } from '../../../middleware/auth.js';
+import { AuthenticatedRequest } from '@/middleware/auth.js';
 
 /**
  * Performance tracking middleware for analytics endpoints

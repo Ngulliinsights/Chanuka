@@ -177,44 +177,44 @@ describe('SocketIOService', () => {
     });
 
     it('should handle bill subscription', (done) => {
-      const billId = 123;
+      const bill_id = 123;
 
       clientSocket.on('subscription_confirmed', (data) => {
         expect(data.type).toBe('subscription_confirmed');
-        expect(data.bill_id).toBe(billId);
+        expect(data.bill_id).toBe(bill_id);
         done();
       });
 
       clientSocket.emit('message', {
         type: 'subscribe',
-        data: { bill_id: billId },
+        data: { bill_id: bill_id },
         messageId: 'test-msg-1'
       });
     });
 
     it('should handle bill unsubscription', (done) => {
-      const billId = 123;
+      const bill_id = 123;
 
       // First subscribe
       clientSocket.on('subscription_confirmed', () => {
         // Then unsubscribe
         clientSocket.emit('message', {
           type: 'unsubscribe',
-          data: { bill_id: billId },
+          data: { bill_id: bill_id },
           messageId: 'test-msg-2'
         });
       });
 
       clientSocket.on('unsubscription_confirmed', (data) => {
         expect(data.type).toBe('unsubscription_confirmed');
-        expect(data.bill_id).toBe(billId);
+        expect(data.bill_id).toBe(bill_id);
         done();
       });
 
       // Start with subscription
       clientSocket.emit('message', {
         type: 'subscribe',
-        data: { bill_id: billId },
+        data: { bill_id: bill_id },
         messageId: 'test-msg-1'
       });
     });

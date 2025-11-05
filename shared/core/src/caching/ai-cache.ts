@@ -9,7 +9,7 @@
  * - Intelligent cache invalidation based on data freshness
  */
 
-import { CacheService } from './types';
+import { CacheService, CacheHealthStatus } from './types';
 import { getDefaultCache } from './index';
 import { performance } from 'perf_hooks';
 import { logger } from '../observability/logging';
@@ -337,9 +337,10 @@ export class AICache {
     warmingQueueSize: number;
   }> {
     try {
-      const baseCacheHealthy = this.baseCache.getHealth 
-        ? (await this.baseCache.getHealth()).healthy 
-        : true;
+      const baseCacheHealth = this.baseCache.getHealth 
+        ? await this.baseCache.getHealth()
+        : { connected: true, latency: 0, stats: { hits: 0, misses: 0, hitRate: 0, operations: 0, errors: 0, memoryUsage: 0, keyCount: 0, avgLatency: 0, maxLatency: 0, minLatency: 0, avgResponseTime: 0 } };
+      const baseCacheHealthy = baseCacheHealth.connected;
 
       return {
         healthy: baseCacheHealthy,

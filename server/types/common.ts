@@ -152,8 +152,8 @@ export interface Affiliation {
   role: string;
   type: 'committee' | 'professional' | 'financial' | 'board' | 'advisory' | 'executive' | 'political' | 'academic';
   conflictType?: 'direct' | 'indirect' | 'minor';
-  startDate?: Date;
-  endDate?: Date;
+  start_date?: Date;
+  end_date?: Date;
 }
 
 export interface TransparencyInfo {
@@ -239,7 +239,7 @@ export interface Expert {
 
 export interface VerificationTask {
   id: number;
-  analysisId: number;
+  analysis_id: number;
   expertId: number;
   status: VerificationStatus;
   assignedAt: Date;
@@ -354,7 +354,7 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   token: string;
-  refreshToken?: string;
+  refresh_token?: string;
   user: UserProfile;
   expiresIn: number;
 }

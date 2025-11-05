@@ -54,7 +54,7 @@ export interface ThreadParticipant { user_id: string;
   username: string;
   avatar?: string;
   joinedAt: string;
-  lastSeenAt: string;
+  last_seen_at: string;
   postCount: number;
  }
 

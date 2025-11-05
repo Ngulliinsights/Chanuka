@@ -11,7 +11,7 @@ import {
   DeploymentPlan,
   DeploymentStatus
 } from './deployment-orchestrator.js';
-import { logger } from '../../../shared/core';
+import { logger } from '@/shared/core';
 import {
   AsyncServiceResult,
   withResultHandling,

@@ -121,8 +121,8 @@ class ProjectStructureVerifier {
         [/from\s+['"]\.\.\/(utils|components|services|hooks)/g, "from '@/$1"],
         
         // Fix specific broken imports based on current structure
-        [/from\s+['"].*\/logger['"](?!\w)/g, "from '@shared/core/src/observability/logging'"],
-        [/from\s+['"].*\/types['"](?!\w)/g, "from '@shared/core/src/types'"],
+        [/from\s+['"].*\/logger['"](?!\w)/g, "from '@shared/core/observability/logging'"],
+        [/from\s+['"].*\/types['"](?!\w)/g, "from '@shared/core/types'"],
         [/from\s+['"].*\/api['"](?!\w)/g, "from '@/services/api'"],
         [/from\s+['"].*\/auth['"](?!\w)/g, "from '@/components/auth'"],
         [/from\s+['"].*\/loading['"](?!\w)/g, "from '@/components/loading'"],

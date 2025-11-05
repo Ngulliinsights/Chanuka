@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { privacyService } from '../features/privacy/privacy-service.js';
 import { auditLogger } from '../infrastructure/monitoring/audit-log.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface PrivacyRequest extends AuthenticatedRequest {
   privacyConsent?: {

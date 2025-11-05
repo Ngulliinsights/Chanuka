@@ -24,7 +24,7 @@ export const users = pgTable('users', {
   id: integer('id').primaryKey(),
   email: varchar('email', { length: 255 }).notNull(),
   name: varchar('name', { length: 255 }),
-  createdAt: timestamp('created_at').defaultNow(),
+  created_at: timestamp('created_at').defaultNow(),
 });
       `;
 
@@ -53,7 +53,7 @@ export const users = pgTable('users', {
 
 export const posts = pgTable('posts', {
   id: integer('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id),
+  user_id: integer('user_id').references(() => users.id),
   title: varchar('title', { length: 255 }),
 });
 
@@ -176,8 +176,8 @@ export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }).notNull(),
-  isActive: boolean('is_active').default(true),
-  createdAt: timestamp('created_at').defaultNow(),
+  is_active: boolean('is_active').default(true),
+  created_at: timestamp('created_at').defaultNow(),
 });
 
 export type User = typeof users.$inferSelect;

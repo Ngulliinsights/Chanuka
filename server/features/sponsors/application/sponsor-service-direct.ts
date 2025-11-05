@@ -1,10 +1,10 @@
-import { db } from '../../../../shared/database/pool.js';
+import { db } from '@shared/database/pool.js';
 import {
   sponsors, bill_cosponsors, bills, sponsor_affiliations, sponsor_transparency,
   type Sponsor, type InsertSponsor, type Bill
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, count, inArray, like, or, isNull, isNotNull } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -36,8 +36,8 @@ export interface SponsorAffiliationInput {
   role?: string | null;
   type: string;
   conflictType?: string | null;
-  startDate?: Date | null;
-  endDate?: Date | null;
+  start_date?: Date | null;
+  end_date?: Date | null;
   is_active?: boolean;
 }
 
@@ -624,8 +624,8 @@ export class SponsorService {
         .insert(sponsor_affiliations)
         .values({
           ...affiliationData,
-          start_date: affiliationData.startDate || now,
-          end_date: affiliationData.endDate,
+          start_date: affiliationData.start_date || now,
+          end_date: affiliationData.end_date,
           created_at: now,
           updated_at: now
         })
@@ -676,7 +676,7 @@ export class SponsorService {
   async setAffiliationActiveStatus(
     id: number, 
     is_active: boolean, 
-    endDate?: Date
+    end_date?: Date
   ): Promise<any | null> {
     const logContext = { 
       component: 'SponsorService', 

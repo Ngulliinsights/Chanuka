@@ -20,7 +20,7 @@ async function main() {
         logger.info('\n📊 Analysis Results:', { component: 'Chanuka' });
         console.log(`Files analyzed: ${analysis.metrics.filesAnalyzed}`);
         console.log(`Issues found: ${analysis.metrics.issuesFound}`);
-        console.log(`Risk score: ${analysis.metrics.riskScore}/100`);
+        console.log(`Risk score: ${analysis.metrics.risk_score}/100`);
         
         logger.info('\n🔍 Findings:', { component: 'Chanuka' });
         analysis.findings.forEach((finding, index) => {

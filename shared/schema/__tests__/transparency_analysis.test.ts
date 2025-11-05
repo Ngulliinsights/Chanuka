@@ -197,23 +197,23 @@ describe('Transparency Analysis Schema', () => {
     });
 
     it('should track interest timeline correctly', async () => {
-      const startDate = new Date('2020-01-01');
-      const endDate = new Date('2023-12-31');
+      const start_date = new Date('2020-01-01');
+      const end_date = new Date('2023-12-31');
 
       const [interest] = await db.insert(financial_interests).values({
         sponsor_id: testSponsorId,
         corporate_entity_id: testCorporateEntityId,
         interest_type: 'directorship',
         interest_description: 'Board member from 2020-2023',
-        interest_start_date: startDate,
-        interest_end_date: endDate,
+        interest_start_date: start_date,
+        interest_end_date: end_date,
         is_current: false,
         disclosure_source: 'company_filings',
         disclosure_date: new Date()
       }).returning();
 
-      expect(interest.interest_start_date).toEqual(startDate);
-      expect(interest.interest_end_date).toEqual(endDate);
+      expect(interest.interest_start_date).toEqual(start_date);
+      expect(interest.interest_end_date).toEqual(end_date);
       expect(interest.is_current).toBe(false);
     });
   });

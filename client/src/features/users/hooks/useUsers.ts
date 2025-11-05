@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userApi } from '../services/user-api';
-import { useToast } from '../../../hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import type {
   User,
   UserProfile,
@@ -24,7 +24,7 @@ export function useAuth() {
     onSuccess: (data) => {
       // Store tokens
       localStorage.setItem('token', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('refresh_token', data.refresh_token);
 
       // Update user in cache
       queryClient.setQueryData(['user'], data.user);
@@ -47,7 +47,7 @@ export function useAuth() {
     mutationFn: (data: RegisterData) => userApi.register(data),
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('refresh_token', data.refresh_token);
       queryClient.setQueryData(['user'], data.user);
 
       toast({
@@ -68,7 +68,7 @@ export function useAuth() {
     mutationFn: () => userApi.logout(),
     onSuccess: () => {
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('refresh_token');
       queryClient.clear();
 
       toast({

@@ -136,7 +136,7 @@ export interface VerificationRequest {
 export interface AuthResponse {
   user: User;
   token: string;
-  refreshToken: string;
+  refresh_token: string;
 }
 
 export interface ProfileResponse {

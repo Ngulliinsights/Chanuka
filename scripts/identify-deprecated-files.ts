@@ -1,8 +1,8 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 
 interface DeprecatedFile {
   path: string;
@@ -51,12 +51,12 @@ function findImports(content: string): string[] {
   const importRegex = /import\s+.*?\s+from\s+['"]([^'"]+)['"]/g;
   let match;
   while ((match = importRegex.exec(content)) !== null) {
-    imports.push(match[1]);
+    if (match[1]) imports.push(match[1]);
   }
   // Also check require statements
   const requireRegex = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
   while ((match = requireRegex.exec(content)) !== null) {
-    imports.push(match[1]);
+    if (match[1]) imports.push(match[1]);
   }
   return imports;
 }
@@ -92,8 +92,11 @@ function walkDirectory(dir: string): string[] {
 }
 
 function main() {
+  console.log('Starting deprecated file analysis...');
   const rootDir = process.cwd();
+  console.log(`Root directory: ${rootDir}`);
   const allFiles = walkDirectory(rootDir);
+  console.log(`Found ${allFiles.length} files to analyze`);
 
   const report: Report = {
     deprecatedByName: [],
@@ -110,6 +113,7 @@ function main() {
   const referencedFiles = new Set<string>();
   const allSourceFiles = new Set<string>();
 
+  console.log('Analyzing files...');
   for (const file of allFiles) {
     const relativePath = path.relative(rootDir, file);
     allSourceFiles.add(relativePath);
@@ -141,12 +145,12 @@ function main() {
     // Track duplicates by name
     const fileName = path.basename(file);
     if (!fileNames[fileName]) fileNames[fileName] = [];
-    fileNames[fileName].push(relativePath);
+    fileNames[fileName]!.push(relativePath);
 
     // Track duplicates by content
     const hash = getFileHash(file);
     if (!fileHashes[hash]) fileHashes[hash] = [];
-    fileHashes[hash].push(relativePath);
+    fileHashes[hash]!.push(relativePath);
 
     // Find imports
     const imports = findImports(content);
@@ -188,9 +192,11 @@ function main() {
   // For now, skip or add a note
 
   // Output report
+  console.log('Analysis complete. Report:');
   console.log(JSON.stringify(report, null, 2));
+  return report;
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }

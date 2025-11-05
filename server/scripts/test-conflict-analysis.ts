@@ -1,5 +1,5 @@
 import { sponsorConflictAnalysisService } from '../features/bills/sponsor-conflict-analysis.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 async function testConflictAnalysis() {
   logger.info('🔍 Testing Sponsor Conflict Analysis Service...\n', { component: 'Chanuka' });
@@ -68,7 +68,7 @@ async function testConflictAnalysis() {
     console.log(`   Analyzed trends for ${trends.length} sponsors`);
     
     if (trends.length > 0) {
-      const avgRiskScore = trends.reduce((sum, t) => sum + t.riskScore, 0) / trends.length;
+      const avgRiskScore = trends.reduce((sum, t) => sum + t.risk_score, 0) / trends.length;
       console.log(`   Average risk score: ${Math.round(avgRiskScore)}`);
       
       const trendDistribution = trends.reduce((acc, t) => {

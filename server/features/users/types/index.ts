@@ -38,7 +38,7 @@ export interface ExtendedExpert extends Expert {
 
 export interface VerificationTask {
   id: string;
-  analysisId: string;
+  analysis_id: string;
   expertId: string;
   status: VerificationStatus;
   assignedAt: Date;
@@ -96,4 +96,4 @@ export type {
   UserRole,
   UserProfile,
   AuthenticatedRequest
-} from '@shared/core/src/types/auth.types';
+} from '@shared/core/types/auth.types';

@@ -2,16 +2,16 @@ import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { eq, and } from 'drizzle-orm';
-import { readDatabase } from '../../../shared/database/connection.js';
+import { readDatabase } from '@shared/database/connection.js';
 const db = readDatabase;
-import { users as users, session as sessions, passwordReset as passwordResets, type User } from '../../../shared/schema';
+import { users as users, session as sessions, passwordReset as passwordResets, type User } from '@/shared/schema';
 import { getEmailService } from '../../infrastructure/notifications/email-service';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { inputValidationService } from '../validation/input-validation-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 
 // Validation schemas
 export const registerSchema = z.object({
@@ -57,7 +57,7 @@ export interface AuthResult {
     is_active: boolean | null;
   };
   token?: string;
-  refreshToken?: string;
+  refresh_token?: string;
   error?: string;
   requiresVerification?: boolean;
 }
@@ -66,7 +66,7 @@ export interface SessionInfo {
   id: string;
   user_id: string;
   token: string;
-  refreshToken: string;
+  refresh_token: string;
   expires_at: Date;
   refresh_token_expires_at: Date;
 }
@@ -132,7 +132,7 @@ export class AuthService {
       const password_hash = await encryptionService.hashPassword(validatedData.password);
 
       // Generate email verification token
-      const verificationToken = crypto.randomBytes(32).toString('hex');
+      const verification_token = crypto.randomBytes(32).toString('hex');
 
       // Create user
       const newUser = await db
@@ -148,7 +148,7 @@ export class AuthService {
           is_active: true,
           preferences: {
             emailNotifications: true,
-            emailVerificationToken: verificationToken,
+            emailVerificationToken: verification_token,
             emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
           }
         })
@@ -162,16 +162,16 @@ export class AuthService {
         html: `
           <h2>Welcome ${validatedData.first_name}!</h2>
           <p>Please verify your email address by clicking the link below:</p>
-          <a href="${process.env.BASE_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}">Verify Email</a>
+          <a href="${process.env.BASE_URL || 'http://localhost:3000'}/verify-email?token=${verification_token}">Verify Email</a>
           <p>This link will expire in 24 hours.</p>
         `
       });
 
       // Generate tokens
-      const { token, refreshToken } = await this.generateTokens(newUser[0].id, validatedData.email);
+      const { token, refresh_token } = await this.generateTokens(newUser[0].id, validatedData.email);
 
       // Create session
-      await this.createSession(newUser[0].id, token, refreshToken);
+      await this.createSession(newUser[0].id, token, refresh_token);
 
       return {
         success: true,
@@ -327,10 +327,10 @@ export class AuthService {
         .where(eq(users.id, userData.id));
 
       // Generate tokens
-      const { token, refreshToken } = await this.generateTokens(userData.id, userData.email);
+      const { token, refresh_token } = await this.generateTokens(userData.id, userData.email);
 
       // Create session
-      await this.createSession(userData.id, token, refreshToken);
+      await this.createSession(userData.id, token, refresh_token);
 
       return {
         success: true,
@@ -395,17 +395,17 @@ export class AuthService {
   /**
    * Refresh access token using refresh token
    */
-  async refreshToken(refreshToken: string): Promise<AuthResult> {
+  async refreshToken(refresh_token: string): Promise<AuthResult> {
     try {
       // Verify refresh token
-      const decoded = jwt.verify(refreshToken, this.refreshTokenSecret) as any;
+      const decoded = jwt.verify(refresh_token, this.refreshTokenSecret) as any;
 
       // Find session
       const session = await db
         .select()
         .from(sessions)
         .where(and(
-          eq(sessions.refresh_token_hash, this.hashToken(refreshToken)),
+          eq(sessions.refresh_token_hash, this.hashToken(refresh_token)),
           eq(sessions.is_active, true)
         ))
         .limit(1);
@@ -450,7 +450,7 @@ export class AuthService {
       const userData = user[0];
 
       // Generate new tokens
-      const { token: newToken, refreshToken: newRefreshToken } = await this.generateTokens(
+      const { token: newToken, refresh_token: newRefreshToken } = await this.generateTokens(
         userData.id,
         userData.email
       );
@@ -480,7 +480,7 @@ export class AuthService {
           is_active: userData.is_active
         },
         token: newToken,
-        refreshToken: newRefreshToken
+        refresh_token: newRefreshToken
       };
 
     } catch (error) {
@@ -518,8 +518,8 @@ export class AuthService {
       const userData = user[0];
 
       // Generate reset token
-      const resetToken = crypto.randomBytes(32).toString('hex');
-      const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+      const reset_token = crypto.randomBytes(32).toString('hex');
+      const tokenHash = crypto.createHash('sha256').update(reset_token).digest('hex');
 
       // Store reset token
       await db
@@ -539,7 +539,7 @@ export class AuthService {
           <h2>Password Reset</h2>
           <p>Hello ${userData.first_name || 'User'},</p>
           <p>You requested a password reset. Click the link below to reset your password:</p>
-          <a href="${process.env.BASE_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}">Reset Password</a>
+          <a href="${process.env.BASE_URL || 'http://localhost:3000'}/reset-password?token=${reset_token}">Reset Password</a>
           <p>This link will expire in 1 hour.</p>
           <p>If you didn't request this, please ignore this email.</p>
         `
@@ -747,33 +747,33 @@ export class AuthService {
   /**
    * Generate JWT and refresh tokens
    */
-  private async generateTokens(user_id: string, email: string): Promise<{ token: string; refreshToken: string }> {
+  private async generateTokens(user_id: string, email: string): Promise<{ token: string; refresh_token: string }> {
     const token = jwt.sign(
       { user_id, email },
       this.jwtSecret,
       { expiresIn: '24h' }
     );
 
-    const refreshToken = jwt.sign(
+    const refresh_token = jwt.sign(
       { user_id, email, type: 'refresh' },
       this.refreshTokenSecret,
       { expiresIn: '30d' }
     );
 
-    return { token, refreshToken };
+    return { token, refresh_token };
   }
 
   /**
    * Create session record
    */
-  private async createSession(user_id: string, token: string, refreshToken: string): Promise<void> {
+  private async createSession(user_id: string, token: string, refresh_token: string): Promise<void> {
     await db
       .insert(sessions)
       .values({
         id: crypto.randomUUID(),
         user_id,
         token,
-        refresh_token_hash: this.hashToken(refreshToken),
+        refresh_token_hash: this.hashToken(refresh_token),
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
         refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
         is_active: true

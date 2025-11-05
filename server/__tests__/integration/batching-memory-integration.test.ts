@@ -34,10 +34,10 @@ describe('Batching & Memory Integration Tests', () => {
 
   test('should integrate batching with memory management', async () => {
     const connectionId = 'test-connection-1';
-    const userId = 'test-user-1';
+    const user_id = 'test-user-1';
 
     // Register connection
-    memoryService.registerConnection(connectionId, userId);
+    memoryService.registerConnection(connectionId, user_id);
 
     // Track delivered batches
     const deliveredBatches: BatchableMessage[][] = [];
@@ -56,7 +56,7 @@ describe('Batching & Memory Integration Tests', () => {
 
     // Queue messages
     for (const message of messages) {
-      const queued = batchingService.queueMessage(userId, message, deliveryCallback);
+      const queued = batchingService.queueMessage(user_id, message, deliveryCallback);
       expect(queued).toBe(true);
       
       // Update memory service
@@ -82,9 +82,9 @@ describe('Batching & Memory Integration Tests', () => {
 
   test('should handle high-priority messages immediately', async () => {
     const connectionId = 'test-connection-2';
-    const userId = 'test-user-2';
+    const user_id = 'test-user-2';
 
-    memoryService.registerConnection(connectionId, userId);
+    memoryService.registerConnection(connectionId, user_id);
 
     const deliveredBatches: BatchableMessage[][] = [];
     const deliveryCallback = async (batch: BatchableMessage[]) => {
@@ -98,7 +98,7 @@ describe('Batching & Memory Integration Tests', () => {
       priority: 10 // Above threshold
     };
 
-    const queued = batchingService.queueMessage(userId, highPriorityMessage, deliveryCallback);
+    const queued = batchingService.queueMessage(user_id, highPriorityMessage, deliveryCallback);
     expect(queued).toBe(true);
 
     // Should be delivered immediately
@@ -116,9 +116,9 @@ describe('Batching & Memory Integration Tests', () => {
 
     for (let i = 0; i < connectionCount; i++) {
       const connectionId = `connection-${i}`;
-      const userId = `user-${i}`;
+      const user_id = `user-${i}`;
       
-      memoryService.registerConnection(connectionId, userId);
+      memoryService.registerConnection(connectionId, user_id);
       connections.push(connectionId);
 
       // Buffer many messages to increase memory usage
@@ -151,10 +151,10 @@ describe('Batching & Memory Integration Tests', () => {
   });
 
   test('should adapt batching configuration under memory pressure', async () => {
-    const userId = 'test-user-3';
+    const user_id = 'test-user-3';
     const connectionId = 'test-connection-3';
 
-    memoryService.registerConnection(connectionId, userId);
+    memoryService.registerConnection(connectionId, user_id);
 
     // Get initial batching configuration
     const initialMetrics = batchingService.getMetrics();
@@ -178,7 +178,7 @@ describe('Batching & Memory Integration Tests', () => {
 
     // Queue messages
     for (const message of messages) {
-      batchingService.queueMessage(userId, message, deliveryCallback);
+      batchingService.queueMessage(user_id, message, deliveryCallback);
     }
 
     // Wait for processing
@@ -198,9 +198,9 @@ describe('Batching & Memory Integration Tests', () => {
     // Create connections
     for (let i = 0; i < 20; i++) {
       const connectionId = `connection-${i}`;
-      const userId = `user-${i}`;
+      const user_id = `user-${i}`;
       
-      memoryService.registerConnection(connectionId, userId);
+      memoryService.registerConnection(connectionId, user_id);
       connectionIds.push(connectionId);
     }
 
@@ -228,10 +228,10 @@ describe('Batching & Memory Integration Tests', () => {
   });
 
   test('should maintain message delivery during optimization', async () => {
-    const userId = 'test-user-4';
+    const user_id = 'test-user-4';
     const connectionId = 'test-connection-4';
 
-    memoryService.registerConnection(connectionId, userId);
+    memoryService.registerConnection(connectionId, user_id);
 
     const deliveredBatches: BatchableMessage[][] = [];
     const deliveryCallback = async (batch: BatchableMessage[]) => {
@@ -244,7 +244,7 @@ describe('Batching & Memory Integration Tests', () => {
         type: 'continuous_message',
         data: { timestamp: Date.now() }
       };
-      batchingService.queueMessage(userId, message, deliveryCallback);
+      batchingService.queueMessage(user_id, message, deliveryCallback);
     }, 50);
 
     // Let messages queue for a bit
@@ -260,7 +260,7 @@ describe('Batching & Memory Integration Tests', () => {
     clearInterval(messageInterval);
 
     // Flush remaining messages
-    await batchingService.flushAll(async (userId, batch) => {
+    await batchingService.flushAll(async (user_id, batch) => {
       deliveredBatches.push(batch);
     });
 
@@ -277,10 +277,10 @@ describe('Batching & Memory Integration Tests', () => {
   });
 
   test('should recover from memory pressure', async () => {
-    const userId = 'test-user-5';
+    const user_id = 'test-user-5';
     const connectionId = 'test-connection-5';
 
-    memoryService.registerConnection(connectionId, userId);
+    memoryService.registerConnection(connectionId, user_id);
 
     // Monitor memory pressure changes
     const pressureChanges: any[] = [];
@@ -310,7 +310,7 @@ describe('Batching & Memory Integration Tests', () => {
       data: { content: 'Testing recovery' }
     };
 
-    const queued = batchingService.queueMessage(userId, message, deliveryCallback);
+    const queued = batchingService.queueMessage(user_id, message, deliveryCallback);
     expect(queued).toBe(true);
 
     await new Promise(resolve => setTimeout(resolve, 150));
@@ -324,10 +324,10 @@ describe('Batching & Memory Integration Tests', () => {
   });
 
   test('should handle batch compression under memory pressure', async () => {
-    const userId = 'test-user-6';
+    const user_id = 'test-user-6';
     const connectionId = 'test-connection-6';
 
-    memoryService.registerConnection(connectionId, userId);
+    memoryService.registerConnection(connectionId, user_id);
 
     const deliveredBatches: BatchableMessage[][] = [];
     const deliveryCallback = async (batch: BatchableMessage[]) => {
@@ -352,7 +352,7 @@ describe('Batching & Memory Integration Tests', () => {
 
     // Queue messages
     for (const message of largeMessages) {
-      batchingService.queueMessage(userId, message, deliveryCallback);
+      batchingService.queueMessage(user_id, message, deliveryCallback);
     }
 
     // Trigger memory optimization to enable compression

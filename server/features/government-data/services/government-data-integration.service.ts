@@ -3,8 +3,8 @@
 // ============================================================================
 // Handles data scarcity and API limitations with multiple fallback mechanisms
 
-import { logger } from '../../../shared/core/index.js';
-import { cache } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
+import { cache } from '@shared/core/index.js';
 import { databaseService } from '../../infrastructure/database/database-service.js';
 import { bills, sponsors } from '@shared/schema';
 import { eq, and, sql, desc, isNull } from 'drizzle-orm';
@@ -13,7 +13,7 @@ export interface DataSource {
   name: string;
   type: 'api' | 'scraper' | 'manual' | 'crowdsourced';
   priority: number;
-  isActive: boolean;
+  is_active: boolean;
   baseUrl?: string;
   apiKey?: string;
   rateLimit: {
@@ -58,7 +58,7 @@ export interface BillData {
   summary?: string;
   fullText?: string;
   status: string;
-  introducedDate?: Date;
+  introduced_date?: Date;
   sponsorName?: string;
   chamber: string;
   committee?: string;
@@ -108,7 +108,7 @@ export class GovernmentDataIntegrationService {
       name: 'Parliament of Kenya API',
       type: 'api',
       priority: 1,
-      isActive: true,
+      is_active: true,
       baseUrl: process.env.PARLIAMENT_API_URL || 'https://parliament.go.ke/api',
       rateLimit: { requestsPerMinute: 30, requestsPerHour: 1000 },
       reliability: { successRate: 0.3, lastSuccessful: null, consecutiveFailures: 0 }
@@ -119,7 +119,7 @@ export class GovernmentDataIntegrationService {
       name: 'Kenya Law Reports',
       type: 'scraper',
       priority: 2,
-      isActive: true,
+      is_active: true,
       baseUrl: 'http://kenyalaw.org',
       rateLimit: { requestsPerMinute: 10, requestsPerHour: 200 },
       reliability: { successRate: 0.7, lastSuccessful: null, consecutiveFailures: 0 }
@@ -130,7 +130,7 @@ export class GovernmentDataIntegrationService {
       name: 'Hansard Scraper',
       type: 'scraper',
       priority: 3,
-      isActive: true,
+      is_active: true,
       baseUrl: 'https://hansard.parliament.go.ke',
       rateLimit: { requestsPerMinute: 5, requestsPerHour: 100 },
       reliability: { successRate: 0.5, lastSuccessful: null, consecutiveFailures: 0 }
@@ -141,7 +141,7 @@ export class GovernmentDataIntegrationService {
       name: 'Crowdsourced Data',
       type: 'crowdsourced',
       priority: 4,
-      isActive: true,
+      is_active: true,
       rateLimit: { requestsPerMinute: 100, requestsPerHour: 5000 },
       reliability: { successRate: 0.8, lastSuccessful: new Date(), consecutiveFailures: 0 }
     });
@@ -151,7 +151,7 @@ export class GovernmentDataIntegrationService {
       name: 'Manual Data Entry',
       type: 'manual',
       priority: 5,
-      isActive: true,
+      is_active: true,
       rateLimit: { requestsPerMinute: 1000, requestsPerHour: 10000 },
       reliability: { successRate: 0.95, lastSuccessful: new Date(), consecutiveFailures: 0 }
     });
@@ -443,7 +443,7 @@ export class GovernmentDataIntegrationService {
         summary: bill.summary || undefined,
         fullText: bill.full_text || undefined,
         status: bill.status,
-        introducedDate: bill.introduced_date || undefined,
+        introduced_date: bill.introduced_date || undefined,
         chamber: bill.chamber,
         committee: bill.committee || undefined,
         tags: bill.tags || [],
@@ -569,7 +569,7 @@ export class GovernmentDataIntegrationService {
             summary: billData.summary,
             full_text: billData.fullText,
             status: billData.status as any,
-            introduced_date: billData.introducedDate,
+            introduced_date: billData.introduced_date,
             committee: billData.committee,
             tags: billData.tags,
             affected_counties: billData.affectedCounties as any,
@@ -588,7 +588,7 @@ export class GovernmentDataIntegrationService {
             summary: billData.summary,
             full_text: billData.fullText,
             status: billData.status as any,
-            introduced_date: billData.introducedDate,
+            introduced_date: billData.introduced_date,
             chamber: billData.chamber as any,
             committee: billData.committee,
             tags: billData.tags,
@@ -605,7 +605,7 @@ export class GovernmentDataIntegrationService {
   // Helper methods for robustness
   private getActiveSources(requestedSources?: string[]): DataSource[] {
     const sources = Array.from(this.dataSources.values())
-      .filter(s => s.isActive)
+      .filter(s => s.is_active)
       .sort((a, b) => a.priority - b.priority);
 
     if (requestedSources && requestedSources.length > 0) {
@@ -653,7 +653,7 @@ export class GovernmentDataIntegrationService {
       status: item.status,
       chamber: item.chamber,
       summary: item.summary,
-      introducedDate: item.introduced_date ? new Date(item.introduced_date) : undefined
+      introduced_date: item.introduced_date ? new Date(item.introduced_date) : undefined
     }));
   }
 
@@ -710,7 +710,7 @@ export class GovernmentDataIntegrationService {
       
       // Disable source if too many consecutive failures
       if (source.reliability.consecutiveFailures >= 5) {
-        source.isActive = false;
+        source.is_active = false;
         logger.warn(`Disabling unreliable source: ${sourceName}`);
       }
     }

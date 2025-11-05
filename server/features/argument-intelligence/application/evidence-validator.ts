@@ -3,7 +3,7 @@
 // ============================================================================
 // Validates evidence claims and assesses their credibility
 
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export interface EvidenceValidationResult {
   evidenceId: string;
@@ -40,7 +40,7 @@ export interface FactCheckResult {
 }
 
 export interface EvidenceAssessment {
-  billId: string;
+  bill_id: string;
   evidenceBase: EvidenceValidationResult[];
   overallCredibility: number;
   verifiedClaimsCount: number;
@@ -64,7 +64,7 @@ export interface EvidenceClaim {
   citedSources: string[];
   extractedFrom: string; // Original argument text
   confidence: number;
-  userId: string;
+  user_id: string;
   submittedAt: Date;
 }
 
@@ -665,7 +665,7 @@ export class EvidenceValidatorService {
           citedSources: this.extractCitedSources(arg.text),
           extractedFrom: arg.text,
           confidence: arg.confidence || 0.5,
-          userId: arg.userId,
+          user_id: arg.user_id,
           submittedAt: new Date()
         });
       }
@@ -754,7 +754,7 @@ export class EvidenceValidatorService {
     const recommendedActions = this.generateRecommendations(validationResults, overallCredibility);
 
     return {
-      billId: '', // Would be set by caller
+      bill_id: '', // Would be set by caller
       evidenceBase: validationResults,
       overallCredibility,
       verifiedClaimsCount: verifiedCount,

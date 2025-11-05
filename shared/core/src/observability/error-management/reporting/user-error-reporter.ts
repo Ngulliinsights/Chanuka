@@ -30,7 +30,7 @@ export interface ErrorReportSubmission { errorId: string;
   technicalDetails?: string;
   recoveryOptions: RecoveryOption[];
   user_id?: string;
-  sessionId?: string;
+  session_id?: string;
   user_agent?: string;
   url?: string;
  }
@@ -69,7 +69,7 @@ export class UserErrorReporter {
       recoveryOptions,
       timestamp: new Date(),
       user_id: context.user_id,
-      sessionId: context.sessionId
+      session_id: context.session_id
      };
 
     // Store the report
@@ -81,7 +81,7 @@ export class UserErrorReporter {
     logger.info('Generated user error report', { component: 'UserErrorReporter',
       errorId,
       user_id: context.user_id,
-      sessionId: context.sessionId
+      session_id: context.session_id
      });
 
     return report;
@@ -250,7 +250,7 @@ export class UserErrorReporter {
       technicalDetails: report.technicalDetails,
       recoveryOptions: report.recoveryOptions || [],
       user_id: report.user_id,
-      sessionId: report.sessionId
+      session_id: report.session_id
      }));
   }
 
@@ -261,7 +261,7 @@ export class UserErrorReporter {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.config.reportRetentionDays);
 
-    for (const [errorId, report] of this.reports.entries()) {
+    for (const [errorId, report] of Array.from(this.reports.entries())) {
       if (report.timestamp < cutoffDate) {
         this.reports.delete(errorId);
       }

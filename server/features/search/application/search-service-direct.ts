@@ -1,4 +1,4 @@
-import { db } from '../../../../shared/database/pool.js';
+import { db } from '@shared/database/pool.js';
 import {
   bills,
   sponsors,
@@ -10,7 +10,7 @@ import {
   type User
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, count, inArray, like, or, isNotNull } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS

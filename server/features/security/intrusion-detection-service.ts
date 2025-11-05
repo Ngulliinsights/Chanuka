@@ -1,11 +1,11 @@
 import { Request } from 'express';
-import { database as db } from '../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { securityAuditService, SecurityEvent } from './security-audit-service.js';
 import { SecurityIncident } from './security-monitoring-service.js';
 import { getEmailService } from '../../infrastructure/notifications/email-service.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { system_audit_log } from '@shared/schema';
 
 // Threat intelligence table
@@ -42,7 +42,7 @@ export interface ThreatDetectionResult {
   isBlocked: boolean;
   threatLevel: 'none' | 'low' | 'medium' | 'high' | 'critical';
   detectedThreats: DetectedThreat[];
-  riskScore: number;
+  risk_score: number;
   recommendedAction: 'allow' | 'monitor' | 'challenge' | 'block';
 }
 
@@ -138,7 +138,7 @@ export class IntrusionDetectionService {
     const body = JSON.stringify(req.body || {});
     
     const detectedThreats: DetectedThreat[] = [];
-    let riskScore = 0;
+    let risk_score = 0;
 
     // 1. Check against threat intelligence
     const threatIntelResult = await this.checkThreatIntelligence(ip_address);
@@ -177,7 +177,7 @@ export class IntrusionDetectionService {
     const user_id = (req as any).user?.id;
     if (user_id) { const behavioralThreats = await this.analyzeBehavioralAnomalies(user_id, req);
       detectedThreats.push(...behavioralThreats);
-      riskScore += behavioralThreats.length * 20;
+      risk_score += behavioralThreats.length * 20;
      }
 
     // 5. Geographic and temporal analysis
@@ -194,7 +194,7 @@ export class IntrusionDetectionService {
     }
 
     // Determine threat level and recommended action
-    const threatLevel = this.calculateThreatLevel(riskScore);
+    const threatLevel = this.calculateThreatLevel(risk_score);
     const recommendedAction = this.determineRecommendedAction(threatLevel, detectedThreats);
     const isBlocked = recommendedAction === 'block' || this.blockedIPs.has(ip_address);
 
@@ -211,7 +211,7 @@ export class IntrusionDetectionService {
         success: !isBlocked,
         details: {
           detectedThreats,
-          riskScore,
+          risk_score,
           recommendedAction
         },
         user_id
@@ -222,7 +222,7 @@ export class IntrusionDetectionService {
       isBlocked,
       threatLevel,
       detectedThreats,
-      riskScore,
+      risk_score,
       recommendedAction
     };
   }
@@ -486,11 +486,11 @@ export class IntrusionDetectionService {
   /**
    * Calculate overall threat level
    */
-  private calculateThreatLevel(riskScore: number): 'none' | 'low' | 'medium' | 'high' | 'critical' {
-    if (riskScore >= this.thresholds.criticalThreatScore) return 'critical';
-    if (riskScore >= this.thresholds.suspiciousPatternScore) return 'high';
-    if (riskScore >= 40) return 'medium';
-    if (riskScore >= 20) return 'low';
+  private calculateThreatLevel(risk_score: number): 'none' | 'low' | 'medium' | 'high' | 'critical' {
+    if (risk_score >= this.thresholds.criticalThreatScore) return 'critical';
+    if (risk_score >= this.thresholds.suspiciousPatternScore) return 'high';
+    if (risk_score >= 40) return 'medium';
+    if (risk_score >= 20) return 'low';
     return 'none';
   }
 
@@ -629,15 +629,15 @@ export class IntrusionDetectionService {
   /**
    * Generate intrusion detection report
    */
-  async generateIntrusionReport(startDate: Date, endDate: Date): Promise<any> {
+  async generateIntrusionReport(start_date: Date, end_date: Date): Promise<any> {
     try {
       const threats = await db
         .select()
         .from(threatIntelligence)
         .where(
           and(
-            gte(threatIntelligence.firstSeen, startDate),
-            sql`${threatIntelligence.firstSeen} <= ${endDate}`
+            gte(threatIntelligence.firstSeen, start_date),
+            sql`${threatIntelligence.firstSeen} <= ${ end_date }`
           )
         )
         .orderBy(desc(threatIntelligence.lastSeen));
@@ -649,7 +649,7 @@ export class IntrusionDetectionService {
       }, {} as Record<string, number>);
 
       return {
-        period: { start: startDate, end: endDate },
+        period: { start: start_date, end: end_date },
         summary: {
           totalThreats: threats.length,
           blockedIPs: blockedIPs.length,

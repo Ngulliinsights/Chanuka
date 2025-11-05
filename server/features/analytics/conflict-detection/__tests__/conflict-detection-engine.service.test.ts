@@ -67,8 +67,8 @@ describe('ConflictDetectionEngineService', () => {
         sponsor_id: 123,
         organization: 'Test Corp',
         role: 'Board Member',
-        startDate: new Date(),
-        endDate: null
+        start_date: new Date(),
+        end_date: null
       }
     ];
 
@@ -131,16 +131,16 @@ describe('ConflictDetectionEngineService', () => {
         sponsor_id: 123,
         organization: 'Tech Corporation',
         role: 'CEO',
-        startDate: new Date(),
-        endDate: null
+        start_date: new Date(),
+        end_date: null
       },
       {
         id: 2,
         sponsor_id: 123,
         organization: 'Advisory Board Inc',
         role: 'Senior Advisor',
-        startDate: new Date(),
-        endDate: null
+        start_date: new Date(),
+        end_date: null
       }
     ];
 
@@ -165,8 +165,8 @@ describe('ConflictDetectionEngineService', () => {
         sponsor_id: 123,
         organization: 'Advisory Corp',
         role: 'Senior Advisor',
-        startDate: new Date(),
-        endDate: null
+        start_date: new Date(),
+        end_date: null
       }];
 
       const conflicts = await service.analyzeProfessionalConflicts(
@@ -184,8 +184,8 @@ describe('ConflictDetectionEngineService', () => {
         sponsor_id: 123,
         organization: 'Former Corp',
         role: 'Former CEO',
-        startDate: new Date('2020-01-01'),
-        endDate: new Date('2021-01-01')
+        start_date: new Date('2020-01-01'),
+        end_date: new Date('2021-01-01')
       }];
 
       const conflicts = await service.analyzeProfessionalConflicts(
