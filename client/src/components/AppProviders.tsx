@@ -1,7 +1,7 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { EnhancedErrorBoundary } from './error-handling';
+import { ErrorBoundary } from './error-handling';
 import { createNavigationProvider } from '../core/navigation/context';
 import { createLoadingProvider } from '../core/loading';
 import { AuthProvider, useAuth } from '../hooks/use-auth';
@@ -41,7 +41,7 @@ interface ProviderConfig {
 
 const PROVIDERS: ProviderConfig[] = [
   // Optimized order: innermost to outermost for reduceRight
-  // Core providers first
+  // Core providers first (NavigationProvider removed - needs to be inside Router)
   {
     name: 'QueryClientProvider',
     component: QueryClientProvider,
@@ -53,10 +53,6 @@ const PROVIDERS: ProviderConfig[] = [
   {
     name: 'AuthProvider',
     component: AuthProvider,
-  },
-  {
-    name: 'NavigationProvider',
-    component: NavigationProvider,
   },
   {
     name: 'ThemeProvider',

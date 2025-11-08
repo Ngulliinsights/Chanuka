@@ -125,7 +125,7 @@ const IMPORT_MAPPINGS = {
   // Components - Error Handling
   '@/components/error-handling/withErrorBoundary': './components/error-handling/withErrorBoundary',
   '@/components/error-handling/ErrorFallback': './components/error-handling/ErrorFallback',
-  '@/components/error-handling/EnhancedErrorBoundary': './components/error-handling/EnhancedErrorBoundary',
+  '@/components/error-handling/ErrorBoundary': './components/error-handling/ErrorBoundary',
   '@/components/error-handling': './components/error-handling',
   
   // Components - Accessibility

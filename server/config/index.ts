@@ -249,6 +249,7 @@ const securityConfigSchema = z.object({
     scriptSrc: z.array(z.string()).default(["'self'"]),
     connectSrc: z.array(z.string()).default(["'self'"]),
     objectSrc: z.array(z.string()).default(["'none'"]),
+    frameAncestors: z.array(z.string()).default(["'none'"]),
     upgradeInsecureRequests: z.boolean().default(false),
   }),
 });
@@ -583,6 +584,7 @@ function createBaseConfig(): AppConfig {
         scriptSrc: ["'self'"],
         connectSrc: ["'self'"],
         objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
         upgradeInsecureRequests: false,
       },
     },

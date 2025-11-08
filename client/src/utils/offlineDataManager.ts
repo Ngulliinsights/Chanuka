@@ -38,6 +38,7 @@ class OfflineDataManager {
   private readonly actionsStore = 'offline-actions';
   private readonly cacheStore = 'offline-cache';
   private readonly analyticsStore = 'offline-analytics';
+  private pendingRequests = new Map<string, Promise<any>>();
 
   async init(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -243,6 +244,33 @@ class OfflineDataManager {
     fetchFn: () => Promise<T>,
     fallbackData?: T
   ): Promise<T> {
+    // Check if there's already a pending request for this key
+    const existingRequest = this.pendingRequests.get(key);
+    if (existingRequest) {
+      logger.debug('Deduplicating request for key', { component: 'OfflineDataManager', key });
+      return existingRequest;
+    }
+
+    // Create the request promise
+    const requestPromise = this.performGetOfflineDataWithFallback(key, fetchFn, fallbackData);
+
+    // Store it in pending requests
+    this.pendingRequests.set(key, requestPromise);
+
+    try {
+      const result = await requestPromise;
+      return result;
+    } finally {
+      // Clean up the pending request
+      this.pendingRequests.delete(key);
+    }
+  }
+
+  private async performGetOfflineDataWithFallback<T = any>(
+    key: string,
+    fetchFn: () => Promise<T>,
+    fallbackData?: T
+  ): Promise<T> {
     // Try to get from offline cache first
     const cached = await this.getOfflineData<T>(key);
     if (cached !== null) {
@@ -254,6 +282,7 @@ class OfflineDataManager {
       const freshData = await fetchFn();
       // Cache the fresh data for future offline use
       await this.setOfflineData(key, freshData);
+      logger.debug('Fetched and cached fresh data', { component: 'OfflineDataManager', key });
       return freshData;
     } catch (error) {
       // If fetch fails and we have fallback data, return it
@@ -261,6 +290,7 @@ class OfflineDataManager {
         logger.warn('Using fallback data due to fetch failure', { component: 'OfflineDataManager', key, error });
         return fallbackData;
       }
+      logger.error('Fetch failed and no fallback available', { component: 'OfflineDataManager', key, error });
       throw error;
     }
   }

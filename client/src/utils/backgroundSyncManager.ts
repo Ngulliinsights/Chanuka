@@ -23,6 +23,7 @@ export interface SyncStatus {
 
 class BackgroundSyncManager {
   private isInitialized = false;
+  private autoSyncCleanup: (() => void) | null = null;
 
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
@@ -91,6 +92,15 @@ class BackgroundSyncManager {
     }
   }
 
+  // Cleanup method to remove event listeners
+  cleanup(): void {
+    if (this.autoSyncCleanup) {
+      this.autoSyncCleanup();
+      this.autoSyncCleanup = null;
+      logger.info('Background sync manager cleaned up', { component: 'BackgroundSyncManager' });
+    }
+  }
+
   // Convenience methods for common actions
   async queueApiRequest(
     method: string,
@@ -139,6 +149,11 @@ class BackgroundSyncManager {
   setupAutoSync(): () => void {
     if (typeof window === 'undefined') return () => {};
 
+    // Clean up existing listener if any
+    if (this.autoSyncCleanup) {
+      this.autoSyncCleanup();
+    }
+
     const handleOnline = () => {
       logger.info('Connection restored, triggering sync', { component: 'BackgroundSyncManager' });
       this.triggerSync().catch(error => {
@@ -148,10 +163,13 @@ class BackgroundSyncManager {
 
     window.addEventListener('online', handleOnline);
 
-    // Cleanup function
-    return () => {
+    // Store cleanup function
+    this.autoSyncCleanup = () => {
       window.removeEventListener('online', handleOnline);
     };
+
+    // Return cleanup function for external use
+    return this.autoSyncCleanup;
   }
 }
 
@@ -164,7 +182,12 @@ if (typeof window !== 'undefined') {
     logger.error('Failed to initialize background sync manager', { component: 'BackgroundSyncManager', error });
   });
 
-  // Setup auto-sync
-  backgroundSyncManager.setupAutoSync();
+  // Setup auto-sync and store cleanup function
+  const cleanup = backgroundSyncManager.setupAutoSync();
+
+  // Add cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    cleanup();
+  });
 }
 

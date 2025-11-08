@@ -262,13 +262,21 @@ export class UserJourneyTracker {
       }
     }
 
-    // Calculate bounce rate
-    journey.bounceRate = journey.steps.length <= 1 ? 1 : 0;
+    // Calculate bounce rate - Fixed: Consider meaningful engagement (time spent > 5s or interactions > 0)
+    const meaningfulEngagement = journey.totalTimeSpent > 5000 || journey.steps.some(step => (step.interactionCount || 0) > 0);
+    journey.bounceRate = (journey.steps.length <= 1 && !meaningfulEngagement) ? 1 : 0;
 
     // Store completed journey
     this.journeys.set(session_id, journey);
     this.activeJourneys.delete(session_id);
     this.sessionStartTimes.delete(session_id);
+
+    // Clean up pageStartTimes for this session to prevent memory leaks
+    for (const key of this.pageStartTimes.keys()) {
+      if (key.startsWith(`${session_id}-`)) {
+        this.pageStartTimes.delete(key);
+      }
+    }
   }
 
   /**
@@ -604,6 +612,24 @@ export class UserJourneyTracker {
     for (const [sessionId, journey] of this.journeys.entries()) {
       if (journey.startTime < cutoffDate) {
         this.journeys.delete(sessionId);
+      }
+    }
+
+    // Also clear stale active journeys (inactive for more than 24 hours)
+    const activeCutoffDate = new Date();
+    activeCutoffDate.setHours(activeCutoffDate.getHours() - 24);
+
+    for (const [sessionId, journey] of this.activeJourneys.entries()) {
+      if (journey.startTime < activeCutoffDate) {
+        this.activeJourneys.delete(sessionId);
+        this.sessionStartTimes.delete(sessionId);
+
+        // Clean up pageStartTimes for stale active journeys
+        for (const key of this.pageStartTimes.keys()) {
+          if (key.startsWith(`${sessionId}-`)) {
+            this.pageStartTimes.delete(key);
+          }
+        }
       }
     }
   }

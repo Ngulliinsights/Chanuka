@@ -199,12 +199,15 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
   const onHealthChangeRef = useRef(onHealthChange);
   
   // Keep refs updated without causing re-renders
-  // This effect has no dependencies, so it runs after every render
-  // but it doesn't cause any cascading effects since it only updates refs
-  useEffect(() => {
+  // Use useCallback to ensure this effect only runs when callbacks actually change
+  const updateCallbackRefs = useCallback(() => {
     onConnectionChangeRef.current = onConnectionChange;
     onHealthChangeRef.current = onHealthChange;
-  });
+  }, [onConnectionChange, onHealthChange]);
+  
+  useEffect(() => {
+    updateCallbackRefs();
+  }, [updateCallbackRefs]);
 
   // Track previous connection state to detect meaningful changes
   // We store null initially to distinguish "first check" from "no change"
@@ -256,12 +259,19 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
   // Manual connection check with comprehensive error handling
   // This function can be called directly by consuming components for on-demand checks
   const performConnectionCheck = useCallback(async () => {
+    // Prevent state updates if component is unmounted
+    if (!isMountedRef.current) return;
+    
     setIsLoading(true);
     setError(null);
     
     try {
       const status = await checkConnection();
-      setConnectionStatus(status);
+      
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
+      
+      handleConnectionUpdate(status);
       
       // Extract the most relevant error for display
       if (status.errors && status.errors.length > 0) {
@@ -269,32 +279,42 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
         setError(corsError || status.errors[0] || null);
       }
     } catch (err) {
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
+      
       // Handle unexpected errors that weren't caught in checkConnection
       const errorMessage = err instanceof Error ? err.message : 'Connection check failed';
       setError(errorMessage);
       
       // Set a failed connection status on error so UI has complete information
-      setConnectionStatus({
+      const failedStatus: ConnectionInfo = {
         status: 'disconnected',
         latency: -1,
         last_checked: new Date(),
         apiReachable: false,
         corsEnabled: false,
         errors: [errorMessage]
-      });
+      };
+      
+      handleConnectionUpdate(failedStatus);
     } finally {
       // Always clear loading state, even if an error occurred
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
-  }, []);
+  }, [handleConnectionUpdate]);
 
   // Manual health check with smart state updates
   // Stable reference due to empty deps array (only depends on enableHealthChecks which is in the function body)
   const performHealthCheck = useCallback(async () => {
-    if (!enableHealthChecks) return;
+    if (!enableHealthChecks || !isMountedRef.current) return;
     
     try {
       const health = await checkApiHealth();
+      
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
       
       // Use functional setState to compare with previous health status
       // This prevents unnecessary re-renders when health status hasn't changed
@@ -319,10 +339,13 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       prevHealthRef.current = isNowHealthy || false;
       
     } catch (err) {
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
+      
       logger.error('Health check failed:', { component: 'Chanuka' }, err);
       
       // Set failed health status with all services marked as down
-      setHealthStatus({
+      const failedHealth: HealthStatus = {
         healthy: false,
         services: {},
         timestamp: new Date(),
@@ -330,7 +353,9 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
         frontend: false,
         database: false,
         latency: 0
-      });
+      };
+      
+      setHealthStatus(failedHealth);
       
       // Notify listeners of health status change
       if (prevHealthRef.current !== false) {
@@ -345,14 +370,36 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     return await diagnoseConnection();
   }, []);
 
+  // Track active intervals and cleanup functions to prevent memory leaks
+  const intervalRefs = useRef<{
+    connectionInterval?: NodeJS.Timeout;
+    healthInterval?: NodeJS.Timeout;
+  }>({});
+  
+  // Track component mount state to prevent state updates after unmount
+  const isMountedRef = useRef(true);
+  
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Setup connection monitoring with proper cleanup
   // This effect manages the lifecycle of connection monitoring
   useEffect(() => {
     if (!autoStart) return;
 
-    // In a real implementation, these would add listeners to a connection monitor singleton
-    // connectionMonitor.addListener(handleConnectionUpdate);
-    // connectionMonitor.start(checkInterval);
+    // Perform initial connection check
+    performConnectionCheck();
+    
+    // Set up periodic connection checks
+    intervalRefs.current.connectionInterval = setInterval(() => {
+      if (isMountedRef.current) {
+        performConnectionCheck();
+      }
+    }, checkInterval);
     
     // Perform initial health check if enabled
     // This ensures we have health data immediately rather than waiting for the first interval
@@ -360,13 +407,15 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       performHealthCheck();
     }
 
-    // Cleanup function removes listener and stops monitoring
+    // Cleanup function removes intervals and prevents memory leaks
     // This is critical for preventing memory leaks when components unmount
     return () => {
-      // connectionMonitor.removeListener(handleConnectionUpdate);
-      // connectionMonitor.stop();
+      if (intervalRefs.current.connectionInterval) {
+        clearInterval(intervalRefs.current.connectionInterval);
+        intervalRefs.current.connectionInterval = undefined;
+      }
     };
-  }, [autoStart, checkInterval, enableHealthChecks, handleConnectionUpdate, performHealthCheck]);
+  }, [autoStart, checkInterval, enableHealthChecks, performConnectionCheck, performHealthCheck]);
 
   // Periodic health checks with separate interval
   // Health checks run less frequently than connection checks to reduce API load
@@ -376,12 +425,19 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
 
     // Health checks run at 2x the connection check interval
     // This reduced frequency is appropriate since health status typically changes less often
-    const healthCheckInterval = setInterval(() => {
-      performHealthCheck();
+    intervalRefs.current.healthInterval = setInterval(() => {
+      if (isMountedRef.current) {
+        performHealthCheck();
+      }
     }, checkInterval * 2);
 
     // Clear interval on cleanup to prevent checks after unmount
-    return () => clearInterval(healthCheckInterval);
+    return () => {
+      if (intervalRefs.current.healthInterval) {
+        clearInterval(intervalRefs.current.healthInterval);
+        intervalRefs.current.healthInterval = undefined;
+      }
+    };
   }, [enableHealthChecks, autoStart, checkInterval, performHealthCheck]);
 
   // Memoize derived state to prevent unnecessary recalculations
@@ -433,18 +489,39 @@ export function useConnectionStatus(): {
 } {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
+  
+  // Track component mount state to prevent state updates after unmount
+  const isMountedRef = useRef(true);
+  
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
-    // Browser online/offline event handlers
+    // Browser online/offline event handlers with mount state checking
     // These track the browser's network connectivity state
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    const handleOnline = () => {
+      if (isMountedRef.current) {
+        setIsOnline(true);
+      }
+    };
+    
+    const handleOffline = () => {
+      if (isMountedRef.current) {
+        setIsOnline(false);
+      }
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Connection monitor listener with smart updates
+    // Connection monitor listener with smart updates and mount state checking
     const handleConnectionUpdate = (info: ConnectionInfo) => {
+      if (!isMountedRef.current) return;
+      
       setConnectionInfo(prevInfo => {
         // Skip update if connection status hasn't changed
         // This prevents unnecessary re-renders when only transient properties change

@@ -48,7 +48,7 @@ This document outlines a systematic approach to fix the 663 TypeScript errors in
 
 2. **Fix error-handling component imports**
    - ✅ Update ErrorFallback.tsx imports
-   - ✅ Update EnhancedErrorBoundary.tsx imports
+   - ✅ Update ErrorBoundary.tsx imports
    - ✅ Fix utility function imports
 
 3. **Fix critical module resolution issues**

@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const mountedRef = useRef(true);
   const validationInProgressRef = useRef(false);
+  const tokenBeingValidatedRef = useRef<string | null>(null);
 
   // Helper function for making cancellable requests
   const makeCancellableRequest = async (url: string, options: RequestInit = {}, abortController: AbortController) => {
@@ -86,6 +87,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Store the token we're validating to detect changes
+    tokenBeingValidatedRef.current = token;
     validationInProgressRef.current = true;
 
     try {
@@ -99,7 +102,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         const result = await response.json();
         if (result.success && result.data?.user) {
-          if (mountedRef.current) {
+          // Only update if the token being validated is still current
+          if (mountedRef.current && tokenBeingValidatedRef.current === token) {
             setUser(result.data.user);
           }
         } else {
@@ -125,6 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } finally {
       validationInProgressRef.current = false;
+      tokenBeingValidatedRef.current = null;
       if (mountedRef.current) {
         setLoading(false);
       }
@@ -394,4 +399,3 @@ export function useAuth() {
   }
   return context;
 }
-

@@ -173,15 +173,38 @@ class CacheInvalidationManager {
   }
 
   // Dependency-based invalidation
-  async invalidateDependencies(key: string): Promise<void> {
+  async invalidateDependencies(key: string, visited: Set<string> = new Set()): Promise<void> {
+    // Prevent infinite recursion by detecting cycles
+    if (visited.has(key)) {
+      logger.warn('Cycle detected in dependency invalidation, skipping to prevent infinite recursion', {
+        component: 'CacheInvalidationManager',
+        key,
+        visited: Array.from(visited)
+      });
+      return;
+    }
+
     const entry = this.cache.get(key);
     if (!entry) return;
 
+    visited.add(key);
     const dependencies = [...entry.dependencies];
-    for (const dep of dependencies) {
-      await this.invalidate(dep);
-      // Recursively invalidate dependencies of dependencies
-      await this.invalidateDependencies(dep);
+
+    try {
+      for (const dep of dependencies) {
+        await this.invalidate(dep);
+        // Recursively invalidate dependencies of dependencies
+        await this.invalidateDependencies(dep, visited);
+      }
+    } catch (error) {
+      logger.error('Error during dependency invalidation', {
+        component: 'CacheInvalidationManager',
+        key,
+        error
+      });
+      throw error;
+    } finally {
+      visited.delete(key);
     }
   }
 

@@ -5,6 +5,39 @@ import { NavigationPreferences } from '../types/navigation';
 
 const PREFERENCES_STORAGE_KEY = 'navigation-preferences';
 
+// Deep equality check for navigation preferences to avoid JSON.stringify issues
+function deepEqual(obj1: any, obj2: any): boolean {
+  if (obj1 === obj2) return true;
+  
+  if (obj1 == null || obj2 == null) return obj1 === obj2;
+  
+  if (typeof obj1 !== typeof obj2) return false;
+  
+  if (typeof obj1 !== 'object') return obj1 === obj2;
+  
+  if (Array.isArray(obj1) !== Array.isArray(obj2)) return false;
+  
+  if (Array.isArray(obj1)) {
+    if (obj1.length !== obj2.length) return false;
+    for (let i = 0; i < obj1.length; i++) {
+      if (!deepEqual(obj1[i], obj2[i])) return false;
+    }
+    return true;
+  }
+  
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  
+  if (keys1.length !== keys2.length) return false;
+  
+  for (const key of keys1) {
+    if (!keys2.includes(key)) return false;
+    if (!deepEqual(obj1[key], obj2[key])) return false;
+  }
+  
+  return true;
+}
+
 export function useNavigationPreferences() {
   const { preferences, updatePreferences } = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
@@ -12,13 +45,16 @@ export function useNavigationPreferences() {
   // Load preferences from localStorage on mount only
   // This runs once when the component mounts to hydrate preferences from storage
   useEffect(() => {
+    let mounted = true;
+    
     const loadPreferences = async () => {
       try {
         const stored = localStorage.getItem(PREFERENCES_STORAGE_KEY);
-        if (stored) {
+        if (stored && mounted) {
           const parsedPreferences = JSON.parse(stored);
-          // Only update if preferences are different to prevent infinite loops
-          if (JSON.stringify(parsedPreferences) !== JSON.stringify(preferences)) {
+          // Use deep equality check instead of JSON.stringify to prevent property order issues
+          const hasChanged = !deepEqual(preferences, parsedPreferences);
+          if (hasChanged) {
             updatePreferences(parsedPreferences);
           }
         }
@@ -26,11 +62,20 @@ export function useNavigationPreferences() {
         logger.error('Failed to load navigation preferences:', { component: 'NavigationPreferences' }, error);
       } finally {
         // Mark loading as complete regardless of success or failure
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    loadPreferences();
+    // Only load on initial mount when preferences are still default
+    if (isLoading) {
+      loadPreferences();
+    }
+    
+    return () => {
+      mounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array ensures this runs only once on mount
 

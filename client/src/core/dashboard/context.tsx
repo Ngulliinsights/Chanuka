@@ -3,7 +3,7 @@
  * Best practices: Widget-based architecture, data management, permissions
  */
 
-import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, useMemo } from 'react';
 import { DashboardState, DashboardAction, DashboardConfig, WidgetConfig, DashboardLayout, DashboardSettings } from './types';
 import { dashboardReducer } from './reducer';
 import { logger } from '../../utils/browser-logger';
@@ -165,7 +165,7 @@ export function createDashboardProvider(
       return state.widgetErrors[widgetId] || null;
     }, [state.widgetErrors]);
 
-    const value: DashboardContextValue = {
+    const value: DashboardContextValue = useMemo(() => ({
       state,
       loadDashboard,
       saveDashboard,
@@ -179,7 +179,21 @@ export function createDashboardProvider(
       getWidgetData,
       isWidgetLoading,
       getWidgetError,
-    };
+    }), [
+      state,
+      loadDashboard,
+      saveDashboard,
+      updateSettings,
+      addWidget,
+      removeWidget,
+      updateWidget,
+      refreshWidget,
+      refreshAllWidgets,
+      updateLayout,
+      getWidgetData,
+      isWidgetLoading,
+      getWidgetError,
+    ]);
 
     return (
       <DashboardContext.Provider value={value}>

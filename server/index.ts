@@ -1,4 +1,4 @@
-// Add diagnostic logging at the very top
+// Diagnostic logging at startup for debugging environment configuration
 console.log('🔍 DIAGNOSTIC: Server startup initiated');
 console.log('🔍 DIAGNOSTIC: Environment variables check:', {
   DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
@@ -6,15 +6,15 @@ console.log('🔍 DIAGNOSTIC: Environment variables check:', {
   ENCRYPTION_KEY: process.env.ENCRYPTION_KEY ? 'SET' : 'NOT SET',
   KEY_DERIVATION_SALT: process.env.KEY_DERIVATION_SALT ? 'SET' : 'NOT SET',
 });
+
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response, NextFunction, Express } from 'express';
 import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { createServer } from 'http';
+import { createServer, Server } from 'http';
 import helmet from 'helmet';
 import { database as db } from '../shared/database/connection.js';
 import { config } from './config/index.js';
+
 // Feature Routes
 import { router as systemRouter } from './features/admin/system.js';
 import { router as billsRouter } from './features/bills/presentation/bills-router.js';
@@ -25,48 +25,87 @@ import { billTrackingRouter } from './features/bills/presentation/bill-tracking.
 import analyticsRouter from './features/analytics/analytics.js';
 import { sponsorsRouter } from './features/sponsors/presentation/sponsors.routes.js';
 import { router as authRouter } from './core/auth/auth.js';
-import { router as usersRouter } from './features/users/application/users.js';
+// Fixed: Use profile router as users router since there's no dedicated users router
+import { router as usersRouter } from './features/users/application/profile.js';
 import { router as verificationRouter } from './features/users/application/verification.js';
 import { router as communityRouter } from './features/community/community.js';
-
 import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
 import { router as searchRouter } from './features/search/presentation/SearchController.js';
 import { router as profileRouter } from './features/users/application/profile.js';
 import { router as privacyRouter } from './features/privacy/privacy-routes.js';
-import { KenyanGovernmentDataIntegrationService } from './features/government-data/routes.js';
 import { router as adminRouter } from './features/admin/admin.js';
 import { router as cacheRouter } from './infrastructure/cache/cache.js';
 import { cacheCoordinator } from './infrastructure/cache/index.js';
-// import { router as realTimeTrackingRouter } from './features/bills/real-time-tracking.js'; // TODO: Implement real-time tracking router
-// import { router as alertPreferencesRouter } from './features/alert-preferences/presentation/routes/unified-alert-routes.js'; // TODO: Fix missing dependencies
-// import engagementAnalyticsRouter from './features/analytics/engagement-analytics.js'; // TODO: Implement engagement analytics router
-// import { sponsorConflictAnalysisRouter } from './features/bills/sponsor-conflict-analysis.js'; // TODO: Implement sponsor conflict analysis router
-// import { votingPatternAnalysisRouter } from './features/bills/voting-pattern-analysis.js'; // TODO: Implement voting pattern analysis router
-// import { createFinancialDisclosureRouter } from './features/analytics/financial-disclosure/index.js'; // TODO: Fix financial disclosure router
-// import financialDisclosureIntegrationRouter from './features/analytics/financial-disclosure-integration.js'; // TODO: Implement financial disclosure integration router
-// import { router as transparencyDashboardRouter } from './features/analytics/transparency-dashboard.js'; // TODO: Implement transparency dashboard router
-// import { getMonitoringService } from './infrastructure/monitoring/monitoring.js'; // TODO: Initialize monitoring router
 import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
 import { router as externalApiDashboardRouter } from './features/admin/external-api-dashboard.js';
 import coverageRouter from './features/coverage/coverage-routes.js';
 import { constitutionalAnalysisRouter } from './features/constitutional-analysis/presentation/constitutional-analysis-router.js';
 import { argumentIntelligenceRouter } from './features/argument-intelligence/presentation/argument-intelligence-router.js';
-// Import migrated middleware
-import {
-  migratedAuthenticateToken,
-  migratedRequireRole,
-  migratedCreateRateLimit,
-  migratedApiRateLimit,
-  migratedAuthRateLimit,
-  migratedSponsorRateLimit,
-  migratedSearchRateLimit,
-  migratedPasswordResetRateLimit,
-  migratedRegistrationRateLimit
-} from './middleware/migration-wrapper.js';
 
-// Use migrated middleware
-const errorHandler = (err: any, req: any, res: any, next: any) => {
-  logger.error('Request error:', { error: err.message, path: req.path });
+// Middleware imports
+import { migratedApiRateLimit } from './middleware/migration-wrapper.js';
+
+// Infrastructure Services
+import { auditMiddleware } from './infrastructure/monitoring/audit-log.js';
+// Fixed: Import the correct export (performanceMonitor, not performanceMiddleware)
+import { performanceMonitor } from './infrastructure/monitoring/performance-monitor.js';
+
+// Create performance middleware from performanceMonitor
+const performanceMiddleware = (req: any, res: any, next: any) => {
+  const operationId = performanceMonitor.startOperation('http', `${req.method} ${req.path}`, {
+    method: req.method,
+    path: req.path,
+    userAgent: req.get('User-Agent')
+  });
+  
+  res.on('finish', () => {
+    performanceMonitor.endOperation(operationId, res.statusCode < 400, undefined, {
+      statusCode: res.statusCode,
+      responseTime: Date.now() - req.startTime
+    });
+  });
+  
+  next();
+};
+import { setupVite } from './vite.js';
+import { databaseFallbackService } from "./infrastructure/database/database-fallback.js";
+import { webSocketService } from './infrastructure/websocket.js';
+import { notificationSchedulerService } from './infrastructure/notifications/index.js';
+import { monitoringScheduler } from './infrastructure/monitoring/monitoring-scheduler.js';
+import { sessionCleanupService } from './core/auth/session-cleanup.js';
+import { securityMonitoringService } from './features/security/security-monitoring-service.js';
+import { privacySchedulerService } from './features/privacy/privacy-scheduler.js';
+
+// Unified utilities
+import { logger, Performance, ApiResponse } from '../shared/core/index.js';
+
+// Type definitions for better error handling
+interface AppError extends Error {
+  statusCode?: number;
+  status?: number;
+  code?: string;
+  type?: string;
+}
+
+interface LogContext {
+  component?: string;
+  error?: string;
+  [key: string]: any;
+}
+
+// Simple monitoring initialization
+const initializeMonitoring = (env: string): void => {
+  logger.info('Performance monitoring initialized', { environment: env } as LogContext);
+};
+
+// Application instance with proper typing
+export const app: Express = express();
+const PORT = config.server.port;
+const isDevelopment = config.server.nodeEnv === 'development';
+
+// Error handler middleware with proper typing
+const errorHandler = (err: AppError, req: Request, res: Response, next: NextFunction): void => {
+  logger.error('Request error:', { error: err.message, path: req.path, component: 'Chanuka' } as LogContext);
 
   const statusCode = err.statusCode || err.status || 500;
   const response = ApiResponse.error(
@@ -78,7 +117,8 @@ const errorHandler = (err: any, req: any, res: any, next: any) => {
   res.status(statusCode).json(response);
 };
 
-const requestLogger = (req: any, res: any, next: any) => {
+// Request logger middleware with performance tracking
+const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
   const timer = Performance.startTimer(`${req.method} ${req.path}`);
 
   res.on('finish', () => {
@@ -87,57 +127,29 @@ const requestLogger = (req: any, res: any, next: any) => {
       method: req.method,
       url: req.url,
       statusCode: res.statusCode,
-      duration
-    });
+      duration,
+      component: 'Chanuka'
+    } as LogContext);
   });
 
   next();
 };
 
-// Use migrated rate limit middleware
-const apiRateLimit = migratedApiRateLimit;
-
+// Security monitoring middleware
 const securityMonitoringMiddleware = {
-  initializeAll: () => (req: any, res: any, next: any) => {
+  initializeAll: () => (req: Request, res: Response, next: NextFunction): void => {
     logger.debug('Security monitoring', {
       ip: req.ip,
       user_agent: req.get('User-Agent'),
       path: req.path,
-      method: req.method
-    });
+      method: req.method,
+      component: 'Chanuka'
+    } as LogContext);
     next();
   }
 };
-// Infrastructure Services
-import { auditMiddleware } from './infrastructure/monitoring/audit-log.js';
-import { performanceMiddleware } from './infrastructure/monitoring/performance-monitor.js';
-import { setupVite } from './vite.js';
-// import { initializeDatabase, validateDatabaseHealth } from "./utils/db-init.js";
-import { databaseFallbackService } from "./infrastructure/database/database-fallback.js";
-import { webSocketService } from './infrastructure/websocket.js';
-// import { billStatusMonitorService as billStatusMonitor } from './features/bills/bill-status-monitor.js';
-import { notificationSchedulerService } from './infrastructure/notifications/index.js';
-import { monitoringScheduler } from './infrastructure/monitoring/monitoring-scheduler.js';
-import { sessionCleanupService } from './core/auth/session-cleanup.js';
-// import { SearchIndexManager } from './features/search/infrastructure/SearchIndexManager.js';
-import { securityMonitoringService } from './features/security/security-monitoring-service.js';
-import { privacySchedulerService } from './features/privacy/privacy-scheduler.js';
-// Unified utilities (consolidated from sprawl)
-import { logger, Performance, RateLimit, ApiResponse } from '../shared/core/index.js';
 
-// Simple monitoring initialization
-const initializeMonitoring = (env: string) => {
-  logger.info('Performance monitoring initialized', { environment: env });
-};
-// import { serveSwagger, setupSwagger } from './features/analytics/swagger.js';
-
-const __dirname = path.resolve();
-
-export const app = express();
-const PORT = config.server.port;
-const isDevelopment = config.server.nodeEnv === 'development';
-
-// Security middleware (should be early in the pipeline)
+// Security middleware configuration
 if (config.security.enableHelmet) {
   app.use(helmet({
     contentSecurityPolicy: {
@@ -147,23 +159,23 @@ if (config.security.enableHelmet) {
         fontSrc: config.security.contentSecurityPolicy.fontSrc,
         imgSrc: config.security.contentSecurityPolicy.imgSrc,
         scriptSrc: isDevelopment
-          ? ["'self'", "'unsafe-eval'", "'unsafe-inline'"] // Allow eval in development for HMR
+          ? ["'self'", "'unsafe-eval'", "'unsafe-inline'"]
           : config.security.contentSecurityPolicy.scriptSrc,
         connectSrc: isDevelopment
-          ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`, `http://localhost:${PORT}`, `http://localhost:${PORT + 1}`, "ws://localhost:4201", "http://localhost:4201"] // Allow WebSocket and HTTP for app and HMR
+          ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`, `http://localhost:${PORT}`, `http://localhost:${PORT + 1}`, "ws://localhost:4201", "http://localhost:4201"]
           : config.security.contentSecurityPolicy.connectSrc,
         objectSrc: config.security.contentSecurityPolicy.objectSrc,
+        frameAncestors: config.security.contentSecurityPolicy.frameAncestors,
         upgradeInsecureRequests: config.security.contentSecurityPolicy.upgradeInsecureRequests ? [] : null,
       },
     },
-    crossOriginEmbedderPolicy: false, // Disable for development compatibility
+    crossOriginEmbedderPolicy: false,
   }));
 }
 
-// Enhanced CORS configuration
-const corsOptions = {
+// Enhanced CORS configuration with proper typing
+const corsOptions: cors.CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) {
       return callback(null, true);
     }
@@ -173,10 +185,10 @@ const corsOptions = {
         `http://localhost:${PORT}`,
         `http://127.0.0.1:${PORT}`,
         `http://0.0.0.0:${PORT}`,
-        'http://localhost:3000', // Common React dev port
-        'http://localhost:5173', // Default Vite dev port
-        'http://localhost:5174', // Alternative Vite dev port
-        'http://localhost:4200', // Current server port for frontend
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:4200',
       ]
       : config.server.frontendUrl ? [config.server.frontendUrl] : [origin];
 
@@ -192,18 +204,16 @@ const corsOptions = {
   allowedHeaders: config.cors.allowedHeaders,
   exposedHeaders: config.cors.exposedHeaders,
   maxAge: config.cors.maxAge,
-  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
-  preflightContinue: false // Pass control to the next handler
+  optionsSuccessStatus: 200,
+  preflightContinue: false
 };
 
 app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
 app.options('*', cors(corsOptions));
 
-// Body parsing middleware with error handling
+// Body parsing middleware with robust error handling
 app.use(express.json({
-  limit: '10mb', // TODO: Make configurable
+  limit: '10mb',
   verify: (req, res, buf) => {
     try {
       JSON.parse(buf.toString());
@@ -218,12 +228,11 @@ app.use(express.json({
 
 app.use(express.urlencoded({
   extended: true,
-  limit: '10mb', // TODO: Make configurable
+  limit: '10mb',
   verify: (req, res, buf) => {
-    // Basic validation for URL-encoded data
     if (buf.length === 0) return;
     const str = buf.toString();
-    if (str.length > 10 * 1024 * 1024) { // 10MB check
+    if (str.length > 10 * 1024 * 1024) {
       res.statusCode = 413;
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify({ error: 'Request entity too large' }));
@@ -232,32 +241,22 @@ app.use(express.urlencoded({
   }
 }));
 
-// Temporarily disable service availability middleware to fix 503 errors
-// import { serviceAvailabilityMiddleware } from './middleware/service-availability.js';
-// import { resourceAvailabilityMiddleware } from './middleware/resource-availability.js';
-// app.use(serviceAvailabilityMiddleware);
-// app.use(resourceAvailabilityMiddleware);
-
-// Request logging and monitoring
+// Request monitoring and logging pipeline
 app.use(requestLogger);
 app.use(performanceMiddleware);
-app.use(apiRateLimit);
+app.use(migratedApiRateLimit);
 app.use(auditMiddleware);
-
-// Security monitoring middleware (should be early in the pipeline)
 app.use(securityMonitoringMiddleware.initializeAll());
 
-// All routers are now imported directly - no setup needed
-
 // Root API endpoint
-app.get('/api', (req, res) => {
+app.get('/api', (req: Request, res: Response) => {
   res.json({
     message: "Chanuka Legislative Transparency Platform API",
     version: "1.0.0",
     environment: config.server.nodeEnv,
     frontend_serving: isDevelopment ? 'vite_dev_server' : 'static_files',
     endpoints: {
-      bills: "/api/bills (includes workarounds)",
+      bills: "/api/bills",
       sponsors: "/api/sponsors",
       analysis: "/api/analysis",
       sponsorship: "/api/sponsorship",
@@ -273,8 +272,8 @@ app.get('/api', (req, res) => {
   });
 });
 
-// Frontend serving health check
-app.get('/api/frontend-health', (req, res) => {
+// Health check endpoints
+app.get('/api/frontend-health', (req: Request, res: Response) => {
   const memUsage = process.memoryUsage();
   const healthStatus = {
     status: 'ok',
@@ -295,7 +294,6 @@ app.get('/api/frontend-health', (req, res) => {
     }
   };
 
-  // Set CORS headers explicitly for health check
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
@@ -304,8 +302,7 @@ app.get('/api/frontend-health', (req, res) => {
   res.json(healthStatus);
 });
 
-// Simple service status endpoint
-app.get('/api/service-status', (req, res) => {
+app.get('/api/service-status', (req: Request, res: Response) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   
@@ -317,32 +314,14 @@ app.get('/api/service-status', (req, res) => {
   });
 });
 
-// Memory analysis endpoint for debugging high memory usage
-app.get('/api/debug/memory-analysis', (req, res) => {
+// Memory analysis endpoint for debugging
+app.get('/api/debug/memory-analysis', (req: Request, res: Response) => {
   try {
-    logger.info('🔍 Triggering detailed memory analysis...', { component: 'Chanuka' });
+    logger.info('🔍 Triggering detailed memory analysis...', { component: 'Chanuka' } as LogContext);
 
-    // WebSocket memory analysis
     const wsAnalysis = webSocketService.forceMemoryAnalysis();
-
-    // Overall memory usage
     const memUsage = process.memoryUsage();
     const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
-
-    // Search index manager analysis
-    const searchAnalysis = {
-      performanceHistorySize: 0, // TODO: Update with new SearchIndexManager API
-      indexUpdateQueueSize: 0,
-      isProcessingQueue: false
-    };
-
-    // Security monitoring analysis
-    const securityAnalysis = {
-      alertHandlers: securityMonitoringService['alertHandlers']?.size || 0,
-      complianceChecks: securityMonitoringService['complianceChecks']?.size || 0,
-      activeIntervals: securityMonitoringService['activeTimers']?.intervals?.length || 0,
-      activeTimeouts: securityMonitoringService['activeTimers']?.timeouts?.size || 0
-    };
 
     const analysis = {
       timestamp: new Date().toISOString(),
@@ -353,26 +332,24 @@ app.get('/api/debug/memory-analysis', (req, res) => {
         external: `${(memUsage.external / 1024 / 1024).toFixed(2)} MB`,
         rss: `${(memUsage.rss / 1024 / 1024).toFixed(2)} MB`
       },
-      webSocket: wsAnalysis,
-      searchIndex: searchAnalysis,
-      securityMonitoring: securityAnalysis
+      webSocket: wsAnalysis
     };
 
-    // Set CORS headers
     res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.header('Access-Control-Allow-Credentials', 'true');
 
     res.json(analysis);
   } catch (error) {
-    logger.error('Error in memory analysis:', error, { component: 'Chanuka' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error in memory analysis:', { error: errorMessage, component: 'Chanuka' } as LogContext);
     res.status(500).json({
       error: 'Failed to perform memory analysis',
-      details: error instanceof Error ? error.message : String(error)
+      details: errorMessage
     });
   }
 });
 
-// API Routes
+// API Routes registration
 app.use('/api/system', systemRouter);
 app.use('/api/bills', billsRouter);
 app.use('/api/sponsorship', sponsorshipRouter);
@@ -384,40 +361,23 @@ app.use('/api/sponsors', sponsorsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/verification', verificationRouter);
-// app.use('/api/health', healthRouter); // TODO: Create health router
 app.use('/api/community', communityRouter);
-
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/privacy', privacyRouter);
-// app.use('/api/government-data', governmentDataRouter); // TODO: Create router for government data service
 app.use('/api/admin', adminRouter);
 app.use('/api/cache', cacheRouter);
-// app.use('/api/real-time', realTimeTrackingRouter); // TODO: Implement real-time tracking router
-// app.use('/api/alert-preferences', alertPreferencesRouter); // TODO: Fix missing dependencies
-// app.use('/api/engagement-analytics', engagementAnalyticsRouter); // TODO: Implement engagement analytics router
-// app.use('/api', sponsorConflictAnalysisRouter); // TODO: Implement sponsor conflict analysis router
-// app.use('/api', votingPatternAnalysisRouter); // TODO: Implement voting pattern analysis router
-// app.use('/api/financial-disclosure-integration', financialDisclosureIntegrationRouter); // TODO: Implement financial disclosure integration router
-// app.use('/api/transparency', transparencyDashboardRouter); // TODO: Implement transparency dashboard router
-// app.use('/api/monitoring', monitoringRouter); // TODO: Initialize monitoring router
 app.use('/api/external-api', externalApiManagementRouter);
 app.use('/api/admin/external-api', externalApiDashboardRouter);
-// TODO: Implement security monitoring router
-// app.use('/api/security', securityMonitoringRouter);
 app.use('/api/coverage', coverageRouter);
 app.use('/api/constitutional-analysis', constitutionalAnalysisRouter);
 app.use('/api/argument-intelligence', argumentIntelligenceRouter);
 
-// Swagger API documentation
-// app.use('/api-docs', serveSwagger, setupSwagger);
-
 // API-specific error handling middleware
-app.use('/api', (error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error('API Error:', error, { component: 'Chanuka' });
+app.use('/api', (error: AppError, req: Request, res: Response, next: NextFunction) => {
+  logger.error('API Error:', { error: error.message, component: 'Chanuka' } as LogContext);
 
-  // Handle CORS errors
   if (error.message && error.message.includes('CORS')) {
     return res.status(403).json({
       error: 'CORS policy violation',
@@ -427,7 +387,6 @@ app.use('/api', (error: any, req: express.Request, res: express.Response, next: 
     });
   }
 
-  // Handle JSON parsing errors
   if (error.type === 'entity.parse.failed') {
     return res.status(400).json({
       error: 'Invalid JSON in request body',
@@ -437,7 +396,6 @@ app.use('/api', (error: any, req: express.Request, res: express.Response, next: 
     });
   }
 
-  // Handle request size errors
   if (error.type === 'entity.too.large') {
     return res.status(413).json({
       error: 'Request entity too large',
@@ -447,7 +405,6 @@ app.use('/api', (error: any, req: express.Request, res: express.Response, next: 
     });
   }
 
-  // Handle timeout errors
   if (error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
     return res.status(408).json({
       error: 'Request timeout',
@@ -457,7 +414,6 @@ app.use('/api', (error: any, req: express.Request, res: express.Response, next: 
     });
   }
 
-  // Default API error response
   res.status(error.status || 500).json({
     error: error.message || 'Internal server error',
     code: error.code || 'INTERNAL_ERROR',
@@ -469,26 +425,25 @@ app.use('/api', (error: any, req: express.Request, res: express.Response, next: 
 // General error handling
 app.use(errorHandler);
 
-// Test database connection
-async function testConnection() {
+// Database connection test
+async function testConnection(): Promise<void> {
   try {
     await db.execute('SELECT 1');
-    logger.info('Database connection established successfully', { component: 'Chanuka' });
+    logger.info('Database connection established successfully', { component: 'Chanuka' } as LogContext);
   } catch (error) {
-    logger.error('Database connection failed:', error, { component: 'Chanuka' });
-    logger.info('Server will continue in development mode without database', { component: 'Chanuka' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Database connection failed:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.info('Server will continue in development mode without database', { component: 'Chanuka' } as LogContext);
   }
 }
 
-// Initialize database with fallback support
-let databaseStatus = { connected: false, initialized: false };
+// Startup initialization with proper state management
 let initializationInProgress = false;
 let initializationPromise: Promise<void> | null = null;
 
-async function startupInitialization() {
-  // Prevent multiple concurrent initializations
+async function startupInitialization(): Promise<void> {
   if (initializationInProgress) {
-    return initializationPromise;
+    return initializationPromise!;
   }
 
   if (initializationPromise) {
@@ -505,119 +460,62 @@ async function startupInitialization() {
   }
 }
 
-async function performStartupInitialization() {
-  logger.info('🚀 Starting Chanuka Platform...', { component: 'Chanuka' });
+async function performStartupInitialization(): Promise<void> {
+  logger.info('🚀 Starting Chanuka Platform...', { component: 'Chanuka' } as LogContext);
 
   try {
-    // Use the new database fallback service
     const dbConnected = await databaseFallbackService.initialize();
-
-    // Get comprehensive health status
     const healthInfo = await databaseFallbackService.getHealthInfo();
 
-    databaseStatus = {
-      connected: dbConnected,
-      initialized: healthInfo.database.connected
-    };
-
     if (dbConnected) {
-      logger.info('✅ Platform ready with full database functionality', { component: 'Chanuka' });
+      logger.info('✅ Platform ready with full database functionality', { component: 'Chanuka' } as LogContext);
     } else {
-      logger.info('⚠️  Platform starting in demonstration mode with sample data', { component: 'Chanuka' });
+      logger.info('⚠️  Platform starting in demonstration mode with sample data', { component: 'Chanuka' } as LogContext);
       console.log(`💡 ${healthInfo.system.message}`);
     }
   } catch (error) {
-    logger.error('❌ Startup initialization error:', error, { component: 'Chanuka' });
-    logger.info('🔄 Continuing with fallback mode...', { component: 'Chanuka' });
-
-    // Ensure demo mode is enabled on startup failure
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('❌ Startup initialization error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.info('🔄 Continuing with fallback mode...', { component: 'Chanuka' } as LogContext);
     databaseFallbackService.setDemoMode(true);
   }
 }
 
-// Run initialization without blocking
+// Initialize startup without blocking
 startupInitialization().catch(err => {
-  logger.info('Startup initialization error (non-blocking):', { component: 'Chanuka', error: err.message });
-  // Ensure demo mode is enabled on startup failure
+  const errorMessage = err instanceof Error ? err.message : String(err);
+  logger.info('Startup initialization error (non-blocking):', { component: 'Chanuka', error: errorMessage } as LogContext);
   databaseFallbackService.setDemoMode(true);
 });
 
-const server = createServer(app);
+const server: Server = createServer(app);
 
-// Graceful shutdown handling
-const gracefulShutdown = async (signal: string) => {
+// Graceful shutdown handler
+const gracefulShutdown = async (signal: string): Promise<void> => {
   console.log(`\n${signal} received. Starting graceful shutdown...`);
 
   try {
-    // 1. Stop accepting new connections first
-    logger.info('🛑 Stopping new connections...', { component: 'Chanuka' });
+    logger.info('🛑 Stopping new connections...', { component: 'Chanuka' } as LogContext);
+    logger.info('🧹 Cleaning up services...', { component: 'Chanuka' } as LogContext);
 
-    // 2. Clean up all services in reverse order of initialization
-    logger.info('🧹 Cleaning up services...', { component: 'Chanuka' });
+    // Cleanup services in reverse order of initialization
+    const cleanupTasks = [
+      { name: 'privacy scheduler', fn: () => { privacySchedulerService.stop(); privacySchedulerService.destroy(); } },
+      { name: 'security monitoring', fn: () => securityMonitoringService.shutdown() },
+      { name: 'session cleanup', fn: () => { sessionCleanupService.stop(); } },
+      { name: 'monitoring scheduler', fn: () => { monitoringScheduler.stop(); } },
+      { name: 'notification scheduler', fn: () => { notificationSchedulerService.cleanup(); } },
+      { name: 'cache coordinator', fn: () => { cacheCoordinator.stop(); } },
+      { name: 'WebSocket service', fn: () => webSocketService.shutdown() },
+    ];
 
-    // Clean up privacy scheduler
-    try {
-      privacySchedulerService.stop();
-      privacySchedulerService.destroy();
-    } catch (error) {
-      logger.error('Error stopping privacy scheduler:', error, { component: 'Chanuka' });
-    }
-
-    // Clean up security monitoring
-    try {
-      await securityMonitoringService.shutdown();
-    } catch (error) {
-      logger.error('Error stopping security monitoring:', error, { component: 'Chanuka' });
-    }
-
-    // Clean up search index manager
-    try {
-      // TODO: Implement shutdown for new SearchIndexManager
-    } catch (error) {
-      logger.error('Error stopping search index manager:', error, { component: 'Chanuka' });
-    }
-
-    // Clean up session cleanup service
-    try {
-      sessionCleanupService.stop();
-    } catch (error) {
-      logger.error('Error stopping session cleanup:', error, { component: 'Chanuka' });
-    }
-
-    // Clean up monitoring scheduler
-    try {
-      monitoringScheduler.stop();
-    } catch (error) {
-      logger.error('Error stopping monitoring scheduler:', error, { component: 'Chanuka' });
-    }
-
-    // Clean up notification scheduler
-    try {
-      notificationSchedulerService.cleanup();
-    } catch (error) {
-      logger.error('Error stopping notification scheduler:', error, { component: 'Chanuka' });
-    }
-
-    // Clean up notification services
-    try {
-      const { notificationService } = await import('./infrastructure/notifications/notification-service.js');
-      notificationService.cleanup();
-    } catch (error) {
-      logger.error('Error stopping notification service:', error, { component: 'Chanuka' });
-    }
-
-    // Clean up cache coordinator
-    try {
-      cacheCoordinator.stop();
-    } catch (error) {
-      logger.error('Error stopping cache coordinator:', error, { component: 'Chanuka' });
-    }
-
-    // Clean up WebSocket service
-    try {
-      await webSocketService.shutdown();
-    } catch (error) {
-      logger.error('Error stopping WebSocket service:', error, { component: 'Chanuka' });
+    for (const task of cleanupTasks) {
+      try {
+        await task.fn();
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error(`Error stopping ${task.name}:`, { error: errorMessage, component: 'Chanuka' } as LogContext);
+      }
     }
 
     // Close Vite dev server if running
@@ -625,44 +523,46 @@ const gracefulShutdown = async (signal: string) => {
       const { closeVite } = await import('./vite.js');
       await closeVite();
     } catch (error) {
-      logger.error('Error closing Vite server:', error, { component: 'Chanuka' });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Error closing Vite server:', { error: errorMessage, component: 'Chanuka' } as LogContext);
     }
 
-    logger.info('✅ All services cleaned up', { component: 'Chanuka' });
+    logger.info('✅ All services cleaned up', { component: 'Chanuka' } as LogContext);
 
   } catch (error) {
-    logger.error('Error during graceful shutdown:', error, { component: 'Chanuka' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error during graceful shutdown:', { error: errorMessage, component: 'Chanuka' } as LogContext);
   }
 
-  // Close HTTP server
   server.close((err) => {
     if (err) {
-      logger.error('Error closing server:', err, { component: 'Chanuka' });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      logger.error('Error closing server:', { error: errorMessage, component: 'Chanuka' } as LogContext);
       process.exit(1);
     }
-    logger.info('Server closed successfully', { component: 'Chanuka' });
+    logger.info('Server closed successfully', { component: 'Chanuka' } as LogContext);
     process.exit(0);
   });
 
-  // Force exit after 10 seconds
+  // Force exit after timeout
   setTimeout(() => {
-    logger.error('Forced shutdown after timeout', { component: 'Chanuka' });
+    logger.error('Forced shutdown after timeout', { component: 'Chanuka' } as LogContext);
     process.exit(1);
   }, 10000);
 };
 
-// Handle shutdown signals
+// Process signal handlers
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception:', error, { component: 'Chanuka' });
+process.on('uncaughtException', (error: Error) => {
+  logger.error('Uncaught Exception:', { error: error.message, stack: error.stack, component: 'Chanuka' } as LogContext);
   gracefulShutdown('UNCAUGHT_EXCEPTION');
 });
 
-process.on('unhandledRejection', (reason) => {
-  logger.error('Unhandled Rejection at:', reason instanceof Error ? reason : new Error(String(reason)), { component: 'Chanuka' });
+process.on('unhandledRejection', (reason: unknown) => {
+  const error = reason instanceof Error ? reason : new Error(String(reason));
+  logger.error('Unhandled Rejection:', { error: error.message, stack: error.stack, component: 'Chanuka' } as LogContext);
   gracefulShutdown('UNHANDLED_REJECTION');
 });
 
@@ -671,192 +571,93 @@ server.on('error', (error: NodeJS.ErrnoException) => {
     console.error(`❌ Port ${PORT} is already in use. Please try a different port or stop the existing process.`);
     console.log(`💡 You can try: PORT=4201 npm run dev`);
   } else {
-    logger.error('❌ Server error:', error, { component: 'Chanuka' });
+    logger.error('❌ Server error:', { error: error.message, component: 'Chanuka' } as LogContext);
   }
   process.exit(1);
 });
 
+// Server startup
 if (process.env.NODE_ENV !== 'test') {
   server.listen(config.server.port, config.server.host, async () => {
     console.log(`Server running on http://${config.server.host}:${config.server.port}`);
 
-    // Ensure startup initialization is complete before initializing services
     await startupInitialization();
 
-    // Initialize services in proper order with error handling
+    // Service initializers with proper error handling
     const serviceInitializers = [
-      {
-        name: 'Performance monitoring',
-        init: () => {
-          initializeMonitoring(config.server.nodeEnv);
-          return Promise.resolve();
-        }
-      },
-      {
-        name: 'WebSocket service',
-        init: () => {
-          webSocketService.initialize(server);
-          return Promise.resolve();
-        }
-      },
-      {
-        name: 'Bill status monitor',
-        init: () => {
-          // Bill status monitor is initialized automatically via constructor
-          return Promise.resolve();
-        }
-      },
-      {
-        name: 'Notification scheduler',
-        init: () => notificationSchedulerService.initialize()
-      },
-      {
-        name: 'Monitoring scheduler',
-        init: () => monitoringScheduler.initialize()
-      },
-      {
-        name: 'Session cleanup service',
-        init: () => {
-          sessionCleanupService.start(60); // Run cleanup every 60 minutes
-          return Promise.resolve();
-        }
-      },
-      {
-        name: 'Search index manager',
-        init: () => Promise.resolve() // TODO: Implement initialization for new SearchIndexManager
-      },
-      {
-        name: 'Security monitoring service',
-        init: () => securityMonitoringService.initialize()
-      },
-      {
-        name: 'Privacy scheduler service',
-        init: async () => {
-          await privacySchedulerService.initialize();
-          privacySchedulerService.start();
-        }
-      },
-      {
-        name: 'Cache coordinator',
-        init: () => {
-          cacheCoordinator.start();
-          return Promise.resolve();
-        }
-      }
+      { name: 'Performance monitoring', init: () => { initializeMonitoring(config.server.nodeEnv); return Promise.resolve(); } },
+      { name: 'WebSocket service', init: () => { webSocketService.initialize(server); return Promise.resolve(); } },
+      { name: 'Notification scheduler', init: () => notificationSchedulerService.initialize() },
+      { name: 'Monitoring scheduler', init: () => monitoringScheduler.initialize() },
+      { name: 'Session cleanup service', init: () => { sessionCleanupService.start(60); return Promise.resolve(); } },
+      { name: 'Security monitoring service', init: () => securityMonitoringService.initialize() },
+      { name: 'Privacy scheduler service', init: async () => { await privacySchedulerService.initialize(); privacySchedulerService.start(); } },
+      { name: 'Cache coordinator', init: () => { cacheCoordinator.start(); return Promise.resolve(); } }
     ];
 
-    // Initialize services sequentially to prevent race conditions
     for (const service of serviceInitializers) {
       try {
         await service.init();
         console.log(`✅ ${service.name} initialized`);
       } catch (error) {
         console.error(`❌ Failed to initialize ${service.name}:`, error);
-        // Continue with other services even if one fails
       }
     }
 
-    // Setup frontend serving (Vite dev server or static files)
+    // Setup frontend serving
     try {
       if (isDevelopment) {
         await setupVite(app, server);
-        logger.info('✅ Vite development server integrated successfully', { component: 'Chanuka' });
+        logger.info('✅ Vite development server integrated successfully', { component: 'Chanuka' } as LogContext);
       } else {
-        // Import serveStatic for production
         const { serveStatic } = await import('./vite.js');
         serveStatic(app);
-        logger.info('✅ Production static file serving configured', { component: 'Chanuka' });
+        logger.info('✅ Production static file serving configured', { component: 'Chanuka' } as LogContext);
       }
     } catch (error) {
-      logger.error('❌ Failed to setup frontend serving:', error, { component: 'Chanuka' });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('❌ Failed to setup frontend serving:', { error: errorMessage, component: 'Chanuka' } as LogContext);
 
-      // Fallback error page for frontend requests
-      app.use('*', (req, res, next) => {
+      app.use('*', (req: Request, res: Response, next: NextFunction) => {
         if (req.originalUrl.startsWith('/api/')) {
           return next();
         }
 
         res.status(500).send(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Service Unavailable</title>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-              .error-container { max-width: 600px; margin: 0 auto; }
-              .logo { width: 64px; height: 64px; margin: 0 auto 20px; }
-            </style>
-          </head>
-          <body>
-            <div class="error-container">
-              <div class="logo">📋</div>
-              <h1>Service Temporarily Unavailable</h1>
-              <p>The Chanuka Legislative Transparency Platform is currently experiencing technical difficulties.</p>
-              <p>Please try again in a few moments.</p>
-              <button onclick="window.location.reload()">Retry</button>
-            </div>
-          </body>
-        </html>
-      `);
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Service Unavailable</title>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+                .error-container { max-width: 600px; margin: 0 auto; }
+                .logo { width: 64px; height: 64px; margin: 0 auto 20px; }
+              </style>
+            </head>
+            <body>
+              <div class="error-container">
+                <div class="logo">📋</div>
+                <h1>Service Temporarily Unavailable</h1>
+                <p>The Chanuka Legislative Transparency Platform is currently experiencing technical difficulties.</p>
+                <p>Please try again in a few moments.</p>
+                <button onclick="window.location.reload()">Retry</button>
+              </div>
+            </body>
+          </html>
+        `);
       });
     }
 
     testConnection();
   });
 } else {
-  // In test environment, avoid starting the HTTP server. Exported `app` will be used by test runners.
-  // Still run a quick testConnection in a non-blocking manner to surface DB connection issues if needed.
   (async () => {
     try {
       await testConnection();
     } catch (err) {
-      // swallow in tests to avoid failing imports
+      // Swallow errors in test environment
     }
   })();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

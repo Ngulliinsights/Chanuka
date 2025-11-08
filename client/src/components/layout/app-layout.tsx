@@ -1,52 +1,79 @@
-import { ReactNode, useEffect, useState, useCallback, useRef, ErrorInfo } from 'react';
-import { useUnifiedNavigation } from '../../hooks/use-unified-navigation';
-import { useNavigationPerformance } from '../../hooks/use-navigation-performance';
-import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from '../../hooks/use-navigation-accessibility';
-import { DesktopSidebar } from '../navigation';
-import MobileNavigation from './mobile-navigation';
-import { SkipLink, useAccessibility } from '../accessibility/accessibility-manager';
-import { 
-  AppLayoutProps, 
-  LayoutConfig, 
-  LayoutError, 
-  LayoutRenderError, 
-  LayoutResponsiveError,
-  validateLayoutConfig,
-  safeValidateLayoutConfig
-} from './index';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  ErrorInfo,
+  useMemo,
+} from "react";
+import { useUnifiedNavigation } from "../../hooks/use-unified-navigation";
+import { useNavigationPerformance } from "../../hooks/use-navigation-performance";
+import {
+  useNavigationAccessibility,
+  useNavigationKeyboardShortcuts,
+} from "../../hooks/use-navigation-accessibility";
+import { DesktopSidebar } from "../navigation";
+import MobileNavigation from "./mobile-navigation";
+import {
+  SkipLink,
+  useAccessibility,
+} from "../accessibility/accessibility-manager";
+import {
+  AppLayoutProps,
+  LayoutConfig,
+  LayoutError,
+  LayoutRenderError,
+  safeValidateLayoutConfig,
+} from "./index";
 
 // Default layout configuration
 const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
-  type: 'app',
+  type: "app",
   showSidebar: true,
   showHeader: true,
   showFooter: true,
-  sidebarState: 'expanded',
-  headerStyle: 'default',
-  footerStyle: 'default',
+  sidebarState: "expanded",
+  headerStyle: "default",
+  footerStyle: "default",
   enableMobileOptimization: true,
   enableAccessibility: true,
   enablePerformanceOptimization: true,
 };
 
-function AppLayout({ children, config, className, onLayoutChange, onError }: AppLayoutProps) {
+const AppLayout = React.memo(function AppLayout({
+  children,
+  config,
+  className,
+  onLayoutChange,
+  onError,
+}: AppLayoutProps) {
   const { isMobile, mounted, sidebarCollapsed } = useUnifiedNavigation();
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [previousIsMobile, setPreviousIsMobile] = useState<boolean | null>(null);
+  const [previousIsMobile, setPreviousIsMobile] = useState<boolean | null>(
+    null
+  );
   const [layoutError, setLayoutError] = useState<LayoutError | null>(null);
-  const [layoutConfig, setLayoutConfig] = useState<LayoutConfig>(DEFAULT_LAYOUT_CONFIG);
+  const [layoutConfig, setLayoutConfig] = useState<LayoutConfig>(
+    DEFAULT_LAYOUT_CONFIG
+  );
+
+  // Move useAccessibility to the top with other hooks
+  const { announceToScreenReader } = useAccessibility();
 
   // Validate and merge layout configuration
   useEffect(() => {
     if (config) {
-      const validation = safeValidateLayoutConfig({ ...DEFAULT_LAYOUT_CONFIG, ...config });
+      const validation = safeValidateLayoutConfig({
+        ...DEFAULT_LAYOUT_CONFIG,
+        ...config,
+      });
       if (validation.success) {
         setLayoutConfig(validation.data);
         onLayoutChange?.(validation.data);
       } else {
         const error = new LayoutRenderError(
           `Invalid layout configuration: ${validation.error?.message}`,
-          'AppLayout',
+          "AppLayout",
           { config, validationError: validation.error }
         );
         setLayoutError(error);
@@ -54,41 +81,41 @@ function AppLayout({ children, config, className, onLayoutChange, onError }: App
       }
     }
   }, [config, onLayoutChange, onError]);
-  
+
   // Performance and accessibility hooks
-  const { 
-    startTransition, 
-    endTransition, 
-    enableGPUAcceleration, 
+  const {
+    startTransition,
+    endTransition,
+    enableGPUAcceleration,
     disableGPUAcceleration,
-    isTransitioning: perfIsTransitioning 
   } = useNavigationPerformance();
-  
-  const { 
-    announce, 
-    handleKeyboardNavigation, 
-    generateSkipLinks, 
-    handleRouteChange,
-    getAriaAttributes 
-  } = useNavigationAccessibility();
-  
+
+  const { announce } = useNavigationAccessibility();
+
   const { registerShortcut } = useNavigationKeyboardShortcuts();
-  
+
   // Refs for accessibility and performance
   const layoutRef = useRef<HTMLDivElement>(null);
   const mainContentRef = useRef<HTMLElement>(null);
-  const skipLinkRef = useRef<HTMLAnchorElement>(null);
+  const isMobileRef = useRef(isMobile);
+  
+  // Keep isMobile ref in sync
+  useEffect(() => {
+    isMobileRef.current = isMobile;
+  }, [isMobile]);
 
   // Error recovery function
-  const handleLayoutError = useCallback((error: Error, errorInfo?: ErrorInfo) => {
-    const layoutError = new LayoutRenderError(
-      error.message,
-      'AppLayout',
-      { error: error.stack, errorInfo }
-    );
-    setLayoutError(layoutError);
-    onError?.(layoutError);
-  }, [onError]);
+  const handleLayoutError = useCallback(
+    (error: Error, errorInfo?: ErrorInfo) => {
+      const layoutError = new LayoutRenderError(error.message, "AppLayout", {
+        error: error.stack,
+        errorInfo,
+      });
+      setLayoutError(layoutError);
+      onError?.(layoutError);
+    },
+    [onError]
+  );
 
   // Recovery function to reset layout to default state
   const recoverFromError = useCallback(() => {
@@ -98,122 +125,168 @@ function AppLayout({ children, config, className, onLayoutChange, onError }: App
     setPreviousIsMobile(null);
   }, []);
 
-  // Responsive error handling
-  const handleResponsiveError = useCallback((breakpoint: string, currentWidth: number) => {
-    const error = new LayoutResponsiveError(
-      `Layout failed to adapt to ${breakpoint} breakpoint`,
-      breakpoint,
-      currentWidth
-    );
-    setLayoutError(error);
-    onError?.(error);
-  }, [onError]);
-  
   // Performance optimization: Memoize main content classes
-  const mainContentClasses = useCallback(() => {
+  const mainContentClasses = useMemo(() => {
     if (isMobile) {
       return "flex-1 flex flex-col chanuka-content-transition";
     }
-    
+
     // Desktop: adjust for sidebar width with smooth transitions
-    const sidebarWidth = sidebarCollapsed ? 'ml-16' : 'ml-64';
+    const sidebarWidth = sidebarCollapsed ? "ml-16" : "ml-64";
     return `flex-1 flex flex-col chanuka-content-transition ${sidebarWidth}`;
   }, [isMobile, sidebarCollapsed]);
-  
-  // Accessibility: Skip link handler
-  const handleSkipToContent = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    mainContentRef.current?.focus();
-    mainContentRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-  
-  // Accessibility: Keyboard navigation for layout
-  const handleLayoutKeyDown = useCallback((event: React.KeyboardEvent) => {
-    // Alt + M to focus main content
-    if (event.altKey && event.key === 'm') {
-      event.preventDefault();
-      mainContentRef.current?.focus();
-    }
-    
-    // Alt + N to focus navigation (if not mobile)
-    if (event.altKey && event.key === 'n' && !isMobile) {
-      event.preventDefault();
-      const sidebarNav = document.querySelector('[role="navigation"][aria-label="Main navigation"]');
-      if (sidebarNav) {
-        (sidebarNav as HTMLElement).focus();
+
+  // Accessibility: Keyboard navigation for layout - stable callback
+  const handleLayoutKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      // Alt + M to focus main content
+      if (event.altKey && event.key === "m") {
+        event.preventDefault();
+        mainContentRef.current?.focus();
+        return;
       }
-    }
-  }, [isMobile]);
+
+      // Alt + N to focus navigation (if not mobile)
+      if (event.altKey && event.key === "n" && !isMobileRef.current) {
+        event.preventDefault();
+        const sidebarNav = document.querySelector(
+          '[role="navigation"][aria-label="Main navigation"]'
+        );
+        if (sidebarNav) {
+          (sidebarNav as HTMLElement).focus();
+        }
+        return;
+      }
+
+      // Alt + S to focus search
+      if (event.altKey && event.key === "s") {
+        event.preventDefault();
+        const searchInput = document.querySelector(
+          'input[type="search"], [role="searchbox"]'
+        );
+        if (searchInput) {
+          (searchInput as HTMLElement).focus();
+        }
+      }
+    },
+    [] // Removed isMobile dependency since we use ref
+  );
+
+  // Stable refs for performance functions to avoid dependency issues
+  const performanceFunctionsRef = useRef({
+    startTransition: null as typeof startTransition,
+    endTransition: null as typeof endTransition,
+    enableGPUAcceleration: null as typeof enableGPUAcceleration,
+    disableGPUAcceleration: null as typeof disableGPUAcceleration,
+    announce: null as typeof announce
+  });
+  
+  // Update refs when functions change - using individual dependencies to prevent circular updates
+  performanceFunctionsRef.current.startTransition = startTransition;
+  performanceFunctionsRef.current.endTransition = endTransition;
+  performanceFunctionsRef.current.enableGPUAcceleration = enableGPUAcceleration;
+  performanceFunctionsRef.current.disableGPUAcceleration = disableGPUAcceleration;
+  performanceFunctionsRef.current.announce = announce;
 
   // Handle responsive breakpoint transitions with performance optimization
   useEffect(() => {
-    if (mounted && previousIsMobile !== null && previousIsMobile !== isMobile) {
+    if (!mounted) return;
+    
+    // Only trigger transition if isMobile actually changed
+    if (previousIsMobile !== null && previousIsMobile !== isMobile) {
+      const funcs = performanceFunctionsRef.current;
+      
       // Start performance-optimized transition
-      startTransition(300);
+      if (funcs.startTransition) funcs.startTransition(300);
       setIsTransitioning(true);
-      
+
       // Announce layout change to screen readers
-      announce(`Layout changed to ${isMobile ? 'mobile' : 'desktop'} view`);
-      
-      // Enable GPU acceleration during transition
-      if (layoutRef.current) {
-        enableGPUAcceleration(layoutRef.current);
+      if (funcs.announce) {
+        funcs.announce(`Layout changed to ${isMobile ? "mobile" : "desktop"} view`);
       }
-      
+
+      // Enable GPU acceleration during transition
+      if (layoutRef.current && funcs.enableGPUAcceleration) {
+        funcs.enableGPUAcceleration(layoutRef.current);
+      }
+
       const timer = setTimeout(() => {
         setIsTransitioning(false);
-        endTransition();
-        
+        if (funcs.endTransition) funcs.endTransition();
+
         // Disable GPU acceleration after transition
-        if (layoutRef.current) {
-          disableGPUAcceleration(layoutRef.current);
+        if (layoutRef.current && funcs.disableGPUAcceleration) {
+          funcs.disableGPUAcceleration(layoutRef.current);
         }
       }, 300);
-      
+
       return () => clearTimeout(timer);
     }
-    
-    if (mounted) {
-      setPreviousIsMobile(isMobile);
-    }
-    
-    return undefined;
-  }, [isMobile, mounted, previousIsMobile, startTransition, endTransition, enableGPUAcceleration, disableGPUAcceleration, announce]);
 
-  // Register keyboard shortcuts for navigation
-  useEffect(() => {
-    const unregisterShortcuts = [
+    // Update previous state only after processing
+    setPreviousIsMobile(isMobile);
+  }, [isMobile, mounted]); // Removed previousIsMobile from dependencies to prevent loops
+
+  // Register keyboard shortcuts for navigation - memoized to prevent re-registration
+  const keyboardShortcuts = useCallback(() => {
+    const funcs = performanceFunctionsRef.current;
+    if (!registerShortcut || !funcs.announce) return [];
+    
+    return [
       // Alt + M to focus main content
-      registerShortcut('m', () => {
-        mainContentRef.current?.focus();
-        announce('Focused main content');
-      }, { alt: true }),
-      
+      registerShortcut(
+        "m",
+        () => {
+          mainContentRef.current?.focus();
+          funcs.announce("Focused main content");
+        },
+        { alt: true }
+      ),
+
       // Alt + N to focus navigation
-      registerShortcut('n', () => {
-        if (!isMobile) {
-          const sidebarNav = document.querySelector('[role="navigation"][aria-label="Main navigation"]');
-          if (sidebarNav) {
-            (sidebarNav as HTMLElement).focus();
-            announce('Focused navigation menu');
+      registerShortcut(
+        "n",
+        () => {
+          if (!isMobileRef.current) {
+            const sidebarNav = document.querySelector(
+              '[role="navigation"][aria-label="Main navigation"]'
+            );
+            if (sidebarNav) {
+              (sidebarNav as HTMLElement).focus();
+              funcs.announce("Focused navigation menu");
+            }
           }
-        }
-      }, { alt: true }),
-      
+        },
+        { alt: true }
+      ),
+
       // Alt + S to focus search (if available)
-      registerShortcut('s', () => {
-        const searchInput = document.querySelector('input[type="search"], [role="searchbox"]');
-        if (searchInput) {
-          (searchInput as HTMLElement).focus();
-          announce('Focused search');
-        }
-      }, { alt: true })
+      registerShortcut(
+        "s",
+        () => {
+          const searchInput = document.querySelector(
+            'input[type="search"], [role="searchbox"]'
+          );
+          if (searchInput) {
+            (searchInput as HTMLElement).focus();
+            funcs.announce("Focused search");
+          }
+        },
+        { alt: true }
+      ),
     ];
+  }, [registerShortcut]); // Removed isMobile dependency since we use ref
+
+  useEffect(() => {
+    const unregisterShortcuts = keyboardShortcuts();
     
     return () => {
-      unregisterShortcuts.forEach(unregister => unregister());
+      unregisterShortcuts.forEach((unregister) => unregister?.());
     };
-  }, [registerShortcut, isMobile, announce]);
+  }, [keyboardShortcuts]);
+
+  // Announce layout changes to screen readers - consolidated with transition effect
+  // This is now handled in the transition effect above to prevent duplicate announcements
 
   // Error boundary rendering
   if (layoutError) {
@@ -222,7 +295,9 @@ function AppLayout({ children, config, className, onLayoutChange, onError }: App
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
           <div className="text-center">
             <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Layout Error</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Layout Error
+            </h2>
             <p className="text-gray-600 mb-4">{layoutError.message}</p>
             <button
               onClick={recoverFromError}
@@ -246,65 +321,46 @@ function AppLayout({ children, config, className, onLayoutChange, onError }: App
           {layoutConfig.showSidebar && (
             <div className="hidden lg:block w-64 bg-white border-r border-gray-200 transition-all duration-300" />
           )}
-          
+
           {/* Main content area with proper spacing */}
           <div className="flex-1 flex flex-col">
             {/* Mobile header placeholder */}
             {layoutConfig.showHeader && isMobile && (
               <div className="lg:hidden bg-white border-b border-gray-200 h-16" />
             )}
-            
+
             {/* Main content */}
-            <main className="flex-1 min-h-screen">
-              {children}
-            </main>
-            
+            <main className="flex-1 min-h-screen">{children}</main>
+
             {/* Footer placeholder */}
             {layoutConfig.showFooter && (
               <footer className="bg-white border-t mt-auto">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                   <div className="text-center text-gray-600">
-                    <p>&copy; 2024 Chanuka Platform. Promoting transparent governance.</p>
+                    <p>
+                      &copy; 2024 Chanuka Platform. Promoting transparent
+                      governance.
+                    </p>
                   </div>
                 </div>
               </footer>
             )}
-            
+
             {/* Mobile bottom nav placeholder */}
-            {isMobile && (
-              <div className="lg:hidden h-16 bg-white border-t" />
-            )}
+            {isMobile && <div className="lg:hidden h-16 bg-white border-t" />}
           </div>
         </div>
       </div>
     );
   }
 
-  // Calculate main content margin based on sidebar state
-  const getMainContentClasses = () => {
-    if (isMobile) {
-      return "flex-1 flex flex-col chanuka-content-transition";
-    }
-    
-    // Desktop: adjust for sidebar width with smooth transitions
-    const sidebarWidth = sidebarCollapsed ? 'ml-16' : 'ml-64';
-    return `flex-1 flex flex-col chanuka-content-transition ${sidebarWidth}`;
-  };
-
-  const { announceToScreenReader } = useAccessibility();
-
-  // Announce layout changes to screen readers
-  useEffect(() => {
-    if (mounted && previousIsMobile !== null && previousIsMobile !== isMobile) {
-      announceToScreenReader(`Layout changed to ${isMobile ? 'mobile' : 'desktop'} view`);
-    }
-  }, [isMobile, mounted, previousIsMobile, announceToScreenReader]);
-
   try {
     return (
-      <div 
+      <div
         ref={layoutRef}
-        className={`chanuka-layout-stable min-h-screen bg-gray-50 ${className || ''}`}
+        className={`chanuka-layout-stable min-h-screen bg-gray-50 ${
+          className || ""
+        }`}
         onKeyDown={handleLayoutKeyDown}
       >
         {/* Skip Links for Accessibility */}
@@ -315,54 +371,63 @@ function AppLayout({ children, config, className, onLayoutChange, onError }: App
             <SkipLink href="#search">Skip to search</SkipLink>
           </>
         )}
-        
+
         <div className="relative chanuka-layout-transition">
           {/* Desktop Sidebar - Fixed positioning for smooth transitions */}
-          {!isMobile && layoutConfig.showSidebar && layoutConfig.sidebarState !== 'hidden' && (
-            <div className="fixed top-0 left-0 h-full z-30">
-              <DesktopSidebar />
-            </div>
-          )}
-          
+          {!isMobile &&
+            layoutConfig.showSidebar &&
+            layoutConfig.sidebarState !== "hidden" && (
+              <div className="fixed top-0 left-0 h-full z-30">
+                <DesktopSidebar />
+              </div>
+            )}
+
           {/* Main content area with responsive positioning */}
-          <div className={mainContentClasses()}>
+          <div className={mainContentClasses}>
             {/* Mobile Navigation - Only shown on mobile */}
             {isMobile && layoutConfig.showHeader && (
-              <div className={`chanuka-layout-transition ${
-                isTransitioning ? 'chanuka-mobile-nav-enter-active opacity-90' : 'opacity-100'
-              }`}>
+              <div
+                className={`chanuka-layout-transition ${
+                  isTransitioning
+                    ? "chanuka-mobile-nav-enter-active opacity-90"
+                    : "opacity-100"
+                }`}
+              >
                 <MobileNavigation />
               </div>
             )}
-            
+
             {/* Main Content with proper spacing and transitions */}
-            <main 
+            <main
               ref={mainContentRef}
               id="main-content"
               className={`flex-1 overflow-auto chanuka-content-transition ${
-                isMobile ? 'pb-16' : 'min-h-screen'
-              } ${isTransitioning ? 'opacity-95' : 'opacity-100'}`}
+                isMobile ? "pb-16" : "min-h-screen"
+              } ${isTransitioning ? "opacity-95" : "opacity-100"}`}
               role="main"
               aria-label="Main content"
               tabIndex={-1}
             >
-              <div className="w-full">
-                {children}
-              </div>
+              <div className="w-full">{children}</div>
             </main>
-            
+
             {/* Footer with responsive behavior */}
             {layoutConfig.showFooter && (
-              <footer 
+              <footer
                 className={`bg-white border-t mt-auto chanuka-layout-transition ${
-                  isMobile ? 'mb-16' : ''
-                } ${layoutConfig.footerStyle === 'sticky' ? 'sticky bottom-0' : ''}`}
+                  isMobile ? "mb-16" : ""
+                } ${
+                  layoutConfig.footerStyle === "sticky" ? "sticky bottom-0" : ""
+                }`}
                 role="contentinfo"
                 aria-label="Site footer"
               >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                   <div className="text-center text-gray-600">
-                    <p>&copy; 2024 Chanuka Platform. Promoting transparent governance.</p>
+                    <p>
+                      &copy; 2024 Chanuka Platform. Promoting transparent
+                      governance.
+                    </p>
                   </div>
                 </div>
               </footer>
@@ -375,7 +440,6 @@ function AppLayout({ children, config, className, onLayoutChange, onError }: App
     handleLayoutError(error as Error);
     return null;
   }
-}
+});
 
 export default AppLayout;
-

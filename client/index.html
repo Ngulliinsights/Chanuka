@@ -66,14 +66,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Essential Resource Preloading Only -->
-    <link rel="preload" href="/src/index.css" as="style" />
-    <link rel="modulepreload" href="/src/main.tsx" />
+    <!-- Vite handles preloading automatically - removed manual preloads to prevent warnings -->
 
     <!-- Security Headers -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:* ws://localhost:4200 http://localhost:4200; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:* ws://localhost:4200 http://localhost:4200; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';"
     />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />

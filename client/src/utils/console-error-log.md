@@ -1,0 +1,15960 @@
+(index):84 The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element.
+client:495 [vite] connecting...
+client:618 [vite] connected.
+(index):185 Removing unused preload: /src/index.css
+performance-optimizer.ts:151 The PerformanceObserver does not support buffered flag with the entryTypes argument.
+initializeBundleAnalysis @ performance-optimizer.ts:151
+initialize @ performance-optimizer.ts:77
+PerformanceOptimizer @ performance-optimizer.ts:63
+(anonymous) @ performance-optimizer.ts:656
+client-core.ts:27 [INFO] 🚀 Applying fast connection optimizations {component: 'PerformanceOptimizer'} {}
+client-core.ts:27 [INFO] 🚀 Performance Optimizer initialized {component: 'PerformanceOptimizer'} {}
+browser-logger.ts:242 [INFO] Initializing Chanuka Legislative Transparency Platform... {component: 'Chanuka'}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/index.css'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/Chanuka_logo.svg'} {}
+client-core.ts:27 [INFO] 🔋 Applying battery saving optimizations {component: 'PerformanceOptimizer'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/main.tsx'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/browser-compatibility-manager.ts'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/development-error-recovery.ts'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/development-debug.ts'} {}
+browser-logger.ts:242 [INFO] 🛡️ Development error recovery initialized {component: 'Chanuka'}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/browser-compatibility-tests.ts'} {}
+browser-logger.ts:242 [INFO] All polyfills loaded successfully in 1ms {component: 'Polyfills'}
+browser-logger.ts:242 [INFO] ✅ Browser polyfills loaded successfully {component: 'Chanuka'}
+browser-compatibility-manager.ts:202   📦 10 polyfills loaded successfully
+browser-compatibility-manager.ts:210     ✅ promises
+browser-compatibility-manager.ts:210     ✅ fetch
+browser-compatibility-manager.ts:210     ✅ localStorage
+browser-compatibility-manager.ts:210     ✅ arrayMethods
+browser-compatibility-manager.ts:210     ✅ objectMethods
+browser-compatibility-manager.ts:210     ✅ stringMethods
+browser-compatibility-manager.ts:210     ✅ numberMethods
+browser-compatibility-manager.ts:210     ✅ intersectionObserver
+browser-compatibility-manager.ts:210     ✅ resizeObserver
+browser-compatibility-manager.ts:210     ✅ sessionStorage
+browser-compatibility-manager.ts:588 🌐 Browser Compatibility Status
+browser-compatibility-manager.ts:590 Browser: Chrome 142.0
+browser-compatibility-manager.ts:591 Supported: ✅
+browser-compatibility-manager.ts:592 Compatibility Score: 100%
+browser-compatibility-manager.ts:593 Should Block: ✅ No
+browser-compatibility-manager.ts:594 Polyfills: 0 required, ✅ loaded
+browser-logger.ts:242 [INFO] Browser compatibility initialized: {component: 'Chanuka'} {browser: 'chrome 142.0', supported: true, polyfillsLoaded: true, warnings: 0}
+development-debug.ts:142 
+🔧 Development Debug Utilities Available:
+  __DEBUG__.getInfo()         - Get comprehensive debug information
+  __DEBUG__.clearAndReload()  - Clear caches and reload
+  __DEBUG__.getErrors()       - Get error history
+  __DEBUG__.testHMR()         - Test HMR connection
+  __DEBUG__.getPerformance()  - Get performance metrics
+  __DEBUG__.simulateError()   - Simulate errors for testing
+  __DEBUG__.getNetworkInfo()  - Get network information
+  __DEBUG__.exportDebugData() - Export debug data
+  __DEBUG__.showDebugPanel()  - Show debug panel
+  
+Keyboard Shortcuts:
+  Ctrl+Shift+D - Show debug panel
+  Ctrl+Shift+R - Clear cache and reload
+  Ctrl+Shift+E - Show error history
+    
+browser-logger.ts:242 [INFO] 🔧 Development debug utilities initialized {component: 'Chanuka'}
+asset-loading.ts:519 A preload for 'http://localhost:5173/src/index.css' is found, but is not used because the request credentials mode does not match. Consider taking a look at crossorigin attribute.
+loadStylesheet @ asset-loading.ts:519
+(anonymous) @ asset-loading.ts:440
+loadAssetByType @ asset-loading.ts:426
+performAssetLoadWithFallback @ asset-loading.ts:365
+loadAsset @ asset-loading.ts:300
+(anonymous) @ asset-loading.ts:677
+loadAssets @ asset-loading.ts:672
+preloadCriticalAssets @ asset-loading.ts:712
+preloadAssets @ main.tsx:312
+await in preloadAssets
+initializeApp @ main.tsx:449
+await in initializeApp
+(anonymous) @ main.tsx:685
+initWithRetry @ main.tsx:717
+startApplication @ main.tsx:743
+(anonymous) @ main.tsx:797
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/manifest.webmanifest'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.ico'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/index.css'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.svg'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.svg'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/Chanuka_logo.png'} {}
+browser-logger.ts:242 [INFO] Critical assets preloaded successfully {component: 'Chanuka'}
+browser-logger.ts:242 [INFO] Critical assets preloaded successfully {component: 'Chanuka'}
+browser-logger.ts:242 [INFO] DOM ready, mounting React application... {component: 'Chanuka'}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/main.tsx'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/App.tsx'} {}
+browser-logger.ts:242 [INFO] Initial performance metrics collected {component: 'PerformanceMonitor'} {loadTime: 10509.299999952316, renderTime: 0.5, navigationTime: 10511.399999976158, resourceLoadTime: 0, memoryUsage: 25604422}
+browser-logger.ts:242 [INFO] Performance monitoring initialized {component: 'PerformanceMonitor'}
+browser-logger.ts:242 [INFO] React application mounted successfully {component: 'Chanuka'}
+browser-logger.ts:242 [INFO] 🚀 Performance monitoring active {component: 'Chanuka'}
+browser-logger.ts:242 [INFO] Application initialization completed successfully {component: 'Chanuka'}
+browser-logger.ts:242 [INFO] Application initialized successfully {component: 'Chanuka'}
+browser-logger.ts:242 [INFO] App initialized with routes {component: 'Chanuka', routeCount: 24}
+browser-logger.ts:242 [INFO] All polyfills loaded successfully in 3ms {component: 'Polyfills'}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/node_modules/.vite/deps/6ELMOJL2-T2RVXUMQ.js?v=3089e83b'} {}
+client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/node_modules/.vite/deps/chunk-PW24LAET.js?v=3089e83b'} {}
+browser-logger.ts:242 [INFO] Service Worker registered: {component: 'Chanuka'} ServiceWorkerRegistration {installing: ServiceWorker, waiting: null, active: null, navigationPreload: NavigationPreloadManager, scope: 'http://localhost:5173/', …}
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:89
+await in (anonymous)
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+browser-logger.ts:242 [INFO] Initial page load time: {component: 'Chanuka'} {loadTime: 10511}
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Retrying component 'lazy-HomePage' (attempt 2/4) after 1000ms: Failed to resolve module specifier '@/pages/home'
+overrideMethod @ installHook.js:1
+(anonymous) @ safe-lazy-loading.tsx:99
+installHook.js:1 [ERROR] Component load failure: lazy-HomePage Error: Failed to load component 'lazy-HomePage' after 4 attempts. Last error: Failed to resolve module specifier '@/pages/home'
+    at safe-lazy-loading.tsx:113:29
+    at async safe-lazy-loading.tsx:128:22
+    at async safe-lazy-loading.tsx:192:22Caused by: TypeError: Failed to resolve module specifier '@/pages/home'
+    at importFn (safe-lazy-loading.tsx:261:31)
+    at safe-lazy-loading.tsx:72:32
+    at async safe-lazy-loading.tsx:128:22
+    at async safe-lazy-loading.tsx:192:22
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+error @ browser-logger.ts:244
+(anonymous) @ safe-lazy-loading.tsx:120
+installHook.js:1 [ERROR] Failed to load component HomePage after retries: Error: Failed to load component 'lazy-HomePage' after 4 attempts. Last error: Failed to resolve module specifier '@/pages/home'
+    at safe-lazy-loading.tsx:113:29
+    at async safe-lazy-loading.tsx:128:22
+    at async safe-lazy-loading.tsx:192:22Caused by: TypeError: Failed to resolve module specifier '@/pages/home'
+    at importFn (safe-lazy-loading.tsx:261:31)
+    at safe-lazy-loading.tsx:72:32
+    at async safe-lazy-loading.tsx:128:22
+    at async safe-lazy-loading.tsx:192:22
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+error @ browser-logger.ts:244
+(anonymous) @ safe-lazy-loading.tsx:195
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+client-core.ts:27 [INFO] 📦 Bundle Analysis: {component: 'PerformanceOptimizer'} {totalSize: 6816377, jsSize: 3817883, cssSize: 842152, imageSize: 1200, fontSize: 0, …}
+installHook.js:1 💰 Bundle budget violations: (3) ['totalSize: 6656.6KB exceeds budget of 1024.0KB', 'jsSize: 3728.4KB exceeds budget of 500.0KB', 'cssSize: 822.4KB exceeds budget of 100.0KB']
+overrideMethod @ installHook.js:1
+checkBundleBudgets @ performance-optimizer.ts:529
+analyzeBundleSize @ performance-optimizer.ts:243
+(anonymous) @ performance-optimizer.ts:138
+installHook.js:1 ⚠️ Limited code splitting detected. Consider implementing route-based splitting.
+overrideMethod @ installHook.js:1
+analyzeCodeSplitting @ performance-optimizer.ts:277
+(anonymous) @ performance-optimizer.ts:140
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+(index):1 The resource http://localhost:5173/src/main.tsx was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+(index):1 The resource http://localhost:5173/src/index.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+client-core.ts:27 [INFO] 💡 Performance Optimization Recommendations: {component: 'PerformanceOptimizer'} {bundleOptimizations: Array(2), cacheOptimizations: Array(0), performanceOptimizations: Array(0), priority: 'high'}
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 HMR connection attempt 1/5
+overrideMethod @ installHook.js:1
+checkHMRConnection @ development-error-recovery.ts:104
+development-error-recovery.ts:193 🔌 Attempting HMR reconnection to ws://localhost:5174
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
+installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
+    at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
+    at DevelopmentTools (<anonymous>)
+    at AppContent (<anonymous>)
+    at NavigationProvider (context.tsx:42:40)
+    at NavigationWrapper (App.tsx:225:30)
+    at Router (react-router-dom.js?v=580c6515:6698:13)
+    at BrowserRouter (react-router-dom.js?v=580c6515:9804:3)
+    at OfflineProvider (offline-manager.tsx:50:35)
+    at AccessibilityProvider (accessibility-manager.tsx:50:3)
+    at LoadingProvider2 (context.tsx:62:37)
+    at ThemeProvider (ThemeContext.tsx:23:3)
+    at AuthProvider (use-auth.tsx:43:32)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at QueryClientProvider (chunk-ADPVC7KD.js?v=3089e83b:3093:3)
+    at AppProviders (AppProviders.tsx:100:3)
+    at BrowserCompatibilityChecker (BrowserCompatibilityChecker.tsx:30:3)
+    at SimpleErrorBoundary (SimpleErrorBoundary.tsx:15:5)
+    at App (App.tsx:232:3)
+overrideMethod @ installHook.js:1
+console.error @ development-error-recovery.ts:126
+printWarning @ chunk-ILO4JA4Q.js?v=3089e83b:521
+error @ chunk-ILO4JA4Q.js?v=3089e83b:505
+checkForNestedUpdates @ chunk-ILO4JA4Q.js?v=3089e83b:19665
+scheduleUpdateOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18533
+dispatchSetState @ chunk-ILO4JA4Q.js?v=3089e83b:12403
+(anonymous) @ PerformanceMetricsCollector.tsx:62
+(anonymous) @ PerformanceMetricsCollector.tsx:102
+commitHookEffectListMount @ chunk-ILO4JA4Q.js?v=3089e83b:16915
+commitPassiveMountOnFiber @ chunk-ILO4JA4Q.js?v=3089e83b:18156
+commitPassiveMountEffects_complete @ chunk-ILO4JA4Q.js?v=3089e83b:18129
+commitPassiveMountEffects_begin @ chunk-ILO4JA4Q.js?v=3089e83b:18119
+commitPassiveMountEffects @ chunk-ILO4JA4Q.js?v=3089e83b:18109
+flushPassiveEffectsImpl @ chunk-ILO4JA4Q.js?v=3089e83b:19490
+flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
+(anonymous) @ chunk-ILO4JA4Q.js?v=3089e83b:19328
+workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
+flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
+performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384

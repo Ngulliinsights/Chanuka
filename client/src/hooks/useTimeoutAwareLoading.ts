@@ -189,37 +189,54 @@ export function useTimeoutAwareLoading<T = any>(
       setError(error);
       completeOperation(operationId, false, error);
 
-      // Auto-retry if enabled and not a timeout
-      if (mergedConfig.autoRetry && !error.message.includes('timed out') && timeoutState.retryCount < mergedConfig.maxRetries) {
-        const delay = mergedConfig.exponentialBackoff
-          ? mergedConfig.retryDelay * Math.pow(2, timeoutState.retryCount)
-          : mergedConfig.retryDelay;
+      // Auto-retry if enabled and not a timeout - use functional update to avoid dependency
+      if (mergedConfig.autoRetry && !error.message.includes('timed out')) {
+        setTimeoutState(prev => {
+          if (prev.retryCount < mergedConfig.maxRetries) {
+            const delay = mergedConfig.exponentialBackoff
+              ? mergedConfig.retryDelay * Math.pow(2, prev.retryCount)
+              : mergedConfig.retryDelay;
 
-        setTimeoutState(prev => ({
-          ...prev,
-          nextRetryIn: delay,
-        }));
+            retryTimeoutRef.current = setTimeout(() => {
+              retry();
+            }, delay);
 
-        retryTimeoutRef.current = setTimeout(() => {
-          retry();
-        }, delay);
+            return {
+              ...prev,
+              nextRetryIn: delay,
+            };
+          }
+          return prev;
+        });
       }
 
       return null;
     }
-  }, [operationId, mergedConfig, startOperation, completeOperation, timeoutState.retryCount]);
+  }, [operationId, mergedConfig, startOperation, completeOperation, retry]);
 
   const retry = useCallback(async (): Promise<T | null> => {
-    if (!operationRef.current || timeoutState.retryCount >= mergedConfig.maxRetries) {
+    if (!operationRef.current) {
       return null;
     }
 
-    const newRetryCount = timeoutState.retryCount + 1;
-    setTimeoutState(prev => ({
-      ...prev,
-      retryCount: newRetryCount,
-      nextRetryIn: 0,
-    }));
+    // Use functional update to avoid dependency on timeoutState.retryCount
+    let shouldRetry = false;
+    setTimeoutState(prev => {
+      if (prev.retryCount >= mergedConfig.maxRetries) {
+        shouldRetry = false;
+        return prev;
+      }
+      shouldRetry = true;
+      return {
+        ...prev,
+        retryCount: prev.retryCount + 1,
+        nextRetryIn: 0,
+      };
+    });
+
+    if (!shouldRetry) {
+      return null;
+    }
 
     retryOperation(operationId);
 
@@ -234,7 +251,7 @@ export function useTimeoutAwareLoading<T = any>(
       completeOperation(operationId, false, error);
       return null;
     }
-  }, [operationId, timeoutState.retryCount, mergedConfig.maxRetries, retryOperation, completeOperation]);
+  }, [operationId, mergedConfig.maxRetries, retryOperation, completeOperation]);
 
   const cancel = useCallback(() => {
     if (retryTimeoutRef.current) {

@@ -112,18 +112,18 @@ router.post('/extract-structure', async (req, res) => {
       submissionContext
     };
 
-    const arguments = await structureExtractor.extractArguments(text, context);
+    const extractedArguments = await structureExtractor.extractArguments(text, context);
     const argumentChains = await structureExtractor.extractArgumentChains(text, context);
 
     res.json({
       success: true,
       data: {
-        arguments,
+        arguments: extractedArguments,
         argumentChains,
         extractionMetrics: {
-          argumentsExtracted: arguments.length,
+          argumentsExtracted: extractedArguments.length,
           chainsIdentified: argumentChains.length,
-          averageConfidence: arguments.reduce((sum, arg) => sum + arg.confidence, 0) / arguments.length || 0
+          averageConfidence: extractedArguments.reduce((sum, arg) => sum + arg.confidence, 0) / extractedArguments.length || 0
         }
       }
     });

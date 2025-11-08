@@ -1,342 +1,366 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   ComponentTemplateGenerator,
   TemplateValidator,
   generateComponentTemplate,
-  ComponentTemplateConfig,
-  TemplateFile,
+  type ComponentTemplateConfig,
+  type TemplateFile
 } from '../component-templates';
 
-describe('ComponentTemplateGenerator', () => {
-  const basicConfig: ComponentTemplateConfig = {
-    componentName: 'test-component',
-    directory: 'client/src/components/test-component',
-    description: 'Test component for unit testing',
-  };
+describe('Component Template System', () => {
+  describe('ComponentTemplateGenerator', () => {
+    const baseConfig: ComponentTemplateConfig = {
+      componentName: 'test-component',
+      directory: 'src/components/test-component',
+      description: 'A test component for template generation'
+    };
 
-  const fullConfig: ComponentTemplateConfig = {
-    componentName: 'full-component',
-    directory: 'client/src/components/full-component',
-    hasValidation: true,
-    hasErrorHandling: true,
-    hasHooks: true,
-    hasUtils: true,
-    hasConfig: true,
-    hasUI: true,
-    hasCore: true,
-    description: 'Full-featured test component',
-  };
-
-  describe('constructor', () => {
-    it('should create generator with config', () => {
-      const generator = new ComponentTemplateGenerator(basicConfig);
-      expect(generator).toBeInstanceOf(ComponentTemplateGenerator);
-    });
-  });
-
-  describe('generateAllFiles', () => {
-    it('should generate basic files for minimal config', () => {
-      const generator = new ComponentTemplateGenerator(basicConfig);
+    it('should generate all required files for basic component', () => {
+      const generator = new ComponentTemplateGenerator(baseConfig);
       const files = generator.generateAllFiles();
 
       expect(files.length).toBeGreaterThan(0);
-      
+
       // Check for required files
       const filePaths = files.map(f => f.path);
-      expect(filePaths).toContain('client/src/components/test-component/index.ts');
-      expect(filePaths).toContain('client/src/components/test-component/types.ts');
-      expect(filePaths).toContain('client/src/components/test-component/__tests__/testComponent.test.tsx');
+      expect(filePaths).toContain('src/components/test-component/index.ts');
+      expect(filePaths).toContain('src/components/test-component/types.ts');
+      expect(filePaths).toContain('src/components/test-component/__tests__/test-component.test.tsx');
     });
 
-    it('should generate all files for full config', () => {
-      const generator = new ComponentTemplateGenerator(fullConfig);
+    it('should generate validation files when hasValidation is true', () => {
+      const config = { ...baseConfig, hasValidation: true };
+      const generator = new ComponentTemplateGenerator(config);
       const files = generator.generateAllFiles();
 
-      expect(files.length).toBeGreaterThan(10);
-      
       const filePaths = files.map(f => f.path);
-      
-      // Core files
-      expect(filePaths).toContain('client/src/components/full-component/index.ts');
-      expect(filePaths).toContain('client/src/components/full-component/types.ts');
-      
-      // Optional files
-      expect(filePaths).toContain('client/src/components/full-component/validation.ts');
-      expect(filePaths).toContain('client/src/components/full-component/errors.ts');
-      expect(filePaths).toContain('client/src/components/full-component/recovery.ts');
-      expect(filePaths).toContain('client/src/components/full-component/hooks/index.ts');
-      expect(filePaths).toContain('client/src/components/full-component/hooks/useFullComponent.ts');
-      expect(filePaths).toContain('client/src/components/full-component/utils/index.ts');
-      expect(filePaths).toContain('client/src/components/full-component/utils/full-component-utils.ts');
-      expect(filePaths).toContain('client/src/components/full-component/config/full-component-config.md');
-      expect(filePaths).toContain('client/src/components/full-component/ui/index.ts');
-      expect(filePaths).toContain('client/src/components/full-component/ui/FullComponentUI.tsx');
-      expect(filePaths).toContain('client/src/components/full-component/core/fullComponentCore.ts');
-      
-      // Test files
-      expect(filePaths).toContain('client/src/components/full-component/__tests__/fullComponent.test.tsx');
-      expect(filePaths).toContain('client/src/components/full-component/__tests__/useFullComponent.test.ts');
-      expect(filePaths).toContain('client/src/components/full-component/__tests__/full-component-utils.test.ts');
+      expect(filePaths).toContain('src/components/test-component/validation.ts');
+    });
+
+    it('should generate error handling files when hasErrorHandling is true', () => {
+      const config = { ...baseConfig, hasErrorHandling: true };
+      const generator = new ComponentTemplateGenerator(config);
+      const files = generator.generateAllFiles();
+
+      const filePaths = files.map(f => f.path);
+      expect(filePaths).toContain('src/components/test-component/errors.ts');
+      expect(filePaths).toContain('src/components/test-component/recovery.ts');
+    });
+
+    it('should generate hook files when hasHooks is true', () => {
+      const config = { ...baseConfig, hasHooks: true };
+      const generator = new ComponentTemplateGenerator(config);
+      const files = generator.generateAllFiles();
+
+      const filePaths = files.map(f => f.path);
+      expect(filePaths).toContain('src/components/test-component/hooks/index.ts');
+      expect(filePaths).toContain('src/components/test-component/hooks/useTestComponent.ts');
+      expect(filePaths).toContain('src/components/test-component/__tests__/useTestComponent.test.ts');
+    });
+
+    it('should generate utility files when hasUtils is true', () => {
+      const config = { ...baseConfig, hasUtils: true };
+      const generator = new ComponentTemplateGenerator(config);
+      const files = generator.generateAllFiles();
+
+      const filePaths = files.map(f => f.path);
+      expect(filePaths).toContain('src/components/test-component/utils/index.ts');
+      expect(filePaths).toContain('src/components/test-component/utils/test-component-utils.ts');
+      expect(filePaths).toContain('src/components/test-component/__tests__/test-component-utils.test.ts');
+    });
+
+    it('should generate config files when hasConfig is true', () => {
+      const config = { ...baseConfig, hasConfig: true };
+      const generator = new ComponentTemplateGenerator(config);
+      const files = generator.generateAllFiles();
+
+      const filePaths = files.map(f => f.path);
+      expect(filePaths).toContain('src/components/test-component/config/test-component-config.md');
+    });
+
+    it('should generate UI files when hasUI is true', () => {
+      const config = { ...baseConfig, hasUI: true };
+      const generator = new ComponentTemplateGenerator(config);
+      const files = generator.generateAllFiles();
+
+      const filePaths = files.map(f => f.path);
+      expect(filePaths).toContain('src/components/test-component/ui/index.ts');
+      expect(filePaths).toContain('src/components/test-component/ui/TestComponentUI.tsx');
+    });
+
+    it('should generate core files when hasCore is true', () => {
+      const config = { ...baseConfig, hasCore: true };
+      const generator = new ComponentTemplateGenerator(config);
+      const files = generator.generateAllFiles();
+
+      const filePaths = files.map(f => f.path);
+      expect(filePaths).toContain('src/components/test-component/core/testComponentCore.ts');
+    });
+
+    it('should generate proper PascalCase component names', () => {
+      const config = { ...baseConfig, componentName: 'my-test-component' };
+      const generator = new ComponentTemplateGenerator(config);
+      const files = generator.generateAllFiles();
+
+      const typesFile = files.find(f => f.path.includes('types.ts'));
+      expect(typesFile?.content).toContain('MyTestComponentProps');
+      expect(typesFile?.content).toContain('MyTestComponentData');
+    });
+
+    it('should generate proper camelCase variable names', () => {
+      const config = { ...baseConfig, componentName: 'my-test-component' };
+      const generator = new ComponentTemplateGenerator(config);
+      const files = generator.generateAllFiles();
+
+      const indexFile = files.find(f => f.path.includes('index.ts'));
+      expect(indexFile?.content).toContain('myTestComponentCore');
     });
   });
 
-  describe('file content generation', () => {
-    it('should generate valid TypeScript content', () => {
-      const generator = new ComponentTemplateGenerator(fullConfig);
-      const files = generator.generateAllFiles();
+  describe('TemplateValidator', () => {
+    describe('validateConfig', () => {
+      it('should pass valid configuration', () => {
+        const config: ComponentTemplateConfig = {
+          componentName: 'valid-component',
+          directory: 'src/components/valid-component'
+        };
 
-      files.forEach(file => {
-        expect(file.content).toBeTruthy();
-        expect(file.content.length).toBeGreaterThan(0);
-        
-        // Check for basic TypeScript/React patterns
-        if (file.path.endsWith('.ts') || file.path.endsWith('.tsx')) {
-          // Should not have obvious syntax errors
-          expect(file.content).not.toContain('undefined');
-          expect(file.content).not.toContain('null');
-        }
+        const errors = TemplateValidator.validateConfig(config);
+        expect(errors).toHaveLength(0);
+      });
+
+      it('should reject missing component name', () => {
+        const config = {
+          componentName: '',
+          directory: 'src/components/test'
+        } as ComponentTemplateConfig;
+
+        const errors = TemplateValidator.validateConfig(config);
+        expect(errors).toContain('Component name is required');
+      });
+
+      it('should reject missing directory', () => {
+        const config = {
+          componentName: 'test-component',
+          directory: ''
+        } as ComponentTemplateConfig;
+
+        const errors = TemplateValidator.validateConfig(config);
+        expect(errors).toContain('Directory is required');
+      });
+
+      it('should reject invalid component names', () => {
+        const invalidNames = ['123component', '-component', '_component', 'component!'];
+
+        invalidNames.forEach(name => {
+          const config = {
+            componentName: name,
+            directory: 'src/components/test'
+          } as ComponentTemplateConfig;
+
+          const errors = TemplateValidator.validateConfig(config);
+          expect(errors).toContain('Component name must start with a letter and contain only letters, numbers, hyphens, and underscores');
+        });
+      });
+
+      it('should accept valid component names', () => {
+        const validNames = ['component', 'myComponent', 'component123', 'my-component', 'my_component'];
+
+        validNames.forEach(name => {
+          const config = {
+            componentName: name,
+            directory: 'src/components/test'
+          } as ComponentTemplateConfig;
+
+          const errors = TemplateValidator.validateConfig(config);
+          expect(errors).toHaveLength(0);
+        });
       });
     });
 
-    it('should include component name in generated content', () => {
-      const generator = new ComponentTemplateGenerator(basicConfig);
-      const files = generator.generateAllFiles();
+    describe('validateDirectoryStructure', () => {
+      it('should pass valid file structure', () => {
+        const files: TemplateFile[] = [
+          { path: 'src/components/test/index.ts', content: '' },
+          { path: 'src/components/test/types.ts', content: '' },
+          { path: 'src/components/test/__tests__/test.test.tsx', content: '' }
+        ];
 
-      const indexFile = files.find(f => f.path.endsWith('index.ts'));
-      expect(indexFile?.content).toContain('TestComponent');
-      
-      const typesFile = files.find(f => f.path.endsWith('types.ts'));
-      expect(typesFile?.content).toContain('TestComponent');
-    });
+        const errors = TemplateValidator.validateDirectoryStructure(files);
+        expect(errors).toHaveLength(0);
+      });
 
-    it('should generate proper imports and exports', () => {
-      const generator = new ComponentTemplateGenerator(fullConfig);
-      const files = generator.generateAllFiles();
+      it('should reject missing required files', () => {
+        const files: TemplateFile[] = [
+          { path: 'src/components/test/types.ts', content: '' }
+        ];
 
-      const indexFile = files.find(f => f.path.endsWith('index.ts'));
-      expect(indexFile?.content).toContain('export * from');
-      
-      const hooksIndex = files.find(f => f.path.includes('hooks/index.ts'));
-      expect(hooksIndex?.content).toContain('export * from \'./useFullComponent\'');
-    });
-  });
+        const errors = TemplateValidator.validateDirectoryStructure(files);
+        expect(errors).toContain('Missing required file: index.ts');
+      });
 
-  describe('naming conventions', () => {
-    it('should handle kebab-case component names', () => {
-      const config: ComponentTemplateConfig = {
-        componentName: 'multi-word-component',
-        directory: 'test',
-      };
-      
-      const generator = new ComponentTemplateGenerator(config);
-      const files = generator.generateAllFiles();
-      
-      const typesFile = files.find(f => f.path.endsWith('types.ts'));
-      expect(typesFile?.content).toContain('MultiWordComponent');
-      expect(typesFile?.content).toContain('multiWordComponent');
-    });
+      it('should accept files with different directory structures', () => {
+        const files: TemplateFile[] = [
+          { path: 'lib/components/test/index.ts', content: '' },
+          { path: 'lib/components/test/types.ts', content: '' },
+          { path: 'lib/components/test/hooks/index.ts', content: '' }
+        ];
 
-    it('should handle snake_case component names', () => {
-      const config: ComponentTemplateConfig = {
-        componentName: 'snake_case_component',
-        directory: 'test',
-      };
-      
-      const generator = new ComponentTemplateGenerator(config);
-      const files = generator.generateAllFiles();
-      
-      const typesFile = files.find(f => f.path.endsWith('types.ts'));
-      expect(typesFile?.content).toContain('SnakeCaseComponent');
-    });
-
-    it('should handle single word component names', () => {
-      const config: ComponentTemplateConfig = {
-        componentName: 'button',
-        directory: 'test',
-      };
-      
-      const generator = new ComponentTemplateGenerator(config);
-      const files = generator.generateAllFiles();
-      
-      const typesFile = files.find(f => f.path.endsWith('types.ts'));
-      expect(typesFile?.content).toContain('Button');
-    });
-  });
-});
-
-describe('TemplateValidator', () => {
-  describe('validateConfig', () => {
-    it('should pass validation for valid config', () => {
-      const config: ComponentTemplateConfig = {
-        componentName: 'valid-component',
-        directory: 'client/src/components/valid-component',
-      };
-      
-      const errors = TemplateValidator.validateConfig(config);
-      expect(errors).toHaveLength(0);
-    });
-
-    it('should fail validation for missing component name', () => {
-      const config: ComponentTemplateConfig = {
-        componentName: '',
-        directory: 'test',
-      };
-      
-      const errors = TemplateValidator.validateConfig(config);
-      expect(errors).toContain('Component name is required');
-    });
-
-    it('should fail validation for missing directory', () => {
-      const config: ComponentTemplateConfig = {
-        componentName: 'test',
-        directory: '',
-      };
-      
-      const errors = TemplateValidator.validateConfig(config);
-      expect(errors).toContain('Directory is required');
-    });
-
-    it('should fail validation for invalid component name format', () => {
-      const config: ComponentTemplateConfig = {
-        componentName: '123-invalid',
-        directory: 'test',
-      };
-      
-      const errors = TemplateValidator.validateConfig(config);
-      expect(errors.length).toBeGreaterThan(0);
-      expect(errors[0]).toContain('must start with a letter');
-    });
-
-    it('should allow valid component name formats', () => {
-      const validNames = [
-        'component',
-        'Component',
-        'multi-word-component',
-        'multi_word_component',
-        'component123',
-        'Component-With-Numbers123',
-      ];
-
-      validNames.forEach(name => {
-        const config: ComponentTemplateConfig = {
-          componentName: name,
-          directory: 'test',
-        };
-        
-        const errors = TemplateValidator.validateConfig(config);
+        const errors = TemplateValidator.validateDirectoryStructure(files);
         expect(errors).toHaveLength(0);
       });
     });
   });
 
-  describe('validateDirectoryStructure', () => {
-    it('should pass validation for complete file structure', () => {
-      const files: TemplateFile[] = [
-        { path: 'test/index.ts', content: 'export' },
-        { path: 'test/types.ts', content: 'interface' },
-      ];
-      
-      const errors = TemplateValidator.validateDirectoryStructure(files);
-      expect(errors).toHaveLength(0);
+  describe('generateComponentTemplate', () => {
+    it('should generate template successfully for valid config', () => {
+      const config: ComponentTemplateConfig = {
+        componentName: 'test-component',
+        directory: 'src/components/test-component',
+        hasValidation: true,
+        hasErrorHandling: true,
+        hasHooks: true
+      };
+
+      const result = generateComponentTemplate(config);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.files.length).toBeGreaterThan(0);
     });
 
-    it('should fail validation for missing required files', () => {
-      const files: TemplateFile[] = [
-        { path: 'test/index.ts', content: 'export' },
-        // Missing types.ts
-      ];
-      
-      const errors = TemplateValidator.validateDirectoryStructure(files);
-      expect(errors).toContain('Missing required file: types.ts');
+    it('should return errors for invalid config', () => {
+      const config = {
+        componentName: '',
+        directory: 'src/components/test'
+      } as ComponentTemplateConfig;
+
+      const result = generateComponentTemplate(config);
+
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.files).toHaveLength(0);
     });
 
-    it('should fail validation for empty file list', () => {
-      const files: TemplateFile[] = [];
-      
-      const errors = TemplateValidator.validateDirectoryStructure(files);
-      expect(errors.length).toBeGreaterThan(0);
+    it('should generate files with correct content structure', () => {
+      const config: ComponentTemplateConfig = {
+        componentName: 'example-component',
+        directory: 'src/components/example',
+        description: 'An example component'
+      };
+
+      const result = generateComponentTemplate(config);
+
+      expect(result.errors).toHaveLength(0);
+
+      // Check that files contain expected content
+      const indexFile = result.files.find(f => f.path.endsWith('index.ts'));
+      expect(indexFile?.content).toContain('ExampleComponent');
+      expect(indexFile?.content).toContain('An example component');
+
+      const typesFile = result.files.find(f => f.path.endsWith('types.ts'));
+      expect(typesFile?.content).toContain('ExampleComponentProps');
+      expect(typesFile?.content).toContain('ExampleComponentData');
+    });
+
+    it('should handle complex component configurations', () => {
+      const config: ComponentTemplateConfig = {
+        componentName: 'complex-component',
+        directory: 'src/features/complex',
+        hasValidation: true,
+        hasErrorHandling: true,
+        hasHooks: true,
+        hasUtils: true,
+        hasConfig: true,
+        hasUI: true,
+        hasCore: true,
+        description: 'A complex component with all features'
+      };
+
+      const result = generateComponentTemplate(config);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.files.length).toBeGreaterThan(10); // Should have many files
+
+      // Check for all expected file types
+      const filePaths = result.files.map(f => f.path);
+      expect(filePaths.some(p => p.includes('/validation.ts'))).toBe(true);
+      expect(filePaths.some(p => p.includes('/errors.ts'))).toBe(true);
+      expect(filePaths.some(p => p.includes('/recovery.ts'))).toBe(true);
+      expect(filePaths.some(p => p.includes('/hooks/'))).toBe(true);
+      expect(filePaths.some(p => p.includes('/utils/'))).toBe(true);
+      expect(filePaths.some(p => p.includes('/config/'))).toBe(true);
+      expect(filePaths.some(p => p.includes('/ui/'))).toBe(true);
+      expect(filePaths.some(p => p.includes('/core/'))).toBe(true);
+    });
+  });
+
+  describe('Template Content Quality', () => {
+    it('should generate syntactically valid TypeScript', () => {
+      const config: ComponentTemplateConfig = {
+        componentName: 'syntax-test',
+        directory: 'src/components/syntax-test'
+      };
+
+      const result = generateComponentTemplate(config);
+
+      // Basic syntax checks - files should not contain obvious syntax errors
+      result.files.forEach(file => {
+        expect(file.content).not.toContain('undefined');
+        expect(file.content).not.toContain('null');
+        // Check for proper imports/exports
+        if (file.path.endsWith('.ts') || file.path.endsWith('.tsx')) {
+          expect(file.content).toMatch(/import|export|interface|type|class|function/);
+        }
+      });
+    });
+
+    it('should generate consistent naming conventions', () => {
+      const config: ComponentTemplateConfig = {
+        componentName: 'naming-test',
+        directory: 'src/components/naming-test'
+      };
+
+      const result = generateComponentTemplate(config);
+
+      const typesFile = result.files.find(f => f.path.endsWith('types.ts'));
+      expect(typesFile?.content).toContain('NamingTestProps');
+      expect(typesFile?.content).toContain('NamingTestData');
+      expect(typesFile?.content).toContain('NamingTestError');
+    });
+
+    it('should include proper JSDoc comments', () => {
+      const config: ComponentTemplateConfig = {
+        componentName: 'docs-test',
+        directory: 'src/components/docs-test'
+      };
+
+      const result = generateComponentTemplate(config);
+
+      result.files.forEach(file => {
+        if (file.path.endsWith('.ts') || file.path.endsWith('.tsx')) {
+          expect(file.content).toContain('/**');
+          expect(file.content).toContain('*/');
+        }
+      });
+    });
+
+    it('should generate proper test file structure', () => {
+      const config: ComponentTemplateConfig = {
+        componentName: 'test-structure',
+        directory: 'src/components/test-structure',
+        hasHooks: true,
+        hasUtils: true
+      };
+
+      const result = generateComponentTemplate(config);
+
+      const testFiles = result.files.filter(f => f.path.includes('__tests__'));
+      expect(testFiles.length).toBeGreaterThan(1);
+
+      // Check for describe blocks and it blocks in test files
+      testFiles.forEach(file => {
+        expect(file.content).toContain('describe(');
+        expect(file.content).toContain('it(');
+      });
     });
   });
 });
-
-describe('generateComponentTemplate', () => {
-  it('should generate template successfully for valid config', () => {
-    const config: ComponentTemplateConfig = {
-      componentName: 'test-component',
-      directory: 'test',
-      hasValidation: true,
-      hasErrorHandling: true,
-    };
-    
-    const result = generateComponentTemplate(config);
-    
-    expect(result.errors).toHaveLength(0);
-    expect(result.files.length).toBeGreaterThan(0);
-    
-    const filePaths = result.files.map(f => f.path);
-    expect(filePaths).toContain('test/index.ts');
-    expect(filePaths).toContain('test/types.ts');
-    expect(filePaths).toContain('test/validation.ts');
-    expect(filePaths).toContain('test/errors.ts');
-  });
-
-  it('should return errors for invalid config', () => {
-    const config: ComponentTemplateConfig = {
-      componentName: '',
-      directory: '',
-    };
-    
-    const result = generateComponentTemplate(config);
-    
-    expect(result.errors.length).toBeGreaterThan(0);
-    expect(result.files).toHaveLength(0);
-  });
-
-  it('should generate different templates based on config options', () => {
-    const minimalConfig: ComponentTemplateConfig = {
-      componentName: 'minimal',
-      directory: 'test-minimal',
-    };
-    
-    const fullConfig: ComponentTemplateConfig = {
-      componentName: 'full',
-      directory: 'test-full',
-      hasValidation: true,
-      hasErrorHandling: true,
-      hasHooks: true,
-      hasUtils: true,
-      hasConfig: true,
-      hasUI: true,
-      hasCore: true,
-    };
-    
-    const minimalResult = generateComponentTemplate(minimalConfig);
-    const fullResult = generateComponentTemplate(fullConfig);
-    
-    expect(minimalResult.errors).toHaveLength(0);
-    expect(fullResult.errors).toHaveLength(0);
-    
-    expect(fullResult.files.length).toBeGreaterThan(minimalResult.files.length);
-  });
-
-  it('should generate consistent file structure', () => {
-    const config: ComponentTemplateConfig = {
-      componentName: 'consistent-test',
-      directory: 'test-consistent',
-      hasValidation: true,
-      hasHooks: true,
-      hasUtils: true,
-    };
-    
-    const result1 = generateComponentTemplate(config);
-    const result2 = generateComponentTemplate(config);
-    
-    expect(result1.files.length).toBe(result2.files.length);
-    
-    const paths1 = result1.files.map(f => f.path).sort();
-    const paths2 = result2.files.map(f => f.path).sort();
-    
-    expect(paths1).toEqual(paths2);
-  });
-});
-

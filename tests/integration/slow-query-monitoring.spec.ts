@@ -1,4 +1,3 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { test, expect } from '@playwright/test';
 
 // Strategic Integration Testing: Slow Query Monitoring End-to-End

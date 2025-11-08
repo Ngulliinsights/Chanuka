@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { defaultApiConfig } from '../config/api.js';
 import { logger } from '../utils/browser-logger';
+import { errorHandler, ErrorType, ErrorSeverity } from '../utils/unified-error-handler';
 
 export interface BillUpdate { type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
   data: {
@@ -93,18 +94,26 @@ export class WebSocketClient {
 
   // Enhanced connect method with better promise handling
   async connect(token: string): Promise<void> {
-    // Optimization: Return existing connection promise if already connecting
-    if (this.connectionPromise && this.connectionState === ConnectionState.CONNECTING) {
+    // Optimization: Return existing connection promise if already connecting with same token
+    if (this.connectionPromise && 
+        this.connectionState === ConnectionState.CONNECTING && 
+        this.currentToken === token) {
       return this.connectionPromise;
     }
 
-    // Already connected, return immediately
-    if (this.connectionState === ConnectionState.CONNECTED && this.isConnected()) {
+    // Already connected with same token, return immediately
+    if (this.connectionState === ConnectionState.CONNECTED && 
+        this.isConnected() && 
+        this.currentToken === token) {
       return Promise.resolve();
     }
 
+    // Clean up any existing connection before creating new one
     this.currentToken = token;
     this.cleanup(false);
+    
+    // Clear any existing connection promise to prevent race conditions
+    this.connectionPromise = null;
 
     // Create and store connection promise for reuse
     this.connectionPromise = new Promise((resolve, reject) => {
@@ -167,6 +176,25 @@ export class WebSocketClient {
           } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
             this.connectionState = ConnectionState.FAILED;
             logger.error('Max reconnection attempts reached', { component: 'Chanuka' });
+
+            // Report reconnection failure to unified error handler
+            errorHandler.handleError({
+              type: ErrorType.NETWORK,
+              severity: ErrorSeverity.CRITICAL,
+              message: 'WebSocket reconnection failed after maximum attempts',
+              details: {
+                maxReconnectAttempts: this.maxReconnectAttempts,
+                code: event.code,
+                reason: event.reason,
+              },
+              context: {
+                component: 'WebSocketClient',
+                action: 'reconnection',
+              },
+              recoverable: false,
+              retryable: false,
+            });
+
             this.emit('error', { message: 'Failed to reconnect after maximum attempts' });
             reject(new Error('Max reconnection attempts reached'));
           }
@@ -175,8 +203,27 @@ export class WebSocketClient {
         this.ws.onerror = (error) => {
           clearTimeout(connectionTimeout);
           logger.error('WebSocket error:', { component: 'Chanuka' }, error);
+
+          // Report error to unified error handler
+          errorHandler.handleError({
+            type: ErrorType.NETWORK,
+            severity: ErrorSeverity.HIGH,
+            message: 'WebSocket connection error',
+            details: {
+              error,
+              connectionState: this.connectionState,
+              reconnectAttempts: this.reconnectAttempts,
+            },
+            context: {
+              component: 'WebSocketClient',
+              action: 'connection',
+            },
+            recoverable: true,
+            retryable: true,
+          });
+
           this.emit('error', error);
-          
+
           // Optimization: Only reject if we're still trying to connect initially
           if (this.connectionState === ConnectionState.CONNECTING) {
             reject(error);
@@ -290,6 +337,25 @@ export class WebSocketClient {
         this.send(message);
       } catch (error) {
         logger.error('Error sending queued message:', { component: 'Chanuka' }, error);
+
+        // Report message sending error to unified error handler
+        errorHandler.handleError({
+          type: ErrorType.NETWORK,
+          severity: ErrorSeverity.MEDIUM,
+          message: 'Failed to send queued WebSocket message',
+          details: {
+            error,
+            messageType: message.type,
+            queueSize: this.messageQueue.length,
+          },
+          context: {
+            component: 'WebSocketClient',
+            action: 'send_queued_message',
+          },
+          recoverable: true,
+          retryable: true,
+        });
+
         // Re-queue failed messages
         this.queueMessage(message);
       }
@@ -339,6 +405,25 @@ export class WebSocketClient {
       this.ws.send(payload);
     } catch (error) {
       logger.error('Error sending WebSocket message:', { component: 'Chanuka' }, error);
+
+      // Report message sending error to unified error handler
+      errorHandler.handleError({
+        type: ErrorType.NETWORK,
+        severity: ErrorSeverity.MEDIUM,
+        message: 'Failed to send WebSocket message',
+        details: {
+          error,
+          messageType: message.type,
+          readyState: this.ws?.readyState,
+        },
+        context: {
+          component: 'WebSocketClient',
+          action: 'send_message',
+        },
+        recoverable: true,
+        retryable: true,
+      });
+
       this.emit('error', { message: 'Failed to send message', error });
       throw error;
     }
@@ -366,23 +451,31 @@ export class WebSocketClient {
     this.stopHeartbeat();
     
     if (this.ws) {
-      // Optimization: Remove event handlers to prevent memory leaks
-      this.ws.onopen = null;
-      this.ws.onmessage = null;
-      this.ws.onclose = null;
-      this.ws.onerror = null;
-      
-      if (normalClose) {
-        this.ws.close(1000, 'Client disconnect');
-      } else {
-        this.ws.close();
-      }
+      // Store reference to avoid race conditions during cleanup
+      const wsToClose = this.ws;
       this.ws = null;
+      
+      // Remove event handlers to prevent memory leaks
+      wsToClose.onopen = null;
+      wsToClose.onmessage = null;
+      wsToClose.onclose = null;
+      wsToClose.onerror = null;
+      
+      // Close connection after clearing reference
+      if (normalClose) {
+        wsToClose.close(1000, 'Client disconnect');
+      } else {
+        wsToClose.close();
+      }
     }
     
     this.connectedAt = null;
     this.lastPongTime = null;
-    this.connectionPromise = null;
+    
+    // Clear connection promise to prevent race conditions
+    if (this.connectionPromise) {
+      this.connectionPromise = null;
+    }
   }
 
   // Optimization: Exponential backoff with better jitter calculation
@@ -440,14 +533,29 @@ export class WebSocketClient {
 
     // Optimization: Convert to array once for iteration
     const listenerArray = Array.from(listeners);
-    listenerArray.forEach(callback => {
-      try {
-        // Optimization: Use microtask to prevent blocking
-        queueMicrotask(() => callback(data));
-      } catch (error) {
-        console.error(`Error in event listener for '${event}':`, error);
-      }
-    });
+    
+    // Limit concurrent microtasks to prevent overwhelming the queue
+    if (listenerArray.length > 10) {
+      // For large listener counts, use setTimeout to batch processing
+      setTimeout(() => {
+        listenerArray.forEach(callback => {
+          try {
+            callback(data);
+          } catch (error) {
+            console.error(`Error in event listener for '${event}':`, error);
+          }
+        });
+      }, 0);
+    } else {
+      // For small listener counts, use microtasks
+      listenerArray.forEach(callback => {
+        try {
+          queueMicrotask(() => callback(data));
+        } catch (error) {
+          console.error(`Error in event listener for '${event}':`, error);
+        }
+      });
+    }
   }
 
   getConnectionStatus(): {

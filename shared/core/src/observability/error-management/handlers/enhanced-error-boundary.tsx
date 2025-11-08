@@ -11,7 +11,7 @@ import { ErrorHandlerChain } from './error-handler-chain.js';
 import { UserErrorReporter } from '../reporting/user-error-reporter.js';
 import { logger } from '../../logging/index.js';
 
-export interface EnhancedErrorBoundaryState {
+export interface ErrorBoundaryState {
   hasError: boolean;
   error?: BaseError;
   errorId?: string;
@@ -20,7 +20,7 @@ export interface EnhancedErrorBoundaryState {
   userFeedbackSubmitted: boolean;
 }
 
-export interface EnhancedErrorBoundaryProps {
+export interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: (props: ErrorFallbackProps) => ReactNode;
   onError?: (error: BaseError, errorInfo: ErrorInfo) => void;
@@ -55,12 +55,12 @@ export interface ErrorFallbackProps {
 /**
  * Enhanced Error Boundary with comprehensive recovery and user interaction
  */
-export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps, EnhancedErrorBoundaryState> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   private recoveryAttempts = 0;
   private readonly handleChain: ErrorHandlerChain;
   private readonly userReporter: UserErrorReporter;
 
-  constructor(props: EnhancedErrorBoundaryProps) {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
@@ -73,7 +73,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
     this.userReporter = props.userReporter || new UserErrorReporter();
   }
 
-  static getDerivedStateFromError(error: Error): Partial<EnhancedErrorBoundaryState> {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // Convert to BaseError
     const baseError = error instanceof BaseError
       ? error
@@ -83,7 +83,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
           severity: ErrorSeverity.HIGH,
           cause: error,
           context: {
-            component: 'EnhancedErrorBoundary',
+            component: 'ErrorBoundary',
             timestamp: new Date().toISOString()
           }
         });
@@ -118,7 +118,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
       await this.handleChain.process(enhancedError);
     } catch (chainError) {
       logger.error('Error boundary handler chain failed', {
-        component: 'EnhancedErrorBoundary',
+        component: 'ErrorBoundary',
         originalError: enhancedError.errorId,
         chainError
       });
@@ -142,7 +142,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
 
     // Log the error
     logger.error('Enhanced error boundary caught error', {
-      component: 'EnhancedErrorBoundary',
+      component: 'ErrorBoundary',
       errorId: enhancedError.errorId,
       componentStack: errorInfo.componentStack,
       recoveryAttempts: this.recoveryAttempts,
@@ -172,7 +172,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
         });
 
         logger.info('Automatic error recovery successful', {
-          component: 'EnhancedErrorBoundary',
+          component: 'ErrorBoundary',
           errorId: error.errorId,
           recoveryOption: option.id,
           attemptNumber: this.recoveryAttempts
@@ -181,7 +181,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
         return;
       } catch (recoveryError) {
         logger.warn('Automatic recovery attempt failed', {
-          component: 'EnhancedErrorBoundary',
+          component: 'ErrorBoundary',
           errorId: error.errorId,
           recoveryOption: option.id,
           attemptNumber: this.recoveryAttempts,
@@ -205,7 +205,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
     });
 
     logger.info('Manual retry attempted', {
-      component: 'EnhancedErrorBoundary',
+      component: 'ErrorBoundary',
       attemptNumber: this.recoveryAttempts
     });
   };
@@ -218,14 +218,14 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
       this.setState({ userFeedbackSubmitted: true });
 
       logger.info('User feedback submitted', {
-        component: 'EnhancedErrorBoundary',
+        component: 'ErrorBoundary',
         errorId: this.state.errorId,
         hasRating: !!feedback.rating,
         hasComment: !!feedback.comment
       });
     } catch (error) {
       logger.error('Failed to submit user feedback', {
-        component: 'EnhancedErrorBoundary',
+        component: 'ErrorBoundary',
         errorId: this.state.errorId,
         error
       });
@@ -241,7 +241,7 @@ export class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps,
   private handleContactSupport = () => {
     // This would integrate with support ticketing system
     logger.info('User requested support contact', {
-      component: 'EnhancedErrorBoundary',
+      component: 'ErrorBoundary',
       errorId: this.state.errorId
     });
 
@@ -605,18 +605,18 @@ function DefaultErrorFallback(props: ErrorFallbackProps & { showTechnicalDetails
 /**
  * Higher-order component for wrapping components with enhanced error boundary
  */
-export function withEnhancedErrorBoundary<P extends object>(
+export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<EnhancedErrorBoundaryProps, 'children'>
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
 ) {
-  const WithEnhancedErrorBoundaryComponent = (props: P) => (
-    <EnhancedErrorBoundary {...errorBoundaryProps}>
+  const WithErrorBoundaryComponent = (props: P) => (
+    <ErrorBoundary {...errorBoundaryProps}>
       <WrappedComponent {...props} />
-    </EnhancedErrorBoundary>
+    </ErrorBoundary>
   );
 
-  WithEnhancedErrorBoundaryComponent.displayName =
-    `withEnhancedErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
+  WithErrorBoundaryComponent.displayName =
+    `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
 
-  return WithEnhancedErrorBoundaryComponent;
+  return WithErrorBoundaryComponent;
 }

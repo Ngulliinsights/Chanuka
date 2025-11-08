@@ -1,4 +1,4 @@
-import { LazyExoticComponent, ComponentType } from 'react';
+import { LazyExoticComponent, ComponentType, useMemo } from 'react';
 
 // Route preloading configuration
 export interface RoutePreloadConfig {
@@ -17,7 +17,7 @@ export interface RoutePreloadConfig {
 export const CRITICAL_ROUTES: RoutePreloadConfig[] = [
   {
     path: '/',
-    component: null as any, // Will be set by the preloader
+    component: null as any,
     priority: 'high',
     preloadConditions: { immediate: true }
   },
@@ -51,8 +51,9 @@ export const CRITICAL_ROUTES: RoutePreloadConfig[] = [
 export class RoutePreloader {
   private preloadedRoutes = new Set<string>();
   private preloadPromises = new Map<string, Promise<any>>();
-  // idle state flag removed — we trigger idle preloads via the idle callback directly
   private idleCallback?: number;
+  private eventListeners: Array<{ event: string; handler: EventListener }> = [];
+  private isDestroyed = false;
 
   constructor() {
     this.setupIdleDetection();
@@ -69,16 +70,19 @@ export class RoutePreloader {
     };
 
     const handleIdle = () => {
+      if (this.isDestroyed) return;
       this.preloadIdleRoutes();
     };
 
     const handleActive = () => {
+      if (this.isDestroyed) return;
       if (this.idleCallback) {
         if ('cancelIdleCallback' in window) {
           cancelIdleCallback(this.idleCallback);
         } else {
           clearTimeout(this.idleCallback);
         }
+        this.idleCallback = undefined;
       }
     };
 
@@ -89,8 +93,10 @@ export class RoutePreloader {
       this.idleCallback = scheduleIdleCallback(handleIdle);
     };
 
+    // Store listeners for cleanup
     events.forEach(event => {
       document.addEventListener(event, resetIdleTimer, { passive: true });
+      this.eventListeners.push({ event, handler: resetIdleTimer });
     });
 
     // Initial idle timer
@@ -102,22 +108,34 @@ export class RoutePreloader {
     component: LazyExoticComponent<ComponentType<any>>,
     routePath: string
   ): Promise<void> {
+    // Early exit if destroyed
+    if (this.isDestroyed) {
+      return;
+    }
+
+    // Route already preloaded
     if (this.preloadedRoutes.has(routePath)) {
       return;
     }
 
+    // Preload already in progress - return existing promise
     if (this.preloadPromises.has(routePath)) {
       return this.preloadPromises.get(routePath);
     }
 
-  const preloadPromise = this.performPreload(component);
+    // Create and store the preload promise
+    const preloadPromise = this.performPreload(component);
     this.preloadPromises.set(routePath, preloadPromise);
 
     try {
       await preloadPromise;
-      this.preloadedRoutes.add(routePath);
+      // Double-check we're not destroyed before updating state
+      if (!this.isDestroyed) {
+        this.preloadedRoutes.add(routePath);
+      }
     } catch (error) {
       console.warn(`Failed to preload route ${routePath}:`, error);
+      // Remove failed promise so it can be retried
       this.preloadPromises.delete(routePath);
     }
   }
@@ -125,7 +143,14 @@ export class RoutePreloader {
   private async performPreload(
     component: LazyExoticComponent<ComponentType<any>>
   ): Promise<void> {
-    // Access the internal _payload to trigger preloading
+    // Use the component's preload method if available (Vite, webpack 5)
+    if (typeof (component as any).preload === 'function') {
+      await (component as any).preload();
+      return;
+    }
+
+    // Fallback: Access the internal _payload to trigger preloading
+    // Note: This uses React internals and may break in future versions
     const payload = (component as any)._payload;
     
     if (payload && typeof payload._result === 'undefined') {
@@ -133,15 +158,21 @@ export class RoutePreloader {
     }
   }
 
-  // Preload routes based on conditions
+  // Preload routes when hovering over links
   preloadOnHover(component: LazyExoticComponent<ComponentType<any>>, routePath: string) {
     return (element: HTMLElement) => {
+      // Check if already destroyed
+      if (this.isDestroyed) {
+        return () => {};
+      }
+
       const handleMouseEnter = () => {
         this.preloadComponent(component, routePath);
       };
 
       element.addEventListener('mouseenter', handleMouseEnter, { once: true });
       
+      // Return cleanup function
       return () => {
         element.removeEventListener('mouseenter', handleMouseEnter);
       };
@@ -151,6 +182,11 @@ export class RoutePreloader {
   // Preload routes when they become visible
   preloadOnVisible(component: LazyExoticComponent<ComponentType<any>>, routePath: string) {
     return (element: HTMLElement) => {
+      // Check if already destroyed
+      if (this.isDestroyed) {
+        return () => {};
+      }
+
       if (!('IntersectionObserver' in window)) {
         // Fallback for browsers without IntersectionObserver
         this.preloadComponent(component, routePath);
@@ -160,7 +196,7 @@ export class RoutePreloader {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting) {
+            if (entry.isIntersecting && !this.isDestroyed) {
               this.preloadComponent(component, routePath);
               observer.disconnect();
             }
@@ -171,6 +207,7 @@ export class RoutePreloader {
 
       observer.observe(element);
 
+      // Return cleanup function
       return () => {
         observer.disconnect();
       };
@@ -179,8 +216,10 @@ export class RoutePreloader {
 
   // Preload routes during idle time
   private preloadIdleRoutes() {
+    if (this.isDestroyed) return;
+
     CRITICAL_ROUTES.forEach((route) => {
-      if (route.preloadConditions?.onIdle && route.component) {
+      if (route.preloadConditions?.onIdle && route.component && !this.isDestroyed) {
         this.preloadComponent(route.component, route.path);
       }
     });
@@ -188,8 +227,10 @@ export class RoutePreloader {
 
   // Preload immediate priority routes
   preloadImmediateRoutes(routes: RoutePreloadConfig[]) {
+    if (this.isDestroyed) return;
+
     routes.forEach((route) => {
-      if (route.preloadConditions?.immediate && route.component) {
+      if (route.preloadConditions?.immediate && route.component && !this.isDestroyed) {
         this.preloadComponent(route.component, route.path);
       }
     });
@@ -211,14 +252,39 @@ export class RoutePreloader {
     this.preloadedRoutes.clear();
     this.preloadPromises.clear();
   }
+
+  // Cleanup method to prevent memory leaks
+  destroy() {
+    this.isDestroyed = true;
+
+    // Clear idle callback
+    if (this.idleCallback) {
+      if ('cancelIdleCallback' in window) {
+        cancelIdleCallback(this.idleCallback);
+      } else {
+        clearTimeout(this.idleCallback);
+      }
+      this.idleCallback = undefined;
+    }
+
+    // Remove all event listeners
+    this.eventListeners.forEach(({ event, handler }) => {
+      document.removeEventListener(event, handler);
+    });
+    this.eventListeners = [];
+
+    // Clear caches
+    this.clearCache();
+  }
 }
 
 // Global preloader instance
 export const routePreloader = new RoutePreloader();
 
 // Hook for using route preloading in components
+// Uses useMemo to prevent creating new function references on each render
 export function useRoutePreloader() {
-  return {
+  return useMemo(() => ({
     preloadRoute: (component: LazyExoticComponent<ComponentType<any>>, path: string) => 
       routePreloader.preloadComponent(component, path),
     preloadOnHover: (component: LazyExoticComponent<ComponentType<any>>, path: string) =>
@@ -226,13 +292,14 @@ export function useRoutePreloader() {
     preloadOnVisible: (component: LazyExoticComponent<ComponentType<any>>, path: string) =>
       routePreloader.preloadOnVisible(component, path),
     getPreloadStatus: (path: string) => routePreloader.getPreloadStatus(path),
-  };
+  }), []); // Empty dependency array since we're using the global instance
 }
 
 // Connection-aware preloading
 export class ConnectionAwarePreloader extends RoutePreloader {
   private connectionType: 'slow' | 'fast' | 'unknown' = 'unknown';
   private isOnline = navigator.onLine;
+  private connectionHandler?: () => void;
 
   constructor() {
     super();
@@ -241,13 +308,31 @@ export class ConnectionAwarePreloader extends RoutePreloader {
 
   private setupConnectionMonitoring() {
     // Monitor online/offline status
-    window.addEventListener('online', () => {
+    const onlineHandler = () => {
       this.isOnline = true;
-    });
+    };
 
-    window.addEventListener('offline', () => {
+    const offlineHandler = () => {
       this.isOnline = false;
-    });
+    };
+
+    window.addEventListener('online', onlineHandler);
+    window.addEventListener('offline', offlineHandler);
+
+    // Store handlers for cleanup
+    const originalDestroy = this.destroy.bind(this);
+    this.destroy = () => {
+      window.removeEventListener('online', onlineHandler);
+      window.removeEventListener('offline', offlineHandler);
+      
+      // Remove connection change listener if it exists
+      if (this.connectionHandler && 'connection' in navigator) {
+        const connection = (navigator as any).connection;
+        connection.removeEventListener('change', this.connectionHandler);
+      }
+      
+      originalDestroy();
+    };
 
     // Monitor connection type if available
     if ('connection' in navigator) {
@@ -259,7 +344,8 @@ export class ConnectionAwarePreloader extends RoutePreloader {
       };
 
       updateConnectionType();
-      connection.addEventListener('change', updateConnectionType);
+      this.connectionHandler = updateConnectionType;
+      connection.addEventListener('change', this.connectionHandler);
     }
   }
 
@@ -268,11 +354,12 @@ export class ConnectionAwarePreloader extends RoutePreloader {
     component: LazyExoticComponent<ComponentType<any>>,
     routePath: string
   ): Promise<void> {
-    // Skip preloading if offline or on slow connection for low priority routes
+    // Skip preloading if offline
     if (!this.isOnline) {
       return;
     }
 
+    // Skip low priority routes on slow connections
     const route = CRITICAL_ROUTES.find(r => r.path === routePath);
     if (route && route.priority === 'low' && this.connectionType === 'slow') {
       return;
@@ -312,52 +399,8 @@ export function setupLinkPreloading(
     cleanupFunctions.push(cleanup);
   }
 
-  // Return cleanup function
+  // Return cleanup function that calls all individual cleanup functions
   return () => {
     cleanupFunctions.forEach(cleanup => cleanup());
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

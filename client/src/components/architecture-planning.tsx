@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArchitectureComponent } from "@shared/schema";
 import { ArrowLeft, Layers } from 'lucide-react';
+import { sanitizeHTML, createSanitizedElement } from '../utils/dom-sanitizer';
 
 
 interface ArchitecturePlanningProps {
@@ -88,8 +89,8 @@ export default function ArchitecturePlanning({ projectId }: ArchitecturePlanning
                   <div className="flex items-center space-x-3">
                     <div className={`w-2 h-2 bg-${statusColor}-500 rounded-full`}></div>
                     <div>
-                      <p className="text-sm font-medium">{component.name}</p>
-                      <p className="text-xs text-muted-foreground">{component.description}</p>
+                      <p className="text-sm font-medium">{sanitizeHTML(component.name)}</p>
+                      <p className="text-xs text-muted-foreground">{sanitizeHTML(component.description || '')}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">

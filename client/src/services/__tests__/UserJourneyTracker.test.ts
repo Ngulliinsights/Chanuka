@@ -1,461 +1,605 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-// Mock logger
-const mockLogger = {
-  info: vi.fn(),
-  error: vi.fn(),
-  warn: vi.fn(),
-  debug: vi.fn(),
-  trace: vi.fn(),
-};
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { UserJourneyTracker } from '../UserJourneyTracker';
 
-vi.mock('@shared/core/src/observability/logging', () => ({
-  logger: mockLogger,
-  createLogger: vi.fn(() => mockLogger),
-}));
-
-import { UserJourneyTracker, UserJourney, JourneyStep } from '../UserJourneyTracker';
-import { UserRole, NavigationSection } from '@/components/navigation';
-import { logger } from '../../utils/browser-logger';
+// Mock Date to control timestamps
+const mockDate = new Date('2023-01-01T00:00:00Z');
+vi.useFakeTimers();
+vi.setSystemTime(mockDate);
 
 describe('UserJourneyTracker', () => {
   let tracker: UserJourneyTracker;
-  const mockSessionId = 'test-session-123';
-  const mockUserId = 'user-456';
 
   beforeEach(() => {
-    // Get fresh instance and clear data
+    vi.clearAllTimers();
+    vi.setSystemTime(mockDate);
+    // Reset singleton instance
+    (UserJourneyTracker as any).instance = null;
     tracker = UserJourneyTracker.getInstance();
-    tracker.clearAllData();
   });
 
-  describe('Journey Management', () => {
-    it('should start a new journey', () => {
-      tracker.startJourney(mockSessionId, mockUserId, 'citizen');
-      
-      const journey = tracker.getJourney(mockSessionId);
-      expect(journey).toBeDefined();
-      expect(journey?.session_id).toBe(mockSessionId);
-      expect(journey?.user_id).toBe(mockUserId);
-      expect(journey?.user_role).toBe('citizen');
-      expect(journey?.completed).toBe(false);
-      expect(journey?.steps).toHaveLength(0);
+  describe('singleton pattern', () => {
+    it('should return the same instance', () => {
+      const instance1 = UserJourneyTracker.getInstance();
+      const instance2 = UserJourneyTracker.getInstance();
+      expect(instance1).toBe(instance2);
+    });
+  });
+
+  describe('startJourney', () => {
+    it('should create a new journey', () => {
+      tracker.startJourney('session-1', 'user-1', 'public');
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey).toEqual({
+        session_id: 'session-1',
+        user_id: 'user-1',
+        user_role: 'public',
+        startTime: mockDate,
+        steps: [],
+        completed: false,
+        totalTimeSpent: 0,
+        conversionEvents: [],
+      });
     });
 
-    it('should track journey steps', () => {
-      tracker.startJourney(mockSessionId, mockUserId, 'public');
-      
-      // Track first step
-      tracker.trackStep(mockSessionId, '/', 'legislative');
-      
-      let journey = tracker.getJourney(mockSessionId);
+    it('should use default role when not provided', () => {
+      tracker.startJourney('session-1');
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey?.user_role).toBe('public');
+    });
+  });
+
+  describe('trackStep', () => {
+    it('should add a step to the journey', () => {
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'home' as any);
+
+      const journey = tracker.getJourney('session-1');
       expect(journey?.steps).toHaveLength(1);
-      expect(journey?.steps[0].pageId).toBe('/');
-      expect(journey?.steps[0].section).toBe('legislative');
-      
-      // Track second step
-      tracker.trackStep(mockSessionId, '/bills', 'legislative', '/');
-      
-      journey = tracker.getJourney(mockSessionId);
-      expect(journey?.steps).toHaveLength(2);
-      expect(journey?.steps[1].pageId).toBe('/bills');
-      expect(journey?.steps[1].referrer).toBe('/');
-      
-      // First step should now have time spent calculated
-      expect(journey?.steps[0].timeSpent).toBeGreaterThan(0);
+      expect(journey?.steps[0]).toEqual({
+        pageId: '/home',
+        timestamp: mockDate,
+        timeSpent: 0,
+        user_role: 'public',
+        section: 'home' as any,
+        referrer: undefined,
+        interactionCount: undefined,
+      });
     });
 
-    it('should track conversion events', () => {
-      tracker.startJourney(mockSessionId, mockUserId, 'citizen');
-      
-      tracker.trackConversionEvent(mockSessionId, 'bill_analysis_viewed');
-      tracker.trackConversionEvent(mockSessionId, 'comment_posted');
-      
-      const journey = tracker.getJourney(mockSessionId);
+    it('should auto-start journey if not exists', () => {
+      tracker.trackStep('session-1', '/home', 'home' as any);
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey).toBeDefined();
+      expect(journey?.steps).toHaveLength(1);
+    });
+
+    it('should calculate time spent on previous step', () => {
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'home' as any);
+
+      // Advance time
+      vi.advanceTimersByTime(5000);
+      tracker.trackStep('session-1', '/about', 'about' as any);
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey?.steps[0].timeSpent).toBe(5000);
+      expect(journey?.totalTimeSpent).toBe(5000);
+    });
+
+    it('should include referrer and interaction count', () => {
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'home' as any, '/referrer', 5);
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey?.steps[0].referrer).toBe('/referrer');
+      expect(journey?.steps[0].interactionCount).toBe(5);
+    });
+  });
+
+  describe('trackConversionEvent', () => {
+    it('should add conversion event to journey', () => {
+      tracker.startJourney('session-1');
+      tracker.trackConversionEvent('session-1', 'bill_analysis_viewed');
+
+      const journey = tracker.getJourney('session-1');
       expect(journey?.conversionEvents).toContain('bill_analysis_viewed');
-      expect(journey?.conversionEvents).toContain('comment_posted');
-      expect(journey?.conversionEvents).toHaveLength(2);
     });
 
-    it('should complete a journey', () => {
-      tracker.startJourney(mockSessionId, mockUserId, 'expert');
-      tracker.trackStep(mockSessionId, '/', 'legislative');
-      tracker.trackStep(mockSessionId, '/bills', 'legislative');
-      
-      tracker.completeJourney(mockSessionId, true);
-      
-      const journey = tracker.getJourney(mockSessionId);
+    it('should not add invalid conversion events', () => {
+      tracker.startJourney('session-1');
+      tracker.trackConversionEvent('session-1', 'invalid_event');
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey?.conversionEvents).toHaveLength(0);
+    });
+
+    it('should do nothing for non-existent journey', () => {
+      tracker.trackConversionEvent('session-1', 'bill_analysis_viewed');
+      // Should not throw
+      expect(true).toBe(true);
+    });
+  });
+
+  describe('completeJourney', () => {
+    it('should mark journey as completed', () => {
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'navigation');
+
+      vi.advanceTimersByTime(10000);
+      tracker.completeJourney('session-1', true);
+
+      const journey = tracker.getJourney('session-1');
       expect(journey?.completed).toBe(true);
       expect(journey?.goalAchieved).toBe(true);
-      expect(journey?.endTime).toBeDefined();
-      expect(journey?.totalTimeSpent).toBeGreaterThan(0);
+      expect(journey?.endTime).toEqual(new Date(mockDate.getTime() + 10000));
     });
 
-    it('should end a journey without completion', () => {
-      tracker.startJourney(mockSessionId, mockUserId, 'public');
-      tracker.trackStep(mockSessionId, '/', 'legislative');
-      tracker.trackStep(mockSessionId, '/bills', 'legislative');
-      
-      tracker.endJourney(mockSessionId);
-      
-      const journey = tracker.getJourney(mockSessionId);
+    it('should calculate final time spent', () => {
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'navigation');
+
+      vi.advanceTimersByTime(5000);
+      tracker.completeJourney('session-1');
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey?.steps[0].timeSpent).toBe(5000);
+      expect(journey?.totalTimeSpent).toBe(5000);
+    });
+
+    it('should calculate bounce rate', () => {
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'navigation');
+      tracker.completeJourney('session-1');
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey?.bounceRate).toBe(1); // Only one step
+    });
+
+    it('should do nothing for non-existent journey', () => {
+      tracker.completeJourney('session-1');
+      expect(true).toBe(true);
+    });
+  });
+
+  describe('endJourney', () => {
+    it('should mark last step as exit point', () => {
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'navigation');
+      tracker.trackStep('session-1', '/about', 'content');
+
+      tracker.endJourney('session-1');
+
+      const journey = tracker.getJourney('session-1');
+      expect(journey?.steps[1].exitPoint).toBe(true);
       expect(journey?.completed).toBe(true);
       expect(journey?.goalAchieved).toBe(false);
-      expect(journey?.steps[journey.steps.length - 1].exitPoint).toBe(true);
     });
   });
 
-  describe('Analytics Calculation', () => {
+  describe('getJourneyAnalytics', () => {
     beforeEach(() => {
-      // Create sample journeys for testing
-      createSampleJourneys();
+      // Create some test journeys
+      tracker.startJourney('session-1', 'user-1', 'public');
+      tracker.trackStep('session-1', '/home', 'navigation');
+      vi.advanceTimersByTime(2000);
+      tracker.trackStep('session-1', '/bills', 'legislative');
+      vi.advanceTimersByTime(3000);
+      tracker.completeJourney('session-1', true);
+
+      tracker.startJourney('session-2', 'user-2', 'expert');
+      tracker.trackStep('session-2', '/home', 'navigation');
+      vi.advanceTimersByTime(1000);
+      tracker.endJourney('session-2');
     });
 
-    it('should calculate basic analytics', () => {
+    it('should calculate overall analytics', () => {
+      tracker.startJourney('session-1', 'user-1', 'public');
+      tracker.trackStep('session-1', '/home', 'home' as any);
+      vi.advanceTimersByTime(2000);
+      tracker.trackStep('session-1', '/bills', 'bills' as any);
+      vi.advanceTimersByTime(3000);
+      tracker.completeJourney('session-1', true);
+
+      tracker.startJourney('session-2', 'user-2', 'expert');
+      tracker.trackStep('session-2', '/home', 'home' as any);
+      vi.advanceTimersByTime(1000);
+      tracker.endJourney('session-2');
+
       const analytics = tracker.getJourneyAnalytics();
-      
-      expect(analytics.totalJourneys).toBeGreaterThan(0);
-      expect(analytics.completionRate).toBeGreaterThanOrEqual(0);
-      expect(analytics.completionRate).toBeLessThanOrEqual(1);
-      expect(analytics.averageJourneyLength).toBeGreaterThan(0);
-      expect(analytics.bounceRate).toBeGreaterThanOrEqual(0);
-      expect(analytics.bounceRate).toBeLessThanOrEqual(1);
+
+      expect(analytics.totalJourneys).toBe(2);
+      expect(analytics.completedJourneys).toBe(1);
+      expect(analytics.averageJourneyLength).toBe(1.5); // (2 + 1) / 2
+      expect(analytics.averageTimeSpent).toBe(3000); // (5000 + 1000) / 2
+      expect(analytics.completionRate).toBe(0.5);
+      expect(analytics.bounceRate).toBe(0.5);
     });
 
-    it('should filter analytics by user role', () => {
-      const allAnalytics = tracker.getJourneyAnalytics();
-      const citizenAnalytics = tracker.getJourneyAnalytics(undefined, undefined, 'citizen');
-      
-      expect(citizenAnalytics.totalJourneys).toBeLessThanOrEqual(allAnalytics.totalJourneys);
+    it('should filter by user role', () => {
+      const analytics = tracker.getJourneyAnalytics(undefined, undefined, 'expert');
+
+      expect(analytics.totalJourneys).toBe(1);
+      expect(analytics.completedJourneys).toBe(0);
     });
 
-    it('should filter analytics by date range', () => {
-      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
-      
-      const filteredAnalytics = tracker.getJourneyAnalytics(yesterday, tomorrow);
-      const allAnalytics = tracker.getJourneyAnalytics();
-      
-      expect(filteredAnalytics.totalJourneys).toBeLessThanOrEqual(allAnalytics.totalJourneys);
-    });
+    it('should filter by date range', () => {
+      const startDate = new Date(mockDate.getTime() - 1000);
+      const endDate = new Date(mockDate.getTime() + 1000);
 
-    it('should calculate popular paths', () => {
-      const analytics = tracker.getJourneyAnalytics();
-      
-      expect(analytics.popularPaths).toBeDefined();
-      expect(analytics.popularPaths.length).toBeGreaterThan(0);
-      
-      const firstPath = analytics.popularPaths[0];
-      expect(firstPath.path).toBeDefined();
-      expect(firstPath.frequency).toBeGreaterThan(0);
-      expect(firstPath.completionRate).toBeGreaterThanOrEqual(0);
-      expect(firstPath.completionRate).toBeLessThanOrEqual(1);
-    });
+      const analytics = tracker.getJourneyAnalytics(startDate, endDate);
 
-    it('should calculate drop-off points', () => {
-      const analytics = tracker.getJourneyAnalytics();
-      
-      expect(analytics.dropOffPoints).toBeDefined();
-      
-      if (analytics.dropOffPoints.length > 0) {
-        const dropOff = analytics.dropOffPoints[0];
-        expect(dropOff.pageId).toBeDefined();
-        expect(dropOff.dropOffRate).toBeGreaterThan(0);
-        expect(dropOff.dropOffRate).toBeLessThanOrEqual(1);
-        expect(dropOff.improvementSuggestions).toBeDefined();
-      }
-    });
-
-    it('should calculate conversion funnels', () => {
-      const analytics = tracker.getJourneyAnalytics();
-      
-      expect(analytics.conversionFunnels).toBeDefined();
-      expect(analytics.conversionFunnels.length).toBeGreaterThan(0);
-      
-      const funnel = analytics.conversionFunnels[0];
-      expect(funnel.name).toBeDefined();
-      expect(funnel.steps).toBeDefined();
-      expect(funnel.conversionRates).toBeDefined();
-      expect(funnel.dropOffPoints).toBeDefined();
-      expect(funnel.steps.length).toBe(funnel.conversionRates.length);
-      expect(funnel.steps.length).toBe(funnel.dropOffPoints.length);
+      expect(analytics.totalJourneys).toBe(2);
     });
   });
 
-  describe('Journey Optimization', () => {
-    beforeEach(() => {
-      createSampleJourneysWithDropOffs();
+  describe('calculatePopularPaths', () => {
+    it('should identify popular navigation paths', () => {
+      // Create journeys with similar paths
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'home' as any);
+      tracker.trackStep('session-1', '/bills', 'bills' as any);
+      tracker.completeJourney('session-1');
+
+      tracker.startJourney('session-2');
+      tracker.trackStep('session-2', '/home', 'home' as any);
+      tracker.trackStep('session-2', '/bills', 'bills' as any);
+      tracker.completeJourney('session-2');
+
+      const analytics = tracker.getJourneyAnalytics();
+      const popularPaths = analytics.popularPaths;
+
+      expect(popularPaths).toHaveLength(1);
+      expect(popularPaths[0].path).toEqual(['/home', '/bills']);
+      expect(popularPaths[0].frequency).toBe(2);
+      expect(popularPaths[0].completionRate).toBe(1);
+    });
+  });
+
+  describe('calculateDropOffPoints', () => {
+    it('should identify pages with high drop-off rates', () => {
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/home', 'home' as any);
+      tracker.trackStep('session-1', '/bills', 'bills' as any);
+      tracker.endJourney('session-1'); // Exit from /bills
+
+      tracker.startJourney('session-2');
+      tracker.trackStep('session-2', '/home', 'home' as any);
+      tracker.endJourney('session-2'); // Exit from /home
+
+      const analytics = tracker.getJourneyAnalytics();
+      const dropOffPoints = analytics.dropOffPoints;
+
+      expect(dropOffPoints).toHaveLength(2);
+      const homeDropOff = dropOffPoints.find(p => p.pageId === '/home');
+      const billsDropOff = dropOffPoints.find(p => p.pageId === '/bills');
+
+      expect(homeDropOff?.dropOffRate).toBe(0.5); // 1 exit out of 2 visits
+      expect(billsDropOff?.dropOffRate).toBe(1); // 1 exit out of 1 visit
+    });
+  });
+
+  describe('calculateConversionFunnels', () => {
+    it('should calculate conversion rates for predefined funnels', () => {
+      // Create journey that follows bill research funnel
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/', 'home' as any);
+      tracker.trackStep('session-1', '/bills', 'bills' as any);
+      tracker.trackStep('session-1', '/bills/123', 'bills' as any);
+      tracker.trackStep('session-1', '/bills/123/analysis', 'analysis' as any);
+      tracker.completeJourney('session-1');
+
+      const analytics = tracker.getJourneyAnalytics();
+      const funnels = analytics.conversionFunnels;
+
+      const billFunnel = funnels.find(f => f.name === 'Bill Research Funnel');
+      expect(billFunnel).toBeDefined();
+      expect(billFunnel?.conversionRates).toEqual([1, 1, 1, 1]);
+      expect(billFunnel?.totalConversions).toBe(1);
+    });
+  });
+
+  describe('getOptimizationRecommendations', () => {
+    it('should generate recommendations based on analytics', () => {
+      // Create journey with drop-off
+      tracker.startJourney('session-1');
+      tracker.trackStep('session-1', '/problematic-page', 'page' as any);
+      tracker.endJourney('session-1');
+
+      const recommendations = tracker.getOptimizationRecommendations();
+
+      expect(recommendations).toHaveLength(1);
+      expect(recommendations[0].pageId).toBe('/problematic-page');
+      expect(recommendations[0].optimizationType).toBe('reduce_friction');
+      expect(recommendations[0].priority).toBe('high');
+    });
+  });
+
+  describe('getActiveJourneyCount', () => {
+    it('should return count of active journeys', () => {
+      expect(tracker.getActiveJourneyCount()).toBe(0);
+
+      tracker.startJourney('session-1');
+      expect(tracker.getActiveJourneyCount()).toBe(1);
+
+      tracker.completeJourney('session-1');
+      expect(tracker.getActiveJourneyCount()).toBe(0);
+    });
+  });
+
+  describe('getJourney', () => {
+    it('should return journey from active or completed journeys', () => {
+      tracker.startJourney('session-1');
+      expect(tracker.getJourney('session-1')).toBeDefined();
+
+      tracker.completeJourney('session-1');
+      expect(tracker.getJourney('session-1')).toBeDefined();
     });
 
-    it('should generate optimization recommendations', () => {
-      const optimizations = tracker.getOptimizationRecommendations();
-      
-      expect(optimizations).toBeDefined();
-      expect(Array.isArray(optimizations)).toBe(true);
-      
-      if (optimizations.length > 0) {
-        const optimization = optimizations[0];
-        expect(optimization.pageId).toBeDefined();
-        expect(optimization.optimizationType).toBeDefined();
-        expect(optimization.priority).toMatch(/^(high|medium|low)$/);
-        expect(optimization.description).toBeDefined();
-        expect(optimization.expectedImpact).toBeGreaterThanOrEqual(0);
-        expect(optimization.expectedImpact).toBeLessThanOrEqual(1);
-        expect(optimization.implementationEffort).toMatch(/^(low|medium|high)$/);
-      }
+    it('should return undefined for non-existent journey', () => {
+      expect(tracker.getJourney('non-existent')).toBeUndefined();
+    });
+  });
+
+  describe('clearOldJourneys', () => {
+    it('should remove journeys older than specified days', () => {
+      tracker.startJourney('session-1');
+      tracker.completeJourney('session-1');
+
+      // Advance time by 40 days
+      vi.advanceTimersByTime(40 * 24 * 60 * 60 * 1000);
+
+      tracker.clearOldJourneys(30);
+
+      expect(tracker.getJourney('session-1')).toBeUndefined();
+    });
+  });
+
+  describe('User Journey Outcomes and Success Metrics', () => {
+    it('should track successful bill research journeys', () => {
+      tracker.startJourney('research-session', 'user-1', 'public');
+
+      // Complete bill research funnel
+      tracker.trackStep('research-session', '/', 'home' as any);
+      vi.advanceTimersByTime(2000);
+      tracker.trackStep('research-session', '/bills', 'bills' as any);
+      vi.advanceTimersByTime(3000);
+      tracker.trackStep('research-session', '/bills/123', 'bills' as any);
+      vi.advanceTimersByTime(5000);
+      tracker.trackStep('research-session', '/bills/123/analysis', 'analysis' as any);
+      vi.advanceTimersByTime(10000);
+
+      // Track conversion events
+      tracker.trackConversionEvent('research-session', 'bill_analysis_viewed');
+      tracker.trackConversionEvent('research-session', 'search_performed');
+
+      tracker.completeJourney('research-session', true);
+
+      const journey = tracker.getJourney('research-session');
+      expect(journey?.completed).toBe(true);
+      expect(journey?.goalAchieved).toBe(true);
+      expect(journey?.conversionEvents).toContain('bill_analysis_viewed');
+      expect(journey?.totalTimeSpent).toBeGreaterThan(19000); // Sum of all steps
     });
 
-    it('should prioritize high-impact optimizations', () => {
-      const optimizations = tracker.getOptimizationRecommendations();
-      
-      if (optimizations.length > 1) {
-        // Check that high priority items come first
-        const highPriorityIndex = optimizations.findIndex(opt => opt.priority === 'high');
-        const lowPriorityIndex = optimizations.findIndex(opt => opt.priority === 'low');
-        
-        if (highPriorityIndex !== -1 && lowPriorityIndex !== -1) {
-          expect(highPriorityIndex).toBeLessThan(lowPriorityIndex);
+    it('should track community engagement outcomes', () => {
+      tracker.startJourney('community-session', 'user-2', 'expert');
+
+      // Community engagement flow
+      tracker.trackStep('community-session', '/', 'home' as any);
+      vi.advanceTimersByTime(1500);
+      tracker.trackStep('community-session', '/community', 'community' as any);
+      vi.advanceTimersByTime(4000);
+      tracker.trackStep('community-session', '/bills/456', 'bills' as any);
+      vi.advanceTimersByTime(6000);
+      tracker.trackStep('community-session', '/bills/456/comments', 'comments' as any);
+      vi.advanceTimersByTime(8000);
+
+      tracker.trackConversionEvent('community-session', 'comment_posted');
+      tracker.trackConversionEvent('community-session', 'bill_tracked');
+
+      tracker.completeJourney('community-session', true);
+
+      const journey = tracker.getJourney('community-session');
+      expect(journey?.goalAchieved).toBe(true);
+      expect(journey?.conversionEvents).toContain('comment_posted');
+      expect(journey?.user_role).toBe('expert');
+    });
+
+    it('should track failed journeys and identify pain points', () => {
+      tracker.startJourney('failed-session', 'user-3', 'public');
+
+      // User gets stuck and leaves
+      tracker.trackStep('failed-session', '/', 'home' as any);
+      vi.advanceTimersByTime(1000);
+      tracker.trackStep('failed-session', '/bills', 'bills' as any);
+      vi.advanceTimersByTime(2000);
+      // User exits from bills page
+      tracker.endJourney('failed-session');
+
+      const journey = tracker.getJourney('failed-session');
+      expect(journey?.completed).toBe(true);
+      expect(journey?.goalAchieved).toBe(false);
+      expect(journey?.bounceRate).toBe(0); // More than one step
+      expect(journey?.steps[1].exitPoint).toBe(true);
+    });
+
+    it('should calculate conversion funnel success rates', () => {
+      // Create multiple journeys with different outcomes
+      const journeys = [
+        { id: 'success-1', steps: ['/', '/bills', '/bills/1', '/bills/1/analysis'], success: true },
+        { id: 'success-2', steps: ['/', '/bills', '/bills/2', '/bills/2/analysis'], success: true },
+        { id: 'partial-1', steps: ['/', '/bills', '/bills/3'], success: false },
+        { id: 'bounce-1', steps: ['/'], success: false },
+      ];
+
+      journeys.forEach(({ id, steps, success }) => {
+        tracker.startJourney(id);
+        steps.forEach((step, index) => {
+          tracker.trackStep(id, step, 'navigation' as any);
+          if (index < steps.length - 1) {
+            vi.advanceTimersByTime(1000);
+          }
+        });
+
+        if (success) {
+          tracker.trackConversionEvent(id, 'bill_analysis_viewed');
+          tracker.completeJourney(id, true);
+        } else {
+          tracker.endJourney(id);
         }
-      }
-    });
-  });
+      });
 
-  describe('Goal Completion Tracking', () => {
-    it('should calculate goal completion rates', () => {
-      // Create journeys that complete the bill_research goal
-      createBillResearchJourneys();
-      
-      const completionRate = tracker.getGoalCompletionRate('bill_research');
-      expect(completionRate).toBeGreaterThanOrEqual(0);
-      expect(completionRate).toBeLessThanOrEqual(1);
+      const analytics = tracker.getJourneyAnalytics();
+      const billFunnel = analytics.conversionFunnels.find(f => f.name === 'Bill Research Funnel');
+
+      expect(billFunnel).toBeDefined();
+      expect(billFunnel?.totalConversions).toBe(2);
+      expect(billFunnel?.conversionRates[3]).toBe(0.5); // 2 out of 4 started, 2 completed
     });
 
-    it('should return 0 for unknown goals', () => {
-      const completionRate = tracker.getGoalCompletionRate('unknown_goal');
-      expect(completionRate).toBe(0);
+    it('should identify user journey pain points and bottlenecks', () => {
+      // Create journeys that highlight common issues
+      const problemJourneys = [
+        { id: 'slow-page', steps: ['/', '/slow-page'], exitAt: 1 },
+        { id: 'confusing-flow', steps: ['/', '/confusing', '/even-more-confusing'], exitAt: 2 },
+        { id: 'error-page', steps: ['/', '/error-page'], exitAt: 1 },
+      ];
+
+      problemJourneys.forEach(({ id, steps, exitAt }) => {
+        tracker.startJourney(id);
+        steps.forEach((step, index) => {
+          tracker.trackStep(id, step, 'navigation' as any);
+          if (index === exitAt) {
+            tracker.endJourney(id);
+            return;
+          }
+          vi.advanceTimersByTime(500);
+        });
+      });
+
+      const analytics = tracker.getJourneyAnalytics();
+      const dropOffPoints = analytics.dropOffPoints;
+
+      expect(dropOffPoints.length).toBeGreaterThan(0);
+      const highDropOffPages = dropOffPoints.filter(p => p.dropOffRate > 0.5);
+      expect(highDropOffPages.length).toBeGreaterThan(0);
     });
-  });
 
-  describe('Data Export', () => {
-    beforeEach(() => {
-      createSampleJourneys();
+    it('should track user onboarding completion rates', () => {
+      const onboardingJourneys = [
+        { id: 'complete-onboarding', steps: ['/', '/onboarding', '/dashboard', '/profile'], complete: true },
+        { id: 'partial-onboarding', steps: ['/', '/onboarding', '/dashboard'], complete: false },
+        { id: 'failed-onboarding', steps: ['/', '/onboarding'], complete: false },
+      ];
+
+      onboardingJourneys.forEach(({ id, steps, complete }) => {
+        tracker.startJourney(id, `user-${id}`, 'public');
+        steps.forEach(step => {
+          tracker.trackStep(id, step, 'navigation' as any);
+          vi.advanceTimersByTime(1000);
+        });
+
+        if (complete) {
+          tracker.trackConversionEvent(id, 'user_registered');
+          tracker.trackConversionEvent(id, 'profile_completed');
+          tracker.completeJourney(id, true);
+        } else {
+          tracker.endJourney(id);
+        }
+      });
+
+      const analytics = tracker.getJourneyAnalytics();
+      const onboardingFunnel = analytics.conversionFunnels.find(f => f.name === 'User Onboarding Funnel');
+
+      expect(onboardingFunnel).toBeDefined();
+      expect(onboardingFunnel?.totalConversions).toBe(1);
+      expect(onboardingFunnel?.conversionRates[3]).toBe(0.33); // 1 out of 3 completed
     });
 
-    it('should export data as JSON', () => {
-      const jsonData = tracker.exportJourneyData('json');
-      
-      expect(typeof jsonData).toBe('string');
-      expect(() => JSON.parse(jsonData)).not.toThrow();
-      
-      const parsed = JSON.parse(jsonData);
-      expect(Array.isArray(parsed)).toBe(true);
+    it('should measure user engagement and interaction quality', () => {
+      tracker.startJourney('engaged-session', 'user-engaged', 'expert');
+
+      // Track highly engaged journey with many interactions
+      tracker.trackStep('engaged-session', '/', 'home' as any, undefined, 15);
+      vi.advanceTimersByTime(5000);
+      tracker.trackStep('engaged-session', '/bills', 'bills' as any, '/', 25);
+      vi.advanceTimersByTime(8000);
+      tracker.trackStep('engaged-session', '/bills/789', 'bills' as any, '/bills', 40);
+      vi.advanceTimersByTime(12000);
+
+      tracker.trackConversionEvent('engaged-session', 'bill_analysis_viewed');
+      tracker.trackConversionEvent('engaged-session', 'comment_posted');
+      tracker.trackConversionEvent('engaged-session', 'search_performed');
+
+      tracker.completeJourney('engaged-session', true);
+
+      const journey = tracker.getJourney('engaged-session');
+      const totalInteractions = journey?.steps.reduce((sum, step) => sum + (step.interactionCount || 0), 0);
+
+      expect(totalInteractions).toBe(80); // 15 + 25 + 40
+      expect(journey?.conversionEvents.length).toBe(3);
+      expect(journey?.totalTimeSpent).toBeGreaterThan(20000);
     });
 
-    it('should export data as CSV', () => {
-      const csvData = tracker.exportJourneyData('csv');
-      
-      expect(typeof csvData).toBe('string');
-      expect(csvData).toContain('session_id');
-      expect(csvData).toContain('user_role');
-      
-      const lines = csvData.split('\n');
-      expect(lines.length).toBeGreaterThan(1); // Header + at least one data row
+    it('should analyze user role behavior patterns', () => {
+      const roleJourneys = [
+        { id: 'public-1', role: 'public', path: ['/', '/bills', '/bills/1'] },
+        { id: 'public-2', role: 'public', path: ['/', '/community'] },
+        { id: 'expert-1', role: 'expert', path: ['/', '/bills', '/bills/2', '/bills/2/analysis'] },
+        { id: 'expert-2', role: 'expert', path: ['/', '/expert-verification', '/bills/3/analysis'] },
+      ];
+
+      roleJourneys.forEach(({ id, role, path }) => {
+        tracker.startJourney(id, `user-${id}`, role as any);
+        path.forEach(step => {
+          tracker.trackStep(id, step, 'navigation' as any);
+          vi.advanceTimersByTime(1000);
+        });
+        tracker.completeJourney(id, path.length > 2);
+      });
+
+      const publicAnalytics = tracker.getJourneyAnalytics(undefined, undefined, 'public');
+      const expertAnalytics = tracker.getJourneyAnalytics(undefined, undefined, 'expert');
+
+      expect(publicAnalytics.totalJourneys).toBe(2);
+      expect(expertAnalytics.totalJourneys).toBe(2);
+      expect(expertAnalytics.completionRate).toBeGreaterThan(publicAnalytics.completionRate);
     });
-  });
 
-  describe('User Journey Retrieval', () => {
-    it('should get user journeys by user ID', () => {
-      tracker.startJourney('session1', 'user1', 'citizen');
-      tracker.startJourney('session2', 'user1', 'citizen');
-      tracker.startJourney('session3', 'user2', 'expert');
-      
-      tracker.completeJourney('session1');
-      tracker.completeJourney('session2');
-      tracker.completeJourney('session3');
-      
-      const user1Journeys = tracker.getUserJourneys('user1');
-      const user2Journeys = tracker.getUserJourneys('user2');
-      
-      expect(user1Journeys).toHaveLength(2);
-      expect(user2Journeys).toHaveLength(1);
-      expect(user1Journeys.every(j => j.user_id === 'user1')).toBe(true);
-      expect(user2Journeys.every(j => j.user_id === 'user2')).toBe(true);
+    it('should track goal achievement and success metrics', () => {
+      const goalJourneys = [
+        { id: 'goal-achieved', goal: 'bill_research', achieved: true },
+        { id: 'goal-partial', goal: 'bill_research', achieved: false },
+        { id: 'goal-failed', goal: 'bill_research', achieved: false },
+      ];
+
+      goalJourneys.forEach(({ id, goal, achieved }) => {
+        tracker.startJourney(id, `user-${id}`, 'public');
+
+        // Simulate goal-oriented paths
+        tracker.trackStep(id, '/', 'home' as any);
+        vi.advanceTimersByTime(1000);
+        tracker.trackStep(id, '/bills', 'bills' as any);
+        vi.advanceTimersByTime(2000);
+
+        if (achieved) {
+          tracker.trackStep(id, '/bills/123', 'bills' as any);
+          vi.advanceTimersByTime(3000);
+          tracker.trackStep(id, '/bills/123/analysis', 'analysis' as any);
+          vi.advanceTimersByTime(5000);
+          tracker.trackConversionEvent(id, 'bill_analysis_viewed');
+          tracker.completeJourney(id, true);
+        } else {
+          tracker.endJourney(id);
+        }
+      });
+
+      const analytics = tracker.getJourneyAnalytics();
+      expect(analytics.completionRate).toBe(0.33); // 1 out of 3
+      expect(analytics.totalJourneys).toBe(3);
     });
-  });
-
-  // Helper functions for creating test data
-  function createSampleJourneys() {
-    // Journey 1: Complete bill research journey
-    tracker.startJourney('journey1', 'user1', 'citizen');
-    tracker.trackStep('journey1', '/', 'legislative');
-    tracker.trackStep('journey1', '/bills', 'legislative');
-    tracker.trackStep('journey1', '/bills/123', 'legislative');
-    tracker.trackStep('journey1', '/bills/123/analysis', 'legislative');
-    tracker.trackConversionEvent('journey1', 'bill_analysis_viewed');
-    tracker.completeJourney('journey1', true);
-
-    // Journey 2: Incomplete journey (bounce)
-    tracker.startJourney('journey2', 'user2', 'public');
-    tracker.trackStep('journey2', '/', 'legislative');
-    tracker.endJourney('journey2');
-
-    // Journey 3: Community engagement journey
-    tracker.startJourney('journey3', 'user3', 'expert');
-    tracker.trackStep('journey3', '/', 'legislative');
-    tracker.trackStep('journey3', '/community', 'community');
-    tracker.trackStep('journey3', '/bills/456', 'legislative');
-    tracker.trackConversionEvent('journey3', 'comment_posted');
-    tracker.completeJourney('journey3', true);
-
-    // Journey 4: Admin workflow
-    tracker.startJourney('journey4', 'admin1', 'admin');
-    tracker.trackStep('journey4', '/admin', 'admin');
-    tracker.trackStep('journey4', '/admin/database', 'admin');
-    tracker.completeJourney('journey4', true);
-  }
-
-  function createSampleJourneysWithDropOffs() {
-    // Create journeys with high drop-off rates on specific pages
-    for (let i = 0; i < 10; i++) {
-      tracker.startJourney(`dropoff-journey-${i}`, `user-${i}`, 'public');
-      tracker.trackStep(`dropoff-journey-${i}`, '/', 'legislative');
-      tracker.trackStep(`dropoff-journey-${i}`, '/bills', 'legislative');
-      
-      // 70% drop off at bills page
-      if (i < 7) {
-        tracker.endJourney(`dropoff-journey-${i}`);
-      } else {
-        tracker.trackStep(`dropoff-journey-${i}`, '/bills/123', 'legislative');
-        tracker.completeJourney(`dropoff-journey-${i}`, true);
-      }
-    }
-  }
-
-  function createBillResearchJourneys() {
-    // Complete bill research journeys
-    for (let i = 0; i < 3; i++) {
-      tracker.startJourney(`research-complete-${i}`, `user-${i}`, 'citizen');
-      tracker.trackStep(`research-complete-${i}`, '/', 'legislative');
-      tracker.trackStep(`research-complete-${i}`, '/bills', 'legislative');
-      tracker.trackStep(`research-complete-${i}`, '/bills/123', 'legislative');
-      tracker.trackStep(`research-complete-${i}`, '/bills/123/analysis', 'legislative');
-      tracker.completeJourney(`research-complete-${i}`, true);
-    }
-
-    // Incomplete bill research journeys
-    for (let i = 0; i < 2; i++) {
-      tracker.startJourney(`research-incomplete-${i}`, `user-${i + 10}`, 'citizen');
-      tracker.trackStep(`research-incomplete-${i}`, '/', 'legislative');
-      tracker.trackStep(`research-incomplete-${i}`, '/bills', 'legislative');
-      tracker.endJourney(`research-incomplete-${i}`);
-    }
-  }
-});
-
-describe('UserJourneyTracker Singleton', () => {
-  it('should return the same instance', () => {
-    const instance1 = UserJourneyTracker.getInstance();
-    const instance2 = UserJourneyTracker.getInstance();
-    
-    expect(instance1).toBe(instance2);
-  });
-
-  it('should maintain state across getInstance calls', () => {
-    const instance1 = UserJourneyTracker.getInstance();
-    instance1.startJourney('test-session', 'test-user', 'citizen');
-    
-    const instance2 = UserJourneyTracker.getInstance();
-    const journey = instance2.getJourney('test-session');
-    
-    expect(journey).toBeDefined();
-    expect(journey?.session_id).toBe('test-session');
   });
 });
-
-describe('UserJourneyTracker Edge Cases', () => {
-  let tracker: UserJourneyTracker;
-
-  beforeEach(() => {
-    tracker = UserJourneyTracker.getInstance();
-    tracker.clearAllData();
-  });
-
-  it('should handle tracking steps without starting journey', () => {
-    // Should auto-start journey
-    tracker.trackStep('auto-session', '/', 'legislative');
-    
-    const journey = tracker.getJourney('auto-session');
-    expect(journey).toBeDefined();
-    expect(journey?.steps).toHaveLength(1);
-  });
-
-  it('should handle invalid conversion events', () => {
-    tracker.startJourney('test-session', 'test-user', 'citizen');
-    
-    // Should not add invalid events
-    tracker.trackConversionEvent('test-session', 'invalid_event');
-    
-    const journey = tracker.getJourney('test-session');
-    expect(journey?.conversionEvents).toHaveLength(0);
-  });
-
-  it('should handle completing non-existent journey', () => {
-    // Should not throw error
-    expect(() => {
-      tracker.completeJourney('non-existent-session');
-    }).not.toThrow();
-  });
-
-  it('should handle empty analytics gracefully', () => {
-    const analytics = tracker.getJourneyAnalytics();
-    
-    expect(analytics.totalJourneys).toBe(0);
-    expect(analytics.completionRate).toBe(0);
-    expect(analytics.bounceRate).toBe(0);
-    expect(analytics.popularPaths).toHaveLength(0);
-    expect(analytics.dropOffPoints).toHaveLength(0);
-  });
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

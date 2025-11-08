@@ -241,35 +241,82 @@ export class AdaptiveResourceLoader {
     }
 
     this.isProcessing = true;
+    const maxIterations = 100; // Safety limit to prevent infinite loops
+    let iterationCount = 0;
+    const startTime = Date.now();
+    const maxProcessingTime = 30000; // 30 seconds timeout
 
-    // Sort by priority
-    this.loadQueue.sort((a, b) => {
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
-      return priorityOrder[b.priority] - priorityOrder[a.priority];
-    });
+    try {
+      // Sort by priority
+      this.loadQueue.sort((a, b) => {
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      });
 
-    const strategy = connectionAwareLoader.getStrategy();
-    const maxConcurrent = strategy.chunkPrefetchCount || 2;
+      const strategy = connectionAwareLoader.getStrategy();
+      const maxConcurrent = strategy.chunkPrefetchCount || 2;
 
-    while (this.loadQueue.length > 0) {
-      const batch = this.loadQueue.splice(0, maxConcurrent);
-      
-      await Promise.allSettled(
-        batch.map(async (resource) => {
-          if (connectionAwareLoader.shouldLoadResource(resource.priority)) {
-            await this.loadResource(resource);
-          }
-        })
-      );
+      while (this.loadQueue.length > 0 && iterationCount < maxIterations) {
+        iterationCount++;
 
-      // Add delay between batches on slow connections
-      const { effectiveType } = connectionAwareLoader.getConnectionInfo();
-      if (effectiveType === 'slow-2g' || effectiveType === '2g') {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Check for timeout
+        if (Date.now() - startTime > maxProcessingTime) {
+          logger.warn('Queue processing timeout reached, stopping to prevent infinite loop', {
+            component: 'AdaptiveResourceLoader',
+            iterations: iterationCount,
+            remainingQueue: this.loadQueue.length
+          });
+          break;
+        }
+
+        const batch = this.loadQueue.splice(0, maxConcurrent);
+
+        await Promise.allSettled(
+          batch.map(async (resource) => {
+            try {
+              if (connectionAwareLoader.shouldLoadResource(resource.priority)) {
+                await this.loadResource(resource);
+              }
+            } catch (error) {
+              logger.error('Failed to load resource in batch', {
+                component: 'AdaptiveResourceLoader',
+                resource: resource.url,
+                error
+              });
+            }
+          })
+        );
+
+        // Add delay between batches on slow connections
+        const { effectiveType } = connectionAwareLoader.getConnectionInfo();
+        if (effectiveType === 'slow-2g' || effectiveType === '2g') {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
-    }
 
-    this.isProcessing = false;
+      if (iterationCount >= maxIterations) {
+        logger.error('Maximum iterations reached in queue processing, possible infinite loop detected', {
+          component: 'AdaptiveResourceLoader',
+          maxIterations,
+          remainingQueue: this.loadQueue.length
+        });
+      }
+
+      logger.debug('Queue processing completed', {
+        component: 'AdaptiveResourceLoader',
+        iterations: iterationCount,
+        remainingQueue: this.loadQueue.length
+      });
+
+    } catch (error) {
+      logger.error('Error during queue processing', {
+        component: 'AdaptiveResourceLoader',
+        error,
+        iterations: iterationCount
+      });
+    } finally {
+      this.isProcessing = false;
+    }
   }
 
   private async loadResource(resource: {

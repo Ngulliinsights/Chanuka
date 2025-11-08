@@ -118,30 +118,45 @@ export function useErrorRecovery(
   const recoveryAttemptsRef = useRef<Record<string, number>>({});
 
   const operation = getOperation(operationId);
-  const context: RecoveryContext = {
-    error: operation?.error || new Error('Unknown error'),
-    operationId,
-    retryCount: operation?.retryCount || 0,
-    timeElapsed: operation ? Date.now() - operation.startTime : 0,
-    connectionType: state.connectionInfo?.connectionType || 'unknown',
-    isOnline: state.isOnline,
-  };
 
-  const getApplicableStrategies = useCallback((): RecoveryStrategy[] => {
+  // Memoize context to prevent infinite re-renders
+  const getApplicableStrategies = useCallback((
+    error: Error,
+    retryCount: number,
+    timeElapsed: number,
+    connectionType: string,
+    isOnline: boolean
+  ): RecoveryStrategy[] => {
+    const context: RecoveryContext = {
+      error,
+      operationId,
+      retryCount,
+      timeElapsed,
+      connectionType,
+      isOnline,
+    };
+
     return strategiesRef.current
       .filter(strategy => {
         const attempts = recoveryAttemptsRef.current[strategy.id] || 0;
-        return attempts < strategy.maxAttempts && strategy.condition(context.error, context);
+        return attempts < strategy.maxAttempts && strategy.condition(error, context);
       })
       .sort((a, b) => a.priority - b.priority);
-  }, [context]);
+  }, [operationId]);
 
   const recover = useCallback(async (): Promise<boolean> => {
     if (!recoveryState.canRecover || recoveryState.isRecovering) {
       return false;
     }
 
-    const strategies = getApplicableStrategies();
+    const currentOperation = getOperation(operationId);
+    const error = currentOperation?.error || new Error('Unknown error');
+    const retryCount = currentOperation?.retryCount || 0;
+    const timeElapsed = currentOperation ? Date.now() - currentOperation.startTime : 0;
+    const connectionType = state.connectionInfo?.connectionType || 'unknown';
+    const isOnline = state.isOnline;
+
+    const strategies = getApplicableStrategies(error, retryCount, timeElapsed, connectionType, isOnline);
     if (strategies.length === 0) {
       setRecoveryState(prev => ({
         ...prev,
@@ -227,7 +242,16 @@ export function useErrorRecovery(
     });
 
     return false;
-  }, [operationId, recoveryState, getApplicableStrategies, retryOperation]);
+  }, [
+    operationId, 
+    recoveryState.canRecover, 
+    recoveryState.isRecovering, 
+    getApplicableStrategies, 
+    retryOperation, 
+    getOperation, 
+    state.connectionInfo?.connectionType, 
+    state.isOnline
+  ]);
 
   const addStrategy = useCallback((strategy: RecoveryStrategy) => {
     strategiesRef.current = [...strategiesRef.current, strategy];
@@ -252,7 +276,13 @@ export function useErrorRecovery(
   // Update suggestions when error changes
   useEffect(() => {
     if (operation?.error && !recoveryState.isRecovering) {
-      const strategies = getApplicableStrategies();
+      const error = operation.error;
+      const retryCount = operation.retryCount || 0;
+      const timeElapsed = Date.now() - operation.startTime;
+      const connectionType = state.connectionInfo?.connectionType || 'unknown';
+      const isOnline = state.isOnline;
+
+      const strategies = getApplicableStrategies(error, retryCount, timeElapsed, connectionType, isOnline);
       const suggestions = strategies.slice(0, 3).map(s => s.description);
 
       setRecoveryState(prev => ({
@@ -261,7 +291,7 @@ export function useErrorRecovery(
         suggestions,
       }));
     }
-  }, [operation?.error, recoveryState.isRecovering, getApplicableStrategies]);
+  }, [operation?.error, operation?.retryCount, operation?.startTime, recoveryState.isRecovering, getApplicableStrategies, state.connectionInfo?.connectionType, state.isOnline]);
 
   return {
     recover,

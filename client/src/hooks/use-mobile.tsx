@@ -1,31 +1,69 @@
-import { useState, useEffect } from "react"
-import { logger } from '../utils/browser-logger';
+import { useState, useEffect, useCallback, useRef } from "react"
+
 
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = useState<boolean | undefined>(undefined)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  const debouncedSetMobile = useCallback((value: boolean) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      setIsMobile(value)
+    }, 100) // 100ms debounce
+  }, [])
 
   useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+      debouncedSetMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
     mql.addEventListener("change", onChange)
     setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
+    
+    return () => {
+      mql.removeEventListener("change", onChange)
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [debouncedSetMobile])
 
   return !!isMobile
 }
 
-// Enhanced media query hook with SSR support
+// Enhanced media query hook with SSR support and debouncing
 export function useMediaQuery(query: string): boolean {
   // Always start with false to prevent hydration mismatches
   const [matches, setMatches] = useState<boolean>(false)
   const [isClient, setIsClient] = useState<boolean>(false)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const currentQueryRef = useRef<string>('')
+  const isMountedRef = useRef<boolean>(true)
+
+  const debouncedSetMatches = useCallback((value: boolean, queryToCheck: string) => {
+    // Clear any existing timer to prevent race conditions
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+      debounceTimerRef.current = null
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      // Only update if query hasn't changed and component is still mounted
+      if (isMountedRef.current && currentQueryRef.current === queryToCheck) {
+        setMatches(value)
+      }
+      debounceTimerRef.current = null
+    }, 100) // 100ms debounce
+  }, [])
 
   useEffect(() => {
+    isMountedRef.current = true
+    currentQueryRef.current = query
+    
     // Check if we're in a browser environment
     if (typeof window === 'undefined') {
       return
@@ -35,11 +73,13 @@ export function useMediaQuery(query: string): boolean {
     setIsClient(true)
 
     const mediaQuery = window.matchMedia(query)
-    const handleChange = () => setMatches(mediaQuery.matches)
+    const handleChange = () => debouncedSetMatches(mediaQuery.matches, query)
     
     // Use setTimeout to set initial value after state update
     const timeoutId = setTimeout(() => {
-      setMatches(mediaQuery.matches)
+      if (isMountedRef.current && currentQueryRef.current === query) {
+        setMatches(mediaQuery.matches)
+      }
     }, 0)
     
     // Listen for changes
@@ -47,10 +87,15 @@ export function useMediaQuery(query: string): boolean {
     
     // Cleanup function to remove event listener and clear timeout
     return () => {
+      isMountedRef.current = false
       clearTimeout(timeoutId)
       mediaQuery.removeEventListener('change', handleChange)
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+        debounceTimerRef.current = null
+      }
     }
-  }, [query])
+  }, [query, debouncedSetMatches])
 
   // Return false during SSR and before client-side hydration to prevent layout shifts
   // Only return actual matches value after we're confirmed to be on the client

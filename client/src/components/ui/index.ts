@@ -112,6 +112,59 @@ export { Switch } from './switch';
 export { Tabs } from './tabs';
 export { Toast } from './toast';
 export { Toaster } from './toaster';
+export { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from './tooltip';
+
+// New shadcn/ui components
+export {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuContent,
+  NavigationMenuTrigger,
+  NavigationMenuLink,
+  NavigationMenuIndicator,
+  NavigationMenuViewport,
+  navigationMenuTriggerStyle
+} from './navigation-menu';
+
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator
+} from './command';
+
+export {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuCheckboxItem,
+  ContextMenuRadioItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuGroup,
+  ContextMenuPortal,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuRadioGroup
+} from './context-menu';
+
+// Enhanced components with business logic
+export {
+  EnhancedTabs,
+  EnhancedTooltip,
+  EnhancedAvatar,
+  EnhancedProgress,
+  EnhancedBadge
+} from './enhanced-components';
 
 // Initialize recovery strategies
 export { initializeUIRecoveryStrategies } from './recovery';

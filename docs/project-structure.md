@@ -179,12 +179,12 @@ client/
 │   │   ├── error-boundary.tsx
 │   │   ├── error-handling/
 │   │   │   ├── __tests__/
-│   │   │   │   ├── EnhancedErrorBoundary.test.tsx
+│   │   │   │   ├── ErrorBoundary.test.tsx
 │   │   │   │   ├── ErrorFallback.test.tsx
 │   │   │   │   ├── error-recovery-flows.test.tsx
 │   │   │   │   ├── PageErrorBoundary.integration.test.tsx
 │   │   │   │   ├── PageErrorBoundary.test.tsx
-│   │   │   ├── EnhancedErrorBoundary.tsx
+│   │   │   ├── ErrorBoundary.tsx
 │   │   │   ├── ErrorFallback.tsx
 │   │   │   ├── ErrorRecoveryManager.tsx
 │   │   │   ├── index.ts

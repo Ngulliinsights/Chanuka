@@ -40,6 +40,22 @@ jobs:
         BUDGET_FAIL_SIZE: 3.0
         BUDGET_VERBOSE: true
 
+    - name: Run Core Web Vitals checks
+      run: node scripts/web-vitals-checker.js
+      env:
+        CI: true
+        VITALS_FAIL_ON_VIOLATION: true
+        VITALS_LCP_THRESHOLD: 2500
+        VITALS_FID_THRESHOLD: 100
+        VITALS_CLS_THRESHOLD: 0.1
+        VITALS_FCP_THRESHOLD: 1800
+        VITALS_TTFB_THRESHOLD: 800
+
+    - name: Check for performance regressions
+      run: node scripts/performance-regression-detector.js
+      env:
+        CI: true
+
     - name: Upload performance reports
       uses: actions/upload-artifact@v4
       if: always()
@@ -51,6 +67,10 @@ jobs:
           bundle-analysis.md
           performance-budget-report.json
           performance-budget-report.md
+          web-vitals-report.json
+          web-vitals-report.md
+          performance-regression-report.json
+          performance-regression-report.md
           performance-data/
           performance-reports/
         retention-days: 30

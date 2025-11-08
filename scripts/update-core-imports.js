@@ -20,7 +20,7 @@ const IMPORT_MAPPINGS = {
   // Error handling
   'UnifiedErrorTracker': '@shared/core/error-handling',
   'ErrorBoundaryAdapter': '@shared/core/error-handling/platform/client',
-  'EnhancedErrorBoundary': '@shared/core/error-handling/platform/client',
+  'ErrorBoundary': '@shared/core/error-handling/platform/client',
   'withErrorBoundary': '@shared/core/error-handling/platform/client',
   'ErrorReportingService': '@shared/core/error-handling/services',
   

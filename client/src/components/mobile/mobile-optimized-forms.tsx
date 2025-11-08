@@ -14,6 +14,14 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Eye, EyeOff, Search, X, ChevronDown } from "lucide-react";
 import { useResponsiveLayoutContext } from "./responsive-layout-manager";
+import {
+  validateEmail,
+  validatePassword,
+  validatePhone,
+  validateText,
+  sanitizeInput,
+  ValidationResult
+} from "../../utils/input-validation";
 
 interface MobileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -23,6 +31,15 @@ interface MobileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   rightIcon?: React.ReactNode;
   clearable?: boolean;
   onClear?: () => void;
+  validationType?: 'email' | 'phone' | 'text' | 'password';
+  validationOptions?: {
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    customPattern?: RegExp;
+    customMessage?: string;
+  };
+  onValidationChange?: (result: ValidationResult) => void;
 }
 
 export function MobileInput({
@@ -37,10 +54,14 @@ export function MobileInput({
   value,
   onChange,
   id,
+  validationType,
+  validationOptions,
+  onValidationChange,
   ...props
 }: MobileInputProps) {
   const { touchOptimized, isMobile } = useResponsiveLayoutContext();
   const [isFocused, setIsFocused] = useState(false);
+  const [validationError, setValidationError] = useState<string>("");
   const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
   const inputClasses = [
@@ -71,17 +92,85 @@ export function MobileInput({
     .filter(Boolean)
     .join(" ");
 
+  const validateInput = useCallback((inputValue: string) => {
+    if (!validationType) return;
+
+    let result: ValidationResult;
+
+    switch (validationType) {
+      case 'email':
+        result = validateEmail(inputValue);
+        break;
+      case 'phone':
+        result = validatePhone(inputValue);
+        break;
+      case 'password':
+        result = validatePassword(inputValue);
+        break;
+      case 'text':
+        result = validateText(inputValue, validationOptions || {});
+        break;
+      default:
+        return;
+    }
+
+    const errorMessage = result.errors.length > 0 ? result.errors[0] : "";
+    setValidationError(errorMessage || "");
+
+    if (onValidationChange) {
+      onValidationChange(result);
+    }
+
+    return result;
+  }, [validationType, validationOptions, onValidationChange]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+
+    // Sanitize input
+    const sanitizedValue = sanitizeInput(inputValue, {
+      maxLength: validationOptions?.maxLength,
+      trim: true,
+    });
+
+    // Create sanitized event
+    const sanitizedEvent = {
+      ...e,
+      target: {
+        ...e.target,
+        value: sanitizedValue,
+      },
+    };
+
+    // Validate if validation is enabled
+    if (validationType) {
+      validateInput(sanitizedValue);
+    }
+
+    // Call original onChange with sanitized value
+    if (onChange) {
+      onChange(sanitizedEvent);
+    }
+  }, [onChange, validationType, validationOptions, validateInput]);
+
   const handleClear = useCallback(() => {
     if (onClear) {
       onClear();
     }
     // If no custom clear handler, try to clear the input
     if (onChange && !onClear) {
-      onChange({
+      const sanitizedEvent = {
         target: { value: "" },
-      } as React.ChangeEvent<HTMLInputElement>);
+      } as React.ChangeEvent<HTMLInputElement>;
+      onChange(sanitizedEvent);
     }
-  }, [onClear, onChange]);
+
+    // Clear validation error
+    setValidationError("");
+    if (onValidationChange) {
+      onValidationChange({ isValid: true, errors: [] });
+    }
+  }, [onClear, onChange, onValidationChange]);
 
   return (
     <div className="w-full">
@@ -108,12 +197,12 @@ export function MobileInput({
           id={inputId}
           className={inputClasses}
           value={value}
-          onChange={onChange}
+          onChange={handleChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          aria-invalid={error ? 'true' : 'false'}
+          aria-invalid={(error || validationError) ? 'true' : 'false'}
           aria-describedby={
-            error
+            error || validationError
               ? `${inputId}-error`
               : helperText
               ? `${inputId}-helper`
@@ -148,18 +237,18 @@ export function MobileInput({
         )}
       </div>
 
-      {(error || helperText) && (
+      {(error || validationError || helperText) && (
         <div className="mt-2">
-          {error && (
+          {(error || validationError) && (
             <p
               id={`${inputId}-error`}
               className="text-sm text-red-600"
               role="alert"
             >
-              {error}
+              {error || validationError}
             </p>
           )}
-          {helperText && !error && (
+          {helperText && !error && !validationError && (
             <p id={`${inputId}-helper`} className="text-sm text-gray-500">
               {helperText}
             </p>

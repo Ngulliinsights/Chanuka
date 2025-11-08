@@ -84,9 +84,9 @@ export class SharedCoreUtilityDetector {
     ]],
     
     // Error handling patterns
-    ['EnhancedErrorBoundary', [
-      /<EnhancedErrorBoundary/g,
-      /EnhancedErrorBoundary\s*>/g
+    ['ErrorBoundary', [
+      /<ErrorBoundary/g,
+      /ErrorBoundary\s*>/g
     ]],
     
     ['AutomatedErrorRecoveryEngine', [
@@ -339,7 +339,7 @@ export class SharedCoreUtilityDetector {
       'CACHE_KEYS': '@shared/core',
       'Performance': '@shared/core',
       'RateLimit': '@shared/core',
-      'EnhancedErrorBoundary': '@shared/core',
+      'ErrorBoundary': '@shared/core',
       'AutomatedErrorRecoveryEngine': '@shared/core',
       'cache': '@shared/core',
       

@@ -14,7 +14,7 @@ export * from './handlers/error-handler-chain.js';
 // Note: React error boundaries are exported conditionally for React environments
 // Only export types when in a React environment to avoid JSX compilation issues
 // export type { ErrorBoundaryProps, ErrorBoundaryState } from './handlers/error-boundary.tsx';
-// export type { EnhancedErrorBoundaryProps } from './handlers/enhanced-error-boundary.tsx';
+// export type { ErrorBoundaryProps } from './handlers/enhanced-error-boundary.tsx';
 
 // Error patterns and resilience
 export * from './patterns/circuit-breaker.js';
@@ -69,7 +69,7 @@ export {
   createIntegrationManager
 } from './integrations/error-tracking-integration.js';
 // React components are conditionally exported for React environments
-// export { EnhancedErrorBoundary, withEnhancedErrorBoundary } from './handlers/enhanced-error-boundary.tsx';
+// export { ErrorBoundary, withErrorBoundary } from './handlers/enhanced-error-boundary.tsx';
 
 // Global error handlers setup
 export function setupGlobalErrorHandlers() {

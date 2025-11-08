@@ -383,12 +383,12 @@ interface ErrorBoundaryProps {
   fallback?: React.ComponentType<{ error?: Error; resetError?: () => void }>;
 }
 
-export const EnhancedErrorBoundary = ({ children }: ErrorBoundaryProps) => {
+export const ErrorBoundary = ({ children }: ErrorBoundaryProps) => {
   // This is a simplified version - the full implementation should be in the client
   return children;
 };
 
-export interface EnhancedErrorBoundaryProps {
+export interface ErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ComponentType<any>;
 }

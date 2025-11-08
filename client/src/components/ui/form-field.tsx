@@ -1,594 +1,442 @@
 /**
- * Enhanced form field components with improved validation feedback
- * Implements inline error messages, success indicators, and accessibility features
+ * Enhanced Form Field Components
+ * Provides advanced form inputs with validation, help text, and accessibility features
  */
 
-import React, { forwardRef, useState, useCallback, useRef, useEffect } from 'react';
-import { AlertCircle, CheckCircle, Eye, EyeOff, HelpCircle } from 'lucide-react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Eye, EyeOff, AlertCircle, CheckCircle, HelpCircle } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { Button } from './button';
+import { Input } from './input';
 import { Label } from './label';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+import { Button } from './button';
 
-
-// Enhanced input with validation states
-interface EnhancedFormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface BaseFieldProps {
+  id?: string;
   label?: string;
   description?: string;
   error?: string;
-  success?: string;
   helpText?: string;
-  showPasswordToggle?: boolean;
+  required?: boolean;
+  className?: string;
   onValidationChange?: (isValid: boolean, error?: string) => void;
 }
 
-export const EnhancedFormInput = forwardRef<HTMLInputElement, EnhancedFormInputProps>(
-  ({
-    className,
-    type,
-    label,
-    description,
-    error,
-    success,
-    helpText,
-    showPasswordToggle = false,
-    onValidationChange,
-    id,
-    ...props
-  }, ref) => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [internalError, setInternalError] = useState<string>();
-    const inputRef = useRef<HTMLInputElement>(null);
-
-    // Combine refs
-    const combinedRef = useCallback((node: HTMLInputElement | null) => {
-      if (inputRef.current !== node) {
-        (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = node;
-      }
-      if (typeof ref === 'function') {
-        ref(node);
-      } else if (ref) {
-        (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
-      }
-    }, [ref]);
-
-    const currentType = showPasswordToggle && type === 'password'
-      ? (showPassword ? 'text' : 'password')
-      : type;
-
-    const hasError = Boolean(error || internalError);
-    const hasSuccess = Boolean(success) && !hasError;
-    const displayError = error || internalError;
-
-    // Real-time validation
-    const handleValidation = useCallback((value: string) => {
-      let validationError: string | undefined;
-
-      // Basic validation examples
-      if (props.required && !value.trim()) {
-        validationError = `${label || 'This field'} is required`;
-      } else if (type === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        validationError = 'Please enter a valid email address';
-      } else if (type === 'password' && value && value.length < 8) {
-        validationError = 'Password must be at least 8 characters long';
-      }
-
-      setInternalError(validationError);
-      onValidationChange?.(!validationError, validationError);
-    }, [props.required, type, label, onValidationChange]);
-
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-      props.onChange?.(e);
-      handleValidation(e.target.value);
-    }, [props.onChange, handleValidation]);
-
-    const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-      props.onBlur?.(e);
-      handleValidation(e.target.value);
-    }, [props.onBlur, handleValidation]);
-
-    const togglePasswordVisibility = useCallback(() => {
-      setShowPassword(prev => !prev);
-      // Refocus input after toggle
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
-    }, []);
-
-    return (
-      <div className="space-y-2">
-        {label && (
-          <div className="flex items-center space-x-2">
-            <Label
-              htmlFor={id}
-              className={cn(
-                'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-                hasError && 'text-destructive',
-                hasSuccess && 'text-green-700'
-              )}
-            >
-              {label}
-              {props.required && (
-                <span className="text-destructive ml-1" aria-label="required">*</span>
-              )}
-            </Label>
-
-            {helpText && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="p-0 h-4 w-4"
-                    >
-                      <HelpCircle className="h-3 w-3 text-muted-foreground" />
-                      <span className="sr-only">Help for {label}</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs text-xs">{helpText}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-        )}
-
-        {description && (
-          <p
-            id={id ? `${id}-description` : undefined}
-            className="text-sm text-muted-foreground"
-          >
-            {description}
-          </p>
-        )}
-
-        <div className="relative">
-          <input
-            type={currentType}
-            className={cn(
-              'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-              hasError && 'border-destructive focus-visible:ring-destructive pr-10',
-              hasSuccess && 'border-green-500 focus-visible:ring-green-500 pr-10',
-              showPasswordToggle && 'pr-10',
-              className
-            )}
-            ref={combinedRef}
-            id={id}
-            aria-invalid={hasError ? 'true' : 'false'}
-            aria-describedby={cn(
-              description && `${id}-description`,
-              hasError && `${id}-error`
-            )}
-            {...props}
-            onChange={handleChange}
-            onBlur={handleBlur}
-          />
-
-          {/* Validation status icons */}
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            {hasError && (
-              <AlertCircle className="h-4 w-4 text-destructive" aria-hidden="true" />
-            )}
-            {hasSuccess && (
-              <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
-            )}
-          </div>
-
-          {showPasswordToggle && type === 'password' && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-              onClick={togglePasswordVisibility}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <Eye className="h-4 w-4 text-muted-foreground" />
-              )}
-            </Button>
-          )}
-        </div>
-
-        {/* Error message */}
-        {hasError && (
-          <div
-            id={id ? `${id}-error` : undefined}
-            className="flex items-start space-x-2 text-sm text-destructive"
-            role="alert"
-            aria-live="polite"
-          >
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <span>{displayError}</span>
-          </div>
-        )}
-
-        {/* Success message */}
-        {hasSuccess && (
-          <div
-            className="flex items-start space-x-2 text-sm text-green-700"
-            role="status"
-            aria-live="polite"
-          >
-            <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <span>{success}</span>
-          </div>
-        )}
-      </div>
-    );
-  }
-);
-EnhancedFormInput.displayName = 'EnhancedFormInput';
-
-// Enhanced textarea with validation
-interface EnhancedFormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string;
-  description?: string;
-  error?: string;
-  success?: string;
-  helpText?: string;
-  showCharacterCount?: boolean;
-  onValidationChange?: (isValid: boolean, error?: string) => void;
+interface EnhancedFormInputProps extends BaseFieldProps, Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  showValidationIcon?: boolean;
+  validateOnBlur?: boolean;
+  validateOnChange?: boolean;
+  customValidator?: (value: string) => string | undefined;
 }
 
-export const EnhancedFormTextarea = forwardRef<HTMLTextAreaElement, EnhancedFormTextareaProps>(
-  ({
-    className,
-    label,
-    description,
-    error,
-    success,
-    helpText,
-    showCharacterCount = false,
-    onValidationChange,
-    id,
-    maxLength,
-    value,
-    ...props
-  }, ref) => {
-    const [internalError, setInternalError] = useState<string>();
-    const [characterCount, setCharacterCount] = useState(0);
+export const EnhancedFormInput: React.FC<EnhancedFormInputProps> = ({
+  id,
+  label,
+  description,
+  error,
+  helpText,
+  required = false,
+  className,
+  onChange,
+  onValidationChange,
+  showValidationIcon = true,
+  validateOnBlur = true,
+  validateOnChange = false,
+  customValidator,
+  type = 'text',
+  value = '',
+  ...props
+}) => {
+  const [internalError, setInternalError] = useState<string | undefined>();
+  const [isTouched, setIsTouched] = useState(false);
+  const [isValid, setIsValid] = useState(true);
+  const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  
+  const currentError = error || internalError;
+  const showError = isTouched && currentError;
 
-    const hasError = Boolean(error || internalError);
-    const hasSuccess = Boolean(success) && !hasError;
-    const displayError = error || internalError;
+  const validateValue = useCallback((val: string): string | undefined => {
+    if (required && !val.trim()) {
+      return 'This field is required';
+    }
 
-    // Update character count
-    useEffect(() => {
-      setCharacterCount(String(value || '').length);
-    }, [value]);
+    if (type === 'email' && val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+      return 'Please enter a valid email address';
+    }
 
-    const handleValidation = useCallback((textValue: string) => {
-      let validationError: string | undefined;
+    if (type === 'url' && val && !/^https?:\/\/.+\..+/.test(val)) {
+      return 'Please enter a valid URL';
+    }
 
-      if (props.required && !textValue.trim()) {
-        validationError = `${label || 'This field'} is required`;
-      } else if (maxLength && textValue.length > maxLength) {
-        validationError = `Maximum ${maxLength} characters allowed`;
-      }
+    if (customValidator) {
+      return customValidator(val);
+    }
 
-      setInternalError(validationError);
-      onValidationChange?.(!validationError, validationError);
-    }, [props.required, maxLength, label, onValidationChange]);
+    return undefined;
+  }, [required, type, customValidator]);
 
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const newValue = e.target.value;
-      setCharacterCount(newValue.length);
-      props.onChange?.(e);
+  const handleValidation = useCallback((val: string) => {
+    const validationError = validateValue(val);
+    setInternalError(validationError);
+    const valid = !validationError;
+    setIsValid(valid);
+    onValidationChange?.(valid, validationError);
+  }, [validateValue, onValidationChange]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    onChange?.(e);
+    
+    if (validateOnChange) {
       handleValidation(newValue);
-    }, [props.onChange, handleValidation]);
+    }
+  }, [onChange, validateOnChange, handleValidation]);
 
-    const handleBlur = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
-      props.onBlur?.(e);
-      handleValidation(e.target.value);
-    }, [props.onBlur, handleValidation]);
+  const handleBlur = useCallback(() => {
+    setIsTouched(true);
+    if (validateOnBlur) {
+      handleValidation(value as string);
+    }
+  }, [validateOnBlur, handleValidation, value]);
 
-    return (
-      <div className="space-y-2">
-        {label && (
-          <div className="flex items-center space-x-2">
-            <Label
-              htmlFor={id}
-              className={cn(
-                'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-                hasError && 'text-destructive',
-                hasSuccess && 'text-green-700'
-              )}
-            >
-              {label}
-              {props.required && (
-                <span className="text-destructive ml-1" aria-label="required">*</span>
-              )}
-            </Label>
+  const getValidationIcon = () => {
+    if (!showValidationIcon || !isTouched) return null;
+    
+    if (currentError) {
+      return <AlertCircle className="h-4 w-4 text-red-500" />;
+    }
+    
+    if (isValid && value) {
+      return <CheckCircle className="h-4 w-4 text-green-500" />;
+    }
+    
+    return null;
+  };
 
-            {helpText && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="p-0 h-4 w-4"
-                    >
-                      <HelpCircle className="h-3 w-3 text-muted-foreground" />
-                      <span className="sr-only">Help for {label}</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs text-xs">{helpText}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-        )}
-
-        {description && (
-          <p
-            id={id ? `${id}-description` : undefined}
-            className="text-sm text-muted-foreground"
-          >
-            {description}
-          </p>
-        )}
-
-        <div className="relative">
-          <textarea
-            className={cn(
-              'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-vertical',
-              hasError && 'border-destructive focus-visible:ring-destructive',
-              hasSuccess && 'border-green-500 focus-visible:ring-green-500',
-              className
-            )}
-            ref={ref}
-            id={id}
-            maxLength={maxLength}
-            value={value}
-            aria-invalid={hasError ? 'true' : 'false'}
-            aria-describedby={cn(
-              description && `${id}-description`,
-              hasError && `${id}-error`
-            )}
-            {...props}
-            onChange={handleChange}
-            onBlur={handleBlur}
-          />
-
-          {/* Validation status icons */}
-          <div className="absolute right-3 top-3 pointer-events-none">
-            {hasError && (
-              <AlertCircle className="h-4 w-4 text-destructive" aria-hidden="true" />
-            )}
-            {hasSuccess && (
-              <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
-            )}
-          </div>
-
-          {showCharacterCount && maxLength && (
-            <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-background px-1">
-              <span className={cn(
-                characterCount > maxLength * 0.9 && 'text-orange-500',
-                characterCount >= maxLength && 'text-destructive'
-              )}>
-                {characterCount}
-              </span>
-              /{maxLength}
+  return (
+    <div className={cn('space-y-2', className)}>
+      {label && (
+        <Label htmlFor={inputId} className="flex items-center space-x-1">
+          <span>{label}</span>
+          {required && <span className="text-red-500">*</span>}
+          {helpText && (
+            <div className="group relative">
+              <HelpCircle className="h-3 w-3 text-gray-400 cursor-help" />
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                {helpText}
+              </div>
             </div>
           )}
-        </div>
-
-        {/* Error message */}
-        {hasError && (
-          <div
-            id={id ? `${id}-error` : undefined}
-            className="flex items-start space-x-2 text-sm text-destructive"
-            role="alert"
-            aria-live="polite"
-          >
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <span>{displayError}</span>
-          </div>
-        )}
-
-        {/* Success message */}
-        {hasSuccess && (
-          <div
-            className="flex items-start space-x-2 text-sm text-green-700"
-            role="status"
-            aria-live="polite"
-          >
-            <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <span>{success}</span>
+        </Label>
+      )}
+      
+      {description && (
+        <p className="text-sm text-gray-600">{description}</p>
+      )}
+      
+      <div className="relative">
+        <Input
+          id={inputId}
+          type={type}
+          value={value}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={cn(
+            showError && 'border-red-500 focus:border-red-500 focus:ring-red-500',
+            isValid && isTouched && value && 'border-green-500',
+            showValidationIcon && 'pr-10'
+          )}
+          aria-invalid={showError ? 'true' : 'false'}
+          aria-describedby={
+            showError ? `${inputId}-error` : 
+            helpText ? `${inputId}-help` : undefined
+          }
+          {...props}
+        />
+        
+        {showValidationIcon && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            {getValidationIcon()}
           </div>
         )}
       </div>
-    );
-  }
-);
-EnhancedFormTextarea.displayName = 'EnhancedFormTextarea';
+      
+      {showError && (
+        <p id={`${inputId}-error`} className="text-sm text-red-600" role="alert">
+          {currentError}
+        </p>
+      )}
+      
+      {helpText && !showError && (
+        <p id={`${inputId}-help`} className="text-sm text-gray-500">
+          {helpText}
+        </p>
+      )}
+    </div>
+  );
+};
 
-// Enhanced select with validation
-interface EnhancedFormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string;
-  description?: string;
-  error?: string;
-  success?: string;
-  helpText?: string;
-  options: Array<{ value: string; label: string; disabled?: boolean }>;
-  placeholder?: string;
-  onValidationChange?: (isValid: boolean, error?: string) => void;
+interface EnhancedFormTextareaProps extends BaseFieldProps, Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  showCharacterCount?: boolean;
+  maxLength?: number;
+  autoResize?: boolean;
+  customValidator?: (value: string) => string | undefined;
 }
 
-export const EnhancedFormSelect = forwardRef<HTMLSelectElement, EnhancedFormSelectProps>(
-  ({
-    className,
-    label,
-    description,
-    error,
-    success,
-    helpText,
-    options,
-    placeholder = 'Select an option...',
-    onValidationChange,
-    id,
-    ...props
-  }, ref) => {
-    const [internalError, setInternalError] = useState<string>();
+export const EnhancedFormTextarea: React.FC<EnhancedFormTextareaProps> = ({
+  id,
+  label,
+  description,
+  error,
+  helpText,
+  required = false,
+  className,
+  onChange,
+  onValidationChange,
+  showCharacterCount = false,
+  maxLength,
+  autoResize = false,
+  customValidator,
+  value = '',
+  rows = 3,
+  ...props
+}) => {
+  const [internalError, setInternalError] = useState<string | undefined>();
+  const [isTouched, setIsTouched] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
+  
+  const currentError = error || internalError;
+  const showError = isTouched && currentError;
+  const characterCount = (value as string).length;
 
-    const hasError = Boolean(error || internalError);
-    const hasSuccess = Boolean(success) && !hasError;
-    const displayError = error || internalError;
+  const validateValue = useCallback((val: string): string | undefined => {
+    if (required && !val.trim()) {
+      return 'This field is required';
+    }
 
-    const handleValidation = useCallback((selectValue: string) => {
-      let validationError: string | undefined;
+    if (maxLength && val.length > maxLength) {
+      return `Maximum ${maxLength} characters allowed`;
+    }
 
-      if (props.required && (!selectValue || selectValue === '')) {
-        validationError = `${label || 'This field'} is required`;
-      }
+    if (customValidator) {
+      return customValidator(val);
+    }
 
-      setInternalError(validationError);
-      onValidationChange?.(!validationError, validationError);
-    }, [props.required, label, onValidationChange]);
+    return undefined;
+  }, [required, maxLength, customValidator]);
 
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-      props.onChange?.(e);
-      handleValidation(e.target.value);
-    }, [props.onChange, handleValidation]);
+  const handleValidation = useCallback((val: string) => {
+    const validationError = validateValue(val);
+    setInternalError(validationError);
+    const valid = !validationError;
+    onValidationChange?.(valid, validationError);
+  }, [validateValue, onValidationChange]);
 
-    const handleBlur = useCallback((e: React.FocusEvent<HTMLSelectElement>) => {
-      props.onBlur?.(e);
-      handleValidation(e.target.value);
-    }, [props.onBlur, handleValidation]);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    onChange?.(e);
+    handleValidation(newValue);
+  }, [onChange, handleValidation]);
 
-    return (
-      <div className="space-y-2">
-        {label && (
-          <div className="flex items-center space-x-2">
-            <Label
-              htmlFor={id}
-              className={cn(
-                'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-                hasError && 'text-destructive',
-                hasSuccess && 'text-green-700'
-              )}
-            >
-              {label}
-              {props.required && (
-                <span className="text-destructive ml-1" aria-label="required">*</span>
-              )}
-            </Label>
+  const handleBlur = useCallback(() => {
+    setIsTouched(true);
+  }, []);
 
-            {helpText && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="p-0 h-4 w-4"
-                    >
-                      <HelpCircle className="h-3 w-3 text-muted-foreground" />
-                      <span className="sr-only">Help for {label}</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs text-xs">{helpText}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-        )}
+  // Auto-resize functionality
+  useEffect(() => {
+    if (autoResize && textareaRef.current) {
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [value, autoResize]);
 
-        {description && (
-          <p
-            id={id ? `${id}-description` : undefined}
-            className="text-sm text-muted-foreground"
-          >
-            {description}
+  return (
+    <div className={cn('space-y-2', className)}>
+      {label && (
+        <Label htmlFor={textareaId} className="flex items-center space-x-1">
+          <span>{label}</span>
+          {required && <span className="text-red-500">*</span>}
+        </Label>
+      )}
+      
+      {description && (
+        <p className="text-sm text-gray-600">{description}</p>
+      )}
+      
+      <div className="relative">
+        <textarea
+          ref={textareaRef}
+          id={textareaId}
+          value={value}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          rows={rows}
+          maxLength={maxLength}
+          className={cn(
+            "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            showError && 'border-red-500 focus:border-red-500 focus:ring-red-500',
+            autoResize && 'resize-none overflow-hidden'
+          )}
+          aria-invalid={showError ? 'true' : 'false'}
+          aria-describedby={
+            showError ? `${textareaId}-error` : 
+            helpText ? `${textareaId}-help` : undefined
+          }
+          {...props}
+        />
+      </div>
+      
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          {showError && (
+            <p id={`${textareaId}-error`} className="text-sm text-red-600" role="alert">
+              {currentError}
+            </p>
+          )}
+          
+          {helpText && !showError && (
+            <p id={`${textareaId}-help`} className="text-sm text-gray-500">
+              {helpText}
+            </p>
+          )}
+        </div>
+        
+        {showCharacterCount && (
+          <p className={cn(
+            'text-xs text-gray-500 ml-2',
+            maxLength && characterCount > maxLength * 0.9 && 'text-amber-600',
+            maxLength && characterCount >= maxLength && 'text-red-600'
+          )}>
+            {characterCount}{maxLength && `/${maxLength}`}
           </p>
         )}
-
-        <div className="relative">
-          <select
-            className={cn(
-              'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-              hasError && 'border-destructive focus-visible:ring-destructive',
-              hasSuccess && 'border-green-500 focus-visible:ring-green-500',
-              className
-            )}
-            ref={ref}
-            id={id}
-            aria-invalid={hasError ? 'true' : 'false'}
-            aria-describedby={cn(
-              description && `${id}-description`,
-              hasError && `${id}-error`
-            )}
-            {...props}
-            onChange={handleChange}
-            onBlur={handleBlur}
-          >
-            {placeholder && (
-              <option value="" disabled>
-                {placeholder}
-              </option>
-            )}
-            {options.map((option) => (
-              <option
-                key={option.value}
-                value={option.value}
-                disabled={option.disabled}
-              >
-                {option.label}
-              </option>
-            ))}
-          </select>
-
-          {/* Validation status icons */}
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            {hasError && (
-              <AlertCircle className="h-4 w-4 text-destructive" aria-hidden="true" />
-            )}
-            {hasSuccess && (
-              <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
-            )}
-          </div>
-        </div>
-
-        {/* Error message */}
-        {hasError && (
-          <div
-            id={id ? `${id}-error` : undefined}
-            className="flex items-start space-x-2 text-sm text-destructive"
-            role="alert"
-            aria-live="polite"
-          >
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <span>{displayError}</span>
-          </div>
-        )}
-
-        {/* Success message */}
-        {hasSuccess && (
-          <div
-            className="flex items-start space-x-2 text-sm text-green-700"
-            role="status"
-            aria-live="polite"
-          >
-            <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <span>{success}</span>
-          </div>
-        )}
       </div>
-    );
-  }
-);
-EnhancedFormSelect.displayName = 'EnhancedFormSelect';
+    </div>
+  );
+};
 
+interface SelectOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+interface EnhancedFormSelectProps extends BaseFieldProps, Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
+  options: SelectOption[];
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  placeholder?: string;
+  customValidator?: (value: string) => string | undefined;
+}
+
+export const EnhancedFormSelect: React.FC<EnhancedFormSelectProps> = ({
+  id,
+  label,
+  description,
+  error,
+  helpText,
+  required = false,
+  className,
+  onChange,
+  onValidationChange,
+  options,
+  placeholder = 'Select an option...',
+  customValidator,
+  value = '',
+  ...props
+}) => {
+  const [internalError, setInternalError] = useState<string | undefined>();
+  const [isTouched, setIsTouched] = useState(false);
+  const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+  
+  const currentError = error || internalError;
+  const showError = isTouched && currentError;
+
+  const validateValue = useCallback((val: string): string | undefined => {
+    if (required && !val) {
+      return 'Please select an option';
+    }
+
+    if (customValidator) {
+      return customValidator(val);
+    }
+
+    return undefined;
+  }, [required, customValidator]);
+
+  const handleValidation = useCallback((val: string) => {
+    const validationError = validateValue(val);
+    setInternalError(validationError);
+    const valid = !validationError;
+    onValidationChange?.(valid, validationError);
+  }, [validateValue, onValidationChange]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newValue = e.target.value;
+    onChange?.(e);
+    handleValidation(newValue);
+  }, [onChange, handleValidation]);
+
+  const handleBlur = useCallback(() => {
+    setIsTouched(true);
+  }, []);
+
+  return (
+    <div className={cn('space-y-2', className)}>
+      {label && (
+        <Label htmlFor={selectId} className="flex items-center space-x-1">
+          <span>{label}</span>
+          {required && <span className="text-red-500">*</span>}
+        </Label>
+      )}
+      
+      {description && (
+        <p className="text-sm text-gray-600">{description}</p>
+      )}
+      
+      <select
+        id={selectId}
+        value={value}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        className={cn(
+          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          showError && 'border-red-500 focus:border-red-500 focus:ring-red-500'
+        )}
+        aria-invalid={showError ? 'true' : 'false'}
+        aria-describedby={
+          showError ? `${selectId}-error` : 
+          helpText ? `${selectId}-help` : undefined
+        }
+        {...props}
+      >
+        <option value="" disabled>
+          {placeholder}
+        </option>
+        {options.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+            disabled={option.disabled}
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
+      
+      {showError && (
+        <p id={`${selectId}-error`} className="text-sm text-red-600" role="alert">
+          {currentError}
+        </p>
+      )}
+      
+      {helpText && !showError && (
+        <p id={`${selectId}-help`} className="text-sm text-gray-500">
+          {helpText}
+        </p>
+      )}
+    </div>
+  );
+};

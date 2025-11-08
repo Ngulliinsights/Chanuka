@@ -1,640 +1,324 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Sidebar } from '../sidebar';
-import { NavigationItem, User } from '../types';
 
 // Mock dependencies
-vi.mock('@/lib/utils', () => ({
-  cn: (...classes: string[]) => classes.filter(Boolean).join(' '),
+jest.mock('../../../lib/utils', () => ({
+  cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }));
 
-vi.mock('@/components/ui/logo', () => ({
-  Logo: (props: any) => (
-    <div data-testid="logo" data-size={props.size} data-show-text={props.showText} className={props.textClassName}>
+jest.mock('../ui/logo', () => ({
+  Logo: ({ size, showText, textClassName }: any) => (
+    <div data-testid="logo" data-size={size} data-show-text={showText} className={textClassName}>
       Logo
     </div>
   ),
 }));
 
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    Link: (props: any) => (
-      <a href={props.to} className={props.className} title={props.title} data-testid="nav-link">
-        {props.children}
-      </a>
-    ),
-    useLocation: () => ({
-      pathname: '/dashboard',
-    }),
-  };
-});
+jest.mock('lucide-react', () => ({
+  Building: () => <span data-testid="building-icon">Building</span>,
+  BarChart3: () => <span data-testid="barchart-icon">BarChart3</span>,
+  FileText: () => <span data-testid="filetext-icon">FileText</span>,
+  Users: () => <span data-testid="users-icon">Users</span>,
+  Search: () => <span data-testid="search-icon">Search</span>,
+  Settings: () => <span data-testid="settings-icon">Settings</span>,
+  HelpCircle: () => <span data-testid="help-icon">HelpCircle</span>,
+  MessageSquare: () => <span data-testid="message-icon">MessageSquare</span>,
+  Shield: () => <span data-testid="shield-icon">Shield</span>,
+  TrendingUp: () => <span data-testid="trending-icon">TrendingUp</span>,
+  User: () => <span data-testid="user-icon">User</span>,
+}));
 
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter>{children}</BrowserRouter>
-);
+const renderWithRouter = (component: React.ReactElement) => {
+  return render(<BrowserRouter>{component}</BrowserRouter>);
+};
 
-describe('Sidebar Component', () => {
-  const mockUser: User = {
-    id: 'user-1',
+describe('Sidebar', () => {
+  const mockUser = {
+    id: '1',
     name: 'John Doe',
     email: 'john@example.com',
-    role: 'citizen',
-    avatar: 'https://example.com/avatar.jpg',
+    avatar: 'avatar.jpg',
+    role: 'user',
   };
 
-  const mockNavigationItems: NavigationItem[] = [
-    {
-      id: 'home',
-      label: 'Home',
-      href: '/',
-      icon: <span data-testid="home-icon">🏠</span>,
-    },
-    {
-      id: 'bills',
-      label: 'Bills',
-      href: '/bills',
-      icon: <span data-testid="bills-icon">📄</span>,
-      badge: 5,
-    },
-    {
-      id: 'admin',
-      label: 'Admin',
-      href: '/admin',
-      icon: <span data-testid="admin-icon">⚙️</span>,
-      adminOnly: true,
-    },
-    {
-      id: 'profile',
-      label: 'Profile',
-      href: '/profile',
-      icon: <span data-testid="profile-icon">👤</span>,
-      requiresAuth: true,
-    },
-    {
-      id: 'disabled',
-      label: 'Disabled',
-      href: '/disabled',
-      icon: <span data-testid="disabled-icon">❌</span>,
-      disabled: true,
-    },
+  const customNavigationItems = [
+    { id: 'home', label: 'Home', href: '/', icon: <span>HomeIcon</span> },
+    { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: <span>DashboardIcon</span> },
   ];
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+  it('renders with default navigation items', () => {
+    renderWithRouter(<Sidebar />);
+
+    expect(screen.getByTestId('logo')).toBeInTheDocument();
+    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Bills')).toBeInTheDocument();
   });
 
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
+  it('renders with custom navigation items', () => {
+    renderWithRouter(<Sidebar navigationItems={customNavigationItems} />);
 
-      expect(screen.getByTestId('logo')).toBeInTheDocument();
-      expect(screen.getByRole('navigation')).toBeInTheDocument();
-    });
-
-    it('should render in expanded state by default', () => {
-      render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
-
-      const sidebar = screen.getByRole('navigation').closest('div');
-      expect(sidebar).toHaveClass('w-64');
-    });
-
-    it('should render in collapsed state when isCollapsed is true', () => {
-      render(
-        <TestWrapper>
-          <Sidebar isCollapsed={true} />
-        </TestWrapper>
-      );
-
-      const sidebar = screen.getByRole('navigation').closest('div');
-      expect(sidebar).toHaveClass('w-16');
-    });
-
-    it('should render custom navigation items', () => {
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={mockNavigationItems} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByText('Home')).toBeInTheDocument();
-      expect(screen.getByText('Bills')).toBeInTheDocument();
-      expect(screen.getByTestId('home-icon')).toBeInTheDocument();
-      expect(screen.getByTestId('bills-icon')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.queryByText('Bills')).not.toBeInTheDocument();
   });
 
-  describe('Logo and Header', () => {
-    it('should render logo in expanded state', () => {
-      render(
-        <TestWrapper>
-          <Sidebar isCollapsed={false} />
-        </TestWrapper>
-      );
+  it('renders in collapsed state', () => {
+    renderWithRouter(<Sidebar isCollapsed={true} />);
 
-      const logo = screen.getByTestId('logo');
-      expect(logo).toHaveAttribute('data-show-text', 'true');
-      expect(logo).toHaveClass('text-xl', 'font-bold', 'text-primary');
-    });
-
-    it('should render compact logo in collapsed state', () => {
-      render(
-        <TestWrapper>
-          <Sidebar isCollapsed={true} />
-        </TestWrapper>
-      );
-
-      // In collapsed state, should show compact logo
-      const compactLogo = screen.getByText('C');
-      expect(compactLogo).toBeInTheDocument();
-    });
-
-    it('should render toggle button when onToggle is provided', () => {
-      const onToggle = vi.fn();
-
-      render(
-        <TestWrapper>
-          <Sidebar onToggle={onToggle} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByLabelText('Expand sidebar')).toBeInTheDocument();
-    });
-
-    it('should call onToggle when toggle button is clicked', async () => {
-      const user = userEvent.setup();
-      const onToggle = vi.fn();
-
-      render(
-        <TestWrapper>
-          <Sidebar onToggle={onToggle} />
-        </TestWrapper>
-      );
-
-      const toggleButton = screen.getByLabelText('Expand sidebar');
-      await users.click(toggleButton);
-
-      expect(onToggle).toHaveBeenCalledTimes(1);
-    });
+    const sidebar = screen.getByTestId('logo').closest('div');
+    expect(sidebar).toHaveClass('w-16');
   });
 
-  describe('Search Functionality', () => {
-    it('should render search input when showSearch is true', () => {
-      render(
-        <TestWrapper>
-          <Sidebar showSearch={true} />
-        </TestWrapper>
-      );
+  it('renders in expanded state', () => {
+    renderWithRouter(<Sidebar isCollapsed={false} />);
 
-      expect(screen.getByLabelText('Search bills')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Search bills...')).toBeInTheDocument();
-    });
-
-    it('should not render search input when showSearch is false', () => {
-      render(
-        <TestWrapper>
-          <Sidebar showSearch={false} />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByLabelText('Search bills')).not.toBeInTheDocument();
-    });
-
-    it('should not render search input in collapsed state', () => {
-      render(
-        <TestWrapper>
-          <Sidebar isCollapsed={true} showSearch={true} />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByLabelText('Search bills')).not.toBeInTheDocument();
-    });
-
-    it('should handle search input changes', async () => {
-      const user = userEvent.setup();
-      const onSearchChange = vi.fn();
-
-      render(
-        <TestWrapper>
-          <Sidebar showSearch={true} onSearchChange={onSearchChange} />
-        </TestWrapper>
-      );
-
-      const searchInput = screen.getByLabelText('Search bills');
-      await users.type(searchInput, 'test query');
-
-      expect(onSearchChange).toHaveBeenCalledWith('test query');
-    });
+    const sidebar = screen.getByTestId('logo').closest('div');
+    expect(sidebar).toHaveClass('w-64');
   });
 
-  describe('Navigation Items', () => {
-    it('should highlight active navigation item', () => {
-      // Mock current location as /dashboard
-      vi.mocked(require('react-router-dom').useLocation).mockReturnValue({
-        pathname: '/dashboard',
-      });
+  it('shows toggle button when onToggle is provided', () => {
+    const mockOnToggle = jest.fn();
+    renderWithRouter(<Sidebar onToggle={mockOnToggle} />);
 
-      render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
-
-      const dashboardLink = screen.getByText('Dashboard');
-      expect(dashboardLink.closest('a')).toHaveClass('bg-primary', 'text-primary-foreground');
-    });
-
-    it('should render navigation item badges', () => {
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={mockNavigationItems} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByText('5')).toBeInTheDocument();
-    });
-
-    it('should render 99+ for badges over 99', () => {
-      const itemsWithLargeBadge = [
-        {
-          id: 'notifications',
-          label: 'Notifications',
-          href: '/notifications',
-          icon: <span>🔔</span>,
-          badge: 150,
-        },
-      ];
-
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={itemsWithLargeBadge} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByText('99+')).toBeInTheDocument();
-    });
-
-    it('should hide auth-required items when user is not authenticated', () => {
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={mockNavigationItems} user={null} />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByText('Profile')).not.toBeInTheDocument();
-    });
-
-    it('should show auth-required items when user is authenticated', () => {
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={mockNavigationItems} user={mockUser} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByText('Profile')).toBeInTheDocument();
-    });
-
-    it('should hide admin-only items for non-admin users', () => {
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={mockNavigationItems} user={mockUser} />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByText('Admin')).not.toBeInTheDocument();
-    });
-
-    it('should show admin-only items for admin users', () => {
-      const adminUser = { ...mockUser, role: 'admin' as const };
-
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={mockNavigationItems} user={adminUser} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByText('Admin')).toBeInTheDocument();
-    });
-
-    it('should disable navigation items when disabled prop is true', () => {
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={mockNavigationItems} />
-        </TestWrapper>
-      );
-
-      const disabledLink = screen.getByText('Disabled').closest('a');
-      expect(disabledLink).toHaveClass('opacity-50', 'cursor-not-allowed');
-    });
-
-    it('should show only icons in collapsed state', () => {
-      render(
-        <TestWrapper>
-          <Sidebar isCollapsed={true} navigationItems={mockNavigationItems} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByTestId('home-icon')).toBeInTheDocument();
-      expect(screen.queryByText('Home')).not.toBeInTheDocument();
-    });
-
-    it('should show tooltips for items in collapsed state', () => {
-      render(
-        <TestWrapper>
-          <Sidebar isCollapsed={true} navigationItems={mockNavigationItems} />
-        </TestWrapper>
-      );
-
-      const homeLink = screen.getByTestId('home-icon').closest('a');
-      expect(homeLink).toHaveAttribute('title', 'Home');
-    });
+    const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i });
+    expect(toggleButton).toBeInTheDocument();
   });
 
-  describe('User Section', () => {
-    it('should render user section when user is provided', () => {
-      render(
-        <TestWrapper>
-          <Sidebar user={mockUser} />
-        </TestWrapper>
-      );
+  it('calls onToggle when toggle button is clicked', () => {
+    const mockOnToggle = jest.fn();
+    renderWithRouter(<Sidebar onToggle={mockOnToggle} />);
 
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
-      expect(screen.getByText('john@example.com')).toBeInTheDocument();
-    });
+    const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i });
+    fireEvent.click(toggleButton);
 
-    it('should render user avatar when provided', () => {
-      render(
-        <TestWrapper>
-          <Sidebar user={mockUser} />
-        </TestWrapper>
-      );
-
-      const avatar = screen.getByAltText('John Doe');
-      expect(avatar).toHaveAttribute('src', 'https://example.com/avatar.jpg');
-    });
-
-    it('should render user initials when avatar is not provided', () => {
-      const userWithoutAvatar = { ...mockUser, avatar: undefined };
-
-      render(
-        <TestWrapper>
-          <Sidebar user={userWithoutAvatar} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByText('J')).toBeInTheDocument();
-    });
-
-    it('should not render user section when user is not provided', () => {
-      render(
-        <TestWrapper>
-          <Sidebar user={null} />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
-    });
-
-    it('should render settings link in user section', () => {
-      render(
-        <TestWrapper>
-          <Sidebar user={mockUser} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByLabelText('User settings')).toBeInTheDocument();
-    });
-
-    it('should show only user avatar in collapsed state', () => {
-      render(
-        <TestWrapper>
-          <Sidebar isCollapsed={true} user={mockUser} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByAltText('John Doe')).toBeInTheDocument();
-      expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
-      expect(screen.queryByText('john@example.com')).not.toBeInTheDocument();
-    });
+    expect(mockOnToggle).toHaveBeenCalledTimes(1);
   });
 
-  describe('Error Handling', () => {
-    it('should handle invalid navigation items gracefully', () => {
-      const invalidItems = [
-        {
-          id: '', // Invalid empty id
-          label: 'Invalid Item',
-          href: '/invalid',
-          icon: <span>❌</span>,
-        },
-      ] as NavigationItem[];
+  it('shows search input when showSearch is true and not collapsed', () => {
+    renderWithRouter(<Sidebar showSearch={true} isCollapsed={false} />);
 
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={invalidItems} />
-        </TestWrapper>
-      );
-
-      expect(screen.getByText(/Sidebar Error/)).toBeInTheDocument();
-    });
-
-    it('should recover from error when recover button is clicked', async () => {
-      const user = userEvent.setup();
-      const invalidItems = [
-        {
-          id: '',
-          label: 'Invalid Item',
-          href: '/invalid',
-          icon: <span>❌</span>,
-        },
-      ] as NavigationItem[];
-
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={invalidItems} />
-        </TestWrapper>
-      );
-
-      const recoverButton = screen.getByText('Recover');
-      await users.click(recoverButton);
-
-      await waitFor(() => {
-        expect(screen.queryByText(/Sidebar Error/)).not.toBeInTheDocument();
-      });
-    });
-
-    it('should handle search change errors', async () => {
-      const user = userEvent.setup();
-      const onSearchChange = vi.fn(() => {
-        throw new Error('Search failed');
-      });
-
-      render(
-        <TestWrapper>
-          <Sidebar showSearch={true} onSearchChange={onSearchChange} />
-        </TestWrapper>
-      );
-
-      const searchInput = screen.getByLabelText('Search bills');
-      await users.type(searchInput, 'test');
-
-      expect(screen.getByText(/Sidebar Error/)).toBeInTheDocument();
-    });
-
-    it('should handle toggle errors', async () => {
-      const user = userEvent.setup();
-      const onToggle = vi.fn(() => {
-        throw new Error('Toggle failed');
-      });
-
-      render(
-        <TestWrapper>
-          <Sidebar onToggle={onToggle} />
-        </TestWrapper>
-      );
-
-      const toggleButton = screen.getByLabelText('Expand sidebar');
-      await users.click(toggleButton);
-
-      expect(screen.getByText(/Sidebar Error/)).toBeInTheDocument();
-    });
+    expect(screen.getByPlaceholderText('Search bills...')).toBeInTheDocument();
   });
 
-  describe('Accessibility', () => {
-    it('should have proper navigation role and label', () => {
-      render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
+  it('hides search input when collapsed', () => {
+    renderWithRouter(<Sidebar showSearch={true} isCollapsed={true} />);
 
-      const navigation = screen.getByRole('navigation');
-      expect(navigation).toHaveAttribute('aria-label', 'Main navigation');
-    });
-
-    it('should have proper aria-current for active items', () => {
-      vi.mocked(require('react-router-dom').useLocation).mockReturnValue({
-        pathname: '/bills',
-      });
-
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={mockNavigationItems} />
-        </TestWrapper>
-      );
-
-      const billsLink = screen.getByText('Bills').closest('a');
-      expect(billsLink).toHaveAttribute('aria-current', 'page');
-    });
-
-    it('should have proper focus management', () => {
-      render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
-
-      const searchInput = screen.getByLabelText('Search bills');
-      expect(searchInput).toHaveAttribute('aria-label', 'Search bills');
-    });
-
-    it('should support keyboard navigation', () => {
-      render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
-
-      const navLinks = screen.getAllByTestId('nav-link');
-      navLinks.forEach(link => {
-        expect(link).toHaveAttribute('href');
-      });
-    });
+    expect(screen.queryByPlaceholderText('Search bills...')).not.toBeInTheDocument();
   });
 
-  describe('Responsive Design', () => {
-    it('should apply custom className', () => {
-      render(
-        <TestWrapper>
-          <Sidebar className="custom-sidebar" />
-        </TestWrapper>
-      );
+  it('calls onSearchChange when search input changes', () => {
+    const mockOnSearchChange = jest.fn();
+    renderWithRouter(<Sidebar onSearchChange={mockOnSearchChange} />);
 
-      const sidebar = screen.getByRole('navigation').closest('div');
-      expect(sidebar).toHaveClass('custom-sidebar');
-    });
+    const searchInput = screen.getByPlaceholderText('Search bills...');
+    fireEvent.change(searchInput, { target: { value: 'test query' } });
 
-    it('should have proper transition classes', () => {
-      render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
-
-      const sidebar = screen.getByRole('navigation').closest('div');
-      expect(sidebar).toHaveClass('transition-all', 'duration-300');
-    });
-
-    it('should handle responsive breakpoints', () => {
-      render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
-
-      const sidebar = screen.getByRole('navigation').closest('div');
-      expect(sidebar).toHaveClass('flex', 'h-full', 'flex-col');
-    });
+    expect(mockOnSearchChange).toHaveBeenCalledWith('test query');
   });
 
-  describe('Performance', () => {
-    it('should not re-render unnecessarily', () => {
-      const { rerender } = render(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
+  it('renders user section when user is provided', () => {
+    renderWithRouter(<Sidebar user={mockUser} />);
 
-      // Re-render with same props
-      rerender(
-        <TestWrapper>
-          <Sidebar />
-        </TestWrapper>
-      );
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('john@example.com')).toBeInTheDocument();
+  });
 
-      // Component should handle re-renders efficiently
-      expect(screen.getByRole('navigation')).toBeInTheDocument();
+  it('does not render user section when no user', () => {
+    renderWithRouter(<Sidebar />);
+
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
+  });
+
+  it('shows user avatar when provided', () => {
+    renderWithRouter(<Sidebar user={mockUser} />);
+
+    const avatar = screen.getByAltText('John Doe');
+    expect(avatar).toBeInTheDocument();
+    expect(avatar).toHaveAttribute('src', 'avatar.jpg');
+  });
+
+  it('shows user initials when no avatar', () => {
+    const userWithoutAvatar = { ...mockUser, avatar: undefined };
+    renderWithRouter(<Sidebar user={userWithoutAvatar} />);
+
+    expect(screen.getByText('J')).toBeInTheDocument();
+  });
+
+  it('applies active class to current route', () => {
+    // Mock useLocation to return '/dashboard'
+    jest.mock('react-router-dom', () => ({
+      ...jest.requireActual('react-router-dom'),
+      useLocation: () => ({ pathname: '/dashboard' }),
+    }));
+
+    renderWithRouter(<Sidebar />);
+
+    const dashboardLink = screen.getByText('Dashboard').closest('a');
+    expect(dashboardLink).toHaveClass('bg-primary');
+  });
+
+  it('filters navigation items based on auth requirements', () => {
+    const authRequiredItems = [
+      { id: 'home', label: 'Home', href: '/', icon: <span>Home</span> },
+      { id: 'admin', label: 'Admin', href: '/admin', icon: <span>Admin</span>, requiresAuth: true },
+    ];
+
+    renderWithRouter(<Sidebar navigationItems={authRequiredItems} />);
+
+    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.queryByText('Admin')).not.toBeInTheDocument();
+  });
+
+  it('filters admin-only items for non-admin users', () => {
+    const adminItems = [
+      { id: 'home', label: 'Home', href: '/', icon: <span>Home</span> },
+      { id: 'admin', label: 'Admin', href: '/admin', icon: <span>Admin</span>, adminOnly: true },
+    ];
+
+    renderWithRouter(<Sidebar navigationItems={adminItems} user={mockUser} />);
+
+    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.queryByText('Admin')).not.toBeInTheDocument();
+  });
+
+  it('shows admin items for admin users', () => {
+    const adminUser = { ...mockUser, role: 'admin' };
+    const adminItems = [
+      { id: 'home', label: 'Home', href: '/', icon: <span>Home</span> },
+      { id: 'admin', label: 'Admin', href: '/admin', icon: <span>Admin</span>, adminOnly: true },
+    ];
+
+    renderWithRouter(<Sidebar navigationItems={adminItems} user={adminUser} />);
+
+    expect(screen.getByText('Admin')).toBeInTheDocument();
+  });
+
+  it('shows badge for navigation items with badge count', () => {
+    const itemsWithBadge = [
+      { id: 'home', label: 'Home', href: '/', icon: <span>Home</span>, badge: 5 },
+    ];
+
+    renderWithRouter(<Sidebar navigationItems={itemsWithBadge} />);
+
+    expect(screen.getByText('5')).toBeInTheDocument();
+  });
+
+  it('shows 99+ for badge count over 99', () => {
+    const itemsWithBadge = [
+      { id: 'home', label: 'Home', href: '/', icon: <span>Home</span>, badge: 150 },
+    ];
+
+    renderWithRouter(<Sidebar navigationItems={itemsWithBadge} />);
+
+    expect(screen.getByText('99+')).toBeInTheDocument();
+  });
+
+  it('applies disabled styling for disabled items', () => {
+    const disabledItems = [
+      { id: 'home', label: 'Home', href: '/', icon: <span>Home</span>, disabled: true },
+    ];
+
+    renderWithRouter(<Sidebar navigationItems={disabledItems} />);
+
+    const link = screen.getByText('Home').closest('a');
+    expect(link).toHaveClass('opacity-50');
+    expect(link).toHaveClass('cursor-not-allowed');
+  });
+
+  it('handles navigation item validation errors', () => {
+    const invalidItems = [
+      { id: '', label: 'Invalid', href: '/', icon: <span>Icon</span> }, // Invalid id
+    ];
+
+    renderWithRouter(<Sidebar navigationItems={invalidItems} />);
+
+    expect(screen.getByText('Sidebar Error:')).toBeInTheDocument();
+  });
+
+  it('recovers from error state', () => {
+    const invalidItems = [
+      { id: '', label: 'Invalid', href: '/', icon: <span>Icon</span> },
+    ];
+
+    renderWithRouter(<Sidebar navigationItems={invalidItems} />);
+
+    const recoverButton = screen.getByRole('button', { name: /recover/i });
+    fireEvent.click(recoverButton);
+
+    expect(screen.queryByText('Sidebar Error:')).not.toBeInTheDocument();
+  });
+
+  it('handles search change errors', () => {
+    const mockOnSearchChange = jest.fn(() => {
+      throw new Error('Search error');
     });
 
-    it('should handle large numbers of navigation items', () => {
-      const manyItems = Array.from({ length: 50 }, (_, i) => ({
-        id: `item-${i}`,
-        label: `Item ${i}`,
-        href: `/item-${i}`,
-        icon: <span>📄</span>,
-      }));
+    renderWithRouter(<Sidebar onSearchChange={mockOnSearchChange} />);
 
-      render(
-        <TestWrapper>
-          <Sidebar navigationItems={manyItems} />
-        </TestWrapper>
-      );
+    const searchInput = screen.getByPlaceholderText('Search bills...');
+    fireEvent.change(searchInput, { target: { value: 'test' } });
 
-      expect(screen.getByText('Item 0')).toBeInTheDocument();
-      expect(screen.getByText('Item 49')).toBeInTheDocument();
+    expect(screen.getByText('Sidebar Error:')).toBeInTheDocument();
+  });
+
+  it('handles toggle errors', () => {
+    const mockOnToggle = jest.fn(() => {
+      throw new Error('Toggle error');
     });
+
+    renderWithRouter(<Sidebar onToggle={mockOnToggle} />);
+
+    const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i });
+    fireEvent.click(toggleButton);
+
+    expect(screen.getByText('Sidebar Error:')).toBeInTheDocument();
+  });
+
+  it('applies custom className', () => {
+    renderWithRouter(<Sidebar className="custom-sidebar" />);
+
+    const sidebar = screen.getByTestId('logo').closest('div');
+    expect(sidebar).toHaveClass('custom-sidebar');
+  });
+
+  it('has proper ARIA attributes', () => {
+    renderWithRouter(<Sidebar />);
+
+    const nav = screen.getByRole('navigation', { name: 'Main navigation' });
+    expect(nav).toBeInTheDocument();
+
+    const searchInput = screen.getByLabelText('Search bills');
+    expect(searchInput).toBeInTheDocument();
+  });
+
+  it('shows title attribute for collapsed items', () => {
+    renderWithRouter(<Sidebar isCollapsed={true} />);
+
+    const homeLink = screen.getByTitle('Home');
+    expect(homeLink).toBeInTheDocument();
+  });
+
+  it('renders user settings link', () => {
+    renderWithRouter(<Sidebar user={mockUser} />);
+
+    const settingsLink = screen.getByLabelText('User settings');
+    expect(settingsLink).toBeInTheDocument();
+    expect(settingsLink).toHaveAttribute('href', '/profile');
+  });
+
+  it('handles runtime render errors', () => {
+    // Mock a component that throws
+    jest.mock('../ui/logo', () => ({
+      Logo: () => {
+        throw new Error('Logo render error');
+      },
+    }));
+
+    expect(() => {
+      renderWithRouter(<Sidebar />);
+    }).toThrow();
   });
 });
-

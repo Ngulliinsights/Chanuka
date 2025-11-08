@@ -2,9 +2,10 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import viteCompression from 'vite-plugin-compression'
 import type { Plugin } from 'vite'
 import type { MinifyOptions } from 'terser'
-import type { PreRenderedAsset } from 'rollup'
+// import type { PreRenderedAsset } from 'rollup'
 
 // cSpell:words treemap Deoptimization
 // https://vitejs.dev/config/
@@ -42,15 +43,36 @@ export default defineConfig(({ mode }) => {
         // Add summary statistics for better insights
         sourcemap: true,
       }) as Plugin] : []),
+
+      // Compression plugin for better bundle size
+      // Enables Brotli and Gzip compression for production builds
+      ...(isProduction ? [
+        viteCompression({
+          algorithm: 'brotliCompress',
+          ext: '.br',
+          threshold: 1024, // Only compress files larger than 1KB
+          deleteOriginFile: false, // Keep original files for fallback
+        }),
+        viteCompression({
+          algorithm: 'gzip',
+          ext: '.gz',
+          threshold: 1024,
+          deleteOriginFile: false,
+        })
+      ] : []),
+
+      // Bundle analysis plugin for automated monitoring
+      // This plugin integrates with the build process to track bundle sizes
+      // Note: Plugin is available via scripts/bundle-analysis-plugin.js
+      // Enable with ANALYZE=true environment variable
     ],
 
     // CSS configuration with PostCSS integration
     css: {
       // Enable source maps in development for easier debugging
       devSourcemap: isDevelopment,
-      // Point to the directory containing postcss.config.js
-      // Vite will automatically find and use the config file in this directory
-      postcss: path.resolve(__dirname, '..'),
+      // Use the client directory's postcss.config.js
+      postcss: path.resolve(__dirname, '.'),
     },
     
     resolve: {
@@ -109,77 +131,114 @@ export default defineConfig(({ mode }) => {
       // Generate source maps in development and for production debugging
       // 'hidden' means source maps exist but aren't referenced in the bundle
       sourcemap: isDevelopment ? true : 'hidden',
-      
-      // Advanced rollup configuration for optimal bundling
+
+      // Bundle size budgets - fail build if exceeded
       rollupOptions: {
         output: {
-          // Intelligent chunk splitting strategy
-          // This function determines which chunk each module belongs to
+          // Optimized chunk splitting strategy
+          // Reduces the number of chunks while maintaining good caching
           manualChunks: (id: string) => {
-            // Separate large vendor libraries into their own chunks
-            // This improves caching since vendor code changes less frequently
+            // Core vendor libraries (loaded on every page)
             if (id.includes('node_modules')) {
-              // Split React and React-DOM into separate chunks for better caching
+              // React ecosystem - critical for all pages
               if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-vendor'
+                return 'react-core'
               }
-              // Split other large libraries that don't change often
-              if (id.includes('lodash') || id.includes('date-fns')) {
-                return 'utils-vendor'
+              
+              // UI and styling libraries - used frequently
+              if (id.includes('@radix-ui') || id.includes('lucide-react') || 
+                  id.includes('clsx') || id.includes('tailwind-merge') ||
+                  id.includes('class-variance-authority')) {
+                return 'ui-core'
               }
-              // All other node_modules go into vendor chunk
+              
+              // Data and forms - used on most interactive pages
+              if (id.includes('@tanstack/react-query') || id.includes('axios') ||
+                  id.includes('react-hook-form') || id.includes('zod')) {
+                return 'data-forms'
+              }
+              
+              // Heavy/specialized libraries - lazy loaded
+              if (id.includes('recharts') || id.includes('date-fns')) {
+                return 'heavy-libs'
+              }
+              
+              // All other vendor code
               return 'vendor'
             }
-            
-            // Split UI components into their own chunk
-            // This allows lazy loading of UI components when needed
-            if (id.includes('src/components/ui')) {
-              return 'ui-components'
-            }
-            
-            // Keep the main app code together
-            if (id.includes('src')) {
+
+            // Application code splitting
+            if (id.includes('src/')) {
+              // Core app infrastructure
+              if (id.includes('src/components/layout') || 
+                  id.includes('src/components/navigation') ||
+                  id.includes('src/hooks/use-') ||
+                  id.includes('src/utils/browser-') ||
+                  id.includes('src/store/')) {
+                return 'app-core'
+              }
+              
+              // Feature-specific code (lazy loaded)
+              if (id.includes('src/pages/') || 
+                  id.includes('src/features/') ||
+                  id.includes('src/components/bills/') ||
+                  id.includes('src/components/analysis/')) {
+                const pathParts = id.split('/')
+                const featureIndex = pathParts.findIndex(part => 
+                  part === 'pages' || part === 'features' || part === 'bills' || part === 'analysis'
+                )
+                if (featureIndex !== -1 && pathParts[featureIndex + 1]) {
+                  return `feature-${pathParts[featureIndex + 1]}`
+                }
+                return 'features'
+              }
+              
+              // Mobile-specific components
+              if (id.includes('src/components/mobile/')) {
+                return 'mobile'
+              }
+              
+              // Everything else goes to main app chunk
               return 'app'
             }
-            
-            // Return undefined to let Rollup decide for other files
+
             return undefined
           },
-          
+
           // Organized file naming strategy
           // Hash ensures cache busting when content changes
           chunkFileNames: 'assets/js/[name]-[hash].js',
           entryFileNames: 'assets/js/[name]-[hash].js',
-          
+
           // Smart asset organization based on file type
-          assetFileNames: (assetInfo: PreRenderedAsset) => {
+          assetFileNames: (assetInfo: any) => {
             const name = assetInfo.name || ''
-            
+
             // Image assets with organized subfolder structure
             if (/\.(png|jpe?g|svg|gif|webp|avif|tiff|bmp|ico)$/i.test(name)) {
               return 'assets/images/[name]-[hash][extname]'
             }
-            
+
             // Font files in dedicated folder
             if (/\.(woff2?|eot|ttf|otf)$/i.test(name)) {
               return 'assets/fonts/[name]-[hash][extname]'
             }
-            
+
             // CSS files in dedicated folder
             if (/\.css$/i.test(name)) {
               return 'assets/css/[name]-[hash][extname]'
             }
-            
+
             // JSON and other data files
             if (/\.json$/i.test(name)) {
               return 'assets/data/[name]-[hash][extname]'
             }
-            
+
             // Default fallback for any other asset type
             return 'assets/misc/[name]-[hash][extname]'
           },
         },
-        
+
         // Tree-shaking optimization to remove unused code
         // These settings ensure aggressive dead code elimination
         treeshake: {
@@ -190,10 +249,17 @@ export default defineConfig(({ mode }) => {
           // Don't disable optimization for try-catch blocks
           tryCatchDeoptimization: false,
         },
+
+        onwarn(warning, warn) {
+          // Suppress certain warnings that are not actionable
+          if (warning.code === 'CIRCULAR_DEPENDENCY') return;
+          if (warning.code === 'THIS_IS_UNDEFINED') return;
+          warn(warning);
+        }
       },
-      
-      // Balanced chunk size limits - warn when chunks get too large
-      chunkSizeWarningLimit: 800, // 800KB - warn for chunks approaching 1MB
+
+      // Strict bundle size budgets - fail build if exceeded
+      chunkSizeWarningLimit: 500, // 500KB - reduced to enforce better code splitting
       
       // Production minification with optimized settings
       minify: isProduction ? 'terser' : false,

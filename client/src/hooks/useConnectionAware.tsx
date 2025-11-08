@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { logger } from '../utils/browser-logger';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * Detailed information about the user's network connection
@@ -28,22 +27,35 @@ export function useConnectionAware(): ConnectionInfo {
     isOnline: navigator.onLine,
     connectionType: 'fast',
   });
+  
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastUpdateRef = useRef<ConnectionInfo | null>(null);
+  const isMountedRef = useRef(true);
 
-  useEffect(() => {
-    /**
-     * Updates connection information based on all available network metrics.
-     * This comprehensive approach ensures accurate quality assessment even
-     * when the effective type alone might be misleading.
-     */
-    const updateConnectionInfo = () => {
+  const debouncedUpdateConnectionInfo = useCallback(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
       const isOnline = navigator.onLine;
 
       // Handle offline state immediately
       if (!isOnline) {
-        setConnectionInfo({
+        const newInfo = {
           isOnline: false,
-          connectionType: 'offline',
-        });
+          connectionType: 'offline' as const,
+        };
+        
+        // Use stable comparison for offline state
+        const hasChanged = !lastUpdateRef.current || 
+          lastUpdateRef.current.isOnline !== false ||
+          lastUpdateRef.current.connectionType !== 'offline';
+          
+        if (hasChanged) {
+          lastUpdateRef.current = newInfo;
+          setConnectionInfo(newInfo);
+        }
         return;
       }
 
@@ -54,10 +66,20 @@ export function useConnectionAware(): ConnectionInfo {
 
       if (!connection) {
         // Network Information API not available - assume fast connection
-        setConnectionInfo({
+        const newInfo = {
           isOnline: true,
-          connectionType: 'fast',
-        });
+          connectionType: 'fast' as const,
+        };
+        
+        // Use stable comparison for fallback state
+        const hasChanged = !lastUpdateRef.current || 
+          lastUpdateRef.current.isOnline !== true ||
+          lastUpdateRef.current.connectionType !== 'fast';
+          
+        if (hasChanged) {
+          lastUpdateRef.current = newInfo;
+          setConnectionInfo(newInfo);
+        }
         return;
       }
 
@@ -82,21 +104,39 @@ export function useConnectionAware(): ConnectionInfo {
         connectionType = 'slow';
       }
 
-      setConnectionInfo({
+      const newInfo = {
         isOnline: true,
         connectionType,
         effectiveType,
         downlink,
         rtt,
-      });
-    };
+      };
+      
+      // Use stable comparison instead of JSON.stringify to avoid property order issues
+      const hasChanged = !lastUpdateRef.current || 
+        lastUpdateRef.current.isOnline !== newInfo.isOnline ||
+        lastUpdateRef.current.connectionType !== newInfo.connectionType ||
+        lastUpdateRef.current.effectiveType !== newInfo.effectiveType ||
+        Math.abs((lastUpdateRef.current.downlink || 0) - (newInfo.downlink || 0)) > 0.1 ||
+        Math.abs((lastUpdateRef.current.rtt || 0) - (newInfo.rtt || 0)) > 10;
+      
+      // Only update if the connection info has actually changed and component is mounted
+      if (hasChanged && isMountedRef.current) {
+        lastUpdateRef.current = newInfo;
+        setConnectionInfo(newInfo);
+      }
+    }, 200); // 200ms debounce for connection changes
+  }, []);
 
+  useEffect(() => {
+    isMountedRef.current = true;
+    
     // Perform initial connection assessment
-    updateConnectionInfo();
+    debouncedUpdateConnectionInfo();
 
     // Set up event listeners for connection changes
-    window.addEventListener('online', updateConnectionInfo);
-    window.addEventListener('offline', updateConnectionInfo);
+    window.addEventListener('online', debouncedUpdateConnectionInfo);
+    window.addEventListener('offline', debouncedUpdateConnectionInfo);
 
     // Listen for connection quality changes if API is available
     const connection = (navigator as any).connection || 
@@ -104,19 +144,25 @@ export function useConnectionAware(): ConnectionInfo {
                       (navigator as any).webkitConnection;
 
     if (connection) {
-      connection.addEventListener('change', updateConnectionInfo);
+      connection.addEventListener('change', debouncedUpdateConnectionInfo);
     }
 
     // Cleanup function to remove all event listeners
     return () => {
-      window.removeEventListener('online', updateConnectionInfo);
-      window.removeEventListener('offline', updateConnectionInfo);
+      isMountedRef.current = false;
+      
+      window.removeEventListener('online', debouncedUpdateConnectionInfo);
+      window.removeEventListener('offline', debouncedUpdateConnectionInfo);
       
       if (connection) {
-        connection.removeEventListener('change', updateConnectionInfo);
+        connection.removeEventListener('change', debouncedUpdateConnectionInfo);
+      }
+      
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
       }
     };
-  }, []);
+  }, [debouncedUpdateConnectionInfo]);
 
   return connectionInfo;
 }

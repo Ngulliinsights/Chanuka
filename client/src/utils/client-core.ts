@@ -3,6 +3,8 @@
  * Browser-compatible implementations of shared functionality
  */
 
+import { initializeCSPReporting, getCSPConfig, setCSPHeader } from './csp-headers';
+
 export interface LogContext {
   component?: string;
   user_id?: string;
@@ -160,6 +162,16 @@ export const performanceMonitor: Performance = {
     }
   }
 };
+
+// Initialize CSP reporting on module load
+if (typeof document !== 'undefined') {
+  initializeCSPReporting();
+
+  // Set CSP header based on environment
+  const environment = process.env.NODE_ENV === 'development' ? 'development' : 'production';
+  const cspConfig = getCSPConfig(environment);
+  setCSPHeader(cspConfig);
+}
 
 // Simple validation service for API responses
 export const validationService = {

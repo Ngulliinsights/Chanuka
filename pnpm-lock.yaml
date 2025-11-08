@@ -76,7 +76,7 @@ importers:
         version: 12.0.3
       drizzle-orm:
         specifier: ^0.38.4
-        version: 0.38.4(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(pg@8.16.3)(postgres@3.4.7)
+        version: 0.38.4(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(@types/react@18.3.26)(pg@8.16.3)(postgres@3.4.7)(react@18.3.1)
       drizzle-zod:
         specifier: ^0.6.0
         version: 0.6.1(drizzle-orm@0.38.4)(zod@3.25.76)
@@ -193,6 +193,15 @@ importers:
       '@playwright/test':
         specifier: ^1.48.0
         version: 1.56.1
+      '@testing-library/jest-dom':
+        specifier: ^6.6.3
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^16.3.0
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
+      '@testing-library/user-event':
+        specifier: ^14.6.1
+        version: 14.6.1(@testing-library/dom@10.4.1)
       '@types/express':
         specifier: ^4.17.23
         version: 4.17.25
@@ -214,6 +223,12 @@ importers:
       '@types/pino':
         specifier: ^7.0.4
         version: 7.0.5
+      '@types/react':
+        specifier: ^18.3.26
+        version: 18.3.26
+      '@types/react-dom':
+        specifier: ^18.3.7
+        version: 18.3.7(@types/react@18.3.26)
       '@types/supertest':
         specifier: ^6.0.2
         version: 6.0.3
@@ -226,6 +241,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^7.18.0
         version: 7.18.0(eslint@8.57.1)(typescript@5.6.3)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.2
+        version: 4.7.0(vite@5.4.21)
       axe-core:
         specifier: ^4.11.0
         version: 4.11.0
@@ -262,6 +280,12 @@ importers:
       puppeteer:
         specifier: ^24.26.0
         version: 24.29.0(bufferutil@4.0.9)(typescript@5.6.3)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
       socket.io-client:
         specifier: ^4.8.1
         version: 4.8.1(bufferutil@4.0.9)
@@ -283,6 +307,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: ^5.4.15
+        version: 5.4.21(@types/node@20.19.24)(terser@5.44.1)
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@20.19.24)(@vitest/ui@3.2.4)(jsdom@26.1.0)(terser@5.44.1)
@@ -8742,7 +8769,7 @@ packages:
       - supports-color
     dev: true
 
-  /drizzle-orm@0.38.4(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(pg@8.16.3)(postgres@3.4.7):
+  /drizzle-orm@0.38.4(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(@types/react@18.3.26)(pg@8.16.3)(postgres@3.4.7)(react@18.3.1):
     resolution: {integrity: sha512-s7/5BpLKO+WJRHspvpqTydxFob8i1vo2rEx4pY6TGY7QSMuUfWUuzaY0DIpXCkgHOo37BaFC+SJQb99dDUXT3Q==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
@@ -8837,8 +8864,10 @@ packages:
       '@neondatabase/serverless': 0.10.4
       '@opentelemetry/api': 1.9.0
       '@types/pg': 8.15.6
+      '@types/react': 18.3.26
       pg: 8.16.3
       postgres: 3.4.7
+      react: 18.3.1
     dev: false
 
   /drizzle-zod@0.6.1(drizzle-orm@0.38.4)(zod@3.25.76):
@@ -8847,7 +8876,7 @@ packages:
       drizzle-orm: '>=0.36.0'
       zod: '>=3.0.0'
     dependencies:
-      drizzle-orm: 0.38.4(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(pg@8.16.3)(postgres@3.4.7)
+      drizzle-orm: 0.38.4(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(@types/react@18.3.26)(pg@8.16.3)(postgres@3.4.7)(react@18.3.1)
       zod: 3.25.76
     dev: false
 

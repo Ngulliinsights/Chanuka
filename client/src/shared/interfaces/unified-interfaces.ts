@@ -189,7 +189,7 @@ export interface ErrorRecovery {
 export interface UnifiedErrorSystem {
   // Error boundary components
   ErrorBoundary: ComponentType<ErrorBoundaryProps>;
-  EnhancedErrorBoundary: ComponentType<ErrorBoundaryProps>;
+  ErrorBoundary: ComponentType<ErrorBoundaryProps>;
   ComponentErrorBoundary: ComponentType<ErrorBoundaryProps>;
   
   // Error handling hooks
