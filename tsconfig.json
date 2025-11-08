@@ -1,154 +1,86 @@
 {
-  "include": [
-    "**/*"
+  "files": [],
+  "references": [
+    { "path": "./client" },
+    { "path": "./server" },
+    { "path": "./shared" }
   ],
+  "include": [],
   "exclude": [
     "node_modules",
     "dist",
     "build",
-    "coverage",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/*.d.ts",
-    "shared/core/dist/**",
-    "migration/**",
-    "scripts/testing/**",
-    "tools/**"
+    "coverage"
   ],
   "compilerOptions": {
+    /* Language and Environment */
     "target": "ES2022",
-    "module": "ES2022",
     "lib": [
       "ES2022",
       "dom",
       "dom.iterable"
     ],
+    "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useUnknownInCatchVariables": true,
+    
+    /* Modules */
+    "module": "ES2022",
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": false,
     "allowJs": true,
     "checkJs": false,
-    "jsx": "react-jsx",
-    "declaration": false,
+    
+    /* Emit */
+    "declaration": true,
     "outDir": "./dist",
     "removeComments": true,
     "importHelpers": true,
     "downlevelIteration": true,
     "sourceMap": true,
+    "verbatimModuleSyntax": false,
+    
+    /* Interop Constraints */
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    
+    /* Type Checking - Strict Mode */
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "exactOptionalPropertyTypes": true,
+    
+    /* Type Checking - Additional Checks */
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitThis": true,
-    "useUnknownInCatchVariables": true,
-    "alwaysStrict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    
+    /* Completeness */
     "skipLibCheck": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": false,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "baseUrl": ".",
-    "ignoreDeprecations": "5.0",
+    
+    /* Performance */
     "incremental": true,
-    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
+    
+    /* Type Definitions */
     "types": [
       "node",
       "vite/client",
       "vitest/globals"
     ],
-    "paths": {
-      "@/*": [
-        "./client/src/*"
-      ],
-      "@/components/*": [
-        "./client/src/components/*"
-      ],
-      "@/hooks/*": [
-        "./client/src/hooks/*"
-      ],
-      "@/pages/*": [
-        "./client/src/pages/*"
-      ],
-      "@/services/*": [
-        "./client/src/services/*"
-      ],
-      "@/utils/*": [
-        "./client/src/utils/*"
-      ],
-      "@/types/*": [
-        "./client/src/types/*"
-      ],
-      "@/styles/*": [
-        "./client/src/styles/*"
-      ],
-      "@/lib/*": [
-        "./client/src/lib/*"
-      ],
-      "@server/*": [
-        "./server/*"
-      ],
-      "@server/features/*": [
-        "./server/features/*"
-      ],
-      "@server/infrastructure/*": [
-        "./server/infrastructure/*"
-      ],
-      "@server/core/*": [
-        "./server/core/*"
-      ],
-      "@server/utils/*": [
-        "./server/utils/*"
-      ],
-      "@server/middleware/*": [
-        "./server/middleware/*"
-      ],
-      "@shared/*": [
-        "./shared/*"
-      ],
-      "@shared/core": [
-        "./shared/core/src/index.ts"
-      ],
-      "@shared/core/*": [
-        "./shared/core/src/*"
-      ],
-      "@shared/schema": [
-        "./shared/schema/index.ts"
-      ],
-      "@shared/schema/*": [
-        "./shared/schema/*"
-      ],
-      "@shared/database": [
-        "./shared/database/index.ts"
-      ],
-      "@shared/database/*": [
-        "./shared/database/*"
-      ],
-      "@db": [
-        "./db/index.ts"
-      ],
-      "@db/*": [
-        "./db/*"
-      ],
-      "@scripts/*": [
-        "./scripts/*"
-      ],
-      "~/*": [
-        "./*"
-      ]
-    }
+    
+    /* Composite project setup for monorepo */
+    "composite": true
   }
 }

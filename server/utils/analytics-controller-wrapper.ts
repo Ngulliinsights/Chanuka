@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 import { ApiValidationError, ApiError, ApiSuccess } from './api-response.js';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../shared/core/src/index.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 
 /**
@@ -76,13 +76,16 @@ export function controllerWrapper<
           validatedBody = options.bodySchema.parse(req.body);
         } catch (error) {
           if (error instanceof ZodError) {
-            ApiValidationError(res, error.errors, {
-              timestamp: new Date().toISOString(),
-              requestId: req.analyticsContext?.traceId,
-              source: 'database',
-              executionTime: Date.now() - startTime
+            return res.status(400).json({
+              success: false,
+              error: { message: 'Validation failed', errors: error.errors, statusCode: 400 },
+              metadata: {
+                timestamp: new Date().toISOString(),
+                requestId: req.analyticsContext?.traceId,
+                source: 'database',
+                executionTime: Date.now() - startTime
+              }
             });
-            return;
           }
           throw error;
         }
@@ -95,13 +98,16 @@ export function controllerWrapper<
           validatedQuery = options.querySchema.parse(req.query);
         } catch (error) {
           if (error instanceof ZodError) {
-            ApiValidationError(res, error.errors, {
-              timestamp: new Date().toISOString(),
-              requestId: req.analyticsContext?.traceId,
-              source: 'database',
-              executionTime: Date.now() - startTime
+            return res.status(400).json({
+              success: false,
+              error: { message: 'Validation failed', errors: error.errors, statusCode: 400 },
+              metadata: {
+                timestamp: new Date().toISOString(),
+                requestId: req.analyticsContext?.traceId,
+                source: 'database',
+                executionTime: Date.now() - startTime
+              }
             });
-            return;
           }
           throw error;
         }
@@ -114,13 +120,16 @@ export function controllerWrapper<
           validatedParams = options.paramsSchema.parse(req.params);
         } catch (error) {
           if (error instanceof ZodError) {
-            ApiValidationError(res, error.errors, {
-              timestamp: new Date().toISOString(),
-              requestId: req.analyticsContext?.traceId,
-              source: 'validation',
-              executionTime: Date.now() - startTime
+            return res.status(400).json({
+              success: false,
+              error: { message: 'Validation failed', errors: error.errors, statusCode: 400 },
+              metadata: {
+                timestamp: new Date().toISOString(),
+                requestId: req.analyticsContext?.traceId,
+                source: 'validation',
+                executionTime: Date.now() - startTime
+              }
             });
-            return;
           }
           throw error;
         }
@@ -137,11 +146,15 @@ export function controllerWrapper<
       const result = await handler(input, req, res);
 
       // Return successful response
-      ApiSuccess(res, result, {
-        timestamp: new Date().toISOString(),
-        requestId: req.analyticsContext?.traceId,
-        source: 'database',
-        executionTime: Date.now() - startTime
+      return res.status(200).json({
+        success: true,
+        data: result,
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.analyticsContext?.traceId,
+          source: 'database',
+          executionTime: Date.now() - startTime
+        }
       });
 
     } catch (error) {
@@ -156,11 +169,15 @@ export function controllerWrapper<
       });
 
       // Return error response
-      ApiError(res, error instanceof Error ? error.message : 'Internal server error', 500, {
-        timestamp: new Date().toISOString(),
-        requestId: req.analyticsContext?.traceId,
-        source: 'controller',
-        executionTime: Date.now() - startTime
+      return res.status(500).json({
+        success: false,
+        error: { message: error instanceof Error ? error.message : 'Internal server error', statusCode: 500 },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.analyticsContext?.traceId,
+          source: 'controller',
+          executionTime: Date.now() - startTime
+        }
       });
     }
   };
@@ -181,40 +198,3 @@ declare global { namespace Express {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

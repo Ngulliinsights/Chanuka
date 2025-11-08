@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { AlertCircle, RefreshCw, PlusCircle, X, Edit3, Search, Tag } from 'lucide-react';
+import { AlertCircle, RefreshCw, CheckCircle, X, Edit, Search, Tag } from 'lucide-react';
 import { useDashboard } from './hooks/useDashboard';
 import { useDashboardTopics } from './hooks/useDashboardTopics';
 import type { DashboardComponentProps, TrackedTopic, TopicCategory } from './types';
@@ -189,7 +189,7 @@ export const TrackedTopics: React.FC<DashboardComponentProps> = ({
               className="text-xs font-medium px-2.5 py-1.5"
               onClick={() => setIsEditing(!isEditing)}
             >
-              <Edit3 className="h-3 w-3 mr-1" />
+              <Edit className="h-3 w-3 mr-1" />
               {isEditing ? 'Done' : 'Edit'}
             </Button>
           </div>
@@ -256,7 +256,7 @@ export const TrackedTopics: React.FC<DashboardComponentProps> = ({
                     disabled={!newTopicName.trim() || isAddingTopic}
                     className="h-7 px-2"
                   >
-                    <PlusCircle className="h-3 w-3 mr-1" />
+                    <CheckCircle className="h-3 w-3 mr-1" />
                     Add
                   </Button>
                 </div>
@@ -306,7 +306,7 @@ export const TrackedTopics: React.FC<DashboardComponentProps> = ({
                       onClick={() => setIsEditing(true)}
                       className="mt-2"
                     >
-                      <PlusCircle className="h-4 w-4 mr-2" />
+                      <CheckCircle className="h-4 w-4 mr-2" />
                       Add Topics
                     </Button>
                   )}

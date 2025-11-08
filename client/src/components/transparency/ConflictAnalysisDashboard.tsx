@@ -415,21 +415,21 @@ const ConflictAnalysisDashboard: React.FC = () => {
               <CardContent>
                 <div className="space-y-3">
                   {dashboardData.topRiskSponsors.slice(0, 5).map((sponsor, index) => (
-                    <div key={sponsors.sponsor_id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div key={sponsor.sponsor_id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-semibold">
                           #{index + 1}
                         </div>
                         <div>
-                          <div className="font-medium">Sponsor {sponsors.sponsor_id}</div>
+                          <div className="font-medium">Sponsor {sponsor.sponsor_id}</div>
                           <div className="text-sm text-gray-600">
-                            {sponsors.conflictCount} conflicts
+                            {sponsor.conflictCount} conflicts
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        {getTrendIcon(sponsors.trend)}
-                        <span className="font-semibold">{sponsors.risk_score}</span>
+                        {getTrendIcon(sponsor.trend)}
+                        <span className="font-semibold">{sponsor.risk_score}</span>
                       </div>
                     </div>
                   ))}

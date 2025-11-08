@@ -22,9 +22,9 @@ export {
 
 export { default as userEvent } from '@testing-library/user-event';
 
-// Jest utilities
-export const mockFn = jest.fn;
-export const mockImplementation = jest.fn().mockImplementation;
-export const mockResolvedValue = jest.fn().mockResolvedValue;
-export const mockRejectedValue = jest.fn().mockRejectedValue;
+// Jest utilities - using vi for Vitest compatibility
+export const mockFn = () => vi.fn();
+export const mockImplementation = (impl: any) => vi.fn().mockImplementation(impl);
+export const mockResolvedValue = (value: any) => vi.fn().mockResolvedValue(value);
+export const mockRejectedValue = (value: any) => vi.fn().mockRejectedValue(value);
 

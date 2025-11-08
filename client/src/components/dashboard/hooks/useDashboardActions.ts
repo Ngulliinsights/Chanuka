@@ -35,8 +35,14 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
 
     try {
       const newAction: ActionItem = {
-        ...actionData,
         id: `action-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        title: actionData.title,
+        description: actionData.description,
+        priority: actionData.priority,
+        due_date: actionData.due_date,
+        category: actionData.category,
+        bill_id: actionData.bill_id,
+        completed: actionData.completed ?? false,
         created_at: new Date(),
         updated_at: new Date()
       };
@@ -66,9 +72,21 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
         throw new Error(`Action with ID ${actionId} not found`);
       }
 
+      const existingAction = actions[actionIndex];
+      if (!existingAction) {
+        throw new Error(`Action with ID ${actionId} not found`);
+      }
+      
       const updatedAction: ActionItem = {
-        ...actions[actionIndex],
-        ...updates,
+        id: existingAction.id,
+        title: updates.title ?? existingAction.title,
+        description: updates.description ?? existingAction.description,
+        priority: updates.priority ?? existingAction.priority,
+        due_date: updates.due_date ?? existingAction.due_date,
+        category: updates.category ?? existingAction.category,
+        bill_id: updates.bill_id ?? existingAction.bill_id,
+        completed: updates.completed ?? existingAction.completed,
+        created_at: existingAction.created_at,
         updated_at: new Date()
       };
 

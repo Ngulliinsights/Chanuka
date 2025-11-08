@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X, Search, Gavel } from 'lucide-react';
+import { BarChart3, X, Search, Settings } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Logo } from '../ui/logo';
 import { 
@@ -196,7 +196,7 @@ export function MobileHeader({
                   {isMenuOpen ? (
                     <X className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <Menu className="h-5 w-5 text-muted-foreground" />
+                    <BarChart3 className="h-5 w-5 text-muted-foreground" />
                   )}
                 </button>
               )}

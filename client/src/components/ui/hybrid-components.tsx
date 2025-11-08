@@ -221,6 +221,8 @@ export const AutoDismissAlertExample = ({
 
       return () => clearTimeout(timer);
     }
+    
+    return undefined;
   }, [duration, onDismiss]);
 
   if (!visible) return null;

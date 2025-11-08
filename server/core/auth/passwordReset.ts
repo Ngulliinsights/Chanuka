@@ -1,46 +1,21 @@
 // services/passwordReset.ts
-import { database as db } from '@shared/database/connection.js';
+import { database as db } from '../../../shared/database';
 // Import specific tables and functions needed from the consolidated schema
-import { users as users, passwordReset as passwordResets  } from '../shared/schema';
-import { ValidationError } from '@shared/core/observability/error-management/errors/specialized-errors.js';
+import { users } from '../../../shared/schema';
+import { ValidationError } from '../../../shared/core/src/observability/error-management/errors/specialized-errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
 import { config } from '../../config/index.js';
 import { sendTemplatedEmail } from '../../infrastructure/notifications/email-service.js';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../shared/core/src/index.js';
 
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;
 
-interface PasswordResetEntry { id: number;
-  user_id: string;
-  tokenHash: string;
-  expires_at: Date;
-  created_at: Date;
- }
+// Using users table directly, no need for separate interfaces
 type UserEntry = InferSelectModel<typeof users>;
-
-// Define a type for the joined result based on your actual schema structure
-interface JoinedResetResult { password_reset: {
-    id: number;
-    user_id: string;
-    tokenHash: string;
-    expires_at: Date;
-    isUsed: boolean;
-    created_at: Date;
-   } | null;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    is_active: boolean;
-    created_at: Date;
-    updated_at: Date;
-    // ...other user fields
-  } | null;
-}
 
 /**
  * Helper function to ensure a value is a number
@@ -73,7 +48,7 @@ class PasswordResetService {
     });
 
     // If user not found or inactive, silently return to prevent email enumeration
-    if (!user || !users.is_active) {
+    if (!user || !user.is_active) {
       console.warn(`Password reset requested for non-existent or inactive user: ${email}`);
       return;
     }
@@ -82,30 +57,24 @@ class PasswordResetService {
     const reset_token = crypto.randomBytes(32).toString('hex');
     const tokenHash = crypto.createHash('sha256').update(reset_token).digest('hex');
 
-    // Store hashed token in database
+    // Store hashed token in users table
     const expiryDate = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
-    await db.transaction(async tx => { // Use upsert logic: try to insert, on conflict (user_id), update token and expiry
+    await db.transaction(async (tx: any) => {
       await tx
-        .insert(passwordResets)
-        .values({
-          user_id: users.id,
-          tokenHash: tokenHash,
-          expires_at: expiryDate,
-         })
-        .onConflictDoUpdate({
-          target: passwordResets.user_id,
-          set: {
-            tokenHash: tokenHash,
-            expires_at: expiryDate,
-          },
-        });
+        .update(users)
+        .set({
+          password_reset_token: tokenHash,
+          password_reset_expires_at: expiryDate,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, user.id));
     });
 
     // Send email with the reset token
-    const resetUrl = `http://localhost:${config.server.port}/reset-password?token=${ reset_token }`;
+    const resetUrl = `http://localhost:${config.server.port}/reset-password?token=${reset_token}`;
 
-    await sendTemplatedEmail('password-reset', users.email, {
-      userName: users.name || users.email,
+    await sendTemplatedEmail('password-reset', user.email, {
+      userName: user.name || user.email,
       resetUrl,
     });
   }
@@ -123,40 +92,36 @@ class PasswordResetService {
     const now = new Date();
 
     // Find token in database and associated user, ensuring it's not expired
-    const results = (await db
+    const userResults = await db
       .select()
-      .from(passwordResets)
-      .where(and(eq(passwordResets.tokenHash, tokenHash), gt(passwordResets.expires_at, now)))
-      .limit(1)
-      .leftJoin(users, eq(passwordResets.user_id, users.id))) as JoinedResetResult[];
+      .from(users)
+      .where(and(
+        eq(users.password_reset_token, tokenHash), 
+        gt(users.password_reset_expires_at, now)
+      ))
+      .limit(1);
 
-    const result = results[0]; // Get the first result if it exists
-
-    if (!result || !result.user || !result.password_reset) {
+    if (userResults.length === 0) {
       throw new ValidationError('Invalid or expired reset token');
     }
 
-    const resetEntry = result.password_reset;
-    const userEntry = result.user;
+    const userEntry = userResults[0];
 
     // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Use a transaction to update password and delete token
-    await db.transaction(async tx => {
-      // Update user's password
+    // Use a transaction to update password and clear reset token
+    await db.transaction(async (tx: any) => {
+      // Update user's password and clear reset token
       await tx
         .update(users)
         .set({
           password_hash: hashedPassword,
+          password_reset_token: null,
+          password_reset_expires_at: null,
           updated_at: now,
         })
         .where(eq(users.id, userEntry.id));
-
-      // Delete the password reset token
-      // Re-applying ensureNumber as TypeScript seems to incorrectly infer the type despite the interface definition
-      // FIX #6: Remove ensureNumber as resetEntry.id should already be number
-      await tx.delete(passwordResets).where(eq(passwordResets.id, resetEntry.id));
     });
 
     // Send password change confirmation email
@@ -176,14 +141,17 @@ class PasswordResetService {
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
     const now = new Date();
 
-    // Find token in database, ensuring it's not expired
-    const resetEntries = await db
-      .select({ id: passwordResets.id })
-      .from(passwordResets)
-      .where(and(eq(passwordResets.tokenHash, tokenHash), gt(passwordResets.expires_at, now)))
+    // Find token in users table, ensuring it's not expired
+    const userEntries = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(
+        eq(users.password_reset_token, tokenHash), 
+        gt(users.password_reset_expires_at, now)
+      ))
       .limit(1);
 
-    return resetEntries.length > 0;
+    return userEntries.length > 0;
   }
 }
 

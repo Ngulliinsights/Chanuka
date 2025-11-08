@@ -94,7 +94,7 @@ export function SearchBar({
     let currentIndex = 0;
 
     // Check suggestions
-    if (suggestions && index < suggestions.length) {
+    if (suggestions && index < suggestions.length && suggestions[index]) {
       setQuery(suggestions[index].text);
       onSearch(suggestions[index].text);
       setIsFocused(false);
@@ -106,10 +106,12 @@ export function SearchBar({
     if (liveResults?.results && index < currentIndex + liveResults.results.length) {
       const resultIndex = index - (suggestions?.length || 0);
       const result = liveResults.results[resultIndex];
-      setQuery(result.title || result.content);
-      onSearch(result.title || result.content);
-      setIsFocused(false);
-      return;
+      if (result) {
+        setQuery(result.title || result.content);
+        onSearch(result.title || result.content);
+        setIsFocused(false);
+        return;
+      }
     }
     currentIndex += liveResults?.results?.length || 0;
 
@@ -117,10 +119,12 @@ export function SearchBar({
     if (showHistory && history?.data && index < currentIndex + history.data.length) {
       const historyIndex = index - currentIndex;
       const historyItem = history.data[historyIndex];
-      setQuery(historyItem.query);
-      onSearch(historyItem.query);
-      setIsFocused(false);
-      return;
+      if (historyItem) {
+        setQuery(historyItem.query);
+        onSearch(historyItem.query);
+        setIsFocused(false);
+        return;
+      }
     }
   };
 

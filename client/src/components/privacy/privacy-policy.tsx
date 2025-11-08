@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { Shield, Eye, Lock, Clock, Users, Globe } from 'lucide-react';
+import { Shield, Eye, Clock, Users, Network } from 'lucide-react';
 import { logger } from '../../utils/browser-logger';
 
 export function PrivacyPolicy() {
@@ -102,7 +102,7 @@ export function PrivacyPolicy() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Lock className="h-5 w-5 text-red-600" />
+              <Shield className="h-5 w-5 text-red-600" />
               <span>How We Protect Your Data</span>
             </CardTitle>
             <CardDescription>
@@ -119,7 +119,7 @@ export function PrivacyPolicy() {
                 </p>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <Lock className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                <Shield className="h-8 w-8 text-green-600 mx-auto mb-2" />
                 <h4 className="font-semibold">Access Controls</h4>
                 <p className="text-sm text-gray-600">
                   Role-based access controls and multi-factor authentication
@@ -240,7 +240,7 @@ export function PrivacyPolicy() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Globe className="h-5 w-5 text-teal-600" />
+              <Network className="h-5 w-5 text-teal-600" />
               <span>Data Sharing</span>
             </CardTitle>
             <CardDescription>

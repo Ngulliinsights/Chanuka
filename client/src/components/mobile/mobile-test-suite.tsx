@@ -8,19 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
-import { 
-  Smartphone, 
-  Tablet, 
-  Monitor, 
-  Wifi, 
-  WifiOff, 
-  Battery, 
-  RotateCcw,
-  TouchpadIcon,
-  AlertTriangle,
-  CheckCircle,
-  XCircle
-} from 'lucide-react';
+import { Smartphone, Monitor, Network, Gauge, RotateCcw, User, AlertTriangle, CheckCircle, X } from 'lucide-react';
 import { MobileTouchUtils } from '../../utils/mobile-touch-handler';
 import { useResponsiveLayout } from '../../utils/responsive-layout';
 import { useMobileErrorHandler } from '../../utils/mobile-error-handler';
@@ -47,7 +35,7 @@ export function MobileTestSuite() {
 
   const collectDeviceInfo = () => {
     const info = {
-      user_agent: navigator.user_agent,
+      user_agent: navigator.userAgent,
       viewport: {
         width: window.innerWidth,
         height: window.innerHeight,
@@ -323,7 +311,7 @@ export function MobileTestSuite() {
       case 'warning':
         return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
       case 'fail':
-        return <XCircle className="h-4 w-4 text-red-600" />;
+        return <X className="h-4 w-4 text-red-600" />;
     }
   };
 
@@ -340,7 +328,7 @@ export function MobileTestSuite() {
 
   const getDeviceIcon = () => {
     if (responsiveState.isMobile) return <Smartphone className="h-5 w-5" />;
-    if (responsiveState.isTablet) return <Tablet className="h-5 w-5" />;
+    if (responsiveState.isTablet) return <Monitor className="h-5 w-5" />;
     return <Monitor className="h-5 w-5" />;
   };
 

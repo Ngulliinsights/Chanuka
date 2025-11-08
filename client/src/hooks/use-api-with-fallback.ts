@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 import {
   ApiResponse,
   ApiError,
@@ -168,6 +168,8 @@ export function useApiWithFallback<T = any>(
         }
       };
     }
+    
+    return undefined;
   }, [fetchData, refetchInterval, enabled]);
 
   // Setup window focus refetching if enabled

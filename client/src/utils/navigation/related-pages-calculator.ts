@@ -1,7 +1,11 @@
 import { RelatedPage, UserRole } from '../../core/navigation/types';
-import { logger } from '@shared/core';
 
 // Page relationship mapping
+interface PageRelationship {
+  pageId: string;
+  relatedPages: Record<string, { type: 'parent' | 'child' | 'sibling' | 'related'; weight: number; context: string }>;
+}
+
 const pageRelationships: Record<string, PageRelationship> = {
   '/': {
     pageId: '/',
@@ -197,9 +201,9 @@ function normalizePath(path: string): string {
  * Converts a normalized path back to actual path with dynamic values
  */
 function denormalizePath(normalizedPath: string, currentPath: string): string {
-  const bill_idMatch = currentPath.match(/\/bills\/([^\/]+)/);
-  if (bill_idMatch && normalizedPath.includes(':id')) {
-    return normalizedPath.replace(':id', bill_idMatch[1]);
+  const billIdMatch = currentPath.match(/\/bills\/([^\/]+)/);
+  if (billIdMatch && normalizedPath.includes(':id')) {
+    return normalizedPath.replace(':id', billIdMatch[1]!);
   }
   return normalizedPath;
 }
@@ -207,15 +211,15 @@ function denormalizePath(normalizedPath: string, currentPath: string): string {
 /**
  * Filters related pages based on user role
  */
-function filterPagesByRole(pages: RelatedPage[], user_role: UserRole): RelatedPage[] {
+function filterPagesByRole(pages: RelatedPage[], userRole: UserRole): RelatedPage[] {
   return pages.filter(page => {
     // Admin pages only for admin users
-    if (page.category === 'admin' && user_role !== 'admin') {
+    if (page.category === 'admin' && userRole !== 'admin') {
       return false;
     }
     
     // User pages only for authenticated users
-    if (page.category === 'user' && user_role === 'public') {
+    if (page.category === 'user' && userRole === 'public') {
       return false;
     }
     
@@ -226,7 +230,7 @@ function filterPagesByRole(pages: RelatedPage[], user_role: UserRole): RelatedPa
 /**
  * Calculates related pages for a given path and user role
  */
-export function calculateRelatedPages(currentPath: string, user_role: UserRole): RelatedPage[] {
+export function calculateRelatedPages(currentPath: string, userRole: UserRole): RelatedPage[] {
   const normalizedPath = normalizePath(currentPath);
   const relationship = pageRelationships[normalizedPath];
   
@@ -237,19 +241,23 @@ export function calculateRelatedPages(currentPath: string, user_role: UserRole):
   const relatedPages: RelatedPage[] = [];
   
   // Convert relationship data to RelatedPage objects
-  Object.entries(relationship.relatedPages).forEach(([path, relation]) => { const actualPath = denormalizePath(path, currentPath);
+  Object.entries(relationship.relatedPages).forEach(([path, relation]) => {
+    const actualPath = denormalizePath(path, currentPath);
     const metadata = pageMetadata[path];
     
     if (metadata) {
       let title = metadata.title;
       let description = metadata.description;
       
-      // Replace placeholders in title and description
-      const bill_idMatch = currentPath.match(/\/bills\/([^\/]+)/);
-      if (bill_idMatch && path.includes(':id')) {
-        const bill_id = bill_idMatch[1];
-        title = title.replace(':id', `Bill ${bill_id }`);
-        description = description.replace(':id', `Bill ${ bill_id }`);
+      // Replace placeholders in title and description if we have a valid bill ID
+      // We extract the bill ID and verify it's a non-empty string before using it
+      const billIdMatch = currentPath.match(/\/bills\/([^\/]+)/);
+      if (billIdMatch && path.includes(':id')) {
+        // TypeScript needs us to be explicit: we know index 1 exists and is a string
+        // because the regex matched successfully and captured a group
+        const billId = billIdMatch[1] as string;
+        title = title.replace(':id', `Bill ${billId}`);
+        description = description.replace(':id', `Bill ${billId}`);
       }
       
       relatedPages.push({
@@ -269,7 +277,7 @@ export function calculateRelatedPages(currentPath: string, user_role: UserRole):
   relatedPages.sort((a, b) => b.relevanceScore - a.relevanceScore);
   
   // Filter by user role
-  const filteredPages = filterPagesByRole(relatedPages, user_role);
+  const filteredPages = filterPagesByRole(relatedPages, userRole);
   
   // Return top 5 most relevant pages
   return filteredPages.slice(0, 5);
@@ -280,10 +288,10 @@ export function calculateRelatedPages(currentPath: string, user_role: UserRole):
  */
 export function getContextualSuggestions(
   currentPath: string, 
-  user_role: UserRole, 
+  userRole: UserRole, 
   recentPages: string[] = []
 ): RelatedPage[] {
-  const baseRelated = calculateRelatedPages(currentPath, user_role);
+  const baseRelated = calculateRelatedPages(currentPath, userRole);
   
   // Add boost for recently visited pages
   const boostedPages = baseRelated.map(page => {
@@ -299,47 +307,3 @@ export function getContextualSuggestions(
   
   return boostedPages;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

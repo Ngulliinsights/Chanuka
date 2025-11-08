@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
-import { database as db } from '@shared/database/connection.js';
-import { sessions, users } from '@/shared/schema';
-import { eq, and, lt } from 'drizzle-orm';
+import { database as db } from '../../../shared/database';
+import { sessions, users } from '../../../shared/schema';
+import { eq, and, lt, gt } from 'drizzle-orm';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../shared/core/src/index.js';
 
 export interface SecureSessionOptions {
   maxAge: number; // in milliseconds
@@ -93,7 +93,7 @@ export class SecureSessionService {
         .where(eq(users.id, user_id))
         .limit(1);
 
-      if (users.length > 0) {
+      if (user.length > 0) {
         sessionData.email = user[0].email;
         sessionData.role = user[0].role;
       }
@@ -107,9 +107,8 @@ export class SecureSessionService {
       // Store session in database
       await db.insert(sessions).values({ id: session_id,
         user_id,
-        token: encryptedSessionData,
         expires_at: new Date(Date.now() + (options.maxAge || this.defaultOptions.maxAge)),
-        is_active: true
+        data: { encryptedSessionData }
        });
 
       // Set secure cookie
@@ -157,7 +156,7 @@ export class SecureSessionService {
         .from(sessions)
         .where(and(
           eq(sessions.id, session_id),
-          eq(sessions.is_active, true)
+          gt(sessions.expires_at, new Date())
         ))
         .limit(1);
 
@@ -270,7 +269,7 @@ export class SecureSessionService {
       await db
         .update(sessions)
         .set({ 
-          is_active: false,
+          expires_at: new Date(), // Mark as expired
           updated_at: new Date()
         })
         .where(eq(sessions.id, session_id));
@@ -287,7 +286,7 @@ export class SecureSessionService {
       await db
         .update(sessions)
         .set({ 
-          is_active: false,
+          expires_at: new Date(), // Mark as expired
           updated_at: new Date()
         })
         .where(eq(sessions.user_id, user_id));
@@ -303,13 +302,10 @@ export class SecureSessionService {
     try {
       const now = new Date();
       
+      // Delete expired sessions entirely
       await db
-        .update(sessions)
-        .set({ is_active: false })
-        .where(and(
-          eq(sessions.is_active, true),
-          lt(sessions.expires_at, now)
-        ));
+        .delete(sessions)
+        .where(lt(sessions.expires_at, now));
 
       logger.info('Expired sessions cleaned up', { component: 'Chanuka' });
     } catch (error) {
@@ -327,7 +323,7 @@ export class SecureSessionService {
         .from(sessions)
         .where(and(
           eq(sessions.user_id, user_id),
-          eq(sessions.is_active, true)
+          gt(sessions.expires_at, new Date())
         ))
         .orderBy(sessions.created_at);
 
@@ -400,7 +396,7 @@ export class SecureSessionService {
       const activeSessions = await db
         .select()
         .from(sessions)
-        .where(eq(sessions.is_active, true));
+        .where(gt(sessions.expires_at, new Date()));
 
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const recentSessions = activeSessions.filter(s => s.created_at! > last24h);

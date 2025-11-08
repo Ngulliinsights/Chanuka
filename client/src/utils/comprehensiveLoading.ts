@@ -1,5 +1,4 @@
 import { LoadingOperation } from '../core/loading/types';
-import { logger } from '@shared/core';
 
 // Utility functions for comprehensive loading management
 
@@ -13,7 +12,7 @@ export interface LoadingScenario {
   priority: 'high' | 'medium' | 'low';
   connectionAware: boolean;
   progressTracking: boolean;
-  stages?: Array<{ id: string; message: string; duration?: number }>;
+  stages?: Array<{ id: string; message: string; duration?: number }> | undefined;
 }
 
 // Predefined loading scenarios
@@ -46,6 +45,7 @@ export const LOADING_SCENARIOS: Record<string, LoadingScenario> = {
     priority: 'high',
     connectionAware: true,
     progressTracking: false,
+    stages: undefined,
   },
   
   COMPONENT_LAZY: {
@@ -58,6 +58,7 @@ export const LOADING_SCENARIOS: Record<string, LoadingScenario> = {
     priority: 'medium',
     connectionAware: true,
     progressTracking: false,
+    stages: undefined,
   },
   
   API_REQUEST: {
@@ -70,6 +71,7 @@ export const LOADING_SCENARIOS: Record<string, LoadingScenario> = {
     priority: 'medium',
     connectionAware: true,
     progressTracking: false,
+    stages: undefined,
   },
   
   FILE_UPLOAD: {
@@ -100,6 +102,7 @@ export const LOADING_SCENARIOS: Record<string, LoadingScenario> = {
     priority: 'medium',
     connectionAware: true,
     progressTracking: false,
+    stages: undefined,
   },
   
   BACKGROUND_SYNC: {
@@ -112,6 +115,7 @@ export const LOADING_SCENARIOS: Record<string, LoadingScenario> = {
     priority: 'low',
     connectionAware: true,
     progressTracking: false,
+    stages: undefined,
   },
   
   ASSET_PRELOAD: {
@@ -124,6 +128,7 @@ export const LOADING_SCENARIOS: Record<string, LoadingScenario> = {
     priority: 'low',
     connectionAware: true,
     progressTracking: true,
+    stages: undefined,
   },
 };
 
@@ -144,7 +149,7 @@ export function getAdjustedTimeout(
   }
 }
 
-// Retry delay calculation
+// Retry delay calculation with jitter for exponential backoff
 export function calculateRetryDelay(
   retryCount: number,
   strategy: 'exponential' | 'linear' | 'none',
@@ -162,21 +167,21 @@ export function calculateRetryDelay(
   }
 }
 
-// Priority-based operation sorting
+// Priority-based operation sorting for optimal processing order
 export function sortOperationsByPriority(operations: LoadingOperation[]): LoadingOperation[] {
   const priorityOrder = { high: 3, medium: 2, low: 1 };
   
   return operations.sort((a, b) => {
-    // First sort by priority
+    // First sort by priority (highest priority first)
     const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
     if (priorityDiff !== 0) return priorityDiff;
     
-    // Then by start time (older first)
+    // Then by start time (older operations first for fairness)
     return a.startTime - b.startTime;
   });
 }
 
-// Connection-aware operation filtering
+// Connection-aware operation filtering to optimize for network conditions
 export function filterOperationsByConnection(
   operations: LoadingOperation[],
   connectionType: 'fast' | 'slow' | 'offline' | 'unknown',
@@ -188,14 +193,14 @@ export function filterOperationsByConnection(
   }
   
   if (connectionType === 'slow') {
-    // Skip low priority operations on slow connections
+    // Skip low priority operations on slow connections to preserve bandwidth
     return operations.filter(op => op.priority !== 'low');
   }
   
   return operations;
 }
 
-// Loading state analysis
+// Loading state analysis for performance insights
 export interface LoadingAnalysis {
   totalOperations: number;
   operationsByType: Record<string, number>;
@@ -215,7 +220,7 @@ export function analyzeLoadingPerformance(
 ): LoadingAnalysis {
   const now = Date.now();
   
-  // Basic counts
+  // Basic counts for categorization
   const totalOperations = operations.length;
   const operationsByType = operations.reduce((acc, op) => {
     acc[op.type] = (acc[op.type] || 0) + 1;
@@ -227,12 +232,13 @@ export function analyzeLoadingPerformance(
     return acc;
   }, {} as Record<string, number>);
   
-  // Performance metrics
+  // Performance metrics calculation
   const completedLoadTimes = completedOperations.map(op => op.completedAt - op.startTime);
   const averageLoadTime = completedLoadTimes.length > 0 
     ? completedLoadTimes.reduce((sum, time) => sum + time, 0) / completedLoadTimes.length
     : 0;
   
+  // Find the operation that has been running the longest
   const longestRunningOperation = operations.reduce((longest, current) => {
     const currentRunTime = now - current.startTime;
     const longestRunTime = longest ? now - longest.startTime : 0;
@@ -243,7 +249,7 @@ export function analyzeLoadingPerformance(
   const totalRetries = operations.reduce((sum, op) => sum + op.retryCount, 0);
   const retryRate = totalOperations > 0 ? totalRetries / totalOperations : 0;
   
-  // Connection impact assessment
+  // Connection impact assessment based on network conditions
   let connectionImpact: 'high' | 'medium' | 'low' = 'low';
   if (connectionInfo?.connectionType === 'slow' || !connectionInfo?.isOnline) {
     connectionImpact = 'high';
@@ -251,7 +257,7 @@ export function analyzeLoadingPerformance(
     connectionImpact = 'medium';
   }
   
-  // Generate recommendations
+  // Generate actionable recommendations based on metrics
   const recommendations: string[] = [];
   
   if (averageLoadTime > 5000) {
@@ -262,7 +268,11 @@ export function analyzeLoadingPerformance(
     recommendations.push('High retry rate detected - check network stability and error handling');
   }
   
-  if (operationsByPriority.low > operationsByPriority.high * 2) {
+  // Safe access to potentially undefined properties
+  const lowPriorityCount = operationsByPriority.low ?? 0;
+  const highPriorityCount = operationsByPriority.high ?? 0;
+  
+  if (lowPriorityCount > highPriorityCount * 2) {
     recommendations.push('Consider reducing low-priority operations during peak usage');
   }
   
@@ -287,7 +297,7 @@ export function analyzeLoadingPerformance(
   };
 }
 
-// Loading scenario builder
+// Loading scenario builder for creating custom loading scenarios
 export class LoadingScenarioBuilder {
   private scenario: Partial<LoadingScenario> = {};
   
@@ -357,7 +367,7 @@ export class LoadingScenarioBuilder {
       priority: this.scenario.priority || 'medium',
       connectionAware: this.scenario.connectionAware ?? true,
       progressTracking: this.scenario.progressTracking ?? false,
-      stages: this.scenario.stages,
+      stages: this.scenario.stages ?? undefined,
     };
   }
 }
@@ -372,6 +382,9 @@ export function createOperationFromScenario(
     ? getAdjustedTimeout(scenario.defaultTimeout, connectionInfo.connectionType)
     : scenario.defaultTimeout;
   
+  // Extract the first stage ID if stages exist, otherwise use undefined
+  const stageId = scenario.stages?.[0]?.id ?? undefined;
+  
   return {
     id: `${scenario.id}-${instanceId}`,
     type: scenario.id.includes('page') ? 'page' : 
@@ -382,41 +395,41 @@ export function createOperationFromScenario(
     timeout: adjustedTimeout,
     maxRetries: scenario.maxRetries,
     connectionAware: scenario.connectionAware,
-    stage: scenario.stages?.[0]?.id,
+    stage: stageId,
   };
 }
 
-// Performance monitoring utilities
+// Performance monitoring utilities for tracking loading operations
 export class LoadingPerformanceMonitor {
   private metrics: Array<{
     operationId: string;
     startTime: number;
-    endTime?: number;
-    success?: boolean;
-    error?: string;
+    endTime?: number | undefined;
+    success?: boolean | undefined;
+    error?: string | undefined;
     retryCount: number;
-    connectionType?: string;
+    connectionType?: string | undefined;
   }> = [];
   
-  startTracking(operationId: string, connectionType?: string) {
+  startTracking(operationId: string, connectionType?: string): void {
     this.metrics.push({
       operationId,
       startTime: Date.now(),
       retryCount: 0,
-      connectionType,
+      connectionType: connectionType ?? undefined,
     });
   }
   
-  endTracking(operationId: string, success: boolean, error?: string) {
+  endTracking(operationId: string, success: boolean, error?: string): void {
     const metric = this.metrics.find(m => m.operationId === operationId);
     if (metric) {
       metric.endTime = Date.now();
       metric.success = success;
-      metric.error = error;
+      metric.error = error ?? undefined;
     }
   }
   
-  recordRetry(operationId: string) {
+  recordRetry(operationId: string): void {
     const metric = this.metrics.find(m => m.operationId === operationId);
     if (metric) {
       metric.retryCount++;
@@ -428,7 +441,7 @@ export class LoadingPerformanceMonitor {
   }
   
   getAverageLoadTime(): number {
-    const completedMetrics = this.metrics.filter(m => m.endTime);
+    const completedMetrics = this.metrics.filter(m => m.endTime !== undefined);
     if (completedMetrics.length === 0) return 0;
     
     const totalTime = completedMetrics.reduce((sum, m) => sum + (m.endTime! - m.startTime), 0);
@@ -436,43 +449,58 @@ export class LoadingPerformanceMonitor {
   }
   
   getSuccessRate(): number {
-    const completedMetrics = this.metrics.filter(m => m.endTime);
+    const completedMetrics = this.metrics.filter(m => m.endTime !== undefined);
     if (completedMetrics.length === 0) return 0;
     
-    const successfulMetrics = completedMetrics.filter(m => m.success);
+    const successfulMetrics = completedMetrics.filter(m => m.success === true);
     return successfulMetrics.length / completedMetrics.length;
   }
   
-  clear() {
+  clear(): void {
     this.metrics = [];
   }
 }
 
-// Global performance monitor instance
+// Global performance monitor instance for application-wide tracking
 export const globalLoadingMonitor = new LoadingPerformanceMonitor();
 
 // Utility functions for common loading patterns
 export const LoadingUtils = {
-  // Create a page loading operation
-  createPageLoading: (pageId: string, connectionInfo?: any) => 
-    createOperationFromScenario(LOADING_SCENARIOS.PAGE_INITIAL, pageId, connectionInfo),
+  // Create a page loading operation with proper scenario lookup
+  createPageLoading: (pageId: string, connectionInfo?: any) => {
+    const scenario = LOADING_SCENARIOS.PAGE_INITIAL;
+    if (!scenario) {
+      throw new Error('PAGE_INITIAL scenario not found');
+    }
+    return createOperationFromScenario(scenario, pageId, connectionInfo);
+  },
   
-  // Create an API loading operation
-  createApiLoading: (apiId: string, connectionInfo?: any) => 
-    createOperationFromScenario(LOADING_SCENARIOS.API_REQUEST, apiId, connectionInfo),
+  // Create an API loading operation with proper scenario lookup
+  createApiLoading: (apiId: string, connectionInfo?: any) => {
+    const scenario = LOADING_SCENARIOS.API_REQUEST;
+    if (!scenario) {
+      throw new Error('API_REQUEST scenario not found');
+    }
+    return createOperationFromScenario(scenario, apiId, connectionInfo);
+  },
   
-  // Create a component loading operation
-  createComponentLoading: (componentId: string, connectionInfo?: any) => 
-    createOperationFromScenario(LOADING_SCENARIOS.COMPONENT_LAZY, componentId, connectionInfo),
+  // Create a component loading operation with proper scenario lookup
+  createComponentLoading: (componentId: string, connectionInfo?: any) => {
+    const scenario = LOADING_SCENARIOS.COMPONENT_LAZY;
+    if (!scenario) {
+      throw new Error('COMPONENT_LAZY scenario not found');
+    }
+    return createOperationFromScenario(scenario, componentId, connectionInfo);
+  },
   
-  // Check if operation should be delayed based on connection
+  // Check if operation should be delayed based on connection quality
   shouldDelayOperation: (priority: 'high' | 'medium' | 'low', connectionType: string, isOnline: boolean): boolean => {
     if (!isOnline && priority !== 'high') return true;
     if (connectionType === 'slow' && priority === 'low') return true;
     return false;
   },
   
-  // Get optimal batch size for operations based on connection
+  // Get optimal batch size for operations based on connection speed
   getOptimalBatchSize: (connectionType: string): number => {
     switch (connectionType) {
       case 'slow': return 1;
@@ -482,7 +510,7 @@ export const LoadingUtils = {
     }
   },
   
-  // Format loading time for display
+  // Format loading time for user-friendly display
   formatLoadingTime: (milliseconds: number): string => {
     if (milliseconds < 1000) return `${milliseconds}ms`;
     const seconds = Math.floor(milliseconds / 1000);
@@ -491,47 +519,3 @@ export const LoadingUtils = {
     return `${minutes}m ${seconds % 60}s`;
   },
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

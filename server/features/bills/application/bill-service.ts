@@ -1,13 +1,13 @@
 // cSpell:ignore upvotes downvotes
 import { eq, desc, and, sql, count, or, inArray } from "drizzle-orm";
-import { databaseService } from '@/infrastructure/database/database-service';
-import { bills, sponsors, Bill } from '@shared/schema/foundation.js';
-import { bill_engagement, comments } from '@shared/schema/citizen_participation.js';
-import { logger } from '@/shared/core';
-import type { AsyncServiceResult } from '@/infrastructure/errors/result-adapter.js';
-import { withResultHandling } from '@/infrastructure/errors/result-adapter.js';
-import { QueryCache, CacheHelpers, Cached } from '@/infrastructure/cache/query-cache';
-import { serverCache } from '@/infrastructure/cache/cache-service';
+import { databaseService } from '../../../infrastructure/database/database-service';
+import { bills, sponsors, Bill } from '../../../../shared/schema/foundation.js';
+import { bill_engagement, comments } from '../../../../shared/schema/citizen_participation.js';
+import { logger } from '../../../../shared/core/src/index.js';
+import type { AsyncServiceResult } from '../../../infrastructure/errors/result-adapter.js';
+import { withResultHandling } from '../../../infrastructure/errors/result-adapter.js';
+import { QueryCache, CacheHelpers, Cached } from '../../../infrastructure/cache/query-cache';
+import { serverCache } from '../../../infrastructure/cache/cache-service';
 
 // ============================================================================
 // Type Definitions
@@ -187,10 +187,8 @@ export class CachedBillService {
 
   /**
    * Retrieves a bill by ID with multi-layer caching.
-   * @decorator Cached - Uses decorator-based caching
    */
-  @Cached(CacheHelpers.bill('', CACHE_TTL.BILL_DETAILS))
-  async getBillById(id: string): AsyncServiceResult<BillWithEngagement | null> {
+  async getBillById(id: string): Promise<AsyncServiceResult<BillWithEngagement | null>> {
     return withResultHandling(async () => {
       try {
         const [bill] = await this.db
@@ -233,7 +231,7 @@ export class CachedBillService {
       } catch (error) {
         logger.warn('Database error in getBillById, using fallback', { error, id });
         const fallbackBills = this.getFallbackBills();
-        return fallbackBills.find(bill => bill.id === id) || null;
+        return fallbackBills.find((bill: any) => bill.id === id) || null;
       }
     }, { service: 'CachedBillService', operation: 'getBillById' });
   }
@@ -241,10 +239,10 @@ export class CachedBillService {
   /**
    * Creates a new bill and invalidates relevant caches.
    */
-  async createBill(billData: InsertBill): AsyncServiceResult<Bill> {
+  async createBill(billData: InsertBill): Promise<AsyncServiceResult<Bill>> {
     return withResultHandling(async () => {
-      if (!billData.title || !billData.summary) {
-        throw new Error('Title and summary are required for bill creation');
+      if (!billData.title) {
+        throw new Error('Title is required for bill creation');
       }
 
       const result = await databaseService.withTransaction(
@@ -272,7 +270,7 @@ export class CachedBillService {
   /**
    * Updates an existing bill and invalidates caches.
    */
-  async updateBill(id: string, updates: Partial<InsertBill>): AsyncServiceResult<Bill | null> {
+  async updateBill(id: string, updates: Partial<InsertBill>): Promise<AsyncServiceResult<Bill | null>> {
     return withResultHandling(async () => {
       const [updatedBill] = await this.db
         .update(bills)
@@ -294,7 +292,7 @@ export class CachedBillService {
   /**
    * Updates bill status with cache invalidation.
    */
-  async updateBillStatus(id: string, newStatus: string, user_id?: string): AsyncServiceResult<void> {
+  async updateBillStatus(id: string, newStatus: string, user_id?: string): Promise<AsyncServiceResult<void>> {
     return withResultHandling(async () => {
       await databaseService.withTransaction(
         async (tx) => {
@@ -325,7 +323,7 @@ export class CachedBillService {
   /**
    * Deletes a bill and cleans up all related caches.
    */
-  async deleteBill(id: string): AsyncServiceResult<boolean> {
+  async deleteBill(id: string): Promise<AsyncServiceResult<boolean>> {
     return withResultHandling(async () => {
       const result = await databaseService.withTransaction(
         async (tx) => {
@@ -354,7 +352,7 @@ export class CachedBillService {
   /**
    * Searches bills with caching support.
    */
-  async searchBills(query: string, filters: BillFilters = {}): AsyncServiceResult<Bill[]> {
+  async searchBills(query: string, filters: BillFilters = {}): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.SEARCH}:${query}:${JSON.stringify(filters)}`;
     
     return await QueryCache.execute(
@@ -391,7 +389,7 @@ export class CachedBillService {
   /**
    * Gets bills by status with caching.
    */
-  async getBillsByStatus(status: string): AsyncServiceResult<Bill[]> {
+  async getBillsByStatus(status: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.STATUS}:${status}`;
     
     return await QueryCache.execute(
@@ -412,7 +410,7 @@ export class CachedBillService {
   /**
    * Gets bills by category with caching.
    */
-  async getBillsByCategory(category: string): AsyncServiceResult<Bill[]> {
+  async getBillsByCategory(category: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.CATEGORY}:${category}`;
     
     return await QueryCache.execute(
@@ -433,7 +431,7 @@ export class CachedBillService {
   /**
    * Gets bills by sponsor with caching.
    */
-  async getBillsBySponsor(sponsor_id: string): AsyncServiceResult<Bill[]> {
+  async getBillsBySponsor(sponsor_id: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.SPONSOR}:${sponsor_id}`;
     
     return await QueryCache.execute(
@@ -454,7 +452,7 @@ export class CachedBillService {
   /**
    * Gets bills by IDs (batch query).
    */
-  async getBillsByIds(ids: string[]): AsyncServiceResult<Bill[]> {
+  async getBillsByIds(ids: string[]): Promise<AsyncServiceResult<Bill[]>> {
     return withResultHandling(async () => {
       if (ids.length === 0) return [];
 
@@ -472,7 +470,7 @@ export class CachedBillService {
   async getAllBills(
     filters: BillFilters = {},
     pagination: PaginationOptions = { page: 1, limit: 10 }
-  ): AsyncServiceResult<PaginatedBills> {
+  ): Promise<AsyncServiceResult<PaginatedBills>> {
     const cacheKey = `${CACHE_KEYS.BILLS}:${JSON.stringify(filters)}:${pagination.page}:${pagination.limit}`;
     
     return await QueryCache.execute(
@@ -558,7 +556,7 @@ export class CachedBillService {
   /**
    * Gets bill statistics with extended caching.
    */
-  async getBillStats(): AsyncServiceResult<BillStats> {
+  async getBillStats(): Promise<AsyncServiceResult<BillStats>> {
     const cacheKey = `${CACHE_KEYS.STATS}:all`;
     
     return await QueryCache.execute(
@@ -599,7 +597,7 @@ export class CachedBillService {
   /**
    * Counts bills with filters.
    */
-  async countBills(filters: BillFilters = {}): AsyncServiceResult<number> {
+  async countBills(filters: BillFilters = {}): Promise<AsyncServiceResult<number>> {
     return withResultHandling(async () => {
       const conditions = [];
 
@@ -637,7 +635,7 @@ export class CachedBillService {
     bill_id: string,
     user_id: string,
     engagement_type: 'view' | 'comment' | 'share'
-  ): AsyncServiceResult<void> {
+  ): Promise<AsyncServiceResult<void>> {
     return withResultHandling(async () => {
       await databaseService.withTransaction(
         async (tx) => {

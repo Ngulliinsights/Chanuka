@@ -145,7 +145,7 @@ function formatDueDate(due_date: Date): {
   isOverdue: boolean;
 } {
   const now = new Date();
-  const diffMs = dueDate.getTime() - now.getTime();
+  const diffMs = due_date.getTime() - now.getTime();
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {

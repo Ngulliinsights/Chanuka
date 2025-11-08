@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the implementation of the Government Data Integration Service for the Chanuka Legislative Transparency Platform. The service provides comprehensive integration with official government data sources, including data parsing, normalization, validation, and error handling.
+This document outlines the implementation of the Government Data Integration Service for the Chanuka Legislative Transparency Platform. The service provides comprehensive integration with official Kenyan government data sources, including data parsing, normalization, validation, and error handling.
 
 ## Components Implemented
 
@@ -11,7 +11,7 @@ This document outlines the implementation of the Government Data Integration Ser
 **Purpose**: Main service for integrating with government data sources
 
 **Key Features**:
-- Multi-source data integration (Parliament of Canada, Ontario Legislature, OpenParliament.ca)
+- Multi-source data integration (Parliament of Kenya, Senate of Kenya, County Assemblies)
 - Rate limiting and quota management
 - Data parsing and normalization
 - Conflict resolution between sources
@@ -31,16 +31,16 @@ This document outlines the implementation of the Government Data Integration Ser
 **Purpose**: Transform raw government data into normalized format
 
 **Key Features**:
-- Support for multiple government data formats (Parliament, Ontario Legislature, OpenParliament)
+- Support for multiple government data formats (Parliament of Kenya, Senate, County Assemblies)
 - Data normalization and cleaning
 - Status mapping between different government systems
 - Sponsor and affiliation extraction
 - Data validation and error reporting
 
 **Supported Formats**:
-- Canadian Parliament XML/JSON format
-- Ontario Legislature HTML/JSON format
-- OpenParliament.ca API format
+- Parliament of Kenya XML/JSON format
+- Senate of Kenya HTML/JSON format
+- County Assembly API formats
 
 ### 3. Data Validation Service (`server/services/data-validation.ts`)
 
@@ -100,12 +100,12 @@ This document outlines the implementation of the Government Data Integration Ser
 
 ```bash
 # Government Data Integration
-PARLIAMENT_CA_API_URL=https://www.ourcommons.ca/members/en/search/xml
-PARLIAMENT_CA_API_KEY=your_parliament_api_key_here
-ONTARIO_LEGISLATURE_API_URL=https://www.ola.org/en/legislative-business/bills
-ONTARIO_LEGISLATURE_API_KEY=your_ontario_api_key_here
-OPENPARLIAMENT_API_URL=https://openparliament.ca/api
-OPENPARLIAMENT_API_KEY=your_openparliament_api_key_here
+PARLIAMENT_KE_API_URL=https://www.parliament.go.ke/api/bills
+PARLIAMENT_KE_API_KEY=your_parliament_api_key_here
+SENATE_KE_API_URL=https://www.parliament.go.ke/senate/api/bills
+SENATE_KE_API_KEY=your_senate_api_key_here
+COUNTY_ASSEMBLIES_API_URL=https://cog.go.ke/api/assemblies
+COUNTY_ASSEMBLIES_API_KEY=your_county_api_key_here
 
 # External API Configuration
 EXTERNAL_API_TIMEOUT=30000

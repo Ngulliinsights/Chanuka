@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, Split, ArrowRight, Zap, Users } from "lucide-react";
+import { Download, Split, ChevronRight, Activity, Users } from 'lucide-react';
 import { apiRequest } from '../lib/queryClient';
 import { useToast } from '../hooks/use-toast';
 import { logger } from '../utils/browser-logger';
@@ -78,7 +78,7 @@ export default function DecisionMatrix({ projectId }: DecisionMatrixProps) {
         {/* Current Path */}
         <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
           <div className="flex items-center space-x-2 mb-3">
-            <ArrowRight className="w-4 h-4 text-blue-600" />
+            <ChevronRight className="w-4 h-4 text-blue-600" />
             <h3 className="font-medium text-blue-900">Continue Current Path</h3>
           </div>
           <div className="space-y-3">
@@ -109,7 +109,7 @@ export default function DecisionMatrix({ projectId }: DecisionMatrixProps) {
         {/* Alternative Path 1 */}
         <div className="border border-purple-200 rounded-lg p-4 bg-purple-50">
           <div className="flex items-center space-x-2 mb-3">
-            <Zap className="w-4 h-4 text-purple-600" />
+            <Activity className="w-4 h-4 text-purple-600" />
             <h3 className="font-medium text-purple-900">AI-First Pivot</h3>
           </div>
           <div className="space-y-3">

@@ -11,7 +11,7 @@ import React, {
   useCallback, 
   useRef 
 } from 'react';
-import { WifiOff, Wifi, CloudOff, RefreshCw } from 'lucide-react';
+import { Network, Database, RefreshCw } from 'lucide-react';
 import { logger } from '../../utils/browser-logger';
 
 interface OfflineData {
@@ -361,6 +361,8 @@ export function OfflineStatus({ className = '', showDetails = false }: OfflineSt
       const timer = setTimeout(() => setIsVisible(false), 3000);
       return () => clearTimeout(timer);
     }
+    
+    return undefined;
   }, [isOnline]);
 
   if (!isVisible) return null;
@@ -375,7 +377,7 @@ export function OfflineStatus({ className = '', showDetails = false }: OfflineSt
       <div className="flex items-center justify-center space-x-2">
         {isOnline ? (
           <>
-            <Wifi className="h-4 w-4" />
+            <Network className="h-4 w-4" />
             <span>Back online</span>
             {pendingActions.length > 0 && (
               <button
@@ -388,7 +390,7 @@ export function OfflineStatus({ className = '', showDetails = false }: OfflineSt
           </>
         ) : (
           <>
-            <WifiOff className="h-4 w-4" />
+            <Network className="h-4 w-4" />
             <span>You're offline</span>
             {showDetails && pendingActions.length > 0 && (
               <span className="ml-2">

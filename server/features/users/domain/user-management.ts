@@ -1,7 +1,7 @@
 import { database as db, users, sessions, comments, notifications } from '@shared/database';
 import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 // Type definitions for better code clarity and type safety
 interface UserProfile {

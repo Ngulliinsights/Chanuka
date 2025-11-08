@@ -57,7 +57,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     )
   }
 )
-Button.display_name = "Button"
+Button.displayName = "Button"
 
 const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
   ({ 
@@ -224,7 +224,7 @@ const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
     );
   }
 );
-EnhancedButton.display_name = "EnhancedButton";
+EnhancedButton.displayName = "EnhancedButton";
 
 export { Button, buttonVariants, EnhancedButton }
 

@@ -6,7 +6,7 @@ import { UserProfile, UserInterest } from '../domain/entities/user-profile';
 import { CitizenVerification } from '../domain/entities/citizen-verification';
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
 import { databaseService } from '@/infrastructure/database/database-service';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 /**
  * UserService - Direct Drizzle implementation replacing UserRepository

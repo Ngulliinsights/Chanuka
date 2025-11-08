@@ -1,48 +1,56 @@
 import { NavigationSection } from '../../types/navigation';
-import { logger } from '@shared/core';
 
 /**
  * Determines the current navigation section based on the path
  */
-export function determineNavigationSection(path: string): NavigationSection {
-  // Remove query parameters and hash
-  const cleanPath = path.split('?')[0].split('#')[0];
-  
+export function determineNavigationSection(path: string | undefined | null): NavigationSection {
+  // Fallback to root if path is missing or invalid
+  const safePath: string = typeof path === 'string' ? path : '/';
+
+  // Safely remove query parameters and hash fragments
+  const cleanPath: string = safePath.split('?')[0]?.split('#')[0] ?? '/';
+
   // Legislative section
-  if (cleanPath === '/' || 
-      cleanPath.startsWith('/bills') || 
-      cleanPath.startsWith('/bill-sponsorship-analysis')) {
+  if (
+    cleanPath === '/' ||
+    cleanPath.startsWith('/bills') ||
+    cleanPath.startsWith('/bill-sponsorship-analysis')
+  ) {
     return 'legislative';
   }
-  
+
   // Community section
-  if (cleanPath.startsWith('/community') || 
-      cleanPath.startsWith('/expert-verification') ||
-      cleanPath.endsWith('/comments') ||
-      cleanPath.includes('/comments/')) {
+  if (
+    cleanPath.startsWith('/community') ||
+    cleanPath.startsWith('/expert-verification') ||
+    cleanPath.endsWith('/comments') ||
+    cleanPath.includes('/comments/')
+  ) {
     return 'community';
   }
-  
+
   // User section
-  if (cleanPath.startsWith('/dashboard') || 
-      cleanPath.startsWith('/profile') || 
-      cleanPath.startsWith('/user-profile') ||
-      cleanPath.startsWith('/onboarding') ||
-      cleanPath.startsWith('/auth')) {
+  if (
+    cleanPath.startsWith('/dashboard') ||
+    cleanPath.startsWith('/profile') ||
+    cleanPath.startsWith('/user-profile') ||
+    cleanPath.startsWith('/onboarding') ||
+    cleanPath.startsWith('/auth')
+  ) {
     return 'user';
   }
-  
+
   // Admin section
   if (cleanPath.startsWith('/admin')) {
     return 'admin';
   }
-  
+
   // Tools section
   if (cleanPath.startsWith('/search')) {
     return 'tools';
   }
-  
-  // Default to tools for unknown paths
+
+  // Default fallback
   return 'tools';
 }
 
@@ -91,47 +99,3 @@ export function sectionRequiresAuth(section: NavigationSection): boolean {
 export function sectionRequiresAdmin(section: NavigationSection): boolean {
   return section === 'admin';
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

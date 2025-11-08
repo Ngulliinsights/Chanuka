@@ -17,6 +17,14 @@ export function isServiceWorkerSupported(): boolean {
 export async function registerServiceWorker(
   config: ServiceWorkerConfig = {},
 ): Promise<ServiceWorkerRegistration | null> {
+  // Skip service worker registration in development
+  if (import.meta.env.DEV) {
+    logger.info('Skipping service worker registration in development mode', {
+      component: 'ServiceWorker',
+    });
+    return null;
+  }
+
   if (!isServiceWorkerSupported()) {
     logger.info('Service workers are not supported in this browser', {
       component: 'ServiceWorker',
@@ -25,7 +33,8 @@ export async function registerServiceWorker(
   }
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
+    const swPath = import.meta.env.DEV ? '/dev-sw.js' : '/sw.js';
+    const registration = await navigator.serviceWorker.register(swPath, {
       scope: '/',
     });
 

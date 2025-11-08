@@ -28,7 +28,7 @@ describe('Auth Validation Utilities', () => {
     it('should validate correct email addresses', () => {
       const validEmails = [
         'test@example.com',
-        'users.name@domain.org',
+        'user.name@domain.org',
         'user+tag@example.co.uk',
         'firstname.lastname@company.com'
       ];

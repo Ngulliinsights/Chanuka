@@ -15,15 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import {
-  Bell,
-  BellOff,
-  Wifi,
-  WifiOff,
-  Settings,
-  Clock,
-  AlertCircle,
-} from "lucide-react";
+import { Bell, Network, Settings, Clock, AlertCircle,  } from 'lucide-react';
 import { toast } from "sonner";
 import { logger } from '../../utils/browser-logger';
 
@@ -166,9 +158,9 @@ export function RealTimeBillTracker({ bill_id,
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
               {isConnected ? (
-                <Wifi className="h-5 w-5" />
+                <Network className="h-5 w-5" />
               ) : (
-                <WifiOff className="h-5 w-5" />
+                <Network className="h-5 w-5" />
               )}
               Real-Time Bill Tracking
             </span>
@@ -203,7 +195,7 @@ export function RealTimeBillTracker({ bill_id,
                 >
                   {isSubscribed ? (
                     <>
-                      <BellOff className="h-4 w-4 mr-2" />
+                      <Bell className="h-4 w-4 mr-2" />
                       Unsubscribe
                     </>
                   ) : (

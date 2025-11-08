@@ -2,7 +2,7 @@
 import { readDatabase as db } from '@shared/database';
 import { users, bills, user_interests } from '@shared/schema'; // Fixed: Added user_interests import
 import { eq } from 'drizzle-orm';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../shared/core/src/index.js';
 
 /**
  * Comprehensive verification suite for the Alert Preference Management System.

@@ -1,5 +1,5 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { en } from '@shared/i18n/en';
+import { en } from '../utils/i18n';
 import { logger } from '../utils/browser-logger';
 
 type Translations = typeof en;

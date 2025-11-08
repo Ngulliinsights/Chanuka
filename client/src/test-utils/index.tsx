@@ -130,7 +130,10 @@ const TestProviders: React.FC<TestProvidersProps> = ({ children, options = {} })
   const NavigationProvider = createNavigationProvider(
     () => ({ pathname: route }),
     () => vi.fn(),
-    () => authState || createMockAuthState(),
+    () => ({ 
+      user: authState?.user || { id: 'test', name: 'Test User' }, 
+      isAuthenticated: authState?.isAuthenticated || false 
+    }),
     () => false // Mock useMediaQuery to return false (desktop)
   );
 

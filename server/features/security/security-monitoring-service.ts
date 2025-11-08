@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { securityAuditService } from './security-audit-service.js';
 import { intrusionDetectionService, ThreatDetectionResult } from './intrusion-detection-service.js';
-import { database as db } from '@shared/database';
+import { database as db } from '../../../shared/database';
 import { pgTable, text, serial, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, desc, eq, or, count } from 'drizzle-orm';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 /**
  * SecurityMonitoringService - The Active Intelligence Layer
@@ -687,7 +687,7 @@ export class SecurityMonitoringService {
 
     try {
       // Clear all escalation timers
-      for (const [alertId, timer] of this.escalationTimers) {
+      for (const [alertId, timer] of Array.from(this.escalationTimers)) {
         clearTimeout(timer);
       }
       this.escalationTimers.clear();
@@ -778,7 +778,7 @@ export class SecurityMonitoringService {
       });
 
       // Check for threshold violations
-      for (const [user_id, count] of failuresByUser) { if (count >= this.config.thresholds.failedLoginAttempts) {
+      for (const [user_id, count] of Array.from(failuresByUser)) { if (count >= this.config.thresholds.failedLoginAttempts) {
           await this.createIncident({
             incidentType: 'brute_force_attack',
             severity: 'high',
@@ -793,7 +793,7 @@ export class SecurityMonitoringService {
         }
       }
 
-      for (const [ip_address, count] of failuresByIP) {
+      for (const [ip_address, count] of Array.from(failuresByIP)) {
         if (count >= this.config.thresholds.failedLoginAttempts) {
           await this.createIncident({
             incidentType: 'brute_force_attack',
@@ -844,7 +844,7 @@ export class SecurityMonitoringService {
       });
 
       // Check for threshold violations
-      for (const [user_id, totalRecords] of accessByUser) { if (totalRecords >= this.config.thresholds.dataAccessVolume) {
+      for (const [user_id, totalRecords] of Array.from(accessByUser)) { if (totalRecords >= this.config.thresholds.dataAccessVolume) {
           await this.createIncident({
             incidentType: 'potential_data_exfiltration',
             severity: 'critical',
@@ -883,7 +883,7 @@ export class SecurityMonitoringService {
       });
 
       // Check for users with unusual admin activity
-      for (const [user_id, count] of actionsByUser) { if (count > 20) { // More than 20 admin actions in the time window is suspicious
+      for (const [user_id, count] of Array.from(actionsByUser)) { if (count > 20) { // More than 20 admin actions in the time window is suspicious
           await this.createIncident({
             incidentType: 'suspicious_admin_activity',
             severity: 'high',

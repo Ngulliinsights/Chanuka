@@ -28,7 +28,6 @@ export * from './safe-lazy-loading';
 // Offline Support
 export * from './offlineAnalytics';
 export * from './offlineDataManager';
-export * from './backgroundSyncManager';
 
 // Development
 export * from './development-debug';
@@ -39,7 +38,7 @@ export * from './mobile-error-handler';
 export * from './mobile-touch-handler';
 
 // Navigation Utils
-export * from './navigation';
+// export * from './navigation'; // Commented out due to missing module
 
 // Service & Error Recovery
 export * from './service-recovery';

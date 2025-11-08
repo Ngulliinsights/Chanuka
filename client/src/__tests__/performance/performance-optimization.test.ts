@@ -20,7 +20,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import { performanceOptimizer } from '../../utils/performance-optimizer';
-import { logger } from '@shared/core';
+import { logger } from '../../utils/browser-logger';
 
 // Mock performance APIs
 const mockPerformance = {

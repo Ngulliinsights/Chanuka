@@ -6,7 +6,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { performanceOptimizer, usePerformanceOptimization } from '../../utils/performance-optimizer';
 import { logger } from '../../utils/browser-logger';
-import { performanceMonitor, cache as getDefaultCache } from '@shared/core';
+import { performanceMonitor } from '../../utils/client-core';
+// import { cache as getDefaultCache } from '@shared/core'; // Commented out due to export issue
 
 interface PerformanceMetricsProps {
   showDetails?: boolean;
@@ -66,7 +67,7 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
       // Prefer a provided getCacheMetrics; fall back to shared cache if available
       const cacheMetrics = typeof getCacheMetrics === 'function'
         ? await Promise.resolve(getCacheMetrics())
-        : (getDefaultCache && typeof getDefaultCache.getMetrics === 'function' ? getDefaultCache.getMetrics() : {});
+        : {}; // Cache not available
 
       const performanceScore = 85; // Placeholder — replace with real calc if available
 

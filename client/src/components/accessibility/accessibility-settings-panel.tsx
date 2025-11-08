@@ -4,17 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { 
-  Settings, 
-  Eye, 
-  AlignLeft, 
-  Bolt, 
-  Volume2, 
-  KeyboardIcon, 
-  Target,
-  Palette,
-  Mouse
-} from 'lucide-react';
+import { Settings, Eye, BarChart3, Activity, Volume2, Target, Circle, User } from 'lucide-react';
 import { useAccessibility, AccessibleButton, AccessibleFormField } from './accessibility-manager';
 import { logger } from '../../utils/browser-logger';
 
@@ -149,7 +139,7 @@ export function AccessibilitySettingsPanel({ isOpen, onClose }: AccessibilitySet
             {/* Motion Settings */}
             <section>
               <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                <Bolt className="h-5 w-5 mr-2 text-blue-600" />
+                <Activity className="h-5 w-5 mr-2 text-blue-600" />
                 Motion & Animation
               </h3>
               
@@ -180,7 +170,7 @@ export function AccessibilitySettingsPanel({ isOpen, onClose }: AccessibilitySet
             {/* Navigation Settings */}
             <section>
               <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                <Keyboard className="h-5 w-5 mr-2 text-blue-600" />
+                <Settings className="h-5 w-5 mr-2 text-blue-600" />
                 Navigation
               </h3>
               

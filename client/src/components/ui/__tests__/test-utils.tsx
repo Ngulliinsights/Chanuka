@@ -4,7 +4,7 @@
  */
 
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
-import { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, useEffect } from 'react';
 import { vi } from 'vitest';
 import { z } from 'zod';
 import { 
@@ -26,7 +26,7 @@ interface TestWrapperProps {
 
 const TestWrapper = ({ children }: TestWrapperProps) => {
   // Initialize recovery strategies for tests
-  React.useEffect(() => {
+  useEffect(() => {
     initializeUIRecoveryStrategies();
   }, []);
 

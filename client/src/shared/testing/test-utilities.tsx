@@ -400,10 +400,10 @@ export class FormTestHelper {
     const user = userEvent.setup();
     
     if (options.clear) {
-      await users.clear(input);
+      await user.clear(input);
     }
     
-    await users.type(input, value);
+    await user.type(input, value);
   }
 
   /**
@@ -414,7 +414,7 @@ export class FormTestHelper {
     value: string
   ): Promise<void> {
     const user = userEvent.setup();
-    await users.selectOptions(select, value);
+    await user.selectOptions(select, value);
   }
 
   /**
@@ -422,7 +422,7 @@ export class FormTestHelper {
    */
   static async clickButton(button: HTMLElement): Promise<void> {
     const user = userEvent.setup();
-    await users.click(button);
+    await user.click(button);
   }
 
   /**
@@ -432,7 +432,8 @@ export class FormTestHelper {
     const user = userEvent.setup();
     const submitButton = form.querySelector('button[type="submit"]') as HTMLElement;
     if (submitButton) {
-      await users.click(submitButton);
+      const user = userEvent.setup();
+      await user.click(submitButton);
     } else {
       // Fallback: trigger form submission event directly
       form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));

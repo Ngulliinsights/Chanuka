@@ -6,7 +6,7 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { ArrowUp, ArrowDown, Plus, Clock, DollarSign, Users, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { ChevronUp, ChevronDown, CheckCircle, Clock, DollarSign, Users, AlertCircle, Loader2 } from 'lucide-react';
 import { logger } from '../../utils/browser-logger';
 
 // Type definitions with improved specificity
@@ -63,9 +63,9 @@ const STATUS_COLORS: Record<Status, string> = {
   proposed: 'bg-gray-100 text-gray-800 border-gray-200',
 } as const;
 
-const STATUS_ICONS: Record<Status, typeof CheckCircle2> = {
-  implemented: CheckCircle2,
-  approved: CheckCircle2,
+const STATUS_ICONS: Record<Status, typeof CheckCircle> = {
+  implemented: CheckCircle,
+  approved: CheckCircle,
   under_review: Clock,
   rejected: AlertCircle,
   proposed: Clock,
@@ -301,7 +301,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
             {votingStates[workaround.id] ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <ArrowUp className="w-4 h-4" />
+              <ChevronUp className="w-4 h-4" />
             )}
             <span className="text-sm">{workaround.upvotes}</span>
           </button>
@@ -314,7 +314,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
             {votingStates[workaround.id] ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <ArrowDown className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4" />
             )}
             <span className="text-sm">{workaround.downvotes}</span>
           </button>
@@ -379,7 +379,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="w-4 h-4 mr-2" />
+              <CheckCircle className="w-4 h-4 mr-2" />
               Propose Workaround
             </Button>
           </DialogTrigger>
@@ -511,7 +511,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
         ) : (
           <Card className="p-8 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Plus className="w-8 h-8 text-gray-400" />
+              <CheckCircle className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No workarounds yet</h3>
             <p className="text-gray-600 mb-4">

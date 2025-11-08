@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 import { AuthenticatedAPI } from '../utils/authenticated-api';
 
 // Define types locally since they're not exported
@@ -225,7 +225,7 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       if (prevStatus && 
           prevStatus.apiReachable === status.apiReachable &&
           prevStatus.corsEnabled === status.corsEnabled &&
-          prevStatus.errors.length === status.errors.length) {
+          (prevStatus.errors?.length || 0) === (status.errors?.length || 0)) {
         return prevStatus; // No meaningful change, skip update to prevent re-render
       }
       return status;
@@ -238,18 +238,18 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     // Trigger connection change callback only if status actually changed
     // The prevConnectionRef.current !== null check prevents callback on initial mount
     if (prevConnectionRef.current !== null && prevConnectionRef.current !== isNowConnected) {
-      onConnectionChangeRef.current?.(isNowConnected);
+      onConnectionChangeRef.current?.(isNowConnected || false);
     }
-    prevConnectionRef.current = isNowConnected;
+    prevConnectionRef.current = isNowConnected || false;
     
     // Update error state based on connection status
     if (isNowConnected) {
       setError(null);
-    } else if (status.errors.length > 0) {
+    } else if (status.errors && status.errors.length > 0) {
       // Prioritize CORS errors as they're typically most critical for troubleshooting
       // CORS issues often indicate configuration problems that need immediate attention
       const corsError = status.errors.find(err => err.toLowerCase().includes('cors'));
-      setError(corsError || status.errors[0]);
+      setError(corsError || status.errors[0] || null);
     }
   }, []); // Empty deps because we use refs for callbacks
 
@@ -264,9 +264,9 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       setConnectionStatus(status);
       
       // Extract the most relevant error for display
-      if (status.errors.length > 0) {
+      if (status.errors && status.errors.length > 0) {
         const corsError = status.errors.find(err => err.toLowerCase().includes('cors'));
-        setError(corsError || status.errors[0]);
+        setError(corsError || status.errors[0] || null);
       }
     } catch (err) {
       // Handle unexpected errors that weren't caught in checkConnection
@@ -314,9 +314,9 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       
       // Trigger health change callback only when health status actually changes
       if (prevHealthRef.current !== null && prevHealthRef.current !== isNowHealthy) {
-        onHealthChangeRef.current?.(isNowHealthy);
+        onHealthChangeRef.current?.(isNowHealthy || false);
       }
-      prevHealthRef.current = isNowHealthy;
+      prevHealthRef.current = isNowHealthy || false;
       
     } catch (err) {
       logger.error('Health check failed:', { component: 'Chanuka' }, err);

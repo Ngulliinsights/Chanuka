@@ -1,6 +1,6 @@
 import { databaseService } from '../../infrastructure/database/database-service.js';
 import { database as db } from '@shared/database';
-import { comments, User, comment_votes } from '@/shared/schema';
+import { comments, User, comment_votes } from '@shared/schema';
 
 // Alias for backward compatibility
 const comments = comments;
@@ -8,7 +8,7 @@ const comment_votess = comment_votes;
 import { eq, and, sql, desc } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys } from '@shared/core/caching/key-generator';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 import { CACHE_TTL_SHORT } from '@shared/core/primitives/constants/time.js';
 
 export interface VoteResult {

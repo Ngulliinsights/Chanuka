@@ -38,11 +38,17 @@ export class SimpleCacheFactory {
 
     switch (config.provider) {
       case 'memory':
-        adapter = new MemoryAdapter({
-          maxSize: config.maxMemoryMB ? config.maxMemoryMB * 1024 * 1024 : undefined,
-          defaultTtlSec: config.defaultTtlSec,
-          keyPrefix: config.keyPrefix,
-        });
+        const memoryConfig: any = {};
+        if (config.maxMemoryMB !== undefined) {
+          memoryConfig.maxSize = config.maxMemoryMB * 1024 * 1024;
+        }
+        if (config.defaultTtlSec !== undefined) {
+          memoryConfig.defaultTtlSec = config.defaultTtlSec;
+        }
+        if (config.keyPrefix !== undefined) {
+          memoryConfig.keyPrefix = config.keyPrefix;
+        }
+        adapter = new MemoryAdapter(memoryConfig);
         break;
       default:
         throw new Error(`Unsupported cache provider: ${config.provider}`);

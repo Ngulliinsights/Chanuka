@@ -11,7 +11,7 @@ import { database } from '@shared/database';
 import { bills, sponsors, comments, users } from '@shared/schema';
 import { sql, desc } from 'drizzle-orm';
 import { SearchQuery, SearchResult } from '../types/search.types.js';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../../shared/core/src/index.js';
 import { databaseService } from '@/infrastructure/database/database-service';
 
 interface QueryExpansionOptions {

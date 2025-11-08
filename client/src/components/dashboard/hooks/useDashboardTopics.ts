@@ -36,8 +36,13 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
 
     try {
       const newTopic: TrackedTopic = {
-        ...topicData,
         id: `topic-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: topicData.name,
+        category: topicData.category,
+        billCount: topicData.billCount,
+        is_active: topicData.is_active,
+        description: topicData.description,
+        keywords: topicData.keywords,
         created_at: new Date()
       };
 
@@ -76,15 +81,26 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
         throw new Error(`Topic with ID ${topicId} not found`);
       }
 
+      const existingTopic = topics[topicIndex];
+      if (!existingTopic) {
+        throw new Error(`Topic with ID ${topicId} not found`);
+      }
+      
       const updatedTopic: TrackedTopic = {
-        ...topics[topicIndex],
-        ...updates
+        id: existingTopic.id,
+        name: updates.name ?? existingTopic.name,
+        category: updates.category ?? existingTopic.category,
+        billCount: updates.billCount ?? existingTopic.billCount,
+        is_active: updates.is_active ?? existingTopic.is_active,
+        description: updates.description ?? existingTopic.description,
+        keywords: updates.keywords ?? existingTopic.keywords,
+        created_at: existingTopic.created_at
       };
 
       validateTrackedTopic(updatedTopic);
 
       // Check for duplicate names if name is being updated
-      if (updates.name && updates.name !== topics[topicIndex].name) {
+      if (updates.name && updates.name !== topics[topicIndex]?.name) {
         const existingTopic = topics.find(topic => 
           topic.id !== topicId && topic.name.toLowerCase() === updates.name!.toLowerCase()
         );

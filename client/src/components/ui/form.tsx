@@ -83,7 +83,7 @@ const FormItem = forwardRef<
     </FormItemContext.Provider>
   )
 })
-FormItem.display_name = "FormItem"
+FormItem.displayName = "FormItem"
 
 const FormLabel = forwardRef<
   ElementRef<typeof Root>,
@@ -100,7 +100,7 @@ const FormLabel = forwardRef<
     />
   )
 })
-FormLabel.display_name = "FormLabel"
+FormLabel.displayName = "FormLabel"
 
 const FormControl = forwardRef<
   ElementRef<typeof Slot>,
@@ -122,7 +122,7 @@ const FormControl = forwardRef<
     />
   )
 })
-FormControl.display_name = "FormControl"
+FormControl.displayName = "FormControl"
 
 const FormDescription = forwardRef<
   HTMLParagraphElement,
@@ -139,7 +139,7 @@ const FormDescription = forwardRef<
     />
   )
 })
-FormDescription.display_name = "FormDescription"
+FormDescription.displayName = "FormDescription"
 
 const FormMessage = forwardRef<
   HTMLParagraphElement,
@@ -163,7 +163,7 @@ const FormMessage = forwardRef<
     </p>
   )
 })
-FormMessage.display_name = "FormMessage"
+FormMessage.displayName = "FormMessage"
 
 // Enhanced form with Zod validation
 interface EnhancedFormProps {
@@ -390,7 +390,7 @@ const EnhancedForm = forwardRef<HTMLFormElement, EnhancedFormProps>(
     );
   }
 );
-EnhancedForm.display_name = "EnhancedForm";
+EnhancedForm.displayName = "EnhancedForm";
 
 export {
   useFormField,

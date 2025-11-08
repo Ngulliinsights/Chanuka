@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import { logger } from '@shared/core';
+import { logger } from './utils/browser-logger';
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

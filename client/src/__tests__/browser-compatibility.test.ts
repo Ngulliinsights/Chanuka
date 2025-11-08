@@ -20,7 +20,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 
 // Mock browser environment
 const mockUserAgent = (user_agent: string) => {
@@ -42,7 +42,7 @@ describe('Browser Compatibility Detection', () => {
   let originalWindow: any;
 
   beforeEach(() => {
-    originalUserAgent = navigator.user_agent;
+    originalUserAgent = navigator.userAgent;
     originalWindow = { ...window };
   });
 

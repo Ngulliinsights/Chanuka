@@ -1,7 +1,7 @@
 // Financial Analysis Service
 // Handles financial impact assessment, relationship mapping, and network analysis
 
-import { cache, logger, DatabaseError } from '@shared/core';
+import { cache, logger, DatabaseError  } from '../../../../../shared/core/src/index.js';
 import { FinancialDisclosureConfig } from '../config';
 import { disclosureProcessingService } from './disclosure-processing.service';
 import type {

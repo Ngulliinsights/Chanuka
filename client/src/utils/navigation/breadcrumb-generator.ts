@@ -1,5 +1,4 @@
 import { BreadcrumbItem } from '../../types/navigation';
-import { logger } from '../browser-logger';
 
 // Route configuration for breadcrumb generation
 const routeConfig: Record<string, { label: string; parent?: string }> = {
@@ -52,7 +51,7 @@ function extractDynamicValues(actualPath: string, normalizedPath: string): Recor
   
   // Extract bill ID
   const bill_idMatch = actualPath.match(/\/bills\/([^\/]+)/);
-  if (bill_idMatch && normalizedPath.includes(':id')) {
+  if (bill_idMatch && bill_idMatch[1] && normalizedPath.includes(':id')) {
     values.id = bill_idMatch[1];
   }
   
@@ -74,7 +73,7 @@ export function generateBreadcrumbs(currentPath: string): BreadcrumbItem[] {
     
     // Add parent breadcrumbs first (recursive)
     if (config.parent) {
-      const parentActualPath = getActualParentPath(config.parent, actualPath, dynamicValues);
+      const parentActualPath = getActualParentPath(config.parent, dynamicValues);
       buildBreadcrumbChain(config.parent, parentActualPath);
     }
     
@@ -101,14 +100,14 @@ export function generateBreadcrumbs(currentPath: string): BreadcrumbItem[] {
 /**
  * Gets the actual parent path by replacing placeholders with dynamic values
  */
-function getActualParentPath(parentPath: string, currentActualPath: string, dynamicValues: Record<string, string>): string {
+function getActualParentPath(parentPath: string, dynamicValues: Record<string, string>): string {
   let actualParentPath = parentPath;
-  
+
   // Replace :id with actual bill ID if present
   if (parentPath.includes(':id') && dynamicValues.id) {
     actualParentPath = parentPath.replace(':id', dynamicValues.id);
   }
-  
+
   return actualParentPath;
 }
 

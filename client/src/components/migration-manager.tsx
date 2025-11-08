@@ -2,15 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
-import { 
-  GitBranch, 
-  CheckCircle, 
-  Clock, 
-  FileText,
-  Play,
-  FilePlus,
-  AlertTriangle
-} from "lucide-react";
+import { GitBranch, CheckCircle, Clock, FileText, AlertTriangle } from 'lucide-react';
 import { cn, formatRelativeTime } from '../lib/utils';
 import { logger } from '../utils/browser-logger';
 
@@ -139,11 +131,11 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
           <div className="pt-6 border-t border-gray-200">
             <div className="flex space-x-3">
               <Button className="flex-1" size="lg">
-                <Play className="h-4 w-4 mr-2" />
+                <CheckCircle className="h-4 w-4 mr-2" />
                 Run Migrations ({pendingMigrations.length})
               </Button>
               <Button variant="outline" className="flex-1" size="lg">
-                <FilePlus className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 mr-2" />
                 Create Migration
               </Button>
             </div>

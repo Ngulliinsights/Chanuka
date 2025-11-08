@@ -13,7 +13,7 @@ const enhancedNotificationService = {
 };
 
 type EnhancedNotificationData = any;
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 export interface ScheduledDigest { user_id: string;
   frequency: 'daily' | 'weekly' | 'monthly';

@@ -6,22 +6,7 @@ import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Progress } from '../ui/progress';
-import { 
-  Shield, 
-  Download, 
-  Trash2, 
-  Settings, 
-  Eye, 
-  Share2, 
-  Clock, 
-  CheckCircle, 
-  AlertTriangle,
-  Info,
-  Cookie,
-  Mail,
-  Bell,
-  Smartphone
-} from 'lucide-react';
+import { Shield, Download, Trash, Settings, Eye, Share2, Clock, CheckCircle, AlertTriangle, Info, Circle, Mail, Bell, Smartphone } from 'lucide-react';
 import { logger } from '../../utils/browser-logger';
 
 interface PrivacyPreferences {
@@ -365,7 +350,7 @@ export function PrivacyDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Cookie className="h-5 w-5" />
+                  <Circle className="h-5 w-5" />
                   <span>Cookie Preferences</span>
                 </CardTitle>
                 <CardDescription>
@@ -435,7 +420,7 @@ export function PrivacyDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Trash2 className="h-5 w-5 text-red-600" />
+                  <Trash className="h-5 w-5 text-red-600" />
                   <span>Delete Your Data</span>
                 </CardTitle>
                 <CardDescription>
@@ -455,7 +440,7 @@ export function PrivacyDashboard() {
                     onClick={() => setShowDeleteConfirm(true)} 
                     variant="destructive"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
+                    <Trash className="h-4 w-4 mr-2" />
                     Delete All My Data
                   </Button>
                 ) : (

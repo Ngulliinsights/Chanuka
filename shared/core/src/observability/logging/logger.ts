@@ -675,8 +675,8 @@ export class UnifiedLogger implements LoggerChild {
       }
     }, cleanupInterval);
 
-    // Prevent interval from keeping process alive
-    if (this.timerCleanupInterval) {
+    // Prevent interval from keeping process alive in Node.js environment
+    if (this.timerCleanupInterval && typeof this.timerCleanupInterval.unref === 'function') {
       this.timerCleanupInterval.unref();
     }
   }

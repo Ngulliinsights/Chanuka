@@ -15,7 +15,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { PageRelationshipService } from '../PageRelationshipService';
 import { RelatedPage, UserRole } from '@/components/navigation';
-import { logger } from '@shared/core';
+import { logger } from '../../utils/browser-logger';
 
 describe('PageRelationshipService', () => {
   let service: PageRelationshipService;

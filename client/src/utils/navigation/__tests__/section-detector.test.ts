@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import { 
-import { logger } from '@shared/core';
+import { logger } from '../../browser-logger';
   determineNavigationSection, 
   getSectionDisplayName, 
   getSectionDescription,

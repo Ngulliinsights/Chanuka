@@ -5,7 +5,7 @@ import { cacheInvalidation } from '../utils/cacheInvalidation';
 import { addNetworkStatusListener, isOnline } from '../utils/serviceWorker';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 import { offlineAnalytics } from '../utils/offlineAnalytics';
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 
 export interface OfflineState {
   isOnline: boolean;

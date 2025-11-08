@@ -1,7 +1,7 @@
 import { GovernmentDataIntegrationService } from '../infrastructure/external-data/government-data-integration.js';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/external-api-manager.js';
 import { ExternalAPIErrorHandler } from './external-api-error-handler.js';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../shared/core/src/index.js';
 import { z } from 'zod';
 
 /**
@@ -421,21 +421,21 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
    */
   private static transformParliamentBill(bill: any): any {
     return {
-      id: bills.BillId || bills.id,
-      title: bills.Title || bills.LongTitle || bills.title,
-      description: bills.Summary || bills.description,
-      content: bills.FullText || bills.content,
-      summary: bills.ShortSummary || bills.Summary || bills.summary,
-      status: this.mapParliamentStatus(bills.Status || bills.status),
-      bill_number: bills.Number || bills.BillNumber || bills.bill_number,
-      introduced_date: bills.IntroducedDate || bills.introduced_date,
-      last_action_date: bills.LastActionDate || bills.last_action_date,
+      id: bill.BillId || bill.id,
+      title: bill.Title || bill.LongTitle || bill.title,
+      description: bill.Summary || bill.description,
+      content: bill.FullText || bill.content,
+      summary: bill.ShortSummary || bill.Summary || bill.summary,
+      status: this.mapParliamentStatus(bill.Status || bill.status),
+      bill_number: bill.Number || bill.BillNumber || bill.bill_number,
+      introduced_date: bill.IntroducedDate || bill.introduced_date,
+      last_action_date: bill.LastActionDate || bill.last_action_date,
       sponsors: this.extractParliamentSponsors(bill),
-      category: bills.Subject || bills.category,
-      tags: this.extractTags(bills.Keywords || bills.tags),
+      category: bill.Subject || bill.category,
+      tags: this.extractTags(bill.Keywords || bill.tags),
       source: 'parliament-ca',
-      sourceUrl: bills.Url || bills.url,
-      lastUpdated: bills.LastModified || bills.updated_at || new Date().toISOString()
+      sourceUrl: bill.Url || bill.url,
+      lastUpdated: bill.LastModified || bill.updated_at || new Date().toISOString()
     };
   }
 
@@ -461,21 +461,21 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   }
 
   /**
-   * Transform Ontario Legislature data format
+   * Transform Senate of Kenya data format
    */
-  static transformOntarioLegislatureData(rawData: any): any {
+  static transformSenateKenyaData(rawData: any): any {
     if (!rawData) return null;
 
-    // Handle Ontario Legislature HTML/JSON format
+    // Handle Senate of Kenya HTML/JSON format
     if (rawData.bills) {
       return {
-        bills: rawData.bills.map(this.transformOntarioBill)
+        bills: rawData.bills.map(this.transformSenateKenyaBill)
       };
     }
 
     if (rawData.members) {
       return {
-        sponsors: rawData.members.map(this.transformOntarioMember)
+        sponsors: rawData.members.map(this.transformSenateKenyaMember)
       };
     }
 
@@ -483,32 +483,32 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   }
 
   /**
-   * Transform individual Ontario bill data
+   * Transform individual Senate of Kenya bill data
    */
-  private static transformOntarioBill(bill: any): any {
+  private static transformSenateKenyaBill(bill: any): any {
     return {
-      id: bills.bill_id || bills.id,
-      title: bills.title || bills.long_title,
-      description: bills.summary || bills.description,
-      content: bills.full_text || bills.content,
-      summary: bills.short_summary || bills.summary,
-      status: this.mapOntarioStatus(bills.status),
-      bill_number: bills.bill_number || bills.number,
-      introduced_date: bills.introduced_date,
-      last_action_date: bills.last_action_date,
-      sponsors: this.extractOntarioSponsors(bill),
-      category: bills.ministry || bills.category,
-      tags: this.extractTags(bills.keywords),
-      source: 'ontario-legislature',
-      sourceUrl: bills.url,
-      lastUpdated: bills.updated_at || new Date().toISOString()
+      id: bill.bill_id || bill.id,
+      title: bill.title || bill.long_title,
+      description: bill.summary || bill.description,
+      content: bill.full_text || bill.content,
+      summary: bill.short_summary || bill.summary,
+      status: this.mapSenateKenyaStatus(bill.status),
+      bill_number: bill.bill_number || bill.number,
+      introduced_date: bill.introduced_date,
+      last_action_date: bill.last_action_date,
+      sponsors: this.extractSenateKenyaSponsors(bill),
+      category: bill.ministry || bill.category,
+      tags: this.extractTags(bill.keywords),
+      source: 'senate-ke',
+      sourceUrl: bill.url,
+      lastUpdated: bill.updated_at || new Date().toISOString()
     };
   }
 
   /**
-   * Transform individual Ontario member data
+   * Transform individual Senate of Kenya member data
    */
-  private static transformOntarioMember(member: any): any {
+  private static transformSenateKenyaMember(member: any): any {
     return {
       id: member.member_id || member.id,
       name: member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim(),
@@ -520,28 +520,28 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
       bio: member.biography,
       photo_url: member.photo_url,
       affiliations: this.extractAffiliations(member),
-      source: 'ontario-legislature',
+      source: 'senate-ke',
       sourceUrl: member.url,
       lastUpdated: member.updated_at || new Date().toISOString()
     };
   }
 
   /**
-   * Transform OpenParliament.ca data format
+   * Transform County Assemblies data format
    */
-  static transformOpenParliamentData(rawData: any): any {
+  static transformCountyAssembliesData(rawData: any): any {
     if (!rawData) return null;
 
-    // Handle OpenParliament API format
+    // Handle County Assemblies API format
     if (rawData.objects) {
       // Determine if this is bills or politicians data
       if (rawData.objects[0] && rawData.objects[0].number) {
         return {
-          bills: rawData.objects.map(this.transformOpenParliamentBill)
+          bills: rawData.objects.map(this.transformCountyAssemblyBill)
         };
       } else if (rawData.objects[0] && rawData.objects[0].name) {
         return {
-          sponsors: rawData.objects.map(this.transformOpenParliamentPolitician)
+          sponsors: rawData.objects.map(this.transformCountyAssemblyMember)
         };
       }
     }
@@ -550,38 +550,38 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   }
 
   /**
-   * Transform individual OpenParliament bill data
+   * Transform individual County Assembly bill data
    */
-  private static transformOpenParliamentBill(bill: any): any {
+  private static transformCountyAssemblyBill(bill: any): any {
     return {
-      id: bills.id,
-      title: bills.name || bills.title,
-      description: bills.summary,
-      content: bills.text,
-      summary: bills.summary,
-      status: this.mapOpenParliamentStatus(bills.status),
-      bill_number: bills.number,
-      introduced_date: bills.introduced,
-      last_action_date: bills.last_action_date,
-      sponsors: bills.sponsor_politician ? [{
-        id: bills.sponsor_politician.id,
-        name: bills.sponsor_politician.name,
+      id: bill.id,
+      title: bill.name || bill.title,
+      description: bill.summary,
+      content: bill.text,
+      summary: bill.summary,
+      status: this.mapCountyAssemblyStatus(bill.status),
+      bill_number: bill.number,
+      introduced_date: bill.introduced,
+      last_action_date: bill.last_action_date,
+      sponsors: bill.sponsor_politician ? [{
+        id: bill.sponsor_politician.id,
+        name: bill.sponsor_politician.name,
         role: 'MP',
-        party: bills.sponsor_politician.party,
+        party: bill.sponsor_politician.party,
         sponsorshipType: 'primary'
       }] : [],
-      category: bills.law_type,
-      tags: this.extractTags(bills.keywords),
-      source: 'openparliament',
-      sourceUrl: `https://openparliament.ca${bills.url}`,
-      lastUpdated: bills.updated || new Date().toISOString()
+      category: bill.law_type,
+      tags: this.extractTags(bill.keywords),
+      source: 'county-assemblies',
+      sourceUrl: `https://cog.go.ke${bill.url}`,
+      lastUpdated: bill.updated || new Date().toISOString()
     };
   }
 
   /**
-   * Transform individual OpenParliament politician data
+   * Transform individual County Assembly member data
    */
-  private static transformOpenParliamentPolitician(politician: any): any {
+  private static transformCountyAssemblyMember(politician: any): any {
     return {
       id: politician.id,
       name: politician.name,
@@ -593,8 +593,8 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
       bio: politician.description,
       photo_url: politician.photo_url,
       affiliations: [],
-      source: 'openparliament',
-      sourceUrl: `https://openparliament.ca${politician.url}`,
+      source: 'county-assemblies',
+      sourceUrl: `https://cog.go.ke${politician.url}`,
       lastUpdated: politician.updated || new Date().toISOString()
     };
   }
@@ -622,9 +622,9 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   }
 
   /**
-   * Map Ontario Legislature status to normalized status
+   * Map Senate of Kenya status to normalized status
    */
-  private static mapOntarioStatus(status: string): string {
+  private static mapSenateKenyaStatus(status: string): string {
     if (!status) return 'introduced';
 
     const statusMap: Record<string, string> = {
@@ -643,9 +643,9 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   }
 
   /**
-   * Map OpenParliament status to normalized status
+   * Map County Assembly status to normalized status
    */
-  private static mapOpenParliamentStatus(status: string): string {
+  private static mapCountyAssemblyStatus(status: string): string {
     if (!status) return 'introduced';
 
     const statusMap: Record<string, string> = {
@@ -668,18 +668,18 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   private static extractParliamentSponsors(bill: any): any[] {
     const sponsors: any[] = [];
 
-    if (bills.SponsorMember) {
+    if (bill.SponsorMember) {
       sponsors.push({
-        id: bills.SponsorMember.PersonId,
-        name: `${bills.SponsorMember.FirstName} ${bills.SponsorMember.LastName}`,
+        id: bill.SponsorMember.PersonId,
+        name: `${bill.SponsorMember.FirstName} ${bill.SponsorMember.LastName}`,
         role: 'MP',
-        party: bills.SponsorMember.Party,
+        party: bill.SponsorMember.Party,
         sponsorshipType: 'primary'
       });
     }
 
-    if (bills.CoSponsors && Array.isArray(bills.CoSponsors)) {
-      sponsors.push(...bills.CoSponsors.map((cosponsor: any) => ({
+    if (bill.CoSponsors && Array.isArray(bill.CoSponsors)) {
+      sponsors.push(...bill.CoSponsors.map((cosponsor: any) => ({
         id: cosponsor.PersonId,
         name: `${cosponsor.FirstName} ${cosponsor.LastName}`,
         role: 'MP',
@@ -692,17 +692,17 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   }
 
   /**
-   * Extract sponsors from Ontario bill data
+   * Extract sponsors from Senate of Kenya bill data
    */
-  private static extractOntarioSponsors(bill: any): any[] {
+  private static extractSenateKenyaSponsors(bill: any): any[] {
     const sponsors: any[] = [];
 
-    if (bills.sponsor) {
+    if (bill.sponsor) {
       sponsors.push({
-        id: bills.sponsors.id,
-        name: bills.sponsors.name,
+        id: bill.sponsor.id,
+        name: bill.sponsor.name,
         role: 'MPP',
-        party: bills.sponsors.party,
+        party: bill.sponsor.party,
         sponsorshipType: 'primary'
       });
     }
@@ -873,9 +873,11 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
     // Remove all non-digit characters
     const digits = phone.replace(/\D/g, '');
 
-    // Canadian phone number format
-    if (digits.length === 10) {
-      return `+1-${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+    // Kenyan phone number format
+    if (digits.length === 9) {
+      return `+254-${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+    } else if (digits.length === 10 && digits.startsWith('0')) {
+      return `+254-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
     } else if (digits.length === 11 && digits.startsWith('1')) {
       return `+1-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
     }

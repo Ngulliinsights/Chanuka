@@ -27,7 +27,10 @@ function useIntersectionObserver(
     if (!element) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        
         setIsIntersecting(entry.isIntersecting);
         if (entry.isIntersecting && !hasIntersected) {
           setHasIntersected(true);
@@ -86,11 +89,14 @@ export function VirtualScroll<T>({
   const visibleItems = useMemo(() => {
     const result: Array<{ index: number; item: T; offsetY: number }> = [];
     for (let i = visibleRange.startIndex; i <= visibleRange.endIndex; i++) {
-      result.push({
-        index: i,
-        item: items[i],
-        offsetY: i * itemHeight
-      });
+      const item = items[i];
+      if (item !== undefined) {
+        result.push({
+          index: i,
+          item,
+          offsetY: i * itemHeight
+        });
+      }
     }
     return result;
   }, [items, visibleRange, itemHeight]);

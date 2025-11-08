@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../shared/core/src/index.js';
 
 // Dynamic import to avoid circular dependencies
 let performanceMonitoring: any = null;
@@ -90,20 +90,20 @@ export class APICostMonitoringService extends EventEmitter {
         currency: 'CAD'
       },
       {
-        source: 'ontario-legislature',
+        source: 'senate-ke',
         dailyBudget: 8.00,
         monthlyBudget: 240.00,
         alertThresholds: { warning: 80, critical: 95 },
         costPerRequest: 0.002,
-        currency: 'CAD'
+        currency: 'KES'
       },
       {
-        source: 'openparliament',
+        source: 'county-assemblies',
         dailyBudget: 5.00,
         monthlyBudget: 150.00,
         alertThresholds: { warning: 80, critical: 95 },
         costPerRequest: 0.0005,
-        currency: 'CAD'
+        currency: 'KES'
       }
     ];
 

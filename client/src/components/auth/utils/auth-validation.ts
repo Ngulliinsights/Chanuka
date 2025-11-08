@@ -378,7 +378,7 @@ export function formatValidationErrors(
   
   for (const [field, fieldErrors] of Object.entries(errors)) {
     if (fieldErrors.length > 0) {
-      formatted[field] = fieldErrors[0]; // Take first error for display
+      formatted[field] = fieldErrors[0] ?? ''; // Take first error for display
     }
   }
   

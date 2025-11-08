@@ -3,7 +3,7 @@ import { forwardRef, ComponentProps, useState, useCallback, useEffect } from "re
 import { cn } from '../../lib/utils'
 import { logger } from '../../utils/browser-logger';
 import { EnhancedTextareaProps, ValidationState } from './types';
-import { validateInputValue, safeValidateInputValue } from './validation';
+import { safeValidateInputValue } from './validation';
 import { UIInputError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
 
@@ -22,7 +22,7 @@ const Textarea = forwardRef<
     />
   )
 })
-Textarea.display_name = "Textarea"
+Textarea.displayName = "Textarea"
 
 const EnhancedTextarea = forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
   ({ 
@@ -197,7 +197,7 @@ const EnhancedTextarea = forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
       <div className="space-y-2">
         {label && (
           <label 
-            htmlFor={props.id} 
+            {...(props.id ? { htmlFor: props.id } : {})}
             className={cn(
               "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
               hasError && "text-destructive",
@@ -208,7 +208,7 @@ const EnhancedTextarea = forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
           </label>
         )}
         
-        <textarea
+        <Textarea
           className={cn(
             "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
             hasError && "border-destructive focus-visible:ring-destructive",
@@ -218,9 +218,9 @@ const EnhancedTextarea = forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
-          aria-invalid={hasError}
+          aria-invalid={hasError ? "true" : "false"}
           aria-describedby={
-            description || hasError 
+            props.id && (description || hasError)
               ? `${props.id}-description ${props.id}-error`.trim()
               : undefined
           }
@@ -249,7 +249,7 @@ const EnhancedTextarea = forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
     );
   }
 )
-EnhancedTextarea.display_name = "EnhancedTextarea"
+EnhancedTextarea.displayName = "EnhancedTextarea"
 
 export { Textarea, EnhancedTextarea }
 

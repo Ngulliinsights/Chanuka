@@ -335,7 +335,7 @@ describe('DataValidationService', () => {
             title: 'Different Title', // Conflict
             status: 'committee' // Conflict
           },
-          source: 'openparliament'
+          source: 'county-assemblies'
         }
       ];
 
@@ -365,7 +365,7 @@ describe('DataValidationService', () => {
             title: 'Same Title',
             status: 'introduced'
           },
-          source: 'openparliament'
+          source: 'county-assemblies'
         }
       ];
 
@@ -391,7 +391,7 @@ describe('DataValidationService', () => {
             role: 'MP',
             party: 'Party B' // Conflict
           },
-          source: 'openparliament'
+          source: 'county-assemblies'
         },
         {
           data: {
@@ -423,7 +423,7 @@ describe('DataValidationService', () => {
             bill_number: 'C-123',
             title: 'Third Party Title'
           },
-          source: 'openparliament'
+          source: 'county-assemblies'
         }
       ];
 

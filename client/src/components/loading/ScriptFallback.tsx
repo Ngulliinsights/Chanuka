@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { cn } from '../../lib/utils';
-import { AlertCircle, Code, RefreshCw } from 'lucide-react';
+import { AlertCircle, FileText, RefreshCw } from 'lucide-react';
 
 export interface ScriptFallbackProps {
   src: string;
@@ -186,7 +186,7 @@ export const ScriptFallback: React.FC<ScriptFallbackProps> = ({
       <div className={cn('relative', className)}>
         {children}
         <div className="absolute top-2 right-2 flex items-center space-x-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 text-xs rounded">
-          <Code className="h-3 w-3" />
+          <FileText className="h-3 w-3" />
           <span>Fallback</span>
         </div>
       </div>

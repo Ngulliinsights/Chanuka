@@ -127,9 +127,9 @@ describe('MockUserFactory', () => {
       const user = MockUserFactory.createMockUser();
       
       expect(users.id).toBeTruthy();
-      expect(users.email).toMatch(/^[^@]+@[^@]+\.[^@]+$/);
-      expect(users.name).toBeTruthy();
-      expect(users.role).toBeTruthy();
+      expect(user.email).toMatch(/^[^@]+@[^@]+\.[^@]+$/);
+      expect(user.name).toBeTruthy();
+      expect(user.role).toBeTruthy();
       expect(users.is_active).toBe(true);
       expect(users.verification_status).toBe('verified');
     });
@@ -142,9 +142,9 @@ describe('MockUserFactory', () => {
       };
       const user = MockUserFactory.createMockUser(overrides);
       
-      expect(users.role).toBe('admin');
+      expect(user.role).toBe('admin');
       expect(users.is_active).toBe(false);
-      expect(users.name).toBe('Custom User');
+      expect(user.name).toBe('Custom User');
     });
   });
 
@@ -154,7 +154,7 @@ describe('MockUserFactory', () => {
       const users = MockUserFactory.createMockUsers(count);
       
       expect(users).toHaveLength(count);
-      expect(users.every(user => users.id && users.email)).toBe(true);
+      expect(users.every(user => users.id && user.email)).toBe(true);
     });
   });
 
@@ -162,7 +162,7 @@ describe('MockUserFactory', () => {
     it('should create admin user', () => {
       const user = MockUserFactory.createMockAdminUser();
       
-      expect(users.role).toBe('admin');
+      expect(user.role).toBe('admin');
       expect(users.verification_status).toBe('verified');
       expect(users.is_active).toBe(true);
     });
@@ -172,7 +172,7 @@ describe('MockUserFactory', () => {
     it('should create citizen user', () => {
       const user = MockUserFactory.createMockCitizenUser();
       
-      expect(users.role).toBe('citizen');
+      expect(user.role).toBe('citizen');
       expect(users.verification_status).toBe('verified');
       expect(users.is_active).toBe(true);
     });

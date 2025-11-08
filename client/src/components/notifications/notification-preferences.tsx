@@ -10,27 +10,7 @@ import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Progress } from '../ui/progress';
 import { Alert, AlertDescription } from '../ui/alert';
-import { 
-  Bell, 
-  Mail, 
-  MessageSquare, 
-  Smartphone, 
-  Clock, 
-  Filter,
-  Settings,
-  TestTube,
-  Save,
-  Plus,
-  X,
-  Phone,
-  Globe,
-  TrendingUp,
-  Users,
-  Calendar,
-  AlertTriangle,
-  CheckCircle,
-  Info
-} from 'lucide-react';
+import { Bell, Mail, MessageSquare, Smartphone, Clock, Filter, Settings, TestTube, Save, CheckCircle, X, Network, TrendingUp, Users, Calendar, AlertTriangle, Info } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
 import { logger } from '../../utils/browser-logger';
 
@@ -530,7 +510,7 @@ export function NotificationPreferences() {
                   onKeyPress={(e) => e.key === 'Enter' && addInterest()}
                 />
                 <Button onClick={addInterest} size="sm">
-                  <Plus className="h-4 w-4" />
+                  <CheckCircle className="h-4 w-4" />
                 </Button>
               </div>
 
@@ -681,7 +661,7 @@ export function NotificationPreferences() {
                         onKeyPress={(e) => e.key === 'Enter' && addSmartFilterItem('keywordFilters', newKeyword, setNewKeyword)}
                       />
                       <Button onClick={() => addSmartFilterItem('keywordFilters', newKeyword, setNewKeyword)} size="sm">
-                        <Plus className="h-4 w-4" />
+                        <CheckCircle className="h-4 w-4" />
                       </Button>
                     </div>
                     <FilterBadgeList
@@ -704,7 +684,7 @@ export function NotificationPreferences() {
                         onKeyPress={(e) => e.key === 'Enter' && addSmartFilterItem('categoryFilters', newCategoryFilter, setNewCategoryFilter)}
                       />
                       <Button onClick={() => addSmartFilterItem('categoryFilters', newCategoryFilter, setNewCategoryFilter)} size="sm">
-                        <Plus className="h-4 w-4" />
+                        <CheckCircle className="h-4 w-4" />
                       </Button>
                     </div>
                     <FilterBadgeList
@@ -727,7 +707,7 @@ export function NotificationPreferences() {
                         onKeyPress={(e) => e.key === 'Enter' && addSmartFilterItem('sponsorFilters', newSponsorFilter, setNewSponsorFilter)}
                       />
                       <Button onClick={() => addSmartFilterItem('sponsorFilters', newSponsorFilter, setNewSponsorFilter)} size="sm">
-                        <Plus className="h-4 w-4" />
+                        <CheckCircle className="h-4 w-4" />
                       </Button>
                     </div>
                     <FilterBadgeList

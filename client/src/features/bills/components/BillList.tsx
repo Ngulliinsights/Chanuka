@@ -151,7 +151,7 @@ export const BillList = ({
                         <div className="text-sm">
                           {bill.sponsors && bill.sponsors.length > 0 && (
                             <>
-                              <span className="font-medium">Sponsor:</span> {bill.sponsors[0].name}
+                              <span className="font-medium">Sponsor:</span> {bill.sponsors[0]?.name}
                               {bill.sponsors.length > 1 && (
                                 <span className="ml-1 text-muted-foreground">
                                   +{formatCount(bill.sponsors.length - 1, 'cosponsor')}

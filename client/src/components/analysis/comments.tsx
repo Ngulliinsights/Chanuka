@@ -8,13 +8,13 @@ import { Separator } from '../ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { 
   MessageSquare, 
-  ChevronUp as ArrowUp, 
-  ChevronDown as ArrowDown, 
+  ChevronUp as ChevronUp, 
+  ChevronDown as ChevronDown, 
   BarChart3, 
   Reply, 
   Flag, 
   Award, 
-  CheckCircle as CheckCircle2, 
+  CheckCircle as CheckCircle, 
   Users, 
   Clock, 
   TrendingUp, 
@@ -244,7 +244,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     switch (sortType) {
       case 'recent': return <Clock className="w-4 h-4" />;
       case 'popular': return <TrendingUp className="w-4 h-4" />;
-      case 'verified': return <CheckCircle2 className="w-4 h-4" />;
+      case 'verified': return <CheckCircle className="w-4 h-4" />;
       default: return null;
     }
   };
@@ -285,7 +285,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
                 )}
                 {comment.verifiedClaims > 0 && (
                   <Badge variant="outline" className="text-green-700 border-green-300 bg-green-50">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
+                    <CheckCircle className="w-3 h-3 mr-1" />
                     Verified Expert
                   </Badge>
                 )}
@@ -393,7 +393,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
               onClick={() => handleVote(comment.id, 'up')}
               className="flex items-center gap-2 text-gray-500 hover:text-green-600 transition-colors group"
             >
-              <ArrowUp className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <ChevronUp className="w-4 h-4 group-hover:scale-110 transition-transform" />
               <span className="text-sm font-medium">{comment.upvotes}</span>
             </button>
 
@@ -401,7 +401,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
               onClick={() => handleVote(comment.id, 'down')}
               className="flex items-center gap-2 text-gray-500 hover:text-red-600 transition-colors group"
             >
-              <ArrowDown className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <ChevronDown className="w-4 h-4 group-hover:scale-110 transition-transform" />
               <span className="text-sm font-medium">{comment.downvotes}</span>
             </button>
 

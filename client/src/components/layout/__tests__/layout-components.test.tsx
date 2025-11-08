@@ -151,16 +151,16 @@ const TestSidebar = ({
       {user && (
         <div className="border-t p-4">
           <div className="flex items-center gap-3">
-            {users.avatar ? (
-              <img src={users.avatar} alt={users.name} className="h-8 w-8 rounded-full" />
+            {user.avatar ? (
+              <img src={user.avatar} alt={user.name} className="h-8 w-8 rounded-full" />
             ) : (
-              <span>{users.name.charAt(0).toUpperCase()}</span>
+              <span>{user.name.charAt(0).toUpperCase()}</span>
             )}
             {!isCollapsed && (
               <>
                 <div>
-                  <p>{users.name}</p>
-                  <p>{users.email}</p>
+                  <p>{user.name}</p>
+                  <p>{user.email}</p>
                 </div>
                 <button aria-label="User settings">Settings</button>
               </>

@@ -6,8 +6,8 @@
 
 import { performance } from 'perf_hooks';
 // import { performanceMonitoring } from '../services/performance-monitoring.js'; // TODO: Fix missing module
-import { logger  } from '@shared/core/index.js';
-// import { createObservabilityStack  } from '@shared/core/index.js'; // TODO: Fix missing export
+import { logger   } from '../../shared/core/src/index.js';
+// import { createObservabilityStack   } from '../../shared/core/src/index.js'; // TODO: Fix missing export
 
 interface MetricData {
   count: number;

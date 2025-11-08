@@ -3,7 +3,7 @@
  * Implements comprehensive performance tracking, bundle analysis, and optimization strategies
  */
 
-import { logger, Performance } from '@shared/core';
+import { logger, Performance } from './client-core';
 
 export interface PerformanceConfig {
   enableMetrics: boolean;
@@ -267,7 +267,7 @@ class PerformanceOptimizer {
     };
 
     // Log bundle analysis
-    logger.info('📦 Bundle Analysis:', { component: 'PerformanceOptimizer' }, this.bundleMetrics);
+    logger.info('📦 Bundle Analysis:', { component: 'PerformanceOptimizer' }, this.bundleMetrics as unknown as Record<string, unknown>);
 
     // Check bundle size budgets
     this.checkBundleBudgets();
@@ -556,7 +556,7 @@ class PerformanceOptimizer {
     if (recommendations.bundleOptimizations.length > 0 || 
         recommendations.cacheOptimizations.length > 0 || 
         recommendations.performanceOptimizations.length > 0) {
-      logger.info('💡 Performance Optimization Recommendations:', { component: 'PerformanceOptimizer' }, recommendations);
+      logger.info('💡 Performance Optimization Recommendations:', { component: 'PerformanceOptimizer' }, recommendations as unknown as Record<string, unknown>);
     }
   }
 

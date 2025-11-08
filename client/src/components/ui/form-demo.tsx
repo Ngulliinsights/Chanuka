@@ -515,8 +515,8 @@ export const FormDemo: React.FC = () => {
                 variant="outline"
                 onClick={() => {
                   const currentIndex = steps.findIndex(s => s.id === currentStep);
-                  if (currentIndex > 0) {
-                    setCurrentStep(steps[currentIndex - 1].id);
+                  if (currentIndex > 0 && steps[currentIndex - 1]) {
+                    setCurrentStep(steps[currentIndex - 1]!.id);
                   }
                 }}
                 disabled={currentStep === 'personal'}
@@ -530,8 +530,8 @@ export const FormDemo: React.FC = () => {
                     type="button"
                     onClick={() => {
                       const currentIndex = steps.findIndex(s => s.id === currentStep);
-                      if (currentIndex < steps.length - 1) {
-                        handleStepChange(steps[currentIndex + 1].id);
+                      if (currentIndex < steps.length - 1 && steps[currentIndex + 1]) {
+                        handleStepChange(steps[currentIndex + 1]!.id);
                       }
                     }}
                   >

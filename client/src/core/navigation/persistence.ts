@@ -63,6 +63,11 @@ export class NavigationStatePersistence {
     recentlyVisited: RecentPage[], 
     newPage: { path: string; title: string }
   ): RecentPage[] {
+    // Ensure path and title are defined
+    if (!newPage.path || !newPage.title) {
+      return recentlyVisited;
+    }
+
     const existingPageIndex = recentlyVisited.findIndex(
       page => page.path === newPage.path
     );
@@ -71,6 +76,10 @@ export class NavigationStatePersistence {
       // Update existing page by moving it to the front and incrementing count
       const updatedRecentPages = [...recentlyVisited];
       const existingPage = updatedRecentPages[existingPageIndex];
+      if (!existingPage) {
+        return recentlyVisited;
+      }
+      
       updatedRecentPages.splice(existingPageIndex, 1);
       updatedRecentPages.unshift({
         ...existingPage,

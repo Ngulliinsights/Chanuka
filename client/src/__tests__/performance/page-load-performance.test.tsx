@@ -1,23 +1,9 @@
 import React from 'react';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-// Mock logger
-const mockLogger = {
-  info: vi.fn(),
-  error: vi.fn(),
-  warn: vi.fn(),
-  debug: vi.fn(),
-  trace: vi.fn(),
-};
-
-vi.mock('@shared/core/src/observability/logging', () => ({
-  logger: mockLogger,
-  createLogger: vi.fn(() => mockLogger),
-}));
-
+import { testLogger } from '../utils/test-logger';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { logger } from '@shared/core';
 
 // Mock performance API
 const mockPerformance = {
@@ -193,19 +179,18 @@ describe('Page Load Performance Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     measurer = new MockPerformanceMeasurer();
-    vi.clearAllMocks();
+    testLogger.clearLogs();
     
     // Mock performance.now to return incrementing values
     let mockTime = 0;
     mockPerformance.now.mockImplementation(() => mockTime += 16.67); // ~60fps
-  
   });
 
   afterEach(() => {
     cleanup();
     measurer?.reset();
     vi.restoreAllMocks();
-  
+    testLogger.assertNoErrors();
   });
 
   describe('Initial Page Load Performance', () => {

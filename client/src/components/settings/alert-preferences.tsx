@@ -230,11 +230,17 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
     let current: any = newPreferences;
 
     for (let i = 0; i < keys.length - 1; i++) {
-      current[keys[i]] = { ...current[keys[i]] };
-      current = current[keys[i]];
+      const key = keys[i];
+      if (key !== undefined) {
+        current[key] = { ...current[key] };
+        current = current[key];
+      }
     }
 
-    current[keys[keys.length - 1]] = value;
+    const lastKey = keys[keys.length - 1];
+    if (lastKey !== undefined) {
+      current[lastKey] = value;
+    }
     setPreferences(newPreferences);
   };
 

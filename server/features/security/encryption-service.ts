@@ -1,7 +1,7 @@
-import crypto from 'crypto';
-import bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 import { promisify } from 'util';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 /**
  * Comprehensive encryption service for data protection

@@ -3,7 +3,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { createHash } from "crypto";
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../shared/core/src/index.js';
 
 // ✅ FIXED INTERFACES - Added missing properties
 interface APICall {

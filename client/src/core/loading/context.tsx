@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
 import { LoadingState, LoadingAction, LoadingOperation, LoadingOptions, LoadingPriority } from './types';
 import { loadingReducer } from './reducer';
-import { logger } from '@shared/core';
+import { logger } from '../../utils/browser-logger';
 
 const initialState: LoadingState = {
   operations: {},

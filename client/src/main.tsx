@@ -1,17 +1,42 @@
+// Ensure a minimal `process.env` exists in browser runtime so shared
+// modules that reference `process.env` do not throw `ReferenceError`.
+// We prefer Vite's `import.meta.env.MODE` when available.
+(function ensureProcessEnv() {
+  try {
+    const mode = (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.MODE) ||
+      (typeof (import.meta as any).env?.VITE_NODE_ENV !== 'undefined' && (import.meta as any).env.VITE_NODE_ENV) ||
+      'development';
+
+    if (typeof (globalThis as any).process === 'undefined') {
+      (globalThis as any).process = { env: { NODE_ENV: mode } };
+    } else if (typeof (globalThis as any).process.env === 'undefined') {
+      (globalThis as any).process.env = { NODE_ENV: mode };
+    } else {
+      (globalThis as any).process.env = {
+        ...(globalThis as any).process.env,
+        NODE_ENV: (globalThis as any).process.env.NODE_ENV || mode,
+      };
+    }
+  } catch (e) {
+    // If anything goes wrong, silently continue — worst case some dev-only
+    // logging won't show, but this prevents a hard crash.
+  }
+})();
+
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import { registerServiceWorker } from "./utils/serviceWorker";
-import { assetLoadingManager, setupAssetPreloading } from "./utils/asset-loading";
+import { EnhancedAssetLoadingProvider } from "./components/asset-loading/AssetLoadingProvider";
 import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
-import { logger } from './utils/browser-logger';
-// import { performanceMonitor } from '@shared/core';
+import { logger } from '../src/utils/browser-logger';
 import { rumService } from './utils/rum-integration';
 
 /**
  * Application Loading States
  * Tracks the progression of application initialization through distinct phases
+ * to provide meaningful feedback to users during the startup process.
  */
 interface LoadingState {
   phase: 'validating' | 'dom-ready' | 'mounting' | 'service-worker' | 'complete';
@@ -21,7 +46,9 @@ interface LoadingState {
 
 /**
  * Retry Configuration
- * Controls the behavior of the exponential backoff retry mechanism
+ * Controls the behavior of the exponential backoff retry mechanism,
+ * allowing the application to recover from transient initialization failures
+ * while avoiding infinite retry loops on permanent errors.
  */
 interface RetryConfig {
   maxRetries: number;
@@ -32,8 +59,19 @@ interface RetryConfig {
 }
 
 /**
+ * Asset Loading Manager Interface
+ * Defines the contract for asset preloading functionality,
+ * ensuring type safety when the actual implementation is loaded dynamically.
+ */
+interface AssetLoadingManager {
+  preloadCriticalAssets(): Promise<void>;
+  setupPreloading?(): void;
+}
+
+/**
  * Initialization State Management
- * Prevents duplicate initialization attempts and tracks retry count
+ * These module-level variables prevent duplicate initialization attempts
+ * and track the current state across multiple async operations.
  */
 let currentLoadingState: LoadingState = {
   phase: 'validating',
@@ -44,14 +82,16 @@ let currentLoadingState: LoadingState = {
 let initRetries = 0;
 let isInitializing = false;
 let initializationPromise: Promise<void> | null = null;
+let assetLoadingManager: AssetLoadingManager | null = null;
 
-// Initialize mobile error handler at module level
+// Initialize mobile error handler at module level for early error capture
 const mobileErrorHandler = getMobileErrorHandler();
 
 /**
  * Development Utilities Initialization
- * Loads debugging and error recovery tools only in development mode
- * These are loaded asynchronously to avoid blocking the main initialization
+ * Loads debugging and error recovery tools only in development mode.
+ * These are loaded asynchronously to avoid blocking the main initialization path,
+ * and failures here won't prevent the application from starting.
  */
 if (process.env.NODE_ENV === 'development') {
   Promise.all([
@@ -68,13 +108,16 @@ if (process.env.NODE_ENV === 'development') {
         logger.info('🔧 Development debug utilities initialized', { component: 'Chanuka' });
       })
       .catch(error => console.warn('Failed to initialize development debug utilities:', error))
-  ]).catch(() => {});
+  ]).catch(() => {
+    // Silently continue if development utilities fail to load
+  });
 }
 
 /**
  * DOM Readiness Check
- * Waits for the DOM to be ready with a 10-second timeout to prevent indefinite hanging
+ * Waits for the DOM to be ready with a timeout to prevent indefinite hanging.
  * Uses both DOMContentLoaded and readystatechange events for maximum compatibility
+ * across different browsers and loading scenarios.
  */
 function waitForDOM(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -101,15 +144,16 @@ function waitForDOM(): Promise<void> {
 
 /**
  * Environment Validation
- * Ensures all required browser APIs and features are available
- * Throws descriptive errors if critical features are missing
+ * Ensures all required browser APIs and features are available before proceeding.
+ * This catches environment issues early and provides clear error messages,
+ * preventing cryptic failures later in the initialization process.
  */
 function validateDOMEnvironment(): void {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error('Application must run in a browser environment');
   }
 
-  // Check for required DOM APIs by traversing the object path
+  // Check for required DOM APIs by traversing the object path safely
   const requiredAPIs = [
     'document.getElementById',
     'document.createElement',
@@ -143,8 +187,9 @@ function validateDOMEnvironment(): void {
 
 /**
  * Loading State Display
- * Shows a user-friendly loading screen with progress indicator
- * Uses inline styles to avoid CSS dependencies during initialization
+ * Shows a user-friendly loading screen with progress indicator.
+ * Uses inline styles to avoid CSS dependencies during initialization,
+ * ensuring the loading screen appears even if stylesheets fail to load.
  */
 function showLoadingState(state: LoadingState): void {
   const rootElement = document.getElementById("root");
@@ -173,7 +218,9 @@ function showLoadingState(state: LoadingState): void {
 
 /**
  * Update Loading State
- * Updates and displays the current initialization phase and progress
+ * Updates and displays the current initialization phase and progress.
+ * This keeps users informed about what's happening during startup,
+ * improving perceived performance and reducing abandonment during slow loads.
  */
 function updateLoadingState(phase: LoadingState['phase'], message: string, progress: number): void {
   currentLoadingState = { phase, message, progress };
@@ -182,8 +229,9 @@ function updateLoadingState(phase: LoadingState['phase'], message: string, progr
 
 /**
  * Browser Compatibility Initialization
- * Attempts to load the advanced compatibility manager, falls back to basic polyfills
- * Non-blocking - continues initialization even if compatibility checks fail
+ * Attempts to load the advanced compatibility manager, falls back to basic polyfills.
+ * This is non-blocking, meaning the application continues initialization even if
+ * compatibility checks fail, preventing one failed feature from breaking everything.
  */
 async function initializeBrowserCompatibility(): Promise<void> {
   updateLoadingState('validating', 'Initializing browser compatibility...', 12);
@@ -221,17 +269,48 @@ async function initializeBrowserCompatibility(): Promise<void> {
 }
 
 /**
+ * Asset Loading Manager Initialization
+ * Dynamically imports the asset loading manager to avoid circular dependencies
+ * and provides a fallback if the module is not available.
+ */
+async function initializeAssetLoadingManager(): Promise<void> {
+  try {
+    const module = await import('./utils/asset-loading');
+    assetLoadingManager = module.assetLoadingManager;
+    
+    // Call setup function if it exists
+    if (assetLoadingManager && typeof (assetLoadingManager as any).setupPreloading === 'function') {
+      (assetLoadingManager as any).setupPreloading();
+    }
+  } catch (error) {
+    console.warn('Asset loading manager not available, skipping asset preloading:', error);
+    // Create a no-op implementation to prevent errors
+    assetLoadingManager = {
+      preloadCriticalAssets: async () => {
+        console.warn('Asset preloading skipped - manager not available');
+      }
+    };
+  }
+}
+
+/**
  * Asset Preloading
- * Sets up asset optimization and preloads critical resources
- * Non-blocking - continues initialization even if asset preloading fails
+ * Sets up asset optimization and preloads critical resources.
+ * This improves initial load time by fetching important assets early,
+ * but failures here are non-blocking to prevent asset issues from breaking the app.
  */
 async function preloadAssets(): Promise<void> {
   updateLoadingState('validating', 'Setting up asset optimization...', 18);
-  setupAssetPreloading();
+  
+  // Initialize the asset loading manager first
+  await initializeAssetLoadingManager();
   
   updateLoadingState('validating', 'Preloading critical assets...', 22);
   try {
-    await assetLoadingManager.preloadCriticalAssets();
+    if (assetLoadingManager) {
+      await assetLoadingManager.preloadCriticalAssets();
+      logger.info('Critical assets preloaded successfully', { component: 'Chanuka' });
+    }
   } catch (error) {
     console.warn('Failed to preload critical assets:', error);
   }
@@ -239,8 +318,9 @@ async function preloadAssets(): Promise<void> {
 
 /**
  * Root Element Validation and Configuration
- * Ensures the root element exists and is properly configured for React mounting
- * Sets appropriate accessibility attributes and ensures visibility
+ * Ensures the root element exists and is properly configured for React mounting.
+ * Sets appropriate accessibility attributes and ensures visibility,
+ * which is important for screen readers and prevents hidden container issues.
  */
 function validateAndConfigureRoot(): HTMLElement {
   const rootElement = document.getElementById("root");
@@ -266,22 +346,26 @@ function validateAndConfigureRoot(): HTMLElement {
 
 /**
  * React Application Mounting
- * Creates the React root and renders the application with necessary providers
- * Includes a small delay to ensure loading state is visible to users
+ * Creates the React root and renders the application with necessary providers.
+ * Includes a small delay to ensure loading state is visible to users,
+ * improving perceived performance by showing progress rather than a blank screen.
  */
 async function mountReactApp(rootElement: HTMLElement): Promise<void> {
   updateLoadingState('mounting', 'Mounting React application...', 60);
   logger.info('DOM ready, mounting React application...', { component: 'Chanuka' });
   
+  // Brief delay to ensure loading state is visible
   await new Promise(resolve => setTimeout(resolve, 100));
   
   const root = createRoot(rootElement);
   const { AssetLoadingProvider } = await import('./components/loading/AssetLoadingIndicator');
   
   root.render(
-    <AssetLoadingProvider>
-      <App />
-    </AssetLoadingProvider>
+    <EnhancedAssetLoadingProvider>
+      <AssetLoadingProvider>
+        <App />
+      </AssetLoadingProvider>
+    </EnhancedAssetLoadingProvider>
   );
   
   logger.info('React application mounted successfully', { component: 'Chanuka' });
@@ -290,8 +374,9 @@ async function mountReactApp(rootElement: HTMLElement): Promise<void> {
 
 /**
  * Service Worker Registration
- * Registers the service worker in production for offline support and caching
- * Shows update notifications when new content is available
+ * Registers the service worker in production for offline support and caching.
+ * Shows update notifications when new content is available,
+ * allowing users to refresh and get the latest version of the application.
  */
 async function registerServiceWorkerIfProduction(): Promise<void> {
   if (process.env.NODE_ENV !== 'production') return;
@@ -318,8 +403,9 @@ async function registerServiceWorkerIfProduction(): Promise<void> {
 
 /**
  * Performance Monitoring Initialization
- * Starts collecting performance metrics after the app is loaded
- * Runs asynchronously to avoid blocking the UI
+ * Starts collecting performance metrics after the app is loaded.
+ * Runs asynchronously with a delay to avoid impacting initial render performance,
+ * ensuring we measure real user experience without the measurement itself causing slowdowns.
  */
 function initializePerformanceMonitoring(): void {
   updateLoadingState('complete', 'Initializing performance monitoring...', 95);
@@ -327,10 +413,18 @@ function initializePerformanceMonitoring(): void {
   try {
     logger.info('🚀 Performance monitoring active', { component: 'Chanuka' });
 
-    // TODO: Re-enable performance monitoring when available
-    // setTimeout(() => {
-    //   performanceMonitor.startMonitoring();
-    // }, 1000);
+    // Delay performance monitoring to avoid impacting initial load
+    setTimeout(() => {
+      // TODO: Re-enable when performanceMonitor is available
+      // performanceMonitor.startMonitoring();
+      
+      // Log initial performance metrics
+      if (window.performance && window.performance.timing) {
+        const timing = window.performance.timing;
+        const loadTime = timing.loadEventEnd - timing.navigationStart;
+        logger.info('Initial page load time:', { component: 'Chanuka' }, { loadTime });
+      }
+    }, 1000);
   } catch (perfError) {
     console.warn('Performance monitoring initialization failed:', perfError);
   }
@@ -338,8 +432,9 @@ function initializePerformanceMonitoring(): void {
 
 /**
  * Main Application Initialization
- * Orchestrates all initialization phases in sequence
- * Each phase updates the loading state to keep users informed
+ * Orchestrates all initialization phases in sequence.
+ * Each phase updates the loading state to keep users informed,
+ * and failures are handled gracefully to allow retry or show helpful error messages.
  */
 async function initializeApp(): Promise<void> {
   logger.info('Initializing Chanuka Legislative Transparency Platform...', { component: 'Chanuka' });
@@ -381,8 +476,9 @@ async function initializeApp(): Promise<void> {
 
 /**
  * Update Notification Display
- * Shows a clickable notification when a new version of the app is available
- * Auto-dismisses after 10 seconds
+ * Shows a clickable notification when a new version of the app is available.
+ * Auto-dismisses after 10 seconds to avoid permanently blocking the interface,
+ * but users can click it anytime to refresh and get the new version.
  */
 function showUpdateNotification(): void {
   const notification = document.createElement('div');
@@ -410,8 +506,9 @@ function showUpdateNotification(): void {
 
 /**
  * Error Reporting
- * Logs error details to localStorage for debugging
- * Attempts to send to external error reporting service if available
+ * Logs error details to localStorage for debugging and attempts to send
+ * to external error reporting service if available. This helps diagnose
+ * initialization issues that users report without requiring console access.
  */
 function reportInitializationError(error: Error): void {
   try {
@@ -422,6 +519,7 @@ function reportInitializationError(error: Error): void {
       userAgent: navigator.userAgent,
       url: window.location.href,
       phase: currentLoadingState.phase,
+      retryCount: initRetries,
       localStorage: {
         available: typeof Storage !== 'undefined',
         quota: 'checking...'
@@ -447,8 +545,9 @@ function reportInitializationError(error: Error): void {
 
 /**
  * Initialization Error Display
- * Shows a user-friendly error screen with recovery options
- * Includes technical details in development mode for debugging
+ * Shows a user-friendly error screen with recovery options.
+ * Includes technical details in development mode for debugging,
+ * while keeping production errors user-friendly without overwhelming technical information.
  */
 function showInitializationError(error: Error): void {
   const rootElement = document.getElementById("root");
@@ -480,7 +579,7 @@ function showInitializationError(error: Error): void {
           Error occurred during: ${currentLoadingState.phase}
         </p>
         
-        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 24px;">
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap;">
           <button onclick="window.location.reload()" 
                   style="background: #3b82f6; color: white; border: none; padding: 12px 24px; 
                          border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: 500;">
@@ -506,6 +605,7 @@ function showInitializationError(error: Error): void {
               
               <p style="margin: 0 0 8px; font-size: 12px; color: #374151; font-weight: 500;">Environment:</p>
               <pre style="margin: 0; font-size: 10px; color: #6b7280;">Phase: ${currentLoadingState.phase}
+Retry Count: ${initRetries}
 User Agent: ${navigator.userAgent}
 URL: ${window.location.href}
 Timestamp: ${new Date().toISOString()}</pre>
@@ -530,7 +630,7 @@ Timestamp: ${new Date().toISOString()}</pre>
             window.location.reload();
           }
         } catch (e) {
-          logger.error('Failed to clear storage:', { component: 'Chanuka' }, e);
+          console.error('Failed to clear storage:', e);
           window.location.reload();
         }
       }
@@ -540,8 +640,9 @@ Timestamp: ${new Date().toISOString()}</pre>
 
 /**
  * Retry Configuration
- * Defines the exponential backoff strategy for initialization retries
- * Avoids retrying non-recoverable errors like missing DOM elements
+ * Defines the exponential backoff strategy for initialization retries.
+ * Avoids retrying non-recoverable errors like missing DOM elements,
+ * while allowing recovery from transient network or timing issues.
  */
 const defaultRetryConfig: RetryConfig = {
   maxRetries: 3,
@@ -563,8 +664,9 @@ const defaultRetryConfig: RetryConfig = {
 
 /**
  * Initialization with Retry
- * Implements exponential backoff retry logic for initialization failures
- * Prevents duplicate initialization attempts and tracks retry count
+ * Implements exponential backoff retry logic for initialization failures.
+ * Prevents duplicate initialization attempts and tracks retry count,
+ * ensuring we don't overwhelm the system while still recovering from transient issues.
  */
 async function initWithRetry(config: RetryConfig = defaultRetryConfig): Promise<void> {
   if (isInitializing && initializationPromise) {
@@ -588,6 +690,7 @@ async function initWithRetry(config: RetryConfig = defaultRetryConfig): Promise<
       initRetries++;
       
       console.error(`Initialization attempt ${initRetries} failed:`, currentError);
+      reportInitializationError(currentError);
       
       const shouldRetry = config.retryCondition(currentError, initRetries) && 
                          initRetries <= config.maxRetries;
@@ -625,7 +728,8 @@ async function initWithRetry(config: RetryConfig = defaultRetryConfig): Promise<
 /**
  * Application Startup
  * Entry point for the application that handles initial loading state
- * and kicks off the initialization with retry mechanism
+ * and kicks off the initialization with retry mechanism.
+ * This is the main function that gets called when the script loads.
  */
 async function startApplication(): Promise<void> {
   try {
@@ -648,6 +752,7 @@ async function startApplication(): Promise<void> {
     } catch (fallbackError) {
       logger.error('Failed to show error message:', { component: 'Chanuka' }, fallbackError);
       
+      // Last resort fallback error display
       document.body.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; 
                     font-family: monospace; background: #fee; color: #c00; padding: 20px; text-align: center;">
@@ -667,8 +772,9 @@ async function startApplication(): Promise<void> {
 
 /**
  * Global Error Handlers
- * Capture unhandled errors during initialization to prevent silent failures
- * Allows the retry mechanism to handle errors gracefully
+ * Capture unhandled errors during initialization to prevent silent failures.
+ * Allows the retry mechanism to handle errors gracefully,
+ * and prevents errors from bubbling up and breaking the initialization process.
  */
 window.addEventListener('error', (event) => {
   logger.error('Global error during initialization:', { component: 'Chanuka' }, event.error);
@@ -684,6 +790,9 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 });
 
-// Start the application
+/**
+ * Start the Application
+ * This is the actual entry point - we call startApplication() immediately
+ * when the module loads to begin the initialization process.
+ */
 startApplication();
-

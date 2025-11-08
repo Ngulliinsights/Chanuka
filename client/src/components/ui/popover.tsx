@@ -27,7 +27,7 @@ const PopoverContent = React.forwardRef<
     />
   </PopoverPrimitive.Portal>
 ))
-PopoverContent.display_name = PopoverPrimitive.Content.display_name
+PopoverContent.displayName = PopoverPrimitive.Content.displayName
 
 // Enhanced popover with error handling
 interface EnhancedPopoverProps {
@@ -115,7 +115,7 @@ const EnhancedPopover = React.forwardRef<
     </PopoverPrimitive.Root>
   );
 });
-EnhancedPopover.display_name = "EnhancedPopover";
+EnhancedPopover.displayName = "EnhancedPopover";
 
 // Enhanced popover content with error handling
 const EnhancedPopoverContent = React.forwardRef<
@@ -181,7 +181,7 @@ const EnhancedPopoverContent = React.forwardRef<
     </PopoverPrimitive.Portal>
   );
 });
-EnhancedPopoverContent.display_name = "EnhancedPopoverContent";
+EnhancedPopoverContent.displayName = "EnhancedPopoverContent";
 
 export { 
   Popover, 

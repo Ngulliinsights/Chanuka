@@ -3,8 +3,8 @@ import { readDatabase } from '@shared/database';
 import { webSocketService } from '../../infrastructure/websocket.js';
 import { cacheService } from '../../infrastructure/cache/cache-service.js';
 import * as schema from '@shared/schema';
-import { Bill } from '@/shared/schema';
-import { logger } from '@shared/core/index.js';
+import { Bill } from '@shared/schema';
+import { logger  } from '../../../shared/core/src/index.js';
 import { notificationOrchestratorService, NotificationRequest } from '../../infrastructure/notifications/notification-orchestrator.js';
 
 // --- Cache Configuration ---

@@ -15,7 +15,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { calculateRelatedPages, getContextualSuggestions } from '../related-pages-calculator';
 import { UserRole } from '@/components/navigation';
-import { logger } from '@shared/core';
+import { logger } from '../../browser-logger';
 
 describe('related-pages-calculator', () => {
   describe('calculateRelatedPages', () => {

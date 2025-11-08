@@ -63,7 +63,7 @@ export function createSafeLazyPage<P extends object = {}>(
   } = options;
 
   const importFn = (() =>
-    // @vite-ignore
+    /* @vite-ignore */
     import(path as any)) as () => Promise<{
     default: ComponentType<P>;
   }>;
@@ -97,7 +97,7 @@ export function createNamedExportLazy<P extends object = {}>(
 ): LazyExoticComponent<ComponentType<P>> {
   // This wrapper ensures proper type inference by explicitly typing the return
   const moduleImport = (() =>
-    // @vite-ignore
+    /* @vite-ignore */
     import(path as any)) as () => Promise<Record<string, any>>;
   const typedImport = async (): Promise<{ default: ComponentType<P> }> => {
     const module = await moduleImport();
@@ -364,7 +364,7 @@ export function createLazyComponentBatch<T extends Record<string, string>>(
   return Object.entries(importMap).reduce(
     (batch, [componentName, importPath]) => {
       const importFn = () =>
-        // @vite-ignore
+        /* @vite-ignore */
         import(importPath);
 
       const lazyComponent = enableRetry

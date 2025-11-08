@@ -1,0 +1,24 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@chanuka/shared": ["../shared"],
+      "@chanuka/shared/*": ["../shared/*"],
+      "@server/*": ["./*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.d.ts",
+    "../shared/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

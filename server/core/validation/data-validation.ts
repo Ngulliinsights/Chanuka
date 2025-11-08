@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 // Comprehensive data validation service for government data integration
 export class DataValidationService {
@@ -467,7 +467,7 @@ export class DataValidationService {
     let recommendation = '';
     if (conflicts.length > 0) {
       // Find the source with highest priority (assuming government sources are more authoritative)
-      const priorityOrder = ['parliament-ca', 'ontario-legislature', 'openparliament'];
+      const priorityOrder = ['parliament-ke', 'senate-ke', 'county-assemblies'];
       const authoritative = recordGroup.find(r => priorityOrder.includes(r.source));
       
       if (authoritative) {

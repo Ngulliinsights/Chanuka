@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 import { processRequestInterceptors } from './apiInterceptors'; // <-- Import interceptors
 import { offlineDataManager } from '../utils/offlineDataManager';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
@@ -132,7 +132,10 @@ class ApiCache {
       const sortedEntries = Array.from(this.cache.entries())
         .sort((a, b) => a[1].timestamp - b[1].timestamp);
       for (let i = 0; i < entriesToRemove && i < sortedEntries.length; i++) {
-        this.cache.delete(sortedEntries[i][0]);
+        const entry = sortedEntries[i];
+        if (entry) {
+          this.cache.delete(entry[0]);
+        }
       }
     }
   }

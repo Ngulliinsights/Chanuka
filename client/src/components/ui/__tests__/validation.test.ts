@@ -290,7 +290,7 @@ describe('UI Validation Utilities', () => {
     describe('EmailSchema', () => {
       it('validates correct email formats', () => {
         expect(() => EmailSchema.parse('test@example.com')).not.toThrow();
-        expect(() => EmailSchema.parse('users.name+tag@domain.co.uk')).not.toThrow();
+        expect(() => EmailSchema.parse('user.name+tag@domain.co.uk')).not.toThrow();
       });
 
       it('rejects invalid email formats', () => {

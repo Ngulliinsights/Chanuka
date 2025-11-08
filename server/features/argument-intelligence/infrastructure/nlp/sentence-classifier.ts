@@ -3,7 +3,7 @@
 // ============================================================================
 // Classifies sentences by their argumentative function using NLP techniques
 
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../../shared/core/src/index.js';
 
 export interface ClassificationResult {
   type: 'claim' | 'evidence' | 'reasoning' | 'prediction' | 'value_judgment';

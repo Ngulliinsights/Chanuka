@@ -5,7 +5,7 @@ import { useJourneyTracker, useJourneyAnalytics } from '../use-journey-tracker';
 import { createNavigationProvider } from '../../core/navigation/context';
 import { UserJourneyTracker } from '../../services/UserJourneyTracker';
 import React from 'react';
-import { logger } from '@shared/core';
+import { logger } from '../../utils/browser-logger';
 
 // Mock the UserJourneyTracker
 vi.mock('@/services/UserJourneyTracker');

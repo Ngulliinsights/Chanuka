@@ -7,7 +7,7 @@ import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSc
 import { engagementAnalyticsService } from './services/engagement.service.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 export const router = Router();
 

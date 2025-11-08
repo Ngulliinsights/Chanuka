@@ -8,12 +8,12 @@ import { bill_engagement } from '@shared/citizen_participation';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 // FIXED: Import cacheKeys from the correct location
-import { cache, cacheKeys  } from '@shared/core/index.js';
+import { cache, cacheKeys   } from '../../../../shared/core/src/index.js';
 import { buildTimeThreshold } from '@/utils/db-helpers';
 import { authenticateToken, AuthenticatedRequest } from '@/middleware/auth.js';
-import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse  } from '@shared/core/index.js';
+import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse   } from '../../../../shared/core/src/index.js';
 import { ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../../shared/core/src/index.js';
 import { errorTracker } from '@/core/errors/error-tracker.js';
 import { z } from 'zod';
 import type {

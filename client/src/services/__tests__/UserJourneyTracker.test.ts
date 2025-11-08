@@ -15,7 +15,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { UserJourneyTracker, UserJourney, JourneyStep } from '../UserJourneyTracker';
 import { UserRole, NavigationSection } from '@/components/navigation';
-import { logger } from '@shared/core';
+import { logger } from '../../utils/browser-logger';
 
 describe('UserJourneyTracker', () => {
   let tracker: UserJourneyTracker;

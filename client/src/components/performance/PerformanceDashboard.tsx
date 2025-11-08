@@ -175,6 +175,8 @@ export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
       const interval = setInterval(loadData, refreshInterval);
       return () => clearInterval(interval);
     }
+    
+    return undefined;
   }, [environments, refreshInterval]);
 
   // Calculate overall health score

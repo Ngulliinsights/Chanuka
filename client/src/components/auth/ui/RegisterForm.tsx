@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Mail, Lock, User } from 'lucide-react';
+import { Mail, Eye, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RegisterFormProps, RegisterFormData } from '../types';
 import { useRegisterForm } from '../hooks/useAuthForm';
@@ -154,7 +154,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           error={errors.password}
           disabled={currentLoading}
           required
-          icon={Lock}
+          icon={Eye}
           showPasswordToggle
         />
 
@@ -183,7 +183,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         error={errors.confirmPassword}
         disabled={currentLoading}
         required
-        icon={Lock}
+        icon={Eye}
         showPasswordToggle
       />
 

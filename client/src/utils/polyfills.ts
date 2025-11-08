@@ -345,7 +345,7 @@ class PolyfillManager {
           private callback: (entries: any[]) => void;
           private elements: Set<Element> = new Set();
 
-          constructor(callback: (entries: any[]) => void, options: any = {}) {
+          constructor(callback: (entries: any[]) => void, _options: any = {}) {
             this.callback = callback;
           }
 
@@ -544,10 +544,10 @@ class PolyfillManager {
         // Array.from
         if (!Array.from) {
           Array.from = function<T>(
-            arrayLike: ArrayLike<T>, 
-            mapFn?: (v: T, k: number) => any
-          ): any[] {
-            const result: any[] = [];
+            arrayLike: ArrayLike<T>,
+            mapFn?: (v: T | undefined, k: number) => T
+          ): (T | undefined)[] {
+            const result: (T | undefined)[] = [];
             for (let i = 0; i < arrayLike.length; i++) {
               const value = mapFn ? mapFn(arrayLike[i], i) : arrayLike[i];
               result.push(value);

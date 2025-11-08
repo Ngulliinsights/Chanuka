@@ -1107,7 +1107,7 @@ export const create${pascalName}Core = (config: ${pascalName}Config): ${pascalNa
     
     const content = `import { render, screen } from '@testing-library/react';
 import { ${pascalName}UI } from '../ui/${pascalName}UI';
-import { ComponentTestHelper } from '@shared/core/testing';
+import { ComponentTestHelper } from 'shared/testing';
 
 describe('${pascalName}UI Component', () => {
   it('should render without errors', () => {

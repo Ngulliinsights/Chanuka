@@ -176,6 +176,8 @@ function AppLayout({ children, config, className, onLayoutChange, onError }: App
     if (mounted) {
       setPreviousIsMobile(isMobile);
     }
+    
+    return undefined;
   }, [isMobile, mounted, previousIsMobile, startTransition, endTransition, enableGPUAcceleration, disableGPUAcceleration, announce]);
 
   // Register keyboard shortcuts for navigation

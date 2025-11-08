@@ -3,17 +3,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
-import { 
-  Settings, 
-  CheckCircle, 
-  Clock, 
-  HelpCircle,
-  Rocket,
-  Database,
-  Code,
-  Shield,
-  Server
-} from "lucide-react";
+import { Settings, CheckCircle, Clock, HelpCircle, TrendingUp, Database, FileText, Shield, Server } from 'lucide-react';
 import { cn, getStatusColor } from '../lib/utils';
 import { logger } from '../utils/browser-logger';
 
@@ -48,7 +38,7 @@ export default function EnvironmentSetup({ environment, health }: EnvironmentSet
       description: 'Type-safe database operations configuration',
       status: isConnected ? 'in_progress' : 'pending',
       progress: 75,
-      icon: <Code className="h-5 w-5" />,
+      icon: <FileText className="h-5 w-5" />,
     },
     {
       id: 'auth',
@@ -153,7 +143,7 @@ export default function EnvironmentSetup({ environment, health }: EnvironmentSet
 
           <div className="pt-6 border-t border-gray-200">
             <Button className="w-full" size="lg">
-              <Rocket className="h-4 w-4 mr-2" />
+              <TrendingUp className="h-4 w-4 mr-2" />
               Complete Environment Setup
             </Button>
           </div>

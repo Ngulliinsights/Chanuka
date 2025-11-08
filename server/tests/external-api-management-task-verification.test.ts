@@ -54,9 +54,9 @@ describe('Task 12.3: External API Management Implementation', () => {
       
       // Should have default configurations for government data sources
       const sources = analytics.sources.map(s => s.source);
-      expect(sources).toContain('parliament-ca');
-      expect(sources).toContain('ontario-legislature');
-      expect(sources).toContain('openparliament');
+      expect(sources).toContain('parliament-ke');
+      expect(sources).toContain('senate-ke');
+      expect(sources).toContain('county-assemblies');
     });
 
     it('should track quota utilization', () => {

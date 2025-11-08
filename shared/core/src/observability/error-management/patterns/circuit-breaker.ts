@@ -8,7 +8,82 @@
  * - Performance optimizations
  */
 
-import { EventEmitter } from 'events';
+// Use a lightweight internal EventEmitter implementation to avoid bundling
+// Node's `events` module into the browser build (Vite externalizes core
+// Node modules which can cause named export resolution issues). The
+// implementation below provides the small subset of functionality we need
+// (on/addListener, once, off/removeListener, emit, removeAllListeners).
+class EventEmitter {
+  private listeners: Map<string, Function[]> = new Map();
+
+  on(event: string, listener: Function): this {
+    const arr = this.listeners.get(event) ?? [];
+    arr.push(listener);
+    this.listeners.set(event, arr);
+    return this;
+  }
+
+  addListener(event: string, listener: Function): this {
+    return this.on(event, listener);
+  }
+
+  once(event: string, listener: Function): this {
+    const wrapper = (...args: any[]) => {
+      this.removeListener(event, wrapper);
+      try {
+        listener(...args);
+      } catch (e) {
+        // swallow listener errors to avoid breaking emitter loop
+        // caller is still responsible for handling errors where needed
+        // but we log minimally to aid debugging in development
+        if (typeof console !== 'undefined' && process?.env?.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.warn('Event listener threw an error', e);
+        }
+      }
+    };
+    return this.on(event, wrapper);
+  }
+
+  removeListener(event: string, listener: Function): this {
+    const arr = this.listeners.get(event);
+    if (!arr) return this;
+    const idx = arr.indexOf(listener as Function);
+    if (idx >= 0) arr.splice(idx, 1);
+    if (arr.length === 0) this.listeners.delete(event);
+    else this.listeners.set(event, arr);
+    return this;
+  }
+
+  off(event: string, listener: Function): this {
+    return this.removeListener(event, listener);
+  }
+
+  removeAllListeners(event?: string): this {
+    if (typeof event === 'string') this.listeners.delete(event);
+    else this.listeners.clear();
+    return this;
+  }
+
+  emit(event: string, ...args: any[]): boolean {
+    const arr = this.listeners.get(event);
+    if (!arr || arr.length === 0) return false;
+    // slice to avoid mutation during iteration
+    const copy = arr.slice();
+    for (const fn of copy) {
+      try {
+        fn(...args);
+      } catch (e) {
+        // Swallow to avoid crashing the emitter; log in dev
+        if (typeof console !== 'undefined' && process?.env?.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('Event handler error', e);
+        }
+      }
+    }
+    return true;
+  }
+}
 import { BaseError, ErrorDomain, ErrorSeverity } from '../errors/base-error.js';
 import { logger } from '../../logging/index.js';
 
@@ -58,8 +133,8 @@ export class CircuitBreaker extends EventEmitter {
   private totalCalls: number = 0;
   private slowCalls: number = 0;
   private lastStateChange: Date = new Date();
-  private lastFailureTime?: Date;
-  private lastSuccessTime?: Date;
+  private lastFailureTime: Date | undefined;
+  private lastSuccessTime: Date | undefined;
   private responseTimeWindow: number[] = [];
   private currentThreshold: number;
   private readonly name: string;

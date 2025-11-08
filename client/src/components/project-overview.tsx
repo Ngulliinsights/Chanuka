@@ -20,10 +20,10 @@ export default function ProjectOverview({ projectId }: ProjectOverviewProps) {
     queryKey: [`/api/projects/${projectId}/analytics`],
   });
 
-  const currentCheckpoint = checkpoints?.find(c => c.status === "in_progress");
-  const completedFeatures = currentCheckpoint?.metrics?.features_completed || 0;
-  const totalFeatures = currentCheckpoint?.metrics?.features_total || 0;
-  const activeFlags = featureFlags?.filter(f => f.isEnabled).length || 0;
+  const currentCheckpoint = checkpoints?.find(c => (c as any).status === "in_progress");
+  const completedFeatures = (currentCheckpoint as any)?.metrics?.features_completed || 0;
+  const totalFeatures = (currentCheckpoint as any)?.metrics?.features_total || 0;
+  const activeFlags = featureFlags?.filter(f => f.enabled).length || 0;
   const flagsExpiringSoon = featureFlags?.filter(f => 
     f.expiryDate && new Date(f.expiryDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
   ).length || 0;

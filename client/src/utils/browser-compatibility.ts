@@ -1,5 +1,5 @@
 /**
- * Browser Compatibility Utilities - Optimized Edition
+ * Browser Compatibility Utilities - Refined Edition
  * 
  * Provides comprehensive browser compatibility detection, feature testing,
  * and user guidance for the Chanuka Legislative Platform.
@@ -7,8 +7,8 @@
  * Key optimizations:
  * - Lazy evaluation with intelligent caching
  * - Reduced memory footprint through shared constants
- * - Enhanced SSR/test environment safety
- * - Improved type safety and documentation
+ * - Enhanced SSR/test environment safety with strict type safety
+ * - Improved error handling and null safety
  */
 
 /**
@@ -91,13 +91,18 @@ function isBrowserEnv(): boolean {
 }
 
 /**
- * Checks if running in a test environment where certain features should be skipped
+ * Checks if running in a test environment where certain features should be skipped.
+ * Now properly handles the optional chaining that could return undefined.
  */
 function isTestEnv(): boolean {
-  return (
-    typeof process !== 'undefined' && 
-    process.env?.NODE_ENV === 'test'
-  );
+  // Safely check if we're in Node.js environment first
+  if (typeof process === 'undefined') {
+    return false;
+  }
+  
+  // Access NODE_ENV with proper type handling
+  const nodeEnv = process.env?.NODE_ENV;
+  return nodeEnv === 'test';
 }
 
 /**
@@ -439,6 +444,17 @@ export class FeatureDetector {
   }
 
   /**
+   * Checks if all critical features are available for basic platform operation
+   */
+  hasCriticalFeatures(): boolean {
+    return CRITICAL_FEATURES.every(feature => {
+      const methodName = `detect${feature.charAt(0).toUpperCase() + feature.slice(1)}Support` as keyof this;
+      const method = this[methodName];
+      return typeof method === 'function' ? (method as () => boolean).call(this) : false;
+    });
+  }
+
+  /**
    * Clears the feature detection cache, forcing re-evaluation on next access.
    * Useful for testing or when browser capabilities may have changed.
    */
@@ -484,7 +500,7 @@ export class BrowserDetector {
         return {
           name: 'ie',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -496,7 +512,7 @@ export class BrowserDetector {
         return {
           name: 'edge-legacy',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -508,7 +524,7 @@ export class BrowserDetector {
         return {
           name: 'edge',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -520,7 +536,7 @@ export class BrowserDetector {
         return {
           name: 'chrome',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -532,7 +548,7 @@ export class BrowserDetector {
         return {
           name: 'firefox',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -544,7 +560,7 @@ export class BrowserDetector {
         return {
           name: 'safari',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -556,7 +572,7 @@ export class BrowserDetector {
         return {
           name: 'opera',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -568,7 +584,7 @@ export class BrowserDetector {
         return {
           name: 'samsung',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -580,7 +596,7 @@ export class BrowserDetector {
         return {
           name: 'ios',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1], 10)
+          majorVersion: parseInt(match[1] || '0', 10)
         };
       }
     }
@@ -592,7 +608,7 @@ export class BrowserDetector {
         return {
           name: 'android',
           version: `${chromeMatch[1]}.${chromeMatch[2]}`,
-          majorVersion: parseInt(chromeMatch[1], 10)
+          majorVersion: parseInt(chromeMatch[1] || '0', 10)
         };
       }
       
@@ -601,7 +617,7 @@ export class BrowserDetector {
         return {
           name: 'android',
           version: `${androidMatch[1]}.${androidMatch[2]}`,
-          majorVersion: parseInt(androidMatch[1], 10)
+          majorVersion: parseInt(androidMatch[1] || '0', 10)
         };
       }
     }
@@ -818,4 +834,8 @@ export function getBrowserRecommendations(): string[] {
 
 export function hasFeature(feature: keyof FeatureSet): boolean {
   return browserDetector.hasFeature(feature);
+}
+
+export function hasCriticalFeatures(): boolean {
+  return featureDetector.hasCriticalFeatures();
 }

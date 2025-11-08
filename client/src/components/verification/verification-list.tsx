@@ -19,7 +19,7 @@ export const VerificationsList = () => {
   const [items, setItems] = useState<VerificationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'verified' | 'disputed'>('all');
-  const { bills } = useBills();
+  const { data: bills } = useBills();
 
   useEffect(() => { // This would be replaced with an actual API call in production
     const mockItems: VerificationItem[] = [
