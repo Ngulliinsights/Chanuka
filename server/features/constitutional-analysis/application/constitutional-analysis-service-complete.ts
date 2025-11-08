@@ -5,7 +5,7 @@ import {
   constitutional_analyses,
   expert_review_queue,
   analysis_audit_trail
-} from '@/shared/schema';
+} from '@shared/schema';
 import { eq, and, sql, desc, asc, like, or } from 'drizzle-orm';
 import { logger } from '@shared/core/observability/logging/index.js';
 
@@ -668,8 +668,8 @@ export class ConstitutionalAnalysisServiceComplete {
    * Higher complexity scores get shorter due dates to ensure timely review.
    */
   private calculateDueDate(complexityScore: number): Date {
-    const due_date = new Date();
-    
+    const dueDate = new Date();
+
     if (complexityScore >= 90) {
       // Critical complexity - 4 hours
       dueDate.setHours(dueDate.getHours() + 4);
@@ -683,7 +683,7 @@ export class ConstitutionalAnalysisServiceComplete {
       // Low complexity - 7 days
       dueDate.setDate(dueDate.getDate() + 7);
     }
-    
+
     return dueDate;
   }
 }

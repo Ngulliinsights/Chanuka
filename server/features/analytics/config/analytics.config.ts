@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 import { errorTracker } from '@/core/errors/error-tracker.js';
 
 /**

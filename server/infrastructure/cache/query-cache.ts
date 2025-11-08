@@ -4,7 +4,7 @@
  */
 
 import { serverCache } from './cache-service';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 export interface QueryCacheOptions {
   ttl?: number;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { Loader2, Wifi, WifiOff, AlertCircle, Clock, X, RefreshCw } from 'lucide-react';
+import { Loader2, Network, AlertCircle, Clock, X, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useLoading } from '../../core/loading';
 import { Button } from '../ui/button';
@@ -43,6 +43,8 @@ export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
       }, autoHideDelay);
       return () => clearTimeout(timer);
     }
+    
+    return undefined;
   }, [state.operations, shouldShowGlobalLoader, autoHide, autoHideDelay]);
 
   const toggleOperationDetails = (operationId: string) => {
@@ -77,12 +79,12 @@ export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
 
   const getConnectionIcon = () => {
     if (!state.isOnline) {
-      return <WifiOff className="h-4 w-4 text-red-500" />;
+      return <Network className="h-4 w-4 text-red-500" />;
     }
     if (state.connectionInfo?.connectionType === 'slow') {
-      return <Wifi className="h-4 w-4 text-yellow-500" />;
+      return <Network className="h-4 w-4 text-yellow-500" />;
     }
-    return <Wifi className="h-4 w-4 text-green-500" />;
+    return <Network className="h-4 w-4 text-green-500" />;
   };
 
   const getOperationIcon = (operation: any) => {
@@ -327,7 +329,7 @@ export const MinimalGlobalLoadingIndicator: React.FC<{
           Loading{operationCount > 1 ? ` (${operationCount})` : ''}
         </span>
         {!state.isOnline && (
-          <WifiOff className="h-4 w-4 text-red-500" />
+          <Network className="h-4 w-4 text-red-500" />
         )}
       </div>
     </div>

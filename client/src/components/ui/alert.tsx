@@ -31,7 +31,7 @@ const Alert = React.forwardRef<
     {...props}
   />
 ))
-Alert.display_name = "Alert"
+Alert.displayName = "Alert"
 
 const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
@@ -43,7 +43,7 @@ const AlertTitle = React.forwardRef<
     {...props}
   />
 ))
-AlertTitle.display_name = "AlertTitle"
+AlertTitle.displayName = "AlertTitle"
 
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -55,7 +55,7 @@ const AlertDescription = React.forwardRef<
     {...props}
   />
 ))
-AlertDescription.display_name = "AlertDescription"
+AlertDescription.displayName = "AlertDescription"
 
 export { Alert, AlertTitle, AlertDescription }
 

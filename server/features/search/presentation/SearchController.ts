@@ -7,7 +7,7 @@ import {
   getSearchIndexHealth,
 } from '../application/SearchService';
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../../shared/core/src/index.js';
 
 const router = Router();
 

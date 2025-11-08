@@ -3,8 +3,8 @@
  * Shows connection status and provides offline feedback to users
  */
 
-import React, { useState, useEffect } from 'react';
-import { logger } from '@shared/core';
+import { useState, useEffect } from 'react';
+import { logger } from '../utils/client-core';
 import { useOnlineStatus } from '../hooks/use-online-status';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 
@@ -56,6 +56,8 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
       const timer = setTimeout(() => setIsVisible(false), 3000);
       return () => clearTimeout(timer);
     }
+    
+    return undefined;
   }, [isOnline, syncStatus, autoHide]);
 
   const handleManualSync = async () => {

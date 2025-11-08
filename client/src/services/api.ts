@@ -5,7 +5,7 @@
 
 import { logger } from '../utils/browser-logger';
 // validationService is exported from the validation sub-module of @shared/core
-import { validationService } from '@shared/core/validation';
+import { validationService } from '../utils/client-core';
 import { ZodSchema } from 'zod';
 import { envConfig } from '../utils/env-config';
 
@@ -138,7 +138,7 @@ class ApiService {
       ...options,
       method: 'POST',
       body,
-      headers: { ...headers, ...options?.headers },
+      headers: { ...headers, ...(options?.headers || {}) } as HeadersInit,
     }, responseSchema);
   }
 
@@ -152,7 +152,7 @@ class ApiService {
       ...options,
       method: 'PUT',
       body,
-      headers: { ...headers, ...options?.headers },
+      headers: { ...headers, ...(options?.headers || {}) } as HeadersInit,
     }, responseSchema);
   }
 

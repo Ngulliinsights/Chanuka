@@ -1,5 +1,4 @@
 import { UserRole, NavigationSection } from '../types/navigation';
-import { logger } from '@shared/core';
 
 /**
  * Represents a single step in a user journey
@@ -18,7 +17,8 @@ export interface JourneyStep {
 /**
  * Represents a complete user journey session
  */
-export interface UserJourney { session_id: string;
+export interface UserJourney {
+  session_id: string;
   user_id?: string;
   user_role: UserRole;
   startTime: Date;
@@ -29,7 +29,7 @@ export interface UserJourney { session_id: string;
   totalTimeSpent: number;
   bounceRate?: number;
   conversionEvents: string[];
- }
+}
 
 /**
  * Represents journey analytics data
@@ -171,7 +171,8 @@ export class UserJourneyTracker {
   /**
    * Start tracking a new user journey
    */
-  public startJourney(session_id: string, user_id?: string, user_role: UserRole = 'public'): void { const journey: UserJourney = {
+  public startJourney(session_id: string, user_id?: string, user_role: UserRole = 'public'): void {
+    const journey: UserJourney = {
       session_id,
       user_id,
       user_role,
@@ -180,7 +181,7 @@ export class UserJourneyTracker {
       completed: false,
       totalTimeSpent: 0,
       conversionEvents: []
-     };
+    };
 
     this.activeJourneys.set(session_id, journey);
     this.sessionStartTimes.set(session_id, new Date());
@@ -251,12 +252,14 @@ export class UserJourneyTracker {
     journey.completed = true;
     journey.goalAchieved = goalAchieved;
 
-    // Calculate final time spent
+    // Calculate final time spent - Fixed: Added null check
     if (journey.steps.length > 0) {
       const lastStep = journey.steps[journey.steps.length - 1];
-      const finalTimeSpent = journey.endTime.getTime() - lastStep.timestamp.getTime();
-      lastStep.timeSpent = finalTimeSpent;
-      journey.totalTimeSpent += finalTimeSpent;
+      if (lastStep && journey.endTime) {
+        const finalTimeSpent = journey.endTime.getTime() - lastStep.timestamp.getTime();
+        lastStep.timeSpent = finalTimeSpent;
+        journey.totalTimeSpent += finalTimeSpent;
+      }
     }
 
     // Calculate bounce rate
@@ -275,9 +278,12 @@ export class UserJourneyTracker {
     const journey = this.activeJourneys.get(session_id);
     if (!journey) return;
 
-    // Mark last step as exit point
+    // Mark last step as exit point - Fixed: Added null check
     if (journey.steps.length > 0) {
-      journey.steps[journey.steps.length - 1].exitPoint = true;
+      const lastStep = journey.steps[journey.steps.length - 1];
+      if (lastStep) {
+        lastStep.exitPoint = true;
+      }
     }
 
     this.completeJourney(session_id, false);
@@ -292,7 +298,7 @@ export class UserJourneyTracker {
     user_role?: UserRole
   ): JourneyAnalytics {
     const filteredJourneys = this.getFilteredJourneys(start_date, end_date, user_role);
-    
+
     const totalJourneys = filteredJourneys.length;
     const completedJourneys = filteredJourneys.filter(j => j.completed).length;
     const totalSteps = filteredJourneys.reduce((sum, j) => sum + j.steps.length, 0);
@@ -344,7 +350,7 @@ export class UserJourneyTracker {
 
       const path = journey.steps.map(step => step.pageId);
       const pathKey = path.join(' -> ');
-      
+
       const existing = pathMap.get(pathKey) || {
         frequency: 0,
         totalTime: 0,
@@ -355,7 +361,7 @@ export class UserJourneyTracker {
       existing.frequency++;
       existing.totalTime += journey.totalTimeSpent;
       existing.user_roles.add(journey.user_role);
-      
+
       if (journey.completed) {
         existing.completions++;
       }
@@ -379,82 +385,55 @@ export class UserJourneyTracker {
    * Calculate drop-off points
    */
   private calculateDropOffPoints(journeys: UserJourney[]): DropOffPoint[] {
-    const pageStats = new Map<string, {
-      visits: number;
+    const pageExits = new Map<string, {
       exits: number;
+      totalVisits: number;
       totalTimeBeforeExit: number;
       nextSteps: Map<string, number>;
     }>();
 
     journeys.forEach(journey => {
       journey.steps.forEach((step, index) => {
-        const stats = pageStats.get(step.pageId) || {
-          visits: 0,
+        const pageId = step.pageId;
+        const existing = pageExits.get(pageId) || {
           exits: 0,
+          totalVisits: 0,
           totalTimeBeforeExit: 0,
           nextSteps: new Map<string, number>()
         };
 
-        stats.visits++;
+        existing.totalVisits++;
 
+        // Check if this is an exit point
         if (step.exitPoint || index === journey.steps.length - 1) {
-          stats.exits++;
-          stats.totalTimeBeforeExit += step.timeSpent;
+          existing.exits++;
+          existing.totalTimeBeforeExit += step.timeSpent;
+        } else if (index < journey.steps.length - 1) {
+          // Track next step
+          const nextStep = journey.steps[index + 1];
+          if (nextStep) {
+            const nextCount = existing.nextSteps.get(nextStep.pageId) || 0;
+            existing.nextSteps.set(nextStep.pageId, nextCount + 1);
+          }
         }
 
-        // Track next steps
-        if (index < journey.steps.length - 1) {
-          const nextStep = journey.steps[index + 1].pageId;
-          stats.nextSteps.set(nextStep, (stats.nextSteps.get(nextStep) || 0) + 1);
-        }
-
-        pageStats.set(step.pageId, stats);
+        pageExits.set(pageId, existing);
       });
     });
 
-    return Array.from(pageStats.entries())
-      .map(([pageId, stats]) => ({
+    return Array.from(pageExits.entries())
+      .map(([pageId, data]) => ({
         pageId,
-        dropOffRate: stats.visits > 0 ? stats.exits / stats.visits : 0,
-        averageTimeBeforeExit: stats.exits > 0 ? stats.totalTimeBeforeExit / stats.exits : 0,
-        commonNextSteps: Array.from(stats.nextSteps.entries())
+        dropOffRate: data.totalVisits > 0 ? data.exits / data.totalVisits : 0,
+        averageTimeBeforeExit: data.exits > 0 ? data.totalTimeBeforeExit / data.exits : 0,
+        commonNextSteps: Array.from(data.nextSteps.entries())
           .sort((a, b) => b[1] - a[1])
           .slice(0, 3)
           .map(([step]) => step),
-        improvementSuggestions: this.generateImprovementSuggestions(pageId, stats)
+        improvementSuggestions: this.generateImprovementSuggestions(pageId, data.exits / data.totalVisits)
       }))
       .filter(point => point.dropOffRate > 0.1) // Only show significant drop-off points
       .sort((a, b) => b.dropOffRate - a.dropOffRate);
-  }
-
-  /**
-   * Generate improvement suggestions for drop-off points
-   */
-  private generateImprovementSuggestions(
-    pageId: string,
-    stats: { visits: number; exits: number; totalTimeBeforeExit: number; nextSteps: Map<string, number> }
-  ): string[] {
-    const suggestions: string[] = [];
-    const dropOffRate = stats.exits / stats.visits;
-    const avgTime = stats.totalTimeBeforeExit / stats.exits;
-
-    if (dropOffRate > 0.5) {
-      suggestions.push('High drop-off rate - consider improving page content or navigation');
-    }
-
-    if (avgTime < 10000) { // Less than 10 seconds
-      suggestions.push('Users leave quickly - improve initial page load or add engaging content');
-    }
-
-    if (stats.nextSteps.size < 2) {
-      suggestions.push('Limited navigation options - add more relevant links or calls-to-action');
-    }
-
-    if (pageId.includes('/bills/') && !pageId.includes('/analysis')) {
-      suggestions.push('Consider adding direct link to bill analysis');
-    }
-
-    return suggestions;
   }
 
   /**
@@ -463,86 +442,112 @@ export class UserJourneyTracker {
   private calculateConversionFunnels(journeys: UserJourney[]): ConversionFunnel[] {
     const funnels: ConversionFunnel[] = [];
 
-    // Bill Research Funnel
-    const billResearchSteps = ['/', '/bills', '/bills/:id', '/bills/:id/analysis'];
-    funnels.push(this.calculateFunnelMetrics('Bill Research', billResearchSteps, journeys));
+    // Define common funnels
+    const funnelDefinitions = [
+      {
+        name: 'Bill Research Funnel',
+        steps: ['/', '/bills', '/bills/:id', '/bills/:id/analysis']
+      },
+      {
+        name: 'Community Engagement Funnel',
+        steps: ['/', '/community', '/bills/:id', '/bills/:id/comments']
+      },
+      {
+        name: 'User Onboarding Funnel',
+        steps: ['/', '/onboarding', '/dashboard', '/profile']
+      }
+    ];
 
-    // Community Engagement Funnel
-    const communitySteps = ['/', '/community', '/bills/:id', '/bills/:id/comments'];
-    funnels.push(this.calculateFunnelMetrics('Community Engagement', communitySteps, journeys));
+    funnelDefinitions.forEach(definition => {
+      const stepCounts = new Array(definition.steps.length).fill(0);
+      let totalConversions = 0;
 
-    // User Onboarding Funnel
-    const onboardingSteps = ['/', '/onboarding', '/dashboard', '/profile'];
-    funnels.push(this.calculateFunnelMetrics('User Onboarding', onboardingSteps, journeys));
+      journeys.forEach(journey => {
+        const journeyPages = journey.steps.map(step => step.pageId);
+        let currentStep = 0;
+
+        journeyPages.forEach(pageId => {
+          if (currentStep < definition.steps.length &&
+            (definition.steps[currentStep] === pageId ||
+              (definition.steps[currentStep]?.includes(':id') && pageId.includes('bills/')))) {
+            stepCounts[currentStep]++;
+            currentStep++;
+          }
+        });
+
+        if (currentStep === definition.steps.length) {
+          totalConversions++;
+        }
+      });
+
+      const conversionRates = stepCounts.map((count, index) =>
+        index === 0 ? 1 : (stepCounts[0] > 0 ? count / stepCounts[0] : 0)
+      );
+
+      const dropOffPoints = conversionRates.map((rate, index) =>
+        index === 0 ? 0 : (conversionRates[index - 1] || 0) - rate
+      );
+
+      funnels.push({
+        name: definition.name,
+        steps: definition.steps,
+        conversionRates,
+        dropOffPoints,
+        totalConversions
+      });
+    });
 
     return funnels;
   }
 
   /**
-   * Calculate metrics for a specific funnel
+   * Generate improvement suggestions for drop-off points
    */
-  private calculateFunnelMetrics(
-    name: string,
-    steps: string[],
-    journeys: UserJourney[]
-  ): ConversionFunnel {
-    const stepCounts = new Array(steps.length).fill(0);
-    let totalConversions = 0;
+  private generateImprovementSuggestions(pageId: string, dropOffRate: number): string[] {
+    const suggestions: string[] = [];
 
-    journeys.forEach(journey => {
-      const journeyPages = journey.steps.map(step => 
-        step.pageId.replace(/\/\d+/g, '/:id') // Normalize dynamic routes
-      );
+    if (dropOffRate > 0.5) {
+      suggestions.push('High drop-off rate detected - consider simplifying page content');
+      suggestions.push('Add clear call-to-action buttons');
+      suggestions.push('Improve page loading performance');
+    } else if (dropOffRate > 0.3) {
+      suggestions.push('Moderate drop-off - consider adding navigation hints');
+      suggestions.push('Review page layout and user flow');
+    }
 
-      let currentStep = 0;
-      journeyPages.forEach(pageId => {
-        if (currentStep < steps.length && pageId === steps[currentStep]) {
-          stepCounts[currentStep]++;
-          currentStep++;
-        }
-      });
+    // Page-specific suggestions
+    if (pageId.includes('bills')) {
+      suggestions.push('Add bill summary or key highlights');
+      suggestions.push('Improve bill readability with better formatting');
+    } else if (pageId.includes('community')) {
+      suggestions.push('Encourage user engagement with prompts');
+      suggestions.push('Show recent activity to increase interest');
+    }
 
-      if (currentStep === steps.length) {
-        totalConversions++;
-      }
-    });
-
-    const conversionRates = stepCounts.map((count, index) => 
-      index === 0 ? 1 : (stepCounts[0] > 0 ? count / stepCounts[0] : 0)
-    );
-
-    const dropOffPoints = conversionRates.map((rate, index) => 
-      index === 0 ? 0 : conversionRates[index - 1] - rate
-    );
-
-    return {
-      name,
-      steps,
-      conversionRates,
-      dropOffPoints,
-      totalConversions
-    };
+    return suggestions;
   }
+
 
   /**
    * Get journey optimization recommendations
    */
   public getOptimizationRecommendations(
     start_date?: Date,
-    end_date?: Date
+    end_date?: Date,
+    user_role?: UserRole
   ): JourneyOptimization[] {
-    const analytics = this.getJourneyAnalytics(start_date, end_date);
+    const analytics = this.getJourneyAnalytics(start_date, end_date, user_role);
     const recommendations: JourneyOptimization[] = [];
 
-    // Analyze drop-off points
+    // Analyze drop-off points for optimization opportunities
     analytics.dropOffPoints.forEach(dropOff => {
       if (dropOff.dropOffRate > 0.3) {
         recommendations.push({
           pageId: dropOff.pageId,
           optimizationType: 'reduce_friction',
           priority: dropOff.dropOffRate > 0.5 ? 'high' : 'medium',
-          description: `High drop-off rate (${(dropOff.dropOffRate * 100).toFixed(1)}%) - ${dropOff.improvementSuggestions.join(', ')}`,
-          expectedImpact: Math.min(dropOff.dropOffRate * 0.5, 0.8),
+          description: `High drop-off rate (${(dropOff.dropOffRate * 100).toFixed(1)}%) detected on ${dropOff.pageId}`,
+          expectedImpact: Math.min(dropOff.dropOffRate * 0.7, 0.9),
           implementationEffort: 'medium'
         });
       }
@@ -551,190 +556,55 @@ export class UserJourneyTracker {
     // Analyze conversion funnels
     analytics.conversionFunnels.forEach(funnel => {
       funnel.dropOffPoints.forEach((dropOff, index) => {
-        if (dropOff > 0.2 && index > 0) {
-          recommendations.push({
-            pageId: funnel.steps[index],
-            optimizationType: 'improve_navigation',
-            priority: dropOff > 0.4 ? 'high' : 'medium',
-            description: `${funnel.name} funnel has ${(dropOff * 100).toFixed(1)}% drop-off at step ${index + 1}`,
-            expectedImpact: dropOff * 0.6,
-            implementationEffort: 'low'
-          });
+        if (dropOff > 0.2 && index < funnel.steps.length - 1) {
+          const pageId = funnel.steps[index];
+          if (pageId) {
+            recommendations.push({
+              pageId,
+              optimizationType: 'improve_navigation',
+              priority: dropOff > 0.4 ? 'high' : 'medium',
+              description: `Significant drop-off in ${funnel.name} at step ${index + 1}`,
+              expectedImpact: dropOff * 0.6,
+              implementationEffort: 'low'
+            });
+          }
         }
       });
     });
 
-    // Analyze popular paths for optimization opportunities
-    analytics.popularPaths.forEach(path => {
-      if (path.completionRate < 0.5 && path.frequency > 5) {
-        recommendations.push({
-          pageId: path.path[path.path.length - 1],
-          optimizationType: 'add_guidance',
-          priority: 'medium',
-          description: `Popular path with low completion rate (${(path.completionRate * 100).toFixed(1)}%) - add user guidance`,
-          expectedImpact: (1 - path.completionRate) * 0.4,
-          implementationEffort: 'low'
-        });
-      }
-    });
-
     return recommendations
       .sort((a, b) => {
-        // Sort by priority and expected impact
-        const priorityWeight = { high: 3, medium: 2, low: 1 };
-        const aPriority = priorityWeight[a.priority];
-        const bPriority = priorityWeight[b.priority];
-        
-        if (aPriority !== bPriority) {
-          return bPriority - aPriority;
-        }
-        
-        return b.expectedImpact - a.expectedImpact;
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
       })
-      .slice(0, 10); // Return top 10 recommendations
+      .slice(0, 10);
   }
 
   /**
-   * Get user journey by session ID
+   * Get active journey count
+   */
+  public getActiveJourneyCount(): number {
+    return this.activeJourneys.size;
+  }
+
+  /**
+   * Get journey by session ID
    */
   public getJourney(session_id: string): UserJourney | undefined {
     return this.journeys.get(session_id) || this.activeJourneys.get(session_id);
   }
 
   /**
-   * Get all journeys for a user
+   * Clear old journeys (for memory management)
    */
-  public getUserJourneys(user_id: string): UserJourney[] { return Array.from(this.journeys.values()).filter(journey => journey.user_id === user_id);
-   }
+  public clearOldJourneys(olderThanDays: number = 30): void {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
 
-  /**
-   * Clear all journey data (for testing)
-   */
-  public clearAllData(): void {
-    this.journeys.clear();
-    this.activeJourneys.clear();
-    this.sessionStartTimes.clear();
-    this.pageStartTimes.clear();
-  }
-
-  /**
-   * Export journey data for analysis
-   */
-  public exportJourneyData(format: 'json' | 'csv' = 'json'): string {
-    const journeys = Array.from(this.journeys.values());
-    
-    if (format === 'json') {
-      return JSON.stringify(journeys, null, 2);
+    for (const [sessionId, journey] of this.journeys.entries()) {
+      if (journey.startTime < cutoffDate) {
+        this.journeys.delete(sessionId);
+      }
     }
-    
-    // CSV format
-    const headers = [
-      'sessionId', 'user_id', 'user_role', 'startTime', 'endTime', 
-      'completed', 'goalAchieved', 'totalTimeSpent', 'stepCount', 
-      'conversionEvents', 'bounceRate'
-    ];
-    
-    const rows = journeys.map(journey => [
-      journey.session_id,
-      journey.user_id || '',
-      journey.user_role,
-      journey.startTime.toISOString(),
-      journey.endTime?.toISOString() || '',
-      journey.completed.toString(),
-      journey.goalAchieved?.toString() || '',
-      journey.totalTimeSpent.toString(),
-      journey.steps.length.toString(),
-      journey.conversionEvents.join(';'),
-      journey.bounceRate?.toString() || ''
-    ]);
-    
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
-  }
-
-  /**
-   * Get journey completion rate for a specific goal
-   */
-  public getGoalCompletionRate(goalName: string): number {
-    const goalSteps = this.journeyGoals.get(goalName);
-    if (!goalSteps) return 0;
-
-    const relevantJourneys = Array.from(this.journeys.values()).filter(journey => {
-      const journeyPages = journey.steps.map(step => 
-        step.pageId.replace(/\/\d+/g, '/:id')
-      );
-      
-      // Check if journey contains all goal steps in order
-      let goalIndex = 0;
-      for (const page of journeyPages) {
-        if (goalIndex < goalSteps.length && page === goalSteps[goalIndex]) {
-          goalIndex++;
-        }
-      }
-      
-      return goalIndex > 0; // Journey attempted this goal
-    });
-
-    if (relevantJourneys.length === 0) return 0;
-
-    const completedGoals = relevantJourneys.filter(journey => {
-      const journeyPages = journey.steps.map(step => 
-        step.pageId.replace(/\/\d+/g, '/:id')
-      );
-      
-      let goalIndex = 0;
-      for (const page of journeyPages) {
-        if (goalIndex < goalSteps.length && page === goalSteps[goalIndex]) {
-          goalIndex++;
-        }
-      }
-      
-      return goalIndex === goalSteps.length; // Completed all steps
-    });
-
-    return completedGoals.length / relevantJourneys.length;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -353,14 +353,14 @@ export function JourneyAnalyticsDashboard({ className }: JourneyAnalyticsDashboa
                         </div>
                         <div className="flex-1">
                           <Progress 
-                            value={funnel.conversionRates[stepIndex] * 100} 
+                            value={(funnel.conversionRates?.[stepIndex] ?? 0) * 100} 
                             className="h-2"
                           />
                         </div>
                         <div className="w-16 text-sm text-right">
-                          {(funnel.conversionRates[stepIndex] * 100).toFixed(1)}%
+                          {((funnel.conversionRates?.[stepIndex] ?? 0) * 100).toFixed(1)}%
                         </div>
-                        {funnel.dropOffPoints[stepIndex] > 0.1 && (
+                        {(funnel.dropOffPoints?.[stepIndex] ?? 0) > 0.1 && (
                           <AlertTriangle className="h-4 w-4 text-yellow-500" />
                         )}
                       </div>

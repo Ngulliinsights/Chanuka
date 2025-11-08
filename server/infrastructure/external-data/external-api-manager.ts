@@ -16,7 +16,7 @@ import { EventEmitter } from 'events';
 // import { Redis } from 'ioredis';
 import { ExternalAPIErrorHandler, ErrorSeverity } from '../../services/external-api-error-handler';
 import { APICostMonitoringService } from '../../services/api-cost-monitoring';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 // ============================================================================
 // Core Types and Interfaces
@@ -204,10 +204,10 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   // ========================================================================
 
   private initializeDefaultConfigurations(): void {
-    // Parliament of Canada API
+    // Parliament of Kenya API
     this.addAPIConfiguration({
-      source: 'parliament-ca',
-      baseUrl: 'https://www.ourcommons.ca/members/en/search/xml',
+      source: 'parliament-ke',
+      baseUrl: 'https://www.parliament.go.ke/api/bills',
       quota: {
         requestsPerMinute: 60,
         requestsPerHour: 1000,
@@ -224,7 +224,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       cacheTTL: 300000,
       enableCaching: true,
       enableMetrics: true,
-      failoverSources: ['openparliament'],
+      failoverSources: ['county-assemblies'],
       circuitBreaker: {
         enabled: true,
         failureThreshold: 5,
@@ -233,10 +233,10 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       }
     });
 
-    // Ontario Legislature API
+    // Senate of Kenya API
     this.addAPIConfiguration({
-      source: 'ontario-legislature',
-      baseUrl: 'https://www.ola.org/en/legislative-business/bills',
+      source: 'senate-ke',
+      baseUrl: 'https://www.parliament.go.ke/senate/api/bills',
       quota: {
         requestsPerMinute: 30,
         requestsPerHour: 500,
@@ -260,10 +260,10 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       }
     });
 
-    // OpenParliament.ca API
+    // County Assemblies API
     this.addAPIConfiguration({
-      source: 'openparliament',
-      baseUrl: 'https://openparliament.ca/api',
+      source: 'county-assemblies',
+      baseUrl: 'https://cog.go.ke/api/assemblies',
       quota: {
         requestsPerMinute: 100,
         requestsPerHour: 2000,

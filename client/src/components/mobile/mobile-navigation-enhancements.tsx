@@ -10,18 +10,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import {
-  Menu,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  Search,
-  Bell,
-  User,
-  Settings,
-  MoreHorizontal,
-} from "lucide-react";
+import { BarChart3, X, ChevronLeft, ChevronRight, Building, Search, Bell, User, Settings, MoreVertical,  } from 'lucide-react';
 import {
   useResponsiveLayoutContext,
   TouchButton,
@@ -32,7 +21,7 @@ import {
   MobileTouchUtils,
 } from "../../utils/mobile-touch-handler";
 import { Link, useLocation } from "react-router-dom";
-import { logger } from "../../utils/browser-logger";
+import { logger } from '../../utils/browser-logger';
 
 interface NavigationItem {
   id: string;
@@ -109,6 +98,8 @@ export function MobileTabBar({
       return () =>
         document.removeEventListener("mousedown", handleClickOutside);
     }
+    
+    return undefined;
   }, [moreMenuOpen]);
 
   const TabBarItem = ({ item }: { item: NavigationItem }) => (
@@ -178,7 +169,7 @@ export function MobileTabBar({
                 aria-label="More navigation options"
                 aria-expanded={moreMenuOpen}
               >
-                <MoreHorizontal className="h-5 w-5" />
+                <MoreVertical className="h-5 w-5" />
                 <span className="text-xs mt-1 font-medium">More</span>
               </TouchButton>
 
@@ -277,6 +268,8 @@ export function SwipeableHeader({
         handler.destroy();
       };
     }
+    
+    return undefined;
   }, [onSwipeLeft, onSwipeRight]);
 
   return (
@@ -358,7 +351,7 @@ export function PullToRefresh({
   const currentY = useRef<number>(0);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (containerRef.current && containerRef.current.scrollTop === 0) {
+    if (containerRef.current && containerRef.current.scrollTop === 0 && e.touches[0]) {
       startY.current = e.touches[0].clientY;
     }
   }, []);
@@ -373,6 +366,7 @@ export function PullToRefresh({
         return;
       }
 
+      if (!e.touches[0]) return;
       currentY.current = e.touches[0].clientY;
       const distance = currentY.current - startY.current;
 

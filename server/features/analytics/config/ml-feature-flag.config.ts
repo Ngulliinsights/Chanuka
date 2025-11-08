@@ -5,7 +5,7 @@
  */
 
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 /**
  * Initialize ML service feature flag with default settings

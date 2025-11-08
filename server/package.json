@@ -1,0 +1,17 @@
+{
+  "name": "@chanuka/server",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "tsx index.ts",
+    "build": "echo 'Server build skipped - using development mode'",
+    "start": "tsx index.ts",
+    "test": "vitest run server/",
+    "test:watch": "vitest server/ --watch",
+    "type-check": "tsc --noEmit --project tsconfig.json"
+  },
+  "dependencies": {
+    "@chanuka/shared": "workspace:*"
+  }
+}

@@ -1,5 +1,5 @@
 import { RelatedPage, PageRelationship, UserRole } from '../types/navigation';
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 
 /**
  * Configuration for page relationships

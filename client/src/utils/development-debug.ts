@@ -1,8 +1,8 @@
 // Development Debugging Utilities
 // This module provides debugging utilities specifically for development mode
 
-import React from 'react';
-import { logger } from '@shared/core';
+import * as React from 'react';
+import { logger } from './client-core';
 
 interface PerformanceMetrics {
   navigation?: {
@@ -203,12 +203,12 @@ Keyboard Shortcuts:
 
     return {
       navigation: navigation ? {
-        domContentLoaded: Math.round(navigation.domContentLoadedEventEnd - navigation.navigationStart),
-        loadComplete: Math.round(navigation.loadEventEnd - navigation.navigationStart),
+        domContentLoaded: Math.round(navigation.domContentLoadedEventEnd - navigation.startTime),
+        loadComplete: Math.round(navigation.loadEventEnd - navigation.startTime),
         firstPaint: this.getFirstPaint(),
         firstContentfulPaint: this.getFirstContentfulPaint(),
-        domInteractive: Math.round(navigation.domInteractive - navigation.navigationStart),
-        domComplete: Math.round(navigation.domComplete - navigation.navigationStart),
+        domInteractive: Math.round(navigation.domInteractive - navigation.startTime),
+        domComplete: Math.round(navigation.domComplete - navigation.startTime),
       } : null,
       resources: resources.length,
       measures: measures.length,
@@ -258,7 +258,7 @@ Keyboard Shortcuts:
 
   private getBrowserInfo(): any {
     return {
-      user_agent: navigator.user_agent,
+      user_agent: navigator.userAgent,
       language: navigator.language,
       platform: navigator.platform,
       cookieEnabled: navigator.cookieEnabled,

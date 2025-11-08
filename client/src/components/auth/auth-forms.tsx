@@ -3,16 +3,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
-import {
-  AlertCircle,
-  CheckCircle as CheckCircle2,
-  Mail,
-  Lock,
-  User,
-  Eye,
-  EyeOff,
-  Loader2
-} from 'lucide-react';
+import { AlertCircle, CheckCircle as CheckCircle, Mail, Shield, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuthForm } from './hooks/useAuthForm';
 import { FormData, FormFieldName } from './types';
 
@@ -103,7 +94,7 @@ const AuthForm = () => {
         <CardContent data-testid="auth-content">
           {apiResponse?.success && (
             <Alert className="mb-4 border-green-200 bg-green-50 text-green-800" data-testid="auth-success-alert">
-              <CheckCircle2 className="h-4 w-4" />
+              <CheckCircle className="h-4 w-4" />
               <AlertDescription>{apiResponse.success}</AlertDescription>
             </Alert>
           )}
@@ -124,7 +115,7 @@ const AuthForm = () => {
             )}
 
             {renderInput('email', 'Email Address', 'email', 'you@example.com', Mail)}
-            {renderInput('password', 'Password', 'password', '••••••••', Lock)}
+            {renderInput('password', 'Password', 'password', '••••••••', Eye)}
             {isRegisterMode && !errors.password && (
               <p className="text-xs text-gray-600 -mt-2" data-testid="auth-password-requirements">
                 12+ characters, with uppercase, lowercase, number, and special character.
@@ -132,7 +123,7 @@ const AuthForm = () => {
             )}
 
             {isRegisterMode &&
-              renderInput('confirmPassword', 'Confirm Password', 'password', '••••••••', Lock)}
+              renderInput('confirmPassword', 'Confirm Password', 'password', '••••••••', Eye)}
 
             <Button type="submit" className="w-full" disabled={loading} data-testid="auth-submit-button">
               {loading ? (

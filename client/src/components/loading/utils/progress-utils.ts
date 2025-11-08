@@ -361,6 +361,8 @@ export function createProgressEstimator(windowSize: number = 10) {
       const oldest = recent[0];
       const newest = recent[recent.length - 1];
       
+      if (!oldest || !newest) return null;
+      
       const timeDiff = newest.time - oldest.time;
       const progressDiff = newest.progress - oldest.progress;
       
@@ -377,6 +379,8 @@ export function createProgressEstimator(windowSize: number = 10) {
       
       const first = samples[0];
       const last = samples[samples.length - 1];
+      
+      if (!first || !last) return null;
       
       const timeDiff = last.time - first.time;
       const progressDiff = last.progress - first.progress;

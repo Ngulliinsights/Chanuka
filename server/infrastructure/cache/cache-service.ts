@@ -3,8 +3,8 @@
  * Enterprise-grade caching with multiple cache tiers and automatic cleanup
  */
 
-import { cacheFactory } from '@shared/core/caching';
-import type { CacheAdapter } from '@shared/core/caching';
+import { cacheFactory } from '../../../shared/core/src/caching';
+import type { CacheAdapter } from '../../../shared/core/src/caching';
 import { logger } from '../../utils/shared-core-fallback.js';
 
 export interface CacheOptions {
@@ -104,7 +104,7 @@ export class CacheService {
       const regex = new RegExp(pattern.replace(/\*/g, '.*'));
       const keysToDelete: string[] = [];
       
-      for (const key of this.cache.keys()) {
+      for (const key of Array.from(this.cache.keys())) {
         if (regex.test(key)) {
           keysToDelete.push(key);
         }
@@ -143,7 +143,7 @@ export class CacheService {
     const now = Date.now();
     let cleaned = 0;
     
-    for (const [key, item] of this.cache.entries()) {
+    for (const [key, item] of Array.from(this.cache.entries())) {
       if (now > item.expires) {
         this.cache.delete(key);
         cleaned++;

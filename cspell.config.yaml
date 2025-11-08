@@ -8,6 +8,7 @@ language: en
 # Words to add to the dictionary
 words:
   - upvotes
+  - TTFB  # Time To First Byte
   - downvotes
   - Chanuka
   - chanuka
@@ -23,3 +24,4 @@ words:
   - Millis
   - unhashable
   - Sxxxx
+  - mdel

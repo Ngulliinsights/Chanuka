@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from './client-core';
 // Connection-aware loading strategies for optimal performance
 
 export interface ConnectionInfo {
@@ -387,7 +387,7 @@ export function getOptimalVideoQuality(): 'low' | 'medium' | 'high' {
 }
 
 // React import for the hook
-import React from 'react';
+import * as React from 'react';
 
 
 

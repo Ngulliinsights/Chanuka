@@ -1,14 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Heart,
-  Bell,
-  Eye,
-  Share2,
-  MessageCircle,
-  TrendingUp,
-  Calendar,
-  User
-} from 'lucide-react';
+import { Star, Bell, Eye, Share2, MessageSquare, TrendingUp, Calendar, User } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -149,7 +140,7 @@ const BillTracking = ({ bill_id  }: BillTrackingProps): JSX.Element => {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center space-x-2">
-              <Heart className="h-5 w-5" />
+              <Star className="h-5 w-5" />
               <span>Track This Bill</span>
             </span>
             <Button
@@ -159,12 +150,12 @@ const BillTracking = ({ bill_id  }: BillTrackingProps): JSX.Element => {
             >
               {(trackingStatus?.data as any)?.isTracking ? (
                 <>
-                  <Heart className="h-4 w-4 mr-2 fill-current" />
+                  <Star className="h-4 w-4 mr-2 fill-current" />
                   Tracking
                 </>
               ) : (
                 <>
-                  <Heart className="h-4 w-4 mr-2" />
+                  <Star className="h-4 w-4 mr-2" />
                   Track Bill
                 </>
               )}
@@ -195,7 +186,7 @@ const BillTracking = ({ bill_id  }: BillTrackingProps): JSX.Element => {
                   </div>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="new-comments" className="flex items-center space-x-2">
-                      <MessageCircle className="h-4 w-4" />
+                      <MessageSquare className="h-4 w-4" />
                       <span>New comments</span>
                     </Label>
                     <Switch
@@ -253,7 +244,7 @@ const BillTracking = ({ bill_id  }: BillTrackingProps): JSX.Element => {
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-1 text-muted-foreground mb-1">
-                  <MessageCircle className="h-4 w-4" />
+                  <MessageSquare className="h-4 w-4" />
                   <span className="text-sm">Comments</span>
                 </div>
                 <p className="text-2xl font-bold">{formatNumber((engagementStats.data as { totalComments?: number })?.totalComments || 0)}</p>
@@ -296,7 +287,7 @@ const BillTracking = ({ bill_id  }: BillTrackingProps): JSX.Element => {
               Share Bill
             </Button>
             <Button variant="outline" className="justify-start">
-              <MessageCircle className="h-4 w-4 mr-2" />
+              <MessageSquare className="h-4 w-4 mr-2" />
               Add Comment
             </Button>
             <Button variant="outline" className="justify-start">

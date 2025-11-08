@@ -1,6 +1,6 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import * as admin from 'firebase-admin';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../shared/core/src/index.js';
 import { 
   NotificationChannelService, 
   ChannelDeliveryRequest, 
@@ -122,12 +122,14 @@ export class NotificationService extends NotificationChannelService {
 
   /**
    * Enhanced SMS sending via AWS SNS
-   * Overrides the parent class method to use real AWS SNS
+   * Implements real AWS SNS functionality
    */
-  protected async sendViaAWSSNS(phone_number: string, message: string): Promise<string> {
+  async sendSMSViaAWS(phone_number: string, message: string): Promise<string> {
     if (!this.snsClient) {
       if (this.config.fallbackToMock) {
-        return super['sendViaAWSSNS'](phone_number, message);
+        // Fallback to mock implementation
+        logger.info('📱 Using mock SMS implementation', { component: 'NotificationService' });
+        return `mock-sms-${Date.now()}`;
       }
       throw new Error('AWS SNS client not initialized');
     }
@@ -183,12 +185,14 @@ export class NotificationService extends NotificationChannelService {
 
   /**
    * Enhanced push notification sending via Firebase Admin SDK
-   * Overrides the parent class method to use real Firebase
+   * Implements real Firebase functionality
    */
-  protected async sendViaFirebase(tokens: string[], payload: any): Promise<string> {
+  async sendPushViaFirebase(tokens: string[], payload: any): Promise<string> {
     if (!this.firebaseApp) {
       if (this.config.fallbackToMock) {
-        return super['sendViaFirebase'](tokens, payload);
+        // Fallback to mock implementation
+        logger.info('📱 Using mock push implementation', { component: 'NotificationService' });
+        return `mock-push-${Date.now()}`;
       }
       throw new Error('Firebase Admin SDK not initialized');
     }
@@ -202,7 +206,9 @@ export class NotificationService extends NotificationChannelService {
       if (validTokens.length === 0) {
         if (this.config.fallbackToMock) {
           logger.info('📱 No valid FCM tokens, using mock implementation', { component: 'NotificationService' });
-          return super['sendViaFirebase'](tokens, payload);
+          // Fallback to mock implementation
+          logger.info('📱 Using mock push implementation', { component: 'NotificationService' });
+          return `mock-push-${Date.now()}`;
         }
         throw new Error('No valid FCM tokens provided');
       }
@@ -220,7 +226,7 @@ export class NotificationService extends NotificationChannelService {
         tokens: validTokens,
       };
 
-      const response = await messaging.sendMulticast(message);
+      const response = await messaging.sendEachForMulticast(message);
       
       // Log results
       logger.info('✅ Push notifications sent via Firebase', {
@@ -273,7 +279,7 @@ export class NotificationService extends NotificationChannelService {
    */
   private normalizePhoneNumber(phone_number: string): string {
     // Remove all non-digit characters
-    const digits = phoneNumber.replace(/\D/g, '');
+    const digits = phone_number.replace(/\D/g, '');
     
     // Handle Kenyan numbers
     if (digits.startsWith('254')) {
@@ -287,16 +293,16 @@ export class NotificationService extends NotificationChannelService {
     }
     
     // For other countries, assume it's already in correct format
-    return phoneNumber.startsWith('+') ? phone_number: `+${digits}`;
+    return phone_number.startsWith('+') ? phone_number: `+${digits}`;
   }
 
   /**
    * Mask phone number for logging (privacy protection)
    */
   private maskPhoneNumber(phone_number: string): string {
-    if (phone_number.length <= 4) return phoneNumber;
-    const start = phoneNumber.substring(0, 4);
-    const end = phoneNumber.substring(phone_number.length - 2);
+    if (phone_number.length <= 4) return phone_number;
+    const start = phone_number.substring(0, 4);
+    const end = phone_number.substring(phone_number.length - 2);
     return `${start}***${end}`;
   }
 

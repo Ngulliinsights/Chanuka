@@ -65,7 +65,7 @@ function Calendar({
     />
   )
 }
-Calendar.display_name = "Calendar"
+Calendar.displayName = "Calendar"
 
 // Enhanced calendar with date validation
 interface EnhancedCalendarProps extends Omit<CalendarProps, 'className' | 'selected' | 'onSelect' | 'disabled'>, DateValidationProps {
@@ -102,7 +102,7 @@ const EnhancedCalendar = React.forwardRef<
   });
   const [retryCount, setRetryCount] = React.useState(0);
 
-  const validateSelectedDate = React.useCallback((date: Date | DateRange | undefined): ValidationState => {
+  const validateSelectedDate = React.useCallback((date: Date | Date[] | DateRange | undefined): ValidationState => {
     if (!showValidation) {
       return { isValid: true, touched: validationState.touched };
     }
@@ -215,7 +215,7 @@ const EnhancedCalendar = React.forwardRef<
     }
   }, [retryCount]);
 
-  const handleSelect = React.useCallback((date: Date | DateRange | undefined) => {
+  const handleSelect = React.useCallback((date: Date | Date[] | undefined) => {
     const newValidationState = {
       ...validateSelectedDate(date),
       touched: true
@@ -228,7 +228,7 @@ const EnhancedCalendar = React.forwardRef<
       const error = new UIDateError('enhanced-calendar', date, newValidationState.error);
       handleValidationError(error);
     } else {
-      onSelect?.(date);
+      onSelect?.(date as Date | DateRange | undefined);
     }
   }, [validateSelectedDate, onValidationChange, onSelect, handleValidationError]);
 
@@ -316,7 +316,7 @@ const EnhancedCalendar = React.forwardRef<
           },
         }}
         selected={selected as Date | undefined}
-        onSelect={handleSelect as (date: Date | undefined) => void}
+        onSelect={handleSelect}
         mode="single"
         disabled={isDateDisabled}
         {...props}
@@ -331,7 +331,7 @@ const EnhancedCalendar = React.forwardRef<
     </div>
   );
 });
-EnhancedCalendar.display_name = "EnhancedCalendar";
+EnhancedCalendar.displayName = "EnhancedCalendar";
 
 export { Calendar, EnhancedCalendar }
 

@@ -6,7 +6,7 @@
  */
 
 import { getBrowserInfo, featureDetector } from './browser-compatibility';
-import { logger } from '@shared/core';
+import { logger } from './client-core';
 
 export interface CompatibilityTestResult {
   testName: string;
@@ -170,11 +170,11 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Modern Array Methods',
       () => {
-        return !!(Array.prototype.find &&
-               Array.prototype.includes &&
-               Array.prototype.map &&
-               Array.prototype.filter &&
-               Array.from);
+        return !!(typeof Array.prototype.find === 'function' &&
+               typeof Array.prototype.includes === 'function' &&
+               typeof Array.prototype.map === 'function' &&
+               typeof Array.prototype.filter === 'function' &&
+               typeof Array.from === 'function');
       },
       'high',
       'Modern array methods are used extensively. Update your browser.'
@@ -184,10 +184,10 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Modern Object Methods',
       () => {
-        return !!(Object.assign &&
-               Object.keys &&
-               Object.values &&
-               Object.entries);
+        return !!(typeof Object.assign === 'function' &&
+               typeof Object.keys === 'function' &&
+               typeof Object.values === 'function' &&
+               typeof Object.entries === 'function');
       },
       'high',
       'Modern object methods are required. Update your browser.'
@@ -206,9 +206,9 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Query Selector APIs',
       () => {
-        return !!(document.querySelector &&
-               document.querySelectorAll &&
-               Element.prototype.closest);
+        return !!(typeof document.querySelector === 'function' &&
+               typeof document.querySelectorAll === 'function' &&
+               typeof Element.prototype.closest === 'function');
       },
       'critical',
       'Query selector APIs are required for DOM manipulation. Update your browser.'
@@ -218,8 +218,8 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Modern Event APIs',
       () => {
-        return !!(Element.prototype.addEventListener &&
-               Element.prototype.removeEventListener &&
+        return !!(typeof Element.prototype.addEventListener === 'function' &&
+               typeof Element.prototype.removeEventListener === 'function' &&
                typeof CustomEvent === 'function');
       },
       'critical',
@@ -230,9 +230,9 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'DOM Manipulation APIs',
       () => {
-        return !!(Element.prototype.remove &&
-               Element.prototype.append &&
-               Element.prototype.prepend);
+        return !!(typeof Element.prototype.remove === 'function' &&
+               typeof Element.prototype.append === 'function' &&
+               typeof Element.prototype.prepend === 'function');
       },
       'medium',
       'Modern DOM manipulation methods improve performance. Consider updating.'
@@ -242,8 +242,8 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Form Validation APIs',
       () => {
-        return !!(HTMLFormElement.prototype.checkValidity &&
-               HTMLInputElement.prototype.setCustomValidity);
+        return !!(typeof HTMLFormElement.prototype.checkValidity === 'function' &&
+               typeof HTMLInputElement.prototype.setCustomValidity === 'function');
       },
       'medium',
       'Form validation APIs enhance user experience. Consider updating.'

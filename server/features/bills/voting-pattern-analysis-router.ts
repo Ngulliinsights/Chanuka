@@ -3,7 +3,7 @@ import { votingPatternAnalysisService } from './voting-pattern-analysis.js';
 import { authenticateToken } from '../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
 import { UnifiedApiResponse  } from '@shared/core/utils/api';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 import { securityAuditService } from '../security/security-audit-service.js';
 
 const router = Router();

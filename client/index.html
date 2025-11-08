@@ -188,19 +188,35 @@
 
     <!-- Service Worker Registration -->
     <script>
-      // Register service worker for PWA functionality
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((registration) => {
-              console.log("SW registered: ", registration);
-            })
-            .catch((registrationError) => {
-              console.log("SW registration failed: ", registrationError);
-            });
-        });
-      }
+      // Register service worker for PWA functionality only in production-like environments.
+      // During local development (localhost/127.0.0.1) we avoid registering the SW to
+      // prevent cached assets from interfering with HMR and local bundling.
+      (function() {
+        try {
+          if ("serviceWorker" in navigator) {
+            const hostname = window.location.hostname;
+            const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || /^192\.168\./.test(hostname);
+            if (!isLocalhost) {
+              window.addEventListener('load', () => {
+                navigator.serviceWorker
+                  .register('/sw.js')
+                  .then((registration) => {
+                    console.log('SW registered: ', registration);
+                  })
+                  .catch((registrationError) => {
+                    console.log('SW registration failed: ', registrationError);
+                  });
+              });
+            } else {
+              // Dev mode: ensure no old service workers remain registered
+              navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(() => {});
+            }
+          }
+        } catch (e) {
+          // Silent fail to avoid blocking application load
+          console.warn('Service worker registration guard failed', e);
+        }
+      })();
     </script>
 
     <!-- Fallback for JavaScript disabled -->

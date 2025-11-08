@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll,
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom';
-import { logger } from '@shared/core';
+import { logger } from '../../utils/browser-logger';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
@@ -383,7 +383,7 @@ describe('API Communication Integration Tests', () => {
 
       expect(mockAuthenticatedApi.get).toHaveBeenCalledWith('/profile');
       expect((response.data as any).success).toBe(true);
-      expect((response.data as any).users.name).toBe('Test User');
+      expect((response.data as any).user.name).toBe('Test User');
     });
 
     test('should handle authentication errors', async () => {

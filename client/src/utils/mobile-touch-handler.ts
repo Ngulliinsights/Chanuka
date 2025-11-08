@@ -70,7 +70,7 @@ export class MobileTouchHandler {
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length !== 1) return;
 
-    const touch = event.touches[0];
+    const touch = event.touches[0]!;
     this.startTouch = {
       x: touch.clientX,
       y: touch.clientY,
@@ -90,7 +90,7 @@ export class MobileTouchHandler {
   private handleTouchMove(event: TouchEvent): void {
     if (!this.is_active || event.touches.length !== 1) return;
 
-    const touch = event.touches[0];
+    const touch = event.touches[0]!;
     this.currentTouch = {
       x: touch.clientX,
       y: touch.clientY,
@@ -102,7 +102,7 @@ export class MobileTouchHandler {
     }
   }
 
-  private handleTouchEnd(event: TouchEvent): void {
+  private handleTouchEnd(): void {
     if (!this.is_active || !this.startTouch || !this.currentTouch) return;
 
     const swipe = this.calculateSwipe();
@@ -150,7 +150,7 @@ export class MobileTouchHandler {
 
   private handlePointerUp(event: PointerEvent): void {
     if (!this.is_active || event.pointerType !== 'touch') return;
-    this.handleTouchEnd(event as any);
+    this.handleTouchEnd();
   }
 
   private handlePointerCancel(): void {

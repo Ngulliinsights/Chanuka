@@ -1,17 +1,17 @@
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
-import { eq, and } from 'drizzle-orm';
-import { readDatabase } from '@shared/database/connection.js';
-const db = readDatabase;
-import { users as users, session as sessions, passwordReset as passwordResets, type User } from '@/shared/schema';
+import { eq, and, gt, lt, isNotNull } from 'drizzle-orm';
+import { database as db } from '../../../shared/database';
+
+import { users, sessions } from '../../../shared/schema';
 import { getEmailService } from '../../infrastructure/notifications/email-service';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { inputValidationService } from '../validation/input-validation-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { z } from 'zod';
-import { logger } from '@shared/core/index.js';
+import { logger } from '../../../shared/core/src/index.js';
 
 // Validation schemas
 export const registerSchema = z.object({
@@ -146,11 +146,8 @@ export class AuthService {
           role: validatedData.role,
           verification_status: 'pending',
           is_active: true,
-          preferences: {
-            emailNotifications: true,
-            emailVerificationToken: verification_token,
-            emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-          }
+          verification_token: verification_token,
+          verification_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
         })
         .returning();
 
@@ -186,7 +183,7 @@ export class AuthService {
           is_active: newUser[0].is_active
         },
         token,
-        refreshToken,
+        refresh_token,
         requiresVerification: true
       };
 
@@ -214,24 +211,23 @@ export class AuthService {
    */
   async verifyEmail(token: string): Promise<AuthResult> {
     try {
-      const user = await db
+      const userResults = await db
         .select()
         .from(users)
-        .where(eq(users.preferences, { emailVerificationToken: token }))
+        .where(eq(users.verification_token, token))
         .limit(1);
 
-      if (users.length === 0) {
+      if (userResults.length === 0) {
         return {
           success: false,
           error: 'Invalid verification token'
         };
       }
 
-      const userData = user[0];
-      const preferences = userData.preferences as any;
+      const userData = userResults[0];
 
       // Check if token is expired
-      if (preferences?.emailVerificationExpires && new Date() > new Date(preferences.emailVerificationExpires)) {
+      if (userData.verification_expires_at && new Date() > userData.verification_expires_at) {
         return {
           success: false,
           error: 'Verification token has expired'
@@ -243,12 +239,9 @@ export class AuthService {
         .update(users)
         .set({
           verification_status: 'verified',
-          preferences: {
-            ...preferences,
-            emailVerificationToken: null,
-            emailVerificationExpires: null,
-            emailVerified: true
-          }
+          verification_token: null,
+          verification_expires_at: null,
+          updated_at: new Date()
         })
         .where(eq(users.id, userData.id));
 
@@ -294,7 +287,7 @@ export class AuthService {
         .where(eq(users.email, validatedData.email))
         .limit(1);
 
-      if (users.length === 0) {
+      if (user.length === 0) {
         return {
           success: false,
           error: 'Invalid credentials'
@@ -345,7 +338,7 @@ export class AuthService {
           is_active: userData.is_active
         },
         token,
-        refreshToken
+        refresh_token
       };
 
     } catch (error) {
@@ -372,11 +365,13 @@ export class AuthService {
    */
   async logout(token: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Invalidate session
+      // Invalidate session by setting expiration to now
+      // We need to find the session by user_id from the token
+      const decoded = jwt.verify(token, this.jwtSecret) as any;
       await db
         .update(sessions)
-        .set({ is_active: false })
-        .where(eq(sessions.token, token));
+        .set({ expires_at: new Date() })
+        .where(eq(sessions.user_id, decoded.user_id));
 
       return { success: true };
     } catch (error) {
@@ -400,13 +395,13 @@ export class AuthService {
       // Verify refresh token
       const decoded = jwt.verify(refresh_token, this.refreshTokenSecret) as any;
 
-      // Find session
+      // Find session by user_id from decoded token
       const session = await db
         .select()
         .from(sessions)
         .where(and(
-          eq(sessions.refresh_token_hash, this.hashToken(refresh_token)),
-          eq(sessions.is_active, true)
+          eq(sessions.user_id, decoded.user_id),
+          gt(sessions.expires_at, new Date())
         ))
         .limit(1);
 
@@ -440,7 +435,7 @@ export class AuthService {
         .where(eq(users.id, sessionData.user_id))
         .limit(1);
 
-      if (users.length === 0 || !user[0].is_active) {
+      if (user.length === 0 || !user[0].is_active) {
         return {
           success: false,
           error: 'User not found or inactive'
@@ -455,14 +450,11 @@ export class AuthService {
         userData.email
       );
 
-      // Update session with new tokens
+      // Update session expiration
       await db
         .update(sessions)
         .set({
-          token: newToken,
-          refresh_token_hash: this.hashToken(newRefreshToken),
           expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-          refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
           updated_at: new Date()
         })
         .where(eq(sessions.id, sessionData.id));
@@ -510,7 +502,7 @@ export class AuthService {
         .where(eq(users.email, validatedData.email))
         .limit(1);
 
-      if (users.length === 0) {
+      if (user.length === 0) {
         // Don't reveal if email exists or not
         return { success: true };
       }
@@ -521,14 +513,15 @@ export class AuthService {
       const reset_token = crypto.randomBytes(32).toString('hex');
       const tokenHash = crypto.createHash('sha256').update(reset_token).digest('hex');
 
-      // Store reset token
+      // Store reset token in users table
       await db
-        .insert(passwordResets)
-        .values({
-          user_id: userData.id,
-          tokenHash,
-          expires_at: new Date(Date.now() + 60 * 60 * 1000) // 1 hour
-        });
+        .update(users)
+        .set({
+          password_reset_token: tokenHash,
+          password_reset_expires_at: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+          updated_at: new Date()
+        })
+        .where(eq(users.id, userData.id));
 
       // Send reset email
       const emailService = await getEmailService();
@@ -576,28 +569,33 @@ export class AuthService {
       // Hash the token to find it in database
       const tokenHash = crypto.createHash('sha256').update(validatedData.token).digest('hex');
 
-      // Find reset token
-      const resetRecord = await db
+      // Find user with reset token
+      const userRecord = await db
         .select()
-        .from(passwordResets)
-        .where(eq(passwordResets.tokenHash, tokenHash))
+        .from(users)
+        .where(eq(users.password_reset_token, tokenHash))
         .limit(1);
 
-      if (resetRecord.length === 0) {
+      if (userRecord.length === 0) {
         return {
           success: false,
           error: 'Invalid or expired reset token'
         };
       }
 
-      const resetData = resetRecord[0];
+      const userData = userRecord[0];
 
       // Check if token is expired
-      if (new Date() > resetData.expires_at) {
+      if (!userData.password_reset_expires_at || new Date() > userData.password_reset_expires_at) {
         // Clean up expired token
         await db
-          .delete(passwordResets)
-          .where(eq(passwordResets.id, resetData.id));
+          .update(users)
+          .set({
+            password_reset_token: null,
+            password_reset_expires_at: null,
+            updated_at: new Date()
+          })
+          .where(eq(users.id, userData.id));
 
         return {
           success: false,
@@ -608,39 +606,39 @@ export class AuthService {
       // Hash new password
       const password_hash = await bcrypt.hash(validatedData.password, 12);
 
-      // Update user password
+      // Update user password and clear reset token
       await db
         .update(users)
-        .set({ password_hash })
-        .where(eq(users.id, resetData.user_id));
-
-      // Delete used reset token
-      await db
-        .delete(passwordResets)
-        .where(eq(passwordResets.id, resetData.id));
+        .set({
+          password_hash,
+          password_reset_token: null,
+          password_reset_expires_at: null,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, userData.id));
 
       // Invalidate all user sessions for security
       await db
         .update(sessions)
-        .set({ is_active: false })
-        .where(eq(sessions.user_id, resetData.user_id));
+        .set({ expires_at: new Date() }) // Mark sessions as expired
+        .where(eq(sessions.user_id, userData.id));
 
       // Get user data for notification
-      const user = await db
+      const userForNotification = await db
         .select()
         .from(users)
-        .where(eq(users.id, resetData.user_id))
+        .where(eq(users.id, userData.id))
         .limit(1);
 
-      if (users.length > 0) {
+      if (userForNotification.length > 0) {
         // Send password change notification
         const emailService = await getEmailService();
         await emailService.sendEmail({
-          to: user[0].email,
+          to: userForNotification[0].email,
           subject: 'Password Changed Successfully',
           html: `
             <h2>Password Changed</h2>
-            <p>Hello ${user[0].first_name || 'User'},</p>
+            <p>Hello ${userForNotification[0].first_name || 'User'},</p>
             <p>Your password has been successfully changed.</p>
             <p>If you didn't make this change, please contact support immediately.</p>
           `
@@ -680,8 +678,8 @@ export class AuthService {
         .select()
         .from(sessions)
         .where(and(
-          eq(sessions.token, token),
-          eq(sessions.is_active, true)
+          eq(sessions.user_id, decoded.user_id),
+          gt(sessions.expires_at, new Date())
         ))
         .limit(1);
 
@@ -692,18 +690,7 @@ export class AuthService {
         };
       }
 
-      // Check if session is expired
-      if (new Date() > session[0].expires_at) {
-        await db
-          .update(sessions)
-          .set({ is_active: false })
-          .where(eq(sessions.id, session[0].id));
-
-        return {
-          success: false,
-          error: 'Session expired'
-        };
-      }
+      // Session is already filtered by expires_at > now, so no need to check again
 
       // Get user data
       const user = await db
@@ -712,7 +699,7 @@ export class AuthService {
         .where(eq(users.id, decoded.user_id))
         .limit(1);
 
-      if (users.length === 0 || !user[0].is_active) {
+      if (user.length === 0 || !user[0].is_active) {
         return {
           success: false,
           error: 'User not found or inactive'
@@ -736,7 +723,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token verification error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Token verification error:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka'
+      });
       return {
         success: false,
         error: 'Invalid token'
@@ -772,11 +763,12 @@ export class AuthService {
       .values({
         id: crypto.randomUUID(),
         user_id,
-        token,
-        refresh_token_hash: this.hashToken(refresh_token),
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-        refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-        is_active: true
+        data: {
+          token_hash: this.hashToken(token),
+          refresh_token_hash: this.hashToken(refresh_token),
+          refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+        }
       });
   }
 
@@ -794,24 +786,31 @@ export class AuthService {
     try {
       const now = new Date();
 
-      // Clean up expired sessions
+      // Clean up expired sessions (delete them entirely)
       await db
-        .update(sessions)
-        .set({ is_active: false })
-        .where(and(
-          eq(sessions.is_active, true),
-          // Sessions where either access token or refresh token is expired
-          // and refresh token is also expired (can't be renewed)
-        ));
+        .delete(sessions)
+        .where(lt(sessions.expires_at, now));
 
-      // Clean up expired password reset tokens
+      // Clean up expired password reset tokens in users table
       await db
-        .delete(passwordResets)
-        .where(eq(passwordResets.expires_at, now));
+        .update(users)
+        .set({
+          password_reset_token: null,
+          password_reset_expires_at: null,
+          updated_at: new Date()
+        })
+        .where(and(
+          isNotNull(users.password_reset_token),
+          lt(users.password_reset_expires_at, now)
+        ));
 
       logger.info('Expired tokens cleaned up successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Token cleanup error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Token cleanup error:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka'
+      });
     }
   }
 }

@@ -11,7 +11,7 @@ import React, {
   useCallback, 
   useRef 
 } from 'react';
-import { logger } from '@shared/core';
+import { logger } from '../../utils/browser-logger';
 
 interface AccessibilitySettings {
   highContrast: boolean;
@@ -484,6 +484,8 @@ export function AccessibleModal({
         previousFocusRef.current.focus();
       }
     }
+    
+    return undefined;
   }, [isOpen, title, trapFocus, announceToScreenReader]);
 
   // Handle escape key
@@ -498,6 +500,8 @@ export function AccessibleModal({
       document.addEventListener('keydown', handleEscape);
       return () => document.removeEventListener('keydown', handleEscape);
     }
+    
+    return undefined;
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;

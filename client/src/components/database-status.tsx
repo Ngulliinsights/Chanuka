@@ -3,14 +3,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Skeleton } from './ui/skeleton';
-import { 
-  Search, 
-  AlertCircle, 
-  AlertTriangle, 
-  Info, 
-  Wand2,
-  ExternalLink
-} from "lucide-react";
+import { Search, AlertCircle, AlertTriangle, Info, Settings, ArrowLeft } from 'lucide-react';
 import { cn, getStatusColor, getStatusBgColor } from '../lib/utils';
 
 interface HealthStatus {
@@ -176,7 +169,7 @@ export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }
                     </div>
                   </div>
                   <Button variant="outline" size="sm">
-                    <ExternalLink className="h-4 w-4 mr-1" />
+                    <ArrowLeft className="h-4 w-4 mr-1" />
                     Fix
                   </Button>
                 </div>
@@ -186,7 +179,7 @@ export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }
             {(schemaCheck?.totalIssues ?? 0) > 0 && (
               <div className="pt-6 border-t border-gray-200">
                 <Button className="w-full" size="lg">
-                  <Wand2 className="h-4 w-4 mr-2" />
+                  <Settings className="h-4 w-4 mr-2" />
                   Auto-Fix All Issues
                 </Button>
               </div>

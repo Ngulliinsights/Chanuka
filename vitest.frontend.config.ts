@@ -7,7 +7,10 @@ export default defineConfig({
   test: {
     name: 'Frontend Tests',
     environment: 'jsdom',
-    setupFiles: ['./client/src/setupTests.ts'],
+    setupFiles: [
+      './client/src/setupTests.ts',
+      './client/src/__tests__/setup.ts'
+    ],
     include: [
       'client/**/*.{test,spec}.{ts,tsx}',
       'client/src/**/__tests__/**/*.{ts,tsx}'

@@ -97,6 +97,8 @@ export function useTimeoutAwareLoading(
         }
       };
     }
+    
+    return undefined;
   }, [state]);
 
   // Notify state changes

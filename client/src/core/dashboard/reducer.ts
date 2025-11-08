@@ -47,7 +47,7 @@ export function dashboardReducer(state: DashboardState, action: DashboardAction)
         ...state,
         widgetErrors: {
           ...state.widgetErrors,
-          [action.payload.widgetId]: action.payload.error,
+          [action.payload.widgetId]: action.payload.error || new Error('Unknown error'),
         },
       };
 

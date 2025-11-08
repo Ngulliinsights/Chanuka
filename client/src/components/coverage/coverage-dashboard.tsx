@@ -18,7 +18,7 @@ import {
   LineChart,
   Line
 } from 'recharts';
-import { AlertTriangle, CheckCircle, XCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import { AlertTriangle, CheckCircle, X, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface CoverageReport {
   lines: { total: number; covered: number; percentage: number };
@@ -302,7 +302,7 @@ export const CoverageDashboard: React.FC = () => {
   if (error) {
     return (
       <Alert variant="destructive">
-        <XCircle className="h-4 w-4" />
+        <X className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>

@@ -154,9 +154,9 @@ export default function SystemHealth({ health, stats, environment, activity }: S
               <div key={index} className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-primary rounded-full mt-2" />
                 <div>
-                  <p className="text-sm text-gray-900">New user: {users.name}</p>
+                  <p className="text-sm text-gray-900">New user: {user.name}</p>
                   <p className="text-xs text-gray-500">
-                    {users.created_at ? formatRelativeTime(users.created_at) : '2 minutes ago'}
+                    {user.created_at ? formatRelativeTime(user.created_at) : '2 minutes ago'}
                   </p>
                 </div>
               </div>
@@ -166,9 +166,9 @@ export default function SystemHealth({ health, stats, environment, activity }: S
               <div key={index} className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-success rounded-full mt-2" />
                 <div>
-                  <p className="text-sm text-foreground">New bill: {bills.title}</p>
+                  <p className="text-sm text-foreground">New bill: {bill.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    {bills.created_at ? formatRelativeTime(bills.created_at) : '5 minutes ago'}
+                    {bill.created_at ? formatRelativeTime(bill.created_at) : '5 minutes ago'}
                   </p>
                 </div>
               </div>

@@ -1,8 +1,8 @@
 import { Request } from 'express';
-import { database as db } from '@shared/database';
-import { system_audit_log } from '@shared/schema';
+import { database as db } from '../../../shared/database';
+import { system_audit_log } from '../../../shared/schema';
 import { eq, and, gte, lte, desc, sql, count, inArray } from 'drizzle-orm';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 /**
  * SecurityAuditService - The System's Black Box Recorder
@@ -65,19 +65,19 @@ export class SecurityAuditService { /**
     try {
       // Drizzle insert expects required fields to be non-undefined.
       // Coalesce `result` to a sensible default so the insert signature matches.
-      await db.insert(securityAuditLog).values({
+      await db.insert(system_audit_log).values({
         event_type: event.event_type,
-        user_id: event.user_id,
-        ip_address: event.ip_address,
+        event_category: 'security', // Required field based on schema
+        actor_type: 'user', // Required field
+        actor_id: event.user_id,
+        action: event.action || 'unknown',
+        source_ip: event.ip_address,
         user_agent: event.user_agent,
-        resource: event.resource,
-        action: event.action,
-        // Ensure `result` is always a string (Drizzle's types require it)
-        result: event.result ?? (event.success ? 'success' : 'failure'),
+        target_description: event.resource,
+        success: event.success,
         severity: event.severity,
-        details: event.details,
+        action_details: event.details || {},
         session_id: event.session_id,
-        timestamp: event.timestamp || new Date(),
        });
     } catch (error) {
       // Audit logging failures should be logged but should never crash the application
@@ -224,17 +224,17 @@ export class SecurityAuditService { /**
   async queryAuditLogs(options: AuditQueryOptions): Promise<any[]> {
     try {
       // Build the base query
-      let query = db.select().from(securityAuditLog);
+      let query = db.select().from(system_audit_log);
 
       // Build where clause by chaining conditions inline
       // This avoids TypeScript issues with condition arrays
       const whereConditions: any[] = [];
 
       if (options.user_id) {
-        whereConditions.push(eq(system_audit_log.user_id, options.user_id));
+        whereConditions.push(eq(system_audit_log.actor_id, options.user_id));
       }
       if (options.ip_address) {
-        whereConditions.push(eq(system_audit_log.ip_address, options.ip_address));
+        whereConditions.push(eq(system_audit_log.source_ip, options.ip_address));
       }
       if (options.event_type) {
         whereConditions.push(eq(system_audit_log.event_type, options.event_type));
@@ -243,7 +243,7 @@ export class SecurityAuditService { /**
         whereConditions.push(inArray(system_audit_log.event_type, options.event_types));
       }
       if (options.severity) {
-        whereConditions.push(eq(system_audit_log.severity, options.severity));
+        whereConditions.push(eq(system_audit_log.severity, options.severity as 'low' | 'medium' | 'high' | 'critical'));
       }
       if (options.start_date) {
         whereConditions.push(gte(system_audit_log.created_at, options.start_date));
@@ -280,25 +280,25 @@ export class SecurityAuditService { /**
   async getEventCount(options: AuditQueryOptions): Promise<number> {
     try {
       // Build the base count query
-      let query = db.select({ count: count() }).from(securityAuditLog);
+      let query = db.select({ count: count() }).from(system_audit_log);
 
       // Build where conditions inline to avoid TypeScript inference issues
       const whereConditions: any[] = [];
 
       if (options.user_id) {
-        whereConditions.push(eq(securityAuditLog.user_id, options.user_id));
+        whereConditions.push(eq(system_audit_log.actor_id, options.user_id));
       }
       if (options.ip_address) {
-        whereConditions.push(eq(securityAuditLog.ip_address, options.ip_address));
+        whereConditions.push(eq(system_audit_log.source_ip, options.ip_address));
       }
       if (options.event_type) {
-        whereConditions.push(eq(securityAuditLog.event_type, options.event_type));
+        whereConditions.push(eq(system_audit_log.event_type, options.event_type));
       }
       if (options.start_date) {
-        whereConditions.push(gte(securityAuditLog.created_at, options.start_date));
+        whereConditions.push(gte(system_audit_log.created_at, options.start_date));
       }
       if (options.end_date) {
-        whereConditions.push(lte(securityAuditLog.created_at, options.end_date));
+        whereConditions.push(lte(system_audit_log.created_at, options.end_date));
       }
 
       // Apply where conditions if any exist

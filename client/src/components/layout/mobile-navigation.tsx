@@ -6,19 +6,9 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import {
-  Menu,
-  X,
-  Home,
-  FileText,
-  Search,
-  User,
-  Settings,
-  LogOut,
-  Bell,
-} from "lucide-react";
+import { BarChart3, X, Building, FileText, Search, User, Settings, ArrowLeft, Bell,  } from 'lucide-react';
 import { cn } from "../../lib/utils";
-import { logger } from "../../utils/browser-logger";
+import { logger } from '../../utils/browser-logger';
 import {
   MobileTouchHandler,
   MobileTouchUtils,
@@ -89,7 +79,7 @@ const NAVIGATION_ITEMS: LayoutNavigationItem[] = [
     id: "home",
     label: "Home",
     href: "/",
-    icon: <Home className="h-5 w-5" />,
+    icon: <Building className="h-5 w-5" />,
   },
   {
     id: "bills",
@@ -441,7 +431,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
         id: "home",
         label: "Home",
         href: "/",
-        icon: <Home className="h-5 w-5" />,
+        icon: <Building className="h-5 w-5" />,
       },
       {
         id: "bills",
@@ -474,7 +464,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
       <SwipeableHeader
         title="Navigation"
         leftAction={{
-          icon: <Menu className="h-6 w-6" />,
+          icon: <BarChart3 className="h-6 w-6" />,
           onClick: () => {
             /* Navigation controlled by parent */
           },
@@ -539,12 +529,12 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                     <User className="h-5 w-5 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{users.name}</p>
+                    <p className="font-medium text-sm truncate">{user.name}</p>
                     <p className="text-xs text-gray-500 truncate">
-                      {users.email}
+                      {user.email}
                     </p>
                     <Badge variant="outline" className="text-xs mt-1">
-                      {users.role}
+                      {user.role}
                     </Badge>
                   </div>
                 </div>
@@ -641,7 +631,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                   onClick={handleLogout}
                   className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
-                  <LogOut className="h-5 w-5 mr-3" />
+                  <ArrowLeft className="h-5 w-5 mr-3" />
                   Sign Out
                 </TouchButton>
               )}

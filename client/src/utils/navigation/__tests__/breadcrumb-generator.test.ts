@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import { generateBreadcrumbs, getPageTitle } from '../breadcrumb-generator';
-import { logger } from '@shared/core';
+import { logger } from '../../browser-logger';
 
 describe('breadcrumb-generator', () => {
   describe('generateBreadcrumbs', () => {

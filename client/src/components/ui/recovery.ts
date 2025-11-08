@@ -377,7 +377,7 @@ export function createRecoveryContext(
     timestamp: new Date(),
     retryCount,
     maxRetries,
-    user_agent: typeof navigator !== 'undefined' ? navigator.user_agent : undefined,
+    user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
     additionalData
   };
 }

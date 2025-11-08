@@ -7,7 +7,7 @@ import { authenticateToken, requireRole } from '../../middleware/auth.js';
 //import { billService } from '../bills/application/bill-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { ApiSuccess, ApiError, ApiForbidden } from '@shared/core/utils/api-utils';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../shared/core/src/index.js';
 
 // Security Services
 import { secureQueryBuilder } from '../../infrastructure/security/secure-query-builder.js';

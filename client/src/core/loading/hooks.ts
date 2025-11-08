@@ -246,7 +246,7 @@ export function useProgressiveLoading(stages: ProgressiveStage[]) {
 
   const nextStage = useCallback(() => {
     const nextIndex = currentStage + 1;
-    if (nextIndex < stages.length) {
+    if (nextIndex < stages.length && stages[nextIndex]) {
       setCurrentStage(nextIndex);
       updateOperation('progressive-loading', {
         message: stages[nextIndex].message,

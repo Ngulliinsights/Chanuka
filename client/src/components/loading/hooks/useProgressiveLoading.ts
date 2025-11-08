@@ -105,6 +105,8 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
   useEffect(() => {
     if (currentStageIndex >= 0 && currentStageIndex < stages.length) {
       const currentStage = stages[currentStageIndex];
+      if (!currentStage) return;
+      
       const stageTimeout = currentStage.duration || timeout;
 
       if (stageTimeout && timeoutManagerRef.current) {
@@ -134,8 +136,8 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     };
   }, [currentStageIndex, stages, timeout]);
 
-  const currentStage = currentStageIndex >= 0 && currentStageIndex < stages.length ? 
-    stages[currentStageIndex] : null;
+  const currentStage: LoadingStage | null = currentStageIndex >= 0 && currentStageIndex < stages.length ? 
+    (stages[currentStageIndex] || null) : null;
 
   const progress = progressTrackerRef.current ? 
     calculateStageProgress(stages, currentStageIndex, stageProgress) : 0;

@@ -4,7 +4,7 @@ import { GovernmentDataIntegrationService } from '../infrastructure/external-dat
 import { DataValidationService } from '../core/validation/data-validation-service.js';
 import { ManagedGovernmentDataIntegrationService } from '../services/managed-government-data-integration.js';
 import { ExternalAPIErrorHandler, FallbackStrategy } from '../services/external-api-error-handler.js';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../shared/core/src/index.js';
 
 // CLI tool for testing government data integration
 class GovernmentDataIntegrationCLI {
@@ -187,9 +187,9 @@ class GovernmentDataIntegrationCLI {
           title: 'Test Bill (Different Title)', // Conflict
           bill_number: 'C-1',
           status: 'committee', // Conflict
-          source: 'openparliament'
+          source: 'county-assemblies'
         },
-        source: 'openparliament'
+        source: 'county-assemblies'
       }
     ];
 

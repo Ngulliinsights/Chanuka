@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 
 interface WebSocketMessage { type: 'connected' | 'subscribed' | 'unsubscribed' | 'bill_update' | 'notification' | 'error' | 'pong';
   bill_id?: number;
@@ -540,6 +540,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     else if (autoConnect) {
       currentConnect();
     }
+    
+    return undefined;
   }, [token]); // CRITICAL FIX: Only depend on token to prevent circular dependencies
 
   return {

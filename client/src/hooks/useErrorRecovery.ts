@@ -154,7 +154,7 @@ export function useErrorRecovery(
     setRecoveryState(prev => ({
       ...prev,
       isRecovering: true,
-      currentStrategy: strategies[0].id,
+      currentStrategy: strategies[0]?.id || '',
       attempts: prev.attempts + 1,
     }));
 
@@ -321,6 +321,8 @@ export function useAutoRecovery(
 
       return () => clearTimeout(timeout);
     }
+    
+    return undefined;
   }, [operation?.error, options, recover, recoveryState.isRecovering, operationId]);
 
   return {

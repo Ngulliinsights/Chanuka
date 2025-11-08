@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { CheckCircle as CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { CheckCircle as CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '../../ui/alert';
 import { Button } from '../../ui/button';
@@ -30,7 +30,7 @@ export const AuthAlert: React.FC<AuthAlertProps> = ({
     switch (type) {
       case 'success':
         return {
-          icon: CheckCircle2,
+          icon: CheckCircle,
           className: 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300',
           iconClassName: 'text-green-600 dark:text-green-400',
         };

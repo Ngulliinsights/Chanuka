@@ -4,7 +4,7 @@ import { notifications, comments, bill_engagement } from '@shared/schema/citizen
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 export interface TestUser {
   id: string;

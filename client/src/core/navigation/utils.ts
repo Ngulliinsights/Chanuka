@@ -149,8 +149,8 @@ export function isNavigationPathActive(path: string, currentPath: string): boole
   if (currentPath.startsWith(path + '/')) return true;
   
   // Handle query parameters and fragments
-  const currentPathBase = currentPath.split('?')[0].split('#')[0];
-  const pathBase = path.split('?')[0].split('#')[0];
+  const currentPathBase = currentPath.split('?')[0]?.split('#')[0] || currentPath;
+  const pathBase = path.split('?')[0]?.split('#')[0] || path;
   
   return currentPathBase === pathBase || currentPathBase.startsWith(pathBase + '/');
 }
@@ -176,6 +176,8 @@ export function extractPageTitle(path: string): string {
   if (segments.length === 0) return 'Home';
   
   const lastSegment = segments[segments.length - 1];
+  if (!lastSegment) return 'Home';
+  
   return lastSegment
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))

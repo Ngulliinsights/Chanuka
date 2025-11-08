@@ -5,7 +5,7 @@
  * and improving transparency based on analysis results.
  */
 
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 import {
   ConflictAnalysis,
   FinancialConflict,

@@ -4,7 +4,7 @@ import { database as db } from '@shared/database';
 import { HealthCheckResponse } from '../../types/api.ts';
 import { ApiSuccess, ApiError, ApiResponseWrapper  } from '@shared/core/utils/api';
 import { errorTracker } from '../../core/errors/error-tracker.js';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 interface SchemaIssue {
   type: string;
   severity: 'critical' | 'warning';

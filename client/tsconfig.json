@@ -1,54 +1,52 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     // Language and Environment
     "target": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    
+
     // Module Resolution
     "module": "ES2022",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
-    
+
     // Type Checking
     "strict": true,
+    "exactOptionalPropertyTypes": false,
     "noImplicitAny": false,
     "skipLibCheck": true,
     "allowJs": true,
-    
+
     // Emit
     "noEmit": true,
+    "declaration": false,
     "isolatedModules": true,
-    
+    "composite": false,
+
     // Interop Constraints
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    
+
     // Project Structure
-    "rootDir": "..",
     "baseUrl": ".",
-    
+    "ignoreDeprecations": "5.0",
+
     // Path Mappings
     "paths": {
       "@/*": ["src/*"],
-      "@shared/*": ["../shared/*"],
-      "@shared/core": ["src/types/shims-shared.d.ts"],
-      "@shared/core/*": ["src/types/shims-shared.d.ts"],
-      "@shared/schema": ["src/types/shims-shared.d.ts"],
-      "@shared/schema/*": ["src/types/shims-shared.d.ts"]
+      "@chanuka/shared": ["../shared"],
+      "@chanuka/shared/*": ["../shared/*"]
     },
-    
+
     // Type Definitions
-    "types": ["vite/client", "vitest/globals"]
+    "types": ["vite/client", "vitest/globals", "node"]
   },
-  
-  "include": [
-    "src/**/*",
-    "src/types/shims-shared.d.ts"
-  ],
-  
+
+  "include": ["src/**/*", "src/types/shims-shared.d.ts"],
+
   "exclude": [
     "node_modules",
     "dist",

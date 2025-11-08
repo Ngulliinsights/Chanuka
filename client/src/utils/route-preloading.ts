@@ -1,5 +1,4 @@
 import { LazyExoticComponent, ComponentType } from 'react';
-import { logger } from './browser-logger';
 
 // Route preloading configuration
 export interface RoutePreloadConfig {
@@ -52,7 +51,7 @@ export const CRITICAL_ROUTES: RoutePreloadConfig[] = [
 export class RoutePreloader {
   private preloadedRoutes = new Set<string>();
   private preloadPromises = new Map<string, Promise<any>>();
-  private isIdle = false;
+  // idle state flag removed — we trigger idle preloads via the idle callback directly
   private idleCallback?: number;
 
   constructor() {
@@ -70,12 +69,10 @@ export class RoutePreloader {
     };
 
     const handleIdle = () => {
-      this.isIdle = true;
       this.preloadIdleRoutes();
     };
 
     const handleActive = () => {
-      this.isIdle = false;
       if (this.idleCallback) {
         if ('cancelIdleCallback' in window) {
           cancelIdleCallback(this.idleCallback);
@@ -113,7 +110,7 @@ export class RoutePreloader {
       return this.preloadPromises.get(routePath);
     }
 
-    const preloadPromise = this.performPreload(component, routePath);
+  const preloadPromise = this.performPreload(component);
     this.preloadPromises.set(routePath, preloadPromise);
 
     try {
@@ -126,8 +123,7 @@ export class RoutePreloader {
   }
 
   private async performPreload(
-    component: LazyExoticComponent<ComponentType<any>>,
-    routePath: string
+    component: LazyExoticComponent<ComponentType<any>>
   ): Promise<void> {
     // Access the internal _payload to trigger preloading
     const payload = (component as any)._payload;
@@ -268,7 +264,7 @@ export class ConnectionAwarePreloader extends RoutePreloader {
   }
 
   // Override preload to consider connection
-  async preloadComponent(
+  override async preloadComponent(
     component: LazyExoticComponent<ComponentType<any>>,
     routePath: string
   ): Promise<void> {

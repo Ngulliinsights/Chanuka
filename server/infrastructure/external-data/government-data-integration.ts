@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { database as db } from '@shared/database';
 import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@shared/schema';
 import { eq, and, or } from 'drizzle-orm';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 // Data source configuration
 interface DataSourceConfig {
@@ -99,30 +99,30 @@ export class GovernmentDataIntegrationService {
   }
 
   private initializeDataSources(): void {
-    // Canadian Parliament API (example)
-    this.dataSources.set('parliament-ca', {
-      name: 'Parliament of Canada',
-      baseUrl: 'https://www.ourcommons.ca/members/en/search/xml',
+    // Parliament of Kenya API
+    this.dataSources.set('parliament-ke', {
+      name: 'Parliament of Kenya',
+      baseUrl: 'https://www.parliament.go.ke/api/bills',
       rateLimit: { requestsPerMinute: 60, requestsPerHour: 1000 },
       timeout: 30000,
       retryAttempts: 3,
       priority: 10
     });
 
-    // Provincial legislature APIs (example for Ontario)
-    this.dataSources.set('ontario-legislature', {
-      name: 'Ontario Legislature',
-      baseUrl: 'https://www.ola.org/en/legislative-business/bills',
+    // Senate of Kenya API
+    this.dataSources.set('senate-ke', {
+      name: 'Senate of Kenya',
+      baseUrl: 'https://www.parliament.go.ke/senate/api/bills',
       rateLimit: { requestsPerMinute: 30, requestsPerHour: 500 },
       timeout: 30000,
       retryAttempts: 3,
       priority: 8
     });
 
-    // OpenParliament.ca API
-    this.dataSources.set('openparliament', {
-      name: 'OpenParliament.ca',
-      baseUrl: 'https://openparliament.ca/api',
+    // County Assemblies API
+    this.dataSources.set('county-assemblies', {
+      name: 'County Assemblies',
+      baseUrl: 'https://cog.go.ke/api/assemblies',
       rateLimit: { requestsPerMinute: 100, requestsPerHour: 2000 },
       timeout: 30000,
       retryAttempts: 3,

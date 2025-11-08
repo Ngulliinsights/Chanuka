@@ -6,7 +6,7 @@ import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '@shared/core/utils/
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from "../../middleware/rate-limiter.js";
 import { z } from "zod";
 import { errorTracker } from '../errors/error-tracker.js';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 
 export const router = Router();
@@ -184,7 +184,7 @@ router.post("/refresh", async (req: Request, res: Response) => {
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
 
-    const result = await authService.refresh_token(refresh_token);
+    const result = await authService.refreshToken(refresh_token);
 
     if (!result.success) {
       return ApiUnauthorized(res, result.error || "Token refresh failed",

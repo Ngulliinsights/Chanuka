@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 import { apiService, ApiResponse, ApiError } from './apiService';
 
 /**
@@ -94,6 +94,9 @@ class AnalysisService {
         status: errStatus
       });
 
+      if (!response.data) {
+        throw new Error('No analysis data available');
+      }
       return response.data; // This is the mock data
     }
   }
@@ -176,7 +179,7 @@ class AnalysisService {
         potentialConflict: false
       }
     ];
-    return bill_id % 2 === 0 ? connections : [connections[0]];
+    return bill_id % 2 === 0 ? connections : connections.slice(0, 1).filter(Boolean);
   }
 
   /**
@@ -262,11 +265,14 @@ class AnalysisService {
     const results = new Map<number, BillAnalysis>();
     
     analyses.forEach((result, index) => {
+      const billId = bill_ids[index];
+      if (!billId) return;
+      
       if (result.status === 'fulfilled') {
-        results.set(bill_ids[index], result.value);
+        results.set(billId, result.value);
       } else {
         // Log failed analyses but continue processing others
-        logger.error(`Failed to analyze bill ${bill_ids[index]} in batch`, {
+        logger.error(`Failed to analyze bill ${billId} in batch`, {
           component: 'AnalysisService',
           error: result.reason
         });

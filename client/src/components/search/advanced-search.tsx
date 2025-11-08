@@ -252,7 +252,7 @@ const AdvancedSearch = ({ onSearch, isLoading = false }: AdvancedSearchProps) =>
                     <CalendarComponent
                       mode="single"
                       selected={filters.dateFrom}
-                      onSelect={(date) => setFilters(prev => ({ ...prev, dateFrom: date }))}
+                      onSelect={(date) => setFilters(prev => ({ ...prev, dateFrom: Array.isArray(date) ? date[0] : date }))}
                       initialFocus
                     />
                   </PopoverContent>
@@ -272,7 +272,7 @@ const AdvancedSearch = ({ onSearch, isLoading = false }: AdvancedSearchProps) =>
                     <CalendarComponent
                       mode="single"
                       selected={filters.dateTo}
-                      onSelect={(date) => setFilters(prev => ({ ...prev, dateTo: date }))}
+                      onSelect={(date) => setFilters(prev => ({ ...prev, dateTo: Array.isArray(date) ? date[0] : date }))}
                       initialFocus
                     />
                   </PopoverContent>

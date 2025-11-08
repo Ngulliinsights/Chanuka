@@ -95,7 +95,7 @@ async function testCachingSystem() {
   
   // Test 10: Factory operations
   console.log('📝 Test 10: Factory operations...');
-  const cache2 = factory.createCache('test-cache-2', { provider: 'memory' });
+  factory.createCache('test-cache-2', { provider: 'memory' });
   const cacheNames = factory.getCacheNames();
   const factoryPass = cacheNames.includes('test-cache') && cacheNames.includes('test-cache-2');
   console.log(`✅ Factory: ${factoryPass ? 'PASS' : 'FAIL'}`);

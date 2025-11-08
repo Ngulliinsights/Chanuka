@@ -5,7 +5,7 @@ import { commentService } from "./comment.js";
 import { commentVotingService } from "./comment-voting.js";
 import { contentModerationService } from "../admin/content-moderation.js";
 import { authenticateToken as requireAuth } from "../../middleware/auth.js";
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 export const router = Router();
 

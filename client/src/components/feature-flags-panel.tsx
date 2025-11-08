@@ -3,7 +3,6 @@ import { FeatureFlag } from "@shared/schema";
 import { Settings } from "lucide-react";
 import { apiRequest } from '../lib/queryClient';
 import { useToast } from '../hooks/use-toast';
-import { logger } from '../utils/browser-logger';
 
 interface FeatureFlagsPanelProps {
   projectId: number;
@@ -40,7 +39,7 @@ export default function FeatureFlagsPanel({ projectId }: FeatureFlagsPanelProps)
 
   const handleToggle = (flag: FeatureFlag) => {
     updateFeatureFlagMutation.mutate({
-      id: flag.id,
+      id: flag.key,
       data: { enabled: !flag.enabled }
     });
   };
@@ -60,7 +59,7 @@ export default function FeatureFlagsPanel({ projectId }: FeatureFlagsPanelProps)
     );
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = () => {
     // Since status property doesn't exist, always return emerald for active
     return "emerald";
   };
@@ -69,7 +68,7 @@ export default function FeatureFlagsPanel({ projectId }: FeatureFlagsPanelProps)
     <section className="bg-background rounded-lg border border-border p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Feature Flags Management</h2>
-        <button className="flex items-center space-x-2 border border-border px-4 py-2 rounded-lg hover:bg-accent transition-colors">
+        <button type="button" className="flex items-center space-x-2 border border-border px-4 py-2 rounded-lg hover:bg-accent transition-colors">
           <Settings className="w-4 h-4" />
           <span>Configure</span>
         </button>
@@ -77,13 +76,13 @@ export default function FeatureFlagsPanel({ projectId }: FeatureFlagsPanelProps)
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {featureFlags?.map((flag) => {
-           const statusColor = getStatusColor('active'); // Default to active since status property doesn't exist
+           const statusColor = getStatusColor(); // Default to active since status property doesn't exist
 
            return (
-             <div key={flag.id} className="border border-border rounded-lg p-4">
+             <div key={flag.key} className="border border-border rounded-lg p-4">
                <div className="flex items-center justify-between mb-3">
                  <div className="flex items-center space-x-3">
-                   <h3 className="font-medium">{flag.name}</h3>
+                   <h3 className="font-medium">{flag.key}</h3>
                    <div className="flex items-center space-x-1">
                      <div className={`w-2 h-2 bg-${statusColor}-500 rounded-full`}></div>
                      <span className={`text-xs text-${statusColor}-600 capitalize`}>active</span>
@@ -96,11 +95,12 @@ export default function FeatureFlagsPanel({ projectId }: FeatureFlagsPanelProps)
                     onChange={() => handleToggle(flag)}
                     className="sr-only peer"
                     disabled={updateFeatureFlagMutation.isPending}
+                    aria-label={`Toggle ${flag.key} feature flag`}
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">{flag.description}</p>
+              <p className="text-sm text-muted-foreground mb-3">Feature flag: {flag.key}</p>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Feature flag</span>
                 <span>Permanent feature</span>

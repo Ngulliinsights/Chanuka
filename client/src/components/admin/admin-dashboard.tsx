@@ -1,15 +1,5 @@
 import { useState } from 'react';
-import { 
-  Users, 
-  FileText, 
-  MessageSquare as MessageCircle, 
-  TrendingUp, 
-  Shield, 
-  Settings, 
-  Database, 
-  Activity,
-  Monitor
-} from 'lucide-react';
+import { Users, FileText, MessageSquare as MessageCircle, TrendingUp, Shield, Settings, Database, Activity, Monitor } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';

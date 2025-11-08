@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import path from 'path';
 import { AnalysisResult } from '../analysis/types/index.js';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../shared/core/src/index.js';
 
 // Configuration interface for better extensibility
 interface AnalysisConfig {

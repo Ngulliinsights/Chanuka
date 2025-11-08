@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 
 export interface ConnectionQuality {
   type: 'offline' | 'slow' | 'fast' | 'unknown';
@@ -165,6 +165,8 @@ export function useOfflineDetection(): OfflineDetectionState & {
         return () => connection.removeEventListener('change', handleConnectionChange);
       }
     }
+    
+    return undefined;
   }, [updateConnectionQuality]);
 
   // Auto-check connection when coming back online

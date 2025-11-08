@@ -1,12 +1,12 @@
 import { Request } from 'express';
-import { database as db } from '@shared/database';
+import { database as db } from '../../../shared/database';
 import { securityAuditService, SecurityEvent } from './security-audit-service.js';
 import { SecurityIncident } from './security-monitoring-service.js';
 import { getEmailService } from '../../infrastructure/notifications/email-service.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';
-import { logger  } from '@shared/core/index.js';
-import { system_audit_log } from '@shared/schema';
+import { logger   } from '../../../shared/core/src/index.js';
+import { system_audit_log } from '../../../shared/schema';
 
 // Threat intelligence table
 const threatIntelligence = pgTable("threat_intelligence", {
@@ -150,7 +150,7 @@ export class IntrusionDetectionService {
         evidence: { source: threatIntelResult.source },
         confidence: 95
       });
-      riskScore += threatIntelResult.severity === 'critical' ? 50 : 30;
+      risk_score += threatIntelResult.severity === 'critical' ? 50 : 30;
     }
 
     // 2. Rate limiting analysis
@@ -163,13 +163,13 @@ export class IntrusionDetectionService {
         evidence: { requestCount: rateLimitResult.requestCount },
         confidence: 90
       });
-      riskScore += 25;
+      risk_score += 25;
     }
 
     // 3. Pattern-based attack detection
     const patternResults = this.detectAttackPatterns(url, body, user_agent);
     detectedThreats.push(...patternResults);
-    riskScore += patternResults.reduce((sum, threat) => {
+    risk_score += patternResults.reduce((sum, threat) => {
       return sum + (threat.severity === 'critical' ? 40 : threat.severity === 'high' ? 25 : 15);
     }, 0);
 
@@ -190,7 +190,7 @@ export class IntrusionDetectionService {
         evidence: geoTemporal.evidence,
         confidence: geoTemporal.confidence
       });
-      riskScore += 20;
+      risk_score += 20;
     }
 
     // Determine threat level and recommended action
@@ -370,10 +370,10 @@ export class IntrusionDetectionService {
       const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const userEvents = await db
         .select()
-        .from(securityAuditLog)
+        .from(system_audit_log)
         .where(
           and(
-            eq(system_audit_log.user_id, user_id),
+            eq(system_audit_log.actor_id, user_id),
             gte(system_audit_log.created_at, oneWeekAgo)
           )
         )

@@ -3,8 +3,8 @@
 // ============================================================================
 // Comprehensive performance monitoring, optimization, and alerting
 
-import { logger } from '../../shared/core/index.js';
-import { cache } from '../../shared/core/index.js';
+import { logger } from '../../../shared/core/src/index.js';
+import { cache } from '../../../shared/core/src/index.js';
 
 export interface PerformanceMetric {
   id: string;
@@ -608,7 +608,7 @@ export class PerformanceMonitor {
         value: metric.value,
         threshold: metric.threshold.critical,
         unit: metric.unit,
-        tags: metric.tags
+        tags: Object.entries(metric.tags).map(([key, value]) => `${key}:${value}`)
       });
     } else if (metric.value >= metric.threshold.warning) {
       logger.warn('Performance warning threshold exceeded', {
@@ -616,7 +616,7 @@ export class PerformanceMonitor {
         value: metric.value,
         threshold: metric.threshold.warning,
         unit: metric.unit,
-        tags: metric.tags
+        tags: Object.entries(metric.tags).map(([key, value]) => `${key}:${value}`)
       });
     }
   }

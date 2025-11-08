@@ -37,7 +37,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
 
   // Memoize filtered bills to prevent unnecessary recalculations on every render
   const filteredBills = useMemo(() => 
-    bills.filter(bill => bills.status.toLowerCase() === filter.toLowerCase()),
+    bills.filter(bill => bill.status.toLowerCase() === filter.toLowerCase()),
     [bills, filter]
   );
 
@@ -180,36 +180,36 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
             {view === 'card' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {paginatedBills.map(bill => (
-                  <BillCard key={bills.id} bill={bill} />
+                  <BillCard key={bill.id} bill={bill} />
                 ))}
               </div>
             ) : (
               <div className="space-y-4">
                 {paginatedBills.map(bill => (
-                  <Link key={bills.id} href={`/bills/${bills.id}`}>
+                  <Link key={bill.id} href={`/bills/${bill.id}`}>
                     <Card className="hover:shadow-md transition-shadow cursor-pointer group">
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
-                          <Badge className={`${getStatusStyle(bills.status)} capitalize`}>
-                            {bills.status}
+                          <Badge className={`${getStatusStyle(bill.status)} capitalize`}>
+                            {bill.status}
                           </Badge>
                           <div className="text-sm text-muted-foreground">
-                            {new Date(bills.introduced_date).toLocaleDateString()}
+                            {new Date(bill.introduced_date).toLocaleDateString()}
                           </div>
                         </div>
                         <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">
-                          {bills.title}
+                          {bill.title}
                         </CardTitle>
                         <CardDescription className="line-clamp-2">
-                          {bills.description}
+                          {bill.description}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="pb-4">
                         <div className="text-sm">
-                          <span className="font-medium">Sponsor:</span> {bills.sponsor}
-                          {bills.cosponsors > 0 && (
+                          <span className="font-medium">Sponsor:</span> {bill.sponsor}
+                          {bill.cosponsors > 0 && (
                             <span className="ml-1 text-muted-foreground">
-                              +{formatCount(bills.cosponsors, 'cosponsor')}
+                              +{formatCount(bill.cosponsors, 'cosponsor')}
                             </span>
                           )}
                         </div>
@@ -218,25 +218,25 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
                         <div className="flex gap-4">
                           <div className="flex items-center">
                             <span className="mr-1">🔍</span>
-                            <span>{formatCount(bills.views, 'view')}</span>
+                            <span>{formatCount(bill.views, 'view')}</span>
                           </div>
                           <div className="flex items-center">
                             <span className="mr-1">📊</span>
-                            <span>{formatCount(bills.analyses, 'analysis', 'analyses')}</span>
+                            <span>{formatCount(bill.analyses, 'analysis', 'analyses')}</span>
                           </div>
                           <div className="flex items-center">
                             <span className="mr-1">👍</span>
-                            <span>{formatCount(bills.endorsements, 'endorsement')}</span>
+                            <span>{formatCount(bill.endorsements, 'endorsement')}</span>
                           </div>
                         </div>
                         <div className="flex items-center">
                           <span 
                             className={`mr-2 inline-block w-2 h-2 rounded-full ${
-                              bills.supportPercentage > 50 ? 'bg-green-500' : 'bg-amber-500'
+                              bill.supportPercentage > 50 ? 'bg-green-500' : 'bg-amber-500'
                             }`}
-                            aria-label={`${bills.supportPercentage}% support`}
+                            aria-label={`${bill.supportPercentage}% support`}
                           ></span>
-                          <span className="font-medium">{bills.supportPercentage}% support</span>
+                          <span className="font-medium">{bill.supportPercentage}% support</span>
                         </div>
                       </CardFooter>
                     </Card>

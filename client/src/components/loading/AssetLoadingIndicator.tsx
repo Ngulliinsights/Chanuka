@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Wifi, WifiOff, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAssetLoading, LoadingProgress } from '../../utils/asset-loading';
 import { logger } from '../../utils/browser-logger';
@@ -111,6 +111,8 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
       }, 2000);
       return () => clearTimeout(timer);
     }
+    
+    return undefined;
   }, [validatedProgress.phase]);
 
   // Don't render if not visible or no loading activity
@@ -143,12 +145,12 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
 
   const getConnectionIcon = () => {
     if (!stats.isOnline) {
-      return <WifiOff className="h-4 w-4 text-red-500" />;
+      return <Network className="h-4 w-4 text-red-500" />;
     }
     if (stats.connectionType === 'slow') {
-      return <Wifi className="h-4 w-4 text-yellow-500" />;
+      return <Network className="h-4 w-4 text-yellow-500" />;
     }
-    return <Wifi className="h-4 w-4 text-green-500" />;
+    return <Network className="h-4 w-4 text-green-500" />;
   };
 
   if (minimal) {

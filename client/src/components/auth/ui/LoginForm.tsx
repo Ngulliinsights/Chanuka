@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LoginFormProps } from '../types';
 import { useLoginForm } from '../hooks/useAuthForm';
@@ -115,7 +115,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         error={errors.password}
         disabled={currentLoading}
         required
-        icon={Lock}
+        icon={Eye}
         showPasswordToggle
         className="w-full"
       />

@@ -1,4 +1,4 @@
-import { NotificationType } from '@shared/schema';
+import { NotificationType } from '../../../../../shared/schema';
 
 export class Notification {
   private constructor(

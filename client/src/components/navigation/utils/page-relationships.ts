@@ -179,8 +179,10 @@ export const generateBreadcrumbRelationships = (
     // Build breadcrumb path
     let currentPathBuilder = '';
     for (let i = 0; i < pathSegments.length; i++) {
-      currentPathBuilder += `/${pathSegments[i]}`;
       const segment = pathSegments[i];
+      if (!segment) continue;
+      
+      currentPathBuilder += `/${segment}`;
 
       // Skip if this is a parameter
       if (segment.startsWith(':') || /^\d+$/.test(segment)) {

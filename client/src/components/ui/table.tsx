@@ -20,7 +20,7 @@ const Table = forwardRef<
     />
   </div>
 ))
-Table.display_name = "Table"
+Table.displayName = "Table"
 
 const TableHeader = forwardRef<
   HTMLTableSectionElement,
@@ -28,7 +28,7 @@ const TableHeader = forwardRef<
 >(({ className, ...props }, ref) => (
   <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
 ))
-TableHeader.display_name = "TableHeader"
+TableHeader.displayName = "TableHeader"
 
 const TableBody = forwardRef<
   HTMLTableSectionElement,
@@ -40,7 +40,7 @@ const TableBody = forwardRef<
     {...props}
   />
 ))
-TableBody.display_name = "TableBody"
+TableBody.displayName = "TableBody"
 
 const TableFooter = forwardRef<
   HTMLTableSectionElement,
@@ -55,7 +55,7 @@ const TableFooter = forwardRef<
     {...props}
   />
 ))
-TableFooter.display_name = "TableFooter"
+TableFooter.displayName = "TableFooter"
 
 const TableRow = forwardRef<
   HTMLTableRowElement,
@@ -70,7 +70,7 @@ const TableRow = forwardRef<
     {...props}
   />
 ))
-TableRow.display_name = "TableRow"
+TableRow.displayName = "TableRow"
 
 const TableHead = forwardRef<
   HTMLTableCellElement,
@@ -85,7 +85,7 @@ const TableHead = forwardRef<
     {...props}
   />
 ))
-TableHead.display_name = "TableHead"
+TableHead.displayName = "TableHead"
 
 const TableCell = forwardRef<
   HTMLTableCellElement,
@@ -97,7 +97,7 @@ const TableCell = forwardRef<
     {...props}
   />
 ))
-TableCell.display_name = "TableCell"
+TableCell.displayName = "TableCell"
 
 const TableCaption = forwardRef<
   HTMLTableCaptionElement,
@@ -109,7 +109,7 @@ const TableCaption = forwardRef<
     {...props}
   />
 ))
-TableCaption.display_name = "TableCaption"
+TableCaption.displayName = "TableCaption"
 
 // Enhanced table with data validation
 interface EnhancedTableProps extends HTMLAttributes<HTMLTableElement>, TableValidationProps {
@@ -193,7 +193,7 @@ const EnhancedTable = forwardRef<HTMLTableElement, EnhancedTableProps>(
     const hasErrors = validationErrors.length > 0;
     const errorsByRow = validationErrors.reduce((acc, error) => {
       if (!acc[error.row]) acc[error.row] = [];
-      acc[error.row].push(error);
+      acc[error.row]?.push(error);
       return acc;
     }, {} as Record<number, ValidationError[]>);
 
@@ -263,7 +263,7 @@ const EnhancedTable = forwardRef<HTMLTableElement, EnhancedTableProps>(
     );
   }
 );
-EnhancedTable.display_name = "EnhancedTable";
+EnhancedTable.displayName = "EnhancedTable";
 
 // Enhanced table row with error highlighting
 const EnhancedTableRow = forwardRef<
@@ -288,7 +288,7 @@ const EnhancedTableRow = forwardRef<
     />
   );
 });
-EnhancedTableRow.display_name = "EnhancedTableRow";
+EnhancedTableRow.displayName = "EnhancedTableRow";
 
 // Enhanced table cell with error highlighting
 const EnhancedTableCell = forwardRef<
@@ -321,7 +321,7 @@ const EnhancedTableCell = forwardRef<
     </td>
   );
 });
-EnhancedTableCell.display_name = "EnhancedTableCell";
+EnhancedTableCell.displayName = "EnhancedTableCell";
 
 export {
   Table,

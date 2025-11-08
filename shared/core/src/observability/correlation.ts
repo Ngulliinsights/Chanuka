@@ -64,7 +64,7 @@ export function extractCorrelationFromHeaders(headers: Record<string, string | s
 
     const session_id = getHeaderValue(headers, SESSION_HEADER);
     if (session_id) {
-      context.session_id = sessionId;
+      context.session_id = session_id;
     }
 
     return context;

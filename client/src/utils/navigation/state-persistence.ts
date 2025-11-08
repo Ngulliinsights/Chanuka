@@ -1,5 +1,5 @@
 import { NavigationState, NavigationPreferences, RecentPage } from '../../types/navigation';
-import { logger } from '@shared/core';
+import { logger } from '../client-core';
 
 // Keys for localStorage
 const STORAGE_KEYS = {
@@ -44,7 +44,7 @@ export class NavigationStatePersistence {
       
       // Validate version compatibility
       if (parsed.version !== this.VERSION) {
-        console.warn('Navigation state version mismatch, clearing stored state');
+        logger.warn('Navigation state version mismatch, clearing stored state', { component: 'NavigationStatePersistence' });
         this.clearNavigationState();
         return null;
       }
@@ -62,7 +62,7 @@ export class NavigationStatePersistence {
 
       return safeState;
     } catch (error) {
-      console.warn('Failed to load navigation state:', error);
+      logger.warn('Failed to load navigation state', { component: 'NavigationStatePersistence' }, { error });
       this.clearNavigationState();
       return null;
     }
@@ -94,7 +94,7 @@ export class NavigationStatePersistence {
           JSON.stringify(stateToSave)
         );
       } catch (error) {
-        console.warn('Failed to save navigation state:', error);
+        logger.warn('Failed to save navigation state', { component: 'NavigationStatePersistence' }, { error });
       }
     }, this.DEBOUNCE_DELAY);
   }
@@ -113,7 +113,7 @@ export class NavigationStatePersistence {
       const parsed: PersistedSidebarState = JSON.parse(stored);
       return typeof parsed.collapsed === 'boolean' ? parsed.collapsed : null;
     } catch (error) {
-      console.warn('Failed to load sidebar state:', error);
+      logger.warn('Failed to load sidebar state', { component: 'NavigationStatePersistence' }, { error });
       this.clearSidebarState();
       return null; // On error, let context decide default
     }
@@ -136,7 +136,7 @@ export class NavigationStatePersistence {
         JSON.stringify(stateToSave)
       );
     } catch (error) {
-      console.warn('Failed to save sidebar state:', error);
+      logger.warn('Failed to save sidebar state', { component: 'NavigationStatePersistence' }, { error });
     }
   }
 
@@ -149,7 +149,7 @@ export class NavigationStatePersistence {
     try {
       localStorage.removeItem(STORAGE_KEYS.SIDEBAR_STATE);
     } catch (error) {
-      console.warn('Failed to clear sidebar state:', error);
+      logger.warn('Failed to clear sidebar state', { component: 'NavigationStatePersistence' }, { error });
     }
   }
 
@@ -164,7 +164,7 @@ export class NavigationStatePersistence {
       localStorage.removeItem(STORAGE_KEYS.SIDEBAR_STATE);
       localStorage.removeItem(STORAGE_KEYS.USER_PREFERENCES);
     } catch (error) {
-      console.warn('Failed to clear navigation state:', error);
+      logger.warn('Failed to clear navigation state', { component: 'NavigationStatePersistence' }, { error });
     }
   }
 
@@ -199,7 +199,7 @@ export class NavigationStatePersistence {
         );
       }
     } catch (error) {
-      console.warn('Failed to clear user-specific state:', error);
+      logger.warn('Failed to clear user-specific state', { component: 'NavigationStatePersistence' }, { error });
     }
   }
 

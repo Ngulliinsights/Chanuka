@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { defaultApiConfig } from '../config/api.js';
-import { logger } from '@shared/core';
+import { logger } from '../utils/browser-logger';
 
 export interface BillUpdate { type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
   data: {

@@ -3,7 +3,7 @@
 // ============================================================================
 // Client for integrating with external legal databases and services
 
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../../shared/core/src/index.js';
 
 export interface ExternalLegalCase {
   caseId: string;

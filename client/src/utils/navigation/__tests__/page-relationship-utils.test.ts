@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import { PageRelationshipUtils } from '../page-relationship-utils';
-import { logger } from '@shared/core';
+import { logger } from '../../browser-logger';
 
 describe('PageRelationshipUtils', () => {
   beforeEach(() => {

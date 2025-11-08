@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApiConnection } from '../hooks/useApiConnection.js';
-import { AlertCircle, CheckCircle, Wifi, WifiOff, RefreshCw, Settings } from 'lucide-react';
+import { AlertCircle, CheckCircle, Network, RefreshCw, Settings } from 'lucide-react';
 import { logger } from '../utils/browser-logger';
 
 interface ConnectionStatusProps {
@@ -44,7 +44,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
     }
     
     if (!navigator.onLine) {
-      return <WifiOff className="w-4 h-4 text-red-500" />;
+      return <Network className="w-4 h-4 text-red-500" />;
     }
     
     if (isConnected && isHealthy) {
@@ -52,7 +52,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
     }
     
     if (isConnected) {
-      return <Wifi className="w-4 h-4 text-yellow-500" />;
+      return <Network className="w-4 h-4 text-yellow-500" />;
     }
     
     return <AlertCircle className="w-4 h-4 text-red-500" />;

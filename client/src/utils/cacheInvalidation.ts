@@ -3,7 +3,7 @@
  * Provides comprehensive cache management and update mechanisms for offline-first applications
  */
 
-import { logger } from '@shared/core';
+import { logger } from './client-core';
 import { offlineDataManager } from './offlineDataManager';
 
 export interface CacheInvalidationConfig {
@@ -271,13 +271,16 @@ class CacheInvalidationManager {
       .map(([key, entry]) => ({
         key,
         entry,
-        lastAccess: this.accessLog.get(key)?.slice(-1)[0] || 0,
+    lastAccess: this.accessLog.get(key)?.slice(-1)?.[0] || 0,
       }))
       .sort((a, b) => a.lastAccess - b.lastAccess);
 
     const toEvict = Math.ceil(this.config.maxEntries * 0.1); // Evict 10%
     for (let i = 0; i < toEvict && i < entries.length; i++) {
-      await this.invalidate(entries[i].key);
+      const entry = entries[i];
+      if (entry) {
+        await this.invalidate(entry.key);
+      }
     }
   }
 

@@ -24,15 +24,15 @@ export { default as ProjectOverview } from './project-overview';
 export { default as SystemHealth } from './system-health';
 
 // Analytics Components
-export { default as EngagementDashboard } from './analytics/engagement-dashboard';
-export { default as JourneyAnalyticsDashboard } from './analytics/JourneyAnalyticsDashboard';
+export { EngagementDashboard } from './analytics/engagement-dashboard';
+export { JourneyAnalyticsDashboard } from './analytics/JourneyAnalyticsDashboard';
 
 // Bills Components
-export { default as BillCard } from './bills/bill-card';
-export { default as BillList } from './bills/bill-list';
+export { BillCard } from './bills/bill-card';
+export { BillList } from './bills/bill-list';
 export { default as BillTracking } from './bills/bill-tracking';
-export { default as ImplementationWorkarounds } from './bills/implementation-workarounds';
+export { ImplementationWorkarounds } from './bills/implementation-workarounds';
 
 // Notifications Components
 export { default as NotificationCenter } from './notifications/notification-center';
-export { default as NotificationPreferences } from './notifications/notification-preferences';
+export { NotificationPreferences } from './notifications/notification-preferences';

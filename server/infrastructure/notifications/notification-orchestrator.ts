@@ -4,7 +4,7 @@ import { eq, and } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
 import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 
 /**
  * Unified Notification Orchestrator Service

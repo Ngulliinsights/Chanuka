@@ -1,0 +1,17 @@
+{
+  "name": "@chanuka/shared",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./schema": "./schema/index.ts",
+    "./database": "./database/index.ts",
+    "./utils": "./utils/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'Shared build skipped - using TypeScript directly'",
+    "type-check": "tsc --noEmit --project tsconfig.json"
+  }
+}

@@ -22,7 +22,7 @@ const Input = forwardRef<HTMLInputElement, ComponentProps<"input">>(
     )
   }
 )
-Input.display_name = "Input"
+Input.displayName = "Input"
 
 const EnhancedInput = forwardRef<HTMLInputElement, EnhancedInputProps>(
   ({ 
@@ -256,7 +256,7 @@ const EnhancedInput = forwardRef<HTMLInputElement, EnhancedInputProps>(
     );
   }
 );
-EnhancedInput.display_name = "EnhancedInput";
+EnhancedInput.displayName = "EnhancedInput";
 
 export { Input, EnhancedInput };
 

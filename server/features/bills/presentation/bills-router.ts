@@ -13,7 +13,7 @@ const logger = {
   }
 };
 import { securityAuditService } from '../../security/security-audit-service.js';
-import type { Bill, BillComment } from '@/shared/schema';
+import type { Bill, BillComment } from '@shared/schema';
 
 const router = Router();
 

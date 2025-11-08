@@ -3,8 +3,8 @@
  * Comprehensive offline status modal with detailed information and actions
  */
 
-import React, { useState, useEffect } from 'react';
-import { logger } from '@shared/core';
+import { useState, useEffect } from 'react';
+import { logger } from '../utils/client-core';
 import { useOnlineStatus } from '../hooks/use-online-status';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 import { offlineDataManager } from '../utils/offlineDataManager';

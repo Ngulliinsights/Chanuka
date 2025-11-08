@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArchitectureComponent } from "@shared/schema";
-import { ExternalLink, Puzzle } from "lucide-react";
-import { logger } from '../utils/browser-logger';
+import { ArrowLeft, Layers } from 'lucide-react';
+
 
 interface ArchitecturePlanningProps {
   projectId: number;
@@ -94,8 +94,12 @@ export default function ArchitecturePlanning({ projectId }: ArchitecturePlanning
                   </div>
                   <div className="flex items-center space-x-2">
                     {getStatusBadge(component.status || 'planned')}
-                    <button className="p-1 hover:bg-accent rounded">
-                      <ExternalLink className="w-3 h-3" />
+                    <button 
+                      className="p-1 hover:bg-accent rounded"
+                      aria-label={`Move ${component.name} component`}
+                      title={`Move ${component.name} component`}
+                    >
+                      <ArrowLeft className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
@@ -110,7 +114,7 @@ export default function ArchitecturePlanning({ projectId }: ArchitecturePlanning
           <div className="space-y-3">
             <div className="p-4 border border-dashed border-border rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <Puzzle className="w-4 h-4 text-blue-600" />
+                <Layers className="w-4 h-4 text-blue-600" />
                 <h4 className="font-medium text-sm">Analytics Plugin Interface</h4>
               </div>
               <p className="text-xs text-muted-foreground mb-2">Standardized API for analytics providers (Google Analytics, Mixpanel, Custom)</p>
@@ -122,7 +126,7 @@ export default function ArchitecturePlanning({ projectId }: ArchitecturePlanning
 
             <div className="p-4 border border-dashed border-border rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <Puzzle className="w-4 h-4 text-purple-600" />
+                <Layers className="w-4 h-4 text-purple-600" />
                 <h4 className="font-medium text-sm">AI Provider Interface</h4>
               </div>
               <p className="text-xs text-muted-foreground mb-2">Abstracted AI service layer (OpenAI, Anthropic, Local models)</p>
@@ -134,7 +138,7 @@ export default function ArchitecturePlanning({ projectId }: ArchitecturePlanning
 
             <div className="p-4 border border-dashed border-border rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <Puzzle className="w-4 h-4 text-emerald-600" />
+                <Layers className="w-4 h-4 text-emerald-600" />
                 <h4 className="font-medium text-sm">Notification System</h4>
               </div>
               <p className="text-xs text-muted-foreground mb-2">Multi-channel notification delivery (Email, SMS, Push, In-app)</p>

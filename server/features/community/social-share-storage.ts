@@ -5,9 +5,9 @@ import {
   bills,
   type SocialShare, 
   type InsertSocialShare
-} from '@/shared/schema';
+} from '@shared/schema';
 import { eq, desc, sql } from 'drizzle-orm';
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../../shared/core/src/index.js';
 import { BaseStorage } from '../../infrastructure/database/base/BaseStorage.js';
 
 const CACHE_TTL = 3600; // 1 hour in seconds

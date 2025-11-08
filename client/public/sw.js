@@ -1,4 +1,17 @@
 // Simple Service Worker for Chanuka Platform
+// Lightweight logger shim for service worker scope to avoid ReferenceError
+const logger = {
+  info: (...args) => {
+    if (typeof self !== 'undefined' && self.registration) {
+      // Workers don't have console grouping in all environments; use console.log
+      try { console.info('[SW]', ...args); } catch (e) {}
+    } else {
+      try { console.info('[SW]', ...args); } catch (e) {}
+    }
+  },
+  warn: (...args) => { try { console.warn('[SW]', ...args); } catch (e) {} },
+  error: (...args) => { try { console.error('[SW]', ...args); } catch (e) {} },
+};
 const CACHE_NAME = 'chanuka-v1';
 const urlsToCache = [
   '/',

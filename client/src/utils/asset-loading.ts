@@ -1,6 +1,5 @@
 import { logger } from './browser-logger';
-import { preloadCriticalResources } from './serviceWorker';
-import { useOfflineDetection } from '../hooks/useOfflineDetection';
+import type { OfflineDetectionState } from '../hooks/useOfflineDetection';
 import {
   DEFAULT_ASSET_FALLBACKS,
   getAssetFallback,
@@ -11,6 +10,7 @@ import {
   initializeAssetFallbacks,
   EnhancementLevel
 } from './asset-fallback-config';
+import React from 'react';
 
 // Asset loading configuration
 export interface AssetLoadConfig {
@@ -36,8 +36,16 @@ export interface LoadingProgress {
   phase: 'preload' | 'critical' | 'lazy' | 'complete';
 }
 
+// Extended progress type for callbacks that includes connection state
+export interface LoadingProgressWithConnection extends LoadingProgress {
+  connectionState?: OfflineDetectionState;
+}
+
+// Valid asset type keys - this ensures type safety throughout
+type AssetType = 'script' | 'style' | 'image' | 'font' | 'critical';
+
 // Default configuration for different asset types
-const DEFAULT_CONFIGS: Record<string, AssetLoadConfig> = {
+const DEFAULT_CONFIGS: Record<AssetType, AssetLoadConfig> = {
   critical: {
     maxRetries: 3,
     retryDelay: 1000,
@@ -75,6 +83,11 @@ const DEFAULT_CONFIGS: Record<string, AssetLoadConfig> = {
   },
 };
 
+// Helper function to safely get default config
+function getDefaultConfig(type: AssetType): AssetLoadConfig {
+  return DEFAULT_CONFIGS[type];
+}
+
 // Asset loading manager
 export class AssetLoadingManager {
   private loadingProgress: LoadingProgress = {
@@ -83,15 +96,25 @@ export class AssetLoadingManager {
     phase: 'preload',
   };
   
-  private progressCallbacks: ((progress: LoadingProgress) => void)[] = [];
+  private progressCallbacks: ((progress: LoadingProgressWithConnection) => void)[] = [];
   private loadedAssets = new Set<string>();
   private failedAssets = new Set<string>();
   private loadPromises = new Map<string, Promise<AssetLoadResult>>();
+
+  private notifyProgressCallbacks() {
+    // Create progress object with properly typed connectionState
+    // Only include connectionState if it exists (not undefined)
+    const progress: LoadingProgressWithConnection = {
+      ...this.loadingProgress,
+      ...(this.connectionState && { connectionState: this.connectionState })
+    };
+    this.progressCallbacks.forEach(callback => callback(progress));
+  }
   
   // Connection monitoring
   private connectionType: 'slow' | 'fast' | 'unknown' = 'unknown';
   private isOnline = navigator.onLine;
-  private offlineDetection = useOfflineDetection();
+  private connectionState: OfflineDetectionState | null = null;
 
   constructor() {
     this.setupConnectionMonitoring();
@@ -105,20 +128,69 @@ export class AssetLoadingManager {
     }
   }
 
+  public updateConnectionState(state: OfflineDetectionState) {
+    this.connectionState = state;
+    this.isOnline = state.isOnline;
+    this.connectionType = state.connectionQuality.type === 'fast' ? 'fast' :
+                         state.connectionQuality.type === 'slow' ? 'slow' : 'unknown';
+    this.handleConnectionUpdate();
+  }
+
   private setupConnectionMonitoring() {
-    // Use enhanced offline detection
-    const updateConnectionStatus = () => {
-      this.isOnline = this.offlineDetection.isOnline;
-      this.connectionType = this.offlineDetection.connectionQuality.type === 'fast' ? 'fast' :
-                           this.offlineDetection.connectionQuality.type === 'slow' ? 'slow' : 'unknown';
-    };
+    // Basic offline detection as fallback
+    window.addEventListener('online', () => {
+      this.isOnline = true;
+      this.handleConnectionUpdate();
+    });
 
-    // Initial status
-    updateConnectionStatus();
+    window.addEventListener('offline', () => {
+      this.isOnline = false;
+      this.handleConnectionUpdate();
+    });
+  }
 
-    // Listen for changes (we'll need to adapt this since offlineDetection is a hook)
-    // For now, we'll use a polling approach
-    setInterval(updateConnectionStatus, 5000);
+  private handleConnectionUpdate() {
+    // Re-evaluate loading strategy based on connection state
+    if (!this.isOnline) {
+      this.handleOfflineMode();
+    } else {
+      this.handleOnlineMode();
+    }
+    
+    // Notify progress callbacks of connection state change
+    this.notifyProgressCallbacks();
+  }
+
+  private handleOfflineMode() {
+    logger.warn('Network is offline, switching to fallback mode');
+    // Pause any non-critical loading
+    this.pauseNonCriticalLoading();
+    // Attempt to use cached resources
+    this.activateFallbackMode();
+  }
+
+  private handleOnlineMode() {
+    logger.info('Network is online, resuming normal operation');
+    // Resume loading if previously paused
+    this.resumeLoading();
+    // Check for any failed assets that need retry
+    this.retryFailedAssets();
+  }
+
+  private pauseNonCriticalLoading() {
+    // Implementation will be added in a separate change
+  }
+
+  private activateFallbackMode() {
+    // Implementation will be added in a separate change
+  }
+
+  private resumeLoading() {
+    // Implementation will be added in a separate change
+  }
+
+  private retryFailedAssets() {
+    // Implementation will be added in a separate change
   }
 
   private setupPerformanceMonitoring() {
@@ -152,7 +224,7 @@ export class AssetLoadingManager {
   }
 
   // Subscribe to loading progress updates
-  onProgress(callback: (progress: LoadingProgress) => void): () => void {
+  onProgress(callback: (progress: LoadingProgressWithConnection) => void): () => void {
     this.progressCallbacks.push(callback);
     
     // Return unsubscribe function
@@ -166,13 +238,13 @@ export class AssetLoadingManager {
 
   private updateProgress(updates: Partial<LoadingProgress>) {
     this.loadingProgress = { ...this.loadingProgress, ...updates };
-    this.progressCallbacks.forEach(callback => callback(this.loadingProgress));
+    this.notifyProgressCallbacks();
   }
 
   // Load a single asset with retry logic and fallbacks
   async loadAsset(
     url: string,
-    type: 'script' | 'style' | 'image' | 'font' | 'critical',
+    type: AssetType,
     config?: Partial<AssetLoadConfig>,
     assetKey?: string
   ): Promise<AssetLoadResult> {
@@ -202,7 +274,18 @@ export class AssetLoadingManager {
       };
     }
 
-    const finalConfig = { ...DEFAULT_CONFIGS[type], ...config };
+    // Get default config for this asset type using our safe helper
+    const defaultConfig = getDefaultConfig(type);
+
+    // Merge configurations with proper type safety
+    // We use nullish coalescing to ensure each property has a defined value
+    const finalConfig: AssetLoadConfig = {
+      maxRetries: config?.maxRetries ?? defaultConfig.maxRetries,
+      retryDelay: config?.retryDelay ?? defaultConfig.retryDelay,
+      timeout: config?.timeout ?? defaultConfig.timeout,
+      priority: config?.priority ?? defaultConfig.priority,
+      connectionAware: config?.connectionAware ?? defaultConfig.connectionAware,
+    };
 
     // Get fallback strategy if asset key is provided
     const fallbackStrategy = assetKey ? getAssetFallback(type + 's' as keyof typeof DEFAULT_ASSET_FALLBACKS, assetKey) : null;
@@ -317,87 +400,22 @@ export class AssetLoadingManager {
     }
 
     const loadTime = performance.now() - startTime;
-    return {
+    
+    // Build result object conditionally to satisfy exactOptionalPropertyTypes
+    // If lastError exists, include it; otherwise, omit the error property entirely
+    const result: AssetLoadResult = {
       success: false,
-      error: lastError,
       retries,
       loadTime,
       fromCache: false,
     };
-  }
-
-  private async performAssetLoad(
-    url: string,
-    type: string,
-    config: AssetLoadConfig
-  ): Promise<AssetLoadResult> {
-    const startTime = performance.now();
-    let retries = 0;
-    let lastError: Error | undefined;
-
-    // Check connection and adjust config if needed
-    if (config.connectionAware && !this.isOnline) {
-      logger.warn('Asset loading skipped due to offline status', { component: 'AssetLoadingManager', url });
-      return {
-        success: false,
-        error: new Error('Device is offline'),
-        retries: 0,
-        loadTime: 0,
-        fromCache: false,
-      };
+    
+    // Only add error property if we have an actual error
+    if (lastError) {
+      result.error = lastError;
     }
-
-    if (config.connectionAware && this.connectionType === 'slow' && config.priority === 'low') {
-      // Skip low priority assets on slow connections
-      logger.info('Skipping low priority asset on slow connection', { component: 'AssetLoadingManager', url });
-      return {
-        success: false,
-        error: new Error('Skipped due to slow connection'),
-        retries: 0,
-        loadTime: 0,
-        fromCache: false,
-      };
-    }
-
-    // Adjust retry config based on connection quality
-    if (this.connectionType === 'slow') {
-      config.maxRetries = Math.max(1, config.maxRetries - 1); // Reduce retries on slow connections
-      config.retryDelay = config.retryDelay * 1.5; // Increase delay
-    }
-
-    while (retries <= config.maxRetries) {
-      try {
-        const loadResult = await this.loadAssetByType(url, type, config.timeout);
-        const loadTime = performance.now() - startTime;
-        
-        return {
-          success: true,
-          retries,
-          loadTime,
-          fromCache: loadResult.fromCache,
-        };
-      } catch (error) {
-        lastError = error as Error;
-        retries++;
-        
-        if (retries <= config.maxRetries) {
-          // Exponential backoff with jitter
-          const delay = config.retryDelay * Math.pow(2, retries - 1) + Math.random() * 1000;
-          await new Promise(resolve => setTimeout(resolve, delay));
-          
-          console.warn(`Retrying asset load (${retries}/${config.maxRetries}): ${url}`, error);
-        }
-      }
-    }
-
-    const loadTime = performance.now() - startTime;
-    return {
-      success: false,
-      error: lastError,
-      retries,
-      loadTime,
-      fromCache: false,
-    };
+    
+    return result;
   }
 
   private async loadAssetByType(
@@ -455,7 +473,7 @@ export class AssetLoadingManager {
       resolve({ fromCache: false });
     };
 
-    const handleError = (event: Event | string) => {
+    const handleError = () => {
       cleanup();
       script.removeEventListener('load', handleLoad);
       script.removeEventListener('error', handleError);
@@ -609,7 +627,7 @@ export class AssetLoadingManager {
 
   // Load multiple assets with progress tracking
   async loadAssets(
-    assets: Array<{ url: string; type: 'script' | 'style' | 'image' | 'font' | 'critical'; config?: Partial<AssetLoadConfig> }>,
+    assets: Array<{ url: string; type: AssetType; config?: Partial<AssetLoadConfig> }>,
     phase: LoadingProgress['phase'] = 'critical'
   ): Promise<AssetLoadResult[]> {
     this.updateProgress({
@@ -622,7 +640,8 @@ export class AssetLoadingManager {
 
     // Filter assets based on offline status and connection quality
     const filteredAssets = assets.filter(asset => {
-      const config = { ...DEFAULT_CONFIGS[asset.type], ...asset.config };
+      const defaultConfig = getDefaultConfig(asset.type);
+      const config = { ...defaultConfig, ...asset.config };
 
       if (config.connectionAware && !this.isOnline) {
         logger.debug('Skipping asset due to offline status', { component: 'AssetLoadingManager', url: asset.url });
@@ -650,7 +669,7 @@ export class AssetLoadingManager {
     const chunks = this.chunkArray(filteredAssets, concurrency);
 
     for (const chunk of chunks) {
-      const chunkPromises = chunk.map(async (asset, index) => {
+      const chunkPromises = chunk.map(async (asset) => {
         this.updateProgress({
           currentAsset: asset.url,
         });
@@ -681,12 +700,12 @@ export class AssetLoadingManager {
 
   // Preload critical assets for the application
   async preloadCriticalAssets(): Promise<void> {
-    const criticalAssets = [
-      { url: '/src/main.tsx', type: 'critical' as const },
-      { url: '/src/index.css', type: 'style' as const },
-      { url: '/src/App.tsx', type: 'critical' as const },
-      { url: '/Chanuka_logo.svg', type: 'image' as const },
-      { url: '/Chanuka_logo.png', type: 'image' as const },
+    const criticalAssets: Array<{ url: string; type: AssetType }> = [
+      { url: '/src/main.tsx', type: 'critical' },
+      { url: '/src/index.css', type: 'style' },
+      { url: '/src/App.tsx', type: 'critical' },
+      { url: '/Chanuka_logo.svg', type: 'image' },
+      { url: '/Chanuka_logo.png', type: 'image' },
     ];
 
     try {
@@ -709,10 +728,10 @@ export class AssetLoadingManager {
       failed: this.failedAssets.size,
       progress: this.loadingProgress,
       connectionType: this.connectionType,
-      isOnline: this.isOnline,
-      connectionQuality: this.offlineDetection.connectionQuality,
-      lastOnlineTime: this.offlineDetection.lastOnlineTime,
-      lastOfflineTime: this.offlineDetection.lastOfflineTime,
+      isOnline: this.connectionState?.isOnline ?? true,
+      connectionQuality: this.connectionState?.connectionQuality ?? 'unknown',
+      lastOnlineTime: this.connectionState?.lastOnlineTime,
+      lastOfflineTime: this.connectionState?.lastOfflineTime,
       enhancementLevel,
       featureAvailability,
       loadedAssets: loaded,
@@ -765,7 +784,7 @@ export function useAssetLoading() {
   return {
     progress,
     enhancementLevel,
-    loadAsset: (url: string, type: 'script' | 'style' | 'image' | 'font' | 'critical', config?: Partial<AssetLoadConfig>, assetKey?: string) =>
+    loadAsset: (url: string, type: AssetType, config?: Partial<AssetLoadConfig>, assetKey?: string) =>
       assetLoadingManager.loadAsset(url, type, config, assetKey),
     loadAssets: assetLoadingManager.loadAssets.bind(assetLoadingManager),
     preloadCriticalAssets: assetLoadingManager.preloadCriticalAssets.bind(assetLoadingManager),
@@ -790,50 +809,3 @@ export function setupAssetPreloading() {
   document.addEventListener('keydown', preloadOnInteraction, { once: true });
   document.addEventListener('touchstart', preloadOnInteraction, { once: true });
 }
-
-// Import React for the hook
-import React from 'react';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

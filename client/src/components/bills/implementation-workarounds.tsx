@@ -5,20 +5,7 @@ import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Textarea } from '../ui/textarea';
-import { AlertTriangle, 
-  Eye, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  FileText, 
-  Users, 
-  Calendar, 
-  ExternalLink, 
-  Shield, 
-  Building, 
-  Gavel, 
-  Scroll 
-} from 'lucide-react';
+import { AlertTriangle, Eye, CheckCircle, X, Clock, FileText, Users, Calendar, ArrowLeft, Shield, Building, Settings } from 'lucide-react';
 import { logger } from '../../utils/browser-logger';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
@@ -173,8 +160,8 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
     switch (type) {
       case 'executive_directive': return <Shield className="w-4 h-4 text-blue-600" />;
       case 'regulatory_implementation': return <Building className="w-4 h-4 text-purple-600" />;
-      case 'judicial_interpretation': return <Gavel className="w-4 h-4 text-gray-700" />;
-      case 'budget_allocation': return <Scroll className="w-4 h-4 text-green-600" />;
+      case 'judicial_interpretation': return <Settings className="w-4 h-4 text-gray-700" />;
+      case 'budget_allocation': return <FileText className="w-4 h-4 text-green-600" />;
       case 'emergency_powers': return <AlertTriangle className="w-4 h-4 text-red-600" />;
       case 'statutory_instrument': return <FileText className="w-4 h-4 text-orange-600" />;
       default: return <FileText className="w-4 h-4 text-gray-600" />;
@@ -200,7 +187,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
   const getBranchIcon = (branch: string) => {
     switch (branch) {
       case 'executive': return <Shield className="w-3 h-3" />;
-      case 'judiciary': return <Gavel className="w-3 h-3" />;
+      case 'judiciary': return <Settings className="w-3 h-3" />;
       case 'multi_branch': return <Building className="w-3 h-3" />;
       default: return <FileText className="w-3 h-3" />;
     }
@@ -209,7 +196,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'verified': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'rejected': return <XCircle className="w-4 h-4 text-red-500" />;
+      case 'rejected': return <X className="w-4 h-4 text-red-500" />;
       default: return <Clock className="w-4 h-4 text-yellow-500" />;
     }
   };
@@ -465,7 +452,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
                       variant="outline"
                       onClick={() => window.open(`/bills/${workaround.originalBillId}`, '_blank')}
                     >
-                      <ExternalLink className="w-4 h-4 mr-1" />
+                      <ArrowLeft className="w-4 h-4 mr-1" />
                       View Original Policy
                     </Button>
 
@@ -601,7 +588,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
                           </div>
                         </div>
                         <Button size="sm" variant="outline" onClick={() => window.open(doc.url, '_blank')}>
-                          <ExternalLink className="w-4 h-4" />
+                          <ArrowLeft className="w-4 h-4" />
                         </Button>
                       </div>
                     ))}

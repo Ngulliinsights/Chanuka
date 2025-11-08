@@ -1,6 +1,6 @@
 import { database as db } from '@shared/database';
 import { sql } from 'drizzle-orm';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 /**
  * Configuration interface for storage options

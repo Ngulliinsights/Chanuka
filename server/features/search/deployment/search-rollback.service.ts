@@ -7,7 +7,7 @@
 
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import { searchPerformanceMonitor } from '../monitoring/search-performance-monitor.js';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 export interface RollbackPlan {
   component: string;

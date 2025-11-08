@@ -19,23 +19,14 @@ export {
 // Error Recovery Manager - Recovery strategies and management
 export { ErrorRecoveryManager } from './ErrorRecoveryManager';
 
-// Re-export error types from shared core for convenience
-export {
-  BaseError,
-  ErrorDomain,
-  ErrorSeverity,
-  ValidationError,
-  NotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
-  NetworkError,
-  ExternalServiceError,
-  ServiceUnavailableError,
-  DatabaseError,
-  CacheError,
-  ConflictError,
-  TooManyRequestsError
-} from '@shared/core';
+// Re-export error types from shared errors for convenience
+export * from '../../shared/errors';
+
+// Export utility functions
+export { createErrorReporter } from './utils/error-reporter';
+export { normalizeError } from './utils/error-normalizer';
+export { getContextualMessage } from './utils/contextual-messages';
+export { getErrorIcon } from './utils/error-icons';
 
 
 

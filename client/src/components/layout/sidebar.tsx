@@ -2,20 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 import { Logo } from '../ui/logo';
-import {
-  Home,
-  BarChart3,
-  FileText,
-  Users,
-  Search,
-  Settings,
-  HelpCircle,
-  MessageSquare,
-  Shield,
-  TrendingUp,
-  User,
-  BookOpen
-} from 'lucide-react';
+import { Building, BarChart3, FileText, Users, Search, Settings, HelpCircle, MessageSquare, Shield, TrendingUp, User } from 'lucide-react';
 import { 
   SidebarProps, 
   NavigationItem, 
@@ -26,7 +13,7 @@ import {
 } from './index';
 
 const DEFAULT_NAVIGATION: NavigationItem[] = [
-  { id: 'home', label: 'Home', href: '/', icon: <Home className="h-4 w-4" /> },
+  { id: 'home', label: 'Home', href: '/', icon: <Building className="h-4 w-4" /> },
   { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: <BarChart3 className="h-4 w-4" /> },
   { id: 'bills', label: 'Bills', href: '/bills', icon: <FileText className="h-4 w-4" /> },
   { id: 'community', label: 'Community', href: '/community', icon: <Users className="h-4 w-4" /> },
@@ -217,23 +204,23 @@ export function Sidebar({
               isCollapsed && "justify-center"
             )}>
               <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                {users.avatar ? (
+                {user.avatar ? (
                   <img 
-                    src={users.avatar} 
-                    alt={users.name}
+                    src={user.avatar} 
+                    alt={user.name}
                     className="h-8 w-8 rounded-full object-cover"
                   />
                 ) : (
                   <span className="text-xs font-medium text-accent-foreground">
-                    {users.name.charAt(0).toUpperCase()}
+                    {user.name.charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
               {!isCollapsed && (
                 <>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{users.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{users.email}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
                   <Link
                     to="/profile"

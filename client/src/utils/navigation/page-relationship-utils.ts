@@ -1,6 +1,6 @@
 import { PageRelationshipService } from '../../services/PageRelationshipService';
 import { RelatedPage, UserRole } from '../../core/navigation/types';
-import { logger } from '@shared/core';
+import { logger } from '../client-core';
 
 /**
  * Utility functions for working with page relationships

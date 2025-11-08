@@ -143,9 +143,9 @@ describe('Layout Types', () => {
       };
 
       expect(users.id).toBe('user-123');
-      expect(users.name).toBe('John Doe');
-      expect(users.email).toBe('john@example.com');
-      expect(users.role).toBe('citizen');
+      expect(user.name).toBe('John Doe');
+      expect(user.email).toBe('john@example.com');
+      expect(user.role).toBe('citizen');
     });
 
     it('should support optional properties', () => {
@@ -166,7 +166,7 @@ describe('Layout Types', () => {
         preferences
       };
 
-      expect(users.avatar).toBe('https://example.com/avatar.jpg');
+      expect(user.avatar).toBe('https://example.com/avatar.jpg');
       expect(users.preferences).toEqual(preferences);
     });
   });

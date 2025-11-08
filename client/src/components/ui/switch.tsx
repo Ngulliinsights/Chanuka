@@ -23,7 +23,7 @@ const Switch = forwardRef<
     />
   </Root>
 ))
-Switch.display_name = Root.display_name
+Switch.displayName = Root.displayName
 
 export { Switch }
 

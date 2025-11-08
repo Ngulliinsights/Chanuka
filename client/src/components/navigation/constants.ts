@@ -1,4 +1,4 @@
-import { Home, FileText, Users, Shield, Search, User, Settings, BarChart3 } from 'lucide-react';
+import { Building, FileText, Users, Shield, Search, User, Settings, BarChart3 } from 'lucide-react';
 import type { NavigationItem, NavigationSection } from './types';
 
 export const SECTION_TITLES: Record<NavigationSection, string> = {
@@ -11,7 +11,7 @@ export const SECTION_TITLES: Record<NavigationSection, string> = {
 export const SECTION_ORDER: NavigationSection[] = ['legislative', 'community', 'tools', 'user', 'admin'];
 
 export const DEFAULT_NAVIGATION_MAP: NavigationItem[] = [
-  { id: 'home', label: 'Home', href: '/', icon: Home, section: 'legislative', priority: 1 },
+  { id: 'home', label: 'Home', href: '/', icon: Building, section: 'legislative', priority: 1 },
   { id: 'bills', label: 'Bills', href: '/bills', icon: FileText, section: 'legislative', priority: 2 },
   { id: 'analysis', label: 'Bill Analysis', href: '/bill-sponsorship-analysis', icon: BarChart3, section: 'legislative', allowedRoles: ['citizen', 'expert', 'admin', 'journalist', 'advocate'], priority: 3 },
   { id: 'community', label: 'Community Input', href: '/community', icon: Users, section: 'community', priority: 1 },

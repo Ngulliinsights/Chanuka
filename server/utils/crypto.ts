@@ -1,6 +1,6 @@
 import { scrypt, randomBytes, timingSafeEqual, createCipheriv, createDecipheriv } from "crypto";
 import { promisify } from "util";
-import { logger  } from '@shared/core/index.js';
+import { logger   } from '../../shared/core/src/index.js';
 
 const scryptAsync = promisify(scrypt);
 

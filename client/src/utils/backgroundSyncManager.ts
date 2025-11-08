@@ -3,7 +3,7 @@
  * Manages offline actions and coordinates with service worker for background sync
  */
 
-import { logger } from '@shared/core';
+import { logger } from './client-core';
 import { sendMessageToServiceWorker } from './serviceWorker';
 
 export interface OfflineAction {

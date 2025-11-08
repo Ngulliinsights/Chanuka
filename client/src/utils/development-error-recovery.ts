@@ -73,7 +73,7 @@ export class DevelopmentErrorRecovery {
     // Resource loading error handler
     window.addEventListener('error', (event) => {
       const target = event.target as HTMLElement;
-      if (target && target !== window && (target.tagName === 'SCRIPT' || target.tagName === 'LINK' || target.tagName === 'IMG')) {
+      if (target && target instanceof HTMLElement && (target.tagName === 'SCRIPT' || target.tagName === 'LINK' || target.tagName === 'IMG')) {
         this.handleError({
           type: 'resource',
           message: `Failed to load ${target.tagName.toLowerCase()}: ${(target as any).src || (target as any).href}`,
@@ -408,7 +408,7 @@ export class DevelopmentErrorRecovery {
       const errorLog = {
         ...errorInfo,
         timestamp: new Date().toISOString(),
-        user_agent: navigator.user_agent,
+        user_agent: navigator.userAgent,
         url: window.location.href,
         devServerInfo: window.__DEV_SERVER__,
         errorCount: this.errorCount,

@@ -31,10 +31,10 @@ export function HealthCheck({
     try {
       const response = await systemApi.getHealth();
       setHealth({
-        status: response.status || 'healthy',
-        message: response.message || 'System is operational',
+        status: (response as any).status || 'healthy',
+        message: (response as any).message || 'System is operational',
         timestamp: new Date().toISOString(),
-        details: response.details
+        details: (response as any).details
       });
     } catch (error) {
       logger.error('Health check failed:', { component: 'HealthCheck' }, error);
@@ -56,6 +56,8 @@ export function HealthCheck({
       const interval = setInterval(checkHealth, refreshInterval);
       return () => clearInterval(interval);
     }
+    
+    return undefined;
   }, [autoRefresh, refreshInterval]);
 
   const getStatusColor = (status: string) => {

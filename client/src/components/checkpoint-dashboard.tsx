@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, ExternalLink, Eye, AlertTriangle } from "lucide-react";
+import { CheckCircle, ArrowLeft, Eye, AlertTriangle } from 'lucide-react';
 import { apiRequest } from "../lib/queryClient";
 import { useToast } from "../hooks/use-toast";
-import { logger } from "../utils/browser-logger";
+
 
 interface CheckpointDashboardProps {
   projectId: number;
@@ -122,7 +122,7 @@ export default function CheckpointDashboard({
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Development Checkpoints</h2>
         <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          <Plus className="w-4 h-4" />
+          <CheckCircle className="w-4 h-4" />
           <span>Add Checkpoint</span>
         </button>
       </div>
@@ -220,7 +220,7 @@ export default function CheckpointDashboard({
                     {isInProgress ? (
                       <Eye className={`w-4 h-4 text-${statusColor}-600`} />
                     ) : (
-                      <ExternalLink
+                      <ArrowLeft
                         className={`w-4 h-4 text-${statusColor}-600`}
                       />
                     )}

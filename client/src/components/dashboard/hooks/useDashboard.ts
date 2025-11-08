@@ -104,6 +104,8 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
         }
       };
     }
+    
+    return undefined;
   }, [dashboardConfig.enableAutoRefresh, dashboardConfig.refreshInterval]);
 
   const refresh = useCallback(async () => {

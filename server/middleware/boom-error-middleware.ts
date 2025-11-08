@@ -8,7 +8,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as Boom from '@hapi/boom';
 import { ZodError } from 'zod';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../shared/core/src/index.js';
 import { errorAdapter } from '../infrastructure/errors/error-adapter.js';
 import { ErrorResponse } from '../infrastructure/errors/error-standardization.js';
 

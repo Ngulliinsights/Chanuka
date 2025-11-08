@@ -223,7 +223,7 @@ export const EnhancedFormInput = forwardRef<HTMLInputElement, EnhancedFormInputP
     );
   }
 );
-EnhancedFormInput.display_name = 'EnhancedFormInput';
+EnhancedFormInput.displayName = 'EnhancedFormInput';
 
 // Enhanced textarea with validation
 interface EnhancedFormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -411,7 +411,7 @@ export const EnhancedFormTextarea = forwardRef<HTMLTextAreaElement, EnhancedForm
     );
   }
 );
-EnhancedFormTextarea.display_name = 'EnhancedFormTextarea';
+EnhancedFormTextarea.displayName = 'EnhancedFormTextarea';
 
 // Enhanced select with validation
 interface EnhancedFormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
@@ -590,5 +590,5 @@ export const EnhancedFormSelect = forwardRef<HTMLSelectElement, EnhancedFormSele
     );
   }
 );
-EnhancedFormSelect.display_name = 'EnhancedFormSelect';
+EnhancedFormSelect.displayName = 'EnhancedFormSelect';
 

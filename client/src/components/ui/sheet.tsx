@@ -56,7 +56,7 @@ const SheetContent = forwardRef<
     </Content>
   </SheetPortal>
 ))
-SheetContent.display_name = Content.display_name
+SheetContent.displayName = Content.displayName
 
 const SheetOverlay = forwardRef<
   ElementRef<typeof Overlay>,
@@ -71,7 +71,7 @@ const SheetOverlay = forwardRef<
     ref={ref}
   />
 ))
-SheetOverlay.display_name = Overlay.display_name
+SheetOverlay.displayName = Overlay.displayName
 
 const SheetHeader = ({
   className,
@@ -85,7 +85,7 @@ const SheetHeader = ({
     {...props}
   />
 )
-SheetHeader.display_name = "SheetHeader"
+SheetHeader.displayName = "SheetHeader"
 
 const SheetFooter = ({
   className,
@@ -99,7 +99,7 @@ const SheetFooter = ({
     {...props}
   />
 )
-SheetFooter.display_name = "SheetFooter"
+SheetFooter.displayName = "SheetFooter"
 
 const SheetTitle = forwardRef<
   ElementRef<typeof Title>,
@@ -111,7 +111,7 @@ const SheetTitle = forwardRef<
     {...props}
   />
 ))
-SheetTitle.display_name = Title.display_name
+SheetTitle.displayName = Title.displayName
 
 const SheetDescription = forwardRef<
   ElementRef<typeof Description>,
@@ -123,7 +123,7 @@ const SheetDescription = forwardRef<
     {...props}
   />
 ))
-SheetDescription.display_name = Description.display_name
+SheetDescription.displayName = Description.displayName
 
 export {
   Sheet,

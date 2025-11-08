@@ -5,10 +5,10 @@
  */
 
 import { EventEmitter } from 'events';
-import { 
-  CacheAdapter, 
-  CacheAdapterConfig, 
-  CacheMetrics, 
+import {
+  CacheAdapter,
+  CacheAdapterConfig,
+  CacheMetrics,
   CacheHealthStatus,
   CacheEvent,
   CacheEventType,
@@ -19,7 +19,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
   public readonly name: string;
   public readonly version: string;
   public readonly config: CacheAdapterConfig;
-  
+
   protected metrics: CacheMetrics;
   protected startTime: number;
   protected connected: boolean = false;
@@ -37,7 +37,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
       compressionThreshold: 1024, // 1KB
       ...config
     };
-    
+
     this.metrics = this.initializeMetrics();
     this.startTime = Date.now();
   }
@@ -56,7 +56,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
   }
 
   async mset<T = any>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void> {
-    await Promise.all(entries.map(({ key, value, ttl }) => 
+    await Promise.all(entries.map(({ key, value, ttl }) =>
       this.set(key, value, ttl || this.config.defaultTtlSec)
     ));
   }
@@ -84,7 +84,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
     return true;
   }
 
-  async ttl(key: string): Promise<number> {
+  async ttl(_key: string): Promise<number> {
     // Default implementation returns -1 (no TTL support)
     // Concrete adapters should override this if they support TTL queries
     return -1;
@@ -93,16 +93,16 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
   // Health and metrics
   async getHealth(): Promise<CacheHealthStatus> {
     const startTime = Date.now();
-    
+
     try {
       // Test basic operations
       const testKey = `${this.config.keyPrefix}health_check_${Date.now()}`;
       await this.set(testKey, 'test', 1);
       const result = await this.get(testKey);
       await this.del(testKey);
-      
+
       const latency = Date.now() - startTime;
-      
+
       return {
         status: result === 'test' ? 'healthy' : 'degraded',
         latency,
@@ -126,7 +126,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
   }
 
   // Event system
-  emit(event_type: CacheEventType, data: Omit<CacheEvent, 'type' | 'timestamp'>): boolean {
+  override emit(event_type: CacheEventType, data: Omit<CacheEvent, 'type' | 'timestamp'>): boolean {
     const event: CacheEvent = {
       type: event_type,
       timestamp: Date.now(),
@@ -160,7 +160,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
     if (!this.config.enableMetrics) return;
 
     this.metrics.operations++;
-    
+
     switch (operation) {
       case 'hit':
         this.metrics.hits++;
@@ -204,7 +204,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
 
   protected shouldCompress(data: any): boolean {
     if (!this.config.enableCompression) return false;
-    
+
     const size = this.estimateSize(data);
     return size >= (this.config.compressionThreshold || 1024);
   }
@@ -215,7 +215,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
     if (typeof data === 'number') return 8;
     if (typeof data === 'boolean') return 1;
     if (data === null || data === undefined) return 0;
-    
+
     try {
       return JSON.stringify(data).length;
     } catch {

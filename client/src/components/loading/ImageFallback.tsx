@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { cn } from '../../lib/utils';
-import { AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { AlertCircle, Eye } from 'lucide-react';
 
 export interface ImageFallbackProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'onError' | 'onLoad'> {
   fallbackSrc?: string;
@@ -127,7 +127,7 @@ export const ImageFallback: React.FC<ImageFallbackProps> = ({
         role="img"
         aria-label={`${alt || 'Image'} (unavailable)`}
       >
-        <ImageIcon className="h-8 w-8 text-muted-foreground" />
+        <Eye className="h-8 w-8 text-muted-foreground" />
       </div>
     );
   }
@@ -156,7 +156,7 @@ export const ImageFallback: React.FC<ImageFallbackProps> = ({
 // Default placeholder component
 export const ImagePlaceholder: React.FC<{ className?: string }> = ({ className }) => (
   <div className={cn('animate-pulse bg-muted rounded-md flex items-center justify-center', className)}>
-    <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
+    <Eye className="h-8 w-8 text-muted-foreground/50" />
   </div>
 );
 
