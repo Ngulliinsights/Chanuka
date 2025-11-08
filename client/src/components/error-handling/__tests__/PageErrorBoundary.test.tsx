@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import PageErrorBoundary from '../EnhancedErrorBoundary';
+import PageErrorBoundary from '../ErrorBoundary';
 import { ErrorFallback } from '../ErrorFallback';
 import { logger } from '../../../utils/browser-logger';
 

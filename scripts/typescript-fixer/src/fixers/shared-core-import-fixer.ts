@@ -32,7 +32,7 @@ export class SharedCoreImportFixer implements ErrorFixer {
     'TraceContext', 'createTracer',
     'validationMiddleware', 'createValidator',
     'ApiSuccessResponse', 'ApiErrorResponse', 'ApiValidationErrorResponse',
-    'EnhancedErrorBoundary', 'AutomatedErrorRecoveryEngine',
+    'ErrorBoundary', 'AutomatedErrorRecoveryEngine',
     'Performance', 'RateLimit', 'cache'
   ]);
 
@@ -262,7 +262,7 @@ export class SharedCoreImportFixer implements ErrorFixer {
       // Error handling utilities
       'ErrorHandler': '@shared/core/src/observability/error-management',
       'ErrorBoundary': '@shared/core/src/observability/error-management',
-      'EnhancedErrorBoundary': '@shared/core',
+      'ErrorBoundary': '@shared/core',
       'createErrorHandler': '@shared/core/src/observability/error-management',
       'AutomatedErrorRecoveryEngine': '@shared/core',
 

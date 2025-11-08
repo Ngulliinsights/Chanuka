@@ -31,6 +31,9 @@ export class DevelopmentErrorRecovery {
   private hmrConnectionAttempts = 0;
   private maxHMRConnectionAttempts = 5;
   private isRecovering = false;
+  private hmrErrorCount = 0;
+  private maxHMRErrors = 10;
+  private hmrErrorResetTime = 0;
 
   private constructor() {
     this.setupErrorHandlers();
@@ -98,29 +101,67 @@ export class DevelopmentErrorRecovery {
   private monitorHMRConnection(): void {
     const checkHMRConnection = () => {
       const isHMRActive = window.__vite_plugin_react_preamble_installed__;
-      
+
+      console.log(`🔍 [HMR MONITOR] Checking HMR status - Active: ${isHMRActive}, Attempts: ${this.hmrConnectionAttempts}/${this.maxHMRConnectionAttempts}`);
+      console.log(`🔍 [HMR MONITOR] Dev server HMR status:`, window.__DEV_SERVER__?.hmrStatus?.());
+
       if (!isHMRActive && this.hmrConnectionAttempts < this.maxHMRConnectionAttempts) {
         this.hmrConnectionAttempts++;
-        console.warn(`HMR connection attempt ${this.hmrConnectionAttempts}/${this.maxHMRConnectionAttempts}`);
-        
-        // Try to reconnect HMR
-        this.attemptHMRReconnection();
+        console.log(`🔄 [HMR MONITOR] HMR connection attempt ${this.hmrConnectionAttempts}/${this.maxHMRConnectionAttempts}`);
+
+        // Try to reconnect HMR, but don't let failures cascade
+        this.attemptHMRReconnection().catch((error) => {
+          console.log(`❌ [HMR MONITOR] HMR reconnection failed:`, error);
+          if (this.hmrConnectionAttempts >= this.maxHMRConnectionAttempts) {
+            console.log('🛑 [HMR MONITOR] HMR monitoring disabled - max attempts reached, dev server appears to be unavailable');
+          }
+        });
+      } else if (isHMRActive && this.hmrConnectionAttempts > 0) {
+        console.log('✅ [HMR MONITOR] HMR connection restored');
+        this.hmrConnectionAttempts = 0; // Reset on successful connection
       }
     };
 
-    // Check HMR connection periodically
-    setInterval(checkHMRConnection, 5000);
+    // Check HMR connection less frequently to reduce noise
+    setInterval(checkHMRConnection, 10000);
   }
 
   private setupHMRErrorRecovery(): void {
     // Override console.error to catch HMR errors
     const originalConsoleError = console.error;
+    let isHandlingHMRError = false; // Prevent infinite recursion
+    let errorCount = 0;
+    let lastErrorTime = 0;
+    
     console.error = (...args: any[]) => {
-      const message = args.join(' ');
-      
-      // Detect HMR-related errors
-      if (this.isHMRError(message)) {
-        this.handleHMRError(message, args);
+      // Rate limiting: don't handle more than 5 errors per second
+      const now = Date.now();
+      if (now - lastErrorTime < 1000) {
+        errorCount++;
+        if (errorCount > 5) {
+          // Skip handling if too many errors
+          originalConsoleError.apply(console, args);
+          return;
+        }
+      } else {
+        errorCount = 0;
+        lastErrorTime = now;
+      }
+
+      if (!isHandlingHMRError) {
+        try {
+          const message = args.join(' ');
+          
+          // Detect HMR-related errors
+          if (this.isHMRError(message)) {
+            isHandlingHMRError = true;
+            this.handleHMRError(message, args);
+            isHandlingHMRError = false;
+          }
+        } catch (handlerError) {
+          // If error handling fails, don't let it cascade
+          isHandlingHMRError = false;
+        }
       }
       
       originalConsoleError.apply(console, args);
@@ -128,32 +169,61 @@ export class DevelopmentErrorRecovery {
   }
 
   private isHMRError(message: string): boolean {
-    const hmrErrorPatterns = [
-      'hmr',
-      'hot module replacement',
-      'vite:hmr',
-      'websocket',
-      'eventSource',
-      '[vite]',
-      'chunk load error',
-      'loading chunk',
-    ];
+    try {
+      const hmrErrorPatterns = [
+        'hmr',
+        'hot module replacement',
+        'vite:hmr',
+        'websocket',
+        'eventSource',
+        '[vite]',
+        'chunk load error',
+        'loading chunk',
+      ];
 
-    return hmrErrorPatterns.some(pattern => 
-      message.toLowerCase().includes(pattern.toLowerCase())
-    );
+      return hmrErrorPatterns.some(pattern => 
+        message.toLowerCase().includes(pattern.toLowerCase())
+      );
+    } catch (error) {
+      // Prevent any errors in this function from causing recursion
+      return false;
+    }
   }
 
   private handleHMRError(message: string, args: any[]): void {
-    console.group('🔥 HMR Error Detected');
-    console.error('Message:', message);
-    console.error('Arguments:', args);
-    console.error('HMR Status:', (window as any).__DEV_SERVER__?.hmrStatus?.() || 'Unknown');
-    console.error('Connection Attempts:', this.hmrConnectionAttempts);
-    console.groupEnd();
+    // Circuit breaker: prevent infinite HMR error loops
+    const now = Date.now();
+    if (now - this.hmrErrorResetTime > 30000) { // Reset every 30 seconds
+      this.hmrErrorCount = 0;
+      this.hmrErrorResetTime = now;
+    }
+    
+    this.hmrErrorCount++;
+    if (this.hmrErrorCount > this.maxHMRErrors) {
+      console.log('🛑 HMR error circuit breaker activated - too many errors');
+      return;
+    }
+    
+    // Use original console methods to avoid recursion
+    const originalConsoleGroup = console.group;
+    const originalConsoleGroupEnd = console.groupEnd;
+    
+    try {
+      originalConsoleGroup('🔥 HMR Error Detected');
+      console.log('Message:', message);
+      console.log('Arguments:', args);
+      console.log('HMR Status:', (window as any).__DEV_SERVER__?.hmrStatus?.() || 'Unknown');
+      console.log('Connection Attempts:', this.hmrConnectionAttempts);
+      originalConsoleGroupEnd();
 
-    // Attempt HMR recovery
-    this.attemptHMRRecovery(message);
+      // Only attempt recovery if we haven't hit the circuit breaker
+      if (this.hmrErrorCount <= 3) {
+        this.attemptHMRRecovery(message);
+      }
+    } catch (error) {
+      // Silently handle any errors to prevent further recursion
+      console.log('HMR error handling failed:', error);
+    }
   }
 
   private async attemptHMRRecovery(errorMessage: string): Promise<void> {
@@ -162,7 +232,7 @@ export class DevelopmentErrorRecovery {
     this.isRecovering = true;
     
     try {
-      logger.info('🔄 Attempting HMR recovery...', { component: 'DevelopmentErrorRecovery' });
+      console.log('🔄 Attempting HMR recovery...');
       
       // Strategy 1: Try to reconnect WebSocket
       await this.attemptHMRReconnection();
@@ -175,11 +245,11 @@ export class DevelopmentErrorRecovery {
       // Strategy 3: Force full reload if HMR is completely broken
       if (this.hmrConnectionAttempts >= this.maxHMRConnectionAttempts) {
         console.warn('🔄 HMR recovery failed, forcing full reload');
-        window.location.reload();
+        setTimeout(() => window.location.reload(), 1000);
       }
       
     } catch (error) {
-      logger.error('❌ HMR recovery failed:', { component: 'DevelopmentErrorRecovery' }, error);
+      console.log('❌ HMR recovery failed:', error);
     } finally {
       this.isRecovering = false;
     }
@@ -187,38 +257,52 @@ export class DevelopmentErrorRecovery {
 
   private async attemptHMRReconnection(): Promise<void> {
     return new Promise((resolve, reject) => {
+      // Skip HMR reconnection if we've tried too many times
+      if (this.hmrConnectionAttempts >= this.maxHMRConnectionAttempts) {
+        console.log(`🚫 Max HMR connection attempts (${this.maxHMRConnectionAttempts}) reached, aborting reconnection`);
+        reject(new Error('Max HMR connection attempts reached'));
+        return;
+      }
+
       const hmrPort = window.__DEV_SERVER__?.hmrPort || (parseInt(window.location.port) + 1);
       const wsUrl = `ws://${window.location.hostname}:${hmrPort}`;
-      
-      console.log(`🔌 Attempting HMR reconnection to ${wsUrl}`);
-      
+
+      console.log(`🔌 [HMR DEBUG] Attempting HMR reconnection to ${wsUrl}`);
+      console.log(`🔌 [HMR DEBUG] Current port: ${window.location.port}, calculated HMR port: ${hmrPort}`);
+      console.log(`🔌 [HMR DEBUG] Dev server info:`, window.__DEV_SERVER__);
+
       try {
         const ws = new WebSocket(wsUrl);
-        
+
         const timeout = setTimeout(() => {
+          console.log(`⏰ [HMR DEBUG] HMR reconnection timeout after 3000ms`);
           ws.close();
           reject(new Error('HMR reconnection timeout'));
-        }, 5000);
-        
+        }, 3000); // Reduced timeout
+
         ws.onopen = () => {
           clearTimeout(timeout);
-          logger.info('✅ HMR reconnection successful', { component: 'DevelopmentErrorRecovery' });
+          console.log('✅ [HMR DEBUG] HMR reconnection successful - WebSocket opened');
           this.hmrConnectionAttempts = 0; // Reset on successful connection
+          ws.close(); // Close the test connection
           resolve();
         };
-        
+
         ws.onerror = (error) => {
           clearTimeout(timeout);
-          logger.error('❌ HMR reconnection failed:', { component: 'DevelopmentErrorRecovery' }, error);
+          console.log(`❌ [HMR DEBUG] WebSocket error during reconnection:`, error);
+          console.log(`❌ [HMR DEBUG] WebSocket readyState: ${ws.readyState}`);
           reject(error);
         };
-        
-        ws.onclose = () => {
+
+        ws.onclose = (event) => {
           clearTimeout(timeout);
-          reject(new Error('HMR connection closed'));
+          console.log(`🔌 [HMR DEBUG] WebSocket closed with code: ${event.code}, reason: ${event.reason}`);
+          reject(new Error(`HMR connection closed with code ${event.code}`));
         };
-        
+
       } catch (error) {
+        console.log(`💥 [HMR DEBUG] Exception during WebSocket creation:`, error);
         reject(error);
       }
     });

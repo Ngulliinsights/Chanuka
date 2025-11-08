@@ -304,7 +304,7 @@ describe('SharedCoreImportFixer', () => {
     });
 
     it('should identify utility mentioned in error text', () => {
-      const error = createTestError(2304, "Some error involving EnhancedErrorBoundary", "Some error involving EnhancedErrorBoundary");
+      const error = createTestError(2304, "Some error involving ErrorBoundary", "Some error involving ErrorBoundary");
       
       expect(fixer.canHandle(error)).toBe(true);
     });

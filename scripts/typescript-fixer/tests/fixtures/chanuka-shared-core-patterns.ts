@@ -104,11 +104,11 @@ export function setupMiddleware(app: Express) {
 
 // Missing error handling utilities
 export function ErrorBoundaryComponent({ children }: { children: React.ReactNode }) {
-  // Missing EnhancedErrorBoundary import
+  // Missing ErrorBoundary import
   return (
-    <EnhancedErrorBoundary fallback={ErrorFallback}>
+    <ErrorBoundary fallback={ErrorFallback}>
       {children}
-    </EnhancedErrorBoundary>
+    </ErrorBoundary>
   );
 }
 

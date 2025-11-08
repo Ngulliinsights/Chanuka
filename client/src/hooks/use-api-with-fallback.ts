@@ -53,6 +53,7 @@ export function useApiWithFallback<T = any>(
   // Use refs for callbacks to avoid dependency issues
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
+  const isMountedRef = useRef(true);
 
   // Update refs when callbacks change, but don't trigger re-fetches
   useEffect(() => {
@@ -62,6 +63,16 @@ export function useApiWithFallback<T = any>(
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   // Memoize fetchOptions to prevent unnecessary re-renders
   // Only recreate when the actual values change
@@ -77,9 +88,6 @@ export function useApiWithFallback<T = any>(
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // Track if component is mounted to prevent state updates after unmount
-  const isMountedRef = useRef(true);
 
   const fetchData = useCallback(async () => {
     if (!enabled) return;
@@ -141,8 +149,11 @@ export function useApiWithFallback<T = any>(
       setFromCache(false);
       onErrorRef.current?.(apiError);
     } finally {
-      if (isMountedRef.current) {
+      // Only update loading state if component is mounted
+      // AND this is still the active request
+      if (isMountedRef.current && abortControllerRef.current) {
         setIsLoading(false);
+        abortControllerRef.current = null;
       }
     }
   }, [endpoint, enabled, fallbackKey, stableFetchOptions]);
@@ -201,8 +212,6 @@ export function useApiWithFallback<T = any>(
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      isMountedRef.current = false;
-      
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
         abortControllerRef.current = null;
@@ -342,6 +351,7 @@ export function useMutation<TData = any, TVariables = any>(
     } catch {
       // Error is already handled in mutateAsync and callbacks
       // Silently catch to provide non-throwing mutation option
+      // The error state is available via the error property
     }
   }, [mutateAsync]);
 
@@ -400,47 +410,3 @@ export function useApiDelete<TData = any>(
     options
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

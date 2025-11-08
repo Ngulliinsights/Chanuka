@@ -1,18 +1,20 @@
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger, type ViteDevServer } from "vite";
+import { createServer } from "vite";
+import type { ViteDevServer } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config.js";
 // Simple console logging for Vite setup
-const logger = {
-  info: (msg: string, context?: any) => console.log(`[INFO] ${msg}`, context || ''),
-  error: (msg: string, context?: any, error?: any) => console.error(`[ERROR] ${msg}`, context || '', error || ''),
-  warn: (msg: string, context?: any) => console.warn(`[WARN] ${msg}`, context || ''),
-  debug: (msg: string, context?: any) => console.log(`[DEBUG] ${msg}`, context || '')
+const viteLogger = {
+  info: (msg: string, options?: any) => console.log(`[VITE INFO] ${msg}`, options || ''),
+  error: (msg: string, options?: any) => console.error(`[VITE ERROR] ${msg}`, options || ''),
+  warn: (msg: string, options?: any) => console.warn(`[VITE WARN] ${msg}`, options || ''),
+  debug: (msg: string, options?: any) => console.log(`[VITE DEBUG] ${msg}`, options || ''),
+  warnOnce: (msg: string, options?: any) => console.warn(`[VITE WARN] ${msg}`, options || ''),
+  clearScreen: () => { },
+  hasErrorLogged: () => false,
+  hasWarned: false
 };
-
-const viteLogger = createLogger();
 
 // Centralized logging utility
 export function log(message: string, source = "express") {
@@ -77,14 +79,14 @@ const MIME_TYPES: Record<string, string> = {
   '.map': 'application/json; charset=utf-8',
 };
 
-let viteDevServer: ViteDevServer | null = null;
+let viteDevServer: any = null;
 let viteInitializationLock = false;
 let viteShutdownLock = false;
 
 // Simplified error categorization focused on actionable types
 function categorizeError(message: string): string {
   const lowerMsg = message.toLowerCase();
-  
+
   if (lowerMsg.includes('eaddrinuse') || (lowerMsg.includes('port') && lowerMsg.includes('use'))) {
     return 'port-conflict';
   }
@@ -106,14 +108,14 @@ function categorizeError(message: string): string {
   if (lowerMsg.includes('transform') || lowerMsg.includes('compile')) {
     return 'transform-error';
   }
-  
+
   return 'unknown';
 }
 
 // Focused HMR error recovery - the only error type worth auto-recovering
 async function attemptHMRRecovery(): Promise<void> {
   if (!viteDevServer) return;
-  
+
   try {
     log("Attempting HMR recovery...", "vite-recovery");
     viteDevServer.moduleGraph.invalidateAll();
@@ -131,9 +133,9 @@ export async function closeVite() {
     log("Vite shutdown already in progress", "vite");
     return;
   }
-  
+
   viteShutdownLock = true;
-  
+
   try {
     if (viteDevServer) {
       await viteDevServer.close();
@@ -152,31 +154,31 @@ export async function setupVite(app: Express, server: Server) {
     log("Vite initialization already in progress", "vite");
     return;
   }
-  
+
   if (viteDevServer) {
     log("Vite development server already initialized", "vite");
     return;
   }
-  
+
   viteInitializationLock = true;
-  
+
   try {
     log("Setting up Vite development server...", "vite");
 
     const hmrPort = parseInt(process.env.HMR_PORT || process.env.PORT || '4200') + 1;
-    
+
     // Streamlined custom logger with focused error handling
     const customLogger = {
       ...viteLogger,
       error: (msg: string, options?: any) => {
         const errorType = categorizeError(msg);
         log(`Vite ${errorType} error: ${msg}`, "vite-error");
-        
+
         // Only attempt recovery for HMR errors - other errors need developer attention
         if (errorType === 'hmr-error') {
           attemptHMRRecovery();
         }
-        
+
         viteLogger.error(msg, options);
       },
       warn: (msg: string, options?: any) => {
@@ -185,21 +187,26 @@ export async function setupVite(app: Express, server: Server) {
       },
       info: (msg: string, options?: any) => {
         // Filter out noisy HMR update messages
-        if (!msg.toLowerCase().includes('hmr update') && 
-            !msg.toLowerCase().includes('page reload')) {
+        if (!msg.toLowerCase().includes('hmr update') &&
+          !msg.toLowerCase().includes('page reload')) {
           log(`Vite info: ${msg}`, "vite-info");
         }
         viteLogger.info(msg, options);
       },
     };
 
-    viteDevServer = await createViteServer({
-      ...viteConfig,
+    viteDevServer = await createServer({
       configFile: false,
+      resolve: {
+        alias: {
+          '@': path.resolve(import.meta.dirname, '..', 'client', 'src'),
+          '@chanuka/shared': path.resolve(import.meta.dirname, '..', 'shared'),
+        },
+      },
       customLogger,
       server: {
         middlewareMode: true,
-        hmr: { 
+        hmr: {
           server,
           port: hmrPort,
           overlay: true,
@@ -229,38 +236,51 @@ export async function setupVite(app: Express, server: Server) {
       }
     });
 
+    // Add HMR WebSocket debugging
+    if (DEBUG_FLAGS.all) {
+      viteDevServer.ws.on('connection', (socket: any) => {
+        log(`[HMR SERVER DEBUG] Client connected to HMR WebSocket`, "vite-hmr");
+        socket.on('message', (data: any) => {
+          log(`[HMR SERVER DEBUG] Received message: ${data}`, "vite-hmr");
+        });
+        socket.on('close', (code: any, reason: any) => {
+          log(`[HMR SERVER DEBUG] Client disconnected: code=${code}, reason=${reason}`, "vite-hmr");
+        });
+      });
+    }
+
     // Simplified Vite middleware with single timeout handler
     app.use((req: Request, res: Response, next: NextFunction) => {
       if (!viteDevServer) {
         return next();
       }
-      
+
       // Let Vite handle all its special routes and source files
-      if (req.originalUrl.startsWith('/src/') || 
-          req.originalUrl.startsWith('/@') ||
-          req.originalUrl.includes('?import') ||
-          req.originalUrl.includes('?direct') ||
-          req.originalUrl.match(/\.(ts|tsx|jsx|vue)$/)) {
+      if (req.originalUrl.startsWith('/src/') ||
+        req.originalUrl.startsWith('/@') ||
+        req.originalUrl.includes('?import') ||
+        req.originalUrl.includes('?direct') ||
+        req.originalUrl.match(/\.(ts|tsx|jsx|vue)(\?|$)/)) {
         return viteDevServer.middlewares(req, res, next);
       }
-      
+
       const timeout = setTimeout(() => {
         if (!res.headersSent) {
           log(`Request timeout for ${req.originalUrl}`, "vite-error");
           res.status(408).end('Request timeout');
         }
       }, 30000);
-      
+
       res.once('finish', () => clearTimeout(timeout));
-      
+
       viteDevServer.middlewares(req, res, (err?: any) => {
         clearTimeout(timeout);
         if (err && !res.headersSent) {
           const errorType = categorizeError(err.message || String(err));
           log(`Vite middleware error [${errorType}]: ${err.message}`, "vite-error");
-          res.status(500).json({ 
+          res.status(500).json({
             error: err.message,
-            type: errorType 
+            type: errorType
           });
         } else {
           next(err);
@@ -271,11 +291,11 @@ export async function setupVite(app: Express, server: Server) {
     // Streamlined SPA routing with focused error handling
     app.use("*", async (req: Request, res: Response, next: NextFunction) => {
       // Skip non-frontend routes and TypeScript/JSX files
-      if (req.originalUrl.startsWith('/api/') || 
-          req.originalUrl.startsWith('/health') ||
-          req.originalUrl.startsWith('/src/') ||
-          req.originalUrl.startsWith('/@') ||
-          req.originalUrl.match(/\.(js|mjs|ts|tsx|jsx|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|json|map)$/)) {
+      if (req.originalUrl.startsWith('/api/') ||
+        req.originalUrl.startsWith('/health') ||
+        req.originalUrl.startsWith('/src/') ||
+        req.originalUrl.startsWith('/@') ||
+        req.originalUrl.match(/\.(js|mjs|ts|tsx|jsx|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|json|map)$/)) {
         return next();
       }
 
@@ -289,74 +309,74 @@ export async function setupVite(app: Express, server: Server) {
         }
 
         let template = await fs.promises.readFile(clientTemplate, "utf-8");
-        
+
         // Simple cache busting for development
         const cacheVersion = Date.now();
         template = template.replace(
           `src="/src/main.tsx"`,
           `src="/src/main.tsx?v=${cacheVersion}"`,
         );
-        
+
         // Minimal template enhancement - only essential debugging utilities
         template = enhanceTemplateForDevelopment(template, req.originalUrl, startTime, hmrPort);
 
         if (viteDevServer) {
           try {
             const page = await viteDevServer.transformIndexHtml(req.originalUrl, template);
-            
-            res.status(200).set({ 
+
+            res.status(200).set({
               "Content-Type": "text/html; charset=utf-8",
               "Cache-Control": "no-cache, no-store, must-revalidate",
               "X-Response-Time": `${Date.now() - startTime}ms`,
             }).end(page);
-            
+
             debugLog('requests', `Served ${req.originalUrl} in ${Date.now() - startTime}ms`, "vite-debug");
-            
+
           } catch (transformError) {
             log(`HTML transform error: ${(transformError as Error).message}`, "vite-error");
-            res.status(200).set({ 
+            res.status(200).set({
               "Content-Type": "text/html; charset=utf-8",
               "Cache-Control": "no-cache",
             }).end(template);
           }
         } else {
-          res.status(200).set({ 
+          res.status(200).set({
             "Content-Type": "text/html; charset=utf-8",
             "Cache-Control": "no-cache",
           }).end(template);
         }
-        
+
       } catch (e) {
         const error = e as Error;
         const errorType = categorizeError(error.message);
-        
+
         log(`Error serving HTML [${errorType}]: ${error.message}`, "vite-error");
-        
+
         if (viteDevServer) {
           viteDevServer.ssrFixStacktrace(error);
         }
-        
+
         const errorPage = createErrorPage({
           title: "Development Server Error",
           message: error.message,
           errorType,
-          stack: error.stack,
+          stack: error.stack || undefined,
           suggestions: getErrorSuggestions(errorType),
         });
-        
-        res.status(500).set({ 
+
+        res.status(500).set({
           "Content-Type": "text/html; charset=utf-8",
         }).end(errorPage);
       }
     });
 
     log("Vite development server setup completed", "vite");
-    
+
     // Optional monitoring only in debug mode
     if (DEBUG_FLAGS.all) {
       setupDevelopmentServerMonitoring();
     }
-    
+
   } catch (error) {
     const err = error as Error;
     const errorType = categorizeError(err.message);
@@ -369,8 +389,8 @@ export async function setupVite(app: Express, server: Server) {
 
 // Minimal template enhancement - only essential debugging utilities
 function enhanceTemplateForDevelopment(
-  template: string, 
-  url: string, 
+  template: string,
+  url: string,
   startTime: number,
   hmrPort: number
 ): string {
@@ -392,8 +412,8 @@ function enhanceTemplateForDevelopment(
       // Consolidated error handler
       const logError = (type, event) => {
         console.group(\`🚨 \${type}\`);
-        logger.error('Error:', { component: 'Chanuka' }, event.error || event.reason || event.message);
-        logger.error('Location:', { component: 'Chanuka' }, event.filename || 'unknown');
+        console.error('Error:', { component: 'Chanuka' }, event.error || event.reason || event.message);
+        console.error('Location:', { component: 'Chanuka' }, event.filename || 'unknown');
         console.groupEnd();
       };
       
@@ -401,20 +421,20 @@ function enhanceTemplateForDevelopment(
       window.addEventListener('unhandledrejection', e => logError('Promise Rejection', e));
     </script>
   `;
-  
+
   return template.replace('</head>', `${developmentEnhancements}</head>`);
 }
 
 // Focused monitoring - only when debug mode is enabled
 function setupDevelopmentServerMonitoring(): void {
   if (!viteDevServer) return;
-  
+
   viteDevServer.ws.on('connection', () => {
     log('HMR client connected', "vite-hmr");
   });
-  
+
   if (DEBUG_FLAGS.fileChanges) {
-    viteDevServer.watcher.on('change', (file) => {
+    viteDevServer.watcher.on('change', (file: string) => {
       log(`File changed: ${path.relative(process.cwd(), file)}`, "vite-watcher");
     });
   }
@@ -425,7 +445,7 @@ function createErrorPage(options: {
   title: string;
   message: string;
   errorType?: string;
-  stack?: string;
+  stack?: string | undefined;
   suggestions?: string[];
 }): string {
   const isDevelopment = options.errorType !== undefined;
@@ -434,7 +454,7 @@ function createErrorPage(options: {
     'Restart the development server',
     'Check the browser console for more details'
   ];
-  
+
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -569,7 +589,7 @@ function getErrorSuggestions(errorType: string): string[] {
       'Or kill the process: lsof -ti:4200 | xargs kill -9',
     ],
   };
-  
+
   return suggestions[errorType] || [
     'Try refreshing the page',
     'Restart the development server',
@@ -585,9 +605,9 @@ export function serveStatic(app: Express) {
       path.resolve(import.meta.dirname, "..", "dist", "public"),
       path.resolve(import.meta.dirname, "..", "client", "dist", "public")
     ];
-    
+
     let distPath: string | null = null;
-    
+
     for (const possiblePath of possibleDistPaths) {
       if (fs.existsSync(possiblePath) && fs.existsSync(path.resolve(possiblePath, "index.html"))) {
         distPath = possiblePath;
@@ -595,13 +615,13 @@ export function serveStatic(app: Express) {
         break;
       }
     }
-    
+
     if (!distPath) {
       throw new Error(
         `No valid build directory found. Please run 'npm run build' to create the production build.`
       );
     }
-    
+
     const indexPath = path.resolve(distPath, "index.html");
 
     // Streamlined static file serving with cache strategy lookup
@@ -615,14 +635,14 @@ export function serveStatic(app: Express) {
         const ext = path.extname(filePath).toLowerCase();
         const fileName = path.basename(filePath);
         const isHashed = /[a-f0-9]{8,}/.test(fileName);
-        
+
         // Set MIME type
         const mimeType = MIME_TYPES[ext] || 'application/octet-stream';
         res.setHeader('Content-Type', mimeType);
-        
+
         // Determine cache strategy
         let cacheStrategy: keyof typeof CACHE_STRATEGIES;
-        
+
         if (ext === '.html') {
           cacheStrategy = 'none';
         } else if (isHashed && /\.(js|mjs|css)$/.test(ext)) {
@@ -638,9 +658,9 @@ export function serveStatic(app: Express) {
         } else {
           cacheStrategy = 'short';
         }
-        
+
         res.setHeader('Cache-Control', CACHE_STRATEGIES[cacheStrategy]);
-        
+
         // Security headers
         res.setHeader('X-Content-Type-Options', 'nosniff');
         res.setHeader('X-Frame-Options', 'DENY');
@@ -651,8 +671,8 @@ export function serveStatic(app: Express) {
     // Simplified SPA fallback
     app.use("*", (req: Request, res: Response, next: NextFunction) => {
       // Skip non-SPA routes
-      if (req.originalUrl.startsWith('/api/') || 
-          req.originalUrl.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|json|map)$/)) {
+      if (req.originalUrl.startsWith('/api/') ||
+        req.originalUrl.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|json|map)$/)) {
         return next();
       }
 

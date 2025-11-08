@@ -22,10 +22,5 @@ export const DEFAULT_NAVIGATION_MAP: NavigationItem[] = [
   { id: 'admin', label: 'Admin Panel', href: '/admin', icon: Settings, section: 'admin', adminOnly: true, priority: 1 },
 ];
 
-// Export as module for test compatibility
-module.exports = {
-  SECTION_TITLES,
-  SECTION_ORDER,
-  DEFAULT_NAVIGATION_MAP,
-};
+// All exports are already available as ES modules above
 

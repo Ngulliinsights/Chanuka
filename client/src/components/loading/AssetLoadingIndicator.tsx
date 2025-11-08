@@ -348,14 +348,14 @@ const AssetLoadingContext = React.createContext<AssetLoadingContextType | undefi
 export const AssetLoadingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isVisible, config, show, hide } = useAssetLoadingIndicator();
   
+  const contextValue = useMemo(() => ({
+    showIndicator: show,
+    hideIndicator: hide,
+    isIndicatorVisible: isVisible,
+  }), [show, hide, isVisible]);
+
   return (
-    <AssetLoadingContext.Provider
-      value={{
-        showIndicator: show,
-        hideIndicator: hide,
-        isIndicatorVisible: isVisible,
-      }}
-    >
+    <AssetLoadingContext.Provider value={contextValue}>
       {children}
       {isVisible && <AssetLoadingIndicator {...config} />}
     </AssetLoadingContext.Provider>

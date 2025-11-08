@@ -318,7 +318,7 @@ export class ImportPathResolver {
       'ApiSuccess', 'ApiError', 'ApiValidationError', 'ApiResponseWrapper',
       'cacheKeys', 'CACHE_KEYS', 'cache',
       'Performance', 'RateLimit',
-      'EnhancedErrorBoundary', 'AutomatedErrorRecoveryEngine',
+      'ErrorBoundary', 'AutomatedErrorRecoveryEngine',
       'ApiSuccessResponse', 'ApiErrorResponse', 'ApiValidationErrorResponse'
     ];
 

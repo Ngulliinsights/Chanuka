@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -86,12 +86,12 @@ export function ThemeProvider({
     });
   };
 
-  const value: ThemeContextType = {
+  const value: ThemeContextType = useMemo(() => ({
     theme,
     resolvedTheme,
     setTheme,
     toggleTheme,
-  };
+  }), [theme, resolvedTheme, setTheme, toggleTheme]);
 
   return (
     <ThemeContext.Provider value={value}>

@@ -447,11 +447,209 @@ describe('Hook Error Handling', () => {
     });
 
     const { result } = renderHook(() => useJourneyAnalytics());
-    
+
     // Should not throw error
     expect(() => {
       result.current.getAnalytics();
     }).not.toThrow();
+  });
+
+  describe('Complex State Interactions', () => {
+    it('should handle concurrent journey tracking with multiple sessions', async () => {
+      const { result: result1 } = renderHook(() => useJourneyTracker('session-1'), { wrapper });
+      const { result: result2 } = renderHook(() => useJourneyTracker('session-2'), { wrapper });
+
+      // Track different paths for each session
+      await act(() => {
+        result1.current.trackPageVisit('/bills', 'legislative');
+        result2.current.trackPageVisit('/community', 'community');
+      });
+
+      expect(mockTracker.trackStep).toHaveBeenCalledWith('session-1', '/bills', 'legislative', undefined, undefined);
+      expect(mockTracker.trackStep).toHaveBeenCalledWith('session-2', '/community', 'community', undefined, undefined);
+    });
+
+    it('should manage state transitions during complex user flows', async () => {
+      const { result } = renderHook(() => useJourneyTracker(), { wrapper });
+
+      // Simulate complex user flow with multiple state changes
+      await act(() => {
+        result.current.trackPageVisit('/', 'home');
+      });
+
+      // Simulate async operation (like API call)
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      await act(() => {
+        result.current.trackPageVisit('/bills', 'legislative');
+        result.current.trackConversion('search_performed');
+      });
+
+      await act(() => {
+        result.current.trackPageVisit('/bills/123', 'legislative');
+        result.current.trackConversion('bill_analysis_viewed');
+      });
+
+      await act(() => {
+        result.current.completeJourney(true);
+      });
+
+      expect(mockTracker.trackStep).toHaveBeenCalledTimes(3);
+      expect(mockTracker.trackConversionEvent).toHaveBeenCalledTimes(2);
+      expect(mockTracker.completeJourney).toHaveBeenCalledWith(
+        expect.stringMatching(/^session_/),
+        true
+      );
+    });
+
+    it('should handle rapid state changes and race conditions', async () => {
+      const { result } = renderHook(() => useJourneyTracker(), { wrapper });
+
+      // Simulate rapid user interactions
+      const promises = [];
+      for (let i = 0; i < 5; i++) {
+        promises.push(
+          act(() => {
+            result.current.trackPageVisit(`/page-${i}`, 'navigation');
+          })
+        );
+      }
+
+      await Promise.all(promises);
+
+      expect(mockTracker.trackStep).toHaveBeenCalledTimes(5);
+    });
+
+    it('should maintain state consistency across hook re-renders', async () => {
+      const { result, rerender } = renderHook(() => useJourneyTracker('test-session'), { wrapper });
+
+      await act(() => {
+        result.current.trackPageVisit('/initial', 'navigation');
+      });
+
+      // Force re-render
+      rerender();
+
+      await act(() => {
+        result.current.trackPageVisit('/second', 'navigation');
+      });
+
+      expect(mockTracker.trackStep).toHaveBeenCalledWith('test-session', '/initial', 'navigation', undefined, undefined);
+      expect(mockTracker.trackStep).toHaveBeenCalledWith('test-session', '/second', 'navigation', undefined, undefined);
+    });
+
+    it('should handle complex analytics queries with multiple filters', () => {
+      const { result } = renderHook(() => useJourneyAnalytics());
+
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-12-31');
+
+      act(() => {
+        result.current.getAnalytics(startDate, endDate, 'expert');
+      });
+
+      expect(mockTracker.getJourneyAnalytics).toHaveBeenCalledWith(startDate, endDate, 'expert');
+    });
+
+    it('should manage state during error recovery scenarios', async () => {
+      mockTracker.trackStep.mockImplementationOnce(() => {
+        throw new Error('Temporary tracking error');
+      }).mockImplementationOnce(() => {
+        // Succeed on retry
+      });
+
+      const { result } = renderHook(() => useJourneyTracker(), { wrapper });
+
+      // First call fails
+      await act(() => {
+        result.current.trackPageVisit('/test', 'navigation');
+      });
+
+      // Second call succeeds
+      await act(() => {
+        result.current.trackPageVisit('/test2', 'navigation');
+      });
+
+      expect(mockTracker.trackStep).toHaveBeenCalledTimes(2);
+      expect(logger.error).toHaveBeenCalled();
+    });
+
+    it('should handle complex conversion funnel tracking', async () => {
+      const { result } = renderHook(() => useJourneyTracker(), { wrapper });
+
+      // Track a complete conversion funnel
+      await act(() => {
+        result.current.trackPageVisit('/', 'home');
+        result.current.trackPageVisit('/bills', 'legislative');
+        result.current.trackPageVisit('/bills/123', 'legislative');
+        result.current.trackPageVisit('/bills/123/analysis', 'analysis');
+        result.current.trackBillAnalysisViewed();
+        result.current.trackCommentPosted();
+        result.current.completeJourney(true);
+      });
+
+      expect(mockTracker.trackStep).toHaveBeenCalledTimes(4);
+      expect(mockTracker.trackConversionEvent).toHaveBeenCalledTimes(2);
+      expect(mockTracker.completeJourney).toHaveBeenCalledWith(
+        expect.stringMatching(/^session_/),
+        true
+      );
+    });
+
+    it('should manage state during navigation context changes', async () => {
+      // Mock changing navigation context
+      const mockUseNavigation = vi.fn()
+        .mockReturnValueOnce({
+          currentPath: '/',
+          currentSection: 'home' as const,
+          user_role: 'public' as const,
+        })
+        .mockReturnValueOnce({
+          currentPath: '/bills',
+          currentSection: 'legislative' as const,
+          user_role: 'expert' as const,
+        });
+
+      vi.doMock('@/contexts/NavigationContext', () => ({
+        useNavigation: mockUseNavigation,
+      }));
+
+      const { result, rerender } = renderHook(() => useJourneyTracker(), { wrapper });
+
+      await act(() => {
+        result.current.trackPageVisit('/initial', 'home');
+      });
+
+      rerender();
+
+      await act(() => {
+        result.current.trackPageVisit('/bills', 'legislative');
+      });
+
+      expect(mockTracker.trackStep).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle complex optimization recommendation queries', () => {
+      const { result } = renderHook(() => useJourneyAnalytics());
+
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-12-31');
+
+      act(() => {
+        result.current.getOptimizations(startDate, endDate);
+      });
+
+      expect(mockTracker.getOptimizationRecommendations).toHaveBeenCalledWith(startDate, endDate);
+    });
+
+    it('should maintain state isolation between multiple hook instances', () => {
+      const { result: result1 } = renderHook(() => useJourneyTracker('session-a'), { wrapper });
+      const { result: result2 } = renderHook(() => useJourneyTracker('session-b'), { wrapper });
+
+      expect(result1.current.session_id).toBe('session-a');
+      expect(result2.current.session_id).toBe('session-b');
+      expect(result1.current.session_id).not.toBe(result2.current.session_id);
+    });
   });
 });
 

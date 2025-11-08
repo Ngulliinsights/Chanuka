@@ -3,7 +3,7 @@
  * Best practices: State persistence, responsive behavior, breadcrumb generation
  */
 
-import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef, useMemo, useCallback } from 'react';
 import { NavigationState, NavigationContextValue, UserRole, BreadcrumbItem, RelatedPage } from './types';
 import { navigationReducer } from './reducer';
 import { generateBreadcrumbs, calculateRelatedPages, determineNavigationSection, isNavigationPathActive } from './utils';
@@ -49,9 +49,13 @@ export function createNavigationProvider(
     // Use refs to track ongoing navigation updates and prevent race conditions
     const navigationUpdateRef = useRef<string | null>(null);
     const persistenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const lastLocationRef = useRef<string>('');
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isMountedRef = useRef(true);
 
     // Handle mounting and hydration
     useEffect(() => {
+      isMountedRef.current = true;
       dispatch({ type: 'SET_MOUNTED', payload: true });
       
       // Load persisted navigation state on mount
@@ -59,25 +63,66 @@ export function createNavigationProvider(
       if (persistedState) {
         dispatch({ type: 'LOAD_PERSISTED_STATE', payload: persistedState });
       }
+      
+      // Cleanup function to mark component as unmounted
+      return () => {
+        isMountedRef.current = false;
+        
+        // Clear all timers on unmount
+        if (persistenceTimerRef.current) {
+          clearTimeout(persistenceTimerRef.current);
+        }
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+        }
+      };
     }, []);
 
-    // Update mobile state when media query changes
+    // Refs to track previous values and prevent unnecessary updates
+    const prevMobileStateRef = useRef<boolean | null>(null);
+    const sidebarStateInitializedRef = useRef(false);
+    
+    // Update mobile state when media query changes - with race condition prevention
     useEffect(() => {
-      if (state.mounted) {
-        dispatch({ type: 'SET_MOBILE', payload: isMobileQuery });
+      if (state.mounted && prevMobileStateRef.current !== isMobileQuery) {
+        prevMobileStateRef.current = isMobileQuery;
         
-        // On mobile, sidebar should be collapsed by default
-        // On desktop, sidebar should be open by default (unless user has saved preference)
-        if (isMobileQuery) {
-          dispatch({ type: 'SET_SIDEBAR_COLLAPSED', payload: true });
+        // Only dispatch if the mobile state actually changed
+        if (state.isMobile !== isMobileQuery) {
+          dispatch({ type: 'SET_MOBILE', payload: isMobileQuery });
+        }
+        
+        // Initialize sidebar state only once to prevent loops
+        if (!sidebarStateInitializedRef.current) {
+          sidebarStateInitializedRef.current = true;
+          
+          if (isMobileQuery) {
+            dispatch({ type: 'SET_SIDEBAR_COLLAPSED', payload: true });
+          } else {
+            const savedSidebarState = NavigationStatePersistence.loadSidebarState();
+            if (savedSidebarState === null) {
+              dispatch({ type: 'SET_SIDEBAR_COLLAPSED', payload: false });
+            }
+          }
         } else {
-          const savedSidebarState = NavigationStatePersistence.loadSidebarState();
-          if (savedSidebarState === null) {
-            dispatch({ type: 'SET_SIDEBAR_COLLAPSED', payload: false });
+          // For subsequent changes, only update if transitioning between mobile/desktop
+          const wasMobile = !isMobileQuery;
+          const isNowMobile = isMobileQuery;
+          
+          if (wasMobile !== isNowMobile) {
+            // Debounce sidebar state changes during responsive transitions
+            setTimeout(() => {
+              if (isMountedRef.current && prevMobileStateRef.current === isMobileQuery) {
+                dispatch({ 
+                  type: 'SET_SIDEBAR_COLLAPSED', 
+                  payload: isMobileQuery 
+                });
+              }
+            }, 100);
           }
         }
       }
-    }, [isMobileQuery, state.mounted]);
+    }, [isMobileQuery, state.mounted, state.isMobile]);
 
     // Sync navigation state with authentication changes
     useEffect(() => {
@@ -95,113 +140,197 @@ export function createNavigationProvider(
 
     // Debounced persistence to avoid excessive localStorage writes
     useEffect(() => {
+      // Only persist if component is mounted and state is stable
+      if (!state.mounted || !isMountedRef.current) {
+        return;
+      }
+      
       if (persistenceTimerRef.current) {
         clearTimeout(persistenceTimerRef.current);
+        persistenceTimerRef.current = null;
       }
       
       persistenceTimerRef.current = setTimeout(() => {
-        NavigationStatePersistence.saveNavigationState(state);
-      }, 500);
+        // Double-check component is still mounted before persisting
+        if (isMountedRef.current) {
+          try {
+            NavigationStatePersistence.saveNavigationState(state);
+          } catch (error) {
+            console.warn('Failed to persist navigation state:', error);
+          }
+        }
+        persistenceTimerRef.current = null;
+      }, 300); // Reduced timeout for better responsiveness
 
       return () => {
         if (persistenceTimerRef.current) {
           clearTimeout(persistenceTimerRef.current);
+          persistenceTimerRef.current = null;
         }
       };
-    }, [state.preferences, state.sidebarOpen, state.sidebarCollapsed]);
+    }, [state.preferences, state.sidebarOpen, state.sidebarCollapsed, state.mounted]);
+
+    // Stable refs for current state values to avoid stale closures
+    const stateRef = useRef(state);
+    stateRef.current = state;
+
+    // Enhanced debounced navigation update with better race condition prevention
+    const debouncedNavigationUpdate = useCallback((currentPath: string) => {
+      // Clear any existing timer
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+      
+      debounceTimerRef.current = setTimeout(() => {
+        // Double-check component is still mounted
+        if (!isMountedRef.current) {
+          return;
+        }
+        
+        // If this path is already being processed or is the same as last processed, skip
+        if (navigationUpdateRef.current === currentPath || lastLocationRef.current === currentPath) {
+          return;
+        }
+        
+        // Mark this path as being processed
+        navigationUpdateRef.current = currentPath;
+        
+        try {
+          // Get current state values from ref to avoid stale closures
+          const currentState = stateRef.current;
+          
+          // Only proceed if state is stable (not in the middle of other updates)
+          if (!currentState.mounted) {
+            return;
+          }
+          
+          // Calculate all navigation data synchronously to ensure consistency
+          const section = determineNavigationSection(currentPath);
+          const breadcrumbs = generateBreadcrumbs(currentPath);
+          const currentUserRole = currentState.user_role;
+          const currentMobileMenuOpen = currentState.mobileMenuOpen;
+          const relatedPages = calculateRelatedPages(currentPath, currentUserRole);
+          const pageTitle = document.title || currentPath;
+          
+          // Only dispatch if we have meaningful changes
+          const hasChanges = (
+            currentState.currentPath !== currentPath ||
+            currentState.currentSection !== section ||
+            currentState.breadcrumbs.length !== breadcrumbs.length
+          );
+          
+          if (hasChanges) {
+            // Dispatch a single batched update to minimize re-renders
+            dispatch({ 
+              type: 'BATCH_NAVIGATION_UPDATE', 
+              payload: {
+                currentPath,
+                section,
+                breadcrumbs,
+                relatedPages,
+                recentPage: { path: currentPath, title: pageTitle },
+                closeMobileMenu: currentMobileMenuOpen
+              }
+            });
+          }
+          
+          // Update last processed path
+          lastLocationRef.current = currentPath;
+          
+        } catch (error) {
+          console.warn('Navigation update error:', error);
+        } finally {
+          // Clear the processing flag after a brief delay
+          setTimeout(() => {
+            if (navigationUpdateRef.current === currentPath) {
+              navigationUpdateRef.current = null;
+            }
+          }, 50);
+        }
+      }, 100); // Reduced debounce time for better responsiveness
+    }, []); // Empty dependencies are safe now with stateRef
 
     // Update navigation state when location changes
     useEffect(() => {
       const currentPath = location.pathname;
+      debouncedNavigationUpdate(currentPath);
       
-      // If this path is already being processed, skip to avoid race conditions
-      if (navigationUpdateRef.current === currentPath) {
-        return;
-      }
-      
-      // Mark this path as being processed
-      navigationUpdateRef.current = currentPath;
-      
-      // Calculate all navigation data synchronously to ensure consistency
-      const section = determineNavigationSection(currentPath);
-      const breadcrumbs = generateBreadcrumbs(currentPath);
-      const relatedPages = calculateRelatedPages(currentPath, state.user_role);
-      const pageTitle = document.title || currentPath;
-      
-      // Dispatch a single batched update to minimize re-renders
-      dispatch({ 
-        type: 'BATCH_NAVIGATION_UPDATE', 
-        payload: {
-          currentPath,
-          section,
-          breadcrumbs,
-          relatedPages,
-          recentPage: { path: currentPath, title: pageTitle },
-          closeMobileMenu: state.mobileMenuOpen
+      return () => {
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
         }
-      });
-      
-      // Clear the processing flag after a brief delay
-      const timeoutId = setTimeout(() => {
-        navigationUpdateRef.current = null;
-      }, 100);
-      
-      return () => clearTimeout(timeoutId);
-    }, [location.pathname, state.user_role]);
+      };
+    }, [location.pathname, debouncedNavigationUpdate]);
 
-    // Context value with all functionality
+    // Memoized navigation actions to prevent unnecessary re-renders
+    const navigateTo = useCallback((path: string) => {
+      navigate(path);
+    }, [navigate]);
+    
+    const updateBreadcrumbs = useCallback((breadcrumbs: BreadcrumbItem[]) => {
+      dispatch({ type: 'SET_BREADCRUMBS', payload: breadcrumbs });
+    }, []);
+    
+    const updateRelatedPages = useCallback((pages: RelatedPage[]) => {
+      dispatch({ type: 'SET_RELATED_PAGES', payload: pages });
+    }, []);
+    
+    const updateUserRole = useCallback((role: UserRole) => {
+      dispatch({ type: 'SET_USER_ROLE', payload: role });
+    }, []);
+    
+    const updatePreferences = useCallback((preferences: any) => {
+      dispatch({ type: 'UPDATE_PREFERENCES', payload: preferences });
+    }, []);
+    
+    const addToRecentPages = useCallback((page: { path: string; title: string }) => {
+      // Get current recent pages from ref to avoid stale closures
+      const currentRecentPages = stateRef.current.preferences.recentlyVisited;
+      const updatedRecentPages = NavigationStatePersistence.updateRecentPages(
+        currentRecentPages, 
+        page
+      );
+      dispatch({ 
+        type: 'UPDATE_PREFERENCES', 
+        payload: { recentlyVisited: updatedRecentPages } 
+      });
+    }, []); // Empty dependencies are safe now with stateRef
+    
+    const toggleSidebar = useCallback(() => {
+      dispatch({ type: 'TOGGLE_SIDEBAR' });
+    }, []);
+    
+    const toggleMobileMenu = useCallback(() => {
+      dispatch({ type: 'TOGGLE_MOBILE_MENU' });
+    }, []);
+    
+    const setSidebarCollapsed = useCallback((collapsed: boolean) => {
+      dispatch({ type: 'SET_SIDEBAR_COLLAPSED', payload: collapsed });
+    }, []);
+    
+    const is_active = useCallback((path: string) => {
+      // Get current path from ref to avoid stale closures
+      return isNavigationPathActive(path, stateRef.current.currentPath);
+    }, []); // Empty dependencies are safe now with stateRef
+
+    // Context value with all functionality - no memoization to avoid dependency issues
     const contextValue: NavigationContextValue = {
       ...state,
       
       // Navigation actions
-      navigateTo: (path: string) => {
-        navigate(path);
-      },
-      
-      updateBreadcrumbs: (breadcrumbs: BreadcrumbItem[]) => {
-        dispatch({ type: 'SET_BREADCRUMBS', payload: breadcrumbs });
-      },
-      
-      updateRelatedPages: (pages: RelatedPage[]) => {
-        dispatch({ type: 'SET_RELATED_PAGES', payload: pages });
-      },
-      
-      updateUserRole: (role: UserRole) => {
-        dispatch({ type: 'SET_USER_ROLE', payload: role });
-      },
-      
-      updatePreferences: (preferences) => {
-        dispatch({ type: 'UPDATE_PREFERENCES', payload: preferences });
-      },
-      
-      addToRecentPages: (page: { path: string; title: string }) => {
-        // Update recent pages manually
-        const updatedRecentPages = NavigationStatePersistence.updateRecentPages(
-          state.preferences.recentlyVisited, 
-          page
-        );
-        dispatch({ 
-          type: 'UPDATE_PREFERENCES', 
-          payload: { recentlyVisited: updatedRecentPages } 
-        });
-      },
+      navigateTo,
+      updateBreadcrumbs,
+      updateRelatedPages,
+      updateUserRole,
+      updatePreferences,
+      addToRecentPages,
       
       // UI actions (merged from ResponsiveNavigationContext)
-      toggleSidebar: () => {
-        dispatch({ type: 'TOGGLE_SIDEBAR' });
-      },
-      
-      toggleMobileMenu: () => {
-        dispatch({ type: 'TOGGLE_MOBILE_MENU' });
-      },
-      
-      setSidebarCollapsed: (collapsed: boolean) => {
-        dispatch({ type: 'SET_SIDEBAR_COLLAPSED', payload: collapsed });
-      },
-      
-      is_active: (path: string) => {
-        return isNavigationPathActive(path, state.currentPath);
-      },
+      toggleSidebar,
+      toggleMobileMenu,
+      setSidebarCollapsed,
+      is_active,
     };
 
     return (

@@ -175,9 +175,9 @@ describe('SharedCoreUtilityDetector', () => {
 
     it('should handle error boundary utilities', () => {
       const testCode = `
-        <EnhancedErrorBoundary fallback={ErrorFallback}>
+        <ErrorBoundary fallback={ErrorFallback}>
           <App />
-        </EnhancedErrorBoundary>
+        </ErrorBoundary>
         
         const recovery = AutomatedErrorRecoveryEngine();
       `;
@@ -187,7 +187,7 @@ describe('SharedCoreUtilityDetector', () => {
       const result = detector.detectMissingUtilities('test.ts');
       
       expect(result.usedUtilities).toHaveLength(2);
-      expect(result.usedUtilities.map(u => u.name)).toContain('EnhancedErrorBoundary');
+      expect(result.usedUtilities.map(u => u.name)).toContain('ErrorBoundary');
       expect(result.usedUtilities.map(u => u.name)).toContain('AutomatedErrorRecoveryEngine');
     });
 

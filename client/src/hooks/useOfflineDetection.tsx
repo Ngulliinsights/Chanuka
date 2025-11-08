@@ -3,7 +3,7 @@
  * Provides comprehensive offline detection with connection quality assessment
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { logger } from '../utils/browser-logger';
 
 export interface ConnectionQuality {
@@ -35,29 +35,44 @@ export function useOfflineDetection(): OfflineDetectionState & {
     isReconnecting: false,
   });
 
-  // Update connection quality
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastQualityRef = useRef<string>('');
+  const isMountedRef = useRef(true);
+
+  // Update connection quality with debouncing
   const updateConnectionQuality = useCallback(() => {
-    if (typeof navigator !== 'undefined' && 'connection' in navigator) {
-      const connection = (navigator as any).connection;
-      if (connection) {
-        const quality: ConnectionQuality = {
-          type: 'fast',
-          downlink: connection.downlink,
-          effectiveType: connection.effectiveType,
-        };
-
-        // Determine quality based on effective type and downlink
-        if (!navigator.onLine) {
-          quality.type = 'offline';
-        } else if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
-          quality.type = 'slow';
-        } else if (connection.effectiveType === '3g' && connection.downlink < 1) {
-          quality.type = 'slow';
-        }
-
-        setState(prev => ({ ...prev, connectionQuality: quality }));
-      }
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
     }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+        const connection = (navigator as any).connection;
+        if (connection) {
+          const quality: ConnectionQuality = {
+            type: 'fast',
+            downlink: connection.downlink,
+            effectiveType: connection.effectiveType,
+          };
+
+          // Determine quality based on effective type and downlink
+          if (!navigator.onLine) {
+            quality.type = 'offline';
+          } else if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+            quality.type = 'slow';
+          } else if (connection.effectiveType === '3g' && connection.downlink < 1) {
+            quality.type = 'slow';
+          }
+
+          // Only update if quality has actually changed and component is mounted
+          const qualityKey = JSON.stringify(quality);
+          if (lastQualityRef.current !== qualityKey && isMountedRef.current) {
+            lastQualityRef.current = qualityKey;
+            setState(prev => ({ ...prev, connectionQuality: quality }));
+          }
+        }
+      }
+    }, 150); // 150ms debounce
   }, []);
 
   // Check connection by making a small request
@@ -67,7 +82,9 @@ export function useOfflineDetection(): OfflineDetectionState & {
     }
 
     try {
-      setState(prev => ({ ...prev, isReconnecting: true }));
+      if (isMountedRef.current) {
+        setState(prev => ({ ...prev, isReconnecting: true }));
+      }
 
       // Try to fetch a small resource with timeout
       const controller = new AbortController();
@@ -82,26 +99,31 @@ export function useOfflineDetection(): OfflineDetectionState & {
       clearTimeout(timeoutId);
 
       const isConnected = response.ok;
-      setState(prev => ({
-        ...prev,
-        isOnline: isConnected,
-        lastOnlineTime: isConnected ? Date.now() : prev.lastOnlineTime,
-        lastOfflineTime: !isConnected ? Date.now() : prev.lastOfflineTime,
-        connectionAttempts: prev.connectionAttempts + 1,
-        isReconnecting: false,
-      }));
+      
+      if (isMountedRef.current) {
+        setState(prev => ({
+          ...prev,
+          isOnline: isConnected,
+          lastOnlineTime: isConnected ? Date.now() : prev.lastOnlineTime,
+          lastOfflineTime: !isConnected ? Date.now() : prev.lastOfflineTime,
+          connectionAttempts: prev.connectionAttempts + 1,
+          isReconnecting: false,
+        }));
+      }
 
       return isConnected;
     } catch (error) {
       logger.warn('Connection check failed', { component: 'useOfflineDetection', error });
 
-      setState(prev => ({
-        ...prev,
-        isOnline: false,
-        lastOfflineTime: Date.now(),
-        connectionAttempts: prev.connectionAttempts + 1,
-        isReconnecting: false,
-      }));
+      if (isMountedRef.current) {
+        setState(prev => ({
+          ...prev,
+          isOnline: false,
+          lastOfflineTime: Date.now(),
+          connectionAttempts: prev.connectionAttempts + 1,
+          isReconnecting: false,
+        }));
+      }
 
       return false;
     }
@@ -115,25 +137,31 @@ export function useOfflineDetection(): OfflineDetectionState & {
 
   // Listen for online/offline events
   useEffect(() => {
+    isMountedRef.current = true;
+    
     const handleOnline = () => {
       logger.info('Browser reports online', { component: 'useOfflineDetection' });
-      setState(prev => ({
-        ...prev,
-        isOnline: true,
-        lastOnlineTime: Date.now(),
-        connectionAttempts: 0,
-      }));
+      if (isMountedRef.current) {
+        setState(prev => ({
+          ...prev,
+          isOnline: true,
+          lastOnlineTime: Date.now(),
+          connectionAttempts: 0,
+        }));
+      }
       updateConnectionQuality();
     };
 
     const handleOffline = () => {
       logger.warn('Browser reports offline', { component: 'useOfflineDetection' });
-      setState(prev => ({
-        ...prev,
-        isOnline: false,
-        lastOfflineTime: Date.now(),
-        connectionQuality: { type: 'offline' },
-      }));
+      if (isMountedRef.current) {
+        setState(prev => ({
+          ...prev,
+          isOnline: false,
+          lastOfflineTime: Date.now(),
+          connectionQuality: { type: 'offline' },
+        }));
+      }
     };
 
     window.addEventListener('online', handleOnline);
@@ -146,9 +174,14 @@ export function useOfflineDetection(): OfflineDetectionState & {
     const qualityInterval = setInterval(updateConnectionQuality, 30000); // Every 30 seconds
 
     return () => {
+      isMountedRef.current = false;
+      
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       clearInterval(qualityInterval);
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
   }, [updateConnectionQuality]);
 

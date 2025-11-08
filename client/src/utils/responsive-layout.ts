@@ -38,6 +38,9 @@ export class ResponsiveLayoutManager {
   private listeners: Set<(state: ResponsiveState) => void> = new Set();
   private currentState: ResponsiveState;
   private resizeObserver: ResizeObserver | null = null;
+  private resizeTimeout: NodeJS.Timeout | null = null;
+  private orientationTimeout: NodeJS.Timeout | null = null;
+  private isUpdating = false;
 
   constructor() {
     this.currentState = this.calculateState();
@@ -68,48 +71,87 @@ export class ResponsiveLayoutManager {
   }
 
   private setupEventListeners(): void {
-    // Use ResizeObserver for better performance
+    // Use ResizeObserver for better performance with debouncing
     if ('ResizeObserver' in window) {
       this.resizeObserver = new ResizeObserver(() => {
-        this.updateState();
+        this.debouncedUpdateState();
       });
       this.resizeObserver.observe(document.documentElement);
     } else {
       // Fallback to window resize event
-      (window as Window).addEventListener('resize', this.handleResize.bind(this), { passive: true });
+      window.addEventListener('resize', this.handleResize.bind(this), { passive: true });
     }
 
-    // Listen for orientation changes
+    // Listen for orientation changes with debouncing
     window.addEventListener('orientationchange', this.handleOrientationChange.bind(this), { passive: true });
   }
 
   private handleResize(): void {
-    // Debounce resize events
-    if (this.resizeTimeout !== null) {
-      clearTimeout(this.resizeTimeout);
-    }
-    this.resizeTimeout = window.setTimeout(() => {
-      this.updateState();
-    }, 100);
+    this.debouncedUpdateState();
   }
 
-  private resizeTimeout: number | null = null;
-
   private handleOrientationChange(): void {
-    // Delay to allow for orientation change to complete
-    setTimeout(() => {
+    // Delay to allow for orientation change to complete with longer timeout
+    if (this.orientationTimeout) {
+      clearTimeout(this.orientationTimeout);
+    }
+    this.orientationTimeout = setTimeout(() => {
+      this.debouncedUpdateState();
+    }, 200); // Longer delay for orientation changes
+  }
+
+  private debouncedUpdateState(): void {
+    // Prevent multiple simultaneous updates
+    if (this.isUpdating) return;
+    
+    // Debounce resize events
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+    this.resizeTimeout = setTimeout(() => {
       this.updateState();
-    }, 100);
+    }, 150); // Slightly longer debounce for stability
   }
 
   private updateState(): void {
-    const newState = this.calculateState();
-    const hasChanged = this.hasStateChanged(this.currentState, newState);
+    if (this.isUpdating) return; // Prevent recursive updates
+    
+    this.isUpdating = true;
+    
+    try {
+      const newState = this.calculateState();
+      const hasChanged = this.hasStateChanged(this.currentState, newState);
 
-    if (hasChanged) {
-      this.currentState = newState;
-      this.notifyListeners();
+      if (hasChanged) {
+        // Add hysteresis to prevent rapid switching between mobile/desktop
+        const isSignificantChange = this.isSignificantStateChange(this.currentState, newState);
+        
+        if (isSignificantChange) {
+          this.currentState = newState;
+          this.notifyListeners();
+        }
+      }
+    } finally {
+      this.isUpdating = false;
     }
+  }
+
+  private isSignificantStateChange(oldState: ResponsiveState, newState: ResponsiveState): boolean {
+    // Add hysteresis for mobile/desktop switching to prevent rapid toggling
+    const HYSTERESIS_THRESHOLD = 20; // 20px buffer zone
+    
+    // If switching from mobile to desktop, require crossing threshold + buffer
+    if (oldState.isMobile && !newState.isMobile) {
+      return newState.width >= BREAKPOINTS.md + HYSTERESIS_THRESHOLD;
+    }
+    
+    // If switching from desktop to mobile, require crossing threshold - buffer
+    if (!oldState.isMobile && newState.isMobile) {
+      return newState.width <= BREAKPOINTS.md - HYSTERESIS_THRESHOLD;
+    }
+    
+    // For other changes, allow normal switching
+    return true;
   }
 
   private hasStateChanged(oldState: ResponsiveState, newState: ResponsiveState): boolean {
@@ -156,11 +198,16 @@ export class ResponsiveLayoutManager {
     }
     window.removeEventListener('orientationchange', this.handleOrientationChange.bind(this));
     
+    // Clear all timeouts
     if (this.resizeTimeout) {
       clearTimeout(this.resizeTimeout);
     }
+    if (this.orientationTimeout) {
+      clearTimeout(this.orientationTimeout);
+    }
     
     this.listeners.clear();
+    this.isUpdating = false;
   }
 }
 

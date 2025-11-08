@@ -95,12 +95,13 @@ interface Comment { id: number;
   };
 }
 
-const apiRequest = async (method: string, url: string, data?: any) => {
+const apiRequest = async (method: string, url: string, data?: any, signal?: AbortSignal) => {
   const options: RequestInit = {
     method,
     headers: {
       'Content-Type': 'application/json',
     },
+    signal, // Add abort signal support
   };
 
   if (data) {

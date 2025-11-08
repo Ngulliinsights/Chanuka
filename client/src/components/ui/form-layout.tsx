@@ -1,173 +1,104 @@
 /**
- * Enhanced form layout components with consistent visual hierarchy
- * Implements progressive disclosure patterns and accessibility features
+ * Form Layout Components
+ * Provides structured layout components for complex forms
  */
 
-import React, { forwardRef, useState, useCallback, useRef, useEffect } from 'react';
-import { ChevronDown, ChevronRight, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown, ChevronRight, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from './button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
+import { Card, CardContent } from './card';
 
-// Form section with progressive disclosure
 interface FormSectionProps {
   title: string;
   description?: string;
   children: React.ReactNode;
-  collapsible?: boolean;
-  defaultOpen?: boolean;
   required?: boolean;
   error?: boolean;
   completed?: boolean;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
   className?: string;
-  onToggle?: (isOpen: boolean) => void;
 }
 
-export const FormSection = forwardRef<HTMLDivElement, FormSectionProps>(
-  ({ 
-    title, 
-    description, 
-    children, 
-    collapsible = false,
-    defaultOpen = true,
-    required = false,
-    error = false,
-    completed = false,
-    className,
-    onToggle,
-    ...props 
-  }, ref) => {
-    const [isOpen, setIsOpen] = useState(defaultOpen);
-    const sectionRef = useRef<HTMLDivElement>(null);
+export const FormSection: React.FC<FormSectionProps> = ({
+  title,
+  description,
+  children,
+  required = false,
+  error = false,
+  completed = false,
+  collapsible = false,
+  defaultOpen = true,
+  className
+}) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
-    const handleToggle = useCallback(() => {
-      const newState = !isOpen;
-      setIsOpen(newState);
-      onToggle?.(newState);
-    }, [isOpen, onToggle]);
+  const getStatusIcon = () => {
+    if (error) return <AlertCircle className="h-4 w-4 text-red-500" />;
+    if (completed) return <CheckCircle className="h-4 w-4 text-green-500" />;
+    return <Clock className="h-4 w-4 text-gray-400" />;
+  };
 
-    // Auto-scroll to section when opened
-    useEffect(() => {
-      if (isOpen && collapsible && sectionRef.current) {
-        sectionRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'nearest' 
-        });
-      }
-    }, [isOpen, collapsible]);
+  const getBorderColor = () => {
+    if (error) return 'border-red-200';
+    if (completed) return 'border-green-200';
+    return 'border-gray-200';
+  };
 
-    const sectionContent = (
-      <div 
-        ref={sectionRef}
+  return (
+    <div className={cn('border rounded-lg', getBorderColor(), className)}>
+      <div
         className={cn(
-          'border rounded-lg transition-all duration-200',
-          error && 'border-destructive bg-destructive/5',
-          completed && 'border-green-500 bg-green-50',
-          !error && !completed && 'border-border',
-          className
+          'p-4 border-b',
+          getBorderColor(),
+          collapsible && 'cursor-pointer hover:bg-gray-50'
         )}
-        {...props}
+        onClick={collapsible ? () => setIsOpen(!isOpen) : undefined}
       >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <h3 className={cn(
-                  'text-lg font-semibold',
-                  error && 'text-destructive',
-                  completed && 'text-green-700'
-                )}>
-                  {title}
-                  {required && (
-                    <span className="text-destructive ml-1" aria-label="required">*</span>
-                  )}
-                </h3>
-                
-                {/* Status indicators */}
-                {error && (
-                  <AlertCircle 
-                    className="h-5 w-5 text-destructive" 
-                    aria-label="Section has errors"
-                  />
-                )}
-                {completed && !error && (
-                  <CheckCircle 
-                    className="h-5 w-5 text-green-600" 
-                    aria-label="Section completed"
-                  />
-                )}
-              </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            {getStatusIcon()}
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {title}
+                {required && <span className="text-red-500 ml-1">*</span>}
+              </h3>
+              {description && (
+                <p className="text-sm text-gray-600 mt-1">{description}</p>
+              )}
             </div>
-            
-            {collapsible && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleToggle}
-                className="p-2"
-                aria-expanded={isOpen}
-                aria-controls={`section-${title.replace(/\s+/g, '-').toLowerCase()}`}
-              >
-                {isOpen ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-                <span className="sr-only">
-                  {isOpen ? 'Collapse' : 'Expand'} {title} section
-                </span>
-              </Button>
-            )}
           </div>
-          
-          {description && (
-            <p className={cn(
-              'text-sm text-muted-foreground mb-6',
-              error && 'text-destructive/80'
-            )}>
-              {description}
-            </p>
+          {collapsible && (
+            <div className="text-gray-400">
+              {isOpen ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </div>
           )}
-          
-          <div 
-            id={`section-${title.replace(/\s+/g, '-').toLowerCase()}`}
-            className={cn(
-              'transition-all duration-200',
-              collapsible && !isOpen && 'hidden'
-            )}
-          >
-            {children}
-          </div>
         </div>
       </div>
-    );
+      {(!collapsible || isOpen) && (
+        <div className="p-4">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
 
-    if (collapsible) {
-      return (
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <div ref={ref}>
-            {sectionContent}
-          </div>
-        </Collapsible>
-      );
-    }
+interface Step {
+  id: string;
+  title: string;
+  description?: string;
+  completed?: boolean;
+  error?: boolean;
+}
 
-    return <div ref={ref}>{sectionContent}</div>;
-  }
-);
-FormSection.displayName = 'FormSection';
-
-// Form step indicator for multi-step forms
 interface FormStepIndicatorProps {
-  steps: Array<{
-    id: string;
-    title: string;
-    description?: string;
-    completed?: boolean;
-    error?: boolean;
-  }>;
+  steps: Step[];
   currentStep: string;
   onStepClick?: (stepId: string) => void;
   className?: string;
@@ -182,78 +113,78 @@ export const FormStepIndicator: React.FC<FormStepIndicatorProps> = ({
   const currentIndex = steps.findIndex(step => step.id === currentStep);
 
   return (
-    <nav 
-      aria-label="Form progress"
-      className={cn('mb-8', className)}
-    >
-      <ol className="flex items-center space-x-4">
+    <div className={cn('mb-8', className)}>
+      <div className="flex items-center justify-between">
         {steps.map((step, index) => {
           const isCurrent = step.id === currentStep;
-          const isCompleted = step.completed || index < currentIndex;
-          const isClickable = onStepClick && (isCompleted || isCurrent);
-          
+          const isPast = index < currentIndex;
+          const isFuture = index > currentIndex;
+
           return (
-            <li key={step.id} className="flex items-center">
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => isClickable && onStepClick(step.id)}
-                  disabled={!isClickable}
+            <React.Fragment key={step.id}>
+              <div
+                className={cn(
+                  'flex flex-col items-center space-y-2',
+                  onStepClick && 'cursor-pointer'
+                )}
+                onClick={() => onStepClick?.(step.id)}
+              >
+                <div
                   className={cn(
-                    'flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors',
-                    isCurrent && 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2',
-                    isCompleted && !isCurrent && 'bg-green-600 text-white',
-                    step.error && 'bg-destructive text-destructive-foreground',
-                    !isCurrent && !isCompleted && !step.error && 'bg-muted text-muted-foreground',
-                    isClickable && 'hover:bg-primary/80 cursor-pointer',
-                    !isClickable && 'cursor-not-allowed'
+                    'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
+                    isCurrent && 'bg-blue-600 text-white',
+                    isPast && step.completed && 'bg-green-600 text-white',
+                    isPast && step.error && 'bg-red-600 text-white',
+                    isPast && !step.completed && !step.error && 'bg-gray-400 text-white',
+                    isFuture && 'bg-gray-200 text-gray-600'
                   )}
-                  aria-current={isCurrent ? 'step' : undefined}
-                  aria-label={`Step ${index + 1}: ${step.title}${step.completed ? ' (completed)' : ''}${step.error ? ' (has errors)' : ''}`}
                 >
-                  {step.error ? (
-                    <AlertCircle className="h-4 w-4" />
-                  ) : isCompleted ? (
+                  {isPast && step.completed ? (
                     <CheckCircle className="h-4 w-4" />
+                  ) : isPast && step.error ? (
+                    <AlertCircle className="h-4 w-4" />
                   ) : (
                     index + 1
                   )}
-                </button>
-                
-                <div className="ml-3 min-w-0">
-                  <p className={cn(
-                    'text-sm font-medium',
-                    isCurrent && 'text-primary',
-                    isCompleted && 'text-green-700',
-                    step.error && 'text-destructive',
-                    !isCurrent && !isCompleted && !step.error && 'text-muted-foreground'
-                  )}>
+                </div>
+                <div className="text-center">
+                  <p
+                    className={cn(
+                      'text-sm font-medium',
+                      isCurrent && 'text-blue-600',
+                      isPast && 'text-gray-900',
+                      isFuture && 'text-gray-500'
+                    )}
+                  >
                     {step.title}
                   </p>
                   {step.description && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-500 mt-1">
                       {step.description}
                     </p>
                   )}
                 </div>
               </div>
-              
               {index < steps.length - 1 && (
-                <div className="ml-4 w-8 h-px bg-border" />
+                <div
+                  className={cn(
+                    'flex-1 h-px mx-4',
+                    index < currentIndex ? 'bg-green-600' : 'bg-gray-200'
+                  )}
+                />
               )}
-            </li>
+            </React.Fragment>
           );
         })}
-      </ol>
-    </nav>
+      </div>
+    </div>
   );
 };
 
-// Form field group with consistent spacing
 interface FormFieldGroupProps {
   children: React.ReactNode;
-  orientation?: 'vertical' | 'horizontal';
-  spacing?: 'sm' | 'md' | 'lg';
+  orientation?: 'horizontal' | 'vertical';
+  spacing?: 'xs' | 'sm' | 'md' | 'lg';
   className?: string;
 }
 
@@ -264,17 +195,23 @@ export const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
   className
 }) => {
   const spacingClasses = {
-    sm: orientation === 'vertical' ? 'space-y-3' : 'space-x-3',
-    md: orientation === 'vertical' ? 'space-y-4' : 'space-x-4',
-    lg: orientation === 'vertical' ? 'space-y-6' : 'space-x-6'
+    xs: 'space-y-2',
+    sm: 'space-y-3',
+    md: 'space-y-4',
+    lg: 'space-y-6'
+  };
+
+  const horizontalSpacingClasses = {
+    xs: 'space-x-2',
+    sm: 'space-x-3',
+    md: 'space-x-4',
+    lg: 'space-x-6'
   };
 
   return (
-    <div 
+    <div
       className={cn(
-        'flex',
-        orientation === 'vertical' ? 'flex-col' : 'flex-row flex-wrap items-end',
-        spacingClasses[spacing],
+        orientation === 'vertical' ? spacingClasses[spacing] : `flex ${horizontalSpacingClasses[spacing]}`,
         className
       )}
     >
@@ -283,65 +220,49 @@ export const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
   );
 };
 
-// Form validation summary
+interface ValidationError {
+  field: string;
+  message: string;
+  section?: string;
+}
+
 interface FormValidationSummaryProps {
-  errors: Array<{
-    field: string;
-    message: string;
-    section?: string;
-  }>;
-  onErrorClick?: (field: string) => void;
+  errors: ValidationError[];
+  title?: string;
   className?: string;
 }
 
 export const FormValidationSummary: React.FC<FormValidationSummaryProps> = ({
   errors,
-  onErrorClick,
+  title = 'Please correct the following errors:',
   className
 }) => {
   if (errors.length === 0) return null;
 
   return (
-    <div 
-      className={cn(
-        'rounded-md bg-destructive/15 p-4 border border-destructive/20 mb-6',
-        className
-      )}
-      role="alert"
-      aria-labelledby="form-errors-heading"
-    >
-      <div className="flex items-start">
-        <AlertCircle className="h-5 w-5 text-destructive mt-0.5 mr-3 flex-shrink-0" />
-        <div className="flex-1">
-          <h3 id="form-errors-heading" className="text-sm font-medium text-destructive mb-2">
-            Please correct the following {errors.length === 1 ? 'error' : 'errors'}:
-          </h3>
-          <ul className="text-sm text-destructive space-y-1">
-            {errors.map((error, index) => (
-              <li key={`${error.field}-${index}`}>
-                {onErrorClick ? (
-                  <button
-                    type="button"
-                    className="underline hover:no-underline text-left"
-                    onClick={() => onErrorClick(error.field)}
-                  >
-                    {error.section ? `${error.section}: ` : ''}{error.message}
-                  </button>
-                ) : (
-                  <span>
-                    {error.section ? `${error.section}: ` : ''}{error.message}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
+    <Card className={cn('border-red-200 bg-red-50', className)}>
+      <CardContent className="pt-4">
+        <div className="flex items-start space-x-3">
+          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+          <div className="flex-1">
+            <h4 className="font-medium text-red-900 mb-2">{title}</h4>
+            <ul className="text-sm text-red-800 space-y-1">
+              {errors.map((error, index) => (
+                <li key={index}>
+                  {error.section && (
+                    <span className="font-medium">{error.section}: </span>
+                  )}
+                  {error.message}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
-// Form success indicator
 interface FormSuccessIndicatorProps {
   message: string;
   details?: string;
@@ -360,35 +281,26 @@ export const FormSuccessIndicator: React.FC<FormSuccessIndicatorProps> = ({
   className
 }) => {
   return (
-    <div 
-      className={cn(
-        'rounded-md bg-green-50 p-4 border border-green-200 mb-6',
-        className
-      )}
-      role="alert"
-      aria-live="polite"
-    >
-      <div className="flex items-start">
-        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" />
-        <div className="flex-1">
-          <h3 className="text-sm font-medium text-green-800 mb-1">
-            {message}
-          </h3>
-          {details && (
-            <p className="text-sm text-green-700 mb-3">
-              {details}
-            </p>
-          )}
+    <Card className={cn('border-green-200 bg-green-50', className)}>
+      <CardContent className="pt-6">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+            <CheckCircle className="h-6 w-6 text-green-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-medium text-green-900">{message}</h3>
+            {details && (
+              <p className="text-sm text-green-700 mt-2">{details}</p>
+            )}
+          </div>
           {actions && actions.length > 0 && (
-            <div className="flex space-x-2">
+            <div className="flex justify-center space-x-3">
               {actions.map((action, index) => (
                 <Button
                   key={index}
-                  type="button"
                   variant={action.variant || 'default'}
-                  size="sm"
                   onClick={action.onClick}
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  size="sm"
                 >
                   {action.label}
                 </Button>
@@ -396,12 +308,11 @@ export const FormSuccessIndicator: React.FC<FormSuccessIndicatorProps> = ({
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
-// Form help text with info icon
 interface FormHelpTextProps {
   children: React.ReactNode;
   className?: string;
@@ -412,10 +323,8 @@ export const FormHelpText: React.FC<FormHelpTextProps> = ({
   className
 }) => {
   return (
-    <div className={cn('flex items-start space-x-2 text-sm text-muted-foreground', className)}>
-      <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-      <div>{children}</div>
+    <div className={cn('text-sm text-gray-600 bg-gray-50 p-3 rounded-md', className)}>
+      {children}
     </div>
   );
 };
-

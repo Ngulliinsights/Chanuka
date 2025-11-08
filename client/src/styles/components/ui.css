@@ -47,6 +47,17 @@
     padding: var(--space-lg);
   }
 
+  /* Navigation Section Titles */
+  .chanuka-nav-section-title {
+    padding: var(--space-sm) var(--space-md);
+    margin-bottom: var(--space-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: hsl(var(--muted-foreground));
+  }
+
   /* Status Indicators - Improved semantic design */
   .chanuka-status-badge {
     display: inline-flex;

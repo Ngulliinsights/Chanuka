@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { AlertTriangle, RefreshCw, Building } from 'lucide-react';
 import { ResponsiveButton as Button } from "../../shared/design-system/components";
 import { Logo } from "../ui/logo";
-import { ErrorFallbackProps } from "./EnhancedErrorBoundary";
+import { ErrorFallbackProps } from "./ErrorBoundary";
 import { logger as baseLogger } from "../../utils/browser-logger";
 
 // Import shared error types and classes

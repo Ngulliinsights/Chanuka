@@ -137,25 +137,37 @@ export function navigationReducer(state: NavigationState, action: NavigationActi
     case 'BATCH_NAVIGATION_UPDATE': {
       const { currentPath, section, breadcrumbs, relatedPages, recentPage, closeMobileMenu } = action.payload;
       
-      // Update recent pages using the utility function
-      const updatedRecentPages = NavigationStatePersistence.updateRecentPages(
-        state.preferences.recentlyVisited, 
-        recentPage
-      );
+      // Avoid unnecessary updates if path hasn't actually changed
+      if (state.currentPath === currentPath && state.currentSection === section) {
+        return state;
+      }
       
-      return {
+      // Update recent pages using the utility function, but only if it's a meaningful navigation
+      const shouldUpdateRecentPages = state.currentPath !== currentPath && currentPath !== '/';
+      const updatedRecentPages = shouldUpdateRecentPages 
+        ? NavigationStatePersistence.updateRecentPages(state.preferences.recentlyVisited, recentPage)
+        : state.preferences.recentlyVisited;
+      
+      // Create optimized state update with minimal object creation
+      const newState = {
         ...state,
-        previousPath: state.currentPath,
+        previousPath: state.currentPath !== currentPath ? state.currentPath : state.previousPath,
         currentPath,
         currentSection: section,
         breadcrumbs,
         relatedPages,
         mobileMenuOpen: closeMobileMenu ? false : state.mobileMenuOpen,
-        preferences: {
+      };
+      
+      // Only update preferences if recent pages actually changed
+      if (shouldUpdateRecentPages && updatedRecentPages !== state.preferences.recentlyVisited) {
+        newState.preferences = {
           ...state.preferences,
           recentlyVisited: updatedRecentPages,
-        },
-      };
+        };
+      }
+      
+      return newState;
     }
     
     default:

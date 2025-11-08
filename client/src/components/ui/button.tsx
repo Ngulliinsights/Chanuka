@@ -50,7 +50,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size }), "btn-enhanced", className)}
         ref={ref}
         {...props}
       />
@@ -85,14 +85,13 @@ const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
 
     const handleValidationError = useCallback(async (error: UIComponentError) => {
       try {
-        const recoveryResult = await attemptUIRecovery('enhanced-button', error, retryCount);
-        
+        const recoveryResult = await attemptUIRecovery(error);
+
         if (recoveryResult.success) {
           setRetryCount(0);
           setInternalState({ error: false });
-        } else if (recoveryResult.shouldRetry) {
-          setRetryCount(prev => prev + 1);
         } else {
+          setRetryCount(prev => prev + 1);
           const suggestions = getUIRecoverySuggestions(error);
           logger.warn('Button recovery failed, suggestions:', suggestions);
         }

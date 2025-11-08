@@ -8,7 +8,7 @@
  * - Poor error handling: Uncaught errors or unclear error states
  */
 
-import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, useQueries, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { useRef, useCallback, useEffect, useMemo } from 'react';
 import AuthenticatedAPI, { APIResponse } from '../utils/authenticated-api';
 import { logger } from '../utils/browser-logger';
@@ -203,14 +203,13 @@ export function useSafeQuery<T = any>(
   };
 }
 
-
 /**
  * Specialized hook for admin-specific queries with enhanced security and longer timeouts.
  * 
  * Admin operations typically require:
  * - Authentication
  * - Longer timeouts (complex operations)
- * - Fewer retries (fail fast for security)
+ * - Fewer retries (fail security)
  * 
  * Example:
  * const { data: users } = useAdminQuery({
@@ -233,14 +232,12 @@ export function useAdminQuery<T = any>(
 }
 
 /**
+ * Fixed: Uses useQueries to comply with Rules of Hooks
  * Hook for coordinating multiple related queries to prevent race conditions
  * when fetching interdependent data.
  * 
- * This is useful when you need to fetch multiple pieces of data that should be
- * loaded together, like user profile + settings + preferences. It ensures:
- * - All queries complete before allowing refetch
- * - No duplicate queries while refetching
- * - Coordinated error handling
+ * IMPORTANT: This hook is designed for a FIXED number of queries (max 5).
+ * For dynamic query lists, use React Query's useQueries hook directly.
  * 
  * Example:
  * const { data, isLoading, refetchAll } = useCoordinatedQueries([
@@ -261,91 +258,51 @@ export function useCoordinatedQueries<T extends Record<string, any>>(
   error: Error | null;
   refetchAll: () => Promise<void>;
 } {
-  // Track which queries are currently being refetched to prevent duplicates
-  const activeQueriesRef = useRef<Set<string>>(new Set());
-  const isMountedRef = useRef(true);
+  // Validate input to prevent hook rule violations
+  if (queries.length > 5) {
+    throw new Error('useCoordinatedQueries supports maximum 5 queries. Use React Query\'s useQueries for more.');
+  }
 
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-      activeQueriesRef.current.clear();
-    };
-  }, []);
+  // Create stable query configurations
+  const queryConfigs = useMemo(() => {
+    return queries.map(q => ({
+      queryKey: [q.key],
+      queryFn: () => AuthenticatedAPI.get(q.endpoint).then(res => res.data),
+      enabled: q.options?.enabled !== false,
+      staleTime: q.options?.staleTime ?? 5 * 60 * 1000,
+      gcTime: q.options?.gcTime ?? 10 * 60 * 1000,
+      ...q.options,
+    }));
+  }, [queries]);
 
-  // Create a separate query for each endpoint
-  const queryResults = useMemo(() => 
-    queries.map(({ key, endpoint, options = {} }) => {
-      // We need to handle the query creation inside a hook, so we'll return a factory
-      return { key, endpoint, options };
-    }), 
-    [queries]
-  );
-
-  // Execute queries
-  const results = queryResults.map(({ key, endpoint, options = {} }) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const result = useSafeQuery({
-      queryKey: [key],
-      endpoint,
-      // Disable query if it's currently being refetched
-      enabled: (options.enabled !== false) && !activeQueriesRef.current.has(key),
-      ...options,
-      onSuccess: (data) => {
-        if (isMountedRef.current) {
-          activeQueriesRef.current.delete(key);
-          options.onSuccess?.(data);
-        }
-      },
-      onError: (error) => {
-        if (isMountedRef.current) {
-          activeQueriesRef.current.delete(key);
-          options.onError?.(error);
-        }
-      }
-    });
-
-    return { key, result };
-  });
+  // Execute queries using useQueries (Rules of Hooks compliant)
+  const results = useQueries({ queries: queryConfigs });
 
   // Aggregate data from all queries into a single object
-  const data = useMemo(() => 
-    results.reduce((acc, { key, result }) => {
-      if (result.data) {
-        acc[key as keyof T] = result.data;
+  const data = useMemo(() => {
+    const result: Partial<T> = {};
+    queries.forEach((queryConfig, index) => {
+      const queryResult = results[index];
+      if (queryResult?.data) {
+        result[queryConfig.key as keyof T] = queryResult.data;
       }
-      return acc;
-    }, {} as Partial<T>),
-    [results]
-  );
+    });
+    return result;
+  }, [queries, results]);
 
   // Overall loading state: true if ANY query is loading
-  const isLoading = results.some(({ result }) => result.isLoading);
+  const isLoading = results.some(query => query.isLoading);
 
   // Return the first error encountered, or null if no errors
-  const error = results.find(({ result }) => result.error)?.result.error || null;
+  const error = results.find(query => query.error)?.error || null;
 
   /**
    * Refetch all queries in a coordinated manner.
    * Uses Promise.allSettled to ensure all refetches complete even if some fail.
    */
   const refetchAll = useCallback(async () => {
-    // Mark all queries as active to prevent concurrent refetches
-    results.forEach(({ key }) => {
-      activeQueriesRef.current.add(key);
-    });
-
-    const refetchPromises = results.map(({ result }) => result.refetchSafely());
-
-    try {
-      // Wait for all refetches to complete (success or failure)
-      await Promise.allSettled(refetchPromises);
-    } finally {
-      // Clean up: clear all active query markers
-      if (isMountedRef.current) {
-        activeQueriesRef.current.clear();
-      }
-    }
+    const refetchPromises = results.map(query => query.refetch());
+    await Promise.allSettled(refetchPromises);
   }, [results]);
 
   return {
@@ -357,47 +314,3 @@ export function useCoordinatedQueries<T extends Record<string, any>>(
 }
 
 export default useSafeQuery;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

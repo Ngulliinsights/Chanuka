@@ -1,10 +1,10 @@
 // Enhanced Error Boundary - Main error boundary component
-export { default as EnhancedErrorBoundary } from './EnhancedErrorBoundary';
+export { default as ErrorBoundary } from './ErrorBoundary';
 export type {
   ErrorFallbackProps,
-  EnhancedErrorBoundaryProps,
-  EnhancedErrorBoundaryState
-} from './EnhancedErrorBoundary';
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+} from './ErrorBoundary';
 
 // Error Fallback Components - Specialized fallback UIs
 export { 

@@ -44,26 +44,26 @@ export class MobileTouchHandler {
   }
 
   private setupEventListeners(): void {
-    // Use passive listeners for better performance
-    this.element.addEventListener('touchstart', this.handleTouchStart.bind(this), { 
+    // Use passive listeners for better performance with stored bound methods
+    this.element.addEventListener('touchstart', this.boundHandlers.touchStart, { 
       passive: !this.options.preventScroll 
     });
-    this.element.addEventListener('touchmove', this.handleTouchMove.bind(this), { 
+    this.element.addEventListener('touchmove', this.boundHandlers.touchMove, { 
       passive: !this.options.preventScroll 
     });
-    this.element.addEventListener('touchend', this.handleTouchEnd.bind(this), { 
+    this.element.addEventListener('touchend', this.boundHandlers.touchEnd, { 
       passive: true 
     });
-    this.element.addEventListener('touchcancel', this.handleTouchCancel.bind(this), { 
+    this.element.addEventListener('touchcancel', this.boundHandlers.touchCancel, { 
       passive: true 
     });
 
     // Add pointer events for better cross-device support
     if ('PointerEvent' in window) {
-      this.element.addEventListener('pointerdown', this.handlePointerDown.bind(this));
-      this.element.addEventListener('pointermove', this.handlePointerMove.bind(this));
-      this.element.addEventListener('pointerup', this.handlePointerUp.bind(this));
-      this.element.addEventListener('pointercancel', this.handlePointerCancel.bind(this));
+      this.element.addEventListener('pointerdown', this.boundHandlers.pointerDown);
+      this.element.addEventListener('pointermove', this.boundHandlers.pointerMove);
+      this.element.addEventListener('pointerup', this.boundHandlers.pointerUp);
+      this.element.addEventListener('pointercancel', this.boundHandlers.pointerCancel);
     }
   }
 
@@ -205,20 +205,38 @@ export class MobileTouchHandler {
   public onSwipe?: (swipe: SwipeDirection) => void;
   public onTap?: (tap: { x: number; y: number; duration: number }) => void;
 
-  public destroy(): void {
-    this.element.removeEventListener('touchstart', this.handleTouchStart.bind(this));
-    this.element.removeEventListener('touchmove', this.handleTouchMove.bind(this));
-    this.element.removeEventListener('touchend', this.handleTouchEnd.bind(this));
-    this.element.removeEventListener('touchcancel', this.handleTouchCancel.bind(this));
+  // Store bound methods for proper cleanup
+  private boundHandlers = {
+    touchStart: this.handleTouchStart.bind(this),
+    touchMove: this.handleTouchMove.bind(this),
+    touchEnd: this.handleTouchEnd.bind(this),
+    touchCancel: this.handleTouchCancel.bind(this),
+    pointerDown: this.handlePointerDown.bind(this),
+    pointerMove: this.handlePointerMove.bind(this),
+    pointerUp: this.handlePointerUp.bind(this),
+    pointerCancel: this.handlePointerCancel.bind(this),
+  };
 
+  public destroy(): void {
+    // Remove touch event listeners using stored bound methods
+    this.element.removeEventListener('touchstart', this.boundHandlers.touchStart);
+    this.element.removeEventListener('touchmove', this.boundHandlers.touchMove);
+    this.element.removeEventListener('touchend', this.boundHandlers.touchEnd);
+    this.element.removeEventListener('touchcancel', this.boundHandlers.touchCancel);
+
+    // Remove pointer event listeners using stored bound methods
     if ('PointerEvent' in window) {
-      this.element.removeEventListener('pointerdown', this.handlePointerDown.bind(this));
-      this.element.removeEventListener('pointermove', this.handlePointerMove.bind(this));
-      this.element.removeEventListener('pointerup', this.handlePointerUp.bind(this));
-      this.element.removeEventListener('pointercancel', this.handlePointerCancel.bind(this));
+      this.element.removeEventListener('pointerdown', this.boundHandlers.pointerDown);
+      this.element.removeEventListener('pointermove', this.boundHandlers.pointerMove);
+      this.element.removeEventListener('pointerup', this.boundHandlers.pointerUp);
+      this.element.removeEventListener('pointercancel', this.boundHandlers.pointerCancel);
     }
 
     this.reset();
+    
+    // Clear callbacks to prevent memory leaks
+    this.onSwipe = undefined;
+    this.onTap = undefined;
   }
 }
 
@@ -298,15 +316,22 @@ export const MobileTouchUtils = {
   /**
    * Prevent zoom on double tap for specific elements
    */
-  preventZoomOnDoubleTap(element: HTMLElement): void {
+  preventZoomOnDoubleTap(element: HTMLElement): () => void {
     let lastTouchEnd = 0;
-    element.addEventListener('touchend', (event) => {
+    const handleTouchEnd = (event: TouchEvent) => {
       const now = Date.now();
       if (now - lastTouchEnd <= 300) {
         event.preventDefault();
       }
       lastTouchEnd = now;
-    }, { passive: false });
+    };
+    
+    element.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Return cleanup function
+    return () => {
+      element.removeEventListener('touchend', handleTouchEnd);
+    };
   },
 
   /**

@@ -3,7 +3,7 @@
  * Best practices: Connection awareness, asset loading integration, timeout management
  */
 
-import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef, useMemo } from 'react';
 import { LoadingState, LoadingAction, LoadingOperation, LoadingOptions, LoadingPriority } from './types';
 import { loadingReducer } from './reducer';
 import { logger } from '../../utils/browser-logger';
@@ -251,7 +251,7 @@ export function createLoadingProvider(
       completeOperation(`api-${apiId}`, success, error);
     }, [completeOperation]);
 
-    const value: LoadingContextValue = {
+    const value: LoadingContextValue = useMemo(() => ({
       state,
       startOperation,
       updateOperation,
@@ -271,7 +271,27 @@ export function createLoadingProvider(
       completeComponentLoading,
       startApiLoading,
       completeApiLoading,
-    };
+    }), [
+      state,
+      startOperation,
+      updateOperation,
+      completeOperation,
+      retryOperation,
+      cancelOperation,
+      getOperation,
+      getOperationsByType,
+      getOperationsByPriority,
+      isOperationActive,
+      getActiveOperationsCount,
+      shouldShowGlobalLoader,
+      getEstimatedTimeRemaining,
+      startPageLoading,
+      completePageLoading,
+      startComponentLoading,
+      completeComponentLoading,
+      startApiLoading,
+      completeApiLoading,
+    ]);
 
     return (
       <LoadingContext.Provider value={value}>

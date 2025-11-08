@@ -1,5 +1,11 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "./components/ui/toaster";
 import AppProviders from "./components/AppProviders";
@@ -17,15 +23,25 @@ import PerformanceMetricsCollector from "./components/performance/PerformanceMet
 import { Suspense, useEffect } from "react";
 import { lazy } from "react";
 import { useLoadingOperation } from "./core/loading/hooks";
-import { logger } from './utils/browser-logger';
+import { logger } from "./utils/browser-logger";
 import {
   SafeLazyPages,
   SafeLazySponsorshipPages,
 } from "./utils/safe-lazy-loading";
+import { SimpleLazyPages, LazyPageWrapper } from "./utils/simple-lazy-pages";
+import { createNavigationProvider } from "./core/navigation/context";
+import { useAuth } from "./hooks/use-auth";
+import { useMediaQuery } from "./hooks/use-mobile";
+import { useWebVitals } from "./hooks/use-web-vitals";
 
 // Import test page for design system verification
-const DesignSystemTestPage = lazy(() => import('./pages/design-system-test'));
-import { SimpleErrorBoundary } from "./components/error-handling/SimpleErrorBoundary";
+const DesignSystemTestPage = lazy(() => import("./pages/design-system-test"));
+// Import unified error handling system
+import {
+  UnifiedErrorProvider,
+  EnhancedErrorBoundary,
+  initializeErrorHandling,
+} from "./components/error";
 
 // =============================================================================
 // CONFIGURATION
@@ -86,11 +102,14 @@ const getQueryClient = (): QueryClient => {
 // =============================================================================
 
 function PageLoader() {
-  const { isLoading, error, isTimeout } = useLoadingOperation('app-page-loading', {
-    timeout: CONFIG.loading.pageTimeout,
-    connectionAware: CONFIG.loading.connectionAware,
-    showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
-  });
+  const { error, isTimeout } = useLoadingOperation(
+    "app-page-loading",
+    {
+      timeout: CONFIG.loading.pageTimeout,
+      connectionAware: CONFIG.loading.connectionAware,
+      showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
+    }
+  );
 
   const currentState = isTimeout ? "timeout" : "loading";
   const loadingMessage = error?.message || "Loading page...";
@@ -114,39 +133,115 @@ function PageLoader() {
 
 const ROUTES = [
   // Main routes
-  { path: "/", element: <SafeLazyPages.HomePage />, id: "home" },
+  {
+    path: "/",
+    element: (
+      <LazyPageWrapper>
+        <SimpleLazyPages.HomePage />
+      </LazyPageWrapper>
+    ),
+    id: "home",
+  },
   { path: "/dashboard", element: <SafeLazyPages.Dashboard />, id: "dashboard" },
-  
+
   // Bill routes
-  { path: "/bills", element: <SafeLazyPages.BillsDashboard />, id: "bills-dashboard" },
-  { path: "/bills/:id", element: <SafeLazyPages.BillDetail />, id: "bill-detail" },
-  { path: "/bills/:id/analysis", element: <SafeLazyPages.BillAnalysis />, id: "bill-analysis" },
-  { path: "/bills/:id/comments", element: <SafeLazyPages.CommentsPage />, id: "bill-comments" },
-  
+  {
+    path: "/bills",
+    element: <SafeLazyPages.BillsDashboard />,
+    id: "bills-dashboard",
+  },
+  {
+    path: "/bills/:id",
+    element: <SafeLazyPages.BillDetail />,
+    id: "bill-detail",
+  },
+  {
+    path: "/bills/:id/analysis",
+    element: <SafeLazyPages.BillAnalysis />,
+    id: "bill-analysis",
+  },
+  {
+    path: "/bills/:id/comments",
+    element: <SafeLazyPages.CommentsPage />,
+    id: "bill-comments",
+  },
+
   // Sponsorship routes
-  { path: "/bill-sponsorship-analysis", element: <SafeLazyPages.BillSponsorshipAnalysis />, id: "sponsorship-analysis" },
-  { path: "/bills/:id/sponsorship-analysis", element: <SafeLazyPages.BillSponsorshipAnalysis />, id: "bill-sponsorship-analysis" },
-  { path: "/bills/:id/sponsorship-analysis/overview", element: <SafeLazySponsorshipPages.SponsorshipOverviewWrapper />, id: "sponsorship-overview" },
-  { path: "/bills/:id/sponsorship-analysis/primary-sponsor", element: <SafeLazySponsorshipPages.PrimarySponsorWrapper />, id: "primary-sponsor" },
-  { path: "/bills/:id/sponsorship-analysis/co-sponsors", element: <SafeLazySponsorshipPages.CoSponsorsWrapper />, id: "co-sponsors" },
-  { path: "/bills/:id/sponsorship-analysis/financial-network", element: <SafeLazySponsorshipPages.FinancialNetworkWrapper />, id: "financial-network" },
-  { path: "/bills/:id/sponsorship-analysis/methodology", element: <SafeLazySponsorshipPages.MethodologyWrapper />, id: "methodology" },
-  
+  {
+    path: "/bill-sponsorship-analysis",
+    element: <SafeLazyPages.BillSponsorshipAnalysis />,
+    id: "sponsorship-analysis",
+  },
+  {
+    path: "/bills/:id/sponsorship-analysis",
+    element: <SafeLazyPages.BillSponsorshipAnalysis />,
+    id: "bill-sponsorship-analysis",
+  },
+  {
+    path: "/bills/:id/sponsorship-analysis/overview",
+    element: <SafeLazySponsorshipPages.SponsorshipOverviewWrapper />,
+    id: "sponsorship-overview",
+  },
+  {
+    path: "/bills/:id/sponsorship-analysis/primary-sponsor",
+    element: <SafeLazySponsorshipPages.PrimarySponsorWrapper />,
+    id: "primary-sponsor",
+  },
+  {
+    path: "/bills/:id/sponsorship-analysis/co-sponsors",
+    element: <SafeLazySponsorshipPages.CoSponsorsWrapper />,
+    id: "co-sponsors",
+  },
+  {
+    path: "/bills/:id/sponsorship-analysis/financial-network",
+    element: <SafeLazySponsorshipPages.FinancialNetworkWrapper />,
+    id: "financial-network",
+  },
+  {
+    path: "/bills/:id/sponsorship-analysis/methodology",
+    element: <SafeLazySponsorshipPages.MethodologyWrapper />,
+    id: "methodology",
+  },
+
   // Community routes
-  { path: "/community", element: <SafeLazyPages.CommunityInput />, id: "community" },
-  { path: "/expert-verification", element: <SafeLazyPages.ExpertVerification />, id: "expert-verification" },
-  
+  {
+    path: "/community",
+    element: <SafeLazyPages.CommunityInput />,
+    id: "community",
+  },
+  {
+    path: "/expert-verification",
+    element: <SafeLazyPages.ExpertVerification />,
+    id: "expert-verification",
+  },
+
   // User routes
   { path: "/auth", element: <SafeLazyPages.AuthPage />, id: "auth" },
   { path: "/profile", element: <SafeLazyPages.Profile />, id: "profile" },
-  { path: "/user-profile", element: <SafeLazyPages.UserProfilePage />, id: "user-profile" },
-  { path: "/onboarding", element: <SafeLazyPages.Onboarding />, id: "onboarding" },
-  
+  {
+    path: "/user-profile",
+    element: <SafeLazyPages.UserProfilePage />,
+    id: "user-profile",
+  },
+  {
+    path: "/onboarding",
+    element: <SafeLazyPages.Onboarding />,
+    id: "onboarding",
+  },
+
   // System routes
   { path: "/search", element: <SafeLazyPages.SearchPage />, id: "search" },
   { path: "/admin", element: <SafeLazyPages.AdminPage />, id: "admin" },
-  { path: "/admin/database", element: <SafeLazyPages.DatabaseManager />, id: "database-manager" },
-  { path: "/design-system-test", element: <DesignSystemTestPage />, id: "design-system-test" },
+  {
+    path: "/admin/database",
+    element: <SafeLazyPages.DatabaseManager />,
+    id: "database-manager",
+  },
+  {
+    path: "/design-system-test",
+    element: <DesignSystemTestPage />,
+    id: "design-system-test",
+  },
   { path: "*", element: <SafeLazyPages.NotFound />, id: "not-found" },
 ] as const;
 
@@ -166,7 +261,7 @@ function DevelopmentTools() {
         </>
       )}
       {CONFIG.dev.showPerformanceMetrics && (
-        <PerformanceMetricsCollector 
+        <PerformanceMetricsCollector
           showDetails={true}
           autoRefresh={true}
           refreshInterval={CONFIG.dev.metricsRefreshInterval}
@@ -195,11 +290,28 @@ function AppContent() {
 
       <AppLayout>
         <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {ROUTES.map(({ path, element, id }) => (
-              <Route key={id} path={path} element={element} />
-            ))}
-          </Routes>
+          <EnhancedErrorBoundary
+            enableRecovery={true}
+            enableFeedback={true}
+            context="Routes"
+          >
+            <Routes>
+              {ROUTES.map(({ path, element, id }) => (
+                <Route
+                  key={id}
+                  path={path}
+                  element={
+                    <EnhancedErrorBoundary
+                      enableRecovery={true}
+                      context={`Route-${id}`}
+                    >
+                      {element}
+                    </EnhancedErrorBoundary>
+                  }
+                />
+              ))}
+            </Routes>
+          </EnhancedErrorBoundary>
         </Suspense>
       </AppLayout>
     </>
@@ -210,30 +322,109 @@ function AppContent() {
 // MAIN APP
 // =============================================================================
 
+// Create NavigationProvider once to avoid infinite re-renders
+const NavigationProvider = createNavigationProvider(
+  useLocation,
+  useNavigate,
+  useAuth,
+  useMediaQuery
+);
+
+// Wrapper component that provides router hooks to NavigationProvider
+function NavigationWrapper({ children }: { children: React.ReactNode }) {
+  return <NavigationProvider>{children}</NavigationProvider>;
+}
+
+// Web Vitals monitoring component
+function WebVitalsMonitor() {
+  useWebVitals({
+    enabled: true,
+    onAllMetrics: (metrics) => {
+      if (IS_DEV) {
+        logger.info("Core Web Vitals collected", metrics);
+      }
+      // In production, this could send to analytics service
+      if (!IS_DEV && (window as any).gtag) {
+        // Send to Google Analytics
+        Object.entries(metrics).forEach(([name, value]) => {
+          if (value !== undefined) {
+            (window as any).gtag("event", "web_vitals", {
+              event_category: "Web Vitals",
+              event_label: name.toUpperCase(),
+              value: Math.round(value),
+              custom_map: { metric_value: value },
+            });
+          }
+        });
+      }
+    },
+    reportTo: IS_DEV ? undefined : "/api/analytics/web-vitals",
+  });
+
+  return null; // This component doesn't render anything
+}
+
 export default function App() {
   const queryClient = getQueryClient();
 
   useEffect(() => {
+    // Initialize advanced error handling system
+    initializeErrorHandling({
+      enableGlobalHandlers: true,
+      enableRecovery: true,
+      logErrors: true,
+      maxErrors: 100,
+      enableAnalytics: process.env.NODE_ENV === "production",
+    }).catch((error) => {
+      console.error("Failed to initialize error handling system:", error);
+    });
+
     if (IS_DEV) {
-      logger.info('App initialized with routes', { component: 'Chanuka', routeCount: ROUTES.length });
+      logger.info("App initialized with advanced error handling", {
+        component: "Chanuka",
+        routeCount: ROUTES.length,
+        errorHandlingEnabled: true,
+        advancedFeaturesEnabled: true,
+      });
     }
   }, []);
 
   return (
-    <SimpleErrorBoundary>
-      <BrowserCompatibilityChecker showWarnings={true} blockUnsupported={false}>
-        <AppProviders queryClient={queryClient}>
-          <BrowserRouter>
-            <AppContent />
-            <Toaster />
-            <AccessibilityTrigger />
-            <OfflineStatus showDetails={true} />
-          </BrowserRouter>
-        </AppProviders>
-
-        {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
-      </BrowserCompatibilityChecker>
-    </SimpleErrorBoundary>
+    <UnifiedErrorProvider
+      showToasts={true}
+      showModalsForCritical={true}
+      enableFeedback={process.env.NODE_ENV === "production"}
+    >
+      <EnhancedErrorBoundary
+        enableRecovery={true}
+        enableFeedback={false} // Don't show feedback for top-level errors
+        context="App-Root"
+        showTechnicalDetails={IS_DEV}
+      >
+        <BrowserCompatibilityChecker
+          showWarnings={true}
+          blockUnsupported={false}
+        >
+          <AppProviders queryClient={queryClient}>
+            <BrowserRouter>
+              <NavigationWrapper>
+                <WebVitalsMonitor />
+                <EnhancedErrorBoundary
+                  enableRecovery={true}
+                  enableFeedback={process.env.NODE_ENV === "production"}
+                  context="AppContent"
+                >
+                  <AppContent />
+                </EnhancedErrorBoundary>
+                <Toaster />
+                <AccessibilityTrigger />
+                <OfflineStatus showDetails={true} />
+                {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
+              </NavigationWrapper>
+            </BrowserRouter>
+          </AppProviders>
+        </BrowserCompatibilityChecker>
+      </EnhancedErrorBoundary>
+    </UnifiedErrorProvider>
   );
 }
-

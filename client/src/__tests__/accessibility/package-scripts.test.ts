@@ -72,8 +72,5 @@ export const runAccessibilityTests = async () => {
   };
 };
 
-// Export for use in npm scripts
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { runAccessibilityTests };
-}
+// Function is already exported as ES module above
 

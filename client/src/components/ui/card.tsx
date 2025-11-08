@@ -10,7 +10,7 @@ const Card = forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "chanuka-card card-enhanced",
       className
     )}
     {...props}

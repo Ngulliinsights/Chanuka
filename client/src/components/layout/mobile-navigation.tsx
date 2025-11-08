@@ -116,17 +116,34 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   const [navigationError, setNavigationError] = useState<LayoutError | null>(
     null
   );
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const location = useLocation();
+  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Use controlled or internal state
+  // Use controlled or internal state with transition management
   const isOpen =
     controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
-  const setIsOpen =
-    controlledIsOpen !== undefined
-      ? (open: boolean) => {
-          if (!open) onClose?.();
-        }
-      : setInternalIsOpen;
+  
+  // Stable setIsOpen function with transition state management
+  const setIsOpen = useCallback((open: boolean) => {
+    if (isTransitioning) return; // Prevent state changes during transitions
+    
+    setIsTransitioning(true);
+    
+    if (controlledIsOpen !== undefined) {
+      if (!open) onClose?.();
+    } else {
+      setInternalIsOpen(open);
+    }
+    
+    // Clear transition state after animation completes
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+    transitionTimeoutRef.current = setTimeout(() => {
+      setIsTransitioning(false);
+    }, 300); // Match CSS transition duration
+  }, [controlledIsOpen, onClose, isTransitioning]);
 
   const headerRef = useRef<HTMLDivElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
@@ -148,11 +165,24 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     }
   }, [navigationItems]);
 
-  // Error recovery function
+  // Error recovery function with cleanup
   const recoverFromError = useCallback(() => {
     setNavigationError(null);
+    setIsTransitioning(false);
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
     setIsOpen(false);
   }, [setIsOpen]);
+
+  // Cleanup transition timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Memoized API functions to prevent recreation on every render
   const fetchUser = useCallback(async (): Promise<User | null> => {
@@ -212,14 +242,11 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     }
   }, [onLogout]);
 
-  // Memoized close handler for sheet
+  // Memoized close handler for sheet with transition management
   const handleSheetClose = useCallback(() => {
-    if (onClose) {
-      onClose();
-    } else {
-      setIsOpen(false);
-    }
-  }, [onClose, setIsOpen]);
+    if (isTransitioning) return; // Prevent multiple close calls during transition
+    setIsOpen(false);
+  }, [setIsOpen, isTransitioning]);
 
   // Memoized path checker to prevent recreation
   const is_activePath = useCallback(
@@ -238,19 +265,26 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
     setTouchOptimized(true);
 
-    // Optimize touch targets for both refs
+    // Optimize touch targets for both refs with cleanup
     const elements = [headerRef.current, bottomNavRef.current].filter(Boolean);
+    const cleanupFunctions: (() => void)[] = [];
 
     elements.forEach((element) => {
       if (element) {
-        MobileTouchUtils.preventZoomOnDoubleTap(element);
+        const cleanup = MobileTouchUtils.preventZoomOnDoubleTap(element);
+        cleanupFunctions.push(cleanup);
       }
     });
+
+    // Return cleanup function
+    return () => {
+      cleanupFunctions.forEach(cleanup => cleanup());
+    };
   }, []);
 
-  // Swipe gesture handler with proper cleanup
+  // Swipe gesture handler with proper cleanup and transition management
   useEffect(() => {
-    if (!headerRef.current || !touchOptimized) return;
+    if (!headerRef.current || !touchOptimized || !enableSwipeGestures) return;
 
     const touchHandler = new MobileTouchHandler(headerRef.current, {
       threshold: 50,
@@ -258,6 +292,9 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     });
 
     touchHandler.onSwipe = (swipe) => {
+      // Prevent swipe actions during transitions
+      if (isTransitioning) return;
+      
       if (swipe.direction === "right" && !isOpen) {
         setIsOpen(true);
       } else if (swipe.direction === "left" && isOpen) {
@@ -269,7 +306,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     return () => {
       touchHandler.destroy();
     };
-  }, [isOpen, touchOptimized]);
+  }, [isOpen, touchOptimized, enableSwipeGestures, isTransitioning, setIsOpen]);
 
   // Memoized touch-optimized class name
   const touchOptimizedClass = useMemo(
@@ -354,16 +391,29 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
 }) => {
   const location = useLocation();
   const { touchOptimized, isMobile } = useResponsiveLayoutContext();
+  const [isContentTransitioning, setIsContentTransitioning] = useState(false);
 
   const headerRef = useRef<HTMLDivElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
+  const contentTransitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Memoized close handler for sheet
+  // Memoized close handler for sheet with transition management
   const handleSheetClose = useCallback(() => {
+    if (isContentTransitioning) return; // Prevent multiple close calls
+    
+    setIsContentTransitioning(true);
     if (onClose) {
       onClose();
     }
-  }, [onClose]);
+    
+    // Clear transition state
+    if (contentTransitionTimeoutRef.current) {
+      clearTimeout(contentTransitionTimeoutRef.current);
+    }
+    contentTransitionTimeoutRef.current = setTimeout(() => {
+      setIsContentTransitioning(false);
+    }, 300);
+  }, [onClose, isContentTransitioning]);
 
   // Memoized logout handler
   const handleLogout = useCallback(() => {
@@ -391,19 +441,26 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
   useEffect(() => {
     if (!MobileTouchUtils.isTouchDevice()) return;
 
-    // Optimize touch targets for both refs
+    // Optimize touch targets for both refs with cleanup
     const elements = [headerRef.current, bottomNavRef.current].filter(Boolean);
+    const cleanupFunctions: (() => void)[] = [];
 
     elements.forEach((element) => {
       if (element) {
-        MobileTouchUtils.preventZoomOnDoubleTap(element);
+        const cleanup = MobileTouchUtils.preventZoomOnDoubleTap(element);
+        cleanupFunctions.push(cleanup);
       }
     });
+
+    // Return cleanup function
+    return () => {
+      cleanupFunctions.forEach(cleanup => cleanup());
+    };
   }, []);
 
-  // Swipe gesture handler with proper cleanup
+  // Swipe gesture handler with proper cleanup and transition management
   useEffect(() => {
-    if (!headerRef.current || !touchOptimized) return;
+    if (!headerRef.current || !touchOptimized || !enableSwipeGestures) return;
 
     const touchHandler = new MobileTouchHandler(headerRef.current, {
       threshold: 50,
@@ -411,6 +468,9 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
     });
 
     touchHandler.onSwipe = (swipe) => {
+      // Prevent swipe actions during transitions
+      if (isContentTransitioning) return;
+      
       if (swipe.direction === "right" && !isOpen) {
         // Can't open from this component, it's controlled by parent
       } else if (swipe.direction === "left" && isOpen) {
@@ -422,7 +482,16 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
     return () => {
       touchHandler.destroy();
     };
-  }, [isOpen, touchOptimized, handleSheetClose]);
+  }, [isOpen, touchOptimized, enableSwipeGestures, handleSheetClose, isContentTransitioning]);
+
+  // Cleanup content transition timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (contentTransitionTimeoutRef.current) {
+        clearTimeout(contentTransitionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Bottom navigation items for tab bar
   const bottomNavigationItems = useMemo(

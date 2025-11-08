@@ -32,6 +32,7 @@ import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
 import { logger } from '../src/utils/browser-logger';
 import { rumService } from './utils/rum-integration';
+import { initPerformanceMonitoring } from './utils/performance-monitor';
 
 /**
  * Application Loading States
@@ -360,13 +361,11 @@ async function mountReactApp(rootElement: HTMLElement): Promise<void> {
   const root = createRoot(rootElement);
   const { AssetLoadingProvider } = await import('./components/loading/AssetLoadingIndicator');
   
-  root.render(
-    <EnhancedAssetLoadingProvider>
-      <AssetLoadingProvider>
-        <App />
-      </AssetLoadingProvider>
-    </EnhancedAssetLoadingProvider>
-  );
+  // Render app immediately for better LCP
+  root.render(<App />);
+  
+  // Initialize performance monitoring
+  initPerformanceMonitoring();
   
   logger.info('React application mounted successfully', { component: 'Chanuka' });
   updateLoadingState('mounting', 'React application mounted...', 80);

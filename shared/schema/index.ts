@@ -370,6 +370,52 @@ export type {
 // Analysis types
 export type { Analysis, NewAnalysis } from "./analysis";
 
+// Architecture Component type for planning interface
+export interface ArchitectureComponent {
+  id: number;
+  name: string;
+  description: string;
+  status?: 'stable' | 'active_dev' | 'refactoring' | 'planned';
+  type?: 'service' | 'component' | 'hook' | 'utility';
+  dependencies?: string[];
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+// Additional types for project management components
+export interface Checkpoint {
+  id: number;
+  name: string;
+  description: string;
+  status: 'completed' | 'in_progress' | 'failed' | 'planned';
+  created_at: string;
+  updated_at: string;
+  targetDate?: string;
+  successRate?: number;
+  phase?: string;
+  metrics?: {
+    features_completed: number;
+    features_total: number;
+  };
+}
+
+export interface FeatureFlag {
+  key: string;
+  enabled: boolean;
+  description?: string;
+  expiryDate?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AnalyticsMetric {
+  id: number;
+  name: string;
+  value: number;
+  timestamp: string;
+  type: string;
+}
+
 // Enum types
 export type {
   KenyanCounty,

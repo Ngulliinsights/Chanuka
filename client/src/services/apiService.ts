@@ -5,6 +5,13 @@ import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 import { cacheInvalidation } from '../utils/cacheInvalidation';
 import { offlineAnalytics } from '../utils/offlineAnalytics';
 import { serviceRecovery } from '../utils/service-recovery';
+import { 
+  createNetworkError, 
+  createServerError, 
+  createAuthError,
+  ErrorDomain,
+  ErrorSeverity 
+} from '../components/error';
 
 // API Error Types - Enhanced with better type safety
 export interface ApiError extends Error {
@@ -385,6 +392,35 @@ export async function fetchWithFallback<T = any>(
     error: lastError,
     endpoint: url,
   });
+
+  // Report error using unified error handler convenience functions
+  if (lastError?.status) {
+    if (lastError.status === 401 || lastError.status === 403) {
+      createAuthError(
+        lastError.message || 'Authentication failed',
+        { status: lastError.status, endpoint: url, retryCount: lastError.retryCount },
+        { component: 'ApiService', action: 'api_request', url }
+      );
+    } else if (lastError.status >= 500) {
+      createServerError(
+        lastError.message || 'Server error',
+        { status: lastError.status, endpoint: url, retryCount: lastError.retryCount },
+        { component: 'ApiService', action: 'api_request', url }
+      );
+    } else {
+      createNetworkError(
+        lastError.message || 'Request failed',
+        { status: lastError.status, endpoint: url, retryCount: lastError.retryCount },
+        { component: 'ApiService', action: 'api_request', url }
+      );
+    }
+  } else {
+    createNetworkError(
+      lastError?.message || 'Network error',
+      { endpoint: url, retryCount: lastError?.retryCount },
+      { component: 'ApiService', action: 'api_request', url }
+    );
+  }
 
   if (fallbackData !== undefined) {
     return { data: fallbackData, success: false, error: lastError!, fromFallback: true };

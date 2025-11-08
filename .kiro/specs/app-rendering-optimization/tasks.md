@@ -9,9 +9,9 @@
 
 - [x] 2. Implement comprehensive error boundary system
 
-  - [x] 2.1 Create enhanced EnhancedErrorBoundary component
+  - [x] 2.1 Create enhanced ErrorBoundary component
 
-    - Write EnhancedErrorBoundary class component with proper error catching
+    - Write ErrorBoundary class component with proper error catching
     - Implement error logging and reporting functionality
     - Create ErrorFallback component with retry mechanisms
     - _Requirements: 1.1, 1.2_
@@ -148,7 +148,7 @@
 
   - [x] 8.1 Error handling and reliability testing
 
-    - Create unit tests for EnhancedErrorBoundary component behavior
+    - Create unit tests for ErrorBoundary component behavior
     - Add tests for fetchWithFallback utility and useApiWithFallback hook
     - Write integration tests for error boundary functionality
     - Add API failure scenario testing with retry logic

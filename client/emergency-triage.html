@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Triage - Frontend Race Condition Diagnostics</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .status {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .critical { background: #fff5f5; border-color: #fed7d7; }
+        .high { background: #fffaf0; border-color: #fbd38d; }
+        .medium { background: #f0fff4; border-color: #9ae6b4; }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 8px;
+        }
+        .button:hover { background: #0056b3; }
+        .button:disabled { background: #6c757d; cursor: not-allowed; }
+        .button.danger { background: #dc3545; }
+        .button.danger:hover { background: #c82333; }
+        .progress {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #007bff;
+            transition: width 0.3s ease;
+        }
+        .results {
+            margin-top: 24px;
+        }
+        .error-item {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .error-item.critical { border-left-color: #dc3545; }
+        .error-item.high { border-left-color: #fd7e14; }
+        .error-item.medium { border-left-color: #ffc107; }
+        .component-name { font-weight: bold; color: #495057; }
+        .error-type { 
+            display: inline-block;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .frequency { color: #6c757d; font-size: 14px; }
+        .log {
+            background: #212529;
+            color: #f8f9fa;
+            padding: 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 16px 0;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 Emergency Triage</h1>
+            <p>Frontend Race Condition Diagnostics</p>
+            <p><strong>Goal:</strong> Reduce 1500+ console errors to &lt;100</p>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="button">Start Monitoring</button>
+            <button id="stopBtn" class="button danger" disabled>Stop Monitoring</button>
+            <button id="clearBtn" class="button">Clear Results</button>
+            <button id="exportBtn" class="button">Export Report</button>
+        </div>
+
+        <div id="status" class="status" style="display: none;">
+            <h3>Monitoring Status</h3>
+            <div class="progress">
+                <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <p>Duration: <span id="duration">0</span>s | Errors: <span id="errorCount">0</span> | Top Components: <span id="topComponents">None</span></p>
+        </div>
+
+        <div id="results" class="results" style="display: none;">
+            <h2>Triage Results</h2>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div id="totalErrors" class="stat-value">0</div>
+                    <div class="stat-label">Total Errors</div>
+                </div>
+                <div class="stat-card">
+                    <div id="errorRate" class="stat-value">0</div>
+                    <div class="stat-label">Errors/Minute</div>
+                </div>
+                <div class="stat-card">
+                    <div id="criticalCount" class="stat-value">0</div>
+                    <div class="stat-label">Critical Issues</div>
+                </div>
+                <div class="stat-card">
+                    <div id="componentCount" class="stat-value">0</div>
+                    <div class="stat-label">Affected Components</div>
+                </div>
+            </div>
+
+            <h3>Top Offending Components</h3>
+            <div id="topOffenders"></div>
+
+            <h3>Critical Issues</h3>
+            <div id="criticalIssues"></div>
+
+            <h3>Error Breakdown by Type</h3>
+            <div id="errorsByType"></div>
+        </div>
+
+        <div id="log" class="log" style="display: none;">
+            <h3>Real-time Log</h3>
+            <div id="logContent"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the emergency triage tool
+        import { emergencyTriage, startEmergencyTriage, stopEmergencyTriage, getTriageStatus } from './src/utils/emergency-triage.js';
+
+        let isMonitoring = false;
+        let monitoringInterval = null;
+        let startTime = 0;
+        const MONITORING_DURATION = 60000; // 1 minute
+
+        const elements = {
+            startBtn: document.getElementById('startBtn'),
+            stopBtn: document.getElementById('stopBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            exportBtn: document.getElementById('exportBtn'),
+            status: document.getElementById('status'),
+            results: document.getElementById('results'),
+            log: document.getElementById('log'),
+            progressBar: document.getElementById('progressBar'),
+            duration: document.getElementById('duration'),
+            errorCount: document.getElementById('errorCount'),
+            topComponents: document.getElementById('topComponents'),
+            totalErrors: document.getElementById('totalErrors'),
+            errorRate: document.getElementById('errorRate'),
+            criticalCount: document.getElementById('criticalCount'),
+            componentCount: document.getElementById('componentCount'),
+            topOffenders: document.getElementById('topOffenders'),
+            criticalIssues: document.getElementById('criticalIssues'),
+            errorsByType: document.getElementById('errorsByType'),
+            logContent: document.getElementById('logContent')
+        };
+
+        // Configure circuit breakers for known problematic components
+        const circuitBreakers = [
+            { component: 'AppLayout', enabled: true, errorThreshold: 10, timeWindow: 5000 },
+            { component: 'WebSocketClient', enabled: true, errorThreshold: 5, timeWindow: 3000 },
+            { component: 'DesktopSidebar', enabled: true, errorThreshold: 8, timeWindow: 5000 },
+            { component: 'MobileNavigation', enabled: true, errorThreshold: 8, timeWindow: 5000 },
+            { component: 'RealTimeTracker', enabled: true, errorThreshold: 5, timeWindow: 3000 }
+        ];
+
+        function logMessage(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span style="color: #6c757d;">[${timestamp}]</span> ${message}`;
+            elements.logContent.appendChild(logEntry);
+            elements.logContent.scrollTop = elements.logContent.scrollHeight;
+        }
+
+        function startMonitoring() {
+            if (isMonitoring) return;
+
+            isMonitoring = true;
+            startTime = Date.now();
+
+            // Configure circuit breakers
+            circuitBreakers.forEach(config => {
+                emergencyTriage.configureCircuitBreaker(config);
+            });
+
+            // Start emergency triage
+            startEmergencyTriage();
+
+            // Update UI
+            elements.startBtn.disabled = true;
+            elements.stopBtn.disabled = false;
+            elements.status.style.display = 'block';
+            elements.log.style.display = 'block';
+            elements.results.style.display = 'none';
+
+            logMessage('🚨 Emergency triage monitoring started');
+            logMessage(`📊 Configured ${circuitBreakers.length} circuit breakers`);
+
+            // Start progress monitoring
+            monitoringInterval = setInterval(updateStatus, 1000);
+
+            // Auto-stop after duration
+            setTimeout(() => {
+                if (isMonitoring) {
+                    stopMonitoring();
+                }
+            }, MONITORING_DURATION);
+        }
+
+        function stopMonitoring() {
+            if (!isMonitoring) return;
+
+            isMonitoring = false;
+
+            try {
+                const report = stopEmergencyTriage();
+                displayResults(report);
+                logMessage('✅ Emergency triage completed successfully');
+            } catch (error) {
+                logMessage(`❌ Error stopping triage: ${error.message}`, 'error');
+            }
+
+            // Update UI
+            elements.startBtn.disabled = false;
+            elements.stopBtn.disabled = true;
+            elements.status.style.display = 'none';
+
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+            }
+        }
+
+        function updateStatus() {
+            if (!isMonitoring) return;
+
+            const status = getTriageStatus();
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min((elapsed / MONITORING_DURATION) * 100, 100);
+
+            elements.progressBar.style.width = `${progress}%`;
+            elements.duration.textContent = Math.round(elapsed / 1000);
+            elements.errorCount.textContent = status.errorCount;
+            elements.topComponents.textContent = status.topComponents.join(', ') || 'None';
+
+            // Log periodic updates
+            if (elapsed % 10000 < 1000) { // Every 10 seconds
+                logMessage(`📊 Progress: ${Math.round(progress)}% | Errors: ${status.errorCount} | Top: [${status.topComponents.join(', ')}]`);
+            }
+        }
+
+        function displayResults(report) {
+            elements.results.style.display = 'block';
+
+            // Update stats
+            elements.totalErrors.textContent = report.totalErrors;
+            elements.errorRate.textContent = report.baseline.errorRate.toFixed(1);
+            elements.criticalCount.textContent = report.criticalIssues.length;
+            elements.componentCount.textContent = report.errorsByComponent.size;
+
+            // Display top offenders
+            elements.topOffenders.innerHTML = '';
+            report.topOffenders.slice(0, 10).forEach((error, index) => {
+                const item = document.createElement('div');
+                item.className = `error-item ${error.severity}`;
+                item.innerHTML = `
+                    <div class="component-name">${index + 1}. ${error.component}</div>
+                    <span class="error-type">${error.errorType}</span>
+                    <span class="frequency">${error.frequency}x</span>
+                    <div style="margin-top: 4px; font-size: 14px; color: #6c757d;">
+                        ${error.message.substring(0, 100)}...
+                    </div>
+                `;
+                elements.topOffenders.appendChild(item);
+            });
+
+            // Display critical issues
+            elements.criticalIssues.innerHTML = '';
+            if (report.criticalIssues.length === 0) {
+                elements.criticalIssues.innerHTML = '<div class="status medium">✅ No critical issues found</div>';
+            } else {
+                report.criticalIssues.slice(0, 5).forEach((error, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'error-item critical';
+                    item.innerHTML = `
+                        <div class="component-name">${index + 1}. ${error.component}</div>
+                        <div style="margin-top: 4px; font-size: 14px;">
+                            ${error.message}
+                        </div>
+                    `;
+                    elements.criticalIssues.appendChild(item);
+                });
+            }
+
+            // Display errors by type
+            elements.errorsByType.innerHTML = '';
+            const sortedTypes = Array.from(report.errorsByType.entries())
+                .sort((a, b) => b[1].length - a[1].length);
+
+            sortedTypes.forEach(([type, errors]) => {
+                const item = document.createElement('div');
+                item.className = 'error-item';
+                const icon = getTypeIcon(type);
+                item.innerHTML = `
+                    <div class="component-name">${icon} ${type}</div>
+                    <span class="frequency">${errors.length} errors</span>
+                `;
+                elements.errorsByType.appendChild(item);
+            });
+
+            // Log summary
+            logMessage(`📊 SUMMARY: ${report.totalErrors} total errors, ${report.criticalIssues.length} critical`);
+            if (report.totalErrors >= 1500) {
+                logMessage('🔥 CRITICAL: Error count exceeds 1500 threshold!');
+            } else if (report.totalErrors >= 100) {
+                logMessage('⚠️ HIGH: Error count above target of <100');
+            } else {
+                logMessage('✅ GOOD: Error count within target range');
+            }
+        }
+
+        function getTypeIcon(type) {
+            const icons = {
+                'infinite-render': '🔄',
+                'race-condition': '🏃',
+                'memory-leak': '💧',
+                'dependency-issue': '🔗',
+                'state-mutation': '🔀',
+                'event-listener-leak': '👂',
+                'unknown': '❓'
+            };
+            return icons[type] || '❓';
+        }
+
+        function clearResults() {
+            elements.results.style.display = 'none';
+            elements.logContent.innerHTML = '';
+            logMessage('🧹 Results cleared');
+        }
+
+        function exportReport() {
+            const reportData = localStorage.getItem('emergency-triage-report');
+            if (!reportData) {
+                alert('No report data available. Run a triage first.');
+                return;
+            }
+
+            const blob = new Blob([reportData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `emergency-triage-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            logMessage('📄 Report exported successfully');
+        }
+
+        // Event listeners
+        elements.startBtn.addEventListener('click', startMonitoring);
+        elements.stopBtn.addEventListener('click', stopMonitoring);
+        elements.clearBtn.addEventListener('click', clearResults);
+        elements.exportBtn.addEventListener('click', exportReport);
+
+        // Initialize
+        logMessage('🚨 Emergency Triage Tool Ready');
+        logMessage('Click "Start Monitoring" to begin capturing console errors');
+    </script>
+</body>
+</html>

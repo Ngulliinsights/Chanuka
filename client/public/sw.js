@@ -27,11 +27,26 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Bypass chrome-extension:// URLs to prevent fetch errors
+  if (event.request.url.startsWith('chrome-extension://')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         // Return cached version or fetch from network
-        return response || fetch(event.request);
+        return response || fetch(event.request).catch((error) => {
+          logger.error('Network fetch failed:', error);
+          // Return a fallback response instead of letting the promise reject
+          return new Response('Network Error', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: new Headers({
+              'Content-Type': 'text/plain',
+            }),
+          });
+        });
       })
   );
 });

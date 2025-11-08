@@ -4,18 +4,17 @@
  */
 
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
-import { ReactElement, ReactNode, useEffect } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import { vi } from 'vitest';
 import { z } from 'zod';
-import { 
-  UIError, 
-  UIValidationError, 
-  UIInputError, 
+import {
+  UIError,
+  UIValidationError,
+  UIInputError,
   UIFormError,
-  UIComponentError 
+  UIComponentError
 } from '../errors';
 import { ValidationState } from '../types';
-import { initializeUIRecoveryStrategies } from '../recovery';
 
 /**
  * Test wrapper component for providing context
@@ -25,11 +24,6 @@ interface TestWrapperProps {
 }
 
 const TestWrapper = ({ children }: TestWrapperProps) => {
-  // Initialize recovery strategies for tests
-  useEffect(() => {
-    initializeUIRecoveryStrategies();
-  }, []);
-
   return <div data-testid="test-wrapper">{children}</div>;
 };
 

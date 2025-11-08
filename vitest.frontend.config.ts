@@ -9,7 +9,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: [
       './client/src/setupTests.ts',
-      './client/src/__tests__/setup.ts'
+      './client/src/test-utils/setup.ts'
     ],
     include: [
       'client/**/*.{test,spec}.{ts,tsx}',

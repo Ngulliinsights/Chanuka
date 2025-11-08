@@ -9,6 +9,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test-utils/setup.ts'],
     css: true,
+    // Add React Testing Library configuration
+    testTimeout: 10000,
+    // Ensure proper React component testing
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+        url: 'http://localhost:3000',
+      },
+    },
   },
   resolve: {
     alias: {
