@@ -3,19 +3,19 @@
  * Provides retry logic, caching, offline support, validation, and comprehensive error handling
  */
 
-import { logger } from '../utils/logger';
-import { validationService } from '../utils/client-core';
+import { logger, validationService } from '../utils/logger';
 import { processRequestInterceptors } from './apiInterceptors';
 import { offlineDataManager } from '../utils/offlineDataManager';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 import { offlineAnalytics } from '../utils/offlineAnalytics';
 import { serviceRecovery } from '../utils/service-recovery';
-import { 
-  createNetworkError, 
-  createServerError, 
-  createAuthError 
+import {
+  createNetworkError,
+  createServerError,
+  createAuthError
 } from '../components/error';
 import { envConfig } from '../utils/env-config';
+import { authBackendService } from './auth-backend-service';
 import { ZodSchema } from 'zod';
 
 // ============================================================================
@@ -313,10 +313,31 @@ export async function fetchWithFallback<T = any>(
 
         // Handle non-OK responses
         if (!response.ok) {
-          // Special handling for 401: clear auth and redirect
+          // Special handling for 401: attempt token refresh before redirecting
           if (response.status === 401 && typeof window !== 'undefined') {
-            localStorage.removeItem('token');
-            localStorage.removeItem('refresh_token');
+            logger.warn('Received 401 response, attempting token refresh', {
+              component: 'ApiService',
+              endpoint: url
+            });
+
+            // Try to refresh tokens
+            try {
+              await authBackendService.refreshTokens();
+              // If refresh succeeds, retry the original request
+              logger.info('Token refresh successful, retrying request', {
+                component: 'ApiService',
+                endpoint: url
+              });
+              return fetchWithFallback<T>(url, options);
+            } catch (refreshError) {
+              logger.warn('Token refresh failed, redirecting to auth', {
+                component: 'ApiService',
+                endpoint: url,
+                refreshError
+              });
+            }
+
+            // If refresh failed or wasn't attempted, clear session and redirect
             if (window.location.pathname !== '/auth') {
               window.location.href = '/auth';
             }
@@ -487,16 +508,8 @@ export class ApiService {
   }
 
   private addAuthHeader(options: FetchOptions = {}): FetchOptions {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (token) {
-      return {
-        ...options,
-        headers: {
-          ...options.headers,
-          'Authorization': `Bearer ${token}`,
-        },
-      };
-    }
+    // HttpOnly cookies are sent automatically by browser, no need to add Authorization header
+    // The server will read tokens from HttpOnly cookies
     return options;
   }
 

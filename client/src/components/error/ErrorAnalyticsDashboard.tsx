@@ -134,7 +134,8 @@ import { coreErrorHandler } from '../../core/error/handler';
 import { ErrorDomain, ErrorSeverity } from '../../core/error/types';
 
 // Import real-time store
-import { useRealTimeStore } from '../../store/slices/realTimeSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 interface ErrorAnalyticsDashboardProps {
   refreshInterval?: number;
@@ -170,7 +171,8 @@ const ErrorAnalyticsDashboard = memo(function ErrorAnalyticsDashboard({
   const [realTimeMetrics, setRealTimeMetrics] = useState<RealTimeMetrics | null>(null);
 
   // Real-time store integration
-  const { connection, notifications } = useRealTimeStore();
+  const connection = useSelector((state: RootState) => state.realTime.connection);
+  const notifications = useSelector((state: RootState) => state.realTime.notifications);
 
   // Error analytics bridge
   const errorAnalyticsBridge = useMemo(() => ({
@@ -1213,8 +1215,8 @@ const ErrorAnalyticsDashboard = memo(function ErrorAnalyticsDashboard({
         <div className="lg:col-span-10">
           <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
+                {/* Overview Tab */}
+                <TabsContent value="overview" className="space-y-6">
           {/* Overview Metrics Cards */}
           {overviewMetrics && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -1358,10 +1360,10 @@ const ErrorAnalyticsDashboard = memo(function ErrorAnalyticsDashboard({
               </Card>
             )}
           </div>
-        </TabsContent>
+            </TabsContent>
 
-        {/* Trends Tab */}
-        <TabsContent value="trends" className="space-y-6">
+            {/* Trends Tab */}
+            <TabsContent value="trends" className="space-y-6">
           {/* Trend Overview Cards */}
           {trendData && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1560,10 +1562,10 @@ const ErrorAnalyticsDashboard = memo(function ErrorAnalyticsDashboard({
               </CardContent>
             </Card>
           )}
-        </TabsContent>
+            </TabsContent>
 
-        {/* Patterns Tab */}
-        <TabsContent value="patterns" className="space-y-6">
+            {/* Patterns Tab */}
+            <TabsContent value="patterns" className="space-y-6">
           {/* Pattern Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
@@ -1730,10 +1732,10 @@ const ErrorAnalyticsDashboard = memo(function ErrorAnalyticsDashboard({
               </ScrollArea>
             </CardContent>
           </Card>
-        </TabsContent>
+            </TabsContent>
 
-        {/* Recovery Tab */}
-        <TabsContent value="recovery" className="space-y-6">
+            {/* Recovery Tab */}
+            <TabsContent value="recovery" className="space-y-6">
           {/* Recovery Overview Cards */}
           {recoveryAnalytics && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -1997,10 +1999,10 @@ const ErrorAnalyticsDashboard = memo(function ErrorAnalyticsDashboard({
               </CardContent>
             </Card>
           )}
-        </TabsContent>
+            </TabsContent>
 
-        {/* Real-time Tab */}
-        <TabsContent value="realtime" className="space-y-6">
+            {/* Real-time Tab */}
+            <TabsContent value="realtime" className="space-y-6">
           {/* Real-time Status Indicator */}
           <Card>
             <CardContent className="p-4">
@@ -2359,8 +2361,8 @@ const ErrorAnalyticsDashboard = memo(function ErrorAnalyticsDashboard({
               </Card>
             </>
           )}
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 
@@ -2432,8 +2434,8 @@ const ErrorAnalyticsDashboard = memo(function ErrorAnalyticsDashboard({
         </CardContent>
       </Card>
     </div>
-  }
-);
+  );
+});
 
 ErrorAnalyticsDashboard.displayName = 'ErrorAnalyticsDashboard';
 

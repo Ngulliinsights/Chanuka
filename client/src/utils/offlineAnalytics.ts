@@ -3,7 +3,7 @@
  * Tracks offline usage patterns and reports errors for offline-first applications
  */
 
-import { logger } from './client-core';
+import { logger } from './logger';
 import { offlineDataManager } from './offlineDataManager';
 import { backgroundSyncManager } from './backgroundSyncManager';
 

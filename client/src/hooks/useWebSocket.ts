@@ -1,23 +1,66 @@
 /**
  * WebSocket Hook for Real-time Civic Engagement
- * 
+ *
  * Provides easy integration with WebSocket functionality for React components.
- * Handles subscriptions, real-time updates, and graceful fallback to polling.
+ * Uses the enhanced UnifiedWebSocketManager with optimized performance patterns.
  */
 
-import { useEffect, useCallback, useRef } from 'react';
-import { useRealTimeStore } from '../store/slices/realTimeSlice';
-import { wsClient } from '../store/middleware/webSocketMiddleware';
-import { 
-  WebSocketSubscription, 
-  RealTimeHandlers,
-  BillRealTimeUpdate,
-  CommunityRealTimeUpdate,
-  EngagementMetricsUpdate,
-  ExpertActivityUpdate,
-  RealTimeNotification
-} from '../types/realtime';
+import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
+import { UnifiedWebSocketManager, globalWebSocketPool } from '../core/api/websocket';
+import {
+  ConnectionState,
+  BillUpdate,
+  WebSocketNotification
+} from '../core/api/types';
 import { logger } from '../utils/logger';
+
+// Define types for the hook
+interface WebSocketSubscription {
+  type: 'bill' | 'community' | 'user_notifications';
+  id: string | number;
+}
+
+interface RealTimeHandlers {
+  onBillUpdate?: (update: BillUpdate) => void;
+  onCommunityUpdate?: (update: any) => void;
+  onEngagementUpdate?: (metrics: any) => void;
+  onExpertActivity?: (activity: any) => void;
+  onNotification?: (notification: WebSocketNotification) => void;
+  onConnectionChange?: (connected: boolean) => void;
+  onError?: (error: any) => void;
+}
+
+interface BillRealTimeUpdate extends BillUpdate {
+  bill_id: number;
+}
+
+interface CommunityRealTimeUpdate {
+  type: string;
+  discussion_id: string;
+  data: any;
+  timestamp: string;
+}
+
+interface EngagementMetricsUpdate {
+  bill_id: number;
+  views: number;
+  comments: number;
+  shares: number;
+  timestamp: string;
+}
+
+interface ExpertActivityUpdate {
+  expert_id: number;
+  type: string;
+  data: any;
+  timestamp: string;
+}
+
+interface RealTimeNotification extends WebSocketNotification {
+  id: string;
+  read: boolean;
+  timestamp: string;
+}
 
 interface UseWebSocketOptions {
   autoConnect?: boolean;
@@ -31,23 +74,23 @@ interface UseWebSocketReturn {
   isConnecting: boolean;
   connectionQuality: 'excellent' | 'good' | 'poor' | 'disconnected';
   error: string | null;
-  
+
   // Connection management
   connect: () => Promise<void>;
   disconnect: () => void;
-  
+
   // Subscription management
   subscribe: (subscription: WebSocketSubscription) => void;
   unsubscribe: (subscription: WebSocketSubscription) => void;
-  
+
   // Real-time data
-  billUpdates: Map<number, BillRealTimeUpdate[]>;
-  communityUpdates: Map<string, CommunityRealTimeUpdate[]>;
-  engagementMetrics: Map<number, EngagementMetricsUpdate>;
+  billUpdates: Record<number, BillRealTimeUpdate[]>;
+  communityUpdates: Record<string, CommunityRealTimeUpdate[]>;
+  engagementMetrics: Record<number, EngagementMetricsUpdate>;
   expertActivities: ExpertActivityUpdate[];
   notifications: RealTimeNotification[];
   notificationCount: number;
-  
+
   // Utility functions
   getBillUpdates: (billId: number) => BillRealTimeUpdate[];
   getEngagementMetrics: (billId: number) => EngagementMetricsUpdate | undefined;
@@ -62,20 +105,19 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     handlers = {}
   } = options;
 
-  // Get real-time store state and actions
-  const {
-    connection,
-    billUpdates,
-    communityUpdates,
-    engagementMetrics,
-    expertActivities,
-    notifications,
-    notificationCount,
-    subscribe: storeSubscribe,
-    unsubscribe: storeUnsubscribe,
-    getRecentUpdates,
-    markNotificationRead: storeMarkNotificationRead
-  } = useRealTimeStore();
+  // Use the global WebSocket manager instance
+  const wsManager = useRef<UnifiedWebSocketManager>(
+    globalWebSocketPool.getConnection('ws://localhost:8080')
+  );
+
+  // Local state for real-time data with deduplication
+  const [billUpdates, setBillUpdates] = useState<Record<number, BillRealTimeUpdate[]>>({});
+  const [communityUpdates, setCommunityUpdates] = useState<Record<string, CommunityRealTimeUpdate[]>>({});
+  const [engagementMetrics, setEngagementMetrics] = useState<Record<number, EngagementMetricsUpdate>>({});
+  const [expertActivities, setExpertActivities] = useState<ExpertActivityUpdate[]>([]);
+  const [notifications, setNotifications] = useState<RealTimeNotification[]>([]);
+  const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
+  const [error, setError] = useState<string | null>(null);
 
   // Track subscriptions to avoid duplicates
   const activeSubscriptions = useRef<Set<string>>(new Set());
@@ -86,158 +128,247 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     handlersRef.current = handlers;
   }, [handlers]);
 
-  // Set up WebSocket handlers
-  useEffect(() => {
-    const wsHandlers: RealTimeHandlers = {
-      onBillUpdate: (update) => {
-        handlersRef.current.onBillUpdate?.(update);
-        logger.debug('Bill update received', { 
-          component: 'useWebSocket',
-          billId: update.bill_id,
-          type: update.type
-        });
-      },
-      
-      onCommunityUpdate: (update) => {
-        handlersRef.current.onCommunityUpdate?.(update);
-        logger.debug('Community update received', { 
-          component: 'useWebSocket',
-          type: update.type,
-          discussionId: update.discussion_id
-        });
-      },
-      
-      onEngagementUpdate: (metrics) => {
-        handlersRef.current.onEngagementUpdate?.(metrics);
-        logger.debug('Engagement metrics updated', { 
-          component: 'useWebSocket',
-          billId: metrics.bill_id
-        });
-      },
-      
-      onExpertActivity: (activity) => {
-        handlersRef.current.onExpertActivity?.(activity);
-        logger.debug('Expert activity received', { 
-          component: 'useWebSocket',
-          expertId: activity.expert_id,
-          type: activity.type
-        });
-      },
-      
-      onNotification: (notification) => {
-        handlersRef.current.onNotification?.(notification);
-        logger.debug('Notification received', { 
-          component: 'useWebSocket',
-          type: notification.type,
-          priority: notification.priority
-        });
-      },
-      
-      onConnectionChange: (connected) => {
-        handlersRef.current.onConnectionChange?.(connected);
-        logger.info(`WebSocket ${connected ? 'connected' : 'disconnected'}`, { 
-          component: 'useWebSocket'
-        });
-      },
-      
-      onError: (error) => {
-        handlersRef.current.onError?.(error);
-        logger.error('WebSocket error', { 
-          component: 'useWebSocket',
-          error
-        });
-      }
+  // Memoized connection state getters
+  const isConnected = useMemo(() => connectionState === ConnectionState.CONNECTED, [connectionState]);
+  const isConnecting = useMemo(() => connectionState === ConnectionState.CONNECTING, [connectionState]);
+  const connectionQuality = useMemo(() => {
+    if (!isConnected) return 'disconnected';
+    // Simple quality estimation based on connection state
+    return 'good';
+  }, [isConnected]);
+
+  // Memoized event handlers with stable references
+  const handleBillUpdate = useCallback((update: BillUpdate) => {
+    const billUpdate: BillRealTimeUpdate = {
+      ...update,
+      bill_id: update.data?.bill_id || 0
     };
 
-    wsClient.setHandlers(wsHandlers);
+    setBillUpdates(prev => {
+      const billId = billUpdate.bill_id;
+      const existing = prev[billId] || [];
+
+      // Deduplication logic
+      const isDuplicate = existing.some(u =>
+        u.timestamp === billUpdate.timestamp &&
+        u.type === billUpdate.type &&
+        u.data?.bill_id === billUpdate.data?.bill_id
+      );
+
+      if (isDuplicate) return prev;
+
+      const newUpdates = [billUpdate, ...existing].slice(0, 50); // Keep last 50 updates
+      return { ...prev, [billId]: newUpdates };
+    });
+
+    handlersRef.current.onBillUpdate?.(billUpdate);
+    logger.debug('Bill update received', {
+      component: 'useWebSocket',
+      billId: billUpdate.bill_id,
+      type: billUpdate.type
+    });
   }, []);
+
+  const handleNotification = useCallback((notification: WebSocketNotification) => {
+    const realTimeNotification: RealTimeNotification = {
+      ...notification,
+      id: `${Date.now()}-${Math.random()}`,
+      read: false,
+      timestamp: new Date().toISOString()
+    };
+
+    setNotifications(prev => {
+      // Deduplication logic
+      const isDuplicate = prev.some(n =>
+        n.title === realTimeNotification.title &&
+        n.message === realTimeNotification.message &&
+        n.timestamp === realTimeNotification.timestamp
+      );
+
+      if (isDuplicate) return prev;
+
+      const newNotifications = [realTimeNotification, ...prev].slice(0, 20); // Keep last 20 notifications
+      return newNotifications;
+    });
+
+    handlersRef.current.onNotification?.(realTimeNotification);
+    logger.debug('Notification received', {
+      component: 'useWebSocket',
+      type: realTimeNotification.type
+    });
+  }, []);
+
+  const handleConnectionChange = useCallback((connected: boolean) => {
+    const newState = connected ? ConnectionState.CONNECTED : ConnectionState.DISCONNECTED;
+    setConnectionState(newState);
+    setError(null);
+
+    handlersRef.current.onConnectionChange?.(connected);
+    logger.info(`WebSocket ${connected ? 'connected' : 'disconnected'}`, {
+      component: 'useWebSocket'
+    });
+  }, []);
+
+  const handleError = useCallback((error: any) => {
+    setError(error.message || 'WebSocket error');
+    setConnectionState(ConnectionState.FAILED);
+
+    handlersRef.current.onError?.(error);
+    logger.error('WebSocket error', {
+      component: 'useWebSocket',
+      error
+    });
+  }, []);
+
+  // Set up WebSocket event listeners
+  useEffect(() => {
+    const manager = wsManager.current;
+
+    // Subscribe to events - the on method doesn't return unsubscribe functions
+    // We need to use off method for cleanup
+    const handleConnected = () => handleConnectionChange(true);
+    const handleDisconnected = () => handleConnectionChange(false);
+
+    manager.on('connected', handleConnected);
+    manager.on('disconnected', handleDisconnected);
+    manager.on('error', handleError);
+    manager.on('billUpdate', handleBillUpdate);
+    manager.on('notification', handleNotification);
+
+    return () => {
+      // Clean up event listeners
+      manager.off('connected', handleConnected);
+      manager.off('disconnected', handleDisconnected);
+      manager.off('error', handleError);
+      manager.off('billUpdate', handleBillUpdate);
+      manager.off('notification', handleNotification);
+    };
+  }, [handleBillUpdate, handleNotification, handleConnectionChange, handleError]);
 
   // Auto-connect on mount
   useEffect(() => {
-    if (autoConnect && !connection.isConnected && !connection.isConnecting) {
+    if (autoConnect && connectionState === ConnectionState.DISCONNECTED) {
       connect();
     }
   }, [autoConnect]);
 
   // Handle initial subscriptions
   useEffect(() => {
-    if (connection.isConnected && subscriptions.length > 0) {
+    if (isConnected && subscriptions.length > 0) {
       subscriptions.forEach(subscription => {
         const key = `${subscription.type}:${subscription.id}`;
         if (!activeSubscriptions.current.has(key)) {
-          subscribe(subscription);
+          subscribeToChannel(subscription);
         }
       });
     }
-  }, [connection.isConnected, subscriptions]);
+  }, [isConnected, subscriptions]);
 
   // Connection management
   const connect = useCallback(async () => {
     try {
-      await wsClient.connect();
+      setConnectionState(ConnectionState.CONNECTING);
+      await wsManager.current.connect();
       logger.info('WebSocket connection initiated', { component: 'useWebSocket' });
     } catch (error) {
-      logger.error('Failed to connect WebSocket', { 
+      setConnectionState(ConnectionState.FAILED);
+      setError(error instanceof Error ? error.message : String(error));
+      logger.error('Failed to connect WebSocket', {
         component: 'useWebSocket',
-        error: error.toString()
+        error: error instanceof Error ? error.message : String(error)
       });
       throw error;
     }
   }, []);
 
   const disconnect = useCallback(() => {
-    wsClient.disconnect();
+    wsManager.current.disconnect();
     activeSubscriptions.current.clear();
+    setConnectionState(ConnectionState.DISCONNECTED);
     logger.info('WebSocket disconnected', { component: 'useWebSocket' });
   }, []);
 
   // Subscription management
-  const subscribe = useCallback((subscription: WebSocketSubscription) => {
+  const subscribeToChannel = useCallback((subscription: WebSocketSubscription) => {
     const key = `${subscription.type}:${subscription.id}`;
-    
-    if (!activeSubscriptions.current.has(key)) {
-      wsClient.subscribe(subscription);
-      storeSubscribe(subscription);
-      activeSubscriptions.current.add(key);
-      
-      logger.debug('Subscribed to WebSocket channel', { 
-        component: 'useWebSocket',
-        subscription: key
-      });
-    }
-  }, [storeSubscribe]);
 
-  const unsubscribe = useCallback((subscription: WebSocketSubscription) => {
-    const key = `${subscription.type}:${subscription.id}`;
-    
-    if (activeSubscriptions.current.has(key)) {
-      wsClient.unsubscribe(subscription);
-      storeUnsubscribe(subscription);
-      activeSubscriptions.current.delete(key);
-      
-      logger.debug('Unsubscribed from WebSocket channel', { 
+    if (!activeSubscriptions.current.has(key)) {
+      if (subscription.type === 'bill') {
+        wsManager.current.subscribeToBill(subscription.id as number);
+      } else {
+        // For other subscription types, use general subscribe method
+        wsManager.current.subscribe(subscription.type, (message) => {
+          // Handle different message types
+          if (subscription.type === 'community') {
+            const communityUpdate: CommunityRealTimeUpdate = {
+              type: message.type || 'update',
+              discussion_id: subscription.id as string,
+              data: message.data || message,
+              timestamp: message.timestamp || new Date().toISOString()
+            };
+
+            setCommunityUpdates(prev => {
+              const existing = prev[subscription.id as string] || [];
+              const newUpdates = [communityUpdate, ...existing].slice(0, 30);
+              return { ...prev, [subscription.id as string]: newUpdates };
+            });
+
+            handlersRef.current.onCommunityUpdate?.(communityUpdate);
+          }
+        });
+      }
+
+      activeSubscriptions.current.add(key);
+      logger.debug('Subscribed to WebSocket channel', {
         component: 'useWebSocket',
         subscription: key
       });
     }
-  }, [storeUnsubscribe]);
+  }, []);
+
+  const unsubscribeFromChannel = useCallback((subscription: WebSocketSubscription) => {
+    const key = `${subscription.type}:${subscription.id}`;
+
+    if (activeSubscriptions.current.has(key)) {
+      if (subscription.type === 'bill') {
+        wsManager.current.unsubscribeFromBill(subscription.id as number);
+      } else {
+        // For other types, we would need to track subscription IDs
+        // This is a simplified version
+        wsManager.current.unsubscribe(key);
+      }
+
+      activeSubscriptions.current.delete(key);
+      logger.debug('Unsubscribed from WebSocket channel', {
+        component: 'useWebSocket',
+        subscription: key
+      });
+    }
+  }, []);
 
   // Utility functions
   const getBillUpdates = useCallback((billId: number) => {
-    return billUpdates.get(billId) || [];
+    return billUpdates[billId] || [];
   }, [billUpdates]);
 
   const getEngagementMetrics = useCallback((billId: number) => {
-    return engagementMetrics.get(billId);
+    return engagementMetrics[billId];
   }, [engagementMetrics]);
 
   const getRecentActivity = useCallback((limit?: number) => {
-    return getRecentUpdates(limit);
-  }, [getRecentUpdates]);
+    const billActivity = Object.values(billUpdates).flat();
+    const communityActivity = Object.values(communityUpdates).flat();
+    const allActivity = [...billActivity, ...communityActivity]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, limit || 20);
+    return allActivity;
+  }, [billUpdates, communityUpdates]);
 
-  const markNotificationRead = useCallback((notificationId: string) => {
-    storeMarkNotificationRead(notificationId);
-  }, [storeMarkNotificationRead]);
+  const markNotificationAsRead = useCallback((notificationId: string) => {
+    setNotifications(prev =>
+      prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+    );
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -248,21 +379,27 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     };
   }, []);
 
+  // Memoized notification count
+  const notificationCount = useMemo(() =>
+    notifications.filter(n => !n.read).length,
+    [notifications]
+  );
+
   return {
     // Connection state
-    isConnected: connection.isConnected,
-    isConnecting: connection.isConnecting,
-    connectionQuality: connection.connection_quality,
-    error: connection.error,
-    
+    isConnected,
+    isConnecting,
+    connectionQuality,
+    error,
+
     // Connection management
     connect,
     disconnect,
-    
+
     // Subscription management
-    subscribe,
-    unsubscribe,
-    
+    subscribe: subscribeToChannel,
+    unsubscribe: unsubscribeFromChannel,
+
     // Real-time data
     billUpdates,
     communityUpdates,
@@ -270,12 +407,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     expertActivities,
     notifications,
     notificationCount,
-    
+
     // Utility functions
     getBillUpdates,
     getEngagementMetrics,
     getRecentActivity,
-    markNotificationRead
+    markNotificationRead: markNotificationAsRead
   };
 }
 
@@ -306,7 +443,7 @@ export function useCommunityRealTime(discussionId: string) {
 
   return {
     ...webSocket,
-    communityUpdates: webSocket.communityUpdates.get(discussionId) || []
+    communityUpdates: webSocket.communityUpdates[discussionId] || []
   };
 }
 

@@ -1,17 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { FileText, Link2, ArrowRight, History } from 'lucide-react';
+import { FileText, Link, ChevronRight, Clock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { Bill } from '../../store/slices/billsSlice';
-
-interface BillRelatedTabProps {
-  bill: Bill;
-}
 
 /**
  * BillRelatedTab - Related bills and cross-references
  */
-function BillRelatedTab({ bill }: BillRelatedTabProps) {
+function BillRelatedTab() {
   // Mock related bills data
   const mockRelatedBills = [
     {
@@ -72,7 +67,7 @@ function BillRelatedTab({ bill }: BillRelatedTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Link2 className="h-5 w-5" style={{ color: 'hsl(var(--civic-expert))' }} />
+            <Link className="h-5 w-5" style={{ color: 'hsl(var(--civic-expert))' }} />
             Related Bills
           </CardTitle>
           <CardDescription>
@@ -107,7 +102,7 @@ function BillRelatedTab({ bill }: BillRelatedTabProps) {
                     </div>
                   </div>
                   <Button variant="outline" size="sm">
-                    <ArrowRight className="h-4 w-4 mr-1" />
+                    <ChevronRight className="h-4 w-4 mr-1" />
                     View Bill
                   </Button>
                 </div>
@@ -132,7 +127,7 @@ function BillRelatedTab({ bill }: BillRelatedTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5" style={{ color: 'hsl(var(--civic-constitutional))' }} />
+            <Clock className="h-5 w-5" style={{ color: 'hsl(var(--civic-constitutional))' }} />
             Historical Precedents
           </CardTitle>
           <CardDescription>

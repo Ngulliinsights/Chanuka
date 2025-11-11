@@ -14,24 +14,17 @@ export interface RequestInterceptor {
   }
   
   /**
-   * Authentication & Header Interceptor
+   * Header Interceptor
    * This function is run before every request. It adds:
-   * 1. Authorization header (if token exists)
-   * 2. X-CSRF-Token (if meta tag exists)
-   * 3. X-Request-ID (for tracing)
-   * 4. Default Content-Type for POST/PUT/PATCH
+   * 1. X-CSRF-Token (if meta tag exists)
+   * 2. X-Request-ID (for tracing)
+   * 3. Default Content-Type for POST/PUT/PATCH
+   *
+   * Note: Authentication is now handled via HttpOnly cookies sent automatically by the browser
    */
-  const authHeaderInterceptor: RequestInterceptor = (config) => {
+  const headerInterceptor: RequestInterceptor = (config) => {
     const headers = new Headers(config.headers);
-    
-    // Add authentication header if token exists
-    if (typeof localStorage !== 'undefined') {
-      const token = localStorage.getItem('token');
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-    }
-    
+  
     // Add CSRF token if available in the DOM
     if (typeof document !== 'undefined') {
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -39,16 +32,16 @@ export interface RequestInterceptor {
         headers.set('X-CSRF-Token', csrfToken);
       }
     }
-    
+  
     // Add request ID for tracking
     headers.set('X-Request-ID', generateRequestId());
-    
+  
     // Ensure JSON content type for POST/PUT/PATCH requests
     const method = config.method?.toUpperCase();
     if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && !headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
     }
-    
+  
     return {
       ...config,
       headers
@@ -60,7 +53,7 @@ export interface RequestInterceptor {
    * Add more here to modify all outgoing requests.
    */
   export const requestInterceptors: RequestInterceptor[] = [
-    authHeaderInterceptor,
+    headerInterceptor,
     // Add other request interceptors here
   ];
   

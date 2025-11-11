@@ -14,7 +14,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Import components for keyboard testing
 import NavigationBar from '../../components/shell/NavigationBar';
-import { EnhancedBillsDashboard } from '../../components/bills/enhanced-bills-dashboard';
+import { BillsDashboard } from '../../components/bills/bills-dashboard';
 import FilterPanel from '../../components/bills/FilterPanel';
 import BillDetailView from '../../components/bill-detail/BillDetailView';
 import DiscussionThread from '../../components/discussion/DiscussionThread';

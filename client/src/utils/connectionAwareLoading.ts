@@ -1,4 +1,4 @@
-import { logger } from './client-core';
+import { logger } from './logger';
 // Connection-aware loading strategies for optimal performance
 
 export interface ConnectionInfo {

@@ -28,6 +28,7 @@ import { createNavigationProvider } from "./core/navigation/context";
 import { useAuth } from "./hooks/use-auth";
 import { useMediaQuery } from "./hooks/use-mobile";
 import { useWebVitals } from "./hooks/use-web-vitals";
+import MonitoringService from "./monitoring";
 import { performanceMonitor } from "./utils/performance-monitor";
 
 // Import test page for design system verification
@@ -40,6 +41,9 @@ import {
 
 // Import security system
 import { initializeSecurity } from "./security";
+
+// Import privacy components
+import { CookieConsentBanner } from "./components/privacy";
 
 // =============================================================================
 // CONFIGURATION
@@ -222,9 +226,19 @@ const ROUTES = [
     id: "user-profile",
   },
   {
+    path: "/user-dashboard",
+    element: <SafeLazyPages.UserDashboard />,
+    id: "user-dashboard",
+  },
+  {
     path: "/onboarding",
     element: <SafeLazyPages.Onboarding />,
     id: "onboarding",
+  },
+  {
+    path: "/privacy-settings",
+    element: <SafeLazyPages.PrivacySettings />,
+    id: "privacy-settings",
   },
 
   // System routes
@@ -433,6 +447,7 @@ export default function App() {
               <Toaster />
               <AccessibilityTrigger />
               <OfflineStatus showDetails={true} />
+              <CookieConsentBanner />
               {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
             </NavigationWrapper>
           </BrowserRouter>

@@ -1,7 +1,7 @@
 /**
  * Test-specific logger that extends the client logger with additional test features
  */
-import { logger as clientLogger, type Logger, type LogContext } from '../../utils/client-core';
+import { logger as clientLogger, type Logger, type LogContext } from '../../utils/logger';
 
 interface TestContext extends LogContext {
   testName?: string;

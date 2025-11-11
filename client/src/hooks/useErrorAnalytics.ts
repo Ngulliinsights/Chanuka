@@ -29,7 +29,7 @@ import {
   selectIsRealTimeEnabled,
   selectConnectionStatus,
 } from '../store/slices/errorAnalyticsSlice';
-import { getWebSocketService } from '../services/webSocketService';
+import { useWebSocket } from './useWebSocket';
 
 interface UseErrorAnalyticsOptions {
   enableRealTime?: boolean;
@@ -146,31 +146,40 @@ export function useErrorAnalytics(options: UseErrorAnalyticsOptions = {}) {
     await loadAllData();
   }, [dispatch, loadAllData]);
 
-  // Real-time setup
+  // Real-time setup using unified WebSocket hook
+  const webSocket = useWebSocket({
+    autoConnect: enableRealTime && isRealTimeEnabled,
+    subscriptions: [
+      { type: 'bill', id: 'error-analytics' }, // Use bill type for error analytics
+      { type: 'user_notifications', id: 'error-alerts' }
+    ],
+    handlers: {
+      onBillUpdate: (update) => {
+        // Handle error analytics real-time updates through existing bill update types
+        // These will be processed by the error analytics slice
+        dispatch({ type: 'errorAnalytics/addRealTimeError', payload: update });
+      },
+      onNotification: (notification) => {
+        // Handle error alerts through existing notification types
+        dispatch({ type: 'errorAnalytics/addRealTimeAlert', payload: notification });
+      }
+    }
+  });
+
   const setupRealTimeUpdates = useCallback(async () => {
     if (!enableRealTime || !isRealTimeEnabled) return;
 
     try {
-      webSocketRef.current = getWebSocketService();
-
-      // Connect to WebSocket
-      await webSocketRef.current.connect();
-
-      // Subscribe to error events
-      webSocketRef.current.subscribeToErrors();
-      webSocketRef.current.subscribeToSystemHealth();
-      webSocketRef.current.subscribeToAlerts();
-
+      // WebSocket connection is handled by the useWebSocket hook
+      console.log('Real-time updates enabled for error analytics');
     } catch (error) {
       console.error('Failed to setup real-time updates:', error);
     }
   }, [enableRealTime, isRealTimeEnabled]);
 
   const disconnectRealTime = useCallback(() => {
-    if (webSocketRef.current) {
-      webSocketRef.current.disconnect();
-      webSocketRef.current = null;
-    }
+    // WebSocket disconnection is handled by the useWebSocket hook
+    console.log('Real-time updates disabled for error analytics');
   }, []);
 
   // Auto-refresh setup
@@ -251,6 +260,9 @@ export function useErrorAnalytics(options: UseErrorAnalyticsOptions = {}) {
     // Real-time actions
     setupRealTimeUpdates,
     disconnectRealTime,
+
+    // WebSocket connection status
+    webSocketConnectionStatus: webSocket.isConnected,
   };
 }
 

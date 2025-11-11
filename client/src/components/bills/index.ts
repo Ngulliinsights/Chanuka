@@ -9,7 +9,7 @@ export { StatsOverview } from './stats-overview';
 export { VirtualBillGrid, BillGrid } from './virtual-bill-grid';
 export { BillList } from './bill-list';
 export { FilterPanel } from './filter-panel';
-export { EnhancedBillsDashboard } from './enhanced-bills-dashboard';
+export { BillsDashboard } from './bills-dashboard';
 
 // Re-export store for convenience
 export { useBillsStore, useBillsSelectors } from '../../store/slices/billsSlice';

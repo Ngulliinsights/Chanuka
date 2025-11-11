@@ -1,361 +1,437 @@
 /**
  * Security Dashboard Component
- * Displays security status and threat monitoring information
+ * Displays security system status and metrics
  */
 
-import React, { useState } from 'react';
-import { useSecurity } from '../../hooks/useSecurity';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
-import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { 
   Shield, 
-  ShieldAlert, 
-  ShieldCheck, 
-  RefreshCw, 
-  Eye, 
-  EyeOff,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Clock
+  AlertTriangle, 
+  CheckCircle, 
+  XCircle, 
+  Activity,
+  Eye,
+  Lock,
+  Zap
 } from 'lucide-react';
+import { getSecuritySystem } from '../../security';
+import { SecurityMetrics, SecurityAlert, SecurityEvent, VulnerabilityReport } from '../../security/types';
+import { logger } from '../../utils/logger';
 
 interface SecurityDashboardProps {
   className?: string;
   showDetails?: boolean;
+  autoRefresh?: boolean;
+  refreshInterval?: number;
 }
 
-export function SecurityDashboard({ className, showDetails = false }: SecurityDashboardProps) {
-  const { 
-    status, 
-    isSecure, 
-    threats, 
-    latestThreat,
-    performScan,
-    scanInProgress,
-    refreshSecurity,
-    clearThreats
-  } = useSecurity({
-    enableThreatMonitoring: true,
-    enablePeriodicScanning: true
-  });
+export function SecurityDashboard({ 
+  className = '',
+  showDetails = true,
+  autoRefresh = true,
+  refreshInterval = 30000
+}: SecurityDashboardProps) {
+  const [metrics, setMetrics] = useState<SecurityMetrics | null>(null);
+  const [alerts, setAlerts] = useState<SecurityAlert[]>([]);
+  const [events, setEvents] = useState<SecurityEvent[]>([]);
+  const [vulnerabilities, setVulnerabilities] = useState<VulnerabilityReport[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-  const [showThreats, setShowThreats] = useState(false);
+  const refreshData = async () => {
+    try {
+      const securitySystem = getSecuritySystem();
+      if (!securitySystem) {
+        logger.warn('Security system not initialized');
+        return;
+      }
 
-  const getSecurityIcon = () => {
-    if (isSecure) {
-      return <ShieldCheck className="h-5 w-5 text-green-600" />;
+      // Get metrics
+      const currentMetrics = securitySystem.monitor.getMetrics();
+      setMetrics(currentMetrics);
+
+      // Get alerts
+      const currentAlerts = securitySystem.monitor.getAlerts();
+      setAlerts(currentAlerts);
+
+      // Get recent events (last 100)
+      const allEvents = securitySystem.monitor.getEvents();
+      setEvents(allEvents.slice(-100));
+
+      // Get vulnerabilities
+      const currentVulnerabilities = securitySystem.vulnerabilityScanner.getVulnerabilities();
+      setVulnerabilities(currentVulnerabilities);
+
+      setLastUpdate(new Date());
+      setIsLoading(false);
+    } catch (error) {
+      logger.error('Failed to refresh security dashboard data', error);
+      setIsLoading(false);
     }
-    if (threats.some(t => t.severity === 'critical' || t.severity === 'high')) {
-      return <ShieldAlert className="h-5 w-5 text-red-600" />;
+  };
+
+  useEffect(() => {
+    refreshData();
+
+    if (autoRefresh) {
+      const interval = setInterval(refreshData, refreshInterval);
+      return () => clearInterval(interval);
     }
-    return <Shield className="h-5 w-5 text-yellow-600" />;
+  }, [autoRefresh, refreshInterval]);
+
+  const getHealthColor = (health: string) => {
+    switch (health) {
+      case 'healthy': return 'text-green-600';
+      case 'warning': return 'text-yellow-600';
+      case 'critical': return 'text-red-600';
+      default: return 'text-gray-600';
+    }
   };
 
-  const getSecurityScore = () => {
-    return status.vulnerabilityScanning.lastScanScore;
+  const getHealthIcon = (health: string) => {
+    switch (health) {
+      case 'healthy': return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'warning': return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+      case 'critical': return <XCircle className="h-5 w-5 text-red-600" />;
+      default: return <Activity className="h-5 w-5 text-gray-600" />;
+    }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-600';
-    if (score >= 70) return 'text-yellow-600';
-    return 'text-red-600';
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'low': return 'bg-blue-100 text-blue-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'critical': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
-  const getSeverityBadge = (severity: string) => {
-    const variants = {
-      critical: 'destructive',
-      high: 'destructive',
-      medium: 'secondary',
-      low: 'outline'
-    } as const;
+  const acknowledgeAlert = async (alertId: string) => {
+    try {
+      const securitySystem = getSecuritySystem();
+      if (securitySystem) {
+        securitySystem.monitor.acknowledgeAlert(alertId);
+        await refreshData();
+      }
+    } catch (error) {
+      logger.error('Failed to acknowledge alert', error);
+    }
+  };
 
+  const runVulnerabilityScan = async () => {
+    try {
+      const securitySystem = getSecuritySystem();
+      if (securitySystem) {
+        await securitySystem.vulnerabilityScanner.scan();
+        await refreshData();
+      }
+    } catch (error) {
+      logger.error('Failed to run vulnerability scan', error);
+    }
+  };
+
+  if (isLoading) {
     return (
-      <Badge variant={variants[severity as keyof typeof variants] || 'outline'}>
-        {severity.toUpperCase()}
-      </Badge>
+      <div className={`p-6 ${className}`}>
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
     );
-  };
-
-  const formatTimestamp = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString();
-  };
+  }
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      {/* Security Overview */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            {getSecurityIcon()}
-            Security Status
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refreshSecurity}
-              className="h-8 px-2"
-            >
-              <RefreshCw className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={performScan}
-              disabled={scanInProgress}
-              className="h-8 px-2"
-            >
-              {scanInProgress ? (
-                <RefreshCw className="h-3 w-3 animate-spin" />
-              ) : (
-                'Scan'
-              )}
-            </Button>
+    <div className={`p-6 space-y-6 ${className}`}>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Shield className="h-8 w-8 text-blue-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Security Dashboard</h1>
+            <p className="text-sm text-gray-500">
+              Last updated: {lastUpdate.toLocaleTimeString()}
+            </p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-2xl font-bold">
-                <span className={getScoreColor(getSecurityScore())}>
-                  {getSecurityScore()}/100
-                </span>
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Security Score
-              </p>
-            </div>
-            <div className="w-32">
-              <Progress 
-                value={getSecurityScore()} 
-                className="h-2"
-              />
-            </div>
-          </div>
-          
-          {latestThreat && (
-            <Alert className="mt-3">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                Latest threat: {latestThreat.description} 
-                <span className="ml-2">
-                  {getSeverityBadge(latestThreat.severity)}
-                </span>
-              </AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Security Components Status */}
-      {showDetails && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* CSP Status */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">CSP</CardTitle>
-              {status.csp.enabled ? (
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              ) : (
-                <XCircle className="h-4 w-4 text-red-600" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {status.csp.enabled ? 'Active' : 'Disabled'}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Content Security Policy
-              </p>
-              {status.csp.enabled && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Nonce: {status.csp.currentNonce.substring(0, 8)}...
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* CSRF Status */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">CSRF</CardTitle>
-              {status.csrf.hasValidToken ? (
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              ) : (
-                <XCircle className="h-4 w-4 text-red-600" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {status.csrf.hasValidToken ? 'Protected' : 'Vulnerable'}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Cross-Site Request Forgery
-              </p>
-              {status.csrf.hasValidToken && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Expires in: {Math.round(status.csrf.tokenExpiresIn / 60000)}m
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Rate Limiting */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Rate Limit</CardTitle>
-              {status.rateLimit.enabled ? (
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              ) : (
-                <XCircle className="h-4 w-4 text-red-600" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {status.rateLimit.activeKeys}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Active Rate Limits
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Vulnerability Scanning */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Scanning</CardTitle>
-              {status.vulnerabilityScanning.enabled ? (
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              ) : (
-                <XCircle className="h-4 w-4 text-red-600" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {status.vulnerabilityScanning.threatsFound}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Threats Found
-              </p>
-            </CardContent>
-          </Card>
         </div>
-      )}
+        <div className="flex items-center space-x-2">
+          <Button onClick={refreshData} variant="outline" size="sm">
+            <Activity className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+          <Button onClick={runVulnerabilityScan} variant="outline" size="sm">
+            <Eye className="h-4 w-4 mr-2" />
+            Scan
+          </Button>
+        </div>
+      </div>
 
-      {/* Threats Section */}
-      {threats.length > 0 && (
+      {/* System Health Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              Security Threats ({threats.length})
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowThreats(!showThreats)}
-                className="h-8 px-2"
-              >
-                {showThreats ? (
-                  <EyeOff className="h-3 w-3" />
-                ) : (
-                  <Eye className="h-3 w-3" />
-                )}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearThreats}
-                className="h-8 px-2"
-              >
-                Clear
-              </Button>
-            </div>
-          </CardHeader>
-          {showThreats && (
-            <CardContent>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {threats.slice(0, 10).map((threat, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start justify-between p-2 border rounded-lg"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        {getSeverityBadge(threat.severity)}
-                        <Badge variant="outline">{threat.type}</Badge>
-                      </div>
-                      <p className="text-sm text-gray-900 truncate">
-                        {threat.description}
-                      </p>
-                      {threat.location && (
-                        <p className="text-xs text-muted-foreground">
-                          Location: {threat.location}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {formatTimestamp(threat.timestamp)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                {threats.length > 10 && (
-                  <p className="text-xs text-muted-foreground text-center py-2">
-                    ... and {threats.length - 10} more threats
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          )}
-        </Card>
-      )}
-
-      {/* Security Recommendations */}
-      {!isSecure && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              Security Recommendations
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">System Health</CardTitle>
+            {getHealthIcon(metrics?.systemHealth || 'unknown')}
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {!status.csrf.hasValidToken && (
-                <Alert>
-                  <AlertDescription>
-                    CSRF protection is not active. Refresh the page to generate a new token.
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              {status.vulnerabilityScanning.lastScanScore < 70 && (
-                <Alert>
-                  <AlertDescription>
-                    Security score is low. Run a security scan to identify issues.
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              {threats.some(t => t.severity === 'critical') && (
-                <Alert>
-                  <AlertDescription>
-                    Critical security threats detected. Review and address immediately.
-                  </AlertDescription>
-                </Alert>
-              )}
+            <div className={`text-2xl font-bold ${getHealthColor(metrics?.systemHealth || 'unknown')}`}>
+              {metrics?.systemHealth || 'Unknown'}
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Security Events</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{metrics?.totalEvents || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Total events recorded
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Alerts</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">
+              {alerts.filter(a => !a.acknowledged).length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Unacknowledged alerts
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Vulnerabilities</CardTitle>
+            <Lock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">
+              {vulnerabilities.filter(v => !v.fixed).length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Unfixed vulnerabilities
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Detailed Information */}
+      {showDetails && (
+        <Tabs defaultValue="alerts" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="vulnerabilities">Vulnerabilities</TabsTrigger>
+            <TabsTrigger value="metrics">Metrics</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="alerts" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Security Alerts</CardTitle>
+                <CardDescription>
+                  Active security alerts requiring attention
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {alerts.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">No alerts</p>
+                ) : (
+                  <div className="space-y-3">
+                    {alerts.slice(0, 10).map((alert) => (
+                      <Alert key={alert.id}>
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertDescription className="flex items-center justify-between">
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <Badge className={getSeverityColor(alert.severity)}>
+                                {alert.severity}
+                              </Badge>
+                              <span className="font-medium">{alert.type}</span>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {alert.message}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {alert.timestamp.toLocaleString()}
+                            </p>
+                          </div>
+                          {!alert.acknowledged && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => acknowledgeAlert(alert.id)}
+                            >
+                              Acknowledge
+                            </Button>
+                          )}
+                        </AlertDescription>
+                      </Alert>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="events" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Security Events</CardTitle>
+                <CardDescription>
+                  Latest security events detected by the system
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {events.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">No events</p>
+                ) : (
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {events.slice(-20).reverse().map((event) => (
+                      <div key={event.id} className="flex items-center justify-between p-3 border rounded">
+                        <div className="flex items-center space-x-3">
+                          <Badge className={getSeverityColor(event.severity)}>
+                            {event.severity}
+                          </Badge>
+                          <div>
+                            <p className="font-medium">{event.type}</p>
+                            <p className="text-sm text-gray-600">{event.source}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-400">
+                            {event.timestamp.toLocaleString()}
+                          </p>
+                          {event.resolved && (
+                            <Badge variant="outline" className="text-green-600">
+                              Resolved
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="vulnerabilities" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Vulnerability Report</CardTitle>
+                <CardDescription>
+                  Security vulnerabilities detected in the system
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {vulnerabilities.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">No vulnerabilities detected</p>
+                ) : (
+                  <div className="space-y-3">
+                    {vulnerabilities.map((vuln) => (
+                      <div key={vuln.id} className="border rounded p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <Badge className={getSeverityColor(vuln.severity)}>
+                              {vuln.severity}
+                            </Badge>
+                            <span className="font-medium">{vuln.type}</span>
+                            {vuln.fixed && (
+                              <Badge variant="outline" className="text-green-600">
+                                Fixed
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-400">
+                            {vuln.timestamp.toLocaleString()}
+                          </p>
+                        </div>
+                        <p className="text-sm text-gray-700 mb-2">{vuln.description}</p>
+                        {vuln.recommendations.length > 0 && (
+                          <div className="text-xs text-gray-600">
+                            <p className="font-medium">Recommendations:</p>
+                            <ul className="list-disc list-inside ml-2">
+                              {vuln.recommendations.map((rec, index) => (
+                                <li key={index}>{rec}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="metrics" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Events by Type</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {metrics?.eventsByType && Object.keys(metrics.eventsByType).length > 0 ? (
+                    <div className="space-y-2">
+                      {Object.entries(metrics.eventsByType).map(([type, count]) => (
+                        <div key={type} className="flex justify-between">
+                          <span className="text-sm">{type.replace('_', ' ')}</span>
+                          <span className="font-medium">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No event data</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Events by Severity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {metrics?.eventsBySeverity && Object.keys(metrics.eventsBySeverity).length > 0 ? (
+                    <div className="space-y-2">
+                      {Object.entries(metrics.eventsBySeverity).map(([severity, count]) => (
+                        <div key={severity} className="flex justify-between">
+                          <Badge className={getSeverityColor(severity)}>
+                            {severity}
+                          </Badge>
+                          <span className="font-medium">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No severity data</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );
 }
-
-export default SecurityDashboard;

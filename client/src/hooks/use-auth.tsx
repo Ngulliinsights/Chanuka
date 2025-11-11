@@ -18,6 +18,10 @@ import { securityMonitor } from '../utils/security-monitoring';
 import { privacyCompliance } from '../utils/privacy-compliance';
 import { validatePassword } from '../utils/password-validation';
 import { apiService } from '../services/apiService';
+import { authBackendService } from '../services/authBackendService';
+import { tokenManager } from '../utils/tokenManager';
+import { sessionManager } from '../utils/sessionManager';
+import { rbacManager } from '../utils/rbac';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -26,32 +30,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const mountedRef = useRef(true);
   const validationInProgressRef = useRef(false);
-  const tokenBeingValidatedRef = useRef<string | null>(null);
-
-  // Helper function for making cancellable requests
-  const makeCancellableRequest = async (url: string, options: RequestInit = {}, abortController: AbortController) => {
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: abortController.signal
-      });
-      return response;
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        throw new Error('Request cancelled');
-      }
-      throw error;
-    }
-  };
 
   useEffect(() => {
     mountedRef.current = true;
 
-    const token = localStorage.getItem('token');
-    if (token && !validationInProgressRef.current) {
-      const abortController = new AbortController();
-      validateToken(token, abortController);
-    } else if (!token) {
+    // Initialize session manager
+    sessionManager.onWarning((warning) => {
+      logger.warn('Session warning:', { component: 'AuthProvider', warning });
+      // Handle session warnings (could show notifications)
+    });
+
+    // Check for existing tokens
+    const tokens = tokenManager.getTokens();
+    if (tokens && !validationInProgressRef.current) {
+      validateStoredTokens();
+    } else if (!tokens) {
       if (mountedRef.current) {
         setLoading(false);
       }
@@ -62,59 +55,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const validateToken = async (token: string, abortController: AbortController) => {
+  const validateStoredTokens = async () => {
     // Prevent multiple simultaneous validation requests
     if (validationInProgressRef.current) {
       return;
     }
 
-    // Store the token we're validating to detect changes
-    tokenBeingValidatedRef.current = token;
     validationInProgressRef.current = true;
 
     try {
-      const response = await fetch('/api/auth/verify', {
-        signal: abortController.signal,
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // Check if token metadata indicates expiration
+      const validation = tokenManager.validateToken();
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data?.user) {
-          // Only update if the token being validated is still current
-          if (mountedRef.current && tokenBeingValidatedRef.current === token) {
-            setUser(result.data.user);
+      if (!validation.isValid) {
+        // Try to refresh token via API call (HttpOnly cookies will be sent automatically)
+        const refreshResult = await authBackendService.refreshToken();
+
+        if (refreshResult.success && refreshResult.tokens && refreshResult.user) {
+          tokenManager.storeTokens(refreshResult.tokens, refreshResult.user);
+          if (mountedRef.current) {
+            setUser(refreshResult.user);
+            sessionManager.startSession(refreshResult.user);
           }
         } else {
-          localStorage.removeItem('token');
-          localStorage.removeItem('refresh_token');
+          // Refresh failed, clear token metadata
+          tokenManager.clearTokens();
           if (mountedRef.current) {
             setUser(null);
           }
         }
       } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refresh_token');
-        if (mountedRef.current) {
-          setUser(null);
+        // Token metadata indicates validity, verify with server
+        // Server will check HttpOnly cookies automatically
+        const response = await apiService.get('/api/auth/verify');
+
+        if (response.success && response.data?.user) {
+          if (mountedRef.current) {
+            setUser(response.data.user);
+            sessionManager.startSession(response.data.user);
+          }
+        } else {
+          tokenManager.clearTokens();
+          if (mountedRef.current) {
+            setUser(null);
+          }
         }
       }
     } catch (error) {
-      logger.error('Token validation failed:', { component: 'Chanuka' }, error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('refresh_token');
+      logger.error('Token validation failed:', { component: 'AuthProvider' }, error);
+      tokenManager.clearTokens();
       if (mountedRef.current) {
         setUser(null);
       }
     } finally {
       validationInProgressRef.current = false;
-      tokenBeingValidatedRef.current = null;
       if (mountedRef.current) {
         setLoading(false);
       }
-      abortController.abort();
     }
   };
 
@@ -155,29 +152,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           deviceFingerprint
         );
 
-        // Store tokens securely
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('refresh_token', response.data.refresh_token);
-        
+        // Store tokens securely using token manager
+        const tokens = {
+          accessToken: response.data.token,
+          refreshToken: response.data.refresh_token,
+          expiresAt: Date.now() + (response.data.expires_in * 1000 || 24 * 60 * 60 * 1000), // Default 24h
+          tokenType: 'Bearer' as const
+        };
+
+        tokenManager.storeTokens(tokens, response.data.user);
+
         // Create security event
         const securityEvent = securityMonitor.createSecurityEvent(
           response.data.user.id,
           'login',
-          { 
+          {
             device_fingerprint: deviceFingerprint,
-            suspicious_alerts: [...alerts, ...deviceAlerts].length 
+            suspicious_alerts: [...alerts, ...deviceAlerts].length
           }
         );
         securityMonitor.logSecurityEvent(securityEvent);
 
         if (mountedRef.current) {
           setUser(response.data.user);
+          sessionManager.startSession(response.data.user);
+          rbacManager.clearUserCache(response.data.user.id); // Clear any cached permissions
         }
 
-        return { 
-          success: true, 
+        return {
+          success: true,
           data: response.data,
-          requires2FA: response.data.requires_2fa 
+          requires2FA: response.data.requires_2fa
         };
       } else {
         // Record failed login
@@ -187,9 +192,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           false
         );
 
-        return { 
-          success: false, 
-          error: response.error?.message || 'Login failed' 
+        return {
+          success: false,
+          error: (response as any).error?.message || 'Login failed'
         };
       }
     } catch (error) {
@@ -247,22 +252,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (response.success && response.data) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('refresh_token', response.data.refresh_token);
-        
+        // Store tokens securely using token manager
+        const tokens = {
+          accessToken: response.data.token,
+          refreshToken: response.data.refresh_token,
+          expiresAt: Date.now() + (response.data.expires_in * 1000 || 24 * 60 * 60 * 1000), // Default 24h
+          tokenType: 'Bearer' as const
+        };
+
+        tokenManager.storeTokens(tokens, response.data.user);
+
         // Create security event for new registration
         const securityEvent = securityMonitor.createSecurityEvent(
           response.data.user.id,
           'login', // First login after registration
-          { 
+          {
             registration: true,
-            device_fingerprint: deviceFingerprint 
+            device_fingerprint: deviceFingerprint
           }
         );
         securityMonitor.logSecurityEvent(securityEvent);
 
         if (mountedRef.current) {
           setUser(response.data.user);
+          sessionManager.startSession(response.data.user);
         }
 
         return {
@@ -271,9 +284,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: response.data
         };
       } else {
-        return { 
-          success: false, 
-          error: response.error?.message || 'Registration failed' 
+        return {
+          success: false,
+          error: (response as any).error?.message || 'Registration failed'
         };
       }
     } catch (error) {
@@ -288,8 +301,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async (): Promise<void> => {
     try {
-      const token = localStorage.getItem('token');
-      if (token && user) {
+      if (user) {
         // Create security event for logout
         const securityEvent = securityMonitor.createSecurityEvent(
           user.id,
@@ -297,13 +309,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
         securityMonitor.logSecurityEvent(securityEvent);
 
+        // End session
+        await sessionManager.endSession();
+        
+        // Clear user permissions cache
+        rbacManager.clearUserCache(user.id);
+
+        // Notify backend
         await apiService.post('/api/auth/logout', {});
       }
     } catch (error) {
       logger.error('Logout request failed:', { component: 'AuthProvider' }, error);
     } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refresh_token');
+      // Clear all tokens and session data
+      tokenManager.clearTokens();
       if (mountedRef.current) {
         setUser(null);
       }
@@ -312,37 +331,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshToken = async (): Promise<AuthResponse> => {
     try {
-      const refreshTokenValue = localStorage.getItem('refresh_token');
-      if (!refreshTokenValue) {
-        return { success: false, error: 'No refresh token available' };
-      }
-
-      const response = await apiService.post('/api/auth/refresh', {
-        refresh_token: refreshTokenValue,
-      });
-
-      if (response.success && response.data) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('refresh_token', response.data.refresh_token);
+      const result = await authBackendService.refreshToken();
+      
+      if (result.success && result.tokens && result.user) {
+        tokenManager.storeTokens(result.tokens, result.user);
         if (mountedRef.current) {
-          setUser(response.data.user);
+          setUser(result.user);
         }
-        return { success: true, data: response.data };
+        return { success: true, data: { user: result.user, tokens: result.tokens } };
       } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refresh_token');
+        tokenManager.clearTokens();
         if (mountedRef.current) {
           setUser(null);
         }
         return { 
           success: false, 
-          error: response.error?.message || 'Token refresh failed' 
+          error: result.error || 'Token refresh failed' 
         };
       }
     } catch (error) {
       logger.error('Token refresh failed:', { component: 'AuthProvider' }, error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('refresh_token');
+      tokenManager.clearTokens();
       if (mountedRef.current) {
         setUser(null);
       }
@@ -360,9 +369,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         return { success: true, data: response.data };
       } else {
-        return { 
-          success: false, 
-          error: response.error?.message || 'Email verification failed' 
+        return {
+          success: false,
+          error: (response as any).error?.message || 'Email verification failed'
         };
       }
     } catch (error) {
@@ -477,7 +486,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.data) {
         return response.data as TwoFactorSetup;
       } else {
-        throw new Error(response.error?.message || 'Two-factor setup failed');
+        throw new Error((response as any).error?.message || 'Two-factor setup failed');
       }
     } catch (error) {
       logger.error('Two-factor setup failed:', { component: 'AuthProvider' }, error);
@@ -585,9 +594,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         return { success: true, data: response.data };
       } else {
-        return { 
-          success: false, 
-          error: response.error?.message || 'Privacy settings update failed' 
+        return {
+          success: false,
+          error: (response as any).error?.message || 'Privacy settings update failed'
         };
       }
     } catch (error) {
@@ -602,8 +611,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const exportRequest = await privacyCompliance.generateDataExport(user.id, format, includes);
-      
       // Also send to server
       const response = await apiService.post('/api/privacy/export', {
         format,
@@ -627,8 +634,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const deletionRequest = await privacyCompliance.requestDataDeletion(user.id, includes, retentionPeriod);
-      
       // Also send to server
       const response = await apiService.post('/api/privacy/delete', {
         retention_period: retentionPeriod,
@@ -657,7 +662,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.data) {
         return response.data as SecurityEvent[];
       } else {
-        throw new Error(response.error?.message || 'Failed to fetch security events');
+        throw new Error((response as any).error?.message || 'Failed to fetch security events');
       }
     } catch (error) {
       logger.error('Security events fetch failed:', { component: 'AuthProvider' }, error);
@@ -676,7 +681,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.data) {
         return response.data as SuspiciousActivityAlert[];
       } else {
-        throw new Error(response.error?.message || 'Failed to fetch suspicious activity');
+        throw new Error((response as any).error?.message || 'Failed to fetch suspicious activity');
       }
     } catch (error) {
       logger.error('Suspicious activity fetch failed:', { component: 'AuthProvider' }, error);
@@ -695,7 +700,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.data) {
         return response.data as SessionInfo[];
       } else {
-        throw new Error(response.error?.message || 'Failed to fetch active sessions');
+        throw new Error((response as any).error?.message || 'Failed to fetch active sessions');
       }
     } catch (error) {
       logger.error('Active sessions fetch failed:', { component: 'AuthProvider' }, error);

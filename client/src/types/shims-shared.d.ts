@@ -225,6 +225,8 @@ declare module 'lucide-react' {
   export const ToggleLeft: React.FC<IconProps>;
   export const GitBranch: React.FC<IconProps>;
   export const Layers: React.FC<IconProps>;
+  export const LayoutGrid: React.FC<IconProps>;
+  export const LayoutList: React.FC<IconProps>;
   export const Flag: React.FC<IconProps>;
   export const Split: React.FC<IconProps>;
   export const RefreshCw: React.FC<IconProps>;
@@ -242,6 +244,8 @@ declare module 'lucide-react' {
   export const Check: React.FC<IconProps>;
   export const Circle: React.FC<IconProps>;
   export const HelpCircle: React.FC<IconProps>;
+  export const Image: React.FC<IconProps>;
+  export const Lock: React.FC<IconProps>;
   export const ChevronDown: React.FC<IconProps>;
   export const ChevronUp: React.FC<IconProps>;
   export const PanelLeft: React.FC<IconProps>;
@@ -251,6 +255,7 @@ declare module 'lucide-react' {
   export const Award: React.FC<IconProps>;
   export const MessageSquare: React.FC<IconProps>;
   export const TestTube: React.FC<IconProps>;
+  export const Link: React.FC<IconProps>;
 
   const _default: Record<string, React.FC<IconProps>>;
   export default _default;

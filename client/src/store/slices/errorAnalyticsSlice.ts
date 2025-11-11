@@ -7,74 +7,15 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-// Import types
-interface TimeRange {
-  start: number;
-  end: number;
-  preset?: '1h' | '24h' | '7d' | '30d' | '90d' | 'custom';
-}
-
-interface DashboardFilters {
-  timeRange: TimeRange;
-  severity: string[];
-  domain: string[];
-  component: string[];
-  userId?: string;
-  sessionId?: string;
-}
-
-interface ErrorOverviewMetrics {
-  totalErrors: number;
-  errorRate: number;
-  uniqueErrors: number;
-  affectedUsers: number;
-  averageResolutionTime: number;
-  severityDistribution: Record<string, number>;
-  domainDistribution: Record<string, number>;
-  timeRange: TimeRange;
-  lastUpdated: number;
-}
-
-interface ErrorTrendData {
-  timeSeries: any[];
-  growthRate: number;
-  seasonality: any;
-  anomalies: any[];
-  projections: any;
-  period: string;
-}
-
-interface ErrorPattern {
-  id: string;
-  name: string;
-  description: string;
-  frequency: number;
-  firstSeen: number;
-  lastSeen: number;
-  affectedUsers: number;
-  severity: string;
-  domain: string;
-  cluster: any;
-  impact: any;
-  recommendations: string[];
-}
-
-interface RecoveryAnalytics {
-  overallSuccessRate: number;
-  strategyEffectiveness: any[];
-  recoveryTimeDistribution: any;
-  failureAnalysis: any[];
-  automatedRecoveryRate: number;
-  manualInterventionRate: number;
-}
-
-interface RealTimeMetrics {
-  currentErrorRate: number;
-  activeAlerts: any[];
-  liveStream: any[];
-  systemHealth: any;
-  performanceMetrics: any;
-}
+// Import unified types from repositories
+import {
+  DashboardFilters,
+  ErrorOverviewMetrics,
+  ErrorTrendData,
+  ErrorPattern,
+  RecoveryAnalytics,
+  RealTimeMetrics
+} from '../../repositories';
 
 interface ErrorAnalyticsState {
   // Data states
@@ -125,41 +66,40 @@ const initialState: ErrorAnalyticsState = {
 export const fetchOverviewMetrics = createAsyncThunk(
   'errorAnalytics/fetchOverviewMetrics',
   async (filters: DashboardFilters) => {
-    // Import the bridge service dynamically to avoid circular dependencies
-    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
-    return await errorAnalyticsBridge.getOverviewMetrics(filters);
+    const { errorAnalyticsRepository } = await import('../../repositories');
+    return await errorAnalyticsRepository.getOverviewMetrics(filters);
   }
 );
 
 export const fetchTrendData = createAsyncThunk(
   'errorAnalytics/fetchTrendData',
   async ({ period, filters }: { period: string; filters: DashboardFilters }) => {
-    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
-    return await errorAnalyticsBridge.getTrendData(period, filters);
+    const { errorAnalyticsRepository } = await import('../../repositories');
+    return await errorAnalyticsRepository.getTrendData(period, filters);
   }
 );
 
 export const fetchPatterns = createAsyncThunk(
   'errorAnalytics/fetchPatterns',
   async (filters: DashboardFilters) => {
-    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
-    return await errorAnalyticsBridge.getPatterns(filters);
+    const { errorAnalyticsRepository } = await import('../../repositories');
+    return await errorAnalyticsRepository.getPatterns(filters);
   }
 );
 
 export const fetchRecoveryAnalytics = createAsyncThunk(
   'errorAnalytics/fetchRecoveryAnalytics',
   async (filters: DashboardFilters) => {
-    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
-    return await errorAnalyticsBridge.getRecoveryAnalytics(filters);
+    const { errorAnalyticsRepository } = await import('../../repositories');
+    return await errorAnalyticsRepository.getRecoveryAnalytics(filters);
   }
 );
 
 export const fetchRealTimeMetrics = createAsyncThunk(
   'errorAnalytics/fetchRealTimeMetrics',
   async () => {
-    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
-    return await errorAnalyticsBridge.getRealTimeMetrics();
+    const { errorAnalyticsRepository } = await import('../../repositories');
+    return await errorAnalyticsRepository.getRealTimeMetrics();
   }
 );
 

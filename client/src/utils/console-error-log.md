@@ -7,18 +7,18 @@ initializeBundleAnalysis @ performance-optimizer.ts:151
 initialize @ performance-optimizer.ts:77
 PerformanceOptimizer @ performance-optimizer.ts:63
 (anonymous) @ performance-optimizer.ts:656
-client-core.ts:27 [INFO] 🚀 Applying fast connection optimizations {component: 'PerformanceOptimizer'} {}
-client-core.ts:27 [INFO] 🚀 Performance Optimizer initialized {component: 'PerformanceOptimizer'} {}
+logger.ts:27 [INFO] 🚀 Applying fast connection optimizations {component: 'PerformanceOptimizer'} {}
+logger.ts:27 [INFO] 🚀 Performance Optimizer initialized {component: 'PerformanceOptimizer'} {}
 logger.ts:242 [INFO] Initializing Chanuka Legislative Transparency Platform... {component: 'Chanuka'}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/index.css'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/Chanuka_logo.svg'} {}
-client-core.ts:27 [INFO] 🔋 Applying battery saving optimizations {component: 'PerformanceOptimizer'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/main.tsx'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/browser-compatibility-manager.ts'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/development-error-recovery.ts'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/development-debug.ts'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/index.css'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/Chanuka_logo.svg'} {}
+logger.ts:27 [INFO] 🔋 Applying battery saving optimizations {component: 'PerformanceOptimizer'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/main.tsx'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/browser-compatibility-manager.ts'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/development-error-recovery.ts'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/development-debug.ts'} {}
 logger.ts:242 [INFO] 🛡️ Development error recovery initialized {component: 'Chanuka'}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/browser-compatibility-tests.ts'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/browser-compatibility-tests.ts'} {}
 logger.ts:242 [INFO] All polyfills loaded successfully in 1ms {component: 'Polyfills'}
 logger.ts:242 [INFO] ✅ Browser polyfills loaded successfully {component: 'Chanuka'}
 browser-compatibility-manager.ts:202   📦 10 polyfills loaded successfully
@@ -74,17 +74,17 @@ await in initializeApp
 initWithRetry @ main.tsx:717
 startApplication @ main.tsx:743
 (anonymous) @ main.tsx:797
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/manifest.webmanifest'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.ico'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/index.css'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.svg'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.svg'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/Chanuka_logo.png'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/manifest.webmanifest'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.ico'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/index.css'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.svg'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.svg'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/Chanuka_logo.png'} {}
 logger.ts:242 [INFO] Critical assets preloaded successfully {component: 'Chanuka'}
 logger.ts:242 [INFO] Critical assets preloaded successfully {component: 'Chanuka'}
 logger.ts:242 [INFO] DOM ready, mounting React application... {component: 'Chanuka'}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/main.tsx'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/App.tsx'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/main.tsx'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/App.tsx'} {}
 logger.ts:242 [INFO] Initial performance metrics collected {component: 'PerformanceMonitor'} {loadTime: 10509.299999952316, renderTime: 0.5, navigationTime: 10511.399999976158, resourceLoadTime: 0, memoryUsage: 25604422}
 logger.ts:242 [INFO] Performance monitoring initialized {component: 'PerformanceMonitor'}
 logger.ts:242 [INFO] React application mounted successfully {component: 'Chanuka'}
@@ -93,8 +93,8 @@ logger.ts:242 [INFO] Application initialization completed successfully {componen
 logger.ts:242 [INFO] Application initialized successfully {component: 'Chanuka'}
 logger.ts:242 [INFO] App initialized with routes {component: 'Chanuka', routeCount: 24}
 logger.ts:242 [INFO] All polyfills loaded successfully in 3ms {component: 'Polyfills'}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/node_modules/.vite/deps/6ELMOJL2-T2RVXUMQ.js?v=3089e83b'} {}
-client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/node_modules/.vite/deps/chunk-PW24LAET.js?v=3089e83b'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/node_modules/.vite/deps/6ELMOJL2-T2RVXUMQ.js?v=3089e83b'} {}
+logger.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/node_modules/.vite/deps/chunk-PW24LAET.js?v=3089e83b'} {}
 logger.ts:242 [INFO] Service Worker registered: {component: 'Chanuka'} ServiceWorkerRegistration {installing: ServiceWorker, waiting: null, active: null, navigationPreload: NavigationPreloadManager, scope: 'http://localhost:5173/', …}
 installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
 overrideMethod @ installHook.js:1
@@ -4397,7 +4397,7 @@ flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
 workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
 flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
 performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
-client-core.ts:27 [INFO] 📦 Bundle Analysis: {component: 'PerformanceOptimizer'} {totalSize: 6816377, jsSize: 3817883, cssSize: 842152, imageSize: 1200, fontSize: 0, …}
+logger.ts:27 [INFO] 📦 Bundle Analysis: {component: 'PerformanceOptimizer'} {totalSize: 6816377, jsSize: 3817883, cssSize: 842152, imageSize: 1200, fontSize: 0, …}
 installHook.js:1 💰 Bundle budget violations: (3) ['totalSize: 6656.6KB exceeds budget of 1024.0KB', 'jsSize: 3728.4KB exceeds budget of 500.0KB', 'cssSize: 822.4KB exceeds budget of 100.0KB']
 overrideMethod @ installHook.js:1
 checkBundleBudgets @ performance-optimizer.ts:529
@@ -12521,7 +12521,7 @@ flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
 workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
 flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
 performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
-client-core.ts:27 [INFO] 💡 Performance Optimization Recommendations: {component: 'PerformanceOptimizer'} {bundleOptimizations: Array(2), cacheOptimizations: Array(0), performanceOptimizations: Array(0), priority: 'high'}
+logger.ts:27 [INFO] 💡 Performance Optimization Recommendations: {component: 'PerformanceOptimizer'} {bundleOptimizations: Array(2), cacheOptimizations: Array(0), performanceOptimizations: Array(0), priority: 'high'}
 installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
     at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
     at DevelopmentTools (<anonymous>)

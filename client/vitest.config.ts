@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { coverageConfig } from './src/__tests__/coverage/coverage-config';
 
 export default defineConfig({
   plugins: [react()],
@@ -9,16 +10,72 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test-utils/setup.ts'],
     css: true,
-    // Add React Testing Library configuration
+    
+    // Test configuration
     testTimeout: 10000,
-    // Ensure proper React component testing
+    hookTimeout: 5000,
+    
+    // Test file patterns
+    include: ['**/*.test.{ts,tsx}'],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/*.integration.test.{ts,tsx}',
+      '**/*.e2e.test.{ts,tsx}',
+      '**/*.performance.test.{ts,tsx}',
+    ],
+    
+    // Environment options
     environmentOptions: {
       jsdom: {
         resources: 'usable',
         url: 'http://localhost:3000',
       },
     },
+    
+    // Coverage configuration
+    coverage: {
+      provider: 'v8',
+      reporter: coverageConfig.reporters,
+      reportsDirectory: coverageConfig.reportsDirectory,
+      
+      // Coverage thresholds
+      thresholds: {
+        global: coverageConfig.global,
+        perFile: coverageConfig.perFile,
+      },
+      
+      // Files to include/exclude
+      include: coverageConfig.collectCoverageFrom,
+      exclude: coverageConfig.exclude,
+      
+      // Additional coverage options
+      all: true,
+      skipFull: false,
+      clean: true,
+    },
+    
+    // Reporters
+    reporter: [
+      'verbose',
+      'json',
+      ['html', { outputFile: './test-results/unit-report.html' }],
+      ['junit', { outputFile: './test-results/unit-results.xml' }],
+    ],
+    
+    // Retry configuration
+    retry: process.env.CI ? 2 : 0,
+    
+    // Parallel execution
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: false,
+        isolate: true,
+      },
+    },
   },
+  
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),

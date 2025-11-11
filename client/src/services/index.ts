@@ -18,3 +18,13 @@ export * from './analysis';
 
 // WebSocket Services
 export * from './websocket-client';
+export { webSocketService } from './webSocketService';
+
+// Bills API Services
+export { billsApiService } from './billsApiService';
+export { billsWebSocketService } from './billsWebSocketService';
+export { billsDataCache } from './billsDataCache';
+export { billsPaginationService } from './billsPaginationService';
+
+// Mock Data Services
+export { mockDataService } from './mockDataService';

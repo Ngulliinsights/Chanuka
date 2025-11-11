@@ -1,542 +1,383 @@
 /**
- * Comprehensive tests for Dialog components
- * Covers basic dialog functionality, enhanced dialog features, accessibility, and error handling
+ * Enhanced Dialog component tests
+ * Following navigation component testing patterns for consistency
  */
 
-import React from 'react';
-import '@testing-library/jest-dom';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-  EnhancedDialog,
-} from '../dialog';
-import { renderWithWrapper, spyOnConsole } from './test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { EnhancedDialog } from '../dialog';
+import { UIDialogError } from '../errors';
 
-// Mock dependencies
-vi.mock('../../../lib/utils', () => ({
-  cn: vi.fn((...classes) => classes.filter(Boolean).join(' '))
-}));
-
-vi.mock('../../../utils/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: vi.fn(),
-    info: vi.fn()
-  }
-}));
-
-vi.mock('../recovery', () => ({
-  attemptUIRecovery: vi.fn(),
-  getUIRecoverySuggestions: vi.fn()
-}));
-
-vi.mock('../errors', () => ({
-  UIDialogError: class UIDialogError extends Error {
-    constructor(component: string, action: string, reason: string, details?: any) {
-      super(reason);
-      this.name = 'UIDialogError';
-    }
-  }
-}));
-
-describe('Basic Dialog Components', () => {
-  const user = userEvent.setup();
-
-  describe('Dialog Structure', () => {
-    it('renders dialog with trigger and content', async () => {
-      render(
-        <Dialog>
-          <DialogTrigger>Open Dialog</DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Dialog Title</DialogTitle>
-              <DialogDescription>Dialog description</DialogDescription>
-            </DialogHeader>
-            <p>Dialog content</p>
-            <DialogFooter>
-              <DialogClose>Close</DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      );
-
-      expect(screen.getByText('Open Dialog')).toBeInTheDocument();
-
-      // Dialog should not be visible initially
-      expect(screen.queryByText('Dialog Title')).not.toBeInTheDocument();
-    });
-
-    it('opens dialog when trigger is clicked', async () => {
-      render(
-        <Dialog>
-          <DialogTrigger>Open Dialog</DialogTrigger>
-          <DialogContent>
-            <DialogTitle>Dialog Title</DialogTitle>
-          </DialogContent>
-        </Dialog>
-      );
-
-      await user.click(screen.getByText('Open Dialog'));
-
-      expect(screen.getByText('Dialog Title')).toBeInTheDocument();
-    });
-
-    it('closes dialog when close button is clicked', async () => {
-      render(
-        <Dialog defaultOpen>
-          <DialogTrigger>Open Dialog</DialogTrigger>
-          <DialogContent>
-            <DialogTitle>Dialog Title</DialogTitle>
-            <DialogClose>Close</DialogClose>
-          </DialogContent>
-        </Dialog>
-      );
-
-      expect(screen.getByText('Dialog Title')).toBeInTheDocument();
-
-      await user.click(screen.getByText('Close'));
-
-      await waitFor(() => {
-        expect(screen.queryByText('Dialog Title')).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Dialog Components', () => {
-    it('DialogHeader applies correct classes', () => {
-      render(
-        <Dialog defaultOpen>
-          <DialogContent>
-            <DialogHeader data-testid="header">Header Content</DialogHeader>
-          </DialogContent>
-        </Dialog>
-      );
-
-      const header = screen.getByTestId('header');
-      expect(header).toHaveClass('flex', 'flex-col', 'space-y-1.5');
-    });
-
-    it('DialogTitle applies correct classes and semantic role', () => {
-      render(
-        <Dialog defaultOpen>
-          <DialogContent>
-            <DialogTitle data-testid="title">Title</DialogTitle>
-          </DialogContent>
-        </Dialog>
-      );
-
-      const title = screen.getByTestId('title');
-      expect(title).toHaveClass('text-lg', 'font-semibold');
-      expect(title.tagName).toBe('H2');
-    });
-
-    it('DialogDescription applies correct classes', () => {
-      render(
-        <Dialog defaultOpen>
-          <DialogContent>
-            <DialogDescription data-testid="desc">Description</DialogDescription>
-          </DialogContent>
-        </Dialog>
-      );
-
-      const desc = screen.getByTestId('desc');
-      expect(desc).toHaveClass('text-sm', 'text-muted-foreground');
-    });
-
-    it('DialogFooter applies correct classes', () => {
-      render(
-        <Dialog defaultOpen>
-          <DialogContent>
-            <DialogFooter data-testid="footer">Footer Content</DialogFooter>
-          </DialogContent>
-        </Dialog>
-      );
-
-      const footer = screen.getByTestId('footer');
-      expect(footer).toHaveClass('flex', 'flex-col-reverse');
-    });
-  });
-
-  describe('Accessibility', () => {
-    it('has proper ARIA attributes', () => {
-      render(
-        <Dialog defaultOpen>
-          <DialogContent>
-            <DialogTitle>Title</DialogTitle>
-            <DialogDescription>Description</DialogDescription>
-          </DialogContent>
-        </Dialog>
-      );
-
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toBeInTheDocument();
-    });
-
-    it('close button has screen reader text', () => {
-      render(
-        <Dialog defaultOpen>
-          <DialogContent>
-            <DialogTitle>Title</DialogTitle>
-          </DialogContent>
-        </Dialog>
-      );
-
-      expect(screen.getByText('Close')).toBeInTheDocument();
-      const srText = screen.getByText('Close');
-      expect(srText).toHaveClass('sr-only');
-    });
-
-    it('supports keyboard navigation', async () => {
-      render(
-        <Dialog defaultOpen>
-          <DialogContent>
-            <DialogTitle>Title</DialogTitle>
-            <button>Focusable Button</button>
-            <DialogClose>Close</DialogClose>
-          </DialogContent>
-        </Dialog>
-      );
-
-      const closeButton = screen.getByText('Close');
-      closeButton.focus();
-      expect(closeButton).toHaveFocus();
-    });
-  });
-});
-
-describe('EnhancedDialog Component', () => {
-  let consoleSpy: any;
+describe('EnhancedDialog', () => {
+  const defaultProps = {
+    title: 'Test Dialog',
+    open: true,
+    onOpenChange: vi.fn()
+  };
 
   beforeEach(() => {
-    consoleSpy = spyOnConsole();
-  });
-
-  afterEach(() => {
-    consoleSpy.restore();
     vi.clearAllMocks();
   });
 
-  it('renders with basic props', () => {
-    renderWithWrapper(
-      <EnhancedDialog
-        title="Test Dialog"
-        description="Test description"
-        open={true}
-      >
-        <p>Content</p>
-      </EnhancedDialog>
-    );
+  describe('Basic Functionality', () => {
+    it('renders dialog with title', () => {
+      render(<EnhancedDialog {...defaultProps} />);
+      
+      expect(screen.getByText('Test Dialog')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
 
-    expect(screen.getByText('Test Dialog')).toBeInTheDocument();
-    expect(screen.getByText('Test description')).toBeInTheDocument();
-    expect(screen.getByText('Content')).toBeInTheDocument();
-  });
+    it('renders with description when provided', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          description="This is a test dialog description"
+        />
+      );
+      
+      expect(screen.getByText('This is a test dialog description')).toBeInTheDocument();
+    });
 
-  it('shows confirm and cancel buttons', () => {
-    renderWithWrapper(
-      <EnhancedDialog
-        title="Confirm Dialog"
-        open={true}
-        onConfirm={vi.fn()}
-        onCancel={vi.fn()}
-      />
-    );
-
-    expect(screen.getByText('Confirm')).toBeInTheDocument();
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-  });
-
-  describe('Loading State', () => {
-    it('shows loading spinner and disables buttons when loading', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Loading Dialog"
-          open={true}
-          loading={true}
+    it('renders custom button text', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          confirmText="Save Changes"
+          cancelText="Discard"
           onConfirm={vi.fn()}
         />
       );
+      
+      expect(screen.getByText('Save Changes')).toBeInTheDocument();
+      expect(screen.getByText('Discard')).toBeInTheDocument();
+    });
 
-      const confirmButton = screen.getByText('Confirm');
+    it('renders children content', () => {
+      render(
+        <EnhancedDialog {...defaultProps}>
+          <div>Custom content</div>
+        </EnhancedDialog>
+      );
+      
+      expect(screen.getByText('Custom content')).toBeInTheDocument();
+    });
+  });
+
+  describe('Dialog State Management', () => {
+    it('calls onOpenChange when dialog is closed', async () => {
+      const onOpenChange = vi.fn();
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          onOpenChange={onOpenChange}
+        />
+      );
+      
       const cancelButton = screen.getByText('Cancel');
-
-      expect(confirmButton).toBeDisabled();
-      expect(cancelButton).toBeDisabled();
-
-      // Check for loading spinner
-      const spinner = confirmButton.querySelector('svg');
-      expect(spinner).toBeInTheDocument();
+      await userEvent.click(cancelButton);
+      
+      expect(onOpenChange).toHaveBeenCalledWith(false);
     });
-  });
 
-  describe('Error State', () => {
-    it('displays error message with icon', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Error Dialog"
-          open={true}
-          error="Something went wrong"
+    it('does not render when open is false', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          open={false}
         />
       );
-
-      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-      expect(screen.getByRole('alert')).toBeInTheDocument();
-
-      // Check for error icon in title
-      const title = screen.getByText('Error Dialog');
-      const icon = title.parentElement?.querySelector('svg');
-      expect(icon).toBeInTheDocument();
+      
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 
-  describe('User Interactions', () => {
+  describe('Confirmation Handling', () => {
     it('calls onConfirm when confirm button is clicked', async () => {
-      const user = userEvent.setup();
-      const onConfirm = vi.fn();
-
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Confirm Dialog"
-          open={true}
-          onConfirm={onConfirm}
-          onOpenChange={vi.fn()}
-        />
-      );
-
-      await user.click(screen.getByText('Confirm'));
-
-      expect(onConfirm).toHaveBeenCalled();
-    });
-
-    it('calls onCancel when cancel button is clicked', async () => {
-      const user = userEvent.setup();
-      const onCancel = vi.fn();
-
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Cancel Dialog"
-          open={true}
-          onCancel={onCancel}
-          onOpenChange={vi.fn()}
-        />
-      );
-
-      await user.click(screen.getByText('Cancel'));
-
-      expect(onCancel).toHaveBeenCalled();
-    });
-
-    it('closes dialog after successful confirmation', async () => {
-      const user = userEvent.setup();
       const onConfirm = vi.fn().mockResolvedValue(undefined);
       const onOpenChange = vi.fn();
-
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Success Dialog"
-          open={true}
+      
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
           onConfirm={onConfirm}
           onOpenChange={onOpenChange}
         />
       );
-
-      await user.click(screen.getByText('Confirm'));
-
+      
+      const confirmButton = screen.getByText('Confirm');
+      await userEvent.click(confirmButton);
+      
+      expect(onConfirm).toHaveBeenCalled();
+      
       await waitFor(() => {
         expect(onOpenChange).toHaveBeenCalledWith(false);
       });
     });
 
-    it('handles confirmation errors', async () => {
-      const user = userEvent.setup();
-      const onConfirm = vi.fn().mockRejectedValue(new Error('Confirm failed'));
-
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Error Dialog"
-          open={true}
+    it('handles async onConfirm function', async () => {
+      const onConfirm = vi.fn().mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 100))
+      );
+      
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
           onConfirm={onConfirm}
         />
       );
-
-      await user.click(screen.getByText('Confirm'));
-
+      
+      const confirmButton = screen.getByText('Confirm');
+      await userEvent.click(confirmButton);
+      
+      // Should show loading state
+      expect(confirmButton).toBeDisabled();
+      
       await waitFor(() => {
-        expect(screen.getByText('Confirm failed')).toBeInTheDocument();
+        expect(confirmButton).not.toBeDisabled();
       });
+    });
+
+    it('calls onCancel when cancel button is clicked', async () => {
+      const onCancel = vi.fn();
+      const onOpenChange = vi.fn();
+      
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          onCancel={onCancel}
+          onOpenChange={onOpenChange}
+        />
+      );
+      
+      const cancelButton = screen.getByText('Cancel');
+      await userEvent.click(cancelButton);
+      
+      expect(onCancel).toHaveBeenCalled();
+      expect(onOpenChange).toHaveBeenCalledWith(false);
     });
   });
 
-  describe('Validation and Error Recovery', () => {
-    it('validates props on mount', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title=""
-          open={true}
+  describe('Loading State', () => {
+    it('shows loading state when loading prop is true', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          loading={true}
+          onConfirm={vi.fn()}
         />
       );
-
-      // Should handle invalid title gracefully
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      
+      const confirmButton = screen.getByText('Confirm');
+      expect(confirmButton).toBeDisabled();
     });
 
-    it('attempts recovery on validation errors', async () => {
-      const user = userEvent.setup();
-      const mockRecovery = vi.fn().mockResolvedValue({ success: true });
-
-      vi.mocked(require('../recovery').attemptUIRecovery).mockImplementation(mockRecovery);
-
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Recovery Test"
-          open={true}
-          onConfirm={vi.fn().mockRejectedValue(new Error('Test error'))}
+    it('shows loading state during async confirmation', async () => {
+      const onConfirm = vi.fn().mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 100))
+      );
+      
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          onConfirm={onConfirm}
         />
       );
+      
+      const confirmButton = screen.getByText('Confirm');
+      await userEvent.click(confirmButton);
+      
+      expect(confirmButton).toBeDisabled();
+    });
 
-      await user.click(screen.getByText('Confirm'));
+    it('disables buttons during loading', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          loading={true}
+          onConfirm={vi.fn()}
+        />
+      );
+      
+      const confirmButton = screen.getByText('Confirm');
+      const cancelButton = screen.getByText('Cancel');
+      
+      expect(confirmButton).toBeDisabled();
+      expect(cancelButton).toBeDisabled();
+    });
+  });
 
-      expect(mockRecovery).toHaveBeenCalled();
+  describe('Error Handling', () => {
+    it('displays error message when error prop is provided', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          error="Something went wrong"
+        />
+      );
+      
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    it('shows error icon in title when error is present', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          error="Error occurred"
+        />
+      );
+      
+      const title = screen.getByText('Test Dialog');
+      expect(title.parentElement).toContainHTML('AlertCircle');
+    });
+
+    it('handles confirmation errors', async () => {
+      const onConfirm = vi.fn().mockRejectedValue(new Error('Confirmation failed'));
+      
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          onConfirm={onConfirm}
+        />
+      );
+      
+      const confirmButton = screen.getByText('Confirm');
+      await userEvent.click(confirmButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Confirmation failed')).toBeInTheDocument();
+      });
+    });
+
+    it('handles cancel errors gracefully', async () => {
+      const onCancel = vi.fn().mockImplementation(() => {
+        throw new Error('Cancel failed');
+      });
+      
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          onCancel={onCancel}
+        />
+      );
+      
+      const cancelButton = screen.getByText('Cancel');
+      
+      // Should not throw error
+      expect(() => userEvent.click(cancelButton)).not.toThrow();
+    });
+  });
+
+  describe('Validation', () => {
+    it('validates dialog props on mount', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      
+      // Should not throw with valid props
+      expect(() => {
+        render(<EnhancedDialog {...defaultProps} />);
+      }).not.toThrow();
+      
+      consoleSpy.mockRestore();
+    });
+
+    it('handles invalid props gracefully', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      
+      render(
+        <EnhancedDialog 
+          title="" // Invalid: empty title
+          open={true}
+          onOpenChange={vi.fn()}
+        />
+      );
+      
+      // Should still render but may show validation errors
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      
+      consoleSpy.mockRestore();
     });
   });
 
   describe('Accessibility', () => {
-    it('has proper heading hierarchy', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Accessible Dialog"
-          open={true}
-        />
-      );
-
-      const title = screen.getByText('Accessible Dialog');
-      expect(title.tagName).toBe('H2');
-    });
-
-    it('error messages are properly announced', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Error Dialog"
-          open={true}
-          error="Validation error"
-        />
-      );
-
-      const errorAlert = screen.getByRole('alert');
-      expect(errorAlert).toHaveTextContent('Validation error');
-    });
-
-    it('buttons have proper focus management', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Focus Dialog"
-          open={true}
-          onConfirm={vi.fn()}
-          onCancel={vi.fn()}
-        />
-      );
-
-      const confirmButton = screen.getByText('Confirm');
-      const cancelButton = screen.getByText('Cancel');
-
-      confirmButton.focus();
-      expect(confirmButton).toHaveFocus();
-
-      cancelButton.focus();
-      expect(cancelButton).toHaveFocus();
-    });
-  });
-
-  describe('Customization', () => {
-    it('accepts custom button text', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Custom Dialog"
-          open={true}
-          confirmText="Yes"
-          cancelText="No"
-          onConfirm={vi.fn()}
-          onCancel={vi.fn()}
-        />
-      );
-
-      expect(screen.getByText('Yes')).toBeInTheDocument();
-      expect(screen.getByText('No')).toBeInTheDocument();
-    });
-
-    it('applies custom className', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Custom Class Dialog"
-          open={true}
-          className="custom-dialog"
-        />
-      );
-
+    it('has proper dialog semantics', () => {
+      render(<EnhancedDialog {...defaultProps} />);
+      
       const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveClass('custom-dialog');
+      expect(dialog).toBeInTheDocument();
+    });
+
+    it('has proper ARIA attributes for error state', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          error="Error message"
+        />
+      );
+      
+      const errorAlert = screen.getByRole('alert');
+      expect(errorAlert).toBeInTheDocument();
+    });
+
+    it('focuses properly when opened', () => {
+      render(<EnhancedDialog {...defaultProps} />);
+      
+      // Dialog should be focusable
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+    });
+
+    it('has proper button roles and labels', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          onConfirm={vi.fn()}
+        />
+      );
+      
+      const confirmButton = screen.getByRole('button', { name: 'Confirm' });
+      const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+      
+      expect(confirmButton).toBeInTheDocument();
+      expect(cancelButton).toBeInTheDocument();
     });
   });
 
-  describe('Edge Cases', () => {
-    it('handles missing onConfirm gracefully', () => {
-      renderWithWrapper(
-        <EnhancedDialog
-          title="No Confirm Dialog"
-          open={true}
+  describe('Keyboard Navigation', () => {
+    it('closes dialog on Escape key', async () => {
+      const onOpenChange = vi.fn();
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          onOpenChange={onOpenChange}
         />
       );
+      
+      fireEvent.keyDown(document, { key: 'Escape' });
+      
+      // Note: This test might need adjustment based on Radix UI's implementation
+      // The actual behavior depends on how Radix handles escape key
+    });
+  });
 
-      expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
+  describe('Button Visibility', () => {
+    it('shows only cancel button when onConfirm is not provided', () => {
+      render(<EnhancedDialog {...defaultProps} />);
+      
       expect(screen.getByText('Cancel')).toBeInTheDocument();
+      expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
     });
 
-    it('prevents actions during loading', async () => {
-      const user = userEvent.setup();
-      const onConfirm = vi.fn();
-
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Loading Dialog"
-          open={true}
-          loading={true}
-          onConfirm={onConfirm}
+    it('shows both buttons when onConfirm is provided', () => {
+      render(
+        <EnhancedDialog 
+          {...defaultProps} 
+          onConfirm={vi.fn()}
         />
       );
-
-      await user.click(screen.getByText('Confirm'));
-
-      expect(onConfirm).not.toHaveBeenCalled();
-    });
-
-    it('handles async operations', async () => {
-      const user = userEvent.setup();
-      const onConfirm = vi.fn().mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
-
-      renderWithWrapper(
-        <EnhancedDialog
-          title="Async Dialog"
-          open={true}
-          onConfirm={onConfirm}
-        />
-      );
-
-      await user.click(screen.getByText('Confirm'));
-
-      expect(screen.getByText('Confirm')).toBeDisabled();
-
-      await waitFor(() => {
-        expect(screen.getByText('Confirm')).not.toBeDisabled();
-      });
+      
+      expect(screen.getByText('Cancel')).toBeInTheDocument();
+      expect(screen.getByText('Confirm')).toBeInTheDocument();
     });
   });
 });

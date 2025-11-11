@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { logger } from '../utils/client-core';
+import { logger } from '../utils/logger';
 import { useOfflineDetection } from '../hooks/useOfflineDetection';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import EnhancedBillsDashboardPage from '../../../pages/enhanced-bills-dashboard-page';
+import BillsDashboardPage from '../../../pages/bills-dashboard-page';
 import { useBillsStore } from '../../../store/slices/billsSlice';
 
 // Mock the WebSocket hook
@@ -43,7 +43,7 @@ describe('EnhancedBillsDashboard', () => {
   it('renders the dashboard header', async () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 
@@ -54,7 +54,7 @@ describe('EnhancedBillsDashboard', () => {
   it('shows loading state initially', () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 
@@ -64,7 +64,7 @@ describe('EnhancedBillsDashboard', () => {
   it('displays stats overview after loading', async () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 
@@ -80,7 +80,7 @@ describe('EnhancedBillsDashboard', () => {
   it('allows searching for bills', async () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 
@@ -97,7 +97,7 @@ describe('EnhancedBillsDashboard', () => {
   it('displays filter options', async () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 
@@ -115,7 +115,7 @@ describe('EnhancedBillsDashboard', () => {
   it('allows changing view mode', async () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 
@@ -133,7 +133,7 @@ describe('EnhancedBillsDashboard', () => {
   it('displays bill cards after loading', async () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 
@@ -146,7 +146,7 @@ describe('EnhancedBillsDashboard', () => {
   it('shows correct bill metadata', async () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 
@@ -161,7 +161,7 @@ describe('EnhancedBillsDashboard', () => {
   it('handles refresh functionality', async () => {
     render(
       <TestWrapper>
-        <EnhancedBillsDashboardPage />
+        <BillsDashboardPage />
       </TestWrapper>
     );
 

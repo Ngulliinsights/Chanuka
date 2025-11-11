@@ -3,7 +3,7 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
-import { BaseError, ErrorDomain } from '../../../shared/errors';
+import { BaseError, ErrorDomain } from '../../../core/error';
 
 export function getContextualMessage(error: BaseError, errorType?: string, context?: string): string {
   if (errorType === 'chunk') {

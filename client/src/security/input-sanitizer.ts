@@ -1,272 +1,546 @@
 /**
- * Enhanced Input Sanitization Service
- * Provides comprehensive input validation and sanitization using Zod schemas
+ * Input Sanitization System
+ * Comprehensive XSS prevention and input validation
  */
 
-import { z } from 'zod';
 import DOMPurify from 'dompurify';
+import { logger } from '../utils/logger';
+import { SecurityEvent } from './types';
 
-// Common validation schemas
-export const ValidationSchemas = {
-  // Basic string validation
-  safeString: z.string()
-    .min(1, 'Field is required')
-    .max(1000, 'Input too long')
-    .refine(
-      (val) => !/<script|javascript:|data:|vbscript:/i.test(val),
-      'Potentially dangerous content detected'
-    ),
-
-  // Email validation
-  email: z.string()
-    .email('Invalid email format')
-    .max(254, 'Email too long')
-    .transform(val => val.toLowerCase().trim()),
-
-  // URL validation
-  url: z.string()
-    .url('Invalid URL format')
-    .refine(
-      (val) => /^https?:\/\//.test(val),
-      'Only HTTP and HTTPS URLs are allowed'
-    ),
-
-  // Bill number validation
-  billNumber: z.string()
-    .regex(/^[A-Z]{1,3}\s?\d{1,5}$/, 'Invalid bill number format')
-    .transform(val => val.toUpperCase().replace(/\s+/g, ' ').trim()),
-
-  // Search query validation
-  searchQuery: z.string()
-    .min(1, 'Search query is required')
-    .max(200, 'Search query too long')
-    .refine(
-      (val) => !/[<>'"&]/.test(val),
-      'Search query contains invalid characters'
-    ),
-
-  // Comment validation
-  comment: z.string()
-    .min(10, 'Comment must be at least 10 characters')
-    .max(2000, 'Comment too long')
-    .refine(
-      (val) => !/<script|javascript:|data:|vbscript:/i.test(val),
-      'Potentially dangerous content detected'
-    ),
-
-  // User ID validation
-  userId: z.string()
-    .uuid('Invalid user ID format'),
-
-  // Pagination validation
-  pagination: z.object({
-    page: z.number().int().min(1).max(1000).default(1),
-    limit: z.number().int().min(1).max(100).default(20),
-    sortBy: z.string().max(50).optional(),
-    sortOrder: z.enum(['asc', 'desc']).default('desc')
-  }),
-
-  // Filter validation
-  billFilters: z.object({
-    status: z.array(z.string().max(50)).max(10).optional(),
-    policyAreas: z.array(z.string().max(100)).max(20).optional(),
-    urgencyLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-    dateRange: z.object({
-      start: z.string().datetime().optional(),
-      end: z.string().datetime().optional()
-    }).optional(),
-    sponsors: z.array(z.string().uuid()).max(50).optional()
-  })
-};
-
-export interface SanitizationOptions {
-  allowHtml?: boolean;
+export interface SanitizerConfig {
+  enabled: boolean;
+  allowedTags: string[];
+  allowedAttributes: Record<string, string[]>;
+  allowedSchemes?: string[];
   maxLength?: number;
-  removeScripts?: boolean;
-  allowedTags?: string[];
-  allowedAttributes?: string[];
+  stripUnknownTags?: boolean;
 }
 
+export interface SanitizationResult {
+  sanitized: string;
+  wasModified: boolean;
+  removedElements: string[];
+  removedAttributes: string[];
+  threats: ThreatDetection[];
+}
+
+export interface ThreatDetection {
+  type: ThreatType;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  originalContent: string;
+  location?: string;
+}
+
+export type ThreatType = 
+  | 'script_injection'
+  | 'html_injection'
+  | 'attribute_injection'
+  | 'url_injection'
+  | 'css_injection'
+  | 'data_uri_abuse'
+  | 'protocol_violation'
+  | 'suspicious_pattern';
+
 export class InputSanitizer {
-  private static instance: InputSanitizer;
+  private config: SanitizerConfig;
+  private domPurify: DOMPurify.DOMPurifyI;
+  private threatPatterns: Map<ThreatType, RegExp[]>;
 
-  private constructor() {}
+  constructor(config: SanitizerConfig) {
+    this.config = {
+      allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+      maxLength: 10000,
+      stripUnknownTags: true,
+      ...config
+    };
 
-  public static getInstance(): InputSanitizer {
-    if (!InputSanitizer.instance) {
-      InputSanitizer.instance = new InputSanitizer();
-    }
-    return InputSanitizer.instance;
+    // Initialize DOMPurify
+    this.domPurify = DOMPurify;
+    this.setupDOMPurify();
+    
+    // Initialize threat detection patterns
+    this.threatPatterns = this.initializeThreatPatterns();
+  }
+
+  private setupDOMPurify(): void {
+    // Configure DOMPurify with our settings
+    this.domPurify.setConfig({
+      ALLOWED_TAGS: this.config.allowedTags.length > 0 ? this.config.allowedTags : ['p', 'b', 'i', 'em', 'strong', 'br'],
+      ALLOWED_ATTR: Object.values(this.config.allowedAttributes).flat(),
+      ALLOWED_URI_REGEXP: new RegExp(
+        `^(?:(?:${(this.config.allowedSchemes || []).join('|')}):|\\/|#)`, 'i'
+      ),
+      KEEP_CONTENT: !this.config.stripUnknownTags,
+      RETURN_DOM: false,
+      RETURN_DOM_FRAGMENT: false,
+      RETURN_DOM_IMPORT: false,
+      SANITIZE_DOM: true,
+      WHOLE_DOCUMENT: false,
+      FORCE_BODY: false
+    });
+
+    // Add hooks for threat detection
+    this.domPurify.addHook('beforeSanitizeElements', (node, data) => {
+      this.detectElementThreats(node, data);
+    });
+
+    this.domPurify.addHook('beforeSanitizeAttributes', (node, data) => {
+      this.detectAttributeThreats(node, data);
+    });
+  }
+
+  private initializeThreatPatterns(): Map<ThreatType, RegExp[]> {
+    return new Map([
+      ['script_injection', [
+        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+        /javascript:/gi,
+        /on\w+\s*=/gi,
+        /eval\s*\(/gi,
+        /setTimeout\s*\(/gi,
+        /setInterval\s*\(/gi
+      ]],
+      ['html_injection', [
+        /<iframe\b[^>]*>/gi,
+        /<object\b[^>]*>/gi,
+        /<embed\b[^>]*>/gi,
+        /<form\b[^>]*>/gi,
+        /<input\b[^>]*>/gi,
+        /<meta\b[^>]*>/gi
+      ]],
+      ['attribute_injection', [
+        /style\s*=.*expression\s*\(/gi,
+        /style\s*=.*javascript:/gi,
+        /href\s*=.*javascript:/gi,
+        /src\s*=.*javascript:/gi
+      ]],
+      ['url_injection', [
+        /data:text\/html/gi,
+        /data:application\/javascript/gi,
+        /vbscript:/gi,
+        /file:/gi,
+        /ftp:/gi
+      ]],
+      ['css_injection', [
+        /expression\s*\(/gi,
+        /@import/gi,
+        /behavior\s*:/gi,
+        /-moz-binding/gi
+      ]],
+      ['data_uri_abuse', [
+        /data:image\/svg\+xml.*<script/gi,
+        /data:text\/html.*<script/gi
+      ]],
+      ['suspicious_pattern', [
+        /\x00/g, // Null bytes
+        /\uFEFF/g, // BOM
+        /[\u0000-\u001F\u007F-\u009F]/g, // Control characters
+        /&#x0*[0-9a-f]{2,}/gi, // Hex entities
+        /&#0*[0-9]{2,}/gi // Decimal entities
+      ]]
+    ]);
   }
 
   /**
-   * Sanitize HTML content using DOMPurify
+   * Sanitize HTML content
    */
-  public sanitizeHtml(
-    input: string, 
-    options: SanitizationOptions = {}
-  ): string {
-    const config: DOMPurify.Config = {
-      ALLOWED_TAGS: options.allowedTags || ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li'],
-      ALLOWED_ATTR: options.allowedAttributes || ['class'],
-      REMOVE_DATA_ATTRIBUTES: true,
-      REMOVE_UNKNOWN_PROTOCOLS: true,
-      USE_PROFILES: { html: true }
-    };
-
-    if (options.removeScripts !== false) {
-      config.FORBID_TAGS = ['script', 'object', 'embed', 'form', 'input'];
-      config.FORBID_ATTR = ['onerror', 'onload', 'onclick', 'onmouseover'];
+  sanitizeHTML(input: string): SanitizationResult {
+    if (!this.config.enabled) {
+      return {
+        sanitized: input,
+        wasModified: false,
+        removedElements: [],
+        removedAttributes: [],
+        threats: []
+      };
     }
 
-    let sanitized = DOMPurify.sanitize(input, config);
+    const original = input;
+    const threats: ThreatDetection[] = [];
+    const removedElements: string[] = [];
+    const removedAttributes: string[] = [];
 
-    if (options.maxLength && sanitized.length > options.maxLength) {
-      sanitized = sanitized.substring(0, options.maxLength);
+    try {
+      // Pre-sanitization threat detection
+      const preThreats = this.detectThreats(input);
+      threats.push(...preThreats);
+
+      // Length check
+      if (this.config.maxLength && input.length > this.config.maxLength) {
+        input = input.substring(0, this.config.maxLength);
+        threats.push({
+          type: 'suspicious_pattern',
+          severity: 'medium',
+          description: `Input truncated from ${original.length} to ${this.config.maxLength} characters`,
+          originalContent: original.substring(this.config.maxLength)
+        });
+      }
+
+      // Sanitize with DOMPurify
+      const sanitized = this.domPurify.sanitize(input);
+
+      // Post-sanitization analysis
+      const wasModified = sanitized !== original;
+
+      if (wasModified) {
+        logger.debug('Input was sanitized', {
+          component: 'InputSanitizer',
+          originalLength: original.length,
+          sanitizedLength: sanitized.length,
+          threatsDetected: threats.length
+        });
+      }
+
+      // Report threats if any were found
+      if (threats.length > 0) {
+        this.reportThreats(threats, original);
+      }
+
+      return {
+        sanitized,
+        wasModified,
+        removedElements,
+        removedAttributes,
+        threats
+      };
+
+    } catch (error) {
+      logger.error('Error during HTML sanitization', error);
+      
+      // Return empty string on error for security
+      return {
+        sanitized: '',
+        wasModified: true,
+        removedElements: ['*'],
+        removedAttributes: ['*'],
+        threats: [{
+          type: 'suspicious_pattern',
+          severity: 'critical',
+          description: 'Sanitization failed, content blocked',
+          originalContent: original
+        }]
+      };
     }
-
-    return sanitized;
   }
 
   /**
    * Sanitize plain text input
    */
-  public sanitizeText(input: string, maxLength?: number): string {
-    let sanitized = input
-      .replace(/[<>'"&]/g, '') // Remove potentially dangerous characters
-      .replace(/\s+/g, ' ') // Normalize whitespace
-      .trim();
-
-    if (maxLength && sanitized.length > maxLength) {
-      sanitized = sanitized.substring(0, maxLength);
+  sanitizeText(input: string): SanitizationResult {
+    if (!this.config.enabled) {
+      return {
+        sanitized: input,
+        wasModified: false,
+        removedElements: [],
+        removedAttributes: [],
+        threats: []
+      };
     }
 
-    return sanitized;
-  }
+    const original = input;
+    let sanitized = input;
+    const threats: ThreatDetection[] = [];
 
-  /**
-   * Validate and sanitize using Zod schema
-   */
-  public async validateAndSanitize<T>(
-    schema: z.ZodSchema<T>,
-    input: unknown
-  ): Promise<{ success: true; data: T } | { success: false; errors: string[] }> {
     try {
-      const result = await schema.parseAsync(input);
-      return { success: true, data: result };
+      // Detect threats in text
+      const textThreats = this.detectThreats(input);
+      threats.push(...textThreats);
+
+      // Remove HTML tags
+      sanitized = sanitized.replace(/<[^>]*>/g, '');
+
+      // Remove potentially dangerous characters
+      sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+
+      // Normalize whitespace
+      sanitized = sanitized.replace(/\s+/g, ' ').trim();
+
+      // Length check
+      if (this.config.maxLength && sanitized.length > this.config.maxLength) {
+        sanitized = sanitized.substring(0, this.config.maxLength);
+        threats.push({
+          type: 'suspicious_pattern',
+          severity: 'low',
+          description: `Text truncated from ${original.length} to ${this.config.maxLength} characters`,
+          originalContent: original.substring(this.config.maxLength)
+        });
+      }
+
+      const wasModified = sanitized !== original;
+
+      if (threats.length > 0) {
+        this.reportThreats(threats, original);
+      }
+
+      return {
+        sanitized,
+        wasModified,
+        removedElements: [],
+        removedAttributes: [],
+        threats
+      };
+
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errors = error.errors.map(err => 
-          `${err.path.join('.')}: ${err.message}`
-        );
-        return { success: false, errors };
+      logger.error('Error during text sanitization', error);
+      
+      return {
+        sanitized: '',
+        wasModified: true,
+        removedElements: [],
+        removedAttributes: [],
+        threats: [{
+          type: 'suspicious_pattern',
+          severity: 'critical',
+          description: 'Text sanitization failed, content blocked',
+          originalContent: original
+        }]
+      };
+    }
+  }
+
+  /**
+   * Sanitize URL
+   */
+  sanitizeURL(url: string): SanitizationResult {
+    const original = url;
+    let sanitized = url;
+    const threats: ThreatDetection[] = [];
+
+    try {
+      // Basic URL validation
+      const urlObj = new URL(sanitized, window.location.origin);
+      
+      // Check allowed schemes
+      if (this.config.allowedSchemes && 
+          !this.config.allowedSchemes.includes(urlObj.protocol.slice(0, -1))) {
+        threats.push({
+          type: 'protocol_violation',
+          severity: 'high',
+          description: `Disallowed protocol: ${urlObj.protocol}`,
+          originalContent: original
+        });
+        sanitized = '#';
       }
-      return { success: false, errors: ['Validation failed'] };
-    }
-  }
 
-  /**
-   * Sanitize object recursively
-   */
-  public sanitizeObject(obj: any, options: SanitizationOptions = {}): any {
-    if (typeof obj === 'string') {
-      return options.allowHtml 
-        ? this.sanitizeHtml(obj, options)
-        : this.sanitizeText(obj, options.maxLength);
-    }
-
-    if (Array.isArray(obj)) {
-      return obj.map(item => this.sanitizeObject(item, options));
-    }
-
-    if (obj && typeof obj === 'object') {
-      const sanitized: any = {};
-      for (const [key, value] of Object.entries(obj)) {
-        // Sanitize key names too
-        const sanitizedKey = this.sanitizeText(key, 100);
-        sanitized[sanitizedKey] = this.sanitizeObject(value, options);
+      // Check for JavaScript URLs
+      if (sanitized.toLowerCase().includes('javascript:')) {
+        threats.push({
+          type: 'script_injection',
+          severity: 'critical',
+          description: 'JavaScript URL detected',
+          originalContent: original
+        });
+        sanitized = '#';
       }
-      return sanitized;
+
+      // Check for data URIs with scripts
+      if (sanitized.toLowerCase().startsWith('data:') && 
+          (sanitized.includes('<script') || sanitized.includes('javascript'))) {
+        threats.push({
+          type: 'data_uri_abuse',
+          severity: 'critical',
+          description: 'Malicious data URI detected',
+          originalContent: original
+        });
+        sanitized = '#';
+      }
+
+      const wasModified = sanitized !== original;
+
+      if (threats.length > 0) {
+        this.reportThreats(threats, original);
+      }
+
+      return {
+        sanitized,
+        wasModified,
+        removedElements: [],
+        removedAttributes: [],
+        threats
+      };
+
+    } catch (error) {
+      // Invalid URL
+      threats.push({
+        type: 'url_injection',
+        severity: 'medium',
+        description: 'Invalid URL format',
+        originalContent: original
+      });
+
+      return {
+        sanitized: '#',
+        wasModified: true,
+        removedElements: [],
+        removedAttributes: [],
+        threats
+      };
+    }
+  }
+
+  private detectThreats(input: string): ThreatDetection[] {
+    const threats: ThreatDetection[] = [];
+
+    for (const [threatType, patterns] of this.threatPatterns) {
+      for (const pattern of patterns) {
+        const matches = input.match(pattern);
+        if (matches) {
+          matches.forEach(match => {
+            threats.push({
+              type: threatType,
+              severity: this.assessThreatSeverity(threatType, match),
+              description: `${threatType.replace('_', ' ')} detected: ${match.substring(0, 50)}...`,
+              originalContent: match
+            });
+          });
+        }
+      }
     }
 
-    return obj;
+    return threats;
+  }
+
+  private assessThreatSeverity(threatType: ThreatType, content: string): 'low' | 'medium' | 'high' | 'critical' {
+    switch (threatType) {
+      case 'script_injection':
+        return 'critical';
+      case 'html_injection':
+        return content.includes('script') ? 'critical' : 'high';
+      case 'attribute_injection':
+        return 'high';
+      case 'url_injection':
+        return content.includes('javascript:') ? 'critical' : 'medium';
+      case 'css_injection':
+        return 'medium';
+      case 'data_uri_abuse':
+        return 'critical';
+      case 'protocol_violation':
+        return 'high';
+      case 'suspicious_pattern':
+        return 'low';
+      default:
+        return 'medium';
+    }
+  }
+
+  private detectElementThreats(node: Element, data: any): void {
+    // This hook is called by DOMPurify before sanitizing elements
+    if (node.tagName && ['SCRIPT', 'IFRAME', 'OBJECT', 'EMBED'].includes(node.tagName)) {
+      logger.debug('Potentially dangerous element detected', {
+        component: 'InputSanitizer',
+        tagName: node.tagName,
+        innerHTML: node.innerHTML.substring(0, 100)
+      });
+    }
+  }
+
+  private detectAttributeThreats(node: Element, data: any): void {
+    // This hook is called by DOMPurify before sanitizing attributes
+    if (data.attrName && data.attrValue) {
+      const dangerousAttrs = ['onclick', 'onload', 'onerror', 'onmouseover'];
+      if (dangerousAttrs.includes(data.attrName.toLowerCase())) {
+        logger.debug('Dangerous attribute detected', {
+          component: 'InputSanitizer',
+          attribute: data.attrName,
+          value: data.attrValue.substring(0, 100)
+        });
+      }
+    }
+  }
+
+  private reportThreats(threats: ThreatDetection[], originalContent: string): void {
+    const highSeverityThreats = threats.filter(t => 
+      t.severity === 'high' || t.severity === 'critical'
+    );
+
+    if (highSeverityThreats.length > 0) {
+      logger.warn('High-severity security threats detected in input', {
+        component: 'InputSanitizer',
+        threatCount: threats.length,
+        highSeverityCount: highSeverityThreats.length,
+        threats: threats.map(t => ({
+          type: t.type,
+          severity: t.severity,
+          description: t.description
+        }))
+      });
+
+      // Create security event for high-severity threats
+      const securityEvent: Partial<SecurityEvent> = {
+        type: 'xss_attempt',
+        severity: highSeverityThreats.some(t => t.severity === 'critical') ? 'critical' : 'high',
+        source: 'InputSanitizer',
+        details: {
+          threatCount: threats.length,
+          threats: threats,
+          originalContentLength: originalContent.length,
+          userAgent: navigator.userAgent
+        }
+      };
+
+      // Report security event
+      const customEvent = new CustomEvent('security-event', {
+        detail: securityEvent
+      });
+      document.dispatchEvent(customEvent);
+    }
   }
 
   /**
-   * Check for SQL injection patterns
+   * Batch sanitize multiple inputs
    */
-  public detectSQLInjection(input: string): boolean {
-    const sqlPatterns = [
-      /(\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\b)/i,
-      /('(''|[^'])*')/,
-      /(;|\||&)/,
-      /(\b(or|and)\b.*[=<>])/i,
-      /(\/\*.*\*\/)/,
-      /(--.*)/
-    ];
+  sanitizeBatch(inputs: { [key: string]: string }, type: 'html' | 'text' | 'url' = 'text'): { [key: string]: SanitizationResult } {
+    const results: { [key: string]: SanitizationResult } = {};
 
-    return sqlPatterns.some(pattern => pattern.test(input));
+    for (const [key, value] of Object.entries(inputs)) {
+      switch (type) {
+        case 'html':
+          results[key] = this.sanitizeHTML(value);
+          break;
+        case 'url':
+          results[key] = this.sanitizeURL(value);
+          break;
+        default:
+          results[key] = this.sanitizeText(value);
+      }
+    }
+
+    return results;
   }
 
   /**
-   * Check for XSS patterns
+   * Check if input is safe without sanitizing
    */
-  public detectXSS(input: string): boolean {
-    const xssPatterns = [
-      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-      /javascript:/i,
-      /vbscript:/i,
-      /data:text\/html/i,
-      /on\w+\s*=/i,
-      /<iframe/i,
-      /<object/i,
-      /<embed/i,
-      /<form/i
-    ];
+  isSafe(input: string, type: 'html' | 'text' | 'url' = 'text'): boolean {
+    let result: SanitizationResult;
+    
+    switch (type) {
+      case 'html':
+        result = this.sanitizeHTML(input);
+        break;
+      case 'url':
+        result = this.sanitizeURL(input);
+        break;
+      default:
+        result = this.sanitizeText(input);
+    }
 
-    return xssPatterns.some(pattern => pattern.test(input));
+    return !result.wasModified && result.threats.length === 0;
   }
 
   /**
-   * Comprehensive security check
+   * Get sanitizer statistics
    */
-  public performSecurityCheck(input: string): {
-    isSafe: boolean;
-    threats: string[];
-    sanitized: string;
+  getStats(): {
+    threatsDetected: number;
+    criticalThreats: number;
+    sanitizationsPerformed: number;
   } {
-    const threats: string[] = [];
-    
-    if (this.detectSQLInjection(input)) {
-      threats.push('SQL Injection attempt detected');
-    }
-    
-    if (this.detectXSS(input)) {
-      threats.push('XSS attempt detected');
-    }
-
-    // Check for path traversal
-    if (/\.\.\/|\.\.\\/.test(input)) {
-      threats.push('Path traversal attempt detected');
-    }
-
-    // Check for command injection
-    if (/[;&|`$(){}[\]\\]/.test(input)) {
-      threats.push('Command injection attempt detected');
-    }
-
-    const sanitized = this.sanitizeText(input);
-    
+    // This would be implemented with actual counters in a real system
     return {
-      isSafe: threats.length === 0,
-      threats,
-      sanitized
+      threatsDetected: 0,
+      criticalThreats: 0,
+      sanitizationsPerformed: 0
     };
   }
 }
-
-// Export singleton instance
-export const inputSanitizer = InputSanitizer.getInstance();
-
-// Export validation schemas for easy access
-export { ValidationSchemas as schemas };

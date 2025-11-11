@@ -40,7 +40,7 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
 
 // Lazy-loaded page components with enhanced error handling
 const HomePage = createLazyComponent(() => import('../../pages/home'), 'Home Page');
-const BillsDashboard = createLazyComponent(() => import('../../pages/enhanced-bills-dashboard-page'), 'Bills Dashboard');
+const BillsDashboard = createLazyComponent(() => import('../../pages/bills-dashboard-page'), 'Bills Dashboard');
 const BillDetail = createLazyComponent(() => import('../../pages/bill-detail'), 'Bill Detail');
 const BillAnalysis = createLazyComponent(() => import('../../pages/bill-analysis'), 'Bill Analysis');
 const CommunityHub = createLazyComponent(() => import('../../pages/community-input'), 'Community Hub');
@@ -294,7 +294,7 @@ export function AppRouter() {
           if (route.id === 'home') {
             import('../../pages/home');
           } else if (route.id === 'bills-dashboard') {
-            import('../../pages/enhanced-bills-dashboard-page');
+            import('../../pages/bills-dashboard-page');
           }
         } catch (error) {
           logger.warn(`Failed to preload route ${route.id}:`, { component: 'AppRouter' }, error);

@@ -1,3 +1,17 @@
+/**
+ * @deprecated This WebSocket client has been consolidated into the UnifiedWebSocketManager.
+ *
+ * DEPRECATED: This file is scheduled for removal. All WebSocket functionality has been
+ * migrated to the enhanced UnifiedWebSocketManager in client/src/core/api/websocket.ts.
+ *
+ * Please use the UnifiedWebSocketManager instead:
+ * import { UnifiedWebSocketManager, globalWebSocketPool } from '../core/api/websocket';
+ *
+ * This client provided React hooks and WebSocket connectivity for bill updates and
+ * community features. All functionality has been preserved and enhanced in the
+ * consolidated service.
+ */
+
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { defaultApiConfig } from '../config/api.js';
 import { logger } from '../utils/logger';

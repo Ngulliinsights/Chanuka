@@ -5,6 +5,44 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import type { Plugin } from 'vite'
 import type { MinifyOptions } from 'terser'
+import crypto from 'crypto'
+
+// Environment variable validation function
+function validateEnvironmentVariables(env: Record<string, string>, mode: string) {
+  const isProduction = mode === 'production'
+
+  // List of required secrets that must be set in production
+  const requiredSecrets = [
+    { key: 'VITE_SENTRY_DSN', placeholder: 'your-sentry-dsn-here' },
+    { key: 'VITE_GOOGLE_ANALYTICS_ID', placeholder: 'your-ga-id-here' }
+  ]
+
+  const errors: string[] = []
+
+  for (const { key, placeholder } of requiredSecrets) {
+    const value = env[key]
+
+    // In production, secrets must be set and not be placeholders
+    if (isProduction) {
+      if (!value || value.trim() === '' || value === placeholder) {
+        errors.push(`${key} must be set to a valid value in production mode. Current value: "${value}"`)
+      }
+    } else {
+      // In development, warn if placeholders are used
+      if (value === placeholder) {
+        console.warn(`⚠️  Warning: ${key} is set to placeholder value "${placeholder}". This should be replaced with actual credentials.`)
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    console.error('❌ Environment validation failed:')
+    errors.forEach(error => console.error(`  - ${error}`))
+    throw new Error('Environment validation failed. Please set required secrets before deploying.')
+  }
+
+  console.log('✅ Environment variables validated successfully')
+}
 
 // Vite configuration for a React application with optimized builds
 // This configuration provides separate optimizations for development and production
@@ -13,11 +51,44 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production'
   const isDevelopment = mode === 'development'
 
+  // Validate environment variables before proceeding
+  validateEnvironmentVariables(env, mode)
+
+  // Generate a nonce for CSP
+  const nonce = crypto.randomBytes(16).toString('base64')
+
+  // CSP policies
+  const baseCSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:* ws://localhost:4200 http://localhost:4200; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';"
+
+  const devCSP = baseCSP.replace("script-src 'self'", "script-src 'self' 'unsafe-inline' 'unsafe-eval'")
+  const prodCSP = baseCSP.replace("script-src 'self'", `script-src 'self' 'nonce-${nonce}'`)
+
   return {
     // ============================================================================
     // PLUGINS - Extend Vite's functionality with various build-time tools
     // ============================================================================
     plugins: [
+      // CSP Plugin for environment-aware Content Security Policy
+      {
+        name: 'csp-plugin',
+        transformIndexHtml(html) {
+          const csp = isDevelopment ? devCSP : prodCSP
+          return html
+            .replace(
+              /<meta\s+http-equiv="Content-Security-Policy"\s+content="[^"]*"\s*\/?>/,
+              `<meta http-equiv="Content-Security-Policy" content="${csp}" />`
+            )
+            .replace(
+              /<script>([\s\S]*?)<\/script>/g,
+              (match, content) => {
+                if (isProduction && content.trim()) {
+                  return `<script nonce="${nonce}">${content}</script>`
+                }
+                return match
+              }
+            )
+        }
+      },
       // React plugin handles JSX transformation and Fast Refresh in development
       // In production, we strip prop-types to reduce bundle size since they're only useful in development
       react(
@@ -43,12 +114,6 @@ export default defineConfig(({ mode }) => {
         // Enhanced analysis options
         projectRoot: process.cwd(),
         title: 'Chanuka Platform Bundle Analysis',
-        exclude: [
-          {
-            file: /node_modules/,
-            size: 1024 * 10 // Exclude small node_modules files
-          }
-        ]
       }) as Plugin] : []),
 
       // Compression plugins create pre-compressed versions of your assets

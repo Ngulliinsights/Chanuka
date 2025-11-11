@@ -1,106 +1,49 @@
 /**
- * Auth component barrel exports
- * Following navigation component pattern
+ * Authentication Components Index
+ * Centralized exports for all authentication-related components
  */
 
-// Types
-export type { 
-  AuthMode, 
-  LoginFormData, 
-  RegisterFormData, 
-  FormData,
-  ValidationErrors,
-  AuthFormProps,
-  AuthInputProps,
-  AuthButtonProps,
-  AuthResponse,
-  UseAuthFormResult,
-  AuthConfig
-} from './types';
+// Core authentication components
+export { AuthProvider } from './AuthProvider';
+export { AuthGuard, RequireAuth, RequireRole, RequirePermission, RequireAdmin, RequireModerator, RequireExpert } from './AuthGuard';
 
-// Validation
+// Authentication UI components
+export { SessionManager } from './SessionManager';
+export { SocialLogin } from './SocialLogin';
+export { OAuthCallback } from './OAuthCallback';
+
+// Re-export auth hook for convenience
+export { useAuth } from '../../hooks/use-auth';
+
+// Re-export RBAC utilities
 export { 
-  validateEmail,
-  validatePassword,
-  validateName,
-  validateLoginData,
-  validateRegisterData,
-  validateAuthMode,
-  validateAuthConfig,
-  safeValidateEmail,
-  safeValidatePassword,
-  safeValidateLoginData,
-  safeValidateRegisterData,
-  validateField,
-  LoginSchema,
-  RegisterSchema,
-  EmailSchema,
-  PasswordSchema,
-  StrongPasswordSchema,
-  NameSchema
-} from './validation';
+  rbacManager, 
+  usePermission, 
+  usePermissions, 
+  useMinimumRole,
+  ROLES,
+  RESOURCES,
+  ACTIONS
+} from '../../utils/rbac';
 
-// Errors
-export {
-  AuthError,
-  AuthValidationError,
-  AuthCredentialsError,
-  AuthRegistrationError,
-  AuthNetworkError,
-  AuthRateLimitError,
-  AuthConfigurationError,
-  AuthSessionError,
-  AuthErrorType,
-  isAuthError,
-  isRetryableError,
-  isValidationError,
-  isCredentialsError,
-  isNetworkError,
-  isRateLimitError,
-  getErrorMessage,
-  getErrorDetails,
-  getUserFriendlyMessage
-} from './errors';
+// Re-export auth services
+export { authBackendService } from '../../services/authBackendService';
+export { tokenManager } from '../../utils/tokenManager';
+export { sessionManager } from '../../utils/sessionManager';
 
-// Recovery
-export {
-  getRecoveryStrategy,
-  canAutoRecover,
-  shouldShowRecovery,
-  getRecoveryDelay,
-  createRecoveryContext,
-  updateRecoveryContext
-} from './recovery';
+// Re-export auth types
+export type { 
+  User, 
+  AuthContextType, 
+  AuthResponse,
+  LoginCredentials,
+  RegisterData,
+  PrivacySettings,
+  SessionInfo,
+  SecurityEvent,
+  SuspiciousActivityAlert
+} from '../../types/auth';
 
-export type {
-  RecoveryStrategy,
-  RecoveryAction,
-  RecoveryContext
-} from './recovery';
-
-// Constants
-export {
-  AUTH_MODES,
-  AUTH_FIELD_NAMES,
-  AUTH_VALIDATION_RULES,
-  AUTH_ERROR_MESSAGES,
-  AUTH_SUCCESS_MESSAGES,
-  AUTH_CONFIG_DEFAULTS,
-  AUTH_RATE_LIMITS,
-  AUTH_STORAGE_KEYS,
-  AUTH_API_ENDPOINTS,
-  AUTH_REDIRECT_PATHS,
-  AUTH_TEST_IDS,
-  AUTH_FIELD_TEST_IDS,
-  AUTH_ACCESSIBILITY
-} from './constants';
-
-// UI Components (will be available after task 4.2 is complete)
-export { LoginForm, RegisterForm, AuthInput, AuthButton } from './ui';
-
-// Hooks (will be available after task 4.3)
-export { useAuthForm } from './hooks';
-
-// Utils (will be available after task 4.3)
-export * from './utils';
-
+// Re-export middleware
+export { authMiddleware, createAuthMiddleware } from '../../store/middleware/authMiddleware';
+export type { AuthMiddlewareConfig } from '../../store/middleware/authMiddleware';

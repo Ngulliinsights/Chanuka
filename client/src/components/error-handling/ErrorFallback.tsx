@@ -12,7 +12,7 @@ import {
   ErrorDomain,
   NetworkError,
   ExternalServiceError 
-} from "../../shared/errors";
+} from "../../core/error";
 
 // Import extracted utilities
 import { createErrorReporter } from "./utils/error-reporter";

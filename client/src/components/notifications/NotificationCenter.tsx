@@ -1,326 +1,392 @@
 /**
  * Notification Center Component
  * 
- * Displays real-time notifications with priority handling, filtering,
- * and action capabilities integrated with WebSocket updates.
+ * Main notification management interface with filtering, categorization,
+ * and real-time updates.
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNotifications } from '../../hooks/useWebSocket';
-import { Badge } from '../ui/badge';
+import { Bell, Filter, Settings, Archive, Trash2, CheckCheck, X } from 'lucide-react';
+import { useNotifications, useNotificationHistory } from '../../hooks/useNotifications';
+import { NotificationCategory, NotificationType } from '../../services/notification-service';
 import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { ScrollArea } from '../ui/scroll-area';
+import { Badge } from '../ui/badge';
 import { 
-  Bell, 
-  BellOff,
-  X, 
-  Check,
-  AlertCircle,
-  Info,
-  TrendingUp,
-  Users,
-  FileText,
-  ExternalLink
-} from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { RealTimeNotification } from '../../types/realtime';
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel
+} from '../ui/dropdown-menu';
+import { NotificationItem } from './NotificationItem';
+import { NotificationPreferences } from './NotificationPreferences';
+import { LoadingSpinner } from '../../core/loading/components/LoadingSpinner';
 
 interface NotificationCenterProps {
   className?: string;
   maxHeight?: string;
-  showHeader?: boolean;
-  autoMarkRead?: boolean;
+  showPreferences?: boolean;
 }
 
-export function NotificationCenter({
-  className,
-  maxHeight = "400px",
-  showHeader = true,
-  autoMarkRead = false
+export function NotificationCenter({ 
+  className = '', 
+  maxHeight = '400px',
+  showPreferences = true 
 }: NotificationCenterProps) {
   const {
     notifications,
-    notificationCount,
+    unreadCount,
+    isLoading,
+    error,
     markAsRead,
-    isConnected
+    markAllAsRead,
+    deleteNotification,
+    loadMore,
+    refresh,
+    clearError
   } = useNotifications();
 
-  const [filter, setFilter] = useState<'all' | 'unread' | 'high' | 'critical'>('all');
-  const [expandedNotifications, setExpandedNotifications] = useState<Set<string>>(new Set());
+  const {
+    history,
+    categories,
+    loadHistory,
+    bulkMarkAsRead,
+    bulkDelete,
+    archiveOld
+  } = useNotificationHistory();
 
-  // Auto-mark notifications as read after viewing for 3 seconds
+  const [isOpen, setIsOpen] = useState(false);
+  const [showPreferencesModal, setShowPreferencesModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<NotificationCategory | 'all'>('all');
+  const [selectedNotifications, setSelectedNotifications] = useState<string[]>([]);
+  const [view, setView] = useState<'recent' | 'history'>('recent');
+
+  // Load history when switching to history view
   useEffect(() => {
-    if (!autoMarkRead) return;
+    if (view === 'history') {
+      loadHistory({
+        category: selectedCategory === 'all' ? undefined : selectedCategory,
+        limit: 50
+      });
+    }
+  }, [view, selectedCategory, loadHistory]);
 
-    const timers: NodeJS.Timeout[] = [];
+  const handleNotificationClick = async (notificationId: string) => {
+    try {
+      await markAsRead(notificationId);
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
 
-    notifications.forEach(notification => {
-      if (!notification.read) {
-        const timer = setTimeout(() => {
-          markAsRead(notification.id);
-        }, 3000);
-        timers.push(timer);
+  const handleBulkAction = async (action: 'read' | 'delete' | 'archive') => {
+    if (selectedNotifications.length === 0) return;
+
+    try {
+      switch (action) {
+        case 'read':
+          await bulkMarkAsRead(selectedNotifications);
+          break;
+        case 'delete':
+          await bulkDelete(selectedNotifications);
+          break;
+        case 'archive':
+          // Archive is handled differently - it's time-based
+          await archiveOld(30);
+          break;
       }
-    });
-
-    return () => {
-      timers.forEach(timer => clearTimeout(timer));
-    };
-  }, [notifications, autoMarkRead, markAsRead]);
-
-  const getNotificationIcon = (type: RealTimeNotification['type']) => {
-    switch (type) {
-      case 'bill_status':
-        return <FileText className="h-4 w-4" />;
-      case 'community_activity':
-        return <Users className="h-4 w-4" />;
-      case 'expert_response':
-        return <Users className="h-4 w-4 text-blue-500" />;
-      case 'trending_bill':
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'constitutional_alert':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      case 'engagement_milestone':
-        return <TrendingUp className="h-4 w-4 text-purple-500" />;
-      default:
-        return <Info className="h-4 w-4" />;
+      setSelectedNotifications([]);
+    } catch (error) {
+      console.error(`Failed to ${action} notifications:`, error);
     }
   };
 
-  const getPriorityColor = (priority: RealTimeNotification['priority']) => {
-    switch (priority) {
-      case 'critical':
-        return 'border-red-500 bg-red-50';
-      case 'high':
-        return 'border-orange-500 bg-orange-50';
-      case 'medium':
-        return 'border-blue-500 bg-blue-50';
-      case 'low':
-        return 'border-gray-300 bg-gray-50';
-      default:
-        return 'border-gray-300 bg-white';
-    }
+  const handleSelectNotification = (notificationId: string, selected: boolean) => {
+    setSelectedNotifications(prev => 
+      selected 
+        ? [...prev, notificationId]
+        : prev.filter(id => id !== notificationId)
+    );
   };
 
-  const getPriorityBadgeVariant = (priority: RealTimeNotification['priority']) => {
-    switch (priority) {
-      case 'critical':
-        return 'destructive' as const;
-      case 'high':
-        return 'secondary' as const;
-      case 'medium':
-        return 'outline' as const;
-      case 'low':
-        return 'outline' as const;
-      default:
-        return 'outline' as const;
-    }
+  const handleSelectAll = () => {
+    const currentNotifications = view === 'recent' ? notifications : history;
+    const allIds = currentNotifications.map(n => n.id);
+    setSelectedNotifications(
+      selectedNotifications.length === allIds.length ? [] : allIds
+    );
   };
 
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
-    return date.toLocaleDateString();
-  };
+  const filteredNotifications = (view === 'recent' ? notifications : history).filter(
+    notification => selectedCategory === 'all' || notification.category === selectedCategory
+  );
 
-  const filteredNotifications = notifications.filter(notification => {
-    switch (filter) {
-      case 'unread':
-        return !notification.read;
-      case 'high':
-        return notification.priority === 'high' || notification.priority === 'critical';
-      case 'critical':
-        return notification.priority === 'critical';
-      default:
-        return true;
-    }
-  });
-
-  const toggleExpanded = (notificationId: string) => {
-    const newExpanded = new Set(expandedNotifications);
-    if (newExpanded.has(notificationId)) {
-      newExpanded.delete(notificationId);
-    } else {
-      newExpanded.add(notificationId);
-    }
-    setExpandedNotifications(newExpanded);
-  };
-
-  const handleNotificationAction = (notification: RealTimeNotification) => {
-    if (notification.action_url) {
-      window.open(notification.action_url, '_blank');
-    }
-    if (!notification.read) {
-      markAsRead(notification.id);
-    }
-  };
+  const categoryOptions: Array<{ value: NotificationCategory | 'all'; label: string; count?: number }> = [
+    { value: 'all', label: 'All', count: Object.values(categories).reduce((sum, count) => sum + count, 0) },
+    { value: 'community', label: 'Community', count: categories.community },
+    { value: 'bills', label: 'Bills', count: categories.bills },
+    { value: 'expert', label: 'Expert', count: categories.expert },
+    { value: 'moderation', label: 'Moderation', count: categories.moderation },
+    { value: 'system', label: 'System', count: categories.system },
+    { value: 'security', label: 'Security', count: categories.security }
+  ];
 
   return (
-    <Card className={cn("w-full", className)}>
-      {showHeader && (
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between">
+    <div className={`relative ${className}`}>
+      {/* Notification Bell Trigger */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="relative p-2"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={`Notifications (${unreadCount} unread)`}
+      >
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <Badge 
+            variant="destructive" 
+            className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+          >
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </Badge>
+        )}
+      </Button>
+
+      {/* Notification Panel */}
+      {isOpen && (
+        <div 
+          className="absolute right-0 top-full mt-2 w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+          style={{ maxHeight }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              <span>Notifications</span>
-              {notificationCount > 0 && (
-                <Badge variant="destructive" className="text-xs">
-                  {notificationCount}
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                Notifications
+              </h3>
+              {unreadCount > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {unreadCount} new
                 </Badge>
               )}
             </div>
             
-            <div className="flex items-center gap-2">
-              {!isConnected && (
-                <Badge variant="outline" className="text-xs">
-                  <BellOff className="h-3 w-3 mr-1" />
-                  Offline
-                </Badge>
-              )}
-              
-              {/* Filter buttons */}
-              <div className="flex gap-1">
-                {(['all', 'unread', 'high', 'critical'] as const).map((filterType) => (
-                  <Button
-                    key={filterType}
-                    variant={filter === filterType ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setFilter(filterType)}
-                    className="text-xs px-2 py-1 h-auto"
-                  >
-                    {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
+            <div className="flex items-center gap-1">
+              {/* View Toggle */}
+              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1">
+                <Button
+                  variant={view === 'recent' ? 'default' : 'ghost'}
+                  size="sm"
+                  className="text-xs px-2 py-1"
+                  onClick={() => setView('recent')}
+                >
+                  Recent
+                </Button>
+                <Button
+                  variant={view === 'history' ? 'default' : 'ghost'}
+                  size="sm"
+                  className="text-xs px-2 py-1"
+                  onClick={() => setView('history')}
+                >
+                  History
+                </Button>
+              </div>
+
+              {/* Actions Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <Settings className="h-4 w-4" />
                   </Button>
-                ))}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => markAllAsRead()}>
+                    <CheckCheck className="h-4 w-4 mr-2" />
+                    Mark all as read
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleBulkAction('archive')}>
+                    <Archive className="h-4 w-4 mr-2" />
+                    Archive old
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {showPreferences && (
+                    <DropdownMenuItem onClick={() => setShowPreferencesModal(true)}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Preferences
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={refresh}>
+                    Refresh
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-1"
+                onClick={() => setIsOpen(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 mb-2">
+              <Filter className="h-4 w-4 text-gray-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Filter by category:</span>
+            </div>
+            
+            <div className="flex flex-wrap gap-1">
+              {categoryOptions.map(option => (
+                <Button
+                  key={option.value}
+                  variant={selectedCategory === option.value ? 'default' : 'outline'}
+                  size="sm"
+                  className="text-xs px-2 py-1"
+                  onClick={() => setSelectedCategory(option.value)}
+                >
+                  {option.label}
+                  {option.count !== undefined && option.count > 0 && (
+                    <Badge variant="secondary" className="ml-1 text-xs">
+                      {option.count}
+                    </Badge>
+                  )}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Bulk Actions */}
+          {selectedNotifications.length > 0 && (
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-blue-700 dark:text-blue-300">
+                  {selectedNotifications.length} selected
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs px-2 py-1"
+                    onClick={() => handleBulkAction('read')}
+                  >
+                    Mark read
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs px-2 py-1"
+                    onClick={() => handleBulkAction('delete')}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs px-2 py-1"
+                    onClick={handleSelectAll}
+                  >
+                    {selectedNotifications.length === filteredNotifications.length ? 'Deselect all' : 'Select all'}
+                  </Button>
+                </div>
               </div>
             </div>
-          </CardTitle>
-        </CardHeader>
-      )}
-      
-      <CardContent className="pt-0">
-        <ScrollArea style={{ maxHeight }}>
-          {filteredNotifications.length === 0 ? (
-            <div className="text-center py-8">
-              <Bell className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">
-                {filter === 'all' ? 'No notifications' : `No ${filter} notifications`}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {filteredNotifications.map((notification) => {
-                const isExpanded = expandedNotifications.has(notification.id);
-                
-                return (
-                  <div
-                    key={notification.id}
-                    className={cn(
-                      "p-3 rounded-md border transition-colors",
-                      getPriorityColor(notification.priority),
-                      !notification.read && "ring-2 ring-blue-200",
-                      "hover:shadow-sm cursor-pointer"
-                    )}
-                    onClick={() => toggleExpanded(notification.id)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-0.5">
-                        {getNotificationIcon(notification.type)}
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium line-clamp-1">
-                              {notification.title}
-                            </p>
-                            <p className={cn(
-                              "text-xs text-muted-foreground mt-1",
-                              isExpanded ? "line-clamp-none" : "line-clamp-2"
-                            )}>
-                              {notification.message}
-                            </p>
-                          </div>
-                          
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <Badge 
-                              variant={getPriorityBadgeVariant(notification.priority)}
-                              className="text-xs"
-                            >
-                              {notification.priority}
-                            </Badge>
-                            
-                            {!notification.read && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  markAsRead(notification.id);
-                                }}
-                                className="h-6 w-6 p-0"
-                              >
-                                <Check className="h-3 w-3" />
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs text-muted-foreground">
-                            {formatTimestamp(notification.created_at)}
-                          </span>
-                          
-                          {notification.action_url && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleNotificationAction(notification);
-                              }}
-                              className="text-xs px-2 py-1 h-auto"
-                            >
-                              {notification.action_text || 'View'}
-                              <ExternalLink className="h-3 w-3 ml-1" />
-                            </Button>
-                          )}
-                        </div>
-                        
-                        {/* Expiry warning */}
-                        {notification.expires_at && (
-                          <div className="mt-2 text-xs text-orange-600">
-                            <AlertCircle className="h-3 w-3 inline mr-1" />
-                            Expires {formatTimestamp(notification.expires_at)}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+          )}
+
+          {/* Error Display */}
+          {error && (
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-red-700 dark:text-red-300">{error}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-1"
+                  onClick={clearError}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           )}
-        </ScrollArea>
-        
-        {/* Connection status footer */}
-        <div className="mt-4 pt-3 border-t flex items-center justify-between text-xs text-muted-foreground">
-          <span>
-            {isConnected ? 'Real-time updates active' : 'Using cached notifications'}
-          </span>
-          <span>
-            {filteredNotifications.length} of {notifications.length} shown
-          </span>
+
+          {/* Notifications List */}
+          <div className="max-h-80 overflow-y-auto">
+            {isLoading && filteredNotifications.length === 0 ? (
+              <div className="flex items-center justify-center p-8">
+                <LoadingSpinner size="sm" />
+                <span className="ml-2 text-sm text-gray-500">Loading notifications...</span>
+              </div>
+            ) : filteredNotifications.length === 0 ? (
+              <div className="p-8 text-center">
+                <Bell className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {selectedCategory === 'all' 
+                    ? 'No notifications yet' 
+                    : `No ${selectedCategory} notifications`
+                  }
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredNotifications.map(notification => (
+                  <NotificationItem
+                    key={notification.id}
+                    notification={notification}
+                    selected={selectedNotifications.includes(notification.id)}
+                    onSelect={(selected) => handleSelectNotification(notification.id, selected)}
+                    onClick={() => handleNotificationClick(notification.id)}
+                    onDelete={() => deleteNotification(notification.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Load More */}
+          {filteredNotifications.length > 0 && (
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => loadMore({ category: selectedCategory === 'all' ? undefined : selectedCategory })}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <LoadingSpinner size="sm" className="mr-2" />
+                    Loading...
+                  </>
+                ) : (
+                  'Load more'
+                )}
+              </Button>
+            </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      )}
+
+      {/* Preferences Modal */}
+      {showPreferencesModal && (
+        <NotificationPreferences
+          isOpen={showPreferencesModal}
+          onClose={() => setShowPreferencesModal(false)}
+        />
+      )}
+
+      {/* Click outside to close */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+    </div>
   );
 }
-
-export default NotificationCenter;

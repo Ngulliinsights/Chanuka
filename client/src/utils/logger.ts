@@ -639,8 +639,8 @@ export class BaseError extends Error {
     }
 }
 
-// Import unified ValidationError from shared core types
-import { ValidationError } from '@shared/core/types/validation-types';
+// Import ValidationError class from specialized errors
+import { ValidationError } from '../../../shared/core/src/observability/error-management/errors/specialized-errors';
 
 // Re-export for backward compatibility
 export { ValidationError };
@@ -950,7 +950,7 @@ export const validationService = {
             } catch (error) {
                 // Re-throw validation errors with enhanced context
                 if (error instanceof Error) {
-                    throw new ValidationError(error.message, {
+                    throw new ValidationError(error.message, [], {
                         originalError: error,
                         data
                     });

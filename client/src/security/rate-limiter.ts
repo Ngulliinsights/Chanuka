@@ -1,266 +1,444 @@
 /**
- * Client-Side Rate Limiting Service
- * Provides rate limiting for user actions and API requests
+ * Client-Side Rate Limiter
+ * Prevents abuse by limiting API requests and user actions
  */
 
-export interface RateLimitConfig {
-  maxRequests: number;
+import { logger } from '../utils/logger';
+import { SecurityEvent, RateLimitInfo } from './types';
+
+export interface RateLimiterConfig {
+  enabled: boolean;
   windowMs: number;
-  keyPrefix?: string;
+  maxRequests: number;
+  skipSuccessfulRequests: boolean;
+  keyGenerator?: (request: Request) => string;
+  onLimitReached?: (info: RateLimitInfo) => void;
 }
 
-export interface RateLimitResult {
-  allowed: boolean;
-  remaining: number;
-  resetTime: number;
-  retryAfter?: number;
+interface RequestRecord {
+  timestamp: number;
+  success: boolean;
+  endpoint: string;
 }
 
-export class ClientRateLimiter {
-  private static instance: ClientRateLimiter;
-  private storage: Map<string, { count: number; resetTime: number }> = new Map();
-  private cleanupInterval?: NodeJS.Timeout;
+interface RateLimitBucket {
+  requests: RequestRecord[];
+  windowStart: number;
+  blocked: boolean;
+}
 
-  private constructor() {
-    this.startCleanup();
-  }
+export class RateLimiter {
+  private config: RateLimiterConfig;
+  private buckets: Map<string, RateLimitBucket> = new Map();
+  private cleanupTimer: NodeJS.Timeout | null = null;
 
-  public static getInstance(): ClientRateLimiter {
-    if (!ClientRateLimiter.instance) {
-      ClientRateLimiter.instance = new ClientRateLimiter();
-    }
-    return ClientRateLimiter.instance;
-  }
-
-  /**
-   * Check if an action is allowed under rate limit
-   */
-  public checkLimit(
-    key: string, 
-    config: RateLimitConfig
-  ): RateLimitResult {
-    const now = Date.now();
-    const fullKey = `${config.keyPrefix || 'default'}:${key}`;
-    
-    // Get or create rate limit entry
-    let entry = this.storage.get(fullKey);
-    
-    // Reset if window has expired
-    if (!entry || now > entry.resetTime) {
-      entry = {
-        count: 0,
-        resetTime: now + config.windowMs
-      };
-    }
-
-    // Check if limit exceeded
-    if (entry.count >= config.maxRequests) {
-      return {
-        allowed: false,
-        remaining: 0,
-        resetTime: entry.resetTime,
-        retryAfter: Math.ceil((entry.resetTime - now) / 1000)
-      };
-    }
-
-    // Increment counter and update storage
-    entry.count++;
-    this.storage.set(fullKey, entry);
-
-    return {
-      allowed: true,
-      remaining: config.maxRequests - entry.count,
-      resetTime: entry.resetTime
+  constructor(config: RateLimiterConfig) {
+    this.config = {
+      keyGenerator: (request: Request) => this.defaultKeyGenerator(request),
+      ...config
     };
   }
 
-  /**
-   * Attempt to perform a rate-limited action
-   */
-  public async attemptAction<T>(
-    key: string,
-    config: RateLimitConfig,
-    action: () => Promise<T>
-  ): Promise<T> {
-    const result = this.checkLimit(key, config);
-    
-    if (!result.allowed) {
-      throw new Error(
-        `Rate limit exceeded. Try again in ${result.retryAfter} seconds.`
-      );
+  async initialize(): Promise<void> {
+    if (!this.config.enabled) {
+      logger.info('Rate Limiter disabled');
+      return;
     }
 
-    return await action();
+    try {
+      // Set up request interception
+      this.setupRequestInterception();
+      
+      // Set up cleanup timer
+      this.setupCleanup();
+      
+      // Set up action rate limiting
+      this.setupActionLimiting();
+
+      logger.info('Rate Limiter initialized successfully', {
+        windowMs: this.config.windowMs,
+        maxRequests: this.config.maxRequests
+      });
+    } catch (error) {
+      logger.error('Failed to initialize Rate Limiter', error);
+      throw error;
+    }
   }
 
-  /**
-   * Get current rate limit status
-   */
-  public getStatus(key: string, keyPrefix?: string): RateLimitResult | null {
-    const fullKey = `${keyPrefix || 'default'}:${key}`;
-    const entry = this.storage.get(fullKey);
+  private defaultKeyGenerator(request: Request): string {
+    // Generate key based on endpoint and user identifier
+    const url = new URL(request.url);
+    const endpoint = url.pathname;
+    const userId = this.getUserId();
+    const sessionId = this.getSessionId();
     
-    if (!entry) {
+    return `${userId || sessionId || 'anonymous'}:${endpoint}`;
+  }
+
+  private getUserId(): string | null {
+    // Try to get user ID from various sources
+    try {
+      const authData = localStorage.getItem('auth-storage');
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        return parsed.state?.user?.id || null;
+      }
+    } catch (error) {
+      // Ignore parsing errors
+    }
+    return null;
+  }
+
+  private getSessionId(): string | null {
+    try {
+      return sessionStorage.getItem('session-id') || null;
+    } catch (error) {
       return null;
     }
+  }
 
-    const now = Date.now();
-    if (now > entry.resetTime) {
-      this.storage.delete(fullKey);
-      return null;
-    }
+  private setupRequestInterception(): void {
+    const originalFetch = window.fetch;
+    
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      const request = new Request(input, init);
+      
+      // Check rate limit before making request
+      const rateLimitResult = this.checkRateLimit(request);
+      
+      if (rateLimitResult.blocked) {
+        // Create a rate limit exceeded response
+        const response = new Response(
+          JSON.stringify({
+            error: 'Rate limit exceeded',
+            retryAfter: Math.ceil((rateLimitResult.resetTime.getTime() - Date.now()) / 1000)
+          }),
+          {
+            status: 429,
+            statusText: 'Too Many Requests',
+            headers: {
+              'Content-Type': 'application/json',
+              'Retry-After': Math.ceil((rateLimitResult.resetTime.getTime() - Date.now()) / 1000).toString(),
+              'X-RateLimit-Limit': this.config.maxRequests.toString(),
+              'X-RateLimit-Remaining': '0',
+              'X-RateLimit-Reset': rateLimitResult.resetTime.getTime().toString()
+            }
+          }
+        );
 
-    return {
-      allowed: true,
-      remaining: Math.max(0, entry.count),
-      resetTime: entry.resetTime,
-      retryAfter: entry.resetTime > now ? Math.ceil((entry.resetTime - now) / 1000) : 0
+        // Report rate limit violation
+        this.reportRateLimitViolation(request, rateLimitResult);
+        
+        return response;
+      }
+
+      // Make the actual request
+      const response = await originalFetch(request);
+      
+      // Record the request
+      this.recordRequest(request, response.ok);
+      
+      return response;
     };
   }
 
-  /**
-   * Clear rate limit for a specific key
-   */
-  public clearLimit(key: string, keyPrefix?: string): void {
-    const fullKey = `${keyPrefix || 'default'}:${key}`;
-    this.storage.delete(fullKey);
+  private setupActionLimiting(): void {
+    // Limit form submissions
+    this.limitFormSubmissions();
+    
+    // Limit button clicks
+    this.limitButtonClicks();
+    
+    // Limit search queries
+    this.limitSearchQueries();
   }
 
-  /**
-   * Clear all rate limits
-   */
-  public clearAll(): void {
-    this.storage.clear();
+  private limitFormSubmissions(): void {
+    document.addEventListener('submit', (event) => {
+      const form = event.target as HTMLFormElement;
+      if (!form) return;
+
+      const key = `form-submit:${form.action || window.location.pathname}`;
+      const bucket = this.getBucket(key);
+      
+      if (this.isRateLimited(bucket, 'form-submit')) {
+        event.preventDefault();
+        this.showRateLimitMessage('Form submissions are rate limited. Please wait before submitting again.');
+        
+        // Report rate limit violation
+        this.reportActionRateLimit('form-submit', key);
+      } else {
+        this.recordAction(bucket, 'form-submit');
+      }
+    });
   }
 
-  /**
-   * Start cleanup of expired entries
-   */
-  private startCleanup(): void {
-    this.cleanupInterval = setInterval(() => {
+  private limitButtonClicks(): void {
+    document.addEventListener('click', (event) => {
+      const button = event.target as HTMLElement;
+      if (!button || !button.matches('button[data-rate-limit]')) return;
+
+      const action = button.getAttribute('data-rate-limit') || 'button-click';
+      const key = `button-click:${action}`;
+      const bucket = this.getBucket(key);
+      
+      if (this.isRateLimited(bucket, action)) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        this.showRateLimitMessage('This action is rate limited. Please wait before trying again.');
+        this.reportActionRateLimit('button-click', key);
+      } else {
+        this.recordAction(bucket, action);
+      }
+    });
+  }
+
+  private limitSearchQueries(): void {
+    // Debounce and rate limit search inputs
+    const searchInputs = document.querySelectorAll('input[type="search"], input[data-search]');
+    
+    searchInputs.forEach(input => {
+      let debounceTimer: NodeJS.Timeout;
+      
+      input.addEventListener('input', (event) => {
+        clearTimeout(debounceTimer);
+        
+        debounceTimer = setTimeout(() => {
+          const key = 'search-query';
+          const bucket = this.getBucket(key);
+          
+          if (this.isRateLimited(bucket, 'search')) {
+            this.showRateLimitMessage('Search queries are rate limited. Please wait before searching again.');
+            this.reportActionRateLimit('search', key);
+          } else {
+            this.recordAction(bucket, 'search');
+          }
+        }, 300); // 300ms debounce
+      });
+    });
+  }
+
+  private checkRateLimit(request: Request): RateLimitInfo {
+    const key = this.config.keyGenerator!(request);
+    const bucket = this.getBucket(key);
+    
+    const now = Date.now();
+    const windowStart = now - this.config.windowMs;
+    
+    // Clean old requests
+    bucket.requests = bucket.requests.filter(req => req.timestamp > windowStart);
+    
+    // Count current requests
+    let currentRequests = bucket.requests.length;
+    
+    // Skip successful requests if configured
+    if (this.config.skipSuccessfulRequests) {
+      currentRequests = bucket.requests.filter(req => !req.success).length;
+    }
+    
+    const blocked = currentRequests >= this.config.maxRequests;
+    const resetTime = new Date(bucket.windowStart + this.config.windowMs);
+    
+    return {
+      windowMs: this.config.windowMs,
+      maxRequests: this.config.maxRequests,
+      currentRequests,
+      resetTime,
+      blocked
+    };
+  }
+
+  private getBucket(key: string): RateLimitBucket {
+    const now = Date.now();
+    let bucket = this.buckets.get(key);
+    
+    if (!bucket || (now - bucket.windowStart) > this.config.windowMs) {
+      bucket = {
+        requests: [],
+        windowStart: now,
+        blocked: false
+      };
+      this.buckets.set(key, bucket);
+    }
+    
+    return bucket;
+  }
+
+  private isRateLimited(bucket: RateLimitBucket, action: string): boolean {
+    const now = Date.now();
+    const windowStart = now - this.config.windowMs;
+    
+    // Clean old requests
+    bucket.requests = bucket.requests.filter(req => req.timestamp > windowStart);
+    
+    return bucket.requests.length >= this.config.maxRequests;
+  }
+
+  private recordRequest(request: Request, success: boolean): void {
+    const key = this.config.keyGenerator!(request);
+    const bucket = this.getBucket(key);
+    
+    bucket.requests.push({
+      timestamp: Date.now(),
+      success,
+      endpoint: new URL(request.url).pathname
+    });
+  }
+
+  private recordAction(bucket: RateLimitBucket, action: string): void {
+    bucket.requests.push({
+      timestamp: Date.now(),
+      success: true,
+      endpoint: action
+    });
+  }
+
+  private reportRateLimitViolation(request: Request, rateLimitInfo: RateLimitInfo): void {
+    logger.warn('Rate limit exceeded', {
+      component: 'RateLimiter',
+      url: request.url,
+      method: request.method,
+      currentRequests: rateLimitInfo.currentRequests,
+      maxRequests: rateLimitInfo.maxRequests
+    });
+
+    // Create security event
+    const securityEvent: Partial<SecurityEvent> = {
+      type: 'rate_limit_exceeded',
+      severity: 'medium',
+      source: 'RateLimiter',
+      details: {
+        url: request.url,
+        method: request.method,
+        rateLimitInfo,
+        userAgent: navigator.userAgent
+      }
+    };
+
+    // Report security event
+    const customEvent = new CustomEvent('security-event', {
+      detail: securityEvent
+    });
+    document.dispatchEvent(customEvent);
+
+    // Call configured callback
+    if (this.config.onLimitReached) {
+      this.config.onLimitReached(rateLimitInfo);
+    }
+  }
+
+  private reportActionRateLimit(action: string, key: string): void {
+    logger.warn('Action rate limit exceeded', {
+      component: 'RateLimiter',
+      action,
+      key
+    });
+
+    const securityEvent: Partial<SecurityEvent> = {
+      type: 'rate_limit_exceeded',
+      severity: 'low',
+      source: 'RateLimiter',
+      details: {
+        action,
+        key,
+        userAgent: navigator.userAgent
+      }
+    };
+
+    const customEvent = new CustomEvent('security-event', {
+      detail: securityEvent
+    });
+    document.dispatchEvent(customEvent);
+  }
+
+  private showRateLimitMessage(message: string): void {
+    // Create a temporary notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-yellow-500 text-white px-4 py-2 rounded shadow-lg z-50';
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 5000);
+  }
+
+  private setupCleanup(): void {
+    // Clean up old buckets periodically
+    this.cleanupTimer = setInterval(() => {
       const now = Date.now();
-      for (const [key, entry] of this.storage.entries()) {
-        if (now > entry.resetTime) {
-          this.storage.delete(key);
+      const cutoff = now - (this.config.windowMs * 2); // Keep buckets for 2 windows
+      
+      for (const [key, bucket] of this.buckets.entries()) {
+        if (bucket.windowStart < cutoff) {
+          this.buckets.delete(key);
         }
       }
-    }, 60000); // Cleanup every minute
+    }, this.config.windowMs);
   }
 
   /**
-   * Stop cleanup interval
+   * Check if a specific key is currently rate limited
    */
-  public destroy(): void {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-    }
+  isKeyRateLimited(key: string): boolean {
+    const bucket = this.buckets.get(key);
+    if (!bucket) return false;
+    
+    return this.isRateLimited(bucket, key);
   }
-}
 
-// Predefined rate limit configurations
-export const RateLimitConfigs = {
-  // Search requests
-  search: {
-    maxRequests: 30,
-    windowMs: 60000, // 1 minute
-    keyPrefix: 'search'
-  },
-
-  // Comment posting
-  comments: {
-    maxRequests: 10,
-    windowMs: 300000, // 5 minutes
-    keyPrefix: 'comments'
-  },
-
-  // Bill saves/bookmarks
-  billActions: {
-    maxRequests: 50,
-    windowMs: 300000, // 5 minutes
-    keyPrefix: 'bill_actions'
-  },
-
-  // Profile updates
-  profileUpdates: {
-    maxRequests: 5,
-    windowMs: 300000, // 5 minutes
-    keyPrefix: 'profile'
-  },
-
-  // Password reset requests
-  passwordReset: {
-    maxRequests: 3,
-    windowMs: 3600000, // 1 hour
-    keyPrefix: 'password_reset'
-  },
-
-  // Login attempts
-  login: {
-    maxRequests: 5,
-    windowMs: 900000, // 15 minutes
-    keyPrefix: 'login'
-  },
-
-  // Registration attempts
-  registration: {
-    maxRequests: 3,
-    windowMs: 3600000, // 1 hour
-    keyPrefix: 'registration'
-  },
-
-  // API requests (general)
-  api: {
-    maxRequests: 100,
-    windowMs: 300000, // 5 minutes
-    keyPrefix: 'api'
-  }
-};
-
-// Export singleton instance
-export const clientRateLimiter = ClientRateLimiter.getInstance();
-
-/**
- * Rate limiting decorator for functions
- */
-export function rateLimit(config: RateLimitConfig, keyGenerator?: (...args: any[]) => string) {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
-    const method = descriptor.value;
-
-    descriptor.value = async function (...args: any[]) {
-      const key = keyGenerator ? keyGenerator(...args) : `${target.constructor.name}.${propertyName}`;
-      
-      const result = clientRateLimiter.checkLimit(key, config);
-      if (!result.allowed) {
-        throw new Error(
-          `Rate limit exceeded for ${propertyName}. Try again in ${result.retryAfter} seconds.`
-        );
-      }
-
-      return await method.apply(this, args);
+  /**
+   * Get rate limit info for a specific key
+   */
+  getRateLimitInfo(key: string): RateLimitInfo {
+    const bucket = this.getBucket(key);
+    const now = Date.now();
+    const windowStart = now - this.config.windowMs;
+    
+    // Clean old requests
+    bucket.requests = bucket.requests.filter(req => req.timestamp > windowStart);
+    
+    return {
+      windowMs: this.config.windowMs,
+      maxRequests: this.config.maxRequests,
+      currentRequests: bucket.requests.length,
+      resetTime: new Date(bucket.windowStart + this.config.windowMs),
+      blocked: bucket.requests.length >= this.config.maxRequests
     };
+  }
 
-    return descriptor;
-  };
-}
+  /**
+   * Reset rate limit for a specific key
+   */
+  resetKey(key: string): void {
+    this.buckets.delete(key);
+  }
 
-/**
- * Hook for React components to use rate limiting
- */
-export function useRateLimit(key: string, config: RateLimitConfig) {
-  const checkLimit = () => clientRateLimiter.checkLimit(key, config);
-  
-  const attemptAction = async <T>(action: () => Promise<T>): Promise<T> => {
-    return clientRateLimiter.attemptAction(key, config, action);
-  };
+  /**
+   * Get all current rate limit buckets
+   */
+  getAllBuckets(): Map<string, RateLimitInfo> {
+    const result = new Map<string, RateLimitInfo>();
+    
+    for (const [key, bucket] of this.buckets.entries()) {
+      result.set(key, this.getRateLimitInfo(key));
+    }
+    
+    return result;
+  }
 
-  const getStatus = () => clientRateLimiter.getStatus(key, config.keyPrefix);
-  
-  const clearLimit = () => clientRateLimiter.clearLimit(key, config.keyPrefix);
-
-  return {
-    checkLimit,
-    attemptAction,
-    getStatus,
-    clearLimit
-  };
+  /**
+   * Cleanup resources
+   */
+  destroy(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+    this.buckets.clear();
+  }
 }

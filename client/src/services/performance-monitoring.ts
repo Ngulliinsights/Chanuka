@@ -1,244 +1,829 @@
-import { WebVitalsMetrics } from '../hooks/use-web-vitals';
+/**
+ * Real User Metrics (RUM) Performance Monitoring Service
+ * 
+ * Collects and analyzes real user performance data including:
+ * - Core Web Vitals (LCP, FID, CLS, FCP, TTFB)
+ * - Custom performance metrics
+ * - User experience analytics
+ * - Resource loading performance
+ * - Network conditions monitoring
+ */
 
-export interface PerformanceBudget {
+import { getCLS, getFCP, getFID, getLCP, getTTFB } from 'web-vitals';
+
+interface PerformanceMetric {
   name: string;
-  limit: number;
+  value: number;
+  delta?: number;
+  id: string;
+  navigationType?: string;
+  rating?: 'good' | 'needs-improvement' | 'poor';
+  timestamp: number;
+}
+
+interface CustomMetric {
+  name: string;
+  value: number;
   unit: string;
-  description: string;
+  context?: Record<string, any>;
+  timestamp: number;
 }
 
-export interface PerformanceViolation {
-  budget: PerformanceBudget;
-  actualValue: number;
-  threshold: number;
-  severity: 'warning' | 'error';
+interface UserSession {
+  sessionId: string;
+  userId?: string;
+  startTime: number;
+  pageViews: number;
+  interactions: number;
+  errors: number;
+  deviceInfo: DeviceInfo;
+  networkInfo: NetworkInfo;
 }
 
-export interface PerformanceReport {
-  timestamp: string;
-  metrics: WebVitalsMetrics;
-  violations: PerformanceViolation[];
-  healthScore: number;
-  recommendations: string[];
+interface DeviceInfo {
+  userAgent: string;
+  platform: string;
+  language: string;
+  cookieEnabled: boolean;
+  onLine: boolean;
+  hardwareConcurrency: number;
+  deviceMemory?: number;
+  screen: {
+    width: number;
+    height: number;
+    colorDepth: number;
+  };
 }
 
-export class PerformanceMonitoringService {
-  private budgets: Record<string, PerformanceBudget> = {};
-  private metricsHistory: Array<{ timestamp: string; metrics: WebVitalsMetrics }> = [];
-  private maxHistorySize = 100;
+interface NetworkInfo {
+  effectiveType?: string;
+  downlink?: number;
+  rtt?: number;
+  saveData?: boolean;
+}
+
+interface ResourceTiming {
+  name: string;
+  duration: number;
+  size: number;
+  type: string;
+  cached: boolean;
+  protocol?: string;
+}
+
+class PerformanceMonitoringService {
+  private sessionId: string;
+  private session: UserSession;
+  private metrics: PerformanceMetric[] = [];
+  private customMetrics: CustomMetric[] = [];
+  private resourceTimings: ResourceTiming[] = [];
+  private observers: PerformanceObserver[] = [];
+  private reportingEndpoint = '/api/performance/metrics';
+  private batchSize = 10;
+  private reportingInterval = 30000; // 30 seconds
+  private reportingTimer?: NodeJS.Timeout;
 
   constructor() {
-    this.loadBudgets().catch(error => {
-      console.warn('Failed to initialize performance budgets:', error);
+    this.sessionId = this.generateSessionId();
+    this.session = this.initializeSession();
+    this.setupPerformanceObservers();
+    this.setupWebVitalsCollection();
+    this.setupCustomMetricsCollection();
+    this.startPeriodicReporting();
+    this.setupPageVisibilityHandling();
+  }
+
+  /**
+   * Initialize the performance monitoring service
+   */
+  initialize(config: {
+    reportingEndpoint?: string;
+    batchSize?: number;
+    reportingInterval?: number;
+    userId?: string;
+  } = {}) {
+    this.reportingEndpoint = config.reportingEndpoint || this.reportingEndpoint;
+    this.batchSize = config.batchSize || this.batchSize;
+    this.reportingInterval = config.reportingInterval || this.reportingInterval;
+    
+    if (config.userId) {
+      this.session.userId = config.userId;
+    }
+
+    console.log('📊 Performance monitoring initialized');
+  }
+
+  /**
+   * Generate unique session ID
+   */
+  private generateSessionId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Initialize user session data
+   */
+  private initializeSession(): UserSession {
+    return {
+      sessionId: this.sessionId,
+      startTime: Date.now(),
+      pageViews: 1,
+      interactions: 0,
+      errors: 0,
+      deviceInfo: this.collectDeviceInfo(),
+      networkInfo: this.collectNetworkInfo()
+    };
+  }
+
+  /**
+   * Collect device information
+   */
+  private collectDeviceInfo(): DeviceInfo {
+    const nav = navigator as any;
+    
+    return {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      cookieEnabled: navigator.cookieEnabled,
+      onLine: navigator.onLine,
+      hardwareConcurrency: navigator.hardwareConcurrency || 0,
+      deviceMemory: nav.deviceMemory,
+      screen: {
+        width: screen.width,
+        height: screen.height,
+        colorDepth: screen.colorDepth
+      }
+    };
+  }
+
+  /**
+   * Collect network information
+   */
+  private collectNetworkInfo(): NetworkInfo {
+    const connection = (navigator as any).connection || 
+                     (navigator as any).mozConnection || 
+                     (navigator as any).webkitConnection;
+
+    if (!connection) {
+      return {};
+    }
+
+    return {
+      effectiveType: connection.effectiveType,
+      downlink: connection.downlink,
+      rtt: connection.rtt,
+      saveData: connection.saveData
+    };
+  }
+
+  /**
+   * Set up Web Vitals collection
+   */
+  private setupWebVitalsCollection() {
+    // Largest Contentful Paint
+    getLCP((metric) => {
+      this.recordMetric({
+        name: 'LCP',
+        value: metric.value,
+        delta: metric.delta,
+        id: metric.id,
+        rating: metric.rating,
+        timestamp: Date.now()
+      });
+    });
+
+    // First Input Delay
+    getFID((metric) => {
+      this.recordMetric({
+        name: 'FID',
+        value: metric.value,
+        delta: metric.delta,
+        id: metric.id,
+        rating: metric.rating,
+        timestamp: Date.now()
+      });
+    });
+
+    // Cumulative Layout Shift
+    getCLS((metric) => {
+      this.recordMetric({
+        name: 'CLS',
+        value: metric.value,
+        delta: metric.delta,
+        id: metric.id,
+        rating: metric.rating,
+        timestamp: Date.now()
+      });
+    });
+
+    // First Contentful Paint
+    getFCP((metric) => {
+      this.recordMetric({
+        name: 'FCP',
+        value: metric.value,
+        delta: metric.delta,
+        id: metric.id,
+        rating: metric.rating,
+        timestamp: Date.now()
+      });
+    });
+
+    // Time to First Byte
+    getTTFB((metric) => {
+      this.recordMetric({
+        name: 'TTFB',
+        value: metric.value,
+        delta: metric.delta,
+        id: metric.id,
+        rating: metric.rating,
+        timestamp: Date.now()
+      });
     });
   }
 
-  private async loadBudgets() {
-    // Load budgets from performance-budgets.json
-    try {
-      const response = await fetch('/performance-budgets.json');
-      if (response.ok) {
-        const config = await response.json();
-        const env = process.env.NODE_ENV || 'development';
-        const envBudgets = config.environments[env] || config.environments.development;
-
-        this.budgets = {
-          ...config.budgets.coreWebVitals,
-          ...config.budgets.bundle,
-          ...config.budgets.performance
-        };
+  /**
+   * Set up performance observers for additional metrics
+   */
+  private setupPerformanceObservers() {
+    // Navigation timing
+    this.observePerformanceEntries('navigation', (entries) => {
+      for (const entry of entries as PerformanceNavigationTiming[]) {
+        this.recordNavigationMetrics(entry);
       }
-    } catch (error) {
-      console.warn('Failed to load performance budgets:', error);
-      // Use default budgets
-      this.budgets = {
-        lcp: { name: 'LCP', limit: 2500, unit: 'ms', description: 'Largest Contentful Paint' },
-        fid: { name: 'FID', limit: 100, unit: 'ms', description: 'First Input Delay' },
-        cls: { name: 'CLS', limit: 0.1, unit: 'score', description: 'Cumulative Layout Shift' },
-        fcp: { name: 'FCP', limit: 1800, unit: 'ms', description: 'First Contentful Paint' },
-        ttfb: { name: 'TTFB', limit: 800, unit: 'ms', description: 'Time to First Byte' }
-      };
-    }
-  }
+    });
 
-  recordWebVitals(metrics: WebVitalsMetrics) {
-    const timestamp = new Date().toISOString();
-    this.metricsHistory.push({ timestamp, metrics });
+    // Resource timing
+    this.observePerformanceEntries('resource', (entries) => {
+      for (const entry of entries as PerformanceResourceTiming[]) {
+        this.recordResourceTiming(entry);
+      }
+    });
 
-    // Keep history size manageable
-    if (this.metricsHistory.length > this.maxHistorySize) {
-      this.metricsHistory = this.metricsHistory.slice(-this.maxHistorySize);
-    }
-
-    // Check for violations
-    const violations = this.checkViolations(metrics);
-    if (violations.length > 0) {
-      this.reportViolations(violations);
-    }
-  }
-
-  private checkViolations(metrics: WebVitalsMetrics): PerformanceViolation[] {
-    const violations: PerformanceViolation[] = [];
-
-    Object.entries(metrics).forEach(([key, value]) => {
-      if (value === undefined) return;
-
-      const budget = this.budgets[key];
-      if (!budget) return;
-
-      const threshold = budget.limit;
-      if (value > threshold) {
-        const severity = value > threshold * 1.5 ? 'error' : 'warning';
-        violations.push({
-          budget,
-          actualValue: value,
-          threshold,
-          severity
+    // Long tasks (blocking main thread)
+    this.observePerformanceEntries('longtask', (entries) => {
+      for (const entry of entries) {
+        this.recordCustomMetric({
+          name: 'long_task_duration',
+          value: entry.duration,
+          unit: 'milliseconds',
+          context: {
+            startTime: entry.startTime,
+            name: entry.name
+          },
+          timestamp: Date.now()
         });
       }
     });
 
-    return violations;
-  }
-
-  private reportViolations(violations: PerformanceViolation[]) {
-    violations.forEach(violation => {
-      const level = violation.severity === 'error' ? 'error' : 'warn';
-      console[level](`Performance budget violation: ${violation.budget.name} exceeded ${violation.threshold}${violation.budget.unit} (actual: ${violation.actualValue.toFixed(2)}${violation.budget.unit})`);
+    // Layout shifts
+    this.observePerformanceEntries('layout-shift', (entries) => {
+      for (const entry of entries as any) {
+        if (!entry.hadRecentInput) {
+          this.recordCustomMetric({
+            name: 'layout_shift',
+            value: entry.value,
+            unit: 'score',
+            context: {
+              sources: entry.sources?.map((s: any) => ({
+                node: s.node?.tagName,
+                previousRect: s.previousRect,
+                currentRect: s.currentRect
+              }))
+            },
+            timestamp: Date.now()
+          });
+        }
+      }
     });
 
-    // In production, send to monitoring service
-    if (process.env.NODE_ENV === 'production') {
-      this.sendToMonitoringService(violations);
-    }
+    // Element timing (for custom elements)
+    this.observePerformanceEntries('element', (entries) => {
+      for (const entry of entries) {
+        this.recordCustomMetric({
+          name: 'element_timing',
+          value: entry.startTime,
+          unit: 'milliseconds',
+          context: {
+            identifier: (entry as any).identifier,
+            naturalWidth: (entry as any).naturalWidth,
+            naturalHeight: (entry as any).naturalHeight
+          },
+          timestamp: Date.now()
+        });
+      }
+    });
   }
 
-  private async sendToMonitoringService(violations: PerformanceViolation[]) {
+  /**
+   * Observe specific performance entry types
+   */
+  private observePerformanceEntries(
+    type: string,
+    callback: (entries: PerformanceEntry[]) => void
+  ) {
     try {
-      await fetch('/api/monitoring/performance-violations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          violations,
-          timestamp: new Date().toISOString(),
-          url: window.location.href,
-          userAgent: navigator.userAgent
-        })
+      const observer = new PerformanceObserver((list) => {
+        callback(list.getEntries());
       });
+      
+      observer.observe({ type, buffered: true });
+      this.observers.push(observer);
     } catch (error) {
-      console.warn('Failed to send performance violations to monitoring service:', error);
+      console.warn(`Failed to observe ${type} entries:`, error);
     }
   }
 
-  generateReport(): PerformanceReport {
-    const latestMetrics = this.metricsHistory[this.metricsHistory.length - 1]?.metrics || {};
-    const violations = this.checkViolations(latestMetrics);
-    const healthScore = this.calculateHealthScore(latestMetrics, violations);
+  /**
+   * Record navigation timing metrics
+   */
+  private recordNavigationMetrics(entry: PerformanceNavigationTiming) {
+    const metrics = [
+      { name: 'dns_lookup', value: entry.domainLookupEnd - entry.domainLookupStart },
+      { name: 'tcp_connect', value: entry.connectEnd - entry.connectStart },
+      { name: 'ssl_negotiation', value: entry.connectEnd - entry.secureConnectionStart },
+      { name: 'request_time', value: entry.responseStart - entry.requestStart },
+      { name: 'response_time', value: entry.responseEnd - entry.responseStart },
+      { name: 'dom_processing', value: entry.domComplete - entry.domLoading },
+      { name: 'dom_interactive', value: entry.domInteractive - entry.navigationStart },
+      { name: 'dom_content_loaded', value: entry.domContentLoadedEventEnd - entry.navigationStart },
+      { name: 'load_complete', value: entry.loadEventEnd - entry.navigationStart }
+    ];
 
+    for (const metric of metrics) {
+      if (metric.value > 0) {
+        this.recordCustomMetric({
+          name: metric.name,
+          value: metric.value,
+          unit: 'milliseconds',
+          timestamp: Date.now()
+        });
+      }
+    }
+
+    // Record navigation type
+    this.recordCustomMetric({
+      name: 'navigation_type',
+      value: entry.type,
+      unit: 'enum',
+      context: {
+        redirectCount: entry.redirectCount,
+        transferSize: entry.transferSize,
+        encodedBodySize: entry.encodedBodySize,
+        decodedBodySize: entry.decodedBodySize
+      },
+      timestamp: Date.now()
+    });
+  }
+
+  /**
+   * Record resource timing information
+   */
+  private recordResourceTiming(entry: PerformanceResourceTiming) {
+    const resourceType = this.getResourceType(entry.name);
+    const cached = entry.transferSize === 0 && entry.decodedBodySize > 0;
+
+    const timing: ResourceTiming = {
+      name: entry.name,
+      duration: entry.duration,
+      size: entry.transferSize || entry.decodedBodySize,
+      type: resourceType,
+      cached,
+      protocol: (entry as any).nextHopProtocol
+    };
+
+    this.resourceTimings.push(timing);
+
+    // Record slow resources
+    if (entry.duration > 1000) {
+      this.recordCustomMetric({
+        name: 'slow_resource',
+        value: entry.duration,
+        unit: 'milliseconds',
+        context: {
+          url: entry.name,
+          type: resourceType,
+          size: entry.transferSize,
+          cached
+        },
+        timestamp: Date.now()
+      });
+    }
+
+    // Record large resources
+    if (entry.transferSize > 1024 * 1024) { // > 1MB
+      this.recordCustomMetric({
+        name: 'large_resource',
+        value: entry.transferSize,
+        unit: 'bytes',
+        context: {
+          url: entry.name,
+          type: resourceType,
+          duration: entry.duration
+        },
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  /**
+   * Determine resource type from URL
+   */
+  private getResourceType(url: string): string {
+    if (url.match(/\.(js|mjs)(\?|$)/)) return 'script';
+    if (url.match(/\.css(\?|$)/)) return 'stylesheet';
+    if (url.match(/\.(png|jpg|jpeg|gif|svg|webp)(\?|$)/)) return 'image';
+    if (url.match(/\.(woff|woff2|ttf|otf)(\?|$)/)) return 'font';
+    if (url.match(/\.(mp4|webm|ogg)(\?|$)/)) return 'video';
+    if (url.match(/\.(mp3|wav|ogg)(\?|$)/)) return 'audio';
+    if (url.includes('/api/')) return 'xhr';
+    return 'other';
+  }
+
+  /**
+   * Set up custom metrics collection
+   */
+  private setupCustomMetricsCollection() {
+    // Memory usage monitoring
+    if ('memory' in performance) {
+      setInterval(() => {
+        const memory = (performance as any).memory;
+        this.recordCustomMetric({
+          name: 'memory_used',
+          value: memory.usedJSHeapSize,
+          unit: 'bytes',
+          context: {
+            total: memory.totalJSHeapSize,
+            limit: memory.jsHeapSizeLimit
+          },
+          timestamp: Date.now()
+        });
+      }, 60000); // Every minute
+    }
+
+    // Connection monitoring
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      
+      const recordConnectionMetrics = () => {
+        this.recordCustomMetric({
+          name: 'connection_speed',
+          value: connection.downlink || 0,
+          unit: 'mbps',
+          context: {
+            effectiveType: connection.effectiveType,
+            rtt: connection.rtt,
+            saveData: connection.saveData
+          },
+          timestamp: Date.now()
+        });
+      };
+
+      // Record initial connection
+      recordConnectionMetrics();
+
+      // Monitor connection changes
+      connection.addEventListener('change', recordConnectionMetrics);
+    }
+
+    // Battery monitoring
+    if ('getBattery' in navigator) {
+      (navigator as any).getBattery().then((battery: any) => {
+        const recordBatteryMetrics = () => {
+          this.recordCustomMetric({
+            name: 'battery_level',
+            value: battery.level * 100,
+            unit: 'percentage',
+            context: {
+              charging: battery.charging,
+              chargingTime: battery.chargingTime,
+              dischargingTime: battery.dischargingTime
+            },
+            timestamp: Date.now()
+          });
+        };
+
+        recordBatteryMetrics();
+        battery.addEventListener('levelchange', recordBatteryMetrics);
+        battery.addEventListener('chargingchange', recordBatteryMetrics);
+      });
+    }
+  }
+
+  /**
+   * Record a performance metric
+   */
+  private recordMetric(metric: PerformanceMetric) {
+    this.metrics.push(metric);
+    
+    // Trigger immediate reporting for critical metrics
+    if (metric.rating === 'poor' || metric.value > this.getCriticalThreshold(metric.name)) {
+      this.reportMetrics(true);
+    }
+  }
+
+  /**
+   * Record a custom metric
+   */
+  recordCustomMetric(metric: CustomMetric) {
+    this.customMetrics.push(metric);
+  }
+
+  /**
+   * Get critical threshold for a metric
+   */
+  private getCriticalThreshold(metricName: string): number {
+    const thresholds: Record<string, number> = {
+      'LCP': 4000,    // 4 seconds
+      'FID': 300,     // 300ms
+      'CLS': 0.25,    // 0.25 score
+      'FCP': 3000,    // 3 seconds
+      'TTFB': 1800    // 1.8 seconds
+    };
+    
+    return thresholds[metricName] || Infinity;
+  }
+
+  /**
+   * Track user interactions
+   */
+  trackInteraction(type: string, target?: string, duration?: number) {
+    this.session.interactions++;
+    
+    this.recordCustomMetric({
+      name: 'user_interaction',
+      value: duration || 0,
+      unit: 'milliseconds',
+      context: {
+        type,
+        target,
+        sessionInteractions: this.session.interactions
+      },
+      timestamp: Date.now()
+    });
+  }
+
+  /**
+   * Track page navigation
+   */
+  trackPageView(path: string, referrer?: string) {
+    this.session.pageViews++;
+    
+    this.recordCustomMetric({
+      name: 'page_view',
+      value: Date.now() - this.session.startTime,
+      unit: 'milliseconds',
+      context: {
+        path,
+        referrer,
+        sessionPageViews: this.session.pageViews
+      },
+      timestamp: Date.now()
+    });
+  }
+
+  /**
+   * Track errors
+   */
+  trackError(error: Error, context?: Record<string, any>) {
+    this.session.errors++;
+    
+    this.recordCustomMetric({
+      name: 'error_occurred',
+      value: 1,
+      unit: 'count',
+      context: {
+        message: error.message,
+        stack: error.stack,
+        sessionErrors: this.session.errors,
+        ...context
+      },
+      timestamp: Date.now()
+    });
+  }
+
+  /**
+   * Start periodic reporting
+   */
+  private startPeriodicReporting() {
+    this.reportingTimer = setInterval(() => {
+      this.reportMetrics();
+    }, this.reportingInterval);
+  }
+
+  /**
+   * Set up page visibility handling
+   */
+  private setupPageVisibilityHandling() {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        // Report metrics before page becomes hidden
+        this.reportMetrics(true);
+      }
+    });
+
+    // Report metrics before page unload
+    window.addEventListener('beforeunload', () => {
+      this.reportMetrics(true);
+    });
+  }
+
+  /**
+   * Report metrics to the server
+   */
+  private async reportMetrics(immediate = false) {
+    const hasMetrics = this.metrics.length > 0 || this.customMetrics.length > 0;
+    const shouldReport = immediate || 
+                        this.metrics.length >= this.batchSize || 
+                        this.customMetrics.length >= this.batchSize;
+
+    if (!hasMetrics || !shouldReport) {
+      return;
+    }
+
+    const payload = {
+      sessionId: this.sessionId,
+      session: this.session,
+      metrics: [...this.metrics],
+      customMetrics: [...this.customMetrics],
+      resourceTimings: [...this.resourceTimings],
+      timestamp: Date.now(),
+      url: window.location.href,
+      userAgent: navigator.userAgent
+    };
+
+    try {
+      // Use sendBeacon for reliability during page unload
+      if (immediate && 'sendBeacon' in navigator) {
+        navigator.sendBeacon(
+          this.reportingEndpoint,
+          JSON.stringify(payload)
+        );
+      } else {
+        await fetch(this.reportingEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          keepalive: immediate
+        });
+      }
+
+      // Clear reported metrics
+      this.metrics = [];
+      this.customMetrics = [];
+      this.resourceTimings = [];
+
+      console.log('📊 Performance metrics reported successfully');
+    } catch (error) {
+      console.warn('Failed to report performance metrics:', error);
+    }
+  }
+
+  /**
+   * Get current performance summary
+   */
+  getPerformanceSummary() {
     return {
-      timestamp: new Date().toISOString(),
-      metrics: latestMetrics,
-      violations,
-      healthScore,
-      recommendations: this.generateRecommendations(violations, latestMetrics)
+      session: this.session,
+      metricsCount: this.metrics.length,
+      customMetricsCount: this.customMetrics.length,
+      resourceTimingsCount: this.resourceTimings.length,
+      lastMetrics: this.metrics.slice(-5),
+      lastCustomMetrics: this.customMetrics.slice(-5)
     };
   }
 
-  private calculateHealthScore(metrics: WebVitalsMetrics, violations: PerformanceViolation[]): number {
-    let score = 100;
-
-    // Deduct points for violations
-    violations.forEach(violation => {
-      const deduction = violation.severity === 'error' ? 20 : 10;
-      score -= deduction;
-    });
-
-    // Bonus points for good metrics
-    Object.entries(metrics).forEach(([key, value]) => {
-      if (value === undefined) return;
-
-      const budget = this.budgets[key];
-      if (!budget) return;
-
-      // Award points for metrics well below budget
-      if (value < budget.limit * 0.5) {
-        score += 5;
-      } else if (value < budget.limit * 0.8) {
-        score += 2;
-      }
-    });
-
-    return Math.max(0, Math.min(100, score));
-  }
-
-  private generateRecommendations(violations: PerformanceViolation[], metrics: WebVitalsMetrics): string[] {
-    const recommendations: string[] = [];
-
-    violations.forEach(violation => {
-      switch (violation.budget.name) {
-        case 'LCP':
-          recommendations.push('Optimize Largest Contentful Paint by improving image loading, reducing server response times, and removing render-blocking JavaScript');
-          break;
-        case 'FID':
-          recommendations.push('Improve First Input Delay by reducing JavaScript execution time and breaking up long tasks');
-          break;
-        case 'CLS':
-          recommendations.push('Fix Cumulative Layout Shift by reserving space for dynamic content and avoiding inserting content above existing content');
-          break;
-        case 'FCP':
-          recommendations.push('Speed up First Contentful Paint by optimizing CSS delivery and reducing render-blocking resources');
-          break;
-        case 'TTFB':
-          recommendations.push('Reduce Time to First Byte by optimizing server response times and improving network performance');
-          break;
-      }
-    });
-
-    // General recommendations based on metrics
-    if (metrics.lcp && metrics.lcp > 4000) {
-      recommendations.push('Consider implementing critical resource hints (preload, prefetch) for above-the-fold content');
+  /**
+   * Cleanup observers and timers
+   */
+  cleanup() {
+    // Clear reporting timer
+    if (this.reportingTimer) {
+      clearInterval(this.reportingTimer);
     }
 
-    if (metrics.cls && metrics.cls > 0.25) {
-      recommendations.push('Audit and fix layout shifts caused by web fonts, images without dimensions, or dynamically inserted content');
+    // Disconnect observers
+    for (const observer of this.observers) {
+      observer.disconnect();
     }
 
-    return [...new Set(recommendations)]; // Remove duplicates
-  }
-
-  getMetricsHistory(hours: number = 24): Array<{ timestamp: string; metrics: WebVitalsMetrics }> {
-    const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
-    return this.metricsHistory.filter(entry => new Date(entry.timestamp) > cutoff);
-  }
-
-  getAverageMetrics(hours: number = 24): WebVitalsMetrics {
-    const history = this.getMetricsHistory(hours);
-    if (history.length === 0) return {};
-
-    const sums: Record<string, number> = {};
-    const counts: Record<string, number> = {};
-
-    history.forEach(entry => {
-      Object.entries(entry.metrics).forEach(([key, value]) => {
-        if (value !== undefined) {
-          sums[key] = (sums[key] || 0) + value;
-          counts[key] = (counts[key] || 0) + 1;
-        }
-      });
-    });
-
-    const averages: WebVitalsMetrics = {};
-    Object.keys(sums).forEach(key => {
-      const sum = sums[key];
-      const count = counts[key];
-      if (sum !== undefined && count !== undefined) {
-        averages[key as keyof WebVitalsMetrics] = sum / count;
-      }
-    });
-
-    return averages;
+    // Final metrics report
+    this.reportMetrics(true);
   }
 }
 
-// Singleton instance
+// Create singleton instance
 export const performanceMonitoring = new PerformanceMonitoringService();
+
+// React hook for performance monitoring
+export function usePerformanceMonitoring() {
+  const trackInteraction = (type: string, target?: string, duration?: number) => {
+    performanceMonitoring.trackInteraction(type, target, duration);
+  };
+
+  const trackPageView = (path: string, referrer?: string) => {
+    performanceMonitoring.trackPageView(path, referrer);
+  };
+
+  const trackError = (error: Error, context?: Record<string, any>) => {
+    performanceMonitoring.trackError(error, context);
+  };
+
+  const recordCustomMetric = (metric: CustomMetric) => {
+    performanceMonitoring.recordCustomMetric(metric);
+  };
+
+  return {
+    trackInteraction,
+    trackPageView,
+    trackError,
+    recordCustomMetric,
+    getPerformanceSummary: () => performanceMonitoring.getPerformanceSummary()
+  };
+}
+
+// Performance monitoring utilities
+export const performanceUtils = {
+  /**
+   * Measure function execution time
+   */
+  measureFunction: <T extends (...args: any[]) => any>(
+    fn: T,
+    name: string
+  ): T => {
+    return ((...args: any[]) => {
+      const start = performance.now();
+      const result = fn(...args);
+      const duration = performance.now() - start;
+
+      performanceMonitoring.recordCustomMetric({
+        name: `function_${name}`,
+        value: duration,
+        unit: 'milliseconds',
+        timestamp: Date.now()
+      });
+
+      return result;
+    }) as T;
+  },
+
+  /**
+   * Measure async function execution time
+   */
+  measureAsyncFunction: <T extends (...args: any[]) => Promise<any>>(
+    fn: T,
+    name: string
+  ): T => {
+    return (async (...args: any[]) => {
+      const start = performance.now();
+      const result = await fn(...args);
+      const duration = performance.now() - start;
+
+      performanceMonitoring.recordCustomMetric({
+        name: `async_function_${name}`,
+        value: duration,
+        unit: 'milliseconds',
+        timestamp: Date.now()
+      });
+
+      return result;
+    }) as T;
+  },
+
+  /**
+   * Mark performance milestones
+   */
+  mark: (name: string) => {
+    performance.mark(name);
+    
+    performanceMonitoring.recordCustomMetric({
+      name: `milestone_${name}`,
+      value: performance.now(),
+      unit: 'milliseconds',
+      timestamp: Date.now()
+    });
+  },
+
+  /**
+   * Measure time between marks
+   */
+  measure: (name: string, startMark: string, endMark?: string) => {
+    performance.measure(name, startMark, endMark);
+    
+    const entries = performance.getEntriesByName(name, 'measure');
+    const entry = entries[entries.length - 1];
+    
+    if (entry) {
+      performanceMonitoring.recordCustomMetric({
+        name: `measure_${name}`,
+        value: entry.duration,
+        unit: 'milliseconds',
+        timestamp: Date.now()
+      });
+    }
+  }
+};
+
+export default performanceMonitoring;

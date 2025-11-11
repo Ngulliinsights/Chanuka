@@ -1,133 +1,140 @@
 /**
- * Security Module Index
- * Exports all security-related functionality
+ * Security Infrastructure Implementation
+ * Comprehensive security system for the Chanuka platform
  */
 
-// Core security service
-export { 
-  securityService, 
-  SecurityService,
-  type SecurityConfig,
-  type SecurityStatus
-} from './security-service';
+import { logger } from '../utils/logger';
+import { CSPManager } from './csp-manager';
+import { CSRFProtection } from './csrf-protection';
+import { InputSanitizer } from './input-sanitizer';
+import { RateLimiter } from './rate-limiter';
+import { VulnerabilityScanner } from './vulnerability-scanner';
+import { SecurityMonitor } from './security-monitor';
 
-// CSP management
-export { 
-  cspNonceManager, 
-  CSPNonceManager 
-} from './csp-nonce';
+export interface SecurityConfig {
+  enableCSP: boolean;
+  enableCSRF: boolean;
+  enableRateLimit: boolean;
+  enableVulnerabilityScanning: boolean;
+  enableInputSanitization: boolean;
+  scanInterval: number;
+}
 
-// Input sanitization
-export { 
-  inputSanitizer, 
-  InputSanitizer,
-  ValidationSchemas,
-  schemas,
-  type SanitizationOptions
-} from './input-sanitizer';
+export interface SecuritySystem {
+  csp: CSPManager;
+  csrf: CSRFProtection;
+  sanitizer: InputSanitizer;
+  rateLimiter: RateLimiter;
+  vulnerabilityScanner: VulnerabilityScanner;
+  monitor: SecurityMonitor;
+}
 
-// CSRF protection
-export { 
-  csrfProtection, 
-  CSRFProtection,
-  setupCSRFInterceptor,
-  type CSRFToken
-} from './csrf-protection';
+let securitySystem: SecuritySystem | null = null;
 
-// Rate limiting
-export { 
-  clientRateLimiter, 
-  ClientRateLimiter,
-  RateLimitConfigs,
-  rateLimit,
-  useRateLimit as useRateLimitDecorator,
-  type RateLimitConfig,
-  type RateLimitResult
-} from './rate-limiter';
+/**
+ * Initialize the security infrastructure
+ */
+export async function initializeSecurity(config: SecurityConfig): Promise<SecuritySystem> {
+  try {
+    logger.info('Initializing security infrastructure', { config });
 
-// Vulnerability scanning
-export { 
-  vulnerabilityScanner, 
-  VulnerabilityScanner,
-  type SecurityThreat,
-  type SecurityScanResult
-} from './vulnerability-scanner';
+    // Initialize CSP Manager
+    const csp = new CSPManager({
+      enabled: config.enableCSP,
+      reportUri: '/api/security/csp-report',
+      reportOnly: process.env.NODE_ENV === 'development'
+    });
 
-// React hooks
-export { 
-  useSecurity, 
-  useSecureForm, 
-  useRateLimit,
-  ValidationSchemas as HookValidationSchemas,
-  type UseSecurityOptions,
-  type SecurityHookResult
-} from '../hooks/useSecurity';
+    // Initialize CSRF Protection
+    const csrf = new CSRFProtection({
+      enabled: config.enableCSRF,
+      tokenName: 'chanuka-csrf-token',
+      headerName: 'X-CSRF-Token'
+    });
 
-// Components
-export { SecurityDashboard } from '../components/security/SecurityDashboard';
+    // Initialize Input Sanitizer
+    const sanitizer = new InputSanitizer({
+      enabled: config.enableInputSanitization,
+      allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li'],
+      allowedAttributes: {
+        'a': ['href', 'title'],
+        'img': ['src', 'alt', 'title']
+      }
+    });
 
-// Initialize security service with default configuration
-export const initializeSecurity = (config?: Partial<SecurityConfig>) => {
-  const service = SecurityService.getInstance(config);
-  
-  // Log initialization
-  console.log('🔒 Chanuka Security initialized');
-  
-  return service;
-};
+    // Initialize Rate Limiter
+    const rateLimiter = new RateLimiter({
+      enabled: config.enableRateLimit,
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      maxRequests: 100, // per window
+      skipSuccessfulRequests: false
+    });
 
-// Security utilities
-export const SecurityUtils = {
-  /**
-   * Quick security check for user input
-   */
-  isInputSafe: (input: string): boolean => {
-    const result = inputSanitizer.performSecurityCheck(input);
-    return result.isSafe;
-  },
+    // Initialize Vulnerability Scanner
+    const vulnerabilityScanner = new VulnerabilityScanner({
+      enabled: config.enableVulnerabilityScanning,
+      scanInterval: config.scanInterval,
+      reportEndpoint: '/api/security/vulnerability-report'
+    });
 
-  /**
-   * Sanitize user input quickly
-   */
-  sanitize: (input: string, maxLength = 1000): string => {
-    return inputSanitizer.sanitizeText(input, maxLength);
-  },
+    // Initialize Security Monitor
+    const monitor = new SecurityMonitor({
+      enabled: true,
+      alertThreshold: 5,
+      monitoringInterval: 30000 // 30 seconds
+    });
 
-  /**
-   * Generate secure random string
-   */
-  generateSecureToken: (length = 32): string => {
-    const array = new Uint8Array(length);
-    crypto.getRandomValues(array);
-    return btoa(String.fromCharCode(...array))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-  },
-
-  /**
-   * Check if current environment is secure
-   */
-  isSecureContext: (): boolean => {
-    return window.isSecureContext && location.protocol === 'https:';
-  },
-
-  /**
-   * Get security headers for API requests
-   */
-  getSecurityHeaders: (): Record<string, string> => {
-    return {
-      ...csrfProtection.getHeaders(),
-      'X-Requested-With': 'XMLHttpRequest',
-      'X-Content-Type-Options': 'nosniff'
+    securitySystem = {
+      csp,
+      csrf,
+      sanitizer,
+      rateLimiter,
+      vulnerabilityScanner,
+      monitor
     };
+
+    // Start security services
+    await csp.initialize();
+    await csrf.initialize();
+    await rateLimiter.initialize();
+    await vulnerabilityScanner.initialize();
+    await monitor.initialize();
+
+    logger.info('Security infrastructure initialized successfully');
+    return securitySystem;
+
+  } catch (error) {
+    logger.error('Failed to initialize security infrastructure', error);
+    throw error;
   }
-};
+}
+
+/**
+ * Get the current security system instance
+ */
+export function getSecuritySystem(): SecuritySystem | null {
+  return securitySystem;
+}
+
+/**
+ * Shutdown security system
+ */
+export async function shutdownSecurity(): Promise<void> {
+  if (securitySystem) {
+    await securitySystem.vulnerabilityScanner.shutdown();
+    await securitySystem.monitor.shutdown();
+    securitySystem = null;
+    logger.info('Security infrastructure shut down');
+  }
+}
+
+// Export individual components
+export { CSPManager } from './csp-manager';
+export { CSRFProtection } from './csrf-protection';
+export { InputSanitizer } from './input-sanitizer';
+export { RateLimiter } from './rate-limiter';
+export { VulnerabilityScanner } from './vulnerability-scanner';
+export { SecurityMonitor } from './security-monitor';
 
 // Export types
-export type { SecurityConfig, SecurityStatus } from './security-service';
-export type { SanitizationOptions } from './input-sanitizer';
-export type { CSRFToken } from './csrf-protection';
-export type { RateLimitConfig, RateLimitResult } from './rate-limiter';
-export type { SecurityThreat, SecurityScanResult } from './vulnerability-scanner';
-export type { UseSecurityOptions, SecurityHookResult } from '../hooks/useSecurity';
+export type { SecurityEvent, SecurityAlert, VulnerabilityReport } from './types';
