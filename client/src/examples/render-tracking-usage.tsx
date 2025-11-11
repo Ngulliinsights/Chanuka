@@ -1,12 +1,12 @@
 /**
  * Render Tracking Usage Examples
  *
- * This file demonstrates how to integrate the extended browser-logger
+ * This file demonstrates how to integrate the extended logger
  * render tracking capabilities into React components.
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { logger } from "../utils/browser-logger";
+import { logger } from "../utils/logger";
 import {
   useRenderTracker,
   withRenderTracking,
@@ -262,7 +262,7 @@ function AppLayout() {
 
         <h5>2. Add to WebSocket components:</h5>
         <pre style={{ backgroundColor: "#fff", padding: "10px" }}>
-          {`import { logger } from '../utils/browser-logger';
+          {`import { logger } from '../utils/logger';
 
 function WebSocketClient() {
   useEffect(() => {

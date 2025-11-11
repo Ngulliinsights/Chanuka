@@ -18,7 +18,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { NavigationProvider, useNavigation } from '../NavigationContext';
 import { UserRole } from '@/components/navigation';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Mock localStorage
 const mockLocalStorage = {

@@ -1,6 +1,6 @@
 import { errorHandler } from './unified-error-handler';
 import { initializeErrorReporting } from './error-reporting';
-import { ErrorBoundary } from '../components/error/ErrorBoundary';
+import { ErrorBoundary } from '../components/error-handling/ErrorBoundary';
 import { ErrorFallback } from '../components/error/ErrorFallback';
 import { ErrorModal, useErrorModal } from '../components/error/ErrorModal';
 import { ErrorToast, useErrorToast } from '../components/error/ErrorToast';
@@ -22,6 +22,10 @@ export interface ErrorIntegrationConfig {
 
 /**
  * Initialize the complete error handling system
+ * 
+ * This function sets up the entire error handling infrastructure for your application.
+ * It configures the unified error handler with your preferences, initializes error
+ * reporting if enabled, and logs the configuration for debugging purposes.
  */
 export function initializeErrorHandling(config: ErrorIntegrationConfig = {}): void {
   const defaultConfig = {
@@ -35,10 +39,10 @@ export function initializeErrorHandling(config: ErrorIntegrationConfig = {}): vo
 
   const finalConfig = { ...defaultConfig, ...config };
 
-  // Configure the unified error handler
+  // Configure the unified error handler with merged settings
   errorHandler.configure(finalConfig);
 
-  // Initialize error reporting if enabled
+  // Initialize error reporting if enabled - this sets up external error tracking
   if (finalConfig.enableReporting) {
     initializeErrorReporting();
   }
@@ -51,13 +55,17 @@ export function initializeErrorHandling(config: ErrorIntegrationConfig = {}): vo
 
 /**
  * React hook that provides access to all error handling functionality
+ * 
+ * This hook is your one-stop-shop for error handling in React components.
+ * It gives you access to the error handler methods, UI components, and
+ * convenient functions for showing error modals and toasts.
  */
 export function useErrorHandling() {
   const errorModal = useErrorModal();
   const errorToast = useErrorToast();
 
   return {
-    // Error handler methods
+    // Error handler methods - these allow you to manually handle errors
     handleError: errorHandler.handleError.bind(errorHandler),
     getRecentErrors: errorHandler.getRecentErrors.bind(errorHandler),
     getErrorsByType: errorHandler.getErrorsByType.bind(errorHandler),
@@ -67,19 +75,19 @@ export function useErrorHandling() {
     addErrorListener: errorHandler.addErrorListener.bind(errorHandler),
     removeErrorListener: errorHandler.removeErrorListener.bind(errorHandler),
 
-    // UI components
+    // UI components - React components you can use in your JSX
     ErrorBoundary,
     ErrorFallback,
     ErrorModal,
     ErrorToast,
 
-    // Modal controls
+    // Modal controls - for programmatic control of error modals
     errorModal,
 
-    // Toast controls
+    // Toast controls - for programmatic control of error toasts
     errorToast,
 
-    // Convenience methods
+    // Convenience methods - shortcuts for common operations
     showErrorModal: errorModal.showError,
     hideErrorModal: errorModal.hideError,
     showErrorToast: errorToast.showError,
@@ -88,23 +96,11 @@ export function useErrorHandling() {
 }
 
 /**
- * Higher-order component that wraps a component with error handling
- */
-export function withErrorHandling<P extends object>(
-  Component: React.ComponentType<P>,
-  errorBoundaryProps?: React.ComponentProps<typeof ErrorBoundary>
-) {
-  return function ErrorHandledComponent(props: P) {
-    return (
-      <ErrorBoundary {...errorBoundaryProps}>
-        <Component {...props} />
-      </ErrorBoundary>
-    );
-  };
-}
-
-/**
  * Utility function to create standardized error objects
+ * 
+ * This function provides a consistent way to create and handle errors throughout
+ * your application. It ensures that all errors have the same structure and are
+ * properly processed by the error handler.
  */
 export function createStandardError(
   type: string,
@@ -123,18 +119,17 @@ export function createStandardError(
   });
 }
 
-
-// Re-export commonly used types and utilities
+// Re-export commonly used types and utilities for convenience
 export type { AppError, ErrorType, ErrorSeverity } from './unified-error-handler';
 export { errorHandler } from './unified-error-handler';
 export { errorReporting, reportCustomError } from './error-reporting';
 
-// Export all error UI components
+// Export available error UI components
 export {
   ErrorBoundary,
   ErrorFallback,
   ErrorModal,
-  ErrorToast,
   useErrorModal,
+  ErrorToast,
   useErrorToast,
-} from '../components/error';
+};

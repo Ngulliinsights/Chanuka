@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Progress } from '../ui/progress';
 import { Shield, Download, Trash, Settings, Eye, Share2, Clock, CheckCircle, AlertTriangle, Info, Circle, Mail, Bell, Smartphone } from 'lucide-react';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface PrivacyPreferences {
   dataProcessing: {

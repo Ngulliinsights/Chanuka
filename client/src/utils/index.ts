@@ -12,7 +12,7 @@ export * from './asset-fallback-config';
 export * from './browser-compatibility';
 export * from './browser-compatibility-manager';
 export * from './browser-compatibility-tests';
-export * from './browser-logger';
+export * from './logger';
 
 // Performance
 export * from './performance-optimizer';

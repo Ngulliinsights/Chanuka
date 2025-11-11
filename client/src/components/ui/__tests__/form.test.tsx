@@ -28,7 +28,7 @@ vi.mock('../../../lib/utils', () => ({
   cn: vi.fn((...classes) => classes.filter(Boolean).join(' '))
 }));
 
-vi.mock('../../../utils/browser-logger', () => ({
+vi.mock('../../../utils/logger', () => ({
   logger: {
     error: vi.fn(),
     warn: vi.fn(),

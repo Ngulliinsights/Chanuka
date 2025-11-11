@@ -1,5 +1,5 @@
 import { errorHandler, AppError, ErrorType, ErrorSeverity } from './unified-error-handler';
-import { logger } from './browser-logger';
+import { logger } from './logger';
 
 /**
  * Error Reporting Service
@@ -229,7 +229,7 @@ function shouldReportError(error: AppError): boolean {
   }
 
   // Report network and server errors
-  if (error.type === ErrorType.NETWORK || error.type === ErrorType.SERVER) {
+  if (error.type === ErrorType.NETWORK || error.type === ErrorType.EXTERNAL_SERVICE) {
     return true;
   }
 
@@ -239,7 +239,7 @@ function shouldReportError(error: AppError): boolean {
   }
 
   // Report client errors that are not recoverable (likely bugs)
-  if (error.type === ErrorType.CLIENT && !error.recoverable) {
+  if (error.type === ErrorType.SYSTEM && !error.recoverable) {
     return true;
   }
 

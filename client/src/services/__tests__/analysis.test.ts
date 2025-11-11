@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { analysisService } from '../analysis';
 
 // Mock dependencies
-vi.mock('../utils/browser-logger', () => ({
+vi.mock('../utils/logger', () => ({
   logger: {
     warn: vi.fn(),
     error: vi.fn(),
@@ -74,7 +74,7 @@ describe('AnalysisService', () => {
     });
 
     it('should use fallback data when API fails', async () => {
-      const { logger } = require('../utils/browser-logger');
+      const { logger } = require('../utils/logger');
 
       mockApiService.get.mockResolvedValue({
         success: false,
@@ -274,7 +274,7 @@ describe('AnalysisService', () => {
     });
 
     it('should handle partial failures gracefully', async () => {
-      const { logger } = require('../utils/browser-logger');
+      const { logger } = require('../utils/logger');
 
       const mockAnalysis = {
         id: 'analysis-1',

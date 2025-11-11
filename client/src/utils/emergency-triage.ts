@@ -5,7 +5,7 @@
  * the worst offending components causing infinite renders and race conditions.
  */
 
-import { logger } from './browser-logger';
+import { logger } from './logger';
 
 export interface ComponentError {
   component: string;

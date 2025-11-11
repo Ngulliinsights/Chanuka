@@ -4,10 +4,10 @@ import {
   performanceMonitor,
   initPerformanceMonitoring,
 } from '../performance-monitor';
-import { logger } from '../browser-logger';
+import { logger } from '../logger';
 
 // Mock logger
-vi.mock('../browser-logger', () => ({
+vi.mock('../logger', () => ({
   logger: {
     warn: vi.fn(),
     info: vi.fn(),

@@ -17,7 +17,7 @@ import {
 } from "../ui/select";
 import { Bell, Network, Settings, Clock, AlertCircle,  } from 'lucide-react';
 import { toast } from "sonner";
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface RealTimeBillTrackerProps { bill_id?: number;
   userToken?: string;

@@ -8,7 +8,7 @@ import { z } from "zod"
 
 import { cn } from '../../lib/utils'
 import { Label } from './label'
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 import { FormValidationConfig } from './types';
 import { validateFormData, safeValidateFormData, FormValidationConfigSchema } from './validation';
 import { UIFormError } from './errors';

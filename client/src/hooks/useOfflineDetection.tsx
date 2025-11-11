@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 export interface ConnectionQuality {
   type: 'offline' | 'slow' | 'fast' | 'unknown';

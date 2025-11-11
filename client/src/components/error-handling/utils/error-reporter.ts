@@ -4,7 +4,7 @@
  */
 
 import { BaseError, ErrorSeverity, ErrorDomain } from '../../../shared/errors';
-import { logger } from '../../../utils/browser-logger';
+import { logger } from '../../../utils/logger';
 
 export interface RecoveryStrategy {
   name: string;

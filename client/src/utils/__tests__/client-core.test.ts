@@ -4,13 +4,13 @@ import {
   BaseError,
   ValidationError,
   performanceMonitor,
-} from '../client-core';
+} from '../logger';
 
 // Mock console methods
-const consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
-const consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+const consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => { });
+const consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => { });
+const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
+const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
 // Mock performance API
 const mockMark = vi.fn();
@@ -261,7 +261,7 @@ describe('Client Core', () => {
         { field: 'test', value: 'invalid' }
       );
 
-      const json = complexError.toJSON();
+      const json = complexError.toJSON() as import('../logger').BaseErrorJSON;
 
       expect(json.code).toBe('COMPLEX_ERROR');
       expect(json.details).toEqual({ field: 'test', value: 'invalid' });

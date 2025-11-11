@@ -9,6 +9,15 @@
 
 import React from 'react';
 
+// Civic Color Constants (HSL values matching CSS custom properties)
+export const civicColors = {
+  urgent: '0 84% 60%',
+  constitutional: '45 93% 47%',
+  expert: '217 91% 60%',
+  community: '142 76% 36%',
+  transparency: '262 83% 58%',
+} as const;
+
 // Breakpoint definitions following mobile-first approach
 export const breakpoints = {
   // Mobile devices (default, no prefix needed)

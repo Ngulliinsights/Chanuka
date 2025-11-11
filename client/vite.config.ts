@@ -5,23 +5,22 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import type { Plugin } from 'vite'
 import type { MinifyOptions } from 'terser'
-// import type { PreRenderedAsset } from 'rollup'
 
-// cSpell:words treemap Deoptimization
-// https://vitejs.dev/config/
+// Vite configuration for a React application with optimized builds
+// This configuration provides separate optimizations for development and production
 export default defineConfig(({ mode }) => {
-  // Load environment variables based on the current mode
   const env = loadEnv(mode, process.cwd(), '')
   const isProduction = mode === 'production'
   const isDevelopment = mode === 'development'
 
   return {
+    // ============================================================================
+    // PLUGINS - Extend Vite's functionality with various build-time tools
+    // ============================================================================
     plugins: [
-      // React plugin with optimized settings for each environment
-      // Fast refresh is enabled by default in development
+      // React plugin handles JSX transformation and Fast Refresh in development
+      // In production, we strip prop-types to reduce bundle size since they're only useful in development
       react(
-        // Only include babel configuration in production builds
-        // This removes prop-types in production for smaller bundle size
         isProduction ? {
           babel: {
             plugins: [
@@ -31,27 +30,36 @@ export default defineConfig(({ mode }) => {
         } : {}
       ),
       
-      // Bundle analyzer - only include when explicitly requested
-      // Set ANALYZE=true to generate a visual bundle analysis
-      ...(env.ANALYZE ? [visualizer({
+      // Bundle analyzer generates a visual representation of your bundle composition
+      // Enable with ANALYZE=true environment variable or analyze mode
+      // This helps identify optimization opportunities like large dependencies
+      ...(env.ANALYZE || mode === 'analyze' ? [visualizer({
         filename: 'dist/bundle-analysis.html',
-        open: env.ANALYZE_OPEN === 'true',
+        open: env.ANALYZE_OPEN === 'true' || mode === 'analyze',
         gzipSize: true,
         brotliSize: true,
-        // Template options: treemap (hierarchical boxes), sunburst (circular), network (graph)
-        template: 'treemap',
-        // Add summary statistics for better insights
+        template: 'treemap', // Hierarchical view of bundle contents
         sourcemap: true,
+        // Enhanced analysis options
+        projectRoot: process.cwd(),
+        title: 'Chanuka Platform Bundle Analysis',
+        exclude: [
+          {
+            file: /node_modules/,
+            size: 1024 * 10 // Exclude small node_modules files
+          }
+        ]
       }) as Plugin] : []),
 
-      // Compression plugin for better bundle size
-      // Enables Brotli and Gzip compression for production builds
+      // Compression plugins create pre-compressed versions of your assets
+      // Modern CDNs and web servers can serve these directly, reducing transfer time
+      // Brotli typically achieves 15-20% better compression than Gzip
       ...(isProduction ? [
         viteCompression({
           algorithm: 'brotliCompress',
           ext: '.br',
-          threshold: 1024, // Only compress files larger than 1KB
-          deleteOriginFile: false, // Keep original files for fallback
+          threshold: 1024, // Only compress files larger than 1KB to avoid overhead
+          deleteOriginFile: false, // Keep originals for compatibility fallback
         }),
         viteCompression({
           algorithm: 'gzip',
@@ -60,116 +68,135 @@ export default defineConfig(({ mode }) => {
           deleteOriginFile: false,
         })
       ] : []),
-
-      // Bundle analysis plugin for automated monitoring
-      // This plugin integrates with the build process to track bundle sizes
-      // Note: Plugin is available via scripts/bundle-analysis-plugin.js
-      // Enable with ANALYZE=true environment variable
     ],
 
-    // CSS configuration with PostCSS integration
+    // ============================================================================
+    // CSS CONFIGURATION - Control how stylesheets are processed
+    // ============================================================================
     css: {
-      // Enable source maps in development for easier debugging
+      // Source maps in development help you find the original source of CSS rules
+      // This makes debugging styled components much easier
       devSourcemap: isDevelopment,
-      // Use the client directory's postcss.config.js
       postcss: path.resolve(__dirname, '.'),
     },
     
+    // ============================================================================
+    // MODULE RESOLUTION - Configure how imports are resolved
+    // ============================================================================
     resolve: {
+      // Path aliases let you use cleaner imports like '@/components' instead of '../../../components'
       alias: {
         '@': path.resolve(__dirname, './src'),
         '@chanuka/shared': path.resolve(__dirname, '../shared'),
       },
-      // Explicitly define extensions to speed up resolution
-      // Order matters: more common extensions first for faster lookups
+      // Extension resolution order affects lookup speed
+      // More common extensions first means fewer failed lookups
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
     },
 
+    // ============================================================================
+    // DEVELOPMENT SERVER - Configuration for local development
+    // ============================================================================
     server: {
       port: 5173,
-      host: true,
-      // Improve CORS handling with specific allowed origins
+      host: true, // Listen on all addresses for network access
+      
+      // CORS settings control which origins can make requests to your dev server
+      // Wide open in development for ease of use, locked down in production
       cors: {
         origin: isDevelopment ? '*' : false,
         credentials: true,
       },
-      // More restrictive CSP for development security
+      
+      // Content Security Policy helps prevent XSS attacks
+      // Development needs looser policies for hot module replacement
       headers: {
         'Content-Security-Policy': isDevelopment 
           ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss: http://localhost:* https://localhost:*;"
           : "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self';",
       },
+      
+      // Hot Module Replacement keeps your app state while updating code
       hmr: {
-        // Use the host from server config for better compatibility
-        overlay: true, // Show errors in browser overlay
+        overlay: true, // Show compilation errors as an overlay in the browser
       },
-      // Watch configuration optimized for different environments
+      
+      // File watching configuration for detecting changes
       watch: {
-        // Only use polling if you're in a containerized environment
+        // Polling checks files periodically instead of using filesystem events
+        // Only needed in containers or network drives where events don't work
         usePolling: process.env.USE_POLLING === 'true',
-        // Ignore unnecessary directories to improve performance
         ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**'],
       },
     },
 
-    // Define global constants with better organization
+    // ============================================================================
+    // GLOBAL CONSTANTS - Values replaced at build time
+    // ============================================================================
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
-      // Provide minimal process shims for browser compatibility
+      // Minimal process shims for libraries expecting Node.js environment
       'process.env': JSON.stringify({}),
       'process.versions': JSON.stringify({}),
       'process.platform': JSON.stringify('browser'),
-      // Add build timestamp for cache busting and debugging
+      // Build timestamp useful for cache busting and debugging production issues
       '__BUILD_TIME__': JSON.stringify(new Date().toISOString()),
     },
 
+    // ============================================================================
+    // BUILD CONFIGURATION - Production build settings
+    // ============================================================================
     build: {
       outDir: 'dist',
-      // Enable CSS code splitting for better caching
-      // Each component's CSS can be loaded only when needed
+      
+      // CSS code splitting allows each route to load only its required styles
+      // This improves initial load time by deferring non-critical CSS
       cssCodeSplit: true,
-      // Generate source maps in development and for production debugging
-      // 'hidden' means source maps exist but aren't referenced in the bundle
+      
+      // Source maps help debug production issues
+      // 'hidden' creates maps but doesn't reference them in bundles for security
       sourcemap: isDevelopment ? true : 'hidden',
 
-      // Bundle size budgets - fail build if exceeded
       rollupOptions: {
         output: {
-          // Optimized chunk splitting strategy
-          // Reduces the number of chunks while maintaining good caching
+          // Manual chunk splitting is the most important optimization for load performance
+          // Good chunking strategy balances parallel loading with caching efficiency
           manualChunks: (id: string) => {
-            // Core vendor libraries (loaded on every page)
             if (id.includes('node_modules')) {
-              // React ecosystem - critical for all pages
+              // React core is used everywhere, so it gets its own chunk
+              // This chunk is highly cacheable since React updates infrequently
               if (id.includes('react') || id.includes('react-dom')) {
                 return 'react-core'
               }
               
-              // UI and styling libraries - used frequently
+              // UI libraries are grouped together because they're often used together
+              // Keeping related dependencies together reduces the number of requests
               if (id.includes('@radix-ui') || id.includes('lucide-react') || 
                   id.includes('clsx') || id.includes('tailwind-merge') ||
                   id.includes('class-variance-authority')) {
                 return 'ui-core'
               }
               
-              // Data and forms - used on most interactive pages
+              // Data fetching and form libraries power interactive features
+              // Grouping them means they load together when needed
               if (id.includes('@tanstack/react-query') || id.includes('axios') ||
                   id.includes('react-hook-form') || id.includes('zod')) {
                 return 'data-forms'
               }
               
-              // Heavy/specialized libraries - lazy loaded
+              // Heavy libraries are isolated so they can be lazy loaded
+              // This prevents them from blocking initial page render
               if (id.includes('recharts') || id.includes('date-fns')) {
                 return 'heavy-libs'
               }
               
-              // All other vendor code
+              // Catch-all for remaining vendor code
               return 'vendor'
             }
 
-            // Application code splitting
+            // Application code splitting by feature improves code organization
             if (id.includes('src/')) {
-              // Core app infrastructure
+              // Core infrastructure is needed everywhere, so load it upfront
               if (id.includes('src/components/layout') || 
                   id.includes('src/components/navigation') ||
                   id.includes('src/hooks/use-') ||
@@ -178,7 +205,8 @@ export default defineConfig(({ mode }) => {
                 return 'app-core'
               }
               
-              // Feature-specific code (lazy loaded)
+              // Feature-specific code gets its own chunk per feature
+              // This enables route-based code splitting for optimal loading
               if (id.includes('src/pages/') || 
                   id.includes('src/features/') ||
                   id.includes('src/components/bills/') ||
@@ -193,143 +221,149 @@ export default defineConfig(({ mode }) => {
                 return 'features'
               }
               
-              // Mobile-specific components
+              // Mobile-specific code can be lazy loaded on mobile devices only
               if (id.includes('src/components/mobile/')) {
                 return 'mobile'
               }
               
-              // Everything else goes to main app chunk
               return 'app'
             }
-
-            return undefined
           },
 
-          // Organized file naming strategy
-          // Hash ensures cache busting when content changes
+          // Hash-based filenames ensure browsers never serve stale cached files
+          // When content changes, the hash changes, forcing a fresh download
           chunkFileNames: 'assets/js/[name]-[hash].js',
           entryFileNames: 'assets/js/[name]-[hash].js',
 
-          // Smart asset organization based on file type
+          // Organized asset structure makes debugging and deployment easier
+          // Different asset types go to different folders for clarity
           assetFileNames: (assetInfo: any) => {
             const name = assetInfo.name || ''
 
-            // Image assets with organized subfolder structure
             if (/\.(png|jpe?g|svg|gif|webp|avif|tiff|bmp|ico)$/i.test(name)) {
               return 'assets/images/[name]-[hash][extname]'
             }
 
-            // Font files in dedicated folder
             if (/\.(woff2?|eot|ttf|otf)$/i.test(name)) {
               return 'assets/fonts/[name]-[hash][extname]'
             }
 
-            // CSS files in dedicated folder
             if (/\.css$/i.test(name)) {
               return 'assets/css/[name]-[hash][extname]'
             }
 
-            // JSON and other data files
             if (/\.json$/i.test(name)) {
               return 'assets/data/[name]-[hash][extname]'
             }
 
-            // Default fallback for any other asset type
             return 'assets/misc/[name]-[hash][extname]'
           },
         },
 
-        // Tree-shaking optimization to remove unused code
-        // These settings ensure aggressive dead code elimination
+        // Tree-shaking removes unused code from your final bundle
+        // These aggressive settings maximize dead code elimination
         treeshake: {
-          // Don't assume external modules have side effects
+          // Don't assume external packages have side effects unless specified
+          // This allows more aggressive optimization of library code
           moduleSideEffects: 'no-external',
-          // Property reads don't cause side effects
+          // Reading properties doesn't cause side effects in most cases
+          // This enables removal of unused property accesses
           propertyReadSideEffects: false,
-          // Don't disable optimization for try-catch blocks
+          // Don't disable optimizations around try-catch blocks
+          // Modern bundlers can handle these safely
           tryCatchDeoptimization: false,
         },
 
+        // Warning filtering keeps your build output clean and actionable
         onwarn(warning, warn) {
-          // Suppress certain warnings that are not actionable
-          if (warning.code === 'CIRCULAR_DEPENDENCY') return;
-          if (warning.code === 'THIS_IS_UNDEFINED') return;
-          warn(warning);
+          // Circular dependencies are common in React apps and usually harmless
+          if (warning.code === 'CIRCULAR_DEPENDENCY') return
+          // This warning appears with some libraries but doesn't affect functionality
+          if (warning.code === 'THIS_IS_UNDEFINED') return
+          warn(warning)
         }
       },
 
-      // Strict bundle size budgets - fail build if exceeded
-      chunkSizeWarningLimit: 500, // 500KB - reduced to enforce better code splitting
+      // Chunk size limit enforces discipline around bundle size
+      // If exceeded, you need to improve code splitting or remove dependencies
+      chunkSizeWarningLimit: 500, // 500KB per chunk
       
-      // Production minification with optimized settings
+      // Terser minification produces smaller bundles than esbuild
+      // The tradeoff is slightly slower builds, but worth it for production
       minify: isProduction ? 'terser' : false,
-      // Only set terserOptions when minify is 'terser' to satisfy TypeScript
+      
       ...(isProduction ? {
         terserOptions: {
           compress: {
-            // Remove console statements in production for cleaner code
+            // Removing console statements prevents debug code from reaching users
+            // Keep console.error for production error monitoring
             drop_console: true,
             drop_debugger: true,
-            // Remove specific console methods while keeping errors
             pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace'],
-            // Additional compression optimizations
-            passes: 2, // Run compression twice for better results
-            unsafe_arrows: true, // Convert functions to arrow functions when safe
+            // Multiple compression passes find more optimization opportunities
+            passes: 2,
+            // These unsafe optimizations work in modern browsers
+            unsafe_arrows: true, // Convert functions to arrow functions
             unsafe_methods: true, // Optimize method calls
           },
           mangle: {
-            safari10: true, // Fix Safari 10+ issues with variable naming
+            // Safari 10+ has specific requirements for variable naming
+            safari10: true,
           },
           format: {
-            comments: false, // Remove all comments
-            // Preserve important license comments
-            preserve_annotations: true,
+            comments: false, // Remove all comments to reduce file size
+            preserve_annotations: true, // Keep important annotations like licenses
           },
         } as MinifyOptions,
       } : {}),
       
-      // Smart asset inlining threshold
-      // Files smaller than this will be inlined as base64 to reduce HTTP requests
-      assetsInlineLimit: 4096, // 4KB
+      // Files smaller than 4KB are inlined as base64 data URLs
+      // This reduces HTTP requests at the cost of slightly larger HTML
+      // The tradeoff is worth it for small assets like icons
+      assetsInlineLimit: 4096,
       
-      // Enable reporting for build analysis
-      // Shows compressed sizes to help optimize bundle size
+      // Reporting compressed sizes helps track bundle size over time
+      // This is the size users actually download, not the raw file size
       reportCompressedSize: isProduction,
       
-      // Target modern browsers for smaller bundle size
-      // ES2020 is supported by all modern browsers
+      // ES2020 target works in all browsers from the last few years
+      // Targeting modern browsers allows smaller, faster code
       target: 'es2020',
       
-      // Optimize CSS handling in production
+      // CSS minification removes whitespace and optimizes selectors
       cssMinify: isProduction,
     },
 
-    // Optimize dependency pre-bundling for faster dev server startup
+    // ============================================================================
+    // DEPENDENCY OPTIMIZATION - Speed up development server startup
+    // ============================================================================
     optimizeDeps: {
-      // Include dependencies that should be pre-bundled
-      // Pre-bundling converts CommonJS modules to ESM for faster loading
+      // Pre-bundling converts CommonJS dependencies to ESM modules
+      // This makes them load much faster in the browser during development
       include: [
         'react',
         'react-dom',
         'react/jsx-runtime',
       ],
-      // Exclude dependencies that shouldn't be pre-bundled
-      // Add any problematic dependencies here
       exclude: [],
-      // Force optimization even if already cached
-      // Useful when dependencies change but cache isn't invalidated
+      // Force re-optimization when dependencies change but cache seems stale
       force: env.FORCE_OPTIMIZE === 'true',
     },
 
-    // Preview server configuration (for testing production builds locally)
+    // ============================================================================
+    // PREVIEW SERVER - For testing production builds locally
+    // ============================================================================
     preview: {
       port: 4173,
       host: true,
       cors: true,
     },
 
-    // Logging configuration
-    // Info level in development for debugging, warn level in production
+    // ============================================================================
+    // LOGGING - Control build output verbosity
+    // ============================================================================
+    // Info level in development helps with debugging
+    // Warn level in production keeps CI logs clean
     logLevel: isDevelopment ? 'info' : 'warn',
   }
 })

@@ -3,14 +3,20 @@ export interface RecoveryResult {
   success: boolean;
   message?: string;
   suggestions?: string[];
+  shouldRetry?: boolean;
 }
 
-export const attemptUIRecovery = async (error: Error): Promise<RecoveryResult> => {
+export const attemptUIRecovery = async (
+  component: string,
+  error: Error,
+  retryCount: number
+): Promise<RecoveryResult> => {
   // Mock recovery implementation
   return {
     success: true,
     message: 'Recovery successful',
-    suggestions: ['Try again', 'Check your input']
+    suggestions: ['Try again', 'Check your input'],
+    shouldRetry: retryCount < 3 // Allow up to 3 retries
   };
 };
 

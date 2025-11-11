@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { Progress } from './progress';
 import { Badge } from './badge';
 import { cn } from '../../lib/utils';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 import { UIComponentError } from './errors';
 import { attemptUIRecovery } from './recovery';
 

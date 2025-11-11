@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { MonitoringDashboard } from '../monitoring/monitoring-dashboard';
 import AuthenticatedAPI from '../../utils/authenticated-api';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {

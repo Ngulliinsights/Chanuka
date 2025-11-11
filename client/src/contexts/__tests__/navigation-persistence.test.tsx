@@ -6,7 +6,7 @@ import { NavigationProvider, useNavigation } from '../NavigationContext';
 import { useNavigation } from '../../core/navigation/context';
 import { NavigationStatePersistence } from '../../utils/navigation/state-persistence';
 // Note: AuthProvider moved to components/auth
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Mock the auth hook
 vi.mock('@/hooks/use-auth', () => ({

@@ -7,7 +7,7 @@ import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { ChevronUp, ChevronDown, CheckCircle, Clock, DollarSign, Users, AlertCircle, Loader2 } from 'lucide-react';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Type definitions with improved specificity
 type Priority = 'low' | 'medium' | 'high' | 'critical';

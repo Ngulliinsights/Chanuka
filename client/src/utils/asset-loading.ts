@@ -1,4 +1,4 @@
-import { logger } from './browser-logger';
+import { logger } from './logger';
 import type { OfflineDetectionState } from '../hooks/useOfflineDetection';
 import {
   DEFAULT_ASSET_FALLBACKS,

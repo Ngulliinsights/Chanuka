@@ -2,7 +2,7 @@ import React from 'react';
 import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAssetLoading, LoadingProgress } from '../../utils/asset-loading';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 import { AssetLoadingIndicatorProps as TypesAssetLoadingIndicatorProps } from './types';
 import { 
   validateLoadingProgress, 

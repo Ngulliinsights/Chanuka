@@ -1,0 +1,367 @@
+/**
+ * Error Analytics Slice for Redux State Management
+ *
+ * Manages state for the Error Analytics Dashboard, including metrics,
+ * filters, real-time data, and UI state.
+ */
+
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+
+// Import types
+interface TimeRange {
+  start: number;
+  end: number;
+  preset?: '1h' | '24h' | '7d' | '30d' | '90d' | 'custom';
+}
+
+interface DashboardFilters {
+  timeRange: TimeRange;
+  severity: string[];
+  domain: string[];
+  component: string[];
+  userId?: string;
+  sessionId?: string;
+}
+
+interface ErrorOverviewMetrics {
+  totalErrors: number;
+  errorRate: number;
+  uniqueErrors: number;
+  affectedUsers: number;
+  averageResolutionTime: number;
+  severityDistribution: Record<string, number>;
+  domainDistribution: Record<string, number>;
+  timeRange: TimeRange;
+  lastUpdated: number;
+}
+
+interface ErrorTrendData {
+  timeSeries: any[];
+  growthRate: number;
+  seasonality: any;
+  anomalies: any[];
+  projections: any;
+  period: string;
+}
+
+interface ErrorPattern {
+  id: string;
+  name: string;
+  description: string;
+  frequency: number;
+  firstSeen: number;
+  lastSeen: number;
+  affectedUsers: number;
+  severity: string;
+  domain: string;
+  cluster: any;
+  impact: any;
+  recommendations: string[];
+}
+
+interface RecoveryAnalytics {
+  overallSuccessRate: number;
+  strategyEffectiveness: any[];
+  recoveryTimeDistribution: any;
+  failureAnalysis: any[];
+  automatedRecoveryRate: number;
+  manualInterventionRate: number;
+}
+
+interface RealTimeMetrics {
+  currentErrorRate: number;
+  activeAlerts: any[];
+  liveStream: any[];
+  systemHealth: any;
+  performanceMetrics: any;
+}
+
+interface ErrorAnalyticsState {
+  // Data states
+  overviewMetrics: ErrorOverviewMetrics | null;
+  trendData: ErrorTrendData | null;
+  patterns: ErrorPattern[];
+  recoveryAnalytics: RecoveryAnalytics | null;
+  realTimeMetrics: RealTimeMetrics | null;
+
+  // UI states
+  filters: DashboardFilters;
+  activeTab: 'overview' | 'trends' | 'patterns' | 'recovery' | 'realtime';
+  isLoading: boolean;
+  lastRefresh: number;
+  error: string | null;
+
+  // Real-time states
+  isRealTimeEnabled: boolean;
+  connectionStatus: 'connected' | 'connecting' | 'disconnected' | 'error';
+  reconnectAttempts: number;
+}
+
+// Initial state
+const initialFilters: DashboardFilters = {
+  timeRange: { start: Date.now() - 24 * 60 * 60 * 1000, end: Date.now(), preset: '24h' },
+  severity: [],
+  domain: [],
+  component: [],
+};
+
+const initialState: ErrorAnalyticsState = {
+  overviewMetrics: null,
+  trendData: null,
+  patterns: [],
+  recoveryAnalytics: null,
+  realTimeMetrics: null,
+  filters: initialFilters,
+  activeTab: 'overview',
+  isLoading: false,
+  lastRefresh: Date.now(),
+  error: null,
+  isRealTimeEnabled: true,
+  connectionStatus: 'disconnected',
+  reconnectAttempts: 0,
+};
+
+// Async thunks for data fetching
+export const fetchOverviewMetrics = createAsyncThunk(
+  'errorAnalytics/fetchOverviewMetrics',
+  async (filters: DashboardFilters) => {
+    // Import the bridge service dynamically to avoid circular dependencies
+    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
+    return await errorAnalyticsBridge.getOverviewMetrics(filters);
+  }
+);
+
+export const fetchTrendData = createAsyncThunk(
+  'errorAnalytics/fetchTrendData',
+  async ({ period, filters }: { period: string; filters: DashboardFilters }) => {
+    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
+    return await errorAnalyticsBridge.getTrendData(period, filters);
+  }
+);
+
+export const fetchPatterns = createAsyncThunk(
+  'errorAnalytics/fetchPatterns',
+  async (filters: DashboardFilters) => {
+    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
+    return await errorAnalyticsBridge.getPatterns(filters);
+  }
+);
+
+export const fetchRecoveryAnalytics = createAsyncThunk(
+  'errorAnalytics/fetchRecoveryAnalytics',
+  async (filters: DashboardFilters) => {
+    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
+    return await errorAnalyticsBridge.getRecoveryAnalytics(filters);
+  }
+);
+
+export const fetchRealTimeMetrics = createAsyncThunk(
+  'errorAnalytics/fetchRealTimeMetrics',
+  async () => {
+    const { errorAnalyticsBridge } = await import('../../services/errorAnalyticsBridge');
+    return await errorAnalyticsBridge.getRealTimeMetrics();
+  }
+);
+
+// Slice definition
+const errorAnalyticsSlice = createSlice({
+  name: 'errorAnalytics',
+  initialState,
+  reducers: {
+    // Filter management
+    updateFilters: (state, action: PayloadAction<Partial<DashboardFilters>>) => {
+      state.filters = { ...state.filters, ...action.payload };
+    },
+
+    resetFilters: (state) => {
+      state.filters = initialFilters;
+    },
+
+    // UI state management
+    setActiveTab: (state, action: PayloadAction<ErrorAnalyticsState['activeTab']>) => {
+      state.activeTab = action.payload;
+    },
+
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
+    },
+
+    // Real-time state management
+    setRealTimeEnabled: (state, action: PayloadAction<boolean>) => {
+      state.isRealTimeEnabled = action.payload;
+    },
+
+    updateConnectionStatus: (state, action: PayloadAction<ErrorAnalyticsState['connectionStatus']>) => {
+      state.connectionStatus = action.payload;
+    },
+
+    incrementReconnectAttempts: (state) => {
+      state.reconnectAttempts += 1;
+    },
+
+    resetReconnectAttempts: (state) => {
+      state.reconnectAttempts = 0;
+    },
+
+    // Data updates
+    updateRealTimeMetrics: (state, action: PayloadAction<Partial<RealTimeMetrics>>) => {
+      if (state.realTimeMetrics) {
+        state.realTimeMetrics = { ...state.realTimeMetrics, ...action.payload };
+      } else {
+        state.realTimeMetrics = action.payload as RealTimeMetrics;
+      }
+      state.lastRefresh = Date.now();
+    },
+
+    addRealTimeError: (state, action: PayloadAction<any>) => {
+      if (state.realTimeMetrics) {
+        // Add to live stream, keeping only last 20
+        state.realTimeMetrics.liveStream = [
+          action.payload,
+          ...state.realTimeMetrics.liveStream.slice(0, 19)
+        ];
+
+        // Update error rate (simple calculation)
+        const recentErrors = state.realTimeMetrics.liveStream.slice(0, 10);
+        state.realTimeMetrics.currentErrorRate = recentErrors.length / 5; // per minute over last 5 minutes
+      }
+    },
+
+    addRealTimeAlert: (state, action: PayloadAction<any>) => {
+      if (state.realTimeMetrics) {
+        state.realTimeMetrics.activeAlerts = [
+          action.payload,
+          ...state.realTimeMetrics.activeAlerts.filter(alert => alert.id !== action.payload.id)
+        ].slice(0, 10); // Keep only last 10 alerts
+      }
+    },
+
+    // Refresh all data
+    refreshData: (state) => {
+      state.lastRefresh = Date.now();
+    },
+
+    // Clear all data
+    clearData: (state) => {
+      state.overviewMetrics = null;
+      state.trendData = null;
+      state.patterns = [];
+      state.recoveryAnalytics = null;
+      state.realTimeMetrics = null;
+      state.lastRefresh = Date.now();
+    },
+  },
+  extraReducers: (builder) => {
+    // Overview metrics
+    builder
+      .addCase(fetchOverviewMetrics.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchOverviewMetrics.fulfilled, (state, action) => {
+        state.overviewMetrics = action.payload;
+        state.isLoading = false;
+        state.lastRefresh = Date.now();
+      })
+      .addCase(fetchOverviewMetrics.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to fetch overview metrics';
+      })
+
+      // Trend data
+      .addCase(fetchTrendData.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchTrendData.fulfilled, (state, action) => {
+        state.trendData = action.payload;
+        state.isLoading = false;
+        state.lastRefresh = Date.now();
+      })
+      .addCase(fetchTrendData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to fetch trend data';
+      })
+
+      // Patterns
+      .addCase(fetchPatterns.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPatterns.fulfilled, (state, action) => {
+        state.patterns = action.payload;
+        state.isLoading = false;
+        state.lastRefresh = Date.now();
+      })
+      .addCase(fetchPatterns.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to fetch patterns';
+      })
+
+      // Recovery analytics
+      .addCase(fetchRecoveryAnalytics.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchRecoveryAnalytics.fulfilled, (state, action) => {
+        state.recoveryAnalytics = action.payload;
+        state.isLoading = false;
+        state.lastRefresh = Date.now();
+      })
+      .addCase(fetchRecoveryAnalytics.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to fetch recovery analytics';
+      })
+
+      // Real-time metrics
+      .addCase(fetchRealTimeMetrics.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(fetchRealTimeMetrics.fulfilled, (state, action) => {
+        state.realTimeMetrics = action.payload;
+        state.lastRefresh = Date.now();
+      })
+      .addCase(fetchRealTimeMetrics.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to fetch real-time metrics';
+      });
+  },
+});
+
+// Export actions
+export const {
+  updateFilters,
+  resetFilters,
+  setActiveTab,
+  setLoading,
+  setError,
+  setRealTimeEnabled,
+  updateConnectionStatus,
+  incrementReconnectAttempts,
+  resetReconnectAttempts,
+  updateRealTimeMetrics,
+  addRealTimeError,
+  addRealTimeAlert,
+  refreshData,
+  clearData,
+} = errorAnalyticsSlice.actions;
+
+// Export selectors
+export const selectOverviewMetrics = (state: any) => state.errorAnalytics.overviewMetrics;
+export const selectTrendData = (state: any) => state.errorAnalytics.trendData;
+export const selectPatterns = (state: any) => state.errorAnalytics.patterns;
+export const selectRecoveryAnalytics = (state: any) => state.errorAnalytics.recoveryAnalytics;
+export const selectRealTimeMetrics = (state: any) => state.errorAnalytics.realTimeMetrics;
+export const selectFilters = (state: any) => state.errorAnalytics.filters;
+export const selectActiveTab = (state: any) => state.errorAnalytics.activeTab;
+export const selectIsLoading = (state: any) => state.errorAnalytics.isLoading;
+export const selectError = (state: any) => state.errorAnalytics.error;
+export const selectLastRefresh = (state: any) => state.errorAnalytics.lastRefresh;
+export const selectIsRealTimeEnabled = (state: any) => state.errorAnalytics.isRealTimeEnabled;
+export const selectConnectionStatus = (state: any) => state.errorAnalytics.connectionStatus;
+
+// Export reducer
+export default errorAnalyticsSlice.reducer;

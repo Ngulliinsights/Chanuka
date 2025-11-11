@@ -3,7 +3,7 @@ import { AlertTriangle, RefreshCw, Building } from 'lucide-react';
 import { ResponsiveButton as Button } from "../../shared/design-system/components";
 import { Logo } from "../ui/logo";
 import { ErrorFallbackProps } from "./ErrorBoundary";
-import { logger as baseLogger } from "../../utils/browser-logger";
+import { logger as baseLogger } from "../../utils/logger";
 
 // Import shared error types and classes
 import { 

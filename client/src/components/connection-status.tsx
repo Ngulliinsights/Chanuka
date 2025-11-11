@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApiConnection } from '../hooks/useApiConnection.js';
 import { AlertCircle, CheckCircle, Network, RefreshCw, Settings } from 'lucide-react';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 interface ConnectionStatusProps {
   showDetails?: boolean;

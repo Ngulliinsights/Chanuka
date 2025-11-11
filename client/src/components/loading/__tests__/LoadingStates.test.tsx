@@ -46,8 +46,8 @@ vi.mock('@/hooks/useConnectionAware', () => ({
   }),
 }));
 
-vi.mock('@/hooks/use-online-status', () => ({
-  useOnlineStatus: () => true,
+vi.mock('@/hooks/useOfflineDetection', () => ({
+  useOfflineDetection: () => ({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false }),
 }));
 
 // Mock logger
@@ -347,7 +347,7 @@ describe('LoadingStates Components', () => {
     });
 
     it('should show offline state', () => {
-      vi.mocked(require('@/hooks/use-online-status').useOnlineStatus).mockReturnValue(false);
+      vi.mocked(require('@/hooks/useOfflineDetection').useOfflineDetection).mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
 
       render(<NetworkAwareLoader />);
       

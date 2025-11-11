@@ -44,7 +44,7 @@ jest.mock('../../lib/utils', () => ({
   formatRelativeTime: (timestamp: number) => `formatted-${timestamp}`,
 }));
 
-jest.mock('../../utils/browser-logger', () => ({
+jest.mock('../../utils/logger', () => ({
   logger: {
     error: jest.fn(),
   },

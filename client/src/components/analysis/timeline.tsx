@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { cn } from '../../lib/utils';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface Action {
   title: string;

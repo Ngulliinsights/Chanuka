@@ -24,8 +24,8 @@ vi.mock('@/hooks/useConnectionAware', () => ({
   }),
 }));
 
-vi.mock('@/hooks/use-online-status', () => ({
-  useOnlineStatus: () => true,
+vi.mock('@/hooks/useOfflineDetection', () => ({
+  useOfflineDetection: () => ({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false }),
 }));
 
 vi.mock('@/utils/asset-loading', () => ({
@@ -410,8 +410,8 @@ describe('Loading Components Integration', () => {
       const mockUseOnlineStatus = vi.fn();
       mockUseOnlineStatus.mockReturnValue(false);
 
-      vi.doMock('@/hooks/use-online-status', () => ({
-        useOnlineStatus: mockUseOnlineStatus,
+      vi.doMock('@/hooks/useOfflineDetection', () => ({
+        useOfflineDetection: () => ({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false }),
       }));
 
       render(

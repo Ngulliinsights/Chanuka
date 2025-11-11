@@ -1,0 +1,317 @@
+/* Progressive Disclosure Navigation Styles */
+
+/* Progressive Disclosure Navigation uses existing design system colors */
+
+/* Progressive disclosure specific styles */
+.progressive-disclosure-container {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* Complexity indicator animations */
+.complexity-dot {
+  transition: all 0.2s ease-in-out;
+}
+
+.complexity-dot:hover {
+  transform: scale(1.2);
+}
+
+/* Reading time indicator styles */
+.reading-time-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Context navigation helper styles */
+.context-nav-helper {
+  background: linear-gradient(135deg, 
+    hsl(var(--muted)) 0%, 
+    hsl(var(--muted) / 0.8) 100%);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.context-nav-current-section {
+  background-color: hsl(var(--primary) / 0.1);
+  border-left: 4px solid hsl(var(--primary));
+  padding-left: var(--space-md);
+}
+
+/* Mobile tab selector styles */
+.mobile-tab-selector {
+  width: 100%;
+  justify-content: space-between;
+  min-height: 44px; /* Touch-friendly minimum */
+}
+
+@media (min-width: 768px) {
+  .mobile-tab-selector {
+    display: none;
+  }
+}
+
+/* Reading path guidance styles */
+.reading-path-card {
+  background: linear-gradient(135deg, 
+    hsl(var(--primary) / 0.05) 0%, 
+    hsl(var(--primary) / 0.1) 100%);
+  border: 1px solid hsl(var(--primary) / 0.2);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  transition: all 0.2s ease-out;
+}
+
+.reading-path-item {
+  padding: var(--space-md);
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+.reading-path-item:hover {
+  border-color: hsl(var(--primary) / 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.reading-path-item.selected {
+  border-color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.05);
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
+}
+
+/* Progress tracker styles */
+.progress-tracker {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.progress-bar-civic {
+  height: 0.5rem;
+  background-color: hsl(var(--primary));
+  border-radius: 9999px;
+  transition: width 0.5s ease-out;
+}
+
+.progress-bar-overall {
+  background-color: hsl(var(--primary));
+}
+
+/* Collapsible section styles */
+.collapsible-section {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  margin-bottom: var(--space-sm);
+  overflow: hidden;
+  transition: all 0.2s ease-out;
+}
+
+.collapsible-section:hover {
+  border-color: hsl(var(--primary) / 0.3);
+}
+
+.collapsible-trigger {
+  width: 100%;
+  padding: var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  background-color: hsl(var(--card));
+}
+
+.collapsible-trigger:hover {
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+.collapsible-trigger.active {
+  background-color: hsl(var(--primary) / 0.1);
+  border-left: 4px solid hsl(var(--primary));
+}
+
+.collapsible-content {
+  border-top: 1px solid hsl(var(--border));
+}
+
+.collapsible-subsection {
+  padding-left: var(--space-xl);
+  padding-bottom: var(--space-lg);
+}
+
+/* Required badge styles */
+.required-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: rgb(254 240 138);
+  color: rgb(133 77 14);
+  border-radius: calc(var(--radius) - 2px);
+  margin-left: var(--space-sm);
+}
+
+/* Accessibility enhancements */
+.progressive-disclosure-nav [role="button"]:focus,
+.progressive-disclosure-nav button:focus {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px hsl(var(--ring) / 0.2);
+}
+
+/* Touch-friendly enhancements for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .collapsible-trigger,
+  .reading-path-item,
+  .mobile-tab-selector {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Enhanced touch targets */
+  .context-nav-helper button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text selection on touch */
+  .collapsible-trigger,
+  .reading-path-item {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Improve tap highlighting */
+  .collapsible-trigger,
+  .reading-path-item {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Responsive design adjustments */
+@media (max-width: 640px) {
+  .context-nav-helper {
+    padding: var(--space-md);
+  }
+
+  .progress-tracker {
+    padding: var(--space-md);
+  }
+
+  .reading-path-card {
+    padding: var(--space-md);
+  }
+
+  .collapsible-trigger {
+    padding: var(--space-md);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .collapsible-trigger .section-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .collapsible-section,
+  .reading-path-item,
+  .context-nav-helper,
+  .progress-tracker {
+    border-width: 2px;
+  }
+
+  .collapsible-trigger:focus,
+  .reading-path-item:focus {
+    outline: 3px solid;
+    outline-offset: 2px;
+  }
+
+  .complexity-dot {
+    border: 1px solid;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .collapsible-section,
+  .reading-path-item,
+  .complexity-dot,
+  .progress-bar-civic {
+    transition: none;
+  }
+
+  .reading-path-item:hover {
+    transform: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .mobile-tab-selector,
+  .context-nav-helper button {
+    display: none !important;
+  }
+
+  .collapsible-section {
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
+
+  .progress-tracker {
+    border: 1px solid #000;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-sm));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-var(--space-md));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Progressive enhancement animations */
+@media (prefers-reduced-motion: no-preference) {
+  .progressive-disclosure-nav {
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  .collapsible-content {
+    animation: slideInFromLeft 0.2s ease-out;
+  }
+}

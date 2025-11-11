@@ -9,7 +9,7 @@ PerformanceOptimizer @ performance-optimizer.ts:63
 (anonymous) @ performance-optimizer.ts:656
 client-core.ts:27 [INFO] 🚀 Applying fast connection optimizations {component: 'PerformanceOptimizer'} {}
 client-core.ts:27 [INFO] 🚀 Performance Optimizer initialized {component: 'PerformanceOptimizer'} {}
-browser-logger.ts:242 [INFO] Initializing Chanuka Legislative Transparency Platform... {component: 'Chanuka'}
+logger.ts:242 [INFO] Initializing Chanuka Legislative Transparency Platform... {component: 'Chanuka'}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/index.css'} {}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/Chanuka_logo.svg'} {}
 client-core.ts:27 [INFO] 🔋 Applying battery saving optimizations {component: 'PerformanceOptimizer'} {}
@@ -17,10 +17,10 @@ client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/main.
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/browser-compatibility-manager.ts'} {}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/development-error-recovery.ts'} {}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/development-debug.ts'} {}
-browser-logger.ts:242 [INFO] 🛡️ Development error recovery initialized {component: 'Chanuka'}
+logger.ts:242 [INFO] 🛡️ Development error recovery initialized {component: 'Chanuka'}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/utils/browser-compatibility-tests.ts'} {}
-browser-logger.ts:242 [INFO] All polyfills loaded successfully in 1ms {component: 'Polyfills'}
-browser-logger.ts:242 [INFO] ✅ Browser polyfills loaded successfully {component: 'Chanuka'}
+logger.ts:242 [INFO] All polyfills loaded successfully in 1ms {component: 'Polyfills'}
+logger.ts:242 [INFO] ✅ Browser polyfills loaded successfully {component: 'Chanuka'}
 browser-compatibility-manager.ts:202   📦 10 polyfills loaded successfully
 browser-compatibility-manager.ts:210     ✅ promises
 browser-compatibility-manager.ts:210     ✅ fetch
@@ -38,7 +38,7 @@ browser-compatibility-manager.ts:591 Supported: ✅
 browser-compatibility-manager.ts:592 Compatibility Score: 100%
 browser-compatibility-manager.ts:593 Should Block: ✅ No
 browser-compatibility-manager.ts:594 Polyfills: 0 required, ✅ loaded
-browser-logger.ts:242 [INFO] Browser compatibility initialized: {component: 'Chanuka'} {browser: 'chrome 142.0', supported: true, polyfillsLoaded: true, warnings: 0}
+logger.ts:242 [INFO] Browser compatibility initialized: {component: 'Chanuka'} {browser: 'chrome 142.0', supported: true, polyfillsLoaded: true, warnings: 0}
 development-debug.ts:142 
 🔧 Development Debug Utilities Available:
   __DEBUG__.getInfo()         - Get comprehensive debug information
@@ -56,7 +56,7 @@ Keyboard Shortcuts:
   Ctrl+Shift+R - Clear cache and reload
   Ctrl+Shift+E - Show error history
     
-browser-logger.ts:242 [INFO] 🔧 Development debug utilities initialized {component: 'Chanuka'}
+logger.ts:242 [INFO] 🔧 Development debug utilities initialized {component: 'Chanuka'}
 asset-loading.ts:519 A preload for 'http://localhost:5173/src/index.css' is found, but is not used because the request credentials mode does not match. Consider taking a look at crossorigin attribute.
 loadStylesheet @ asset-loading.ts:519
 (anonymous) @ asset-loading.ts:440
@@ -80,22 +80,22 @@ client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/index
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.svg'} {}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/favicon.svg'} {}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/Chanuka_logo.png'} {}
-browser-logger.ts:242 [INFO] Critical assets preloaded successfully {component: 'Chanuka'}
-browser-logger.ts:242 [INFO] Critical assets preloaded successfully {component: 'Chanuka'}
-browser-logger.ts:242 [INFO] DOM ready, mounting React application... {component: 'Chanuka'}
+logger.ts:242 [INFO] Critical assets preloaded successfully {component: 'Chanuka'}
+logger.ts:242 [INFO] Critical assets preloaded successfully {component: 'Chanuka'}
+logger.ts:242 [INFO] DOM ready, mounting React application... {component: 'Chanuka'}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/main.tsx'} {}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/src/App.tsx'} {}
-browser-logger.ts:242 [INFO] Initial performance metrics collected {component: 'PerformanceMonitor'} {loadTime: 10509.299999952316, renderTime: 0.5, navigationTime: 10511.399999976158, resourceLoadTime: 0, memoryUsage: 25604422}
-browser-logger.ts:242 [INFO] Performance monitoring initialized {component: 'PerformanceMonitor'}
-browser-logger.ts:242 [INFO] React application mounted successfully {component: 'Chanuka'}
-browser-logger.ts:242 [INFO] 🚀 Performance monitoring active {component: 'Chanuka'}
-browser-logger.ts:242 [INFO] Application initialization completed successfully {component: 'Chanuka'}
-browser-logger.ts:242 [INFO] Application initialized successfully {component: 'Chanuka'}
-browser-logger.ts:242 [INFO] App initialized with routes {component: 'Chanuka', routeCount: 24}
-browser-logger.ts:242 [INFO] All polyfills loaded successfully in 3ms {component: 'Polyfills'}
+logger.ts:242 [INFO] Initial performance metrics collected {component: 'PerformanceMonitor'} {loadTime: 10509.299999952316, renderTime: 0.5, navigationTime: 10511.399999976158, resourceLoadTime: 0, memoryUsage: 25604422}
+logger.ts:242 [INFO] Performance monitoring initialized {component: 'PerformanceMonitor'}
+logger.ts:242 [INFO] React application mounted successfully {component: 'Chanuka'}
+logger.ts:242 [INFO] 🚀 Performance monitoring active {component: 'Chanuka'}
+logger.ts:242 [INFO] Application initialization completed successfully {component: 'Chanuka'}
+logger.ts:242 [INFO] Application initialized successfully {component: 'Chanuka'}
+logger.ts:242 [INFO] App initialized with routes {component: 'Chanuka', routeCount: 24}
+logger.ts:242 [INFO] All polyfills loaded successfully in 3ms {component: 'Polyfills'}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/node_modules/.vite/deps/6ELMOJL2-T2RVXUMQ.js?v=3089e83b'} {}
 client-core.ts:23 [DEBUG] Cache Miss {resource: 'http://localhost:5173/node_modules/.vite/deps/chunk-PW24LAET.js?v=3089e83b'} {}
-browser-logger.ts:242 [INFO] Service Worker registered: {component: 'Chanuka'} ServiceWorkerRegistration {installing: ServiceWorker, waiting: null, active: null, navigationPreload: NavigationPreloadManager, scope: 'http://localhost:5173/', …}
+logger.ts:242 [INFO] Service Worker registered: {component: 'Chanuka'} ServiceWorkerRegistration {installing: ServiceWorker, waiting: null, active: null, navigationPreload: NavigationPreloadManager, scope: 'http://localhost:5173/', …}
 installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
 overrideMethod @ installHook.js:1
 console.error @ development-error-recovery.ts:126
@@ -2185,7 +2185,7 @@ flushPassiveEffects @ chunk-ILO4JA4Q.js?v=3089e83b:19447
 workLoop @ chunk-ILO4JA4Q.js?v=3089e83b:197
 flushWork @ chunk-ILO4JA4Q.js?v=3089e83b:176
 performWorkUntilDeadline @ chunk-ILO4JA4Q.js?v=3089e83b:384
-browser-logger.ts:242 [INFO] Initial page load time: {component: 'Chanuka'} {loadTime: 10511}
+logger.ts:242 [INFO] Initial page load time: {component: 'Chanuka'} {loadTime: 10511}
 installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
     at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)
     at DevelopmentTools (<anonymous>)
@@ -2355,7 +2355,7 @@ installHook.js:1 [ERROR] Component load failure: lazy-HomePage Error: Failed to 
     at async safe-lazy-loading.tsx:192:22
 overrideMethod @ installHook.js:1
 console.error @ development-error-recovery.ts:126
-error @ browser-logger.ts:244
+error @ logger.ts:244
 (anonymous) @ safe-lazy-loading.tsx:120
 installHook.js:1 [ERROR] Failed to load component HomePage after retries: Error: Failed to load component 'lazy-HomePage' after 4 attempts. Last error: Failed to resolve module specifier '@/pages/home'
     at safe-lazy-loading.tsx:113:29
@@ -2367,7 +2367,7 @@ installHook.js:1 [ERROR] Failed to load component HomePage after retries: Error:
     at async safe-lazy-loading.tsx:192:22
 overrideMethod @ installHook.js:1
 console.error @ development-error-recovery.ts:126
-error @ browser-logger.ts:244
+error @ logger.ts:244
 (anonymous) @ safe-lazy-loading.tsx:195
 installHook.js:1 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. Error Component Stack
     at PerformanceMetricsCollector (PerformanceMetricsCollector.tsx:42:3)

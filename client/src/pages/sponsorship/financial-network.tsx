@@ -17,7 +17,7 @@ import {
   Share2,
   Target
 } from 'lucide-react';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface FinancialNetworkProps { bill_id?: string;
  }

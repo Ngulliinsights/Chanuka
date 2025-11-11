@@ -13,7 +13,7 @@
  */
 
 import { featureDetector } from './browser-compatibility';
-import { logger } from './browser-logger';
+import { logger } from './logger';
 
 /**
  * Tracks the loading state of individual polyfills including success, failure,

@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { logger } from '../utils/client-core';
-import { useOnlineStatus } from '../hooks/use-online-status';
+import { useOfflineDetection } from '../hooks/useOfflineDetection';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 import { offlineDataManager } from '../utils/offlineDataManager';
 
@@ -15,7 +15,7 @@ interface OfflineModalProps {
 }
 
 export const OfflineModal: React.FC<OfflineModalProps> = ({ isOpen, onClose }) => {
-  const isOnline = useOnlineStatus();
+  const { isOnline } = useOfflineDetection();
   const [syncStatus, setSyncStatus] = useState<any>(null);
   const [analytics, setAnalytics] = useState<any[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);

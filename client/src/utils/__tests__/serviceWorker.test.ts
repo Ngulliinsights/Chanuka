@@ -15,10 +15,10 @@ import {
   isOnline,
   addNetworkStatusListener,
 } from '../serviceWorker';
-import { logger } from '../browser-logger';
+import { logger } from '../logger';
 
 // Mock logger
-vi.mock('../browser-logger', () => ({
+vi.mock('../logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),

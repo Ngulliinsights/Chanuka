@@ -1,4 +1,4 @@
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 // Note: AssetLoadingIndicator was moved to components/loading/

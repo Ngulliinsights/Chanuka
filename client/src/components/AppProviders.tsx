@@ -6,7 +6,7 @@ import { createNavigationProvider } from '../core/navigation/context';
 import { createLoadingProvider } from '../core/loading';
 import { AuthProvider, useAuth } from '../hooks/use-auth';
 import { useConnectionAware } from '../hooks/useConnectionAware';
-import { useOnlineStatus } from '../hooks/use-online-status';
+import { useOfflineDetection } from '../hooks/useOfflineDetection';
 import { assetLoadingManager } from '../utils/asset-loading';
 import { useMediaQuery } from '../hooks/use-mobile';
 import { AccessibilityProvider } from './accessibility/accessibility-manager';
@@ -29,7 +29,7 @@ const NavigationProvider = createNavigationProvider(
 // Create the React-specific LoadingProvider (inject runtime deps)
 const LoadingProviderWithDeps = createLoadingProvider(
   useConnectionAware,
-  useOnlineStatus,
+  () => useOfflineDetection().isOnline,
   assetLoadingManager
 );
 

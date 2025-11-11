@@ -1,4 +1,4 @@
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 import { apiService, ApiResponse, ApiError } from './apiService';
 
 /**

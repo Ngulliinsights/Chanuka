@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { logger, type RenderTrackingData, type ComponentLifecycleData, type PerformanceImpactData } from '../browser-logger';
+import { logger, type RenderTrackingData, type ComponentLifecycleData, type PerformanceImpactData } from '../logger';
 
 // Mock console methods
 const consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});

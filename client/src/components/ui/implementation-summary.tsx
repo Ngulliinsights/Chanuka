@@ -7,7 +7,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
 import { Progress } from './progress';
-import { CheckCircle, Package, Zap, Shield, Palette, Code } from 'lucide-react';
+import { CheckCircle, Shield, Package2, Palette, Code2, Zap } from 'lucide-react';
 
 interface ComponentStatus {
   name: string;
@@ -22,109 +22,109 @@ export const ImplementationSummary: React.FC = () => {
       name: 'Button',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-slot',
-      features: ['Loading states', 'Error handling', 'Validation', 'Analytics']
+      features: ['Loading states', 'Error handling', 'Validation', 'Analytics'],
     },
     {
       name: 'Dialog',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-dialog',
-      features: ['Error recovery', 'Validation', 'Loading states', 'Accessibility']
+      features: ['Error recovery', 'Validation', 'Loading states', 'Accessibility'],
     },
     {
       name: 'Select',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-select',
-      features: ['Validation', 'Error handling', 'Custom validators', 'Accessibility']
+      features: ['Validation', 'Error handling', 'Custom validators', 'Accessibility'],
     },
     {
       name: 'Tabs',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-tabs',
-      features: ['Analytics tracking', 'Time spent tracking', 'State management']
+      features: ['Analytics tracking', 'Time spent tracking', 'State management'],
     },
     {
       name: 'Tooltip',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-tooltip',
-      features: ['Interaction tracking', 'Delay configuration', 'Analytics']
+      features: ['Interaction tracking', 'Delay configuration', 'Analytics'],
     },
     {
       name: 'Avatar',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-avatar',
-      features: ['Status indicators', 'Loading states', 'Error handling', 'Size variants']
+      features: ['Status indicators', 'Loading states', 'Error handling', 'Size variants'],
     },
     {
       name: 'Progress',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-progress',
-      features: ['Milestones', 'Animations', 'Color variants', 'Callbacks']
+      features: ['Milestones', 'Animations', 'Color variants', 'Callbacks'],
     },
     {
       name: 'Badge',
       status: 'enhanced',
-      features: ['Interactive states', 'Remove functionality', 'Animations', 'Size variants']
+      features: ['Interactive states', 'Remove functionality', 'Animations', 'Size variants'],
     },
     {
       name: 'Navigation Menu',
       status: 'new',
       radixPrimitive: '@radix-ui/react-navigation-menu',
-      features: ['Keyboard navigation', 'Animations', 'Responsive design', 'Accessibility']
+      features: ['Keyboard navigation', 'Animations', 'Responsive design', 'Accessibility'],
     },
     {
       name: 'Command',
       status: 'new',
       radixPrimitive: 'cmdk',
-      features: ['Keyboard shortcuts', 'Search', 'Grouping', 'Filtering']
+      features: ['Keyboard shortcuts', 'Search', 'Grouping', 'Filtering'],
     },
     {
       name: 'Context Menu',
       status: 'new',
       radixPrimitive: '@radix-ui/react-context-menu',
-      features: ['Right-click interactions', 'Keyboard navigation', 'Submenus', 'Shortcuts']
+      features: ['Right-click interactions', 'Keyboard navigation', 'Submenus', 'Shortcuts'],
     },
     {
       name: 'Dropdown Menu',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-dropdown-menu',
-      features: ['Error handling', 'Recovery strategies', 'Enhanced items', 'Validation']
+      features: ['Error handling', 'Recovery strategies', 'Enhanced items', 'Validation'],
     },
     {
       name: 'Form',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-label',
-      features: ['Validation', 'Error handling', 'Accessibility', 'Field groups']
+      features: ['Validation', 'Error handling', 'Accessibility', 'Field groups'],
     },
     {
       name: 'Popover',
       status: 'enhanced',
       radixPrimitive: '@radix-ui/react-popover',
-      features: ['Error handling', 'Validation', 'Enhanced content', 'Recovery']
+      features: ['Error handling', 'Validation', 'Enhanced content', 'Recovery'],
     },
     {
       name: 'Toast',
       status: 'complete',
       radixPrimitive: '@radix-ui/react-toast',
-      features: ['Variants', 'Actions', 'Animations', 'Positioning']
+      features: ['Variants', 'Actions', 'Animations', 'Positioning'],
     },
     {
       name: 'Switch',
       status: 'complete',
       radixPrimitive: '@radix-ui/react-switch',
-      features: ['Accessibility', 'Animations', 'Variants']
+      features: ['Accessibility', 'Animations', 'Variants'],
     },
     {
       name: 'Separator',
       status: 'complete',
       radixPrimitive: '@radix-ui/react-separator',
-      features: ['Orientation', 'Styling', 'Accessibility']
+      features: ['Orientation', 'Styling', 'Accessibility'],
     },
     {
       name: 'Scroll Area',
       status: 'complete',
       radixPrimitive: '@radix-ui/react-scroll-area',
-      features: ['Custom scrollbars', 'Smooth scrolling', 'Cross-browser']
-    }
+      features: ['Custom scrollbars', 'Smooth scrolling', 'Cross-browser'],
+    },
   ];
 
   const getStatusBadge = (status: ComponentStatus['status']) => {
@@ -158,13 +158,11 @@ export const ImplementationSummary: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Components</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <Package2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalComponents}</div>
-            <p className="text-xs text-muted-foreground">
-              All shadcn/ui components
-            </p>
+            <p className="text-xs text-muted-foreground">All shadcn/ui components</p>
           </CardContent>
         </Card>
 
@@ -175,22 +173,18 @@ export const ImplementationSummary: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{enhancedComponents}</div>
-            <p className="text-xs text-muted-foreground">
-              With business logic
-            </p>
+            <p className="text-xs text-muted-foreground">With business logic</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">New Components</CardTitle>
-            <Code className="h-4 w-4 text-muted-foreground" />
+            <Code2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{newComponents}</div>
-            <p className="text-xs text-muted-foreground">
-              Recently added
-            </p>
+            <p className="text-xs text-muted-foreground">Recently added</p>
           </CardContent>
         </Card>
 
@@ -213,9 +207,7 @@ export const ImplementationSummary: React.FC = () => {
             <Shield className="h-5 w-5" />
             Key Implementation Features
           </CardTitle>
-          <CardDescription>
-            Strategic advantages of our shadcn/ui implementation
-          </CardDescription>
+          <CardDescription>Strategic advantages of our shadcn/ui implementation</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -275,13 +267,11 @@ export const ImplementationSummary: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle>Component Implementation Status</CardTitle>
-          <CardDescription>
-            Complete list of all implemented shadcn/ui components
-          </CardDescription>
+          <CardDescription>Complete list of all implemented shadcn/ui components</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {components.map((component) => (
+            {components.map(component => (
               <div
                 key={component.name}
                 className="flex items-start justify-between p-4 border rounded-lg"
@@ -297,7 +287,7 @@ export const ImplementationSummary: React.FC = () => {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1">
-                    {component.features.map((feature) => (
+                    {component.features.map(feature => (
                       <span
                         key={feature}
                         className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded"
@@ -325,7 +315,9 @@ export const ImplementationSummary: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle className="h-5 w-5" />
-              <span className="font-medium">Navigation Menu - Added with full keyboard support</span>
+              <span className="font-medium">
+                Navigation Menu - Added with full keyboard support
+              </span>
             </div>
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle className="h-5 w-5" />
@@ -333,11 +325,15 @@ export const ImplementationSummary: React.FC = () => {
             </div>
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle className="h-5 w-5" />
-              <span className="font-medium">Context Menu - Added with right-click interactions</span>
+              <span className="font-medium">
+                Context Menu - Added with right-click interactions
+              </span>
             </div>
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle className="h-5 w-5" />
-              <span className="font-medium">Enhanced Components - Added business logic versions</span>
+              <span className="font-medium">
+                Enhanced Components - Added business logic versions
+              </span>
             </div>
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle className="h-5 w-5" />
@@ -345,7 +341,9 @@ export const ImplementationSummary: React.FC = () => {
             </div>
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle className="h-5 w-5" />
-              <span className="font-medium">Configuration - Tailwind and CSS variables updated</span>
+              <span className="font-medium">
+                Configuration - Tailwind and CSS variables updated
+              </span>
             </div>
           </div>
         </CardContent>

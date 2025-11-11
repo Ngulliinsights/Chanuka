@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import * as api from '@/services/api';
-import { logger } from '../../../utils/browser-logger';
+import { logger } from '../../../utils/logger';
 
 // Mock fetch
 const mockFetch = vi.fn();

@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useRenderTracker } from '../use-render-tracker';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Mock the logger
-vi.mock('../../utils/browser-logger', () => ({
+vi.mock('../../utils/logger', () => ({
   logger: {
     trackRender: vi.fn(),
     trackLifecycle: vi.fn(),

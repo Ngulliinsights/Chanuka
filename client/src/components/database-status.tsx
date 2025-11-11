@@ -191,7 +191,7 @@ export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }
   );
 }
 import { useQuery } from "@tanstack/react-query";
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 export function useDatabaseStatus() {
   // Updated database status endpoint to match refactored routes

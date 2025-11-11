@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { BarChart3, X, Building, FileText, Search, User, Settings, ArrowLeft, Bell,  } from 'lucide-react';
 import { cn } from "../../lib/utils";
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 import {
   MobileTouchHandler,
   MobileTouchUtils,

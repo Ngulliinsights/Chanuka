@@ -20,7 +20,7 @@ import {
   TrendingUp,
   AlertTriangle
 } from 'lucide-react';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface CosponsorProps { bill_id?: string;
  }

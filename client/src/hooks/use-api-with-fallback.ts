@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 import {
   ApiResponse,
   ApiError,

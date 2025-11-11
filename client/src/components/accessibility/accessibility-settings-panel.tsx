@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { Settings, Eye, BarChart3, Activity, Volume2, Target, Circle, User } from 'lucide-react';
 import { useAccessibility, AccessibleButton, AccessibleFormField } from './accessibility-manager';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface AccessibilitySettingsPanelProps {
   isOpen: boolean;
