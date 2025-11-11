@@ -6,6 +6,8 @@ import { Alert, AlertDescription } from '../ui/alert';
 import { AlertCircle, CheckCircle as CheckCircle, Mail, Shield, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuthForm } from './hooks/useAuthForm';
 import { FormData, FormFieldName } from './types';
+import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
+import { SocialLogin } from './SocialLogin';
 
 const AuthForm = () => {
   const {
@@ -114,12 +116,31 @@ const AuthForm = () => {
               </div>
             )}
 
+            {/* Social Login */}
+            <SocialLogin 
+              onSuccess={(data) => {
+                // Handle social login success
+                console.log('Social login successful:', data);
+              }}
+              onError={(error) => {
+                // Handle social login error
+                console.error('Social login failed:', error);
+              }}
+            />
+
             {renderInput('email', 'Email Address', 'email', 'you@example.com', Mail)}
             {renderInput('password', 'Password', 'password', '••••••••', Eye)}
-            {isRegisterMode && !errors.password && (
-              <p className="text-xs text-gray-600 -mt-2" data-testid="auth-password-requirements">
-                12+ characters, with uppercase, lowercase, number, and special character.
-              </p>
+            
+            {/* Password Strength Indicator for Registration */}
+            {isRegisterMode && formData.password && (
+              <PasswordStrengthIndicator
+                password={formData.password}
+                userInfo={{
+                  email: formData.email,
+                  name: `${formData.first_name} ${formData.last_name}`.trim(),
+                }}
+                className="mt-2"
+              />
             )}
 
             {isRegisterMode &&

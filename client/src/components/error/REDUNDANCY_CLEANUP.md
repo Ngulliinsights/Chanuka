@@ -9,13 +9,13 @@
 **Resolution**: Deprecate the legacy version and consolidate into the full-featured version.
 
 ### 2. **Duplicate Error Type Systems**
-- `shared/errors/index.ts`: Uses `ErrorSeverity` + `ErrorDomain`
+- `core/error/index.ts`: Uses `ErrorSeverity` + `ErrorDomain`
 - `unified-error-handler.ts`: Uses `ErrorSeverity` + `ErrorType`
 
 **Resolution**: Unify type systems by making unified-error-handler use shared types.
 
 ### 3. **Conflicting Error Classes**
-- `shared/errors/BaseError` - Legacy error class
+- `core/error/BaseError` - Legacy error class
 - `unified-error-handler/AppError` - New unified error interface
 
 **Resolution**: Extend BaseError to implement AppError interface.

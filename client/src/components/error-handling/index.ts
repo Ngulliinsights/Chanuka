@@ -20,7 +20,7 @@ export {
 export { ErrorRecoveryManager } from './ErrorRecoveryManager';
 
 // Re-export error types from shared errors for convenience
-export * from '../../shared/errors';
+export * from '../../core/error';
 
 // Export utility functions
 export { createErrorReporter } from './utils/error-reporter';

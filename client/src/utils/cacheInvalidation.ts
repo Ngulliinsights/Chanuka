@@ -3,7 +3,7 @@
  * Provides comprehensive cache management and update mechanisms for offline-first applications
  */
 
-import { logger } from './client-core';
+import { logger } from './logger';
 import { offlineDataManager } from './offlineDataManager';
 
 export interface CacheInvalidationConfig {

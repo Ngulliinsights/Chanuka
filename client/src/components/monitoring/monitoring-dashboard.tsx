@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { logger } from '../../utils/client-core';
+import { logger } from '../../utils/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';

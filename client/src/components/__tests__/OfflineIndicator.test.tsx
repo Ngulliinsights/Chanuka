@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { OfflineIndicator } from '../OfflineIndicator';
 
 // Mock dependencies
-jest.mock('../../utils/client-core', () => ({
+jest.mock('../../utils/logger', () => ({
   logger: {
     error: jest.fn(),
   },
@@ -22,7 +22,7 @@ jest.mock('../utils/backgroundSyncManager', () => ({
 
 const mockUseOfflineDetection = require('../hooks/useOfflineDetection').useOfflineDetection;
 const mockBackgroundSyncManager = require('../utils/backgroundSyncManager').backgroundSyncManager;
-const mockLogger = require('../../utils/client-core').logger;
+const mockLogger = require('../../utils/logger').logger;
 
 describe('OfflineIndicator', () => {
   beforeEach(() => {

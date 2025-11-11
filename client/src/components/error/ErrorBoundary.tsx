@@ -1,6 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { errorHandler, ErrorType, ErrorSeverity, AppError } from '../../utils/unified-error-handler';
-import { ErrorDomain } from '../../shared/errors';
+import { ErrorDomain } from '../../core/error';
 import { ErrorFallback } from './ErrorFallback';
 
 interface Props {

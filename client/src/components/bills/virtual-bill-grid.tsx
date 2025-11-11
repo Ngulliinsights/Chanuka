@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { FixedSizeGrid as Grid } from 'react-window';
+import { FixedSizeGrid } from 'react-window';
 import { BillCard } from './bill-card';
 import { Bill } from '../../store/slices/billsSlice';
 import { cn } from '../../lib/utils';

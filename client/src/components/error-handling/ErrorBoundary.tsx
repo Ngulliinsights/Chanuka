@@ -12,7 +12,8 @@ import { getBrowserInfo } from "../../utils/browser-compatibility";
 import { performanceMonitor } from "../../utils/performance-monitor";
 
 // Import unified error types
-import { BaseError, ErrorDomain, ErrorSeverity } from "../../shared/errors";
+import { ErrorDomain, ErrorSeverity } from "../../core/error";
+import { BaseError } from "../../utils/logger";
 import { errorHandler } from "../../utils/unified-error-handler";
 
 export interface RecoveryOption {

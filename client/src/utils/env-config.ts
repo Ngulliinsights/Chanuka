@@ -1,88 +1,76 @@
 /**
- * Environment Configuration Validator
- * Ensures all required environment variables are available and valid
+ * Environment Configuration
+ * Centralized configuration management for different environments
  */
 
-interface EnvConfig {
+import { logger } from './logger';
+
+interface EnvironmentConfig {
   apiUrl: string;
-  appName: string;
-  appVersion: string;
-  environment: 'development' | 'production' | 'test';
+  wsUrl: string;
+  environment: 'development' | 'staging' | 'production';
   enableAnalytics: boolean;
-  enableDebug: boolean;
-  enableServiceWorker: boolean;
-  apiTimeout: number;
-  apiRetryAttempts: number;
-  enablePerformanceMonitoring: boolean;
-}
-
-function getEnvVar(key: string, defaultValue?: string): string {
-  const value = import.meta.env[key] || defaultValue;
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-  return value;
-}
-
-function getBooleanEnvVar(key: string, defaultValue: boolean = false): boolean {
-  const value = import.meta.env[key];
-  if (value === undefined) return defaultValue;
-  return value === 'true' || value === '1';
-}
-
-function getNumberEnvVar(key: string, defaultValue: number): number {
-  const value = import.meta.env[key];
-  if (value === undefined) return defaultValue;
-  const parsed = parseInt(value, 10);
-  if (isNaN(parsed)) {
-    console.warn(`Invalid number for ${key}: ${value}, using default: ${defaultValue}`);
-    return defaultValue;
-  }
-  return parsed;
-}
-
-export function getEnvConfig(): EnvConfig {
-  try {
-    return {
-      apiUrl: getEnvVar('VITE_API_URL', 
-        process.env.NODE_ENV === 'production' 
-          ? window.location.origin 
-          : 'http://localhost:3000'
-      ),
-      appName: getEnvVar('VITE_APP_NAME', 'Chanuka Platform'),
-      appVersion: getEnvVar('VITE_APP_VERSION', '1.0.0'),
-      environment: getEnvVar('VITE_ENVIRONMENT', process.env.NODE_ENV || 'development') as EnvConfig['environment'],
-      enableAnalytics: getBooleanEnvVar('VITE_ENABLE_ANALYTICS', true),
-      enableDebug: getBooleanEnvVar('VITE_ENABLE_DEBUG', process.env.NODE_ENV === 'development'),
-      enableServiceWorker: getBooleanEnvVar('VITE_ENABLE_SERVICE_WORKER', process.env.NODE_ENV === 'production'),
-      apiTimeout: getNumberEnvVar('VITE_API_TIMEOUT', 10000),
-      apiRetryAttempts: getNumberEnvVar('VITE_API_RETRY_ATTEMPTS', 3),
-      enablePerformanceMonitoring: getBooleanEnvVar('VITE_ENABLE_PERFORMANCE_MONITORING', true),
+  enableSecurityMonitoring: boolean;
+  logLevel: 'debug' | 'info' | 'warn' | 'error';
+  oauth: {
+    google: {
+      clientId: string;
+      enabled: boolean;
     };
-  } catch (error) {
-    console.error('Environment configuration error:', error);
-    // Return safe defaults
-    return {
-      apiUrl: process.env.NODE_ENV === 'production' 
-        ? window.location.origin 
-        : 'http://localhost:3000',
-      appName: 'Chanuka Platform',
-      appVersion: '1.0.0',
-      environment: (process.env.NODE_ENV || 'development') as EnvConfig['environment'],
-      enableAnalytics: false,
-      enableDebug: process.env.NODE_ENV === 'development',
-      enableServiceWorker: process.env.NODE_ENV === 'production',
-      apiTimeout: 10000,
-      apiRetryAttempts: 3,
-      enablePerformanceMonitoring: false,
+    github: {
+      clientId: string;
+      enabled: boolean;
     };
-  }
+  };
+  security: {
+    enableCSP: boolean;
+    enableHSTS: boolean;
+    sessionTimeout: number;
+    maxLoginAttempts: number;
+  };
 }
 
-// Export singleton instance
-export const envConfig = getEnvConfig();
+const getEnvironmentConfig = (): EnvironmentConfig => {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  const config = {
+    apiUrl: process.env.REACT_APP_API_URL || (isDevelopment ? 'http://localhost:5000' : ''),
+    wsUrl: process.env.REACT_APP_WS_URL || (isDevelopment ? 'ws://localhost:5000' : ''),
+    environment: isProduction ? 'production' : isDevelopment ? 'development' : 'staging',
+    enableAnalytics: process.env.REACT_APP_ENABLE_ANALYTICS === 'true',
+    enableSecurityMonitoring: process.env.REACT_APP_ENABLE_SECURITY_MONITORING !== 'false',
+    logLevel: (process.env.REACT_APP_LOG_LEVEL as any) || (isDevelopment ? 'debug' : 'info'),
+    oauth: {
+      google: {
+        clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
+        enabled: !!process.env.REACT_APP_GOOGLE_CLIENT_ID,
+      },
+      github: {
+        clientId: process.env.REACT_APP_GITHUB_CLIENT_ID || '',
+        enabled: !!process.env.REACT_APP_GITHUB_CLIENT_ID,
+      },
+    },
+    security: {
+      enableCSP: process.env.REACT_APP_ENABLE_CSP !== 'false',
+      enableHSTS: process.env.REACT_APP_ENABLE_HSTS !== 'false',
+      sessionTimeout: parseInt(process.env.REACT_APP_SESSION_TIMEOUT || '1800000', 10), // 30 minutes
+      maxLoginAttempts: parseInt(process.env.REACT_APP_MAX_LOGIN_ATTEMPTS || '5', 10),
+    },
+  } as const;
 
-// Validate configuration on module load
-if (envConfig.enableDebug) {
-  console.log('Environment configuration loaded:', envConfig);
-}
+  logger.info('Environment configuration loaded', { 
+    component: 'EnvConfig',
+    environment: config.environment,
+    oauthEnabled: {
+      google: config.oauth.google.enabled,
+      github: config.oauth.github.enabled
+    }
+  });
+  
+  return config;
+};
+
+export const envConfig = getEnvironmentConfig();
+
+export default envConfig;

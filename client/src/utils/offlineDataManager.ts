@@ -3,7 +3,7 @@
  * Handles IndexedDB operations for offline data storage and sync queue management
  */
 
-import { logger } from './client-core';
+import { logger } from './logger';
 
 export interface OfflineAction {
   id: string;

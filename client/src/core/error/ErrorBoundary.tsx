@@ -5,14 +5,13 @@
  * handling system and provides user-friendly error recovery options.
  */
 
-import React, { Component, ReactNode } from 'react';
+import React, { Component } from 'react';
 import { ErrorSeverity, ErrorDomain } from '../../utils/logger';
 import { coreErrorHandler } from './handler';
 import {
   ErrorBoundaryProps,
   ErrorFallbackProps,
   ReactErrorInfo,
-  RecoveryAction,
 } from './types';
 
 // ============================================================================
@@ -140,6 +139,7 @@ class DefaultErrorFallback extends Component<ErrorFallbackProps, DefaultErrorFal
 
           <div className="flex flex-col sm:flex-row gap-3">
             <button
+              type="button"
               onClick={this.handleRetry}
               disabled={recoveryAttempted}
               className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -147,12 +147,14 @@ class DefaultErrorFallback extends Component<ErrorFallbackProps, DefaultErrorFal
               {recoveryAttempted ? 'Retrying...' : 'Try Again'}
             </button>
             <button
+              type="button"
               onClick={this.handleReload}
               className="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
             >
               Reload Page
             </button>
             <button
+              type="button"
               onClick={this.handleGoHome}
               className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
@@ -182,7 +184,7 @@ interface ErrorBoundaryState {
   errorId: string | null;
 }
 
-export class EnhancedErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   private retryTimeout: NodeJS.Timeout | null = null;
 
   constructor(props: ErrorBoundaryProps) {
@@ -329,9 +331,9 @@ export function withErrorBoundary<P extends object>(
   errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
 ) {
   const WrappedComponent = (props: P) => (
-    <EnhancedErrorBoundary {...errorBoundaryProps}>
+    <ErrorBoundary {...errorBoundaryProps}>
       <Component {...props} />
-    </EnhancedErrorBoundary>
+    </ErrorBoundary>
   );
 
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
@@ -340,7 +342,13 @@ export function withErrorBoundary<P extends object>(
 }
 
 // ============================================================================
+// Enhanced Error Boundary (alias for compatibility)
+// ============================================================================
+
+export const EnhancedErrorBoundary = ErrorBoundary;
+
+// ============================================================================
 // Export Default Error Boundary
 // ============================================================================
 
-export default EnhancedErrorBoundary;
+export default ErrorBoundary;

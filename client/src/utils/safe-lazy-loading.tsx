@@ -283,13 +283,15 @@ export function createSafeLazyPage<P extends object = {}>(
       case "@/pages/dashboard":
         return import("../pages/dashboard");
       case "@/pages/bills-dashboard":
-        return import("../pages/enhanced-bills-dashboard-page");
+        return import("../pages/bills-dashboard-page");
       case "@/pages/enhanced-bills-dashboard":
-        return import("../pages/enhanced-bills-dashboard-page");
+        return import("../pages/bills-dashboard-page");
       case "@/pages/enhanced-bills-dashboard-page":
-        return import("../pages/enhanced-bills-dashboard-page");
+        return import("../pages/bills-dashboard-page");
       case "@/pages/auth-page":
         return import("../pages/auth-page");
+      case "@/pages/authentication":
+        return import("../pages/AuthenticationPage");
       case "@/pages/bill-detail":
         return import("../pages/bill-detail");
       case "@/pages/bill-analysis":
@@ -303,7 +305,9 @@ export function createSafeLazyPage<P extends object = {}>(
       case "@/pages/profile":
         return import("../pages/profile");
       case "@/pages/user-profile":
-        return import("../pages/user-profile");
+        return import("../pages/UserProfilePage");
+      case "@/pages/user-dashboard":
+        return import("../pages/UserDashboardPage");
       case "@/pages/onboarding":
         return import("../pages/onboarding");
       case "@/pages/admin":
@@ -447,7 +451,7 @@ export const SafeLazyPages = {
     enablePreloading: true,
     displayName: "HomePage",
   }),
-  BillsDashboard: createSafeLazyPage("@/pages/enhanced-bills-dashboard-page", "default", {
+  BillsDashboard: createSafeLazyPage("@/pages/bills-dashboard-page", "default", {
     preloadPriority: "high",
     enablePreloading: true,
     displayName: "BillsDashboard",
@@ -491,6 +495,11 @@ export const SafeLazyPages = {
     enablePreloading: false,
     displayName: "AuthPage",
   }),
+  AuthenticationPage: createSafeLazyPage("@/pages/authentication", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "AuthenticationPage",
+  }),
   Profile: createSafeLazyPage("@/pages/profile", "default", {
     preloadPriority: "low",
     enablePreloading: false,
@@ -500,6 +509,11 @@ export const SafeLazyPages = {
     preloadPriority: "low",
     enablePreloading: false,
     displayName: "UserProfilePage",
+  }),
+  UserDashboard: createSafeLazyPage("@/pages/user-dashboard", "default", {
+    preloadPriority: "medium",
+    enablePreloading: true,
+    displayName: "UserDashboard",
   }),
   Onboarding: createSafeLazyPage("@/pages/onboarding", "default", {
     preloadPriority: "low",
@@ -534,6 +548,11 @@ export const SafeLazyPages = {
     preloadPriority: "low",
     enablePreloading: false,
     displayName: "NotFound",
+  }),
+  PrivacySettings: createSafeLazyPage("@/pages/PrivacySettingsPage", "default", {
+    preloadPriority: "medium",
+    enablePreloading: true,
+    displayName: "PrivacySettings",
   }),
 } as const;
 

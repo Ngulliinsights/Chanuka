@@ -3,7 +3,7 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
-import { BaseError, ErrorSeverity, ErrorDomain } from '../../../shared/errors';
+import { BaseError, ErrorSeverity, ErrorDomain } from '../../../core/error';
 import { logger } from '../../../utils/logger';
 
 export interface RecoveryStrategy {

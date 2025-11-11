@@ -125,7 +125,7 @@ import { ErrorBoundary } from './components/error-handling/ErrorBoundary';
 ### 🔄 Legacy Components (Backward Compatible)
 
 1. **ErrorToast** - Still works, but consider using UnifiedErrorToast
-2. **shared/errors** - Still works, but unified types are preferred
+2. **core/error** - Still works, but unified types are preferred
 
 ### 📋 Usage Examples
 

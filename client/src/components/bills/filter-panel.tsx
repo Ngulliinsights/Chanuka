@@ -18,11 +18,9 @@ import {
   ChevronDown, 
   ChevronUp, 
   AlertTriangle, 
-  Flag, 
-  Users, 
-  Calendar,
+  Flag,
   Tag,
-  Sliders,
+  Settings,
   RotateCcw
 } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -32,9 +30,11 @@ import { Label } from '../ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { Separator } from '../ui/separator';
 import { Checkbox } from '../ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { cn } from '../../lib/utils';
-import { useBillsStore, type BillsFilter } from '../../store/slices/billsSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../store';
+import { setFilters, type BillsFilter } from '../../store/slices/billsSlice';
 
 interface FilterPanelProps {
   className?: string;
@@ -50,22 +50,22 @@ interface FilterOption {
   description?: string;
 }
 
-interface FilterSection {
-  key: keyof BillsFilter;
-  title: string;
-  icon: React.ComponentType<{ className?: string }>;
-  options: FilterOption[];
-  type: 'checkbox' | 'select' | 'toggle';
-  collapsible?: boolean;
-}
+// interface FilterSection {
+//   key: keyof BillsFilter;
+//   title: string;
+//   icon: React.ComponentType<{ className?: string }>;
+//   options: FilterOption[];
+//   type: 'checkbox' | 'select' | 'toggle';
+//   collapsible?: boolean;
+// }
 
 // Filter configuration data
-const BILL_TYPES: FilterOption[] = [
-  { value: 'public', label: 'Public Bills', description: 'Bills affecting the general public' },
-  { value: 'private', label: 'Private Bills', description: 'Bills affecting specific individuals or organizations' },
-  { value: 'money', label: 'Money Bills', description: 'Bills dealing with taxation or government spending' },
-  { value: 'constitutional', label: 'Constitutional Bills', description: 'Bills amending the constitution' },
-];
+// const BILL_TYPES: FilterOption[] = [
+//   { value: 'public', label: 'Public Bills', description: 'Bills affecting the general public' },
+//   { value: 'private', label: 'Private Bills', description: 'Bills affecting specific individuals or organizations' },
+//   { value: 'money', label: 'Money Bills', description: 'Bills dealing with taxation or government spending' },
+//   { value: 'constitutional', label: 'Constitutional Bills', description: 'Bills amending the constitution' },
+// ];
 
 const POLICY_AREAS: FilterOption[] = [
   { value: 'technology', label: 'Technology & Digital' },
@@ -103,7 +103,16 @@ const STATUS_OPTIONS: FilterOption[] = [
 ];
 
 export function FilterPanel({ className, isMobile = false, resultCount = 0, totalCount = 0 }: FilterPanelProps) {
-  const { filters, setFilters, clearFilters } = useBillsStore();
+  const dispatch = useDispatch();
+  const filters = useSelector((state: RootState) => state.bills.filters);
+  
+  const handleSetFilters = (newFilters: BillsFilter) => {
+    dispatch(setFilters(newFilters));
+  };
+  
+  const clearFilters = () => {
+    dispatch(setFilters({}));
+  };
   const [searchParams, setSearchParams] = useSearchParams();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['status', 'urgency']));
   const [isOpen, setIsOpen] = useState(false);
@@ -154,9 +163,9 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
 
     // Update filters if URL has parameters
     if (Object.keys(urlFilters).length > 0) {
-      setFilters(urlFilters);
+      handleSetFilters(urlFilters as BillsFilter);
     }
-  }, [searchParams, setFilters]);
+  }, [searchParams]);
 
   // Update URL when filters change
   useEffect(() => {
@@ -221,7 +230,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
         chips.push({
           key: `status-${status}`,
           label: option.label,
-          onRemove: () => setFilters({ 
+          onRemove: () => handleSetFilters({ 
+            ...filters,
             status: filters.status.filter(s => s !== status) 
           })
         });
@@ -235,7 +245,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
         chips.push({
           key: `urgency-${urgency}`,
           label: `${option.label} Priority`,
-          onRemove: () => setFilters({ 
+          onRemove: () => handleSetFilters({ 
+            ...filters,
             urgency: filters.urgency.filter(u => u !== urgency) 
           })
         });
@@ -249,7 +260,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
         chips.push({
           key: `policy-${area}`,
           label: option.label,
-          onRemove: () => setFilters({ 
+          onRemove: () => handleSetFilters({ 
+            ...filters,
             policyAreas: filters.policyAreas.filter(p => p !== area) 
           })
         });
@@ -261,7 +273,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
       chips.push({
         key: 'constitutional-flags',
         label: 'Constitutional Issues',
-        onRemove: () => setFilters({ constitutionalFlags: false })
+        onRemove: () => handleSetFilters({ ...filters, constitutionalFlags: false })
       });
     }
     
@@ -272,7 +284,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
         chips.push({
           key: `controversy-${level}`,
           label: option.label,
-          onRemove: () => setFilters({ 
+          onRemove: () => handleSetFilters({ 
+            ...filters,
             controversyLevels: filters.controversyLevels.filter(c => c !== level) 
           })
         });
@@ -292,7 +305,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
       chips.push({
         key: 'date-range',
         label: dateLabel,
-        onRemove: () => setFilters({ 
+        onRemove: () => handleSetFilters({ 
+          ...filters,
           dateRange: { start: null, end: null } 
         })
       });
@@ -323,7 +337,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
       ? [...currentArray, value]
       : currentArray.filter(item => item !== value);
     
-    setFilters({ [filterKey]: newArray });
+    handleSetFilters({ ...filters, [filterKey]: newArray });
   };
 
   const FilterSection = ({ 
@@ -512,7 +526,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
             id="constitutional-flags"
             checked={filters.constitutionalFlags}
             onCheckedChange={(checked) => 
-              setFilters({ constitutionalFlags: checked as boolean })
+              handleSetFilters({ ...filters, constitutionalFlags: checked as boolean })
             }
           />
           <Label 
@@ -574,7 +588,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
         <SheetContent side="bottom" className="h-[80vh] overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <Sliders className="h-5 w-5" />
+              <Settings className="h-5 w-5" />
               Filter Bills
             </SheetTitle>
           </SheetHeader>
@@ -591,7 +605,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
     <Card className={cn("chanuka-card", className)}>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Sliders className="h-5 w-5" />
+          <Settings className="h-5 w-5" />
           Filter Bills
           {activeFilterCount > 0 && (
             <Badge variant="secondary" className="ml-auto">

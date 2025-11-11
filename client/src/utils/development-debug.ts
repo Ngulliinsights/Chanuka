@@ -2,7 +2,7 @@
 // This module provides debugging utilities specifically for development mode
 
 import * as React from 'react';
-import { logger } from './client-core';
+import { logger } from './logger';
 
 interface PerformanceMetrics {
   navigation?: {

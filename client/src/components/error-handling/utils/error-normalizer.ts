@@ -17,7 +17,7 @@ import {
   ValidationError,
   ConflictError,
   TooManyRequestsError
-} from '../../../shared/errors';
+} from '../../../core/error';
 
 export function normalizeError(
   error: any,

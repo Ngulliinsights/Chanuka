@@ -1,5 +1,5 @@
 import { NavigationState, NavigationPreferences, RecentPage } from '../../types/navigation';
-import { logger } from '../client-core';
+import { logger } from '../logger';
 
 // Keys for localStorage
 const STORAGE_KEYS = {

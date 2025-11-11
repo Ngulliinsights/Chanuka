@@ -128,10 +128,10 @@ export interface CivicWebSocketState {
   lastMessage: CivicWebSocketMessage | null;
   reconnectAttempts: number;
   
-  // Subscription tracking
-  bill_subscriptions: Set<number>;
-  community_subscriptions: Set<string>;
-  expert_subscriptions: Set<string>;
+  // Subscription tracking - using arrays for Immer compatibility
+  bill_subscriptions: number[];
+  community_subscriptions: string[];
+  expert_subscriptions: string[];
   notification_subscriptions: boolean;
   
   // Real-time metrics

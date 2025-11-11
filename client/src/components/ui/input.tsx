@@ -1,5 +1,10 @@
-import * as React from "react"
+/**
+ * Input Component
+ * 
+ * A styled input component
+ */
 
+import * as React from "react"
 import { cn } from "../../lib/utils"
 
 export interface InputProps

@@ -53,7 +53,7 @@ export {
   CacheError,
   ConflictError,
   TooManyRequestsError,
-} from '../../shared/errors';
+} from '../../core/error';
 
 // Convenience error creation functions
 export {

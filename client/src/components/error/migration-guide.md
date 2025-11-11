@@ -27,14 +27,14 @@ This guide outlines the migration from the existing error handling components to
 - `ErrorFallback` → Integrated into unified error boundary
 - `ErrorModal` → Use unified error handler with modal listeners
 - `ErrorToast` → Use unified error handler with toast listeners
-- `shared/errors` → Use unified error types and classes
+- `core/error` → Use unified error types and classes
 
 ## Key Changes
 
 ### 1. Error Types
 ```typescript
 // Old
-import { BaseError } from '../../shared/errors'
+import { BaseError } from '../../core/error'
 
 // New
 import { AppError, ErrorType, ErrorSeverity } from '../../utils/unified-error-handler'
