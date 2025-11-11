@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 import { AuthenticatedAPI } from '../utils/authenticated-api';
 
 // Define types locally since they're not exported

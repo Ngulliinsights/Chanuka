@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
 import { GitBranch, CheckCircle, Clock, FileText, AlertTriangle } from 'lucide-react';
 import { cn, formatRelativeTime } from '../lib/utils';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 interface Migration {
   name: string;

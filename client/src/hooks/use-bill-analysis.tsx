@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 interface Bill {
   id: number;

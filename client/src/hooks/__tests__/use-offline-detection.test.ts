@@ -23,7 +23,7 @@ Object.defineProperty(window, 'navigator', {
 });
 
 // Mock logger
-vi.mock('../utils/browser-logger', () => ({
+vi.mock('../utils/logger', () => ({
   logger: {
     error: vi.fn(),
     warn: vi.fn(),

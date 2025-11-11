@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { en } from '../utils/i18n';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 type Translations = typeof en;
 

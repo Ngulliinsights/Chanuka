@@ -22,7 +22,7 @@ import {
   AlertCircle,
   Info
 } from 'lucide-react';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface NotificationChannel {
   type: 'inApp' | 'email' | 'push' | 'sms';

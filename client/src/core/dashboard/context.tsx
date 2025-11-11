@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useMemo } from 'react';
 import { DashboardState, DashboardAction, DashboardConfig, WidgetConfig, DashboardLayout, DashboardSettings } from './types';
 import { dashboardReducer } from './reducer';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 const initialState: DashboardState = {
   config: null,

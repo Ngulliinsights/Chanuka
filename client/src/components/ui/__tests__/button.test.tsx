@@ -22,7 +22,7 @@ vi.mock('../recovery', () => ({
   getUIRecoverySuggestions: vi.fn()
 }));
 
-vi.mock('../../../utils/browser-logger', () => ({
+vi.mock('../../../utils/logger', () => ({
   logger: {
     error: vi.fn(),
     warn: vi.fn(),

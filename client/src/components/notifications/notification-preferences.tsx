@@ -12,7 +12,7 @@ import { Progress } from '../ui/progress';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Bell, Mail, MessageSquare, Smartphone, Clock, Filter, Settings, TestTube, Save, CheckCircle, X, Network, TrendingUp, Users, Calendar, AlertTriangle, Info } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // --- INTERFACES ---
 

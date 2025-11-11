@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import { 
-import { logger } from '../../browser-logger';
+import { logger } from '../../logger';
   isNavigationPathActive, 
   getActiveStateClasses,
   getActiveIconClasses,

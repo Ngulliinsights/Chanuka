@@ -13,7 +13,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Mock service worker registration
 const mockServiceWorkerRegistration = {

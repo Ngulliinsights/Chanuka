@@ -1,68 +1,28 @@
 /**
- * Browser Logger - Client Utility
+ * Enhanced Browser Logger with Render Tracking
  *
- * Simple console-based logger for browser environment that avoids
- * importing Node.js specific modules that can cause runtime errors.
- * Extended with render tracking capabilities for race condition diagnostics.
+ * Extends the unified client logger with browser-specific features
+ * including render tracking, performance monitoring, and user interaction logging.
  */
 
-type LoggerLike = {
-  debug: (...args: any[]) => void;
-  info: (...args: any[]) => void;
-  warn: (...args: any[]) => void;
-  error: (...args: any[]) => void;
-};
+import { UnifiedClientLogger } from './unified-logger';
+import { 
+  LogContext, 
+  BrowserLogger, 
+  RenderTrackingData, 
+  ComponentLifecycleData, 
+  PerformanceImpactData, 
+  RenderStats,
+  BrowserLoggerConfig 
+} from '../types/logging';
 
-// Render tracking interfaces
-interface RenderTrackingData {
-  component: string;
-  renderCount: number;
-  timestamp: number;
-  trigger: string;
-  props?: any;
-  state?: any;
-}
-
-interface ComponentLifecycleData {
-  component: string;
-  action: 'mount' | 'unmount' | 'update';
-  timestamp: number;
-  props?: any;
-  state?: any;
-}
-
-interface PerformanceImpactData {
-  component: string;
-  renderDuration: number;
-  timestamp: number;
-  memoryUsage?: number;
-}
-
+// Additional interfaces for render tracking
 interface InfiniteRenderAlert {
   component: string;
   renderCount: number;
   timeWindow: number;
   rendersPerSecond: number;
   timestamp: number;
-}
-
-// Extended logger interface with render tracking
-interface ExtendedLoggerLike extends LoggerLike {
-  trackRender: (data: RenderTrackingData) => void;
-  trackLifecycle: (data: ComponentLifecycleData) => void;
-  trackPerformanceImpact: (data: PerformanceImpactData) => void;
-  detectInfiniteRender: (component: string, threshold?: number) => boolean;
-  getRenderStats: (component?: string) => RenderStats;
-  clearRenderStats: (component?: string) => void;
-}
-
-interface RenderStats {
-  totalRenders: number;
-  averageRenderTime: number;
-  lastRenderTime: number;
-  infiniteRenderAlerts: number;
-  mountCount: number;
-  unmountCount: number;
 }
 
 // Render tracking storage
@@ -230,30 +190,37 @@ class RenderTracker {
   }
 }
 
-// Global render tracker instance
-const renderTracker = new RenderTracker();
+/**
+ * Enhanced Browser Logger Class
+ * 
+ * Extends the unified client logger with browser-specific features:
+ * - Render tracking for React components
+ * - Performance monitoring
+ * - User interaction logging
+ * - Memory usage tracking
+ */
+export class EnhancedBrowserLogger extends UnifiedClientLogger implements BrowserLogger {
+  private renderTracker = new RenderTracker();
 
-const browserLogger: LoggerLike = {
-  debug: (...args: any[]) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug('[DEBUG]', ...args);
-    }
-  },
-  info: (...args: any[]) => console.info('[INFO]', ...args),
-  warn: (...args: any[]) => console.warn('[WARN]', ...args),
-  error: (...args: any[]) => console.error('[ERROR]', ...args),
-};
+  constructor(config: BrowserLoggerConfig = {}) {
+    super({
+      enableRenderTracking: true,
+      enablePerformanceTracking: true,
+      enableUserTracking: true,
+      maxRenderHistory: 1000,
+      infiniteRenderThreshold: 50,
+      ...config,
+    });
+  }
 
-// Extended logger with render tracking capabilities
-const extendedLogger: ExtendedLoggerLike = {
-  ...browserLogger,
+  // ==================== Render Tracking Methods ====================
   
-  trackRender: (data: RenderTrackingData) => {
+  trackRender(data: RenderTrackingData): void {
     try {
-      renderTracker.trackRender(data);
+      this.renderTracker.trackRender(data);
       
       if (process.env.NODE_ENV === 'development') {
-        browserLogger.debug('[RENDER_TRACK]', {
+        this.debug('[RENDER_TRACK]', {
           component: data.component,
           renderCount: data.renderCount,
           trigger: data.trigger,
@@ -262,34 +229,34 @@ const extendedLogger: ExtendedLoggerLike = {
       }
       
       // Check for infinite renders
-      renderTracker.detectInfiniteRender(data.component);
+      this.renderTracker.detectInfiniteRender(data.component);
     } catch (error) {
-      browserLogger.warn('Failed to track render', { component: data.component }, error);
+      this.warn('Failed to track render', { component: data.component }, error);
     }
-  },
+  }
   
-  trackLifecycle: (data: ComponentLifecycleData) => {
+  trackLifecycle(data: ComponentLifecycleData): void {
     try {
-      renderTracker.trackLifecycle(data);
+      this.renderTracker.trackLifecycle(data);
       
       if (process.env.NODE_ENV === 'development') {
-        browserLogger.debug('[LIFECYCLE_TRACK]', {
+        this.debug('[LIFECYCLE_TRACK]', {
           component: data.component,
           action: data.action,
           timestamp: new Date(data.timestamp).toISOString()
         });
       }
     } catch (error) {
-      browserLogger.warn('Failed to track lifecycle', { component: data.component }, error);
+      this.warn('Failed to track lifecycle', { component: data.component }, error);
     }
-  },
+  }
   
-  trackPerformanceImpact: (data: PerformanceImpactData) => {
+  trackPerformanceImpact(data: PerformanceImpactData): void {
     try {
-      renderTracker.trackPerformanceImpact(data);
+      this.renderTracker.trackPerformanceImpact(data);
       
       if (process.env.NODE_ENV === 'development') {
-        browserLogger.debug('[PERFORMANCE_TRACK]', {
+        this.debug('[PERFORMANCE_TRACK]', {
           component: data.component,
           renderDuration: `${data.renderDuration.toFixed(2)}ms`,
           memoryUsage: data.memoryUsage ? `${(data.memoryUsage / 1024 / 1024).toFixed(2)}MB` : 'N/A',
@@ -299,31 +266,31 @@ const extendedLogger: ExtendedLoggerLike = {
       
       // Warn about slow renders
       if (data.renderDuration > 16) { // > 1 frame at 60fps
-        browserLogger.warn('[SLOW_RENDER]', {
+        this.warn('[SLOW_RENDER]', {
           component: data.component,
           duration: `${data.renderDuration.toFixed(2)}ms`,
           threshold: '16ms'
         });
       }
     } catch (error) {
-      browserLogger.warn('Failed to track performance impact', { component: data.component }, error);
+      this.warn('Failed to track performance impact', { component: data.component }, error);
     }
-  },
+  }
   
-  detectInfiniteRender: (component: string, threshold = 50) => {
+  detectInfiniteRender(component: string, threshold = 50): boolean {
     try {
-      return renderTracker.detectInfiniteRender(component, threshold);
+      return this.renderTracker.detectInfiniteRender(component, threshold);
     } catch (error) {
-      browserLogger.warn('Failed to detect infinite render', { component }, error);
+      this.warn('Failed to detect infinite render', { component }, error);
       return false;
     }
-  },
+  }
   
-  getRenderStats: (component?: string) => {
+  getRenderStats(component?: string): RenderStats {
     try {
-      return renderTracker.getRenderStats(component);
+      return this.renderTracker.getRenderStats(component);
     } catch (error) {
-      browserLogger.warn('Failed to get render stats', { component }, error);
+      this.warn('Failed to get render stats', { component }, error);
       return {
         totalRenders: 0,
         averageRenderTime: 0,
@@ -333,27 +300,185 @@ const extendedLogger: ExtendedLoggerLike = {
         unmountCount: 0
       };
     }
-  },
+  }
   
-  clearRenderStats: (component?: string) => {
+  clearRenderStats(component?: string): void {
     try {
-      renderTracker.clearRenderStats(component);
-      browserLogger.info('[RENDER_STATS_CLEARED]', { component: component || 'all' });
+      this.renderTracker.clearRenderStats(component);
+      this.info('[RENDER_STATS_CLEARED]', { component: component || 'all' });
     } catch (error) {
-      browserLogger.warn('Failed to clear render stats', { component }, error);
+      this.warn('Failed to clear render stats', { component }, error);
     }
   }
-};
 
-export const logger: ExtendedLoggerLike = extendedLogger;
+  // ==================== Browser-Specific Logging Methods ====================
+
+  logPerformance(operation: string, duration: number, metadata?: Record<string, unknown>): void {
+    const performanceData = {
+      component: 'performance',
+      operation,
+      duration,
+      user_agent: navigator.userAgent,
+      url: window.location.href,
+      memoryUsage: this.getMemoryUsage(),
+      connectionType: this.getConnectionType(),
+    };
+
+    const level = duration > 1000 ? 'warn' : 'info';
+    this[level](`Performance: ${operation} completed in ${duration.toFixed(2)}ms`, performanceData, metadata);
+  }
+
+  logUserInteraction(event: string, element?: string, metadata?: Record<string, unknown>): void {
+    this.info(`User interaction: ${event}`, {
+      component: 'ui',
+      operation: event,
+      element,
+      url: window.location.href,
+      user_agent: navigator.userAgent,
+    }, metadata);
+  }
+
+  logNavigation(from: string, to: string, metadata?: Record<string, unknown>): void {
+    this.info(`Navigation: ${from} -> ${to}`, {
+      component: 'navigation',
+      operation: 'navigate',
+      from,
+      to,
+      user_agent: navigator.userAgent,
+    }, metadata);
+  }
+
+  logError(error: Error | string, context?: LogContext, metadata?: Record<string, unknown>): void {
+    const errorData = this.processErrorForBrowser(error, context, metadata);
+    this.error(typeof error === 'string' ? error : error.message, context, errorData);
+  }
+
+  // ==================== Browser-Specific Utility Methods ====================
+
+  private processErrorForBrowser(
+    error: Error | string,
+    context?: LogContext,
+    metadata?: Record<string, unknown>
+  ): Record<string, unknown> {
+    let errorObj: Error;
+    
+    if (typeof error === 'string') {
+      errorObj = new Error(error);
+    } else {
+      errorObj = error;
+    }
+
+    return {
+      ...metadata,
+      error: {
+        message: errorObj.message,
+        name: errorObj.name,
+        stack: errorObj.stack,
+        filename: (errorObj as any).filename,
+        lineno: (errorObj as any).lineno,
+        colno: (errorObj as any).colno,
+      },
+      browser: {
+        user_agent: navigator.userAgent,
+        url: window.location.href,
+        referrer: document.referrer,
+        timestamp: new Date().toISOString(),
+        memoryUsage: this.getMemoryUsage(),
+        connectionType: this.getConnectionType(),
+      },
+    };
+  }
+
+  private getMemoryUsage(): Record<string, unknown> | undefined {
+    if ('memory' in performance) {
+      const mem = (performance as any).memory;
+      return {
+        used: mem.usedJSHeapSize,
+        total: mem.totalJSHeapSize,
+        limit: mem.jsHeapSizeLimit,
+      };
+    }
+    return undefined;
+  }
+
+  private getConnectionType(): string | undefined {
+    if ('connection' in navigator) {
+      return (navigator as any).connection?.effectiveType || 'unknown';
+    }
+    return undefined;
+  }
+}
+
+// ==================== Default Logger Instance ====================
+
+/**
+ * Default enhanced browser logger instance
+ */
+export const logger = new EnhancedBrowserLogger({
+  level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+  enableRenderTracking: process.env.NODE_ENV === 'development',
+  enablePerformanceTracking: true,
+  enableUserTracking: process.env.NODE_ENV !== 'development',
+});
+
+// ==================== Convenience Functions ====================
+
+/**
+ * Create an enhanced browser logger with specific configuration
+ */
+export function createBrowserLogger(config: BrowserLoggerConfig): BrowserLogger {
+  return new EnhancedBrowserLogger(config);
+}
+
+/**
+ * Track a component render
+ */
+export function trackRender(component: string, trigger: string = 'unknown', additionalData?: any): void {
+  logger.trackRender({
+    component,
+    renderCount: 1, // This would be managed by the component
+    timestamp: Date.now(),
+    trigger,
+    ...additionalData,
+  });
+}
+
+/**
+ * Track component lifecycle events
+ */
+export function trackLifecycle(component: string, action: 'mount' | 'unmount' | 'update', additionalData?: any): void {
+  logger.trackLifecycle({
+    component,
+    action,
+    timestamp: Date.now(),
+    ...additionalData,
+  });
+}
+
+/**
+ * Measure and track performance impact
+ */
+export function measurePerformance<T>(component: string, fn: () => T): T {
+  const startTime = performance.now();
+  const result = fn();
+  const duration = performance.now() - startTime;
+  
+  logger.trackPerformanceImpact({
+    component,
+    renderDuration: duration,
+    timestamp: Date.now(),
+    memoryUsage: logger['getMemoryUsage']?.()?.used as number,
+  });
+  
+  return result;
+}
 
 // Export types for external use
 export type {
   RenderTrackingData,
   ComponentLifecycleData,
   PerformanceImpactData,
-  InfiniteRenderAlert,
   RenderStats
-};
+} from '../types/logging';
 
 export default logger;

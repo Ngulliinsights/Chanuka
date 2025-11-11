@@ -12,10 +12,14 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
 
-    // Type Checking
+    // Type Checking - Progressive strict mode for Chanuka UI upgrade
     "strict": true,
     "exactOptionalPropertyTypes": false,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "noImplicitOverride": false,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitThis": true,
     "skipLibCheck": true,
     "allowJs": true,
 

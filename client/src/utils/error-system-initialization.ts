@@ -6,7 +6,7 @@
  */
 
 import { errorHandler } from './unified-error-handler';
-import { errorAnalytics, setupSentryAnalytics, setupDataDogAnalytics, setupCustomAnalytics } from './error-analytics';
+import { errorAnalytics, setupSentry, setupDataDog, setupCustomAnalytics } from './error-analytics';
 import { smartRecoveryEngine } from './advanced-error-recovery';
 import { errorRateLimiter } from './error-rate-limiter';
 
@@ -131,31 +131,45 @@ export async function initializeErrorSystem(config: ErrorSystemConfig = {}): Pro
  * Setup analytics providers based on configuration
  */
 async function setupAnalytics(analyticsConfig: Required<ErrorSystemConfig>['analytics']): Promise<void> {
-  const { providers, batchSize, batchTimeout } = analyticsConfig;
+  const { providers } = analyticsConfig;
 
   // Configure analytics manager
-  errorAnalytics.configure({
+  await errorAnalytics.configure({
     enabled: true,
-    batchSize,
-    batchTimeout,
+    sentry: providers?.sentry ? {
+      ...providers.sentry,
+      environment: 'production'
+    } : undefined,
+    datadog: providers?.datadog ? {
+      ...providers.datadog,
+      applicationId: 'app-id' // This would need to be configured
+    } : undefined,
+    custom: providers?.custom,
   });
 
   // Setup providers
-  if (providers.sentry?.dsn) {
-    setupSentryAnalytics(providers.sentry.dsn);
+  if (providers?.sentry?.dsn) {
+    await setupSentry({
+      dsn: providers.sentry.dsn,
+      environment: 'production' // Default environment
+    });
     console.log('📊 Sentry analytics provider configured');
   }
 
-  if (providers.datadog?.clientToken) {
-    setupDataDogAnalytics({
+  if (providers?.datadog?.clientToken) {
+    await setupDataDog({
+      applicationId: 'app-id', // This would need to be configured
       clientToken: providers.datadog.clientToken,
       site: providers.datadog.site,
     });
     console.log('📊 DataDog analytics provider configured');
   }
 
-  if (providers.custom?.endpoint) {
-    setupCustomAnalytics(providers.custom.endpoint, providers.custom.apiKey);
+  if (providers?.custom?.endpoint) {
+    await setupCustomAnalytics({
+      endpoint: providers.custom.endpoint,
+      apiKey: providers.custom.apiKey,
+    });
     console.log('📊 Custom analytics provider configured');
   }
 }
@@ -218,10 +232,10 @@ export function getErrorSystemStatus(): {
   return {
     initialized: true, // If this function runs, system is initialized
     coreHandler: !!errorHandler,
-    analytics: errorAnalytics?.isEnabled() || false,
+    analytics: errorAnalytics?.getStats()?.enabled || false,
     recovery: !!smartRecoveryEngine,
     rateLimiting: !!errorRateLimiter,
-    providers: errorAnalytics?.getProviders() || [],
+    providers: errorAnalytics?.getStats()?.providers?.map(p => p.displayName) || [],
   };
 }
 

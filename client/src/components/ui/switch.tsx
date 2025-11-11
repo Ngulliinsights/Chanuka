@@ -2,7 +2,7 @@ import { forwardRef, ElementRef, ComponentPropsWithoutRef } from "react"
 import { Root, Thumb } from "@radix-ui/react-switch"
 
 import { cn } from '../../lib/utils'
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 const Switch = forwardRef<
   ElementRef<typeof Root>,

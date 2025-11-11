@@ -18,7 +18,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { useUnifiedNavigation } from '../use-unified-navigation';
 import { createNavigationProvider } from '../../core/navigation/context';
 import React from 'react';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (

@@ -20,7 +20,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 // Mock browser environment
 const mockUserAgent = (user_agent: string) => {

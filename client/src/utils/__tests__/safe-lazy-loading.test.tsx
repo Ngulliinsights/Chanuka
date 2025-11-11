@@ -15,7 +15,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { render, screen, waitFor } from '@testing-library/react';
 import { Suspense } from 'react';
-import { logger } from '../browser-logger';
+import { logger } from '../logger';
 import {
   createSafeLazyPage,
   createSafeLazyComponent,

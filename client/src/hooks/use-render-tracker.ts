@@ -1,13 +1,13 @@
 /**
  * React Hook for Render Tracking
  * 
- * This hook integrates with the extended browser-logger to automatically
+ * This hook integrates with the extended logger to automatically
  * track component renders, lifecycle events, and performance metrics.
  */
 
 import * as React from 'react';
 import { useEffect, useRef, useCallback } from 'react';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 interface UseRenderTrackerOptions {
   componentName: string;

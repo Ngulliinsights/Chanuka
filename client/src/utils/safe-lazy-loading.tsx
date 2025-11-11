@@ -1,4 +1,4 @@
-import {
+import React, {
   lazy,
   LazyExoticComponent,
   ComponentType,
@@ -6,7 +6,7 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { logger } from "./browser-logger";
+import { logger } from "./logger";
 import {
   PageLoader,
 } from "../components/loading/LoadingStates";
@@ -283,7 +283,11 @@ export function createSafeLazyPage<P extends object = {}>(
       case "@/pages/dashboard":
         return import("../pages/dashboard");
       case "@/pages/bills-dashboard":
-        return import("../pages/bills-dashboard");
+        return import("../pages/enhanced-bills-dashboard-page");
+      case "@/pages/enhanced-bills-dashboard":
+        return import("../pages/enhanced-bills-dashboard-page");
+      case "@/pages/enhanced-bills-dashboard-page":
+        return import("../pages/enhanced-bills-dashboard-page");
       case "@/pages/auth-page":
         return import("../pages/auth-page");
       case "@/pages/bill-detail":
@@ -443,7 +447,7 @@ export const SafeLazyPages = {
     enablePreloading: true,
     displayName: "HomePage",
   }),
-  BillsDashboard: createSafeLazyPage("@/pages/bills-dashboard", "default", {
+  BillsDashboard: createSafeLazyPage("@/pages/enhanced-bills-dashboard-page", "default", {
     preloadPriority: "high",
     enablePreloading: true,
     displayName: "BillsDashboard",

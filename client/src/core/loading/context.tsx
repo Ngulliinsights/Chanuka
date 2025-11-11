@@ -1,304 +1,417 @@
 /**
- * Unified Loading Context - Consolidated from UnifiedLoadingContext and LoadingContext
+ * Unified Loading Context - Consolidated from multiple implementations
  * Best practices: Connection awareness, asset loading integration, timeout management
+ * Integrated with error management system
  */
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef, useMemo } from 'react';
-import { LoadingState, LoadingAction, LoadingOperation, LoadingOptions, LoadingPriority } from './types';
+import { LoadingStateData, LoadingAction, LoadingOperation, LoadingOptions, LoadingPriority, LoadingType, LoadingContextValue, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats, LoadingError, LoadingTimeoutError, LoadingRetryError, LoadingConnectionError } from './types';
 import { loadingReducer } from './reducer';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
+import { useErrorAnalytics } from '../../hooks/useErrorAnalytics';
 
-const initialState: LoadingState = {
+const initialState: LoadingStateData = {
   operations: {},
   globalLoading: false,
   highPriorityLoading: false,
-  connectionInfo: null,
-  isOnline: true,
+  connectionInfo: {
+    type: 'unknown',
+  },
+  isOnline: navigator.onLine,
   adaptiveSettings: {
     enableAnimations: true,
     maxConcurrentOperations: 4,
     defaultTimeout: 30000,
     retryDelay: 1000,
     timeoutWarningThreshold: 0.7,
+    connectionMultiplier: 1,
   },
   assetLoadingProgress: {
     loaded: 0,
     total: 0,
     phase: 'preload',
   },
+  stats: {
+    totalOperations: 0,
+    activeOperations: 0,
+    completedOperations: 0,
+    failedOperations: 0,
+    averageLoadTime: 0,
+    retryRate: 0,
+    connectionImpact: 'low',
+    lastUpdate: Date.now(),
+  },
 };
 
-export interface LoadingContextValue {
-  state: LoadingState;
-  startOperation: (operation: Omit<LoadingOperation, 'startTime' | 'retryCount' | 'timeoutWarningShown'>) => void;
-  updateOperation: (id: string, updates: Partial<LoadingOperation>) => void;
-  completeOperation: (id: string, success: boolean, error?: Error) => void;
-  retryOperation: (id: string) => void;
-  cancelOperation: (id: string) => void;
-  getOperation: (id: string) => LoadingOperation | undefined;
-  getOperationsByType: (type: LoadingOperation['type']) => LoadingOperation[];
-  getOperationsByPriority: (priority: LoadingOperation['priority']) => LoadingOperation[];
-  isOperationActive: (id: string) => boolean;
-  getActiveOperationsCount: () => number;
-  shouldShowGlobalLoader: () => boolean;
-  getEstimatedTimeRemaining: (id: string) => number | null;
-
-  // Convenience methods
-  startPageLoading: (pageId: string, message?: string) => void;
-  completePageLoading: (pageId: string, success?: boolean, error?: Error) => void;
-  startComponentLoading: (componentId: string, message?: string, priority?: LoadingPriority) => void;
-  completeComponentLoading: (componentId: string, success?: boolean, error?: Error) => void;
-  startApiLoading: (apiId: string, message?: string, priority?: LoadingPriority) => void;
-  completeApiLoading: (apiId: string, success?: boolean, error?: Error) => void;
+export interface LoadingProviderProps {
+  children: React.ReactNode;
+  useConnectionAware?: () => ConnectionInfo;
+  useOnlineStatus?: () => boolean;
+  assetLoadingManager?: any;
+  errorAnalytics?: ReturnType<typeof useErrorAnalytics>;
 }
 
 const LoadingContext = createContext<LoadingContextValue | undefined>(undefined);
 
-export function createLoadingProvider(
-  useConnectionAware: () => any,
-  useOnlineStatus: () => boolean,
-  assetLoadingManager?: any
-) {
-  return function LoadingProvider({ children }: { children: React.ReactNode }) {
-    const [state, dispatch] = useReducer(loadingReducer, initialState);
-    const connectionInfo = useConnectionAware();
-    const isOnline = useOnlineStatus();
+export function LoadingProvider({
+  children,
+  useConnectionAware,
+  useOnlineStatus,
+  assetLoadingManager,
+  errorAnalytics
+}: LoadingProviderProps) {
+  const [state, dispatch] = useReducer(loadingReducer, initialState);
+  const errorAnalyticsRef = useRef(errorAnalytics);
 
-    // Asset loading progress subscription (if available)
-    useEffect(() => {
-      if (assetLoadingManager?.onProgress) {
-        const unsubscribe = assetLoadingManager.onProgress((progress: any) => {
-          dispatch({ type: 'UPDATE_ASSET_PROGRESS', payload: progress });
-        });
-        return unsubscribe;
-      }
-    }, []);
+  // Update error analytics reference
+  useEffect(() => {
+    errorAnalyticsRef.current = errorAnalytics;
+  }, [errorAnalytics]);
 
-    // Update connection info when it changes
-    useEffect(() => {
-      dispatch({
-        type: 'UPDATE_CONNECTION',
-        payload: { connectionInfo, isOnline: isOnline ?? true },
+  // Connection awareness
+  const connectionInfo = useConnectionAware?.() || state.connectionInfo;
+  const isOnline = useOnlineStatus?.() ?? navigator.onLine;
+
+  // Asset loading progress subscription
+  useEffect(() => {
+    if (assetLoadingManager?.onProgress) {
+      const unsubscribe = assetLoadingManager.onProgress((progress: AssetLoadingProgress) => {
+        dispatch({ type: 'UPDATE_ASSET_PROGRESS', payload: progress });
       });
-    }, [connectionInfo, isOnline]);
+      return unsubscribe;
+    }
+  }, [assetLoadingManager]);
 
-    // Monitor operations for timeouts and warnings
-    useEffect(() => {
-      const interval = setInterval(() => {
-        const now = Date.now();
+  // Update connection info when it changes
+  useEffect(() => {
+    dispatch({
+      type: 'UPDATE_CONNECTION',
+      payload: { connectionInfo, isOnline },
+    });
+  }, [connectionInfo, isOnline]);
 
-        Object.entries(state.operations).forEach(([id, operation]) => {
-          const elapsed = now - operation.startTime;
-          const timeout = operation.timeout || state.adaptiveSettings.defaultTimeout;
-          const warningThreshold = timeout * state.adaptiveSettings.timeoutWarningThreshold;
+  // Monitor operations for timeouts and warnings
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
 
-          // Show timeout warning
-          if (elapsed > warningThreshold && !operation.timeoutWarningShown) {
-            dispatch({ type: 'SHOW_TIMEOUT_WARNING', payload: { id } });
-          }
+      Object.entries(state.operations).forEach(([id, operation]) => {
+        const elapsed = now - operation.startTime;
+        const timeout = operation.timeout || state.adaptiveSettings.defaultTimeout;
+        const warningThreshold = timeout * state.adaptiveSettings.timeoutWarningThreshold;
 
-          // Timeout operation
-          if (elapsed > timeout) {
-            dispatch({
-              type: 'COMPLETE_OPERATION',
-              payload: {
-                id,
-                success: false,
-                error: new Error('Operation timed out'),
-              },
-            });
-          }
-        });
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }, [state.operations, state.adaptiveSettings]);
-
-    const startOperation = useCallback((operation: Omit<LoadingOperation, 'startTime' | 'retryCount' | 'timeoutWarningShown'>) => {
-      // Prevent duplicate operations
-      if (state.operations[operation.id]) {
-        logger.warn(`Operation ${operation.id} is already running`);
-        return;
-      }
-
-      // Check concurrent operation limits
-      const activeOperations = Object.values(state.operations);
-      const totalCount = activeOperations.length;
-
-      if (totalCount >= state.adaptiveSettings.maxConcurrentOperations) {
-        if (operation.priority !== 'high') {
-          logger.warn(`Delaying operation ${operation.id} due to concurrent operation limit`);
-          return;
+        // Show timeout warning
+        if (elapsed > warningThreshold && !operation.timeoutWarningShown) {
+          dispatch({ type: 'SHOW_TIMEOUT_WARNING', payload: { id } });
         }
-      }
 
-      // Skip low priority operations on slow connections or when offline
-      if (!isOnline || (connectionInfo?.connectionType === 'slow' && operation.priority === 'low')) {
-        logger.warn(`Skipping operation ${operation.id} due to connection constraints`);
+        // Timeout operation
+        if (elapsed > timeout && !operation.error) {
+          const timeoutError = new LoadingTimeoutError(id, timeout, {
+            elapsed,
+            retryCount: operation.retryCount,
+            maxRetries: operation.maxRetries,
+          });
+
+          dispatch({
+            type: 'TIMEOUT_OPERATION',
+            payload: { id },
+          });
+
+          // Report to error analytics
+          errorAnalyticsRef.current?.trackError(timeoutError, {
+            component: 'LoadingProvider',
+            operation: operation,
+            context: 'timeout',
+          });
+        }
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [state.operations, state.adaptiveSettings]);
+
+  const startOperation = useCallback((operation: Omit<LoadingOperation, 'startTime' | 'retryCount' | 'timeoutWarningShown' | 'cancelled'>) => {
+    // Prevent duplicate operations
+    if (state.operations[operation.id]) {
+      logger.warn(`Operation ${operation.id} is already running`);
+      return;
+    }
+
+    // Check concurrent operation limits
+    const activeOperations = Object.values(state.operations);
+    const totalCount = activeOperations.length;
+
+    if (totalCount >= state.adaptiveSettings.maxConcurrentOperations) {
+      if (operation.priority !== 'high') {
+        logger.warn(`Delaying operation ${operation.id} due to concurrent operation limit`);
         return;
       }
+    }
 
-      dispatch({ type: 'START_OPERATION', payload: operation });
-    }, [state.operations, state.adaptiveSettings.maxConcurrentOperations, isOnline, connectionInfo]);
-
-    const updateOperation = useCallback((id: string, updates: Partial<LoadingOperation>) => {
-      dispatch({ type: 'UPDATE_OPERATION', payload: { id, updates } });
-    }, []);
-
-    const completeOperation = useCallback((id: string, success: boolean, error?: Error) => {
-      dispatch({ type: 'COMPLETE_OPERATION', payload: { id, success, error } });
-    }, []);
-
-    const retryOperation = useCallback((id: string) => {
-      const operation = state.operations[id];
-      if (!operation) return;
-
-      if (operation.retryCount >= operation.maxRetries) {
-        completeOperation(id, false, new Error('Maximum retry attempts reached'));
-        return;
-      }
-
-      // Exponential backoff with connection-aware delay
-      const delay = state.adaptiveSettings.retryDelay * Math.pow(2, operation.retryCount);
-
-      setTimeout(() => {
-        dispatch({ type: 'RETRY_OPERATION', payload: { id } });
-      }, delay);
-    }, [state.operations, state.adaptiveSettings.retryDelay, completeOperation]);
-
-    const cancelOperation = useCallback((id: string) => {
-      dispatch({ type: 'CANCEL_OPERATION', payload: { id } });
-    }, []);
-
-    const getOperation = useCallback((id: string) => {
-      return state.operations[id];
-    }, [state.operations]);
-
-    const getOperationsByType = useCallback((type: LoadingOperation['type']) => {
-      return Object.values(state.operations).filter(op => op.type === type);
-    }, [state.operations]);
-
-    const getOperationsByPriority = useCallback((priority: LoadingOperation['priority']) => {
-      return Object.values(state.operations).filter(op => op.priority === priority);
-    }, [state.operations]);
-
-    const isOperationActive = useCallback((id: string) => {
-      return id in state.operations;
-    }, [state.operations]);
-
-    const getActiveOperationsCount = useCallback(() => {
-      return Object.keys(state.operations).length;
-    }, [state.operations]);
-
-    const shouldShowGlobalLoader = useCallback(() => {
-      return state.highPriorityLoading || (state.globalLoading && getActiveOperationsCount() > 2);
-    }, [state.highPriorityLoading, state.globalLoading, getActiveOperationsCount]);
-
-    const getEstimatedTimeRemaining = useCallback((id: string): number | null => {
-      const operation = state.operations[id];
-      if (!operation) return null;
-
-      const elapsed = Date.now() - operation.startTime;
-      const timeout = operation.timeout || state.adaptiveSettings.defaultTimeout;
-      const remaining = timeout - elapsed;
-
-      return remaining > 0 ? remaining : null;
-    }, [state.operations, state.adaptiveSettings.defaultTimeout]);
-
-    // Convenience methods
-    const startPageLoading = useCallback((pageId: string, message?: string) => {
-      startOperation({
-        id: `page-${pageId}`,
-        type: 'page',
-        message: message || 'Loading page...',
-        priority: 'high',
-        maxRetries: 2,
-        connectionAware: true,
+    // Skip low priority operations on slow connections or when offline
+    if (!isOnline || (connectionInfo.type === 'slow' && operation.priority === 'low')) {
+      const connectionError = new LoadingConnectionError(operation.id, connectionInfo.type, {
+        isOnline,
+        connectionInfo,
       });
-    }, [startOperation]);
 
-    const completePageLoading = useCallback((pageId: string, success: boolean = true, error?: Error) => {
-      completeOperation(`page-${pageId}`, success, error);
-    }, [completeOperation]);
+      logger.warn(`Skipping operation ${operation.id} due to connection constraints`, connectionError);
 
-    const startComponentLoading = useCallback((componentId: string, message?: string, priority: LoadingPriority = 'medium') => {
-      startOperation({
-        id: `component-${componentId}`,
-        type: 'component',
-        message: message || 'Loading component...',
-        priority,
-        maxRetries: 1,
-        connectionAware: true,
+      // Report to error analytics
+      errorAnalyticsRef.current?.trackError(connectionError, {
+        component: 'LoadingProvider',
+        operation: operation,
+        context: 'connection-constraint',
       });
-    }, [startOperation]);
 
-    const completeComponentLoading = useCallback((componentId: string, success: boolean = true, error?: Error) => {
-      completeOperation(`component-${componentId}`, success, error);
-    }, [completeOperation]);
+      return;
+    }
 
-    const startApiLoading = useCallback((apiId: string, message?: string, priority: LoadingPriority = 'medium') => {
-      startOperation({
-        id: `api-${apiId}`,
-        type: 'api',
-        message: message || 'Loading data...',
-        priority,
-        maxRetries: 3,
-        connectionAware: true,
+    dispatch({ type: 'START_OPERATION', payload: operation });
+  }, [state.operations, state.adaptiveSettings.maxConcurrentOperations, isOnline, connectionInfo]);
+
+  const updateOperation = useCallback((id: string, updates: Partial<LoadingOperation>) => {
+    dispatch({ type: 'UPDATE_OPERATION', payload: { id, updates } });
+  }, []);
+
+  const completeOperation = useCallback((id: string, success: boolean, error?: Error) => {
+    dispatch({ type: 'COMPLETE_OPERATION', payload: { id, success, error } });
+
+    // Report errors to analytics
+    if (!success && error) {
+      const loadingError = error instanceof LoadingError ? error :
+        new LoadingError(id, error.message, 'OPERATION_FAILED', { originalError: error });
+
+      errorAnalyticsRef.current?.trackError(loadingError, {
+        component: 'LoadingProvider',
+        operation: state.operations[id],
+        context: 'operation-failure',
       });
-    }, [startOperation]);
+    }
+  }, [state.operations]);
 
-    const completeApiLoading = useCallback((apiId: string, success: boolean = true, error?: Error) => {
-      completeOperation(`api-${apiId}`, success, error);
-    }, [completeOperation]);
+  const retryOperation = useCallback((id: string) => {
+    const operation = state.operations[id];
+    if (!operation) return;
 
-    const value: LoadingContextValue = useMemo(() => ({
-      state,
-      startOperation,
-      updateOperation,
-      completeOperation,
-      retryOperation,
-      cancelOperation,
-      getOperation,
-      getOperationsByType,
-      getOperationsByPriority,
-      isOperationActive,
-      getActiveOperationsCount,
-      shouldShowGlobalLoader,
-      getEstimatedTimeRemaining,
-      startPageLoading,
-      completePageLoading,
-      startComponentLoading,
-      completeComponentLoading,
-      startApiLoading,
-      completeApiLoading,
-    }), [
-      state,
-      startOperation,
-      updateOperation,
-      completeOperation,
-      retryOperation,
-      cancelOperation,
-      getOperation,
-      getOperationsByType,
-      getOperationsByPriority,
-      isOperationActive,
-      getActiveOperationsCount,
-      shouldShowGlobalLoader,
-      getEstimatedTimeRemaining,
-      startPageLoading,
-      completePageLoading,
-      startComponentLoading,
-      completeComponentLoading,
-      startApiLoading,
-      completeApiLoading,
-    ]);
+    if (operation.retryCount >= operation.maxRetries) {
+      const retryError = new LoadingRetryError(id, operation.retryCount, operation.maxRetries, {
+        operation,
+      });
 
-    return (
-      <LoadingContext.Provider value={value}>
-        {children}
-      </LoadingContext.Provider>
-    );
-  };
+      completeOperation(id, false, retryError);
+      return;
+    }
+
+    // Calculate retry delay based on strategy
+    let delay = operation.retryDelay;
+    switch (operation.retryStrategy) {
+      case 'exponential':
+        delay = operation.retryDelay * Math.pow(2, operation.retryCount);
+        break;
+      case 'linear':
+        delay = operation.retryDelay * (operation.retryCount + 1);
+        break;
+      case 'none':
+        delay = 0;
+        break;
+    }
+
+    // Apply connection-aware delay multiplier
+    delay *= state.adaptiveSettings.connectionMultiplier;
+
+    setTimeout(() => {
+      dispatch({ type: 'RETRY_OPERATION', payload: { id } });
+    }, delay);
+  }, [state.operations, state.adaptiveSettings.connectionMultiplier, completeOperation]);
+
+  const cancelOperation = useCallback((id: string) => {
+    dispatch({ type: 'CANCEL_OPERATION', payload: { id } });
+  }, []);
+
+  const timeoutOperation = useCallback((id: string) => {
+    const operation = state.operations[id];
+    if (!operation) return;
+
+    const timeoutError = new LoadingTimeoutError(id, operation.timeout || state.adaptiveSettings.defaultTimeout, {
+      operation,
+    });
+
+    completeOperation(id, false, timeoutError);
+  }, [state.operations, state.adaptiveSettings.defaultTimeout, completeOperation]);
+
+  const getOperation = useCallback((id: string) => {
+    return state.operations[id];
+  }, [state.operations]);
+
+  const getOperationsByType = useCallback((type: LoadingType) => {
+    return Object.values(state.operations).filter(op => op.type === type);
+  }, [state.operations]);
+
+  const getOperationsByPriority = useCallback((priority: LoadingPriority) => {
+    return Object.values(state.operations).filter(op => op.priority === priority);
+  }, [state.operations]);
+
+  const isOperationActive = useCallback((id: string) => {
+    return id in state.operations;
+  }, [state.operations]);
+
+  const getActiveOperationsCount = useCallback(() => {
+    return Object.keys(state.operations).length;
+  }, [state.operations]);
+
+  const shouldShowGlobalLoader = useCallback(() => {
+    return state.highPriorityLoading || (state.globalLoading && getActiveOperationsCount() > 2);
+  }, [state.highPriorityLoading, state.globalLoading, getActiveOperationsCount]);
+
+  const getEstimatedTimeRemaining = useCallback((id: string): number | null => {
+    const operation = state.operations[id];
+    if (!operation) return null;
+
+    const elapsed = Date.now() - operation.startTime;
+    const timeout = operation.timeout || state.adaptiveSettings.defaultTimeout;
+    const remaining = timeout - elapsed;
+
+    return remaining > 0 ? remaining : null;
+  }, [state.operations, state.adaptiveSettings.defaultTimeout]);
+
+  const getStats = useCallback(() => {
+    return state.stats;
+  }, [state.stats]);
+
+  // Convenience methods
+  const startPageLoading = useCallback((pageId: string, message?: string, options: Partial<LoadingOptions> = {}) => {
+    startOperation({
+      id: `page-${pageId}`,
+      type: 'page',
+      message: message || 'Loading page...',
+      priority: options.priority || 'high',
+      timeout: options.timeout,
+      maxRetries: options.retryLimit || 2,
+      connectionAware: options.connectionAware ?? true,
+      retryStrategy: options.retryStrategy || 'exponential',
+      retryDelay: options.retryDelay || 1000,
+      metadata: options.metadata,
+    });
+  }, [startOperation]);
+
+  const completePageLoading = useCallback((pageId: string, success: boolean = true, error?: Error) => {
+    completeOperation(`page-${pageId}`, success, error);
+  }, [completeOperation]);
+
+  const startComponentLoading = useCallback((componentId: string, message?: string, options: Partial<LoadingOptions> = {}) => {
+    startOperation({
+      id: `component-${componentId}`,
+      type: 'component',
+      message: message || 'Loading component...',
+      priority: options.priority || 'medium',
+      timeout: options.timeout,
+      maxRetries: options.retryLimit || 1,
+      connectionAware: options.connectionAware ?? true,
+      retryStrategy: options.retryStrategy || 'linear',
+      retryDelay: options.retryDelay || 1000,
+      metadata: options.metadata,
+    });
+  }, [startOperation]);
+
+  const completeComponentLoading = useCallback((componentId: string, success: boolean = true, error?: Error) => {
+    completeOperation(`component-${componentId}`, success, error);
+  }, [completeOperation]);
+
+  const startApiLoading = useCallback((apiId: string, message?: string, options: Partial<LoadingOptions> = {}) => {
+    startOperation({
+      id: `api-${apiId}`,
+      type: 'api',
+      message: message || 'Loading data...',
+      priority: options.priority || 'medium',
+      timeout: options.timeout || 12000,
+      maxRetries: options.retryLimit || 3,
+      connectionAware: options.connectionAware ?? true,
+      retryStrategy: options.retryStrategy || 'exponential',
+      retryDelay: options.retryDelay || 1000,
+      metadata: options.metadata,
+    });
+  }, [startOperation]);
+
+  const completeApiLoading = useCallback((apiId: string, success: boolean = true, error?: Error) => {
+    completeOperation(`api-${apiId}`, success, error);
+  }, [completeOperation]);
+
+  const startAssetLoading = useCallback((assetId: string, message?: string, options: Partial<LoadingOptions> = {}) => {
+    startOperation({
+      id: `asset-${assetId}`,
+      type: 'asset',
+      message: message || 'Loading assets...',
+      priority: options.priority || 'low',
+      timeout: options.timeout || 20000,
+      maxRetries: options.retryLimit || 1,
+      connectionAware: options.connectionAware ?? true,
+      retryStrategy: options.retryStrategy || 'linear',
+      retryDelay: options.retryDelay || 2000,
+      metadata: options.metadata,
+    });
+  }, [startOperation]);
+
+  const completeAssetLoading = useCallback((assetId: string, success: boolean = true, error?: Error) => {
+    completeOperation(`asset-${assetId}`, success, error);
+  }, [completeOperation]);
+
+  const value: LoadingContextValue = useMemo(() => ({
+    state,
+    startOperation,
+    updateOperation,
+    completeOperation,
+    retryOperation,
+    cancelOperation,
+    timeoutOperation,
+    getOperation,
+    getOperationsByType,
+    getOperationsByPriority,
+    isOperationActive,
+    getActiveOperationsCount,
+    shouldShowGlobalLoader,
+    getEstimatedTimeRemaining,
+    getStats,
+    startPageLoading,
+    completePageLoading,
+    startComponentLoading,
+    completeComponentLoading,
+    startApiLoading,
+    completeApiLoading,
+    startAssetLoading,
+    completeAssetLoading,
+  }), [
+    state,
+    startOperation,
+    updateOperation,
+    completeOperation,
+    retryOperation,
+    cancelOperation,
+    timeoutOperation,
+    getOperation,
+    getOperationsByType,
+    getOperationsByPriority,
+    isOperationActive,
+    getActiveOperationsCount,
+    shouldShowGlobalLoader,
+    getEstimatedTimeRemaining,
+    getStats,
+    startPageLoading,
+    completePageLoading,
+    startComponentLoading,
+    completeComponentLoading,
+    startApiLoading,
+    completeApiLoading,
+    startAssetLoading,
+    completeAssetLoading,
+  ]);
+
+  return (
+    <LoadingContext.Provider value={value}>
+      {children}
+    </LoadingContext.Provider>
+  );
 }
 
 export function useLoading(): LoadingContextValue {
@@ -310,4 +423,4 @@ export function useLoading(): LoadingContextValue {
 }
 
 // Export LoadingProvider for compatibility
-export const LoadingProvider = createLoadingProvider(() => ({}), () => true);
+export const UnifiedLoadingProvider = LoadingProvider;

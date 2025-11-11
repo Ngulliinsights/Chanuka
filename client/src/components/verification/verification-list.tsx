@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { LoadingSpinner } from '../ui/spinner';
 import { useBills } from '../../hooks/use-bills';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface VerificationItem { id: number;
   bill_id: number;

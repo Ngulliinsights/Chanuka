@@ -17,7 +17,7 @@ import {
   Eye,
   RefreshCw
 } from 'lucide-react';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface ConflictData {
   conflicts: ConflictDetectionResult[];

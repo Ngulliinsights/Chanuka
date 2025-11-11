@@ -1,6 +1,6 @@
 import { useNavigation } from '../core/navigation/context';
 import { useKeyboardFocus } from './use-keyboard-focus';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 /**
  * Unified navigation hook that combines both navigation contexts

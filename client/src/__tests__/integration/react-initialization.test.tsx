@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { createRoot } from 'react-dom/client';
 import '@testing-library/jest-dom';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Mock modules that are imported in main.tsx
 vi.mock('../../utils/serviceWorker', () => ({

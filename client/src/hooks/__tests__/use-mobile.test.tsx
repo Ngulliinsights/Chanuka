@@ -15,7 +15,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { renderHook } from '@testing-library/react';
 import { useMediaQuery } from '../use-mobile';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Mock matchMedia
 const mockMatchMedia = vi.fn();

@@ -21,7 +21,7 @@ import {
   MobileTouchUtils,
 } from "../../utils/mobile-touch-handler";
 import { Link, useLocation } from "react-router-dom";
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 interface NavigationItem {
   id: string;

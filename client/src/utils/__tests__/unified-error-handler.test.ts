@@ -9,7 +9,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('../browser-logger', () => ({
+vi.mock('../logger', () => ({
   logger: mockLogger,
 }));
 

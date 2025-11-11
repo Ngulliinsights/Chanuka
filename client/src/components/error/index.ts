@@ -10,14 +10,14 @@
 // ============================================================================
 
 // Enhanced ErrorBoundary with full unified error handler features
-export { 
-  ErrorBoundary as EnhancedErrorBoundary,
+export type {
   ErrorBoundaryProps,
   ErrorFallbackProps,
   RecoveryOption,
   UserFeedback,
   ErrorMetrics
 } from '../error-handling/ErrorBoundary';
+export { ErrorBoundary as EnhancedErrorBoundary } from '../error-handling/ErrorBoundary';
 
 // ============================================================================
 // CORE: Unified Error Handler System
@@ -26,12 +26,14 @@ export {
 // Unified error handler core
 export {
   errorHandler,
+  useErrorHandler,
+  useErrorBoundary,
+} from '../../utils/unified-error-handler';
+export type {
   AppError,
   ErrorContext,
   ErrorRecoveryStrategy,
   ErrorHandlerConfig,
-  useErrorHandler,
-  useErrorBoundary,
 } from '../../utils/unified-error-handler';
 
 // Error types (single source of truth)

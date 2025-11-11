@@ -13,7 +13,7 @@ import { BaseError, ErrorDomain, ErrorSeverity } from '../../../shared/errors';
 import { renderWithWrapper } from '../../ui/__tests__/test-utils';
 
 // Mock dependencies
-vi.mock('../../../utils/browser-logger', () => ({
+vi.mock('../../../utils/logger', () => ({
   logger: {
     error: vi.fn(),
     warn: vi.fn(),
@@ -322,7 +322,7 @@ describe('ErrorBoundary', () => {
   
       it('handles network failures during error reporting', async () => {
         // Mock network failure for error reporting
-        const mockLogger = vi.mocked(require('../../../utils/browser-logger').logger);
+        const mockLogger = vi.mocked(require('../../../utils/logger').logger);
         mockLogger.error.mockImplementation(() => {
           throw new Error('Network error during logging');
         });

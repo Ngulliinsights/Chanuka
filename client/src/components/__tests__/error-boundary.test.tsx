@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ErrorBoundary from '../error-boundary';
 
 // Mock logger
-jest.mock('../../utils/browser-logger', () => ({
+jest.mock('../../utils/logger', () => ({
   logger: {
     error: jest.fn(),
   },
@@ -60,7 +60,7 @@ describe('ErrorBoundary', () => {
 
   it('calls componentDidCatch when error occurs', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const mockLogger = require('../../utils/browser-logger').logger;
+    const mockLogger = require('../../utils/logger').logger;
 
     render(
       <ErrorBoundary>
@@ -111,7 +111,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('handles unhandled promise rejections', () => {
-    const mockLogger = require('../../utils/browser-logger').logger;
+    const mockLogger = require('../../utils/logger').logger;
 
     render(
       <ErrorBoundary>

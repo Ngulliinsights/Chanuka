@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react"
 import { DayPicker, DateRange } from "react-day-picker"
 import { cn } from '../../lib/utils'
 import { buttonVariants } from './button'
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 import { DateValidationProps, ValidationState } from './types';
 import { validateDate, safeValidateDate } from './validation';
 import { UIDateError } from './errors';

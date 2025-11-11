@@ -10,7 +10,7 @@ import {
 } from './LoadingStates';
 import { useProgressiveLoading, useTimeoutAwareOperation, usePageLoading, useComponentLoading } from '../../core/loading';
 import { useLoading } from '../../core/loading';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 export const LoadingDemo: React.FC = () => {
   const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>('idle');

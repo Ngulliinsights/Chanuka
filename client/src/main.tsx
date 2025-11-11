@@ -30,9 +30,9 @@ import { registerServiceWorker } from "./utils/serviceWorker";
 import { EnhancedAssetLoadingProvider } from "./components/asset-loading/AssetLoadingProvider";
 import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
-import { logger } from '../src/utils/browser-logger';
+import { logger } from '../src/utils/logger';
 import { rumService } from './utils/rum-integration';
-import { initPerformanceMonitoring } from './utils/performance-monitor';
+import { initPerformanceMonitoring, performanceMonitor } from './utils/performance-monitor';
 
 /**
  * Application Loading States
@@ -364,8 +364,8 @@ async function mountReactApp(rootElement: HTMLElement): Promise<void> {
   // Render app immediately for better LCP
   root.render(<App />);
   
-  // Initialize performance monitoring
-  initPerformanceMonitoring();
+  // Initialize enhanced performance monitoring
+  await initPerformanceMonitoring();
   
   logger.info('React application mounted successfully', { component: 'Chanuka' });
   updateLoadingState('mounting', 'React application mounted...', 80);

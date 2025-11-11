@@ -15,7 +15,7 @@ import { Progress } from './progress';
 import { Alert, AlertDescription } from './alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './dialog';
 import { cn } from '../../lib/utils';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 
 // Enhanced Button with Loading States
 export const HybridButtonExample = ({

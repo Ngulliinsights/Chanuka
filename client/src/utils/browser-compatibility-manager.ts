@@ -19,7 +19,7 @@ import {
 } from './browser-compatibility';
 import { loadPolyfills, polyfillManager } from './polyfills';
 import { runBrowserCompatibilityTests, type CompatibilityTestSuite } from './browser-compatibility-tests';
-import { logger } from './browser-logger';
+import { logger } from './logger';
 
 /**
  * Configuration options for the compatibility manager's behavior

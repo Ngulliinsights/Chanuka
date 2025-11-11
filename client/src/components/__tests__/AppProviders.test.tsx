@@ -71,8 +71,8 @@ jest.mock('../hooks/useConnectionAware', () => ({
   useConnectionAware: jest.fn(),
 }));
 
-jest.mock('../hooks/use-online-status', () => ({
-  useOnlineStatus: jest.fn(),
+jest.mock('../hooks/useOfflineDetection', () => ({
+  useOfflineDetection: jest.fn(),
 }));
 
 jest.mock('../utils/asset-loading', () => ({

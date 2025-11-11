@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { createNavigationProvider } from '../core/navigation/context';
 import AppLayout from '@/components/layout/app-layout';
 import HomePage from '../pages/home';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '@/utils/logger';
 
 // Mock pages for testing
 function BillsPage() {

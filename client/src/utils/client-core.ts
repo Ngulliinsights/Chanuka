@@ -5,36 +5,15 @@
 
 import { initializeCSPReporting, getCSPConfig, setCSPHeader } from './csp-headers';
 
-export interface LogContext {
-  component?: string;
-  user_id?: string;
-  requestId?: string;
-  [key: string]: unknown;
-}
-
-export interface Logger {
-  debug: (message: string, context?: LogContext, meta?: Record<string, unknown>) => void;
-  info: (message: string, context?: LogContext, meta?: Record<string, unknown>) => void;
-  warn: (message: string, context?: LogContext, meta?: Record<string, unknown>) => void;
-  error: (message: string, context?: LogContext, error?: Error | unknown) => void;
-}
-
-export const logger: Logger = {
-  debug: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug(`[DEBUG] ${message}`, context ?? {}, meta ?? {});
-    }
-  },
-  info: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
-    console.info(`[INFO] ${message}`, context ?? {}, meta ?? {});
-  },
-  warn: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
-    console.warn(`[WARN] ${message}`, context ?? {}, meta ?? {});
-  },
-  error: (message: string, context?: LogContext, error?: Error | unknown) => {
-    console.error(`[ERROR] ${message}`, context ?? {}, error);
-  }
-};
+// Re-export logger and types from the main client logger
+export { 
+  logger, 
+  type LogContext, 
+  ErrorDomain, 
+  ErrorSeverity, 
+  BaseError,
+  ValidationError 
+} from './logger';
 
 export interface Performance {
   mark: (name: string) => void;
@@ -45,90 +24,7 @@ export interface Performance {
 }
 
 // Browser-safe performance monitoring
-// Base error class for standardized error handling
-export enum ErrorDomain {
-  AUTHENTICATION = 'authentication',
-  AUTHORIZATION = 'authorization',
-  VALIDATION = 'validation',
-  NETWORK = 'network',
-  DATABASE = 'database',
-  EXTERNAL_SERVICE = 'external_service',
-  CACHE = 'cache',
-  BUSINESS_LOGIC = 'business_logic',
-  SECURITY = 'security',
-  SYSTEM = 'system',
-  UNKNOWN = 'unknown'
-}
-
-export enum ErrorSeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
-}
-
-export interface ErrorMetadata {
-  domain?: ErrorDomain;
-  severity?: ErrorSeverity;
-  timestamp?: Date;
-  context?: Record<string, unknown>;
-  recoveryStrategies?: Array<{
-    type: string;
-    label: string;
-    action: () => void;
-  }>;
-  retryable?: boolean;
-  correlationId?: string;
-  cause?: Error | unknown;
-}
-
-export class BaseError extends Error {
-  public readonly code: string;
-  public readonly status?: number;
-  public readonly details?: Record<string, unknown>;
-  public readonly metadata?: ErrorMetadata;
-
-  constructor(
-    message: string, 
-    code = 'UNKNOWN_ERROR', 
-    metadata?: ErrorMetadata,
-    details?: Record<string, unknown>
-  ) {
-    super(message);
-    this.name = this.constructor.name;
-    this.code = code;
-    this.metadata = {
-      timestamp: new Date(),
-      ...metadata
-    };
-    this.details = details;
-
-    // Ensure proper prototype chain for instanceof checks
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-
-  public toJSON() {
-    return {
-      name: this.name,
-      message: this.message,
-      code: this.code,
-      status: this.status,
-      details: this.details,
-      metadata: this.metadata
-    };
-  }
-}
-
-// Validation error for handling input/data validation failures
-export class ValidationError extends BaseError {
-  constructor(message: string, details?: Record<string, unknown>) {
-    super(message, 'VALIDATION_ERROR', {
-      domain: ErrorDomain.VALIDATION,
-      severity: ErrorSeverity.MEDIUM,
-      context: details
-    });
-  }
-}
+// Error types are now exported from the main logger above
 
 export const performanceMonitor: Performance = {
   mark: (name: string) => {

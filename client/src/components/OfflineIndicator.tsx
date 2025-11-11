@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { logger } from '../utils/client-core';
-import { useOnlineStatus } from '../hooks/use-online-status';
+import { useOfflineDetection } from '../hooks/useOfflineDetection';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 
 interface OfflineIndicatorProps {
@@ -19,7 +19,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
   showDetails = false,
   autoHide = true,
 }) => {
-  const isOnline = useOnlineStatus();
+  const { isOnline } = useOfflineDetection();
   const [syncStatus, setSyncStatus] = useState<{
     queueLength: number;
     lastSyncTime: number | null;

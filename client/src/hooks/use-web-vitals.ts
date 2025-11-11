@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { onCLS, onFCP, onLCP, onTTFB } from 'web-vitals';
 import type { Metric } from 'web-vitals';
 
 export interface WebVitalsMetrics {
   cls?: number;
-  fid?: number;
   fcp?: number;
   lcp?: number;
   ttfb?: number;
@@ -40,8 +39,8 @@ export const useWebVitals = (options: WebVitalsHookOptions = {}) => {
       onMetric?.(metric);
 
       // Check if all metrics are collected
-      const { cls, fid, fcp, lcp, ttfb } = metricsRef.current;
-      if (cls !== undefined && fid !== undefined && fcp !== undefined &&
+      const { cls, fcp, lcp, ttfb } = metricsRef.current;
+      if (cls !== undefined && fcp !== undefined &&
           lcp !== undefined && ttfb !== undefined && !hasReportedRef.current) {
         hasReportedRef.current = true;
         onAllMetrics?.(metricsRef.current);
@@ -67,11 +66,10 @@ export const useWebVitals = (options: WebVitalsHookOptions = {}) => {
     };
 
     // Collect Core Web Vitals
-    getCLS(reportMetric);
-    getFID(reportMetric);
-    getFCP(reportMetric);
-    getLCP(reportMetric);
-    getTTFB(reportMetric);
+    onCLS(reportMetric);
+    onFCP(reportMetric);
+    onLCP(reportMetric);
+    onTTFB(reportMetric);
 
   }, [enabled, onMetric, onAllMetrics, reportTo]);
 
@@ -104,7 +102,6 @@ export const getPerformanceRating = (metric: Metric): 'good' | 'needs-improvemen
 // Hook for monitoring performance budgets
 export const usePerformanceBudget = (budgets?: {
   lcp?: number;
-  fid?: number;
   cls?: number;
   fcp?: number;
   ttfb?: number;
@@ -129,14 +126,6 @@ export const usePerformanceBudget = (budgets?: {
         });
       }
 
-      if (budgets?.fid && metrics.fid && metrics.fid > budgets.fid) {
-        newViolations.push({
-          metric: 'FID',
-          value: metrics.fid,
-          budget: budgets.fid,
-          severity: metrics.fid > budgets.fid * 1.5 ? 'error' : 'warning',
-        });
-      }
 
       if (budgets?.cls && metrics.cls && metrics.cls > budgets.cls) {
         newViolations.push({

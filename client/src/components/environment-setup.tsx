@@ -5,7 +5,7 @@ import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
 import { Settings, CheckCircle, Clock, HelpCircle, TrendingUp, Database, FileText, Shield, Server } from 'lucide-react';
 import { cn, getStatusColor } from '../lib/utils';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 interface EnvironmentSetupProps {
   environment?: any;

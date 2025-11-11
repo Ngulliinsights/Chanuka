@@ -21,8 +21,8 @@ export { useNavigationPreferences } from './use-navigation-preferences';
 
 // System Hooks
 // export { useSystem } from './use-system'; // Module not found
-export { useOnlineStatus } from './use-online-status';
 export { useOfflineDetection } from './useOfflineDetection';
+// export { useOnlineStatus } from './use-online-status'; // Deprecated: Use useOfflineDetection instead
 export { useOfflineCapabilities } from './useOfflineCapabilities';
 export { useConnectionAware } from './useConnectionAware';
 export { useServiceStatus } from './useServiceStatus';

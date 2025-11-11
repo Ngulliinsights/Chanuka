@@ -12,7 +12,7 @@ import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test-utils';
 import App from '../../App';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 import { navigationService } from '../../services/navigation';
 
 // Mock API calls

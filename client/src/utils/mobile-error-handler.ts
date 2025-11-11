@@ -1,4 +1,4 @@
-import { logger } from './browser-logger';
+import { logger } from './logger';
 /**
  * Mobile Error Handler
  * Provides mobile-specific error handling and fallback mechanisms

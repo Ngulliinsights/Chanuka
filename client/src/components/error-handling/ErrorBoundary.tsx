@@ -7,13 +7,13 @@
  */
 
 import { Component, ReactNode, ErrorInfo } from "react";
-import { logger } from "../../utils/browser-logger";
+import { logger } from "../../utils/logger";
 import { getBrowserInfo } from "../../utils/browser-compatibility";
 import { performanceMonitor } from "../../utils/performance-monitor";
 
 // Import unified error types
 import { BaseError, ErrorDomain, ErrorSeverity } from "../../shared/errors";
-import { errorHandler, AppError, ErrorType } from "../../utils/unified-error-handler";
+import { errorHandler } from "../../utils/unified-error-handler";
 
 export interface RecoveryOption {
   id: string;
@@ -100,7 +100,6 @@ export class ErrorBoundary extends Component<
 > {
   private recoveryAttempts = 0;
   private errorMetrics: ErrorMetrics[] = [];
-  private startTime = Date.now();
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
@@ -243,7 +242,6 @@ export class ErrorBoundary extends Component<
     // Attempt automatic recovery if enabled
     if (this.props.enableRecovery) {
       await this.attemptAutomaticRecovery(
-        enhancedError,
         this.generateRecoveryOptions(enhancedError)
       );
     }
@@ -329,7 +327,6 @@ export class ErrorBoundary extends Component<
    * Attempt automatic recovery with timeout and error handling
    */
   private async attemptAutomaticRecovery(
-    error: BaseError,
     recoveryOptions: RecoveryOption[]
   ) {
     const automaticOptions = recoveryOptions.filter((opt) => opt.automatic);

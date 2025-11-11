@@ -1,10 +1,10 @@
 # Render Tracking System
 
-This document describes the extended browser-logger render tracking capabilities implemented to diagnose and prevent race conditions and infinite render loops in React components.
+This document describes the extended logger render tracking capabilities implemented to diagnose and prevent race conditions and infinite render loops in React components.
 
 ## Overview
 
-The render tracking system extends the existing browser-logger with comprehensive monitoring capabilities for:
+The render tracking system extends the existing logger with comprehensive monitoring capabilities for:
 
 - **Render Cycle Tracking**: Monitor component render frequency and patterns
 - **Infinite Render Detection**: Automatically detect components rendering >50 times per second
@@ -16,7 +16,7 @@ The render tracking system extends the existing browser-logger with comprehensiv
 ### 1. Render Cycle Tracking
 
 ```typescript
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 // Track a component render
 logger.trackRender({
@@ -206,7 +206,7 @@ function AppLayout() {
 ### WebSocket Components
 
 ```typescript
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 function WebSocketClient() {
   const renderCountRef = useRef(0);

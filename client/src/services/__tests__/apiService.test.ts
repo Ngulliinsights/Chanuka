@@ -14,7 +14,7 @@ import {
 } from '../apiService';
 
 // Mock dependencies
-vi.mock('../utils/browser-logger', () => ({
+vi.mock('../utils/logger', () => ({
   logger: {
     error: vi.fn(),
     warn: vi.fn(),

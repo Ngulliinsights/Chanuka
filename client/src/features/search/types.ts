@@ -23,7 +23,7 @@ export interface SearchFilters {
 
 export interface SearchResult {
   id: string;
-  type: 'bill' | 'user' | 'comment' | 'thread';
+  type: 'bill' | 'user' | 'comment' | 'thread' | 'sponsor';
   title: string;
   content: string;
   excerpt: string;
@@ -57,6 +57,18 @@ export interface SearchHighlight {
   }>;
 }
 
+export interface AutocompleteResult {
+  suggestions: SearchSuggestion[];
+  facets: {
+    categories: string[];
+    sponsors: string[];
+    tags: string[];
+    statuses: string[];
+  };
+  query: string;
+  totalSuggestions: number;
+}
+
 export interface SearchResponse {
   query: string;
   total: number;
@@ -81,9 +93,12 @@ export interface SearchFacets {
 }
 
 export interface SearchSuggestion {
-  text: string;
-  type: 'completion' | 'correction' | 'related';
-  score: number;
+  term: string;
+  type: 'completion' | 'correction' | 'related' | 'recent' | 'popular' | 'bill_title';
+  score?: number;
+  frequency?: number;
+  id?: string;
+  metadata?: any;
 }
 
 export interface AdvancedSearchOptions {

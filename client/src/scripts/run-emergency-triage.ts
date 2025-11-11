@@ -8,7 +8,7 @@
  */
 
 import { emergencyTriage, type TriageReport, type CircuitBreakerConfig } from '../utils/emergency-triage';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 interface TriageConfig {
   duration: number; // milliseconds

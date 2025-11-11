@@ -13,8 +13,8 @@
  * - Better async handling
  */
 
-import { logger } from './browser-logger'
-import { tokenStorage } from './secure-storage'
+import { logger, ErrorDomain, ErrorSeverity } from './logger';
+import { tokenStorage } from './secure-storage';
 
 // Advanced error handling modules - lazy loaded to avoid circular dependencies
 let errorAnalytics: any = null;
@@ -31,7 +31,7 @@ const loadAdvancedModules = async () => {
       console.warn('Error analytics module not available');
     }
   }
-  
+
   if (!smartRecoveryEngine) {
     try {
       const recoveryModule = await import('./advanced-error-recovery');
@@ -40,7 +40,7 @@ const loadAdvancedModules = async () => {
       console.warn('Smart recovery engine not available');
     }
   }
-  
+
   if (!errorRateLimiter) {
     try {
       const rateLimiterModule = await import('./error-rate-limiter');
@@ -52,63 +52,72 @@ const loadAdvancedModules = async () => {
 };
 
 // ============================================================================
-// Type Definitions
+// Type Definitions (using existing logger types where possible)
 // ============================================================================
 
-// Import shared error types to eliminate redundancy
-import { ErrorSeverity, ErrorDomain } from '../shared/errors';
+export { ErrorDomain, ErrorSeverity } from './logger';
 
-// Re-export for convenience
-export { ErrorSeverity, ErrorDomain } from '../shared/errors';
+export interface ErrorContext {
+  component?: string;
+  action?: string;
+  userId?: string;
+  sessionId?: string;
+  url?: string;
+  userAgent?: string;
+  [key: string]: any;
+}
+
+export interface AppError {
+  id: string;
+  type: ErrorDomain;
+  severity: ErrorSeverity;
+  message: string;
+  details?: any;
+  timestamp: number;
+  context?: ErrorContext;
+  recoverable: boolean;
+  retryable: boolean;
+  retryCount?: number;
+  recovered?: boolean;
+  recoveryStrategy?: string;
+}
+
+export interface ErrorRecoveryStrategy {
+  id: string;
+  name: string;
+  description: string;
+  canRecover: (error: AppError) => boolean;
+  recover: (error: AppError) => Promise<boolean>;
+  priority: number;
+  maxRetries?: number;
+}
+
+export interface ErrorHandlerConfig {
+  maxErrors?: number;
+  enableGlobalHandlers?: boolean;
+  enableRecovery?: boolean;
+  notificationDebounceMs?: number;
+  logErrors?: boolean;
+}
+
+export type ErrorListener = (error: AppError) => void;
+
+export interface ErrorStats {
+  total: number;
+  byType: Record<ErrorDomain, number>;
+  bySeverity: Record<ErrorSeverity, number>;
+  recent: {
+    lastHour: number;
+    last24Hours: number;
+    last7Days: number;
+  };
+  recovered: number;
+  retryable: number;
+}
 
 // Create type alias for backward compatibility
 export type ErrorType = ErrorDomain;
 export const ErrorType = ErrorDomain;
-
-export interface ErrorContext {
-  component?: string
-  action?: string
-  userId?: string
-  sessionId?: string
-  url?: string
-  userAgent?: string
-  [key: string]: any // Allow custom context fields
-}
-
-export interface AppError {
-  id: string
-  type: ErrorType
-  severity: ErrorSeverity
-  message: string
-  details?: any
-  timestamp: number
-  context?: ErrorContext
-  recoverable: boolean
-  retryable: boolean
-  retryCount?: number
-  recovered?: boolean
-  recoveryStrategy?: string
-}
-
-export interface ErrorRecoveryStrategy {
-  id: string
-  name: string
-  description: string
-  canRecover: (error: AppError) => boolean
-  recover: (error: AppError) => Promise<boolean>
-  priority: number
-  maxRetries?: number
-}
-
-export interface ErrorHandlerConfig {
-  maxErrors?: number
-  enableGlobalHandlers?: boolean
-  enableRecovery?: boolean
-  notificationDebounceMs?: number
-  logErrors?: boolean
-}
-
-type ErrorListener = (error: AppError) => void
 
 // ============================================================================
 // Unified Error Handler Class
@@ -121,7 +130,7 @@ class UnifiedErrorHandler {
   private errorListeners: Set<ErrorListener> = new Set()
   private notificationTimeout: NodeJS.Timeout | null = null
   private pendingNotifications: AppError[] = []
-  
+
   private config: Required<ErrorHandlerConfig> = {
     maxErrors: 100,
     enableGlobalHandlers: true,
@@ -147,13 +156,13 @@ class UnifiedErrorHandler {
    */
   public configure(config: ErrorHandlerConfig = {}): void {
     this.config = { ...this.config, ...config }
-    
+
     if (this.config.enableGlobalHandlers) {
       this.setupGlobalErrorHandlers()
     }
-    
+
     this.setupDefaultRecoveryStrategies()
-    
+
     // Initialize advanced error handling modules
     loadAdvancedModules().catch(e => {
       if (this.config.logErrors) {
@@ -172,19 +181,19 @@ class UnifiedErrorHandler {
       id: 'network-retry',
       name: 'Network Retry',
       description: 'Retry network requests with exponential backoff',
-      canRecover: (error) => 
-        error.type === ErrorDomain.NETWORK && 
-        error.retryable && 
+      canRecover: (error) =>
+        error.type === ErrorDomain.NETWORK &&
+        error.retryable &&
         (error.retryCount || 0) < 3,
       recover: async (error) => {
         const retryCount = (error.retryCount || 0) + 1
         const delayMs = Math.min(1000 * Math.pow(2, retryCount), 10000)
-        
+
         await new Promise(resolve => setTimeout(resolve, delayMs))
-        
+
         // Update retry count in the stored error
         error.retryCount = retryCount
-        
+
         // The actual retry logic would be handled by the code that triggered the error
         // This strategy just implements the backoff delay
         return false // Return false to allow the caller to retry the operation
@@ -198,7 +207,7 @@ class UnifiedErrorHandler {
       id: 'auth-refresh',
       name: 'Authentication Refresh',
       description: 'Attempt to refresh authentication tokens',
-      canRecover: (error) => 
+      canRecover: (error) =>
         error.type === ErrorDomain.AUTHENTICATION &&
         error.recoverable,
       recover: async (error) => {
@@ -218,14 +227,14 @@ class UnifiedErrorHandler {
               errorId: error.id,
             })
           }
-          
+
           // Simulate successful refresh
           // const response = await fetch('/api/auth/refresh', {
           //   method: 'POST',
           //   headers: { 'Content-Type': 'application/json' },
           //   body: JSON.stringify({ refreshToken })
           // })
-          
+
           return true
         } catch (refreshError) {
           await this.redirectToLogin()
@@ -240,7 +249,7 @@ class UnifiedErrorHandler {
       id: 'cache-clear',
       name: 'Cache Clear and Reload',
       description: 'Clear application cache and reload the page',
-      canRecover: (error) => 
+      canRecover: (error) =>
         error.severity === ErrorSeverity.CRITICAL &&
         error.recoverable,
       recover: async (error) => {
@@ -250,7 +259,7 @@ class UnifiedErrorHandler {
             const cacheNames = await caches.keys()
             await Promise.all(cacheNames.map(name => caches.delete(name)))
           }
-          
+
           // Clear storage (be selective in production)
           const criticalKeys = ['auth_token', 'refresh_token', 'user_preferences']
           Object.keys(localStorage).forEach(key => {
@@ -264,17 +273,17 @@ class UnifiedErrorHandler {
               sessionStorage.removeItem(key)
             }
           })
-          
+
           if (this.config.logErrors) {
             logger.info('Cache cleared, reloading application', {
               component: 'UnifiedErrorHandler',
               errorId: error.id,
             })
           }
-          
+
           // Give time for logging to complete
           setTimeout(() => window.location.reload(), 500)
-          
+
           return true
         } catch (clearError) {
           logger.error('Cache clear failed', {
@@ -296,7 +305,7 @@ class UnifiedErrorHandler {
     window.addEventListener('error', (event) => {
       // Prevent default browser error handling
       event.preventDefault()
-      
+
       this.handleError({
         type: ErrorDomain.SYSTEM,
         severity: this.determineSeverityFromError(event.error),
@@ -319,7 +328,7 @@ class UnifiedErrorHandler {
     // Handle unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {
       event.preventDefault()
-      
+
       this.handleError({
         type: ErrorDomain.SYSTEM,
         severity: ErrorSeverity.HIGH,
@@ -343,21 +352,21 @@ class UnifiedErrorHandler {
    */
   private determineSeverityFromError(error: Error | undefined): ErrorSeverity {
     if (!error) return ErrorSeverity.MEDIUM
-    
+
     const errorString = error.toString().toLowerCase()
-    
+
     // Critical errors that break the application
-    if (errorString.includes('out of memory') || 
-        errorString.includes('quota exceeded')) {
+    if (errorString.includes('out of memory') ||
+      errorString.includes('quota exceeded')) {
       return ErrorSeverity.CRITICAL
     }
-    
+
     // High severity errors
-    if (errorString.includes('typeerror') || 
-        errorString.includes('referenceerror')) {
+    if (errorString.includes('typeerror') ||
+      errorString.includes('referenceerror')) {
       return ErrorSeverity.HIGH
     }
-    
+
     return ErrorSeverity.MEDIUM
   }
 
@@ -431,10 +440,10 @@ class UnifiedErrorHandler {
     // Attempt recovery if enabled and error is recoverable
     if (this.config.enableRecovery && error.recoverable) {
       // Use smart recovery engine if available, fallback to basic recovery
-      const recoveryPromise = smartRecoveryEngine 
+      const recoveryPromise = smartRecoveryEngine
         ? smartRecoveryEngine.attemptRecovery(error)
         : this.attemptRecovery(error);
-      
+
       // Don't await - recovery happens in background
       recoveryPromise.catch((recoveryError: any) => {
         if (this.config.logErrors) {
@@ -482,12 +491,12 @@ class UnifiedErrorHandler {
         }
 
         const recovered = await strategy.recover(error)
-        
+
         if (recovered) {
           // Mark error as recovered
           error.recovered = true
           error.recoveryStrategy = strategy.id
-          
+
           if (this.config.logErrors) {
             logger.info('Error recovery successful', {
               component: 'UnifiedErrorHandler',
@@ -495,7 +504,7 @@ class UnifiedErrorHandler {
               strategy: strategy.name,
             })
           }
-          
+
           return true
         }
       } catch (recoveryError) {
@@ -529,7 +538,7 @@ class UnifiedErrorHandler {
    */
   private storeError(error: AppError): void {
     this.errors.set(error.id, error)
-    
+
     // Implement LRU eviction if over limit
     if (this.errors.size > this.config.maxErrors) {
       // Remove oldest error (first key in Map maintains insertion order)
@@ -583,11 +592,11 @@ class UnifiedErrorHandler {
    */
   private queueNotification(error: AppError): void {
     this.pendingNotifications.push(error)
-    
+
     if (this.notificationTimeout) {
       clearTimeout(this.notificationTimeout)
     }
-    
+
     this.notificationTimeout = setTimeout(() => {
       this.flushNotifications()
     }, this.config.notificationDebounceMs)
@@ -599,7 +608,7 @@ class UnifiedErrorHandler {
   private flushNotifications(): void {
     const notifications = [...this.pendingNotifications]
     this.pendingNotifications = []
-    
+
     notifications.forEach(error => {
       this.errorListeners.forEach(listener => {
         try {
@@ -629,7 +638,7 @@ class UnifiedErrorHandler {
     } else {
       this.recoveryStrategies.push(strategy)
     }
-    
+
     // Keep strategies sorted by priority
     this.recoveryStrategies.sort((a, b) => a.priority - b.priority)
   }
@@ -661,7 +670,7 @@ class UnifiedErrorHandler {
       .slice(0, limit)
   }
 
-  public getErrorsByType(type: ErrorType, limit = 10): AppError[] {
+  public getErrorsByType(type: ErrorDomain, limit = 10): AppError[] {
     return Array.from(this.errors.values())
       .filter(error => error.type === type)
       .sort((a, b) => b.timestamp - a.timestamp)
@@ -682,27 +691,27 @@ class UnifiedErrorHandler {
   public clearErrorsOlderThan(ageInMs: number): number {
     const cutoffTime = Date.now() - ageInMs
     let removedCount = 0
-    
+
     for (const [id, error] of this.errors.entries()) {
       if (error.timestamp < cutoffTime) {
         this.errors.delete(id)
         removedCount++
       }
     }
-    
+
     return removedCount
   }
 
   /**
    * Get comprehensive error statistics
    */
-  public getErrorStats() {
+  public getErrorStats(): ErrorStats {
     const errors = Array.from(this.errors.values())
     const now = Date.now()
-    
-    const stats = {
+
+    const stats: ErrorStats = {
       total: errors.length,
-      byType: {} as Record<ErrorType, number>,
+      byType: {} as Record<ErrorDomain, number>,
       bySeverity: {} as Record<ErrorSeverity, number>,
       recent: {
         lastHour: 0,
@@ -716,10 +725,10 @@ class UnifiedErrorHandler {
     errors.forEach(error => {
       // Count by type
       stats.byType[error.type] = (stats.byType[error.type] || 0) + 1
-      
+
       // Count by severity
       stats.bySeverity[error.severity] = (stats.bySeverity[error.severity] || 0) + 1
-      
+
       // Count recent errors
       const age = now - error.timestamp
       if (age < 3600000) stats.recent.lastHour++
@@ -775,8 +784,8 @@ export function useErrorHandler() {
   return {
     handleError: (errorData: Partial<AppError>) => handler.handleError(errorData),
     getRecentErrors: (limit?: number) => handler.getRecentErrors(limit),
-    getErrorsByType: (type: ErrorType, limit?: number) => handler.getErrorsByType(type, limit),
-    getErrorsBySeverity: (severity: ErrorSeverity, limit?: number) => 
+    getErrorsByType: (type: ErrorDomain, limit?: number) => handler.getErrorsByType(type, limit),
+    getErrorsBySeverity: (severity: ErrorSeverity, limit?: number) =>
       handler.getErrorsBySeverity(severity, limit),
     getErrorStats: () => handler.getErrorStats(),
     clearErrors: () => handler.clearErrors(),
@@ -818,7 +827,7 @@ export function useErrorBoundary() {
  * Create and handle a network error
  */
 export function createNetworkError(
-  message: string, 
+  message: string,
   details?: any,
   context?: Partial<ErrorContext>
 ): AppError {
@@ -837,7 +846,7 @@ export function createNetworkError(
  * Create and handle a validation error
  */
 export function createValidationError(
-  message: string, 
+  message: string,
   details?: any,
   context?: Partial<ErrorContext>
 ): AppError {

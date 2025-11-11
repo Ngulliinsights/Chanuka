@@ -17,7 +17,7 @@ const PageLoader = () => (
 export const SimpleLazyPages = {
   HomePage: lazy(() => import('../pages/home')),
   Dashboard: lazy(() => import('../pages/dashboard')),
-  BillsDashboard: lazy(() => import('../pages/bills-dashboard')),
+  BillsDashboard: lazy(() => import('../pages/enhanced-bills-dashboard-page')),
   AuthPage: lazy(() => import('../pages/auth-page')),
   BillDetail: lazy(() => import('../pages/bill-detail')),
   BillAnalysis: lazy(() => import('../pages/bill-analysis')),

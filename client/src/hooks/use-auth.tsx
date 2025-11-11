@@ -1,42 +1,23 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { logger } from '../utils/browser-logger';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  username: string;
-  first_name: string | null;
-  last_name: string | null;
-  role: string;
-  verification_status: string;
-  is_active: boolean | null;
-  created_at: string;
-  reputation: number;
-  expertise: string;
-}
-
-interface RegisterData {
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  role?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; data?: any }>;
-  register: (data: RegisterData) => Promise<{ success: boolean; error?: string; requiresVerification?: boolean; data?: any }>;
-  logout: () => Promise<void>;
-  refresh_token: () => Promise<{ success: boolean; error?: string }>;
-  verifyEmail: (token: string) => Promise<{ success: boolean; error?: string }>;
-  requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
-  resetPassword: (token: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  loading: boolean;
-  isAuthenticated: boolean;
-  updateUser: (userData: Partial<User>) => void;
-}
+import { logger } from '../utils/logger';
+import { 
+  User, 
+  AuthContextType, 
+  LoginCredentials, 
+  RegisterData, 
+  AuthResponse,
+  TwoFactorSetup,
+  PrivacySettings,
+  SecurityEvent,
+  SuspiciousActivityAlert,
+  SessionInfo,
+  DataExportRequest,
+  DataDeletionRequest
+} from '../types/auth';
+import { securityMonitor } from '../utils/security-monitoring';
+import { privacyCompliance } from '../utils/privacy-compliance';
+import { validatePassword } from '../utils/password-validation';
+import { apiService } from '../services/apiService';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -137,231 +118,634 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; data?: any }> => {
+  const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
     if (mountedRef.current) {
       setLoading(true);
     }
-    const abortController = new AbortController();
+
+    const deviceFingerprint = securityMonitor.generateDeviceFingerprint();
+    const currentIP = '0.0.0.0'; // Would be provided by server in production
+
     try {
-      const response = await makeCancellableRequest('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      }, abortController);
+      // Check for rate limiting
+      if (securityMonitor.shouldLockAccount(currentIP)) {
+        return { 
+          success: false, 
+          error: 'Account temporarily locked due to multiple failed attempts. Please try again later.' 
+        };
+      }
 
-      const result = await response.json();
+      const response = await apiService.post('/api/auth/login', {
+        ...credentials,
+        device_fingerprint: deviceFingerprint,
+      });
 
-      if (response.ok && result.success) {
-        localStorage.setItem('token', result.data.token);
-        localStorage.setItem('refresh_token', result.data.refresh_token);
+      if (response.success && response.data) {
+        // Record successful login
+        const alerts = securityMonitor.recordLoginAttempt(
+          currentIP,
+          navigator.userAgent,
+          true,
+          response.data.user.id
+        );
+
+        // Analyze device fingerprint
+        const deviceAlerts = securityMonitor.analyzeDeviceFingerprint(
+          response.data.user.id,
+          deviceFingerprint
+        );
+
+        // Store tokens securely
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('refresh_token', response.data.refresh_token);
+        
+        // Create security event
+        const securityEvent = securityMonitor.createSecurityEvent(
+          response.data.user.id,
+          'login',
+          { 
+            device_fingerprint: deviceFingerprint,
+            suspicious_alerts: [...alerts, ...deviceAlerts].length 
+          }
+        );
+        securityMonitor.logSecurityEvent(securityEvent);
+
         if (mountedRef.current) {
-          setUser(result.data.user);
+          setUser(response.data.user);
         }
-        return { success: true };
+
+        return { 
+          success: true, 
+          data: response.data,
+          requires2FA: response.data.requires_2fa 
+        };
       } else {
-        return { success: false, error: result.error || 'Login failed' };
+        // Record failed login
+        securityMonitor.recordLoginAttempt(
+          currentIP,
+          navigator.userAgent,
+          false
+        );
+
+        return { 
+          success: false, 
+          error: response.error?.message || 'Login failed' 
+        };
       }
     } catch (error) {
-      logger.error('Login failed:', { component: 'Chanuka' }, error);
+      // Record failed login
+      securityMonitor.recordLoginAttempt(
+        currentIP,
+        navigator.userAgent,
+        false
+      );
+
+      logger.error('Login failed:', { component: 'AuthProvider' }, error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
       if (mountedRef.current) {
         setLoading(false);
       }
-      abortController.abort();
     }
   };
 
-  const register = async (data: RegisterData): Promise<{ success: boolean; error?: string; requiresVerification?: boolean; data?: any }> => {
+  const register = async (data: RegisterData): Promise<AuthResponse> => {
     if (mountedRef.current) {
       setLoading(true);
     }
-    const abortController = new AbortController();
+
     try {
-      const response = await makeCancellableRequest('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      }, abortController);
+      // Validate password strength
+      const passwordValidation = validatePassword(data.password, undefined, {
+        email: data.email,
+        name: `${data.first_name} ${data.last_name}`,
+      });
 
-      const result = await response.json();
+      if (!passwordValidation.isValid) {
+        return {
+          success: false,
+          error: `Password requirements not met: ${passwordValidation.errors.join(', ')}`
+        };
+      }
 
-      if (response.ok && result.success) {
-        localStorage.setItem('token', result.data.token);
-        localStorage.setItem('refresh_token', result.data.refresh_token);
+      // Record consent if provided
+      const consentRecords = data.consent_records?.map(consent =>
+        privacyCompliance.recordConsent(
+          'pending', // Will be updated with actual user ID after registration
+          consent.consent_type,
+          consent.granted,
+          consent.version
+        )
+      ) || [];
+
+      const deviceFingerprint = securityMonitor.generateDeviceFingerprint();
+
+      const response = await apiService.post('/api/auth/register', {
+        ...data,
+        device_fingerprint: deviceFingerprint,
+        consent_records: consentRecords,
+      });
+
+      if (response.success && response.data) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('refresh_token', response.data.refresh_token);
+        
+        // Create security event for new registration
+        const securityEvent = securityMonitor.createSecurityEvent(
+          response.data.user.id,
+          'login', // First login after registration
+          { 
+            registration: true,
+            device_fingerprint: deviceFingerprint 
+          }
+        );
+        securityMonitor.logSecurityEvent(securityEvent);
+
         if (mountedRef.current) {
-          setUser(result.data.user);
+          setUser(response.data.user);
         }
+
         return {
           success: true,
-          requiresVerification: result.data.requiresVerification
+          requiresVerification: response.data.requiresVerification,
+          data: response.data
         };
       } else {
-        return { success: false, error: result.error || 'Registration failed' };
+        return { 
+          success: false, 
+          error: response.error?.message || 'Registration failed' 
+        };
       }
     } catch (error) {
-      logger.error('Registration failed:', { component: 'Chanuka' }, error);
+      logger.error('Registration failed:', { component: 'AuthProvider' }, error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
       if (mountedRef.current) {
         setLoading(false);
       }
-      abortController.abort();
     }
   };
 
   const logout = async (): Promise<void> => {
-    const abortController = new AbortController();
     try {
       const token = localStorage.getItem('token');
-      if (token) {
-        await makeCancellableRequest('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }, abortController);
+      if (token && user) {
+        // Create security event for logout
+        const securityEvent = securityMonitor.createSecurityEvent(
+          user.id,
+          'logout'
+        );
+        securityMonitor.logSecurityEvent(securityEvent);
+
+        await apiService.post('/api/auth/logout', {});
       }
     } catch (error) {
-      logger.error('Logout request failed:', { component: 'Chanuka' }, error);
+      logger.error('Logout request failed:', { component: 'AuthProvider' }, error);
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('refresh_token');
       if (mountedRef.current) {
         setUser(null);
       }
-      abortController.abort();
     }
   };
 
-  const refresh_token = async (): Promise<{ success: boolean; error?: string }> => {
-    const abortController = new AbortController();
+  const refreshToken = async (): Promise<AuthResponse> => {
     try {
       const refreshTokenValue = localStorage.getItem('refresh_token');
       if (!refreshTokenValue) {
         return { success: false, error: 'No refresh token available' };
       }
 
-      const response = await makeCancellableRequest('/api/auth/refresh', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh_token: refreshTokenValue }),
-      }, abortController);
+      const response = await apiService.post('/api/auth/refresh', {
+        refresh_token: refreshTokenValue,
+      });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        localStorage.setItem('token', result.data.token);
-        localStorage.setItem('refresh_token', result.data.refresh_token);
+      if (response.success && response.data) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('refresh_token', response.data.refresh_token);
         if (mountedRef.current) {
-          setUser(result.data.user);
+          setUser(response.data.user);
         }
-        return { success: true };
+        return { success: true, data: response.data };
       } else {
         localStorage.removeItem('token');
         localStorage.removeItem('refresh_token');
         if (mountedRef.current) {
           setUser(null);
         }
-        return { success: false, error: result.error || 'Token refresh failed' };
+        return { 
+          success: false, 
+          error: response.error?.message || 'Token refresh failed' 
+        };
       }
     } catch (error) {
-      logger.error('Token refresh failed:', { component: 'Chanuka' }, error);
+      logger.error('Token refresh failed:', { component: 'AuthProvider' }, error);
       localStorage.removeItem('token');
       localStorage.removeItem('refresh_token');
       if (mountedRef.current) {
         setUser(null);
       }
       return { success: false, error: 'Network error during token refresh' };
-    } finally {
-      abortController.abort();
     }
   };
 
-  const verifyEmail = async (token: string): Promise<{ success: boolean; error?: string }> => {
-    const abortController = new AbortController();
+  const verifyEmail = async (token: string): Promise<AuthResponse> => {
     try {
-      const response = await makeCancellableRequest('/api/auth/verify-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      }, abortController);
+      const response = await apiService.post('/api/auth/verify-email', { token });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        if (result.data?.user && mountedRef.current) {
-          setUser(result.data.user);
+      if (response.success && response.data?.user) {
+        if (mountedRef.current) {
+          setUser(response.data.user);
         }
-        return { success: true };
+        return { success: true, data: response.data };
       } else {
-        return { success: false, error: result.error || 'Email verification failed' };
+        return { 
+          success: false, 
+          error: response.error?.message || 'Email verification failed' 
+        };
       }
     } catch (error) {
-      logger.error('Email verification failed:', { component: 'Chanuka' }, error);
+      logger.error('Email verification failed:', { component: 'AuthProvider' }, error);
       return { success: false, error: 'Network error. Please try again.' };
-    } finally {
-      abortController.abort();
     }
   };
 
-  const requestPasswordReset = async (email: string): Promise<{ success: boolean; error?: string }> => {
-    const abortController = new AbortController();
+  const requestPasswordReset = async (email: string): Promise<AuthResponse> => {
     try {
-      const response = await makeCancellableRequest('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      }, abortController);
+      const response = await apiService.post('/api/auth/forgot-password', { email });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        return { success: true };
+      if (response.success) {
+        return { success: true, data: response.data };
       } else {
-        return { success: false, error: result.error || 'Password reset request failed' };
+        return { 
+          success: false, 
+          error: response.error?.message || 'Password reset request failed' 
+        };
       }
     } catch (error) {
-      logger.error('Password reset request failed:', { component: 'Chanuka' }, error);
+      logger.error('Password reset request failed:', { component: 'AuthProvider' }, error);
       return { success: false, error: 'Network error. Please try again.' };
-    } finally {
-      abortController.abort();
     }
   };
 
-  const resetPassword = async (token: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    const abortController = new AbortController();
+  const resetPassword = async (token: string, password: string): Promise<AuthResponse> => {
     try {
-      const response = await makeCancellableRequest('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token, password }),
-      }, abortController);
+      // Validate new password
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.isValid) {
+        return {
+          success: false,
+          error: `Password requirements not met: ${passwordValidation.errors.join(', ')}`
+        };
+      }
 
-      const result = await response.json();
+      const response = await apiService.post('/api/auth/reset-password', { 
+        token, 
+        password 
+      });
 
-      if (response.ok && result.success) {
-        return { success: true };
+      if (response.success) {
+        return { success: true, data: response.data };
       } else {
-        return { success: false, error: result.error || 'Password reset failed' };
+        return { 
+          success: false, 
+          error: response.error?.message || 'Password reset failed' 
+        };
       }
     } catch (error) {
-      logger.error('Password reset failed:', { component: 'Chanuka' }, error);
+      logger.error('Password reset failed:', { component: 'AuthProvider' }, error);
       return { success: false, error: 'Network error. Please try again.' };
-    } finally {
-      abortController.abort();
+    }
+  };
+
+  // New enhanced authentication methods
+  const changePassword = async (currentPassword: string, newPassword: string): Promise<AuthResponse> => {
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      // Validate new password
+      const passwordValidation = validatePassword(newPassword, undefined, {
+        email: user.email,
+        name: user.name,
+        username: user.username,
+      });
+
+      if (!passwordValidation.isValid) {
+        return {
+          success: false,
+          error: `Password requirements not met: ${passwordValidation.errors.join(', ')}`
+        };
+      }
+
+      const response = await apiService.post('/api/auth/change-password', {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+
+      if (response.success) {
+        // Create security event
+        const securityEvent = securityMonitor.createSecurityEvent(
+          user.id,
+          'password_change'
+        );
+        securityMonitor.logSecurityEvent(securityEvent);
+
+        return { success: true, data: response.data };
+      } else {
+        return { 
+          success: false, 
+          error: response.error?.message || 'Password change failed' 
+        };
+      }
+    } catch (error) {
+      logger.error('Password change failed:', { component: 'AuthProvider' }, error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const setupTwoFactor = async (): Promise<TwoFactorSetup> => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const response = await apiService.post('/api/auth/2fa/setup', {});
+      
+      if (response.success && response.data) {
+        return response.data as TwoFactorSetup;
+      } else {
+        throw new Error(response.error?.message || 'Two-factor setup failed');
+      }
+    } catch (error) {
+      logger.error('Two-factor setup failed:', { component: 'AuthProvider' }, error);
+      throw error;
+    }
+  };
+
+  const enableTwoFactor = async (code: string): Promise<AuthResponse> => {
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      const response = await apiService.post('/api/auth/2fa/enable', { code });
+
+      if (response.success) {
+        // Update user state
+        if (mountedRef.current) {
+          setUser({ ...user, two_factor_enabled: true });
+        }
+
+        // Create security event
+        const securityEvent = securityMonitor.createSecurityEvent(
+          user.id,
+          'two_factor_enabled'
+        );
+        securityMonitor.logSecurityEvent(securityEvent);
+
+        return { success: true, data: response.data };
+      } else {
+        return { 
+          success: false, 
+          error: response.error?.message || 'Two-factor enable failed' 
+        };
+      }
+    } catch (error) {
+      logger.error('Two-factor enable failed:', { component: 'AuthProvider' }, error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const disableTwoFactor = async (password: string): Promise<AuthResponse> => {
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      const response = await apiService.post('/api/auth/2fa/disable', { password });
+
+      if (response.success) {
+        // Update user state
+        if (mountedRef.current) {
+          setUser({ ...user, two_factor_enabled: false });
+        }
+
+        // Create security event
+        const securityEvent = securityMonitor.createSecurityEvent(
+          user.id,
+          'two_factor_disabled'
+        );
+        securityMonitor.logSecurityEvent(securityEvent);
+
+        return { success: true, data: response.data };
+      } else {
+        return { 
+          success: false, 
+          error: response.error?.message || 'Two-factor disable failed' 
+        };
+      }
+    } catch (error) {
+      logger.error('Two-factor disable failed:', { component: 'AuthProvider' }, error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const updatePrivacySettings = async (settings: Partial<PrivacySettings>): Promise<AuthResponse> => {
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      // Validate privacy settings
+      const validation = privacyCompliance.validatePrivacySettings({
+        ...user.privacy_settings,
+        ...settings,
+      });
+
+      if (!validation.isValid) {
+        return {
+          success: false,
+          error: `Privacy settings validation failed: ${validation.errors.join(', ')}`
+        };
+      }
+
+      const response = await apiService.put('/api/auth/privacy-settings', settings);
+
+      if (response.success && response.data) {
+        // Update user state
+        if (mountedRef.current) {
+          setUser({
+            ...user,
+            privacy_settings: { ...user.privacy_settings, ...settings }
+          });
+        }
+
+        return { success: true, data: response.data };
+      } else {
+        return { 
+          success: false, 
+          error: response.error?.message || 'Privacy settings update failed' 
+        };
+      }
+    } catch (error) {
+      logger.error('Privacy settings update failed:', { component: 'AuthProvider' }, error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const requestDataExport = async (format: 'json' | 'csv' | 'xml', includes: string[]): Promise<DataExportRequest> => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const exportRequest = await privacyCompliance.generateDataExport(user.id, format, includes);
+      
+      // Also send to server
+      const response = await apiService.post('/api/privacy/export', {
+        format,
+        includes,
+      });
+
+      if (response.success) {
+        return response.data as DataExportRequest;
+      } else {
+        throw new Error(response.error?.message || 'Data export request failed');
+      }
+    } catch (error) {
+      logger.error('Data export request failed:', { component: 'AuthProvider' }, error);
+      throw error;
+    }
+  };
+
+  const requestDataDeletion = async (retentionPeriod: string, includes: string[]): Promise<DataDeletionRequest> => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const deletionRequest = await privacyCompliance.requestDataDeletion(user.id, includes, retentionPeriod);
+      
+      // Also send to server
+      const response = await apiService.post('/api/privacy/delete', {
+        retention_period: retentionPeriod,
+        includes,
+      });
+
+      if (response.success) {
+        return response.data as DataDeletionRequest;
+      } else {
+        throw new Error(response.error?.message || 'Data deletion request failed');
+      }
+    } catch (error) {
+      logger.error('Data deletion request failed:', { component: 'AuthProvider' }, error);
+      throw error;
+    }
+  };
+
+  const getSecurityEvents = async (limit: number = 50): Promise<SecurityEvent[]> => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const response = await apiService.get(`/api/auth/security-events?limit=${limit}`);
+      
+      if (response.success && response.data) {
+        return response.data as SecurityEvent[];
+      } else {
+        throw new Error(response.error?.message || 'Failed to fetch security events');
+      }
+    } catch (error) {
+      logger.error('Security events fetch failed:', { component: 'AuthProvider' }, error);
+      throw error;
+    }
+  };
+
+  const getSuspiciousActivity = async (): Promise<SuspiciousActivityAlert[]> => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const response = await apiService.get('/api/auth/suspicious-activity');
+      
+      if (response.success && response.data) {
+        return response.data as SuspiciousActivityAlert[];
+      } else {
+        throw new Error(response.error?.message || 'Failed to fetch suspicious activity');
+      }
+    } catch (error) {
+      logger.error('Suspicious activity fetch failed:', { component: 'AuthProvider' }, error);
+      throw error;
+    }
+  };
+
+  const getActiveSessions = async (): Promise<SessionInfo[]> => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const response = await apiService.get('/api/auth/sessions');
+      
+      if (response.success && response.data) {
+        return response.data as SessionInfo[];
+      } else {
+        throw new Error(response.error?.message || 'Failed to fetch active sessions');
+      }
+    } catch (error) {
+      logger.error('Active sessions fetch failed:', { component: 'AuthProvider' }, error);
+      throw error;
+    }
+  };
+
+  const terminateSession = async (sessionId: string): Promise<AuthResponse> => {
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      const response = await apiService.delete(`/api/auth/sessions/${sessionId}`);
+
+      if (response.success) {
+        return { success: true, data: response.data };
+      } else {
+        return { 
+          success: false, 
+          error: response.error?.message || 'Session termination failed' 
+        };
+      }
+    } catch (error) {
+      logger.error('Session termination failed:', { component: 'AuthProvider' }, error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const terminateAllSessions = async (): Promise<AuthResponse> => {
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      const response = await apiService.delete('/api/auth/sessions');
+
+      if (response.success) {
+        // This will log out the current session too
+        await logout();
+        return { success: true, data: response.data };
+      } else {
+        return { 
+          success: false, 
+          error: response.error?.message || 'Session termination failed' 
+        };
+      }
+    } catch (error) {
+      logger.error('All sessions termination failed:', { component: 'AuthProvider' }, error);
+      return { success: false, error: 'Network error. Please try again.' };
     }
   };
 
@@ -371,15 +755,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     login,
     register,
     logout,
-    refresh_token,
+    refreshToken,
     verifyEmail,
     requestPasswordReset,
     resetPassword,
+    changePassword,
+    setupTwoFactor,
+    enableTwoFactor,
+    disableTwoFactor,
+    updatePrivacySettings,
+    requestDataExport,
+    requestDataDeletion,
+    getSecurityEvents,
+    getSuspiciousActivity,
+    getActiveSessions,
+    terminateSession,
+    terminateAllSessions,
     loading,
     isAuthenticated: !!user,
     updateUser

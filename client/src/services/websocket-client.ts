@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { defaultApiConfig } from '../config/api.js';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 import { errorHandler, ErrorType, ErrorSeverity } from '../utils/unified-error-handler';
 
 export interface BillUpdate { type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
@@ -121,7 +121,7 @@ export class WebSocketClient {
 
       try {
         const wsUrl = `${this.baseUrl}/ws?token=${encodeURIComponent(token)}`;
-        logger.info('WebSocket attempting to connect to:', { component: 'Chanuka' }, wsUrl);
+        logger.info('WebSocket attempting to connect to:', { component: 'Chanuka' }, { url: wsUrl });
         this.ws = new WebSocket(wsUrl);
 
         // Optimization: Add connection timeout to prevent hanging
@@ -160,8 +160,8 @@ export class WebSocketClient {
         };
 
         this.ws.onclose = (event) => {
-          clearTimeout(connectionTimeout);
-          logger.info('WebSocket connection closed:', { component: 'Chanuka' }, event.code, event.reason);
+           clearTimeout(connectionTimeout);
+           logger.info('WebSocket connection closed:', { component: 'Chanuka' }, { code: event.code, reason: event.reason });
           
           // Optimization: Update state before emitting events
           const wasConnected = this.connectionState === ConnectionState.CONNECTED;

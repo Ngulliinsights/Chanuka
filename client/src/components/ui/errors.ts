@@ -41,6 +41,13 @@ export class UIError extends Error {
   }
 }
 
+// Import unified ValidationError from shared core types
+import { ValidationError } from '@shared/core';
+
+// Re-export for backward compatibility
+export { ValidationError };
+
+// Keep UIValidationError for UI-specific validation errors
 export class UIValidationError extends UIError {
   constructor(message: string, field: string, value: any, details?: Record<string, any>) {
     super(

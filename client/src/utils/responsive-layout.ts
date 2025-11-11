@@ -1,4 +1,4 @@
-import { logger } from './browser-logger';
+import { logger } from './logger';
 import React from 'react';
 
 /**

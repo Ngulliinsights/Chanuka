@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useLoading } from '../core/loading';
-import { logger } from '../utils/browser-logger';
+import { logger } from '../utils/logger';
 
 export interface TimeoutConfig {
   timeout: number;

@@ -9,8 +9,8 @@ jest.mock('../../utils/client-core', () => ({
   },
 }));
 
-jest.mock('../hooks/use-online-status', () => ({
-  useOnlineStatus: jest.fn(),
+jest.mock('../hooks/useOfflineDetection', () => ({
+  useOfflineDetection: jest.fn(),
 }));
 
 jest.mock('../utils/backgroundSyncManager', () => ({
@@ -20,7 +20,7 @@ jest.mock('../utils/backgroundSyncManager', () => ({
   },
 }));
 
-const mockUseOnlineStatus = require('../hooks/use-online-status').useOnlineStatus;
+const mockUseOfflineDetection = require('../hooks/useOfflineDetection').useOfflineDetection;
 const mockBackgroundSyncManager = require('../utils/backgroundSyncManager').backgroundSyncManager;
 const mockLogger = require('../../utils/client-core').logger;
 
@@ -35,7 +35,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('does not render when online and no pending sync', () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: null, lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: Date.now(),
@@ -47,7 +47,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('renders when offline', () => {
-    mockUseOnlineStatus.mockReturnValue(false);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: null,
@@ -59,7 +59,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('renders when online but has pending sync items', () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: Date.now() - 1000 * 60 * 5, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 5,
       lastSyncTime: Date.now() - 1000 * 60 * 5, // 5 minutes ago
@@ -71,7 +71,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('shows online status when synced', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: Date.now(),
@@ -85,7 +85,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('displays sync details when showDetails is true', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: Date.now() - 1000 * 60 * 30, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 3,
       lastSyncTime: Date.now() - 1000 * 60 * 30, // 30 minutes ago
@@ -100,7 +100,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('shows sync button when online and has pending items', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 2,
       lastSyncTime: Date.now(),
@@ -114,7 +114,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('does not show sync button when offline', async () => {
-    mockUseOnlineStatus.mockReturnValue(false);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 2,
       lastSyncTime: null,
@@ -128,7 +128,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('handles manual sync', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 2,
       lastSyncTime: Date.now(),
@@ -150,7 +150,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('shows offline message when not connected', () => {
-    mockUseOnlineStatus.mockReturnValue(false);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: null,
@@ -162,7 +162,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('applies custom className', () => {
-    mockUseOnlineStatus.mockReturnValue(false);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: null,
@@ -175,7 +175,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('auto-hides after sync completion', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: Date.now(),
@@ -197,7 +197,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('does not auto-hide when autoHide is false', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: Date.now(),
@@ -217,7 +217,7 @@ describe('OfflineIndicator', () => {
 
   it('shows correct status colors', () => {
     // Offline - red
-    mockUseOnlineStatus.mockReturnValue(false);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: null,
@@ -227,7 +227,7 @@ describe('OfflineIndicator', () => {
     expect(screen.getByTestId('status-indicator')).toHaveClass('bg-red-500');
 
     // Online with pending - yellow
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue(true);
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 1,
       lastSyncTime: Date.now(),
@@ -247,7 +247,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('handles sync status update errors', async () => {
-    mockUseOnlineStatus.mockReturnValue(false);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockRejectedValue(new Error('Sync error'));
 
     render(<OfflineIndicator />);
@@ -258,7 +258,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('handles manual sync errors', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 1,
       lastSyncTime: Date.now(),
@@ -276,7 +276,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('updates sync status periodically', async () => {
-    mockUseOnlineStatus.mockReturnValue(false);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: null,
@@ -295,7 +295,7 @@ describe('OfflineIndicator', () => {
 
   it('shows correct last sync time formatting', async () => {
     const now = Date.now();
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: now, lastOfflineTime: now - 1000 * 60 * 60 * 2, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 1,
       lastSyncTime: now - 1000 * 60 * 60 * 2, // 2 hours ago
@@ -309,7 +309,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('shows "Never synced" when no last sync time', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 1,
       lastSyncTime: null,
@@ -323,7 +323,7 @@ describe('OfflineIndicator', () => {
   });
 
   it('disables sync button during syncing', async () => {
-    mockUseOnlineStatus.mockReturnValue(true);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 1,
       lastSyncTime: Date.now(),
@@ -352,7 +352,7 @@ describe('OfflineIndicator', () => {
 // In actual component, we'd need to add data-testid to the status div
 describe('OfflineIndicator - Status Indicator', () => {
   it('has accessible status indicator', () => {
-    mockUseOnlineStatus.mockReturnValue(false);
+    mockUseOfflineDetection.mockReturnValue({ isOnline: false, connectionQuality: { type: 'offline' }, lastOnlineTime: null, lastOfflineTime: Date.now(), connectionAttempts: 0, isReconnecting: false });
     mockBackgroundSyncManager.getSyncStatus.mockResolvedValue({
       queueLength: 0,
       lastSyncTime: null,

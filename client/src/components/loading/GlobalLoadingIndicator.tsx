@@ -6,7 +6,7 @@ import { useLoading } from '../../core/loading';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { Card, CardContent } from '../ui/card';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../utils/logger';
 import { GlobalLoadingIndicatorProps } from './types';
 
 export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({

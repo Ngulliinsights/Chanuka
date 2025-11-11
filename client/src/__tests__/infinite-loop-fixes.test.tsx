@@ -13,7 +13,7 @@ global.WebSocket = vi.fn().mockImplementation(() => ({
  */
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '@/utils/logger';
 
 // Mock dependencies
 vi.mock('../hooks/useConnectionAware', () => ({
@@ -26,8 +26,8 @@ vi.mock('../hooks/useConnectionAware', () => ({
   }),
 }));
 
-vi.mock('../hooks/use-online-status', () => ({
-  useOnlineStatus: () => true,
+vi.mock('../hooks/useOfflineDetection', () => ({
+  useOfflineDetection: () => ({ isOnline: true, connectionQuality: { type: 'fast' }, lastOnlineTime: Date.now(), lastOfflineTime: null, connectionAttempts: 0, isReconnecting: false }),
 }));
 
 // Mock fetch for auth tests
