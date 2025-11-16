@@ -17,8 +17,8 @@ import {
   ExternalLink,
   Loader2
 } from 'lucide-react';
-import { authBackendService, OAuthProvider } from '../../services/authBackendService';
-import { useAuth } from '../../hooks/use-auth';
+import { authService, OAuthProvider } from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
 import { logger } from '../../utils/logger';
 
 interface OAuthLoginProps {
@@ -36,7 +36,7 @@ export function OAuthLogin({ onSuccess, onError, className = '', redirectTo }: O
 
   useEffect(() => {
     // Get available OAuth providers
-    const availableProviders = authBackendService.getOAuthProviders();
+    const availableProviders = authService.getOAuthProviders();
     // Filter to only enabled providers (those with client IDs configured)
     const enabledProviders = availableProviders.filter(p => p.clientId);
     setProviders(enabledProviders);
@@ -61,7 +61,7 @@ export function OAuthLogin({ onSuccess, onError, className = '', redirectTo }: O
         setLoading(provider);
         
         try {
-          const result = await authBackendService.handleOAuthCallback(provider, code, state || undefined);
+          const result = await authService.handleOAuthCallback(provider, code, state || undefined);
           
           if (result.success && result.data) {
             updateUser(result.data.user);
@@ -107,7 +107,7 @@ export function OAuthLogin({ onSuccess, onError, className = '', redirectTo }: O
       });
 
       // Initiate OAuth flow (this will redirect the page)
-      authBackendService.initiateOAuthLogin(providerId, state);
+      authService.initiateOAuthLogin(providerId, state);
       
     } catch (error) {
       logger.error('OAuth login initiation failed:', { component: 'OAuthLogin' }, error);

@@ -14,8 +14,8 @@ vi.mock('../../shared/core/src/observability/logging', () => ({
 }));
 
 import { Pool } from 'pg';
-import { MigrationService } from '../infrastructure/database/migration-service.ts';
-import { DataValidationService } from '../core/validation/data-validation-service.ts';
+import { MigrationService } from '../infrastructure/database/migration-service.js';
+import { DataIntegrityValidationService } from '../core/validation/data-validation-service.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import { logger  } from '../../shared/core/src/index.js';
@@ -205,12 +205,12 @@ DROP TABLE IF EXISTS test_table;
   });
 });
 
-describe('DataValidationService', () => {
-  let validationService: DataValidationService;
+describe('DataIntegrityValidationService', () => {
+  let validationService: DataIntegrityValidationService;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    validationService = new DataValidationService(mockPool);
+    validationService = new DataIntegrityValidationService(mockPool);
   });
 
   describe('runValidationRule', () => {

@@ -147,18 +147,23 @@ export interface CacheEvent {
   key: string;
   timestamp: number;
   metadata?: Record<string, any>;
+  error?: Error;
+  tier?: 'L1' | 'L2';
+  size?: number;
 }
 
-export type CacheEventType = 
-  | 'hit' 
-  | 'miss' 
-  | 'set' 
-  | 'delete' 
-  | 'expire' 
-  | 'evict' 
+export type CacheEventType =
+  | 'hit'
+  | 'miss'
+  | 'set'
+  | 'delete'
+  | 'expire'
+  | 'evict'
   | 'error'
   | 'circuit_open'
-  | 'circuit_close';
+  | 'circuit_close'
+  | 'cache:event'
+  | 'promotion';
 
 export interface CacheEventEmitter {
   on(event: CacheEventType, listener: (event: CacheEvent) => void): void;

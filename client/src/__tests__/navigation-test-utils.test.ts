@@ -48,7 +48,7 @@ export function setupNavigationMocks() {
   });
 
   // Mock hooks
-  vi.mock('@/hooks/use-auth', () => ({
+  vi.mock('@/hooks/useAuth', () => ({
     useAuth: () => ({
       user: {
         id: '1',

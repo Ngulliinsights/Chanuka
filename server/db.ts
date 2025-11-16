@@ -1,13 +1,12 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import pg from 'pg';
-const { Pool } = pg;
+import { Pool, type PoolConfig } from 'pg';
 import * as schema from "../shared/schema";
 import { databaseFallbackService as fallbackService } from './infrastructure/database/database-fallback.js';
 import { logger  } from '../shared/core/src/index.js';
 
 // Connection state management with clear separation of concerns
 interface DatabaseState {
-  pool: pg.Pool | null;
+  pool: Pool | null;
   db: any;
   isConnected: boolean;
   initPromise: Promise<void> | null;
@@ -26,8 +25,8 @@ const state: DatabaseState = {
  * Creates a pool configuration based on available environment variables.
  * Prioritizes DATABASE_URL for simplicity, falls back to individual parameters.
  */
-function createPoolConfig(): pg.PoolConfig {
-  const baseConfig: pg.PoolConfig = {
+function createPoolConfig(): PoolConfig {
+  const baseConfig: PoolConfig = {
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 5000,
@@ -66,7 +65,7 @@ function createPoolConfig(): pg.PoolConfig {
  * Tests the database connection by executing a simple query.
  * Returns true if successful, false otherwise.
  */
-async function testConnection(pool: pg.Pool): Promise<boolean> {
+async function testConnection(pool: Pool): Promise<boolean> {
   try {
     const client = await pool.connect();
     await client.query('SELECT NOW()');

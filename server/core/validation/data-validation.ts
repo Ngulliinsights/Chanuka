@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { logger   } from '../../../shared/core/src/index.js';
+import { validationMetricsCollector } from './validation-metrics.js';
 
 // Comprehensive data validation service for government data integration
-export class DataValidationService {
+export class GovernmentDataValidationService {
   
   // Validation rules for different data types
   private static readonly VALIDATION_RULES = {
@@ -37,6 +38,8 @@ export class DataValidationService {
    * Validate bill data comprehensively
    */
   static validateBill(bill: any): ValidationResult {
+    const endMetric = validationMetricsCollector.startValidation('GovernmentDataValidationService', 'validateBill');
+
     const result: ValidationResult = {
       isValid: true,
       errors: [],
@@ -65,13 +68,13 @@ export class DataValidationService {
     }
 
     // Validate bill status
-    if (bills.status && !this.VALIDATION_RULES.bills.statusValues.includes(bills.status)) {
-      result.warnings.push(`Invalid bill status: ${bills.status}. Expected one of: ${this.VALIDATION_RULES.bills.statusValues.join(', ')}`);
+    if (bill.status && !this.VALIDATION_RULES.bills.statusValues.includes(bill.status)) {
+      result.warnings.push(`Invalid bill status: ${bill.status}. Expected one of: ${this.VALIDATION_RULES.bills.statusValues.join(', ')}`);
     }
 
     // Validate bill number format
-    if (bills.bill_number && !this.VALIDATION_RULES.bills.bill_numberPattern.test(bills.bill_number)) {
-      result.warnings.push(`Bill number format may be invalid: ${bills.bill_number}`);
+    if (bill.bill_number && !this.VALIDATION_RULES.bills.bill_numberPattern.test(bill.bill_number)) {
+      result.warnings.push(`Bill number format may be invalid: ${bill.bill_number}`);
     }
 
     // Validate dates
@@ -104,6 +107,8 @@ export class DataValidationService {
       result.details.consistency * 0.2 +
       result.details.timeliness * 0.2
     );
+
+    endMetric(result.isValid, result.isValid ? undefined : 'validation_failed', 'business_logic');
 
     return result;
   }
@@ -140,19 +145,19 @@ export class DataValidationService {
     }
 
     // Validate role
-    if (sponsors.role && !this.VALIDATION_RULES.sponsors.roleValues.includes(sponsors.role)) {
-      result.warnings.push(`Uncommon role: ${sponsors.role}. Expected one of: ${this.VALIDATION_RULES.sponsors.roleValues.join(', ')}`);
+    if (sponsor.role && !this.VALIDATION_RULES.sponsors.roleValues.includes(sponsor.role)) {
+      result.warnings.push(`Uncommon role: ${sponsor.role}. Expected one of: ${this.VALIDATION_RULES.sponsors.roleValues.join(', ')}`);
     }
 
     // Validate email format
-    if (sponsors.email && !this.isValidEmail(sponsors.email)) {
-      result.errors.push(`Invalid email format: ${sponsors.email}`);
+    if (sponsor.email && !this.isValidEmail(sponsor.email)) {
+      result.errors.push(`Invalid email format: ${sponsor.email}`);
       result.isValid = false;
     }
 
     // Validate phone format
-    if (sponsors.phone && !this.isValidPhone(sponsors.phone)) {
-      result.warnings.push(`Phone number format may be invalid: ${sponsors.phone}`);
+    if (sponsor.phone && !this.isValidPhone(sponsor.phone)) {
+      result.warnings.push(`Phone number format may be invalid: ${sponsor.phone}`);
     }
 
     // Calculate completeness score

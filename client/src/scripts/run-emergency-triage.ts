@@ -9,6 +9,7 @@
 
 import { emergencyTriage, type TriageReport, type CircuitBreakerConfig } from '../utils/emergency-triage';
 import { logger } from '../utils/logger';
+import { fileURLToPath } from 'url';
 
 interface TriageConfig {
   duration: number; // milliseconds
@@ -308,7 +309,7 @@ class EmergencyTriageRunner {
 export { EmergencyTriageRunner };
 
 // CLI usage when run directly
-if (typeof window === 'undefined' && require.main === module) {
+if (typeof window === 'undefined' && import.meta.url.endsWith('run-emergency-triage.ts')) {
   const runner = new EmergencyTriageRunner();
   
   runner.start()

@@ -115,6 +115,27 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 /**
+ * Browser Extension Error Handling
+ * Suppress common browser extension errors that don't affect app functionality
+ */
+window.addEventListener('error', (event) => {
+  // Suppress browser extension message channel errors
+  if (event.message && event.message.includes('message channel closed before a response was received')) {
+    event.preventDefault();
+    return false;
+  }
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  // Suppress browser extension promise rejections
+  if (event.reason && typeof event.reason === 'object' && 
+      event.reason.message && event.reason.message.includes('message channel closed before a response was received')) {
+    event.preventDefault();
+    return false;
+  }
+});
+
+/**
  * DOM Readiness Check
  * Waits for the DOM to be ready with a timeout to prevent indefinite hanging.
  * Uses both DOMContentLoaded and readystatechange events for maximum compatibility
@@ -352,14 +373,24 @@ function validateAndConfigureRoot(): HTMLElement {
  * improving perceived performance by showing progress rather than a blank screen.
  */
 async function mountReactApp(rootElement: HTMLElement): Promise<void> {
+  updateLoadingState('mounting', 'Initializing application state...', 50);
+  logger.info('DOM ready, initializing application state...', { component: 'Chanuka' });
+  
+  // Initialize store before mounting React app
+  try {
+    const { initializeStore } = await import('./store');
+    await initializeStore();
+    logger.info('Store initialized successfully', { component: 'Chanuka' });
+  } catch (error) {
+    logger.warn('Store initialization failed, using fallback', { component: 'Chanuka', error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+  
   updateLoadingState('mounting', 'Mounting React application...', 60);
-  logger.info('DOM ready, mounting React application...', { component: 'Chanuka' });
   
   // Brief delay to ensure loading state is visible
   await new Promise(resolve => setTimeout(resolve, 100));
   
   const root = createRoot(rootElement);
-  const { AssetLoadingProvider } = await import('./components/loading/AssetLoadingIndicator');
   
   // Render app immediately for better LCP
   root.render(<App />);
@@ -414,8 +445,8 @@ function initializePerformanceMonitoring(): void {
 
     // Delay performance monitoring to avoid impacting initial load
     setTimeout(() => {
-      // TODO: Re-enable when performanceMonitor is available
-      // performanceMonitor.startMonitoring();
+      // Initialize performance monitoring
+      performanceMonitor.startMonitoring();
       
       // Log initial performance metrics
       if (window.performance && window.performance.timing) {

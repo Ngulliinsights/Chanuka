@@ -126,9 +126,16 @@ export function applyCSPNonce(element: HTMLScriptElement | HTMLStyleElement, non
 /**
  * Set CSP header on document (client-side)
  * Note: This is mainly for development/testing. CSP should be set server-side.
+ * Some directives like frame-ancestors are not supported in meta tags and will be filtered out.
  */
 export function setCSPHeader(directives: CSPDirectives): void {
-  const cspString = generateCSPHeader(directives);
+  // Filter out directives not supported in meta tags
+  const metaCompatibleDirectives = { ...directives };
+  delete metaCompatibleDirectives['frame-ancestors']; // Not supported in meta tags
+  delete metaCompatibleDirectives['report-uri']; // Not supported in meta tags
+  delete metaCompatibleDirectives['report-to']; // Not supported in meta tags
+  
+  const cspString = generateCSPHeader(metaCompatibleDirectives);
   const metaTag = document.querySelector('meta[http-equiv="Content-Security-Policy"]') as HTMLMetaElement;
 
   if (metaTag) {
@@ -138,6 +145,11 @@ export function setCSPHeader(directives: CSPDirectives): void {
     newMetaTag.httpEquiv = 'Content-Security-Policy';
     newMetaTag.content = cspString;
     document.head.appendChild(newMetaTag);
+  }
+  
+  // Log warning about filtered directives
+  if (directives['frame-ancestors'] || directives['report-uri'] || directives['report-to']) {
+    console.warn('CSP: Some directives (frame-ancestors, report-uri, report-to) are not supported in meta tags and were filtered out. These should be set via HTTP headers.');
   }
 }
 

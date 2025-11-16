@@ -126,7 +126,7 @@ class RealtimeOptimizer {
 
       logger.info('Compression worker initialized', { component: 'RealtimeOptimizer' });
     } catch (error) {
-      logger.warn('Failed to initialize compression worker', { component: 'RealtimeOptimizer' }, error);
+      logger.warn('Failed to initialize compression worker', { component: 'RealtimeOptimizer', error });
       this.config.enableCompression = false;
     }
   }
@@ -244,7 +244,7 @@ class RealtimeOptimizer {
         origin: event.origin,
         lastEventId: event.lastEventId,
         source: event.source,
-        ports: event.ports
+        ports: [...event.ports]
       });
 
       // Call original handler
@@ -287,8 +287,8 @@ class RealtimeOptimizer {
         }
       };
 
-      this.compressionWorker.addEventListener('message', handleMessage);
-      this.compressionWorker.postMessage({ id, data, compress: true });
+      this.compressionWorker?.addEventListener('message', handleMessage);
+      this.compressionWorker?.postMessage({ id, data, compress: true });
 
       // Timeout after 1 second
       setTimeout(() => {
@@ -321,8 +321,8 @@ class RealtimeOptimizer {
         }
       };
 
-      this.compressionWorker.addEventListener('message', handleMessage);
-      this.compressionWorker.postMessage({ id, data, compress: false });
+      this.compressionWorker?.addEventListener('message', handleMessage);
+      this.compressionWorker?.postMessage({ id, data, compress: false });
 
       // Timeout after 1 second
       setTimeout(() => {
@@ -453,7 +453,7 @@ class RealtimeOptimizer {
         return data;
       }
     } catch (error) {
-      logger.warn('Failed to apply delta update', { component: 'RealtimeOptimizer' }, error);
+      logger.warn('Failed to apply delta update', { component: 'RealtimeOptimizer', error });
       return data;
     }
   }
@@ -515,7 +515,7 @@ class RealtimeOptimizer {
   /**
    * Update receive metrics
    */
-  private updateReceiveMetrics(originalSize: number, optimizedSize: number): void {
+  private updateReceiveMetrics(originalSize: number, _optimizedSize: number): void {
     this.metrics.messagesReceived++;
     this.metrics.bytesReceived += originalSize;
   }

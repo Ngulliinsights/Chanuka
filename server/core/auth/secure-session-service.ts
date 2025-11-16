@@ -1,11 +1,14 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
-import { database as db } from '../../../shared/database';
+import { getLegacyDatabase } from '../../../shared/database';
 import { sessions, users } from '../../../shared/schema';
 import { eq, and, lt, gt } from 'drizzle-orm';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { logger  } from '../../../shared/core/src/index.js';
+
+// Get database instance
+const db = getLegacyDatabase();
 
 export interface SecureSessionOptions {
   maxAge: number; // in milliseconds
@@ -47,7 +50,6 @@ export class SecureSessionService {
   };
 
   private readonly maxSessionsPerUser = 5;
-  private readonly sessionTimeoutMinutes = 30;
   private readonly maxInactivityMinutes = 120;
 
   /**
@@ -190,7 +192,7 @@ export class SecureSessionService {
           severity: 'high',
           user_id: sessionData.user_id,
           ip_address: this.getClientIP(req),
-          user_agent: req.get('User-Agent'),
+          user_agent: req.get('User-Agent') || 'unknown',
           result: 'blocked',
           success: false,
           details: {
@@ -216,7 +218,7 @@ export class SecureSessionService {
           severity: 'medium',
           user_id: sessionData.user_id,
           ip_address,
-          user_agent: req.get('User-Agent'),
+          user_agent: req.get('User-Agent') || 'unknown',
           result: 'allowed',
           success: true,
           details: {
@@ -372,14 +374,17 @@ export class SecureSessionService {
    * Generate secure session configuration for production
    */
   getProductionSessionConfig(): SecureSessionOptions {
-    return {
+    const config: SecureSessionOptions = {
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       secure: true, // HTTPS only
       httpOnly: true,
       sameSite: 'strict',
-      domain: process.env.DOMAIN || undefined,
       path: '/'
     };
+    if (process.env.DOMAIN) {
+      config.domain = process.env.DOMAIN;
+    }
+    return config;
   }
 
   /**
@@ -399,7 +404,7 @@ export class SecureSessionService {
         .where(gt(sessions.expires_at, new Date()));
 
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const recentSessions = activeSessions.filter(s => s.created_at! > last24h);
+      const recentSessions = activeSessions.filter((s: any) => s.created_at! > last24h);
 
       return {
         totalActiveSessions: activeSessions.length,

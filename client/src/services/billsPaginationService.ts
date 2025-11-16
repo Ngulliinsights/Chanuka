@@ -7,7 +7,7 @@
 
 import { billsApiService, BillsSearchParams, PaginatedBillsResponse } from './billsApiService';
 import { billsDataCache } from './billsDataCache';
-import { store } from '../store';
+import { getStore } from '../store';
 import { setBills, updateBill, Bill } from '../store/slices/billsSlice';
 import { logger } from '../utils/logger';
 
@@ -167,7 +167,7 @@ class BillsPaginationService {
 
         // Add bills to store (append mode for infinite scroll)
         response.bills.forEach(bill => {
-          store.dispatch(updateBill({ id: bill.id, updates: bill }));
+          getStore().dispatch(updateBill({ id: bill.id, updates: bill }));
         });
 
         // Continue prefetching
@@ -177,7 +177,7 @@ class BillsPaginationService {
           component: 'BillsPaginationService',
           page: nextPage,
           billsCount: response.bills.length,
-          totalLoaded: store.getState().bills.bills.length
+          totalLoaded: getStore().getState().bills.bills.length
         });
 
         return response.bills;
@@ -229,7 +229,7 @@ class BillsPaginationService {
           hasNext: page < this.state.totalPages,
           hasPrevious: page > 1
         },
-        stats: store.getState().bills.stats
+        stats: getStore().getState().bills.stats
       };
     }
 
@@ -401,7 +401,7 @@ class BillsPaginationService {
       Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
     );
 
-    const billsState = store.getState().bills;
+    const billsState = getStore().getState().bills;
     const visibleItems = billsState.bills.slice(startIndex, endIndex + 1);
 
     return {

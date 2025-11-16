@@ -9,7 +9,7 @@
  * - Confirms migration readiness
  */
 
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 interface SimpleValidationResult {
   component: string;

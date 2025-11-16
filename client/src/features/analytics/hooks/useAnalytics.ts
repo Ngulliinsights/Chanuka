@@ -1,15 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { analyticsApi } from '../services/analytics-api';
+import { analyticsService } from '../services/analytics';
 import { useToast } from '@/hooks/use-toast';
 import type {
-  BillAnalytics,
-  AnalyticsFilters,
-  AnalyticsSummary,
-  DashboardData,
-  EngagementReport,
-  ConflictReport,
-  AnalyticsResponse,
-  UserActivity
+  AnalyticsFilters
 } from '../types';
 
 /**
@@ -18,7 +11,7 @@ import type {
 export function useAnalyticsDashboard(filters?: AnalyticsFilters) {
   return useQuery({
     queryKey: ['analytics', 'dashboard', filters],
-    queryFn: () => analyticsApi.getDashboard(filters),
+    queryFn: () => analyticsService.getDashboard(filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes for live data
   });
@@ -30,7 +23,7 @@ export function useAnalyticsDashboard(filters?: AnalyticsFilters) {
 export function useAnalyticsSummary(filters?: AnalyticsFilters) {
   return useQuery({
     queryKey: ['analytics', 'summary', filters],
-    queryFn: () => analyticsApi.getSummary(filters),
+    queryFn: () => analyticsService.getSummary(filters),
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }
@@ -38,34 +31,37 @@ export function useAnalyticsSummary(filters?: AnalyticsFilters) {
 /**
  * Hook for individual bill analytics
  */
-export function useBillAnalytics(bill_id: string | undefined, filters?: AnalyticsFilters) { return useQuery({
+export function useBillAnalytics(bill_id: string | undefined, filters?: AnalyticsFilters) {
+  return useQuery({
     queryKey: ['analytics', 'bill', bill_id, filters],
-    queryFn: () => analyticsApi.getBillAnalytics(bill_id!, filters),
+    queryFn: () => analyticsService.getBillAnalytics(bill_id!, filters),
     enabled: !!bill_id,
     staleTime: 5 * 60 * 1000, // 5 minutes
-   });
+  });
 }
 
 /**
  * Hook for bill engagement reports
  */
-export function useEngagementReport(bill_id: string | undefined, filters?: AnalyticsFilters) { return useQuery({
+export function useEngagementReport(bill_id: string | undefined, filters?: AnalyticsFilters) {
+  return useQuery({
     queryKey: ['analytics', 'engagement', bill_id, filters],
-    queryFn: () => analyticsApi.getEngagementReport(bill_id!, filters),
+    queryFn: () => analyticsService.getEngagementReport(bill_id!, filters),
     enabled: !!bill_id,
     staleTime: 15 * 60 * 1000, // 15 minutes
-   });
+  });
 }
 
 /**
  * Hook for conflict analysis reports
  */
-export function useConflictReport(bill_id: string | undefined) { return useQuery({
+export function useConflictReport(bill_id: string | undefined) {
+  return useQuery({
     queryKey: ['analytics', 'conflicts', bill_id],
-    queryFn: () => analyticsApi.getConflictReport(bill_id!),
+    queryFn: () => analyticsService.getConflictReport(bill_id!),
     enabled: !!bill_id,
     staleTime: 30 * 60 * 1000, // 30 minutes - conflicts don't change often
-   });
+  });
 }
 
 /**
@@ -74,7 +70,7 @@ export function useConflictReport(bill_id: string | undefined) { return useQuery
 export function useTopBills(limit = 10, filters?: AnalyticsFilters) {
   return useQuery({
     queryKey: ['analytics', 'top-bills', limit, filters],
-    queryFn: () => analyticsApi.getTopBills(limit, filters),
+    queryFn: () => analyticsService.getTopBills(limit, filters),
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }
@@ -82,11 +78,12 @@ export function useTopBills(limit = 10, filters?: AnalyticsFilters) {
 /**
  * Hook for user activity analytics
  */
-export function useUserActivity(user_id?: string, filters?: AnalyticsFilters) { return useQuery({
+export function useUserActivity(user_id?: string, filters?: AnalyticsFilters) {
+  return useQuery({
     queryKey: ['analytics', 'user-activity', user_id, filters],
-    queryFn: () => analyticsApi.getUserActivity(user_id, filters),
+    queryFn: () => analyticsService.getUserActivity(user_id, filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
-   });
+  });
 }
 
 /**
@@ -97,13 +94,13 @@ export function useAnalyticsAlerts(acknowledged = false) {
 
   const alerts = useQuery({
     queryKey: ['analytics', 'alerts', acknowledged],
-    queryFn: () => analyticsApi.getAlerts(acknowledged),
+    queryFn: () => analyticsService.getAlerts(acknowledged),
     staleTime: 2 * 60 * 1000, // 2 minutes
     refetchInterval: acknowledged ? false : 60 * 1000, // Poll unacknowledged alerts every minute
   });
 
   const acknowledgeAlert = useMutation({
-    mutationFn: (alertId: string) => analyticsApi.acknowledgeAlert(alertId),
+    mutationFn: (alertId: string) => analyticsService.acknowledgeAlert(alertId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['analytics', 'alerts'] });
     },
@@ -124,7 +121,7 @@ export function useAnalyticsAlerts(acknowledged = false) {
 export function useTrendingTopics(limit = 20) {
   return useQuery({
     queryKey: ['analytics', 'trends', limit],
-    queryFn: () => analyticsApi.getTrendingTopics(limit),
+    queryFn: () => analyticsService.getTrendingTopics(limit),
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }
@@ -132,11 +129,12 @@ export function useTrendingTopics(limit = 20) {
 /**
  * Hook for stakeholder analysis
  */
-export function useStakeholderAnalysis(bill_id?: string) { return useQuery({
+export function useStakeholderAnalysis(bill_id?: string) {
+  return useQuery({
     queryKey: ['analytics', 'stakeholders', bill_id],
-    queryFn: () => analyticsApi.getStakeholderAnalysis(bill_id),
+    queryFn: () => analyticsService.getStakeholderAnalysis(bill_id),
     staleTime: 30 * 60 * 1000, // 30 minutes
-   });
+  });
 }
 
 /**
@@ -145,7 +143,7 @@ export function useStakeholderAnalysis(bill_id?: string) { return useQuery({
 export function useRealtimeAnalytics() {
   return useQuery({
     queryKey: ['analytics', 'realtime'],
-    queryFn: () => analyticsApi.getRealtimeMetrics(),
+    queryFn: () => analyticsService.getRealtimeMetrics(),
     staleTime: 30 * 1000, // 30 seconds
     refetchInterval: 30 * 1000, // Refetch every 30 seconds
   });
@@ -159,7 +157,7 @@ export function useAnalyticsExport() {
 
   return useMutation({
     mutationFn: ({ filters, format }: { filters?: AnalyticsFilters; format?: 'csv' | 'json' }) =>
-      analyticsApi.exportAnalytics(filters, format),
+      analyticsService.exportAnalytics(filters, format),
     onSuccess: (data, { format }) => {
       // Create download link
       const blob = new Blob([data], {
@@ -189,26 +187,6 @@ export function useAnalyticsExport() {
   });
 }
 
-/**
- * Hook for analytics filters management
- */
-export function useAnalyticsFilters(initialFilters?: AnalyticsFilters) {
-  const queryClient = useQueryClient();
-
-  const updateFilters = (newFilters: Partial<AnalyticsFilters>) => {
-    // Invalidate all analytics queries to refetch with new filters
-    queryClient.invalidateQueries({ queryKey: ['analytics'] });
-  };
-
-  const clearFilters = () => {
-    queryClient.invalidateQueries({ queryKey: ['analytics'] });
-  };
-
-  return {
-    updateFilters,
-    clearFilters,
-  };
-}
 
 
 

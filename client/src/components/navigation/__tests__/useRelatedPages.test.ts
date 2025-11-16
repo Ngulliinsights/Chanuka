@@ -4,7 +4,7 @@ import { useRelatedPages } from '@/hooks/useRelatedPages';
 import { NavigationValidationError } from '../errors';
 
 // Mock the auth hook
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     user: { id: '1', role: 'citizen' },
   }),

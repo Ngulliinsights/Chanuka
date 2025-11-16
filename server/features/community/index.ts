@@ -2,16 +2,14 @@
 // Centralized exports for community and social functionality
 
 // Routes
-export { default as communityRouter } from './community';
+export { router as communityRouter } from './community';
 
 // Services
 export { CommentService } from './comment';
 export { CommentVotingService } from './comment-voting';
 export { SocialIntegrationService } from './social-integration';
 
-// Storage
-export { CommentStorage } from './comment-storage';
-export { StakeholderStorage } from './stakeholder-storage';
+// Storage classes removed - using direct Drizzle ORM services instead
 export { SocialShareStorage } from './social-share-storage';
 
 

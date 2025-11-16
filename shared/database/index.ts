@@ -1,10 +1,63 @@
 /**
  * Unified Database Infrastructure
- * 
+ *
  * This module provides a single entry point for all database-related
  * functionality across the Chanuka platform, promoting cohesion and
  * consistency in database operations.
  */
+
+// Import types and classes for re-export
+import type {
+  DatabaseConfig,
+  ConnectionConfig,
+  FeatureConfig,
+  MigrationConfig,
+  MonitoringConfig,
+  BackupConfig,
+  SecurityConfig,
+  EnvironmentConfig,
+} from './core/unified-config';
+import {
+  DatabaseConfigManager,
+  initializeDatabaseConfig,
+  getDatabaseConfig,
+  createTestDatabaseConfig,
+} from './core/unified-config';
+import {
+  DatabaseOrchestrator,
+  createDatabaseOrchestrator,
+  getDatabaseOrchestrator,
+  initializeDatabaseOrchestrator,
+  shutdownDatabaseOrchestrator,
+} from './core/database-orchestrator';
+import type {
+  DatabaseOrchestrationConfig,
+  DatabaseStatus,
+  DatabaseMetrics,
+} from './core/database-orchestrator';
+import {
+  UnifiedConnectionManager,
+  createConnectionManager,
+  getConnectionManager,
+  closeConnectionManager,
+} from './core/connection-manager';
+import type {
+  ConnectionManagerConfig,
+  ConnectionMetrics,
+  DatabaseHealthStatus,
+  DatabaseTransaction,
+  TransactionOptions,
+} from './core/connection-manager';
+import type {
+  UnifiedHealthMonitor,
+  HealthCheckResult,
+  HealthMetrics,
+  HealthMonitorConfig,
+  Alert,
+  AlertRule,
+} from './core/health-monitor';
+import { BaseDatabaseScript, DatabaseScriptLogger, runDatabaseScript, createScriptResult } from './utils/base-script';
+import type { ScriptOptions, ScriptResult, ScriptContext } from './utils/base-script';
 
 // ============================================================================
 // Core Infrastructure Exports
@@ -332,17 +385,38 @@ export function isDatabaseFeatureEnabled(feature: keyof FeatureConfig): boolean 
 }
 
 // ============================================================================
+// Direct Database Connection Exports
+// ============================================================================
+
+// Re-export database connections for backward compatibility
+export {
+  database,
+  readDatabase,
+  writeDatabase,
+  operationalDb,
+  analyticsDb,
+  securityDb,
+  pool,
+  getDatabase,
+  withTransaction,
+  withReadConnection,
+  checkDatabaseHealth,
+  closeDatabaseConnections,
+  type DatabaseOperation,
+} from './connection';
+
+// ============================================================================
 // Legacy Compatibility
 // ============================================================================
 
 /**
  * Legacy database connection getter for backward compatibility
- * 
+ *
  * @deprecated Use getDatabaseOrchestrator().getConnectionManager() instead
  */
 export function getLegacyDatabase() {
   console.warn('getLegacyDatabase() is deprecated. Use getDatabaseOrchestrator().getConnectionManager() instead.');
-  
+
   try {
     const orchestrator = getDatabaseOrchestrator();
     return orchestrator.getConnectionManager().getDatabase();

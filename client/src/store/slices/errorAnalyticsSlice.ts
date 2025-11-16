@@ -7,20 +7,25 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-// Import unified types from repositories
+// Import unified types from services
 import {
   DashboardFilters,
-  ErrorOverviewMetrics,
-  ErrorTrendData,
+  OverviewMetrics as ErrorOverviewMetrics,
+  TrendDataPoint,
   ErrorPattern,
   RecoveryAnalytics,
-  RealTimeMetrics
-} from '../../repositories';
+  RealTimeMetrics,
+  errorAnalyticsRepository
+} from '../../services';
+
+interface Alert {
+  id: string;
+}
 
 interface ErrorAnalyticsState {
   // Data states
   overviewMetrics: ErrorOverviewMetrics | null;
-  trendData: ErrorTrendData | null;
+  trendData: TrendDataPoint[] | null;
   patterns: ErrorPattern[];
   recoveryAnalytics: RecoveryAnalytics | null;
   realTimeMetrics: RealTimeMetrics | null;
@@ -66,7 +71,6 @@ const initialState: ErrorAnalyticsState = {
 export const fetchOverviewMetrics = createAsyncThunk(
   'errorAnalytics/fetchOverviewMetrics',
   async (filters: DashboardFilters) => {
-    const { errorAnalyticsRepository } = await import('../../repositories');
     return await errorAnalyticsRepository.getOverviewMetrics(filters);
   }
 );
@@ -74,7 +78,6 @@ export const fetchOverviewMetrics = createAsyncThunk(
 export const fetchTrendData = createAsyncThunk(
   'errorAnalytics/fetchTrendData',
   async ({ period, filters }: { period: string; filters: DashboardFilters }) => {
-    const { errorAnalyticsRepository } = await import('../../repositories');
     return await errorAnalyticsRepository.getTrendData(period, filters);
   }
 );
@@ -82,7 +85,6 @@ export const fetchTrendData = createAsyncThunk(
 export const fetchPatterns = createAsyncThunk(
   'errorAnalytics/fetchPatterns',
   async (filters: DashboardFilters) => {
-    const { errorAnalyticsRepository } = await import('../../repositories');
     return await errorAnalyticsRepository.getPatterns(filters);
   }
 );
@@ -90,7 +92,6 @@ export const fetchPatterns = createAsyncThunk(
 export const fetchRecoveryAnalytics = createAsyncThunk(
   'errorAnalytics/fetchRecoveryAnalytics',
   async (filters: DashboardFilters) => {
-    const { errorAnalyticsRepository } = await import('../../repositories');
     return await errorAnalyticsRepository.getRecoveryAnalytics(filters);
   }
 );
@@ -98,7 +99,6 @@ export const fetchRecoveryAnalytics = createAsyncThunk(
 export const fetchRealTimeMetrics = createAsyncThunk(
   'errorAnalytics/fetchRealTimeMetrics',
   async () => {
-    const { errorAnalyticsRepository } = await import('../../repositories');
     return await errorAnalyticsRepository.getRealTimeMetrics();
   }
 );
@@ -171,11 +171,11 @@ const errorAnalyticsSlice = createSlice({
       }
     },
 
-    addRealTimeAlert: (state, action: PayloadAction<any>) => {
+    addRealTimeAlert: (state, action: PayloadAction<Alert>) => {
       if (state.realTimeMetrics) {
         state.realTimeMetrics.activeAlerts = [
           action.payload,
-          ...state.realTimeMetrics.activeAlerts.filter(alert => alert.id !== action.payload.id)
+          ...state.realTimeMetrics.activeAlerts.filter((alert: any) => alert.id !== action.payload.id)
         ].slice(0, 10); // Keep only last 10 alerts
       }
     },

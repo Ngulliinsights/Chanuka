@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { GovernmentDataIntegrationService } from '../infrastructure/external-data/government-data-integration.js';
-import { DataValidationService } from '../core/validation/data-validation-service.js';
+import { GovernmentDataValidationService } from '../core/validation/data-validation.js';
 import { ManagedGovernmentDataIntegrationService } from '../services/managed-government-data-integration.js';
 import { ExternalAPIErrorHandler, FallbackStrategy } from '../services/external-api-error-handler.js';
 import { logger   } from '../../shared/core/src/index.js';
@@ -128,7 +128,7 @@ class GovernmentDataIntegrationCLI {
       logger.info('✅ Parliament Data Transformation:', { component: 'Chanuka' }, JSON.stringify(transformed, null, 2));
 
       // Validate transformed data
-      const validation = DataValidationService.validateBatch(transformed.bills || [], 'bills');
+      const validation = GovernmentDataValidationService.validateBatch(transformed.bills || [], 'bills');
       logger.info('📋 Validation Result:', { component: 'Chanuka' }, JSON.stringify(validation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -159,7 +159,7 @@ class GovernmentDataIntegrationCLI {
     ];
 
     try {
-      const validation = DataValidationService.validateBatch(testBills, 'bills');
+      const validation = GovernmentDataValidationService.validateBatch(testBills, 'bills');
       logger.info('✅ Batch Validation Result:', { component: 'Chanuka' }, JSON.stringify(validation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -194,7 +194,7 @@ class GovernmentDataIntegrationCLI {
     ];
 
     try {
-      const crossValidation = DataValidationService.crossValidate(testRecords, 'bills');
+      const crossValidation = GovernmentDataValidationService.crossValidate(testRecords, 'bills');
       logger.info('✅ Cross-Validation Result:', { component: 'Chanuka' }, JSON.stringify(crossValidation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);

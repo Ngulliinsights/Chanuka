@@ -24,7 +24,7 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyRequest
         return next();
       }
 
-      const user_id = req.users.id;
+      const user_id = req.user.id;
       const preferences = await privacyService.getPrivacyPreferences(user_id);
       
       // Attach privacy consent to request
@@ -76,7 +76,7 @@ export const checkDataSharingConsent = (requiredSharing: 'publicProfile' | 'shar
         return next();
       }
 
-      const user_id = req.users.id;
+      const user_id = req.user.id;
       const preferences = await privacyService.getPrivacyPreferences(user_id);
 
       // Check if user has given consent for the required sharing
@@ -178,7 +178,7 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
           });
         }
       } else if (req.user) { // Check user's privacy preferences for authenticated users
-        const user_id = req.users.id;
+        const user_id = req.user.id;
         const preferences = await privacyService.getPrivacyPreferences(user_id);
         
         if (!preferences.cookies[cookieType]) {
@@ -233,9 +233,9 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
       return next();
     }
 
-    const user_id = req.users.id;
+    const user_id = req.user.id;
     const preferences = await privacyService.getPrivacyPreferences(user_id);
-    
+
     // Add retention preferences to request for use by other middleware/routes
     (req as any).dataRetentionPrefs = preferences.dataRetention;
 

@@ -58,10 +58,13 @@ export class SessionCleanupService {
    * Get service status
    */
   getStatus(): { isRunning: boolean; nextCleanup?: Date } {
-    return {
-      isRunning: this.isRunning,
-      nextCleanup: this.cleanupInterval ? new Date(Date.now() + 60 * 60 * 1000) : undefined
+    const status: { isRunning: boolean; nextCleanup?: Date } = {
+      isRunning: this.isRunning
     };
+    if (this.cleanupInterval) {
+      status.nextCleanup = new Date(Date.now() + 60 * 60 * 1000);
+    }
+    return status;
   }
 }
 

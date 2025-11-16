@@ -73,7 +73,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Enhanced bill fetching with full API management
    */
-  async fetchBillsFromSource(sourceName: string, options: {
+  override async fetchBillsFromSource(sourceName: string, options: {
     limit?: number;
     offset?: number;
     since?: Date;
@@ -103,7 +103,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Enhanced sponsor fetching with full API management
    */
-  async fetchSponsorsFromSource(sourceName: string, options: {
+  override async fetchSponsorsFromSource(sourceName: string, options: {
     limit?: number;
     offset?: number;
     since?: Date;
@@ -132,7 +132,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Enhanced integration with comprehensive monitoring and analytics
    */
-  async integrateBills(options: {
+  override async integrateBills(options: {
     sources?: string[];
     since?: Date;
     dryRun?: boolean;
@@ -199,7 +199,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Enhanced sponsor integration with API management
    */
-  async integrateSponsors(options: {
+  override async integrateSponsors(options: {
     sources?: string[];
     since?: Date;
     dryRun?: boolean;
@@ -264,7 +264,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Get comprehensive integration status with API management metrics
    */
-  async getIntegrationStatus(): Promise<any> {
+  override async getIntegrationStatus(): Promise<any> {
     const baseStatus = await super.getIntegrationStatus();
     const apiAnalytics = this.apiManager.getAPIAnalytics();
     const healthStatuses = this.apiManager.getHealthStatus();
@@ -897,6 +897,9 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
     return emailRegex.test(normalizedEmail) ? normalizedEmail : null;
   }
 }
+
+// This service now serves as the unified GovernmentDataIntegrationService
+// The original GovernmentDataIntegrationService should be deprecated in favor of this managed version
 
 
 

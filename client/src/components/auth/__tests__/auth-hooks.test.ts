@@ -21,7 +21,7 @@ import { AuthError, AuthValidationError } from '../errors';
 const mockLogin = vi.fn();
 const mockRegister = vi.fn();
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     login: mockLogin,
     register: mockRegister,

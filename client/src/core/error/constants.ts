@@ -20,6 +20,8 @@ export enum ErrorDomain {
     BUSINESS_LOGIC = 'business_logic',
     SECURITY = 'security',
     SYSTEM = 'system',
+    RESOURCE = 'resource',
+    RATE_LIMITING = 'rate_limiting',
     UNKNOWN = 'unknown'
 }
 

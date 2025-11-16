@@ -23,7 +23,7 @@ interface CacheEntry {
 export class MemoryAdapter extends BaseCacheAdapter {
   private cache = new Map<string, CacheEntry>();
   private accessOrder: string[] = [];
-  private cleanupTimer?: NodeJS.Timeout;
+  private cleanupTimer: NodeJS.Timeout | undefined;
   private readonly maxSize: number;
   private readonly cleanupInterval: number;
   private readonly enableLRU: boolean;
@@ -77,9 +77,9 @@ export class MemoryAdapter extends BaseCacheAdapter {
 
       const entry: CacheEntry = {
         value,
-        expires_at: ttlSeconds ? now + (ttlSeconds * 1000) : undefined,
         accessedAt: now,
-        created_at: now
+        created_at: now,
+        ...(ttlSeconds && { expires_at: now + (ttlSeconds * 1000) }),
       };
 
       // Check if we need to evict entries
@@ -133,7 +133,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     return true;
   }
 
-  async ttl(key: string): Promise<number> {
+  override async ttl(key: string): Promise<number> {
     const formattedKey = this.formatKey(key);
     const entry = this.cache.get(formattedKey);
 
@@ -179,7 +179,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
   }
 
   // Override to provide accurate memory usage
-  protected getMemoryUsage(): number {
+  protected override getMemoryUsage(): number {
     let totalSize = 0;
 
     for (const [key, entry] of Array.from(this.cache)) {
@@ -191,17 +191,17 @@ export class MemoryAdapter extends BaseCacheAdapter {
     return Math.round(totalSize / (1024 * 1024)); // Convert to MB
   }
 
-  async connect(): Promise<void> {
+  override async connect(): Promise<void> {
     await super.connect();
     this.startCleanupTimer();
   }
 
-  async disconnect(): Promise<void> {
+  override async disconnect(): Promise<void> {
     await super.disconnect();
     this.stopCleanupTimer();
   }
 
-  async destroy(): Promise<void> {
+  override async destroy(): Promise<void> {
     this.stopCleanupTimer();
     await this.clear();
     await super.destroy();
@@ -226,9 +226,11 @@ export class MemoryAdapter extends BaseCacheAdapter {
     if (this.accessOrder.length === 0) return;
 
     // Remove least recently used item
-    const lruKey = this.accessOrder[0];
-    await this.del(lruKey);
-    this.emit('evict', { key: lruKey, metadata: { reason: 'lru' } });
+    const lruKey = this.accessOrder.shift();
+    if (lruKey) {
+      await this.del(lruKey);
+      this.emit('evict', { key: lruKey, metadata: { reason: 'lru' } });
+    }
   }
 
   private startCleanupTimer(): void {

@@ -28,8 +28,8 @@ export type {
   CommentFilterOption,
 } from '../../types/discussion';
 
-// Store and hooks
-export { useDiscussionStore, useDiscussionSelectors } from '../../store/slices/discussionSlice';
+// Store and hooks - Redux version
+export * from '../../store/slices/discussionSlice';
 export { useDiscussion } from '../../hooks/useDiscussion';
 
 // Services

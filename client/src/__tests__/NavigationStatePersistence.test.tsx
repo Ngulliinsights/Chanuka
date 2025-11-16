@@ -21,7 +21,7 @@ const mockUseMediaQuery = vi.fn(() => false);
 const mockUseLocation = vi.fn(() => ({ pathname: '/' }));
 const mockUseNavigate = vi.fn(() => vi.fn());
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: mockUseAuth,
 }));
 
@@ -326,7 +326,7 @@ describe('Navigation State Persistence', () => {
       const mockLogout = vi.fn();
       
       // Mock authenticated user initially
-      vi.mocked(vi.importActual('@/hooks/use-auth')).useAuth = () => ({
+      vi.mocked(vi.importActual('@/hooks/useAuth')).useAuth = () => ({
         user: {
           id: '1',
           email: 'test@example.com',
@@ -348,7 +348,7 @@ describe('Navigation State Persistence', () => {
       });
 
       // Simulate logout
-      vi.mocked(vi.importActual('@/hooks/use-auth')).useAuth = () => ({
+      vi.mocked(vi.importActual('@/hooks/useAuth')).useAuth = () => ({
         user: null,
         isAuthenticated: false,
         logout: mockLogout,
@@ -370,7 +370,7 @@ describe('Navigation State Persistence', () => {
       const mockLogout = vi.fn();
       
       // Start with authenticated user
-      vi.mocked(vi.importActual('@/hooks/use-auth')).useAuth = () => ({
+      vi.mocked(vi.importActual('@/hooks/useAuth')).useAuth = () => ({
         user: {
           id: '1',
           email: 'test@example.com',
@@ -400,7 +400,7 @@ describe('Navigation State Persistence', () => {
       });
 
       // Simulate logout
-      vi.mocked(vi.importActual('@/hooks/use-auth')).useAuth = () => ({
+      vi.mocked(vi.importActual('@/hooks/useAuth')).useAuth = () => ({
         user: null,
         isAuthenticated: false,
         logout: mockLogout,

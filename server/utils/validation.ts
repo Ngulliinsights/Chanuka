@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError, z } from 'zod';
-import { ValidationError   } from '../../shared/core/src/index.js';
-import { logger   } from '../../shared/core/src/index.js';
+import { ValidationError } from '@shared/core';
+import { logger } from '@shared/core';
 import DOMPurify from 'isomorphic-dompurify';
 
 type ZodSchema<T> = z.ZodType<T>;
@@ -114,9 +114,9 @@ export function validatePassword(password: string): { isValid: boolean; strength
 
   return {
     isValid: errors.length === 0,
-    strength,
-    score,
-    errors: errors.length > 0 ? errors : undefined
+    strength: strength as string | undefined,
+    score: score as number | undefined,
+    errors: errors.length > 0 ? errors : []
   };
 }
 
@@ -146,7 +146,11 @@ export function validateBillNumber(bill_number: string): { isValid: boolean; nor
     return { isValid: false, error: 'Invalid bill number format. Expected C-123 or S-456' };
   }
 
-  const number = parseInt(trimmed.split('-')[1]);
+  const numberPart = trimmed.split('-')[1];
+  if (!numberPart) {
+    return { isValid: false, error: 'Invalid bill number format' };
+  }
+  const number = parseInt(numberPart);
   if (number < 1 || number > 9999) {
     return { isValid: false, error: 'Bill number must be between 1 and 9999' };
   }

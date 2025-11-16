@@ -6,7 +6,8 @@
  */
 
 import { faker } from '@faker-js/faker';
-import { Bill, BillsStats } from '../../store/slices/billsSlice';
+import { Bill as ReadonlyBill } from '../../core/api/types';
+import { BillsStats } from '../../store/slices/billsSlice';
 import {
   generateId,
   generateDateInRange,
@@ -45,9 +46,11 @@ const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low'
 
   return faker.helpers.arrayElements(flagTypes, flagCount).map(flag => ({
     id: generateId('flag'),
+    type: flag.category,
+    description: flag.description,
     severity: faker.helpers.arrayElement(severityLevels),
-    category: flag.category,
-    description: flag.description
+    article: faker.helpers.maybe(() => `Article ${faker.number.int({ min: 1, max: 7 })}`, { probability: 0.7 }),
+    clause: faker.helpers.maybe(() => `Section ${faker.number.int({ min: 1, max: 10 })}`, { probability: 0.5 })
   }));
 };
 
@@ -56,7 +59,7 @@ const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low'
  */
 const generateSponsors = (count: number = 3) => {
   const parties = ['Republican', 'Democratic', 'Independent'];
-  const roles: Array<'primary' | 'cosponsor'> = ['primary', 'cosponsor'];
+  const positions = ['Senator', 'Representative', 'Delegate'];
   
   const sponsors = [];
   
@@ -65,7 +68,9 @@ const generateSponsors = (count: number = 3) => {
     id: faker.number.int({ min: 1, max: 1000 }),
     name: faker.person.fullName(),
     party: faker.helpers.arrayElement(parties),
-    role: 'primary' as const
+    district: faker.location.state() + '-' + faker.number.int({ min: 1, max: 50 }),
+    position: faker.helpers.arrayElement(positions),
+    isPrimary: true
   });
   
   // Add cosponsors
@@ -74,7 +79,9 @@ const generateSponsors = (count: number = 3) => {
       id: faker.number.int({ min: 1, max: 1000 }),
       name: faker.person.fullName(),
       party: faker.helpers.arrayElement(parties),
-      role: 'cosponsor' as const
+      district: faker.location.state() + '-' + faker.number.int({ min: 1, max: 50 }),
+      position: faker.helpers.arrayElement(positions),
+      isPrimary: false
     });
   }
   
@@ -89,10 +96,10 @@ export const generateMockBill = (id: number, options: {
   status?: 'introduced' | 'committee' | 'passed' | 'failed' | 'signed' | 'vetoed';
   popularity?: number;
   constitutionalConcerns?: 'low' | 'medium' | 'high';
-} = {}): Bill => {
+} = {}): ReadonlyBill => {
   const {
     urgency = weightedRandom(['low', 'medium', 'high', 'critical'], [40, 35, 20, 5]),
-    status = weightedRandom(['introduced', 'committee', 'passed', 'failed', 'signed', 'vetoed'], [30, 40, 15, 8, 5, 2]),
+    status = weightedRandom(['introduced', 'committee', 'floor_debate', 'passed_house', 'passed_senate', 'passed', 'failed', 'signed', 'vetoed'], [25, 30, 10, 8, 7, 10, 5, 3, 2]),
     popularity = faker.number.float({ min: 0.1, max: 2.0 }),
     constitutionalConcerns = weightedRandom(['low', 'medium', 'high'], [70, 25, 5])
   } = options;
@@ -117,19 +124,16 @@ export const generateMockBill = (id: number, options: {
     constitutionalFlags,
     ...engagement,
     policyAreas,
-    complexity: weightedRandom(['low', 'medium', 'high'], [30, 50, 20]),
-    readingTime: faker.number.int({ min: 5, max: 45 }),
-    category: faker.helpers.arrayElement(policyAreas),
-    conflict_level: weightedRandom(['low', 'medium', 'high'], [60, 30, 10]),
-    sponsor_count: sponsors.length
+    complexity: weightedRandom(['low', 'medium', 'high', 'expert'], [30, 40, 25, 5]),
+    readingTime: faker.number.int({ min: 5, max: 45 })
   };
 };
 
 /**
  * Generate a collection of mock bills
  */
-export const generateMockBills = (count: number = 50): Bill[] => {
-  const bills: Bill[] = [];
+export const generateMockBills = (count: number = 50): ReadonlyBill[] => {
+  const bills: ReadonlyBill[] = [];
   
   for (let i = 1; i <= count; i++) {
     // Create some variety in bill characteristics
@@ -169,7 +173,7 @@ export const generateMockBills = (count: number = 50): Bill[] => {
 /**
  * Generate mock bills statistics
  */
-export const generateMockBillsStats = (bills: Bill[]): BillsStats => {
+export const generateMockBillsStats = (bills: ReadonlyBill[]): BillsStats => {
   const urgentCount = bills.filter(b => 
     b.urgencyLevel === 'high' || b.urgencyLevel === 'critical'
   ).length;
@@ -197,7 +201,7 @@ export const generateMockBillsStats = (bills: Bill[]): BillsStats => {
 /**
  * Get mock bills with specific filters for testing
  */
-export const getMockBillsByCategory = (category: string, count: number = 10): Bill[] => {
+export const getMockBillsByCategory = (category: string, count: number = 10): ReadonlyBill[] => {
   return generateMockBills(count).map(bill => ({
     ...bill,
     policyAreas: [category, ...bill.policyAreas.slice(1)]
@@ -207,7 +211,7 @@ export const getMockBillsByCategory = (category: string, count: number = 10): Bi
 /**
  * Get mock bills with high constitutional concerns
  */
-export const getMockBillsWithConstitutionalConcerns = (count: number = 5): Bill[] => {
+export const getMockBillsWithConstitutionalConcerns = (count: number = 5): ReadonlyBill[] => {
   return Array.from({ length: count }, (_, i) => 
     generateMockBill(i + 1000, { constitutionalConcerns: 'high' })
   );
@@ -216,7 +220,7 @@ export const getMockBillsWithConstitutionalConcerns = (count: number = 5): Bill[
 /**
  * Get mock bills with high urgency
  */
-export const getMockUrgentBills = (count: number = 5): Bill[] => {
+export const getMockUrgentBills = (count: number = 5): ReadonlyBill[] => {
   return Array.from({ length: count }, (_, i) => 
     generateMockBill(i + 2000, { urgency: 'critical', popularity: 2.0 })
   );

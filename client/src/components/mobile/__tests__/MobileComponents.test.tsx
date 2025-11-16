@@ -26,7 +26,7 @@ vi.mock('../../../hooks/use-mobile', () => ({
   useMediaQuery: vi.fn(() => true), // Default to mobile
 }));
 
-vi.mock('../../../hooks/use-auth', () => ({
+vi.mock('../../../hooks/useAuth', () => ({
   useAuth: vi.fn(() => ({
     user: { name: 'Test User', email: 'test@example.com' },
     isAuthenticated: true,

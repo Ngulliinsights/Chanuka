@@ -317,7 +317,7 @@ export class MobileErrorHandler {
     document.dispatchEvent(event);
   }
 
-  private showFallbackUI(error: Error, type: MobileErrorType): void {
+  private showFallbackUI(_error: Error, type: MobileErrorType): void {
     const fallbackContainer = document.createElement('div');
     fallbackContainer.className = 'mobile-error-fallback';
     fallbackContainer.innerHTML = `

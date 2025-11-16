@@ -24,7 +24,7 @@ import {
   Trash2,
   RefreshCw
 } from 'lucide-react';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { TwoFactorSetup } from './TwoFactorSetup';
 import { SecurityEvent, SuspiciousActivityAlert, SessionInfo } from '../../types/auth';
 import { logger } from '../../utils/logger';

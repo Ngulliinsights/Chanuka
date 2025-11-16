@@ -5,7 +5,7 @@
 // Provides automatic memory optimization triggers and connection management
 
 import { EventEmitter } from 'events';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 import { BatchingService, BatchableMessage } from './batching-service.js';
 
 // cSpell:ignore Batchable BatchableMessage

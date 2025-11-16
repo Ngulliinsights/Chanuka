@@ -15,7 +15,7 @@ export { default as ConnectionStatus } from './connection-status';
 export { default as DatabaseStatus } from './database-status';
 export { default as DecisionMatrix } from './decision-matrix';
 export { default as EnvironmentSetup } from './environment-setup';
-export { default as ErrorBoundary } from './error-boundary';
+export { ErrorBoundary } from './error-handling/ErrorBoundary';
 export { default as FeatureFlagsPanel } from './feature-flags-panel';
 export { default as MigrationManager } from './migration-manager';
 export { default as OfflineIndicator } from './OfflineIndicator';

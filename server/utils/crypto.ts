@@ -1,6 +1,6 @@
 import { scrypt, randomBytes, timingSafeEqual, createCipheriv, createDecipheriv } from "crypto";
 import { promisify } from "util";
-import { logger   } from '../../shared/core/src/index.js';
+import { logger } from '@shared/core';
 
 const scryptAsync = promisify(scrypt);
 
@@ -12,6 +12,9 @@ export async function hashPassword(password: string) {
 
 export async function comparePasswords(supplied: string, stored: string) {
   const [hashed, salt] = stored.split(".");
+  if (!hashed || !salt) {
+    throw new Error('Invalid stored password format');
+  }
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
   return timingSafeEqual(hashedBuf, suppliedBuf);
@@ -50,6 +53,9 @@ export function decrypt(encryptedData: string, key?: string): string {
   const encryptionKey = key || process.env.ENCRYPTION_KEY || 'default-key-for-testing';
   const keyBuffer = Buffer.from(encryptionKey.padEnd(32, '0').slice(0, 32));
   const [ivHex, encrypted] = encryptedData.split(':');
+  if (!ivHex || !encrypted) {
+    throw new Error('Invalid encrypted data format');
+  }
   const iv = Buffer.from(ivHex, 'hex');
   const decipher = createDecipheriv('aes-256-cbc', keyBuffer, iv);
   let decrypted = decipher.update(encrypted, 'hex', 'utf8');

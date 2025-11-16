@@ -12,7 +12,7 @@ export { errorTracker } from './errors/error-tracker.js';
 
 // Types
 // Avoid re-exporting SocialProfile to prevent conflicts
-export {
+export type {
   User,
   Bill,
   BillComment,
@@ -22,7 +22,8 @@ export {
 export * from './StorageTypes.js';
 
 // API Response Types
-export { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/utils/api';
+// TODO: Fix import when shared/core modules are available
+// export { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/utils/api';
 
 // Avoid re-exporting SocialProfile to prevent conflicts
 // export * from './types/index.js'; // SocialProfile already exported elsewhere

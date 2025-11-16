@@ -4,9 +4,9 @@
  */
 
 import { Middleware } from '@reduxjs/toolkit';
-import { authBackendService } from '../../services/authBackendService';
+import { authApiService as authService } from '../../core/api';
 import { tokenManager } from '../../utils/tokenManager';
-import { sessionManager } from '../../utils/sessionManager';
+import { setCurrentSession, recordActivity } from '../slices/sessionSlice';
 import { securityMonitor } from '../../utils/security-monitoring';
 import { rbacManager } from '../../utils/rbac';
 import { logger } from '../../utils/logger';
@@ -90,7 +90,15 @@ function handleLoginSuccess(payload: any, config: AuthMiddlewareConfig): void {
 
     // Start session monitoring
     if (payload.user) {
-      sessionManager.startSession(payload.user, payload.sessionId);
+      dispatch(setCurrentSession({
+        id: payload.sessionId || crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        lastActive: new Date().toISOString(),
+        ipAddress: '',
+        deviceInfo: navigator.userAgent,
+        current: true
+      }));
+      dispatch(recordActivity({ type: 'api', details: { action: 'session_start', userId: payload.user.id } }));
     }
 
     // Record security event
@@ -152,7 +160,7 @@ function handleLogoutSuccess(config: AuthMiddlewareConfig): void {
     logger.info('Logout successful', { component: 'AuthMiddleware' });
 
     // End session
-    sessionManager.endSession();
+    dispatch(recordActivity({ type: 'api', details: { action: 'session_end' } }));
 
     // Clear tokens
     tokenManager.clearTokens();
@@ -216,11 +224,11 @@ async function performTokenRefresh(store: any): Promise<void> {
   try {
     logger.debug('Attempting token refresh', { component: 'AuthMiddleware' });
 
-    const result = await authBackendService.refreshToken();
+    const result = await authService.refreshTokens();
 
-    if (result.success && result.tokens && result.user) {
+    if (result.success && result.data?.tokens && result.user) {
       // Update tokens
-      tokenManager.storeTokens(result.tokens, result.user);
+      tokenManager.storeTokens(result.data.tokens, result.user);
       
       // Update user in store
       store.dispatch(setUser(result.user));

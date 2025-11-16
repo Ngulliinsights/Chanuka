@@ -14,7 +14,7 @@ import {
   type SynthesisJob
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, count, inArray, like, or, isNotNull } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS

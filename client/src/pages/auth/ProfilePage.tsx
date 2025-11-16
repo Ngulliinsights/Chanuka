@@ -6,7 +6,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { SessionManager } from '../../components/auth/SessionManager';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { Shield, User, Settings, Lock } from 'lucide-react';
 
 export default function ProfilePage() {

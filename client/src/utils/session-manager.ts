@@ -57,6 +57,7 @@ class SessionManager {
   private isActive: boolean = false;
   private lastErrorLog: number = 0;
   private sessionId: string | null = null;
+  private isInitialized: boolean = false;
 
   constructor(config: Partial<SessionConfig> = {}) {
     this.config = {
@@ -79,7 +80,7 @@ class SessionManager {
   }
 
   private initialize(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || this.isInitialized) return;
 
     // Set up activity tracking
     if (this.config.enableActivityTracking) {
@@ -94,6 +95,8 @@ class SessionManager {
 
     // Handle beforeunload
     window.addEventListener('beforeunload', this.handleBeforeUnload.bind(this));
+
+    this.isInitialized = true;
 
     logger.info('Unified SessionManager initialized', {
       component: 'SessionManager',
@@ -307,7 +310,14 @@ class SessionManager {
    * Record user activity
    */
   recordActivity(type: SessionActivity['type'], details?: Record<string, any>): void {
+    // Skip if not active to prevent unnecessary processing
+    if (!this.isActive) return;
+
     const now = Date.now();
+
+    // Throttle activity recording to prevent excessive updates
+    if (now - this.lastActivity < 1000) return; // Max once per second
+
     this.lastActivity = now;
 
     if (this.config.enableActivityTracking) {
@@ -381,6 +391,9 @@ class SessionManager {
   }
 
   private checkSessionStatus(): void {
+    // Skip if not active to prevent unnecessary processing
+    if (!this.isActive) return;
+
     const now = Date.now();
     const idleTime = now - this.lastActivity;
 
@@ -704,6 +717,7 @@ class SessionManager {
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
 
     this.warningCallbacks = [];
+    this.isInitialized = false;
 
     logger.info('SessionManager cleaned up', { component: 'SessionManager' });
   }
@@ -712,14 +726,37 @@ class SessionManager {
 // Export singleton
 export const sessionManager = new SessionManager();
 
-// Auto-start integrity validation
+// Auto-start integrity validation (only if not already running)
 if (typeof window !== 'undefined') {
-  setInterval(() => {
-    sessionManager.validateIntegrity();
-  }, 60000); // Every minute
+  let integrityInterval: NodeJS.Timeout | null = null;
+
+  const startIntegrityCheck = () => {
+    if (!integrityInterval) {
+      integrityInterval = setInterval(() => {
+        sessionManager.validateIntegrity();
+      }, 60000); // Every minute
+    }
+  };
+
+  const stopIntegrityCheck = () => {
+    if (integrityInterval) {
+      clearInterval(integrityInterval);
+      integrityInterval = null;
+    }
+  };
+
+  // Start when session becomes active
+  if (sessionManager.isSessionActive()) {
+    startIntegrityCheck();
+  }
 
   // Cleanup on unload
   window.addEventListener('beforeunload', () => {
+    stopIntegrityCheck();
     sessionManager.cleanup();
   });
+
+  // Export control functions for external use
+  (sessionManager as any).startIntegrityCheck = startIntegrityCheck;
+  (sessionManager as any).stopIntegrityCheck = stopIntegrityCheck;
 }

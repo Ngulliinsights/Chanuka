@@ -15,7 +15,7 @@ expect.extend(toHaveNoViolations);
 
 // Mock the useAuth hook
 const mockUseAuth = createMockUseAuth();
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => mockUseAuth
 }));
 

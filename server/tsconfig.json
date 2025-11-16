@@ -2,14 +2,21 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
+    "rootDir": ".",
     "baseUrl": ".",
+    "composite": true,
     "paths": {
       "@/*": ["./*"],
+      "@server/*": ["./*"],
       "@chanuka/shared": ["../shared"],
       "@chanuka/shared/*": ["../shared/*"],
-      "@server/*": ["./*"]
+      "@shared": ["../shared"],
+      "@shared/*": ["../shared/*"]
     }
   },
+  "references": [
+    { "path": "../shared" }
+  ],
   "include": [
     "**/*.ts",
     "**/*.d.ts"
@@ -18,6 +25,7 @@
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "../shared/**/*"
   ]
 }

@@ -1,25 +1,10 @@
 /**
- * Fallback implementation for @shared/core imports
- * This provides basic functionality when the shared core module is not available
+ * Consolidated utilities - imports from shared/core when available
+ * This provides unified access to shared utilities across the server
  */
 
-// Logger fallback
-export const logger = {
-  info: (message: string, context?: any, meta?: any) => {
-    console.log(`[INFO] ${message}`, context || '', meta || '');
-  },
-  error: (message: string, context?: any, error?: any) => {
-    console.error(`[ERROR] ${message}`, context || '', error || '');
-  },
-  warn: (message: string, context?: any, meta?: any) => {
-    console.warn(`[WARN] ${message}`, context || '', meta || '');
-  },
-  debug: (message: string, context?: any, meta?: any) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[DEBUG] ${message}`, context || '', meta || '');
-    }
-  }
-};
+// Import logger from shared/core
+export { logger } from '../../shared/core/src/index.js';
 
 // Performance monitoring fallback
 export class Performance {
@@ -28,7 +13,7 @@ export class Performance {
   static startTimer(label: string): { end: () => number } {
     const start = Date.now();
     this.timers.set(label, start);
-    
+
     return {
       end: () => {
         const duration = Date.now() - start;
@@ -43,7 +28,7 @@ export class Performance {
     try {
       const result = fn();
       const duration = timer.end();
-      logger.debug(`Performance: ${label} took ${duration}ms`);
+      console.debug(`Performance: ${label} took ${duration}ms`);
       return result;
     } catch (error) {
       timer.end();
@@ -61,15 +46,15 @@ export class RateLimit {
       const key = req.ip || 'unknown';
       const now = Date.now();
       const windowStart = now - options.windowMs;
-      
+
       if (!this.requests.has(key)) {
         this.requests.set(key, []);
       }
-      
+
       const requests = this.requests.get(key)!;
       // Remove old requests
       const validRequests = requests.filter(time => time > windowStart);
-      
+
       if (validRequests.length >= options.max) {
         return res.status(429).json({
           error: 'Too Many Requests',
@@ -77,7 +62,7 @@ export class RateLimit {
           retryAfter: Math.ceil(options.windowMs / 1000)
         });
       }
-      
+
       validRequests.push(now);
       this.requests.set(key, validRequests);
       next();
@@ -194,7 +179,7 @@ export class ApiSuccess<T = any> {
     public data: T,
     public message: string = 'Success',
     public statusCode: number = 200
-  ) {}
+  ) { }
 
   toJSON() {
     return {
@@ -239,7 +224,7 @@ export class ApiValidationError extends ApiError {
     this.name = 'ApiValidationError';
   }
 
-  toJSON() {
+  override toJSON() {
     return {
       success: false,
       error: {
@@ -258,28 +243,29 @@ export class ApiValidationError extends ApiError {
 // Cache service fallback
 export const cacheService = {
   async get(key: string): Promise<any> {
-    logger.debug(`Cache get: ${key} (fallback - no caching)`);
+    console.debug(`Cache get: ${key} (fallback - no caching)`);
     return null;
   },
 
-  async set(key: string, value: any, ttl?: number): Promise<void> {
-    logger.debug(`Cache set: ${key} (fallback - no caching)`);
+  async set(_key: string, _value: any, _ttl?: number): Promise<void> {
+    console.debug(`Cache set: ${_key} (fallback - no caching)`);
   },
 
   async delete(key: string): Promise<void> {
-    logger.debug(`Cache delete: ${key} (fallback - no caching)`);
+    console.debug(`Cache delete: ${key} (fallback - no caching)`);
   },
 
   async clear(): Promise<void> {
-    logger.debug('Cache clear (fallback - no caching)');
+    console.debug('Cache clear (fallback - no caching)');
   }
 };
 
 // Cache keys for consistent caching across the application
-export const cacheKeys = { USER_PROFILE: (user_id: string) => `user:profile:${user_id }`,
-  BILL_DETAILS: (bill_id: number) => `bill:details:${ bill_id }`,
-  BILL_COMMENTS: (bill_id: number) => `bill:comments:${ bill_id }`,
-  USER_ENGAGEMENT: (user_id: string) => `user:engagement:${ user_id }`,
+export const cacheKeys = {
+  USER_PROFILE: (user_id: string) => `user:profile:${user_id}`,
+  BILL_DETAILS: (bill_id: number) => `bill:details:${bill_id}`,
+  BILL_COMMENTS: (bill_id: number) => `bill:comments:${bill_id}`,
+  USER_ENGAGEMENT: (user_id: string) => `user:engagement:${user_id}`,
   ANALYTICS: (key: string) => `analytics:${key}`
 };
 
@@ -297,7 +283,7 @@ export const cache = {
     try {
       return await fetchFn();
     } catch (error) {
-      logger.error('Cache operation failed', { key, ttl }, error);
+      console.error('Cache operation failed', { key, ttl }, error);
       throw error;
     }
   }
@@ -305,13 +291,13 @@ export const cache = {
 
 // Database connection fallback
 export const database = {
-  execute: async (query: string, params?: any[]) => {
-    logger.warn('Database execute called with fallback implementation');
+  execute: async (_query: string, _params?: any[]) => {
+    console.warn('Database execute called with fallback implementation');
     throw new Error('Database not available - using fallback mode');
   },
-  
-  query: async (query: string, params?: any[]) => {
-    logger.warn('Database query called with fallback implementation');
+
+  query: async (_query: string, _params?: any[]) => {
+    console.warn('Database query called with fallback implementation');
     return { rows: [], rowCount: 0 };
   }
 };
@@ -347,7 +333,6 @@ export class AuthorizationError extends Error {
 
 // Export everything that might be imported from @shared/core
 export default {
-  logger,
   Performance,
   RateLimit,
   ApiResponse,

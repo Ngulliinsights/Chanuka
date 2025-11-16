@@ -37,7 +37,7 @@ const formatDistanceToNow = (date: Date) => {
 import { useBillAnalysis } from '../../hooks/use-bill-analysis';
 import { logger } from '../../utils/logger';
 
-interface Comment { id: number;
+interface Comment { id: string;
   user_id: number;
   username: string;
   userInitials: string;
@@ -67,22 +67,22 @@ interface Poll {
 
 interface CommentsProps { comments: Comment[];
   onAddComment: (content: string, expertise?: string) => Promise<void>;
-  onEndorseComment: (comment_id: number) => Promise<void>;
+  onEndorseComment: (commentId: string) => Promise<void>;
   isAddingComment: boolean;
   isEndorsing: boolean;
   sortOrder: 'newest' | 'oldest' | 'endorsed';
   bill_id: number;
   billSection?: string;
- }
+  }
 
 export function Comments({ comments, onAddComment, onEndorseComment, isAddingComment, isEndorsing, sortOrder, bill_id, billSection  }: CommentsProps) {
   const [newComment, setNewComment] = useState('');
   const [newExpertise, setNewExpertise] = useState('');
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [showPollDialog, setShowPollDialog] = useState(false);
   const [pollData, setPollData] = useState<Poll>({ question: '', options: ['', ''] });
-  const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
   const [characterCount, setCharacterCount] = useState(0);
 
   const maxCommentLength = 2000;
@@ -94,13 +94,13 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
   }, [newComment]);
 
 
-  const toggleCommentExpansion = (comment_id: number) => {
+  const toggleCommentExpansion = (commentId: string) => {
     setExpandedComments(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(comment_id)) {
-        newSet.delete(comment_id);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
       } else {
-        newSet.add(comment_id);
+        newSet.add(commentId);
       }
       return newSet;
     });
@@ -141,9 +141,9 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handleVote = async (comment_id: number, type: 'up' | 'down') => {
+  const handleVote = async (commentId: string, type: 'up' | 'down') => {
     try {
-      const response = await fetch(`/api/comments/${comment_id}/vote`, {
+      const response = await fetch(`/api/comments/${commentId}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type }),
@@ -157,9 +157,9 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handlePollVote = async (comment_id: number, optionIndex: number) => {
+  const handlePollVote = async (commentId: string, optionIndex: number) => {
     try {
-      const response = await fetch(`/api/comments/${comment_id}/poll-vote`, {
+      const response = await fetch(`/api/comments/${commentId}/poll-vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ optionIndex }),
@@ -173,7 +173,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handleReply = async (parent_id: number) => { if (!replyContent.trim()) return;
+  const handleReply = async (parentId: string) => { if (!replyContent.trim()) return;
 
     try {
       const response = await fetch(`/api/bills/${bill_id }/comments`, {
@@ -181,7 +181,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: replyContent,
-          parent_id,
+          parent_id: parentId,
           section: billSection,
         }),
       });
@@ -196,9 +196,9 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handleHighlight = async (comment_id: number) => {
+  const handleHighlight = async (commentId: string) => {
     try {
-      const response = await fetch(`/api/comments/${comment_id}/highlight`, {
+      const response = await fetch(`/api/comments/${commentId}/highlight`, {
         method: 'POST',
       });
 

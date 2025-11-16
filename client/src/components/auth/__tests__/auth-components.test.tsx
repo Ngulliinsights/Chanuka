@@ -28,7 +28,7 @@ import { AuthError, AuthValidationError } from '../errors';
 // AuthInputProps and AuthButtonProps should be defined locally in auth components
 
 // Mock the auth hook
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     login: vi.fn(),
     register: vi.fn(),

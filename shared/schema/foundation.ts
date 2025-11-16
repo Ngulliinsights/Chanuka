@@ -46,6 +46,11 @@ export const users = pgTable("users", {
   password_reset_token: varchar("password_reset_token", { length: 64 }),
   password_reset_expires_at: timestamp("password_reset_expires_at", { withTimezone: true }),
 
+  // Two-factor authentication
+  two_factor_enabled: boolean("two_factor_enabled").notNull().default(false),
+  two_factor_secret: varchar("two_factor_secret", { length: 32 }),
+  backup_codes: jsonb("backup_codes").notNull().default(sql`'[]'::jsonb`),
+
   // Account lifecycle tracking
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -620,5 +625,100 @@ export type NewParliamentarySession = typeof parliamentary_sessions.$inferInsert
 export type ParliamentarySitting = typeof parliamentary_sittings.$inferSelect;
 export type NewParliamentarySitting = typeof parliamentary_sittings.$inferInsert;
 
+// ============================================================================
+// AUTHENTICATION EXTENSIONS - OAuth, Sessions, Security
+// ============================================================================
+
+export const oauth_providers = pgTable("oauth_providers", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  provider_name: varchar("provider_name", { length: 50 }).notNull(), // 'google', 'github', 'facebook'
+  client_id: varchar("client_id", { length: 255 }).notNull(),
+  client_secret: varchar("client_secret", { length: 255 }).notNull(),
+  authorization_url: varchar("authorization_url", { length: 500 }).notNull(),
+  token_url: varchar("token_url", { length: 500 }).notNull(),
+  user_info_url: varchar("user_info_url", { length: 500 }),
+  scopes: varchar("scopes", { length: 500 }).notNull().default('openid profile email'),
+  is_active: boolean("is_active").notNull().default(true),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  providerNameUnique: unique("oauth_providers_provider_name_unique").on(table.provider_name),
+  providerActiveIdx: index("idx_oauth_providers_active").on(table.is_active),
+}));
+
+export const oauth_tokens = pgTable("oauth_tokens", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  provider_id: uuid("provider_id").notNull().references(() => oauth_providers.id, { onDelete: "cascade" }),
+  provider_user_id: varchar("provider_user_id", { length: 255 }).notNull(),
+  access_token: varchar("access_token", { length: 500 }).notNull(),
+  refresh_token: varchar("refresh_token", { length: 500 }),
+  token_type: varchar("token_type", { length: 50 }).notNull().default('Bearer'),
+  expires_at: timestamp("expires_at", { withTimezone: true }),
+  scope: varchar("scope", { length: 500 }),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  userProviderUnique: unique("oauth_tokens_user_provider_unique").on(table.user_id, table.provider_id),
+  userIdx: index("idx_oauth_tokens_user").on(table.user_id),
+  providerIdx: index("idx_oauth_tokens_provider").on(table.provider_id),
+  expiresIdx: index("idx_oauth_tokens_expires").on(table.expires_at),
+}));
+
+export const user_sessions = pgTable("user_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  session_token: varchar("session_token", { length: 255 }).notNull(),
+  device_info: jsonb("device_info").notNull().default(sql`'{}'::jsonb`), // browser, OS, device type
+  ip_address: varchar("ip_address", { length: 45 }), // IPv4/IPv6
+  user_agent: text("user_agent"),
+  location: jsonb("location"), // geolocation data
+  is_active: boolean("is_active").notNull().default(true),
+  last_activity: timestamp("last_activity", { withTimezone: true }).notNull().defaultNow(),
+  expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  userActiveIdx: index("idx_user_sessions_user_active").on(table.user_id, table.is_active),
+  sessionTokenIdx: index("idx_user_sessions_token").on(table.session_token),
+  expiresIdx: index("idx_user_sessions_expires").on(table.expires_at),
+  lastActivityIdx: index("idx_user_sessions_last_activity").on(table.last_activity),
+  userAgentIdx: index("idx_user_sessions_user_agent").on(table.user_agent),
+}));
+
 export type Bill = typeof bills.$inferSelect;
 export type NewBill = typeof bills.$inferInsert;
+
+export type OAuthProvider = typeof oauth_providers.$inferSelect;
+export type NewOAuthProvider = typeof oauth_providers.$inferInsert;
+
+export type OAuthToken = typeof oauth_tokens.$inferSelect;
+export type NewOAuthToken = typeof oauth_tokens.$inferInsert;
+
+export type UserSession = typeof user_sessions.$inferSelect;
+export type NewUserSession = typeof user_sessions.$inferInsert;
+
+// ============================================================================
+// AUTHENTICATION EXTENSIONS RELATIONS
+// ============================================================================
+
+export const oauthProvidersRelations = relations(oauth_providers, ({ many }) => ({
+  tokens: many(oauth_tokens),
+}));
+
+export const oauthTokensRelations = relations(oauth_tokens, ({ one }) => ({
+  user: one(users, {
+    fields: [oauth_tokens.user_id],
+    references: [users.id],
+  }),
+  provider: one(oauth_providers, {
+    fields: [oauth_tokens.provider_id],
+    references: [oauth_providers.id],
+  }),
+}));
+
+export const userSessionsRelations = relations(user_sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [user_sessions.user_id],
+    references: [users.id],
+  }),
+}));

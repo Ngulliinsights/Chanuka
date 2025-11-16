@@ -5,7 +5,7 @@
  */
 
 // Auth Hooks
-export { useAuth } from './use-auth';
+export { useAuth } from './useAuth';
 
 // API Hooks
 export { useApiConnection } from './useApiConnection';
@@ -52,4 +52,4 @@ export { useI18n } from './use-i18n';
 export { useErrorRecovery } from './useErrorRecovery';
 
 // WebSocket Hooks
-export { useWebSocket } from './useWebSocket';
+export { useWebSocket } from './use-websocket';

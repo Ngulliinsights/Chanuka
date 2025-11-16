@@ -1,4 +1,5 @@
 import { logger  } from '../../../shared/core/src/index.js';
+import { schemaValidationService } from '../../core/validation/schema-validation-service.js';
 
 export class MonitoringScheduler {
   private intervals: Map<string, NodeJS.Timeout> = new Map();
@@ -30,7 +31,7 @@ export class MonitoringScheduler {
     this.schedule('memory-monitor', () => {
       const usage = process.memoryUsage();
       const heapUsedMB = Math.round(usage.heapUsed / 1024 / 1024);
-      
+
       if (heapUsedMB > 500) {
         logger.warn('High memory usage detected', {
           component: 'Chanuka',
@@ -39,6 +40,43 @@ export class MonitoringScheduler {
         });
       }
     }, 60 * 1000);
+
+    // Schedule schema validation monitoring every 30 minutes
+    this.schedule('schema-validation', async () => {
+      try {
+        logger.debug('Running periodic schema validation check', { component: 'Chanuka' });
+
+        const report = await schemaValidationService.generateValidationReport();
+
+        if (report.criticalIssues > 0) {
+          logger.error('Critical schema validation issues detected', {
+            component: 'Chanuka',
+            criticalIssues: report.criticalIssues,
+            totalIssues: report.totalIssues,
+            overallStatus: report.overallStatus,
+            recommendations: report.recommendations
+          });
+        } else if (report.totalIssues > 0) {
+          logger.warn('Schema validation issues detected', {
+            component: 'Chanuka',
+            totalIssues: report.totalIssues,
+            overallStatus: report.overallStatus,
+            recommendations: report.recommendations
+          });
+        } else {
+          logger.debug('Schema validation passed', {
+            component: 'Chanuka',
+            validatedTables: report.validatedTables,
+            overallStatus: report.overallStatus
+          });
+        }
+      } catch (error) {
+        logger.error('Periodic schema validation failed', {
+          component: 'Chanuka',
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }, 30 * 60 * 1000); // 30 minutes
   }
 
   stop() {

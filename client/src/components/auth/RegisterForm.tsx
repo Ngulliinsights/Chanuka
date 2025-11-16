@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Alert, AlertDescription } from '../ui/alert';
 import { Checkbox } from '../ui/checkbox';
 import { Progress } from '../ui/progress';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { RegisterData, PrivacySettings } from '../../types/auth';
 import { validatePassword, PASSWORD_STRENGTH_CONFIG, estimateCrackTime } from '../../utils/password-validation';
 import { privacyCompliance } from '../../utils/privacy-compliance';

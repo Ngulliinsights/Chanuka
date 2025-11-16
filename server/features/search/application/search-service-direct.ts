@@ -10,7 +10,7 @@ import {
   type User
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, count, inArray, like, or, isNotNull } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -73,10 +73,12 @@ export interface SearchFacets {
 // ============================================================================
 
 /**
- * SearchService - Consolidated search service using direct Drizzle ORM
- * 
- * This service replaces the repository pattern with direct database queries,
- * providing comprehensive search capabilities across bills, sponsors, and comments.
+ * SearchService - Direct database search service using Drizzle ORM
+ *
+ * This service provides direct database queries for search operations,
+ * optimized for performance with comprehensive search capabilities across
+ * bills, sponsors, and comments. This is the direct database implementation
+ * that complements the multi-engine search service.
  */
 export class SearchService {
   private get database() {

@@ -1,10 +1,10 @@
-import { database as db } from '@shared/database';
+import database from '@shared/database';
 import { users, bills, sponsors } from '@shared/schema/foundation';
 import { notifications, comments, bill_engagement } from '@shared/schema/citizen_participation';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core';
 
 export interface TestUser {
   id: string;
@@ -505,7 +505,7 @@ export class DatabaseTestHelper {
     condition: any
   ): Promise<boolean> {
     try {
-      const records = await db.select().from(table).where(condition);
+      const records = await database.select().from(table).where(condition);
       return records.length > 0;
     } catch (error) {
       return false;
@@ -518,7 +518,7 @@ export class DatabaseTestHelper {
     expectedCount: number
   ): Promise<boolean> {
     try {
-      const records = await db.select().from(table).where(condition);
+      const records = await database.select().from(table).where(condition);
       return records.length === expectedCount;
     } catch (error) {
       return false;

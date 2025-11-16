@@ -19,7 +19,7 @@ import {
 import AuthForm from '../components/auth/auth-forms';
 import { SecurityDashboard } from '../components/auth/SecurityDashboard';
 import { PrivacyControls } from '../components/auth/PrivacyControls';
-import { useAuth } from '../hooks/use-auth';
+import { useAuth } from '../hooks/useAuth';
 
 export default function AuthenticationPage() {
   const auth = useAuth();

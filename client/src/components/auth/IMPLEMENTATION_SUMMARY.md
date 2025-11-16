@@ -15,7 +15,7 @@ Task 28 has been successfully completed, implementing a comprehensive authentica
 
 ### 2. OAuth Integration for Social Login
 - **Files**: 
-  - `client/src/services/authBackendService.ts` (OAuth methods)
+  - `client/src/services/authService.ts` (OAuth methods)
   - `client/src/components/auth/SocialLogin.tsx`
   - `client/src/components/auth/OAuthCallback.tsx`
 - **Features**:
@@ -25,7 +25,7 @@ Task 28 has been successfully completed, implementing a comprehensive authentica
   - Callback handling with error management
 
 ### 3. User Profile Synchronization
-- **File**: `client/src/services/authBackendService.ts`
+- **File**: `client/src/services/authService.ts`
 - **Features**:
   - Profile sync with backend
   - Profile update methods
@@ -199,7 +199,7 @@ import { RequireAuth, RequireRole, RequirePermission } from './components/auth';
 
 ### Using Auth Hook
 ```tsx
-import { useAuth } from './hooks/use-auth';
+import { useAuth } from './hooks/useAuth';
 
 function MyComponent() {
   const { user, login, logout, isAuthenticated } = useAuth();

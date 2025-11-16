@@ -122,7 +122,7 @@ export class FeatureFlagsService {
   private hashUser(user_id: string): number {
     let hash = 0;
     for (let i = 0; i < user_id.length; i++) {
-      const char = userId.charCodeAt(i);
+      const char = user_id.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash; // Convert to 32-bit integer
     }

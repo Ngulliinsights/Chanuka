@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { LoadingStateManager } from '../loading/LoadingStates';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Button } from '../ui/button';

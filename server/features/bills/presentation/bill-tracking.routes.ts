@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { authenticateToken, AuthenticatedRequest } from '@/middleware/auth.js';
+import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
 // cspell:words untracking
 // Correct import path for the new service location

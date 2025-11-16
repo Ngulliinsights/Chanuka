@@ -29,12 +29,12 @@ interface CommentPayload { content: string;
  }
 
 interface EndorseCommentPayload {
-  comment_id: number;
+  commentId: string;
   endorsements: number;
 }
 
 interface VotePayload {
-  comment_id: number;
+  commentId: string;
   type: 'up' | 'down';
 }
 
@@ -73,7 +73,7 @@ interface BillAnalysis {
   }>;
 }
 
-interface Comment { id: number;
+interface Comment { id: string;
   user_id: number;
   username: string;
   userInitials: string;
@@ -175,8 +175,8 @@ export function useBillAnalysis(bill_id: number) {
   // Vote on comment mutation
   const voteCommentMutation = useMutation({
     mutationFn: async (payload: VotePayload) => {
-      const res = await apiRequest('POST', `/api/comments/${payload.comment_id}/vote`, { 
-        type: payload.type 
+      const res = await apiRequest('POST', `/api/comments/${payload.commentId}/vote`, {
+        type: payload.type
       });
       return res.json();
     },
@@ -187,8 +187,8 @@ export function useBillAnalysis(bill_id: number) {
   // Endorse comment mutation
   const endorseCommentMutation = useMutation({
     mutationFn: async (payload: EndorseCommentPayload) => {
-      const res = await apiRequest('POST', `/api/comments/${payload.comment_id}/endorse`, { 
-        endorsements: payload.endorsements 
+      const res = await apiRequest('POST', `/api/comments/${payload.commentId}/endorse`, {
+        endorsements: payload.endorsements
       });
       return res.json();
     },

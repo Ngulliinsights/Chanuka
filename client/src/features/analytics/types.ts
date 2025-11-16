@@ -8,14 +8,15 @@ export interface EngagementMetrics {
   engagementRate: number;
 }
 
-export interface ConflictAnalysis { bill_id: string;
+export interface ConflictAnalysis {
+  bill_id: string;
   sponsor_id: string;
   conflict_level: 'low' | 'medium' | 'high';
   description: string;
   evidence: string[];
   confidence: number;
   detectedAt: string;
- }
+}
 
 export interface StakeholderImpact {
   group: string;
@@ -25,7 +26,8 @@ export interface StakeholderImpact {
   confidence: number;
 }
 
-export interface BillAnalytics { id: string;
+export interface BillAnalytics {
+  id: string;
   bill_id: string;
   title: string;
   status: string;
@@ -34,7 +36,8 @@ export interface BillAnalytics { id: string;
   stakeholders: StakeholderImpact[];
   trends: TrendData[];
   lastUpdated: string;
- }
+  riskLevel?: 'low' | 'medium' | 'high';
+}
 
 export interface TrendData {
   date: string;
@@ -53,6 +56,7 @@ export interface AnalyticsFilters {
   conflict_level?: string[];
   stakeholderGroup?: string[];
   minEngagement?: number;
+  limit?: number;
 }
 
 export interface AnalyticsSummary {
@@ -66,21 +70,27 @@ export interface AnalyticsSummary {
     start: string;
     end: string;
   };
+  engagementGrowthRate?: number;
+  riskScore?: number;
 }
 
-export interface UserActivity { user_id: string;
+export interface UserActivity {
+  user_id: string;
   actions: UserAction[];
   totalEngagement: number;
   favoriteTopics: string[];
   activityScore: number;
   lastActive: string;
- }
+  engagementScore?: number;
+  activityLevel?: 'low' | 'medium' | 'high';
+}
 
-export interface UserAction { type: 'view' | 'comment' | 'share' | 'bookmark' | 'vote';
+export interface UserAction {
+  type: 'view' | 'comment' | 'share' | 'bookmark' | 'vote';
   bill_id: string;
   timestamp: string;
   metadata?: Record<string, any>;
- }
+}
 
 export interface DashboardData {
   summary: AnalyticsSummary;
@@ -90,7 +100,8 @@ export interface DashboardData {
   charts: ChartData[];
 }
 
-export interface AnalyticsAlert { id: string;
+export interface AnalyticsAlert {
+  id: string;
   type: 'conflict' | 'engagement' | 'stakeholder' | 'trend';
   severity: 'low' | 'medium' | 'high';
   title: string;
@@ -98,7 +109,9 @@ export interface AnalyticsAlert { id: string;
   bill_id?: string;
   created_at: string;
   acknowledged: boolean;
- }
+  priority?: number;
+  impact?: 'low' | 'medium' | 'high';
+}
 
 export interface ChartData {
   id: string;
@@ -108,6 +121,31 @@ export interface ChartData {
   xAxis?: string;
   yAxis?: string;
   colors?: string[];
+}
+
+export interface TrendingTopic {
+  topic: string;
+  count: number;
+  trend: 'up' | 'down' | 'stable';
+  sentiment?: number;
+  velocity: number;
+}
+
+export interface StakeholderAnalysis {
+  group: string;
+  impact: 'positive' | 'negative' | 'neutral';
+  description: string;
+  affectedCount: number;
+  confidence: number;
+  impactScore?: number;
+}
+
+export interface RealtimeMetrics {
+  activeUsers: number;
+  currentEngagement: number;
+  recentAlerts: number;
+  systemHealth: 'healthy' | 'warning' | 'error';
+  healthScore?: number;
 }
 
 // API response types
@@ -121,27 +159,36 @@ export interface AnalyticsResponse<T> {
   };
 }
 
-export interface EngagementReport { bill_id: string;
+export interface EngagementReport {
+  bill_id: string;
   period: {
     start: string;
     end: string;
-   };
+  };
   metrics: EngagementMetrics;
   breakdown: {
     byDay: TrendData[];
     byUserType: Record<string, number>;
     byTopic: Record<string, number>;
   };
+  trendAnalysis?: {
+    direction: 'up' | 'down' | 'stable';
+    changePercent: number;
+    momentum: number;
+  };
+  engagementScore?: number;
 }
 
-export interface ConflictReport { bill_id: string;
+export interface ConflictReport {
+  bill_id: string;
   conflicts: ConflictAnalysis[];
   summary: {
     totalConflicts: number;
     bySeverity: Record<string, number>;
     topIssues: string[];
-   };
+  };
   recommendations: string[];
+  priorityScore?: number;
 }
 
 

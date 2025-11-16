@@ -329,11 +329,11 @@ export class ServiceWorkerUpdateNotifier {
 
   async initialize(): Promise<void> {
     this.registration = await registerServiceWorker({
-      onUpdate: (registration) => {
+      onUpdate: (_registration) => {
         this.updateAvailable = true;
         this.callbacks.onUpdateAvailable?.();
       },
-      onSuccess: (registration) => {
+      onSuccess: (_registration) => {
         this.callbacks.onUpdateInstalled?.();
       },
     });

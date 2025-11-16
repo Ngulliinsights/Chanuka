@@ -1,0 +1,15 @@
+{
+  "totalErrors": 0,
+  "errorsByComponent": {},
+  "errorsByType": {},
+  "topOffenders": [],
+  "criticalIssues": [],
+  "baseline": {
+    "startTime": 1763216492205,
+    "endTime": 1763216552212,
+    "duration": 60007,
+    "errorRate": 0
+  },
+  "generatedAt": "2025-11-15T14:22:32.214Z",
+  "version": "1.0.0"
+}

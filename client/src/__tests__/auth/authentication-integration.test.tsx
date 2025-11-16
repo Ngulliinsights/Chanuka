@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import AuthenticationPage from '../../pages/AuthenticationPage';
-import { AuthProvider } from '../../hooks/use-auth';
+import { AuthProvider } from '../../hooks/useAuth';
 import { SecurityDashboard } from '../../components/auth/SecurityDashboard';
 import { PrivacyControls } from '../../components/auth/PrivacyControls';
 import { TwoFactorSetup } from '../../components/auth/TwoFactorSetup';
@@ -369,7 +369,7 @@ describe('Authentication Integration', () => {
 
     it('should show security overview', () => {
       // Mock the auth context to return a user
-      vi.doMock('../../hooks/use-auth', () => ({
+      vi.doMock('../../hooks/useAuth', () => ({
         useAuth: () => ({
           user: mockUser,
           isAuthenticated: true,
@@ -443,7 +443,7 @@ describe('Authentication Integration', () => {
 
     it('should show privacy controls overview', () => {
       // Mock the auth context
-      vi.doMock('../../hooks/use-auth', () => ({
+      vi.doMock('../../hooks/useAuth', () => ({
         useAuth: () => ({
           user: mockUser,
           isAuthenticated: true,
@@ -464,7 +464,7 @@ describe('Authentication Integration', () => {
     });
 
     it('should show privacy tabs', () => {
-      vi.doMock('../../hooks/use-auth', () => ({
+      vi.doMock('../../hooks/useAuth', () => ({
         useAuth: () => ({
           user: mockUser,
           isAuthenticated: true,

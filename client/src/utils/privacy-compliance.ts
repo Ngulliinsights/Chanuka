@@ -279,7 +279,7 @@ class PrivacyComplianceManager {
    * Checks if user needs to reconfirm consent due to policy changes
    */
   needsConsentReconfirmation(userConsents: ConsentRecord[]): boolean {
-    const currentVersion = this.getCurrentConsentVersion();
+    const _currentVersion = this.getCurrentConsentVersion();
     const latestUserConsent = userConsents
       .sort((a, b) => new Date(b.granted_at).getTime() - new Date(a.granted_at).getTime())[0];
 

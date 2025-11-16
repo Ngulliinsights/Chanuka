@@ -9,7 +9,7 @@ import { NavigationStatePersistence } from '../../utils/navigation/state-persist
 import { logger } from '../../utils/logger';
 
 // Mock the auth hook
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   useAuth: vi.fn(() => ({
     user: null,
@@ -195,7 +195,7 @@ describe('Navigation State Persistence and Consistency', () => {
 
   describe('Authentication State Synchronization', () => {
     it('should sync user role with authentication state', async () => {
-      const { useAuth } = await import('@/hooks/use-auth');
+      const { useAuth } = await import('@/hooks/useAuth');
       
       // Mock authenticated user
       vi.mocked(useAuth).mockReturnValue({
@@ -220,7 +220,7 @@ describe('Navigation State Persistence and Consistency', () => {
     it('should clear user-specific state on logout', async () => {
       const clearUserStateSpy = vi.spyOn(NavigationStatePersistence, 'clearUserSpecificState').mockImplementation(() => {});
       
-      const { useAuth } = await import('@/hooks/use-auth');
+      const { useAuth } = await import('@/hooks/useAuth');
       const mockUseAuth = vi.mocked(useAuth);
 
       // Start with authenticated user

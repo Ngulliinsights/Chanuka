@@ -23,7 +23,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { TwoFactorSetup as TwoFactorSetupType } from '../../types/auth';
 import { logger } from '../../utils/logger';
 

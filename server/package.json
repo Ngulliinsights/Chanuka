@@ -4,14 +4,20 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "tsx index.ts",
+    "dev": "ts-node -r tsconfig-paths/register index.ts",
     "build": "echo 'Server build skipped - using development mode'",
     "start": "tsx index.ts",
-    "test": "vitest run server/",
+    "test": "vitest run",
     "test:watch": "vitest server/ --watch",
     "type-check": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
-    "@chanuka/shared": "workspace:*"
+    "@chanuka/shared": "workspace:*",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6",
+    "@types/speakeasy": "^2.0.10"
   }
 }

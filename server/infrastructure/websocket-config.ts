@@ -6,7 +6,7 @@
 
 import { BatchingService, BatchingConfig } from './batching-service.js';
 import { MemoryAwareSocketService, MemoryThresholds } from './memory-aware-socket-service.js';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 export interface WebSocketServiceConfig {
   batching: Partial<BatchingConfig>;

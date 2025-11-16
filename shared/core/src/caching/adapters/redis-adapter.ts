@@ -11,9 +11,7 @@ import { promisify } from 'util';
 import { BaseCacheAdapter } from '../core/base-adapter';
 import type {
   CacheAdapterConfig,
-  CacheHealthStatus,
-  CompressionOptions,
-  CacheConfig
+  CacheHealthStatus
 } from '../core/interfaces';
 
 // Promisified compression functions
@@ -33,18 +31,11 @@ export interface RedisAdapterConfig extends CacheAdapterConfig {
 
 export class RedisAdapter extends BaseCacheAdapter {
   private client!: Redis;
-  protected connected: boolean = false;
+  protected override connected: boolean = false;
   private connectionPromise: Promise<void> | null = null;
-  private compressionOptions: CompressionOptions;
 
   constructor(config: RedisAdapterConfig) {
     super('RedisAdapter', '1.0.0', config);
-
-    this.compressionOptions = {
-      algorithm: 'gzip',
-      threshold: config.compressionThreshold ?? 1024,
-      level: 6,
-    };
 
     this.initializeRedis();
   }
@@ -88,7 +79,7 @@ export class RedisAdapter extends BaseCacheAdapter {
       this.connected = true;
     });
 
-    this.client.on('error', (error) => {
+    this.client.on('error', (_error) => {
       this.connected = false;
       this.metrics.errors++;
       this.emit('error', { key: 'redis_connection' });
@@ -110,7 +101,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Connect to Redis with connection pooling
    */
-  async connect(): Promise<void> {
+  override async connect(): Promise<void> {
     if (this.connectionPromise) {
       return this.connectionPromise;
     }
@@ -135,7 +126,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Disconnect from Redis gracefully
    */
-  async disconnect(): Promise<void> {
+  override async disconnect(): Promise<void> {
     try {
       if (this.connected) {
         await this.client.quit();
@@ -291,7 +282,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Set expiration for a key
    */
-  async expire(key: string, seconds: number): Promise<boolean> {
+  override async expire(key: string, seconds: number): Promise<boolean> {
     if (!this.connected) {
       return false;
     }
@@ -590,27 +581,28 @@ export class RedisAdapter extends BaseCacheAdapter {
       const latency = performance.now() - start;
 
       // Return with explicit errors array or omit the property entirely
-      return errors.length > 0
-        ? {
-            status: 'degraded' as const,
-            latency,
-            memoryUsage: memory,
-            lastError: errors[0],
-            uptime: Date.now() - this.startTime
-          }
-        : {
-            status: 'healthy' as const,
-            latency,
-            memoryUsage: memory,
-            uptime: Date.now() - this.startTime
-          };
+      const baseResult = {
+        status: errors.length > 0 ? 'degraded' as const : 'healthy' as const,
+        latency,
+        uptime: Date.now() - this.startTime
+      };
+
+      if (memory !== undefined) {
+        (baseResult as any).memoryUsage = memory;
+      }
+
+      if (errors.length > 0) {
+        (baseResult as any).lastError = errors[0];
+      }
+
+      return baseResult;
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
       
       return {
         status: 'unhealthy' as const,
         latency: performance.now() - start,
-        lastError: errors[0],
+        lastError: errors[0] || 'Unknown error',
         uptime: Date.now() - this.startTime
       };
     }
@@ -648,7 +640,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Cleanup resources and disconnect
    */
-  async destroy(): Promise<void> {
+  override async destroy(): Promise<void> {
     await super.destroy();
     await this.disconnect();
   }

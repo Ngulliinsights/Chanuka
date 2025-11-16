@@ -21,7 +21,7 @@ import {
 import { PrivacyControls } from '../components/auth/PrivacyControls';
 import { DataUsageReportDashboard } from '../components/privacy/DataUsageReportDashboard';
 import { GDPRComplianceManager } from '../components/privacy/GDPRComplianceManager';
-import { useAuth } from '../hooks/use-auth';
+import { useAuth } from '../hooks/useAuth';
 
 export default function PrivacySettingsPage() {
   const auth = useAuth();

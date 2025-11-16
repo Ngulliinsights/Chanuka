@@ -15,8 +15,8 @@ import {
   ArrowLeft,
   Shield
 } from 'lucide-react';
-import { authBackendService } from '../../services/authBackendService';
-import { useAuth } from '../../hooks/use-auth';
+import { authService } from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
 import { logger } from '../../utils/logger';
 
 interface CallbackState {
@@ -107,7 +107,7 @@ export function OAuthCallback() {
       }
 
       // Process OAuth callback
-      const result = await authBackendService.handleOAuthCallback(provider, code, state || undefined);
+      const result = await authService.handleOAuthCallback(provider, code, state || undefined);
 
       if (result.success && result.data) {
         logger.info('OAuth authentication successful:', { 

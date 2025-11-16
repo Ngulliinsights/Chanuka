@@ -1,0 +1,41 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-css-modules"
+  ],
+  "plugins": [
+    "stylelint-order"
+  ],
+  "rules": {
+    "order/properties-alphabetical-order": true,
+    "selector-class-pattern": [
+      "^chanuka-[a-z][a-zA-Z0-9]*(-[a-z][a-zA-Z0-9]*)*$",
+      {
+        "message": "Class names must follow the pattern 'chanuka-*' for design system consistency"
+      }
+    ],
+    "custom-property-pattern": [
+      "^--[a-z][a-zA-Z0-9]*(-[a-z][a-zA-Z0-9]*)*$",
+      {
+        "message": "Custom properties must follow kebab-case pattern"
+      }
+    ],
+    "declaration-no-important": true,
+    "color-hex-length": "long",
+    "color-named": "never",
+    "font-family-name-quotes": "always-where-recommended",
+    "function-url-quotes": "always",
+    "string-quotes": "double",
+    "value-keyword-case": "lower",
+    "property-no-vendor-prefix": true,
+    "value-no-vendor-prefix": true,
+    "at-rule-no-vendor-prefix": true,
+    "selector-no-vendor-prefix": true,
+    "media-feature-name-no-vendor-prefix": true
+  },
+  "ignoreFiles": [
+    "node_modules/**/*",
+    "dist/**/*",
+    "build/**/*"
+  ]
+}

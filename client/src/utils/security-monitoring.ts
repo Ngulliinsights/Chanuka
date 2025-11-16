@@ -39,10 +39,10 @@ class SecurityMonitor {
   
   // Configuration
   private readonly MAX_FAILED_ATTEMPTS = 5;
-  private readonly LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+  private readonly _LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
   private readonly ATTEMPT_WINDOW = 60 * 60 * 1000; // 1 hour
-  private readonly UNUSUAL_HOUR_THRESHOLD = 2; // 2 AM to 6 AM considered unusual
-  private readonly MAX_REQUESTS_PER_MINUTE = 60;
+  private readonly _UNUSUAL_HOUR_THRESHOLD = 2; // 2 AM to 6 AM considered unusual
+  private readonly _MAX_REQUESTS_PER_MINUTE = 60;
 
   /**
    * Records a login attempt and analyzes for suspicious patterns
@@ -199,7 +199,7 @@ class SecurityMonitor {
     ip: string,
     userAgent: string,
     location?: LocationInfo,
-    userId?: string
+    _userId?: string
   ): number {
     let score = 0;
 
@@ -353,7 +353,7 @@ class SecurityMonitor {
     return '0.0.0.0';
   }
 
-  private async sendToSecurityService(event: SecurityEvent): Promise<void> {
+  private async sendToSecurityService(_event: SecurityEvent): Promise<void> {
     try {
       // In production, send to security monitoring service
       // await fetch('/api/security/events', {

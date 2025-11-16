@@ -4,7 +4,7 @@
 // Implements intelligent message batching for WebSocket connections
 // Provides memory-aware batching with automatic optimization and backpressure handling
 
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 // cSpell:ignore Batchable BatchableMessage
 

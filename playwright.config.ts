@@ -59,7 +59,7 @@ export default defineConfig({
       name: 'api',
       testDir: './tests/api',
       use: {
-        baseURL: process.env.API_BASE_URL || 'http://localhost:4200/api',
+        baseURL: process.env.API_BASE_URL || 'http://127.0.0.1:4200',
       },
     },
     /* Database Performance Testing */
@@ -82,7 +82,7 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
+  webServer: process.env.PW_DISABLE_WEB_SERVER === '1' ? undefined : {
     command: 'npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,

@@ -1,10 +1,12 @@
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
-import { eq, and, gt, lt, isNotNull } from 'drizzle-orm';
-import { database as db } from '../../../shared/database';
+import * as speakeasy from 'speakeasy';
+import * as qrcode from 'qrcode';
+import { eq, and, gt, lt, isNotNull, desc, ne } from 'drizzle-orm';
+import { database as db } from '../../../shared/database/connection.js';
 
-import { users, sessions } from '../../../shared/schema';
+import { users, sessions, oauth_providers, oauth_tokens, user_sessions } from '../../../shared/schema';
 import { getEmailService } from '../../infrastructure/notifications/email-service';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { inputValidationService } from '../validation/input-validation-service.js';
@@ -275,7 +277,7 @@ export class AuthService {
   /**
    * Login user with credentials
    */
-  async login(data: z.infer<typeof loginSchema>): Promise<AuthResult> {
+  async login(data: z.infer<typeof loginSchema>): Promise<AuthResult & { requiresTwoFactor?: boolean }> {
     try {
       // Validate input
       const validatedData = loginSchema.parse(data);
@@ -310,6 +312,24 @@ export class AuthService {
         return {
           success: false,
           error: 'Invalid credentials'
+        };
+      }
+
+      // Check if 2FA is enabled
+      if (userData.two_factor_enabled) {
+        return {
+          success: true,
+          requiresTwoFactor: true,
+          user: {
+            id: userData.id,
+            email: userData.email,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            name: userData.name,
+            role: userData.role,
+            verification_status: userData.verification_status,
+            is_active: userData.is_active
+          }
         };
       }
 
@@ -811,6 +831,655 @@ export class AuthService {
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
       });
+    }
+  }
+
+  // ============================================================================
+  // TWO-FACTOR AUTHENTICATION METHODS
+  // ============================================================================
+
+  /**
+   * Setup two-factor authentication for a user
+   */
+  async setupTwoFactor(userId: string): Promise<{ success: boolean; secret?: string; qrCode?: string; backupCodes?: string[]; error?: string }> {
+    try {
+      // Generate TOTP secret
+      const secret = speakeasy.generateSecret({
+        name: 'Chanuka Platform',
+        issuer: 'Chanuka',
+        length: 32
+      });
+
+      // Generate backup codes
+      const backupCodes = [];
+      for (let i = 0; i < 10; i++) {
+        backupCodes.push(crypto.randomBytes(4).toString('hex').toUpperCase());
+      }
+
+      // Generate QR code
+      const qrCode = await qrcode.toDataURL(secret.otpauth_url!);
+
+      // Store in database (don't enable yet)
+      await db
+        .update(users)
+        .set({
+          two_factor_secret: secret.base32,
+          backup_codes: backupCodes,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, userId));
+
+      return {
+        success: true,
+        secret: secret.base32,
+        qrCode,
+        backupCodes
+      };
+    } catch (error) {
+      logger.error('2FA setup error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'Failed to setup two-factor authentication'
+      };
+    }
+  }
+
+  /**
+   * Enable two-factor authentication after verification
+   */
+  async enableTwoFactor(userId: string, token: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Get user data
+      const userResult = await db
+        .select({ two_factor_secret: users.two_factor_secret })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userResult.length === 0 || !userResult[0].two_factor_secret) {
+        return { success: false, error: 'Two-factor authentication not set up' };
+      }
+
+      // Verify token
+      const verified = speakeasy.totp.verify({
+        secret: userResult[0].two_factor_secret,
+        encoding: 'base32',
+        token,
+        window: 2 // Allow 2 time windows (30 seconds each)
+      });
+
+      if (!verified) {
+        return { success: false, error: 'Invalid verification token' };
+      }
+
+      // Enable 2FA
+      await db
+        .update(users)
+        .set({
+          two_factor_enabled: true,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, userId));
+
+      return { success: true };
+    } catch (error) {
+      logger.error('2FA enable error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'Failed to enable two-factor authentication'
+      };
+    }
+  }
+
+  /**
+   * Disable two-factor authentication
+   */
+  async disableTwoFactor(userId: string, token: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Get user data
+      const userResult = await db
+        .select({ two_factor_secret: users.two_factor_secret })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userResult.length === 0 || !userResult[0].two_factor_secret) {
+        return { success: false, error: 'Two-factor authentication not enabled' };
+      }
+
+      // Verify token
+      const verified = speakeasy.totp.verify({
+        secret: userResult[0].two_factor_secret,
+        encoding: 'base32',
+        token,
+        window: 2
+      });
+
+      if (!verified) {
+        return { success: false, error: 'Invalid verification token' };
+      }
+
+      // Disable 2FA
+      await db
+        .update(users)
+        .set({
+          two_factor_enabled: false,
+          two_factor_secret: null,
+          backup_codes: [],
+          updated_at: new Date()
+        })
+        .where(eq(users.id, userId));
+
+      return { success: true };
+    } catch (error) {
+      logger.error('2FA disable error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'Failed to disable two-factor authentication'
+      };
+    }
+  }
+
+  /**
+   * Complete login with two-factor verification
+   */
+  async completeTwoFactorLogin(userId: string, token: string): Promise<AuthResult> {
+    try {
+      // First verify the 2FA token
+      const verifyResult = await this.verifyTwoFactorToken(userId, token);
+      if (!verifyResult.success) {
+        return {
+          success: false,
+          error: verifyResult.error || 'Invalid two-factor token'
+        };
+      }
+
+      // Get user data
+      const userResult = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userResult.length === 0) {
+        return {
+          success: false,
+          error: 'User not found'
+        };
+      }
+
+      const userData = userResult[0];
+
+      // Update last login
+      await db
+        .update(users)
+        .set({ last_login_at: new Date() })
+        .where(eq(users.id, userData.id));
+
+      // Generate tokens
+      const { token: accessToken, refresh_token } = await this.generateTokens(userData.id, userData.email);
+
+      // Create session
+      await this.createSession(userData.id, accessToken, refresh_token);
+
+      return {
+        success: true,
+        user: {
+          id: userData.id,
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          name: userData.name,
+          role: userData.role,
+          verification_status: userData.verification_status,
+          is_active: userData.is_active
+        },
+        token: accessToken,
+        refresh_token
+      };
+    } catch (error) {
+      logger.error('Complete 2FA login error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'Failed to complete two-factor login'
+      };
+    }
+  }
+
+  /**
+   * Verify two-factor token during login
+   */
+  async verifyTwoFactorToken(userId: string, token: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Get user data
+      const userResult = await db
+        .select({ two_factor_secret: users.two_factor_secret, backup_codes: users.backup_codes })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userResult.length === 0 || !userResult[0].two_factor_secret) {
+        return { success: false, error: 'Two-factor authentication not enabled' };
+      }
+
+      const { two_factor_secret, backup_codes } = userResult[0];
+
+      // Check if it's a backup code first
+      if (backup_codes && backup_codes.includes(token)) {
+        // Remove used backup code
+        const updatedBackupCodes = backup_codes.filter((code: string) => code !== token);
+        await db
+          .update(users)
+          .set({
+            backup_codes: updatedBackupCodes,
+            updated_at: new Date()
+          })
+          .where(eq(users.id, userId));
+
+        return { success: true };
+      }
+
+      // Verify TOTP token
+      const verified = speakeasy.totp.verify({
+        secret: two_factor_secret,
+        encoding: 'base32',
+        token,
+        window: 2
+      });
+
+      if (!verified) {
+        return { success: false, error: 'Invalid verification token' };
+      }
+
+      return { success: true };
+    } catch (error) {
+      logger.error('2FA verification error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'Failed to verify two-factor token'
+      };
+    }
+  }
+
+  // ============================================================================
+  // OAUTH METHODS
+  // ============================================================================
+
+  /**
+   * Handle OAuth callback and create/update user
+   */
+  async handleOAuthCallback(provider: string, _code: string, _state?: string): Promise<AuthResult> {
+    try {
+      // Get OAuth provider config
+      const providerResult = await db
+        .select()
+        .from(oauth_providers)
+        .where(eq(oauth_providers.provider_name, provider))
+        .limit(1);
+
+      if (providerResult.length === 0) {
+        return { success: false, error: 'OAuth provider not configured' };
+      }
+
+      const providerConfig = providerResult[0];
+
+      // Exchange code for tokens (simplified - would need actual OAuth client)
+      // This is a placeholder for the actual OAuth token exchange
+      const tokenResponse = {
+        access_token: 'mock_access_token',
+        refresh_token: 'mock_refresh_token',
+        expires_in: 3600,
+        token_type: 'Bearer'
+      };
+
+      // Get user info from provider (simplified)
+      const userInfo = {
+        id: 'mock_provider_user_id',
+        email: 'oauth@example.com',
+        name: 'OAuth User',
+        verified: true
+      };
+
+      // Check if OAuth token already exists
+      const existingToken = await db
+        .select()
+        .from(oauth_tokens)
+        .where(and(
+          eq(oauth_tokens.provider_id, providerConfig.id),
+          eq(oauth_tokens.provider_user_id, userInfo.id)
+        ))
+        .limit(1);
+
+      let userId: string;
+
+      if (existingToken.length > 0) {
+        // Update existing token
+        userId = existingToken[0].user_id;
+        await db
+          .update(oauth_tokens)
+          .set({
+            access_token: tokenResponse.access_token,
+            refresh_token: tokenResponse.refresh_token,
+            expires_at: new Date(Date.now() + tokenResponse.expires_in * 1000),
+            updated_at: new Date()
+          })
+          .where(eq(oauth_tokens.id, existingToken[0].id));
+      } else {
+        // Check if user with this email exists
+        const existingUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, userInfo.email))
+          .limit(1);
+
+        if (existingUser.length > 0) {
+          userId = existingUser[0].id;
+        } else {
+          // Create new user
+          const newUser = await db
+            .insert(users)
+            .values({
+              email: userInfo.email,
+              password_hash: crypto.randomBytes(32).toString('hex'), // Random password for OAuth users
+              role: 'citizen',
+              is_verified: userInfo.verified,
+              name: userInfo.name
+            })
+            .returning();
+          userId = newUser[0].id;
+        }
+
+        // Create OAuth token record
+        await db
+          .insert(oauth_tokens)
+          .values({
+            user_id: userId,
+            provider_id: providerConfig.id,
+            provider_user_id: userInfo.id,
+            access_token: tokenResponse.access_token,
+            refresh_token: tokenResponse.refresh_token,
+            expires_at: new Date(Date.now() + tokenResponse.expires_in * 1000)
+          });
+      }
+
+      // Generate JWT tokens
+      const { token, refresh_token } = await this.generateTokens(userId, userInfo.email);
+
+      // Create session
+      await this.createSession(userId, token, refresh_token);
+
+      // Get user data
+      const userData = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      return {
+        success: true,
+        user: {
+          id: userData[0].id,
+          email: userData[0].email,
+          first_name: userData[0].first_name,
+          last_name: userData[0].last_name,
+          name: userData[0].name,
+          role: userData[0].role,
+          verification_status: userData[0].is_verified ? 'verified' : 'pending',
+          is_active: userData[0].is_active
+        },
+        token,
+        refresh_token
+      };
+    } catch (error) {
+      logger.error('OAuth callback error:', {
+        error: error instanceof Error ? error.message : String(error),
+        provider,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'OAuth authentication failed'
+      };
+    }
+  }
+
+  /**
+   * Get OAuth authorization URL
+   */
+  getOAuthUrl(_provider: string, state?: string): string {
+    // This would generate the OAuth authorization URL for the provider
+    // Simplified implementation
+    return `https://accounts.google.com/o/oauth2/v2/auth?client_id=mock&redirect_uri=mock&scope=openid profile email&response_type=code&state=${state || 'default'}`;
+  }
+
+  // ============================================================================
+  // SESSION MANAGEMENT METHODS
+  // ============================================================================
+
+  /**
+   * Get active sessions for a user
+   */
+  async getUserSessions(userId: string): Promise<any[]> {
+    try {
+      const userSessions = await db
+        .select({
+          id: user_sessions.id,
+          device_info: user_sessions.device_info,
+          ip_address: user_sessions.ip_address,
+          user_agent: user_sessions.user_agent,
+          location: user_sessions.location,
+          last_activity: user_sessions.last_activity,
+          created_at: user_sessions.created_at
+        })
+        .from(user_sessions)
+        .where(and(
+          eq(user_sessions.user_id, userId),
+          eq(user_sessions.is_active, true)
+        ))
+        .orderBy(desc(user_sessions.last_activity));
+
+      return userSessions;
+    } catch (error) {
+      logger.error('Get user sessions error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Terminate a specific session
+   */
+  async terminateSession(sessionId: string, userId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const result = await db
+        .update(user_sessions)
+        .set({
+          is_active: false,
+          expires_at: new Date(),
+          updated_at: new Date()
+        })
+        .where(and(
+          eq(user_sessions.id, sessionId),
+          eq(user_sessions.user_id, userId)
+        ));
+
+      if (result.rowCount === 0) {
+        return { success: false, error: 'Session not found' };
+      }
+
+      return { success: true };
+    } catch (error) {
+      logger.error('Terminate session error:', {
+        error: error instanceof Error ? error.message : String(error),
+        sessionId,
+        userId,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'Failed to terminate session'
+      };
+    }
+  }
+
+  /**
+   * Terminate all sessions for a user except current
+   */
+  async terminateAllSessions(userId: string, currentSessionId?: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      let query = db
+        .update(user_sessions)
+        .set({
+          is_active: false,
+          expires_at: new Date(),
+          updated_at: new Date()
+        })
+        .where(and(
+          eq(user_sessions.user_id, userId),
+          eq(user_sessions.is_active, true)
+        ));
+
+      if (currentSessionId) {
+        query = query.where(ne(user_sessions.id, currentSessionId));
+      }
+
+      await query;
+      return { success: true };
+    } catch (error) {
+      logger.error('Terminate all sessions error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'Failed to terminate sessions'
+      };
+    }
+  }
+
+  /**
+   * Extend session expiry
+   */
+  async extendSession(sessionId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const result = await db
+        .update(user_sessions)
+        .set({
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          last_activity: new Date(),
+          updated_at: new Date()
+        })
+        .where(eq(user_sessions.id, sessionId));
+
+      if (result.rowCount === 0) {
+        return { success: false, error: 'Session not found' };
+      }
+
+      return { success: true };
+    } catch (error) {
+      logger.error('Extend session error:', {
+        error: error instanceof Error ? error.message : String(error),
+        sessionId,
+        component: 'Chanuka'
+      });
+      return {
+        success: false,
+        error: 'Failed to extend session'
+      };
+    }
+  }
+
+  /**
+   * Create a new user session
+   */
+  async createUserSession(userId: string, deviceInfo: any, ipAddress?: string, userAgent?: string): Promise<string> {
+    try {
+      const sessionToken = crypto.randomBytes(32).toString('hex');
+
+      const [session] = await db
+        .insert(user_sessions)
+        .values({
+          user_id: userId,
+          session_token: sessionToken,
+          device_info: deviceInfo,
+          ip_address: ipAddress,
+          user_agent: userAgent,
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+        })
+        .returning({ id: user_sessions.id });
+
+      return session.id;
+    } catch (error) {
+      logger.error('Create user session error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      throw error;
+    }
+  }
+
+  // ============================================================================
+  // SECURITY MONITORING METHODS
+  // ============================================================================
+
+  /**
+   * Get security events for a user
+   */
+  async getSecurityEvents(userId: string, _limit: number = 50): Promise<any[]> {
+    try {
+      // This would query security events from a security_events table
+      // For now, return empty array as placeholder
+      return [];
+    } catch (error) {
+      logger.error('Get security events error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Get suspicious activity alerts
+   */
+  async getSuspiciousActivity(userId: string): Promise<any[]> {
+    try {
+      // This would analyze user activity patterns and return alerts
+      // For now, return empty array as placeholder
+      return [];
+    } catch (error) {
+      logger.error('Get suspicious activity error:', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+        component: 'Chanuka'
+      });
+      return [];
     }
   }
 }

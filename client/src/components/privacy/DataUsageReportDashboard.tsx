@@ -28,7 +28,7 @@ import {
 import { dataRetentionService, retentionUtils } from '../../services/dataRetentionService';
 import { privacyAnalyticsService, analyticsUtils } from '../../services/privacyAnalyticsService';
 import { privacyCompliance } from '../../utils/privacy-compliance';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { logger } from '../../utils/logger';
 
 interface DataUsageStats {

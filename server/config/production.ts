@@ -154,6 +154,7 @@ export const productionConfig: AppConfig = {
       scriptSrc: ["'self'"],
       connectSrc: ["'self'"],
       objectSrc: ["'none'"],
+      frameAncestors: ["'self'"],
       upgradeInsecureRequests: true,
     },
   },

@@ -182,7 +182,7 @@ export async function checkPasswordBreach(password: string): Promise<boolean> {
     const data = encoder.encode(password);
     const hashBuffer = await crypto.subtle.digest('SHA-1', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const _hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     
     // In production, you would:
     // 1. Take first 5 characters of hash

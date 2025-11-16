@@ -261,7 +261,7 @@ export type VerificationStatus = 'pending' | 'in_progress' | 'approved' | 'rejec
 
 // ===== COMMENT TYPES =====
 
-export interface Comment { id: number;
+export interface Comment { id: string;
   bill_id: number;
   user_id: number;
   content: string;

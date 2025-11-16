@@ -26,7 +26,7 @@ import {
   ExternalLink,
   Cookie
 } from 'lucide-react';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { ConsentModal } from './ConsentModal';
 import { 
   PrivacySettings, 

@@ -1,4 +1,4 @@
-import { logger   } from '../../shared/core/src/index.js';
+import { logger } from '@shared/core';
 
 /**
  * Database helper utilities for standardized date calculations and result formatting.
@@ -28,7 +28,7 @@ export function buildTimeThreshold(timeframe: string): Date {
 
   // Handle "Xd" format (days)
   const dayMatch = timeframe.match(/^(-?\d+)d$/);
-  if (dayMatch) {
+  if (dayMatch && dayMatch[1]) {
     const days = parseInt(dayMatch[1], 10);
     if (days <= 0 || isNaN(days)) {
       throw new Error(`Invalid timeframe: ${timeframe}. Days must be a positive number.`);
@@ -41,7 +41,7 @@ export function buildTimeThreshold(timeframe: string): Date {
 
   // Handle "Xh" format (hours)
   const hourMatch = timeframe.match(/^(\d+)h$/);
-  if (hourMatch) {
+  if (hourMatch && hourMatch[1]) {
     const hours = parseInt(hourMatch[1], 10);
     if (hours <= 0) {
       throw new Error(`Invalid timeframe: ${timeframe}. Hours must be positive.`);
@@ -168,7 +168,7 @@ export function groupByTime<T extends Record<string, any>>(
         const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Monday start
         startOfWeek.setUTCDate(startOfWeek.getUTCDate() - daysToSubtract);
         startOfWeek.setUTCHours(0, 0, 0, 0);
-        key = startOfWeek.toISOString().split('T')[0];
+        key = startOfWeek.toISOString().split('T')[0] || '';
         break;
       }
       case 'month':
@@ -179,7 +179,7 @@ export function groupByTime<T extends Record<string, any>>(
     if (!groups[key]) {
       groups[key] = [];
     }
-    groups[key].push(item);
+    groups[key]?.push(item);
   });
 
   return groups;

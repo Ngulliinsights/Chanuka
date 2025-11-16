@@ -30,10 +30,10 @@ const checks = [
       if (!fs.existsSync(appProvidersPath)) return false;
       
       const content = fs.readFileSync(appProvidersPath, 'utf8');
-      return content.includes("import { AuthProvider, useAuth } from '../hooks/use-auth';") &&
+      return content.includes("import { AuthProvider, useAuth } from '../hooks/useAuth';") &&
              !content.includes("import { AuthProvider } from './auth/AuthProvider';");
     },
-    fix: 'AuthProvider should be imported from use-auth.tsx, not from separate file'
+    fix: 'AuthProvider should be imported from useAuth.tsx, not from separate file'
   },
   {
     name: 'LoadingProvider Fix',

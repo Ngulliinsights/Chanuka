@@ -5,7 +5,7 @@ import { sponsorConflictAnalysisService } from '../application/sponsor-conflict-
 // import { insertSponsorSchema } from '@shared/schema/validation';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '@shared/core/utils/api-utils.js';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 const router = express.Router();
 

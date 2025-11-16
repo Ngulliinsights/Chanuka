@@ -12,7 +12,7 @@ import { authSlice, login, logout } from '../store/slices/authSlice';
 import { errorAnalyticsSlice, fetchOverviewMetrics } from '../store/slices/errorAnalyticsSlice';
 
 // Mock all external dependencies
-jest.mock('../repositories', () => ({
+jest.mock('../services', () => ({
   billsRepository: {
     getBills: jest.fn(),
     recordEngagement: jest.fn(),
@@ -21,7 +21,7 @@ jest.mock('../repositories', () => ({
     getBillComments: jest.fn(),
     addComment: jest.fn()
   },
-  authRepository: {
+  authService: {
     login: jest.fn(),
     logout: jest.fn(),
     getCurrentUser: jest.fn(),
@@ -152,12 +152,13 @@ describe('End-to-End API Flow Tests', () => {
     };
 
     it('should complete full user journey: login -> browse bills -> engage -> logout', async () => {
-      const { authRepository, billsRepository } = require('../repositories');
+      const { authService } = require('../services/AuthService');
+      const { billsRepository } = require('../services');
       const { billsPaginationService } = require('../services/billsPaginationService');
       const { billsDataCache } = require('../services/billsDataCache');
 
       // Step 1: User logs in
-      authRepository.login.mockResolvedValue(mockAuthResponse);
+      authService.login = vi.fn().mockResolvedValue(mockAuthResponse);
 
       await store.dispatch(login({ email: 'test@example.com', password: 'password' }));
 
@@ -193,15 +194,15 @@ describe('End-to-End API Flow Tests', () => {
         savedAt: new Date().toISOString()
       };
 
-      authRepository.saveBill.mockResolvedValue(mockSavedBill);
+      authService.saveBill = vi.fn().mockResolvedValue(mockSavedBill);
 
-      // Simulate saving bill through repository
-      await authRepository.saveBill('1', 'Important for community', ['environment']);
+      // Simulate saving bill through service
+      await authService.saveBill('1', 'Important for community', ['environment']);
 
-      expect(authRepository.saveBill).toHaveBeenCalledWith('1', 'Important for community', ['environment']);
+      expect(authService.saveBill).toHaveBeenCalledWith('1', 'Important for community', ['environment']);
 
       // Step 5: User logs out
-      authRepository.logout.mockResolvedValue(undefined);
+      authService.logout = vi.fn().mockResolvedValue(undefined);
 
       await store.dispatch(logout());
 
@@ -211,12 +212,13 @@ describe('End-to-End API Flow Tests', () => {
     });
 
     it('should handle error scenarios gracefully throughout the flow', async () => {
-      const { authRepository, billsRepository } = require('../repositories');
+      const { authService } = require('../services/AuthService');
+      const { billsRepository } = require('../services');
       const { billsPaginationService } = require('../services/billsPaginationService');
       const { mockDataService } = require('../services/mockDataService');
 
       // Step 1: Login fails
-      authRepository.login.mockRejectedValue(new Error('Invalid credentials'));
+      authService.login = vi.fn().mockRejectedValue(new Error('Invalid credentials'));
 
       await store.dispatch(login({ email: 'test@example.com', password: 'wrong' }));
 
@@ -270,7 +272,7 @@ describe('End-to-End API Flow Tests', () => {
     };
 
     it('should complete community interaction flow: view discussion -> add comment -> vote', async () => {
-      const { communityRepository } = require('../repositories');
+      const { communityRepository } = require('../services');
 
       // Step 1: User views discussion thread
       const mockDiscussionThread = {
@@ -334,7 +336,7 @@ describe('End-to-End API Flow Tests', () => {
     };
 
     it('should complete error analytics workflow: fetch metrics -> update filters -> monitor real-time', async () => {
-      const { errorAnalyticsRepository } = require('../repositories');
+      const { errorAnalyticsRepository } = require('../services');
 
       // Step 1: Load overview metrics
       errorAnalyticsRepository.getOverviewMetrics.mockResolvedValue(mockOverviewMetrics);
@@ -391,13 +393,14 @@ describe('End-to-End API Flow Tests', () => {
 
   describe('Cross-Feature Integration Flow', () => {
     it('should demonstrate unified error handling across features', async () => {
-      const { authRepository, billsRepository, errorAnalyticsRepository } = require('../repositories');
+      const { authService } = require('../services/AuthService');
+      const { billsRepository, errorAnalyticsRepository } = require('../services');
 
       // Simulate network errors across different features
       const networkError = new Error('Network connection failed');
 
       // Auth error
-      authRepository.login.mockRejectedValue(networkError);
+      authService.login = vi.fn().mockRejectedValue(networkError);
       await store.dispatch(login({ email: 'test@example.com', password: 'password' }));
 
       let authState = store.getState().auth;
@@ -440,7 +443,7 @@ describe('End-to-End API Flow Tests', () => {
     });
 
     it('should demonstrate caching benefits across user sessions', async () => {
-      const { billsRepository } = require('../repositories');
+      const { billsRepository } = require('../services');
       const { billsDataCache } = require('../services/billsDataCache');
 
       // First session - cache miss, API call
@@ -484,7 +487,7 @@ describe('End-to-End API Flow Tests', () => {
       // This would test the circuit breaker functionality
       // For now, we'll test the error handling resilience
 
-      const { billsRepository } = require('../repositories');
+      const { billsRepository } = require('../services');
 
       // Simulate multiple failures that would trigger circuit breaker in real implementation
       for (let i = 0; i < 3; i++) {
@@ -502,7 +505,7 @@ describe('End-to-End API Flow Tests', () => {
     });
 
     it('should demonstrate WebSocket integration for real-time features', async () => {
-      const { billsRepository } = require('../repositories');
+      const { billsRepository } = require('../services');
 
       // Simulate WebSocket real-time updates
       const realTimeUpdate = {

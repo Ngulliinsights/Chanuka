@@ -11,20 +11,30 @@ import { billsSlice, loadBillsFromAPI, recordEngagement } from '../slices/billsS
 import { authSlice, login, logout } from '../slices/authSlice';
 import { errorAnalyticsSlice, fetchOverviewMetrics } from '../slices/errorAnalyticsSlice';
 
-// Mock repositories
-jest.mock('../../repositories', () => ({
+// Mock services
+jest.mock('../../services', () => ({
   billsRepository: {
     getBills: jest.fn(),
     recordEngagement: jest.fn(),
     getBillById: jest.fn()
   },
-  authRepository: {
+  authService: {
     login: jest.fn(),
     logout: jest.fn(),
     getCurrentUser: jest.fn()
   },
   errorAnalyticsRepository: {
     getOverviewMetrics: jest.fn()
+  }
+}));
+
+// Mock AuthService separately
+jest.mock('../../services/AuthService', () => ({
+  authService: {
+    login: jest.fn(),
+    logout: jest.fn(),
+    getCurrentUser: jest.fn(),
+    updateProfile: jest.fn()
   }
 }));
 
@@ -120,7 +130,7 @@ describe('Store Slices Integration', () => {
     };
 
     it('should load bills from API and update state', async () => {
-      const { billsRepository } = require('../../repositories');
+      const { billsRepository } = require('../../services');
       const { billsPaginationService } = require('../../services/billsPaginationService');
       const { billsDataCache } = require('../../services/billsDataCache');
 
@@ -161,7 +171,7 @@ describe('Store Slices Integration', () => {
     });
 
     it('should record engagement and update state', async () => {
-      const { billsRepository } = require('../../repositories');
+      const { billsRepository } = require('../../services');
 
       billsRepository.recordEngagement.mockResolvedValue(undefined);
 
@@ -171,7 +181,7 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle engagement recording failures silently', async () => {
-      const { billsRepository } = require('../../repositories');
+      const { billsRepository } = require('../../services');
 
       billsRepository.recordEngagement.mockRejectedValue(new Error('API Error'));
 
@@ -247,9 +257,9 @@ describe('Store Slices Integration', () => {
     };
 
     it('should handle successful login', async () => {
-      const { authRepository } = require('../../repositories');
+      const { authService } = require('../../services/AuthService');
 
-      authRepository.login.mockResolvedValue(mockAuthResponse);
+      authService.login = jest.fn().mockResolvedValue(mockAuthResponse);
 
       await store.dispatch(login({ email: 'test@example.com', password: 'password' }));
 
@@ -262,9 +272,9 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle login failure', async () => {
-      const { authRepository } = require('../../repositories');
+      const { authService } = require('../../services/AuthService');
 
-      authRepository.login.mockRejectedValue(new Error('Invalid credentials'));
+      authService.login = jest.fn().mockRejectedValue(new Error('Invalid credentials'));
 
       await store.dispatch(login({ email: 'test@example.com', password: 'wrong' }));
 
@@ -276,14 +286,14 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle logout', async () => {
-      const { authRepository } = require('../../repositories');
+      const { authService } = require('../../services/AuthService');
 
       // First login
-      authRepository.login.mockResolvedValue(mockAuthResponse);
+      authService.login = jest.fn().mockResolvedValue(mockAuthResponse);
       await store.dispatch(login({ email: 'test@example.com', password: 'password' }));
 
       // Then logout
-      authRepository.logout.mockResolvedValue(undefined);
+      authService.logout = jest.fn().mockResolvedValue(undefined);
       await store.dispatch(logout());
 
       const state = store.getState().auth;
@@ -294,14 +304,14 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle logout API failure gracefully', async () => {
-      const { authRepository } = require('../../repositories');
+      const { authService } = require('../../services/AuthService');
 
       // First login
-      authRepository.login.mockResolvedValue(mockAuthResponse);
+      authService.login = jest.fn().mockResolvedValue(mockAuthResponse);
       await store.dispatch(login({ email: 'test@example.com', password: 'password' }));
 
       // Logout with API failure
-      authRepository.logout.mockRejectedValue(new Error('API error'));
+      authService.logout = jest.fn().mockRejectedValue(new Error('API error'));
       await store.dispatch(logout());
 
       const state = store.getState().auth;
@@ -310,16 +320,16 @@ describe('Store Slices Integration', () => {
     });
 
     it('should update user profile', async () => {
-      const { authRepository } = require('../../repositories');
+      const { authService } = require('../../services/AuthService');
 
       // First login
-      authRepository.login.mockResolvedValue(mockAuthResponse);
+      authService.login = jest.fn().mockResolvedValue(mockAuthResponse);
       await store.dispatch(login({ email: 'test@example.com', password: 'password' }));
 
       // Update profile
       const updates = { displayName: 'Updated Name' };
       const updatedUser = { ...mockUser, ...updates };
-      authRepository.updateProfile = jest.fn().mockResolvedValue(updatedUser);
+      authService.updateProfile = jest.fn().mockResolvedValue(updatedUser);
 
       await store.dispatch(authSlice.actions.updateProfile.fulfilled(updatedUser, 'updateProfile', updates));
 
@@ -349,7 +359,7 @@ describe('Store Slices Integration', () => {
     };
 
     it('should fetch overview metrics successfully', async () => {
-      const { errorAnalyticsRepository } = require('../../repositories');
+      const { errorAnalyticsRepository } = require('../../services');
 
       errorAnalyticsRepository.getOverviewMetrics.mockResolvedValue(mockOverviewMetrics);
 
@@ -363,7 +373,7 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle fetch errors', async () => {
-      const { errorAnalyticsRepository } = require('../../repositories');
+      const { errorAnalyticsRepository } = require('../../services');
 
       errorAnalyticsRepository.getOverviewMetrics.mockRejectedValue(new Error('API Error'));
 

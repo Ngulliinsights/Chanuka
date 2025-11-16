@@ -13,6 +13,12 @@ import * as React from 'react';
 // Ensure React is available globally
 global.React = React;
 
+// Type declarations for global performance test utilities
+declare global {
+  var performanceTestUtils: any;
+  var requestIdleCallback: (callback: any) => number;
+}
+
 // =============================================================================
 // PERFORMANCE MEASUREMENT UTILITIES
 // =============================================================================
@@ -451,7 +457,8 @@ process.env.PERFORMANCE_TEST = 'true';
 
 // Mock requestIdleCallback for performance tests
 global.requestIdleCallback = vi.fn((callback) => {
-  return setTimeout(() => callback({ didTimeout: false, timeRemaining: () => 50 }), 0);
+  const timeoutId = setTimeout(() => callback({ didTimeout: false, timeRemaining: () => 50 }), 0);
+  return timeoutId as unknown as number;
 });
 
 global.cancelIdleCallback = vi.fn((id) => clearTimeout(id));

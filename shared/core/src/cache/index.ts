@@ -5,8 +5,7 @@
  * resolving conflicts between different cache implementations.
  */
 
-import { CacheService as CoreCacheService, CacheMetrics as CoreCacheMetrics } from '../caching/core/interfaces';
-import { CacheService as TypesCacheService, CacheMetrics as TypesCacheMetrics } from '../caching/types';
+import { CacheService as CoreCacheService, CacheMetrics } from '../caching/core/interfaces';
 
 // Unified cache service interface that combines both definitions
 export interface CacheService extends CoreCacheService {
@@ -31,7 +30,6 @@ export type {
 } from '../caching/core/interfaces';
 
 export type {
-  CacheTierStats,
   PromotionStrategy,
   MultiTierOptions,
   CompressionOptions,
@@ -40,8 +38,6 @@ export type {
   EvictionOptions
 } from '../caching/types';
 
-// Import CacheTierStats for use in CacheMetrics
-import type { CacheTierStats } from '../caching/types';
 
 // Simple in-memory cache implementation for fallback
 class MemoryCache implements CacheService {
@@ -203,7 +199,7 @@ export function setDefaultCache(cache: CacheService): void {
 /**
  * Create a cache service instance
  */
-export function createCacheService(config?: any): CacheService {
+export function createCacheService(_config?: any): CacheService {
   // For now, return the memory cache
   // This can be extended to support different providers based on config
   return new MemoryCache();

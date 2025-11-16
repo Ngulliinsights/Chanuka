@@ -15,7 +15,7 @@
  */
 
 import { globalWebSocketPool } from '../core/api/websocket';
-import { store } from '../store';
+import { getStore } from '../store';
 import { subscribe, unsubscribe } from '../store/slices/realTimeSlice';
 import { updateBill } from '../store/slices/billsSlice';
 import { logger } from '../utils/logger';
@@ -185,7 +185,7 @@ class BillsWebSocketService {
       this.subscribedBills.add(billId);
 
       // Update real-time store
-      store.dispatch(subscribe({
+      getStore().dispatch(subscribe({
         type: 'bill',
         id: billId.toString()
       }));
@@ -227,7 +227,7 @@ class BillsWebSocketService {
       this.subscribedBills.delete(billId);
 
       // Update real-time store
-      store.dispatch(unsubscribe({
+      getStore().dispatch(unsubscribe({
         type: 'bill',
         id: billId.toString()
       }));
@@ -469,7 +469,7 @@ class BillsWebSocketService {
 
     // Update bills store if there are changes
     if (Object.keys(billUpdates).length > 0) {
-      store.dispatch(updateBill({ id: billId, updates: billUpdates }));
+      getStore().dispatch(updateBill({ id: billId, updates: billUpdates }));
 
       logger.debug('Bill updated in store', {
         component: 'BillsWebSocketService',

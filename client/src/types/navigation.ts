@@ -46,6 +46,9 @@ export interface NavigationState {
   currentSection: NavigationSection;
   sidebarOpen: boolean;
   mobileMenuOpen: boolean;
+  isMobile: boolean;
+  sidebarCollapsed: boolean;
+  mounted: boolean;
   user_role: UserRole;
   preferences: NavigationPreferences;
 }

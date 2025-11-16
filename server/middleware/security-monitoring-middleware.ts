@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { securityMonitoringService } from '../features/security/security-monitoring-service.js';
 import { intrusionDetectionService } from '../features/security/intrusion-detection-service.js';
 import { securityAuditService } from '../features/security/security-audit-service.js';
-import { logger   } from '../../shared/core/src/index.js';
+import { logger } from '@shared/core';
+import { getClientIP } from '../utils/request-utils.js';
 
 export interface SecurityMonitoringOptions {
   enableThreatDetection: boolean;
@@ -49,7 +50,7 @@ export class SecurityMonitoringMiddleware {
         // Initialize request context
         (req as any).securityContext = { requestId,
           startTime,
-          ip_address: this.getClientIP(req),
+          ip_address: getClientIP(req),
           user_agent: req.get('User-Agent'),
           user_id: (req as any).user?.id
          };
@@ -104,7 +105,7 @@ export class SecurityMonitoringMiddleware {
           await securityAuditService.logSecurityEvent({
             event_type: 'monitoring_error',
             severity: 'medium',
-            ip_address: this.getClientIP(req),
+            ip_address: getClientIP(req),
             user_agent: req.get('User-Agent'),
             resource: req.path,
             action: req.method,
@@ -316,7 +317,7 @@ export class SecurityMonitoringMiddleware {
    * Handle blocked requests
    */
   private async handleBlockedRequest(req: Request, res: Response, threatResult: any): Promise<void> {
-    const ip_address = this.getClientIP(req);
+    const ip_address = getClientIP(req);
     
     console.warn(`🚫 Request blocked from ${ip_address}: ${threatResult.detectedThreats.map((t: any) => t.type).join(', ')}`);
 
@@ -332,7 +333,7 @@ export class SecurityMonitoringMiddleware {
    * Handle challenge requests (e.g., CAPTCHA)
    */
   private async handleChallengeRequest(req: Request, res: Response, threatResult: any): Promise<void> {
-    console.warn(`⚠️ Challenge required for ${this.getClientIP(req)}: Risk score ${threatResult.risk_score}`);
+    console.warn(`⚠️ Challenge required for ${getClientIP(req)}: Risk score ${threatResult.risk_score}`);
 
     res.status(429).json({
       error: 'Additional verification required',
@@ -348,7 +349,7 @@ export class SecurityMonitoringMiddleware {
     * Handle suspicious patterns
     */
    private async handleSuspiciousPattern(req: Request, patternType: string): Promise<void> {
-     const ip_address = this.getClientIP(req);
+     const ip_address = getClientIP(req);
 
      await securityAuditService.logSecurityEvent({
        event_type: 'suspicious_pattern',
@@ -375,13 +376,6 @@ export class SecurityMonitoringMiddleware {
     return this.options.bypassPaths.some(bypassPath => path.startsWith(bypassPath));
   }
 
-  private getClientIP(req: Request): string {
-    return (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
-           req.headers['x-real-ip'] as string ||
-           req.connection.remoteAddress ||
-           req.socket.remoteAddress ||
-           'unknown';
-  }
 
   private generateRequestId(): string {
     return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;

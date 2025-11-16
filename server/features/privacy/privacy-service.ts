@@ -93,7 +93,7 @@ export interface UserDataExport {
     shares: number | null;
     comments: number | null;
    }>;
-  comment_votess: Array<{
+  comment_votes: Array<{
     comment_id: number;
     vote_type: string;
     created_at: Date | null;
@@ -358,7 +358,7 @@ class PrivacyService {
          .where(eq(social_share.user_id, user_id));
 
       // Fetch comment voting history - declare before use
-       const comment_votessData = await db
+       const comment_votesData = await db
          .select()
          .from(comment_votes)
          .where(eq(comment_votes.user_id, user_id));
@@ -395,7 +395,7 @@ class PrivacyService {
         socialProfiles.length +
         progress.length +
         social_sharesData.length +
-        comment_votessData.length +
+        comment_votesData.length +
         auditLogs.length;
 
       // Construct the complete export object
@@ -409,7 +409,7 @@ class PrivacyService {
          socialProfiles,
          progress,
          social_shares: social_sharesData,
-         comment_votess: comment_votessData,
+         comment_votes: comment_votesData,
          auditLogs,
          exportMetadata: {
            exportedAt: new Date(),
@@ -463,7 +463,7 @@ class PrivacyService {
            .delete(comment_votes)
            .where(eq(comment_votes.user_id, user_id))
            .returning({ id: comment_votes.id });
-        deletedRecords.comment_votess = deletedVotes.length;
+        deletedRecords.comment_votes = deletedVotes.length;
 
         // Remove social media shares
          const deletedShares = await tx

@@ -1,18 +1,40 @@
-// Prefer canonical types from shared schema as single source of truth.
-// Import the user-related types and expose small local aliases when convenient.
-import type {
-  User as SharedUser,
-  InsertUser as SharedInsertUser,
-  UserProgress as SharedUserProgress,
-  InsertUserProgress as SharedInsertUserProgress,
-  UserSocialProfile as SharedUserSocialProfile,
-} from '@shared/schema/types';
+// TODO: Fix import when shared/schema/types is available
+// For now, define types locally
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  created_at: Date;
+  updated_at: Date;
+}
 
-export type User = SharedUser;
-export type InsertUser = SharedInsertUser;
-export type UserProgress = SharedUserProgress;
-export type InsertUserProgress = SharedInsertUserProgress;
-export type SocialProfile = SharedUserSocialProfile;
+export interface InsertUser {
+  username: string;
+  email: string;
+  role?: string;
+}
+
+export interface UserProgress {
+  id: string;
+  user_id: string;
+  achievement_type: string;
+  progress_value: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface InsertUserProgress {
+  user_id: string;
+  achievement_type: string;
+  progress_value: number;
+}
+
+export interface SocialProfile {
+  platform: string;
+  profile_id: string;
+  username: string;
+}
 
 // Bill-related types
 export interface Bill {

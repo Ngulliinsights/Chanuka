@@ -7,7 +7,6 @@
 
 import { BaseCacheAdapter } from '../core/base-adapter';
 import { CacheAdapterConfig } from '../core/interfaces';
-import { Result, ok, err } from '../../primitives/types/result';
 
 export interface BrowserAdapterConfig extends CacheAdapterConfig {
   storageType?: 'localStorage' | 'sessionStorage' | 'indexedDB';
@@ -29,10 +28,8 @@ interface CacheEntry {
 export class BrowserAdapter extends BaseCacheAdapter {
   private storage: Storage | null = null;
   private indexedDB: IDBDatabase | null = null;
-  private readonly storageType: 'localStorage' | 'sessionStorage' | 'indexedDB';
+  private storageType: 'localStorage' | 'sessionStorage' | 'indexedDB';
   private readonly maxSize: number;
-  private readonly enableCompression: boolean;
-  private readonly compressionThreshold: number;
   private isInitialized = false;
 
   constructor(config: BrowserAdapterConfig = {}) {
@@ -40,8 +37,6 @@ export class BrowserAdapter extends BaseCacheAdapter {
 
     this.storageType = config.storageType || 'localStorage';
     this.maxSize = config.maxSize || 1000; // Max entries
-    this.enableCompression = config.enableCompression ?? false;
-    this.compressionThreshold = config.compressionThreshold || 1024;
 
     this.initializeStorage();
   }
@@ -132,7 +127,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
 
         // Check expiration
         if (entry.expires_at && Date.now() > entry.expires_at) {
-          await this.delete(key); // Remove expired entry
+          await this.del(key); // Remove expired entry
           this.recordMiss(key);
           return null;
         }
@@ -170,7 +165,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
 
         const entry: CacheEntry = {
           value,
-          expires_at: validatedTtl > 0 ? now + (validatedTtl * 1000) : undefined,
+          ...(validatedTtl > 0 && { expires_at: now + (validatedTtl * 1000) }),
           created_at: now,
           accessedAt: now,
           size,
@@ -186,7 +181,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
     }, 'set', key);
   }
 
-  async delete(key: string): Promise<boolean> {
+  async del(key: string): Promise<boolean> {
     if (!this.isInitialized) {
       await this.initializeStorage();
     }
@@ -241,7 +236,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
 
       // Check expiration
       if (entry.expires_at && Date.now() > entry.expires_at) {
-        await this.delete(key); // Clean up expired entry
+        await this.del(key); // Clean up expired entry
         return false;
       }
 
@@ -265,7 +260,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
         const keysToRemove: string[] = [];
         for (let i = 0; i < this.storage.length; i++) {
           const key = this.storage.key(i);
-          if (key && key.startsWith(this.keyPrefix)) {
+          if (key && key.startsWith(this.config.keyPrefix || '')) {
             keysToRemove.push(key);
           }
         }
@@ -293,7 +288,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
         let count = 0;
         for (let i = 0; i < this.storage.length; i++) {
           const key = this.storage.key(i);
-          if (key && key.startsWith(this.keyPrefix)) {
+          if (key && key.startsWith(this.config.keyPrefix || '')) {
             count++;
           }
         }
@@ -321,14 +316,14 @@ export class BrowserAdapter extends BaseCacheAdapter {
       } else if (this.storage) {
         for (let i = 0; i < this.storage.length; i++) {
           const key = this.storage.key(i);
-          if (key && key.startsWith(this.keyPrefix)) {
+          if (key && key.startsWith(this.config.keyPrefix || '')) {
             keys.push(key);
           }
         }
       }
 
       // Remove prefix and filter by pattern
-      let result = keys.map(key => key.replace(this.keyPrefix, ''));
+      let result = keys.map(key => key.replace(this.config.keyPrefix || '', ''));
 
       if (pattern) {
         const regex = new RegExp(pattern.replace(/\*/g, '.*'));
@@ -348,7 +343,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
       let deleted = 0;
 
       for (const key of keys) {
-        if (await this.delete(key)) {
+        if (await this.del(key)) {
           deleted++;
         }
       }
@@ -373,9 +368,9 @@ export class BrowserAdapter extends BaseCacheAdapter {
         const estimate = await navigator.storage.estimate();
         return {
           type: this.storageType,
-          quota: estimate.quota,
-          usage: estimate.usage,
-          available: estimate.quota && estimate.usage ? estimate.quota - estimate.usage : undefined,
+          ...(estimate.quota && { quota: estimate.quota }),
+          ...(estimate.usage && { usage: estimate.usage }),
+          ...(estimate.quota && estimate.usage && { available: estimate.quota - estimate.usage }),
         };
       }
 
@@ -398,7 +393,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
 
         for (let i = 0; i < this.storage.length; i++) {
           const key = this.storage.key(i);
-          if (key && key.startsWith(this.keyPrefix)) {
+          if (key && key.startsWith(this.config.keyPrefix || '')) {
             try {
               const data = this.storage.getItem(key);
               if (data) {
@@ -586,7 +581,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
   private async evictLRU(): Promise<void> {
     try {
       // Simple LRU: remove oldest entries
-      const entries: Array<{ key: string; entry: CacheEntry }> = [];
+      const entries: Array<{ key: string | null; entry: CacheEntry }> = [];
 
       if (this.storageType === 'indexedDB' && this.indexedDB) {
         // For IndexedDB, we'd need to get all entries and sort by accessedAt
@@ -598,12 +593,13 @@ export class BrowserAdapter extends BaseCacheAdapter {
           await this.deleteFromIndexedDB(key);
         }
       } else if (this.storage) {
+        const storage = this.storage;
         // For Web Storage, collect entries and sort by accessedAt
-        for (let i = 0; i < this.storage.length; i++) {
-          const key = this.storage.key(i);
-          if (key && key.startsWith(this.keyPrefix)) {
+        for (let i = 0; i < storage.length; i++) {
+          const key = storage.key(i);
+          if (key && key.startsWith(this.config.keyPrefix || '')) {
             try {
-              const data = this.storage.getItem(key);
+              const data = storage.getItem(key);
               if (data) {
                 const entry: CacheEntry = JSON.parse(data);
                 entries.push({ key, entry });
@@ -621,7 +617,10 @@ export class BrowserAdapter extends BaseCacheAdapter {
         // Remove oldest 10%
         const toRemove = Math.ceil(entries.length * 0.1);
         for (let i = 0; i < toRemove; i++) {
-          this.storage.removeItem(entries[i].key);
+          const entry = entries[i];
+          if (entry && entry.key) {
+            storage.removeItem(entry.key);
+          }
         }
       }
     } catch (error) {
@@ -639,9 +638,40 @@ export class BrowserAdapter extends BaseCacheAdapter {
   }
 
   // Override base class methods
-  protected getMemoryUsage(): number {
+  protected override getMemoryUsage(): number {
     // For browser storage, we can't easily track memory usage
     // Return an estimate based on number of entries
     return this.metrics.keyCount * 1024; // Rough estimate: 1KB per entry
+  }
+
+  // Helper methods
+  protected validateKey(key: string): void {
+    if (!key || typeof key !== 'string') {
+      throw new Error('Invalid key');
+    }
+  }
+
+  protected validateTtl(ttl?: number): number {
+    return ttl || this.config.defaultTtlSec || 300;
+  }
+
+  protected async measureOperation<T>(operation: () => Promise<T>, _operationType: string, _key: string): Promise<T> {
+    return this.measureLatency(operation);
+  }
+
+  protected recordHit(_key: string): void {
+    this.updateMetrics('hit');
+  }
+
+  protected recordMiss(_key: string): void {
+    this.updateMetrics('miss');
+  }
+
+  protected recordSet(_key: string, _size: number): void {
+    this.updateMetrics('set');
+  }
+
+  protected recordDelete(_key: string): void {
+    this.updateMetrics('delete');
   }
 }

@@ -30,7 +30,7 @@ import {
   Mail,
   Phone
 } from 'lucide-react';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { privacyCompliance } from '../../utils/privacy-compliance';
 import { dataRetentionService } from '../../services/dataRetentionService';
 import { logger } from '../../utils/logger';

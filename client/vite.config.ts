@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import type { Plugin } from 'vite'
@@ -75,6 +76,8 @@ export default defineConfig(({ mode }) => {
 
   const devCSP = baseCSP.replace("script-src 'self'", "script-src 'self' 'unsafe-inline' 'unsafe-eval'")
   const prodCSP = baseCSP.replace("script-src 'self'", `script-src 'self' 'nonce-${nonce}'`)
+
+  const rootDir = path.dirname(fileURLToPath(import.meta.url))
 
   return {
     // ============================================================================
@@ -155,7 +158,7 @@ export default defineConfig(({ mode }) => {
       // Source maps in development help you find the original source of CSS rules
       // This makes debugging styled components much easier
       devSourcemap: isDevelopment,
-      postcss: path.resolve(__dirname, '.'),
+      postcss: path.resolve(rootDir, '.'),
     },
     
     // ============================================================================
@@ -164,8 +167,10 @@ export default defineConfig(({ mode }) => {
     resolve: {
       // Path aliases let you use cleaner imports like '@/components' instead of '../../../components'
       alias: {
-        '@': path.resolve(__dirname, './src'),
-        '@chanuka/shared': path.resolve(__dirname, '../shared'),
+        '@': path.resolve(rootDir, './src'),
+        '@chanuka/shared': path.resolve(rootDir, '../shared'),
+        '@shared': path.resolve(rootDir, '../shared'),
+        '@shared/*': path.resolve(rootDir, '../shared/*'),
       },
       // Extension resolution order affects lookup speed
       // More common extensions first means fewer failed lookups

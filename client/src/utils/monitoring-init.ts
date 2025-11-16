@@ -140,7 +140,7 @@ class MonitoringInitializer {
     datadogRum.init({
       applicationId: this.config.datadog!.applicationId,
       clientToken: this.config.datadog!.clientToken,
-      site: this.config.datadog?.site || 'datadoghq.com',
+      site: (this.config.datadog?.site as any) || 'datadoghq.com',
       service: 'chanuka-client',
       env: this.config.environment,
       version: this.config.version,
@@ -254,7 +254,7 @@ class MonitoringInitializer {
             
             performanceMonitoring.recordCustomMetric({
               name: 'navigation_timing',
-              value: navEntry.loadEventEnd - navEntry.navigationStart,
+              value: navEntry.loadEventEnd - (navEntry as any).navigationStart,
               unit: 'milliseconds',
               context: {
                 type: navEntry.type,

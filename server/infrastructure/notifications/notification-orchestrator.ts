@@ -4,6 +4,7 @@ import { eq, and } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
 import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
+import { CombinedBillTrackingPreferences } from './types.js';
 import { logger   } from '../../../shared/core/src/index.js';
 
 /**
@@ -128,15 +129,6 @@ interface ServiceMetrics {
   lastProcessedAt?: Date;
 }
 
-/**
- * Combined preference type that merges global and per-bill settings.
- * Per-bill settings take precedence when available and active.
- */
-interface CombinedBillTrackingPreferences extends GlobalBillTrackingPreferences {
-  _perBillSettingsApplied?: boolean; // Internal flag indicating per-bill override was used
-  alert_frequency?: GlobalBillTrackingPreferences['updateFrequency']; // Alias for compatibility
-  alert_channels?: Array<'in_app' | 'email' | 'push' | 'sms'>; // Per-bill channel format
-}
 
 // ============================================================================
 // Main Service Class
