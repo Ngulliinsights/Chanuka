@@ -3,9 +3,11 @@
  * Following navigation component testing patterns for consistency
  */
 
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import '@testing-library/jest-dom';
 import { z } from 'zod';
 import { EnhancedForm } from '../form';
 import { UIFormError } from '../errors';
@@ -25,7 +27,7 @@ describe('EnhancedForm', () => {
     it('renders form with children', () => {
       render(
         <EnhancedForm>
-          <input name="test" />
+          <input name="test" aria-label="Test input" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -54,14 +56,14 @@ describe('EnhancedForm', () => {
       const onValidationError = vi.fn();
       
       render(
-        <EnhancedForm 
+        <EnhancedForm
           schema={TestSchema}
           onSubmit={onSubmit}
           onValidationError={onValidationError}
         >
-          <input name="name" />
-          <input name="email" />
-          <input name="age" type="number" />
+          <input name="name" aria-label="Name" />
+          <input name="email" aria-label="Email" />
+          <input name="age" type="number" aria-label="Age" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -80,9 +82,9 @@ describe('EnhancedForm', () => {
       
       render(
         <EnhancedForm schema={TestSchema} onSubmit={onSubmit}>
-          <input name="name" defaultValue="John Doe" />
-          <input name="email" defaultValue="john@example.com" />
-          <input name="age" type="number" defaultValue="25" />
+          <input name="name" defaultValue="John Doe" aria-label="Name" />
+          <input name="email" defaultValue="john@example.com" aria-label="Email" />
+          <input name="age" type="number" defaultValue="25" aria-label="Age" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -103,14 +105,14 @@ describe('EnhancedForm', () => {
       const onValidationError = vi.fn();
       
       render(
-        <EnhancedForm 
+        <EnhancedForm
           schema={TestSchema}
           onValidationError={onValidationError}
           config={{ showErrorSummary: true }}
         >
-          <input name="name" />
-          <input name="email" defaultValue="invalid-email" />
-          <input name="age" type="number" defaultValue="15" />
+          <input name="name" aria-label="Name" />
+          <input name="email" defaultValue="invalid-email" aria-label="Email" />
+          <input name="age" type="number" defaultValue="15" aria-label="Age" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -131,12 +133,12 @@ describe('EnhancedForm', () => {
       const onValidationError = vi.fn();
       
       render(
-        <EnhancedForm 
+        <EnhancedForm
           schema={TestSchema}
           onSubmit={onSubmit}
           onValidationError={onValidationError}
         >
-          <input name="name" />
+          <input name="name" aria-label="Name" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -153,12 +155,12 @@ describe('EnhancedForm', () => {
       const onSubmit = vi.fn();
       
       render(
-        <EnhancedForm 
+        <EnhancedForm
           schema={TestSchema}
           onSubmit={onSubmit}
           config={{ validateOnSubmit: false }}
         >
-          <input name="name" />
+          <input name="name" aria-label="Name" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -173,11 +175,11 @@ describe('EnhancedForm', () => {
 
     it('shows error summary when configured', async () => {
       render(
-        <EnhancedForm 
+        <EnhancedForm
           schema={TestSchema}
           config={{ showErrorSummary: true }}
         >
-          <input name="name" />
+          <input name="name" aria-label="Name" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -192,11 +194,11 @@ describe('EnhancedForm', () => {
 
     it('hides error summary when configured', async () => {
       render(
-        <EnhancedForm 
+        <EnhancedForm
           schema={TestSchema}
           config={{ showErrorSummary: false }}
         >
-          <input name="name" />
+          <input name="name" aria-label="Name" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -216,7 +218,7 @@ describe('EnhancedForm', () => {
       
       render(
         <EnhancedForm onSubmit={onSubmit}>
-          <input name="test" defaultValue="value" />
+          <input name="test" defaultValue="value" aria-label="Test input" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -234,7 +236,7 @@ describe('EnhancedForm', () => {
       
       render(
         <EnhancedForm onSubmit={onSubmit}>
-          <input name="test" defaultValue="value" />
+          <input name="test" defaultValue="value" aria-label="Test input" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -254,11 +256,11 @@ describe('EnhancedForm', () => {
       const onValidationError = vi.fn();
       
       render(
-        <EnhancedForm 
+        <EnhancedForm
           onSubmit={onSubmit}
           onValidationError={onValidationError}
         >
-          <input name="test" defaultValue="value" />
+          <input name="test" defaultValue="value" aria-label="Test input" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -278,7 +280,7 @@ describe('EnhancedForm', () => {
       
       render(
         <EnhancedForm config={{ validateOnSubmit: 'invalid' as any }}>
-          <input name="test" />
+          <input name="test" aria-label="Test input" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );
@@ -295,9 +297,9 @@ describe('EnhancedForm', () => {
       
       render(
         <EnhancedForm onSubmit={onSubmit}>
-          <input name="text" defaultValue="test value" />
-          <input name="number" type="number" defaultValue="42" />
-          <input name="checkbox" type="checkbox" defaultChecked />
+          <input name="text" defaultValue="test value" aria-label="Text input" />
+          <input name="number" type="number" defaultValue="42" aria-label="Number input" />
+          <input name="checkbox" type="checkbox" defaultChecked aria-label="Checkbox input" />
           <button type="submit">Submit</button>
         </EnhancedForm>
       );

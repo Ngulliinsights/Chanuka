@@ -1,90 +1,66 @@
-// Database Infrastructure - Consolidated
-// Uses shared/database for core functionality, keeps server-specific services
+/**
+ * Database Infrastructure Index
+ * 
+ * Main entry point for database integration services
+ */
 
-// Core database functionality from shared
-export {
-  database,
-  readDatabase,
-  writeDatabase,
-  withTransaction,
-  withReadConnection,
-  getDatabase,
-  pool
-} from '@shared/database';
+// Core services
+export { 
+  DatabaseConnectionPool,
+  createConnectionPool,
+  getConnectionPool,
+  closeConnectionPool
+} from './connection-pool.js';
 
-// Database schema and types
-export * from '@shared/schema';
+export { 
+  DatabaseMigrationManager,
+  createMigrationManager,
+  getMigrationManager
+} from './migration-manager.js';
 
-// Server-specific services (keep these)
-export { DatabaseFallbackService } from './database-fallback';
-export { MigrationService } from './migration-service';
-export { SeedDataService } from './seed-data-service';
-export { databaseService } from './database-service';
+export { 
+  DatabaseIndexingOptimizer,
+  createIndexOptimizer,
+  getIndexOptimizer
+} from './indexing-optimizer.js';
 
-// Storage services (if they provide unique server-specific value)
-export { storage as StorageService } from './storage';
-export { unifiedStorage as UnifiedStorageService } from './unified-storage';
+export { 
+  DatabaseBackupRecovery,
+  createBackupRecovery,
+  getBackupRecovery
+} from './backup-recovery.js';
 
-// Storage base classes
-export * from './base/BaseStorage';
+export { 
+  DatabaseMonitoring,
+  createDatabaseMonitoring,
+  getDatabaseMonitoring
+} from './monitoring.js';
+
+export { 
+  DatabaseValidation,
+  createDatabaseValidation,
+  getDatabaseValidation
+} from './validation.js';
+
+// Main integration service
+export { 
+  DatabaseIntegrationService,
+  createDatabaseIntegration,
+  getDatabaseIntegration,
+  closeDatabaseIntegration
+} from './database-integration.js';
 
 // Configuration
-export * from './config';
+export { 
+  createDatabaseConfig,
+  defaultDatabaseConfig
+} from './config.js';
 
-// Database optimization (if it provides unique server-specific value)
-export { databaseOptimizationService as DatabaseOptimizationService } from './database-optimization';
-
-// Legacy compatibility exports
-export { database as DatabaseService } from '@shared/database';
-export { pool as ConnectionPoolService } from '@shared/database';
-
-// Re-export database types for convenience
-export type {
-  DatabaseTransaction,
-  DatabaseOperation,
-  TransactionOptions
-} from '@shared/database';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Types
+export type { ConnectionPoolConfig } from './connection-pool.js';
+export type { MigrationResult, MigrationStatus } from './migration-manager.js';
+export type { IndexOptimizationReport, MissingIndexSuggestion } from './indexing-optimizer.js';
+export type { BackupConfig, BackupMetadata, RecoveryOptions } from './backup-recovery.js';
+export type { DatabaseMetrics, Alert, AlertRule } from './monitoring.js';
+export type { ValidationRule, DataQualityReport, IntegrityCheckResult } from './validation.js';
+export type { DatabaseIntegrationConfig, DatabaseHealthStatus } from './database-integration.js';

@@ -13,7 +13,7 @@ import { createErrorAnalyticsEngine } from '../analytics/error-analytics.js';
 import { createUserErrorReporter } from '../reporting/user-error-reporter.js';
 import { createErrorRecoveryEngine } from '../recovery/error-recovery-engine.js';
 import { ErrorHandlerChain } from '../handlers/error-handler-chain.js';
-import { ErrorBoundary } from '../handlers/enhanced-error-boundary.js';
+import { ErrorBoundary } from '../handlers/error-boundary.js';
 import { createConsoleIntegration, ErrorTrackingIntegrationManager } from '../integrations/error-tracking-integration.js';
 
 describe('Error Management System Integration', () => {

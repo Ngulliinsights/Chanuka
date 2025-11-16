@@ -6,7 +6,7 @@
  * community analytics.
  */
 
-import { webSocketClient } from './websocket-client';
+import { UnifiedWebSocketManager } from '../core/api/websocket';
 import { communityWebSocketExtension } from './community-websocket-extension';
 import { communityBackendService } from './community-backend-service';
 import { notificationService } from './notification-service';
@@ -70,21 +70,21 @@ class CommunityWebSocketMiddleware {
    */
   private setupEventHandlers(): void {
     // Handle WebSocket connection events
-    webSocketClient.on('connected', () => {
+    UnifiedWebSocketManager.getInstance().on('connected', () => {
       this.onWebSocketConnected();
     });
 
-    webSocketClient.on('disconnected', () => {
+    UnifiedWebSocketManager.getInstance().on('disconnected', () => {
       this.onWebSocketDisconnected();
     });
 
     // Handle bill updates that might include community data
-    webSocketClient.on('billUpdate', (data) => {
+    UnifiedWebSocketManager.getInstance().on('billUpdate', (data) => {
       this.handleBillUpdate(data);
     });
 
     // Handle general notifications
-    webSocketClient.on('notification', (data) => {
+    UnifiedWebSocketManager.getInstance().on('notification', (data) => {
       this.handleNotification(data);
     });
 
@@ -390,7 +390,7 @@ class CommunityWebSocketMiddleware {
    * Get connection status
    */
   isConnected(): boolean {
-    return webSocketClient.isConnected();
+    return UnifiedWebSocketManager.getInstance().isConnected();
   }
 
   /**

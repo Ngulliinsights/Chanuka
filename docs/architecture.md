@@ -32,7 +32,7 @@
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS + Radix UI
-- **State Management**: React Query + Context
+- **State Management**: Redux Toolkit + React Query
 - **Routing**: React Router
 - **Testing**: Vitest + Testing Library
 

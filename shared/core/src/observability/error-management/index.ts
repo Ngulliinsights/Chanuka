@@ -6,31 +6,31 @@
  */
 
 // Core error types and base classes
-export * from './errors/base-error.js';
-export * from './errors/specialized-errors.js';
+export * from './errors/base-error';
+export * from './errors/specialized-errors';
 
 // Error handlers and processing
-export * from './handlers/error-handler-chain.js';
+export * from './handlers/error-handler-chain';
 // Note: React error boundaries are exported conditionally for React environments
 // Only export types when in a React environment to avoid JSX compilation issues
 // export type { ErrorBoundaryProps, ErrorBoundaryState } from './handlers/error-boundary.tsx';
-// export type { ErrorBoundaryProps } from './handlers/enhanced-error-boundary.tsx';
+// export type { ErrorBoundaryProps } from './handlers/error-boundary.tsx';
 
 // Error patterns and resilience
-export * from './patterns/circuit-breaker.js';
-export * from './patterns/retry-patterns.js';
+export * from './patterns/circuit-breaker';
+export * from './patterns/retry-patterns';
 
 // Monitoring and analytics
-export * from './monitoring/error-monitor.js';
-export * from './analytics/error-analytics.js';
-export * from './reporting/user-error-reporter.js';
-export * from './recovery/error-recovery-engine.js';
+export * from './monitoring/error-monitor';
+export * from './analytics/error-analytics';
+export * from './reporting/user-error-reporter';
+export * from './recovery/error-recovery-engine';
 
 // Integrations
-export * from './integrations/error-tracking-integration.js';
+export * from './integrations/error-tracking-integration';
 
 // Middleware for different platforms
-export * from './middleware/express-error-middleware.js';
+export * from './middleware/express-error-middleware';
 
 
 // Types and interfaces
@@ -54,22 +54,22 @@ export type {
 } from './types';
 
 // Default exports for common use cases
-export { BaseError } from './errors/base-error.js';
-export { ErrorHandlerChain } from './handlers/error-handler-chain.js';
-export { CircuitBreaker } from './patterns/circuit-breaker.js';
-export { RealTimeErrorMonitor, createErrorMonitor } from './monitoring/error-monitor.js';
-export { ErrorAnalyticsEngine, createErrorAnalyticsEngine } from './analytics/error-analytics.js';
-export { UserErrorReporter, createUserErrorReporter } from './reporting/user-error-reporter.js';
-export { AutomatedErrorRecoveryEngine, createErrorRecoveryEngine } from './recovery/error-recovery-engine.js';
+export { BaseError } from './errors/base-error';
+export { ErrorHandlerChain } from './handlers/error-handler-chain';
+export { CircuitBreaker } from './patterns/circuit-breaker';
+export { RealTimeErrorMonitor, createErrorMonitor } from './monitoring/error-monitor';
+export { ErrorAnalyticsEngine, createErrorAnalyticsEngine } from './analytics/error-analytics';
+export { UserErrorReporter, createUserErrorReporter } from './reporting/user-error-reporter';
+export { AutomatedErrorRecoveryEngine, createErrorRecoveryEngine } from './recovery/error-recovery-engine';
 export {
   createSentryIntegration,
   createRollbarIntegration,
   createBugsnagIntegration,
   createConsoleIntegration,
   createIntegrationManager
-} from './integrations/error-tracking-integration.js';
+} from './integrations/error-tracking-integration';
 // React components are conditionally exported for React environments
-// export { ErrorBoundary, withErrorBoundary } from './handlers/enhanced-error-boundary.tsx';
+// export { ErrorBoundary, withErrorBoundary } from './handlers/error-boundary.tsx';
 
 // Global error handlers setup
 export function setupGlobalErrorHandlers() {

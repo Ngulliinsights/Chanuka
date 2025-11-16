@@ -37,6 +37,7 @@ class SessionManager {
   private checkInterval: NodeJS.Timeout | null = null;
   private warningTimeout: NodeJS.Timeout | null = null;
   private isActive: boolean = true;
+  private lastErrorLog: number = 0;
   private sessionId: string | null = null;
 
   constructor(config: Partial<SessionConfig> = {}) {
@@ -255,6 +256,11 @@ class SessionManager {
 
   private async checkConcurrentSessions(): Promise<void> {
     try {
+      // Skip if we're offline or if we've failed recently
+      if (!navigator.onLine) {
+        return;
+      }
+
       const sessions = await authBackendService.getActiveSessions();
       
       // Filter out current session
@@ -269,7 +275,12 @@ class SessionManager {
         this.notifyWarning(warning);
       }
     } catch (error) {
-      logger.error('Failed to check concurrent sessions:', { component: 'SessionManager' }, error);
+      // Only log error once per minute to avoid spam
+      const now = Date.now();
+      if (!this.lastErrorLog || now - this.lastErrorLog > 60000) {
+        logger.error('Failed to check concurrent sessions:', { component: 'SessionManager' }, error);
+        this.lastErrorLog = now;
+      }
     }
   }
 

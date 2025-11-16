@@ -5,7 +5,7 @@
  * providing a comprehensive set of domain-specific error types.
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity, BaseErrorOptions } from './base-error';
+import { BaseError, ErrorDomain, ErrorSeverity } from './base-error';
 
 /**
  * Validation Error - for input validation failures
@@ -61,7 +61,9 @@ export class ValidationError extends BaseError {
   this.errors = validationErrors;
 
   // Set unified interface properties for compatibility
-  this.field = validationErrors.length === 1 ? validationErrors[0].field : undefined;
+  if (validationErrors.length === 1 && validationErrors[0]?.field !== undefined) {
+    this.field = validationErrors[0].field;
+  }
   }
 }
 
@@ -94,14 +96,17 @@ export class NotFoundError extends BaseError {
  */
 export class UnauthorizedError extends BaseError {
   constructor(message: string = 'Authentication required', details?: Record<string, any>) {
-    super(message, {
+    const options: any = {
       statusCode: 401,
       code: 'UNAUTHORIZED',
-      details,
       isOperational: true,
       domain: ErrorDomain.AUTHENTICATION,
       severity: ErrorSeverity.MEDIUM,
-    });
+    };
+    if (details !== undefined) {
+      options.details = details;
+    }
+    super(message, options);
   }
 }
 
@@ -250,15 +255,18 @@ export class ExternalServiceError extends BaseError {
  */
 export class NetworkError extends BaseError {
   constructor(message: string, details?: Record<string, any>) {
-    super(message, {
+    const options: any = {
       statusCode: 503,
       code: 'NETWORK_ERROR',
-      details,
       isOperational: true,
       domain: ErrorDomain.NETWORK,
       severity: ErrorSeverity.HIGH,
       retryable: true,
-    });
+    };
+    if (details !== undefined) {
+      options.details = details;
+    }
+    super(message, options);
   }
 }
 
@@ -293,14 +301,17 @@ export class LegacyError extends BaseError {
     details?: any,
     isOperational: boolean = true
   ) {
-    super(message, {
+    const options: any = {
       statusCode,
       code: code || 'APP_ERROR',
-      details,
       isOperational,
       domain: ErrorDomain.SYSTEM,
       severity: statusCode >= 500 ? ErrorSeverity.HIGH : ErrorSeverity.MEDIUM,
-    });
+    };
+    if (details !== undefined) {
+      options.details = details;
+    }
+    super(message, options);
   }
 }
 

@@ -6,6 +6,60 @@ import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
 
 // WebSocketEvents interface imported from types.ts
 
+// ============================================================================
+// Bill Update Type Definitions
+// ============================================================================
+
+export interface BillsWebSocketConfig {
+  autoReconnect: boolean;
+  maxReconnectAttempts: number;
+  reconnectDelay: number;
+  heartbeatInterval: number;
+  batchUpdateInterval: number;
+  maxBatchSize: number;
+}
+
+export interface BillStatusUpdate {
+  bill_id: number;
+  oldStatus: string;
+  newStatus: string;
+  timestamp: string;
+  reason?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface BillEngagementUpdate {
+  bill_id: number;
+  viewCount?: number;
+  saveCount?: number;
+  commentCount?: number;
+  shareCount?: number;
+  timestamp: string;
+}
+
+export interface BillAmendmentUpdate {
+  bill_id: number;
+  amendment_id: string;
+  type: 'added' | 'modified' | 'removed';
+  title: string;
+  summary: string;
+  timestamp: string;
+}
+
+export interface BillVotingUpdate {
+  bill_id: number;
+  voting_date: string;
+  voting_type: 'committee' | 'floor' | 'final';
+  chamber: 'house' | 'senate' | 'both';
+  timestamp: string;
+}
+
+export type BillRealTimeUpdate =
+  | BillStatusUpdate
+  | BillEngagementUpdate
+  | BillAmendmentUpdate
+  | BillVotingUpdate;
+
 // Type-safe Event Emitter for WebSocket events
 class EventEmitter {
   private events: Map<string, Set<Function>> = new Map();
@@ -75,6 +129,7 @@ class EventEmitter {
 
 // Unified WebSocket Manager
 export class UnifiedWebSocketManager {
+  private static instance: UnifiedWebSocketManager | null = null;
   private ws: WebSocket | null = null;
   private config: WebSocketConfig;
   private subscriptions = new Map<string, Subscription>();
@@ -93,8 +148,30 @@ export class UnifiedWebSocketManager {
   private connectedAt: number | null = null;
   private lastPongTime: number | null = null;
 
-  constructor(config: WebSocketConfig) {
+  // Bill-specific batch processing properties
+  private billsConfig: BillsWebSocketConfig;
+  private subscribedBills = new Set<number>();
+  private updateQueue: BillRealTimeUpdate[] = [];
+  private billsBatchTimer: NodeJS.Timeout | null = null;
+
+  constructor(config: WebSocketConfig, billsConfig?: Partial<BillsWebSocketConfig>) {
     this.config = config;
+    this.billsConfig = {
+      autoReconnect: true,
+      maxReconnectAttempts: 5,
+      reconnectDelay: 2000,
+      heartbeatInterval: 30000,
+      batchUpdateInterval: 1000, // Process batched updates every second
+      maxBatchSize: 50,
+      ...billsConfig
+    };
+  }
+
+  static getInstance(): UnifiedWebSocketManager {
+    if (!UnifiedWebSocketManager.instance) {
+      UnifiedWebSocketManager.instance = globalWebSocketPool.getConnection('ws://localhost:8080');
+    }
+    return UnifiedWebSocketManager.instance;
   }
 
   async connect(token?: string): Promise<void> {
@@ -270,8 +347,8 @@ export class UnifiedWebSocketManager {
     return this.subscriptions.size;
   }
 
-  on(event: string, listener: (...args: any[]) => void): void {
-    this.eventEmitter.on(event, listener);
+  on(event: string, listener: (...args: any[]) => void): () => void {
+    return this.eventEmitter.on(event, listener);
   }
 
   off(event: string, listener: (...args: any[]) => void): void {
@@ -294,8 +371,14 @@ export class UnifiedWebSocketManager {
       this.startBatchProcessing();
     }
 
+    // Start bills batch processing
+    this.startBillsBatchProcessing();
+
     // Re-subscribe to all topics
     this.resubscribeAll();
+
+    // Re-subscribe to all bills
+    this.resubscribeAllBills();
 
     // Send queued messages
     this.flushMessageQueue();
@@ -318,6 +401,18 @@ export class UnifiedWebSocketManager {
       // Handle pong (heartbeat response)
       if (message.type === 'pong') {
         this.handlePong(message);
+        return;
+      }
+
+      // Handle bill updates
+      if (message.type === 'billUpdate' || message.type === 'bill_update') {
+        this.handleBillUpdateMessage(message);
+        return;
+      }
+
+      // Handle batched bill updates
+      if (message.type === 'batchedBillUpdates' || message.type === 'batched_updates') {
+        this.handleBatchedBillUpdatesMessage(message);
         return;
       }
 
@@ -440,6 +535,21 @@ export class UnifiedWebSocketManager {
     });
   }
 
+  private resubscribeAllBills(): void {
+    this.subscribedBills.forEach(billId => {
+      this.subscribeToBill(billId, [
+        'status_change',
+        'new_comment',
+        'amendment',
+        'voting_scheduled'
+      ]);
+    });
+
+    console.info('Re-subscribed to all bills', {
+      billCount: this.subscribedBills.size
+    });
+  }
+
   // Optimization: Better message queue management
   private queueMessage(message: any): void {
     if (this.messageQueue.length >= this.maxQueueSize) {
@@ -522,6 +632,186 @@ export class UnifiedWebSocketManager {
         type: 'batch',
         messages: batch,
         timestamp: Date.now()
+      });
+    }
+  }
+
+  // ============================================================================
+  // Bill-specific batch processing methods
+  // ============================================================================
+
+  /**
+   * Start batch processing for bill updates
+   */
+  private startBillsBatchProcessing(): void {
+    if (this.billsBatchTimer) {
+      clearInterval(this.billsBatchTimer);
+    }
+
+    this.billsBatchTimer = setInterval(() => {
+      if (this.updateQueue.length > 0) {
+        this.processBillsBatchedUpdates();
+      }
+    }, this.billsConfig.batchUpdateInterval);
+
+    console.debug('Bills batch processing timer started', {
+      interval: this.billsConfig.batchUpdateInterval
+    });
+  }
+
+  /**
+   * Process queued bill updates in batches
+   */
+  private processBillsBatchedUpdates(): void {
+    if (this.updateQueue.length === 0) return;
+
+    const updates = this.updateQueue.splice(0, this.billsConfig.maxBatchSize);
+
+    // Group updates by bill ID for efficient processing
+    const updatesByBill = new Map<number, BillRealTimeUpdate[]>();
+
+    updates.forEach(update => {
+      const billId = update.bill_id;
+      if (!updatesByBill.has(billId)) {
+        updatesByBill.set(billId, []);
+      }
+      updatesByBill.get(billId)!.push(update);
+    });
+
+    // Process updates for each bill
+    updatesByBill.forEach((billUpdates, billId) => {
+      try {
+        this.processBillUpdates(billId, billUpdates);
+      } catch (error) {
+        console.error('Failed to process updates for bill', {
+          billId,
+          updateCount: billUpdates.length,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    });
+
+    console.debug('Processed batched bill updates', {
+      processedCount: updates.length,
+      billsAffected: updatesByBill.size,
+      remainingInQueue: this.updateQueue.length
+    });
+  }
+
+  /**
+   * Queue a bill update for batch processing
+   */
+  private queueBillUpdate(update: BillRealTimeUpdate): void {
+    this.updateQueue.push(update);
+
+    // Prevent queue from growing too large
+    if (this.updateQueue.length > this.billsConfig.maxBatchSize * 2) {
+      // Remove oldest updates
+      this.updateQueue = this.updateQueue.slice(-this.billsConfig.maxBatchSize);
+
+      console.warn('Bill update queue overflow, removed oldest updates', {
+        queueSize: this.updateQueue.length
+      });
+    }
+  }
+
+  /**
+   * Process updates for a specific bill
+   */
+  private processBillUpdates(
+    billId: number,
+    updates: BillRealTimeUpdate[]
+  ): void {
+    // Emit individual bill update events for each update
+    updates.forEach(update => {
+      this.eventEmitter.emit('billUpdate', {
+        bill_id: billId,
+        update: {
+          type: this.getBillUpdateType(update),
+          data: update
+        },
+        timestamp: update.timestamp || new Date().toISOString()
+      });
+    });
+
+    // Emit batched updates event
+    if (updates.length > 1) {
+      this.eventEmitter.emit('batchedBillUpdates', {
+        bill_id: billId,
+        updates: updates.map(update => ({
+          type: this.getBillUpdateType(update),
+          data: update
+        })),
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+
+  /**
+   * Determine update type from update object
+   */
+  private getBillUpdateType(update: BillRealTimeUpdate): string {
+    if ('oldStatus' in update && 'newStatus' in update) return 'status';
+    if ('viewCount' in update || 'saveCount' in update || 'commentCount' in update || 'shareCount' in update) return 'engagement';
+    if ('amendment_id' in update) return 'amendment';
+    if ('voting_date' in update) return 'voting';
+    return 'unknown';
+  }
+
+  /**
+   * Handle individual bill update messages
+   */
+  private handleBillUpdateMessage(message: any): void {
+    try {
+      const { bill_id, update, timestamp } = message;
+
+      // Add to update queue for batch processing
+      this.queueBillUpdate({
+        ...update.data,
+        bill_id,
+        timestamp: timestamp || new Date().toISOString()
+      } as BillRealTimeUpdate);
+
+      console.debug('Bill update queued for processing', {
+        billId: bill_id,
+        updateType: update.type,
+        queueSize: this.updateQueue.length
+      });
+    } catch (error) {
+      console.error('Failed to handle bill update message', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        message
+      });
+    }
+  }
+
+  /**
+   * Handle batched bill updates messages
+   */
+  private handleBatchedBillUpdatesMessage(message: any): void {
+    try {
+      const updates = Array.isArray(message.updates) ? message.updates : [message];
+
+      updates.forEach((update: any) => {
+        this.queueBillUpdate({
+          ...update,
+          timestamp: update.timestamp || new Date().toISOString()
+        } as BillRealTimeUpdate);
+      });
+
+      console.debug('Batched bill updates queued for processing', {
+        updateCount: updates.length,
+        queueSize: this.updateQueue.length
+      });
+
+      // Process immediately if queue is getting large
+      if (this.updateQueue.length >= this.billsConfig.maxBatchSize) {
+        this.processBillsBatchedUpdates();
+      }
+    } catch (error) {
+      console.error('Failed to handle batched bill updates message', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        message
       });
     }
   }
@@ -641,8 +931,139 @@ export class UnifiedWebSocketManager {
     this.messageQueue = [];
   }
 
+  // Update user preferences
+  updatePreferences(preferences: any): void {
+    this.send({
+      type: 'updatePreferences',
+      data: preferences
+    });
+  }
+
+  // ============================================================================
+  // Bill-specific public methods
+  // ============================================================================
+
+  /**
+   * Subscribe to real-time updates for a specific bill
+   */
+  subscribeToBillUpdates(billId: number, updateTypes?: Array<'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled'>): void {
+    if (this.subscribedBills.has(billId)) {
+      console.debug('Already subscribed to bill updates', { billId });
+      return;
+    }
+
+    try {
+      // Check if WebSocket is connected
+      const connectionStatus = this.getConnectionStatus();
+      if (!connectionStatus.connected) {
+        console.warn('WebSocket not connected, subscription will be queued', { billId });
+        // The WebSocket client will handle queuing
+      }
+
+      // Subscribe via WebSocket client
+      this.subscribeToBill(billId, updateTypes);
+
+      // Track subscription locally
+      this.subscribedBills.add(billId);
+
+      console.info('Subscribed to bill updates', {
+        billId,
+        updateTypes,
+        totalSubscriptions: this.subscribedBills.size
+      });
+    } catch (error) {
+      console.error('Failed to subscribe to bill updates', {
+        billId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Unsubscribe from real-time updates for a specific bill
+   */
+  unsubscribeFromBillUpdates(billId: number): void {
+    if (!this.subscribedBills.has(billId)) {
+      console.debug('Not subscribed to bill updates', { billId });
+      return;
+    }
+
+    try {
+      // Unsubscribe via WebSocket client
+      this.unsubscribeFromBill(billId);
+
+      // Remove from local tracking
+      this.subscribedBills.delete(billId);
+
+      console.info('Unsubscribed from bill updates', {
+        billId,
+        remainingSubscriptions: this.subscribedBills.size
+      });
+    } catch (error) {
+      console.error('Failed to unsubscribe from bill updates', {
+        billId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Subscribe to multiple bills at once
+   */
+  subscribeToMultipleBills(billIds: number[], updateTypes?: Array<'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled'>): void {
+    const subscriptionPromises = billIds.map(billId =>
+      Promise.resolve(this.subscribeToBillUpdates(billId, updateTypes))
+    );
+
+    Promise.allSettled(subscriptionPromises).then(() => {
+      console.info('Bulk bill subscription completed', {
+        billCount: billIds.length,
+        totalSubscriptions: this.subscribedBills.size
+      });
+    }).catch(error => {
+      console.error('Bulk bill subscription failed', {
+        billIds,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    });
+  }
+
+  /**
+   * Get current bill subscription status
+   */
+  getBillSubscriptionStatus(): {
+    subscribedBills: number[];
+    subscriptionCount: number;
+    updateQueueSize: number;
+    isConnected: boolean;
+  } {
+    return {
+      subscribedBills: Array.from(this.subscribedBills),
+      subscriptionCount: this.subscribedBills.size,
+      updateQueueSize: this.updateQueue.length,
+      isConnected: this.isConnected()
+    };
+  }
+
+  /**
+   * Clear all bill subscriptions
+   */
+  clearAllBillSubscriptions(): void {
+    const billIds = Array.from(this.subscribedBills);
+
+    billIds.forEach(billId => {
+      this.unsubscribeFromBillUpdates(billId);
+    });
+
+    console.info('All bill subscriptions cleared', {
+      clearedCount: billIds.length
+    });
+  }
+
   // Helper methods
-  private isConnected(): boolean {
+  isConnected(): boolean {
     return this.ws !== null &&
            this.ws.readyState === WebSocket.OPEN &&
            this.connectionState === ConnectionState.CONNECTED;
@@ -664,6 +1085,20 @@ export class UnifiedWebSocketManager {
       clearInterval(this.batchTimer);
       this.batchTimer = null;
     }
+
+    // Stop bills batch processing
+    if (this.billsBatchTimer) {
+      clearInterval(this.billsBatchTimer);
+      this.billsBatchTimer = null;
+    }
+
+    // Process any remaining bill updates
+    if (this.updateQueue.length > 0) {
+      this.processBillsBatchedUpdates();
+    }
+
+    // Clear bill update queue
+    this.updateQueue = [];
 
     if (this.ws) {
       // Store reference to avoid race conditions during cleanup
@@ -698,15 +1133,25 @@ export class UnifiedWebSocketManager {
 export class WebSocketConnectionPool {
   private connections = new Map<string, UnifiedWebSocketManager>();
   private defaultConfig: WebSocketConfig;
+  private defaultBillsConfig: BillsWebSocketConfig;
 
-  constructor(defaultConfig: WebSocketConfig) {
+  constructor(defaultConfig: WebSocketConfig, defaultBillsConfig?: BillsWebSocketConfig) {
     this.defaultConfig = defaultConfig;
+    this.defaultBillsConfig = defaultBillsConfig || {
+      autoReconnect: true,
+      maxReconnectAttempts: 5,
+      reconnectDelay: 2000,
+      heartbeatInterval: 30000,
+      batchUpdateInterval: 1000,
+      maxBatchSize: 50
+    };
   }
 
-  getConnection(url: string, config?: Partial<WebSocketConfig>): UnifiedWebSocketManager {
+  getConnection(url: string, config?: Partial<WebSocketConfig>, billsConfig?: Partial<BillsWebSocketConfig>): UnifiedWebSocketManager {
     if (!this.connections.has(url)) {
       const wsConfig = { ...this.defaultConfig, ...config, url };
-      const manager = new UnifiedWebSocketManager(wsConfig);
+      const mergedBillsConfig = { ...this.defaultBillsConfig, ...billsConfig };
+      const manager = new UnifiedWebSocketManager(wsConfig, mergedBillsConfig);
       this.connections.set(url, manager);
     }
     return this.connections.get(url)!;
@@ -751,4 +1196,12 @@ export const globalWebSocketPool = new WebSocketConnectionPool({
     batchSize: 10,
     batchInterval: 1000
   }
+}, {
+  // Bills-specific configuration
+  autoReconnect: true,
+  maxReconnectAttempts: 5,
+  reconnectDelay: 2000,
+  heartbeatInterval: 30000,
+  batchUpdateInterval: 1000, // Process batched updates every second
+  maxBatchSize: 50
 });

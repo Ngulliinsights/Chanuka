@@ -60,7 +60,7 @@ export class RateLimiter {
         maxRequests: this.config.maxRequests
       });
     } catch (error) {
-      logger.error('Failed to initialize Rate Limiter', error);
+      logger.error('Failed to initialize Rate Limiter', undefined, error);
       throw error;
     }
   }
@@ -201,13 +201,13 @@ export class RateLimiter {
     searchInputs.forEach(input => {
       let debounceTimer: NodeJS.Timeout;
       
-      input.addEventListener('input', (event) => {
+      input.addEventListener('input', (_event) => {
         clearTimeout(debounceTimer);
-        
+
         debounceTimer = setTimeout(() => {
           const key = 'search-query';
           const bucket = this.getBucket(key);
-          
+
           if (this.isRateLimited(bucket, 'search')) {
             this.showRateLimitMessage('Search queries are rate limited. Please wait before searching again.');
             this.reportActionRateLimit('search', key);
@@ -265,13 +265,13 @@ export class RateLimiter {
     return bucket;
   }
 
-  private isRateLimited(bucket: RateLimitBucket, action: string): boolean {
+  private isRateLimited(bucket: RateLimitBucket, _action: string): boolean {
     const now = Date.now();
     const windowStart = now - this.config.windowMs;
-    
+
     // Clean old requests
     bucket.requests = bucket.requests.filter(req => req.timestamp > windowStart);
-    
+
     return bucket.requests.length >= this.config.maxRequests;
   }
 
@@ -424,7 +424,7 @@ export class RateLimiter {
   getAllBuckets(): Map<string, RateLimitInfo> {
     const result = new Map<string, RateLimitInfo>();
     
-    for (const [key, bucket] of this.buckets.entries()) {
+    for (const [key, _bucket] of this.buckets.entries()) {
       result.set(key, this.getRateLimitInfo(key));
     }
     
@@ -432,8 +432,8 @@ export class RateLimiter {
   }
 
   /**
-   * Cleanup resources
-   */
+    * Cleanup resources
+    */
   destroy(): void {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
@@ -441,4 +441,51 @@ export class RateLimiter {
     }
     this.buckets.clear();
   }
+
+  /**
+    * Check rate limit for a key with specific config
+    */
+  checkLimit(key: string, config: { windowMs: number, maxRequests: number }): { allowed: boolean, remaining: number, resetTime: number } {
+    const bucket = this.getBucket(key);
+    const now = Date.now();
+    const windowStart = now - config.windowMs;
+    bucket.requests = bucket.requests.filter(req => req.timestamp > windowStart);
+    const currentRequests = bucket.requests.length;
+    const allowed = currentRequests < config.maxRequests;
+    const resetTime = bucket.windowStart + config.windowMs;
+    if (allowed) {
+      bucket.requests.push({
+        timestamp: now,
+        success: true,
+        endpoint: key
+      });
+    }
+    return {
+      allowed,
+      remaining: Math.max(0, config.maxRequests - currentRequests - 1),
+      resetTime
+    };
+  }
+
+  /**
+    * Get number of active keys
+    */
+  getActiveKeys(): number {
+    return this.buckets.size;
+  }
 }
+
+// Export singleton instance
+export const clientRateLimiter = new RateLimiter({
+  enabled: true,
+  windowMs: 60000,
+  maxRequests: 100,
+  skipSuccessfulRequests: false
+});
+
+// Export rate limit configs
+export const RateLimitConfigs = {
+  strict: { windowMs: 60000, maxRequests: 10 },
+  normal: { windowMs: 60000, maxRequests: 100 },
+  lenient: { windowMs: 60000, maxRequests: 1000 }
+};

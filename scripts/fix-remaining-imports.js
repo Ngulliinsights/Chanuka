@@ -33,21 +33,21 @@ function fixImportsInFile(filePath) {
     let content = fs.readFileSync(filePath, 'utf8');
     let modified = false;
 
-    // Calculate correct relative path to utils/browser-logger
+    // Calculate correct relative path to utils/logger
     const relativePath = path.relative('client/src', filePath);
     const depth = relativePath.split('/').length - 1;
     const relativePrefix = '../'.repeat(depth);
 
     // Fix incorrect logger import paths
     const incorrectLoggerPatterns = [
-      /import\s*{\s*logger\s*}\s*from\s*['"]utils\/browser-logger['"];?/g,
-      /import\s*{\s*logger\s*}\s*from\s*['"]\.\/utils\/browser-logger['"];?/g,
-      /import\s*{\s*logger\s*}\s*from\s*['"]utils\/client-core['"];?/g
+      /import\s*{\s*logger\s*}\s*from\s*['"]utils\/logger['"];?/g,
+      /import\s*{\s*logger\s*}\s*from\s*['"]\.\/utils\/logger['"];?/g,
+      /import\s*{\s*logger\s*}\s*from\s*['"]utils\/logger['"];?/g
     ];
 
     incorrectLoggerPatterns.forEach(pattern => {
       if (pattern.test(content)) {
-        content = content.replace(pattern, `import { logger } from '${relativePrefix}utils/browser-logger';`);
+        content = content.replace(pattern, `import { logger } from '${relativePrefix}utils/logger';`);
         modified = true;
       }
     });
@@ -67,13 +67,13 @@ function fixImportsInFile(filePath) {
 
     // Fix validation service imports
     const incorrectValidationPatterns = [
-      /import\s*{\s*validationService\s*}\s*from\s*['"]utils\/client-core['"];?/g,
-      /import\s*{\s*validationService\s*}\s*from\s*['"]\.\/utils\/client-core['"];?/g
+      /import\s*{\s*validationService\s*}\s*from\s*['"]utils\/logger['"];?/g,
+      /import\s*{\s*validationService\s*}\s*from\s*['"]\.\/utils\/logger['"];?/g
     ];
 
     incorrectValidationPatterns.forEach(pattern => {
       if (pattern.test(content)) {
-        content = content.replace(pattern, `import { validationService } from '${relativePrefix}utils/client-core';`);
+        content = content.replace(pattern, `import { validationService } from '${relativePrefix}utils/logger';`);
         modified = true;
       }
     });

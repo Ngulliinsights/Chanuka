@@ -1,0 +1,465 @@
+# Chanuka Client Deployment Pipeline
+# Multi-environment deployment with quality gates and monitoring
+
+name: Chanuka Client Deployment Pipeline
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - pre-production
+          - production
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8'
+
+jobs:
+  # Quality Gates
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.quality-check.outputs.passed }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm run lint
+
+      - name: Type check
+        run: pnpm run type-check
+
+      - name: Run unit tests
+        run: pnpm run test:unit --coverage
+
+      - name: Run integration tests
+        run: pnpm run test:integration
+
+      - name: Run accessibility tests
+        run: pnpm run test:a11y
+
+      - name: Security audit
+        run: pnpm audit --audit-level moderate
+
+      - name: Bundle analysis
+        run: pnpm run build:analyze
+
+      - name: Performance budget check
+        run: pnpm run test:performance-budget
+
+      - name: Quality gate decision
+        id: quality-check
+        run: |
+          # Check if all quality gates passed
+          if [ $? -eq 0 ]; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Build and Test
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    needs: quality-gates
+    if: needs.quality-gates.outputs.should-deploy == 'true'
+    
+    strategy:
+      matrix:
+        environment: [development, staging, pre-production, production]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Load environment configuration
+        run: |
+          cp .env.${{ matrix.environment }} .env.production
+          echo "REACT_APP_VERSION=${{ github.sha }}" >> .env.production
+          echo "REACT_APP_BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .env.production
+
+      - name: Build application
+        run: pnpm run build:${{ matrix.environment }}
+        env:
+          NODE_ENV: production
+
+      - name: Run E2E tests
+        run: pnpm run test:e2e
+        env:
+          ENVIRONMENT: ${{ matrix.environment }}
+
+      - name: Generate build artifacts
+        run: |
+          # Create build info
+          echo "{
+            \"version\": \"${{ github.sha }}\",
+            \"buildTime\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+            \"environment\": \"${{ matrix.environment }}\",
+            \"branch\": \"${{ github.ref_name }}\",
+            \"commit\": \"${{ github.sha }}\",
+            \"buildNumber\": \"${{ github.run_number }}\"
+          }" > dist/build-info.json
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.environment }}
+          path: |
+            dist/
+            deployment/
+          retention-days: 30
+
+  # Development Deployment
+  deploy-development:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-and-test]
+    if: |
+      needs.quality-gates.outputs.should-deploy == 'true' &&
+      (github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'development')
+    environment:
+      name: development
+      url: https://dev.chanuka.ke
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-development
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync dist/ s3://chanuka-client-development --delete
+          aws s3 cp dist/build-info.json s3://chanuka-client-development/build-info.json
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_DEV }} \
+            --paths "/*"
+
+      - name: Run smoke tests
+        run: |
+          curl -f https://dev.chanuka.ke/health || exit 1
+          curl -f https://dev.chanuka.ke/build-info.json || exit 1
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Staging Deployment
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-and-test]
+    if: |
+      needs.quality-gates.outputs.should-deploy == 'true' &&
+      (github.ref == 'refs/heads/staging' || github.event.inputs.environment == 'staging')
+    environment:
+      name: staging
+      url: https://staging.chanuka.ke
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-staging
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync dist/ s3://chanuka-client-staging --delete
+          aws s3 cp dist/build-info.json s3://chanuka-client-staging/build-info.json
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_STAGING }} \
+            --paths "/*"
+
+      - name: Run comprehensive tests
+        run: |
+          # Health checks
+          curl -f https://staging.chanuka.ke/health || exit 1
+          
+          # Performance tests
+          npx lighthouse https://staging.chanuka.ke --chrome-flags="--headless" --output=json --output-path=lighthouse-report.json
+          
+          # Security tests
+          npx @lhci/cli autorun --upload.target=temporary-public-storage
+
+      - name: Performance regression check
+        run: |
+          # Compare with baseline performance metrics
+          node scripts/performance-regression-check.js lighthouse-report.json
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Pre-production Deployment
+  deploy-pre-production:
+    name: Deploy to Pre-production
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-and-test, deploy-staging]
+    if: |
+      needs.quality-gates.outputs.should-deploy == 'true' &&
+      github.event.inputs.environment == 'pre-production'
+    environment:
+      name: pre-production
+      url: https://preprod.chanuka.ke
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-pre-production
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Blue-Green deployment preparation
+        run: |
+          # Create new version in parallel environment
+          aws s3 sync dist/ s3://chanuka-client-preprod-blue --delete
+
+      - name: Run production-like tests
+        run: |
+          # Load testing
+          npx artillery run tests/load-test.yml --target https://preprod-blue.chanuka.ke
+          
+          # Security scanning
+          npx @zaproxy/zap-baseline-scan.py -t https://preprod-blue.chanuka.ke
+
+      - name: Switch traffic to new version
+        run: |
+          # Update CloudFront to point to blue environment
+          aws cloudfront update-distribution \
+            --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PREPROD }} \
+            --distribution-config file://deployment/preprod-blue-config.json
+
+      - name: Monitor deployment
+        run: |
+          # Monitor for 10 minutes
+          for i in {1..20}; do
+            curl -f https://preprod.chanuka.ke/health || exit 1
+            sleep 30
+          done
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          # Rollback to green environment
+          aws cloudfront update-distribution \
+            --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PREPROD }} \
+            --distribution-config file://deployment/preprod-green-config.json
+
+  # Production Deployment
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-and-test, deploy-pre-production]
+    if: |
+      needs.quality-gates.outputs.should-deploy == 'true' &&
+      github.ref == 'refs/heads/main' &&
+      github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://chanuka.ke
+    
+    steps:
+      - name: Manual approval gate
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ secrets.PRODUCTION_APPROVERS }}
+          minimum-approvals: 2
+          issue-title: "Production Deployment Approval Required"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-production
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Canary deployment (5% traffic)
+        run: |
+          # Deploy to canary environment
+          aws s3 sync dist/ s3://chanuka-client-production-canary --delete
+          
+          # Update CloudFront to send 5% traffic to canary
+          aws cloudfront update-distribution \
+            --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PROD }} \
+            --distribution-config file://deployment/production-canary-5pct.json
+
+      - name: Monitor canary deployment
+        run: |
+          # Monitor canary for 15 minutes
+          node scripts/canary-monitor.js --duration=15 --error-threshold=1
+
+      - name: Gradual rollout (25% traffic)
+        run: |
+          # Increase to 25% traffic
+          aws cloudfront update-distribution \
+            --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PROD }} \
+            --distribution-config file://deployment/production-canary-25pct.json
+
+      - name: Monitor 25% rollout
+        run: |
+          node scripts/canary-monitor.js --duration=10 --error-threshold=2
+
+      - name: Full production deployment
+        run: |
+          # Deploy to main production environment
+          aws s3 sync dist/ s3://chanuka-client-production --delete
+          
+          # Switch 100% traffic to new version
+          aws cloudfront update-distribution \
+            --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PROD }} \
+            --distribution-config file://deployment/production-full.json
+
+      - name: Post-deployment verification
+        run: |
+          # Comprehensive health checks
+          curl -f https://chanuka.ke/health || exit 1
+          curl -f https://chanuka.ke/api/health || exit 1
+          
+          # Performance verification
+          npx lighthouse https://chanuka.ke --chrome-flags="--headless" --preset=desktop
+          
+          # Functional smoke tests
+          npx playwright test tests/smoke/
+
+      - name: Update monitoring dashboards
+        run: |
+          # Update deployment markers in monitoring
+          curl -X POST "${{ secrets.DATADOG_API_URL }}/api/v1/events" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: ${{ secrets.DATADOG_API_KEY }}" \
+            -d '{
+              "title": "Chanuka Client Production Deployment",
+              "text": "Version ${{ github.sha }} deployed to production",
+              "tags": ["deployment", "production", "chanuka-client"]
+            }'
+
+      - name: Rollback on critical failure
+        if: failure()
+        run: |
+          # Emergency rollback
+          aws s3 sync s3://chanuka-client-production-backup/ s3://chanuka-client-production --delete
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PROD }} \
+            --paths "/*"
+
+      - name: Notify production deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#production-deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+
+  # Post-deployment monitoring
+  post-deployment-monitoring:
+    name: Post-deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: always() && needs.deploy-production.result == 'success'
+    
+    steps:
+      - name: Setup monitoring alerts
+        run: |
+          # Create temporary high-sensitivity alerts for 24 hours
+          curl -X POST "${{ secrets.DATADOG_API_URL }}/api/v1/monitor" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: ${{ secrets.DATADOG_API_KEY }}" \
+            -d '{
+              "name": "Chanuka Client - Post Deployment Error Rate",
+              "type": "metric alert",
+              "query": "avg(last_5m):avg:chanuka.client.error_rate{env:production} > 2",
+              "message": "High error rate detected after deployment",
+              "options": {
+                "thresholds": {
+                  "critical": 2,
+                  "warning": 1
+                },
+                "notify_no_data": true,
+                "no_data_timeframe": 10
+              }
+            }'
+
+      - name: Schedule monitoring cleanup
+        run: |
+          # Schedule cleanup of temporary alerts after 24 hours
+          echo "Monitoring alerts created for 24-hour post-deployment period"

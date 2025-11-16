@@ -19,14 +19,11 @@ export * from './data-utils';
 
 // HTTP utilities - request/response handling, client, status codes
 // Note: Excluding ApiResponse to avoid conflict with api-utils
-export { 
-  HttpClient, 
-  HttpError, 
+export {
+  HttpClient,
+  HttpError,
   NetworkError,
   TimeoutError,
-  HttpRequestOptions,
-  HttpResponse,
-  HttpClientConfig,
   HTTP_STATUS,
   createSuccessResponse,
   createErrorResponse,
@@ -39,6 +36,8 @@ export {
   httpClient
 } from './http-utils';
 
+export type { HttpRequestOptions, HttpResponse, HttpClientConfig } from './http-utils';
+
 // Security utilities - sanitization, validation, encryption, authentication
 export * from './security-utils';
 
@@ -49,7 +48,8 @@ export * from './performance-utils';
 export * from './string-utils';
 
 // Type guards - runtime type checking and validation
-export * from './type-guards';
+export { TypeGuards } from './type-guards';
+export type { TypeValidationResult, SchemaValidationOptions } from './type-guards';
 
 // Browser logger - client-side logging utility
 export * from './browser-logger';

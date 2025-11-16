@@ -15,9 +15,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // Import components for keyboard testing
 import NavigationBar from '../../components/shell/NavigationBar';
 import { BillsDashboard } from '../../components/bills/bills-dashboard';
-import FilterPanel from '../../components/bills/FilterPanel';
-import BillDetailView from '../../components/bill-detail/BillDetailView';
-import DiscussionThread from '../../components/discussion/DiscussionThread';
+import { FilterPanel } from '../../components/bills/filter-panel';
+import BillDetailView from '../../pages/bill-detail';
+import { DiscussionThread } from '../../components/discussion/DiscussionThread';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 
@@ -580,14 +580,14 @@ describe('Keyboard Navigation Tests', () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              aria-expanded={suggestions.length > 0}
+              aria-label="Search"
               aria-autocomplete="list"
               aria-activedescendant={
                 selectedIndex >= 0 ? `suggestion-${selectedIndex}` : undefined
               }
             />
             {suggestions.length > 0 && (
-              <ul role="listbox">
+              <ul role="listbox" aria-label="Search suggestions">
                 {suggestions.map((suggestion, index) => (
                   <li
                     key={suggestion}

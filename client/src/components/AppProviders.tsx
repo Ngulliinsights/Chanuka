@@ -4,8 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from './error-handling';
 import { createNavigationProvider } from '../core/navigation/context';
 import { LoadingProvider } from '../core/loading';
-import { AuthProvider } from './auth/AuthProvider';
-import { useAuth } from '../hooks/use-auth';
+import { AuthProvider, useAuth } from '../hooks/use-auth';
 import { useConnectionAware } from '../hooks/useConnectionAware';
 import { useOfflineDetection } from '../hooks/useOfflineDetection';
 import { assetLoadingManager } from '../utils/asset-loading';
@@ -27,12 +26,21 @@ const NavigationProvider = createNavigationProvider(
   useMediaQuery
 );
 
-// Create the React-specific LoadingProvider (inject runtime deps)
-const LoadingProviderWithDeps = createLoadingProvider(
-  useConnectionAware,
-  () => useOfflineDetection().isOnline,
-  assetLoadingManager
-);
+// Create a wrapper component for LoadingProvider with dependencies
+function LoadingProviderWithDeps({ children }: { children: React.ReactNode }) {
+  const connectionInfo = useConnectionAware();
+  const { isOnline } = useOfflineDetection();
+  
+  return (
+    <LoadingProvider
+      useConnectionAware={() => connectionInfo}
+      useOnlineStatus={() => isOnline}
+      assetLoadingManager={assetLoadingManager}
+    >
+      {children}
+    </LoadingProvider>
+  );
+}
 
 interface ProviderConfig {
   name: string;

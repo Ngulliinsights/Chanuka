@@ -616,7 +616,7 @@ UnifiedPerformanceMonitor.endTimer('operation');
 Existing imports continue to work with deprecation warnings:
 \`\`\`typescript
 import { ApiResponseWrapper } from '@shared/core/utils/api'-response'; // Still works
-import { logger } from '@shared/core/utils/browser-logger''; // Still works
+import { logger } from '@shared/core/utils/logger''; // Still works
 \`\`\`
 
 ## Next Steps

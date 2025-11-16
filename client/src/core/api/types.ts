@@ -1,6 +1,8 @@
 // Unified Type Definitions for API Client Architecture
 // Based on the consolidated API client design specifications
 
+import { ZodSchema } from 'zod';
+
 // Base API Types
 export interface ApiRequest<T = any> {
   id: string;
@@ -33,6 +35,10 @@ export interface RequestOptions {
   validate?: ValidationOptions;
   headers?: Record<string, string>;
   params?: Record<string, any>;
+  fallbackData?: any;
+  skipCache?: boolean;
+  cacheTTL?: number;
+  responseSchema?: ZodSchema<any>;
 }
 
 export interface RetryConfig {

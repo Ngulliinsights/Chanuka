@@ -41,8 +41,8 @@ export class UIError extends Error {
   }
 }
 
-// Import unified ValidationError from shared core types
-import type { ValidationError } from '../../../shared/core/src/types/validation-types';
+// Import ValidationError from client logger where it's defined
+import type { ValidationError } from '../../utils/logger';
 
 // Re-export for backward compatibility
 export type { ValidationError };

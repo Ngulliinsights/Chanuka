@@ -1,0 +1,2035 @@
+# Chanuka Platform UI - Complete Implementation Guide
+
+## Document Overview
+
+**Version:** 1.0  
+**Last Updated:** November 9, 2025  
+**Purpose:** Comprehensive implementation guide for building the Chanuka civic engagement platform UI  
+**Audience:** Development teams and AI coding agents
+
+This document provides a complete, unified implementation plan for the Chanuka platform UI. It breaks down the entire system into concrete, actionable tasks with detailed code examples, success criteria, and testing requirements. The structure is optimized for both human developers and AI coding agents.
+
+---
+
+## Table of Contents
+
+1. [Implementation Strategy](#implementation-strategy)
+2. [Phase 1: Foundation (Weeks 1-4)](#phase-1-foundation)
+3. [Phase 2: Discovery Features (Weeks 5-8)](#phase-2-discovery-features)
+4. [Phase 3: Detail & Analysis (Weeks 9-12)](#phase-3-detail-analysis)
+5. [Phase 4: Community & Real-time (Weeks 13-16)](#phase-4-community-realtime)
+6. [Quality Standards](#quality-standards)
+7. [AI Agent Usage Guide](#ai-agent-usage)
+
+---
+
+## Implementation Strategy
+
+### Guiding Principles
+
+The implementation follows an iterative approach where each phase delivers working, testable functionality. Tasks are structured to minimize blocking dependencies while ensuring proper architectural foundations are established early. Every task includes explicit requirements traceability, measurable success criteria, and comprehensive testing requirements.
+
+### Technology Stack
+
+The platform is built using modern web technologies optimized for performance, accessibility, and developer experience:
+
+- **Frontend Framework:** React 18 with TypeScript in strict mode
+- **Build Tool:** Vite for fast development and optimized production builds
+- **Styling:** Tailwind CSS with custom design system tokens
+- **State Management:** Redux Toolkit with normalized data structures
+- **Routing:** React Router with code splitting and lazy loading
+- **Component Library:** shadcn/ui for accessible, customizable components
+- **Real-time:** WebSocket middleware for live updates
+- **Testing:** Jest and React Testing Library with accessibility testing
+
+### Development Workflow
+
+Each task follows a consistent workflow pattern. First, implement one subtask at a time to maintain focus and enable incremental testing. After completing each subtask, run the associated tests to verify functionality. Before moving to the next subtask, verify that all success criteria are met and document any deviations from the specification. If dependencies change during implementation, update related tasks accordingly to maintain system coherence.
+
+---
+
+## Phase 1: Foundation (Weeks 1-4)
+
+### TASK-F-001: Project Setup & Configuration
+
+**Purpose:** Establish the foundational project structure, build configuration, and development tooling to enable efficient development from day one.
+
+**Requirements Fulfilled:** REQ-PA-001 (Core Web Vitals), REQ-SP-003 (Content Security)
+
+**Success Criteria:**
+- Development server starts within 5 seconds of running npm commands
+- Pre-commit hooks successfully run linting and type checking
+- Production builds meet performance budgets (main bundle under 100KB gzipped)
+- CI/CD pipeline runs all checks automatically on pull requests
+
+**Implementation:**
+
+Initialize the project using Vite with React and TypeScript. This combination provides the fastest development experience while maintaining production-ready output quality.
+
+```bash
+npm create vite@latest chanuka-ui -- --template react-ts
+cd chanuka-ui
+npm install
+```
+
+Configure TypeScript with strict mode enabled in tsconfig.json. Set up path aliases for clean imports throughout the application, such as @/components for component files and @/services for API integration code. This makes refactoring easier and import statements more readable.
+
+```typescript
+// vite.config.ts - Build optimization configuration
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          'chart-vendor': ['recharts', 'd3']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 100
+  },
+  plugins: [
+    react(),
+    compression(),
+    visualizer() // Analyzes bundle sizes
+  ]
+});
+```
+
+The build configuration enables code splitting by route and vendor library, ensuring users only download the JavaScript they need for the current page. The visualizer plugin helps identify bundle bloat during development.
+
+Configure ESLint with accessibility rules to catch common issues during development rather than in production. Include the jsx-a11y plugin to enforce WCAG 2.1 AA standards automatically.
+
+```json
+// .eslintrc.json
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsx-a11y/recommended"
+  ],
+  "rules": {
+    "jsx-a11y/no-autofocus": "error",
+    "jsx-a11y/click-events-have-key-events": "error"
+  }
+}
+```
+
+Set up GitHub Actions for continuous integration. The pipeline runs on every push and pull request, ensuring code quality standards are maintained across the team.
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run test
+      - run: npm run build
+```
+
+**Testing:** Verify that the development server starts without errors, production builds complete successfully, linting passes with no violations, TypeScript type checking passes, bundle sizes meet performance budgets, and the CI pipeline runs all checks correctly.
+
+---
+
+### TASK-F-002: Design System Integration
+
+**Purpose:** Integrate the Chanuka design system, configure Tailwind CSS, and establish the component library foundation for consistent styling.
+
+**Requirements Fulfilled:** REQ-PA-001 (Performance), REQ-PA-002 (Accessibility)
+
+**Success Criteria:**
+- Components using design tokens maintain consistent styling
+- Theme switching updates all components without flicker
+- Typography scale maintains proper semantic hierarchy
+- CSS bundle remains under 50KB in production
+
+**Implementation:**
+
+Install and configure Tailwind CSS with the design system tokens. Tailwind's utility-first approach combined with custom design tokens ensures consistency while maintaining flexibility.
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+```typescript
+// tailwind.config.js
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#0ea5e9',
+          900: '#0c4a6e'
+        },
+        // Additional color scales from design system
+      },
+      spacing: {
+        // Consistent spacing scale
+      },
+      typography: {
+        // Typography system configuration
+      }
+    }
+  },
+  plugins: [require('@tailwindcss/typography')]
+};
+```
+
+Implement a theme provider that supports light and dark modes with localStorage persistence. This ensures user preferences persist across sessions and system preferences are respected.
+
+```typescript
+// src/components/providers/ThemeProvider.tsx
+export const ThemeProvider: React.FC = ({ children }) => {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    // Check localStorage first, then system preference
+    const stored = localStorage.getItem('theme');
+    if (stored) return stored as 'light' | 'dark';
+    
+    return window.matchMedia('(prefers-color-scheme: dark)').matches 
+      ? 'dark' 
+      : 'light';
+  });
+  
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+    root.classList.add(theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+  
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+```
+
+Integrate shadcn/ui components for the base component library. These components are built on Radix UI primitives, ensuring accessibility is built in from the start.
+
+```bash
+npx shadcn-ui@latest init
+npx shadcn-ui@latest add button card dialog dropdown-menu tabs
+```
+
+Create a typography system with semantic HTML elements to maintain proper document structure and accessibility.
+
+```typescript
+// src/components/ui/Typography.tsx
+const typographyVariants = {
+  h1: 'text-4xl font-bold tracking-tight',
+  h2: 'text-3xl font-semibold tracking-tight',
+  h3: 'text-2xl font-semibold tracking-tight',
+  body: 'text-base leading-relaxed',
+  caption: 'text-sm text-muted-foreground'
+};
+
+export const Typography: React.FC<TypographyProps> = ({
+  variant,
+  children,
+  className
+}) => {
+  const Component = variantToElement[variant];
+  return (
+    <Component className={cn(typographyVariants[variant], className)}>
+      {children}
+    </Component>
+  );
+};
+```
+
+**Testing:** Verify design tokens import correctly, theme switching works without visual flicker, components render properly in both light and dark themes, typography hierarchy is semantically correct, and the CSS bundle size remains under budget.
+
+---
+
+### TASK-F-003: Application Shell & Routing
+
+**Purpose:** Create the root application structure with navigation, routing, authentication, and error handling to provide the foundation for all features.
+
+**Requirements Fulfilled:** REQ-BD-001 (Dashboard Core), REQ-SP-001 (Authentication)
+
+**Success Criteria:**
+- Client-side route transitions are instant with no page reload
+- Error boundary catches errors and displays graceful fallback UI
+- Unauthenticated users are redirected to login for protected routes
+- Navigation is fully keyboard accessible and responsive across viewports
+
+**Implementation:**
+
+Create the app shell that wraps all other components with necessary providers and error boundaries. This structure ensures proper initialization order and error handling throughout the application.
+
+```typescript
+// src/App.tsx
+export const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <ErrorBoundary fallback={<ErrorFallback />}>
+          <AppShell>
+            <Suspense fallback={<LoadingScreen />}>
+              <Router />
+            </Suspense>
+          </AppShell>
+        </ErrorBoundary>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+};
+```
+
+Configure React Router with lazy loading for route-based code splitting. This ensures users only download the code for the pages they visit, significantly improving initial load times.
+
+```typescript
+// src/routes/index.tsx
+const BillsDashboard = lazy(() => import('@/pages/BillsDashboard'));
+const BillDetail = lazy(() => import('@/pages/BillDetail'));
+const Search = lazy(() => import('@/pages/Search'));
+const UserDashboard = lazy(() => import('@/pages/UserDashboard'));
+
+export const Router: React.FC = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<BillsDashboard />} />
+      <Route path="/bills/:id" element={<BillDetail />} />
+      <Route path="/search" element={<Search />} />
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute>
+            <UserDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+```
+
+Implement authentication context for managing user state across the application. This provides a single source of truth for authentication status and user information.
+
+```typescript
+// src/contexts/AuthContext.tsx
+export const AuthProvider: React.FC = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    // Check for existing session on mount
+    checkAuthStatus().then(setUser).finally(() => setLoading(false));
+  }, []);
+  
+  const login = async (credentials: Credentials) => {
+    const user = await authService.login(credentials);
+    setUser(user);
+    localStorage.setItem('auth_token', user.token);
+  };
+  
+  const logout = () => {
+    authService.logout();
+    setUser(null);
+    localStorage.removeItem('auth_token');
+  };
+  
+  return (
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+```
+
+Create a global error boundary to catch and gracefully handle errors throughout the application. This prevents the entire app from crashing when individual components encounter errors.
+
+```typescript
+// src/components/errors/ErrorBoundary.tsx
+export class ErrorBoundary extends React.Component<Props, State> {
+  state = { hasError: false, error: null };
+  
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log error to monitoring service
+    logErrorToService({
+      error,
+      errorInfo,
+      userAgent: navigator.userAgent,
+      url: window.location.href
+    });
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return (
+        <ErrorFallback
+          error={this.state.error}
+          resetError={() => this.setState({ hasError: false, error: null })}
+        />
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+
+**Testing:** Verify all routes load without errors, navigation works via keyboard, authentication state persists across page reloads, error boundary catches errors appropriately, layouts are responsive across screen sizes, and skip links work correctly for accessibility.
+
+---
+
+### TASK-F-004: State Management Setup
+
+**Purpose:** Configure Redux Toolkit for global state management with middleware for API calls and WebSocket integration.
+
+**Requirements Fulfilled:** REQ-DI-001 (Real-time Sync), all data-related requirements
+
+**Success Criteria:**
+- API requests are handled automatically by Redux middleware
+- Data is normalized and stored efficiently in state
+- WebSocket messages update state without manual dispatching
+- Components re-render appropriately when state updates
+
+**Implementation:**
+
+Configure the Redux store with all necessary reducers and middleware. The store serves as the single source of truth for application state.
+
+```typescript
+// src/store/index.ts
+export const store = configureStore({
+  reducer: {
+    bills: billsSlice.reducer,
+    sponsors: sponsorsSlice.reducer,
+    comments: commentsSlice.reducer,
+    auth: authSlice.reducer,
+    ui: uiSlice.reducer,
+    realtime: realtimeSlice.reducer
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware()
+      .concat(apiMiddleware)
+      .concat(websocketMiddleware),
+  devTools: process.env.NODE_ENV !== 'production'
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+Create a normalized state structure for bills. Normalization prevents data duplication and makes updates efficient by storing entities by ID in an object rather than an array.
+
+```typescript
+// src/store/slices/billsSlice.ts
+interface BillsState {
+  byId: Record<string, Bill>;
+  allIds: string[];
+  filters: FilterState;
+  sort: SortOptions;
+  loading: boolean;
+  error: string | null;
+}
+
+export const billsSlice = createSlice({
+  name: 'bills',
+  initialState,
+  reducers: {
+    billsReceived: (state, action: PayloadAction<Bill[]>) => {
+      const normalized = normalizeBills(action.payload);
+      state.byId = { ...state.byId, ...normalized.byId };
+      state.allIds = [...new Set([...state.allIds, ...normalized.allIds])];
+      state.loading = false;
+    },
+    billUpdated: (state, action: PayloadAction<Bill>) => {
+      state.byId[action.payload.id] = action.payload;
+    }
+  }
+});
+```
+
+Implement WebSocket middleware for real-time updates. This middleware manages the WebSocket connection lifecycle and automatically dispatches actions when messages arrive.
+
+```typescript
+// src/store/middleware/websocketMiddleware.ts
+export const websocketMiddleware: Middleware = (store) => {
+  let socket: WebSocket | null = null;
+  
+  return (next) => (action) => {
+    switch (action.type) {
+      case 'realtime/connect':
+        if (socket) socket.close();
+        
+        socket = new WebSocket(WS_URL);
+        
+        socket.onopen = () => {
+          store.dispatch({ type: 'realtime/connected' });
+        };
+        
+        socket.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+          handleWebSocketMessage(message, store.dispatch);
+        };
+        
+        socket.onclose = () => {
+          store.dispatch({ type: 'realtime/disconnected' });
+          // Reconnect after 5 seconds
+          setTimeout(() => {
+            store.dispatch({ type: 'realtime/connect' });
+          }, 5000);
+        };
+        break;
+        
+      case 'realtime/disconnect':
+        if (socket) {
+          socket.close();
+          socket = null;
+        }
+        break;
+    }
+    
+    return next(action);
+  };
+};
+```
+
+Create typed hooks for use throughout the application. These hooks provide TypeScript autocompletion and type safety when accessing state.
+
+```typescript
+// src/store/hooks.ts
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+// Custom hooks for common operations
+export const useBills = () => {
+  const bills = useAppSelector(selectAllBills);
+  const loading = useAppSelector(state => state.bills.loading);
+  const error = useAppSelector(state => state.bills.error);
+  
+  return { bills, loading, error };
+};
+```
+
+**Testing:** Verify the store initializes with correct structure, actions update state correctly, API middleware handles requests, WebSocket middleware connects and receives messages, selectors return correct data, and TypeScript types are accurate.
+
+---
+
+## Phase 2: Discovery Features (Weeks 5-8)
+
+### TASK-BD-001: Bills Dashboard Implementation
+
+**Purpose:** Build the main bills dashboard with statistics overview, bill cards, and responsive grid layout.
+
+**Requirements Fulfilled:** REQ-BD-001 (Dashboard Core), REQ-BD-002 (Enhanced Bill Card)
+
+**Success Criteria:**
+- Statistics display within 2.5 seconds (Largest Contentful Paint target)
+- Grid adapts to viewport (3 columns desktop, 2 tablet, 1 mobile)
+- All required bill information displays on cards
+- Core content displays even with JavaScript disabled
+
+**Implementation:**
+
+The bills dashboard serves as the primary entry point for discovering legislative activity. It combines real-time statistics, filtering capabilities, and an engaging card-based layout that adapts to any screen size.
+
+```typescript
+// src/pages/BillsDashboard/index.tsx
+export const BillsDashboard: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { bills, loading, error } = useBills();
+  
+  useEffect(() => {
+    // Fetch bills and connect to real-time updates
+    dispatch(fetchBills());
+    dispatch({ type: 'realtime/connect' });
+    
+    return () => {
+      dispatch({ type: 'realtime/disconnect' });
+    };
+  }, [dispatch]);
+  
+  if (loading && bills.length === 0) {
+    return <DashboardSkeleton />;
+  }
+  
+  return (
+    <PageLayout
+      header={<DashboardHeader />}
+      sidebar={<FilterPanel />}
+    >
+      <StatsOverview />
+      <BillsGrid bills={bills} />
+    </PageLayout>
+  );
+};
+```
+
+The stats overview provides at-a-glance insights into current legislative activity. These metrics update in real-time via WebSocket connections, keeping users informed of changing conditions.
+
+```typescript
+// src/components/dashboard/StatsOverview.tsx
+export const StatsOverview: React.FC = () => {
+  const stats = useAppSelector(selectDashboardStats);
+  
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatCard
+        title="Active Bills"
+        value={stats.totalBills}
+        icon={<FileTextIcon />}
+        trend={stats.billsTrend}
+      />
+      <StatCard
+        title="Urgent Items"
+        value={stats.urgentCount}
+        icon={<AlertTriangleIcon />}
+        variant="warning"
+        trend={stats.urgentTrend}
+      />
+      <StatCard
+        title="Constitutional Flags"
+        value={stats.constitutionalFlags}
+        icon={<ShieldAlertIcon />}
+        variant="danger"
+        trend={stats.flagsTrend}
+      />
+      <StatCard
+        title="Trending Discussions"
+        value={stats.trendingCount}
+        icon={<TrendingUpIcon />}
+        variant="success"
+        trend={stats.trendingTrend}
+      />
+    </div>
+  );
+};
+```
+
+The bill card component displays comprehensive information about each bill in a visually appealing, scannable format. The card uses color coding, badges, and icons to quickly communicate key information.
+
+```typescript
+// src/components/bills/BillCard.tsx
+export const BillCard: React.FC<BillCardProps> = ({ bill, onSave, onShare }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <article
+      className="relative rounded-lg border bg-card transition-shadow hover:shadow-lg"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Status indicator - colored left border */}
+      <div 
+        className={cn(
+          "absolute left-0 top-0 bottom-0 w-1 rounded-l-lg",
+          statusColorMap[bill.status]
+        )}
+        aria-hidden="true"
+      />
+      
+      {/* Urgency badge in top right */}
+      {bill.urgencyLevel !== 'low' && (
+        <Badge 
+          variant={urgencyVariantMap[bill.urgencyLevel]}
+          className="absolute top-4 right-4"
+        >
+          {bill.urgencyLevel}
+        </Badge>
+      )}
+      
+      <div className="p-6">
+        <h3 className="text-xl font-semibold mb-2">
+          <Link to={`/bills/${bill.id}`}>
+            {bill.title}
+          </Link>
+        </h3>
+        
+        <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+          {bill.summary}
+        </p>
+        
+        {/* Engagement metrics */}
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t">
+          <MetricBadge icon={<EyeIcon />} value={bill.viewCount} />
+          <MetricBadge icon={<MessageSquareIcon />} value={bill.commentCount} />
+          <MetricBadge icon={<ShareIcon />} value={bill.shareCount} />
+        </div>
+      </div>
+      
+      {/* Quick actions appear on hover */}
+      {isHovered && (
+        <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center gap-4">
+          <Button variant="secondary" size="sm" onClick={() => onSave(bill.id)}>
+            Save
+          </Button>
+          <Button variant="secondary" size="sm" onClick={() => onShare(bill.id)}>
+            Share
+          </Button>
+        </div>
+      )}
+    </article>
+  );
+};
+```
+
+**Testing:** Verify dashboard loads and displays bills successfully, bill cards render all required elements, keyboard navigation works throughout, LCP meets the 2.5 second target, grid adapts correctly at all breakpoints, and basic content displays without JavaScript enabled.
+
+---
+
+### TASK-BD-002: Advanced Filtering System
+
+**Purpose:** Implement sophisticated multi-dimensional filtering with URL synchronization and mobile optimization.
+
+**Requirements Fulfilled:** REQ-BD-003 (Smart Filtering System)
+
+**Success Criteria:**
+- Filter application updates results within 300 milliseconds
+- Sharing filtered URLs shows identical results to recipients
+- Mobile users access filters through optimized bottom sheet interface
+- Helpful empty state displays when no bills match filters
+
+**Implementation:**
+
+The filtering system allows users to precisely narrow down bills based on multiple criteria. The implementation includes both desktop and mobile interfaces, URL synchronization for sharing, and dynamic result count previews.
+
+```typescript
+// src/components/filters/FilterPanel.tsx
+export const FilterPanel: React.FC = () => {
+  const filters = useAppSelector(state => state.bills.filters);
+  const resultCounts = useAppSelector(selectFilterResultCounts);
+  const dispatch = useAppDispatch();
+  
+  const handleFilterChange = (category: string, values: string[]) => {
+    const newFilters = { ...filters, [category]: values };
+    dispatch(updateFilters(newFilters));
+  };
+  
+  return (
+    <aside className="filter-panel w-64 space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Filters</h2>
+        {Object.keys(filters).length > 0 && (
+          <Button variant="ghost" size="sm" onClick={() => dispatch(clearFilters())}>
+            Clear All
+          </Button>
+        )}
+      </div>
+      
+      <FilterSection
+        title="Bill Type"
+        options={billTypeOptions}
+        selected={filters.billType || []}
+        onChange={(values) => handleFilterChange('billType', values)}
+        resultCounts={resultCounts.billType}
+      />
+      
+      <FilterSection
+        title="Policy Areas"
+        options={policyAreaOptions}
+        selected={filters.policyAreas || []}
+        onChange={(values) => handleFilterChange('policyAreas', values)}
+        resultCounts={resultCounts.policyAreas}
+      />
+      
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="constitutional-flags"
+          checked={filters.constitutionalFlags || false}
+          onCheckedChange={(checked) => handleFilterChange('constitutionalFlags', checked)}
+        />
+        <label htmlFor="constitutional-flags" className="text-sm cursor-pointer">
+          Show only bills with constitutional concerns
+        </label>
+      </div>
+    </aside>
+  );
+};
+```
+
+Active filter chips provide visual feedback about current filters and allow quick removal of individual criteria without opening the filter panel.
+
+```typescript
+// src/components/filters/ActiveFilters.tsx
+export const ActiveFilters: React.FC = () => {
+  const filters = useAppSelector(state => state.bills.filters);
+  const dispatch = useAppDispatch();
+  
+  const activeFilterChips = useMemo(() => {
+    const chips: FilterChip[] = [];
+    
+    Object.entries(filters).forEach(([category, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach(v => {
+          chips.push({
+            category,
+            value: v,
+            label: getFilterLabel(category, v),
+            onRemove: () => dispatch(removeFilter({ category, value: v }))
+          });
+        });
+      }
+    });
+    
+    return chips;
+  }, [filters, dispatch]);
+  
+  if (activeFilterChips.length === 0) return null;
+  
+  return (
+    <div className="flex flex-wrap gap-2 mb-4">
+      {activeFilterChips.map((chip, index) => (
+        <Badge key={index} variant="secondary" className="flex items-center gap-2">
+          <span>{chip.label}</span>
+          <button onClick={chip.onRemove} aria-label={`Remove ${chip.label} filter`}>
+            <XIcon className="h-3 w-3" />
+          </button>
+        </Badge>
+      ))}
+      
+      <Button variant="ghost" size="sm" onClick={() => dispatch(clearFilters())}>
+        Clear all
+      </Button>
+    </div>
+  );
+};
+```
+
+URL synchronization enables sharing specific filtered views with others. The implementation maintains filter state in the URL query string, making links shareable and bookmarkable.
+
+```typescript
+// src/hooks/useFilterUrlSync.ts
+export const useFilterUrlSync = () => {
+  const filters = useAppSelector(state => state.bills.filters);
+  const dispatch = useAppDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Sync filters to URL when they change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    
+    Object.entries(filters).forEach(([key, value]) => {
+      if (Array.isArray(value) && value.length > 0) {
+        params.set(key, value.join(','));
+      } else if (value && typeof value === 'object') {
+        params.set(key, JSON.stringify(value));
+      } else if (value) {
+        params.set(key, String(value));
+      }
+    });
+    
+    setSearchParams(params, { replace: true });
+  }, [filters, setSearchParams]);
+  
+  // Read filters from URL on mount
+  useEffect(() => {
+    const filtersFromUrl: FilterState = {};
+    
+    searchParams.forEach((value, key) => {
+      if (value.includes(',')) {
+        filtersFromUrl[key] = value.split(',');
+      } else {
+        filtersFromUrl[key] = value;
+      }
+    });
+    
+    if (Object.keys(filtersFromUrl).length > 0) {
+      dispatch(updateFilters(filtersFromUrl));
+    }
+  }, []); // Only run on mount
+};
+```
+
+**Testing:** Verify filters update results within 300ms, filter state persists in URLs and restores correctly, the bottom sheet appears and functions on mobile devices, filter controls are keyboard navigable with proper ARIA labels, filter operations don't block the UI thread, and the empty state displays appropriate messaging when no results match.
+
+---
+
+## Phase 3: Detail & Analysis (Weeks 9-12)
+
+### TASK-BDA-001: Bill Detail Page Core
+
+**Purpose:** Build comprehensive bill detail pages with tabbed navigation, progressive disclosure, and performance optimization.
+
+**Requirements Fulfilled:** REQ-BDA-001 (Bill Detail Core), REQ-BDA-002 (Progressive Disclosure)
+
+**Success Criteria:**
+- Bill header displays within 1 second of page load
+- Tab content loads within 300ms when selected
+- Progressive navigation tracks user scroll position accurately
+- Quick actions trigger appropriate behaviors immediately
+
+**Implementation:**
+
+The bill detail page provides deep information about individual bills through an organized tabbed interface. Progressive navigation helps users understand their position within long content and quickly jump to relevant sections.
+
+```typescript
+// src/pages/BillDetail/index.tsx
+export const BillDetail: React.FC = () => {
+  const { billId } = useParams<{ billId: string }>();
+  const bill = useAppSelector(state => selectBillById(state, billId!));
+  const [activeTab, setActiveTab] = useState('overview');
+  const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    if (billId && !bill) {
+      dispatch(fetchBillById(billId));
+    }
+    
+    // Subscribe to real-time updates for this specific bill
+    dispatch({ type: 'realtime/subscribe', payload: { billId } });
+    
+    return () => {
+      dispatch({ type: 'realtime/unsubscribe', payload: { billId } });
+    };
+  }, [billId, bill, dispatch]);
+  
+  if (!bill) return <BillDetailSkeleton />;
+  
+  return (
+    <PageLayout
+      header={<BillHeader bill={bill} />}
+      sidebar={<ProgressiveNavigation bill={bill} activeTab={activeTab} />}
+      sidebarPosition="right"
+    >
+      <QuickActionsBar bill={bill} />
+      
+      <TabbedContent
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        tabs={[
+          { id: 'overview', label: 'Overview', content: <OverviewTab bill={bill} /> },
+          { id: 'full-text', label: 'Full Text', content: <FullTextTab bill={bill} /> },
+          { id: 'analysis', label: 'Analysis', badge: bill.constitutionalFlags.length, content: <AnalysisTab bill={bill} /> },
+          { id: 'community', label: 'Community', badge: bill.commentCount, content: <CommunityTab bill={bill} /> }
+        ]}
+      />
+    </PageLayout>
+  );
+};
+```
+
+The bill header prominently displays essential metadata using semantic HTML and proper visual hierarchy.
+
+```typescript
+// src/components/bill-detail/BillHeader.tsx
+export const BillHeader: React.FC<BillHeaderProps> = ({ bill }) => {
+  return (
+    <header className="bill-header border-b pb-6 mb-6">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <Badge variant={statusVariantMap[bill.status]}>
+          {bill.status.replace('_', ' ')}
+        </Badge>
+        
+        {bill.urgencyLevel !== 'low' && (
+          <Badge variant={urgencyVariantMap[bill.urgencyLevel]}>
+            {bill.urgencyLevel} Priority
+          </Badge>
+        )}
+        
+        {bill.constitutionalFlags.length > 0 && (
+          <Badge variant="destructive">
+            <ShieldAlertIcon className="h-3 w-3 mr-1" />
+            {bill.constitutionalFlags.length} Constitutional Concern(s)
+          </Badge>
+        )}
+      </div>
+      
+      <h1 className="text-3xl font-bold mb-4">{bill.title}</h1>
+      
+      <p className="text-lg text-muted-foreground mb-6">{bill.summary}</p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">Introduced</h3>
+          <time dateTime={bill.introducedDate.toISOString()}>
+            {formatDate(bill.introducedDate)}
+          </time>
+        </div>
+        
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">Last Updated</h3>
+          <time dateTime={bill.lastUpdated.toISOString()}>
+            {formatRelativeTime(bill.lastUpdated)}
+          </time>
+        </div>
+        
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">Primary Sponsors</h3>
+          <div className="flex flex-wrap gap-2">
+            {bill.sponsors.slice(0, 3).map(sponsor => (
+              <Link key={sponsor.id} to={`/sponsors/${sponsor.id}`} className="text-primary hover:underline">
+                {sponsor.name}
+              </Link>
+            ))}
+            {bill.sponsors.length > 3 && (
+              <span className="text-muted-foreground">+{bill.sponsors.length - 3} more</span>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+```
+
+Progressive navigation tracks scroll position and provides quick jump links to major sections, helping users navigate long documents efficiently.
+
+```typescript
+// src/components/bill-detail/ProgressiveNavigation.tsx
+export const ProgressiveNavigation: React.FC<ProgressiveNavigationProps> = ({ bill, activeTab }) => {
+  const [currentSection, setCurrentSection] = useState<string>('');
+  const [readingProgress, setReadingProgress] = useState(0);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = document.querySelectorAll('[data-section]');
+      const scrollPosition = window.scrollY + window.innerHeight / 3;
+      
+      sections.forEach(section => {
+        const element = section as HTMLElement;
+        const top = element.offsetTop;
+        const bottom = top + element.offsetHeight;
+        
+        if (scrollPosition >= top && scrollPosition < bottom) {
+          setCurrentSection(element.dataset.section || '');
+        }
+      });
+      
+      // Calculate reading progress
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrolled = window.scrollY;
+      const progress = (scrolled / (documentHeight - windowHeight)) * 100;
+      setReadingProgress(Math.min(100, Math.max(0, progress)));
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  const sections = useMemo(() => getSectionsForTab(activeTab, bill), [activeTab, bill]);
+  
+  return (
+    <nav className="progressive-navigation sticky top-24 space-y-4">
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium">Reading Progress</span>
+          <span className="text-sm text-muted-foreground">{Math.round(readingProgress)}%</span>
+        </div>
+        <Progress value={readingProgress} className="h-2" />
+      </Card>
+      
+      <Card className="p-4">
+        <h3 className="text-sm font-medium mb-3">Jump to Section</h3>
+        <nav aria-label="Page sections">
+          <ul className="space-y-2">
+            {sections.map(section => (
+              <li key={section.id}>
+                <button
+                  onClick={() => scrollToSection(section.id)}
+                  className={cn(
+                    "w-full text-left text-sm px-2 py-1 rounded transition-colors",
+                    currentSection === section.id
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "hover:bg-muted"
+                  )}
+                >
+                  {section.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </Card>
+    </nav>
+  );
+};
+```
+
+**Testing:** Verify bill detail pages load complete information, progressive navigation tracks scroll position accurately, tabbed navigation follows ARIA patterns and supports keyboard navigation, page achieves LCP under 1 second, URL fragments correctly select initial tabs, and bill updates appear without page refresh.
+
+---
+
+### TASK-BDA-002: Constitutional Analysis Panel
+
+**Purpose:** Display constitutional concerns with expert analysis, legal precedents, and civic action guidance.
+
+**Requirements Fulfilled:** REQ-BDA-003 (Constitutional Analysis), REQ-CE-002 (Expert Verification)
+
+**Success Criteria:**
+- Constitutional flags display with clear severity indicators
+- Expert credentials and credibility scores are visible
+- Legal precedents show full citations and summaries
+- Clear civic action guidance is provided to users
+
+**Implementation:**
+
+The constitutional analysis panel presents expert-identified concerns about potential constitutional issues in legislation. The implementation emphasizes transparency through expert verification, clear severity indicators, and actionable guidance.
+
+```typescript
+// src/components/bill-detail/analysis/ConstitutionalAnalysisPanel.tsx
+export const ConstitutionalAnalysisPanel: React.FC<ConstitutionalAnalysisPanelProps> = ({ bill }) => {
+  const flags = bill.constitutionalFlags;
+  
+  const sortedFlags = useMemo(() => {
+    // Sort by severity: critical > high > moderate > low
+    const severityOrder = { critical: 0, high: 1, moderate: 2, low: 3 };
+    return [...flags].sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+  }, [flags]);
+  
+  if (flags.length === 0) {
+    return (
+      <Card className="p-6">
+        <div className="flex items-start gap-4">
+          <CheckCircleIcon className="h-6 w-6 text-success flex-shrink-0" />
+          <div>
+            <h3 className="font-semibold mb-2">No Constitutional Concerns Identified</h3>
+            <p className="text-muted-foreground">
+              Based on current expert analysis, this bill does not appear to raise significant 
+              constitutional concerns. However, constitutional implications can evolve as bills 
+              are amended or implemented.
+            </p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+  
+  return (
+    <div className="constitutional-analysis space-y-6" data-section="constitutional-analysis">
+      <Alert variant={getHighestSeverityVariant(flags)}>
+        <ShieldAlertIcon className="h-5 w-5" />
+        <AlertTitle>Constitutional Analysis Summary</AlertTitle>
+        <AlertDescription>
+          {flags.length} constitutional {flags.length === 1 ? 'concern has' : 'concerns have'} 
+          been identified by expert reviewers. Review the detailed analysis below.
+        </AlertDescription>
+      </Alert>
+      
+      {sortedFlags.map(flag => (
+        <ConstitutionalFlagCard key={flag.id} flag={flag} billId={bill.id} />
+      ))}
+    </div>
+  );
+};
+```
+
+Each constitutional flag is presented in a detailed card with expandable sections for expert analysis and legal precedents.
+
+```typescript
+// src/components/bill-detail/analysis/ConstitutionalFlagCard.tsx
+export const ConstitutionalFlagCard: React.FC<ConstitutionalFlagCardProps> = ({ flag, billId }) => {
+  const [isExpanded, setIsExpanded] = useState(flag.severity === 'critical');
+  
+  return (
+    <Card className={cn(
+      "border-l-4",
+      flag.severity === 'critical' && "border-l-destructive",
+      flag.severity === 'high' && "border-l-orange-500",
+      flag.severity === 'moderate' && "border-l-yellow-500",
+      flag.severity === 'low' && "border-l-blue-500"
+    )}>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Badge variant={severityVariantMap[flag.severity]}>{flag.severity}</Badge>
+              <Badge variant="outline">{flag.category}</Badge>
+            </div>
+            <CardTitle className="text-lg">{flag.description}</CardTitle>
+          </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            aria-expanded={isExpanded}
+          >
+            {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
+          </Button>
+        </div>
+      </CardHeader>
+      
+      {isExpanded && (
+        <CardContent className="space-y-6">
+          {flag.constitutionalReference.length > 0 && (
+            <div>
+              <h4 className="font-semibold mb-3 flex items-center">
+                <BookOpenIcon className="h-4 w-4 mr-2" />
+                Constitutional Provisions
+              </h4>
+              <div className="space-y-4">
+                {flag.constitutionalReference.map((ref, index) => (
+                  <ConstitutionalReference key={index} reference={ref} />
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {flag.expertAnalysis.length > 0 && (
+            <div>
+              <h4 className="font-semibold mb-3 flex items-center">
+                <GraduationCapIcon className="h-4 w-4 mr-2" />
+                Expert Analysis
+              </h4>
+              <div className="space-y-4">
+                {flag.expertAnalysis.map(analysis => (
+                  <ExpertAnalysisCard key={analysis.id} analysis={analysis} />
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <CivicActionGuidance flagId={flag.id} billId={billId} />
+        </CardContent>
+      )}
+    </Card>
+  );
+};
+```
+
+Expert analysis cards display credentials, verification badges, and community validation metrics to establish credibility.
+
+```typescript
+// src/components/bill-detail/analysis/ExpertAnalysisCard.tsx
+export const ExpertAnalysisCard: React.FC<ExpertAnalysisCardProps> = ({ analysis }) => {
+  const [showCredentials, setShowCredentials] = useState(false);
+  const dispatch = useAppDispatch();
+  const userVote = useAppSelector(state => selectUserVoteForAnalysis(state, analysis.id));
+  
+  const handleVote = (voteType: 'up' | 'down') => {
+    if (userVote === voteType) {
+      dispatch(removeVote({ analysisId: analysis.id }));
+    } else {
+      dispatch(voteOnAnalysis({ analysisId: analysis.id, vote: voteType }));
+    }
+  };
+  
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-start gap-4">
+          <Avatar>
+            <AvatarImage src={analysis.expert.avatar} />
+            <AvatarFallback>{analysis.expert.initials}</AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-semibold">{analysis.expert.name}</span>
+              <ExpertBadge 
+                verificationType={analysis.expert.verificationType}
+                credibilityScore={analysis.expert.credibilityScore}
+              />
+            </div>
+            
+            <button
+              className="text-sm text-muted-foreground hover:underline"
+              onClick={() => setShowCredentials(!showCredentials)}
+            >
+              {analysis.expert.specializations.join(', ')}
+            </button>
+          </div>
+        </div>
+        
+        {showCredentials && (
+          <div className="mt-4 pt-4 border-t">
+            <ExpertCredentials expert={analysis.expert} />
+          </div>
+        )}
+      </CardHeader>
+      
+      <CardContent>
+        <div 
+          className="prose prose-sm dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(analysis.analysis) }}
+        />
+      </CardContent>
+      
+      <CardFooter className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button
+            variant={userVote === 'up' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => handleVote('up')}
+          >
+            <ThumbsUpIcon className="h-4 w-4 mr-1" />
+            {analysis.upvotes}
+          </Button>
+          <Button
+            variant={userVote === 'down' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => handleVote('down')}
+          >
+            <ThumbsDownIcon className="h-4 w-4 mr-1" />
+            {analysis.downvotes}
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+};
+```
+
+**Testing:** Verify constitutional flags display with correct severity styling, expert verification badges appear correctly, voting functionality works and updates in real-time, constitutional references expand to show full text, civic action guidance provides clear next steps, and all expandable sections work with keyboard navigation.
+
+---
+
+## Phase 4: Community & Real-time (Weeks 13-16)
+
+### TASK-CE-001: Discussion Threading System
+
+**Purpose:** Implement nested comment discussions with voting, moderation, and real-time updates.
+
+**Requirements Fulfilled:** REQ-CE-003 (Discussion Threading), REQ-DI-001 (Real-time Sync)
+
+**Success Criteria:**
+- Posted comments appear immediately in the thread
+- Comments nest clearly up to 5 levels deep
+- New comments from other users appear without page refresh
+- Reporting workflow initiates correctly when users flag comments
+
+**Implementation:**
+
+The discussion threading system enables community discourse on legislation. The implementation supports nested replies, real-time updates, voting, and moderation tools.
+
+```typescript
+// src/components/community/DiscussionThread.tsx
+export const DiscussionThread: React.FC<DiscussionThreadProps> = ({ billId }) => {
+  const comments = useAppSelector(state => selectCommentsForBill(state, billId));
+  const [sortBy, setSortBy] = useState<CommentSort>('best');
+  const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    dispatch(fetchComments({ billId }));
+    
+    // Subscribe to real-time comment updates
+    dispatch({ 
+      type: 'realtime/subscribe', 
+      payload: { channel: `bill:${billId}:comments` } 
+    });
+    
+    return () => {
+      dispatch({ 
+        type: 'realtime/unsubscribe', 
+        payload: { channel: `bill:${billId}:comments` } 
+      });
+    };
+  }, [billId, dispatch]);
+  
+  const sortedComments = useMemo(() => {
+    return sortComments(comments.filter(c => !c.parentId), sortBy);
+  }, [comments, sortBy]);
+  
+  return (
+    <div className="discussion-thread space-y-6">
+      <CommentForm billId={billId} parentId={null} />
+      
+      <div className="flex items-center justify-between border-b pb-4">
+        <h3 className="font-semibold">
+          {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
+        </h3>
+        
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="best">Best</SelectItem>
+            <SelectItem value="newest">Newest</SelectItem>
+            <SelectItem value="oldest">Oldest</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-4" role="feed" aria-label="Comments">
+        {sortedComments.map(comment => (
+          <CommentItem key={comment.id} comment={comment} depth={0} maxDepth={5} />
+        ))}
+      </div>
+      
+      {sortedComments.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground">
+          <MessageSquareIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p>No comments yet. Be the first to share your thoughts!</p>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+Individual comment items support voting, replying, and moderation actions while maintaining clear visual hierarchy through nesting.
+
+```typescript
+// src/components/community/CommentItem.tsx
+export const CommentItem: React.FC<CommentItemProps> = ({ comment, depth, maxDepth }) => {
+  const [isReplying, setIsReplying] = useState(false);
+  const replies = useAppSelector(state => selectRepliesForComment(state, comment.id));
+  const user = useAppSelector(state => state.auth.user);
+  const userVote = useAppSelector(state => selectUserVoteForComment(state, comment.id));
+  const dispatch = useAppDispatch();
+  
+  const handleVote = (voteType: 'up' | 'down') => {
+    if (!user) {
+      dispatch(openLoginModal());
+      return;
+    }
+    
+    if (userVote === voteType) {
+      dispatch(removeCommentVote({ commentId: comment.id }));
+    } else {
+      dispatch(voteOnComment({ commentId: comment.id, vote: voteType }));
+    }
+  };
+  
+  const canNestDeeper = depth < maxDepth;
+  
+  return (
+    <div className={cn("comment-item", depth > 0 && "ml-8 pl-4 border-l-2")}>
+      <div className="flex gap-3">
+        {/* Vote column */}
+        <div className="flex flex-col items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0"
+            onClick={() => handleVote('up')}
+            aria-pressed={userVote === 'up'}
+          >
+            <ChevronUpIcon className={cn("h-4 w-4", userVote === 'up' && "text-primary")} />
+          </Button>
+          
+          <span className={cn(
+            "text-sm font-medium",
+            userVote === 'up' && "text-primary",
+            userVote === 'down' && "text-destructive"
+          )}>
+            {comment.upvotes - comment.downvotes}
+          </span>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0"
+            onClick={() => handleVote('down')}
+            aria-pressed={userVote === 'down'}
+          >
+            <ChevronDownIcon className={cn("h-4 w-4", userVote === 'down' && "text-destructive")} />
+          </Button>
+        </div>
+        
+        {/* Comment content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={comment.user.avatar} />
+              <AvatarFallback>{comment.user.initials}</AvatarFallback>
+            </Avatar>
+            
+            <span className="font-medium text-sm">{comment.user.displayName}</span>
+            
+            {comment.user.role === 'verified_expert' && (
+              <ExpertBadge verificationType="domain" size="sm" />
+            )}
+            
+            <span className="text-xs text-muted-foreground">
+              {formatRelativeTime(comment.createdAt)}
+            </span>
+          </div>
+          
+          <div 
+            className="prose prose-sm dark:prose-invert max-w-none mb-2"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(comment.content) }}
+          />
+          
+          <div className="flex items-center gap-4 text-sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0"
+              onClick={() => setIsReplying(!isReplying)}
+              disabled={!canNestDeeper}
+            >
+              <ReplyIcon className="h-3 w-3 mr-1" />
+              Reply
+            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-auto p-0">
+                  <MoreHorizontalIcon className="h-3 w-3 mr-1" />
+                  More
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => dispatch(openReportDialog({ commentId: comment.id }))}>
+                  <FlagIcon className="mr-2 h-4 w-4" />
+                  Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          
+          {isReplying && (
+            <div className="mt-4">
+              <CommentForm
+                billId={comment.billId}
+                parentId={comment.id}
+                onCancel={() => setIsReplying(false)}
+                onSuccess={() => setIsReplying(false)}
+              />
+            </div>
+          )}
+          
+          {replies.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {replies.map(reply => (
+                <CommentItem key={reply.id} comment={reply} depth={depth + 1} maxDepth={maxDepth} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+The comment form enforces quality standards through validation while providing clear feedback about requirements.
+
+```typescript
+// src/components/community/CommentForm.tsx
+export const CommentForm: React.FC<CommentFormProps> = ({ billId, parentId, onCancel, onSuccess }) => {
+  const [content, setContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
+  const user = useAppSelector(state => state.auth.user);
+  const dispatch = useAppDispatch();
+  
+  if (!user) {
+    return (
+      <Card className="p-6 text-center">
+        <p className="mb-4">You must be signed in to comment</p>
+        <Button onClick={() => dispatch(openLoginModal())}>Sign In to Comment</Button>
+      </Card>
+    );
+  }
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const validationErrors = validateComment(content);
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setErrors([]);
+    
+    try {
+      await dispatch(postComment({ billId, parentId, content })).unwrap();
+      setContent('');
+      onSuccess?.();
+    } catch (error) {
+      setErrors([error.message || "Failed to post comment"]);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const characterCount = content.length;
+  const minChars = 50;
+  const maxChars = 5000;
+  const isValid = characterCount >= minChars && characterCount <= maxChars;
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">
+            {parentId ? 'Write a Reply' : 'Add Your Perspective'}
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent>
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Share your thoughts, analysis, or questions..."
+            rows={6}
+            disabled={isSubmitting}
+          />
+          
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-xs text-muted-foreground">
+              Minimum {minChars} characters for substantive discussion
+            </p>
+            <span className={cn(
+              "text-xs",
+              characterCount < minChars && "text-destructive",
+              isValid && "text-success"
+            )}>
+              {characterCount} / {maxChars}
+            </span>
+          </div>
+          
+          {errors.length > 0 && (
+            <div className="mt-3">
+              {errors.map((error, index) => (
+                <Alert key={index} variant="destructive" className="py-2">
+                  <AlertCircleIcon className="h-4 w-4" />
+                  <AlertDescription className="text-sm">{error}</AlertDescription>
+                </Alert>
+              ))}
+            </div>
+          )}
+        </CardContent>
+        
+        <CardFooter className="flex justify-between">
+          {onCancel && (
+            <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+              Cancel
+            </Button>
+          )}
+          
+          <Button type="submit" disabled={!isValid || isSubmitting} className={onCancel ? "" : "ml-auto"}>
+            {isSubmitting ? (
+              <>
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                Posting...
+              </>
+            ) : (
+              <>
+                <SendIcon className="mr-2 h-4 w-4" />
+                {parentId ? 'Post Reply' : 'Post Comment'}
+              </>
+            )}
+          </Button>
+        </CardFooter>
+      </Card>
+    </form>
+  );
+};
+```
+
+**Testing:** Verify comments post and appear immediately, nesting works correctly up to 5 levels, new comments from other users appear without refresh, voting counts update immediately, form validation prevents invalid submissions, reporting workflow initiates correctly, and thread navigation works with keyboard and screen readers.
+
+---
+
+### TASK-PA-001: Performance Optimization
+
+**Purpose:** Implement comprehensive performance optimizations to meet Core Web Vitals targets.
+
+**Requirements Fulfilled:** REQ-PA-001 (Core Web Vitals), REQ-PA-003 (Progressive Enhancement)
+
+**Success Criteria:**
+- LCP under 2.5 seconds at 75th percentile
+- FID under 100 milliseconds at 75th percentile
+- CLS under 0.1 at 75th percentile
+- Cached content remains accessible offline
+
+**Implementation:**
+
+Performance optimization involves service worker implementation for offline support, Web Vitals monitoring, and ensuring the application meets performance budgets.
+
+```typescript
+// public/service-worker.js
+const CACHE_NAME = 'chanuka-v1';
+const RUNTIME_CACHE = 'chanuka-runtime';
+
+const PRECACHE_ASSETS = [
+  '/',
+  '/offline.html',
+  '/static/css/main.css',
+  '/static/js/main.js'
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(PRECACHE_ASSETS);
+    })
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+  
+  // API requests - network first with cache fallback
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const clonedResponse = response.clone();
+          caches.open(RUNTIME_CACHE).then((cache) => {
+            cache.put(request, clonedResponse);
+          });
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+  
+  // Static assets - cache first
+  event.respondWith(
+    caches.match(request).then((cachedResponse) => {
+      return cachedResponse || fetch(request);
+    })
+  );
+});
+```
+
+Web Vitals monitoring tracks performance metrics and alerts when budgets are exceeded.
+
+```typescript
+// src/utils/performance.ts
+import { onCLS, onFID, onLCP, onFCP, onTTFB } from 'web-vitals';
+
+export const initPerformanceMonitoring = () => {
+  onCLS(sendToAnalytics);
+  onFID(sendToAnalytics);
+  onLCP(sendToAnalytics);
+  onFCP(sendToAnalytics);
+  onTTFB(sendToAnalytics);
+};
+
+const sendToAnalytics = (metric: PerformanceMetric) => {
+  // Send to analytics service
+  if (window.gtag) {
+    window.gtag('event', metric.name, {
+      value: Math.round(metric.value),
+      metric_rating: metric.rating,
+      page_path: window.location.pathname
+    });
+  }
+  
+  // Check against performance budgets
+  const budgets = { LCP: 2500, FID: 100, CLS: 0.1 };
+  
+  if (metric.name in budgets && metric.value > budgets[metric.name]) {
+    console.warn(`Performance budget exceeded for ${metric.name}`, {
+      value: metric.value,
+      budget: budgets[metric.name]
+    });
+    
+    if (process.env.NODE_ENV === 'production') {
+      sendPerformanceAlert({
+        metric: metric.name,
+        value: metric.value,
+        budget: budgets[metric.name],
+        page: window.location.pathname
+      });
+    }
+  }
+};
+```
+
+**Testing:** Verify application meets all Core Web Vitals targets, offline functionality works for cached content, performance budgets trigger alerts when exceeded, and metrics are reported correctly to analytics.
+
+---
+
+## Quality Standards
+
+### Code Quality
+
+All code must follow strict TypeScript usage patterns with explicit types and no use of 'any'. Use discriminated unions for complex state and prefer readonly for immutable data.
+
+```typescript
+// Good: Explicit types
+interface BillCardProps {
+  bill: Bill;
+  onSave: (billId: string) => void;
+  onShare: (billId: string) => void;
+  showQuickActions?: boolean;
+}
+
+// Good: Discriminated unions
+type LoadingState = 
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; data: Bill[] }
+  | { status: 'error'; error: Error };
+```
+
+### Error Handling
+
+Always handle errors with try-catch blocks and provide meaningful error messages. Use error boundaries for React component errors.
+
+```typescript
+const fetchBill = async (billId: string): Promise<Result<Bill, Error>> => {
+  try {
+    const response = await api.get(`/bills/${billId}`);
+    return { success: true, data: response.data };
+  } catch (error) {
+    logError(error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error : new Error('Unknown error') 
+    };
+  }
+};
+```
+
+### Performance Best Practices
+
+Memoize expensive computations and callbacks to prevent unnecessary re-renders. Use React.memo for pure components.
+
+```typescript
+// Memoize expensive computations
+const sortedBills = useMemo(() => {
+  return bills.sort((a, b) => b.lastUpdated - a.lastUpdated);
+}, [bills]);
+
+// Memoize callbacks
+const handleSave = useCallback((billId: string) => {
+  dispatch(saveBill(billId));
+}, [dispatch]);
+
+// Memoize pure components
+export const BillCard = memo<BillCardProps>(({ bill, onSave }) => {
+  // Component implementation
+}, (prevProps, nextProps) => {
+  return prevProps.bill.id === nextProps.bill.id &&
+         prevProps.bill.lastUpdated === nextProps.bill.lastUpdated;
+});
+```
+
+### Accessibility Requirements
+
+Always include ARIA labels and roles, use semantic HTML, and manage focus appropriately.
+
+```typescript
+<button
+  onClick={handleSave}
+  aria-label={`Save ${bill.title} for later`}
+  aria-pressed={isSaved}
+>
+  {isSaved ? 'Saved' : 'Save'}
+</button>
+
+<nav aria-label="Primary navigation">
+  <ul role="list">
+    <li><a href="/">Home</a></li>
+  </ul>
+</nav>
+```
+
+### Testing Standards
+
+Write comprehensive tests covering unit, integration, and accessibility concerns.
+
+```typescript
+describe('BillCard', () => {
+  const mockBill = createMockBill({
+    id: '1',
+    title: 'Test Bill',
+    urgencyLevel: 'high'
+  });
+  
+  it('displays bill title and urgency badge', () => {
+    render(<BillCard bill={mockBill} onSave={jest.fn()} onShare={jest.fn()} />);
+    
+    expect(screen.getByText('Test Bill')).toBeInTheDocument();
+    expect(screen.getByText('high')).toBeInTheDocument();
+  });
+  
+  it('calls onSave when save button is clicked', () => {
+    const onSave = jest.fn();
+    render(<BillCard bill={mockBill} onSave={onSave} onShare={jest.fn()} />);
+    
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+    
+    expect(onSave).toHaveBeenCalledWith('1');
+  });
+  
+  it('meets accessibility requirements', async () => {
+    const { container } = render(
+      <BillCard bill={mockBill} onSave={jest.fn()} onShare={jest.fn()} />
+    );
+    
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+```
+
+---
+
+## AI Agent Usage Guide
+
+### Using This Plan with AI Coding Agents
+
+When working with AI coding agents, provide complete context for each task by including the task description, all referenced requirements, relevant design specifications, and any completed dependencies.
+
+### Prompt Template
+
+```
+I need to implement [TASK-ID: Task Name].
+
+Requirements being fulfilled:
+[Copy relevant requirements from requirements document]
+
+Design specifications:
+[Copy relevant design patterns from design document]
+
+Context:
+- Dependencies completed: [List completed prerequisite tasks]
+- Technology stack: React, TypeScript, Tailwind CSS, Redux Toolkit
+- Target files: [List files to create/modify]
+
+Please generate:
+1. Complete implementation code for all subtasks
+2. Unit tests covering success criteria
+3. Integration tests for user workflows
+4. Documentation comments in code
+
+Follow these patterns:
+- Use TypeScript strict mode
+- Follow WCAG 2.1 AA accessibility guidelines
+- Implement error handling per design document
+- Use existing design system components
+- Optimize for Core Web Vitals performance targets
+```
+
+### Iterative Development Approach
+
+Implement one subtask at a time, run tests after each subtask, verify success criteria before moving to the next subtask, document any deviations from specification, and update related tasks if dependencies change.
+
+### Quality Checkpoints
+
+Before marking a task complete, verify all success criteria are met, all testing requirements pass, code follows TypeScript best practices, accessibility requirements are satisfied, performance budgets are maintained, error handling is implemented, and documentation is complete.
+
+### Git Workflow
+
+Use conventional commit messages with the format:
+
+```
+<type>(<scope>): <subject>
+
+Types: feat, fix, docs, style, refactor, test, chore
+Scope: component/feature affected
+
+Example:
+feat(bill-card): add quick actions on hover
+
+- Implement hover overlay with save/share/comment buttons
+- Add smooth transition animations
+- Ensure keyboard accessibility for actions
+- Add unit tests for quick actions
+
+Closes #123
+```
+
+Use descriptive branch names:
+
+```
+<type>/<task-id>-<brief-description>
+
+Examples:
+- feature/TASK-BD-001-bills-dashboard
+- fix/bill-card-hover-state
+- refactor/state-management-optimization
+```
+
+---
+
+## Deployment Strategy
+
+### Environment Configuration
+
+Configure different environments for development, staging, and production:
+
+```bash
+# Development
+VITE_API_URL=http://localhost:3001/api
+VITE_WS_URL=ws://localhost:3001
+VITE_ENABLE_DEV_TOOLS=true
+VITE_LOG_LEVEL=debug
+
+# Staging
+VITE_API_URL=https://staging-api.chanuka.ke/api
+VITE_WS_URL=wss://staging-api.chanuka.ke
+VITE_ENABLE_DEV_TOOLS=true
+VITE_LOG_LEVEL=info
+
+# Production
+VITE_API_URL=https://api.chanuka.ke/api
+VITE_WS_URL=wss://api.chanuka.ke
+VITE_ENABLE_DEV_TOOLS=false
+VITE_LOG_LEVEL=error
+VITE_SENTRY_DSN=<sentry-dsn>
+```
+
+### Build and Deploy Process
+
+```bash
+# Install dependencies
+npm ci
+
+# Run quality checks
+npm run lint
+npm run type-check
+npm run test
+
+# Build for production
+npm run build
+
+# Analyze bundle size
+npm run build:analyze
+
+# Deploy to staging
+npm run deploy:staging
+
+# Run smoke tests
+npm run test:smoke
+
+# Deploy to production
+npm run deploy:production
+```
+
+### Monitoring and Alerts
+
+Track Core Web Vitals for all pages and alert if metrics exceed targets. Monitor JavaScript errors via Sentry, track API error rates, monitor failed WebSocket connections, and alert on critical error rate increases. Track user journeys and drop-off points, monitor conversion rates for key actions, track accessibility feature usage, and monitor mobile versus desktop usage patterns.
+
+---
+
+## Maintenance and Updates
+
+### Regular Maintenance Tasks
+
+**Weekly:** Review error logs and fix critical issues, update dependencies with security patches, review and merge Dependabot pull requests, check performance metrics trends.
+
+**Monthly:** Conduct full dependency update reviews, perform accessibility audits, review and optimize performance, review user feedback and prioritize improvements.
+
+**Quarterly:** Perform major dependency upgrades, conduct security audits, execute full regression testing, review and update documentation.
+
+### Emergency Response
+
+For critical bugs, create a hotfix branch from production, implement minimal fix with tests, fast-track review and testing, deploy to production immediately, backport fix to development branch, and conduct post-mortem analysis.
+
+For security vulnerabilities, assess severity and impact, patch immediately if critical, deploy emergency update, notify users if data is affected, and document incident and response.
+
+---
+
+## Conclusion
+
+This unified implementation guide provides comprehensive guidance for building the Chanuka platform UI. The plan delivers complete task breakdowns with code examples, clear dependency ordering ensuring proper foundations, requirements traceability maintaining complete coverage, measurable success criteria enabling quality verification, comprehensive testing requirements covering all aspects, detailed code quality standards and best practices, and AI agent optimization through structured formats.
+
+The plan enables systematic development whether implemented by human developers, AI coding agents, or collaborative teams. Each task is self-contained yet properly integrated into the larger system architecture, ensuring both rapid development and long-term maintainability.
+
+By following this implementation plan in conjunction with the Requirements Specification and Design Specification, development teams can build a world-class civic engagement platform that truly empowers democratic participation through transparent, accessible, and performant user interfaces.

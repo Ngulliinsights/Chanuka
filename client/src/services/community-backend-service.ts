@@ -6,13 +6,12 @@
  * and community analytics.
  */
 
-import { webSocketClient } from './websocket-client';
-import { 
+import { communityApiService } from '../core/api/community';
+import { UnifiedWebSocketManager } from '../core/api/websocket';
+import {
   ActivityItem,
   TrendingTopic,
   ExpertInsight,
-  Campaign,
-  Petition,
   CommunityStats,
   LocalImpactMetrics
 } from '../types/community';
@@ -21,12 +20,10 @@ import {
   Comment,
   CommentFormData,
   CommentReport,
-  ModerationAction,
   ModerationViolationType
 } from '../types/discussion';
 import { Expert } from '../types/expert';
 import { logger } from '../utils/logger';
-import { cleanup } from './apiService';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -90,7 +87,7 @@ class CommunityBackendService {
       
       logger.info('Backend connection verified', { component: 'CommunityBackendService' });
     } catch (error) {
-      logger.warn('Backend connection test failed, will use fallback mode', { component: 'CommunityBackendService' }, error);
+      logger.warn('Backend connection test failed, will use fallback mode', { component: 'CommunityBackendService' });
       // Don't throw here - allow fallback to mock data
     }
   }
@@ -100,7 +97,7 @@ class CommunityBackendService {
    */
   private setupWebSocketListeners(): void {
     // Listen for community-specific updates
-    webSocketClient.on('billUpdate', (data: any) => {
+    UnifiedWebSocketManager.getInstance().on('billUpdate', (data: any) => {
       if (data.update?.type === 'new_comment' || 
           data.update?.type === 'comment_update' ||
           data.update?.type === 'expert_contribution' ||
@@ -111,7 +108,7 @@ class CommunityBackendService {
     });
 
     // Listen for notifications that include community events
-    webSocketClient.on('notification', (data: any) => {
+    UnifiedWebSocketManager.getInstance().on('notification', (data: any) => {
       if (data.type === 'community_activity' || 
           data.type === 'expert_verification' ||
           data.type === 'moderation_action' ||
@@ -124,11 +121,11 @@ class CommunityBackendService {
     });
 
     // Listen for connection events to manage subscriptions
-    webSocketClient.on('connected', () => {
+    UnifiedWebSocketManager.getInstance().on('connected', () => {
       this.onWebSocketConnected();
     });
 
-    webSocketClient.on('disconnected', () => {
+    UnifiedWebSocketManager.getInstance().on('disconnected', () => {
       this.onWebSocketDisconnected();
     });
   }
@@ -276,21 +273,9 @@ class CommunityBackendService {
    */
   async getDiscussionThread(billId: number): Promise<DiscussionThread> {
     try {
-      const response = await fetch(`${this.baseUrl}/bills/${billId}/discussion`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch discussion thread: ${response.statusText}`);
-      }
-      
-      const result: ApiResponse<DiscussionThread> = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Failed to fetch discussion thread');
-      }
-
-      return result.data;
+      return await communityApiService.getDiscussionThread(billId);
     } catch (error) {
-      logger.error('Failed to fetch discussion thread', { component: 'CommunityBackendService' }, error);
+      logger.error('Failed to fetch discussion thread', { component: 'CommunityBackendService' }, error as Error);
       throw error;
     }
   }
@@ -299,7 +284,7 @@ class CommunityBackendService {
    * Get comments for a bill with filtering and sorting
    */
   async getBillComments(
-    billId: number, 
+    billId: number,
     options: {
       sort?: 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
       expertOnly?: boolean;
@@ -308,27 +293,9 @@ class CommunityBackendService {
     } = {}
   ): Promise<Comment[]> {
     try {
-      const params = new URLSearchParams();
-      if (options.sort) params.append('sort', options.sort);
-      if (options.expertOnly) params.append('expert', 'true');
-      if (options.limit) params.append('limit', options.limit.toString());
-      if (options.offset) params.append('offset', options.offset.toString());
-
-      const response = await fetch(`${this.baseUrl}/community/comments/${billId}?${params.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch comments: ${response.statusText}`);
-      }
-      
-      const result: ApiResponse<Comment[]> = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Failed to fetch comments');
-      }
-
-      return result.data;
+      return await communityApiService.getBillComments(billId, options);
     } catch (error) {
-      logger.error('Failed to fetch bill comments', { component: 'CommunityBackendService' }, error);
+      logger.error('Failed to fetch bill comments', { component: 'CommunityBackendService' }, error as Error);
       throw error;
     }
   }
@@ -338,35 +305,18 @@ class CommunityBackendService {
    */
   async addComment(data: CommentFormData): Promise<Comment> {
     try {
-      const response = await fetch(`${this.baseUrl}/community/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        },
-        body: JSON.stringify({
-          bill_id: data.billId,
-          content: data.content,
-          parent_id: data.parentId,
-        }),
+      const result = await communityApiService.addComment({
+        billId: data.billId,
+        content: data.content,
+        parentId: data.parentId
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to add comment: ${response.statusText}`);
-      }
-
-      const result: ApiResponse<Comment> = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Failed to add comment');
-      }
 
       // Subscribe to real-time updates for this bill if not already subscribed
       this.subscribeToDiscussion(data.billId);
 
-      return result.data;
+      return result;
     } catch (error) {
-      logger.error('Failed to add comment', { component: 'CommunityBackendService' }, error);
+      logger.error('Failed to add comment', { component: 'CommunityBackendService' }, error as Error);
       throw error;
     }
   }
@@ -689,13 +639,13 @@ class CommunityBackendService {
    * Subscribe to real-time updates for a bill's discussion
    */
   subscribeToDiscussion(billId: number): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to discussion updates.', { component: 'CommunityBackendService' });
       return;
     }
 
     // Use existing WebSocket client to subscribe to bill-specific updates
-    webSocketClient.subscribeToBill(billId, ['new_comment', 'comment_update', 'expert_contribution']);
+    UnifiedWebSocketManager.getInstance().subscribeToBill(billId, ['new_comment']);
     
     logger.info('Subscribed to discussion updates', { component: 'CommunityBackendService', billId });
   }
@@ -704,11 +654,11 @@ class CommunityBackendService {
    * Unsubscribe from real-time updates for a bill's discussion
    */
   unsubscribeFromDiscussion(billId: number): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       return;
     }
 
-    webSocketClient.unsubscribeFromBill(billId);
+    UnifiedWebSocketManager.getInstance().unsubscribeFromBill(billId);
     
     logger.info('Unsubscribed from discussion updates', { component: 'CommunityBackendService', billId });
   }
@@ -717,7 +667,7 @@ class CommunityBackendService {
    * Subscribe to community-wide real-time updates
    */
   subscribeToCommunityUpdates(): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to community updates.', { component: 'CommunityBackendService' });
       return;
     }
@@ -815,7 +765,7 @@ class CommunityBackendService {
    * Subscribe to notification updates via WebSocket
    */
   subscribeToNotifications(): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to notifications.', { component: 'CommunityBackendService' });
       return;
     }
@@ -957,5 +907,4 @@ class CommunityBackendService {
 export const communityBackendService = new CommunityBackendService();
 
 // Export class for testing
-export { CommunityBackendService };
 export { CommunityBackendService };

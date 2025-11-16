@@ -25,6 +25,10 @@ Visit:
 - [🏗️ Setup Guide](./docs/setup.md)
 - [🔧 Monorepo Guide](./docs/monorepo.md)
 - [🏛️ Architecture](./docs/architecture.md)
+- [🔄 Migration Guides](./docs/migrations/)
+  - [API Service Unification](./docs/migrations/api-service-unification.md)
+  - [Logger Consolidation](./docs/migrations/logger-consolidation.md)
+  - [Offline Detection Resolution](./docs/migrations/offline-detection-resolution.md)
 
 ## 🏗️ Structure
 
@@ -54,6 +58,28 @@ pnpm lint          # Lint all projects
 - **Monorepo**: PNPM + Nx
 - **Testing**: Vitest, Playwright
 
-## 📄 License
+## 📦 API Reference
+
+### Core Services
+
+```typescript
+// Unified API Service
+import { api, fetchWithFallback } from '@/services/apiService';
+
+// Consolidated Logger
+import { logger } from '@/utils/logger';
+
+// Offline Detection Hook
+import { useOfflineDetection } from '@/hooks/useOfflineDetection';
+```
+
+### Import Patterns
+
+- **API Services**: `import { api } from '@/services/apiService'`
+- **Logger**: `import { logger } from '@/utils/logger'`
+- **Offline Detection**: `import { useOfflineDetection } from '@/hooks/useOfflineDetection'`
+- **Error Handling**: `import { createNetworkError } from '@/components/error'`
+
+##  License
 
 MIT

@@ -7,7 +7,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useAuthStore } from '../../store/slices/authSlice';
-import { authBackendService } from '../../services/auth-backend-service';
+import { authBackendService } from '../../services/authBackendService';
 import { logger } from '../../utils/logger';
 
 interface SessionManagerProps {

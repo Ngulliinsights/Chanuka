@@ -16,7 +16,14 @@ import {
   calculateProgressPercentage,
   createProgress,
 } from '@/utils/loading-utils';
-import { LoadingOperation, LoadingStage } from '@shared/core/src/types';
+// Define types locally to avoid shared/core dependency
+interface LoadingOperation {
+  id: string;
+  stage: LoadingStage;
+  progress: number;
+}
+
+type LoadingStage = 'initializing' | 'loading' | 'processing' | 'complete' | 'error';
 import { LOADING_TIMEOUTS, RETRY_DELAYS } from '../constants';
 
 describe('Loading Utils', () => {

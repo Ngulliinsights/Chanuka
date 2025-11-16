@@ -25,7 +25,7 @@ export interface CacheService {
 }
 
 // Re-export unified interfaces from core
-export type { CacheMetrics, CacheTierStats } from './core/interfaces';
+export type { CacheMetrics, CacheHealthStatus, CacheTierStats } from './core/interfaces';
 
 // Cache entry with metadata
 export interface CacheEntry<T = any> {

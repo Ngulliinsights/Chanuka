@@ -26,7 +26,7 @@ export {
   ErrorDomain,
   ErrorSeverity,
   RecoveryAction,
-} from './types';
+} from './constants';
 
 // ============================================================================
 // Core Error Handler

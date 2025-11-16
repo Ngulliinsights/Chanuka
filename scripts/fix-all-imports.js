@@ -40,9 +40,9 @@ function fixImportsInFile(filePath) {
     let modified = false;
 
     const clientSrcPath = path.join(__dirname, '..', 'client', 'src');
-    const browserLoggerPath = path.join(clientSrcPath, 'utils', 'browser-logger.ts');
+    const browserLoggerPath = path.join(clientSrcPath, 'utils', 'logger.ts');
     const i18nPath = path.join(clientSrcPath, 'utils', 'i18n.ts');
-    const clientCorePath = path.join(clientSrcPath, 'utils', 'client-core.ts');
+    const clientCorePath = path.join(clientSrcPath, 'utils', 'logger.ts');
 
     // Calculate correct relative paths
     const loggerRelativePath = calculateRelativePath(filePath, browserLoggerPath).replace('.ts', '');
@@ -51,11 +51,11 @@ function fixImportsInFile(filePath) {
 
     // Fix all variations of incorrect logger imports
     const loggerPatterns = [
-      /import\s*{\s*logger\s*}\s*from\s*['"]utils\/browser-logger['"];?/g,
-      /import\s*{\s*logger\s*}\s*from\s*['"]\.\/utils\/browser-logger['"];?/g,
-      /import\s*{\s*logger\s*}\s*from\s*['"]\.\.\/utils\/browser-logger['"];?/g,
-      /import\s*{\s*logger\s*}\s*from\s*['"]\.\.\/\.\.\/utils\/browser-logger['"];?/g,
-      /import\s*{\s*logger\s*}\s*from\s*['"]\.\.\/\.\.\/\.\.\/utils\/browser-logger['"];?/g
+      /import\s*{\s*logger\s*}\s*from\s*['"]utils\/logger['"];?/g,
+      /import\s*{\s*logger\s*}\s*from\s*['"]\.\/utils\/logger['"];?/g,
+      /import\s*{\s*logger\s*}\s*from\s*['"]\.\.\/utils\/logger['"];?/g,
+      /import\s*{\s*logger\s*}\s*from\s*['"]\.\.\/\.\.\/utils\/logger['"];?/g,
+      /import\s*{\s*logger\s*}\s*from\s*['"]\.\.\/\.\.\/\.\.\/utils\/logger['"];?/g
     ];
 
     loggerPatterns.forEach(pattern => {
@@ -82,9 +82,9 @@ function fixImportsInFile(filePath) {
 
     // Fix validation service imports
     const validationPatterns = [
-      /import\s*{\s*validationService\s*}\s*from\s*['"]utils\/client-core['"];?/g,
-      /import\s*{\s*validationService\s*}\s*from\s*['"]\.\/utils\/client-core['"];?/g,
-      /import\s*{\s*validationService\s*}\s*from\s*['"]\.\.\/utils\/client-core['"];?/g
+      /import\s*{\s*validationService\s*}\s*from\s*['"]utils\/logger['"];?/g,
+      /import\s*{\s*validationService\s*}\s*from\s*['"]\.\/utils\/logger['"];?/g,
+      /import\s*{\s*validationService\s*}\s*from\s*['"]\.\.\/utils\/logger['"];?/g
     ];
 
     validationPatterns.forEach(pattern => {

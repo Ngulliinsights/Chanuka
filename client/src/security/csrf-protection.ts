@@ -15,11 +15,18 @@ export interface CSRFConfig {
   refreshInterval?: number;
 }
 
+// Interface to extend XMLHttpRequest with our custom properties
+interface ExtendedXMLHttpRequest extends XMLHttpRequest {
+  _csrfMethod?: string;
+  _csrfUrl?: string;
+}
+
 export class CSRFProtection {
   private config: CSRFConfig;
   private currentToken: string | null = null;
   private tokenExpiry: Date | null = null;
   private refreshTimer: NodeJS.Timeout | null = null;
+  private mutationObserver: MutationObserver | null = null;
 
   constructor(config: CSRFConfig) {
     this.config = {
@@ -51,7 +58,13 @@ export class CSRFProtection {
 
       logger.info('CSRF Protection initialized successfully');
     } catch (error) {
-      logger.error('Failed to initialize CSRF Protection', error);
+      // Properly handle the unknown error type by converting to an Error object
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      logger.error('Failed to initialize CSRF Protection', {
+        component: 'CSRFProtection',
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }
@@ -77,10 +90,15 @@ export class CSRFProtection {
       logger.debug('CSRF token refreshed', {
         component: 'CSRFProtection',
         tokenPreview: this.currentToken.substring(0, 8) + '...',
-        expiresAt: this.tokenExpiry
+        expiresAt: this.tokenExpiry.toISOString()
       });
     } catch (error) {
-      logger.error('Failed to refresh CSRF token', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      logger.error('Failed to refresh CSRF token', {
+        component: 'CSRFProtection',
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }
@@ -98,9 +116,17 @@ export class CSRFProtection {
       if (response.ok) {
         const data = await response.json();
         return data.token;
+      } else if (response.status === 404) {
+        // Server doesn't have CSRF endpoint, generate client-side token
+        logger.debug('CSRF endpoint not available, using client-side token generation');
+        return this.generateToken();
       }
     } catch (error) {
-      logger.warn('Failed to fetch CSRF token from server, using client-side generation', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      logger.warn('Failed to fetch CSRF token from server, using client-side generation', {
+        component: 'CSRFProtection',
+        error: errorMessage
+      });
     }
     return null;
   }
@@ -128,7 +154,11 @@ export class CSRFProtection {
     try {
       sessionStorage.setItem(this.config.tokenName, token);
     } catch (error) {
-      logger.warn('Failed to store CSRF token in sessionStorage', error);
+      const errorMessage = error instanceof Error ? error.message : 'Storage failed';
+      logger.warn('Failed to store CSRF token in sessionStorage', {
+        component: 'CSRFProtection',
+        error: errorMessage
+      });
     }
 
     // Set cookie if configured
@@ -141,7 +171,11 @@ export class CSRFProtection {
     if (this.config.refreshInterval) {
       this.refreshTimer = setInterval(() => {
         this.refreshToken().catch(error => {
-          logger.error('Automatic CSRF token refresh failed', error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+          logger.error('Automatic CSRF token refresh failed', {
+            component: 'CSRFProtection',
+            error: errorMessage
+          });
         });
       }, this.config.refreshInterval);
     }
@@ -160,23 +194,43 @@ export class CSRFProtection {
 
   private interceptFetch(): void {
     const originalFetch = window.fetch;
+    const self = this; // Capture the class instance for use in the interceptor
     
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      // Create a new request object to work with
       const request = new Request(input, init);
       
-      // Only add CSRF token to same-origin requests
-      if (this.shouldAddToken(request)) {
-        const token = this.getToken();
+      // Only add CSRF token to same-origin requests that need protection
+      if (self.shouldAddToken(request)) {
+        const token = self.getToken();
         if (token) {
-          request.headers.set(this.config.headerName, token);
+          // If init was provided, modify it; otherwise create new init
+          const modifiedInit: RequestInit = {
+            ...init,
+            headers: {
+              ...(init?.headers || {}),
+              [self.config.headerName]: token
+            }
+          };
+          
+          // Make the request with the modified headers
+          const response = await originalFetch(input, modifiedInit);
+          
+          // Check for CSRF validation errors
+          if (response.status === 403 && response.headers.get('X-CSRF-Error')) {
+            self.handleCSRFError(request);
+          }
+          
+          return response;
         }
       }
       
+      // If no token needed, proceed with original request
       const response = await originalFetch(request);
       
-      // Check for CSRF validation errors
+      // Still check for CSRF errors even on unmodified requests
       if (response.status === 403 && response.headers.get('X-CSRF-Error')) {
-        this.handleCSRFError(request);
+        self.handleCSRFError(request);
       }
       
       return response;
@@ -186,27 +240,51 @@ export class CSRFProtection {
   private interceptXHR(): void {
     const originalOpen = XMLHttpRequest.prototype.open;
     const originalSend = XMLHttpRequest.prototype.send;
+    const self = this; // Capture the class instance
     
-    XMLHttpRequest.prototype.open = function(method: string, url: string | URL, ...args: any[]) {
-      this._method = method;
-      this._url = url.toString();
-      return originalOpen.apply(this, [method, url, ...args]);
+    // Store the CSRF protection instance globally so XHR can access it
+    (window as any).__CSRF_PROTECTION__ = this;
+    
+    // Override the open method to capture request details
+    XMLHttpRequest.prototype.open = function(
+      this: ExtendedXMLHttpRequest,
+      method: string,
+      url: string | URL,
+      async: boolean = true,
+      username?: string | null,
+      password?: string | null
+    ): void {
+      // Store method and URL on the XHR instance for later use
+      this._csrfMethod = method;
+      this._csrfUrl = url.toString();
+      
+      // Call the original open method with proper typing
+      if (username !== undefined) {
+        originalOpen.call(this, method, url, async, username, password ?? undefined);
+      } else {
+        originalOpen.call(this, method, url, async);
+      }
     };
     
-    XMLHttpRequest.prototype.send = function(body?: Document | XMLHttpRequestBodyInit | null) {
-      if (this._method && this._url) {
-        const request = new Request(this._url, { method: this._method });
-        const csrfProtection = (window as any).__CSRF_PROTECTION__;
+    // Override the send method to add CSRF token
+    XMLHttpRequest.prototype.send = function(
+      this: ExtendedXMLHttpRequest,
+      body?: Document | XMLHttpRequestBodyInit | null
+    ): void {
+      // Check if we have the necessary information and should add token
+      if (this._csrfMethod && this._csrfUrl) {
+        const request = new Request(this._csrfUrl, { method: this._csrfMethod });
         
-        if (csrfProtection && csrfProtection.shouldAddToken(request)) {
-          const token = csrfProtection.getToken();
+        if (self.shouldAddToken(request)) {
+          const token = self.getToken();
           if (token) {
-            this.setRequestHeader(csrfProtection.config.headerName, token);
+            this.setRequestHeader(self.config.headerName, token);
           }
         }
       }
       
-      return originalSend.apply(this, [body]);
+      // Call the original send method
+      originalSend.call(this, body);
     };
   }
 
@@ -219,8 +297,8 @@ export class CSRFProtection {
       }
     });
 
-    // Also handle dynamically created forms
-    const observer = new MutationObserver((mutations) => {
+    // Handle dynamically created forms using MutationObserver
+    this.mutationObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
@@ -239,7 +317,7 @@ export class CSRFProtection {
       });
     });
 
-    observer.observe(document.body, {
+    this.mutationObserver.observe(document.body, {
       childList: true,
       subtree: true
     });
@@ -302,7 +380,8 @@ export class CSRFProtection {
       details: {
         url: request.url,
         method: request.method,
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString()
       }
     };
 
@@ -311,7 +390,11 @@ export class CSRFProtection {
 
     // Refresh token for next request
     this.refreshToken().catch(error => {
-      logger.error('Failed to refresh CSRF token after validation error', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      logger.error('Failed to refresh CSRF token after validation error', {
+        component: 'CSRFProtection',
+        error: errorMessage
+      });
     });
   }
 
@@ -326,9 +409,15 @@ export class CSRFProtection {
     // Validate token periodically
     setInterval(() => {
       if (this.tokenExpiry && new Date() > this.tokenExpiry) {
-        logger.warn('CSRF token expired, refreshing');
+        logger.warn('CSRF token expired, refreshing', {
+          component: 'CSRFProtection'
+        });
         this.refreshToken().catch(error => {
-          logger.error('Failed to refresh expired CSRF token', error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+          logger.error('Failed to refresh expired CSRF token', {
+            component: 'CSRFProtection',
+            error: errorMessage
+          });
         });
       }
     }, 60000); // Check every minute
@@ -377,5 +466,45 @@ export class CSRFProtection {
       clearInterval(this.refreshTimer);
       this.refreshTimer = null;
     }
+    
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+      this.mutationObserver = null;
+    }
   }
+
+  /**
+   * Get token metadata
+   */
+  getTokenMetadata(): { hasToken: boolean; isExpired: boolean; expiresIn: number } | null {
+    if (!this.currentToken) return null;
+    
+    const now = Date.now();
+    const isExpired = this.tokenExpiry ? now > this.tokenExpiry.getTime() : false;
+    const expiresIn = this.tokenExpiry ? Math.max(0, this.tokenExpiry.getTime() - now) : 0;
+    
+    return {
+      hasToken: true,
+      isExpired,
+      expiresIn
+    };
+  }
+}
+
+// Export singleton instance
+export const csrfProtection = new CSRFProtection({
+  enabled: true,
+  tokenName: 'csrf-token',
+  headerName: 'X-CSRF-Token'
+});
+
+// Export setup function for axios or other HTTP clients
+export function setupCSRFInterceptor(axiosInstance: any): void {
+  axiosInstance.interceptors.request.use((config: any) => {
+    const token = csrfProtection.getToken();
+    if (token) {
+      config.headers['X-CSRF-Token'] = token;
+    }
+    return config;
+  });
 }

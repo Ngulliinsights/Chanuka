@@ -44,6 +44,8 @@ import { argumentIntelligenceRouter } from './features/argument-intelligence/pre
 
 // Middleware imports
 import { migratedApiRateLimit } from './middleware/migration-wrapper.js';
+import { enhancedSecurityService } from './features/security/enhanced-security-service.js';
+import { SecuritySchemas, createValidationMiddleware } from './core/validation/security-schemas.js';
 
 // Infrastructure Services
 import { auditMiddleware } from './infrastructure/monitoring/audit-log.js';
@@ -248,6 +250,11 @@ app.use(migratedApiRateLimit);
 app.use(auditMiddleware);
 app.use(securityMonitoringMiddleware.initializeAll());
 
+// Enhanced security middleware
+app.use(enhancedSecurityService.csrfProtection());
+app.use(enhancedSecurityService.rateLimiting());
+app.use(enhancedSecurityService.vulnerabilityScanning());
+
 // Root API endpoint
 app.get('/api', (req: Request, res: Response) => {
   res.json({
@@ -312,6 +319,55 @@ app.get('/api/service-status', (req: Request, res: Response) => {
     uptime: process.uptime(),
     version: '1.0.0'
   });
+});
+
+// Security status endpoint
+app.get('/api/security/status', (req: Request, res: Response) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  try {
+    const securityStats = enhancedSecurityService.getSecurityStats();
+    res.json({
+      success: true,
+      data: securityStats,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Security status error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get security status',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// CSRF token endpoint
+app.get('/api/security/csrf-token', (req: Request, res: Response) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  try {
+    const userId = (req as any).user?.id;
+    const sessionId = (req as any).sessionID;
+    const token = enhancedSecurityService.generateCSRFToken(userId, sessionId);
+    
+    res.json({
+      success: true,
+      data: { token },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('CSRF token generation error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate CSRF token',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Memory analysis endpoint for debugging

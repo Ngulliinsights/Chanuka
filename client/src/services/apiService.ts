@@ -4,7 +4,7 @@
  */
 
 import { logger, validationService } from '../utils/logger';
-import { processRequestInterceptors } from './apiInterceptors';
+import { processRequestInterceptors } from '../core/api/interceptors';
 import { offlineDataManager } from '../utils/offlineDataManager';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 import { offlineAnalytics } from '../utils/offlineAnalytics';
@@ -15,7 +15,7 @@ import {
   createAuthError
 } from '../components/error';
 import { envConfig } from '../utils/env-config';
-import { authBackendService } from './auth-backend-service';
+import { authApiService } from '../core/api/auth';
 import { ZodSchema } from 'zod';
 
 // ============================================================================
@@ -322,7 +322,7 @@ export async function fetchWithFallback<T = any>(
 
             // Try to refresh tokens
             try {
-              await authBackendService.refreshTokens();
+              await authApiService.refreshTokens();
               // If refresh succeeds, retry the original request
               logger.info('Token refresh successful, retrying request', {
                 component: 'ApiService',
@@ -634,45 +634,6 @@ export const { register, login, getCurrentUser, logout } = authApi;
 export const updateProfile = (profileData: any) => api.put('/api/users/profile', profileData);
 export const updatePreferences = (preferences: any) => api.put('/api/users/preferences', preferences);
 
-// Bills API
-export const billsApi = {
-  getAll: (params?: any) => api.get('/api/bills', params),
-  getBills: () => api.get('/api/bills'),
-  getById: (id: string | number) => api.get(`/api/bills/${id}`),
-  getBill: (id: number) => api.get(`/api/bills/${id}`),
-  searchBills: (query: any) => {
-    const url = new URL('/api/bills/search', api.getBaseUrl());
-    Object.keys(query).forEach(key => {
-      if (query[key] !== undefined && query[key] !== null) {
-        url.searchParams.append(key, query[key]);
-      }
-    });
-    return api.get(url.pathname + url.search);
-  },
-  getComments: (bill_id: string | number) => api.get(`/api/bills/${bill_id}/comments`),
-  getBillComments: (id: number) => api.get(`/api/bills/${id}/comments`),
-  getSponsors: (bill_id: string | number) => api.get(`/api/bills/${bill_id}/sponsors`),
-  getAnalysis: (bill_id: string | number) => api.get(`/api/bills/${bill_id}/analysis`),
-  getCategories: () => api.get('/api/bills/categories'),
-  getBillCategories: () => api.get('/api/bills/meta/categories'),
-  getStatuses: () => api.get('/api/bills/statuses'),
-  getBillStatuses: () => api.get('/api/bills/meta/statuses'),
-  addComment: (bill_id: string | number, comment: any) => 
-    api.post(`/api/bills/${bill_id}/comments`, comment),
-  createBillComment: (bill_id: number, comment: any) => 
-    api.post(`/api/bills/${bill_id}/comments`, comment),
-  recordEngagement: (bill_id: string | number, engagement: any) => 
-    api.post(`/api/bills/${bill_id}/engagement`, engagement),
-};
-
-// Export individual bills methods for convenience
-export const { 
-  getBills, 
-  getBill, 
-  searchBills, 
-  getBillComments, 
-  createBillComment 
-} = billsApi;
 
 // System API
 export const systemApi = {

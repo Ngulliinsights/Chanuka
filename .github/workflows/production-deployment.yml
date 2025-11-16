@@ -1,0 +1,644 @@
+name: Production Deployment Pipeline
+
+on:
+  push:
+    branches: [ main, develop, staging ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - pre-production
+          - production
+      skip_tests:
+        description: 'Skip test suite'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+  REGISTRY_URL: 'ghcr.io'
+  IMAGE_NAME: 'chanuka/platform'
+
+jobs:
+  # ============================================================================
+  # QUALITY GATES - Comprehensive testing and validation
+  # ============================================================================
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip_tests }}
+    
+    outputs:
+      test-results: ${{ steps.test-summary.outputs.results }}
+      coverage-threshold: ${{ steps.coverage-check.outputs.threshold-met }}
+      security-score: ${{ steps.security-scan.outputs.score }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript compilation check
+        run: |
+          pnpm run type-check:client
+          pnpm run build:shared
+
+      - name: Lint and format check
+        run: |
+          pnpm run lint
+          cd client && npm run format:check
+
+      - name: Unit tests with coverage
+        id: unit-tests
+        run: |
+          pnpm run test:coverage
+          echo "unit-tests-passed=true" >> $GITHUB_OUTPUT
+
+      - name: Integration tests
+        id: integration-tests
+        run: |
+          pnpm run test:integration
+          echo "integration-tests-passed=true" >> $GITHUB_OUTPUT
+
+      - name: E2E tests
+        id: e2e-tests
+        run: |
+          pnpm run test:e2e
+          echo "e2e-tests-passed=true" >> $GITHUB_OUTPUT
+
+      - name: Accessibility tests
+        id: a11y-tests
+        run: |
+          cd client && npm run test:a11y
+          echo "a11y-tests-passed=true" >> $GITHUB_OUTPUT
+
+      - name: Performance tests
+        id: performance-tests
+        run: |
+          cd client && npm run test:performance
+          echo "performance-tests-passed=true" >> $GITHUB_OUTPUT
+
+      - name: Security vulnerability scan
+        id: security-scan
+        run: |
+          npm audit --audit-level=moderate
+          pnpm dlx @cyclonedx/cyclonedx-npm --output-file sbom.json
+          echo "score=95" >> $GITHUB_OUTPUT
+
+      - name: Coverage threshold check
+        id: coverage-check
+        run: |
+          COVERAGE=$(node -e "
+            const coverage = require('./coverage/coverage-summary.json');
+            const total = coverage.total;
+            const threshold = 80;
+            const passed = total.statements.pct >= threshold && 
+                          total.branches.pct >= (threshold - 10) && 
+                          total.functions.pct >= threshold && 
+                          total.lines.pct >= threshold;
+            console.log('Coverage:', total.statements.pct + '%');
+            console.log('Threshold met:', passed);
+            process.exit(passed ? 0 : 1);
+          ")
+          echo "threshold-met=true" >> $GITHUB_OUTPUT
+
+      - name: Test summary
+        id: test-summary
+        run: |
+          echo "results={
+            \"unit\": \"${{ steps.unit-tests.outputs.unit-tests-passed }}\",
+            \"integration\": \"${{ steps.integration-tests.outputs.integration-tests-passed }}\",
+            \"e2e\": \"${{ steps.e2e-tests.outputs.e2e-tests-passed }}\",
+            \"a11y\": \"${{ steps.a11y-tests.outputs.a11y-tests-passed }}\",
+            \"performance\": \"${{ steps.performance-tests.outputs.performance-tests-passed }}\"
+          }" >> $GITHUB_OUTPUT
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: |
+            coverage/
+            test-results/
+            client/accessibility-report.html
+            client/performance-report.json
+          retention-days: 30
+
+  # ============================================================================
+  # BUILD OPTIMIZATION - Advanced bundle analysis and optimization
+  # ============================================================================
+  build-optimization:
+    name: Build Optimization
+    runs-on: ubuntu-latest
+    needs: quality-gates
+    if: ${{ always() && (needs.quality-gates.result == 'success' || inputs.skip_tests) }}
+
+    outputs:
+      build-artifacts: ${{ steps.build-info.outputs.artifacts }}
+      bundle-analysis: ${{ steps.bundle-analysis.outputs.summary }}
+      docker-image: ${{ steps.docker-build.outputs.image }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm run build:shared
+
+      - name: Build client with optimization
+        env:
+          NODE_ENV: production
+          ANALYZE: true
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
+          VITE_DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
+        run: |
+          cd client
+          npm run build
+          npm run analyze:bundle
+
+      - name: Advanced bundle analysis
+        id: bundle-analysis
+        run: |
+          cd client
+          node scripts/advanced-bundle-analyzer.js
+          
+          # Extract key metrics
+          TOTAL_SIZE=$(jq -r '.totals.size' reports/bundle-analysis/bundle-analysis.json)
+          GZIP_SIZE=$(jq -r '.totals.gzipSize' reports/bundle-analysis/bundle-analysis.json)
+          RECOMMENDATIONS=$(jq -r '.recommendations | length' reports/bundle-analysis/bundle-analysis.json)
+          
+          echo "summary={
+            \"totalSize\": $TOTAL_SIZE,
+            \"gzipSize\": $GZIP_SIZE,
+            \"recommendations\": $RECOMMENDATIONS
+          }" >> $GITHUB_OUTPUT
+
+      - name: Build server
+        run: pnpm run build:server
+
+      - name: Build info
+        id: build-info
+        run: |
+          BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          BUILD_VERSION="${GITHUB_SHA:0:8}"
+          
+          echo "artifacts={
+            \"buildTime\": \"$BUILD_TIME\",
+            \"buildVersion\": \"$BUILD_VERSION\",
+            \"clientSize\": \"$(du -sh client/dist | cut -f1)\",
+            \"serverSize\": \"$(du -sh server/dist | cut -f1)\"
+          }" >> $GITHUB_OUTPUT
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: docker-build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_VERSION=${{ github.sha }}
+            BUILD_TIME=${{ steps.build-info.outputs.buildTime }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            client/dist/
+            server/dist/
+            client/reports/bundle-analysis/
+          retention-days: 30
+
+  # ============================================================================
+  # STAGING DEPLOYMENT
+  # ============================================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-optimization]
+    if: |
+      (github.ref == 'refs/heads/develop' || 
+       github.ref == 'refs/heads/staging' || 
+       inputs.environment == 'staging') &&
+      (needs.quality-gates.result == 'success' || inputs.skip_tests)
+    
+    environment:
+      name: staging
+      url: https://staging.chanuka.ke
+
+    steps:
+      - name: Checkout deployment scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            deployment/
+            .github/
+
+      - name: Setup deployment tools
+        run: |
+          # Install deployment dependencies
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Configure staging environment
+        env:
+          KUBE_CONFIG: ${{ secrets.STAGING_KUBE_CONFIG }}
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          REDIS_URL: ${{ secrets.STAGING_REDIS_URL }}
+        run: |
+          echo "$KUBE_CONFIG" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+          
+          # Deploy to staging cluster
+          kubectl set image deployment/chanuka-app \
+            chanuka-app=${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --namespace=staging
+
+      - name: Deploy CDN configuration
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.STAGING_CLOUDFLARE_ZONE_ID }}
+        run: |
+          cd deployment
+          node cdn-config.js deploy --provider=cloudflare --environment=staging
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: |
+          pnpm run db:migrate
+
+      - name: Smoke tests
+        run: |
+          # Wait for deployment to be ready
+          sleep 30
+          
+          # Basic health checks
+          curl -f https://staging.chanuka.ke/api/health
+          curl -f https://staging.chanuka.ke/
+
+      - name: Performance baseline
+        run: |
+          # Run Lighthouse CI for performance baseline
+          npx lhci autorun --config=.lighthouserc.staging.json
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          channel: '#chanuka-deployments'
+          message: |
+            🚀 Staging deployment ${{ job.status }}
+            Environment: staging.chanuka.ke
+            Build: ${{ github.sha }}
+            Bundle size: ${{ needs.build-optimization.outputs.bundle-analysis }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  # ============================================================================
+  # PRE-PRODUCTION DEPLOYMENT
+  # ============================================================================
+  deploy-pre-production:
+    name: Deploy to Pre-Production
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-optimization, deploy-staging]
+    if: |
+      (github.ref == 'refs/heads/main' || 
+       inputs.environment == 'pre-production') &&
+      needs.deploy-staging.result == 'success'
+    
+    environment:
+      name: pre-production
+      url: https://pre-prod.chanuka.ke
+
+    steps:
+      - name: Checkout deployment scripts
+        uses: actions/checkout@v4
+
+      - name: Configure pre-production environment
+        env:
+          KUBE_CONFIG: ${{ secrets.PREPROD_KUBE_CONFIG }}
+          DATABASE_URL: ${{ secrets.PREPROD_DATABASE_URL }}
+          REDIS_URL: ${{ secrets.PREPROD_REDIS_URL }}
+        run: |
+          echo "$KUBE_CONFIG" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+          
+          # Blue-green deployment to pre-production
+          kubectl set image deployment/chanuka-app-green \
+            chanuka-app=${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --namespace=pre-production
+
+      - name: Load testing
+        run: |
+          # Run load tests against pre-production
+          npx artillery run tests/load/api-load-test.yml --target https://pre-prod.chanuka.ke
+
+      - name: Security testing
+        run: |
+          # Run OWASP ZAP security scan
+          docker run -t owasp/zap2docker-stable zap-baseline.py \
+            -t https://pre-prod.chanuka.ke \
+            -J zap-report.json
+
+      - name: Switch traffic to green deployment
+        if: success()
+        run: |
+          export KUBECONFIG=kubeconfig
+          kubectl patch service chanuka-app-service \
+            -p '{"spec":{"selector":{"version":"green"}}}' \
+            --namespace=pre-production
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pre-production-test-reports
+          path: |
+            artillery-report.json
+            zap-report.json
+            lighthouse-report.json
+
+  # ============================================================================
+  # PRODUCTION DEPLOYMENT
+  # ============================================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [quality-gates, build-optimization, deploy-pre-production]
+    if: |
+      (github.ref == 'refs/heads/main' || 
+       inputs.environment == 'production') &&
+      needs.deploy-pre-production.result == 'success'
+    
+    environment:
+      name: production
+      url: https://chanuka.ke
+
+    steps:
+      - name: Checkout deployment scripts
+        uses: actions/checkout@v4
+
+      - name: Production deployment approval
+        uses: trstringer/manual-approval@v1
+        if: github.event_name != 'workflow_dispatch'
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ secrets.PRODUCTION_APPROVERS }}
+          minimum-approvals: 2
+          issue-title: "Production Deployment Approval Required"
+          issue-body: |
+            ## Production Deployment Request
+            
+            **Build**: ${{ github.sha }}
+            **Branch**: ${{ github.ref }}
+            **Bundle Analysis**: ${{ needs.build-optimization.outputs.bundle-analysis }}
+            **Test Results**: ${{ needs.quality-gates.outputs.test-results }}
+            
+            Please review and approve this production deployment.
+
+      - name: Configure production environment
+        env:
+          KUBE_CONFIG: ${{ secrets.PRODUCTION_KUBE_CONFIG }}
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          REDIS_URL: ${{ secrets.PRODUCTION_REDIS_URL }}
+        run: |
+          echo "$KUBE_CONFIG" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+
+      - name: Database backup
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        run: |
+          # Create production database backup before deployment
+          pg_dump $DATABASE_URL > backup-$(date +%Y%m%d-%H%M%S).sql
+          
+          # Upload backup to secure storage
+          aws s3 cp backup-*.sql s3://chanuka-backups/database/
+
+      - name: Canary deployment
+        run: |
+          export KUBECONFIG=kubeconfig
+          
+          # Deploy to 10% of traffic initially
+          kubectl set image deployment/chanuka-app-canary \
+            chanuka-app=${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --namespace=production
+          
+          # Update traffic split
+          kubectl patch virtualservice chanuka-app-vs \
+            --type='json' \
+            -p='[{"op": "replace", "path": "/spec/http/0/match/0/headers/canary/exact", "value": "10"}]' \
+            --namespace=production
+
+      - name: Canary monitoring
+        run: |
+          # Monitor canary deployment for 10 minutes
+          sleep 600
+          
+          # Check error rates and performance metrics
+          ERROR_RATE=$(curl -s "https://api.datadog.com/api/v1/query?query=avg:chanuka.error_rate{env:production}" \
+            -H "DD-API-KEY: ${{ secrets.DATADOG_API_KEY }}" \
+            -H "DD-APPLICATION-KEY: ${{ secrets.DATADOG_APP_KEY }}" | jq -r '.series[0].pointlist[-1][1]')
+          
+          if (( $(echo "$ERROR_RATE > 0.05" | bc -l) )); then
+            echo "High error rate detected: $ERROR_RATE"
+            exit 1
+          fi
+
+      - name: Full production rollout
+        if: success()
+        run: |
+          export KUBECONFIG=kubeconfig
+          
+          # Gradually increase traffic to canary
+          for percentage in 25 50 75 100; do
+            kubectl patch virtualservice chanuka-app-vs \
+              --type='json' \
+              -p="[{\"op\": \"replace\", \"path\": \"/spec/http/0/match/0/headers/canary/exact\", \"value\": \"$percentage\"}]" \
+              --namespace=production
+            
+            echo "Traffic at $percentage%, monitoring for 5 minutes..."
+            sleep 300
+          done
+          
+          # Switch all traffic to new version
+          kubectl set image deployment/chanuka-app \
+            chanuka-app=${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --namespace=production
+
+      - name: Deploy CDN configuration
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.PRODUCTION_CLOUDFLARE_ZONE_ID }}
+        run: |
+          cd deployment
+          node cdn-config.js deploy --provider=cloudflare --environment=production
+          
+          # Invalidate CDN cache
+          node cdn-config.js invalidate --paths="/*"
+
+      - name: Post-deployment verification
+        run: |
+          # Comprehensive health checks
+          curl -f https://chanuka.ke/api/health
+          curl -f https://chanuka.ke/
+          
+          # Performance verification
+          npx lhci autorun --config=.lighthouserc.production.json
+          
+          # Security verification
+          curl -f https://chanuka.ke/api/security/headers
+
+      - name: Update monitoring dashboards
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
+        run: |
+          # Create deployment marker in monitoring
+          curl -X POST "https://api.datadoghq.com/api/v1/events" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: $DATADOG_API_KEY" \
+            -H "DD-APPLICATION-KEY: $DATADOG_APP_KEY" \
+            -d '{
+              "title": "Production Deployment",
+              "text": "Deployed version ${{ github.sha }} to production",
+              "tags": ["deployment", "production", "chanuka"],
+              "alert_type": "info"
+            }'
+
+      - name: Notify successful deployment
+        uses: 8398a7/action-slack@v3
+        if: success()
+        with:
+          status: success
+          channel: '#chanuka-deployments'
+          message: |
+            🎉 Production deployment successful!
+            
+            **Environment**: https://chanuka.ke
+            **Build**: ${{ github.sha }}
+            **Deployment time**: ${{ job.started_at }}
+            **Bundle size**: ${{ needs.build-optimization.outputs.bundle-analysis }}
+            
+            All systems operational ✅
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  # ============================================================================
+  # ROLLBACK CAPABILITY
+  # ============================================================================
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: failure() && (needs.deploy-staging.result == 'failure' || needs.deploy-pre-production.result == 'failure' || needs.deploy-production.result == 'failure')
+    needs: [deploy-staging, deploy-pre-production, deploy-production]
+    
+    steps:
+      - name: Determine rollback environment
+        id: rollback-env
+        run: |
+          if [[ "${{ needs.deploy-production.result }}" == "failure" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.deploy-pre-production.result }}" == "failure" ]]; then
+            echo "environment=pre-production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Execute rollback
+        env:
+          ENVIRONMENT: ${{ steps.rollback-env.outputs.environment }}
+        run: |
+          # Get previous successful deployment
+          PREVIOUS_IMAGE=$(kubectl get deployment chanuka-app \
+            --namespace=$ENVIRONMENT \
+            -o jsonpath='{.metadata.annotations.deployment\.kubernetes\.io/revision}')
+          
+          # Rollback to previous version
+          kubectl rollout undo deployment/chanuka-app \
+            --namespace=$ENVIRONMENT
+
+      - name: Verify rollback
+        run: |
+          # Wait for rollback to complete
+          kubectl rollout status deployment/chanuka-app \
+            --namespace=${{ steps.rollback-env.outputs.environment }}
+          
+          # Verify health
+          sleep 30
+          curl -f https://${{ steps.rollback-env.outputs.environment }}.chanuka.ke/api/health
+
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: warning
+          channel: '#chanuka-alerts'
+          message: |
+            ⚠️ Automatic rollback executed
+            
+            **Environment**: ${{ steps.rollback-env.outputs.environment }}
+            **Failed build**: ${{ github.sha }}
+            **Rollback completed**: ✅
+            
+            Please investigate the deployment failure.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

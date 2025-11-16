@@ -345,6 +345,7 @@ export class BackupError extends ModernizationError {
   }
 }
 
+// Keep the modernization-specific ValidationError for modernization module
 export class ValidationError extends ModernizationError {
   constructor(message: string, public validationType: ValidationType, metadata?: Record<string, unknown>) {
     super(message, 'VALIDATION_ERROR', ModernizationPhase.VALIDATION, true, metadata);

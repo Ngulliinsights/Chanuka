@@ -1,15 +1,37 @@
 import { describe, it, expect } from 'vitest';
-import {
-  LayoutType,
-  LayoutBreakpoint,
-  SidebarState,
-  HeaderStyle,
-  FooterStyle,
-  LayoutConfig,
-  NavigationItem,
-  User,
-  UserPreferences
-} from '@shared/core/src/types';
+
+// Define types locally to avoid shared/core dependency
+type LayoutType = 'app' | 'auth' | 'landing' | 'admin' | 'mobile';
+type LayoutBreakpoint = 'mobile' | 'tablet' | 'desktop' | 'wide';
+type SidebarState = 'collapsed' | 'expanded' | 'hidden';
+type HeaderStyle = 'default' | 'minimal' | 'transparent';
+type FooterStyle = 'default' | 'minimal' | 'hidden';
+
+interface LayoutConfig {
+  type: LayoutType;
+  breakpoint: LayoutBreakpoint;
+  sidebar: SidebarState;
+  header: HeaderStyle;
+  footer: FooterStyle;
+}
+
+interface NavigationItem {
+  id: string;
+  label: string;
+  path: string;
+  icon?: string;
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface UserPreferences {
+  theme: 'light' | 'dark';
+  notifications: boolean;
+}
 
 describe('Layout Types', () => {
   describe('LayoutType', () => {
