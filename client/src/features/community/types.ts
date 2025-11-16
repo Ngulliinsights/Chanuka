@@ -14,7 +14,7 @@ export interface Comment { id: string;
   isEdited: boolean;
   attachments?: Attachment[];
   mentions?: Mention[];
- }
+  }
 
 export interface Attachment {
   id: string;

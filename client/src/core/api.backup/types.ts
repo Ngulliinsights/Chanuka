@@ -77,7 +77,7 @@ export interface Bill {
 }
 
 export interface Comment {
-  id: number;
+  id: string;
   billId: number;
   userId: number;
   content: string;

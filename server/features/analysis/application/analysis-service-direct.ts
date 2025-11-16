@@ -7,7 +7,7 @@ import {
   constitutional_analyses,
 } from '@shared/schema';
 import { eq, and, sql, desc, count } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS

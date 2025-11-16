@@ -29,7 +29,7 @@ const mockAuthService = {
   getCurrentUser: vi.fn(),
 };
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     login: mockAuthService.login,
     register: mockAuthService.register,

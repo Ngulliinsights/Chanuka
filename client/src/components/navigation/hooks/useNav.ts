@@ -1,4 +1,4 @@
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/useAuth';
 import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
 import { canViewItem } from '../core/roleGuard';

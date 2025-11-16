@@ -8,7 +8,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { communityWebSocketExtension, CommunityWebSocketEvents } from '../services/community-websocket-extension';
 import { useCommunityStore } from '../store/slices/communitySlice';
-import { useDiscussionStore } from '../store/slices/discussionSlice';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { selectDiscussionState } from '../store/slices/discussionSlice';
 import { logger } from '../utils/logger';
 
 interface UseCommunityRealTimeOptions {
@@ -51,7 +52,8 @@ export function useCommunityRealTime(options: UseCommunityRealTimeOptions = {}):
 
   const [isConnected, setIsConnected] = useState(false);
   const communityStore = useCommunityStore();
-  const discussionStore = useDiscussionStore();
+  const dispatch = useAppDispatch();
+  const discussionState = useAppSelector(selectDiscussionState);
   
   // Track active subscriptions to avoid duplicates
   const subscriptionsRef = useRef<Set<string>>(new Set());

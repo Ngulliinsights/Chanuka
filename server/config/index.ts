@@ -2,8 +2,6 @@
 // Comprehensive, type-safe configuration for all server services
 
 import { z } from 'zod';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
 
 // Configuration utilities (defined early to avoid initialization issues)
 export const isDev = (): boolean => {
@@ -395,45 +393,9 @@ export type CoverageConfig = z.infer<typeof coverageConfigSchema>;
 export type AdminConfig = z.infer<typeof adminConfigSchema>;
 export type AppConfig = z.infer<typeof configSchema>;
 
-// Utility function to merge configurations
-function mergeConfigs(base: AppConfig, overrides: Partial<AppConfig>): AppConfig {
-  return {
-    ...base,
-    ...overrides,
-    server: { ...base.server, ...overrides.server },
-    database: { ...base.database, ...overrides.database },
-    auth: { ...base.auth, ...overrides.auth },
-    email: { ...base.email, ...overrides.email },
-    redis: { ...base.redis, ...overrides.redis },
-    externalApi: {
-      ...base.externalApi,
-      ...overrides.externalApi,
-      openai: { ...base.externalApi.openai, ...overrides.externalApi?.openai },
-      anthropic: { ...base.externalApi.anthropic, ...overrides.externalApi?.anthropic },
-      governmentData: { ...base.externalApi.governmentData, ...overrides.externalApi?.governmentData },
-    },
-    features: { ...base.features, ...overrides.features },
-    logging: { ...base.logging, ...overrides.logging },
-    cors: { ...base.cors, ...overrides.cors },
-    rateLimit: { ...base.rateLimit, ...overrides.rateLimit },
-    security: { ...base.security, ...overrides.security },
-    monitoring: { ...base.monitoring, ...overrides.monitoring },
-    cache: { ...base.cache, ...overrides.cache },
-    websocket: { ...base.websocket, ...overrides.websocket },
-    notification: { ...base.notification, ...overrides.notification },
-    privacy: { ...base.privacy, ...overrides.privacy },
-    search: { ...base.search, ...overrides.search },
-    analytics: { ...base.analytics, ...overrides.analytics },
-    governmentData: { ...base.governmentData, ...overrides.governmentData },
-    coverage: { ...base.coverage, ...overrides.coverage },
-    admin: { ...base.admin, ...overrides.admin },
-  };
-}
 
 // Load configuration based on environment
 function loadEnvironmentConfig(): AppConfig {
-  const env = process.env.NODE_ENV || 'development';
-
   // For now, use the base config with environment-specific overrides
   // TODO: Load from separate config files when needed
   return createBaseConfig();
@@ -797,7 +759,7 @@ export function enableHotReload(intervalMs: number = 5000): void {
 
   configWatcher = setInterval(() => {
     try {
-      const newConfig = createConfig();
+      createConfig();
       // In a real implementation, you'd compare and update the config object
       // For now, we'll just validate that the config can be reloaded
       // Validation passed (silent)

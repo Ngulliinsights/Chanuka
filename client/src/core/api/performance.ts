@@ -1,97 +1,244 @@
 /**
  * Performance Monitoring API Service
- * Core API communication layer for performance metrics
- * Extracted from services/performance-monitoring.ts during infrastructure consolidation
+ * 
+ * This service manages communication with backend performance monitoring endpoints.
+ * It tracks Core Web Vitals, custom metrics, resource timings, and provides
+ * actionable insights through performance analytics and recommendations.
+ * 
+ * Core Web Vitals tracked:
+ * - LCP (Largest Contentful Paint): Loading performance
+ * - FID (First Input Delay): Interactivity
+ * - CLS (Cumulative Layout Shift): Visual stability
+ * - TTFB (Time to First Byte): Server response time
+ * - FCP (First Contentful Paint): Perceived load speed
+ * 
+ * @module PerformanceApiService
  */
 
 import { globalApiClient } from './client';
 import { logger } from '../../utils/logger';
+import { ErrorCode, ErrorFactory } from './errors';
 
-// Define types locally since they're not exported from the performance monitoring service
+// ============================================================================
+// Type Definitions
+// ============================================================================
+
+/**
+ * Core Web Vitals and performance metrics as defined by the Web Performance API
+ */
 export interface PerformanceMetric {
-  name: string;
-  value: number;
-  delta?: number;
-  id: string;
-  navigationType?: string;
-  rating?: 'good' | 'needs-improvement' | 'poor';
-  timestamp: number;
-}
-
-export interface CustomMetric {
-  name: string;
-  value: number;
-  unit: string;
-  context?: Record<string, any>;
-  timestamp: number;
-}
-
-export interface UserSession {
-  sessionId: string;
-  userId?: string;
-  startTime: number;
-  pageViews: number;
-  interactions: number;
-  errors: number;
-  deviceInfo: DeviceInfo;
-  networkInfo: NetworkInfo;
-}
-
-export interface DeviceInfo {
-  userAgent: string;
-  platform: string;
-  language: string;
-  cookieEnabled: boolean;
-  onLine: boolean;
-  hardwareConcurrency: number;
-  deviceMemory?: number;
-  screen: {
-    width: number;
-    height: number;
-    colorDepth: number;
-  };
-}
-
-export interface NetworkInfo {
-  effectiveType?: string;
-  downlink?: number;
-  rtt?: number;
-  saveData?: boolean;
-}
-
-export interface ResourceTiming {
-  name: string;
-  duration: number;
-  size: number;
-  type: string;
-  cached: boolean;
-  protocol?: string;
+  readonly name: string;
+  readonly value: number;
+  readonly delta?: number;
+  readonly id: string;
+  readonly navigationType?: string;
+  readonly rating?: 'good' | 'needs-improvement' | 'poor';
+  readonly timestamp: number;
 }
 
 /**
- * Performance Monitoring API Service Class
- * Handles all performance-related API communication
+ * Application-specific custom metrics for business-critical operations
+ */
+export interface CustomMetric {
+  readonly name: string;
+  readonly value: number;
+  readonly unit: string;
+  readonly context?: Readonly<Record<string, unknown>>;
+  readonly timestamp: number;
+}
+
+/**
+ * Complete user session information including device and network context
+ */
+export interface UserSession {
+  readonly sessionId: string;
+  readonly userId?: string;
+  readonly startTime: number;
+  readonly pageViews: number;
+  readonly interactions: number;
+  readonly errors: number;
+  readonly deviceInfo: DeviceInfo;
+  readonly networkInfo: NetworkInfo;
+}
+
+/**
+ * Device capabilities and characteristics
+ */
+export interface DeviceInfo {
+  readonly userAgent: string;
+  readonly platform: string;
+  readonly language: string;
+  readonly cookieEnabled: boolean;
+  readonly onLine: boolean;
+  readonly hardwareConcurrency: number;
+  readonly deviceMemory?: number;
+  readonly screen: {
+    readonly width: number;
+    readonly height: number;
+    readonly colorDepth: number;
+  };
+}
+
+/**
+ * Network conditions and connection quality indicators
+ */
+export interface NetworkInfo {
+  readonly effectiveType?: string; // '4g', '3g', '2g', 'slow-2g'
+  readonly downlink?: number; // Megabits per second
+  readonly rtt?: number; // Round-trip time in milliseconds
+  readonly saveData?: boolean; // Data saver mode enabled
+}
+
+/**
+ * Resource loading performance data
+ */
+export interface ResourceTiming {
+  readonly name: string;
+  readonly duration: number;
+  readonly size: number;
+  readonly type: string;
+  readonly cached: boolean;
+  readonly protocol?: string;
+}
+
+/**
+ * Performance issue types that can be detected and reported
+ */
+export type PerformanceIssueType = 
+  | 'slow_page'
+  | 'high_memory'
+  | 'network_issue'
+  | 'javascript_error';
+
+/**
+ * Severity levels for performance issues
+ */
+export type IssueSeverity = 'low' | 'medium' | 'high' | 'critical';
+
+/**
+ * Priority levels for performance recommendations
+ */
+export type RecommendationPriority = 'low' | 'medium' | 'high';
+
+/**
+ * Performance issue report structure
+ */
+export interface PerformanceIssue {
+  readonly type: PerformanceIssueType;
+  readonly severity: IssueSeverity;
+  readonly description: string;
+  readonly metrics: Readonly<Record<string, unknown>>;
+  readonly sessionId: string;
+  readonly url: string;
+  readonly userAgent: string;
+}
+
+/**
+ * Performance improvement recommendation
+ */
+export interface PerformanceRecommendation {
+  readonly type: string;
+  readonly priority: RecommendationPriority;
+  readonly description: string;
+  readonly impact: number; // Expected improvement percentage
+  readonly implementation: string;
+}
+
+/**
+ * Performance analytics data structure
+ */
+export interface PerformanceAnalytics {
+  readonly sessions: UserSession[];
+  readonly averageMetrics: Readonly<Record<string, number>>;
+  readonly performanceTrends: ReadonlyArray<{
+    readonly date: string;
+    readonly metrics: Readonly<Record<string, number>>;
+  }>;
+}
+
+/**
+ * Performance benchmarks for comparison
+ */
+export interface PerformanceBenchmarks {
+  readonly webVitals: Readonly<Record<string, { good: number; poor: number }>>;
+  readonly customMetrics: Readonly<Record<string, { target: number; warning: number }>>;
+}
+
+/**
+ * Complete metrics payload sent to the backend
+ */
+export interface MetricsPayload {
+  readonly sessionId: string;
+  readonly session: UserSession;
+  readonly metrics: readonly PerformanceMetric[];
+  readonly customMetrics: readonly CustomMetric[];
+  readonly resourceTimings: readonly ResourceTiming[];
+  readonly timestamp: number;
+  readonly url: string;
+  readonly userAgent: string;
+}
+
+// ============================================================================
+// Performance API Service
+// ============================================================================
+
+/**
+ * Service class that handles all performance monitoring API operations.
+ * This service is designed to work seamlessly with the Web Performance API
+ * and provides a bridge between client-side measurements and backend analytics.
  */
 export class PerformanceApiService {
-  private baseUrl: string;
-
-  constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || '/api';
-  }
+  private readonly baseUrl: string;
 
   /**
-   * Report performance metrics to the backend
+   * Creates a new Performance API Service instance
+   * @param baseUrl - Base URL for API endpoints (defaults to '/api')
    */
-  async reportMetrics(payload: {
-    sessionId: string;
-    session: any;
-    metrics: any[];
-    customMetrics: any[];
-    resourceTimings: any[];
-    timestamp: number;
-    url: string;
-    userAgent: string;
-  }): Promise<void> {
+  constructor(baseUrl: string = '/api') {
+    this.baseUrl = baseUrl;
+  }
+
+  // ==========================================================================
+  // Metrics Reporting
+  // ==========================================================================
+
+  /**
+   * Reports comprehensive performance metrics to the backend.
+   * 
+   * This method sends a complete snapshot of the current page's performance,
+   * including Core Web Vitals, custom business metrics, and resource timings.
+   * This data powers performance dashboards and automated alerting systems.
+   * 
+   * The backend aggregates this data to identify performance trends, detect
+   * regressions, and generate recommendations for optimization.
+   * 
+   * @param payload - Complete metrics payload including all performance data
+   * @throws {UnifiedError} When the network request fails or validation errors occur
+   * 
+   * @example
+   * ```typescript
+   * await service.reportMetrics({
+   *   sessionId: 'sess_abc123',
+   *   session: currentSession,
+   *   metrics: webVitals,
+   *   customMetrics: businessMetrics,
+   *   resourceTimings: resourcePerf,
+   *   timestamp: Date.now(),
+   *   url: window.location.href,
+   *   userAgent: navigator.userAgent
+   * });
+   * ```
+   */
+  async reportMetrics(payload: MetricsPayload): Promise<void> {
+    if (!payload?.sessionId) {
+      throw ErrorFactory.createValidationError(
+        ErrorCode.VALIDATION_INVALID_INPUT,
+        'Session ID is required to report metrics',
+        { payload },
+        { component: 'PerformanceApi', operation: 'reportMetrics' }
+      );
+    }
+
     try {
       await globalApiClient.post(
         `${this.baseUrl}/performance/metrics`,
@@ -103,7 +250,8 @@ export class PerformanceApiService {
         component: 'PerformanceApi',
         sessionId: payload.sessionId,
         metricsCount: payload.metrics.length,
-        customMetricsCount: payload.customMetrics.length
+        customMetricsCount: payload.customMetrics.length,
+        resourceTimingsCount: payload.resourceTimings.length
       });
     } catch (error) {
       logger.error('Failed to report performance metrics', {
@@ -111,24 +259,73 @@ export class PerformanceApiService {
         sessionId: payload.sessionId,
         error
       });
-      throw error;
+
+      throw ErrorFactory.createNetworkError(
+        ErrorCode.NETWORK_REQUEST_FAILED,
+        'Failed to send performance metrics to the server',
+        { 
+          sessionId: payload.sessionId,
+          metricsCount: payload.metrics.length,
+          originalError: error 
+        },
+        { component: 'PerformanceApi', operation: 'reportMetrics' }
+      );
     }
   }
 
+  // ==========================================================================
+  // Analytics & Insights
+  // ==========================================================================
+
   /**
-   * Get performance analytics for a user
+   * Retrieves performance analytics for a specific user.
+   * 
+   * This method returns historical performance data, trends over time, and
+   * aggregated metrics for a user. It helps identify patterns like:
+   * - Performance degradation over time
+   * - Correlation between device/network and performance
+   * - User-specific performance bottlenecks
+   * 
+   * The date range parameter allows you to focus on specific time periods
+   * for more detailed analysis.
+   * 
+   * @param userId - The unique identifier of the user
+   * @param dateRange - Optional date range to filter results
+   * @returns Promise resolving to comprehensive analytics data
+   * @throws {UnifiedError} When retrieval fails or user is not found
+   * 
+   * @example
+   * ```typescript
+   * const analytics = await service.getUserAnalytics('user_123', {
+   *   start: '2024-01-01',
+   *   end: '2024-01-31'
+   * });
+   * 
+   * console.log(`Average LCP: ${analytics.averageMetrics.LCP}ms`);
+   * ```
    */
-  async getUserAnalytics(userId: string, dateRange?: {
-    start: string;
-    end: string;
-  }): Promise<{
-    sessions: any[];
-    averageMetrics: Record<string, number>;
-    performanceTrends: Array<{
-      date: string;
-      metrics: Record<string, number>;
-    }>;
-  }> {
+  async getUserAnalytics(
+    userId: string,
+    dateRange?: { start: string; end: string }
+  ): Promise<PerformanceAnalytics> {
+    if (!userId?.trim()) {
+      throw ErrorFactory.createValidationError(
+        ErrorCode.VALIDATION_INVALID_INPUT,
+        'User ID is required to retrieve analytics',
+        { userId },
+        { component: 'PerformanceApi', operation: 'getUserAnalytics' }
+      );
+    }
+
+    if (dateRange && (!dateRange.start || !dateRange.end)) {
+      throw ErrorFactory.createValidationError(
+        ErrorCode.VALIDATION_INVALID_INPUT,
+        'Date range must include both start and end dates',
+        { userId, dateRange },
+        { component: 'PerformanceApi', operation: 'getUserAnalytics' }
+      );
+    }
+
     try {
       const params = new URLSearchParams();
       if (dateRange) {
@@ -136,62 +333,122 @@ export class PerformanceApiService {
         params.append('end', dateRange.end);
       }
 
-      const response = await globalApiClient.get(
-        `${this.baseUrl}/performance/analytics/${userId}?${params.toString()}`
-      );
+      const queryString = params.toString();
+      const url = queryString
+        ? `${this.baseUrl}/performance/analytics/${encodeURIComponent(userId)}?${queryString}`
+        : `${this.baseUrl}/performance/analytics/${encodeURIComponent(userId)}`;
 
-      return response.data as {
-        sessions: any[];
-        averageMetrics: Record<string, number>;
-        performanceTrends: Array<{
-          date: string;
-          metrics: Record<string, number>;
-        }>;
-      };
+      const response = await globalApiClient.get<PerformanceAnalytics>(url);
+
+      return response.data;
     } catch (error) {
       logger.error('Failed to get user performance analytics', {
         component: 'PerformanceApi',
         userId,
+        dateRange,
         error
       });
-      throw error;
+
+      throw ErrorFactory.createNetworkError(
+        ErrorCode.NETWORK_REQUEST_FAILED,
+        'Failed to retrieve user performance analytics',
+        { userId, dateRange, originalError: error },
+        { component: 'PerformanceApi', operation: 'getUserAnalytics' }
+      );
     }
   }
 
   /**
-   * Get performance benchmarks
+   * Retrieves performance benchmarks for comparison.
+   * 
+   * Benchmarks define what constitutes "good" vs "poor" performance based on
+   * industry standards (like Google's Core Web Vitals thresholds) and your
+   * application's specific requirements. Use these to:
+   * - Color-code metrics in dashboards (green/yellow/red)
+   * - Trigger alerts when performance degrades
+   * - Set team goals and track improvements
+   * 
+   * @returns Promise resolving to benchmark thresholds
+   * @throws {UnifiedError} When retrieval fails
+   * 
+   * @example
+   * ```typescript
+   * const benchmarks = await service.getBenchmarks();
+   * const lcpGood = benchmarks.webVitals.LCP.good; // 2500ms
+   * const lcpPoor = benchmarks.webVitals.LCP.poor; // 4000ms
+   * ```
    */
-  async getBenchmarks(): Promise<{
-    webVitals: Record<string, { good: number; poor: number }>;
-    customMetrics: Record<string, { target: number; warning: number }>;
-  }> {
+  async getBenchmarks(): Promise<PerformanceBenchmarks> {
     try {
-      const response = await globalApiClient.get(`${this.baseUrl}/performance/benchmarks`);
-      return response.data as {
-        webVitals: Record<string, { good: number; poor: number }>;
-        customMetrics: Record<string, { target: number; warning: number }>;
-      };
+      const response = await globalApiClient.get<PerformanceBenchmarks>(
+        `${this.baseUrl}/performance/benchmarks`
+      );
+
+      return response.data;
     } catch (error) {
       logger.error('Failed to get performance benchmarks', {
         component: 'PerformanceApi',
         error
       });
-      throw error;
+
+      throw ErrorFactory.createNetworkError(
+        ErrorCode.NETWORK_REQUEST_FAILED,
+        'Failed to retrieve performance benchmarks',
+        { originalError: error },
+        { component: 'PerformanceApi', operation: 'getBenchmarks' }
+      );
     }
   }
 
+  // ==========================================================================
+  // Issue Reporting & Recommendations
+  // ==========================================================================
+
   /**
-   * Report performance issue
+   * Reports a detected performance issue.
+   * 
+   * Use this method when automated monitoring detects performance problems
+   * like slow page loads, memory leaks, or network failures. The backend
+   * can aggregate these reports to:
+   * - Identify widespread issues affecting multiple users
+   * - Correlate issues with deployments or infrastructure changes
+   * - Prioritize performance improvements based on impact
+   * 
+   * @param issue - Complete issue report with context
+   * @throws {UnifiedError} When reporting fails
+   * 
+   * @example
+   * ```typescript
+   * await service.reportIssue({
+   *   type: 'slow_page',
+   *   severity: 'high',
+   *   description: 'LCP exceeded 4 seconds on homepage',
+   *   metrics: { LCP: 4234, FID: 145 },
+   *   sessionId: 'sess_abc123',
+   *   url: window.location.href,
+   *   userAgent: navigator.userAgent
+   * });
+   * ```
    */
-  async reportIssue(issue: {
-    type: 'slow_page' | 'high_memory' | 'network_issue' | 'javascript_error';
-    severity: 'low' | 'medium' | 'high' | 'critical';
-    description: string;
-    metrics: Record<string, any>;
-    sessionId: string;
-    url: string;
-    userAgent: string;
-  }): Promise<void> {
+  async reportIssue(issue: PerformanceIssue): Promise<void> {
+    if (!issue?.sessionId) {
+      throw ErrorFactory.createValidationError(
+        ErrorCode.VALIDATION_INVALID_INPUT,
+        'Session ID is required to report performance issue',
+        { issue },
+        { component: 'PerformanceApi', operation: 'reportIssue' }
+      );
+    }
+
+    if (!issue.type || !issue.severity || !issue.description) {
+      throw ErrorFactory.createValidationError(
+        ErrorCode.VALIDATION_INVALID_INPUT,
+        'Type, severity, and description are required fields',
+        { issue },
+        { component: 'PerformanceApi', operation: 'reportIssue' }
+      );
+    }
+
     try {
       await globalApiClient.post(
         `${this.baseUrl}/performance/issues`,
@@ -209,44 +466,93 @@ export class PerformanceApiService {
       logger.error('Failed to report performance issue', {
         component: 'PerformanceApi',
         type: issue.type,
+        severity: issue.severity,
         error
       });
-      throw error;
+
+      throw ErrorFactory.createNetworkError(
+        ErrorCode.NETWORK_REQUEST_FAILED,
+        'Failed to report performance issue',
+        { issue, originalError: error },
+        { component: 'PerformanceApi', operation: 'reportIssue' }
+      );
     }
   }
 
   /**
-   * Get performance recommendations
+   * Retrieves personalized performance recommendations.
+   * 
+   * Based on a session's performance data, this endpoint returns actionable
+   * recommendations for improvement. The backend analyzes metrics to identify:
+   * - Resource optimization opportunities (images, scripts, fonts)
+   * - Code splitting opportunities
+   * - Caching strategy improvements
+   * - Critical rendering path optimizations
+   * 
+   * Each recommendation includes an estimated impact score to help you
+   * prioritize improvements that will provide the most benefit.
+   * 
+   * @param sessionId - The session to analyze
+   * @returns Promise resolving to an array of prioritized recommendations
+   * @throws {UnifiedError} When retrieval fails or session is not found
+   * 
+   * @example
+   * ```typescript
+   * const recommendations = await service.getRecommendations('sess_abc123');
+   * 
+   * for (const rec of recommendations) {
+   *   console.log(`${rec.priority}: ${rec.description}`);
+   *   console.log(`Expected improvement: ${rec.impact}%`);
+   * }
+   * ```
    */
-  async getRecommendations(sessionId: string): Promise<Array<{
-    type: string;
-    priority: 'low' | 'medium' | 'high';
-    description: string;
-    impact: number;
-    implementation: string;
-  }>> {
+  async getRecommendations(sessionId: string): Promise<PerformanceRecommendation[]> {
+    if (!sessionId?.trim()) {
+      throw ErrorFactory.createValidationError(
+        ErrorCode.VALIDATION_INVALID_INPUT,
+        'Session ID is required to retrieve recommendations',
+        { sessionId },
+        { component: 'PerformanceApi', operation: 'getRecommendations' }
+      );
+    }
+
     try {
-      const response = await globalApiClient.get(
-        `${this.baseUrl}/performance/recommendations/${sessionId}`
+      const response = await globalApiClient.get<PerformanceRecommendation[]>(
+        `${this.baseUrl}/performance/recommendations/${encodeURIComponent(sessionId)}`
       );
 
-      return response.data as Array<{
-        type: string;
-        priority: 'low' | 'medium' | 'high';
-        description: string;
-        impact: number;
-        implementation: string;
-      }>;
+      return response.data;
     } catch (error) {
       logger.error('Failed to get performance recommendations', {
         component: 'PerformanceApi',
         sessionId,
         error
       });
-      throw error;
+
+      throw ErrorFactory.createNetworkError(
+        ErrorCode.NETWORK_REQUEST_FAILED,
+        'Failed to retrieve performance recommendations',
+        { sessionId, originalError: error },
+        { component: 'PerformanceApi', operation: 'getRecommendations' }
+      );
     }
   }
 }
 
-// Global performance API service instance
+// ============================================================================
+// Global Instance
+// ============================================================================
+
+/**
+ * Global singleton instance of the Performance API Service.
+ * Use this instance throughout your application for consistent behavior
+ * and proper resource management.
+ * 
+ * @example
+ * ```typescript
+ * import { performanceApiService } from './api/performance';
+ * 
+ * await performanceApiService.reportMetrics(metricsPayload);
+ * ```
+ */
 export const performanceApiService = new PerformanceApiService();

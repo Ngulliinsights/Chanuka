@@ -29,7 +29,7 @@ export const generateTestData = {
   user: (overrides = {}) => ({
     email: `test.${Date.now()}@example.com`,
     password_hash: 'hashed_password_123',
-    role: 'citizen',
+    role: 'citizen' as const,
     county: 'nairobi',
     constituency: 'westlands',
     is_verified: true,
@@ -56,7 +56,7 @@ export const generateTestData = {
     full_text: 'Full text of the test bill...',
     status: 'introduced' as const,
     chamber: 'national_assembly' as const,
-    affected_counties: ['nairobi', 'kiambu'] as const,
+    affected_counties: ['nairobi', 'kiambu'],
     impact_areas: ['healthcare', 'education'],
     ...overrides
   }),

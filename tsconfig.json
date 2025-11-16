@@ -35,7 +35,6 @@
     
     /* Emit */
     "declaration": true,
-    "outDir": "./dist",
     "removeComments": true,
     "importHelpers": true,
     "downlevelIteration": true,
@@ -81,6 +80,6 @@
     ],
     
     /* Composite project setup for monorepo */
-    "composite": true
+    "composite": false
   }
 }

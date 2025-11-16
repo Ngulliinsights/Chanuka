@@ -4,7 +4,7 @@
  * Provides type-safe, consistent interface for all auth operations
  */
 
-import { globalApiClient } from './client';
+import type { UnifiedApiClient } from './types';
 import { logger } from '../../utils/logger';
 
 // ============================================================================
@@ -60,6 +60,8 @@ export interface AuthSession {
   sessionId: string;
   expiresAt: string;
   requiresTwoFactor?: boolean;
+  sessionExpiry?: string;
+  requires2FA?: boolean;
 }
 
 // ============================================================================
@@ -190,8 +192,10 @@ export interface SecurityIncidentReport {
 export class AuthApiService {
   private readonly baseUrl: string;
   private readonly authEndpoint: string;
+  private readonly apiClient: UnifiedApiClient;
 
-  constructor(baseUrl: string = '/api') {
+  constructor(apiClient: UnifiedApiClient, baseUrl: string = '/api') {
+    this.apiClient = apiClient;
     this.baseUrl = baseUrl;
     this.authEndpoint = `${baseUrl}/auth`;
   }
@@ -210,7 +214,7 @@ export class AuthApiService {
    */
   async login(credentials: LoginCredentials): Promise<AuthSession> {
     try {
-      const response = await globalApiClient.post<AuthSession>(
+      const response = await this.apiClient.post<AuthSession>(
         `${this.authEndpoint}/login`,
         credentials,
         { skipCache: true }
@@ -225,7 +229,7 @@ export class AuthApiService {
       return response.data;
     } catch (error) {
       logger.error('Login failed', { email: credentials.email, error });
-      throw this.handleAuthError(error, 'Login failed');
+      throw await this.handleAuthError(error, 'Login failed');
     }
   }
 
@@ -247,7 +251,7 @@ export class AuthApiService {
         throw new Error('Terms and conditions must be accepted');
       }
 
-      const response = await globalApiClient.post<AuthSession>(
+      const response = await this.apiClient.post<AuthSession>(
         `${this.authEndpoint}/register`,
         data,
         { skipCache: true }
@@ -261,7 +265,7 @@ export class AuthApiService {
       return response.data;
     } catch (error) {
       logger.error('Registration failed', { email: data.email, error });
-      throw this.handleAuthError(error, 'Registration failed');
+      throw await this.handleAuthError(error, 'Registration failed');
     }
   }
 
@@ -271,7 +275,7 @@ export class AuthApiService {
    */
   async logout(): Promise<void> {
     try {
-      await globalApiClient.post(
+      await this.apiClient.post(
         `${this.authEndpoint}/logout`,
         {},
         { skipCache: true }
@@ -292,25 +296,25 @@ export class AuthApiService {
    */
   async getCurrentUser(): Promise<AuthUser> {
     try {
-      const response = await globalApiClient.get<AuthUser>(`${this.authEndpoint}/me`);
+      const response = await this.apiClient.get<AuthUser>(`${this.authEndpoint}/me`);
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch current user', { error });
-      throw this.handleAuthError(error, 'Failed to fetch user data');
+      throw await this.handleAuthError(error, 'Failed to fetch user data');
     }
   }
 
   /**
    * Update the current user's profile with partial updates.
    * Only provided fields will be updated.
-   * 
+   *
    * @param updates - Partial user data to update
    * @returns Updated user profile
    * @throws Error if update fails or validation errors occur
    */
-  async updateProfile(updates: Partial<AuthUser>): Promise<AuthUser> {
+  async updateUserProfile(updates: Partial<AuthUser>): Promise<AuthUser> {
     try {
-      const response = await globalApiClient.patch<AuthUser>(
+      const response = await this.apiClient.patch<AuthUser>(
         `${this.authEndpoint}/profile`,
         updates,
         { skipCache: true }
@@ -323,7 +327,92 @@ export class AuthApiService {
       return response.data;
     } catch (error) {
       logger.error('Profile update failed', { updates, error });
-      throw this.handleAuthError(error, 'Failed to update profile');
+      throw await this.handleAuthError(error, 'Failed to update profile');
+    }
+  }
+
+  /**
+   * Update the current user's privacy settings.
+   *
+   * @param settings - Privacy settings to update
+   * @throws Error if update fails
+   */
+  async updatePrivacySettings(settings: any): Promise<void> {
+    try {
+      await this.apiClient.post(
+        `${this.authEndpoint}/privacy-settings`,
+        settings,
+        { skipCache: true }
+      );
+
+      logger.info('Privacy settings updated successfully');
+    } catch (error) {
+      logger.error('Privacy settings update failed', { error });
+      throw await this.handleAuthError(error, 'Failed to update privacy settings');
+    }
+  }
+
+  /**
+   * Request data export for the current user.
+   *
+   * @returns Data export request details
+   * @throws Error if request fails
+   */
+  async requestDataExport(): Promise<any> {
+    try {
+      const response = await this.apiClient.post(
+        `${this.authEndpoint}/data-export`,
+        {},
+        { skipCache: true }
+      );
+
+      logger.info('Data export requested successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Data export request failed', { error });
+      throw await this.handleAuthError(error, 'Failed to request data export');
+    }
+  }
+
+  /**
+   * Request data deletion for the current user.
+   *
+   * @returns Data deletion request details
+   * @throws Error if request fails
+   */
+  async requestDataDeletion(): Promise<any> {
+    try {
+      const response = await this.apiClient.post(
+        `${this.authEndpoint}/data-deletion`,
+        {},
+        { skipCache: true }
+      );
+
+      logger.info('Data deletion requested successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Data deletion request failed', { error });
+      throw await this.handleAuthError(error, 'Failed to request data deletion');
+    }
+  }
+
+  /**
+   * Validate stored authentication tokens.
+   *
+   * @returns Boolean indicating if tokens are valid
+   */
+  async validateStoredTokens(): Promise<boolean> {
+    try {
+      const response = await this.apiClient.post<{ valid: boolean }>(
+        `${this.authEndpoint}/validate-tokens`,
+        {},
+        { skipCache: true }
+      );
+
+      return response.data?.valid ?? false;
+    } catch (error) {
+      logger.warn('Token validation failed', { error });
+      return false;
     }
   }
 
@@ -336,7 +425,7 @@ export class AuthApiService {
    */
   async refreshTokens(): Promise<AuthTokens> {
     try {
-      const response = await globalApiClient.post<AuthTokens>(
+      const response = await this.apiClient.post<AuthTokens>(
         `${this.authEndpoint}/refresh`,
         {},
         { skipCache: true }
@@ -346,7 +435,7 @@ export class AuthApiService {
       return response.data;
     } catch (error) {
       logger.error('Token refresh failed', { error });
-      throw this.handleAuthError(error, 'Failed to refresh authentication tokens');
+      throw await this.handleAuthError(error, 'Failed to refresh authentication tokens');
     }
   }
 
@@ -355,32 +444,27 @@ export class AuthApiService {
   // ==========================================================================
 
   /**
-   * Process OAuth callback after user authorization.
+   * Process OAuth login after user authorization.
    * Exchanges authorization code for authentication session.
-   * 
-   * @param providerId - OAuth provider identifier (e.g., 'google', 'github')
+   *
    * @param code - Authorization code from OAuth provider
    * @param state - CSRF protection state parameter
    * @returns Authentication session from OAuth login
    * @throws Error if OAuth exchange fails or state is invalid
    */
-  async handleOAuthCallback(
-    providerId: string,
-    code: string,
-    state: string
-  ): Promise<AuthSession> {
+  async loginWithOAuth(code: string, state?: string): Promise<AuthSession> {
     try {
-      const response = await globalApiClient.post<AuthSession>(
+      const response = await this.apiClient.post<AuthSession>(
         `${this.authEndpoint}/oauth/callback`,
-        { provider: providerId, code, state },
+        { code, state },
         { skipCache: true }
       );
 
-      logger.info('OAuth callback processed successfully', { provider: providerId });
+      logger.info('OAuth login processed successfully');
       return response.data;
     } catch (error) {
-      logger.error('OAuth callback failed', { provider: providerId, error });
-      throw this.handleAuthError(error, `OAuth authentication with ${providerId} failed`);
+      logger.error('OAuth login failed', { error });
+      throw await this.handleAuthError(error, 'OAuth authentication failed');
     }
   }
 
@@ -397,7 +481,7 @@ export class AuthApiService {
    */
   async setupTwoFactor(): Promise<TwoFactorSetup> {
     try {
-      const response = await globalApiClient.post<TwoFactorSetup>(
+      const response = await this.apiClient.post<TwoFactorSetup>(
         `${this.authEndpoint}/2fa/setup`,
         {},
         { skipCache: true }
@@ -407,7 +491,7 @@ export class AuthApiService {
       return response.data;
     } catch (error) {
       logger.error('2FA setup failed', { error });
-      throw this.handleAuthError(error, 'Failed to setup two-factor authentication');
+      throw await this.handleAuthError(error, 'Failed to setup two-factor authentication');
     }
   }
 
@@ -420,7 +504,7 @@ export class AuthApiService {
    */
   async enableTwoFactor(token: string): Promise<AuthResponse> {
     try {
-      const response = await globalApiClient.post<AuthResponse>(
+      const response = await this.apiClient.post<AuthResponse>(
         `${this.authEndpoint}/2fa/enable`,
         { token },
         { skipCache: true }
@@ -430,7 +514,7 @@ export class AuthApiService {
       return response.data;
     } catch (error) {
       logger.error('2FA enable failed', { error });
-      throw this.handleAuthError(error, 'Failed to enable two-factor authentication');
+      throw await this.handleAuthError(error, 'Failed to enable two-factor authentication');
     }
   }
 
@@ -443,7 +527,7 @@ export class AuthApiService {
    */
   async disableTwoFactor(token: string): Promise<void> {
     try {
-      await globalApiClient.post(
+      await this.apiClient.post(
         `${this.authEndpoint}/2fa/disable`,
         { token },
         { skipCache: true }
@@ -452,32 +536,53 @@ export class AuthApiService {
       logger.info('2FA disabled successfully');
     } catch (error) {
       logger.error('2FA disable failed', { error });
-      throw this.handleAuthError(error, 'Failed to disable two-factor authentication');
+      throw await this.handleAuthError(error, 'Failed to disable two-factor authentication');
     }
   }
 
   /**
    * Verify two-factor token during login process.
-   * 
+   *
    * @param token - 6-digit token from authenticator app
    * @returns Complete authentication session after 2FA verification
    * @throws Error if token is invalid or verification fails
    */
-  async verifyTwoFactor(token: string): Promise<AuthSession> {
-    try {
-      const response = await globalApiClient.post<AuthSession>(
-        `${this.authEndpoint}/2fa/verify`,
-        { token },
-        { skipCache: true }
-      );
+   async verifyTwoFactor(token: string): Promise<AuthSession> {
+     try {
+       const response = await this.apiClient.post<AuthSession>(
+         `${this.authEndpoint}/2fa/verify`,
+         { token },
+         { skipCache: true }
+       );
 
-      logger.info('2FA verification successful');
-      return response.data;
-    } catch (error) {
-      logger.error('2FA verification failed', { error });
-      throw this.handleAuthError(error, 'Two-factor authentication failed');
-    }
-  }
+       logger.info('2FA verification successful');
+       return response.data;
+     } catch (error) {
+       logger.error('2FA verification failed', { error });
+       throw await this.handleAuthError(error, 'Two-factor authentication failed');
+     }
+   }
+
+   /**
+    * Verify user email address with verification token.
+    *
+    * @param token - Email verification token
+    * @throws Error if token is invalid or verification fails
+    */
+   async verifyEmail(token: string): Promise<void> {
+     try {
+       await this.apiClient.post(
+         `${this.authEndpoint}/verify-email`,
+         { token },
+         { skipCache: true }
+       );
+
+       logger.info('Email verification successful');
+     } catch (error) {
+       logger.error('Email verification failed', { error });
+       throw await this.handleAuthError(error, 'Email verification failed');
+     }
+   }
 
   // ==========================================================================
   // Password Management Methods
@@ -493,7 +598,7 @@ export class AuthApiService {
    */
   async changePassword(currentPassword: string, newPassword: string): Promise<void> {
     try {
-      await globalApiClient.post(
+      await this.apiClient.post(
         `${this.authEndpoint}/password/change`,
         { currentPassword, newPassword },
         { skipCache: true }
@@ -502,7 +607,7 @@ export class AuthApiService {
       logger.info('Password changed successfully');
     } catch (error) {
       logger.error('Password change failed', { error });
-      throw this.handleAuthError(error, 'Failed to change password');
+      throw await this.handleAuthError(error, 'Failed to change password');
     }
   }
 
@@ -514,7 +619,7 @@ export class AuthApiService {
    */
   async requestPasswordReset(request: PasswordResetRequest): Promise<void> {
     try {
-      await globalApiClient.post(
+      await this.apiClient.post(
         `${this.authEndpoint}/password/reset-request`,
         request,
         { skipCache: true }
@@ -539,7 +644,7 @@ export class AuthApiService {
         throw new Error('Passwords do not match');
       }
 
-      await globalApiClient.post(
+      await this.apiClient.post(
         `${this.authEndpoint}/password/reset`,
         reset,
         { skipCache: true }
@@ -548,7 +653,7 @@ export class AuthApiService {
       logger.info('Password reset completed successfully');
     } catch (error) {
       logger.error('Password reset failed', { error });
-      throw this.handleAuthError(error, 'Failed to reset password');
+      throw await this.handleAuthError(error, 'Failed to reset password');
     }
   }
 
@@ -562,7 +667,7 @@ export class AuthApiService {
    */
   async extendSession(): Promise<void> {
     try {
-      await globalApiClient.post(
+      await this.apiClient.post(
         `${this.authEndpoint}/session/extend`,
         {},
         { skipCache: true }
@@ -571,7 +676,7 @@ export class AuthApiService {
       logger.debug('Session extended successfully');
     } catch (error) {
       logger.error('Session extension failed', { error });
-      throw this.handleAuthError(error, 'Failed to extend session');
+      throw await this.handleAuthError(error, 'Failed to extend session');
     }
   }
 
@@ -583,26 +688,26 @@ export class AuthApiService {
    */
   async getActiveSessions(): Promise<SessionInfo[]> {
     try {
-      const response = await globalApiClient.get<SessionInfo[]>(
+      const response = await this.apiClient.get<SessionInfo[]>(
         `${this.authEndpoint}/sessions`
       );
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch active sessions', { error });
-      throw this.handleAuthError(error, 'Failed to retrieve active sessions');
+      throw await this.handleAuthError(error, 'Failed to retrieve active sessions');
     }
   }
 
   /**
-   * Revoke a specific session by ID.
+   * Terminate a specific session by ID.
    * Useful for logging out specific devices.
-   * 
-   * @param sessionId - Unique identifier of the session to revoke
-   * @throws Error if session cannot be revoked
+   *
+   * @param sessionId - Unique identifier of the session to terminate
+   * @throws Error if session cannot be terminated
    */
-  async revokeSession(sessionId: string): Promise<void> {
+  async terminateSession(sessionId: string): Promise<void> {
     try {
-      await globalApiClient.delete(
+      await this.apiClient.delete(
         `${this.authEndpoint}/sessions/${sessionId}`,
         { skipCache: true }
       );
@@ -610,17 +715,17 @@ export class AuthApiService {
       logger.info('Session revoked successfully', { sessionId });
     } catch (error) {
       logger.error('Session revocation failed', { sessionId, error });
-      throw this.handleAuthError(error, 'Failed to revoke session');
+      throw await this.handleAuthError(error, 'Failed to revoke session');
     }
   }
 
   /**
-   * Revoke all sessions except the current one.
+   * Terminate all sessions except the current one.
    * Security feature to log out all other devices.
    */
-  async revokeAllOtherSessions(): Promise<void> {
+  async terminateAllOtherSessions(): Promise<void> {
     try {
-      await globalApiClient.delete(
+      await this.apiClient.delete(
         `${this.authEndpoint}/sessions/others`,
         { skipCache: true }
       );
@@ -628,8 +733,22 @@ export class AuthApiService {
       logger.info('All other sessions revoked successfully');
     } catch (error) {
       logger.error('Failed to revoke other sessions', { error });
-      throw this.handleAuthError(error, 'Failed to revoke other sessions');
+      throw await this.handleAuthError(error, 'Failed to revoke other sessions');
     }
+  }
+
+  /**
+   * Revoke a specific session by ID (alias for terminateSession).
+   */
+  async revokeSession(sessionId: string): Promise<void> {
+    return this.terminateSession(sessionId);
+  }
+
+  /**
+   * Revoke all sessions except the current one (alias for terminateAllOtherSessions).
+   */
+  async revokeAllOtherSessions(): Promise<void> {
+    return this.terminateAllOtherSessions();
   }
 
   // ==========================================================================
@@ -645,13 +764,13 @@ export class AuthApiService {
    */
   async getUserRoles(userId: string): Promise<UserRole[]> {
     try {
-      const response = await globalApiClient.get<UserRole[]>(
+      const response = await this.apiClient.get<UserRole[]>(
         `${this.baseUrl}/users/${userId}/roles`
       );
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch user roles', { userId, error });
-      throw this.handleAuthError(error, 'Failed to retrieve user roles');
+      throw await this.handleAuthError(error, 'Failed to retrieve user roles');
     }
   }
 
@@ -664,7 +783,7 @@ export class AuthApiService {
    */
   async checkPermission(context: PermissionCheckContext): Promise<boolean> {
     try {
-      const response = await globalApiClient.post<PermissionCheckResult>(
+      const response = await this.apiClient.post<PermissionCheckResult>(
         `${this.authEndpoint}/check-permission`,
         context,
         { skipCache: true }
@@ -687,7 +806,7 @@ export class AuthApiService {
    */
   async getResourcePermissions(userId: string, resource: string): Promise<string[]> {
     try {
-      const response = await globalApiClient.get<{ permissions: string[] }>(
+      const response = await this.apiClient.get<{ permissions: string[] }>(
         `${this.baseUrl}/users/${userId}/permissions/${resource}`
       );
       return response.data?.permissions ?? [];
@@ -712,13 +831,13 @@ export class AuthApiService {
    */
   async getSecurityEvents(limit: number = 50): Promise<SecurityEvent[]> {
     try {
-      const response = await globalApiClient.get<SecurityEvent[]>(
+      const response = await this.apiClient.get<SecurityEvent[]>(
         `${this.authEndpoint}/security-events?limit=${limit}`
       );
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch security events', { limit, error });
-      throw this.handleAuthError(error, 'Failed to retrieve security events');
+      throw await this.handleAuthError(error, 'Failed to retrieve security events');
     }
   }
 
@@ -730,13 +849,13 @@ export class AuthApiService {
    */
   async getSuspiciousActivity(): Promise<SuspiciousActivityAlert[]> {
     try {
-      const response = await globalApiClient.get<SuspiciousActivityAlert[]>(
+      const response = await this.apiClient.get<SuspiciousActivityAlert[]>(
         `${this.authEndpoint}/suspicious-activity`
       );
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch suspicious activity', { error });
-      throw this.handleAuthError(error, 'Failed to retrieve suspicious activity');
+      throw await this.handleAuthError(error, 'Failed to retrieve suspicious activity');
     }
   }
 
@@ -749,7 +868,7 @@ export class AuthApiService {
    */
   async reportSecurityIncident(incident: SecurityIncidentReport): Promise<AuthResponse> {
     try {
-      const response = await globalApiClient.post<any>(
+      const response = await this.apiClient.post<any>(
         `${this.authEndpoint}/security-incidents`,
         incident,
         { skipCache: true }
@@ -781,12 +900,12 @@ export class AuthApiService {
   /**
    * Centralized error handling for authentication operations.
    * Extracts meaningful error messages and provides consistent error responses.
-   * 
+   *
    * @param error - Error object from API call
    * @param defaultMessage - Default message if error details unavailable
    * @returns Error object with user-friendly message
    */
-  private handleAuthError(error: any, defaultMessage: string): Error {
+  private async handleAuthError(error: any, defaultMessage: string): Promise<Error> {
     // Extract error message from various possible error structures
     const errorMessage =
       error?.response?.data?.message ||
@@ -794,7 +913,18 @@ export class AuthApiService {
       error?.message ||
       defaultMessage;
 
-    return new Error(errorMessage);
+    const authError = new Error(errorMessage);
+
+    // Log the error for debugging
+    logger.error('Authentication error', {
+      component: 'AuthApiService',
+      operation: 'authentication',
+      status: error?.response?.status,
+      endpoint: error?.config?.url,
+      error: errorMessage
+    });
+
+    return authError;
   }
 }
 
@@ -803,7 +933,15 @@ export class AuthApiService {
 // ============================================================================
 
 /**
- * Pre-configured global instance of the authentication API service.
- * Use this throughout the application for consistency.
+ * Factory function to create AuthApiService with API client dependency.
+ * This breaks the circular dependency by allowing late binding.
  */
-export const authApiService = new AuthApiService();
+export const createAuthApiService = (apiClient: UnifiedApiClient): AuthApiService => {
+  return new AuthApiService(apiClient);
+};
+
+/**
+ * Global instance of the authentication API service.
+ * Will be initialized by the API client after it's created.
+ */
+export let authApiService: AuthApiService;

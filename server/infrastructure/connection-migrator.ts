@@ -17,7 +17,7 @@ import { Server } from 'http';
 import { webSocketService } from './websocket.js';
 import { socketIOService } from './socketio-service.js';
 import { featureFlagService } from './feature-flags.js';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS

@@ -3,7 +3,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { billComprehensiveAnalysisService } from '../application/bill-comprehensive-analysis.service.js';
 // Import repository for fetching historical data
 import { analysisService } from '../application/analysis-service-direct.js';
-import { authenticateToken, AuthenticatedRequest } from '@/middleware/auth.js'; // Use if auth needed
+import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js'; // Use if auth needed
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api';
 import { logger   } from '../../../../shared/core/src/index.js';
 import { z } from 'zod';

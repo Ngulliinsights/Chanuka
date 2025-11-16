@@ -45,7 +45,7 @@ export interface Comment {
 }
 
 export interface ModerationFlag {
-  id: string;
+  id: number;
   commentId: string;
   reporterId: string;
   type: ModerationViolationType;
@@ -70,7 +70,7 @@ export type ModerationViolationType =
   | 'other';
 
 export interface ModerationAction {
-  id: string;
+  id: number;
   commentId: string;
   moderatorId: string;
   action: 'hide' | 'remove' | 'restore' | 'warn' | 'ban_user';
@@ -82,7 +82,7 @@ export interface ModerationAction {
 }
 
 export interface CommentReport {
-  id: string;
+  id: number;
   commentId: string;
   reporterId: string;
   violationType: ModerationViolationType;
@@ -96,7 +96,7 @@ export interface CommentReport {
 }
 
 export interface DiscussionThread {
-  id: string;
+  id: number;
   billId: number;
   title?: string;
   description?: string;
@@ -159,11 +159,11 @@ export interface ModerationStats {
 }
 
 export interface CommunityGuidelines {
-  id: string;
+  id: number;
   title: string;
   description: string;
   rules: Array<{
-    id: string;
+    id: number;
     title: string;
     description: string;
     examples: string[];
@@ -232,7 +232,7 @@ export interface QualityThresholds {
 
 // Appeal system types
 export interface ModerationAppeal {
-  id: string;
+  id: number;
   commentId: string;
   userId: string;
   moderationActionId: string;

@@ -18,7 +18,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { SocialLoginProvider } from '../../types/auth';
-import { authBackendService, OAuthProvider } from '../../services/authBackendService';
+import { authService, OAuthProvider } from '../../services/authService';
 import { logger } from '../../utils/logger';
 
 interface SocialLoginProps {
@@ -35,7 +35,7 @@ export function SocialLogin({ onSuccess, onError, className = '', redirectTo }: 
 
   useEffect(() => {
     // Get available OAuth providers
-    const availableProviders = authBackendService.getOAuthProviders();
+    const availableProviders = authService.getOAuthProviders();
     // Filter to only enabled providers (those with client IDs configured)
     const enabledProviders = availableProviders.filter(p => p.clientId);
     setProviders(enabledProviders);
@@ -60,7 +60,7 @@ export function SocialLogin({ onSuccess, onError, className = '', redirectTo }: 
       }
 
       // Initiate OAuth flow (this will redirect the page)
-      authBackendService.initiateOAuthLogin(providerId, state);
+      authService.initiateOAuthLogin(providerId, state);
       
     } catch (error) {
       logger.error('OAuth login initiation failed:', { component: 'SocialLogin' }, error);

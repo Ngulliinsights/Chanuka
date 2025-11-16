@@ -283,7 +283,7 @@ class PerformanceMonitor {
             const bundleMetrics = bundleAnalyzer.getMetrics();
             const assetMetrics = assetOptimizer.getMetrics();
             const webVitalsMetrics = webVitalsMonitor.getMetrics();
-            const connectionMetrics = realtimeOptimizer.getMetrics();
+            const _connectionMetrics = realtimeOptimizer.getMetrics();
 
             // Update combined metrics
             if (bundleMetrics) {

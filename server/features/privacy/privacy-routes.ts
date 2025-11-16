@@ -201,7 +201,7 @@ router.post('/data-export', authenticateToken, async (req: AuthenticatedRequest,
         `Social Profiles,${exportData.socialProfiles.length}`,
         `Progress Records,${exportData.progress.length}`,
         `Social Shares,${exportData.social_shares.length}`,
-        `Comment Votes,${exportData.comment_votess.length}`,
+        `Comment Votes,${exportData.comment_votes.length}`,
         `Audit Logs,${exportData.auditLogs.length}`
       ].join('\n');
       

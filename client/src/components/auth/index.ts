@@ -13,7 +13,7 @@ export { SocialLogin } from './SocialLogin';
 export { OAuthCallback } from './OAuthCallback';
 
 // Re-export auth hook for convenience
-export { useAuth } from '../../hooks/use-auth';
+export { useAuth } from '../../hooks/useAuth';
 
 // Re-export RBAC utilities
 export { 
@@ -27,9 +27,9 @@ export {
 } from '../../utils/rbac';
 
 // Re-export auth services
-export { authBackendService } from '../../services/authBackendService';
+export { authService } from '../../services/authService';
 export { tokenManager } from '../../utils/tokenManager';
-export { sessionManager } from '../../utils/sessionManager';
+export { sessionManager } from '../../utils/session-manager';
 
 // Re-export auth types
 export type { 

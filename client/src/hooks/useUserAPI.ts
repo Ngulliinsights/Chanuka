@@ -7,18 +7,18 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
-import { userBackendService } from '../services/user-backend-service';
+import { userService as userBackendService } from '../services/userService';
 import { useAuthStore } from '../store/slices/authSlice';
 import { useUserDashboardStore } from '../store/slices/userDashboardSlice';
 import { logger } from '../utils/logger';
 import type {
   UserProfile,
   SavedBill,
-  UserEngagementActivity,
-  UserNotificationPreferences,
+  UserEngagementHistory as UserEngagementActivity,
+  NotificationPreferences as UserNotificationPreferences,
   UserBadge,
   UserAchievement
-} from '../services/user-backend-service';
+} from '../services/userService';
 import type {
   UserDashboardData,
   TrackedBill,
@@ -90,7 +90,7 @@ export function useUserDashboard(userId?: string, timeFilter?: { start?: string;
 
   return useQuery({
     queryKey: [...userQueryKeys.dashboard(targetUserId || ''), timeFilter],
-    queryFn: () => userBackendService.getDashboardData(targetUserId!, timeFilter),
+    queryFn: () => userBackendService.getDashboardDataForUser(targetUserId!, timeFilter),
     enabled: !!targetUserId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 2
@@ -104,7 +104,7 @@ export function useSavedBills(userId?: string, page: number = 1, limit: number =
 
   return useQuery({
     queryKey: userQueryKeys.savedBills(targetUserId || '', page),
-    queryFn: () => userBackendService.getSavedBills(targetUserId!, page, limit),
+    queryFn: () => userBackendService.getSavedBillsForUser(targetUserId!, page, limit),
     enabled: !!targetUserId,
     staleTime: 1 * 60 * 1000, // 1 minute
     keepPreviousData: true
@@ -125,7 +125,7 @@ export function useSaveBill() {
       userId: string; 
       billId: number; 
       options?: { notes?: string; tags?: string[]; notifications?: boolean } 
-    }) => userBackendService.saveBill(userId, billId, options),
+    }) => userBackendService.saveBillForUser(userId, billId, options),
     onSuccess: (data, { userId }) => {
       // Invalidate saved bills queries
       queryClient.invalidateQueries({ queryKey: userQueryKeys.savedBills(userId) });
@@ -151,7 +151,7 @@ export function useUnsaveBill() {
 
   return useMutation({
     mutationFn: ({ userId, billId }: { userId: string; billId: number }) =>
-      userBackendService.unsaveBill(userId, billId),
+      userBackendService.unsaveBillForUser(userId, billId),
     onSuccess: (_, { userId, billId }) => {
       // Invalidate saved bills queries
       queryClient.invalidateQueries({ queryKey: userQueryKeys.savedBills(userId) });
@@ -241,7 +241,7 @@ export function useEngagementHistory(
 
   return useQuery({
     queryKey: userQueryKeys.engagementHistory(targetUserId || '', options),
-    queryFn: () => userBackendService.getEngagementHistory(targetUserId!, options),
+    queryFn: () => userBackendService.getEngagementHistoryForUser(targetUserId!, options),
     enabled: !!targetUserId,
     staleTime: 30 * 1000, // 30 seconds
     keepPreviousData: true
@@ -260,7 +260,7 @@ export function useTrackEngagement() {
       metadata?: Record<string, any>;
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
-      return userBackendService.trackEngagement(user.id, activity);
+      return userBackendService.trackEngagementForUser(user.id, activity);
     },
     onSuccess: (data) => {
       // Update dashboard store
@@ -514,7 +514,7 @@ export function useSyncDashboardData() {
 
     try {
       // Fetch fresh data from backend
-      const dashboardData = await userBackendService.getDashboardData(user.id);
+      const dashboardData = await userBackendService.getDashboardDataForUser(user.id);
       
       // Update query cache
       queryClient.setQueryData(userQueryKeys.dashboard(user.id), dashboardData);

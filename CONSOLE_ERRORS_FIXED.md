@@ -40,9 +40,9 @@ function LoadingProviderWithDeps({ children }: { children: React.ReactNode }) {
 
 ### 1.1. ❌ `useAuth must be used within an AuthProvider` Circular Dependency
 
-**Problem**: There were two `AuthProvider` components - one in `use-auth.tsx` (correct) and a duplicate in `AuthProvider.tsx` that was trying to use `useAuth`, creating a circular dependency.
+**Problem**: There were two `AuthProvider` components - one in `useAuth.tsx` (correct) and a duplicate in `AuthProvider.tsx` that was trying to use `useAuth`, creating a circular dependency.
 
-**Fix**: Removed the duplicate `AuthProvider.tsx` and updated imports to use the correct one from `use-auth.tsx`.
+**Fix**: Removed the duplicate `AuthProvider.tsx` and updated imports to use the correct one from `useAuth.tsx`.
 
 **Files Changed**:
 - `client/src/components/AppProviders.tsx` - Fixed import
@@ -51,12 +51,12 @@ function LoadingProviderWithDeps({ children }: { children: React.ReactNode }) {
 **Before**:
 ```typescript
 import { AuthProvider } from './auth/AuthProvider';
-import { useAuth } from '../hooks/use-auth';
+import { useAuth } from '../hooks/useAuth';
 ```
 
 **After**:
 ```typescript
-import { AuthProvider, useAuth } from '../hooks/use-auth';
+import { AuthProvider, useAuth } from '../hooks/useAuth';
 ```
 
 ### 2. ❌ CSP (Content Security Policy) Violations

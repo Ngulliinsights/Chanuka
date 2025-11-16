@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { AuthService, registerSchema, loginSchema } from '../../core/auth/auth-service.ts';
+import { AuthService, registerSchema, loginSchema } from '../../core/auth/auth-service.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';

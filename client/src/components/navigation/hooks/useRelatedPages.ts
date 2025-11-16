@@ -1,4 +1,4 @@
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/useAuth';
 import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
 import { getPageRelationships, generateBreadcrumbRelationships } from '../utils/page-relationships';
 import { validateNavigationPath, validateUserRole, validateUseRelatedPagesOptions } from '../validation';

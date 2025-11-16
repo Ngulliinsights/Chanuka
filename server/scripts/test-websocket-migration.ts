@@ -6,7 +6,7 @@
 
 import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 /**
  * Simple Socket.IO WebSocket Service for testing

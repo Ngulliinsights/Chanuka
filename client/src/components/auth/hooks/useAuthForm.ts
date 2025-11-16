@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useAuth } from '../../../hooks/use-auth';
+import { useAuth } from '../../../hooks/useAuth';
 import { validatePassword } from '../../../utils/password-validation';
 import { validateEmail } from '../../../utils/input-validation';
 import { logger } from '../../../utils/logger';

@@ -4,7 +4,7 @@ import HomePage from '../home';
 import { renderWithProviders } from '../../test-utils';
 
 // Mock hooks
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     user: null,
     isAuthenticated: false,

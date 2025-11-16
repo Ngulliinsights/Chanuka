@@ -1,9 +1,10 @@
 import { errorHandler } from './unified-error-handler';
 import { initializeErrorReporting } from './error-reporting';
 import { ErrorBoundary } from '../components/error-handling/ErrorBoundary';
-import { ErrorFallback } from '../components/error/ErrorFallback';
-import { ErrorModal, useErrorModal } from '../components/error/ErrorModal';
-import { ErrorToast, useErrorToast } from '../components/error/ErrorToast';
+import { ErrorFallback } from '../components/error-handling/ErrorFallback';
+// Note: ErrorModal and ErrorToast may need to be implemented in error-handling directory
+// import { ErrorModal, useErrorModal } from '../components/error-handling/ErrorModal';
+// import { ErrorToast, useErrorToast } from '../components/error-handling/ErrorToast';
 
 /**
  * Error Integration Module

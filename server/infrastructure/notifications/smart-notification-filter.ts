@@ -2,7 +2,7 @@ import { database as db, readDatabase } from '@shared/database';
 import { users, bills, bill_engagement, user_interests, comments, sponsors, bill_cosponsors } from '@shared/schema';
 import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 // Import the *combined* preference type, NOT the global one directly
-import type { CombinedBillTrackingPreferences } from './notification-orchestrator.js'; // Adjust path if needed
+import type { CombinedBillTrackingPreferences } from './types.js';
 import { logger   } from '../../../shared/core/src/index.js';
 import { getDefaultCache  } from '@shared/core/caching';
 

@@ -10,7 +10,19 @@
     "Ussd",
     "fontobject",
     "Segoe",
-    "nosniff"
+    "nosniff",
+    "refetched",
+    "unvoting",
+    "unvote",
+    "upvote",
+    "downvote",
+    "upvotes",
+    "downvotes",
+    "netVotes",
+    "vote_type",
+    "comment_votes",
+    "engagement_score",
+    "trendingScore"
   ],
   "ignoreWords": [
     "USSD",

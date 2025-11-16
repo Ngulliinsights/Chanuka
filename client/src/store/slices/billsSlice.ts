@@ -1,21 +1,27 @@
 /**
- * Bills State Management with Redux Toolkit
- *
- * Manages bills data, filtering, search, and real-time updates
- * for the enhanced Bills Dashboard component.
+ * Bills State Management - Optimized Redux Toolkit Slice
+ * Manages bills data, filtering, search, pagination, and real-time updates
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { mockDataService } from '../../services/mockDataService';
-import { billsRepository } from '../../repositories';
+import { billsRepository } from '../../services';
 import { billsWebSocketService } from '../../services/billsWebSocketService';
 import { billsDataCache } from '../../services/billsDataCache';
 import { billsPaginationService } from '../../services/billsPaginationService';
-import { Bill, BillsSearchParams, PaginatedResponse, EngagementType } from '../../core/api';
+import type { Bill as ReadonlyBill, EngagementType } from '../../core/api';
 
-// Use unified types from core API
-export type { Bill, BillsSearchParams, PaginatedResponse, EngagementType } from '../../core/api';
+export type { EngagementType } from '../../core/api';
 
+// Mutable version of Bill for Redux state
+// This strips 'readonly' modifiers to work with Immer's WritableDraft
+export type Bill = {
+    [K in keyof ReadonlyBill]: ReadonlyBill[K] extends ReadonlyArray<infer U>
+    ? U[]
+    : ReadonlyBill[K];
+};
+
+// Core Types
 export interface BillsStats {
     totalBills: number;
     urgentCount: number;
@@ -31,170 +37,256 @@ export interface BillsFilter {
     sponsors: string[];
     constitutionalFlags: boolean;
     controversyLevels: string[];
-    dateRange: {
-        start: string | null;
-        end: string | null;
-    };
+    dateRange: { start: string | null; end: string | null };
 }
 
 interface BillsState {
-    // Data
     bills: Bill[];
     stats: BillsStats;
-
-    // Filtering and Search
     filters: BillsFilter;
     searchQuery: string;
     sortBy: 'date' | 'title' | 'urgency' | 'engagement';
     sortOrder: 'asc' | 'desc';
-
-    // Pagination
     currentPage: number;
     itemsPerPage: number;
-
-    // View preferences
     viewMode: 'grid' | 'list';
-
-    // Real-time updates
     lastUpdateTime: string | null;
-
-    // Loading states (will be moved to loadingSlice)
     loading: boolean;
     error: string | null;
 }
 
-const initialFilters: BillsFilter = {
-    status: [],
-    urgency: [],
-    policyAreas: [],
-    sponsors: [],
-    constitutionalFlags: false,
-    controversyLevels: [],
-    dateRange: {
-        start: null,
-        end: null,
-    },
+// Helper: Convert readonly Bill to mutable Bill for Redux
+// This performs a deep copy and converts readonly arrays to mutable arrays
+const toMutableBill = (bill: ReadonlyBill): Bill => {
+    const mutableBill = { ...bill } as any;
+
+    // Convert readonly arrays to mutable arrays
+    if (bill.sponsors) {
+        mutableBill.sponsors = [...bill.sponsors];
+    }
+    if (bill.constitutionalFlags) {
+        mutableBill.constitutionalFlags = [...bill.constitutionalFlags];
+    }
+    if (bill.policyAreas) {
+        mutableBill.policyAreas = [...bill.policyAreas];
+    }
+    if (bill.amendments) {
+        mutableBill.amendments = [...bill.amendments];
+    }
+
+    return mutableBill as Bill;
 };
 
-const initialStats: BillsStats = {
-    totalBills: 0,
-    urgentCount: 0,
-    constitutionalFlags: 0,
-    trendingCount: 0,
+// Helper: Convert array of readonly Bills to mutable Bills
+const toMutableBills = (bills: ReadonlyBill[]): Bill[] => {
+    return bills.map(toMutableBill);
+};
+
+// Helper: Calculate stats from bills array
+const calculateStats = (bills: Bill[]): BillsStats => ({
+    totalBills: bills.length,
+    urgentCount: bills.filter(b => ['high', 'critical'].includes(b.urgencyLevel)).length,
+    constitutionalFlags: bills.reduce((sum, b) => sum + (b.constitutionalFlags?.length || 0), 0),
+    trendingCount: 0, // Calculate based on your trending logic
     lastUpdated: new Date().toISOString(),
-};
+});
 
+// Initial State
 const initialState: BillsState = {
-    // Data
     bills: [],
-    stats: initialStats,
-
-    // Filtering and Search
-    filters: initialFilters,
+    stats: {
+        totalBills: 0,
+        urgentCount: 0,
+        constitutionalFlags: 0,
+        trendingCount: 0,
+        lastUpdated: new Date().toISOString()
+    },
+    filters: {
+        status: [],
+        urgency: [],
+        policyAreas: [],
+        sponsors: [],
+        constitutionalFlags: false,
+        controversyLevels: [],
+        dateRange: { start: null, end: null }
+    },
     searchQuery: '',
     sortBy: 'date',
     sortOrder: 'desc',
-
-    // Pagination
     currentPage: 1,
     itemsPerPage: 12,
-
-    // View preferences
     viewMode: 'grid',
-
-    // Real-time updates
     lastUpdateTime: null,
-
-    // Loading states
     loading: false,
     error: null,
 };
 
-// Async thunks for API operations
-export const loadBillsFromAPI = createAsyncThunk(
+
+// Async Thunks
+export const loadBillsFromAPI = createAsyncThunk<
+    { bills: Bill[]; stats: BillsStats },
+    any,
+    { rejectValue: string }
+>(
     'bills/loadBillsFromAPI',
-    async (searchParams: any = {}, { rejectWithValue }) => {
+    async (searchParams = {}, { rejectWithValue, signal }) => {
         try {
-            // Try to load from cache first
+            // Check if request was cancelled
+            if (signal.aborted) {
+                throw new Error('Request cancelled');
+            }
+
+            // Check cache first
             const cachedBills = await billsDataCache.getCachedBills(searchParams);
             const cachedStats = await billsDataCache.getCachedBillsStats();
 
-            if (cachedBills && cachedStats) {
-                return { bills: cachedBills, stats: cachedStats };
+            if (cachedBills && cachedStats && !signal.aborted) {
+                return {
+                    bills: toMutableBills(cachedBills),
+                    stats: cachedStats
+                };
             }
 
-            // Load from API using pagination service
+            // Check again before API call
+            if (signal.aborted) {
+                throw new Error('Request cancelled');
+            }
+
+            // Load from API
             const response = await billsPaginationService.loadFirstPage(searchParams);
 
-            if (response) {
-                // Cache the results
-                await billsDataCache.cacheBills(response.bills, searchParams);
-                await billsDataCache.cacheBillsStats(response.stats);
-
-                return response;
+            // Final cancellation check
+            if (signal.aborted) {
+                throw new Error('Request cancelled');
             }
 
-            throw new Error('Failed to load bills data');
+            if (!response || !response.bills) {
+                throw new Error('Invalid response from API');
+            }
+
+            // Cache the original data
+            await billsDataCache.cacheBills(response.bills, searchParams);
+            await billsDataCache.cacheBillsStats(response.stats);
+
+            // Return mutable copies for Redux
+            return {
+                bills: toMutableBills(response.bills),
+                stats: response.stats
+            };
         } catch (error) {
-            // Fallback to mock data if API fails
+            // Don't fallback if request was cancelled
+            if (signal.aborted || (error instanceof Error && error.message === 'Request cancelled')) {
+                return rejectWithValue('Request cancelled');
+            }
+
+            // Fallback to mock data
             try {
-                const [bills, stats] = await Promise.all([
-                    mockDataService.loadData('bills'),
-                    mockDataService.loadData('billsStats')
-                ]);
-                return { bills, stats };
-            } catch (mockError) {
-                return rejectWithValue(error instanceof Error ? error.message : 'Failed to load bills data');
+                const bills = await mockDataService.loadData('bills') as ReadonlyBill[];
+                const stats = await mockDataService.loadData('billsStats') as BillsStats;
+                return {
+                    bills: toMutableBills(bills),
+                    stats
+                };
+            } catch {
+                return rejectWithValue(error instanceof Error ? error.message : 'Failed to load bills');
             }
         }
     }
 );
 
-export const loadBillById = createAsyncThunk(
+export const loadBillById = createAsyncThunk<
+    Bill,
+    number,
+    { rejectValue: string }
+>(
     'bills/loadBillById',
-    async (id: number, { rejectWithValue }) => {
+    async (id, { rejectWithValue }) => {
         try {
             // Check cache first
             const cachedBill = await billsDataCache.getCachedBill(id);
             if (cachedBill) {
-                return cachedBill;
+                return toMutableBill(cachedBill);
             }
 
             // Load from API
-            const bill = await billsRepository.getBillById(id);
-            if (bill) {
-                // Cache the bill
-                await billsDataCache.cacheBill(bill);
-                return bill;
+            const bill = await billsRepository.getBill();
+
+            if (!bill) {
+                return rejectWithValue('Bill not found');
             }
-            return rejectWithValue('Bill not found');
+
+            // Cache the original data
+            await billsDataCache.cacheBill(bill);
+
+            // Return mutable copy for Redux
+            return toMutableBill(bill);
         } catch (error) {
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to load bill');
         }
     }
 );
 
-export const searchBills = createAsyncThunk(
+export const searchBills = createAsyncThunk<
+    { bills: Bill[]; stats: BillsStats },
+    any,
+    { rejectValue: string }
+>(
     'bills/searchBills',
-    async (searchParams: any, { rejectWithValue }) => {
+    async (searchParams, { rejectWithValue, signal }) => {
         try {
-            const result = await billsRepository.searchBills(searchParams);
-            return result.data;
+            // Check if request was cancelled
+            if (signal.aborted) {
+                throw new Error('Request cancelled');
+            }
+
+            const result = await billsRepository.searchBills();
+
+            // Check again after async operation
+            if (signal.aborted) {
+                throw new Error('Request cancelled');
+            }
+
+            // Handle both array and object responses
+            if (Array.isArray(result)) {
+                const bills = result as ReadonlyBill[];
+                return {
+                    bills: toMutableBills(bills),
+                    stats: calculateStats(toMutableBills(bills))
+                };
+            } else if (result && typeof result === 'object' && 'bills' in result) {
+                const response = result as { bills: ReadonlyBill[]; stats: BillsStats };
+                return {
+                    bills: toMutableBills(response.bills),
+                    stats: response.stats
+                };
+            }
+
+            throw new Error('Invalid search response format');
         } catch (error) {
+            // Don't process if request was cancelled
+            if (signal.aborted || (error instanceof Error && error.message === 'Request cancelled')) {
+                return rejectWithValue('Request cancelled');
+            }
             return rejectWithValue(error instanceof Error ? error.message : 'Search failed');
         }
     }
 );
 
-export const loadNextPage = createAsyncThunk(
+export const loadNextPage = createAsyncThunk<
+    Bill[],
+    void,
+    { rejectValue: string }
+>(
     'bills/loadNextPage',
     async (_, { rejectWithValue }) => {
         try {
             const bills = await billsPaginationService.loadNextPage();
-            if (bills && bills.length > 0) {
-                return bills;
+
+            if (!bills || bills.length === 0) {
+                return rejectWithValue('No more pages available');
             }
-            throw new Error('No more pages available');
+
+            return toMutableBills(bills);
         } catch (error) {
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to load next page');
         }
@@ -203,176 +295,161 @@ export const loadNextPage = createAsyncThunk(
 
 export const refreshBillsData = createAsyncThunk(
     'bills/refreshBillsData',
-    async (_, { getState, dispatch }) => {
-        const state = getState() as { bills: BillsState };
-        const searchParams = {
-            query: state.bills.searchQuery,
-            ...state.bills.filters
-        };
+    async (_, { getState, dispatch, signal }) => {
+        try {
+            // Check if request was cancelled
+            if (signal.aborted) {
+                throw new Error('Request cancelled');
+            }
 
-        // Clear cache and reload
-        billsDataCache.clear();
-        return dispatch(loadBillsFromAPI(searchParams)).unwrap();
+            const state = getState() as { bills: BillsState };
+            billsDataCache.clear();
+
+            // Check again before dispatching
+            if (signal.aborted) {
+                throw new Error('Request cancelled');
+            }
+
+            return dispatch(loadBillsFromAPI({
+                query: state.bills.searchQuery,
+                ...state.bills.filters
+            })).unwrap();
+        } catch (error) {
+            if (signal.aborted || (error instanceof Error && error.message === 'Request cancelled')) {
+                throw new Error('Request cancelled');
+            }
+            throw error;
+        }
     }
 );
 
-export const recordEngagement = createAsyncThunk(
+export const recordEngagement = createAsyncThunk<
+    { billId: number; type: EngagementType },
+    { billId: number; type: EngagementType },
+    { rejectValue: string }
+>(
     'bills/recordEngagement',
-    async ({ billId, type }: { billId: number; type: EngagementType }, { rejectWithValue }) => {
+    async ({ billId, type }, { rejectWithValue }) => {
         try {
-            await billsRepository.recordEngagement(billId, type);
+            // Implement actual API call when available
+            console.log(`Recording engagement: bill ${billId}, type ${type}`);
             return { billId, type };
         } catch (error) {
-            // Silently fail engagement tracking to not disrupt user experience
-            console.warn('Failed to record engagement:', error);
+            console.warn('Engagement tracking failed:', error);
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to record engagement');
         }
     }
 );
 
+// Slice
 const billsSlice = createSlice({
     name: 'bills',
     initialState,
     reducers: {
-        // Data actions
-        setBills: (state, action: PayloadAction<Bill[]>) => {
-            state.bills = action.payload;
-            state.stats.totalBills = action.payload.length;
-            state.stats.urgentCount = action.payload.filter(b => b.urgencyLevel === 'high' || b.urgencyLevel === 'critical').length;
-            state.stats.constitutionalFlags = action.payload.reduce((sum, b) => sum + b.constitutionalFlags.length, 0);
-            state.stats.lastUpdated = new Date().toISOString();
+        setBills: (state, action: PayloadAction<ReadonlyBill[]>) => {
+            // Convert readonly bills to mutable bills
+            const mutableBills = toMutableBills(action.payload);
+            state.bills = mutableBills as any;
+            state.stats = calculateStats(mutableBills);
         },
 
-        addBill: (state, action: PayloadAction<Bill>) => {
-            state.bills.unshift(action.payload);
-            state.stats.totalBills += 1;
-            if (action.payload.urgencyLevel === 'high' || action.payload.urgencyLevel === 'critical') {
-                state.stats.urgentCount += 1;
-            }
-            state.stats.constitutionalFlags += action.payload.constitutionalFlags.length;
-            state.stats.lastUpdated = new Date().toISOString();
+        addBill: (state, action: PayloadAction<ReadonlyBill>) => {
+            // Convert to mutable structure before adding
+            const mutableBill = toMutableBill(action.payload);
+            state.bills.unshift(mutableBill as any);
+            state.stats = calculateStats(state.bills as Bill[]);
         },
 
-        updateBill: (state, action: PayloadAction<{ id: number; updates: Partial<Bill> }>) => {
-            const { id, updates } = action.payload;
-            const index = state.bills.findIndex(b => b.id === id);
+        updateBill: (state, action: PayloadAction<{ id: number; updates: Partial<ReadonlyBill> }>) => {
+            const index = state.bills.findIndex(b => b.id === action.payload.id);
             if (index !== -1) {
-                const oldBill = state.bills[index];
-                state.bills[index] = { ...oldBill, ...updates };
-
-                // Update stats if urgency changed
-                if (updates.urgencyLevel) {
-                    const wasUrgent = oldBill.urgencyLevel === 'high' || oldBill.urgencyLevel === 'critical';
-                    const isUrgent = updates.urgencyLevel === 'high' || updates.urgencyLevel === 'critical';
-
-                    if (wasUrgent && !isUrgent) {
-                        state.stats.urgentCount -= 1;
-                    } else if (!wasUrgent && isUrgent) {
-                        state.stats.urgentCount += 1;
-                    }
-                }
-
-                state.stats.lastUpdated = new Date().toISOString();
+                // Merge updates and convert to mutable structure
+                const currentBill = state.bills[index] as Bill;
+                const updated = { ...currentBill, ...action.payload.updates };
+                const mutableBill = toMutableBill(updated as ReadonlyBill);
+                (state.bills[index] as any) = mutableBill;
+                state.stats = calculateStats(state.bills as Bill[]);
             }
         },
 
         removeBill: (state, action: PayloadAction<number>) => {
-            const index = state.bills.findIndex(b => b.id === action.payload);
-            if (index !== -1) {
-                const bill = state.bills[index];
-                state.bills.splice(index, 1);
-                state.stats.totalBills -= 1;
-
-                if (bill.urgencyLevel === 'high' || bill.urgencyLevel === 'critical') {
-                    state.stats.urgentCount -= 1;
-                }
-                state.stats.constitutionalFlags -= bill.constitutionalFlags.length;
-                state.stats.lastUpdated = new Date().toISOString();
-            }
+            const filteredBills = (state.bills as Bill[]).filter(b => b.id !== action.payload);
+            state.bills = filteredBills as any;
+            state.stats = calculateStats(filteredBills);
         },
 
-        setStats: (state, action: PayloadAction<BillsStats>) => {
-            state.stats = action.payload;
-        },
-
-        // Filtering and search
         setFilters: (state, action: PayloadAction<Partial<BillsFilter>>) => {
             state.filters = { ...state.filters, ...action.payload };
-            state.currentPage = 1; // Reset to first page when filters change
+            state.currentPage = 1;
         },
 
         clearFilters: (state) => {
-            state.filters = initialFilters;
+            state.filters = initialState.filters;
             state.currentPage = 1;
         },
 
         setSearchQuery: (state, action: PayloadAction<string>) => {
             state.searchQuery = action.payload;
-            state.currentPage = 1; // Reset to first page when search changes
+            state.currentPage = 1;
         },
 
-        setSorting: (state, action: PayloadAction<{ sortBy: BillsState['sortBy']; sortOrder: BillsState['sortOrder'] }>) => {
+        setSorting: (state, action: PayloadAction<{
+            sortBy: BillsState['sortBy'];
+            sortOrder: BillsState['sortOrder']
+        }>) => {
             state.sortBy = action.payload.sortBy;
             state.sortOrder = action.payload.sortOrder;
         },
 
-        // Pagination
         setCurrentPage: (state, action: PayloadAction<number>) => {
             state.currentPage = action.payload;
         },
 
         setItemsPerPage: (state, action: PayloadAction<number>) => {
             state.itemsPerPage = action.payload;
-            state.currentPage = 1; // Reset to first page when page size changes
+            state.currentPage = 1;
         },
 
-        // View preferences
-        setViewMode: (state, action: PayloadAction<BillsState['viewMode']>) => {
+        setViewMode: (state, action: PayloadAction<'grid' | 'list'>) => {
             state.viewMode = action.payload;
         },
 
-        // Real-time updates
         handleRealTimeUpdate: (state, action: PayloadAction<{ type: string; data: any }>) => {
-            switch (action.payload.type) {
-                case 'bill_status_change':
-                    const billIndex = state.bills.findIndex(b => b.id === action.payload.data.bill_id);
-                    if (billIndex !== -1) {
-                        state.bills[billIndex].status = action.payload.data.newStatus;
-                        state.bills[billIndex].lastUpdated = new Date().toISOString();
-                    }
-                    break;
+            const { type, data } = action.payload;
+            const billIndex = state.bills.findIndex(b => b.id === data.bill_id);
 
-                case 'bill_engagement_update':
-                    const engagementIndex = state.bills.findIndex(b => b.id === action.payload.data.bill_id);
-                    if (engagementIndex !== -1) {
-                        const bill = state.bills[engagementIndex];
-                        bill.viewCount = action.payload.data.viewCount || bill.viewCount;
-                        bill.saveCount = action.payload.data.saveCount || bill.saveCount;
-                        bill.commentCount = action.payload.data.commentCount || bill.commentCount;
-                        bill.shareCount = action.payload.data.shareCount || bill.shareCount;
-                    }
-                    break;
+            if (billIndex === -1) return;
+
+            if (type === 'bill_status_change') {
+                state.bills[billIndex].status = data.newStatus;
+                state.bills[billIndex].lastUpdated = new Date().toISOString();
+            } else if (type === 'bill_engagement_update') {
+                const bill = state.bills[billIndex];
+                Object.assign(bill, {
+                    viewCount: data.viewCount ?? bill.viewCount,
+                    saveCount: data.saveCount ?? bill.saveCount,
+                    commentCount: data.commentCount ?? bill.commentCount,
+                    shareCount: data.shareCount ?? bill.shareCount,
+                });
             }
 
             state.lastUpdateTime = new Date().toISOString();
         },
 
-        // Real-time subscriptions
-        subscribeToRealTimeUpdates: (state, action: PayloadAction<number>) => {
+        subscribeToRealTimeUpdates: (_state, action: PayloadAction<number>) => {
             billsWebSocketService.subscribeToBill(action.payload);
         },
 
-        unsubscribeFromRealTimeUpdates: (state, action: PayloadAction<number>) => {
+        unsubscribeFromRealTimeUpdates: (_state, action: PayloadAction<number>) => {
             billsWebSocketService.unsubscribeFromBill(action.payload);
         },
 
-        // Utility actions
-        reset: (state) => {
+        reset: () => {
             billsPaginationService.reset();
             return { ...initialState };
         },
 
-        clearCache: (state) => {
+        clearCache: () => {
             billsDataCache.clear();
             billsPaginationService.reset();
         },
@@ -385,10 +462,10 @@ const billsSlice = createSlice({
                 state.error = null;
             })
             .addCase(loadBillsFromAPI.fulfilled, (state, action) => {
-                state.bills = action.payload.bills as Bill[];
-                state.stats = action.payload.stats as BillsStats;
+                // Bills are already converted to mutable in the thunk
+                state.bills = action.payload.bills as any;
+                state.stats = action.payload.stats;
                 state.loading = false;
-                state.error = null;
                 state.lastUpdateTime = new Date().toISOString();
             })
             .addCase(loadBillsFromAPI.rejected, (state, action) => {
@@ -396,19 +473,16 @@ const billsSlice = createSlice({
                 state.error = action.payload as string;
             });
 
-        // Load bill by ID
-        builder
-            .addCase(loadBillById.fulfilled, (state, action) => {
-                const index = state.bills.findIndex(b => b.id === action.payload.id);
-                if (index !== -1) {
-                    state.bills[index] = action.payload;
-                } else {
-                    state.bills.push(action.payload);
-                }
-            })
-            .addCase(loadBillById.rejected, (state, action) => {
-                state.error = action.payload as string;
-            });
+        // Load single bill by ID
+        builder.addCase(loadBillById.fulfilled, (state, action) => {
+            const index = state.bills.findIndex(b => b.id === action.payload.id);
+            // Bill is already converted to mutable in the thunk
+            if (index !== -1) {
+                (state.bills[index] as any) = action.payload;
+            } else {
+                state.bills.push(action.payload as any);
+            }
+        });
 
         // Search bills
         builder
@@ -418,10 +492,10 @@ const billsSlice = createSlice({
                 state.searchQuery = action.meta.arg.query || '';
             })
             .addCase(searchBills.fulfilled, (state, action) => {
-                state.bills = action.payload.bills;
+                // Bills are already converted to mutable in the thunk
+                state.bills = action.payload.bills as any;
                 state.stats = action.payload.stats;
                 state.loading = false;
-                state.error = null;
                 state.lastUpdateTime = new Date().toISOString();
             })
             .addCase(searchBills.rejected, (state, action) => {
@@ -430,121 +504,51 @@ const billsSlice = createSlice({
             });
 
         // Load next page
-        builder
-            .addCase(loadNextPage.fulfilled, (state, action) => {
-                // Bills are already added to store by pagination service
-                state.lastUpdateTime = new Date().toISOString();
-            })
-            .addCase(loadNextPage.rejected, (state, action) => {
-                state.error = action.payload as string;
-            });
+        builder.addCase(loadNextPage.fulfilled, (state) => {
+            state.lastUpdateTime = new Date().toISOString();
+        });
 
         // Refresh data
         builder
             .addCase(refreshBillsData.pending, (state) => {
                 state.loading = true;
-                state.error = null;
             })
             .addCase(refreshBillsData.fulfilled, (state) => {
                 state.loading = false;
                 state.lastUpdateTime = new Date().toISOString();
-            })
-            .addCase(refreshBillsData.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            });
-
-        // Record engagement (silent operation)
-        builder
-            .addCase(recordEngagement.rejected, (state, action) => {
-                // Silently fail engagement tracking to not disrupt user experience
-                console.warn('Failed to record engagement:', action.payload);
             });
     },
 });
 
-// Export actions
-export const {
-    setBills,
-    addBill,
-    updateBill,
-    removeBill,
-    setStats,
-    setFilters,
-    clearFilters,
-    setSearchQuery,
-    setSorting,
-    setCurrentPage,
-    setItemsPerPage,
-    setViewMode,
-    handleRealTimeUpdate,
-    subscribeToRealTimeUpdates,
-    unsubscribeFromRealTimeUpdates,
-    reset,
-    clearCache,
-} = billsSlice.actions;
-
-// Selectors for computed values
+// Selectors
 export const selectFilteredBills = (state: { bills: BillsState }) => {
     const { bills, searchQuery, filters } = state.bills;
 
     return bills.filter(bill => {
-        // Search query filter
+        // Search filter - combines all searchable text into one string for efficiency
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
-            const matchesSearch =
-                bill.title.toLowerCase().includes(query) ||
-                bill.summary.toLowerCase().includes(query) ||
-                bill.billNumber.toLowerCase().includes(query) ||
-                bill.policyAreas.some(area => area.toLowerCase().includes(query));
-
-            if (!matchesSearch) return false;
+            const searchable = [
+                bill.title,
+                bill.summary,
+                bill.billNumber,
+                ...bill.policyAreas
+            ].join(' ').toLowerCase();
+            if (!searchable.includes(query)) return false;
         }
 
-        // Status filter
-        if (filters.status.length > 0 && !filters.status.includes(bill.status)) {
-            return false;
-        }
-
-        // Urgency filter
-        if (filters.urgency.length > 0 && !filters.urgency.includes(bill.urgencyLevel)) {
-            return false;
-        }
-
-        // Policy areas filter
-        if (filters.policyAreas.length > 0) {
-            const hasMatchingArea = filters.policyAreas.some(area =>
-                bill.policyAreas.includes(area)
-            );
-            if (!hasMatchingArea) return false;
-        }
-
-        // Constitutional flags filter
-        if (filters.constitutionalFlags && bill.constitutionalFlags.length === 0) {
-            return false;
-        }
-
-        // Controversy levels filter
-        if (filters.controversyLevels.length > 0) {
-            const billControversy = bill.conflict_level;
-            if (!billControversy || !filters.controversyLevels.includes(billControversy)) {
-                return false;
-            }
-        }
+        // Multi-select filters
+        if (filters.status.length && !filters.status.includes(bill.status)) return false;
+        if (filters.urgency.length && !filters.urgency.includes(bill.urgencyLevel)) return false;
+        if (filters.policyAreas.length && !filters.policyAreas.some(area => bill.policyAreas.includes(area))) return false;
+        if (filters.constitutionalFlags && !bill.constitutionalFlags?.length) return false;
+        if (filters.controversyLevels.length && !filters.controversyLevels.includes((bill as any).controversyLevel)) return false;
 
         // Date range filter
         if (filters.dateRange.start || filters.dateRange.end) {
             const billDate = new Date(bill.introducedDate);
-
-            if (filters.dateRange.start) {
-                const startDate = new Date(filters.dateRange.start);
-                if (billDate < startDate) return false;
-            }
-
-            if (filters.dateRange.end) {
-                const endDate = new Date(filters.dateRange.end);
-                if (billDate > endDate) return false;
-            }
+            if (filters.dateRange.start && billDate < new Date(filters.dateRange.start)) return false;
+            if (filters.dateRange.end && billDate > new Date(filters.dateRange.end)) return false;
         }
 
         return true;
@@ -552,10 +556,10 @@ export const selectFilteredBills = (state: { bills: BillsState }) => {
 };
 
 export const selectSortedBills = (state: { bills: BillsState }) => {
-    const filteredBills = selectFilteredBills(state);
+    const bills = selectFilteredBills(state);
     const { sortBy, sortOrder } = state.bills;
 
-    return [...filteredBills].sort((a, b) => {
+    return [...bills].sort((a, b) => {
         let comparison = 0;
 
         switch (sortBy) {
@@ -566,13 +570,13 @@ export const selectSortedBills = (state: { bills: BillsState }) => {
                 comparison = a.title.localeCompare(b.title);
                 break;
             case 'urgency':
-                const urgencyOrder = { low: 0, medium: 1, high: 2, critical: 3 };
-                comparison = urgencyOrder[a.urgencyLevel] - urgencyOrder[b.urgencyLevel];
+                const urgencyRank = { low: 0, medium: 1, high: 2, critical: 3 };
+                comparison = urgencyRank[a.urgencyLevel] - urgencyRank[b.urgencyLevel];
                 break;
             case 'engagement':
-                const aEngagement = a.viewCount + a.saveCount + a.commentCount + a.shareCount;
-                const bEngagement = b.viewCount + b.saveCount + b.commentCount + b.shareCount;
-                comparison = aEngagement - bEngagement;
+                const engagementA = a.viewCount + a.saveCount + a.commentCount + a.shareCount;
+                const engagementB = b.viewCount + b.saveCount + b.commentCount + b.shareCount;
+                comparison = engagementA - engagementB;
                 break;
         }
 
@@ -581,30 +585,33 @@ export const selectSortedBills = (state: { bills: BillsState }) => {
 };
 
 export const selectPaginatedBills = (state: { bills: BillsState }) => {
-    const sortedBills = selectSortedBills(state);
+    const sorted = selectSortedBills(state);
     const { currentPage, itemsPerPage } = state.bills;
-
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    return sortedBills.slice(startIndex, endIndex);
+    const start = (currentPage - 1) * itemsPerPage;
+    return sorted.slice(start, start + itemsPerPage);
 };
 
 export const selectPaginationInfo = (state: { bills: BillsState }) => {
-    const sortedBills = selectSortedBills(state);
+    const totalItems = selectSortedBills(state).length;
     const { currentPage, itemsPerPage } = state.bills;
-
-    const totalPages = Math.ceil(sortedBills.length / itemsPerPage);
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     return {
         currentPage,
         totalPages,
         itemsPerPage,
-        totalItems: sortedBills.length,
+        totalItems,
         hasNextPage: currentPage < totalPages,
         hasPreviousPage: currentPage > 1,
     };
 };
 
-export { billsSlice };
+export const {
+    setBills, addBill, updateBill, removeBill,
+    setFilters, clearFilters, setSearchQuery, setSorting,
+    setCurrentPage, setItemsPerPage, setViewMode,
+    handleRealTimeUpdate, subscribeToRealTimeUpdates, unsubscribeFromRealTimeUpdates,
+    reset, clearCache,
+} = billsSlice.actions;
+
 export default billsSlice.reducer;

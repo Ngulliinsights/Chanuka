@@ -4,7 +4,14 @@
  */
 
 import { User } from '../types/auth';
-import { authBackendService, RBACContext } from '../services/authBackendService';
+// import { authService } from '../services/AuthService';
+
+export interface RBACContext {
+  user: User;
+  resource: string;
+  action: string;
+  conditions?: Record<string, any>;
+}
 import { logger } from './logger';
 
 // Permission definitions
@@ -168,14 +175,16 @@ class RBACManager {
       }
 
       // Fall back to backend check for complex permissions
-      const context: RBACContext = {
+      const _context: RBACContext = {
         user,
         resource,
         action,
         conditions
       };
 
-      const result = await authBackendService.checkPermission(context);
+      // For now, use local permission checking since the backend service doesn't have this method
+      // In a full implementation, you would call the backend here
+      const result = this.checkLocalPermission(user, resource, action, conditions) ?? false;
       this.setCache(cacheKey, result);
       return result;
 
@@ -315,7 +324,7 @@ class RBACManager {
     for (const [key, value] of Object.entries(permissionConditions)) {
       switch (key) {
         case 'owner':
-          if (value && !requestConditions.userId === user.id) {
+          if (value && requestConditions.userId !== user.id) {
             return false;
           }
           break;
@@ -389,7 +398,9 @@ class RBACManager {
     }
 
     try {
-      const permissions = await authBackendService.getResourcePermissions(user.id, resource);
+      // For now, return local permissions since the backend service doesn't have this method
+      // In a full implementation, you would call the backend here
+      const permissions = this.getLocalResourcePermissions(user, resource);
       return permissions;
     } catch (error) {
       logger.error('Failed to get available actions:', { component: 'RBACManager' }, error);
@@ -446,6 +457,19 @@ class RBACManager {
   }
 
   /**
+   * Get local resource permissions for a user
+   */
+  private getLocalResourcePermissions(user: User, resource: string): string[] {
+    const userRole = this.getUserRole(user);
+    if (!userRole) return [];
+
+    const allPermissions = this.getAllPermissions(userRole);
+    return allPermissions
+      .filter(p => p.resource === resource || p.resource === '*')
+      .map(p => p.action);
+  }
+
+  /**
    * Clear permission cache
    */
   clearCache(): void {
@@ -475,7 +499,7 @@ export const rbacManager = new RBACManager();
 // ============================================================================
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/use-auth';
+import { useAuth } from '../hooks/useAuth';
 
 /**
  * Hook to check if user has permission

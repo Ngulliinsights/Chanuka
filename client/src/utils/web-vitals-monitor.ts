@@ -140,7 +140,7 @@ class WebVitalsMonitor {
 
     // Set up all Core Web Vitals observers
     webVitals.onCLS(handleMetric);
-    webVitals.onFID(handleMetric);
+    // webVitals.onFID(handleMetric); // Deprecated in web-vitals v5
     webVitals.onFCP(handleMetric);
     webVitals.onLCP(handleMetric);
     webVitals.onTTFB(handleMetric);
@@ -257,7 +257,7 @@ class WebVitalsMonitor {
       this.observers.push(navObserver);
 
     } catch (error) {
-      logger.warn('Failed to setup additional performance observers', { component: 'WebVitalsMonitor' }, error);
+      logger.warn('Failed to setup additional performance observers', { component: 'WebVitalsMonitor', error });
     }
   }
 

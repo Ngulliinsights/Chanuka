@@ -61,7 +61,7 @@ export function retryLazyComponentLoad<P extends object>(
         loadedComponents.delete(componentId);
         logger.warn(
           `Cached component ${componentId} failed to load, retrying`,
-          error
+          { error }
         );
       }
     }
@@ -121,7 +121,7 @@ export function retryLazyComponentLoad<P extends object>(
       );
       (enhancedError as any).cause = lastError;
 
-      logger.error(`Component load failure: ${componentId}`, enhancedError);
+      logger.error(`Component load failure: ${componentId}`, { error: enhancedError });
       throw enhancedError;
     })();
 
@@ -201,7 +201,7 @@ function createSafeLazyComponent<P extends object>(
     } catch (error) {
       logger.error(
         `Failed to load component ${componentName} after retries:`,
-        error
+        { error }
       );
 
       // Get or create stable fallback component
@@ -254,7 +254,7 @@ function cleanupPreloadRegistry(): void {
  */
 export function createSafeLazyPage<P extends object = {}>(
   path: string,
-  exportName: string,
+  _exportName: string,
   options: {
     enablePreloading?: boolean;
     preloadPriority?: "high" | "medium" | "low";
@@ -264,8 +264,8 @@ export function createSafeLazyPage<P extends object = {}>(
 ): LazyExoticComponent<ComponentType<P>> {
   const {
     enablePreloading = true,
-    preloadPriority = "medium",
-    connectionAware = true,
+    preloadPriority: _preloadPriority = "medium",
+    connectionAware: _connectionAware = true,
     displayName,
   } = options;
 

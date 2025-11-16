@@ -6,7 +6,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../hooks/useAuth';
-import { userBackendService } from '../../services/user-backend-service';
+import { userService as userBackendService } from '../../services/userService';
+import { useAuthStore } from '../../store/slices/authSlice';
+import { useUserDashboardStore } from '../../store/slices/userDashboardSlice';
+import { logger } from '../../utils/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -46,23 +49,13 @@ interface UserDashboardProps {
 export function UserDashboard({ className }: UserDashboardProps) {
   const { user, isAuthenticated } = useAuth();
   const {
-    profile,
-    preferences,
-    savedBills,
-    engagementHistory,
-    badges,
-    achievements,
     dashboardData,
-    fetchDashboardData,
-    fetchSavedBills,
-    fetchEngagementHistory,
-    fetchAchievements,
-    trackEngagement,
-    clearError
-  } = useUserStore();
-
-  const isLoading = useUserStore(userSelectors.isLoading);
-  const error = useUserStore(userSelectors.getError);
+    loading: isLoading,
+    error,
+    setError,
+    addEngagementItem,
+    refreshDashboard
+  } = useUserDashboardStore();
 
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -72,10 +65,11 @@ export function UserDashboard({ className }: UserDashboardProps) {
       loadDashboardData();
 
       // Track dashboard view
-      trackEngagement({
-        action_type: 'view',
-        entity_type: 'dashboard',
-        entity_id: 'user-dashboard',
+      addEngagementItem({
+        id: Date.now(),
+        type: 'view',
+        billId: undefined,
+        timestamp: new Date().toISOString(),
         metadata: { tab: activeTab }
       });
     }
@@ -84,10 +78,11 @@ export function UserDashboard({ className }: UserDashboardProps) {
   useEffect(() => {
     // Track tab changes
     if (activeTab !== 'overview') {
-      trackEngagement({
-        action_type: 'view',
-        entity_type: 'dashboard',
-        entity_id: `dashboard-${activeTab}`,
+      addEngagementItem({
+        id: Date.now(),
+        type: 'view',
+        billId: undefined,
+        timestamp: new Date().toISOString(),
         metadata: { tab: activeTab }
       });
     }
@@ -98,7 +93,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
       if (!user?.id) return;
       
       // Load dashboard data from backend
-      const dashboardData = await userBackendService.getDashboardData(user.id);
+      const dashboardData = await userBackendService.getDashboardDataForUser(user.id);
       useUserDashboardStore.getState().setDashboardData(dashboardData);
       
       // Load user profile
@@ -118,9 +113,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
         useUserDashboardStore.getState().setDashboardData(mockData);
         logger.warn('Using mock data as fallback');
       } catch (mockError) {
-        clearError();
-        // Set error through the store
-        useUserStore.getState().setError?.(error instanceof Error ? error.message : 'Failed to load dashboard');
+        setError(error instanceof Error ? error.message : 'Failed to load dashboard');
       }
     }
   };
@@ -151,8 +144,8 @@ export function UserDashboard({ className }: UserDashboardProps) {
       <ErrorMessage 
         message={error} 
         onRetry={() => {
-          clearError();
-          fetchDashboardData();
+          setError(null);
+          refreshDashboard();
         }}
       />
     );
@@ -164,21 +157,21 @@ export function UserDashboard({ className }: UserDashboardProps) {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={profile?.avatar_url} alt={profile?.name || user.name} />
+            <AvatarImage src={user.avatar_url} alt={user.name} />
             <AvatarFallback>
-              {(profile?.name || user.name)?.split(' ').map(n => n[0]).join('').toUpperCase()}
+              {user.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-bold">{profile?.name || user.name}</h1>
+            <h1 className="text-2xl font-bold">{user.name}</h1>
             <p className="text-muted-foreground">
-              {profile?.bio || 'Engaged citizen working for better governance'}
+              Engaged citizen working for better governance
             </p>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="secondary">
-                Civic Score: {profile?.civic_engagement_score || 0}
+                Civic Score: {dashboardData?.civicMetrics?.overallScore || 0}
               </Badge>
-              {profile?.verification_status === 'verified' && (
+              {user.verified && (
                 <Badge variant="default">
                   <Star className="h-3 w-3 mr-1" />
                   Verified
@@ -208,7 +201,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Bills Tracked</p>
-                <p className="text-2xl font-bold">{profile?.activity_summary?.bills_tracked || 0}</p>
+                <p className="text-2xl font-bold">{dashboardData?.stats?.totalBillsTracked || 0}</p>
               </div>
               <BookmarkIcon className="h-8 w-8 text-blue-500" />
             </div>
@@ -220,7 +213,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Comments</p>
-                <p className="text-2xl font-bold">{profile?.activity_summary?.comments_posted || 0}</p>
+                <p className="text-2xl font-bold">{dashboardData?.stats?.totalComments || 0}</p>
               </div>
               <MessageSquare className="h-8 w-8 text-green-500" />
             </div>
@@ -232,7 +225,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Streak Days</p>
-                <p className="text-2xl font-bold">{profile?.activity_summary?.streak_days || 0}</p>
+                <p className="text-2xl font-bold">{dashboardData?.civicMetrics?.streakDays || 0}</p>
               </div>
               <TrendingUp className="h-8 w-8 text-orange-500" />
             </div>
@@ -244,7 +237,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Badges</p>
-                <p className="text-2xl font-bold">{badges?.length || 0}</p>
+                <p className="text-2xl font-bold">{dashboardData?.achievements?.badges?.length || 0}</p>
               </div>
               <Award className="h-8 w-8 text-purple-500" />
             </div>
@@ -277,12 +270,12 @@ export function UserDashboard({ className }: UserDashboardProps) {
                   <div className="flex justify-center py-8">
                     <LoadingSpinner />
                   </div>
-                ) : dashboardData?.recent_activity?.length ? (
+                ) : dashboardData?.recentActivity?.length ? (
                   <div className="space-y-4">
-                    {dashboardData.recent_activity.slice(0, 5).map((activity) => (
+                    {dashboardData.recentActivity.slice(0, 5).map((activity) => (
                       <div key={activity.id} className="flex items-start gap-3">
                         <div className="flex-shrink-0 mt-1">
-                          {getActivityIcon(activity.action_type)}
+                          {getActivityIcon(activity.type)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm">
@@ -321,20 +314,20 @@ export function UserDashboard({ className }: UserDashboardProps) {
                   <div className="flex justify-center py-8">
                     <LoadingSpinner />
                   </div>
-                ) : dashboardData?.trending_bills?.length ? (
+                ) : dashboardData?.recommendations?.length ? (
                   <div className="space-y-4">
-                    {dashboardData.trending_bills.slice(0, 3).map((bill) => (
-                      <div key={bill.id} className="border rounded-lg p-3">
-                        <h4 className="font-medium text-sm mb-1">{bill.title}</h4>
+                    {dashboardData.recommendations.slice(0, 3).map((recommendation) => (
+                      <div key={recommendation.bill.id} className="border rounded-lg p-3">
+                        <h4 className="font-medium text-sm mb-1">{recommendation.bill.title}</h4>
                         <p className="text-xs text-muted-foreground mb-2">
-                          {bill.bill_number} • {bill.status}
+                          {recommendation.bill.billNumber} • {recommendation.bill.status}
                         </p>
                         <div className="flex items-center justify-between">
                           <Badge variant="outline" size="sm">
-                            {bill.urgency_level}
+                            {recommendation.bill.urgencyLevel}
                           </Badge>
                           <Button variant="ghost" size="sm" asChild>
-                            <Link to={`/bills/${bill.id}`}>View</Link>
+                            <Link to={`/bills/${recommendation.bill.id}`}>View</Link>
                           </Button>
                         </div>
                       </div>
@@ -350,7 +343,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
           </div>
 
           {/* Civic Score Trend */}
-          {dashboardData?.civic_score_trend && (
+          {dashboardData?.civicMetrics && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -367,7 +360,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
                   <div className="text-center">
                     <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Chart visualization would go here</p>
-                    <p className="text-xs">Current Score: {profile?.civic_engagement_score || 0}</p>
+                    <p className="text-xs">Current Score: {dashboardData?.civicMetrics?.overallScore || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -378,7 +371,7 @@ export function UserDashboard({ className }: UserDashboardProps) {
         <TabsContent value="saved-bills" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Saved Bills ({savedBills?.length || 0})</CardTitle>
+              <CardTitle>Saved Bills ({dashboardData?.trackedBills?.length || 0})</CardTitle>
               <CardDescription>
                 Bills you've saved for tracking and future reference
               </CardDescription>
@@ -388,35 +381,23 @@ export function UserDashboard({ className }: UserDashboardProps) {
                 <div className="flex justify-center py-8">
                   <LoadingSpinner />
                 </div>
-              ) : savedBills?.length ? (
+              ) : dashboardData?.trackedBills?.length ? (
                 <div className="space-y-4">
-                  {savedBills.map((savedBill) => (
-                    <div key={savedBill.id} className="border rounded-lg p-4">
+                  {dashboardData.trackedBills.map((trackedBill) => (
+                    <div key={trackedBill.id} className="border rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h4 className="font-medium mb-1">{savedBill.bill.title}</h4>
+                          <h4 className="font-medium mb-1">{trackedBill.title}</h4>
                           <p className="text-sm text-muted-foreground mb-2">
-                            {savedBill.bill.bill_number} • {savedBill.bill.status}
+                            {trackedBill.billNumber} • {trackedBill.status}
                           </p>
-                          {savedBill.notes && (
-                            <p className="text-sm mb-2">{savedBill.notes}</p>
-                          )}
-                          {savedBill.tags?.length > 0 && (
-                            <div className="flex gap-1 mb-2">
-                              {savedBill.tags.map((tag) => (
-                                <Badge key={tag} variant="outline" size="sm">
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
                           <p className="text-xs text-muted-foreground">
-                            Saved {formatDistanceToNow(new Date(savedBill.saved_at), { addSuffix: true })}
+                            Last updated {formatDistanceToNow(new Date(trackedBill.lastStatusChange), { addSuffix: true })}
                           </p>
                         </div>
                         <div className="flex gap-2">
                           <Button variant="outline" size="sm" asChild>
-                            <Link to={`/bills/${savedBill.bill_id}`}>View</Link>
+                            <Link to={`/bills/${trackedBill.id}`}>View</Link>
                           </Button>
                         </div>
                       </div>
@@ -452,12 +433,12 @@ export function UserDashboard({ className }: UserDashboardProps) {
                 <div className="flex justify-center py-8">
                   <LoadingSpinner />
                 </div>
-              ) : engagementHistory?.length ? (
+              ) : dashboardData?.recentActivity?.length ? (
                 <div className="space-y-4">
-                  {engagementHistory.map((activity) => (
+                  {dashboardData.recentActivity.map((activity) => (
                     <div key={activity.id} className="flex items-start gap-3 pb-3 border-b last:border-b-0">
                       <div className="flex-shrink-0 mt-1">
-                        {getActivityIcon(activity.action_type)}
+                        {getActivityIcon(activity.type)}
                       </div>
                       <div className="flex-1">
                         <p className="text-sm">{getActivityDescription(activity)}</p>
@@ -488,15 +469,15 @@ export function UserDashboard({ className }: UserDashboardProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {badges?.length ? (
+                {dashboardData?.achievements?.badges?.length ? (
                   <div className="grid grid-cols-2 gap-4">
-                    {badges.map((badge) => (
+                    {dashboardData.achievements.badges.map((badge) => (
                       <div key={badge.id} className="text-center p-3 border rounded-lg">
                         <div className="text-2xl mb-2">{badge.icon}</div>
                         <h4 className="font-medium text-sm">{badge.name}</h4>
                         <p className="text-xs text-muted-foreground">{badge.description}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Earned {formatDistanceToNow(new Date(badge.earned_at), { addSuffix: true })}
+                          Earned {formatDistanceToNow(new Date(badge.earnedAt), { addSuffix: true })}
                         </p>
                       </div>
                     ))}
@@ -519,18 +500,18 @@ export function UserDashboard({ className }: UserDashboardProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {achievements?.length ? (
+                {dashboardData?.achievements?.milestones?.length ? (
                   <div className="space-y-4">
-                    {achievements.map((achievement) => (
+                    {dashboardData.achievements.milestones.map((achievement) => (
                       <div key={achievement.id} className="space-y-2">
                         <div className="flex items-center justify-between">
                           <h4 className="font-medium text-sm">{achievement.title}</h4>
                           <span className="text-xs text-muted-foreground">
-                            {achievement.progress}/{achievement.max_progress}
+                            {achievement.progress}/{achievement.target}
                           </span>
                         </div>
                         <Progress 
-                          value={(achievement.progress / achievement.max_progress) * 100} 
+                          value={(achievement.progress / achievement.target) * 100} 
                           className="h-2"
                         />
                         <p className="text-xs text-muted-foreground">{achievement.description}</p>
@@ -563,21 +544,21 @@ export function UserDashboard({ className }: UserDashboardProps) {
               <div className="grid lg:grid-cols-3 gap-4 mb-6">
                 <div className="text-center p-4 border rounded-lg">
                   <p className="text-2xl font-bold text-blue-500">
-                    {profile?.activity_summary?.community_score || 0}
+                    {dashboardData?.civicMetrics?.communityScore || 0}
                   </p>
                   <p className="text-sm text-muted-foreground">Community Score</p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <p className="text-2xl font-bold text-green-500">
-                    {profile?.activity_summary?.votes_cast || 0}
+                    {dashboardData?.civicMetrics?.participationRate || 0}%
                   </p>
-                  <p className="text-sm text-muted-foreground">Votes Cast</p>
+                  <p className="text-sm text-muted-foreground">Participation Rate</p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <p className="text-2xl font-bold text-purple-500">
-                    {profile?.activity_summary?.expert_contributions || 0}
+                    {dashboardData?.civicMetrics?.impactScore || 0}
                   </p>
-                  <p className="text-sm text-muted-foreground">Expert Contributions</p>
+                  <p className="text-sm text-muted-foreground">Impact Score</p>
                 </div>
               </div>
               
@@ -611,14 +592,27 @@ function getActivityIcon(actionType: string) {
 
 function getActivityDescription(activity: any) {
   const actionMap = {
-    view: `Viewed ${activity.entity_type}`,
-    comment: `Commented on ${activity.entity_type}`,
-    save: `Saved ${activity.entity_type}`,
-    share: `Shared ${activity.entity_type}`,
-    vote: `Voted on ${activity.entity_type}`,
-    track: `Started tracking ${activity.entity_type}`
+    view: `Viewed ${activity.billId ? 'bill' : 'dashboard'}`,
+    comment: `Commented on ${activity.billId ? 'bill' : 'discussion'}`,
+    save: `Saved ${activity.billId ? 'bill' : 'item'}`,
+    share: `Shared ${activity.billId ? 'bill' : 'content'}`,
+    vote: `Voted on ${activity.billId ? 'bill' : 'item'}`,
+    track: `Started tracking ${activity.billId ? 'bill' : 'item'}`
   };
-  return actionMap[activity.action_type as keyof typeof actionMap] || `Performed ${activity.action_type} on ${activity.entity_type}`;
+  return actionMap[activity.type as keyof typeof actionMap] || `Performed ${activity.type}`;
+}
+
+async function generateMockDashboardData() {
+  // Mock dashboard data for development/fallback
+  return {
+    profile: null,
+    recent_activity: [],
+    saved_bills: [],
+    trending_bills: [],
+    recommendations: [],
+    notifications: [],
+    civic_score_trend: []
+  };
 }
 
 export default UserDashboard;

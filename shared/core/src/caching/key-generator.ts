@@ -182,13 +182,18 @@ export class CacheKeys implements CacheKeyGenerator {
   }
 
   /**
-   * Notification cache keys
-   */
+    * Notification cache keys
+    */
   notifications(user_id: number): string { return this.formatKey(`notifications:${user_id }`);
   }
 
   notificationPreferences(user_id: number): string { return this.formatKey(`notifications:preferences:${user_id }`);
   }
+
+  /**
+    * Comment voting cache keys
+    */
+  COMMENT_VOTES: string = this.formatKey('comment_votes');
 
   /**
    * Communication cache keys

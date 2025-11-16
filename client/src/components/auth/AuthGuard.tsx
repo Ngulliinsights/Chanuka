@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { rbacManager, usePermission, useMinimumRole } from '../../utils/rbac';
 import { LoadingSpinner } from '../ui/loading-spinner';
 import { Alert, AlertDescription } from '../ui/alert';

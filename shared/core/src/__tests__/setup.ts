@@ -137,8 +137,8 @@ function createMockLogger() {
     // These help track operation duration in tests
     startTimer: vi.fn(() => Date.now()),
     endTimer: vi.fn(() => 0),
-    measure: vi.fn((name: string, fn: () => any) => fn()),
-    measureAsync: vi.fn(async (name: string, fn: () => Promise<any>) => await fn()),
+    measure: vi.fn((_name: string, fn: () => any) => fn()),
+    measureAsync: vi.fn(async (_name: string, fn: () => Promise<any>) => await fn()),
 
     // Error tracking integration
     setErrorTracker: vi.fn().mockReturnThis(),
@@ -358,12 +358,12 @@ export const testUtils = {
         return res;
       }),
       
-      json: vi.fn(function(data: any) {
+      json: vi.fn(function(_data: any) {
         res.headersSent = true;
         return res;
       }),
       
-      send: vi.fn(function(data: any) {
+      send: vi.fn(function(_data: any) {
         res.headersSent = true;
         return res;
       }),
@@ -374,11 +374,11 @@ export const testUtils = {
         return res;
       }),
       
-      set: vi.fn(function(field: string | object, value?: string) {
+      set: vi.fn(function(_field: string | object, _value?: string) {
         return res;
       }),
       
-      setHeader: vi.fn(function(name: string, value: string) {
+      setHeader: vi.fn(function(_name: string, _value: string) {
         return res;
       }),
       
@@ -387,16 +387,16 @@ export const testUtils = {
         return res;
       }),
       
-      redirect: vi.fn(function(url: string) {
+      redirect: vi.fn(function(_url: string) {
         res.headersSent = true;
         return res;
       }),
       
-      cookie: vi.fn(function(name: string, value: string, options?: any) {
+      cookie: vi.fn(function(_name: string, _value: string, _options?: any) {
         return res;
       }),
       
-      clearCookie: vi.fn(function(name: string, options?: any) {
+      clearCookie: vi.fn(function(_name: string, _options?: any) {
         return res;
       }),
     };

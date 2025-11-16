@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Badge } from '../ui/badge';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigation } from '../../core/navigation/context';
 import { useMediaQuery } from '../../hooks/use-mobile';
 import { cn } from '../../lib/utils';

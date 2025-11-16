@@ -22,7 +22,7 @@ jest.mock('../error-handling/SimpleErrorBoundary', () => ({
 }));
 
 const mockAuthValue = { user: { name: 'Test User' }, isAuthenticated: true };
-jest.mock('../hooks/use-auth', () => ({
+jest.mock('../hooks/useAuth', () => ({
   AuthProvider: ({ children }: any) => (
     <div data-testid="auth-provider">{children}</div>
   ),
@@ -92,7 +92,7 @@ jest.mock('../core/navigation/context', () => ({
 // Test component that consumes contexts
 const ContextConsumer = () => {
   const { useQueryClient } = require('@tanstack/react-query');
-  const { useAuth } = require('../hooks/use-auth');
+  const { useAuth } = require('../hooks/useAuth');
   const { useTheme } = require('../contexts/ThemeContext');
   const { useLoading } = require('../core/loading');
   const { useAccessibility } = require('./accessibility/accessibility-manager');
@@ -198,7 +198,7 @@ describe('AppProviders', () => {
   it('applies provider overrides and maintains context propagation', async () => {
     const MockAuthProvider = ({ children }: any) => {
       const mockAuthValue = { user: { name: 'Override User' }, isAuthenticated: true };
-      const { useAuth } = require('../hooks/use-auth');
+      const { useAuth } = require('../hooks/useAuth');
       // Override the hook to return different value
       useAuth.mockReturnValue(mockAuthValue);
 

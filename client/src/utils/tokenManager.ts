@@ -3,8 +3,15 @@
  * Secure token storage and management with automatic refresh
  */
 
-import { logger } from './logger';
-import { authBackendService, JWTTokens } from '../services/authBackendService';
+import { logger } from './logger-simple';
+import { authApiService as authService } from '../core/api';
+
+export interface JWTTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
+  tokenType: string;
+}
 
 export interface TokenValidationResult {
   isValid: boolean;
@@ -20,8 +27,8 @@ export interface SecureStorageOptions {
 }
 
 class TokenManager {
-  private readonly TOKEN_KEY = 'auth_token';
-  private readonly REFRESH_TOKEN_KEY = 'refresh_token';
+  private readonly _TOKEN_KEY = 'auth_token';
+  private readonly _REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly EXPIRES_AT_KEY = 'token_expires_at';
   private readonly USER_KEY = 'user_data';
   
@@ -214,7 +221,7 @@ class TokenManager {
   /**
    * Validate JWT token - HttpOnly cookies validation via API
    */
-  validateToken(token?: string): TokenValidationResult {
+  validateToken(_token?: string): TokenValidationResult {
     try {
       // Since tokens are in HttpOnly cookies, we can't validate them directly
       // Check if we have expiration metadata stored
@@ -252,7 +259,7 @@ class TokenManager {
   /**
    * Parse JWT payload without verification (for client-side use only)
    */
-  private parseJWTPayload(token: string): any | null {
+  private _parseJWTPayload(token: string): any | null {
     try {
       const parts = token.split('.');
       if (parts.length !== 3) return null;
@@ -330,10 +337,17 @@ class TokenManager {
 
   private async performTokenRefresh(): Promise<boolean> {
     try {
-      const result = await authBackendService.refreshToken();
+      const result = await authService.refreshTokens();
       
-      if (result.success && result.tokens) {
-        this.storeTokens(result.tokens, result.user);
+      if (result.success && result.data) {
+        // Extract tokens from the response data
+        const tokens: JWTTokens = {
+          accessToken: result.data.tokens.accessToken,
+          refreshToken: result.data.tokens.refreshToken,
+          expiresAt: Date.now() + result.data.tokens.expiresIn * 1000,
+          tokenType: result.data.tokens.tokenType
+        };
+        this.storeTokens(tokens, result.user);
         return true;
       } else {
         this.clearTokens();

@@ -1,18 +1,49 @@
 import { z } from 'zod';
-import DOMPurify from 'isomorphic-dompurify';
-import { encryptionService } from '../../features/security/encryption-service.js';
-import { logger   } from '../../../shared/core/src/index.js';
+import { Request, Response, NextFunction } from 'express';
+import { logger } from '../../../shared/core/src/index.js';
+import { ApiValidationError } from '../../../shared/core/src/utils/api-utils.js';
+import { validationMetricsCollector } from './validation-metrics.js';
+import {
+  validateEmail,
+  validatePhone,
+  validateURL,
+  sanitizeString,
+  sanitizeHtml,
+  commonZodSchemas
+} from './validation-utils.js';
 
 /**
- * Comprehensive input validation and sanitization service
+ * Unified Input Validation Service
+ * Combines comprehensive input validation, sanitization, security checks, and API middleware
  * Prevents SQL injection, XSS, and other injection attacks
  */
+
+export interface ValidationResult<T = unknown> {
+  isValid: boolean;
+  data?: T;
+  errors: ValidationError[];
+}
+
+export interface ValidationError {
+  field: string;
+  message: string;
+  code?: string;
+}
+
+export interface FileValidationOptions {
+  maxSize: number; // in bytes
+  allowedTypes: string[];
+  allowedExtensions: string[];
+}
+
 export class InputValidationService {
-  private readonly maxStringLength = 10000;
+  private static instance: InputValidationService;
+
   private readonly maxArrayLength = 1000;
   private readonly maxObjectDepth = 10;
 
   // SQL injection patterns to detect and block
+  // cspell:disable SYSOBJECTS SYSCOLUMNS
   private readonly sqlInjectionPatterns = [
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION|SCRIPT)\b)/gi,
     /(\b(OR|AND)\s+\d+\s*=\s*\d+)/gi,
@@ -22,25 +53,78 @@ export class InputValidationService {
     /(\bsp_\w+)/gi,
   ];
 
-  // XSS patterns to detect and block
-  private readonly xssPatterns = [
-    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-    /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
-    /javascript:/gi,
-    /on\w+\s*=/gi,
-    /<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi,
-    /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi,
-  ];
 
-  // Path traversal patterns
-  private readonly pathTraversalPatterns = [
-    /\.\.\//g,
-    /\.\.\\/g,
-    /%2e%2e%2f/gi,
-    /%2e%2e%5c/gi,
-    /\.\.%2f/gi,
-    /\.\.%5c/gi,
-  ];
+  private constructor() {}
+
+  public static getInstance(): InputValidationService {
+    if (!InputValidationService.instance) {
+      InputValidationService.instance = new InputValidationService();
+    }
+    return InputValidationService.instance;
+  }
+
+  /**
+    * Validate API input against a Zod schema
+    */
+   public validateApiInput<T>(schema: z.ZodSchema<T>, input: unknown): ValidationResult {
+     const endMetric = validationMetricsCollector.startValidation('InputValidationService', 'validateApiInput');
+
+     try {
+       const result = schema.safeParse(input);
+
+       if (result.success) {
+         endMetric();
+         return {
+           isValid: true,
+           data: result.data,
+           errors: []
+         };
+       } else {
+         const errors: ValidationError[] = result.error.errors.map(err => ({
+           field: err.path.join('.'),
+           message: err.message,
+           code: err.code
+         }));
+
+         // Categorize the first error for metrics
+         const primaryError = errors[0];
+         let errorCategory: 'security' | 'format' | 'business_logic' | 'system' = 'format';
+
+         if (primaryError && (primaryError.message.toLowerCase().includes('security') ||
+             primaryError.message.toLowerCase().includes('injection') ||
+             primaryError.message.toLowerCase().includes('xss'))) {
+           errorCategory = 'security';
+         }
+
+         endMetric(false, primaryError?.code || 'validation_error', errorCategory);
+
+         logger.warn('Input validation failed', {
+           component: 'input-validation',
+           errors: errors.map(e => `${e.field}: ${e.message}`)
+         });
+
+         return {
+           isValid: false,
+           errors
+         };
+       }
+     } catch (error) {
+       endMetric(false, 'internal_error', 'system');
+
+       logger.error('Validation error', {
+         component: 'input-validation',
+         error: error instanceof Error ? error.message : String(error)
+       });
+
+       return {
+         isValid: false,
+         errors: [{
+           field: 'validation',
+           message: 'Internal validation error'
+         }]
+       };
+     }
+   }
 
   /**
    * Sanitize string input to prevent injection attacks
@@ -51,149 +135,46 @@ export class InputValidationService {
     stripSQL?: boolean;
     stripXSS?: boolean;
   } = {}): string {
-    if (typeof input !== 'string') {
-      throw new Error('Input must be a string');
-    }
-
-    const {
-      allowHTML = false,
-      maxLength = this.maxStringLength,
-      stripSQL = true,
-      stripXSS = true
-    } = options;
-
-    let sanitized = input;
-
-    // Remove null bytes and control characters
-    sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-
-    // Limit length to prevent DoS
-    if (sanitized.length > maxLength) {
-      sanitized = sanitized.substring(0, maxLength);
-    }
-
-    // Strip SQL injection patterns
-    if (stripSQL) {
-      for (const pattern of this.sqlInjectionPatterns) {
-        if (pattern.test(sanitized)) {
-          throw new Error('Potential SQL injection detected');
-        }
-      }
-    }
-
-    // Strip XSS patterns
-    if (stripXSS) {
-      for (const pattern of this.xssPatterns) {
-        if (pattern.test(sanitized)) {
-          throw new Error('Potential XSS attack detected');
-        }
-      }
-    }
-
-    // Check for path traversal
-    for (const pattern of this.pathTraversalPatterns) {
-      if (pattern.test(sanitized)) {
-        throw new Error('Path traversal attempt detected');
-      }
-    }
-
-    // HTML sanitization
-    if (allowHTML) {
-      sanitized = DOMPurify.sanitize(sanitized, {
-        ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li'],
-        ALLOWED_ATTR: []
-      });
-    } else {
-      // Escape HTML entities
-      sanitized = sanitized
-        .replace(/&/g, '&')
-        .replace(/</g, '<')
-        .replace(/>/g, '>')
-        .replace(/"/g, '"')
-        .replace(/'/g, '&#x27;');
-    }
-
-    return sanitized.trim();
+    return sanitizeString(input, options);
   }
 
   /**
    * Validate and sanitize email addresses
    */
   validateEmail(email: string): { isValid: boolean; sanitized?: string; error?: string } {
-    try {
-      const sanitized = this.sanitizeString(email, { maxLength: 254 });
-      
-      if (!encryptionService.validateEmail(sanitized)) {
-        return { isValid: false, error: 'Invalid email format' };
-      }
-
-      return { isValid: true, sanitized };
-    } catch (error) {
-      return { isValid: false, error: (error as Error).message };
-    }
+    const endMetric = validationMetricsCollector.startValidation('InputValidationService', 'validateEmail');
+    const result = validateEmail(email);
+    endMetric(result.isValid, result.isValid ? undefined : 'invalid_email', 'format');
+    return result;
   }
 
   /**
    * Validate and sanitize URLs
    */
   validateURL(url: string): { isValid: boolean; sanitized?: string; error?: string } {
-    try {
-      const sanitized = this.sanitizeString(url, { maxLength: 2048 });
-      
-      // Basic URL validation
-      const urlRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
-      
-      if (!urlRegex.test(sanitized)) {
-        return { isValid: false, error: 'Invalid URL format' };
-      }
-
-      // Check for suspicious protocols
-      if (sanitized.match(/^(javascript|data|vbscript|file|ftp):/i)) {
-        return { isValid: false, error: 'Unsafe URL protocol' };
-      }
-
-      return { isValid: true, sanitized };
-    } catch (error) {
-      return { isValid: false, error: (error as Error).message };
-    }
+    return validateURL(url);
   }
 
   /**
    * Validate and sanitize phone numbers
    */
   validatePhone(phone: string): { isValid: boolean; sanitized?: string; error?: string } {
-    try {
-      const sanitized = this.sanitizeString(phone, { maxLength: 20 });
-      
-      // Remove all non-digit characters except + and -
-      const cleaned = sanitized.replace(/[^\d+\-\s()]/g, '');
-      
-      // Basic phone validation (international format)
-      const phoneRegex = /^[\+]?[1-9][\d\s\-\(\)]{7,15}$/;
-      
-      if (!phoneRegex.test(cleaned)) {
-        return { isValid: false, error: 'Invalid phone number format' };
-      }
-
-      return { isValid: true, sanitized: cleaned };
-    } catch (error) {
-      return { isValid: false, error: (error as Error).message };
-    }
+    return validatePhone(phone);
   }
 
   /**
    * Validate and sanitize JSON input
    */
-  validateJSON(input: string): { isValid: boolean; parsed?: any; error?: string } {
+  validateJSON(input: string): { isValid: boolean; parsed?: unknown; error?: string } {
     try {
-      const sanitized = this.sanitizeString(input, { 
+      const sanitized = this.sanitizeString(input, {
         maxLength: 50000,
         stripSQL: false, // JSON might contain legitimate SQL-like strings
         stripXSS: false   // JSON might contain legitimate HTML-like strings
       });
 
       const parsed = JSON.parse(sanitized);
-      
+
       // Check object depth and size
       if (!this.validateObjectStructure(parsed)) {
         return { isValid: false, error: 'JSON structure too complex or large' };
@@ -208,7 +189,7 @@ export class InputValidationService {
   /**
    * Validate object structure to prevent DoS attacks
    */
-  private validateObjectStructure(obj: any, depth: number = 0): boolean {
+  private validateObjectStructure(obj: unknown, depth: number = 0): boolean {
     if (depth > this.maxObjectDepth) {
       return false;
     }
@@ -221,125 +202,256 @@ export class InputValidationService {
     }
 
     if (obj && typeof obj === 'object') {
-      const keys = Object.keys(obj);
+      const record = obj as Record<string, unknown>;
+      const keys = Object.keys(record);
       if (keys.length > 100) { // Max 100 properties per object
         return false;
       }
-      return keys.every(key => this.validateObjectStructure(obj[key], depth + 1));
+      return keys.every(key => this.validateObjectStructure(record[key], depth + 1));
     }
 
     return true;
   }
 
   /**
+   * Sanitize HTML input to prevent XSS
+   */
+  public sanitizeHtmlInput(input: string): string {
+    return sanitizeHtml(input);
+  }
+
+  /**
+   * Validate file upload
+   */
+  public validateFileUpload(file: { size: number; mimetype: string; originalname?: string }, options: FileValidationOptions): ValidationResult {
+    const endMetric = validationMetricsCollector.startValidation('InputValidationService', 'validateFileUpload');
+    const errors: ValidationError[] = [];
+
+    if (!file) {
+      errors.push({
+        field: 'file',
+        message: 'No file provided'
+      });
+      endMetric(false, 'no_file', 'business_logic');
+      return { isValid: false, errors };
+    }
+
+    // Check file size
+    if (file.size > options.maxSize) {
+      errors.push({
+        field: 'file.size',
+        message: `File size exceeds maximum allowed size of ${options.maxSize} bytes`
+      });
+    }
+
+    // Check MIME type
+    if (!options.allowedTypes.includes(file.mimetype)) {
+      errors.push({
+        field: 'file.type',
+        message: `File type ${file.mimetype} is not allowed. Allowed types: ${options.allowedTypes.join(', ')}`
+      });
+    }
+
+    // Check file extension
+    const fileExtension = file.originalname?.split('.').pop()?.toLowerCase();
+    if (!fileExtension || !options.allowedExtensions.includes(fileExtension)) {
+      errors.push({
+        field: 'file.extension',
+        message: `File extension .${fileExtension} is not allowed. Allowed extensions: ${options.allowedExtensions.join(', ')}`
+      });
+    }
+
+    // Additional security checks
+    if (this.containsMaliciousContent(file)) {
+      errors.push({
+        field: 'file.content',
+        message: 'File contains potentially malicious content'
+      });
+    }
+
+    const isValid = errors.length === 0;
+    endMetric(isValid, isValid ? undefined : 'malicious_content', isValid ? undefined : 'security');
+
+    return {
+      isValid,
+      errors
+    };
+  }
+
+  /**
+   * Create validation middleware for Express routes
+   */
+  public createValidationMiddleware<T>(
+    schema: z.ZodSchema<T>,
+    source: 'body' | 'query' | 'params' = 'body'
+  ) {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const input = req[source];
+      const validation = this.validateApiInput(schema, input);
+
+      if (!validation.isValid) {
+        return ApiValidationError(res, validation.errors);
+      }
+
+      // Replace the original input with validated/sanitized data
+      (req as unknown as Record<string, unknown>)[source] = validation.data;
+      next();
+    };
+  }
+
+  /**
+   * Validate and sanitize user role
+   */
+  public validateUserRole(role: string): ValidationResult {
+    const validRoles = ['citizen', 'expert', 'admin', 'journalist', 'advocate'];
+
+    if (!role || typeof role !== 'string') {
+      return {
+        isValid: false,
+        errors: [{
+          field: 'role',
+          message: 'Role is required and must be a string'
+        }]
+      };
+    }
+
+    if (!validRoles.includes(role)) {
+      return {
+        isValid: false,
+        errors: [{
+          field: 'role',
+          message: `Invalid role. Valid roles are: ${validRoles.join(', ')}`
+        }]
+      };
+    }
+
+    return {
+      isValid: true,
+      data: role,
+      errors: []
+    };
+  }
+
+  /**
+   * Validate search query
+   */
+  public validateSearchQuery(query: string): ValidationResult {
+    if (!query || typeof query !== 'string') {
+      return {
+        isValid: false,
+        errors: [{
+          field: 'query',
+          message: 'Search query is required'
+        }]
+      };
+    }
+
+    // Sanitize the query
+    let sanitized = query.trim();
+
+    // Remove potentially dangerous characters
+    sanitized = sanitized.replace(/[<>'"&]/g, '');
+
+    // Limit length
+    if (sanitized.length > 200) {
+      sanitized = sanitized.substring(0, 200);
+    }
+
+    // Ensure minimum length
+    if (sanitized.length < 1) {
+      return {
+        isValid: false,
+        errors: [{
+          field: 'query',
+          message: 'Search query must be at least 1 character long'
+        }]
+      };
+    }
+
+    return {
+      isValid: true,
+      data: sanitized,
+      errors: []
+    };
+  }
+
+  /**
+   * Validate pagination parameters
+   */
+  public validatePaginationParams(page?: string, limit?: string): ValidationResult {
+    const schema = z.object({
+      page: z.string().optional().transform(val => {
+        const num = parseInt(val || '1');
+        return Math.max(1, isNaN(num) ? 1 : num);
+      }),
+      limit: z.string().optional().transform(val => {
+        const num = parseInt(val || '20');
+        return Math.min(100, Math.max(1, isNaN(num) ? 20 : num));
+      })
+    });
+
+    try {
+      const result = schema.safeParse({ page, limit });
+
+      if (result.success) {
+        return {
+          isValid: true,
+          data: result.data,
+          errors: []
+        };
+      } else {
+        const errors: ValidationError[] = result.error.errors.map(err => ({
+          field: err.path.join('.'),
+          message: err.message,
+          code: err.code
+        }));
+
+        return {
+          isValid: false,
+          errors
+        };
+      }
+    } catch (error) {
+      return {
+        isValid: false,
+        errors: [{
+          field: 'pagination',
+          message: 'Internal pagination validation error'
+        }]
+      };
+    }
+  }
+
+  /**
    * Create Zod schema with security validations
    */
   createSecureSchema() {
-    return {
-      email: z.string()
-        .min(1, 'Email is required')
-        .max(254, 'Email too long')
-        .refine((email) => this.validateEmail(email).isValid, 'Invalid email format'),
-
-      password: z.string()
-        .min(12, 'Password must be at least 12 characters')
-        .max(128, 'Password too long')
-        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
-               'Password must contain uppercase, lowercase, number, and special character'),
-
-      name: z.string()
-        .min(1, 'Name is required')
-        .max(100, 'Name too long')
-        .refine((name) => {
-          try {
-            this.sanitizeString(name);
-            return true;
-          } catch {
-            return false;
-          }
-        }, 'Invalid characters in name'),
-
-      url: z.string()
-        .max(2048, 'URL too long')
-        .refine((url) => this.validateURL(url).isValid, 'Invalid URL format'),
-
-      phone: z.string()
-        .max(20, 'Phone number too long')
-        .refine((phone) => this.validatePhone(phone).isValid, 'Invalid phone number format'),
-
-      text: z.string()
-        .max(this.maxStringLength, 'Text too long')
-        .refine((text) => {
-          try {
-            this.sanitizeString(text);
-            return true;
-          } catch {
-            return false;
-          }
-        }, 'Invalid characters in text'),
-
-      html: z.string()
-        .max(this.maxStringLength, 'HTML content too long')
-        .refine((html) => {
-          try {
-            this.sanitizeString(html, { allowHTML: true });
-            return true;
-          } catch {
-            return false;
-          }
-        }, 'Invalid HTML content'),
-
-      id: z.string()
-        .uuid('Invalid ID format')
-        .refine((id) => {
-          try {
-            this.sanitizeString(id);
-            return true;
-          } catch {
-            return false;
-          }
-        }, 'Invalid ID'),
-
-      integer: z.number()
-        .int('Must be an integer')
-        .min(-2147483648, 'Number too small')
-        .max(2147483647, 'Number too large'),
-
-      positiveInteger: z.number()
-        .int('Must be an integer')
-        .min(1, 'Must be positive'),
-
-      array: z.array(z.any())
-        .max(this.maxArrayLength, 'Array too large'),
-
-      object: z.record(z.any())
-        .refine((obj) => this.validateObjectStructure(obj), 'Object structure too complex')
-    };
+    return commonZodSchemas;
   }
 
   /**
    * Validate request parameters against schema
    */
-  validateRequest<T>(data: unknown, schema: z.ZodSchema<T>): { 
-    success: boolean; 
-    data?: T; 
-    errors?: string[] 
+  validateRequest<T>(data: unknown, schema: z.ZodSchema<T>): {
+    success: boolean;
+    data?: T;
+    errors?: string[]
   } {
     try {
       const result = schema.safeParse(data);
-      
+
       if (result.success) {
         return { success: true, data: result.data };
       } else {
-        return { 
-          success: false, 
+        return {
+          success: false,
           errors: result.error.errors.map(err => `${err.path.join('.')}: ${err.message}`)
         };
       }
     } catch (error) {
-      return { 
-        success: false, 
-        errors: ['Validation failed: ' + (error as Error).message] 
+      return {
+        success: false,
+        errors: ['Validation failed: ' + (error instanceof Error ? error.message : String(error))]
       };
     }
   }
@@ -347,8 +459,8 @@ export class InputValidationService {
   /**
    * Sanitize database query parameters
    */
-  sanitizeQueryParams(params: Record<string, any>): Record<string, any> {
-    const sanitized: Record<string, any> = {};
+  sanitizeQueryParams(params: Record<string, unknown>): Record<string, unknown> {
+    const sanitized: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(params)) {
       // Sanitize key
@@ -369,7 +481,7 @@ export class InputValidationService {
         if (value.length > this.maxArrayLength) {
           throw new Error(`Array too large for ${key}`);
         }
-        sanitized[sanitizedKey] = value.map(item => 
+        sanitized[sanitizedKey] = value.map(item =>
           typeof item === 'string' ? this.sanitizeString(item) : item
         );
       } else {
@@ -388,7 +500,7 @@ export class InputValidationService {
   /**
    * Create parameterized query helper to prevent SQL injection
    */
-  createParameterizedQuery(query: string, params: any[]): { query: string; params: any[] } {
+  createParameterizedQuery(query: string, params: unknown[]): { query: string; params: unknown[] } {
     // Validate that the query doesn't contain dangerous patterns
     for (const pattern of this.sqlInjectionPatterns) {
       if (pattern.test(query)) {
@@ -406,45 +518,93 @@ export class InputValidationService {
 
     return { query, params: sanitizedParams };
   }
+
+  /**
+   * Check if file contains malicious content
+   */
+  private containsMaliciousContent(file: { size: number; mimetype: string; originalname?: string }): boolean {
+    // Check filename for suspicious patterns
+    const suspiciousPatterns = [
+      /\.exe$/i,
+      /\.bat$/i,
+      /\.cmd$/i,
+      /\.scr$/i,
+      /\.pif$/i,
+      /\.com$/i,
+      /\.vbs$/i,
+      /\.js$/i,
+      /\.jar$/i,
+      /\.php$/i,
+      /\.asp$/i,
+      /\.jsp$/i
+    ];
+
+    const filename = file.originalname || '';
+    if (suspiciousPatterns.some(pattern => pattern.test(filename))) {
+      return true;
+    }
+
+    // Check for null bytes in filename (directory traversal attempt)
+    if (filename.includes('\0')) {
+      return true;
+    }
+
+    // Check for path traversal attempts
+    if (filename.includes('../') || filename.includes('..\\')) {
+      return true;
+    }
+
+    return false;
+  }
 }
 
-// Singleton instance
-export const inputValidationService = new InputValidationService();
+// Common validation schemas
+export const commonSchemas = {
+  // User role validation
+  user_role: z.enum(['citizen', 'expert', 'admin', 'journalist', 'advocate']),
 
+  // Pagination validation
+  pagination: z.object({
+    page: z.string().optional().transform(val => Math.max(1, parseInt(val || '1') || 1)),
+    limit: z.string().optional().transform(val => Math.min(100, Math.max(1, parseInt(val || '20') || 20)))
+  }),
 
+  // Search validation
+  search: z.object({
+    query: z.string().min(1).max(200).transform(val => val.trim()),
+    filters: z.record(z.string()).optional()
+  }),
 
+  // User update validation
+  userUpdate: z.object({
+    role: z.enum(['citizen', 'expert', 'admin', 'journalist', 'advocate']).optional(),
+    is_active: z.boolean().optional(),
+    name: z.string().min(1).max(255).optional(),
+    email: z.string().email().optional()
+  }),
 
+  // Bill comment validation
+  comments: z.object({
+    content: z.string().min(1).max(5000),
+    parent_id: z.number().optional(),
+    commentType: z.enum(['general', 'expert_analysis', 'concern', 'support']).optional()
+  }),
 
+  // File upload validation options
+  fileUpload: {
+    image: {
+      maxSize: 5 * 1024 * 1024, // 5MB
+      allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp']
+    },
+    document: {
+      maxSize: 10 * 1024 * 1024, // 10MB
+      // cspell:disable msword
+      allowedTypes: ['application/pdf', 'text/plain', 'application/msword'],
+      allowedExtensions: ['pdf', 'txt', 'doc', 'docx']
+    }
+  }
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Export singleton instance
+export const inputValidationService = InputValidationService.getInstance();

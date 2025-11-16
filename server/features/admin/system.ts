@@ -1,10 +1,13 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { sql } from 'drizzle-orm';
 import { database as db } from '../../../shared/database/index.js';
-import { HealthCheckResponse } from '../../types/api.ts';
+import { HealthCheckResponse } from '../../types/api.js';
 import { ResponseHelper } from '../../../shared/core/src/utils/response-helpers.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
-import { logger   } from '../../../shared/core/src/index.js';
+import { schemaValidationService } from '../../core/validation/schema-validation-service.js';
+import { validationMetricsCollector } from '../../core/validation/validation-metrics.js';
+
+// Define interfaces for type safety
 interface SchemaIssue {
   type: string;
   severity: 'critical' | 'warning';
@@ -13,14 +16,36 @@ interface SchemaIssue {
   column?: string;
 }
 
-const router = express.Router();
+interface TableColumn {
+  column: string;
+  type: string;
+  nullable: boolean;
+  default: string | null;
+}
 
-export function setupSystemRoutes(app: express.Router) {
-  // Database schema information
-  app.get('/schema', async (req: express.Request, res: express.Response) => {
-    const startTime = Date.now();
+// This interface represents a row returned from the information_schema.columns query
+// PostgreSQL's information schema has standardized column names that we can rely on
+interface DatabaseRow {
+  table_name: string;
+  column_name: string;
+  data_type: string;
+  is_nullable: string;
+  column_default: string | null;
+}
 
+// Note: We don't define TableStatsRow interface because the /stats endpoint
+// returns raw PostgreSQL statistics rows without transformation.
+// The pg_stat_user_tables view uses PostgreSQL naming: schemaname, tablename (not typos)
+
+// Create the router with explicit type annotation to satisfy TypeScript
+const router: express.Router = express.Router();
+
+export function setupSystemRoutes(app: express.Router): void {
+  // Database schema information endpoint
+  // This retrieves all table structures from the PostgreSQL information schema
+  app.get('/schema', async (_req: express.Request, res: express.Response) => {
     try {
+      // Query the information schema to get comprehensive table structure details
       const tableInfo = await db.execute(sql`
         SELECT table_name, column_name, data_type, is_nullable, column_default
         FROM information_schema.columns
@@ -28,16 +53,30 @@ export function setupSystemRoutes(app: express.Router) {
         ORDER BY table_name, ordinal_position
       `);
 
-      const tables: Record<string, any[]> = {};
-      tableInfo.rows.forEach((row: any) => {
-        if (!tables[row.table_name]) {
-          tables[row.table_name] = [];
+      // Organize columns by their parent table for easier consumption
+      const tables: Record<string, TableColumn[]> = {};
+      
+      // We explicitly type the parameter here to tell TypeScript what structure to expect
+      // This is safer than using 'any' and provides proper autocomplete and error checking
+      tableInfo.rows.forEach((row: unknown) => {
+        const dbRow = row as DatabaseRow;
+        
+        // Guard against undefined values - defensive programming for database queries
+        if (!dbRow || !dbRow.table_name) {
+          return; // Skip malformed rows
         }
-        tables[row.table_name].push({
-          column: row.column_name,
-          type: row.data_type,
-          nullable: row.is_nullable === 'YES',
-          default: row.column_default
+        
+        // Initialize the table array if this is the first column we've seen for this table
+        if (!tables[dbRow.table_name]) {
+          tables[dbRow.table_name] = [];
+        }
+        
+        // Add this column's information to the appropriate table array
+        tables[dbRow.table_name].push({
+          column: dbRow.column_name,
+          type: dbRow.data_type,
+          nullable: dbRow.is_nullable === 'YES',
+          default: dbRow.column_default
         });
       });
 
@@ -49,7 +88,7 @@ export function setupSystemRoutes(app: express.Router) {
     } catch (error) {
       errorTracker.trackRequestError(
         error as Error,
-        req,
+        _req,
         'medium',
         'database'
       );
@@ -60,10 +99,9 @@ export function setupSystemRoutes(app: express.Router) {
     }
   });
 
-  // Environment status
-  app.get('/environment', (req: express.Request, res: express.Response) => {
-    const startTime = Date.now();
-
+  // Environment status endpoint
+  // Returns sanitized environment configuration without exposing sensitive values
+  app.get('/environment', (_req: express.Request, res: express.Response) => {
     const envStatus = {
       NODE_ENV: process.env.NODE_ENV || 'development',
       DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set',
@@ -76,11 +114,13 @@ export function setupSystemRoutes(app: express.Router) {
     return ResponseHelper.success(res, envStatus);
   });
 
-  // Database table count summary
-  app.get('/stats', async (req: express.Request, res: express.Response) => {
-    const startTime = Date.now();
-
+  // Database statistics endpoint
+  // Provides insights into table activity and row counts
+  app.get('/stats', async (_req: express.Request, res: express.Response) => {
     try {
+      // Query PostgreSQL statistics for user tables
+      // Note: "schemaname" and "tablename" are PostgreSQL's actual column names (not typos)
+      // cspell:disable-next-line
       const tableStats = await db.execute(sql`
         SELECT 
           schemaname,
@@ -104,7 +144,7 @@ export function setupSystemRoutes(app: express.Router) {
     } catch (error) {
       errorTracker.trackRequestError(
         error as Error,
-        req,
+        _req,
         'medium',
         'database'
       );
@@ -115,10 +155,9 @@ export function setupSystemRoutes(app: express.Router) {
     }
   });
 
-  // Migration status
-  app.get('/migrations', (req: express.Request, res: express.Response) => {
-    const startTime = Date.now();
-
+  // Migration status endpoint
+  // Returns the current state of database migrations
+  app.get('/migrations', (_req: express.Request, res: express.Response) => {
     return ResponseHelper.success(res, {
       migrations: [
         {
@@ -141,22 +180,28 @@ export function setupSystemRoutes(app: express.Router) {
     });
   });
 
-  // Schema consistency check
-  app.get('/schema/check', async (req: express.Request, res: express.Response) => {
-    const startTime = Date.now();
-
+  // Schema consistency check endpoint
+  // Validates that all expected tables exist and have correct structure
+  app.get('/schema/check', async (_req: express.Request, res: express.Response) => {
     try {
       const issues: SchemaIssue[] = [];
 
-      // Check for missing tables
+      // Retrieve all public schema tables
       const tables = await db.execute(sql`
         SELECT table_name FROM information_schema.tables 
         WHERE table_schema = 'public'
       `);
 
-      const tableNames = tables.rows.map((row: any) => row.table_name);
+      // Extract table names with proper type casting
+      // We type the parameter explicitly to avoid implicit 'any' errors
+      const tableNames = tables.rows.map((row: unknown) => {
+        const dbRow = row as DatabaseRow;
+        return dbRow.table_name;
+      });
+      
       const expectedTables = ['users', 'bills', 'bill_comments', 'user_profiles', 'bill_engagement'];
 
+      // Check for missing required tables
       expectedTables.forEach(table => {
         if (!tableNames.includes(table)) {
           issues.push({
@@ -168,15 +213,17 @@ export function setupSystemRoutes(app: express.Router) {
         }
       });
 
-      // Check for ID type consistency
+      // Verify ID column type consistency for users table
       if (tableNames.includes('users')) {
-        const user_idType = await db.execute(sql`
+        const userIdType = await db.execute(sql`
           SELECT data_type FROM information_schema.columns 
           WHERE table_name = 'users' AND column_name = 'id'
         `);
 
-        if (user_idType.rows.length > 0) {
-          const idType = user_idType.rows[0].data_type;
+        // We need to check if rows exist AND if the first row exists before accessing properties
+        // This prevents the "Object is possibly 'undefined'" error
+        if (userIdType.rows.length > 0 && userIdType.rows[0]) {
+          const idType = (userIdType.rows[0] as DatabaseRow).data_type;
           if (idType !== 'uuid') {
             issues.push({
               type: 'id_type_inconsistency',
@@ -199,7 +246,7 @@ export function setupSystemRoutes(app: express.Router) {
     } catch (error) {
       errorTracker.trackRequestError(
         error as Error,
-        req,
+        _req,
         'medium',
         'database'
       );
@@ -210,12 +257,11 @@ export function setupSystemRoutes(app: express.Router) {
     }
   });
 
-  // System health check
-  app.get('/health', async (req: express.Request, res: express.Response<HealthCheckResponse>) => {
-    const startTime = Date.now();
-
+  // System health check endpoint
+  // Tests basic database connectivity and system status
+  app.get('/health', async (_req: express.Request, res: express.Response<HealthCheckResponse>) => {
     try {
-      // Test database connection
+      // Simple database ping to verify connectivity
       await db.execute(sql`SELECT 1`);
 
       const healthResponse: HealthCheckResponse = {
@@ -230,79 +276,119 @@ export function setupSystemRoutes(app: express.Router) {
     } catch (error) {
       errorTracker.trackRequestError(
         error as Error,
-        req,
+        _req,
         'high',
         'database'
       );
-      const errorResponse: HealthCheckResponse = {
-        status: 'unhealthy',
-        database: 'error',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        version: '1.0.0'
-      };
+      
+      // Return error response while maintaining type consistency
       return ResponseHelper.error(res, {
         statusCode: 500,
         message: error instanceof Error ? error.message : 'System health check failed'
       });
     }
   });
+
+  // Schema validation health check endpoint
+  // Provides detailed validation status for database schema
+  app.get('/health/schema', async (_req: express.Request, res: express.Response) => {
+    try {
+      const report = await schemaValidationService.generateValidationReport();
+
+      const schemaHealth = {
+        status: report.overallStatus === 'valid' ? 'healthy' : report.overallStatus === 'warning' ? 'warning' : 'unhealthy',
+        overallStatus: report.overallStatus,
+        validatedTables: report.validatedTables,
+        invalidTables: report.invalidTables,
+        totalIssues: report.totalIssues,
+        criticalIssues: report.criticalIssues,
+        timestamp: report.timestamp.toISOString(),
+        recommendations: report.recommendations
+      };
+
+      // Determine HTTP status based on issue severity
+      const statusCode = report.criticalIssues > 0 ? 500 : 200;
+
+      return ResponseHelper.success(res, schemaHealth, statusCode);
+    } catch (error) {
+      errorTracker.trackRequestError(
+        error as Error,
+        _req,
+        'high',
+        'database'
+      );
+      return ResponseHelper.error(res, {
+        statusCode: 500,
+        message: error instanceof Error ? error.message : 'Schema validation health check failed'
+      });
+    }
+  });
+
+  // Validation metrics endpoint
+  // Returns validation performance metrics with optional CSV export
+  app.get('/metrics/validation', async (req: express.Request, res: express.Response) => {
+    try {
+      const hoursBack = parseInt(req.query.hours as string) || 1;
+      const format = req.query.format as 'json' | 'csv' || 'json';
+
+      // Support CSV export for data analysis tools
+      if (format === 'csv') {
+        const csvData = validationMetricsCollector.exportMetrics('csv', hoursBack);
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="validation-metrics.csv"');
+        return res.send(csvData);
+      }
+
+      const metrics = validationMetricsCollector.getMetricsSummary(hoursBack);
+      return ResponseHelper.success(res, {
+        metrics,
+        period: `${hoursBack} hour(s)`,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'medium',
+        'validation'
+      );
+      return ResponseHelper.error(res, {
+        statusCode: 500,
+        message: 'Failed to retrieve validation metrics'
+      });
+    }
+  });
+
+  // Validation health status endpoint
+  // Provides real-time health assessment of validation system
+  app.get('/health/validation', async (_req: express.Request, res: express.Response) => {
+    try {
+      const healthStatus = validationMetricsCollector.getHealthStatus();
+
+      // Map health status to appropriate HTTP status code
+      const statusCode = healthStatus.overall === 'critical' ? 500 : 200;
+
+      return ResponseHelper.success(res, {
+        health: healthStatus,
+        timestamp: new Date().toISOString()
+      }, statusCode);
+    } catch (error) {
+      errorTracker.trackRequestError(
+        error as Error,
+        _req,
+        'high',
+        'validation'
+      );
+      return ResponseHelper.error(res, {
+        statusCode: 500,
+        message: 'Failed to retrieve validation health status'
+      });
+    }
+  });
 }
 
-// Set up the routes on the router
+// Initialize routes on the router instance
 setupSystemRoutes(router);
 
-// Export both the router and setup function for flexibility
+// Export both router and setup function for flexible integration
 export { router };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

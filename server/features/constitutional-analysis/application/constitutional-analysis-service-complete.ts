@@ -7,7 +7,7 @@ import {
   analysis_audit_trail
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, like, or } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS

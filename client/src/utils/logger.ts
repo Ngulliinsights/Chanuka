@@ -703,7 +703,7 @@ export class NetworkError extends BaseError {
 export class ExternalServiceError extends BaseError {
     constructor(message: string = 'External service error', code: string = 'EXTERNAL_SERVICE_ERROR', status?: number) {
         super(message, code, {
-            domain: ErrorDomain.EXTERNAL,
+            domain: ErrorDomain.EXTERNAL_SERVICE,
             severity: ErrorSeverity.MEDIUM,
         }, { status });
         this.name = 'ExternalServiceError';

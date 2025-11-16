@@ -494,6 +494,9 @@ describe('Universal Access Schema Tests', () => {
           technology_name: 'NVDA',
           technology_type: 'screen_reader',
           platform: 'windows',
+          browser_compatibility: {},
+          feature_support: {},
+          recommendation: 'recommended',
           compatibility_score: 9.1,
           is_active: true
         },
@@ -501,6 +504,9 @@ describe('Universal Access Schema Tests', () => {
           technology_name: 'VoiceOver',
           technology_type: 'screen_reader',
           platform: 'macos',
+          browser_compatibility: {},
+          feature_support: {},
+          recommendation: 'recommended',
           compatibility_score: 8.8,
           is_active: true
         },
@@ -508,6 +514,9 @@ describe('Universal Access Schema Tests', () => {
           technology_name: 'Dragon NaturallySpeaking',
           technology_type: 'voice_recognition',
           platform: 'windows',
+          browser_compatibility: {},
+          feature_support: {},
+          recommendation: 'recommended',
           compatibility_score: 7.5,
           is_active: true
         },
@@ -515,6 +524,9 @@ describe('Universal Access Schema Tests', () => {
           technology_name: 'ZoomText',
           technology_type: 'magnification',
           platform: 'windows',
+          browser_compatibility: {},
+          feature_support: {},
+          recommendation: 'recommended',
           compatibility_score: 8.2,
           is_active: true
         }
@@ -605,13 +617,14 @@ describe('Universal Access Schema Tests', () => {
         .values(auditData)
         .returning();
 
-      expect(audit.audit_type).toBe('comprehensive_accessibility_review');
-      expect(audit.scope).toBe('full_platform');
-      expect(audit.findings.total_issues).toBe(45);
-      expect(audit.findings.critical_issues).toBe(3);
-      expect(audit.overall_compliance_score).toBe(72);
-      expect(audit.compliance_level).toBe('partial');
-      expect(audit.status).toBe('remediation_in_progress');
+      expect(audit).toBeDefined();
+      expect(audit!.audit_type).toBe('comprehensive_accessibility_review');
+      expect(audit!.scope).toBe('full_platform');
+      expect((audit!.findings as any)?.total_issues).toBe(45);
+      expect((audit!.findings as any)?.critical_issues).toBe(3);
+      expect(audit!.overall_compliance_score).toBe(72);
+      expect(audit!.compliance_level).toBe('partial');
+      expect(audit!.status).toBe('remediation_in_progress');
     });
 
     it('should track accessibility feedback from users', async () => {
@@ -619,7 +632,7 @@ describe('Universal Access Schema Tests', () => {
       const [user] = await testDb.insert(users).values(testUser).returning();
 
       const feedbackData = {
-        user_id: user.id,
+        user_id: user!.id,
         feedback_type: 'barrier_report',
         page_url: '/bills/bill-123',
         component: 'bill_text_section',
@@ -628,6 +641,8 @@ describe('Universal Access Schema Tests', () => {
         description: 'The bill text is not properly structured with headings, making it difficult to navigate with a screen reader',
         expected_behavior: 'Bill should have proper heading structure (H1, H2, H3) for easy navigation',
         current_behavior: 'All text appears as paragraphs without proper heading hierarchy',
+        steps_to_reproduce: 'Navigate to bill page, use screen reader to read content',
+        browser_info: 'Firefox 115.0 on Windows 11',
         assistive_technology_used: 'NVDA',
         browser: 'firefox',
         operating_system: 'windows',
@@ -647,13 +662,15 @@ describe('Universal Access Schema Tests', () => {
         .values(feedbackData)
         .returning();
 
-      expect(feedback.user_id).toBe(user.id);
-      expect(feedback.feedback_type).toBe('barrier_report');
-      expect(feedback.issue_category).toBe('screen_reader_compatibility');
-      expect(feedback.severity).toBe('high');
-      expect(feedback.assistive_technology_used).toBe('NVDA');
-      expect(feedback.status).toBe('new');
-      expect(feedback.priority).toBe('high');
+      expect(feedback).toBeDefined();
+      expect(user).toBeDefined();
+      expect(feedback!.user_id).toBe(user!.id);
+      expect(feedback!.feedback_type).toBe('barrier_report');
+      expect(feedback!.issue_category).toBe('screen_reader_compatibility');
+      expect(feedback!.severity).toBe('high');
+      expect(feedback!.assistive_technology_used).toBe('NVDA');
+      expect(feedback!.status).toBe('new');
+      expect(feedback!.priority).toBe('high');
     });
   });
 
@@ -732,6 +749,11 @@ describe('Universal Access Schema Tests', () => {
           'Increase sign language content to 25%',
           'Improve cognitive accessibility features',
           'Launch mobile accessibility improvements'
+        ],
+        improvement_recommendations: [
+          'Focus on cognitive accessibility',
+          'Expand sign language content',
+          'Improve mobile experience'
         ]
       };
 
@@ -740,14 +762,15 @@ describe('Universal Access Schema Tests', () => {
         .values(metricsData)
         .returning();
 
-      expect(metrics.measurement_date).toEqual(new Date('2024-03-15'));
-      expect(metrics.user_diversity_metrics.users_with_disabilities).toBe(1250);
-      expect(metrics.user_diversity_metrics.disability_types.visual_impairment).toBe(350);
-      expect(metrics.accessibility_usage_metrics.user_satisfaction_scores.overall).toBe(8.2);
-      expect(metrics.content_accessibility_metrics.percentage_of_bills).toBe(72);
-      expect(metrics.technical_compliance_metrics.wcag_compliance.level_aa).toBe(85);
-      expect(metrics.inclusive_design_score).toBe(7.8);
-      expect(metrics.benchmark_comparison.our_ranking).toBe('top_20_percent');
+      expect(metrics).toBeDefined();
+      expect(metrics!.measurement_date).toEqual(new Date('2024-03-15'));
+      expect((metrics!.user_diversity_metrics as any)?.users_with_disabilities).toBe(1250);
+      expect((metrics!.user_diversity_metrics as any)?.disability_types?.visual_impairment).toBe(350);
+      expect((metrics!.accessibility_usage_metrics as any)?.user_satisfaction_scores?.overall).toBe(8.2);
+      expect((metrics!.content_accessibility_metrics as any)?.percentage_of_bills).toBe(72);
+      expect((metrics!.technical_compliance_metrics as any)?.wcag_compliance?.level_aa).toBe(85);
+      expect(metrics!.inclusive_design_score).toBe(7.8);
+      expect((metrics!.benchmark_comparison as any)?.our_ranking).toBe('top_20_percent');
     });
   });
 

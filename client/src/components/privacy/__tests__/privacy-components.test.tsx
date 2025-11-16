@@ -11,7 +11,7 @@ import { DataUsageReportDashboard } from '../DataUsageReportDashboard';
 import { GDPRComplianceManager } from '../GDPRComplianceManager';
 
 // Mock the auth hook
-vi.mock('../../../hooks/use-auth', () => ({
+vi.mock('../../../hooks/useAuth', () => ({
   useAuth: () => ({
     user: {
       id: 'test-user',

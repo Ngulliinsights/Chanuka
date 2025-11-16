@@ -7,7 +7,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useAuthStore } from '../../store/slices/authSlice';
-import { authBackendService } from '../../services/authBackendService';
+import { authService } from '../../services/authService';
 import { logger } from '../../utils/logger';
 
 interface SessionManagerProps {
@@ -30,7 +30,7 @@ export function SessionManager({ children }: SessionManagerProps) {
       await refreshTokens();
       
       // Get updated user info after token refresh
-      const updatedUser = await authBackendService.getCurrentUser();
+      const updatedUser = await authService.getCurrentUser();
       setUser(updatedUser);
       
       logger.info('Session refreshed successfully');
@@ -72,13 +72,13 @@ export function SessionManager({ children }: SessionManagerProps) {
       if (!isAuthenticated) return;
 
       try {
-        const isValid = await authBackendService.validateSession();
+        const isValid = await authService.validateSession();
         if (!isValid) {
           logger.warn('Session invalid on focus, logging out');
           await logout();
         } else {
           // Update user info in case it changed
-          const updatedUser = await authBackendService.getCurrentUser();
+          const updatedUser = await authService.getCurrentUser();
           setUser(updatedUser);
         }
       } catch (error) {
@@ -120,7 +120,7 @@ export function SessionManager({ children }: SessionManagerProps) {
       // If user has been active in the last 30 minutes, extend session
       if (timeSinceActivity < 30 * 60 * 1000) {
         try {
-          await authBackendService.extendSession();
+          await authService.extendSession();
           logger.debug('Session extended due to user activity');
         } catch (error) {
           logger.warn('Failed to extend session', { error });
@@ -167,7 +167,7 @@ export function SessionManager({ children }: SessionManagerProps) {
     const healthCheckInterval = setInterval(async () => {
       try {
         // Simple health check - just verify we can make an authenticated request
-        await authBackendService.getCurrentUser();
+        await authService.getCurrentUser();
         logger.debug('Session health check passed');
       } catch (error) {
         logger.warn('Session health check failed', { error });

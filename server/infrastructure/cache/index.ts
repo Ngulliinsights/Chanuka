@@ -2,10 +2,10 @@
 // Uses shared/core caching system for consistency and reduced duplication
 
 // Re-export from shared caching system
-export * from '@shared/core/caching';
+export * from '../../../shared/core/src/caching';
 
 // Legacy compatibility - create default cache service
-import { createCacheService } from '@shared/core/caching';
+import { createCacheService } from '../../../shared/core/src/cache';
 
 // Create default cache instance for backward compatibility with memory pressure monitoring
 const defaultCacheConfig = {
@@ -20,6 +20,8 @@ const defaultCacheConfig = {
 
 export const cacheService = createCacheService(defaultCacheConfig);
 export const CacheService = cacheService; // For backward compatibility
+
+// Remove duplicate CacheService class - use shared/core instead
 
 // Cache warming service using shared cache
 export class CacheWarmingService {
@@ -105,7 +107,7 @@ export class AdvancedCachingService {
   /**
    * Adjust cache TTL for memory pressure
    */
-  private async adjustCacheTTL(multiplier: number): Promise<void> {
+  private async adjustCacheTTL(_multiplier: number): Promise<void> {
     // This would require extending the cache interface to support TTL adjustments
     // For now, we'll clear the cache to force fresh data with new TTL
     await this.clear();

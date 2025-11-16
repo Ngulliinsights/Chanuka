@@ -51,29 +51,53 @@ export default function sponsorhipOverview({ bill_id  }: OverviewProps) { const 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    let isMounted = true;
+
     const fetchAnalysisData = async () => {
       try {
+        if (!isMounted) return;
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/bills/${bill_id }/sponsorhip-analysis`);
         
+        const response = await fetch(`/api/bills/${bill_id}/sponsorship-analysis`, {
+          signal: abortController.signal,
+        });
+
         if (!response.ok) {
           throw new Error(`Failed to fetch analysis: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        setAnalysis(data);
+        
+        // Only update state if component is still mounted
+        if (isMounted && !abortController.signal.aborted) {
+          setAnalysis(data);
+        }
       } catch (err) {
-        logger.error('Error fetching sponsorhip analysis:', { component: 'Chanuka' }, err);
-        setError(err instanceof Error ? err.message : 'Failed to load analysis');
+        if (err instanceof Error && err.name === 'AbortError') {
+          // Request was cancelled, ignore
+          return;
+        }
+        if (isMounted) {
+          logger.error('Error fetching sponsorship analysis:', { component: 'Chanuka' }, err);
+          setError(err instanceof Error ? err.message : 'Failed to load analysis');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     if (bill_id) {
       fetchAnalysisData();
     }
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, [bill_id]);
 
   const getConflictLevelColor = (level: string) => {

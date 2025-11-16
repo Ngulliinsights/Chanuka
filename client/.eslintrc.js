@@ -40,5 +40,41 @@ module.exports = {
     'jsx-a11y/no-redundant-roles': 'error',
     'jsx-a11y/scope': 'error',
     'jsx-a11y/label-has-associated-control': 'error',
+    
+    // Design System Compliance Rules
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: 'ImportDeclaration[source.value=/\\.module\\.css$/]',
+        message: 'CSS modules are not allowed. Use design system classes instead. See: client/src/shared/design-system/README.md'
+      },
+      {
+        selector: 'ImportDeclaration[source.value=/\\.css$/]:not([source.value*="design-system"]):not([source.value*="index.css"])',
+        message: 'Direct CSS imports in components are not allowed. Use design system classes instead.'
+      }
+    ],
+    // Allow inline styles for legitimate use cases, warn about static styling
+    'react/forbid-dom-props': [
+      'warn',
+      {
+        forbid: [
+          {
+            propName: 'style',
+            message: 'Consider using design system classes for static styling. Inline styles are OK for dynamic values, calculations, and performance-critical animations.',
+            allowedFor: [
+              // Allow for components that commonly need dynamic styling
+              'div[className*="progress"]',
+              'div[className*="chart"]', 
+              'div[className*="visualization"]',
+              'svg',
+              'circle',
+              'rect',
+              'line',
+              'path'
+            ]
+          }
+        ]
+      }
+    ],
   },
 };

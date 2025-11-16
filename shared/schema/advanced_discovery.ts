@@ -3,7 +3,7 @@
 // ============================================================================
 // Search intelligence, discovery patterns, and bill relationship mapping
 
-import { pgTable, uuid, varchar, integer, decimal, boolean, timestamp, jsonb, text, index, check, unique } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, integer, decimal, boolean, timestamp, jsonb, text, index, unique } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users, bills } from './foundation';
 

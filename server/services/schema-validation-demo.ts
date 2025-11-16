@@ -1,30 +1,10 @@
 import { logger } from '../../shared/core/index.js';
+import { schemaValidationService } from '../core/validation/schema-validation-service.js';
 
-// TODO: Implement proper schema validation service
-const schemaValidationService = {
-  validateComplianceChecksTable: async () => ({
-    isValid: true,
-    missingColumns: [],
-    incorrectTypes: [],
-    recommendations: []
-  }),
-  generateValidationReport: async () => ({
-    timestamp: new Date(),
-    overallStatus: 'valid',
-    validatedTables: 0,
-    invalidTables: 0,
-    totalIssues: 0,
-    criticalIssues: 0,
-    results: [],
-    recommendations: []
-  }),
-  repairSchema: async () => ({
-    success: true,
-    repairedTables: [],
-    errors: [],
-    warnings: []
-  })
-};
+/**
+ * Schema validation service integration
+ * This file now uses the real SchemaValidationService instead of mock implementations
+ */
 
 /**
  * Demonstration script showing how to use the SchemaValidationService
@@ -32,12 +12,12 @@ const schemaValidationService = {
  */
 export async function demonstrateSchemaValidation() {
   logger.info('🔍 Starting database schema validation...', { component: 'Chanuka' });
-  
+
   try {
     // 1. Validate the critical compliance_checks table
     logger.info('\n📋 Validating compliance_checks table...', { component: 'Chanuka' });
     const complianceResult = await schemaValidationService.validateComplianceChecksTable();
-    
+
     if (!complianceResult.isValid) {
       logger.info('❌ Compliance checks table has issues:', { component: 'Chanuka' });
       if (complianceResult.missingColumns.length > 0) {
@@ -51,18 +31,18 @@ export async function demonstrateSchemaValidation() {
     } else {
       logger.info('✅ Compliance checks table schema is valid', { component: 'Chanuka' });
     }
-    
+
     // 2. Generate comprehensive validation report
     logger.info('\n📊 Generating comprehensive validation report...', { component: 'Chanuka' });
     const report = await schemaValidationService.generateValidationReport();
-    
+
     console.log(`\n📈 Schema Validation Report (${report.timestamp.toISOString()})`);
     console.log(`   Overall Status: ${report.overallStatus.toUpperCase()}`);
     console.log(`   Tables Validated: ${report.validatedTables}`);
     console.log(`   Invalid Tables: ${report.invalidTables}`);
     console.log(`   Total Issues: ${report.totalIssues}`);
     console.log(`   Critical Issues: ${report.criticalIssues}`);
-    
+
     if (report.criticalIssues > 0) {
       logger.info('\n🚨 CRITICAL ISSUES DETECTED:', { component: 'Chanuka' });
       report.results
@@ -72,18 +52,18 @@ export async function demonstrateSchemaValidation() {
           console.log(`   Missing: ${r.missingColumns.join(', ')}`);
         });
     }
-    
+
     // 3. Show recommendations
     if (report.recommendations.length > 0) {
       logger.info('\n💡 Recommendations:', { component: 'Chanuka' });
       report.recommendations.forEach(rec => console.log(`   - ${rec}`));
     }
-    
+
     // 4. Attempt automatic repair if issues found
     if (report.totalIssues > 0) {
       logger.info('\n🔧 Attempting automatic schema repair...', { component: 'Chanuka' });
       const repairResult = await schemaValidationService.repairSchema();
-      
+
       if (repairResult.success) {
         logger.info('✅ Schema repair completed successfully', { component: 'Chanuka' });
         if (repairResult.repairedTables.length > 0) {
@@ -93,16 +73,16 @@ export async function demonstrateSchemaValidation() {
         logger.info('❌ Schema repair failed', { component: 'Chanuka' });
         repairResult.errors.forEach(error => console.log(`   Error: ${error}`));
       }
-      
+
       if (repairResult.warnings.length > 0) {
         logger.info('⚠️  Warnings:', { component: 'Chanuka' });
         repairResult.warnings.forEach(warning => console.log(`   - ${warning}`));
       }
     }
-    
+
     logger.info('\n✅ Schema validation demonstration completed', { component: 'Chanuka' });
     return report;
-    
+
   } catch (error) {
     logger.error('❌ Schema validation failed:', { component: 'Chanuka' }, error);
     throw error;
@@ -115,15 +95,15 @@ export async function demonstrateSchemaValidation() {
 export async function quickSchemaHealthCheck(): Promise<boolean> {
   try {
     const complianceResult = await schemaValidationService.validateComplianceChecksTable();
-    
+
     // Check for critical issues that would prevent the security monitoring service from working
     const hasCriticalIssues = complianceResult.missingColumns.includes('next_check') || !complianceResult.isValid;
-    
+
     if (hasCriticalIssues) {
       console.warn('⚠️  Critical database schema issues detected. Security monitoring may not function properly.');
       return false;
     }
-    
+
     return true;
   } catch (error) {
     logger.error('❌ Schema health check failed:', { component: 'Chanuka' }, error);
@@ -136,20 +116,20 @@ export async function quickSchemaHealthCheck(): Promise<boolean> {
  */
 export async function validateSchemaBeforeSecurityInit(): Promise<void> {
   logger.info('🔒 Validating database schema before security monitoring initialization...', { component: 'Chanuka' });
-  
+
   const isHealthy = await quickSchemaHealthCheck();
-  
+
   if (!isHealthy) {
     logger.info('🔧 Attempting to repair critical schema issues...', { component: 'Chanuka' });
     const repairResult = await schemaValidationService.repairSchema();
-    
+
     if (!repairResult.success) {
       throw new Error('Critical database schema issues detected and automatic repair failed. Manual intervention required.');
     }
-    
+
     logger.info('✅ Schema issues repaired successfully', { component: 'Chanuka' });
   }
-  
+
   logger.info('✅ Database schema validation passed - security monitoring can proceed', { component: 'Chanuka' });
 }
 

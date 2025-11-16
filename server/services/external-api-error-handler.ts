@@ -412,7 +412,7 @@ export class ExternalAPIErrorHandler extends EventEmitter {
    */
   private async provideDegradedService(
     source: string,
-    apiError: ExternalAPIError,
+    _apiError: ExternalAPIError,
     degradedFeatures: string[]
   ): Promise<{ success: boolean; data?: any; fallbackUsed: boolean; error?: ExternalAPIError }> {
     
@@ -613,7 +613,7 @@ interface CachedData {
   ttl: number;
 }
 
-export { ExternalAPIError, RetryConfig, CircuitBreakerConfig, FallbackConfig };
+export type { ExternalAPIError, RetryConfig, CircuitBreakerConfig, FallbackConfig };
 
 
 

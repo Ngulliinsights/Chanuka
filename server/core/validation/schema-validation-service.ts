@@ -1,6 +1,7 @@
-import { getDbInstance, readDatabase } from '../../infrastructure/database/index.ts';
+import { getDbInstance, readDatabase } from '../../infrastructure/database/index.js';
 import { sql } from 'drizzle-orm';
 import { logger   } from '../../../shared/core/src/index.js';
+import { validationMetricsCollector } from './validation-metrics.js';
 import {
   complianceChecks,
   securityAuditLogs,
@@ -59,17 +60,18 @@ export class SchemaValidationService {
   }
 
   /**
-   * Validate the compliance_checks table specifically for missing next_check column
-   */
-  async validateComplianceChecksTable(): Promise<ValidationResult> {
-    const tableName = 'compliance_checks';
-    const result: ValidationResult = {
-      tableName,
-      isValid: true,
-      missingColumns: [],
-      incorrectTypes: [],
-      recommendations: []
-    };
+    * Validate the compliance_checks table specifically for missing next_check column
+    */
+   async validateComplianceChecksTable(): Promise<ValidationResult> {
+     const endMetric = validationMetricsCollector.startValidation('SchemaValidationService', 'validateComplianceChecksTable');
+     const tableName = 'compliance_checks';
+     const result: ValidationResult = {
+       tableName,
+       isValid: true,
+       missingColumns: [],
+       incorrectTypes: [],
+       recommendations: []
+     };
 
     try {
       // Check if table exists
@@ -159,6 +161,8 @@ export class SchemaValidationService {
       result.isValid = false;
       result.recommendations.push(`Error validating table: ${error instanceof Error ? error.message : new Error(String(error)).message}`);
     }
+
+    endMetric(result.isValid, result.isValid ? undefined : 'schema_validation_failed', 'system');
 
     return result;
   }

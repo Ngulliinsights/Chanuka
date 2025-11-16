@@ -7,8 +7,11 @@ Maximum depth: 7 levels
 chanuka-ui-ux-specification.md
 client/
 ├── CLEANUP_SUMMARY.md
+├── IMMEDIATE_ACTIONS_SUMMARY.md
 ├── index.html
 ├── jest.a11y.config.js
+├── MIGRATION_COMPLETED.md
+├── migration-helper.js
 ├── package.json
 ├── playwright.config.ts
 ├── playwright.visual.config.ts
@@ -59,6 +62,16 @@ client/
 │   │   ├── auth/
 │   │   │   ├── authentication-backend-integration.test.tsx
 │   │   │   ├── authentication-integration.test.tsx
+│   │   │   ├── auth-integration.test.tsx
+│   │   │   ├── auth-repository.test.ts
+│   │   │   ├── auth-service.test.ts
+│   │   │   ├── backward-compatibility.test.tsx
+│   │   │   ├── dependency-injection.test.ts
+│   │   │   ├── error-handling-edge-cases.test.ts
+│   │   │   ├── hook-compatibility.test.ts
+│   │   │   ├── security-features.test.ts
+│   │   │   ├── service-integration.test.ts
+│   │   │   ├── type-safety.test.ts
 │   │   ├── browser-compatibility.test.ts
 │   │   ├── community-data-integration.test.tsx
 │   │   ├── e2e/
@@ -78,6 +91,8 @@ client/
 │   │   │   ├── end-to-end-flows.test.tsx
 │   │   │   ├── frontend-serving-core.test.tsx
 │   │   │   ├── react-initialization.test.tsx
+│   │   ├── mocks/
+│   │   │   ├── services.ts
 │   │   ├── NavigationCore.test.tsx
 │   │   ├── navigation-coverage-report.test.ts
 │   │   ├── NavigationFlow.integration.test.tsx
@@ -170,7 +185,6 @@ client/
 │   │   │   │   ├── validation.test.ts
 │   │   │   ├── auth-forms.tsx
 │   │   │   ├── AuthGuard.tsx
-│   │   │   ├── AuthProvider.tsx
 │   │   │   ├── AuthRoutes.tsx
 │   │   │   ├── config/
 │   │   │   │   ├── index.ts
@@ -653,6 +667,7 @@ client/
 │   │   │   ├── VerificationWorkflow.tsx
 │   ├── config/
 │   │   ├── api.ts
+│   │   ├── feature-flags.ts
 │   │   ├── onboarding.ts
 │   ├── contexts/
 │   │   ├── __tests__/
@@ -662,6 +677,7 @@ client/
 │   │   ├── ThemeContext.tsx
 │   ├── core/
 │   │   ├── api/
+│   │   ├── api.backup/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── client.integration.test.ts
 │   │   │   │   ├── websocket-backward-compatibility.test.ts
@@ -679,6 +695,32 @@ client/
 │   │   │   ├── registry.ts
 │   │   │   ├── types.ts
 │   │   │   ├── websocket.ts
+│   │   │   ├── __tests__/
+│   │   │   │   ├── client.integration.test.ts
+│   │   │   │   ├── websocket-backward-compatibility.test.ts
+│   │   │   │   ├── websocket-error-handling.test.ts
+│   │   │   │   ├── websocket-integration.test.ts
+│   │   │   │   ├── websocket-lifecycle.test.ts
+│   │   │   │   ├── websocket-manager.test.ts
+│   │   │   │   ├── websocket-message-routing.test.ts
+│   │   │   │   ├── websocket-performance.test.ts
+│   │   │   ├── auth.ts
+│   │   │   ├── bills.ts
+│   │   │   ├── cache.ts
+│   │   │   ├── client.ts
+│   │   │   ├── community.ts
+│   │   │   ├── config.ts
+│   │   │   ├── errors.ts
+│   │   │   ├── index.ts
+│   │   │   ├── interceptors.ts
+│   │   │   ├── notifications.ts
+│   │   │   ├── performance.ts
+│   │   │   ├── privacy.ts
+│   │   │   ├── registry.ts
+│   │   │   ├── system.ts
+│   │   │   ├── types.ts
+│   │   │   ├── user.ts
+│   │   │   ├── websocket.ts
 │   │   ├── dashboard/
 │   │   │   ├── context.tsx
 │   │   │   ├── hooks.ts
@@ -691,6 +733,7 @@ client/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── ErrorBoundary.test.tsx
 │   │   │   │   ├── handler.test.ts
+│   │   │   ├── constants.ts
 │   │   │   ├── ErrorBoundary.tsx
 │   │   │   ├── handler.ts
 │   │   │   ├── index.ts
@@ -841,8 +884,7 @@ client/
 │   │   ├── index.ts
 │   │   ├── useApiConnection.ts
 │   │   ├── use-api-with-fallback.ts
-│   │   ├── useAuth.ts
-│   │   ├── use-auth.tsx
+│   │   ├── useAuth.tsx
 │   │   ├── use-bill-analysis.tsx
 │   │   ├── use-bills.tsx
 │   │   ├── useBillsAPI.ts
@@ -873,13 +915,14 @@ client/
 │   │   ├── use-safe-mutation.ts
 │   │   ├── use-safe-query.ts
 │   │   ├── useSecurity.ts
+│   │   ├── useService.ts
 │   │   ├── useServiceStatus.ts
 │   │   ├── use-system.tsx
 │   │   ├── useTimeoutAwareLoading.ts
 │   │   ├── use-toast.ts
 │   │   ├── use-unified-navigation.ts
 │   │   ├── useUserAPI.ts
-│   │   ├── useWebSocket.ts
+│   │   ├── use-websocket.ts
 │   │   ├── use-web-vitals.ts
 │   ├── index.css
 │   ├── lib/
@@ -938,19 +981,6 @@ client/
 │   │   ├── UserDashboardPage.tsx
 │   │   ├── user-profile.tsx
 │   │   ├── UserProfilePage.tsx
-│   ├── repositories/
-│   │   ├── __tests__/
-│   │   │   ├── analysis.test.ts
-│   │   │   ├── auth.test.ts
-│   │   │   ├── bills.test.ts
-│   │   │   ├── community.test.ts
-│   │   │   ├── error-analytics.test.ts
-│   │   ├── analysis.ts
-│   │   ├── auth.ts
-│   │   ├── bills.ts
-│   │   ├── community.ts
-│   │   ├── error-analytics.ts
-│   │   ├── index.ts
 │   ├── scripts/
 │   │   ├── run-emergency-triage.ts
 │   ├── security/
@@ -983,12 +1013,12 @@ client/
 │   │   │   ├── security-types.ts
 │   │   ├── vulnerability-scanner.ts
 │   ├── services/
+│   ├── services.backup/
 │   │   ├── __tests__/
 │   │   │   ├── analysis.test.ts
 │   │   │   ├── api-error-handling.integration.test.ts
 │   │   │   ├── api-error-handling.test.ts
 │   │   │   ├── apiInterceptors.test.ts
-│   │   │   ├── apiService.test.ts
 │   │   │   ├── billsApiIntegration.test.ts
 │   │   │   ├── navigation.test.ts
 │   │   │   ├── PageRelationshipService.test.ts
@@ -996,20 +1026,20 @@ client/
 │   │   │   ├── websocket-client.test.ts
 │   │   ├── analysis.ts
 │   │   ├── apiInterceptors.ts
-│   │   ├── apiService.ts
-│   │   ├── authBackendService.ts
-│   │   ├── authBackendService.ts
+│   │   ├── AuthService.ts
+│   │   ├── auth-service-init.ts
 │   │   ├── billsApiService.ts
 │   │   ├── billsDataCache.ts
 │   │   ├── billsPaginationService.ts
 │   │   ├── billsWebSocketService.ts
+│   │   ├── billTrackingService.ts
 │   │   ├── community-backend-service.ts
 │   │   ├── community-websocket-extension.ts
 │   │   ├── community-websocket-middleware.ts
 │   │   ├── dataRetentionService.ts
 │   │   ├── discussion-service.ts
 │   │   ├── errorAnalyticsBridge.ts
-│   │   ├── error-monitoring.ts
+│   │   ├── error-monitoring.tsx
 │   │   ├── index.ts
 │   │   ├── mockDataService.ts
 │   │   ├── mockUserData.ts
@@ -1019,11 +1049,10 @@ client/
 │   │   ├── PageRelationshipService.ts
 │   │   ├── performance-monitoring.ts
 │   │   ├── privacyAnalyticsService.ts
-│   │   ├── realtime/
-│   │   ├── user-backend-service.ts
+│   │   ├── stateManagementService.ts
 │   │   ├── UserJourneyTracker.ts
-│   │   ├── userProfileService.ts
-│   │   ├── websocket-client.ts
+│   │   ├── userService.ts
+│   │   ├── webSocketService.ts
 │   ├── setupTests.ts
 │   ├── shared/
 │   │   ├── design-system/
@@ -1103,7 +1132,12 @@ client/
 │   │   │   ├── index.ts
 │   ├── store/
 │   │   ├── __tests__/
+│   │   │   ├── auth-load.performance.test.ts
+│   │   │   ├── auth-session-edge-cases.test.ts
+│   │   │   ├── backward-compatibility.test.ts
+│   │   │   ├── redux-migration.test.ts
 │   │   │   ├── slices.integration.test.ts
+│   │   ├── hooks.ts
 │   │   ├── index.ts
 │   │   ├── middleware/
 │   │   │   ├── __tests__/
@@ -1111,15 +1145,22 @@ client/
 │   │   │   ├── apiMiddleware.ts
 │   │   │   ├── authMiddleware.ts
 │   │   │   ├── errorHandlingMiddleware.ts
+│   │   │   ├── navigationPersistenceMiddleware.ts
 │   │   │   ├── webSocketMiddleware.ts
 │   │   ├── slices/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── authSlice.test.ts
+│   │   │   │   ├── sessionSlice.test.ts
 │   │   │   ├── authSlice.ts
 │   │   │   ├── billsSlice.ts
+│   │   │   ├── discussionSlice.redux.ts
 │   │   │   ├── discussionSlice.ts
 │   │   │   ├── errorAnalyticsSlice.ts
 │   │   │   ├── errorHandlingSlice.ts
 │   │   │   ├── loadingSlice.ts
+│   │   │   ├── navigationSlice.ts
 │   │   │   ├── realTimeSlice.ts
+│   │   │   ├── sessionSlice.ts
 │   │   │   ├── uiSlice.ts
 │   │   │   ├── userDashboardSlice.ts
 │   │   ├── utils/
@@ -1150,7 +1191,7 @@ client/
 │   ├── TestComponent.tsx
 │   ├── test-utils/
 │   │   ├── comprehensive-test-config.ts
-│   │   ├── comprehensive-test-setup.ts
+│   │   ├── comprehensive-test-setup.tsx
 │   │   ├── index.tsx
 │   │   ├── navigation-test-utils.tsx
 │   │   ├── setup.ts
@@ -1158,6 +1199,7 @@ client/
 │   │   ├── setup-integration.ts
 │   │   ├── setup-performance.ts
 │   ├── types/
+│   │   ├── api.ts
 │   │   ├── auth.ts
 │   │   ├── community.ts
 │   │   ├── conflict-of-interest.ts
@@ -1165,6 +1207,7 @@ client/
 │   │   ├── discussion.ts
 │   │   ├── engagement-analytics.ts
 │   │   ├── expert.ts
+│   │   ├── global.d.ts
 │   │   ├── navigation.ts
 │   │   ├── onboarding.ts
 │   │   ├── realtime.ts
@@ -1175,8 +1218,8 @@ client/
 │   │   ├── __tests__/
 │   │   │   ├── advanced-error-system.test.ts
 │   │   │   ├── browser-compatibility.test.ts
-│   │   │   ├── logger.test.ts
-│   │   │   ├── logger.test.ts
+│   │   │   ├── browser-logger.test.ts
+│   │   │   ├── client-core.test.ts
 │   │   │   ├── emergency-triage.test.ts
 │   │   │   ├── env-config.test.ts
 │   │   │   ├── i18n.test.ts
@@ -1196,10 +1239,8 @@ client/
 │   │   ├── browser-compatibility.ts
 │   │   ├── browser-compatibility-manager.ts
 │   │   ├── browser-compatibility-tests.ts
-│   │   ├── logger.ts
 │   │   ├── bundle-analyzer.ts
 │   │   ├── cacheInvalidation.ts
-│   │   ├── logger.ts
 │   │   ├── cn.ts
 │   │   ├── comprehensiveLoading.ts
 │   │   ├── connectionAwareLoading.ts
@@ -1220,6 +1261,7 @@ client/
 │   │   ├── index.ts
 │   │   ├── input-validation.ts
 │   │   ├── logger.ts
+│   │   ├── logger-simple.ts
 │   │   ├── mobile-error-handler.ts
 │   │   ├── mobile-touch-handler.ts
 │   │   ├── monitoring-init.ts
@@ -1260,22 +1302,28 @@ client/
 │   │   ├── service-recovery.ts
 │   │   ├── serviceWorker.ts
 │   │   ├── session-management.ts
+│   │   ├── session-manager.ts
 │   │   ├── sessionManager.ts
 │   │   ├── simple-lazy-pages.tsx
+│   │   ├── test-imports.ts
 │   │   ├── tokenManager.ts
 │   │   ├── unified-error-handler.ts
+│   │   ├── validateArchitecture.ts
 │   │   ├── web-vitals-monitor.ts
 │   ├── vite-env.d.ts
 ├── tailwind.config.minimal.ts
 ├── tailwind.config.ts
 ├── tsconfig.json
+├── tsconfig.tsbuildinfo
 ├── validate-fixes.cjs
 ├── vite.config.ts
 ├── vite.production.config.ts
 ├── vitest.config.ts
 ├── vitest.integration.config.ts
 ├── vitest.performance.config.ts
+client-migration-analysis-report.md
 components.json
+CONSOLE_ERRORS_FIXED.md
 cspell.config.yaml
 deployment/
 ├── cdn-config.js
@@ -1295,6 +1343,7 @@ docs/
 │   ├── codebase-analysis.md
 │   ├── constitutional_analysis_framework.md
 │   ├── legislative_framework.md
+├── API.md
 ├── architecture/
 ├── architecture.md
 │   ├── ai-code-review/
@@ -1326,6 +1375,7 @@ docs/
 │   ├── Kenyan_constitution_2010.md
 │   ├── merged_bill_sponsorship.html
 │   ├── missing-strategic-features-analysis.md
+│   ├── Module 12 Discussion - ECON 310 (Annette)..docx
 │   ├── philosophical_connections_analysis.md
 │   ├── philosophical_threshold_poems.md
 │   ├── README.md
@@ -1346,11 +1396,15 @@ docs/
 ├── DIGITAL LAW 2018.pdf
 ├── DIGITAL LAW AMENDMENTS AMENDMENTS (2025).pdf
 ├── domain-integration-completion-summary.md
+├── environment-config-assessment.md
 ├── error-analytics-dashboard-architecture.md
 ├── error-analytics-dashboard-types.md
+├── examples/
+│   ├── validation-integration-examples.ts
 ├── migrations/
 │   ├── comprehensive-migration-strategy.md
 ├── missing-tables-analysis.md
+├── monitoring.md
 ├── monorepo.md
 ├── new-domains-integration-guide.md
 ├── project/
@@ -1360,10 +1414,12 @@ docs/
 ├── project-structure.md
 ├── README.md
 ├── schema-domain-relationships.md
+├── secure-environment-setup.md
 ├── setup.md
 ├── structure_tools_guide.md
 ├── ui-design-plan.md
 ├── unified-api-client-architecture.md
+├── validation-services.md
 drizzle/
 drizzle.config.ts
 ├── 0021_clean_comprehensive_schema.sql
@@ -1387,10 +1443,13 @@ drizzle.config.ts
 │   ├── 0002_snapshot.json
 │   ├── 0021_snapshot.json
 │   ├── 20251104110148_snapshot.json
+ERROR_CLASSES_IMPLEMENTATION_SUMMARY.md
+FIXES_SUMMARY.md
 generate_concept_note.py
 generate_invitation.py
 generate_overview.py
 generate-structure-to-file.sh
+INITIALIZATION_FIX_SUMMARY.md
 logs/
 ├── app.log
 ├── error.log
@@ -1399,6 +1458,7 @@ logs/
 ├── logger_files_clean.txt
 ├── performance.log
 ├── security.log
+MIGRATION_GUIDE.md
 nginx.conf
 nx.json
 package.json
@@ -1411,6 +1471,9 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 postcss.config.js
 README.md
+REDUX_MIGRATION_DOCUMENTATION.md
+REDUX_TYPE_FIXES_SUMMARY.md
+RENDERING_ISSUES_RESOLVED.md
 scripts/
 ├── accessibility/
 │   ├── accessibility-reporter.test.js
@@ -1515,7 +1578,7 @@ scripts/
 ├── performance-trend-analyzer.cjs
 ├── rollback-cleanup.ts
 ├── run-adapter-cleanup.js
-├── run-strategic-tests.js
+├── run-strategic-tests.cjs
 ├── seeds/
 │   ├── legislative-seed.ts
 │   ├── seed.ts
@@ -1646,6 +1709,7 @@ scripts/
 ├── verify-cleanup.ts
 ├── verify-project-structure.ts
 ├── web-vitals-checker.js
+SEPARATION_OF_CONCERNS_COMPLETE.md
 server/
 ├── __tests__/
 │   ├── integration/
@@ -1683,6 +1747,7 @@ server/
 │   │   ├── error-tracker.ts
 │   │   ├── index.ts
 │   ├── index.ts
+│   ├── services-init.ts
 │   ├── StorageTypes.d.ts
 │   ├── StorageTypes.ts
 │   ├── types/
@@ -1696,15 +1761,21 @@ server/
 │   │   ├── input-validation-service.ts
 │   │   ├── schema-validation-service.ts
 │   │   ├── security-schemas.ts
+│   │   ├── validation-metrics.ts
+│   │   ├── validation-services-init.ts
+│   │   ├── validation-utils.ts
 ├── db.ts
 ├── demo/
 │   ├── real-time-tracking-demo.ts
 ├── docs/
 │   ├── government-data-integration-implementation.md
+│   ├── INITIALIZATION_ARCHITECTURE.md
+│   ├── README-schema-validation.md
 │   ├── schema-import-guide.md
 │   ├── schema-migration-summary.md
 ├── examples/
 │   ├── cached-routes-example.ts
+├── example-server-integration.ts
 ├── features/
 │   ├── admin/
 │   │   ├── __tests__/
@@ -2137,6 +2208,7 @@ server/
 │   ├── search-suggestions.ts
 │   ├── security/
 │   │   ├── encryption-service.ts
+│   │   ├── enhanced-security-service.ts
 │   │   ├── index.ts
 │   │   ├── intrusion-detection-service.ts
 │   │   ├── privacy-service.ts
@@ -2403,6 +2475,7 @@ server/
 │   ├── validate-connection-migration.ts
 │   ├── verify-external-api-management.ts
 │   ├── websocket-performance-validation.ts
+├── server-startup.ts
 ├── services/
 │   ├── api-cost-monitoring.ts
 │   ├── external-api-error-handler.ts
@@ -2410,8 +2483,10 @@ server/
 │   ├── README-schema-validation.md
 │   ├── schema-validation-demo.ts
 │   ├── schema-validation-test.ts
+├── simple-server.ts
 ├── tests/
 │   ├── auth-system.test.ts
+│   ├── basic-api.test.ts
 │   ├── external-api-management-task-verification.test.ts
 │   ├── features/
 │   ├── financial-disclosure-api.test.ts
@@ -2594,6 +2669,9 @@ shared/
 │   │   │   │   ├── __tests__/
 │   │   │   │   │   ├── consolidation-integration.test.ts
 │   │   │   │   │   ├── orchestrator.test.ts
+│   │   │   │   │   ├── test-workspace/
+│   │   │   │   │   │   ├── docs/
+│   │   │   │   │   │   ├── scripts/
 │   │   │   │   ├── backup-system.ts
 │   │   │   │   ├── cli.ts
 │   │   │   │   ├── executor.ts
@@ -2800,8 +2878,8 @@ shared/
 │   │   │   │   ├── interceptors.ts
 │   │   │   ├── api-utils.ts
 │   │   │   ├── async-utils.ts
-│   │   │   ├── logger.test.ts
-│   │   │   ├── logger.ts
+│   │   │   ├── browser-logger.test.ts
+│   │   │   ├── browser-logger.ts
 │   │   │   ├── cache-utils.ts
 │   │   │   ├── concurrency-adapter.ts
 │   │   │   ├── concurrency-migration-router.ts
@@ -2937,12 +3015,15 @@ shared/
 ├── utils/
 │   ├── anonymity-helper.ts
 ├── vitest.config.ts
+start-dev.js
 startup-validation.js
 tailwind.config.js
 test-auth-compile.ts
 test-connection.html
 test-race-prevention.ts
 test-results/
+├── results.json
+├── results.xml
 tests/
 ├── api/
 │   ├── auth.spec.ts
@@ -2965,11 +3046,13 @@ tests/
 │   ├── components.spec.ts
 tsconfig.json
 tsconfig.server.json
+tsconfig.tsbuildinfo
 validation-report.js
+verify-fixes.js
 vitest.setup.ts
 vitest.workspace.config.ts
 ```
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-11-11 21:19:50
+Generated on: 2025-11-15 10:40:13

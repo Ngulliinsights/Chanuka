@@ -6,11 +6,12 @@
  */
 
 import { logger } from '../utils/logger';
-import { 
-  dataLoaders, 
-  initializeEssentialData, 
-  preloadData, 
-  clearCache, 
+import { DiscussionThread } from '../types/discussion';
+import {
+  dataLoaders,
+  initializeEssentialData,
+  preloadData,
+  clearCache,
   validateDataIntegrity,
   getCacheStats
 } from '../data/mock/loaders';
@@ -232,6 +233,14 @@ class MockDataService {
 
     await Promise.all(promises);
     return results;
+  }
+
+  /**
+   * Get discussion thread by bill ID
+   */
+  async getDiscussionThread(billId: number): Promise<DiscussionThread | null> {
+    const threads = await this.loadData<Record<number, DiscussionThread>>('discussionThreads');
+    return threads[billId] || null;
   }
 
   /**

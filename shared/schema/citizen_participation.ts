@@ -6,17 +6,13 @@
 
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-  index, uniqueIndex, date, unique
+  index, unique
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 
 import {
   kenyanCountyEnum,
-  chamberEnum,
-  billStatusEnum,
-  userRoleEnum,
-  verificationStatusEnum,
   moderationStatusEnum,
   commentVoteTypeEnum,
   billVoteTypeEnum,

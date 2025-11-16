@@ -7,12 +7,11 @@
  */
 
 import { billsApiService as coreBillsApi } from '../core/api/bills';
-import { UnifiedWebSocketManager } from '../core/api/websocket';
-import { store } from '../store';
-import { addBillUpdate, addNotification } from '../store/slices/realTimeSlice';
-import { setBills, updateBill, Bill, BillsStats } from '../store/slices/billsSlice';
+import { webSocketService } from './webSocketService';
+import { stateManagementService } from './stateManagementService';
+import { Bill, BillsStats } from '../store/slices/billsSlice';
 import { logger } from '../utils/logger';
-import { z } from 'zod';
+import { globalConfig } from '../core/api/config';
 
 // ============================================================================
 // Type Definitions and Validation Schemas
@@ -76,55 +75,7 @@ export interface BillComment {
   user_vote?: 'up' | 'down' | null;
 }
 
-// Validation schemas
-const BillSchema = z.object({
-  id: z.number(),
-  billNumber: z.string(),
-  title: z.string(),
-  summary: z.string(),
-  status: z.enum(['introduced', 'committee', 'passed', 'failed', 'signed', 'vetoed']),
-  urgencyLevel: z.enum(['low', 'medium', 'high', 'critical']),
-  introducedDate: z.string(),
-  lastUpdated: z.string(),
-  sponsors: z.array(z.object({
-    id: z.number(),
-    name: z.string(),
-    party: z.string(),
-    role: z.enum(['primary', 'cosponsor'])
-  })),
-  constitutionalFlags: z.array(z.object({
-    id: z.string(),
-    severity: z.enum(['critical', 'high', 'moderate', 'low']),
-    category: z.string(),
-    description: z.string()
-  })),
-  viewCount: z.number(),
-  saveCount: z.number(),
-  commentCount: z.number(),
-  shareCount: z.number(),
-  policyAreas: z.array(z.string()),
-  complexity: z.enum(['low', 'medium', 'high']),
-  readingTime: z.number()
-});
 
-const PaginatedBillsResponseSchema = z.object({
-  bills: z.array(BillSchema),
-  pagination: z.object({
-    page: z.number(),
-    limit: z.number(),
-    total: z.number(),
-    totalPages: z.number(),
-    hasNext: z.boolean(),
-    hasPrevious: z.boolean()
-  }),
-  stats: z.object({
-    totalBills: z.number(),
-    urgentCount: z.number(),
-    constitutionalFlags: z.number(),
-    trendingCount: z.number(),
-    lastUpdated: z.string()
-  })
-});
 
 // ============================================================================
 // Bills API Service Class
@@ -134,7 +85,7 @@ class BillsApiService {
   private isInitialized = false;
   private realTimeSubscriptions = new Set<number>();
   private searchCache = new Map<string, { data: any; timestamp: number }>();
-  private readonly SEARCH_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private readonly SEARCH_CACHE_TTL = globalConfig.get('api').cache.defaultTTL;
 
   constructor() {
     this.initializeRealTimeIntegration();
@@ -147,15 +98,11 @@ class BillsApiService {
     if (this.isInitialized) return;
 
     try {
-      // Set up WebSocket event listeners for bill updates
-      UnifiedWebSocketManager.getInstance().on('billUpdate', this.handleRealTimeBillUpdate.bind(this));
-      UnifiedWebSocketManager.getInstance().on('notification', this.handleRealTimeNotification.bind(this));
-      UnifiedWebSocketManager.getInstance().on('connected', this.handleWebSocketConnected.bind(this));
-      UnifiedWebSocketManager.getInstance().on('disconnected', this.handleWebSocketDisconnected.bind(this));
-
+      // WebSocket integration is now handled by webSocketService
+      // No direct WebSocket management needed here
       this.isInitialized = true;
       
-      logger.info('Bills API Service initialized with real-time integration', {
+      logger.info('Bills API Service initialized', {
         component: 'BillsApiService'
       });
     } catch (error) {
@@ -174,14 +121,14 @@ class BillsApiService {
     try {
       const response = await coreBillsApi.getBills(params);
 
-      // Update local store with fresh data
+      // Update local store with fresh data using state management service
       if (params.page === 1 || !params.page) {
         // If this is the first page, replace all bills
-        store.dispatch(setBills(response.bills));
+        stateManagementService.setBills(response.bills);
       } else {
         // For subsequent pages, add to existing bills (infinite scroll)
         response.bills.forEach((bill: Bill) => {
-          store.dispatch(updateBill({ id: bill.id, updates: bill }));
+          stateManagementService.updateBill(bill.id, bill);
         });
       }
 
@@ -210,11 +157,11 @@ class BillsApiService {
     try {
       const response = await coreBillsApi.getBillById(id);
 
-      // Update bill in store
-      store.dispatch(updateBill({ id, updates: response }));
+      // Update bill in store using state management service
+      stateManagementService.updateBill(id, response);
 
-      // Subscribe to real-time updates for this bill
-      this.subscribeToRealTimeUpdates(id);
+      // Subscribe to real-time updates for this bill using WebSocket service
+      webSocketService.subscribe({ type: 'bill', id });
 
       logger.info('Bill details loaded', {
         component: 'BillsApiService',
@@ -307,12 +254,13 @@ class BillsApiService {
     try {
       const response = await coreBillsApi.addBillComment(billId, content);
 
-      // Update bill comment count in store
-      // Note: This would need to get current state first, but for now we'll just increment
-      store.dispatch(updateBill({
-        id: billId,
-        updates: { commentCount: 1 } // This is a simplified increment
-      }));
+      // Update bill comment count in store using state management service
+      const currentBill = stateManagementService.getBill(billId);
+      if (currentBill) {
+        stateManagementService.updateBill(billId, {
+          commentCount: (currentBill.commentCount || 0) + 1
+        });
+      }
 
       logger.info('Comment added successfully', {
         component: 'BillsApiService',
@@ -338,7 +286,7 @@ class BillsApiService {
     try {
       const response = await coreBillsApi.recordEngagement(billId, type);
 
-      // Update engagement metrics in store
+      // Update engagement metrics in store using state management service
       const updates: Partial<Bill> = {};
 
       switch (type) {
@@ -353,7 +301,7 @@ class BillsApiService {
           break;
       }
 
-      store.dispatch(updateBill({ id: billId, updates }));
+      stateManagementService.updateBill(billId, updates);
 
       logger.debug('Engagement recorded', {
         component: 'BillsApiService',
@@ -417,26 +365,13 @@ class BillsApiService {
     }
 
     try {
-      if (UnifiedWebSocketManager.getInstance().isConnected()) {
-        UnifiedWebSocketManager.getInstance().subscribeToBill(billId, [
-          'status_change',
-          'new_comment',
-          'amendment',
-          'voting_scheduled'
-        ]);
-        
-        this.realTimeSubscriptions.add(billId);
-        
-        logger.debug('Subscribed to real-time updates', {
-          component: 'BillsApiService',
-          billId
-        });
-      } else {
-        logger.warn('WebSocket not connected, cannot subscribe to real-time updates', {
-          component: 'BillsApiService',
-          billId
-        });
-      }
+      webSocketService.subscribe({ type: 'bill', id: billId });
+      this.realTimeSubscriptions.add(billId);
+      
+      logger.debug('Subscribed to real-time updates', {
+        component: 'BillsApiService',
+        billId
+      });
     } catch (error) {
       logger.error('Failed to subscribe to real-time updates', {
         component: 'BillsApiService',
@@ -455,10 +390,7 @@ class BillsApiService {
     }
 
     try {
-      if (UnifiedWebSocketManager.getInstance().isConnected()) {
-        UnifiedWebSocketManager.getInstance().unsubscribeFromBill(billId);
-      }
-      
+      webSocketService.unsubscribe({ type: 'bill', id: billId });
       this.realTimeSubscriptions.delete(billId);
       
       logger.debug('Unsubscribed from real-time updates', {
@@ -474,116 +406,10 @@ class BillsApiService {
     }
   }
 
-  /**
-   * Handle real-time bill updates from WebSocket
-   */
-  private handleRealTimeBillUpdate(data: any): void {
-    try {
-      const { bill_id, update } = data;
-      // Update bills store with real-time update
-      store.dispatch(updateBill({ id: bill_id, updates: update.data }));
-
-      // Add to real-time store for UI notifications
-      store.dispatch(addBillUpdate({
-        bill_id,
-        type: update.type,
-        data: update.data,
-        timestamp: update.timestamp || new Date().toISOString()
-      }));
-
-      logger.info('Real-time bill update processed', {
-        component: 'BillsApiService',
-        billId: bill_id,
-        updateType: update.type
-      });
-    } catch (error) {
-      logger.error('Failed to process real-time bill update', {
-        component: 'BillsApiService',
-        error: error instanceof Error ? error.message : 'Unknown error',
-        data
-      });
-    }
-  }
-
-  /**
-   * Handle real-time notifications
-   */
-  private handleRealTimeNotification(notification: any): void {
-    try {
-      // Add notification to real-time store
-      store.dispatch(addNotification({
-        id: notification.id || `notification_${Date.now()}`,
-        type: notification.type || 'info',
-        title: notification.title,
-        message: notification.message,
-        created_at: new Date().toISOString(),
-        read: false,
-        priority: notification.priority || 'medium'
-      }));
-
-      logger.debug('Real-time notification processed', {
-        component: 'BillsApiService',
-        notificationType: notification.type,
-        title: notification.title
-      });
-    } catch (error) {
-      logger.error('Failed to process real-time notification', {
-        component: 'BillsApiService',
-        error: error instanceof Error ? error.message : 'Unknown error',
-        notification
-      });
-    }
-  }
-
-  /**
-   * Handle WebSocket connection events
-   */
-  private handleWebSocketConnected(): void {
-    logger.info('WebSocket connected, re-subscribing to bill updates', {
-      component: 'BillsApiService',
-      subscriptions: this.realTimeSubscriptions.size
-    });
-
-    // Re-subscribe to all previously subscribed bills
-    this.realTimeSubscriptions.forEach(billId => {
-      UnifiedWebSocketManager.getInstance().subscribeToBill(billId, [
-        'status_change',
-        'new_comment',
-        'amendment',
-        'voting_scheduled'
-      ]);
-    });
-  }
-
-  /**
-   * Handle WebSocket disconnection events
-   */
-  private handleWebSocketDisconnected(): void {
-    logger.warn('WebSocket disconnected, real-time updates unavailable', {
-      component: 'BillsApiService',
-      subscriptions: this.realTimeSubscriptions.size
-    });
-  }
-
   // ============================================================================
   // Utility Methods
   // ============================================================================
 
-  /**
-   * Get update priority based on update type
-   */
-  private getUpdatePriority(updateType: string): 'high' | 'medium' | 'low' {
-    switch (updateType) {
-      case 'status_change':
-      case 'voting_scheduled':
-        return 'high';
-      case 'amendment':
-        return 'medium';
-      case 'new_comment':
-      default:
-        return 'low';
-    }
-  }
 
   /**
    * Clean up old search cache entries
@@ -634,7 +460,7 @@ class BillsApiService {
       initialized: this.isInitialized,
       realTimeSubscriptions: this.realTimeSubscriptions.size,
       searchCacheSize: this.searchCache.size,
-      webSocketConnected: UnifiedWebSocketManager.getInstance().isConnected()
+      webSocketConnected: webSocketService.isConnected()
     };
   }
 

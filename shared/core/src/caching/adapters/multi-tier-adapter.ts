@@ -8,14 +8,12 @@
 import { BaseCacheAdapter } from '../core/base-adapter';
 import { MemoryAdapter, type MemoryAdapterConfig } from './memory-adapter';
 import { RedisAdapter, type RedisAdapterConfig } from './redis-adapter';
-import { logger } from '../../observability/logging';
 import type {
   CacheOptions,
   CacheHealthStatus,
   CacheMetrics,
   CacheTierStats,
-  PromotionStrategy,
-  MultiTierOptions
+  PromotionStrategy
 } from '../types';
 
 export interface MultiTierAdapterConfig {
@@ -24,9 +22,9 @@ export interface MultiTierAdapterConfig {
   promotionStrategy?: PromotionStrategy;
   promotionThreshold?: number;
   enableL1Warmup?: boolean;
-  l1WarmupSize?: number;
   enableMetrics?: boolean;
   keyPrefix?: string;
+  defaultTtlSec?: number;
 }
 
 export class MultiTierAdapter extends BaseCacheAdapter {
@@ -35,19 +33,18 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   private promotionStrategy: PromotionStrategy;
   private promotionThreshold: number;
   private enableL1Warmup: boolean;
-  private l1WarmupSize: number;
   private promotionCandidates = new Map<string, { hits: number; lastHit: number }>();
 
-  constructor(private config: MultiTierAdapterConfig) {
+  constructor(override config: MultiTierAdapterConfig) {
     super('multi-tier', '1.0.0', {
-      enableMetrics: config.enableMetrics,
-      keyPrefix: config.keyPrefix,
+      ...(config.enableMetrics !== undefined && { enableMetrics: config.enableMetrics }),
+      ...(config.keyPrefix && { keyPrefix: config.keyPrefix }),
+      ...(config.defaultTtlSec && { defaultTtlSec: config.defaultTtlSec }),
     });
 
     this.promotionStrategy = config.promotionStrategy || 'hybrid';
     this.promotionThreshold = config.promotionThreshold || 3;
     this.enableL1Warmup = config.enableL1Warmup !== false;
-    this.l1WarmupSize = config.l1WarmupSize || 100;
 
     // Initialize cache tiers
     this.l1Cache = new MemoryAdapter(config.l1Config);
@@ -78,7 +75,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Connect to both cache tiers
    */
-  async connect(): Promise<void> {
+  override async connect(): Promise<void> {
     await this.l2Cache.connect();
     
     if (this.enableL1Warmup) {
@@ -89,7 +86,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Disconnect from both cache tiers
    */
-  async disconnect(): Promise<void> {
+  override async disconnect(): Promise<void> {
     await Promise.all([
       this.l1Cache.destroy(),
       this.l2Cache.disconnect(),
@@ -99,7 +96,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Get value from multi-tier cache
    */
-  async get<T>(key: string): Promise<T | null> {
+  override async get<T>(key: string): Promise<T | null> {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid cache key');
     }
@@ -108,30 +105,30 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       // Try L1 first
       const l1Result = await this.l1Cache.get<T>(key);
       if (l1Result !== null) {
-        this.recordHit(key, 'L1');
+        this.updateMetrics('hit');
         return l1Result;
       }
 
       // Try L2
       const l2Result = await this.l2Cache.get<T>(key);
       if (l2Result !== null) {
-        this.recordHit(key, 'L2');
-        
+        this.updateMetrics('hit');
+
         // Consider promotion to L1
         await this.considerPromotion(key, l2Result);
-        
+
         return l2Result;
       }
 
-      this.recordMiss(key);
+      this.updateMetrics('miss');
       return null;
-    }, 'hit', key);
+    });
   }
 
   /**
    * Set value in multi-tier cache
    */
-  async set<T>(key: string, value: T, ttlSec?: number): Promise<void> {
+  override async set<T>(key: string, value: T, ttlSec?: number): Promise<void> {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid cache key');
     }
@@ -155,31 +152,32 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       promises.push(this.l2Cache.set(key, value, validatedTtl));
       
       await Promise.all(promises);
-      
-      this.recordSet(key, size, shouldUseL1 ? 'L1' : 'L2');
-    }, 'set', key);
+
+      this.updateMetrics('set');
+    });
   }
 
   /**
    * Delete value from multi-tier cache
    */
-  async del(key: string): Promise<boolean> {
+  override async del(key: string): Promise<boolean> {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid cache key');
     }
 
     return this.measureLatency(async () => {
       // Delete from both tiers
-      await Promise.all([
+      const [l1Result, l2Result] = await Promise.all([
         this.l1Cache.del(key),
         this.l2Cache.del(key),
       ]);
-      
+
       // Remove from promotion candidates
       this.promotionCandidates.delete(key);
-      
-      this.recordDelete(key);
-    }, 'delete', key);
+
+      this.updateMetrics('delete');
+      return l1Result || l2Result;
+    });
   }
 
   /**
@@ -199,7 +197,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Get TTL from the appropriate tier
    */
-  async ttl(key: string): Promise<number> {
+  override async ttl(key: string): Promise<number> {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid cache key');
     }
@@ -215,9 +213,9 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Get multiple values from multi-tier cache
    */
-  async mget<T>(keys: string[]): Promise<(T | null)[]> {
+  override async mget<T>(keys: string[]): Promise<(T | null)[]> {
     if (keys.length === 0) return [];
-    
+
     keys.forEach(key => {
       if (!key || typeof key !== 'string') {
         throw new Error('Invalid cache key');
@@ -228,91 +226,93 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       const results: (T | null)[] = new Array(keys.length).fill(null);
       const l2Keys: string[] = [];
       const l2Indices: number[] = [];
-      
+
       // Try L1 first for all keys
       const l1Results = await this.l1Cache.mget<T>(keys);
-      
+
       for (let i = 0; i < keys.length; i++) {
-        if (l1Results[i] !== null) {
-          results[i] = l1Results[i];
-          this.recordHit(keys[i], 'L1');
+        const l1Result = l1Results[i];
+        if (l1Result !== null && l1Result !== undefined) {
+          results[i] = l1Result;
+          this.updateMetrics('hit');
         } else {
-          l2Keys.push(keys[i]);
+          l2Keys.push(keys[i]!);
           l2Indices.push(i);
         }
       }
-      
+
       // Get remaining keys from L2
       if (l2Keys.length > 0) {
         const l2Results = await this.l2Cache.mget<T>(l2Keys);
-        
+
         for (let i = 0; i < l2Keys.length; i++) {
           const result = l2Results[i];
-          const originalIndex = l2Indices[i];
-          
-          if (result !== null) {
+          const originalIndex = l2Indices[i]!;
+
+          if (result !== null && result !== undefined) {
             results[originalIndex] = result;
             this.updateMetrics('hit');
-            
+
             // Consider promotion
-            await this.considerPromotion(l2Keys[i], result);
+            await this.considerPromotion(l2Keys[i]!, result);
           } else {
             this.updateMetrics('miss');
           }
         }
       }
-      
+
       return results;
-    }, 'hit', `mget:${keys.length}`);
+    });
   }
 
   /**
    * Set multiple values in multi-tier cache
    */
-  async mset<T>(entries: [string, T, number?][]): Promise<void> {
+  override async mset<T>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void> {
     if (entries.length === 0) return;
     
     // Validate keys (basic validation)
-    entries.forEach(([key]) => {
-      if (!key || typeof key !== 'string') {
+    entries.forEach(entry => {
+      if (!entry.key || typeof entry.key !== 'string') {
         throw new Error('Invalid cache key');
       }
     });
 
     return this.measureLatency(async () => {
-      const l1Entries: [string, T, number?][] = [];
-      const l2Entries: [string, T, number?][] = [];
-      
-      for (const [key, value, ttl] of entries) {
+      const l1Entries: Array<{ key: string; value: T; ttl?: number }> = [];
+      const l2Entries: Array<{ key: string; value: T; ttl?: number }> = [];
+
+      for (const entry of entries) {
+        const { key, value, ttl } = entry;
         const size = this.estimateSize(value);
         const validatedTtl = ttl || this.config.defaultTtlSec || 300;
-        
+
         if (this.shouldStoreInL1(size, { ttl: validatedTtl })) {
           const l1Ttl = Math.min(validatedTtl || 300, 300);
-          l1Entries.push([key, value, l1Ttl]);
+          l1Entries.push({ key, value, ttl: l1Ttl });
         }
-        
-        l2Entries.push([key, value, validatedTtl]);
+
+        l2Entries.push({ key, value, ttl: validatedTtl });
       }
-      
+
       const promises: Promise<void>[] = [];
-      
+
       if (l1Entries.length > 0) {
         promises.push(this.l1Cache.mset(l1Entries));
       }
-      
+
       if (l2Entries.length > 0) {
         promises.push(this.l2Cache.mset(l2Entries));
       }
-      
+
       await Promise.all(promises);
-    }, 'set', `mset:${entries.length}`);
+    });
   }
 
   /**
    * Delete multiple keys from both tiers
    */
-  async mdel(keys: string[]): Promise<number> {
+  override async mdel(keys: string[]): Promise<number> {
     if (!Array.isArray(keys) || keys.length === 0) {
       return 0;
     }
@@ -322,71 +322,71 @@ export class MultiTierAdapter extends BaseCacheAdapter {
         this.l1Cache.mdel(keys),
         this.l2Cache.mdel(keys),
       ]);
-      
+
       // Return the maximum count (since a key might exist in both tiers)
       return Math.max(l1Count, l2Count);
-    }, 'delete', `mdel:${keys.length}`);
+    });
   }
 
   /**
    * Increment a numeric value in both tiers
    */
-  async increment(key: string, delta: number = 1): Promise<number> {
+  override async increment(key: string, delta: number = 1): Promise<number> {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid cache key');
     }
-    
+
     return this.measureLatency(async () => {
       // Increment in L2 first (source of truth)
       const result = await this.l2Cache.increment(key, delta);
-      
+
       // Update L1 if present
       if (await this.l1Cache.exists(key)) {
         await this.l1Cache.increment(key, delta);
       }
-      
+
       return result;
-    }, 'set', 'increment');
+    });
   }
 
   /**
    * Decrement a numeric value in both tiers
    */
-  async decrement(key: string, delta: number = 1): Promise<number> {
+  override async decrement(key: string, delta: number = 1): Promise<number> {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid cache key');
     }
-    
+
     return this.measureLatency(async () => {
       // Decrement in L2 first (source of truth)
       const result = await this.l2Cache.decrement(key, delta);
-      
+
       // Update L1 if present
       if (await this.l1Cache.exists(key)) {
         await this.l1Cache.decrement(key, delta);
       }
-      
+
       return result;
-    }, 'set', 'decrement');
+    });
   }
 
   /**
    * Set expiration time for a key in both tiers
    */
-  async expire(key: string, ttlSeconds: number): Promise<boolean> {
+  override async expire(key: string, ttlSeconds: number): Promise<boolean> {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid cache key');
     }
-    
+
     return this.measureLatency(async () => {
       const [l1Result, l2Result] = await Promise.all([
         this.l1Cache.expire(key, ttlSeconds),
         this.l2Cache.expire(key, ttlSeconds)
       ]);
-      
+
       // Return true if either tier had the key
       return l1Result || l2Result;
-    }, 'set', 'expire');
+    });
   }
 
   /**
@@ -424,33 +424,32 @@ export class MultiTierAdapter extends BaseCacheAdapter {
    * Invalidate by tags in both tiers
    */
   async invalidateByTags(tags: string[]): Promise<number> {
-    const [l1Count, l2Count] = await Promise.all([
-      this.l1Cache.invalidateByTags(tags),
-      this.l2Cache.invalidateByTags(tags),
-    ]);
-    
-    return l1Count + l2Count;
+    // Only L2 supports tag invalidation for now
+    if (this.l2Cache.invalidateByTags) {
+      return this.l2Cache.invalidateByTags(tags);
+    }
+    return 0;
   }
 
   /**
    * Warm up cache with critical data
    */
   async warmUp(entries: Array<{ key: string; value: any; options?: CacheOptions }>): Promise<void> {
-    // Warm up both tiers
-    await Promise.all([
-      this.l1Cache.preload(entries.map(({ key, options }) => ({
-        key,
-        factory: async () => entries.find(e => e.key === key)?.value,
-        options,
-      }))),
-      this.l2Cache.warmUp(entries),
-    ]);
+    // Warm up L2 tier
+    if (this.l2Cache.warmUp) {
+      await this.l2Cache.warmUp(entries);
+    }
+
+    // For L1, set the values directly
+    for (const entry of entries) {
+      await this.set(entry.key, entry.value, entry.options?.ttl);
+    }
   }
 
   /**
    * Get multi-tier cache health status
    */
-  async getHealth(): Promise<CacheHealthStatus> {
+  override async getHealth(): Promise<CacheHealthStatus> {
     const start = performance.now();
     const errors: string[] = [];
 
@@ -482,22 +481,25 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       const connected = l1Health.connected && l2Health.connected;
 
       return {
-        connected,
+        status: connected ? 'healthy' : 'unhealthy',
         latency,
-        memory: {
-          l1: l1Health.memory,
-          l2: l2Health.memory,
-        },
-        stats: this.getMetrics(),
-        errors: errors.length > 0 ? errors : undefined,
+        memoryUsage: this.getMemoryUsage(),
+        connectionStatus: connected ? 'connected' : 'disconnected',
+        uptime: Date.now() - this.startTime,
+        connected: connected || false,
+        errors: errors.length > 0 ? errors : [],
       };
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
       
       return {
-        connected: false,
+        status: 'unhealthy',
         latency: performance.now() - start,
-        stats: this.getMetrics(),
+        memoryUsage: this.getMemoryUsage(),
+        connectionStatus: 'disconnected',
+        lastError: errors.join(', '),
+        uptime: Date.now() - this.startTime,
+        connected: false,
         errors,
       };
     }
@@ -506,7 +508,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Get combined metrics from both tiers
    */
-  getMetrics(): CacheMetrics {
+  override getMetrics(): CacheMetrics {
     const l1Stats = this.l1Cache.getMetrics();
     const l2Stats = this.l2Cache.getMetrics();
 
@@ -517,6 +519,11 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       operations: l1Stats.operations + l2Stats.operations,
       avgResponseTime: this.calculateCombinedResponseTime(l1Stats, l2Stats),
       errors: l1Stats.errors + l2Stats.errors,
+      memoryUsage: this.getMemoryUsage(),
+      keyCount: (l1Stats.totalEntries || 0) + (l2Stats.totalEntries || 0),
+      avgLatency: this.calculateCombinedResponseTime(l1Stats, l2Stats),
+      maxLatency: Math.max(l1Stats.maxLatency || 0, l2Stats.maxLatency || 0),
+      minLatency: Math.min(l1Stats.minLatency || Infinity, l2Stats.minLatency || Infinity),
       totalSize: (l1Stats.totalSize || 0) + (l2Stats.totalSize || 0),
       totalEntries: (l1Stats.totalEntries || 0) + (l2Stats.totalEntries || 0),
       l1Stats: this.convertToTierStats(l1Stats, 'L1'),
@@ -578,7 +585,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Determine if an item should be promoted to L1
    */
-  private shouldPromoteToL1(key: string, candidate: { hits: number; lastHit: number }): boolean {
+  private shouldPromoteToL1(_key: string, candidate: { hits: number; lastHit: number }): boolean {
     switch (this.promotionStrategy) {
       case 'lru':
         return candidate.hits >= this.promotionThreshold;
@@ -647,7 +654,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Convert cache metrics to tier stats
    */
-  private convertToTierStats(metrics: CacheMetrics, tier: 'L1' | 'L2'): CacheTierStats {
+  private convertToTierStats(metrics: CacheMetrics, _tier: 'L1' | 'L2'): CacheTierStats {
     return {
       hits: metrics.hits,
       misses: metrics.misses,
@@ -664,8 +671,8 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Cleanup resources
    */
-  destroy(): void {
-    super.destroy();
+  override async destroy(): Promise<void> {
+    await super.destroy();
     this.promotionCandidates.clear();
     this.l1Cache.destroy();
     this.l2Cache.destroy();

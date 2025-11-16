@@ -26,7 +26,7 @@ import { PasswordStrengthIndicator } from '../ui/PasswordStrengthIndicator';
 expect.extend(toHaveNoViolations);
 
 // Mock the auth hook
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     login: vi.fn(),
     register: vi.fn(),

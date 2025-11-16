@@ -31,3 +31,11 @@ words:
   - mbps
   - levelchange
   - chargingchange
+  - unsubscription
+  - Unsubscription
+  - timeouterror
+  - validationerror
+  - criticalerror
+  - highpriorityerror
+  - unvoting
+  - unvote

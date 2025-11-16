@@ -5,7 +5,7 @@ import HomePage from '../pages/home';
 import { logger } from '@/utils/logger';
 
 // Mock hooks with minimal setup
-vi.mock('../hooks/use-auth', () => ({
+vi.mock('../hooks/useAuth', () => ({
   useAuth: () => ({
     user: null,
     isAuthenticated: false,

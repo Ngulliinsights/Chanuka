@@ -85,29 +85,53 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    let isMounted = true;
+
     const fetchPrimarySponsorData = async () => {
       try {
+        if (!isMounted) return;
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/bills/${bill_id }/sponsorhip-analysis/primary-sponsor`);
+        
+        const response = await fetch(`/api/bills/${bill_id}/sponsorship-analysis/primary-sponsor`, {
+          signal: abortController.signal,
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to fetch primary sponsor data: ${response.status}`);
         }
 
         const data = await response.json();
-        setSponsor(data);
+        
+        // Only update state if component is still mounted
+        if (isMounted && !abortController.signal.aborted) {
+          setSponsor(data);
+        }
       } catch (err) {
-        logger.error('Error fetching primary sponsor data:', { component: 'Chanuka' }, err);
-        setError(err instanceof Error ? err.message : 'Failed to load primary sponsor data');
+        if (err instanceof Error && err.name === 'AbortError') {
+          // Request was cancelled, ignore
+          return;
+        }
+        if (isMounted) {
+          logger.error('Error fetching primary sponsor data:', { component: 'Chanuka' }, err);
+          setError(err instanceof Error ? err.message : 'Failed to load primary sponsor data');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     if (bill_id) {
       fetchPrimarySponsorData();
     }
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, [bill_id]);
 
   const getConflictLevelColor = (level: string) => {

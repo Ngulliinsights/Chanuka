@@ -39,24 +39,57 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    let isMounted = true;
+
     const fetchNetworkData = async () => {
       try {
+        if (!isMounted) return;
         setLoading(true);
-        const response = await fetch(`/api/bills/${bill_id }/sponsorship-analysis/financial-network`);
+        
+        const response = await fetch(`/api/bills/${bill_id}/sponsorship-analysis/financial-network`, {
+          signal: abortController.signal,
+        });
 
         if (response.ok) {
           const data = await response.json();
-          setNetworkData({
-            totalEntities: data.metrics?.totalEntities || 0,
-            interconnectionRate: data.metrics?.interconnectionRate || 0,
-            totalAffiliations: data.metrics?.totalConnections || 0,
-            primarySponsorExposure: data.industryAnalysis?.breakdown?.[0]?.amount || 0,
-            totalFinancialExposure: data.industryAnalysis?.breakdown?.reduce((sum: number, item: any) => sum + item.amount, 0) || 0,
-            industryBreakdown: data.industryAnalysis?.breakdown || []
-          });
+          
+          // Only update state if component is still mounted
+          if (isMounted && !abortController.signal.aborted) {
+            setNetworkData({
+              totalEntities: data.metrics?.totalEntities || 0,
+              interconnectionRate: data.metrics?.interconnectionRate || 0,
+              totalAffiliations: data.metrics?.totalConnections || 0,
+              primarySponsorExposure: data.industryAnalysis?.breakdown?.[0]?.amount || 0,
+              totalFinancialExposure: data.industryAnalysis?.breakdown?.reduce((sum: number, item: any) => sum + item.amount, 0) || 0,
+              industryBreakdown: data.industryAnalysis?.breakdown || []
+            });
+          }
         } else {
-          logger.error('Failed to fetch financial network data', { component: 'Chanuka' });
-          // Fallback to mock data if API fails
+          if (isMounted) {
+            logger.error('Failed to fetch financial network data', { component: 'Chanuka' });
+            // Fallback to mock data if API fails
+            setNetworkData({
+              totalEntities: 13,
+              interconnectionRate: 68,
+              totalAffiliations: 42,
+              primarySponsorExposure: 28700000,
+              totalFinancialExposure: 142800000,
+              industryBreakdown: [
+                { sector: "Healthcare Services", percentage: 60, amount: 85680000 },
+                { sector: "Pharmaceutical", percentage: 40, amount: 57120000 }
+              ]
+            });
+          }
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Request was cancelled, ignore
+          return;
+        }
+        if (isMounted) {
+          logger.error('Error fetching financial network data:', { component: 'Chanuka' }, error);
+          // Fallback to mock data on error
           setNetworkData({
             totalEntities: 13,
             interconnectionRate: 68,
@@ -69,28 +102,21 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
             ]
           });
         }
-      } catch (error) {
-        logger.error('Error fetching financial network data:', { component: 'Chanuka' }, error);
-        // Fallback to mock data on error
-        setNetworkData({
-          totalEntities: 13,
-          interconnectionRate: 68,
-          totalAffiliations: 42,
-          primarySponsorExposure: 28700000,
-          totalFinancialExposure: 142800000,
-          industryBreakdown: [
-            { sector: "Healthcare Services", percentage: 60, amount: 85680000 },
-            { sector: "Pharmaceutical", percentage: 40, amount: 57120000 }
-          ]
-        });
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     if (bill_id) {
       fetchNetworkData();
     }
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, [bill_id]);
 
   if (loading) {

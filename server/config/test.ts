@@ -150,6 +150,7 @@ export const testConfig: AppConfig = {
       scriptSrc: ["'self'"],
       connectSrc: ["'self'"],
       objectSrc: ["'none'"],
+      frameAncestors: ["'self'"],
       upgradeInsecureRequests: false,
     },
   },

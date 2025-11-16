@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { billService, BillNotFoundError, CommentNotFoundError, ValidationError } from '../application/bills.js';
-import { authenticateToken } from '@/middleware/auth.js';
-import type { AuthenticatedRequest } from '@/middleware/auth.js';
+import { authenticateToken } from '../../../middleware/auth.js';
+import type { AuthenticatedRequest } from '../../../middleware/auth.js';
 import { ApiResponse, ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '@shared/core/utils/api-utils.js';
 // Temporary logger import - will be fixed when shared/core is properly configured
 const logger = {

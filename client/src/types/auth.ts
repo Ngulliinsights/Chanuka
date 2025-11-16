@@ -7,26 +7,14 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  username: string;
-  first_name: string | null;
-  last_name: string | null;
-  role: string;
-  verification_status: string;
-  is_active: boolean | null;
-  created_at: string;
-  reputation: number;
-  expertise: string;
-  // Enhanced security fields
-  two_factor_enabled: boolean;
-  last_login: string | null;
-  login_count: number;
-  account_locked: boolean;
-  locked_until: string | null;
-  password_changed_at: string;
-  // Privacy settings
-  privacy_settings: PrivacySettings;
-  consent_given: ConsentRecord[];
-  data_retention_preference: DataRetentionPreference;
+  role: 'citizen' | 'expert' | 'official' | 'admin';
+  verified: boolean;
+  twoFactorEnabled: boolean;
+  avatar_url?: string;
+  preferences: UserPreferences;
+  permissions: string[];
+  lastLogin: string;
+  createdAt: string;
 }
 
 export interface PrivacySettings {
@@ -70,21 +58,26 @@ export interface DataRetentionPreference {
   export_before_delete: boolean;
 }
 
+export interface UserPreferences {
+  notifications: boolean;
+  emailAlerts: boolean;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;
-  remember_me?: boolean;
-  two_factor_code?: string;
+  rememberMe?: boolean;
+  twoFactorToken?: string;
 }
 
 export interface RegisterData {
   email: string;
   password: string;
-  first_name: string;
-  last_name: string;
-  role?: string;
-  privacy_settings?: Partial<PrivacySettings>;
-  consent_records?: Omit<ConsentRecord, 'id' | 'granted_at' | 'ip_address' | 'user_agent'>[];
+  name: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
 }
 
 export interface PasswordRequirements {
@@ -99,32 +92,26 @@ export interface PasswordRequirements {
 
 export interface TwoFactorSetup {
   secret: string;
-  qr_code: string;
-  backup_codes: string[];
+  qrCode: string;
+  backupCodes: string[];
 }
 
 export interface SecurityEvent {
   id: string;
-  user_id: string;
-  event_type: 'login' | 'logout' | 'password_change' | 'failed_login' | 'suspicious_activity' | 'account_locked' | 'two_factor_enabled' | 'two_factor_disabled';
-  ip_address: string;
-  user_agent: string;
-  location?: string;
+  type: 'login' | 'logout' | 'password_change' | 'permission_change' | 'suspicious_activity';
+  description: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
   timestamp: string;
-  risk_score: number;
-  details: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
 export interface SuspiciousActivityAlert {
   id: string;
-  user_id: string;
-  alert_type: 'unusual_location' | 'multiple_failed_logins' | 'new_device' | 'unusual_time' | 'rapid_requests';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: string;
   description: string;
-  triggered_at: string;
+  detectedAt: string;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
   resolved: boolean;
-  resolved_at: string | null;
-  actions_taken: string[];
 }
 
 export interface SocialLoginProvider {
@@ -163,14 +150,12 @@ export interface DataDeletionRequest {
 
 export interface SessionInfo {
   id: string;
-  user_id: string;
-  created_at: string;
-  last_activity: string;
-  ip_address: string;
-  user_agent: string;
+  deviceInfo: string;
+  ipAddress: string;
   location?: string;
-  is_current: boolean;
-  expires_at: string;
+  lastActive: string;
+  createdAt: string;
+  current: boolean;
 }
 
 export interface AuthContextType {

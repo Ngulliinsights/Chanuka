@@ -45,59 +45,85 @@ export default function CosponsorAnalysis({ bill_id  }: CosponsorProps) { const 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    let isMounted = true;
+
     const fetchCosponsorData = async () => {
       try {
+        if (!isMounted) return;
         setLoading(true);
-        const response = await fetch(`/api/bills/${bill_id }/sponsorhip-analysis/co-sponsor`);
+        
+        const response = await fetch(`/api/bills/${bill_id}/sponsorship-analysis/co-sponsors`, {
+          signal: abortController.signal,
+        });
 
         if (response.ok) {
           const data = await response.json();
-          setCosponsor(data.cosponsor || []);
+          
+          // Only update state if component is still mounted
+          if (isMounted && !abortController.signal.aborted) {
+            setCosponsor(data.cosponsors || []);
+          }
         } else {
-          logger.error('Failed to fetch co-sponsor data', { component: 'Chanuka' });
-          // Fallback to mock data if API fails
-          setCosponsor([
-            {
-              id: "1",
-              name: "Hon. Sarah Odhiambo",
-              role: "MP - Kisumu East",
-              party: "ODM",
-              constituency: "Kisumu East",
-              conflict_level: "high",
-              financial_exposure: 2800000,
-              affiliations: [
-                { organization: "National Healthcare Alliance", role: "Board Member", type: "governance" },
-                { organization: "Medical Research Foundation", role: "Senior Advisor", type: "advisory" }
-              ],
-              voting_alignment: 85
-            },
-            {
-              id: "2",
-              name: "Hon. Michael Gitonga",
-              role: "MP - Mombasa Central",
-              party: "Jubilee",
-              constituency: "Mombasa Central",
-              conflict_level: "low",
-              financial_exposure: 0,
-              affiliations: [
-                { organization: "Public Health Institute", role: "Former Research Fellow", type: "academic" }
-              ],
-              voting_alignment: 45
-            }
-          ]);
+          if (isMounted) {
+            logger.error('Failed to fetch co-sponsor data', { component: 'Chanuka' });
+            // Fallback to mock data if API fails
+            setCosponsor([
+              {
+                id: "1",
+                name: "Hon. Sarah Odhiambo",
+                role: "MP - Kisumu East",
+                party: "ODM",
+                constituency: "Kisumu East",
+                conflict_level: "high",
+                financial_exposure: 2800000,
+                affiliations: [
+                  { organization: "National Healthcare Alliance", role: "Board Member", type: "governance" },
+                  { organization: "Medical Research Foundation", role: "Senior Advisor", type: "advisory" }
+                ],
+                voting_alignment: 85
+              },
+              {
+                id: "2",
+                name: "Hon. Michael Gitonga",
+                role: "MP - Mombasa Central",
+                party: "Jubilee",
+                constituency: "Mombasa Central",
+                conflict_level: "low",
+                financial_exposure: 0,
+                affiliations: [
+                  { organization: "Public Health Institute", role: "Former Research Fellow", type: "academic" }
+                ],
+                voting_alignment: 45
+              }
+            ]);
+          }
         }
       } catch (error) {
-        logger.error('Error fetching co-sponsor data:', { component: 'Chanuka' }, error);
-        // Fallback to mock data on error
-        setCosponsor([]);
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Request was cancelled, ignore
+          return;
+        }
+        if (isMounted) {
+          logger.error('Error fetching co-sponsor data:', { component: 'Chanuka' }, error);
+          // Fallback to empty array on error
+          setCosponsor([]);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     if (bill_id) {
       fetchCosponsorData();
     }
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, [bill_id]);
 
   const getConflictLevelColor = (level: string) => {

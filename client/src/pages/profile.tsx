@@ -2,7 +2,7 @@ import { useState } from 'react';
 import AppLayout from '../components/layout/app-layout';
 import { Card, CardContent } from '../components/ui/card';
 import { Switch } from '../components/ui/switch';
-import { useAuth } from '../hooks/use-auth';
+import { useAuth } from '../hooks/useAuth';
 import { logger } from '../utils/logger';
 import { ThemeToggle } from '../components/ui/theme-toggle';
 

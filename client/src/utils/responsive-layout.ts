@@ -79,7 +79,7 @@ export class ResponsiveLayoutManager {
       this.resizeObserver.observe(document.documentElement);
     } else {
       // Fallback to window resize event
-      window.addEventListener('resize', this.handleResize.bind(this), { passive: true });
+      (window as any).addEventListener('resize', this.handleResize.bind(this), { passive: true });
     }
 
     // Listen for orientation changes with debouncing

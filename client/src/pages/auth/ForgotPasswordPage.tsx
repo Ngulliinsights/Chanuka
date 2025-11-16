@@ -11,7 +11,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Shield, ArrowLeft, Loader2, AlertTriangle, CheckCircle, Mail } from 'lucide-react';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function ForgotPasswordPage() {
   const { requestPasswordReset } = useAuth();

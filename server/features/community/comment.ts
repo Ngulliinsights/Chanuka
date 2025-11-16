@@ -11,7 +11,7 @@ import { logger } from '@/shared/core';
 
 // Types for comment operations
 export interface CommentWithUser {
-  id: number;
+  id: string;
   bill_id: number;
   user_id: string;
   content: string;
@@ -61,7 +61,7 @@ export interface CommentFilters {
 }
 
 export interface CommentVote {
-  comment_id: number;
+  commentId: string;
   user_id: string;
   vote_type: 'up' | 'down';
 }
@@ -938,7 +938,7 @@ export class CommentService {
    */
   private createFallbackComment(data: CreateCommentData): CommentWithUser {
     return {
-      id: Date.now(),
+      id: Date.now().toString(),
       bill_id: data.bill_id,
       user_id: data.user_id,
       content: data.content,
@@ -967,7 +967,7 @@ export class CommentService {
   private getSampleComments(bill_id: number): CommentWithUser[] {
     return [
       {
-        id: 1,
+        id: '1',
         bill_id,
         user_id: 'user1',
         content: 'This bill raises several constitutional concerns regarding the separation of powers.',
@@ -994,7 +994,7 @@ export class CommentService {
         netVotes: 21
       },
       {
-        id: 2,
+        id: '2',
         bill_id,
         user_id: 'user2',
         content: 'From a digital rights perspective, Section 15 of this bill is particularly concerning.',

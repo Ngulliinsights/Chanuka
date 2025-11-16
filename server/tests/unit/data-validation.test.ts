@@ -14,10 +14,10 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { DataValidationService } from '../../core/validation/data-validation.ts';
-import { logger  } from '../../../shared/core/src/index.js';
+import { GovernmentDataValidationService } from '../../core/validation/data-validation.js';
+import { logger } from '../../../shared/core/src/index.js';
 
-describe('DataValidationService', () => {
+describe('GovernmentDataValidationService', () => {
   describe('validateBill', () => {
     it('should validate a complete bill successfully', () => {
       const validBill = {
@@ -33,7 +33,7 @@ describe('DataValidationService', () => {
         lastUpdated: new Date().toISOString()
       };
 
-      const result = DataValidationService.validateBill(validBill);
+      const result = GovernmentDataValidationService.validateBill(validBill);
 
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
@@ -261,7 +261,7 @@ describe('DataValidationService', () => {
       expect(result.totalRecords).toBe(3);
       expect(result.validRecords).toBe(2);
       expect(result.invalidRecords).toBe(1);
-      expect(result.validationRate).toBeCloseTo(2/3);
+      expect(result.validationRate).toBeCloseTo(2 / 3);
       expect(result.validData).toHaveLength(2);
       expect(result.invalidData).toHaveLength(1);
     });
@@ -287,7 +287,7 @@ describe('DataValidationService', () => {
       expect(result.totalRecords).toBe(3);
       expect(result.validRecords).toBe(2);
       expect(result.invalidRecords).toBe(1);
-      expect(result.validationRate).toBeCloseTo(2/3);
+      expect(result.validationRate).toBeCloseTo(2 / 3);
     });
 
     it('should calculate summary statistics', () => {
@@ -446,8 +446,8 @@ describe('DataValidationService', () => {
 
       const recordsHighSeverity = [
         {
-          data: { 
-            bill_number: 'C-123', 
+          data: {
+            bill_number: 'C-123',
             title: 'Title A',
             status: 'introduced',
             description: 'Desc A',
@@ -456,8 +456,8 @@ describe('DataValidationService', () => {
           source: 'source1'
         },
         {
-          data: { 
-            bill_number: 'C-123', 
+          data: {
+            bill_number: 'C-123',
             title: 'Title B',
             status: 'passed',
             description: 'Desc B',

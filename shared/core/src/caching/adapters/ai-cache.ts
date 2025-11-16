@@ -10,7 +10,7 @@
  */
 
 import { CacheService } from '../core/interfaces';
-import { getDefaultCache } from '../index';
+import { getDefaultCache } from '../../cache/index';
 import { performance } from 'perf_hooks';
 import { logger } from '../../observability/logging';
 
@@ -185,14 +185,14 @@ export class AICache {
         data,
         timestamp: Date.now(),
         cost: options.cost || 1,
-        accuracy: options.accuracy,
+        ...(options.accuracy && { accuracy: options.accuracy }),
         hitCount: 0,
         lastAccessed: Date.now(),
         ttl,
         service,
         operation,
         inputHash: this.hashInput(options.inputData),
-        metadata: options.metadata
+        ...(options.metadata && { metadata: options.metadata })
       };
 
       await this.baseCache.set(cacheKey, entry, ttl);
@@ -338,7 +338,7 @@ export class AICache {
   }> {
     try {
       const baseCacheHealthy = this.baseCache.getHealth
-        ? (await this.baseCache.getHealth()).connected
+        ? (await this.baseCache.getHealth()).connected ?? true
         : true;
 
       return {
@@ -365,7 +365,7 @@ export class AICache {
 
   private calculateTTL(
     service: string,
-    operation: string,
+    _operation: string,
     cost?: number,
     accuracy?: number
   ): number {
@@ -393,8 +393,9 @@ export class AICache {
       'recommendation': 1.5 // Recommendations can be cached moderately
     };
 
-    if (serviceMultipliers[service]) {
-      ttl = ttl * serviceMultipliers[service];
+    const multiplier = serviceMultipliers[service];
+    if (multiplier) {
+      ttl = ttl * multiplier;
     }
 
     return Math.max(this.options.minTTL, Math.min(this.options.maxTTL, Math.floor(ttl)));
@@ -414,9 +415,9 @@ export class AICache {
   }
 
   private async findSimilarCachedResult(
-    service: string,
-    operation: string,
-    inputData: any
+    _service: string,
+    _operation: string,
+    _inputData: any
   ): Promise<AICacheEntry | null> {
     // This would implement semantic similarity search
     // For now, return null as it requires complex NLP processing
@@ -468,7 +469,7 @@ export class AICache {
       };
     }
 
-    const serviceMetrics = this.metrics.serviceBreakdown[service];
+    const serviceMetrics = this.metrics.serviceBreakdown[service]!;
     serviceMetrics.requests++;
 
     if (hit) {

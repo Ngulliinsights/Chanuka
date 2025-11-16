@@ -6,7 +6,8 @@ import { inputValidationService } from '../core/validation/input-validation-serv
 import { secureSessionService } from '../core/auth/secure-session-service.js';
 import { securityAuditService } from '../features/security/security-audit-service.js';
 import { createRateLimit } from './rate-limiter.js';
-import { logger   } from '../../shared/core/src/index.js';
+import { logger } from '@shared/core';
+import { getClientIP } from '../utils/request-utils.js';
 
 export interface SecurityMiddlewareOptions {
   enableCSP: boolean;
@@ -178,7 +179,7 @@ export class SecurityMiddleware {
           event_type: 'input_validation_failure',
           severity: 'medium',
           ip_address: this.getClientIP(req),
-          user_agent: req.get('User-Agent'),
+          user_agent: req.get('User-Agent') || 'unknown',
           resource: req.path,
           action: req.method,
           success: false,
@@ -231,7 +232,7 @@ export class SecurityMiddleware {
             event_type: 'unauthorized_access_attempt',
             severity: 'medium',
             ip_address: this.getClientIP(req),
-            user_agent: req.get('User-Agent'),
+            user_agent: req.get('User-Agent') || 'unknown',
             resource: req.path,
             action: req.method,
             success: false,
@@ -317,7 +318,7 @@ export class SecurityMiddleware {
             event_type: 'suspicious_request_pattern',
             severity: 'high',
             ip_address: this.getClientIP(req),
-            user_agent: req.get('User-Agent'),
+            user_agent: req.get('User-Agent') || 'unknown',
             resource: req.path,
             action: req.method,
             success: false,
@@ -362,9 +363,7 @@ export class SecurityMiddleware {
     return createRateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       max: 1000, // requests per window
-      message: 'Too many requests from this IP',
-      standardHeaders: true,
-      legacyHeaders: false
+      message: 'Too many requests from this IP'
     });
   }
 

@@ -90,7 +90,6 @@ interface ApiErrorResponse {
   timestamp: string;
 }
 
-type ApiResponseType<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
 
 export const ApiResponse = {
   success: <T = unknown>(data: T, message = 'Success'): ApiSuccessResponse<T> => ({
@@ -114,7 +113,7 @@ export const ApiResponse = {
   
   validation: (message: string, details?: Record<string, unknown>): ApiErrorResponse => ({
     success: false,
-    error: { message, code: 'VALIDATION_ERROR', statusCode: 400, details },
+    error: { message, code: 'VALIDATION_ERROR', statusCode: 400, ...(details && { details }) },
     timestamp: new Date().toISOString()
   })
 };
@@ -170,7 +169,7 @@ export class ApiValidationError extends ApiError {
     this.name = 'ApiValidationError';
   }
 
-  toJSON() {
+  override toJSON() {
     return {
       success: false,
       error: {
@@ -240,9 +239,9 @@ export const ApiValidationErrorResponse = (
 };
 
 // For backward compatibility with existing code - using different names to avoid conflicts
-export { ApiSuccessResponse as ApiSuccessFunc };
-export { ApiErrorResponse as ApiErrorFunc };
-export { ApiValidationErrorResponse as ApiValidationErrorFunc };
+export const ApiSuccessFunc = ApiSuccessResponse;
+export const ApiErrorFunc = ApiErrorResponse;
+export const ApiValidationErrorFunc = ApiValidationErrorResponse;
 
 // ApiResponseWrapper utility class
 export class ApiResponseWrapper {
@@ -303,26 +302,16 @@ export const RateLimit = {
   },
   
   middleware: (limit = 100, windowMs = 15 * 60 * 1000) => {
-    interface Request {
-      ip?: string;
-    }
-    
-    interface Response {
-      status: (code: number) => Response;
-      json: (data: unknown) => Response;
-    }
-    
-    type NextFunction = () => void;
-    
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: any, res: any, next: any) => {
       const key = req.ip ?? 'unknown';
-      
+
       if (!RateLimit.check(key, limit, windowMs)) {
-        return res.status(429).json(
+        res.status(429).json(
           ApiResponse.error('Too many requests', 'RATE_LIMIT_EXCEEDED', 429)
         );
+        return;
       }
-      
+
       next();
     };
   }
@@ -395,11 +384,13 @@ export interface RecoverySuggestion {
 }
 
 // Cache keys for consistent caching across the application
-export const cacheKeys = { USER_PROFILE: (user_id: string) => `user:profile:${user_id }`,
-  BILL_DETAILS: (bill_id: number) => `bill:details:${ bill_id }`,
-  BILL_COMMENTS: (bill_id: number) => `bill:comments:${ bill_id }`,
-  USER_ENGAGEMENT: (user_id: string) => `user:engagement:${ user_id }`,
-  ANALYTICS: (key: string) => `analytics:${key}`
+export const cacheKeys = {
+  USER_PROFILE: 'user:profile',
+  BILL_DETAILS: 'bill:details',
+  BILL_COMMENTS: 'bill:comments',
+  COMMENT_VOTES: 'comment_votes',
+  USER_ENGAGEMENT: 'user:engagement',
+  ANALYTICS: 'analytics'
 };
 
 // For backward compatibility

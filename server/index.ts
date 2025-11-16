@@ -1,4 +1,4 @@
-// Diagnostic logging at startup for debugging environment configuration
+c// Diagnostic logging at startup for debugging environment configuration
 console.log('🔍 DIAGNOSTIC: Server startup initiated');
 console.log('🔍 DIAGNOSTIC: Environment variables check:', {
   DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
@@ -12,7 +12,7 @@ import express, { Request, Response, NextFunction, Express } from 'express';
 import cors from 'cors';
 import { createServer, Server } from 'http';
 import helmet from 'helmet';
-import { database as db } from '../shared/database/connection.js';
+import { pool } from '../shared/database/pool.js';
 import { config } from './config/index.js';
 
 // Feature Routes
@@ -77,6 +77,7 @@ import { monitoringScheduler } from './infrastructure/monitoring/monitoring-sche
 import { sessionCleanupService } from './core/auth/session-cleanup.js';
 import { securityMonitoringService } from './features/security/security-monitoring-service.js';
 import { privacySchedulerService } from './features/privacy/privacy-scheduler.js';
+import { schemaValidationService } from './core/validation/schema-validation-service.js';
 
 // Unified utilities
 import { logger, Performance, ApiResponse } from '../shared/core/index.js';
@@ -484,7 +485,9 @@ app.use(errorHandler);
 // Database connection test
 async function testConnection(): Promise<void> {
   try {
-    await db.execute('SELECT 1');
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
     logger.info('Database connection established successfully', { component: 'Chanuka' } as LogContext);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -524,6 +527,27 @@ async function performStartupInitialization(): Promise<void> {
     const healthInfo = await databaseFallbackService.getHealthInfo();
 
     if (dbConnected) {
+      // Perform schema validation during startup
+      logger.info('🔍 Performing database schema validation...', { component: 'Chanuka' } as LogContext);
+      try {
+        const report = await schemaValidationService.generateValidationReport();
+        if (report.criticalIssues > 0) {
+          logger.warn(`⚠️  Schema validation found ${report.criticalIssues} critical issues`, { component: 'Chanuka' } as LogContext);
+          logger.info('🔧 Attempting automatic schema repair...', { component: 'Chanuka' } as LogContext);
+          const repairResult = await schemaValidationService.repairSchema();
+          if (repairResult.success) {
+            logger.info('✅ Schema issues repaired successfully', { component: 'Chanuka' } as LogContext);
+          } else {
+            logger.error('❌ Schema repair failed - manual intervention may be required', { component: 'Chanuka' } as LogContext);
+          }
+        } else {
+          logger.info('✅ Database schema validation passed', { component: 'Chanuka' } as LogContext);
+        }
+      } catch (schemaError) {
+        const schemaErrorMessage = schemaError instanceof Error ? schemaError.message : String(schemaError);
+        logger.warn('⚠️  Schema validation failed during startup, continuing:', { error: schemaErrorMessage, component: 'Chanuka' } as LogContext);
+      }
+
       logger.info('✅ Platform ready with full database functionality', { component: 'Chanuka' } as LogContext);
     } else {
       logger.info('⚠️  Platform starting in demonstration mode with sample data', { component: 'Chanuka' } as LogContext);

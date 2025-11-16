@@ -1,49 +1,43 @@
-import { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AppProviders from "./components/AppProviders";
-import AppLayout from "./components/layout/app-layout";
-import { AccessibilityTrigger } from "./components/accessibility/accessibility-settings-panel";
-import { OfflineStatus } from "./components/offline/offline-manager";
-import { LoadingStateManager } from "./components/loading/LoadingStates";
-import { GlobalLoadingIndicator } from "./components/loading/GlobalLoadingIndicator";
-import { Toaster } from "./components/ui/toaster";
+import { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import AppProviders from './components/AppProviders';
+import AppLayout from './components/layout/app-layout';
+import AccessibilitySettingsPanel from './components/accessibility/accessibility-settings-panel';
+import { OfflineStatus } from './components/offline/offline-manager';
+import { LoadingStateManager } from './components/loading/LoadingStates';
+import { GlobalLoadingIndicator } from './components/loading/GlobalLoadingIndicator';
+import { Toaster } from './components/ui/toaster';
 import {
   CriticalAssetLoader,
   DevAssetLoadingDebug,
-} from "./components/loading/AssetLoadingIndicator";
-import PerformanceMetricsCollector from "./components/performance/PerformanceMetricsCollector";
-import BrowserCompatibilityChecker from "./components/compatibility/BrowserCompatibilityChecker";
-import { Suspense, useEffect } from "react";
-import { lazy } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useLoadingOperation } from "./core/loading/hooks";
-import { logger } from "./utils/logger";
-import {
-  SafeLazyPages,
-  SafeLazySponsorshipPages,
-} from "./utils/safe-lazy-loading";
-import { SimpleLazyPages, LazyPageWrapper } from "./utils/simple-lazy-pages";
-import { createNavigationProvider } from "./core/navigation/context";
-import { useAuth } from "./hooks/use-auth";
-import { useMediaQuery } from "./hooks/use-mobile";
-import { useWebVitals } from "./hooks/use-web-vitals";
-import MonitoringService from "./monitoring";
-import { performanceMonitor } from "./utils/performance-monitor";
+} from './components/loading/AssetLoadingIndicator';
+import PerformanceMetricsCollector from './components/performance/PerformanceMetricsCollector';
+import BrowserCompatibilityChecker from './components/compatibility/BrowserCompatibilityChecker';
+import { Suspense, useEffect } from 'react';
+import { lazy } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useLoadingOperation } from './core/loading/hooks';
+import { logger } from './utils/logger';
+import { SafeLazyPages, SafeLazySponsorshipPages } from './utils/safe-lazy-loading';
+import { SimpleLazyPages, LazyPageWrapper } from './utils/simple-lazy-pages';
+import { createNavigationProvider } from './core/navigation/context';
+import { useAuth } from './hooks/useAuth';
+import { useMediaQuery } from './hooks/use-mobile';
+import { useWebVitals } from './hooks/use-web-vitals';
+
+import { performanceMonitor } from './utils/performance-monitor';
 
 // Import test page for design system verification
-const DesignSystemTestPage = lazy(() => import("./pages/design-system-test"));
+const DesignSystemTestPage = lazy(() => import('./pages/design-system-test'));
 // Import consolidated core error management system
-import {
-  initializeCoreErrorHandling,
-  EnhancedErrorBoundary,
-} from "./core/error";
+import { initializeCoreErrorHandling, EnhancedErrorBoundary } from './core/error';
 
 // Import security system
-import { initializeSecurity } from "./security";
+import { initializeSecurity } from './security';
 
 // Import privacy components
-import { CookieConsentBanner } from "./components/privacy";
+import { CookieConsentBanner } from './components/privacy';
 
 // =============================================================================
 // CONFIGURATION
@@ -69,7 +63,7 @@ const CONFIG = {
   },
 } as const;
 
-const IS_DEV = process.env.NODE_ENV === "development";
+const IS_DEV = process.env.NODE_ENV === 'development';
 
 // =============================================================================
 // QUERY CLIENT SINGLETON
@@ -87,11 +81,11 @@ const getQueryClient = (): QueryClient => {
           gcTime: CONFIG.query.gcTime,
           refetchOnWindowFocus: CONFIG.query.refetchOnWindowFocus,
           throwOnError: false,
-          networkMode: "online",
+          networkMode: 'online',
         },
         mutations: {
           retry: CONFIG.query.retry,
-          networkMode: "online",
+          networkMode: 'online',
         },
       },
     });
@@ -104,17 +98,14 @@ const getQueryClient = (): QueryClient => {
 // =============================================================================
 
 function PageLoader() {
-  const { error, isTimeout } = useLoadingOperation(
-    "app-page-loading",
-    {
-      timeout: CONFIG.loading.pageTimeout,
-      connectionAware: CONFIG.loading.connectionAware,
-      showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
-    }
-  );
+  const { error, isTimeout } = useLoadingOperation('app-page-loading', {
+    timeout: CONFIG.loading.pageTimeout,
+    connectionAware: CONFIG.loading.connectionAware,
+    showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
+  });
 
-  const currentState = isTimeout ? "timeout" : "loading";
-  const loadingMessage = error?.message || "Loading page...";
+  const currentState = isTimeout ? 'timeout' : 'loading';
+  const loadingMessage = error?.message || 'Loading page...';
 
   return (
     <LoadingStateManager
@@ -136,125 +127,125 @@ function PageLoader() {
 const ROUTES = [
   // Main routes
   {
-    path: "/",
+    path: '/',
     element: (
       <LazyPageWrapper>
         <SimpleLazyPages.HomePage />
       </LazyPageWrapper>
     ),
-    id: "home",
+    id: 'home',
   },
-  { path: "/dashboard", element: <SafeLazyPages.Dashboard />, id: "dashboard" },
+  { path: '/dashboard', element: <SafeLazyPages.Dashboard />, id: 'dashboard' },
 
   // Bill routes
   {
-    path: "/bills",
+    path: '/bills',
     element: <SafeLazyPages.BillsDashboard />,
-    id: "bills-dashboard",
+    id: 'bills-dashboard',
   },
   {
-    path: "/bills/:id",
+    path: '/bills/:id',
     element: <SafeLazyPages.BillDetail />,
-    id: "bill-detail",
+    id: 'bill-detail',
   },
   {
-    path: "/bills/:id/analysis",
+    path: '/bills/:id/analysis',
     element: <SafeLazyPages.BillAnalysis />,
-    id: "bill-analysis",
+    id: 'bill-analysis',
   },
   {
-    path: "/bills/:id/comments",
+    path: '/bills/:id/comments',
     element: <SafeLazyPages.CommentsPage />,
-    id: "bill-comments",
+    id: 'bill-comments',
   },
 
   // Sponsorship routes
   {
-    path: "/bill-sponsorship-analysis",
+    path: '/bill-sponsorship-analysis',
     element: <SafeLazyPages.BillSponsorshipAnalysis />,
-    id: "sponsorship-analysis",
+    id: 'sponsorship-analysis',
   },
   {
-    path: "/bills/:id/sponsorship-analysis",
+    path: '/bills/:id/sponsorship-analysis',
     element: <SafeLazyPages.BillSponsorshipAnalysis />,
-    id: "bill-sponsorship-analysis",
+    id: 'bill-sponsorship-analysis',
   },
   {
-    path: "/bills/:id/sponsorship-analysis/overview",
+    path: '/bills/:id/sponsorship-analysis/overview',
     element: <SafeLazySponsorshipPages.SponsorshipOverviewWrapper />,
-    id: "sponsorship-overview",
+    id: 'sponsorship-overview',
   },
   {
-    path: "/bills/:id/sponsorship-analysis/primary-sponsor",
+    path: '/bills/:id/sponsorship-analysis/primary-sponsor',
     element: <SafeLazySponsorshipPages.PrimarySponsorWrapper />,
-    id: "primary-sponsor",
+    id: 'primary-sponsor',
   },
   {
-    path: "/bills/:id/sponsorship-analysis/co-sponsors",
+    path: '/bills/:id/sponsorship-analysis/co-sponsors',
     element: <SafeLazySponsorshipPages.CoSponsorsWrapper />,
-    id: "co-sponsors",
+    id: 'co-sponsors',
   },
   {
-    path: "/bills/:id/sponsorship-analysis/financial-network",
+    path: '/bills/:id/sponsorship-analysis/financial-network',
     element: <SafeLazySponsorshipPages.FinancialNetworkWrapper />,
-    id: "financial-network",
+    id: 'financial-network',
   },
   {
-    path: "/bills/:id/sponsorship-analysis/methodology",
+    path: '/bills/:id/sponsorship-analysis/methodology',
     element: <SafeLazySponsorshipPages.MethodologyWrapper />,
-    id: "methodology",
+    id: 'methodology',
   },
 
   // Community routes
   {
-    path: "/community",
+    path: '/community',
     element: <SafeLazyPages.CommunityInput />,
-    id: "community",
+    id: 'community',
   },
   {
-    path: "/expert-verification",
+    path: '/expert-verification',
     element: <SafeLazyPages.ExpertVerification />,
-    id: "expert-verification",
+    id: 'expert-verification',
   },
 
   // User routes
-  { path: "/auth", element: <SafeLazyPages.AuthPage />, id: "auth" },
-  { path: "/profile", element: <SafeLazyPages.Profile />, id: "profile" },
+  { path: '/auth', element: <SafeLazyPages.AuthPage />, id: 'auth' },
+  { path: '/profile', element: <SafeLazyPages.Profile />, id: 'profile' },
   {
-    path: "/user-profile",
+    path: '/user-profile',
     element: <SafeLazyPages.UserProfilePage />,
-    id: "user-profile",
+    id: 'user-profile',
   },
   {
-    path: "/user-dashboard",
+    path: '/user-dashboard',
     element: <SafeLazyPages.UserDashboard />,
-    id: "user-dashboard",
+    id: 'user-dashboard',
   },
   {
-    path: "/onboarding",
+    path: '/onboarding',
     element: <SafeLazyPages.Onboarding />,
-    id: "onboarding",
+    id: 'onboarding',
   },
   {
-    path: "/privacy-settings",
+    path: '/privacy-settings',
     element: <SafeLazyPages.PrivacySettings />,
-    id: "privacy-settings",
+    id: 'privacy-settings',
   },
 
   // System routes
-  { path: "/search", element: <SafeLazyPages.SearchPage />, id: "search" },
-  { path: "/admin", element: <SafeLazyPages.AdminPage />, id: "admin" },
+  { path: '/search', element: <SafeLazyPages.SearchPage />, id: 'search' },
+  { path: '/admin', element: <SafeLazyPages.AdminPage />, id: 'admin' },
   {
-    path: "/admin/database",
+    path: '/admin/database',
     element: <SafeLazyPages.DatabaseManager />,
-    id: "database-manager",
+    id: 'database-manager',
   },
   {
-    path: "/design-system-test",
+    path: '/design-system-test',
     element: <DesignSystemTestPage />,
-    id: "design-system-test",
+    id: 'design-system-test',
   },
-  { path: "*", element: <SafeLazyPages.NotFound />, id: "not-found" },
+  { path: '*', element: <SafeLazyPages.NotFound />, id: 'not-found' },
 ] as const;
 
 // =============================================================================
@@ -302,20 +293,14 @@ function AppContent() {
 
       <AppLayout>
         <Suspense fallback={<PageLoader />}>
-          <EnhancedErrorBoundary
-            enableRecovery={true}
-            context="Routes"
-          >
+          <EnhancedErrorBoundary enableRecovery={true} context="Routes">
             <Routes>
               {ROUTES.map(({ path, element, id }) => (
                 <Route
                   key={id}
                   path={path}
                   element={
-                    <EnhancedErrorBoundary
-                      enableRecovery={true}
-                      context={`Route-${id}`}
-                    >
+                    <EnhancedErrorBoundary enableRecovery={true} context={`Route-${id}`}>
                       {element}
                     </EnhancedErrorBoundary>
                   }
@@ -333,7 +318,7 @@ function AppContent() {
 // MAIN APP
 // =============================================================================
 
-// Create NavigationProvider once to avoid infinite re-renders
+// Create NavigationProvider outside component to prevent recreation on every render
 const NavigationProvider = createNavigationProvider(
   useLocation,
   useNavigate,
@@ -350,17 +335,17 @@ function NavigationWrapper({ children }: { children: React.ReactNode }) {
 function WebVitalsMonitor() {
   useWebVitals({
     enabled: true,
-    onAllMetrics: (metrics) => {
+    onAllMetrics: metrics => {
       if (IS_DEV) {
-        logger.info("Core Web Vitals collected", undefined, metrics as Record<string, unknown>);
+        logger.info('Core Web Vitals collected', undefined, metrics as Record<string, unknown>);
       }
       // In production, this could send to analytics service
       if (!IS_DEV && (window as any).gtag) {
         // Send to Google Analytics
         Object.entries(metrics).forEach(([name, value]) => {
           if (value !== undefined) {
-            (window as any).gtag("event", "web_vitals", {
-              event_category: "Web Vitals",
+            (window as any).gtag('event', 'web_vitals', {
+              event_category: 'Web Vitals',
               event_label: name.toUpperCase(),
               value: Math.round(value),
               custom_map: { metric_value: value },
@@ -369,7 +354,7 @@ function WebVitalsMonitor() {
         });
       }
     },
-    reportTo: IS_DEV ? undefined : "/api/analytics/web-vitals",
+    reportTo: IS_DEV ? undefined : '/api/analytics/web-vitals',
   });
 
   return null; // This component doesn't render anything
@@ -379,73 +364,81 @@ export default function App() {
   const queryClient = getQueryClient();
 
   useEffect(() => {
-    // Initialize consolidated core error handling system
-    initializeCoreErrorHandling({
-      enableGlobalHandlers: true,
-      enableRecovery: true,
-      logErrors: true,
-      maxErrors: 100,
-      enableAnalytics: process.env.NODE_ENV === "production",
-    });
+    let isInitialized = false;
+    
+    const initializeApp = async () => {
+      if (isInitialized) return;
+      isInitialized = true;
 
-    // Initialize security system
-    initializeSecurity({
-      enableCSP: true,
-      enableCSRF: true,
-      enableRateLimit: true,
-      enableVulnerabilityScanning: true,
-      enableInputSanitization: true,
-      scanInterval: IS_DEV ? 60000 : 300000, // 1 min dev, 5 min prod
-    });
+      try {
+        // Initialize consolidated core error handling system
+        initializeCoreErrorHandling({
+          enableGlobalHandlers: true,
+          enableRecovery: true,
+          logErrors: true,
+          maxErrors: 100,
+          enableAnalytics: process.env.NODE_ENV === 'production',
+        });
 
-    // Initialize performance monitoring (already started in main.tsx, but ensure config is set)
-    performanceMonitor.updateConfig({
-      enableBundleAnalysis: true,
-      enableAssetOptimization: true,
-      enableWebVitalsMonitoring: true,
-      enableRealtimeOptimization: true,
-      reportingInterval: IS_DEV ? 10000 : 30000, // More frequent in dev
-      performanceBudgets: {
-        loadTime: IS_DEV ? 5000 : 3000, // More lenient in dev
-        bundleSize: 2 * 1024 * 1024, // 2MB
-        memoryUsage: IS_DEV ? 200 * 1024 * 1024 : 100 * 1024 * 1024 // 200MB dev, 100MB prod
+        // Initialize security system
+        await initializeSecurity({
+          enableCSP: true,
+          enableCSRF: true,
+          enableRateLimit: true,
+          enableVulnerabilityScanning: true,
+          enableInputSanitization: true,
+          scanInterval: IS_DEV ? 60000 : 300000, // 1 min dev, 5 min prod
+        });
+
+        // Initialize performance monitoring (already started in main.tsx, but ensure config is set)
+        performanceMonitor.updateConfig({
+          enableBundleAnalysis: true,
+          enableAssetOptimization: true,
+          enableWebVitalsMonitoring: true,
+          enableRealtimeOptimization: true,
+          reportingInterval: IS_DEV ? 10000 : 30000, // More frequent in dev
+          performanceBudgets: {
+            loadTime: IS_DEV ? 5000 : 3000, // More lenient in dev
+            bundleSize: 2 * 1024 * 1024, // 2MB
+            memoryUsage: IS_DEV ? 200 * 1024 * 1024 : 100 * 1024 * 1024, // 200MB dev, 100MB prod
+          },
+        });
+
+        if (IS_DEV) {
+          logger.info('App initialized with unified error handling and security', {
+            component: 'Chanuka',
+            routeCount: ROUTES.length,
+            errorHandlingEnabled: true,
+            coreErrorSystemEnabled: true,
+            securitySystemEnabled: true,
+            advancedFeaturesEnabled: true,
+          });
+        }
+      } catch (error) {
+        logger.error('Failed to initialize app systems', { error });
       }
-    });
+    };
 
-    if (IS_DEV) {
-      logger.info("App initialized with unified error handling and security", {
-        component: "Chanuka",
-        routeCount: ROUTES.length,
-        errorHandlingEnabled: true,
-        coreErrorSystemEnabled: true,
-        securitySystemEnabled: true,
-        advancedFeaturesEnabled: true,
-      });
-    }
+    initializeApp();
+
+    // Cleanup function
+    return () => {
+      isInitialized = false;
+    };
   }, []);
 
   return (
-    <EnhancedErrorBoundary
-      enableRecovery={true}
-      context="App-Root"
-      showTechnicalDetails={IS_DEV}
-    >
-      <BrowserCompatibilityChecker
-        showWarnings={true}
-        blockUnsupported={false}
-      >
+    <EnhancedErrorBoundary enableRecovery={true} context="App-Root" showTechnicalDetails={IS_DEV}>
+      <BrowserCompatibilityChecker showWarnings={true} blockUnsupported={false}>
         <AppProviders queryClient={queryClient}>
           <BrowserRouter>
             <NavigationWrapper>
               <WebVitalsMonitor />
-              <EnhancedErrorBoundary
-                enableRecovery={true}
-                context="AppContent"
-              >
+              <EnhancedErrorBoundary enableRecovery={true} context="AppContent">
                 <AppContent />
               </EnhancedErrorBoundary>
               <Toaster />
-              <AccessibilityTrigger />
+              <AccessibilitySettingsPanel />
               <OfflineStatus showDetails={true} />
               <CookieConsentBanner />
               {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}

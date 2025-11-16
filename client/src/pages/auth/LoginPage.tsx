@@ -11,7 +11,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { SocialLogin } from '../../components/auth/SocialLogin';
-import { useAuth } from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/useAuth';
 import { Shield, Eye, EyeOff, Loader2, AlertTriangle } from 'lucide-react';
 import { logger } from '../../utils/logger';
 

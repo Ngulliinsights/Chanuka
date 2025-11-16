@@ -10,7 +10,7 @@ import { GlobalLoadingIndicator } from '../loading/GlobalLoadingIndicator';
 import { SkipLinks } from './SkipLinks';
 import { NavigationBar } from './NavigationBar';
 import { AppRouter } from './AppRouter';
-import { AuthProvider } from '../../hooks/use-auth';
+import { AuthProvider } from '../../hooks/useAuth';
 import { logger } from '../../utils/logger';
 
 interface AppShellProps {

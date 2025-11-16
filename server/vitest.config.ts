@@ -1,16 +1,15 @@
 import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import path from 'path';
 
 export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    setupFiles: ['./tests/setup.ts'],
   },
-  resolve: {
-    alias: {
-      '@chanuka/shared': resolve(__dirname, '../shared'),
-      '@server': resolve(__dirname, '.'),
-    },
+  alias: {
+    '@': path.resolve(__dirname),
+    '@server': path.resolve(__dirname),
+    '@chanuka/shared': path.resolve(__dirname, '../shared'),
+    '@shared': path.resolve(__dirname, '../shared'),
   },
 });

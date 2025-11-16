@@ -1,7 +1,5 @@
-import pkg from 'pg';
-import { logger   } from '../../../shared/core/src/index.js';
-const { Pool } = pkg;
 import type { Pool as PoolType } from 'pg';
+import { validationMetricsCollector } from './validation-metrics.js';
 
 export interface ValidationRule {
   name: string;
@@ -28,7 +26,7 @@ export interface ValidationSummary {
   results: ValidationResult[];
 }
 
-export class DataValidationService {
+export class DataIntegrityValidationService {
   private pool: PoolType;
 
   constructor(pool: PoolType) {
@@ -256,10 +254,12 @@ export class DataValidationService {
    * Run a single validation rule
    */
   async runValidationRule(rule: ValidationRule): Promise<ValidationResult> {
+    const endMetric = validationMetricsCollector.startValidation('DataIntegrityValidationService', 'runValidationRule', { rule: rule.name });
+
     try {
       const result = await this.pool.query(rule.query);
       const count = result.rows.length;
-      
+
       let passed = true;
       let message = `${rule.description}: OK`;
 
@@ -275,6 +275,8 @@ export class DataValidationService {
         }
       }
 
+      endMetric(passed, passed ? undefined : 'data_integrity_issue', 'business_logic');
+
       return {
         rule: rule.name,
         passed,
@@ -284,6 +286,8 @@ export class DataValidationService {
         details: result.rows.slice(0, 5) // Limit details to first 5 rows
       };
     } catch (error) {
+      endMetric(false, 'database_error', 'system');
+
       return {
         rule: rule.name,
         passed: false,

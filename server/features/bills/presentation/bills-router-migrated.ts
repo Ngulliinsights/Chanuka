@@ -8,9 +8,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import * as Boom from '@hapi/boom';
 import { billService, BillNotFoundError, CommentNotFoundError, ValidationError } from '../application/bills.js';
-import { authenticateToken } from '@/middleware/auth.js';
-import { asyncErrorHandler } from '@/middleware/boom-error-middleware.js';
-import type { AuthenticatedRequest } from '@/middleware/auth.js';
+import { authenticateToken } from '../../../middleware/auth.js';
+import { asyncErrorHandler } from '../../../middleware/boom-error-middleware.js';
+import type { AuthenticatedRequest } from '../../../middleware/auth.js';
 import { errorAdapter } from '@/infrastructure/errors/error-adapter.js';
 import { logger  } from '../../../../shared/core/src/index.js';
 import { securityAuditService } from '../../security/security-audit-service.js';

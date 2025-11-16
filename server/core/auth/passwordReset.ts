@@ -1,32 +1,18 @@
 // services/passwordReset.ts
-import { database as db } from '../../../shared/database';
+import { database as db } from '../../../shared/database/connection.js';
 // Import specific tables and functions needed from the consolidated schema
 import { users } from '../../../shared/schema';
 import { ValidationError } from '../../../shared/core/src/observability/error-management/errors/specialized-errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
 import { config } from '../../config/index.js';
 import { sendTemplatedEmail } from '../../infrastructure/notifications/email-service.js';
-import { logger  } from '../../../shared/core/src/index.js';
 
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;
 
 // Using users table directly, no need for separate interfaces
-type UserEntry = InferSelectModel<typeof users>;
-
-/**
- * Helper function to ensure a value is a number
- * Converts strings to numbers and keeps numbers as they are
- */
-function ensureNumber(value: string | number): number {
-  if (typeof value === 'string') {
-    return parseInt(value, 10);
-  }
-  return value;
-}
 
 class PasswordResetService {
   /**
@@ -37,15 +23,12 @@ class PasswordResetService {
    */
   async generateResetToken(email: string): Promise<void> {
     // Find user by email
-    const user = await db.query.users.findFirst({
-      where: (usersTable, { eq }) => eq(usersTable.email, email),
-      columns: {
-        id: true,
-        email: true,
-        name: true,
-        is_active: true,
-      },
-    });
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1)
+      .then((rows: any) => rows[0] || null);
 
     // If user not found or inactive, silently return to prevent email enumeration
     if (!user || !user.is_active) {

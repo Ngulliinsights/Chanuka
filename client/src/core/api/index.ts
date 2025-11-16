@@ -14,6 +14,7 @@ export type { BillsSearchParams, PaginatedBillsResponse, BillEngagementData, Bil
 export type { DiscussionThread, Comment, CommentFormData, CommentReport, ModerationAction, ModerationViolationType, Expert, ActivityItem, TrendingTopic, CommunityStats, LocalImpactMetrics } from './community';
 export type { UserProfile, UserBadge, UserAchievement, ActivitySummary, SavedBill, UserEngagementHistory, UserPreferences } from './user';
 export type { Notification, NotificationPreferences, NotificationType, NotificationCategory } from './notifications';
+export type { SystemHealth, SystemStats, SystemActivity, SystemSchema, SystemEnvironment } from './system';
 
 // Re-export commonly used instances
 export { globalApiClient } from './client';
@@ -24,8 +25,12 @@ export { globalServiceLocator } from './registry';
 export { globalWebSocketPool } from './websocket';
 
 // Re-export API service instances
+export { authApiService } from './client';
 export { communityApiService } from './community';
+export { systemApiService } from './system';
 export { userApiService } from './user';
 export { notificationApiService } from './notifications';
 export { performanceApiService } from './performance';
 export { privacyAnalyticsApiService } from './privacy';
+export { analyticsApiService } from './analytics';
+export { searchApiClient } from './search';

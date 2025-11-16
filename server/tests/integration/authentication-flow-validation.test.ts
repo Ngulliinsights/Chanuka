@@ -19,7 +19,7 @@ import express from 'express';
 import cors from 'cors';
 import { router as authRouter } from '@/components/auth';
 import { router as billsRouter } from '../../features/bills/presentation/bills-router.js';
-import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
+import { router as sponsorsRouter } from '../../features/bills/sponsors.js';
 import { router as profileRouter } from '../../features/users/application/profile.js';
 import { router as adminRouter } from '../../features/admin/admin.js';
 import { database as db, users } from '@shared/database/connection.js';

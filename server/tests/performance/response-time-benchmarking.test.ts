@@ -16,8 +16,8 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import { router as billsRouter } from '../../features/bills/bills-router.ts';
-import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
+import { router as billsRouter } from '../../features/bills/bills-router.js';
+import { router as sponsorsRouter } from '../../features/bills/sponsors.js';
 import { router as financialDisclosureRouter } from '../../features/analytics/financial-disclosure/index.js';
 import { logger  } from '../../../shared/core/src/index.js';
 

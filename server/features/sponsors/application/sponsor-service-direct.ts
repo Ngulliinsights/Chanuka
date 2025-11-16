@@ -4,7 +4,7 @@ import {
   type Sponsor, type InsertSponsor, type Bill
 } from '@shared/schema';
 import { eq, and, sql, desc, asc, count, inArray, like, or, isNull, isNotNull } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS

@@ -43,6 +43,7 @@ export function useMediaQuery(query: string): boolean {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const currentQueryRef = useRef<string>('')
   const isMountedRef = useRef<boolean>(true)
+  const mediaQueryRef = useRef<MediaQueryList | null>(null)
 
   const debouncedSetMatches = useCallback((value: boolean, queryToCheck: string) => {
     // Clear any existing timer to prevent race conditions
@@ -72,30 +73,62 @@ export function useMediaQuery(query: string): boolean {
     // Set isClient to true first
     setIsClient(true)
 
-    const mediaQuery = window.matchMedia(query)
-    const handleChange = () => debouncedSetMatches(mediaQuery.matches, query)
-    
-    // Use setTimeout to set initial value after state update
-    const timeoutId = setTimeout(() => {
-      if (isMountedRef.current && currentQueryRef.current === query) {
-        setMatches(mediaQuery.matches)
+    try {
+      const mediaQuery = window.matchMedia(query)
+      mediaQueryRef.current = mediaQuery
+      
+      const handleChange = () => {
+        if (isMountedRef.current && currentQueryRef.current === query) {
+          debouncedSetMatches(mediaQuery.matches, query)
+        }
       }
-    }, 0)
-    
-    // Listen for changes
-    mediaQuery.addEventListener('change', handleChange)
-    
-    // Cleanup function to remove event listener and clear timeout
+      
+      // Use setTimeout to set initial value after state update
+      const timeoutId = setTimeout(() => {
+        if (isMountedRef.current && currentQueryRef.current === query) {
+          setMatches(mediaQuery.matches)
+        }
+      }, 0)
+      
+      // Listen for changes
+      mediaQuery.addEventListener('change', handleChange)
+      
+      // Cleanup function to remove event listener and clear timeout
+      return () => {
+        isMountedRef.current = false
+        clearTimeout(timeoutId)
+        
+        // Clean up media query listener
+        if (mediaQueryRef.current) {
+          mediaQueryRef.current.removeEventListener('change', handleChange)
+          mediaQueryRef.current = null
+        }
+        
+        // Clean up debounce timer
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current)
+          debounceTimerRef.current = null
+        }
+      }
+    } catch (error) {
+      // Handle potential errors with matchMedia
+      console.warn('Error setting up media query:', error)
+      return () => {
+        isMountedRef.current = false
+      }
+    }
+  }, [query, debouncedSetMatches])
+
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
       isMountedRef.current = false
-      clearTimeout(timeoutId)
-      mediaQuery.removeEventListener('change', handleChange)
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current)
         debounceTimerRef.current = null
       }
     }
-  }, [query, debouncedSetMatches])
+  }, [])
 
   // Return false during SSR and before client-side hydration to prevent layout shifts
   // Only return actual matches value after we're confirmed to be on the client

@@ -47,7 +47,7 @@ class CircuitBreaker {
     private readonly failureThreshold: number = 5,
     private readonly recoveryTimeout: number = 60000,
     private readonly successThreshold: number = 3
-  ) {}
+  ) { }
 
   async execute<T>(operation: () => Promise<T>): Promise<T> {
     this.metrics.totalRequests++;
@@ -84,7 +84,7 @@ class CircuitBreaker {
 
   private onSuccess(): void {
     this.failureCount = 0;
-    
+
     if (this.state === CircuitState.HALF_OPEN) {
       this.successCount++;
       if (this.successCount >= this.successThreshold) {
@@ -310,7 +310,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
         return this.createFallbackResponse<T>(
           requestId,
-          options.fallbackData,
+          options.fallbackData as T,
           startTime
         );
       }
@@ -320,9 +320,9 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
   // Apply all response interceptors
   private async applyResponseInterceptors<T>(response: ApiResponse<T>): Promise<ApiResponse<T>> {
-    let processedResponse = response;
+    let processedResponse: ApiResponse<T> = response;
     for (const interceptor of this.responseInterceptors) {
-      processedResponse = await interceptor.intercept(processedResponse);
+      processedResponse = await interceptor.intercept(processedResponse) as ApiResponse<T>;
     }
     return processedResponse;
   }
@@ -335,10 +335,14 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   ): Promise<ApiResponse<T>> {
     if (options?.responseSchema && response.data) {
       try {
-        response.data = await validationService.validate(
+        const validatedData = await validationService.validate(
           options.responseSchema,
           response.data
         );
+        return {
+          ...response,
+          data: validatedData
+        };
       } catch (validationError) {
         logger.error('API response validation failed', {
           component: 'ApiClient',
@@ -358,7 +362,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     response: ApiResponse<T>,
     options: RequestOptions | undefined
   ): Promise<void> {
-    const shouldCache = 
+    const shouldCache =
       method === 'GET' &&
       !options?.skipCache &&
       response.status >= 200 &&
@@ -368,9 +372,9 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     if (shouldCache) {
       const cacheKey = CacheKeyGenerator.generate(endpoint, options?.params, method);
       const ttl = options?.cacheTTL || options?.cache?.ttl;
-      
+
       await globalCache.set(cacheKey, response.data, { ttl });
-      
+
       logger.debug('Response cached', {
         component: 'ApiClient',
         endpoint,
@@ -402,7 +406,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
       return this.createFallbackResponse<T>(
         requestId,
-        options.fallbackData,
+        options.fallbackData as T,
         startTime
       );
     }
@@ -500,7 +504,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   // Build retry configuration with sensible defaults
   private buildRetryConfig(retryConfig?: RetryConfig): Required<RetryConfig> {
     const apiConfig = globalConfig.get('api');
-    
+
     return {
       maxRetries: retryConfig?.maxRetries ?? apiConfig.retry.maxRetries,
       baseDelay: retryConfig?.baseDelay ?? apiConfig.retry.baseDelay,
@@ -542,7 +546,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       baseDelay * Math.pow(backoffMultiplier, attempt),
       maxDelay
     );
-    
+
     // Add jitter (50-100% of calculated delay) to prevent thundering herd
     return exponentialDelay * (0.5 + Math.random() * 0.5);
   }
@@ -550,24 +554,24 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   // Enhanced retry condition with detailed error analysis
   private defaultRetryCondition(error: Error, attempt: number): boolean {
     const errorMessage = error.message.toLowerCase();
-    
+
     // Never retry 4xx errors except timeouts (408) and rate limits (429)
-    if (errorMessage.includes('40') && 
-        !errorMessage.includes('408') && 
-        !errorMessage.includes('429')) {
+    if (errorMessage.includes('40') &&
+      !errorMessage.includes('408') &&
+      !errorMessage.includes('429')) {
       return false;
     }
 
     // Retry network errors and specific 5xx errors
     const isNetworkError = error.name === 'TypeError' || error.name === 'TimeoutError';
     const isServerError = errorMessage.includes('5');
-    
+
     if (isNetworkError || isServerError) {
       // On final attempt, only retry specific recoverable errors
       if (attempt === 2) {
-        return errorMessage.includes('503') || 
-               errorMessage.includes('504') || 
-               error.name === 'TypeError';
+        return errorMessage.includes('503') ||
+          errorMessage.includes('504') ||
+          error.name === 'TypeError';
       }
       return true;
     }
@@ -660,15 +664,15 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     });
 
     try {
-      const authService = (globalThis as any).authBackendService;
+      const authService = (globalThis as any).authService;
       if (authService?.refreshTokens) {
         await authService.refreshTokens();
-        
+
         logger.info('Token refresh successful, retrying request', {
           component: 'ApiClient',
           endpoint: request.url
         });
-        
+
         return this.executeRequest(request);
       }
     } catch (refreshError) {
@@ -694,12 +698,17 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     throw new Error(`Service ${name} not found in registry`);
   }
 
+  hasService(name: string): boolean {
+    // For now, always return false as we don't have a registry
+    return false;
+  }
+
   // Configuration Management
   configure(config: ClientConfig): void {
     this.baseUrl = config.baseUrl;
     this.timeout = config.timeout;
     this.headers = { ...this.headers, ...config.headers };
-    
+
     logger.info('API client reconfigured', {
       component: 'ApiClient',
       baseUrl: this.baseUrl,
@@ -727,7 +736,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     });
   }
 
-  cleanup(): void {
+  async cleanup(): Promise<void> {
     // Cancel all active requests
     const activeCount = this.activeRequests.size;
     for (const [, controller] of this.activeRequests) {
@@ -830,14 +839,17 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
 // Default Interceptors
 export class AuthRequestInterceptor implements RequestInterceptor {
-  constructor(private getToken: () => string | null) {}
+  constructor(private getToken: () => string | null) { }
 
   async intercept(request: ApiRequest): Promise<ApiRequest> {
     const token = this.getToken();
     if (token) {
-      request.headers = {
-        ...request.headers,
-        'Authorization': `Bearer ${token}`
+      return {
+        ...request,
+        headers: {
+          ...request.headers,
+          'Authorization': `Bearer ${token}`
+        }
       };
     }
     return request;
@@ -873,3 +885,7 @@ export const globalApiClient = new UnifiedApiClientImpl({
 
 // Initialize with default interceptors
 globalApiClient.addResponseInterceptor(new LoggingResponseInterceptor());
+
+// Initialize auth service with the API client to break circular dependency
+import { createAuthApiService } from './auth';
+export const authApiService = createAuthApiService(globalApiClient);

@@ -17,10 +17,7 @@ export const analysis = pgTable("analysis", {
   approved_by: uuidType("approved_by").references(() => users.id, { onDelete: "set null" }),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  // Unique per bill and analysis type could be enforced via migration
-  // Add indexes in SQL migrations as needed
-}));
+});
 
 // Types
 export type Analysis = typeof analysis.$inferSelect;

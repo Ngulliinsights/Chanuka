@@ -35,7 +35,7 @@ const mockUseMediaQuery = vi.fn(() => false);
 const mockUseLocation = vi.fn(() => ({ pathname: '/' }));
 const mockUseNavigate = vi.fn(() => vi.fn());
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: mockUseAuth,
 }));
 

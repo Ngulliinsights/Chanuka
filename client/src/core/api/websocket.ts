@@ -1,8 +1,8 @@
 // Consolidated WebSocket Service for Unified API Client Architecture
 // Based on the consolidated API client design specifications
 
-import { WebSocketConfig, Subscription, WebSocketEvents, BillUpdate, WebSocketNotification, UserPreferences, ConnectionState } from './types';
-import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
+import { WebSocketConfig, Subscription, ConnectionState } from './types';
+import { globalErrorHandler } from './errors';
 
 // WebSocketEvents interface imported from types.ts
 
@@ -141,8 +141,7 @@ export class UnifiedWebSocketManager {
   private connectionState: ConnectionState = ConnectionState.DISCONNECTED;
   private eventEmitter = new EventEmitter();
   private reconnectTimer: NodeJS.Timeout | null = null;
-  private lastHeartbeat = 0;
-  private heartbeatTimeoutTimer: NodeJS.Timeout | null = null;
+
   private connectionPromise: Promise<void> | null = null;
   private currentToken: string | null = null;
   private connectedAt: number | null = null;
@@ -204,7 +203,7 @@ export class UnifiedWebSocketManager {
         const wsUrl = token
           ? `${this.config.url}?token=${encodeURIComponent(token)}`
           : this.config.url;
-        this.ws = new WebSocket(wsUrl, this.config.protocols);
+        this.ws = new WebSocket(wsUrl, this.config.protocols as string[]);
 
         // Optimization: Add connection timeout to prevent hanging
         const connectionTimeout = setTimeout(() => {
@@ -353,6 +352,10 @@ export class UnifiedWebSocketManager {
 
   off(event: string, listener: (...args: any[]) => void): void {
     this.eventEmitter.off(event, listener);
+  }
+
+  private emit(event: string, ...args: any[]): void {
+    this.eventEmitter.emit(event, ...args);
   }
 
   private onConnected(): void {
@@ -606,12 +609,12 @@ export class UnifiedWebSocketManager {
     }
   }
 
-  private handleHeartbeat(message: any): void {
+  private handleHeartbeat(_message: any): void {
     // Update last pong time
     this.lastPongTime = Date.now();
   }
 
-  private handlePong(message: any): void {
+  private handlePong(_message: any): void {
     // Update last pong time
     this.lastPongTime = Date.now();
   }
@@ -847,10 +850,10 @@ export class UnifiedWebSocketManager {
     return `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private compressMessage(message: any): string {
+  private compressMessage(_message: any): string {
     // Placeholder for compression implementation
     // Would use a library like pako for actual compression
-    return JSON.stringify(message);
+    return JSON.stringify(_message);
   }
 
   private decompressMessage(data: string): any {
@@ -905,17 +908,17 @@ export class UnifiedWebSocketManager {
     maxQueueSize?: number;
   }): void {
     if (options.maxReconnectAttempts !== undefined) {
-      this.config.reconnect.maxAttempts = Math.max(0, options.maxReconnectAttempts);
+      (this.config.reconnect as any).maxAttempts = Math.max(0, options.maxReconnectAttempts);
     }
     if (options.reconnectDelay !== undefined) {
-      this.config.reconnect.baseDelay = Math.max(100, options.reconnectDelay);
+      (this.config.reconnect as any).baseDelay = Math.max(100, options.reconnectDelay);
     }
     if (options.heartbeatInterval !== undefined) {
-      this.config.heartbeat.interval = Math.max(5000, options.heartbeatInterval);
+      (this.config.heartbeat as any).interval = Math.max(5000, options.heartbeatInterval);
     }
     if (options.heartbeatTimeout !== undefined) {
       // Update both config and local variable
-      this.config.heartbeat.timeout = Math.max(10000, options.heartbeatTimeout);
+      (this.config.heartbeat as any).timeout = Math.max(10000, options.heartbeatTimeout);
     }
     if (options.maxQueueSize !== undefined) {
       this.maxQueueSize = Math.max(0, options.maxQueueSize);
@@ -1069,9 +1072,7 @@ export class UnifiedWebSocketManager {
            this.connectionState === ConnectionState.CONNECTED;
   }
 
-  private emit(event: string, data?: any): void {
-    this.eventEmitter.emit(event, data);
-  }
+
 
   private cleanup(normalClose: boolean = false): void {
     if (this.reconnectTimer) {

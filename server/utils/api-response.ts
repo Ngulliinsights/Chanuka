@@ -2,11 +2,14 @@
  * LEGACY ADAPTER: API Response Utilities
  */
 
-import { UnifiedApiResponse,
+import { 
   ApiResponse,
-  ErrorResponse,
-  sendApiResponse
- } from '@shared/core/utils/api-utils';
+  ApiErrorResponse as ErrorResponse,
+  ApiSuccessResponse as sendApiResponse
+ } from '@shared/core';
+
+// For backward compatibility
+export const UnifiedApiResponse = ApiResponse;
 
 console.warn(
   '[DEPRECATED] server/utils/api-response.ts is deprecated. ' +

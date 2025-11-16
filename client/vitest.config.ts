@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { coverageConfig } from './src/__tests__/coverage/coverage-config';
 
 export default defineConfig({
@@ -55,13 +56,7 @@ export default defineConfig({
       clean: true,
     },
     
-    // Reporters
-    reporter: [
-      'verbose',
-      'json',
-      ['html', { outputFile: './test-results/unit-report.html' }],
-      ['junit', { outputFile: './test-results/unit-results.xml' }],
-    ],
+    reporter: ['verbose'],
     
     // Retry configuration
     retry: process.env.CI ? 2 : 0,
@@ -78,8 +73,8 @@ export default defineConfig({
   
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@chanuka/shared': resolve(__dirname, '../shared'),
+      '@': resolve(resolve(fileURLToPath(import.meta.url), '..'), './src'),
+      '@chanuka/shared': resolve(resolve(fileURLToPath(import.meta.url), '..'), '../shared'),
     },
   },
 });

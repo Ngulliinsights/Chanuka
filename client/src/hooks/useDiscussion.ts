@@ -6,7 +6,19 @@
  */
 
 import { useEffect, useCallback, useState, useRef } from 'react';
-import { useDiscussionStore, useDiscussionSelectors } from '../store/slices/discussionSlice';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { 
+  selectDiscussionState, 
+  selectThread, 
+  selectComment, 
+  selectThreadComments,
+  loadDiscussionData,
+  addCommentAsync,
+  voteCommentAsync,
+  reportCommentAsync,
+  setLoading,
+  setError
+} from '../store/slices/discussionSlice';
 import { discussionService } from '../services/discussion-service';
 import { 
   CommentFormData, 

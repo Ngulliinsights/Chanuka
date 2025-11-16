@@ -4,7 +4,7 @@ import { useRouteAccess } from '@/hooks/useRouteAccess';
 import { NavigationValidationError } from '../errors';
 
 // Mock the auth hook
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     user: { id: '1', role: 'citizen' },
   }),
@@ -48,7 +48,7 @@ describe('useRouteAccess', () => {
 
   it('should handle unauthenticated users', () => {
     // Mock unauthenticated user
-    vi.mocked(require('@/hooks/use-auth').useAuth).mockReturnValue({
+    vi.mocked(require('@/hooks/useAuth').useAuth).mockReturnValue({
       user: null,
     });
 

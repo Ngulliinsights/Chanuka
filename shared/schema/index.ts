@@ -8,12 +8,12 @@
 // ============================================================================
 export {
   operationalDb,
-  analyticsDb, 
+  analyticsDb,
   securityDb,
   database as db, // Default export (operational)
   checkDatabaseHealth,
   closeDatabaseConnections
-} from "../database";
+} from "../database/connection";
 
 // Base types are now defined inline in each schema file
 
@@ -34,6 +34,9 @@ export {
   parliamentary_sessions,
   parliamentary_sittings,
   bills,
+  oauth_providers,
+  oauth_tokens,
+  user_sessions,
   usersRelations,
   userProfilesRelations,
   sponsorsRelations,
@@ -41,7 +44,10 @@ export {
   committeeMembersRelations,
   parliamentarySessionsRelations,
   parliamentarySittingsRelations,
-  billsRelations
+  billsRelations,
+  oauthProvidersRelations,
+  oauthTokensRelations,
+  userSessionsRelations
 } from "./foundation";
 
 // ============================================================================
@@ -73,7 +79,7 @@ export {
 // ============================================================================
 // SCHEMA OBJECT - For backward compatibility
 // ============================================================================
-import { users as usersTable, user_profiles as userProfilesTable, sponsors as sponsorsTable, committees as committeesTable, committee_members as committeeMembersTable, parliamentary_sessions as parliamentarySessionsTable, parliamentary_sittings as parliamentarySittingsTable, bills as billsTable } from "./foundation";
+import { users as usersTable, user_profiles as userProfilesTable, sponsors as sponsorsTable, committees as committeesTable, committee_members as committeeMembersTable, parliamentary_sessions as parliamentarySessionsTable, parliamentary_sittings as parliamentarySittingsTable, bills as billsTable, oauth_providers as oauthProvidersTable, oauth_tokens as oauthTokensTable, user_sessions as userSessionsTable } from "./foundation";
 import { user_interests as userInterestsTable, bill_engagement as billEngagementTable, comments as commentsTable } from "./citizen_participation";
 import { analysis as analysisTable } from "./analysis";
 
@@ -86,6 +92,9 @@ export const schema = {
   parliamentary_sessions: parliamentarySessionsTable,
   parliamentary_sittings: parliamentarySittingsTable,
   bills: billsTable,
+  oauth_providers: oauthProvidersTable,
+  oauth_tokens: oauthTokensTable,
+  user_sessions: userSessionsTable,
   user_interests: userInterestsTable,
   bill_engagement: billEngagementTable,
   comments: commentsTable,
@@ -382,7 +391,13 @@ export type {
   ParliamentarySitting,
   NewParliamentarySitting,
   Bill,
-  NewBill
+  NewBill,
+  OAuthProvider,
+  NewOAuthProvider,
+  OAuthToken,
+  NewOAuthToken,
+  UserSession,
+  NewUserSession
 } from "./foundation";
 
 // Impact measurement types

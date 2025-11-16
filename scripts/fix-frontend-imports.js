@@ -57,7 +57,7 @@ const IMPORT_MAPPINGS = {
   
   // Hooks
   '@/hooks/useComprehensiveLoading': './hooks/useComprehensiveLoading',
-  '@/hooks/use-auth': './hooks/use-auth',
+  '@/hooks/useAuth': './hooks/useAuth',
   '@/hooks/use-unified-navigation': './hooks/use-unified-navigation',
   '@/hooks/use-navigation-performance': './hooks/use-navigation-performance',
   '@/hooks/use-navigation-accessibility': './hooks/use-navigation-accessibility',
