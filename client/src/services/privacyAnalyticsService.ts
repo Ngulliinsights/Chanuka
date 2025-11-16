@@ -1,10 +1,11 @@
 /**
  * Privacy-Focused Analytics Service
  * Analytics with user consent and privacy protection
- */
+ */                                                                                
 
 import { logger } from '../utils/logger';
 import { privacyUtils } from '../utils/privacy-compliance';
+import { privacyAnalyticsApiService } from '../core/api/privacy';
 
 interface AnalyticsEvent {
   id: string;
@@ -340,15 +341,7 @@ class PrivacyAnalyticsService {
    */
   private async sendEventsToBackend(events: AnalyticsEvent[]): Promise<void> {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // In production, this would be:
-      // await fetch('/api/analytics/events', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ events }),
-      // });
+      await privacyAnalyticsApiService.sendEvents(events);
 
       logger.debug('Events sent to analytics backend', {
         component: 'PrivacyAnalyticsService',
@@ -357,7 +350,7 @@ class PrivacyAnalyticsService {
     } catch (error) {
       // Re-queue events on failure
       this.eventQueue.unshift(...events);
-      
+
       logger.error('Failed to send analytics events', {
         component: 'PrivacyAnalyticsService',
         error,
@@ -490,8 +483,8 @@ class PrivacyAnalyticsService {
   /**
    * Handles consent update events
    */
-  private handleConsentUpdate(event: CustomEvent): void {
-    const consent = event.detail as UserConsent;
+  private handleConsentUpdate(event: Event): void {
+    const consent = (event as CustomEvent<UserConsent>).detail;
     this.userConsent = consent;
   }
 

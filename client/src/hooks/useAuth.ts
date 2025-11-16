@@ -7,7 +7,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { useAuthStore } from '../store/slices/authSlice';
-import { authBackendService, type LoginCredentials, type RegisterData } from '../services/auth-backend-service';
+import { authBackendService, type LoginCredentials, type RegisterData } from '../services/authBackendService';
 import { logger } from '../utils/logger';
 
 export function useAuth() {

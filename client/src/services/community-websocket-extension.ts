@@ -5,7 +5,7 @@
  * including discussion threads, expert verification, and community analytics.
  */
 
-import { webSocketClient } from './websocket-client';
+import { UnifiedWebSocketManager } from '../core/api/websocket';
 import { logger } from '../utils/logger';
 
 // Community-specific WebSocket message types
@@ -108,12 +108,12 @@ class CommunityWebSocketExtension {
    */
   private setupExistingEventListeners(): void {
     // Listen for bill updates that might include community data
-    webSocketClient.on('billUpdate', (data: any) => {
+    UnifiedWebSocketManager.getInstance().on('billUpdate', (data: any) => {
       this.handleBillUpdate(data);
     });
 
     // Listen for notifications that might be community-related
-    webSocketClient.on('notification', (data: any) => {
+    UnifiedWebSocketManager.getInstance().on('notification', (data: any) => {
       this.handleNotification(data);
     });
   }
@@ -190,13 +190,13 @@ class CommunityWebSocketExtension {
    * Subscribe to discussion updates for a specific bill
    */
   subscribeToDiscussion(billId: number): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to discussion.', { component: 'CommunityWebSocketExtension' });
       return;
     }
 
     // Use existing WebSocket client subscription with community-specific types
-    webSocketClient.subscribeToBill(billId, [
+    UnifiedWebSocketManager.getInstance().subscribeToBill(billId, [
       'new_comment', 
       'comment_update', 
       'expert_contribution',
@@ -210,11 +210,11 @@ class CommunityWebSocketExtension {
    * Unsubscribe from discussion updates for a specific bill
    */
   unsubscribeFromDiscussion(billId: number): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       return;
     }
 
-    webSocketClient.unsubscribeFromBill(billId);
+    UnifiedWebSocketManager.getInstance().unsubscribeFromBill(billId);
     
     // Clear any typing indicators for this bill
     this.clearTypingIndicators(billId);
@@ -226,7 +226,7 @@ class CommunityWebSocketExtension {
    * Send typing indicator
    */
   sendTypingIndicator(billId: number, parentId?: string): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       logger.warn('WebSocket not connected. Cannot send typing indicator.', { component: 'CommunityWebSocketExtension' });
       return;
     }
@@ -304,7 +304,7 @@ class CommunityWebSocketExtension {
    * Subscribe to expert verification updates
    */
   subscribeToExpertUpdates(): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to expert updates.', { component: 'CommunityWebSocketExtension' });
       return;
     }
@@ -333,7 +333,7 @@ class CommunityWebSocketExtension {
    * Subscribe to community analytics updates
    */
   subscribeToCommunityAnalytics(): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to community analytics.', { component: 'CommunityWebSocketExtension' });
       return;
     }
@@ -371,7 +371,7 @@ class CommunityWebSocketExtension {
    * Subscribe to moderation events (for moderators)
    */
   subscribeToModerationEvents(): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to moderation events.', { component: 'CommunityWebSocketExtension' });
       return;
     }
@@ -464,7 +464,7 @@ class CommunityWebSocketExtension {
    * Get connection status
    */
   isConnected(): boolean {
-    return webSocketClient.isConnected();
+    return UnifiedWebSocketManager.getInstance().isConnected();
   }
 
   /**

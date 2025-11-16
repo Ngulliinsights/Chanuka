@@ -9,7 +9,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ErrorBoundary, { EnhancedErrorFallback } from '../ErrorBoundary';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../../../core/error';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../../../utils/logger';
+import type { AppError } from '../../../core/error';
 import { renderWithWrapper } from '../../ui/__tests__/test-utils';
 
 // Mock dependencies

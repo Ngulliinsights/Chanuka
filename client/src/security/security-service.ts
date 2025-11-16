@@ -4,10 +4,11 @@
  */
 
 import { cspNonceManager } from './csp-nonce';
-import { inputSanitizer, ValidationSchemas } from './input-sanitizer';
+import { inputSanitizer } from './input-sanitizer';
 import { csrfProtection, setupCSRFInterceptor } from './csrf-protection';
 import { clientRateLimiter, RateLimitConfigs } from './rate-limiter';
 import { vulnerabilityScanner, SecurityThreat } from './vulnerability-scanner';
+import { SecurityEvent } from './types';
 
 export interface SecurityConfig {
   enableCSP: boolean;
@@ -60,7 +61,10 @@ export class SecurityService {
       ...config
     };
 
-    this.initialize();
+    // Initialize asynchronously
+    this.initialize().catch(error => {
+      console.error('Failed to initialize security service:', error);
+    });
   }
 
   public static getInstance(config?: Partial<SecurityConfig>): SecurityService {
@@ -73,7 +77,7 @@ export class SecurityService {
   /**
    * Initialize security service
    */
-  private initialize(): void {
+  private async initialize(): Promise<void> {
     console.log('🔒 Initializing Chanuka Security Service...');
 
     // Initialize CSP if enabled
@@ -83,11 +87,17 @@ export class SecurityService {
 
     // Initialize CSRF protection if enabled
     if (this.config.enableCSRF) {
-      this.initializeCSRF();
+      await this.initializeCSRF();
     }
 
-    // Start vulnerability scanning if enabled
+    // Initialize rate limiter if enabled
+    if (this.config.enableRateLimit) {
+      await clientRateLimiter.initialize();
+    }
+
+    // Initialize vulnerability scanner if enabled
     if (this.config.enableVulnerabilityScanning) {
+      await vulnerabilityScanner.initialize();
       this.startVulnerabilityScanning();
     }
 
@@ -103,7 +113,7 @@ export class SecurityService {
   private initializeCSP(): void {
     // Set initial CSP header if we can (this would typically be done server-side)
     const cspHeader = cspNonceManager.generateCSPHeader();
-    
+
     // Add meta tag for CSP (fallback)
     const existingCSP = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
     if (!existingCSP) {
@@ -119,28 +129,28 @@ export class SecurityService {
   /**
    * Initialize CSRF protection
    */
-  private initializeCSRF(): void {
-    // Create initial CSRF token
-    csrfProtection.getToken();
+  private async initializeCSRF(): Promise<void> {
+    // Initialize CSRF protection
+    await csrfProtection.initialize();
     console.log('🔐 CSRF protection initialized');
   }
 
   /**
    * Start vulnerability scanning
    */
-  private startVulnerabilityScanning(): void {
+  private async startVulnerabilityScanning(): Promise<void> {
     // Perform initial scan
-    const initialScan = vulnerabilityScanner.performScan();
+    const initialScan = await vulnerabilityScanner.scan();
     console.log(`🔍 Initial security scan completed. Score: ${initialScan.score}/100`);
-    
+
     if (initialScan.threats.length > 0) {
       console.warn(`⚠️ Found ${initialScan.threats.length} security threats:`, initialScan.threats);
     }
 
     // Set up periodic scanning
     if (this.config.scanInterval && this.config.scanInterval > 0) {
-      this.scanInterval = setInterval(() => {
-        const scan = vulnerabilityScanner.performScan();
+      this.scanInterval = setInterval(async () => {
+        const scan = await vulnerabilityScanner.scan();
         if (scan.threats.length > 0) {
           console.warn(`🚨 Security scan found ${scan.threats.length} threats. Score: ${scan.score}/100`);
           this.notifyThreats(scan.threats);
@@ -153,7 +163,7 @@ export class SecurityService {
    * Start real-time threat monitoring
    */
   private startThreatMonitoring(): void {
-    this.threatMonitoringCleanup = vulnerabilityScanner.startMonitoring((threat) => {
+    this.threatMonitoringCleanup = vulnerabilityScanner.startMonitoring((threat: SecurityThreat) => {
       console.warn('🚨 Real-time threat detected:', threat);
       this.notifyThreats([threat]);
     });
@@ -200,23 +210,23 @@ export class SecurityService {
   }
 
   /**
-   * Sanitize input using configured sanitizer
-   */
-  public sanitizeInput(input: string, options?: any): string {
+    * Sanitize input using configured sanitizer
+    */
+  public sanitizeInput(input: string): string {
     if (!this.config.enableInputSanitization) {
       return input;
     }
-    return inputSanitizer.sanitizeText(input, options?.maxLength);
+    return inputSanitizer.sanitizeText(input).sanitized;
   }
 
   /**
-   * Sanitize HTML content
-   */
-  public sanitizeHtml(html: string, options?: any): string {
+    * Sanitize HTML content
+    */
+  public sanitizeHtml(html: string): string {
     if (!this.config.enableInputSanitization) {
       return html;
     }
-    return inputSanitizer.sanitizeHtml(html, options);
+    return inputSanitizer.sanitizeHTML(html).sanitized;
   }
 
   /**
@@ -265,7 +275,7 @@ export class SecurityService {
       },
       rateLimit: {
         enabled: this.config.enableRateLimit,
-        activeKeys: clientRateLimiter['storage']?.size || 0
+        activeKeys: clientRateLimiter.getActiveKeys()
       },
       vulnerabilityScanning: {
         enabled: this.config.enableVulnerabilityScanning,
@@ -281,11 +291,11 @@ export class SecurityService {
   /**
    * Perform manual security scan
    */
-  public performSecurityScan() {
+  public async performSecurityScan() {
     if (!this.config.enableVulnerabilityScanning) {
       throw new Error('Vulnerability scanning is disabled');
     }
-    return vulnerabilityScanner.performScan();
+    return await vulnerabilityScanner.scan();
   }
 
   /**
@@ -293,7 +303,7 @@ export class SecurityService {
    */
   public onThreatDetected(callback: (threat: SecurityThreat) => void): () => void {
     this.threatCallbacks.push(callback);
-    
+
     // Return unsubscribe function
     return () => {
       const index = this.threatCallbacks.indexOf(callback);
@@ -306,16 +316,16 @@ export class SecurityService {
   /**
    * Update security configuration
    */
-  public updateConfig(newConfig: Partial<SecurityConfig>): void {
+  public async updateConfig(newConfig: Partial<SecurityConfig>): Promise<void> {
     this.config = { ...this.config, ...newConfig };
-    
+
     // Restart services if needed
     if (newConfig.scanInterval !== undefined) {
       if (this.scanInterval) {
         clearInterval(this.scanInterval);
       }
       if (this.config.enableVulnerabilityScanning) {
-        this.startVulnerabilityScanning();
+        await this.startVulnerabilityScanning();
       }
     }
   }
@@ -323,24 +333,26 @@ export class SecurityService {
   /**
    * Cleanup resources
    */
-  public destroy(): void {
+  public async destroy(): Promise<void> {
     if (this.scanInterval) {
       clearInterval(this.scanInterval);
     }
-    
+
     if (this.threatMonitoringCleanup) {
       this.threatMonitoringCleanup();
     }
 
     cspNonceManager.stopRotation();
     clientRateLimiter.destroy();
-    
+    csrfProtection.destroy();
+    await vulnerabilityScanner.shutdown();
+
     console.log('🔒 Security service destroyed');
   }
 }
 
-// Export validation schemas for easy access
-export { ValidationSchemas };
+// Export validation schemas for easy access (if available)
+// export { ValidationSchemas };
 
 // Export singleton instance
 export const securityService = SecurityService.getInstance();

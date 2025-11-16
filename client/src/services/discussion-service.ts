@@ -5,7 +5,7 @@
  * and integrates with existing WebSocket client for real-time updates.
  */
 
-import { webSocketClient } from './websocket-client';
+import { UnifiedWebSocketManager } from '../core/api/websocket';
 import { 
   DiscussionThread, 
   Comment, 
@@ -42,7 +42,7 @@ class DiscussionService {
    */
   private setupWebSocketListeners(): void {
     // Listen for bill updates which can include comment updates
-    webSocketClient.on('billUpdate', (data: any) => {
+    UnifiedWebSocketManager.getInstance().on('billUpdate', (data: any) => {
       // Check if this is a comment-related update
       if (data.update?.type === 'new_comment' || data.update?.type === 'comment_update') {
         window.dispatchEvent(new CustomEvent('discussionUpdate', { detail: data }));
@@ -50,7 +50,7 @@ class DiscussionService {
     });
 
     // Listen for notifications which can include moderation events
-    webSocketClient.on('notification', (data: any) => {
+    UnifiedWebSocketManager.getInstance().on('notification', (data: any) => {
       if (data.type === 'moderation_action' || data.type === 'comment_reported') {
         window.dispatchEvent(new CustomEvent('moderationUpdate', { detail: data }));
       }
@@ -280,31 +280,31 @@ class DiscussionService {
    * Subscribe to real-time updates for a bill's discussion
    */
   subscribeToDiscussion(billId: number): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       console.warn('WebSocket not connected. Cannot subscribe to discussion updates.');
       return;
     }
 
     // Use existing WebSocket client to subscribe to bill-specific updates
-    webSocketClient.subscribeToBill(billId, ['new_comment', 'comment_update', 'moderation_action']);
+    UnifiedWebSocketManager.getInstance().subscribeToBill(billId, ['new_comment', 'comment_update', 'moderation_action']);
   }
 
   /**
    * Unsubscribe from real-time updates for a bill's discussion
    */
   unsubscribeFromDiscussion(billId: number): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       return;
     }
 
-    webSocketClient.unsubscribeFromBill(billId);
+    UnifiedWebSocketManager.getInstance().unsubscribeFromBill(billId);
   }
 
   /**
    * Send typing indicator
    */
   sendTypingIndicator(billId: number, parentId?: string): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       return;
     }
 
@@ -317,7 +317,7 @@ class DiscussionService {
    * Stop typing indicator
    */
   stopTypingIndicator(billId: number, parentId?: string): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       return;
     }
 
@@ -328,7 +328,7 @@ class DiscussionService {
    * Send comment update via WebSocket
    */
   private sendCommentUpdate(event: CommentUpdateEvent): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       return;
     }
 
@@ -341,7 +341,7 @@ class DiscussionService {
    * Send moderation event via WebSocket
    */
   private sendModerationEvent(event: ModerationEvent): void {
-    if (!webSocketClient.isConnected()) {
+    if (!UnifiedWebSocketManager.getInstance().isConnected()) {
       return;
     }
 

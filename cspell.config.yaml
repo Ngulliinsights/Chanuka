@@ -8,7 +8,7 @@ language: en
 # Words to add to the dictionary
 words:
   - upvotes
-  - TTFB  # Time To First Byte
+  - TTFB # Time To First Byte
   - downvotes
   - Chanuka
   - chanuka
@@ -25,3 +25,9 @@ words:
   - unhashable
   - Sxxxx
   - mdel
+  - longtask
+  - unsub
+  - prefs
+  - mbps
+  - levelchange
+  - chargingchange

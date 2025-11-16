@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { BrowserLogger, detectEnvironment, getDefaultFeatureFlags, createBrowserLoggerWithLegacyFallback } from './browser-logger';
+import { BrowserLogger, detectEnvironment, getDefaultFeatureFlags, createBrowserLoggerWithLegacyFallback } from './logger';
 
 // Mock navigator and window for browser environment
 const mockNavigator = {

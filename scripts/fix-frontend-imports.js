@@ -18,7 +18,7 @@ const CLIENT_SRC = path.join(__dirname, '..', 'client', 'src');
 // Mapping of old @/ imports to correct relative paths based on file location
 const IMPORT_MAPPINGS = {
   // Utils
-  '@/utils/browser-logger': './utils/browser-logger',
+  '@/utils/logger': './utils/logger',
   '@/utils/asset-loading': './utils/asset-loading',
   '@/utils/serviceWorker': './utils/serviceWorker',
   '@/utils/safe-lazy-loading': './utils/safe-lazy-loading',

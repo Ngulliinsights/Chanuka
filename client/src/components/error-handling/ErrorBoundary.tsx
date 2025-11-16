@@ -6,15 +6,15 @@
  * user feedback, better UI, metrics collection, and monitoring integration.
  */
 
-import { Component, ReactNode, ErrorInfo } from "react";
-import { logger } from "../../utils/logger";
-import { getBrowserInfo } from "../../utils/browser-compatibility";
-import { performanceMonitor } from "../../utils/performance-monitor";
+import { Component, ReactNode, ErrorInfo } from 'react';
+import { logger } from '../../utils/logger';
+import { getBrowserInfo } from '../../utils/browser-compatibility';
+import { performanceMonitor } from '../../utils/performance-monitor';
 
 // Import unified error types
-import { ErrorDomain, ErrorSeverity } from "../../core/error";
-import { BaseError } from "../../utils/logger";
-import { errorHandler } from "../../utils/unified-error-handler";
+import { ErrorDomain, ErrorSeverity } from '../../core/error';
+import { BaseError } from '../../utils/logger';
+import { errorHandler } from '../../utils/unified-error-handler';
 
 export interface RecoveryOption {
   id: string;
@@ -95,10 +95,7 @@ export interface ErrorMetrics {
  * - Error metrics collection and reporting
  * - Integration with monitoring services
  */
-export class ErrorBoundary extends Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   private recoveryAttempts = 0;
   private errorMetrics: ErrorMetrics[] = [];
 
@@ -116,29 +113,25 @@ export class ErrorBoundary extends Component<
   /**
    * Updates state when an error is caught with enhanced error context
    */
-  static getDerivedStateFromError(
-    error: Error
-  ): Partial<ErrorBoundaryState> {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // Convert to BaseError with enhanced context
     const baseError =
       error instanceof BaseError
         ? error
-        : new BaseError(error.message, "REACT_ERROR_BOUNDARY", {
-            code: "REACT_ERROR_BOUNDARY",
+        : new BaseError(error.message, 'REACT_ERROR_BOUNDARY', {
+            code: 'REACT_ERROR_BOUNDARY',
             domain: ErrorDomain.SYSTEM,
             severity: ErrorSeverity.HIGH,
             cause: error,
             context: {
-              component: "ErrorBoundary",
+              component: 'ErrorBoundary',
               timestamp: new Date().toISOString(),
               browserInfo: getBrowserInfo(),
               performanceMetrics: performanceMonitor.getMetrics(),
             },
           });
 
-    const errorId = `error_${Date.now()}_${Math.random()
-      .toString(36)
-      .substr(2, 9)}`;
+    const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     return {
       hasError: true,
@@ -197,11 +190,10 @@ export class ErrorBoundary extends Component<
         reactErrorInfo: {
           componentStack: errorInfo.componentStack,
         },
-        url: typeof window !== "undefined" ? window.location.href : undefined,
-        userAgent:
-          typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+        url: typeof window !== 'undefined' ? window.location.href : undefined,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
         viewport:
-          typeof window !== "undefined"
+          typeof window !== 'undefined'
             ? {
                 width: window.innerWidth,
                 height: window.innerHeight,
@@ -215,8 +207,8 @@ export class ErrorBoundary extends Component<
     const metrics: ErrorMetrics = {
       errorId,
       timestamp: new Date(),
-      component: this.props.context || "ErrorBoundary",
-      errorType: enhancedError.code || "UNKNOWN_ERROR",
+      component: this.props.context || 'ErrorBoundary',
+      errorType: enhancedError.code || 'UNKNOWN_ERROR',
       severity: enhancedError.metadata?.severity || ErrorSeverity.HIGH,
       recoveryAttempts: this.recoveryAttempts,
       recoverySuccessful: false,
@@ -229,8 +221,8 @@ export class ErrorBoundary extends Component<
     this.errorMetrics.push(metrics);
 
     // Process through error handler chain (log comprehensive error)
-    logger.error("Enhanced error boundary caught error", {
-      component: "ErrorBoundary",
+    logger.error('Enhanced error boundary caught error', {
+      component: 'ErrorBoundary',
       errorId,
       componentStack: errorInfo.componentStack,
       context: this.props.context,
@@ -242,9 +234,7 @@ export class ErrorBoundary extends Component<
 
     // Attempt automatic recovery if enabled
     if (this.props.enableRecovery) {
-      await this.attemptAutomaticRecovery(
-        this.generateRecoveryOptions(enhancedError)
-      );
+      await this.attemptAutomaticRecovery(this.generateRecoveryOptions(enhancedError));
     }
 
     // Call custom error handler
@@ -266,9 +256,9 @@ export class ErrorBoundary extends Component<
 
     // Always provide manual retry option
     options.push({
-      id: "manual_retry",
-      label: "Try Again",
-      description: "Retry the failed operation manually",
+      id: 'manual_retry',
+      label: 'Try Again',
+      description: 'Retry the failed operation manually',
       action: this.handleRetry,
       automatic: false,
       priority: 1,
@@ -276,9 +266,9 @@ export class ErrorBoundary extends Component<
 
     // Page reload option
     options.push({
-      id: "page_reload",
-      label: "Reload Page",
-      description: "Reload the entire page to reset the application state",
+      id: 'page_reload',
+      label: 'Reload Page',
+      description: 'Reload the entire page to reset the application state',
       action: this.handleReload,
       automatic: false,
       priority: 2,
@@ -287,12 +277,12 @@ export class ErrorBoundary extends Component<
     // Automatic recovery options based on error type
     if (error.metadata?.domain === ErrorDomain.NETWORK) {
       options.push({
-        id: "retry_network",
-        label: "Retry Network Request",
-        description: "Automatically retry network operations",
+        id: 'retry_network',
+        label: 'Retry Network Request',
+        description: 'Automatically retry network operations',
         action: async () => {
           // Simulate network retry with delay
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 1000));
           this.handleRetry();
         },
         automatic: true,
@@ -302,15 +292,15 @@ export class ErrorBoundary extends Component<
 
     if (error.metadata?.domain === ErrorDomain.CACHE) {
       options.push({
-        id: "clear_cache",
-        label: "Clear Cache",
-        description: "Clear local cache and retry",
+        id: 'clear_cache',
+        label: 'Clear Cache',
+        description: 'Clear local cache and retry',
         action: async () => {
-          if (typeof localStorage !== "undefined") {
+          if (typeof localStorage !== 'undefined') {
             try {
               localStorage.clear();
             } catch (e) {
-              logger.warn("Failed to clear localStorage", { error: e });
+              logger.warn('Failed to clear localStorage', { error: e });
             }
           }
           this.handleRetry();
@@ -327,10 +317,8 @@ export class ErrorBoundary extends Component<
   /**
    * Attempt automatic recovery with timeout and error handling
    */
-  private async attemptAutomaticRecovery(
-    recoveryOptions: RecoveryOption[]
-  ) {
-    const automaticOptions = recoveryOptions.filter((opt) => opt.automatic);
+  private async attemptAutomaticRecovery(recoveryOptions: RecoveryOption[]) {
+    const automaticOptions = recoveryOptions.filter(opt => opt.automatic);
 
     for (const option of automaticOptions) {
       if (this.recoveryAttempts >= (this.props.maxRecoveryAttempts || 3)) {
@@ -339,8 +327,8 @@ export class ErrorBoundary extends Component<
 
       try {
         this.recoveryAttempts++;
-        logger.info("Attempting automatic recovery", {
-          component: "ErrorBoundary",
+        logger.info('Attempting automatic recovery', {
+          component: 'ErrorBoundary',
           errorId: this.state.errorId,
           recoveryOption: option.id,
           attemptNumber: this.recoveryAttempts,
@@ -351,7 +339,7 @@ export class ErrorBoundary extends Component<
         await Promise.race([
           option.action(),
           new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Recovery timeout")), timeout)
+            setTimeout(() => reject(new Error('Recovery timeout')), timeout)
           ),
         ]);
 
@@ -371,8 +359,8 @@ export class ErrorBoundary extends Component<
           latestMetric.recoveryAttempts = this.recoveryAttempts;
         }
 
-        logger.info("Automatic error recovery successful", {
-          component: "ErrorBoundary",
+        logger.info('Automatic error recovery successful', {
+          component: 'ErrorBoundary',
           errorId: this.state.errorId,
           recoveryOption: option.id,
           attemptNumber: this.recoveryAttempts,
@@ -380,8 +368,8 @@ export class ErrorBoundary extends Component<
 
         return;
       } catch (recoveryError) {
-        logger.warn("Automatic recovery attempt failed", {
-          component: "ErrorBoundary",
+        logger.warn('Automatic recovery attempt failed', {
+          component: 'ErrorBoundary',
           errorId: this.state.errorId,
           recoveryOption: option.id,
           attemptNumber: this.recoveryAttempts,
@@ -411,8 +399,8 @@ export class ErrorBoundary extends Component<
       recoverySuccessful: false,
     });
 
-    logger.info("Manual retry attempted", {
-      component: "ErrorBoundary",
+    logger.info('Manual retry attempted', {
+      component: 'ErrorBoundary',
       attemptNumber: this.recoveryAttempts,
     });
   };
@@ -425,14 +413,13 @@ export class ErrorBoundary extends Component<
       const enhancedFeedback: UserFeedback = {
         ...feedback,
         timestamp: new Date(),
-        userAgent:
-          typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
         sessionId: this.generateSessionId(),
       };
 
       // Log feedback for now (could be sent to analytics service)
-      logger.info("User feedback submitted", {
-        component: "ErrorBoundary",
+      logger.info('User feedback submitted', {
+        component: 'ErrorBoundary',
         errorId: this.state.errorId,
         feedback: enhancedFeedback,
       });
@@ -445,8 +432,8 @@ export class ErrorBoundary extends Component<
         latestMetric.userFeedbackProvided = true;
       }
     } catch (error) {
-      logger.error("Failed to submit user feedback", {
-        component: "ErrorBoundary",
+      logger.error('Failed to submit user feedback', {
+        component: 'ErrorBoundary',
         errorId: this.state.errorId,
         error,
       });
@@ -454,22 +441,22 @@ export class ErrorBoundary extends Component<
   };
 
   private handleReload = () => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       window.location.reload();
     }
   };
 
   private handleContactSupport = () => {
-    logger.info("User requested support contact", {
-      component: "ErrorBoundary",
+    logger.info('User requested support contact', {
+      component: 'ErrorBoundary',
       errorId: this.state.errorId,
     });
 
     // In a real implementation, this would open a support modal/chat
     // For now, show an alert
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       alert(
-        "Support contact functionality would be implemented here. Please check the console for error details."
+        'Support contact functionality would be implemented here. Please check the console for error details.'
       );
     }
   };
@@ -516,9 +503,7 @@ export class ErrorBoundary extends Component<
 }
 
 // Enhanced default fallback component with accessibility and user feedback
-function EnhancedErrorFallback(
-  props: ErrorFallbackProps & { showTechnicalDetails?: boolean }
-) {
+function EnhancedErrorFallback(props: ErrorFallbackProps & { showTechnicalDetails?: boolean }) {
   const {
     error,
     errorId,
@@ -560,9 +545,7 @@ function EnhancedErrorFallback(
               </svg>
             </div>
             <div className="ml-4">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Something went wrong
-              </h1>
+              <h1 className="text-2xl font-bold text-gray-900">Something went wrong</h1>
               <p className="text-gray-600 mt-1">{error.message}</p>
             </div>
           </div>
@@ -573,8 +556,8 @@ function EnhancedErrorFallback(
           <div
             className={`mb-6 p-4 rounded-md ${
               recoverySuccessful
-                ? "bg-green-50 border border-green-200"
-                : "bg-yellow-50 border border-yellow-200"
+                ? 'bg-green-50 border border-green-200'
+                : 'bg-yellow-50 border border-yellow-200'
             }`}
           >
             <div className="flex">
@@ -610,12 +593,12 @@ function EnhancedErrorFallback(
               <div className="ml-3">
                 <p
                   className={`text-sm font-medium ${
-                    recoverySuccessful ? "text-green-800" : "text-yellow-800"
+                    recoverySuccessful ? 'text-green-800' : 'text-yellow-800'
                   }`}
                 >
                   {recoverySuccessful
-                    ? "✓ Automatic recovery was successful!"
-                    : "✗ Automatic recovery failed. Please try the options below."}
+                    ? '✓ Automatic recovery was successful!'
+                    : '✗ Automatic recovery failed. Please try the options below.'}
                 </p>
               </div>
             </div>
@@ -625,11 +608,9 @@ function EnhancedErrorFallback(
         {/* Recovery Options */}
         {recoveryOptions.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Recovery Options
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Recovery Options</h2>
             <div className="space-y-3">
-              {recoveryOptions.slice(0, 4).map((option) => (
+              {recoveryOptions.slice(0, 4).map(option => (
                 <button
                   key={option.id}
                   onClick={() => option.action()}
@@ -638,13 +619,8 @@ function EnhancedErrorFallback(
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">
-                        {option.label}
-                      </h3>
-                      <p
-                        id={`${option.id}-description`}
-                        className="text-sm text-gray-600 mt-1"
-                      >
+                      <h3 className="text-sm font-medium text-gray-900">{option.label}</h3>
+                      <p id={`${option.id}-description`} className="text-sm text-gray-600 mt-1">
                         {option.description}
                       </p>
                     </div>
@@ -687,9 +663,7 @@ function EnhancedErrorFallback(
         {/* User Feedback */}
         {props.showTechnicalDetails !== false && (
           <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Help us improve
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Help us improve</h3>
 
             {!userFeedbackSubmitted ? (
               <div className="space-y-4">
@@ -698,14 +672,12 @@ function EnhancedErrorFallback(
                     How would you rate this error experience?
                   </label>
                   <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((rating) => (
+                    {[1, 2, 3, 4, 5].map(rating => (
                       <button
                         key={rating}
                         onClick={() => onFeedback({ rating })}
                         className="w-10 h-10 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                        aria-label={`Rate ${rating} star${
-                          rating !== 1 ? "s" : ""
-                        }`}
+                        aria-label={`Rate ${rating} star${rating !== 1 ? 's' : ''}`}
                       >
                         {rating}
                       </button>
@@ -721,7 +693,7 @@ function EnhancedErrorFallback(
                     placeholder="Tell us what happened..."
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
                     rows={3}
-                    onChange={(e) => {
+                    onChange={e => {
                       // Store temporarily - would be submitted with rating
                       (e.target as any)._comment = e.target.value;
                     }}
@@ -730,10 +702,8 @@ function EnhancedErrorFallback(
 
                 <button
                   onClick={() => {
-                    const textarea = document.querySelector(
-                      "textarea"
-                    ) as HTMLTextAreaElement;
-                    const comment = (textarea as any)._comment || "";
+                    const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+                    const comment = (textarea as any)._comment || '';
                     onFeedback({ comment: comment || undefined });
                   }}
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
@@ -743,9 +713,7 @@ function EnhancedErrorFallback(
               </div>
             ) : (
               <div className="text-center py-4">
-                <div className="text-green-600 font-medium">
-                  ✓ Thank you for your feedback!
-                </div>
+                <div className="text-green-600 font-medium">✓ Thank you for your feedback!</div>
                 <p className="text-sm text-gray-600 mt-1">
                   Your input helps us improve the application.
                 </p>
@@ -781,7 +749,7 @@ function EnhancedErrorFallback(
                 <div>
                   <dt className="font-medium text-gray-900">Timestamp:</dt>
                   <dd className="text-gray-700 font-mono">
-                    {error.metadata?.timestamp || new Date().toISOString()}
+                    {(error.metadata?.timestamp || new Date()).toISOString()}
                   </dd>
                 </div>
                 {error.stack && (

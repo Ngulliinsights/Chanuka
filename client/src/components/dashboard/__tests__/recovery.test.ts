@@ -18,7 +18,12 @@ import {
   DashboardTopicError,
   DashboardErrorType
 } from '../errors';
-import type { DashboardData } from '@shared/core/src/testing';
+// Define type locally to avoid shared/core dependency
+interface DashboardData {
+  id: string;
+  title: string;
+  data: any;
+}
 // DashboardConfig should be defined locally or imported from appropriate module
 
 describe('Dashboard Recovery', () => {

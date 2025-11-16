@@ -1,0 +1,723 @@
+name: Database Migration Automation
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (staging, pre-production, production)'
+        required: true
+        type: string
+      risk_level:
+        description: 'Migration risk level (low, medium, high)'
+        required: false
+        default: 'medium'
+        type: string
+      skip_tests:
+        description: 'Skip migration testing (for emergency deployments)'
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Run migrations in dry-run mode'
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      DATABASE_URL:
+        required: true
+      SLACK_WEBHOOK:
+        required: false
+      DATADOG_API_KEY:
+        required: false
+      DATADOG_APP_KEY:
+        required: false
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - pre-production
+          - production
+      risk_level:
+        description: 'Migration risk level'
+        required: false
+        default: 'medium'
+        type: choice
+        options:
+          - low
+          - medium
+          - high
+      skip_tests:
+        description: 'Skip migration testing'
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Run migrations in dry-run mode'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+  MIGRATION_TIMEOUT: '1800'  # 30 minutes
+  HEALTH_CHECK_RETRIES: '3'
+  NOTIFICATION_LEVEL: 'summary'  # critical, summary, verbose
+
+jobs:
+  # ============================================================================
+  # MIGRATION RISK ASSESSMENT
+  # ============================================================================
+  risk-assessment:
+    name: Migration Risk Assessment
+    runs-on: ubuntu-latest
+    outputs:
+      risk_level: ${{ steps.assess.outputs.risk_level }}
+      requires_approval: ${{ steps.assess.outputs.requires_approval }}
+      test_scope: ${{ steps.assess.outputs.test_scope }}
+      rollback_strategy: ${{ steps.assess.outputs.rollback_strategy }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Assess migration risk
+        id: assess
+        env:
+          RISK_LEVEL: ${{ inputs.risk_level || 'medium' }}
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          # Analyze migration files for risk assessment
+          MIGRATION_FILES=$(find drizzle -name "*.sql" -newer $(git log --oneline -n 1 --pretty=format:"%H" --since="1 week ago") | wc -l)
+          SCHEMA_CHANGES=$(grep -r "DROP\|DELETE\|ALTER" drizzle/*.sql | wc -l)
+          DATA_MIGRATIONS=$(grep -r "UPDATE\|INSERT.*SELECT" drizzle/*.sql | wc -l)
+
+          # Determine risk level based on analysis
+          if [[ $SCHEMA_CHANGES -gt 5 || $DATA_MIGRATIONS -gt 10 ]]; then
+            ACTUAL_RISK="high"
+          elif [[ $SCHEMA_CHANGES -gt 2 || $DATA_MIGRATIONS -gt 3 ]]; then
+            ACTUAL_RISK="medium"
+          else
+            ACTUAL_RISK="low"
+          fi
+
+          # Override with manual risk level if higher
+          if [[ "$RISK_LEVEL" == "high" ]] || [[ "$ACTUAL_RISK" == "high" ]]; then
+            FINAL_RISK="high"
+          elif [[ "$RISK_LEVEL" == "medium" ]] || [[ "$ACTUAL_RISK" == "medium" ]]; then
+            FINAL_RISK="medium"
+          else
+            FINAL_RISK="low"
+          fi
+
+          # Determine approval requirements
+          REQUIRES_APPROVAL="false"
+          if [[ "$FINAL_RISK" == "high" && "$ENVIRONMENT" == "production" ]]; then
+            REQUIRES_APPROVAL="true"
+          fi
+
+          # Set test scope based on risk
+          case $FINAL_RISK in
+            "high")
+              TEST_SCOPE="full"
+              ROLLBACK_STRATEGY="full-backup"
+              ;;
+            "medium")
+              TEST_SCOPE="standard"
+              ROLLBACK_STRATEGY="transaction-rollback"
+              ;;
+            "low")
+              TEST_SCOPE="basic"
+              ROLLBACK_STRATEGY="transaction-rollback"
+              ;;
+          esac
+
+          echo "risk_level=$FINAL_RISK" >> $GITHUB_OUTPUT
+          echo "requires_approval=$REQUIRES_APPROVAL" >> $GITHUB_OUTPUT
+          echo "test_scope=$TEST_SCOPE" >> $GITHUB_OUTPUT
+          echo "rollback_strategy=$ROLLBACK_STRATEGY" >> $GITHUB_OUTPUT
+
+          echo "📊 Migration Risk Assessment:" >> $GITHUB_STEP_SUMMARY
+          echo "- Risk Level: $FINAL_RISK" >> $GITHUB_STEP_SUMMARY
+          echo "- Migration Files: $MIGRATION_FILES" >> $GITHUB_STEP_SUMMARY
+          echo "- Schema Changes: $SCHEMA_CHANGES" >> $GITHUB_STEP_SUMMARY
+          echo "- Data Migrations: $DATA_MIGRATIONS" >> $GITHUB_STEP_SUMMARY
+          echo "- Test Scope: $TEST_SCOPE" >> $GITHUB_STEP_SUMMARY
+          echo "- Rollback Strategy: $ROLLBACK_STRATEGY" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # MIGRATION APPROVAL (HIGH RISK PRODUCTION ONLY)
+  # ============================================================================
+  migration-approval:
+    name: Migration Approval
+    runs-on: ubuntu-latest
+    needs: risk-assessment
+    if: needs.risk-assessment.outputs.requires_approval == 'true'
+    environment:
+      name: production-migration-approval
+
+    steps:
+      - name: Request Migration Approval
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ secrets.MIGRATION_APPROVERS }}
+          minimum-approvals: 2
+          issue-title: "High-Risk Database Migration Approval Required"
+          issue-body: |
+            ## 🚨 High-Risk Database Migration Approval Required
+
+            **Environment**: ${{ inputs.environment }}
+            **Risk Level**: ${{ needs.risk-assessment.outputs.risk_level }}
+            **Build**: ${{ github.sha }}
+            **Test Scope**: ${{ needs.risk-assessment.outputs.test_scope }}
+
+            ### Migration Analysis:
+            - Schema changes detected
+            - Data migrations present
+            - Full backup required
+
+            ### Approval Requirements:
+            - 2 approvals required from migration approvers
+            - Review migration files in `drizzle/` directory
+            - Confirm rollback strategy is appropriate
+
+            Please review and approve this database migration.
+
+  # ============================================================================
+  # DATABASE BACKUP (HIGH RISK)
+  # ============================================================================
+  database-backup:
+    name: Database Backup
+    runs-on: ubuntu-latest
+    needs: [risk-assessment, migration-approval]
+    if: |
+      always() &&
+      (needs.risk-assessment.result == 'success' || needs.migration-approval.result == 'success') &&
+      needs.risk-assessment.outputs.rollback_strategy == 'full-backup'
+
+    steps:
+      - name: Checkout deployment scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/database/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create database backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          BACKUP_FILE="migration-backup-${TIMESTAMP}.sql"
+
+          echo "📦 Creating database backup: $BACKUP_FILE"
+          pg_dump $DATABASE_URL > $BACKUP_FILE
+
+          # Compress backup
+          gzip $BACKUP_FILE
+
+          # Upload to secure storage (implement based on your storage solution)
+          echo "Backup created: ${BACKUP_FILE}.gz"
+
+          # Store backup reference for potential rollback
+          echo "BACKUP_FILE=${BACKUP_FILE}.gz" >> $GITHUB_ENV
+          echo "BACKUP_TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-backup-${{ env.BACKUP_TIMESTAMP }}
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 30
+
+  # ============================================================================
+  # SCHEMA DRIFT DETECTION
+  # ============================================================================
+  schema-drift-detection:
+    name: Schema Drift Detection
+    runs-on: ubuntu-latest
+    needs: risk-assessment
+    if: |
+      !inputs.skip_tests &&
+      (needs.risk-assessment.result == 'success' || needs.migration-approval.result == 'success')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect schema drift
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🔍 Detecting schema drift..."
+          npx tsx scripts/database/schema-drift-detection.ts
+
+      - name: Upload drift report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: schema-drift-report
+          path: schema-drift-report.json
+          retention-days: 30
+
+  # ============================================================================
+  # MIGRATION TESTING
+  # ============================================================================
+  migration-testing:
+    name: Migration Testing
+    runs-on: ubuntu-latest
+    needs: [risk-assessment, schema-drift-detection]
+    if: |
+      !inputs.skip_tests &&
+      (needs.risk-assessment.result == 'success' || needs.schema-drift-detection.result != 'failure')
+
+    strategy:
+      matrix:
+        test_type: ['production-like', 'rollback', 'performance']
+        include:
+          - test_type: production-like
+            script: migration-testing.ts
+            timeout: 900
+          - test_type: rollback
+            script: rollback-testing.ts
+            timeout: 600
+          - test_type: performance
+            script: migration-performance-profile.ts
+            timeout: 1200
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup test database
+        if: matrix.test_type != 'performance'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          # Create test database snapshot
+          TEST_DB_URL=$(echo $DATABASE_URL | sed 's/\/[^\/]*$/\/test_migration/')
+          echo "TEST_DATABASE_URL=$TEST_DB_URL" >> $GITHUB_ENV
+
+          # Setup test data based on risk level
+          case ${{ needs.risk-assessment.outputs.test_scope }} in
+            "full")
+              npx tsx scripts/database/setup-production-like-data.ts --scale=large
+              ;;
+            "standard")
+              npx tsx scripts/database/setup-production-like-data.ts --scale=medium
+              ;;
+            "basic")
+              npx tsx scripts/database/setup-production-like-data.ts --scale=small
+              ;;
+          esac
+
+      - name: Run ${{ matrix.test_type }} tests
+        timeout-minutes: ${{ matrix.timeout / 60 }}
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL || secrets.DATABASE_URL }}
+          RISK_LEVEL: ${{ needs.risk-assessment.outputs.risk_level }}
+          TEST_SCOPE: ${{ needs.risk-assessment.outputs.test_scope }}
+        run: |
+          echo "🧪 Running ${{ matrix.test_type }} migration tests..."
+          npx tsx scripts/database/${{ matrix.script }}
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: migration-test-${{ matrix.test_type }}-report
+          path: |
+            migration-test-results.json
+            performance-metrics.json
+            rollback-test-results.json
+          retention-days: 30
+
+  # ============================================================================
+  # PRE-MIGRATION HEALTH CHECK
+  # ============================================================================
+  pre-migration-health-check:
+    name: Pre-Migration Health Check
+    runs-on: ubuntu-latest
+    needs: [risk-assessment, migration-testing]
+    if: |
+      (needs.risk-assessment.result == 'success' || needs.migration-testing.result != 'failure')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pre-migration health check
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🏥 Running pre-migration health check..."
+          npx tsx scripts/database/health-check.ts --output=pre-migration-health.json
+
+      - name: Validate data integrity
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🔒 Validating data integrity before migration..."
+          npx tsx scripts/database/data-integrity-check.ts --baseline
+
+      - name: Upload health reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-migration-health
+          path: |
+            pre-migration-health.json
+            data-integrity-baseline.json
+          retention-days: 30
+
+  # ============================================================================
+  # DATABASE MIGRATION EXECUTION
+  # ============================================================================
+  execute-migration:
+    name: Execute Database Migration
+    runs-on: ubuntu-latest
+    needs: [risk-assessment, database-backup, pre-migration-health-check]
+    if: |
+      always() &&
+      needs.pre-migration-health-check.result == 'success'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Execute migrations
+        timeout-minutes: 30
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          RISK_LEVEL: ${{ needs.risk-assessment.outputs.risk_level }}
+        run: |
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "🧪 DRY RUN MODE - Simulating migration execution..."
+            npx tsx scripts/database/run-migrations.ts --dry-run
+          else
+            echo "🚀 Executing database migrations..."
+            npx tsx scripts/database/run-migrations.ts
+          fi
+
+      - name: Create rollback point
+        if: success() && env.DRY_RUN != 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🔄 Creating rollback point..."
+          npx tsx scripts/database/create-rollback-point.ts
+
+  # ============================================================================
+  # POST-MIGRATION VALIDATION
+  # ============================================================================
+  post-migration-validation:
+    name: Post-Migration Validation
+    runs-on: ubuntu-latest
+    needs: execute-migration
+    if: always() && needs.execute-migration.result == 'success'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run post-migration health check
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🏥 Running post-migration health check..."
+          npx tsx scripts/database/health-check.ts --output=post-migration-health.json
+
+      - name: Validate data integrity
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🔒 Validating data integrity after migration..."
+          npx tsx scripts/database/data-integrity-check.ts --compare
+
+      - name: Verify migration success
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "✅ Verifying migration execution..."
+          npx tsx scripts/database/verify-migration-success.ts
+
+      - name: Upload validation reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-migration-validation
+          path: |
+            post-migration-health.json
+            data-integrity-comparison.json
+            migration-verification.json
+          retention-days: 30
+
+  # ============================================================================
+  # MIGRATION ROLLBACK (ON FAILURE)
+  # ============================================================================
+  migration-rollback:
+    name: Migration Rollback
+    runs-on: ubuntu-latest
+    needs: [execute-migration, post-migration-validation]
+    if: |
+      failure() &&
+      (needs.execute-migration.result == 'success' || needs.post-migration-validation.result == 'failure')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Execute rollback
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ROLLBACK_STRATEGY: ${{ needs.risk-assessment.outputs.rollback_strategy }}
+        run: |
+          echo "🔄 Executing migration rollback..."
+          case $ROLLBACK_STRATEGY in
+            "full-backup")
+              echo "Using full backup rollback strategy..."
+              npx tsx scripts/database/rollback-from-backup.ts
+              ;;
+            "transaction-rollback")
+              echo "Using transaction rollback strategy..."
+              npx tsx scripts/database/rollback-transaction.ts
+              ;;
+          esac
+
+      - name: Verify rollback success
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🔍 Verifying rollback success..."
+          npx tsx scripts/database/health-check.ts --output=rollback-health.json
+
+      - name: Upload rollback reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-rollback-report
+          path: |
+            rollback-health.json
+            rollback-log.json
+          retention-days: 30
+
+  # ============================================================================
+  # NOTIFICATIONS & REPORTING
+  # ============================================================================
+  migration-notification:
+    name: Migration Notifications
+    runs-on: ubuntu-latest
+    needs: [risk-assessment, execute-migration, post-migration-validation, migration-rollback]
+    if: always()
+
+    steps:
+      - name: Generate migration summary
+        id: summary
+        run: |
+          # Determine overall status
+          if [[ "${{ needs.post-migration-validation.result }}" == "success" ]]; then
+            STATUS="success"
+            MESSAGE="✅ Database migration completed successfully"
+          elif [[ "${{ needs.migration-rollback.result }}" == "success" ]]; then
+            STATUS="warning"
+            MESSAGE="⚠️ Migration failed and was rolled back"
+          else
+            STATUS="failure"
+            MESSAGE="💥 Migration failed - manual intervention required"
+          fi
+
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+
+          # Create detailed summary
+          echo "## Database Migration Summary" >> migration-summary.md
+          echo "" >> migration-summary.md
+          echo "**Environment**: ${{ inputs.environment }}" >> migration-summary.md
+          echo "**Risk Level**: ${{ needs.risk-assessment.outputs.risk_level }}" >> migration-summary.md
+          echo "**Status**: $STATUS" >> migration-summary.md
+          echo "**Build**: ${{ github.sha }}" >> migration-summary.md
+          echo "**Executed At**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> migration-summary.md
+          echo "" >> migration-summary.md
+          echo "### Test Results" >> migration-summary.md
+          echo "- Schema Drift: ${{ needs.schema-drift-detection.result }}" >> migration-summary.md
+          echo "- Migration Tests: ${{ needs.migration-testing.result }}" >> migration-summary.md
+          echo "- Pre-migration Health: ${{ needs.pre-migration-health-check.result }}" >> migration-summary.md
+          echo "- Post-migration Validation: ${{ needs.post-migration-validation.result }}" >> migration-summary.md
+          echo "" >> migration-summary.md
+          echo "### Rollback Information" >> migration-summary.md
+          echo "- Strategy: ${{ needs.risk-assessment.outputs.rollback_strategy }}" >> migration-summary.md
+          echo "- Status: ${{ needs.migration-rollback.result }}" >> migration-summary.md
+
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        if: always() && env.NOTIFICATION_LEVEL != 'none'
+        with:
+          status: ${{ steps.summary.outputs.status }}
+          channel: '#chanuka-database-migrations'
+          message: |
+            ${{ steps.summary.outputs.message }}
+
+            **Environment**: ${{ inputs.environment }}
+            **Risk Level**: ${{ needs.risk-assessment.outputs.risk_level }}
+            **Build**: ${{ github.sha }}
+
+            View details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Send critical alert
+        uses: 8398a7/action-slack@v3
+        if: failure() && needs.risk-assessment.outputs.risk_level == 'high'
+        with:
+          status: failure
+          channel: '#chanuka-alerts'
+          message: |
+            🚨 CRITICAL: High-risk database migration failed!
+
+            **Environment**: ${{ inputs.environment }}
+            **Risk Level**: HIGH
+            **Build**: ${{ github.sha }}
+
+            Immediate attention required! Check rollback status and data integrity.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Update DataDog metrics
+        if: always() && env.DATADOG_API_KEY
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
+        run: |
+          # Send migration metrics to DataDog
+          curl -X POST "https://api.datadoghq.com/api/v1/series" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: $DATADOG_API_KEY" \
+            -H "DD-APPLICATION-KEY: $DATADOG_APP_KEY" \
+            -d '{
+              "series": [{
+                "metric": "chanuka.migration.status",
+                "points": [["'$(date +%s)'", "'${{ steps.summary.outputs.status == "success" && 1 || 0 }}'"]],
+                "tags": ["environment:'${{ inputs.environment }}'", "risk_level:'${{ needs.risk-assessment.outputs.risk_level }}'"]
+              }]
+            }'
+
+      - name: Upload migration summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-summary
+          path: migration-summary.md
+          retention-days: 90

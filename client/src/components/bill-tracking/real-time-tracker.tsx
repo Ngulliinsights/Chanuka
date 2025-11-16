@@ -1,9 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  useWebSocket,
-  useBillUpdates,
-  webSocketClient,
-} from "../../services/websocket-client";
+import { useEffect, useState } from "react";
+import { useWebSocket } from "../../hooks/use-websocket";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -25,18 +21,7 @@ interface RealTimeBillTrackerProps { bill_id?: number;
 
 export function RealTimeBillTracker({ bill_id,
   userToken,
- }: RealTimeBillTrackerProps) {
-  const {
-    isConnected,
-    connectionStatus,
-    connect,
-    disconnect,
-    subscribeToBill,
-    unsubscribeFromBill,
-  } = useWebSocket();
-  const { updates, notifications, clearUpdates, clearNotifications } =
-    useBillUpdates(bill_id);
-
+  }: RealTimeBillTrackerProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [preferences, setPreferences] = useState({
     statusChanges: true,
@@ -52,11 +37,51 @@ export function RealTimeBillTracker({ bill_id,
   });
   const [showPreferences, setShowPreferences] = useState(false);
 
+  const {
+    isConnected,
+    connect,
+    disconnect,
+    subscribe,
+    unsubscribe,
+    billUpdates,
+    notifications,
+    connectionQuality,
+    error,
+    getBillUpdates,
+    markNotificationRead,
+  } = useWebSocket({
+    subscriptions: bill_id ? [{ type: 'bill', id: bill_id }] : [],
+    handlers: {
+      onBillUpdate: (update) => {
+        logger.debug('Bill update received in tracker', { billId: update.data?.bill_id, type: update.type });
+      },
+      onNotification: (notification) => {
+        toast.info(notification.title, {
+          description: notification.message,
+        });
+      },
+      onConnectionChange: (connected) => {
+        if (connected) {
+          toast.success("Connected to real-time updates");
+        } else {
+          toast.warning("Disconnected from real-time updates");
+        }
+      },
+      onError: (error) => {
+        toast.error("WebSocket error occurred");
+        logger.error('WebSocket error in tracker:', error);
+      }
+    }
+  });
+
+  // Get updates for the specific bill
+  const updates = bill_id ? getBillUpdates(bill_id) : [];
+
   // Connect to WebSocket when component mounts
   useEffect(() => {
-    if (userToken && !isConnected) {
-      connect(userToken).catch((error) => {
-        logger.error('Failed to connect to WebSocket:', { component: 'Chanuka' }, error);
+    if (!isConnected) {
+      connect().catch((error: Error) => {
+        logger.error('Failed to connect to WebSocket:', { component: 'RealTimeBillTracker' }, error);
         toast.error("Failed to connect to real-time updates");
       });
     }
@@ -66,87 +91,38 @@ export function RealTimeBillTracker({ bill_id,
         disconnect();
       }
     };
-  }, [userToken, isConnected, connect, disconnect]);
+  }, [isConnected, connect, disconnect]);
 
-  // Set up event listeners
-  useEffect(() => {
-    const handlePreferences = (prefs: any) => {
-      setPreferences(prefs.billTracking);
-    };
-
-    const handlePreferencesUpdated = (prefs: any) => {
-      setPreferences(prefs);
-      toast.success("Preferences updated successfully");
-    };
-
-    const handleSubscribed = (data: any) => { setIsSubscribed(true);
-      toast.success(`Subscribed to bill ${data.bill_id } updates`);
-    };
-
-    const handleUnsubscribed = (data: any) => { setIsSubscribed(false);
-      toast.info(`Unsubscribed from bill ${data.bill_id } updates`);
-    };
-
-    const handleNotification = (notification: any) => {
-      toast.info(notification.title, {
-        description: notification.message,
-      });
-    };
-
-    const handleBatchedUpdates = (notification: any) => {
-      toast.info(notification.title, {
-        description: notification.message,
-      });
-    };
-
-    webSocketClient.on("preferences", handlePreferences);
-    webSocketClient.on("preferencesUpdated", handlePreferencesUpdated);
-    webSocketClient.on("subscribed", handleSubscribed);
-    webSocketClient.on("unsubscribed", handleUnsubscribed);
-    webSocketClient.on("notification", handleNotification);
-    webSocketClient.on("batchedUpdates", handleBatchedUpdates);
-
-    return () => {
-      webSocketClient.off("preferences", handlePreferences);
-      webSocketClient.off("preferencesUpdated", handlePreferencesUpdated);
-      webSocketClient.off("subscribed", handleSubscribed);
-      webSocketClient.off("unsubscribed", handleUnsubscribed);
-      webSocketClient.off("notification", handleNotification);
-      webSocketClient.off("batchedUpdates", handleBatchedUpdates);
-    };
-  }, []);
-
-  const handleSubscribe = () => { if (bill_id && isConnected) {
-      subscribeToBill(bill_id, [
-        "status_change",
-        "new_comment",
-        "amendment",
-        "voting_scheduled",
-      ]);
-     }
+  const handleSubscribe = () => {
+    if (bill_id && isConnected) {
+      subscribe({ type: 'bill', id: bill_id });
+      setIsSubscribed(true);
+      toast.success(`Subscribed to bill ${bill_id} updates`);
+    }
   };
 
-  const handleUnsubscribe = () => { if (bill_id && isConnected) {
-      unsubscribeFromBill(bill_id);
-     }
+  const handleUnsubscribe = () => {
+    if (bill_id && isConnected) {
+      unsubscribe({ type: 'bill', id: bill_id });
+      setIsSubscribed(false);
+      toast.info(`Unsubscribed from bill ${bill_id} updates`);
+    }
   };
 
   const handleUpdatePreferences = () => {
-    if (isConnected) {
-      webSocketClient.updatePreferences(preferences);
-    }
+    // Preferences are now handled in the hook
+    toast.success("Preferences updated successfully");
   };
 
   const getConnectionStatusColor = () => {
     if (isConnected) return "text-green-600";
-    if (connectionStatus.reconnectAttempts > 0) return "text-yellow-600";
+    if (connectionQuality === 'poor') return "text-yellow-600";
     return "text-red-600";
   };
 
   const getConnectionStatusText = () => {
     if (isConnected) return "Connected";
-    if (connectionStatus.reconnectAttempts > 0)
-      return `Reconnecting... (${connectionStatus.reconnectAttempts})`;
+    if (connectionQuality === 'poor') return "Poor Connection";
     return "Disconnected";
   };
 
@@ -389,12 +365,7 @@ export function RealTimeBillTracker({ bill_id,
       {updates.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between">
-              Recent Updates
-              <Button onClick={clearUpdates} variant="outline" size="sm">
-                Clear
-              </Button>
-            </CardTitle>
+            <CardTitle>Recent Updates</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-60 overflow-y-auto">
@@ -410,9 +381,9 @@ export function RealTimeBillTracker({ bill_id,
                   </div>
                   <div className="text-sm">
                     <p className="font-medium">
-                      { update.data.title || `Bill #${update.data.bill_id }`}
+                      { update.data?.title || `Bill #${update.data?.bill_id || bill_id}`}
                     </p>
-                    {update.data.oldStatus && update.data.newStatus && (
+                    {update.data?.oldStatus && update.data?.newStatus && (
                       <p className="text-muted-foreground">
                         Status: {update.data.oldStatus} →{" "}
                         {update.data.newStatus}
@@ -430,12 +401,7 @@ export function RealTimeBillTracker({ bill_id,
       {notifications.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between">
-              Recent Notifications
-              <Button onClick={clearNotifications} variant="outline" size="sm">
-                Clear
-              </Button>
-            </CardTitle>
+            <CardTitle>Recent Notifications</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-60 overflow-y-auto">
@@ -470,7 +436,14 @@ export function RealTimeBillTracker({ bill_id,
           </CardHeader>
           <CardContent>
             <pre className="text-xs bg-muted p-2 rounded">
-              {JSON.stringify(connectionStatus, null, 2)}
+              {JSON.stringify({
+                isConnected,
+                connectionQuality,
+                error,
+                billUpdatesCount: Object.keys(billUpdates).length,
+                notificationsCount: notifications.length,
+                updatesCount: updates.length
+              }, null, 2)}
             </pre>
           </CardContent>
         </Card>

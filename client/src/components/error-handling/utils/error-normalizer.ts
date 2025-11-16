@@ -5,7 +5,6 @@
 
 import { 
   BaseError, 
-  ErrorSeverity,
   NetworkError,
   ExternalServiceError,
   ServiceUnavailableError,
@@ -17,7 +16,9 @@ import {
   ValidationError,
   ConflictError,
   TooManyRequestsError
-} from '../../../core/error';
+} from '../../../utils/logger';
+
+import { ErrorSeverity } from '../../../core/error';
 
 export function normalizeError(
   error: any,

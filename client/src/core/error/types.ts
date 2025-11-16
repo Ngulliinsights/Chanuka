@@ -6,7 +6,7 @@
  * system from shared/core but adapted for client-side React usage.
  */
 
-import { ErrorDomain, ErrorSeverity } from '../../utils/logger';
+import { ErrorDomain, ErrorSeverity } from './constants';
 
 // ============================================================================
 // Core Error Types
@@ -123,16 +123,7 @@ export interface ErrorFallbackProps {
   showTechnicalDetails?: boolean;
 }
 
-/**
- * Recovery action types
- */
-export enum RecoveryAction {
-  RETRY = 'retry',
-  CACHE_CLEAR = 'cache_clear',
-  RELOAD = 'reload',
-  REDIRECT = 'redirect',
-  IGNORE = 'ignore',
-}
+import { RecoveryAction } from './constants';
 
 /**
  * Recovery result interface
@@ -148,5 +139,5 @@ export interface RecoveryResult {
 // Re-export shared error types for convenience
 // ============================================================================
 
-export { ErrorDomain, ErrorSeverity } from '../../utils/logger';
+export { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
 

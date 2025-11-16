@@ -378,7 +378,7 @@ export const createErrorRecoveryEngine = (): ErrorRecoveryEngine => ({
 export const AutomatedErrorRecoveryEngine = createErrorRecoveryEngine;
 
 // Type-safe Enhanced Error Boundary interface
-interface ErrorBoundaryProps {
+export interface ErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ComponentType<{ error?: Error; resetError?: () => void }>;
 }
@@ -387,11 +387,6 @@ export const ErrorBoundary = ({ children }: ErrorBoundaryProps) => {
   // This is a simplified version - the full implementation should be in the client
   return children;
 };
-
-export interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType<any>;
-}
 
 export interface RecoverySuggestion {
   type: string;

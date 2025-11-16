@@ -6,7 +6,8 @@
  */
 
 import { communityBackendService } from './community-backend-service';
-import { webSocketClient } from './websocket-client';
+import { UnifiedWebSocketManager } from '../core/api/websocket';
+import { notificationApiService } from '../core/api/notifications';
 import { logger } from '../utils/logger';
 
 export interface Notification {
@@ -148,7 +149,8 @@ class NotificationService {
     });
 
     // Listen for general WebSocket notifications
-    webSocketClient.on('notification', (data: any) => {
+    const wsManager = UnifiedWebSocketManager.getInstance();
+    wsManager.on('notification', (data: any) => {
       this.handleGeneralNotification(data);
     });
   }
@@ -223,29 +225,14 @@ class NotificationService {
    * Get VAPID public key from backend
    */
   private async getVapidPublicKey(): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/notifications/vapid-key`, {
-      headers: { 'Authorization': `Bearer ${this.getAuthToken()}` }
-    });
-    const result = await response.json();
-    return result.publicKey;
+    return await notificationApiService.getVapidPublicKey();
   }
 
   /**
    * Send push subscription to backend
    */
   private async sendPushSubscriptionToBackend(subscription: PushSubscription): Promise<void> {
-    await fetch(`${this.baseUrl}/notifications/push-subscription`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.getAuthToken()}`
-      },
-      body: JSON.stringify({
-        subscription: subscription.toJSON(),
-        userAgent: navigator.userAgent,
-        timestamp: new Date().toISOString()
-      })
-    });
+    await notificationApiService.sendPushSubscription(subscription, navigator.userAgent);
   }
 
   /**
@@ -320,22 +307,14 @@ class NotificationService {
    */
   async loadUserPreferences(): Promise<NotificationPreferences> {
     try {
-      const response = await fetch(`${this.baseUrl}/notifications/preferences`, {
-        headers: { 'Authorization': `Bearer ${this.getAuthToken()}` }
-      });
+      const preferences = await notificationApiService.getPreferences();
+      this.preferences = preferences || this.getDefaultPreferences();
 
-      if (!response.ok) {
-        throw new Error(`Failed to load preferences: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      this.preferences = result.data || this.getDefaultPreferences();
-      
-      return this.preferences;
+      return this.preferences!;
     } catch (error) {
       logger.error('Failed to load notification preferences', { component: 'NotificationService' }, error);
       this.preferences = this.getDefaultPreferences();
-      return this.preferences;
+      return this.preferences!;
     }
   }
 
@@ -344,22 +323,11 @@ class NotificationService {
    */
   async updatePreferences(preferences: Partial<NotificationPreferences>): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/notifications/preferences`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        },
-        body: JSON.stringify(preferences)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update preferences: ${response.statusText}`);
-      }
+      await notificationApiService.updatePreferences(preferences);
 
       // Update local preferences
       this.preferences = { ...this.preferences!, ...preferences };
-      
+
       // Emit preferences updated event
       this.emit('preferences:updated', this.preferences);
 
@@ -381,23 +349,7 @@ class NotificationService {
     category?: NotificationCategory;
   } = {}): Promise<Notification[]> {
     try {
-      const params = new URLSearchParams();
-      if (options.limit) params.append('limit', options.limit.toString());
-      if (options.offset) params.append('offset', options.offset.toString());
-      if (options.unreadOnly) params.append('unreadOnly', 'true');
-      if (options.since) params.append('since', options.since);
-      if (options.category) params.append('category', options.category);
-
-      const response = await fetch(`${this.baseUrl}/notifications?${params.toString()}`, {
-        headers: { 'Authorization': `Bearer ${this.getAuthToken()}` }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to load notifications: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      const notifications = result.data || [];
+      const notifications = await notificationApiService.getNotifications(options);
 
       // Update local state
       if (options.offset === 0 || !options.offset) {
@@ -421,21 +373,14 @@ class NotificationService {
    */
   async markAsRead(notificationId: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/notifications/${notificationId}/read`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${this.getAuthToken()}` }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to mark notification as read: ${response.statusText}`);
-      }
+      await notificationApiService.markAsRead(notificationId);
 
       // Update local state
       const notification = this.notifications.find(n => n.id === notificationId);
       if (notification && !notification.read) {
         notification.read = true;
         this.unreadCount = Math.max(0, this.unreadCount - 1);
-        
+
         this.emit('notification:read', notification);
         this.emit('unread_count:changed', this.unreadCount);
       }
@@ -450,19 +395,12 @@ class NotificationService {
    */
   async markAllAsRead(): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/notifications/read-all`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${this.getAuthToken()}` }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to mark all notifications as read: ${response.statusText}`);
-      }
+      await notificationApiService.markAllAsRead();
 
       // Update local state
       this.notifications.forEach(n => n.read = true);
       this.unreadCount = 0;
-      
+
       this.emit('notifications:all_read');
       this.emit('unread_count:changed', 0);
     } catch (error) {
@@ -476,14 +414,7 @@ class NotificationService {
    */
   async deleteNotification(notificationId: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/notifications/${notificationId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${this.getAuthToken()}` }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete notification: ${response.statusText}`);
-      }
+      await notificationApiService.deleteNotification(notificationId);
 
       // Update local state
       const index = this.notifications.findIndex(n => n.id === notificationId);
@@ -492,9 +423,9 @@ class NotificationService {
         if (!notification.read) {
           this.unreadCount = Math.max(0, this.unreadCount - 1);
         }
-        
+
         this.notifications.splice(index, 1);
-        
+
         this.emit('notification:deleted', notification);
         this.emit('unread_count:changed', this.unreadCount);
       }
@@ -722,12 +653,6 @@ class NotificationService {
     };
   }
 
-  /**
-   * Get authentication token
-   */
-  private getAuthToken(): string {
-    return localStorage.getItem('authToken') || '';
-  }
 
   // ============================================================================
   // EVENT SYSTEM
@@ -839,4 +764,3 @@ export const notificationService = new NotificationService();
 
 // Export types and class for testing
 export { NotificationService };
-export type { NotificationPreferences, NotificationChannel };

@@ -287,6 +287,76 @@ export {
 } from "./platform_operations";
 
 // ============================================================================
+// TRANSPARENCY INTELLIGENCE SCHEMA
+// ============================================================================
+export {
+  financialDisclosures,
+  financialInterests,
+  conflictDetections,
+  influenceNetworks,
+  implementationWorkarounds,
+  transparencyFinancialDisclosuresRelations,
+  transparencyFinancialInterestsRelations,
+  conflictDetectionsRelations,
+  implementationWorkaroundsRelations
+} from "./transparency_intelligence";
+
+// ============================================================================
+// EXPERT VERIFICATION SCHEMA
+// ============================================================================
+export {
+  expertCredentials,
+  expertDomains,
+  credibilityScores,
+  expertReviews,
+  peerValidations,
+  expertActivity,
+  expertCredentialsRelations,
+  expertDomainsRelations,
+  credibilityScoresRelations,
+  expertReviewsRelations,
+  peerValidationsRelations,
+  expertActivityRelations
+} from "./expert_verification";
+
+// ============================================================================
+// ADVANCED DISCOVERY SCHEMA
+// ============================================================================
+export {
+  searchQueries,
+  discoveryPatterns,
+  billRelationships,
+  searchAnalytics,
+  trendingTopics,
+  userRecommendations,
+  searchQueriesRelations,
+  billRelationshipsRelations,
+  searchAnalyticsRelations,
+  userRecommendationsRelations
+} from "./advanced_discovery";
+
+// ============================================================================
+// REAL-TIME ENGAGEMENT SCHEMA
+// ============================================================================
+export {
+  engagementEvents,
+  liveMetricsCache,
+  civicAchievements,
+  userAchievements,
+  civicScores,
+  engagementLeaderboards,
+  realTimeNotifications,
+  engagementAnalytics,
+  engagementEventsRelations,
+  userAchievementsRelations,
+  civicAchievementsRelations,
+  civicScoresRelations,
+  engagementLeaderboardsRelations,
+  realTimeNotificationsRelations,
+  engagementAnalyticsRelations
+} from "./real_time_engagement";
+
+// ============================================================================
 // ANALYSIS SCHEMA
 // ============================================================================
 export { analysis } from "./analysis";
@@ -369,6 +439,72 @@ export type {
 
 // Analysis types
 export type { Analysis, NewAnalysis } from "./analysis";
+
+// Transparency Intelligence types
+export type {
+  FinancialDisclosure,
+  NewFinancialDisclosure,
+  FinancialInterest,
+  NewFinancialInterest,
+  ConflictDetection,
+  NewConflictDetection,
+  InfluenceNetwork,
+  NewInfluenceNetwork,
+  ImplementationWorkaround,
+  NewImplementationWorkaround
+} from "./transparency_intelligence";
+
+// Expert Verification types
+export type {
+  ExpertCredential,
+  NewExpertCredential,
+  ExpertDomain,
+  NewExpertDomain,
+  CredibilityScore,
+  NewCredibilityScore,
+  ExpertReview,
+  NewExpertReview,
+  PeerValidation,
+  NewPeerValidation,
+  ExpertActivity,
+  NewExpertActivity
+} from "./expert_verification";
+
+// Advanced Discovery types
+export type {
+  SearchQuery,
+  NewSearchQuery,
+  DiscoveryPattern,
+  NewDiscoveryPattern,
+  BillRelationship,
+  NewBillRelationship,
+  SearchAnalytics,
+  NewSearchAnalytics,
+  TrendingTopic,
+  NewTrendingTopic,
+  UserRecommendation,
+  NewUserRecommendation
+} from "./advanced_discovery";
+
+// Real-Time Engagement types
+export type {
+  EngagementEvent,
+  NewEngagementEvent,
+  LiveMetricsCache,
+  NewLiveMetricsCache,
+  CivicAchievement,
+  NewCivicAchievement,
+  UserAchievement,
+  NewUserAchievement,
+  CivicScore,
+  NewCivicScore,
+  EngagementLeaderboard,
+  NewEngagementLeaderboard,
+  RealTimeNotification,
+  NewRealTimeNotification,
+  EngagementAnalytics,
+  NewEngagementAnalytics
+} from "./real_time_engagement";
 
 // Architecture Component type for planning interface
 export interface ArchitectureComponent {

@@ -14,6 +14,12 @@ import * as universalAccess from "./universal_access";
 import * as transparencyAnalysis from "./transparency_analysis";
 import * as impactMeasurement from "./impact_measurement";
 
+// Import new domains
+import * as transparencyIntelligence from "./transparency_intelligence";
+import * as expertVerification from "./expert_verification";
+import * as advancedDiscovery from "./advanced_discovery";
+import * as realTimeEngagement from "./real_time_engagement";
+
 // Import the main index to ensure all exports work
 import * as mainSchema from "./index";
 
@@ -30,6 +36,10 @@ const schemas = {
   universalAccess,
   transparencyAnalysis,
   impactMeasurement,
+  transparencyIntelligence,
+  expertVerification,
+  advancedDiscovery,
+  realTimeEngagement,
   mainSchema
 };
 

@@ -19,8 +19,41 @@ export {
 // Error Recovery Manager - Recovery strategies and management
 export { ErrorRecoveryManager } from './ErrorRecoveryManager';
 
-// Re-export error types from shared errors for convenience
-export * from '../../core/error';
+// Re-export error types from core error (excluding BaseError which comes from logger)
+export type { 
+  AppError, 
+  ErrorContext, 
+  ErrorRecoveryStrategy, 
+  ErrorHandlerConfig,
+  ErrorListener,
+  ErrorStats,
+  ReactErrorInfo,
+  ErrorBoundaryProps as CoreErrorBoundaryProps,
+  ErrorFallbackProps as CoreErrorFallbackProps,
+  RecoveryResult
+} from '../../core/error/types';
+
+export { 
+  ErrorDomain, 
+  ErrorSeverity, 
+  RecoveryAction 
+} from '../../core/error/constants';
+
+// Re-export all error classes from logger where they are defined
+export { 
+  BaseError, 
+  ValidationError,
+  NetworkError,
+  ExternalServiceError,
+  ServiceUnavailableError,
+  DatabaseError,
+  CacheError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  TooManyRequestsError,
+} from '../../utils/logger';
 
 // Export utility functions
 export { createErrorReporter } from './utils/error-reporter';

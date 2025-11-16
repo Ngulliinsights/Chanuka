@@ -513,32 +513,11 @@ const renderTracker = new RenderTracker();
 // Error Handling System
 // ============================================================================
 
-/**
- * Categories for error classification, enabling better error routing and handling.
- */
-export enum ErrorDomain {
-    AUTHENTICATION = 'authentication',
-    AUTHORIZATION = 'authorization',
-    VALIDATION = 'validation',
-    NETWORK = 'network',
-    DATABASE = 'database',
-    EXTERNAL_SERVICE = 'external_service',
-    CACHE = 'cache',
-    BUSINESS_LOGIC = 'business_logic',
-    SECURITY = 'security',
-    SYSTEM = 'system',
-    UNKNOWN = 'unknown'
-}
+// Import error constants from core error module
+import { ErrorDomain, ErrorSeverity } from '../core/error/constants';
 
-/**
- * Severity levels for error prioritization and alerting.
- */
-export enum ErrorSeverity {
-    LOW = 'low',
-    MEDIUM = 'medium',
-    HIGH = 'high',
-    CRITICAL = 'critical'
-}
+// Re-export for backward compatibility
+export { ErrorDomain, ErrorSeverity };
 
 /**
  * Rich metadata that can be attached to errors for better debugging.
@@ -556,6 +535,8 @@ export interface ErrorMetadata {
     retryable?: boolean;
     correlationId?: string;
     cause?: Error | unknown;
+    code?: string;
+    appError?: any;
 }
 
 /**
@@ -639,11 +620,199 @@ export class BaseError extends Error {
     }
 }
 
-// Import ValidationError class from specialized errors
-import { ValidationError } from '../../../shared/core/src/observability/error-management/errors/specialized-errors';
+/**
+ * Validation Error - for input validation failures
+ * Compatible with the logger's BaseError class
+ */
+export class ValidationError extends BaseError {
+    public readonly errors: Array<{
+        field?: string;
+        code: string;
+        message: string;
+        value?: unknown;
+    }>;
 
-// Re-export for backward compatibility
-export { ValidationError };
+    public readonly field?: string;
+
+    constructor(
+        messageOrZodError: string | any, 
+        errors?: any[], 
+        details?: Record<string, any>
+    ) {
+        let message: string;
+        let validationErrors: Array<{
+            field?: string;
+            code: string;
+            message: string;
+            value?: unknown;
+        }>;
+
+        // Handle ZodError input
+        if (typeof messageOrZodError === 'object' && messageOrZodError?.issues) {
+            message = 'Validation failed';
+            validationErrors = messageOrZodError.issues.map((issue: any) => ({
+                field: issue.path?.join('.') || '',
+                code: issue.code || 'invalid',
+                message: issue.message || 'Invalid value',
+                value: issue.received
+            }));
+        } else {
+            // Handle string message + errors array
+            message = messageOrZodError;
+            validationErrors = errors || [];
+        }
+
+        super(
+            message,
+            'VALIDATION_ERROR',
+            {
+                domain: ErrorDomain.VALIDATION,
+                severity: ErrorSeverity.LOW,
+            },
+            {
+                errors: validationErrors,
+                ...details
+            }
+        );
+
+        this.errors = validationErrors;
+
+        // Set unified interface properties for compatibility
+        if (validationErrors.length === 1 && validationErrors[0]?.field !== undefined) {
+            this.field = validationErrors[0].field;
+        }
+    }
+}
+
+/**
+ * Network Error - for network-related failures
+ */
+export class NetworkError extends BaseError {
+    constructor(message: string = 'Network error occurred', code: string = 'NETWORK_ERROR', status?: number) {
+        super(message, code, {
+            domain: ErrorDomain.NETWORK,
+            severity: ErrorSeverity.MEDIUM,
+        }, { status });
+        this.name = 'NetworkError';
+    }
+}
+
+/**
+ * External Service Error - for third-party service failures
+ */
+export class ExternalServiceError extends BaseError {
+    constructor(message: string = 'External service error', code: string = 'EXTERNAL_SERVICE_ERROR', status?: number) {
+        super(message, code, {
+            domain: ErrorDomain.EXTERNAL,
+            severity: ErrorSeverity.MEDIUM,
+        }, { status });
+        this.name = 'ExternalServiceError';
+    }
+}
+
+/**
+ * Service Unavailable Error - for 503 errors
+ */
+export class ServiceUnavailableError extends BaseError {
+    constructor(message: string = 'Service unavailable', code: string = 'SERVICE_UNAVAILABLE') {
+        super(message, code, {
+            domain: ErrorDomain.NETWORK,
+            severity: ErrorSeverity.HIGH,
+        }, { status: 503 });
+        this.name = 'ServiceUnavailableError';
+    }
+}
+
+/**
+ * Database Error - for database-related failures
+ */
+export class DatabaseError extends BaseError {
+    constructor(message: string = 'Database error occurred', code: string = 'DATABASE_ERROR') {
+        super(message, code, {
+            domain: ErrorDomain.DATABASE,
+            severity: ErrorSeverity.HIGH,
+        });
+        this.name = 'DatabaseError';
+    }
+}
+
+/**
+ * Cache Error - for cache-related failures
+ */
+export class CacheError extends BaseError {
+    constructor(message: string = 'Cache error occurred', code: string = 'CACHE_ERROR') {
+        super(message, code, {
+            domain: ErrorDomain.CACHE,
+            severity: ErrorSeverity.LOW,
+        });
+        this.name = 'CacheError';
+    }
+}
+
+/**
+ * Unauthorized Error - for 401 errors
+ */
+export class UnauthorizedError extends BaseError {
+    constructor(message: string = 'Unauthorized access', code: string = 'UNAUTHORIZED') {
+        super(message, code, {
+            domain: ErrorDomain.AUTHENTICATION,
+            severity: ErrorSeverity.MEDIUM,
+        }, { status: 401 });
+        this.name = 'UnauthorizedError';
+    }
+}
+
+/**
+ * Forbidden Error - for 403 errors
+ */
+export class ForbiddenError extends BaseError {
+    constructor(message: string = 'Access forbidden', code: string = 'FORBIDDEN') {
+        super(message, code, {
+            domain: ErrorDomain.AUTHORIZATION,
+            severity: ErrorSeverity.MEDIUM,
+        }, { status: 403 });
+        this.name = 'ForbiddenError';
+    }
+}
+
+/**
+ * Not Found Error - for 404 errors
+ */
+export class NotFoundError extends BaseError {
+    constructor(message: string = 'Resource not found', code: string = 'NOT_FOUND') {
+        super(message, code, {
+            domain: ErrorDomain.RESOURCE,
+            severity: ErrorSeverity.LOW,
+        }, { status: 404 });
+        this.name = 'NotFoundError';
+    }
+}
+
+/**
+ * Conflict Error - for 409 errors
+ */
+export class ConflictError extends BaseError {
+    constructor(message: string = 'Resource conflict', code: string = 'CONFLICT') {
+        super(message, code, {
+            domain: ErrorDomain.BUSINESS_LOGIC,
+            severity: ErrorSeverity.MEDIUM,
+        }, { status: 409 });
+        this.name = 'ConflictError';
+    }
+}
+
+/**
+ * Too Many Requests Error - for 429 errors
+ */
+export class TooManyRequestsError extends BaseError {
+    constructor(message: string = 'Too many requests', code: string = 'TOO_MANY_REQUESTS') {
+        super(message, code, {
+            domain: ErrorDomain.RATE_LIMITING,
+            severity: ErrorSeverity.MEDIUM,
+        }, { status: 429 });
+        this.name = 'TooManyRequestsError';
+    }
+}
 
 // ============================================================================
 // Performance Monitoring

@@ -9,7 +9,9 @@
  * - Network conditions monitoring
  */
 
-import { getCLS, getFCP, getFID, getLCP, getTTFB } from 'web-vitals';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
+import type { Metric } from 'web-vitals';
+import { performanceApiService } from '../core/api/performance';
 
 interface PerformanceMetric {
   name: string;
@@ -180,67 +182,67 @@ class PerformanceMonitoringService {
   /**
    * Set up Web Vitals collection
    */
-  private setupWebVitalsCollection() {
-    // Largest Contentful Paint
-    getLCP((metric) => {
-      this.recordMetric({
-        name: 'LCP',
-        value: metric.value,
-        delta: metric.delta,
-        id: metric.id,
-        rating: metric.rating,
-        timestamp: Date.now()
-      });
-    });
+   private setupWebVitalsCollection() {
+     // Largest Contentful Paint
+     onLCP((metric: Metric) => {
+       this.recordMetric({
+         name: 'LCP',
+         value: metric.value,
+         delta: metric.delta,
+         id: metric.id,
+         rating: metric.rating,
+         timestamp: Date.now()
+       });
+     });
 
-    // First Input Delay
-    getFID((metric) => {
-      this.recordMetric({
-        name: 'FID',
-        value: metric.value,
-        delta: metric.delta,
-        id: metric.id,
-        rating: metric.rating,
-        timestamp: Date.now()
-      });
-    });
+     // Interaction to Next Paint
+     onINP((metric: Metric) => {
+       this.recordMetric({
+         name: 'INP',
+         value: metric.value,
+         delta: metric.delta,
+         id: metric.id,
+         rating: metric.rating,
+         timestamp: Date.now()
+       });
+     });
 
-    // Cumulative Layout Shift
-    getCLS((metric) => {
-      this.recordMetric({
-        name: 'CLS',
-        value: metric.value,
-        delta: metric.delta,
-        id: metric.id,
-        rating: metric.rating,
-        timestamp: Date.now()
-      });
-    });
+     // Cumulative Layout Shift
+     onCLS((metric: Metric) => {
+       this.recordMetric({
+         name: 'CLS',
+         value: metric.value,
+         delta: metric.delta,
+         id: metric.id,
+         rating: metric.rating,
+         timestamp: Date.now()
+       });
+     });
 
-    // First Contentful Paint
-    getFCP((metric) => {
-      this.recordMetric({
-        name: 'FCP',
-        value: metric.value,
-        delta: metric.delta,
-        id: metric.id,
-        rating: metric.rating,
-        timestamp: Date.now()
-      });
-    });
+     // First Contentful Paint
+     onFCP((metric: Metric) => {
+       this.recordMetric({
+         name: 'FCP',
+         value: metric.value,
+         delta: metric.delta,
+         id: metric.id,
+         rating: metric.rating,
+         timestamp: Date.now()
+       });
+     });
 
-    // Time to First Byte
-    getTTFB((metric) => {
-      this.recordMetric({
-        name: 'TTFB',
-        value: metric.value,
-        delta: metric.delta,
-        id: metric.id,
-        rating: metric.rating,
-        timestamp: Date.now()
-      });
-    });
-  }
+     // Time to First Byte
+     onTTFB((metric: Metric) => {
+       this.recordMetric({
+         name: 'TTFB',
+         value: metric.value,
+         delta: metric.delta,
+         id: metric.id,
+         rating: metric.rating,
+         timestamp: Date.now()
+       });
+     });
+   }
 
   /**
    * Set up performance observers for additional metrics
@@ -338,16 +340,17 @@ class PerformanceMonitoringService {
    * Record navigation timing metrics
    */
   private recordNavigationMetrics(entry: PerformanceNavigationTiming) {
+    const startTime = entry.activationStart ?? 0;
     const metrics = [
       { name: 'dns_lookup', value: entry.domainLookupEnd - entry.domainLookupStart },
       { name: 'tcp_connect', value: entry.connectEnd - entry.connectStart },
       { name: 'ssl_negotiation', value: entry.connectEnd - entry.secureConnectionStart },
       { name: 'request_time', value: entry.responseStart - entry.requestStart },
       { name: 'response_time', value: entry.responseEnd - entry.responseStart },
-      { name: 'dom_processing', value: entry.domComplete - entry.domLoading },
-      { name: 'dom_interactive', value: entry.domInteractive - entry.navigationStart },
-      { name: 'dom_content_loaded', value: entry.domContentLoadedEventEnd - entry.navigationStart },
-      { name: 'load_complete', value: entry.loadEventEnd - entry.navigationStart }
+      { name: 'dom_processing', value: entry.domComplete - entry.domContentLoadedEventStart },
+      { name: 'dom_interactive', value: entry.domInteractive - startTime },
+      { name: 'dom_content_loaded', value: entry.domContentLoadedEventEnd - startTime },
+      { name: 'load_complete', value: entry.loadEventEnd - startTime }
     ];
 
     for (const metric of metrics) {
@@ -362,9 +365,10 @@ class PerformanceMonitoringService {
     }
 
     // Record navigation type
+    const typeMap: Record<string, number> = { navigate: 0, reload: 1, 'back_forward': 2, prerender: 3 };
     this.recordCustomMetric({
       name: 'navigation_type',
-      value: entry.type,
+      value: typeMap[entry.type] ?? 0,
       unit: 'enum',
       context: {
         redirectCount: entry.redirectCount,
@@ -633,8 +637,8 @@ class PerformanceMonitoringService {
    */
   private async reportMetrics(immediate = false) {
     const hasMetrics = this.metrics.length > 0 || this.customMetrics.length > 0;
-    const shouldReport = immediate || 
-                        this.metrics.length >= this.batchSize || 
+    const shouldReport = immediate ||
+                        this.metrics.length >= this.batchSize ||
                         this.customMetrics.length >= this.batchSize;
 
     if (!hasMetrics || !shouldReport) {
@@ -660,14 +664,7 @@ class PerformanceMonitoringService {
           JSON.stringify(payload)
         );
       } else {
-        await fetch(this.reportingEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload),
-          keepalive: immediate
-        });
+        await performanceApiService.reportMetrics(payload);
       }
 
       // Clear reported metrics

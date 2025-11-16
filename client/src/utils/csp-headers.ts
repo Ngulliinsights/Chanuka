@@ -54,6 +54,8 @@ export const CSP_CONFIGS = {
     'frame-src': ["'self'"],
     'frame-ancestors': ["'self'"],
     'form-action': ["'self'"],
+    'worker-src': ["'self'", 'blob:'],
+    'child-src': ["'self'", 'blob:'],
   } as CSPDirectives,
 
   // Minimal CSP for legacy support
@@ -63,6 +65,8 @@ export const CSP_CONFIGS = {
     'style-src': ["'self'", "'unsafe-inline'"],
     'img-src': ["'self'", 'data:', 'https:', 'http:'],
     'connect-src': ["'self'", 'https:', 'http:'],
+    'worker-src': ["'self'", 'blob:'],
+    'child-src': ["'self'", 'blob:'],
   } as CSPDirectives,
 };
 

@@ -33,19 +33,19 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
 const replacements = [
   {
     from: "import { logger } from '@shared/core';",
-    to: "import { logger } from '../utils/browser-logger';",
+    to: "import { logger } from '../utils/logger';",
   },
   {
     from: "import { logger } from '@shared/core';",
-    to: "import { logger } from '../../utils/browser-logger';",
+    to: "import { logger } from '../../utils/logger';",
   },
   {
     from: "import { logger } from '@shared/core';",
-    to: "import { logger } from '../../../utils/browser-logger';",
+    to: "import { logger } from '../../../utils/logger';",
   },
   {
     from: "from '@shared/core/validation'",
-    to: "from '../utils/client-core'",
+    to: "from '../utils/logger'",
   },
   {
     from: "from '@shared/i18n/en'",
@@ -73,18 +73,18 @@ function fixImportsInFile(filePath) {
     if (loggerImportRegex.test(content)) {
       content = content.replace(
         loggerImportRegex,
-        `import { logger } from '${relativePrefix}utils/browser-logger';`
+        `import { logger } from '${relativePrefix}utils/logger';`
       );
       modified = true;
     }
 
     // Also fix the incorrect paths we just created
     const incorrectLoggerRegex =
-      /import\s*{\s*logger\s*}\s*from\s*['"]utils\/browser-logger['"];?/g;
+      /import\s*{\s*logger\s*}\s*from\s*['"]utils\/logger['"];?/g;
     if (incorrectLoggerRegex.test(content)) {
       content = content.replace(
         incorrectLoggerRegex,
-        `import { logger } from '${relativePrefix}utils/browser-logger';`
+        `import { logger } from '${relativePrefix}utils/logger';`
       );
       modified = true;
     }
@@ -93,7 +93,7 @@ function fixImportsInFile(filePath) {
     if (content.includes("from '@shared/core/validation'")) {
       content = content.replace(
         /from\s*['"]@shared\/core\/validation['"]/g,
-        `from '${relativePrefix}utils/client-core'`
+        `from '${relativePrefix}utils/logger'`
       );
       modified = true;
     }

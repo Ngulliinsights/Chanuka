@@ -6,13 +6,12 @@
  * infrastructure and state management.
  */
 
-import { api, ApiResponse } from './apiService';
-import { webSocketClient } from './websocket-client';
+import { billsApiService as coreBillsApi } from '../core/api/bills';
+import { UnifiedWebSocketManager } from '../core/api/websocket';
 import { store } from '../store';
 import { addBillUpdate, addNotification } from '../store/slices/realTimeSlice';
 import { setBills, updateBill, Bill, BillsStats } from '../store/slices/billsSlice';
 import { logger } from '../utils/logger';
-import { API_ENDPOINTS, TIMEOUT_CONFIG, CACHE_CONFIG } from '../config/api';
 import { z } from 'zod';
 
 // ============================================================================
@@ -149,10 +148,10 @@ class BillsApiService {
 
     try {
       // Set up WebSocket event listeners for bill updates
-      webSocketClient.on('billUpdate', this.handleRealTimeBillUpdate.bind(this));
-      webSocketClient.on('notification', this.handleRealTimeNotification.bind(this));
-      webSocketClient.on('connected', this.handleWebSocketConnected.bind(this));
-      webSocketClient.on('disconnected', this.handleWebSocketDisconnected.bind(this));
+      UnifiedWebSocketManager.getInstance().on('billUpdate', this.handleRealTimeBillUpdate.bind(this));
+      UnifiedWebSocketManager.getInstance().on('notification', this.handleRealTimeNotification.bind(this));
+      UnifiedWebSocketManager.getInstance().on('connected', this.handleWebSocketConnected.bind(this));
+      UnifiedWebSocketManager.getInstance().on('disconnected', this.handleWebSocketDisconnected.bind(this));
 
       this.isInitialized = true;
       
@@ -171,69 +170,27 @@ class BillsApiService {
   /**
    * Get paginated bills with advanced filtering and search
    */
-  async getBills(params: BillsSearchParams = {}): Promise<ApiResponse<PaginatedBillsResponse>> {
-    const {
-      query,
-      status,
-      urgency,
-      policyAreas,
-      sponsors,
-      constitutionalFlags,
-      controversyLevels,
-      dateRange,
-      sortBy = 'date',
-      sortOrder = 'desc',
-      page = 1,
-      limit = 12
-    } = params;
-
-    // Build query parameters
-    const queryParams = new URLSearchParams();
-    
-    if (query) queryParams.append('q', query);
-    if (status?.length) queryParams.append('status', status.join(','));
-    if (urgency?.length) queryParams.append('urgency', urgency.join(','));
-    if (policyAreas?.length) queryParams.append('policy_areas', policyAreas.join(','));
-    if (sponsors?.length) queryParams.append('sponsors', sponsors.join(','));
-    if (constitutionalFlags) queryParams.append('constitutional_flags', 'true');
-    if (controversyLevels?.length) queryParams.append('controversy', controversyLevels.join(','));
-    if (dateRange?.start) queryParams.append('date_start', dateRange.start);
-    if (dateRange?.end) queryParams.append('date_end', dateRange.end);
-    
-    queryParams.append('sort_by', sortBy);
-    queryParams.append('sort_order', sortOrder);
-    queryParams.append('page', page.toString());
-    queryParams.append('limit', limit.toString());
-
-    const endpoint = `${API_ENDPOINTS.bills.list}?${queryParams.toString()}`;
-
+  async getBills(params: BillsSearchParams = {}): Promise<PaginatedBillsResponse> {
     try {
-      const response = await api.get<PaginatedBillsResponse>(endpoint, {
-        timeout: TIMEOUT_CONFIG.default,
-        responseSchema: PaginatedBillsResponseSchema,
-        cacheTTL: CACHE_CONFIG.durations.short
-      });
+      const response = await coreBillsApi.getBills(params);
 
-      if (response.success) {
-        // Update local store with fresh data
-        if (page === 1) {
-          // If this is the first page, replace all bills
-          store.dispatch(setBills(response.data.bills));
-          // Note: setStats action needs to be added to billsSlice if it doesn't exist
-        } else {
-          // For subsequent pages, add to existing bills (infinite scroll)
-          response.data.bills.forEach(bill => {
-            store.dispatch(updateBill({ id: bill.id, updates: bill }));
-          });
-        }
-
-        logger.info('Bills data loaded successfully', {
-          component: 'BillsApiService',
-          page,
-          count: response.data.bills.length,
-          total: response.data.pagination.total
+      // Update local store with fresh data
+      if (params.page === 1 || !params.page) {
+        // If this is the first page, replace all bills
+        store.dispatch(setBills(response.bills));
+      } else {
+        // For subsequent pages, add to existing bills (infinite scroll)
+        response.bills.forEach((bill: Bill) => {
+          store.dispatch(updateBill({ id: bill.id, updates: bill }));
         });
       }
+
+      logger.info('Bills data loaded successfully', {
+        component: 'BillsApiService',
+        page: params.page || 1,
+        count: response.bills.length,
+        total: response.pagination.total
+      });
 
       return response;
     } catch (error) {
@@ -249,27 +206,21 @@ class BillsApiService {
   /**
    * Get a single bill by ID with full details
    */
-  async getBillById(id: number): Promise<ApiResponse<Bill>> {
+  async getBillById(id: number): Promise<Bill> {
     try {
-      const response = await api.get<Bill>(API_ENDPOINTS.bills.detail(id), {
-        timeout: TIMEOUT_CONFIG.default,
-        responseSchema: BillSchema,
-        cacheTTL: CACHE_CONFIG.durations.medium
+      const response = await coreBillsApi.getBillById(id);
+
+      // Update bill in store
+      store.dispatch(updateBill({ id, updates: response }));
+
+      // Subscribe to real-time updates for this bill
+      this.subscribeToRealTimeUpdates(id);
+
+      logger.info('Bill details loaded', {
+        component: 'BillsApiService',
+        billId: id,
+        title: response.title
       });
-
-      if (response.success) {
-        // Update bill in store
-        store.dispatch(updateBill({ id, updates: response.data }));
-
-        // Subscribe to real-time updates for this bill
-        this.subscribeToRealTimeUpdates(id);
-
-        logger.info('Bill details loaded', {
-          component: 'BillsApiService',
-          billId: id,
-          title: response.data.title
-        });
-      }
 
       return response;
     } catch (error) {
@@ -285,9 +236,9 @@ class BillsApiService {
   /**
    * Search bills with intelligent caching and real-time updates
    */
-  async searchBills(searchParams: BillsSearchParams): Promise<ApiResponse<PaginatedBillsResponse>> {
+  async searchBills(searchParams: BillsSearchParams): Promise<PaginatedBillsResponse> {
     const cacheKey = JSON.stringify(searchParams);
-    
+
     // Check cache first
     const cached = this.searchCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < this.SEARCH_CACHE_TTL) {
@@ -295,22 +246,20 @@ class BillsApiService {
         component: 'BillsApiService',
         cacheKey: cacheKey.substring(0, 50) + '...'
       });
-      return { data: cached.data, success: true, fromCache: true };
+      return cached.data;
     }
 
     try {
       const response = await this.getBills(searchParams);
-      
-      if (response.success) {
-        // Cache successful search results
-        this.searchCache.set(cacheKey, {
-          data: response.data,
-          timestamp: Date.now()
-        });
 
-        // Clean up old cache entries
-        this.cleanupSearchCache();
-      }
+      // Cache successful search results
+      this.searchCache.set(cacheKey, {
+        data: response,
+        timestamp: Date.now()
+      });
+
+      // Clean up old cache entries
+      this.cleanupSearchCache();
 
       return response;
     } catch (error) {
@@ -326,32 +275,19 @@ class BillsApiService {
   /**
    * Get bill comments with pagination
    */
-  async getBillComments(billId: number, page = 1, limit = 20): Promise<ApiResponse<{
+  async getBillComments(billId: number, page = 1, limit = 20): Promise<{
     comments: BillComment[];
     pagination: { page: number; limit: number; total: number; hasNext: boolean; };
-  }>> {
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString()
-    });
-
+  }> {
     try {
-      const response = await api.get(
-        `${API_ENDPOINTS.bills.comments(billId)}?${queryParams.toString()}`,
-        {
-          timeout: TIMEOUT_CONFIG.default,
-          cacheTTL: CACHE_CONFIG.durations.short
-        }
-      );
+      const response = await coreBillsApi.getBillComments(billId, page, limit);
 
-      if (response.success) {
-        logger.info('Bill comments loaded', {
-          component: 'BillsApiService',
-          billId,
-          page,
-          count: response.data.comments?.length || 0
-        });
-      }
+      logger.info('Bill comments loaded', {
+        component: 'BillsApiService',
+        billId,
+        page,
+        count: response.comments?.length || 0
+      });
 
       return response;
     } catch (error) {
@@ -367,28 +303,22 @@ class BillsApiService {
   /**
    * Add a comment to a bill
    */
-  async addBillComment(billId: number, content: string): Promise<ApiResponse<BillComment>> {
+  async addBillComment(billId: number, content: string): Promise<BillComment> {
     try {
-      const response = await api.post<BillComment>(
-        API_ENDPOINTS.bills.comments(billId),
-        { content },
-        { timeout: TIMEOUT_CONFIG.default }
-      );
+      const response = await coreBillsApi.addBillComment(billId, content);
 
-      if (response.success) {
-        // Update bill comment count in store
-        // Note: This would need to get current state first, but for now we'll just increment
-        store.dispatch(updateBill({ 
-          id: billId, 
-          updates: { commentCount: 1 } // This is a simplified increment
-        }));
+      // Update bill comment count in store
+      // Note: This would need to get current state first, but for now we'll just increment
+      store.dispatch(updateBill({
+        id: billId,
+        updates: { commentCount: 1 } // This is a simplified increment
+      }));
 
-        logger.info('Comment added successfully', {
-          component: 'BillsApiService',
-          billId,
-          commentId: response.data.id
-        });
-      }
+      logger.info('Comment added successfully', {
+        component: 'BillsApiService',
+        billId,
+        commentId: response.id
+      });
 
       return response;
     } catch (error) {
@@ -404,40 +334,33 @@ class BillsApiService {
   /**
    * Record bill engagement (view, save, share)
    */
-  async recordEngagement(billId: number, type: 'view' | 'save' | 'share'): Promise<ApiResponse<BillEngagementData>> {
+  async recordEngagement(billId: number, type: 'view' | 'save' | 'share'): Promise<BillEngagementData> {
     try {
-      const response = await api.post<BillEngagementData>(
-        API_ENDPOINTS.bills.engagement(billId),
-        { type },
-        { timeout: TIMEOUT_CONFIG.realtime }
-      );
+      const response = await coreBillsApi.recordEngagement(billId, type);
 
-      if (response.success) {
-        // Update engagement metrics in store
-        const billsStore = useBillsStore.getState();
-        const updates: Partial<Bill> = {};
-        
-        switch (type) {
-          case 'view':
-            updates.viewCount = response.data.viewCount;
-            break;
-          case 'save':
-            updates.saveCount = response.data.saveCount;
-            break;
-          case 'share':
-            updates.shareCount = response.data.shareCount;
-            break;
-        }
-        
-        store.dispatch(updateBill({ id: billId, updates }));
+      // Update engagement metrics in store
+      const updates: Partial<Bill> = {};
 
-        logger.debug('Engagement recorded', {
-          component: 'BillsApiService',
-          billId,
-          type,
-          newCount: response.data[`${type}Count` as keyof BillEngagementData]
-        });
+      switch (type) {
+        case 'view':
+          updates.viewCount = response.viewCount;
+          break;
+        case 'save':
+          updates.saveCount = response.saveCount;
+          break;
+        case 'share':
+          updates.shareCount = response.shareCount;
+          break;
       }
+
+      store.dispatch(updateBill({ id: billId, updates }));
+
+      logger.debug('Engagement recorded', {
+        component: 'BillsApiService',
+        billId,
+        type,
+        newCount: response[`${type}Count` as keyof BillEngagementData]
+      });
 
       return response;
     } catch (error) {
@@ -454,14 +377,9 @@ class BillsApiService {
   /**
    * Get bill categories for filtering
    */
-  async getBillCategories(): Promise<ApiResponse<string[]>> {
+  async getBillCategories(): Promise<string[]> {
     try {
-      const response = await api.get<string[]>(API_ENDPOINTS.bills.categories, {
-        timeout: TIMEOUT_CONFIG.default,
-        cacheTTL: CACHE_CONFIG.durations.long
-      });
-
-      return response;
+      return await coreBillsApi.getBillCategories();
     } catch (error) {
       logger.error('Failed to load bill categories', {
         component: 'BillsApiService',
@@ -474,14 +392,9 @@ class BillsApiService {
   /**
    * Get bill statuses for filtering
    */
-  async getBillStatuses(): Promise<ApiResponse<string[]>> {
+  async getBillStatuses(): Promise<string[]> {
     try {
-      const response = await api.get<string[]>(API_ENDPOINTS.bills.statuses, {
-        timeout: TIMEOUT_CONFIG.default,
-        cacheTTL: CACHE_CONFIG.durations.long
-      });
-
-      return response;
+      return await coreBillsApi.getBillStatuses();
     } catch (error) {
       logger.error('Failed to load bill statuses', {
         component: 'BillsApiService',
@@ -504,8 +417,8 @@ class BillsApiService {
     }
 
     try {
-      if (webSocketClient.isConnected()) {
-        webSocketClient.subscribeToBill(billId, [
+      if (UnifiedWebSocketManager.getInstance().isConnected()) {
+        UnifiedWebSocketManager.getInstance().subscribeToBill(billId, [
           'status_change',
           'new_comment',
           'amendment',
@@ -542,8 +455,8 @@ class BillsApiService {
     }
 
     try {
-      if (webSocketClient.isConnected()) {
-        webSocketClient.unsubscribeFromBill(billId);
+      if (UnifiedWebSocketManager.getInstance().isConnected()) {
+        UnifiedWebSocketManager.getInstance().unsubscribeFromBill(billId);
       }
       
       this.realTimeSubscriptions.delete(billId);
@@ -572,12 +485,10 @@ class BillsApiService {
 
       // Add to real-time store for UI notifications
       store.dispatch(addBillUpdate({
-        id: `${bill_id}_${Date.now()}`,
         bill_id,
         type: update.type,
         data: update.data,
-        timestamp: update.timestamp || new Date().toISOString(),
-        priority: this.getUpdatePriority(update.type)
+        timestamp: update.timestamp || new Date().toISOString()
       }));
 
       logger.info('Real-time bill update processed', {
@@ -607,8 +518,7 @@ class BillsApiService {
         message: notification.message,
         created_at: new Date().toISOString(),
         read: false,
-        priority: notification.priority || 'medium',
-        data: notification.data
+        priority: notification.priority || 'medium'
       }));
 
       logger.debug('Real-time notification processed', {
@@ -636,7 +546,7 @@ class BillsApiService {
 
     // Re-subscribe to all previously subscribed bills
     this.realTimeSubscriptions.forEach(billId => {
-      webSocketClient.subscribeToBill(billId, [
+      UnifiedWebSocketManager.getInstance().subscribeToBill(billId, [
         'status_change',
         'new_comment',
         'amendment',
@@ -704,8 +614,8 @@ class BillsApiService {
    */
   clearCache(): void {
     this.searchCache.clear();
-    api.clearCache();
-    
+    // Note: Core API client handles its own cache clearing
+
     logger.info('All caches cleared', {
       component: 'BillsApiService'
     });
@@ -724,7 +634,7 @@ class BillsApiService {
       initialized: this.isInitialized,
       realTimeSubscriptions: this.realTimeSubscriptions.size,
       searchCacheSize: this.searchCache.size,
-      webSocketConnected: webSocketClient.isConnected()
+      webSocketConnected: UnifiedWebSocketManager.getInstance().isConnected()
     };
   }
 
@@ -754,13 +664,5 @@ class BillsApiService {
 
 export const billsApiService = new BillsApiService();
 
-// Export types for use in components
-export type {
-  BillsSearchParams,
-  PaginatedBillsResponse,
-  BillEngagementData,
-  BillComment
-};
-
-// Export validation schemas for external use
-export { BillSchema, PaginatedBillsResponseSchema };
+// Types are now exported from core/api/bills.ts
+// Validation schemas are handled in the core API layer

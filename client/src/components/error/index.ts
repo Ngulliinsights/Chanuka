@@ -41,19 +41,23 @@ export {
   ErrorSeverity,
   ErrorDomain,
   ErrorDomain as ErrorType, // Backward compatibility alias
+} from '../../core/error/constants';
+
+// All error classes come from logger where they are defined
+export {
   BaseError,
   ValidationError,
-  NotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
   NetworkError,
   ExternalServiceError,
   ServiceUnavailableError,
   DatabaseError,
   CacheError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
   ConflictError,
   TooManyRequestsError,
-} from '../../core/error';
+} from '../../utils/logger';
 
 // Convenience error creation functions
 export {
