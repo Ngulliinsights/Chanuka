@@ -9,7 +9,7 @@
  */
 
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/external-api-manager.js';
-import { APICostMonitoringService } from '@client/services/api-cost-monitoring.js';
+import { APICostMonitoringService } from '@server/services/api-cost-monitoring.ts';
 import { logger   } from '@shared/core/src/index.js';
 
 async function verifyExternalAPIManagement() {
@@ -120,6 +120,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export { verifyExternalAPIManagement };
+
 
 
 

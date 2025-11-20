@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
-import { controllerWrapper } from '@client/utils/analytics-controller-wrapper.js';
+import { controllerWrapper } from '@server/utils/analytics-controller-wrapper.ts';
 import { analyticsContextMiddleware } from './middleware/analytics-context.js';
 import { performanceTrackingMiddleware } from './middleware/performance-tracking.js';
 import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSchema } from './controllers/engagement.controller.js';
-import { engagementAnalyticsService } from '@client/services/engagement.service.js';
+import { engagementAnalyticsService } from '@server/services/engagement.service.ts';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
 import { logger   } from '@shared/core/src/index.js';

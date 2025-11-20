@@ -14,7 +14,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { GovernmentDataValidationService } from '@client/core/validation/data-validation.js';
+import { GovernmentDataValidationService } from '@server/core/validation/data-validation.ts';
 import { logger } from '@shared/core/src/index.js';
 
 describe('GovernmentDataValidationService', () => {
@@ -475,6 +475,7 @@ describe('GovernmentDataValidationService', () => {
     });
   });
 });
+
 
 
 

@@ -13,7 +13,7 @@ import {
   SearchAnalytics
 } from "./types/search.types";
 // Query builder service removed - using direct Drizzle queries
-import { parallelQueryExecutor, QueryTask } from "@client/utils/parallel-query-executor";
+import { parallelQueryExecutor, QueryTask } from "@server/utils/parallel-query-executor";
 import { suggestionRankingService, type RankingContext } from "./suggestion-ranking.service";
 
 /**

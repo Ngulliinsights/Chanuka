@@ -4,7 +4,7 @@
 
 import { Router, Request, Response, NextFunction } from "express";
 import { FinancialDisclosureMonitoringService } from "./monitoring.js";
-import { FinancialDisclosureAnalyticsService } from "@client/services/financial-disclosure.service.js";
+import { FinancialDisclosureAnalyticsService } from "@server/services/financial-disclosure.service.ts";
 import { ApiSuccess, ApiError  } from '@shared/core/utils/api-utils.js';
 import { z, ZodError } from "zod";
 import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from '@/utils/errors.js';
@@ -683,6 +683,7 @@ export type {
   FinancialDisclosureMonitoringService,
   FinancialDisclosureAnalyticsService 
 };
+
 
 
 

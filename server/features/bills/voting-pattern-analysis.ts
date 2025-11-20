@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { VotingPatternAnalysisService } from '@client/services/voting-pattern-analysis-service.js';
+import { VotingPatternAnalysisService } from '@server/services/voting-pattern-analysis-service.ts';
 import { authenticateToken } from '../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
 import { UnifiedApiResponse  } from '@shared/core/utils/api';
@@ -241,6 +241,7 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 export { router };
+
 
 
 

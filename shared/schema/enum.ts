@@ -164,3 +164,4 @@ export type AmbassadorStatus = typeof ambassadorStatusEnum.enumValues[number];
 export type SessionType = typeof sessionTypeEnum.enumValues[number];
 export type ParticipationMethod = typeof participationMethodEnum.enumValues[number];
 
+

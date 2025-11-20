@@ -2350,3 +2350,4 @@ export class WebSocketService {
 
 // Export singleton instance
 export const webSocketService = new WebSocketService();
+

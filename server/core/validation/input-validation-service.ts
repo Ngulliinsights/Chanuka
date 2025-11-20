@@ -608,3 +608,4 @@ export const commonSchemas = {
 
 // Export singleton instance
 export const inputValidationService = InputValidationService.getInstance();
+

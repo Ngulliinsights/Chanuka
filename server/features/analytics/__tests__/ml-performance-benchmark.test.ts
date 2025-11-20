@@ -6,9 +6,9 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { MLAnalysisService } from '@client/services/ml.service.js';
-import { RealMLAnalysisService } from '@client/services/real-ml.service.js';
-import { MLServiceAdapter } from '@client/services/ml-adapter.service.js';
+import { MLAnalysisService } from '@server/services/ml.service.ts';
+import { RealMLAnalysisService } from '@server/services/real-ml.service.ts';
+import { MLServiceAdapter } from '@server/services/ml-adapter.service.ts';
 import { featureFlagsService } from '../../../infrastructure/migration/feature-flags.service.js';
 
 describe('ML Performance Benchmark', () => {

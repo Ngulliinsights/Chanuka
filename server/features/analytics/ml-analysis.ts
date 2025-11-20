@@ -3,7 +3,7 @@ import { bills } from '@shared/schema/foundation';
 import { argumentTable } from '@shared/schema/argument_intelligence';
 import { eq, desc } from 'drizzle-orm';
 import { logger  } from '@shared/core/src/index.js';
-import { errorTracker } from '@client/core/errors/error-tracker.js';
+import { errorTracker } from '@server/core/errors/error-tracker.ts';
 import type {
   AnalysisResult,
   SimilarityAnalysis,
@@ -469,6 +469,7 @@ export async function performComprehensiveAnalysis(bill_id: string): Promise<{
     };
   }
 }
+
 
 
 

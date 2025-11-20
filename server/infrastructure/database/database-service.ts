@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as pg from 'pg';
 const { Pool } = pg;
-import { errorTracker } from '@client/core/errors/error-tracker.js';
+import { errorTracker } from '@server/core/errors/error-tracker.ts';
 import { config } from '../../config/index.js';
 import { logger  } from '@shared/core/src/index.js';
 import { users, bills, sponsors, User, Bill, Sponsor, comments, notifications, bill_engagement, bill_tracking_preferences } from '@shared/schema/index.js';

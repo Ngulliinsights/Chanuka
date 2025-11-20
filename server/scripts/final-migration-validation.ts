@@ -258,7 +258,7 @@ export class FinalMigrationValidator {
       // Validate that repository abstractions are removed
       try {
         // This should fail if repository files still exist
-        await import('@client/features/users/infrastructure/user-repository.js');
+        await import('@server/features/users/infrastructure/user-repository.ts');
         this.addValidationResult('phase4_repository', 'cleanup', 'failed', 'Repository abstractions still exist');
       } catch {
         this.addValidationResult('phase4_repository', 'cleanup', 'passed', 'Repository abstractions successfully removed');

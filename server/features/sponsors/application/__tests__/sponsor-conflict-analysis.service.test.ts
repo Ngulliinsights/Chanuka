@@ -202,3 +202,4 @@ describe('SponsorConflictAnalysisService', () => {
     // - analyzeConflictTrends (requires mocking historical data simulation)
     // - calculateConflictSeverity with various inputs
 });
+

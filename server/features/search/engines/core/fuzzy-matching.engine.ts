@@ -6,7 +6,7 @@
 import { database } from '@shared/database';
 import { bills } from '@shared/schema';
 import { sql, desc } from 'drizzle-orm';
-import { SearchQuery, SearchResult } from '@client/types/search.types.js';
+import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
 
 export class FuzzyMatchingEngine {
 

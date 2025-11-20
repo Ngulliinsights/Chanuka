@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { securityMonitoringService } from '@client/features/security/security-monitoring-service.js';
-import { intrusionDetectionService } from '@client/features/security/intrusion-detection-service.js';
-import { securityAuditService } from '@client/features/security/security-audit-service.js';
+import { securityMonitoringService } from '@server/features/security/security-monitoring-service.ts';
+import { intrusionDetectionService } from '@server/features/security/intrusion-detection-service.ts';
+import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 import { logger } from '@shared/core';
-import { getClientIP } from '@client/utils/request-utils.js';
+import { getClientIP } from '@server/utils/request-utils.ts';
 
 export interface SecurityMonitoringOptions {
   enableThreatDetection: boolean;
@@ -404,6 +404,7 @@ export const securityMonitoringMiddleware = new SecurityMonitoringMiddleware({
   bypassPaths: ['/health', '/metrics', '/favicon.ico', '/api/health'],
   alertThreshold: 70
 });
+
 
 
 

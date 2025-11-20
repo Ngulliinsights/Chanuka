@@ -104,3 +104,4 @@ export class SimpleCacheFactory {
 // Export a default instance
 export const cacheFactory = SimpleCacheFactory.getInstance();
 
+

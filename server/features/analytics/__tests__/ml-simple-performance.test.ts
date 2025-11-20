@@ -25,9 +25,9 @@ vi.mock('../../../infrastructure/migration/feature-flags.service.js', () => ({
   }
 }));
 
-import { realMLAnalysisService } from '@client/services/real-ml.service.js';
-import { MLAnalysisService } from '@client/services/ml.service.js';
-import { MLServiceAdapter } from '@client/services/ml-adapter.service.js';
+import { realMLAnalysisService } from '@server/services/real-ml.service.ts';
+import { MLAnalysisService } from '@server/services/ml.service.ts';
+import { MLServiceAdapter } from '@server/services/ml-adapter.service.ts';
 
 describe('ML Service Performance Tests', () => {
   const testBillContent = `

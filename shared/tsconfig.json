@@ -3,12 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": ".",
-  "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-  // Suppress baseUrl deprecation warnings until migration to TS7 is planned.
-  "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./*"]
     }
@@ -24,4 +22,5 @@
     "**/*.spec.ts"
   ]
 }
+
 

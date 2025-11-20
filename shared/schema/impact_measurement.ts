@@ -724,3 +724,4 @@ export type NewCivicEngagementIndicator = typeof civic_engagement_indicators.$in
 export type FinancialSustainabilityIndicator = typeof financial_sustainability_indicators.$inferSelect;
 export type NewFinancialSustainabilityIndicator = typeof financial_sustainability_indicators.$inferInsert;
 
+

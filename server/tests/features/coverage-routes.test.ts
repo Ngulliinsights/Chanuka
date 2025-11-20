@@ -31,12 +31,12 @@ describe('Coverage Routes', () => {
       generateCoverageReport: vi.fn()
     } as any;
     // Dynamically import the mocked CoverageAnalyzer and set the implementation
-    const imported = await import('@client/services/coverage-analyzer');
+    const imported = await import('@server/services/coverage-analyzer');
     const CoverageAnalyzer = imported.CoverageAnalyzer as unknown as vi.MockedClass<any>;
     CoverageAnalyzer.mockImplementation(() => mockCoverageAnalyzer);
 
     // Import router after mocking
-    const routerModule = await import('@client/features/coverage/coverage-routes');
+    const routerModule = await import('@server/features/coverage/coverage-routes');
     coverageRouter = routerModule.default;
     app.use('/api/coverage', coverageRouter);
   });
@@ -262,6 +262,7 @@ describe('Coverage Routes', () => {
     });
   });
 });
+
 
 
 

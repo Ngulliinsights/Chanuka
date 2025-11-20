@@ -5,7 +5,7 @@ import { sql, eq, and, or, ilike, desc, count } from 'drizzle-orm';
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
 // TODO: Fix bil
 //import { billService } from '../bills/application/bill-service.js';
-import { securityAuditService } from '@client/features/security/security-audit-service.js';
+import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 import { ApiSuccess, ApiError, ApiForbidden } from '@shared/core/utils/api-utils';
 import { logger  } from '@shared/core/src/index.js';
 
@@ -785,6 +785,7 @@ router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
 });
 
 export { router };
+
 
 
 

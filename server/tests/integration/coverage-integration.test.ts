@@ -16,7 +16,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 import { describe, it, expect } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import coverageRouter from '@client/features/coverage/coverage-routes';
+import coverageRouter from '@server/features/coverage/coverage-routes';
 import { logger  } from '@shared/core/src/index.js';
 
 describe('Coverage Integration Tests', () => {
@@ -72,6 +72,7 @@ describe('Coverage Integration Tests', () => {
     });
   });
 });
+
 
 
 

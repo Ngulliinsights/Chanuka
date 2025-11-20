@@ -14,7 +14,7 @@ vi.mock('../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { votingPatternAnalysisService } from '@client/features/bills/voting-pattern-analysis';
+import { votingPatternAnalysisService } from '@server/features/bills/voting-pattern-analysis';
 import { logger  } from '@shared/core/src/index.js';
 
 describe('VotingPatternAnalysisService', () => {
@@ -216,6 +216,7 @@ describe('VotingPatternAnalysisService', () => {
     });
   });
 });
+
 
 
 

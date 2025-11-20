@@ -224,3 +224,4 @@ export type NewTrendingTopic = typeof trendingTopics.$inferInsert;
 export type UserRecommendation = typeof userRecommendations.$inferSelect;
 export type NewUserRecommendation = typeof userRecommendations.$inferInsert;
 
+

@@ -343,3 +343,4 @@ export type NewLegislativeBrief = typeof legislative_briefs.$inferInsert;
 export type SynthesisJob = typeof synthesis_jobs.$inferSelect;
 export type NewSynthesisJob = typeof synthesis_jobs.$inferInsert;
 
+

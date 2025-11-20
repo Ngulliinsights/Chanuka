@@ -1,5 +1,5 @@
 import { logger } from '@shared/core/index.js';
-import { schemaValidationService } from '@client/core/validation/schema-validation-service.js';
+import { schemaValidationService } from '@server/core/validation/schema-validation-service.ts';
 
 /**
  * Schema validation service integration
@@ -132,6 +132,7 @@ export async function validateSchemaBeforeSecurityInit(): Promise<void> {
 
   logger.info('✅ Database schema validation passed - security monitoring can proceed', { component: 'Chanuka' });
 }
+
 
 
 

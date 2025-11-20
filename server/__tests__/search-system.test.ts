@@ -4,8 +4,8 @@
 // Integration tests for the consolidated search system with dual-engine orchestration
 
 import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
-import { embeddingService, semanticSearchEngine, dualEngineOrchestrator, searchSyntaxParser } from '@client/features/search';
-import { searchService } from '@client/services/search-service';
+import { embeddingService, semanticSearchEngine, dualEngineOrchestrator, searchSyntaxParser } from '@server/features/search';
+import { searchService } from '@server/services/search-service';
 
 // Mock OpenAI to avoid API calls during testing
 jest.mock('openai', () => {

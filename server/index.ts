@@ -16,34 +16,34 @@ import { pool } from '@shared/database/pool.js';
 import { config } from './config/index.js';
 
 // Feature Routes
-import { router as systemRouter } from '@client/features/admin/system.js';
-import { router as billsRouter } from '@client/features/bills/presentation/bills-router.js';
-import { router as sponsorshipRouter } from '@client/features/bills/presentation/sponsorship.routes.js';
-import { realTimeTrackingRouter } from '@client/features/bills/index.js';
-import { analysisRouter } from '@client/features/analysis/presentation/analysis.routes.js';
-import { billTrackingRouter } from '@client/features/bills/presentation/bill-tracking.routes.js';
-import analyticsRouter from '@client/features/analytics/analytics.js';
-import { sponsorsRouter } from '@client/features/sponsors/presentation/sponsors.routes.js';
-import { router as authRouter } from '@client/core/auth/auth.js';
-import { router as usersRouter } from '@client/features/users/application/profile.js';
-import { router as verificationRouter } from '@client/features/users/application/verification.js';
-import { router as communityRouter } from '@client/features/community/community.js';
+import { router as systemRouter } from '@server/features/admin/system.ts';
+import { router as billsRouter } from '@server/features/bills/presentation/bills-router.ts';
+import { router as sponsorshipRouter } from '@server/features/bills/presentation/sponsorship.routes.ts';
+import { realTimeTrackingRouter } from '@server/features/bills/index.ts';
+import { analysisRouter } from '@server/features/analysis/presentation/analysis.routes.ts';
+import { billTrackingRouter } from '@server/features/bills/presentation/bill-tracking.routes.ts';
+import analyticsRouter from '@server/features/analytics/analytics.ts';
+import { sponsorsRouter } from '@server/features/sponsors/presentation/sponsors.routes.ts';
+import { router as authRouter } from '@server/core/auth/auth.ts';
+import { router as usersRouter } from '@server/features/users/application/profile.ts';
+import { router as verificationRouter } from '@server/features/users/application/verification.ts';
+import { router as communityRouter } from '@server/features/community/community.ts';
 import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
-import { router as searchRouter } from '@client/features/search/presentation/SearchController.js';
-import { router as privacyRouter } from '@client/features/privacy/privacy-routes.js';
-import { router as adminRouter } from '@client/features/admin/admin.js';
+import { router as searchRouter } from '@server/features/search/presentation/SearchController.ts';
+import { router as privacyRouter } from '@server/features/privacy/privacy-routes.ts';
+import { router as adminRouter } from '@server/features/admin/admin.ts';
 import { router as cacheRouter } from './infrastructure/cache/cache.js';
 import { cacheCoordinator } from './infrastructure/cache/index.js';
 import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
-import { router as externalApiDashboardRouter } from '@client/features/admin/external-api-dashboard.js';
-import coverageRouter from '@client/features/coverage/coverage-routes.js';
-import { constitutionalAnalysisRouter } from '@client/features/constitutional-analysis/presentation/constitutional-analysis-router.js';
-import { argumentIntelligenceRouter } from '@client/features/argument-intelligence/presentation/argument-intelligence-router.js';
+import { router as externalApiDashboardRouter } from '@server/features/admin/external-api-dashboard.ts';
+import coverageRouter from '@server/features/coverage/coverage-routes.ts';
+import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/presentation/constitutional-analysis-router.ts';
+import { argumentIntelligenceRouter } from '@server/features/argument-intelligence/presentation/argument-intelligence-router.ts';
 
 // Middleware imports
 import { migratedApiRateLimit } from './middleware/migration-wrapper.js';
-import { enhancedSecurityService } from '@client/features/security/enhanced-security-service.js';
-import { SecuritySchemas, createValidationMiddleware } from '@client/core/validation/security-schemas.js';
+import { enhancedSecurityService } from '@server/features/security/enhanced-security-service.ts';
+import { SecuritySchemas, createValidationMiddleware } from '@server/core/validation/security-schemas.ts';
 
 // Infrastructure Services
 import { auditMiddleware } from './infrastructure/monitoring/audit-log.js';
@@ -72,10 +72,10 @@ import { databaseFallbackService } from "./infrastructure/database/database-fall
 import { webSocketService } from './infrastructure/websocket.js';
 import { notificationSchedulerService } from './infrastructure/notifications/index.js';
 import { monitoringScheduler } from './infrastructure/monitoring/monitoring-scheduler.js';
-import { sessionCleanupService } from '@client/core/auth/session-cleanup.js';
-import { securityMonitoringService } from '@client/features/security/security-monitoring-service.js';
-import { privacySchedulerService } from '@client/features/privacy/privacy-scheduler.js';
-import { schemaValidationService } from '@client/core/validation/schema-validation-service.js';
+import { sessionCleanupService } from '@server/core/auth/session-cleanup.ts';
+import { securityMonitoringService } from '@server/features/security/security-monitoring-service.ts';
+import { privacySchedulerService } from '@server/features/privacy/privacy-scheduler.ts';
+import { schemaValidationService } from '@server/core/validation/schema-validation-service.ts';
 
 // Unified utilities
 import { logger, Performance, ApiResponse } from '@shared/core/index.js';
@@ -789,3 +789,4 @@ if (process.env.NODE_ENV !== 'test') {
     }
   })();
 }
+

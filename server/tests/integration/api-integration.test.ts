@@ -17,14 +17,14 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@je
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
-import { router as billsRouter } from '@client/features/bills/presentation/bills-router';
-import { router as sponsorsRouter } from '@client/features/bills/sponsors.js';
-import { createFinancialDisclosureRouter } from '@client/features/analytics/financial-disclosure/index.js';
-import { router as authRouter } from '@client/core/auth/auth.js';
-import { router as adminRouter } from '@client/features/admin/admin.js';
+import { router as billsRouter } from '@server/features/bills/presentation/bills-router';
+import { router as sponsorsRouter } from '@server/features/bills/sponsors.ts';
+import { createFinancialDisclosureRouter } from '@server/features/analytics/financial-disclosure/index.ts';
+import { router as authRouter } from '@server/core/auth/auth.ts';
+import { router as adminRouter } from '@server/features/admin/admin.ts';
 import { router as notificationsRouter } from '../../infrastructure/notifications/notifications.js';
-import realTimeTrackingRouter from '@client/features/bills/real-time-tracking.js';
-import engagementAnalyticsRouter from '@client/features/analytics/engagement-analytics.js';
+import realTimeTrackingRouter from '@server/features/bills/real-time-tracking.ts';
+import engagementAnalyticsRouter from '@server/features/analytics/engagement-analytics.ts';
 import { router as healthRouter } from '../../infrastructure/monitoring/health.js';
 import { database as db, withTransaction } from '@shared/database/connection.js';
 import { logger  } from '@shared/core/src/index.js';
@@ -676,6 +676,7 @@ describe('Comprehensive API Integration Tests', () => {
     });
   });
 });
+
 
 
 

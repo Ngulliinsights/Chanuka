@@ -6,7 +6,7 @@
  */
 
 import { logger } from '@shared/core/src/index.js';
-import { initializeServerServices, shutdownServerServices } from '@client/core/services-init.js';
+import { initializeServerServices, shutdownServerServices } from '@server/core/services-init.ts';
 
 /**
  * Initialize all server services and dependencies
