@@ -4,10 +4,10 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { LoadingState } from '../types';
+import { LoadingState } from '@client/types';
 import { LoadingError, LoadingTimeoutError } from '../errors';
-import { createTimeoutManager, TimeoutManager } from '../utils/timeout-utils';
-import { formatTimeRemaining } from '../utils/timeout-utils';
+import { createTimeoutManager, TimeoutManager } from '@client/utils/timeout-utils';
+import { formatTimeRemaining } from '@client/utils/timeout-utils';
 
 export interface UseTimeoutAwareLoadingOptions {
   timeout?: number;

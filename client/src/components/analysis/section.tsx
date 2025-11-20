@@ -3,7 +3,7 @@ import { Button } from '../ui/button';
 import { ErrorBoundary } from '../error-handling/ErrorBoundary';
 import { LoadingSpinner } from '../ui/spinner';
 import { Suspense } from 'react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export interface SectionProps {
   title: string;

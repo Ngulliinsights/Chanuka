@@ -11,7 +11,7 @@ import jwt from 'jsonwebtoken';
 import { BatchingService } from '../../infrastructure/batching-service.js';
 import { MemoryAwareSocketService } from '../../infrastructure/memory-aware-socket-service.js';
 import { webSocketService } from '../../infrastructure/websocket.js';
-import { logger } from '../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/src/observability/logging/index.js';
 
 interface LoadTestConfig {
   maxConnections: number;

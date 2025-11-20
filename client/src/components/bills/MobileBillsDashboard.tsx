@@ -15,16 +15,15 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FileText, 
-  Filter, 
-  Search, 
-  TrendingUp, 
-  AlertTriangle, 
+import {
+  FileText,
+  Search,
+  TrendingUp,
+  AlertTriangle,
   Users,
   Clock,
   Eye,
-  Heart,
+  Bookmark,
   Share2,
   MessageCircle
 } from 'lucide-react';
@@ -33,9 +32,7 @@ import {
   MobileContainer,
   MobileSection,
   MobileGrid,
-  MobileBottomSheet,
   useBottomSheet,
-  PullToRefresh,
   InfiniteScroll,
   useInfiniteScroll,
   MobileTabSelector,
@@ -49,87 +46,90 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
-import { cn } from '../../lib/utils';
-import { useBillsStore, useBillsSelectors } from '../../store/slices/billsSlice';
+import { cn } from '@client/lib/utils';
+// Using mock data for now - can be replaced with useBills hook when needed
+// import { useBills } from '@client/features/bills/hooks/useBills';
+import { Bill, BillStatus, UrgencyLevel, ComplexityLevel } from '@client/core/api/types';
+import { Heart } from 'lucide-react';
 
-interface Bill {
-  id: number;
-  title: string;
-  summary: string;
-  status: 'introduced' | 'committee' | 'passed' | 'failed' | 'signed' | 'vetoed';
-  urgency: 'low' | 'medium' | 'high' | 'critical';
-  introducedDate: string;
-  viewCount: number;
-  saveCount: number;
-  commentCount: number;
-  shareCount: number;
-  constitutionalFlags: number;
-  sponsors: string[];
-  policyAreas: string[];
-}
 
 const mockBills: Bill[] = [
   {
     id: 1,
+    billNumber: 'HB-2024-001',
     title: 'Healthcare Access Reform Act',
     summary: 'Comprehensive healthcare reform to improve access and reduce costs for all citizens.',
-    status: 'committee',
-    urgency: 'high',
+    status: BillStatus.COMMITTEE,
+    urgencyLevel: UrgencyLevel.HIGH,
     introducedDate: '2024-01-15',
+    lastUpdated: '2024-01-15',
     viewCount: 1250,
     saveCount: 89,
     commentCount: 23,
     shareCount: 45,
-    constitutionalFlags: 2,
-    sponsors: ['Rep. Johnson', 'Sen. Smith'],
+    constitutionalFlags: [],
+    sponsors: [
+      { id: 1, name: 'Rep. Johnson', party: 'Democrat', state: 'CA', position: 'Representative' },
+      { id: 2, name: 'Sen. Smith', party: 'Republican', state: 'TX', position: 'Senator' }
+    ],
     policyAreas: ['Healthcare', 'Social Policy'],
+    complexity: ComplexityLevel.MEDIUM,
+    readingTime: 15,
   },
   {
     id: 2,
+    billNumber: 'SB-2024-002',
     title: 'Digital Privacy Protection Bill',
     summary: 'Strengthens digital privacy rights and data protection for consumers.',
-    status: 'introduced',
-    urgency: 'medium',
+    status: BillStatus.INTRODUCED,
+    urgencyLevel: UrgencyLevel.MEDIUM,
     introducedDate: '2024-01-20',
+    lastUpdated: '2024-01-20',
     viewCount: 890,
     saveCount: 67,
     commentCount: 15,
     shareCount: 32,
-    constitutionalFlags: 1,
-    sponsors: ['Rep. Davis'],
+    constitutionalFlags: [],
+    sponsors: [
+      { id: 3, name: 'Rep. Davis', party: 'Democrat', state: 'NY', position: 'Representative' }
+    ],
     policyAreas: ['Technology', 'Privacy'],
+    complexity: ComplexityLevel.HIGH,
+    readingTime: 20,
   },
-  // Add more mock bills as needed
 ];
 
 const statusColors = {
-  introduced: 'bg-blue-100 text-blue-800',
-  committee: 'bg-yellow-100 text-yellow-800',
-  passed: 'bg-green-100 text-green-800',
-  failed: 'bg-red-100 text-red-800',
-  signed: 'bg-green-100 text-green-800',
-  vetoed: 'bg-red-100 text-red-800',
+  [BillStatus.INTRODUCED]: 'bg-blue-100 text-blue-800',
+  [BillStatus.COMMITTEE]: 'bg-yellow-100 text-yellow-800',
+  [BillStatus.FLOOR_DEBATE]: 'bg-orange-100 text-orange-800',
+  [BillStatus.PASSED]: 'bg-green-100 text-green-800',
+  [BillStatus.FAILED]: 'bg-red-100 text-red-800',
+  [BillStatus.SIGNED]: 'bg-green-100 text-green-800',
+  [BillStatus.VETOED]: 'bg-red-100 text-red-800',
+  [BillStatus.PASSED_HOUSE]: 'bg-green-100 text-green-800',
+  [BillStatus.PASSED_SENATE]: 'bg-green-100 text-green-800',
+  [BillStatus.OVERRIDE_ATTEMPT]: 'bg-purple-100 text-purple-800',
 };
 
 const urgencyColors = {
-  low: 'bg-gray-100 text-gray-800',
-  medium: 'bg-yellow-100 text-yellow-800',
-  high: 'bg-orange-100 text-orange-800',
-  critical: 'bg-red-100 text-red-800',
+  [UrgencyLevel.LOW]: 'bg-gray-100 text-gray-800',
+  [UrgencyLevel.MEDIUM]: 'bg-yellow-100 text-yellow-800',
+  [UrgencyLevel.HIGH]: 'bg-orange-100 text-orange-800',
+  [UrgencyLevel.CRITICAL]: 'bg-red-100 text-red-800',
 };
 
 export function MobileBillsDashboard() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Mobile tabs for different views
   const tabs: MobileTab[] = [
     { id: 'all', label: 'All Bills', icon: <FileText className="h-4 w-4" /> },
     { id: 'urgent', label: 'Urgent', icon: <AlertTriangle className="h-4 w-4" />, badge: '12' },
     { id: 'trending', label: 'Trending', icon: <TrendingUp className="h-4 w-4" /> },
-    { id: 'saved', label: 'Saved', icon: <Heart className="h-4 w-4" /> },
+    { id: 'saved', label: 'Saved', icon: <Bookmark className="h-4 w-4" /> },
   ];
   
   const { activeTab, changeTab } = useMobileTabs('all');
@@ -192,13 +192,8 @@ export function MobileBillsDashboard() {
 
   // Handle refresh
   const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    try {
-      reset();
-      await loadMore(loadBills);
-    } finally {
-      setIsRefreshing(false);
-    }
+    reset();
+    await loadMore(loadBills);
   }, [reset, loadMore, loadBills]);
 
   // Handle bill card click
@@ -225,7 +220,7 @@ export function MobileBillsDashboard() {
   }, [navigate]);
 
   // Render bill card
-  const renderBillCard = (bill: Bill, index: number) => (
+  const renderBillCard = (bill: Bill) => (
     <Card 
       key={bill.id}
       className="cursor-pointer transition-all duration-200 hover:shadow-md active:scale-[0.98]"
@@ -240,9 +235,9 @@ export function MobileBillsDashboard() {
             <Badge className={cn('text-xs', statusColors[bill.status])}>
               {bill.status}
             </Badge>
-            {bill.urgency !== 'low' && (
-              <Badge className={cn('text-xs', urgencyColors[bill.urgency])}>
-                {bill.urgency}
+            {bill.urgencyLevel !== UrgencyLevel.LOW && (
+              <Badge className={cn('text-xs', urgencyColors[bill.urgencyLevel])}>
+                {bill.urgencyLevel}
               </Badge>
             )}
           </div>
@@ -264,10 +259,10 @@ export function MobileBillsDashboard() {
             <Eye className="h-3 w-3" />
             {bill.viewCount}
           </div>
-          {bill.constitutionalFlags > 0 && (
+          {bill.constitutionalFlags.length > 0 && (
             <div className="flex items-center gap-1 text-orange-600">
               <AlertTriangle className="h-3 w-3" />
-              {bill.constitutionalFlags}
+              {bill.constitutionalFlags.length}
             </div>
           )}
         </div>

@@ -3,7 +3,7 @@
  * Provides adaptive loading strategies based on network conditions
  */
 
-import { ConnectionType, ConnectionInfo, LoadingPriority } from '../types';
+import { ConnectionType, ConnectionInfo, LoadingPriority } from '@client/types';
 
 /**
  * Get connection multiplier for adaptive timeouts and delays

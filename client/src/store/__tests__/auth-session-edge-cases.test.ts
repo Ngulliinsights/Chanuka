@@ -84,7 +84,7 @@ Object.defineProperty(window, 'crypto', {
   writable: true
 });
 
-import { authService } from '../../services/AuthService';
+import { authService } from '@client/services/AuthService';
 
 describe('Auth and Session Edge Cases', () => {
   let store: any;

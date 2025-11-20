@@ -2,7 +2,7 @@
  * Dashboard State Reducer - Handles all dashboard state transitions
  */
 
-import { DashboardState, DashboardAction } from './types';
+import { DashboardState, DashboardAction } from '@client/types';
 
 export function dashboardReducer(state: DashboardState, action: DashboardAction): DashboardState {
   switch (action.type) {

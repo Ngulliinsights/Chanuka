@@ -74,7 +74,7 @@ describe('AnalysisService', () => {
     });
 
     it('should use fallback data when API fails', async () => {
-      const { logger } = require('../utils/logger');
+      const { logger } = require('@client/utils/logger');
 
       mockApiService.get.mockResolvedValue({
         success: false,
@@ -274,7 +274,7 @@ describe('AnalysisService', () => {
     });
 
     it('should handle partial failures gracefully', async () => {
-      const { logger } = require('../utils/logger');
+      const { logger } = require('@client/utils/logger');
 
       const mockAnalysis = {
         id: 'analysis-1',

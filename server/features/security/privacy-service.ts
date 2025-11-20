@@ -4,7 +4,7 @@ import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from './encryption-service.js';
 import { securityAuditService } from './security-audit-service.js';
 import { Request } from 'express';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 export interface DataExportRequest { user_id: string;
   requestedBy: string;

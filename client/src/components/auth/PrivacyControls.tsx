@@ -3,7 +3,7 @@
  * GDPR compliance and privacy settings management
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Switch } from '../ui/switch';
@@ -14,19 +14,14 @@ import { Badge } from '../ui/badge';
 import { 
   Shield, 
   Download, 
-  Trash2, 
+  Trash, 
   Eye, 
-  Settings, 
   Bell, 
-  Globe, 
   Database,
   AlertTriangle,
-  CheckCircle,
-  Info,
-  ExternalLink,
-  Cookie
+  Info
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@client/hooks/useAuth';
 import { ConsentModal } from './ConsentModal';
 import { 
   PrivacySettings, 
@@ -34,8 +29,8 @@ import {
   DataDeletionRequest,
   ConsentRecord 
 } from '../../types/auth';
-import { privacyCompliance } from '../../utils/privacy-compliance';
-import { logger } from '../../utils/logger';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { logger } from '@client/utils/logger';
 
 interface PrivacyControlsProps {
   className?: string;
@@ -48,11 +43,13 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [consentType, setConsentType] = useState<ConsentRecord['consent_type']>('analytics');
   const [exportRequests, setExportRequests] = useState<DataExportRequest[]>([]);
-  const [deletionRequests, setDeletionRequest] = useState<DataDeletionRequest[]>([]);
+  const [deletionRequests, setDeletionRequests] = useState<DataDeletionRequest[]>([]);
 
+  // Initialize settings from user data
   useEffect(() => {
-    if (auth.user?.privacy_settings) {
-      setSettings(auth.user.privacy_settings);
+    // Type-safe check for privacy_settings property
+    if (auth.user && 'privacy_settings' in auth.user) {
+      setSettings(auth.user.privacy_settings as PrivacySettings);
     }
   }, [auth.user]);
 
@@ -65,12 +62,12 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
     try {
       const result = await auth.updatePrivacySettings({ [key]: value });
       if (!result.success) {
-        // Revert on failure
+        // Revert on failure to maintain UI consistency
         setSettings(settings);
         logger.error('Failed to update privacy setting:', { component: 'PrivacyControls' }, result.error);
       }
     } catch (error) {
-      // Revert on failure
+      // Revert on error to prevent UI from showing incorrect state
       setSettings(settings);
       logger.error('Privacy setting update failed:', { component: 'PrivacyControls' }, error);
     }
@@ -115,7 +112,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
         'communications'
       ]);
       
-      setDeletionRequest(prev => [...prev, deletionRequest]);
+      setDeletionRequests(prev => [...prev, deletionRequest]);
     } catch (error) {
       logger.error('Data deletion request failed:', { component: 'PrivacyControls' }, error);
     } finally {
@@ -145,6 +142,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
     }
   };
 
+  // Show login prompt if user is not authenticated
   if (!auth.user || !settings) {
     return (
       <Alert>
@@ -161,7 +159,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Privacy Overview */}
+      {/* Privacy Overview Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -182,14 +180,16 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                 rel="noopener noreferrer"
               >
                 Read our Privacy Policy
-                <ExternalLink className="h-3 w-3 ml-1" />
+                <svg className="h-3 w-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
               </a>
             </AlertDescription>
           </Alert>
         </CardContent>
       </Card>
 
-      {/* Privacy Settings */}
+      {/* Privacy Settings Tabs */}
       <Tabs defaultValue="visibility" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="visibility">Visibility</TabsTrigger>
@@ -199,7 +199,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
           <TabsTrigger value="rights">Your Rights</TabsTrigger>
         </TabsList>
 
-        {/* Profile Visibility */}
+        {/* Profile Visibility Tab */}
         <TabsContent value="visibility">
           <Card>
             <CardHeader>
@@ -212,15 +212,19 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-base font-medium">Profile Visibility</Label>
+                    <Label htmlFor="profile-visibility" className="text-base font-medium">
+                      Profile Visibility
+                    </Label>
                     <p className="text-sm text-gray-600">
                       Control who can see your profile information
                     </p>
                   </div>
                   <select
+                    id="profile-visibility"
                     value={settings.profile_visibility}
                     onChange={(e) => handleSettingChange('profile_visibility', e.target.value)}
                     className="border rounded-md px-3 py-2"
+                    aria-label="Profile visibility setting"
                   >
                     <option value="public">Public</option>
                     <option value="registered">Registered Users Only</option>
@@ -230,15 +234,19 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-base font-medium">Email Visibility</Label>
+                    <Label htmlFor="email-visibility" className="text-base font-medium">
+                      Email Visibility
+                    </Label>
                     <p className="text-sm text-gray-600">
                       Control who can see your email address
                     </p>
                   </div>
                   <select
+                    id="email-visibility"
                     value={settings.email_visibility}
                     onChange={(e) => handleSettingChange('email_visibility', e.target.value)}
                     className="border rounded-md px-3 py-2"
+                    aria-label="Email visibility setting"
                   >
                     <option value="public">Public</option>
                     <option value="registered">Registered Users Only</option>
@@ -256,6 +264,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.activity_tracking}
                     onCheckedChange={(checked) => handleSettingChange('activity_tracking', checked)}
+                    aria-label="Activity tracking toggle"
                   />
                 </div>
 
@@ -269,6 +278,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.personalized_content}
                     onCheckedChange={(checked) => handleSettingChange('personalized_content', checked)}
+                    aria-label="Personalized content toggle"
                   />
                 </div>
               </div>
@@ -276,7 +286,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
           </Card>
         </TabsContent>
 
-        {/* Data Usage */}
+        {/* Data Usage Tab */}
         <TabsContent value="data">
           <Card>
             <CardHeader>
@@ -298,11 +308,13 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                     <Switch
                       checked={settings.analytics_consent}
                       onCheckedChange={(checked) => handleConsentChange('analytics', checked)}
+                      aria-label="Analytics consent toggle"
                     />
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => openConsentModal('analytics')}
+                      aria-label="More information about analytics"
                     >
                       <Info className="h-4 w-4" />
                     </Button>
@@ -320,11 +332,13 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                     <Switch
                       checked={settings.marketing_consent}
                       onCheckedChange={(checked) => handleConsentChange('marketing', checked)}
+                      aria-label="Marketing consent toggle"
                     />
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => openConsentModal('marketing')}
+                      aria-label="More information about marketing"
                     >
                       <Info className="h-4 w-4" />
                     </Button>
@@ -342,11 +356,13 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                     <Switch
                       checked={settings.data_sharing_consent}
                       onCheckedChange={(checked) => handleConsentChange('data_sharing', checked)}
+                      aria-label="Data sharing consent toggle"
                     />
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => openConsentModal('data_sharing')}
+                      aria-label="More information about data sharing"
                     >
                       <Info className="h-4 w-4" />
                     </Button>
@@ -364,11 +380,13 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                     <Switch
                       checked={settings.location_tracking}
                       onCheckedChange={(checked) => handleConsentChange('location', checked)}
+                      aria-label="Location tracking toggle"
                     />
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => openConsentModal('location')}
+                      aria-label="More information about location tracking"
                     >
                       <Info className="h-4 w-4" />
                     </Button>
@@ -385,6 +403,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.third_party_integrations}
                     onCheckedChange={(checked) => handleSettingChange('third_party_integrations', checked)}
+                    aria-label="Third-party integrations toggle"
                   />
                 </div>
               </div>
@@ -392,7 +411,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
           </Card>
         </TabsContent>
 
-        {/* Notifications */}
+        {/* Notifications Tab */}
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
@@ -413,6 +432,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.notification_preferences.email_notifications}
                     onCheckedChange={(checked) => handleNotificationChange('email_notifications', checked)}
+                    aria-label="Email notifications toggle"
                   />
                 </div>
 
@@ -426,6 +446,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.notification_preferences.push_notifications}
                     onCheckedChange={(checked) => handleNotificationChange('push_notifications', checked)}
+                    aria-label="Push notifications toggle"
                   />
                 </div>
 
@@ -439,6 +460,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.notification_preferences.sms_notifications}
                     onCheckedChange={(checked) => handleNotificationChange('sms_notifications', checked)}
+                    aria-label="SMS notifications toggle"
                   />
                 </div>
 
@@ -454,6 +476,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.notification_preferences.bill_updates}
                     onCheckedChange={(checked) => handleNotificationChange('bill_updates', checked)}
+                    aria-label="Bill updates toggle"
                   />
                 </div>
 
@@ -467,6 +490,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.notification_preferences.comment_replies}
                     onCheckedChange={(checked) => handleNotificationChange('comment_replies', checked)}
+                    aria-label="Comment replies toggle"
                   />
                 </div>
 
@@ -480,6 +504,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.notification_preferences.expert_insights}
                     onCheckedChange={(checked) => handleNotificationChange('expert_insights', checked)}
+                    aria-label="Expert insights toggle"
                   />
                 </div>
 
@@ -493,6 +518,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.notification_preferences.security_alerts}
                     onCheckedChange={(checked) => handleNotificationChange('security_alerts', checked)}
+                    aria-label="Security alerts toggle"
                   />
                 </div>
 
@@ -506,6 +532,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   <Switch
                     checked={settings.notification_preferences.privacy_updates}
                     onCheckedChange={(checked) => handleNotificationChange('privacy_updates', checked)}
+                    aria-label="Privacy updates toggle"
                   />
                 </div>
               </div>
@@ -513,12 +540,14 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
           </Card>
         </TabsContent>
 
-        {/* Cookies */}
+        {/* Cookies Tab */}
         <TabsContent value="cookies">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Cookie className="h-5 w-5" />
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
                 Cookie Preferences
               </CardTitle>
             </CardHeader>
@@ -533,8 +562,9 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                       )}
                     </div>
                     <Switch
-                      checked={category.required || true} // Would be managed by cookie consent
+                      checked={category.required || true}
                       disabled={category.required}
+                      aria-label={`${category.name} cookie toggle`}
                     />
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{category.description}</p>
@@ -551,17 +581,19 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
           </Card>
         </TabsContent>
 
-        {/* Your Rights */}
+        {/* Your Rights Tab */}
         <TabsContent value="rights">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 Your Data Rights
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Data Export */}
+              {/* Data Export Section */}
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium mb-2">Export Your Data</h4>
                 <p className="text-sm text-gray-600 mb-4">
@@ -587,7 +619,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                 </div>
               </div>
 
-              {/* Data Deletion */}
+              {/* Data Deletion Section */}
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium mb-2">Delete Your Account</h4>
                 <p className="text-sm text-gray-600 mb-4">
@@ -604,7 +636,7 @@ export function PrivacyControls({ className = '' }: PrivacyControlsProps) {
                   onClick={requestDataDeletion}
                   disabled={loading}
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash className="h-4 w-4 mr-2" />
                   Request Account Deletion
                 </Button>
               </div>

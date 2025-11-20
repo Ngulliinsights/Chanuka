@@ -24,11 +24,11 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-import { bundleAnalyzer, type BundleMetrics, type OptimizationRecommendation } from '../../utils/bundle-analyzer';
-import { assetOptimizer, type AssetMetrics } from '../../utils/asset-optimization';
-import { webVitalsMonitor, type WebVitalsMetric, type WebVitalsReport } from '../../utils/web-vitals-monitor';
-import { realtimeOptimizer, type ConnectionMetrics } from '../../utils/realtime-optimizer';
-import { logger } from '../../utils/logger';
+import { bundleAnalyzer, type BundleMetrics, type OptimizationRecommendation } from '@client/utils/bundle-analyzer';
+import { assetOptimizer, type AssetMetrics } from '@client/utils/asset-optimization';
+import { webVitalsMonitor, type WebVitalsMetric, type WebVitalsReport } from '@client/utils/web-vitals-monitor';
+import { realtimeOptimizer, type ConnectionMetrics } from '@client/utils/realtime-optimizer';
+import { logger } from '@client/utils/logger';
 
 interface PerformanceOptimizationDashboardProps {
   className?: string;

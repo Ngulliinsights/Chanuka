@@ -15,7 +15,7 @@
 import { ZodSchema, ZodError } from 'zod';
 import * as crypto from 'crypto';
 import { logger } from '../observability/logging';
-import { ValidationError } from './types';
+import { ValidationError } from '@client/types';
 import { commonSchemas } from './schemas/common';
 import {
   ValidationOptions,

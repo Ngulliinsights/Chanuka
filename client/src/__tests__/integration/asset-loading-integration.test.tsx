@@ -1,9 +1,9 @@
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 // Note: AssetLoadingIndicator was moved to components/loading/
-import { AssetLoadingIndicator } from '../../components/loading/AssetLoadingIndicator';
-import { AssetLoadingManager } from '../../utils/asset-loading';
+import { AssetLoadingIndicator } from '@client/components/loading/AssetLoadingIndicator';
+import { AssetLoadingManager } from '@client/utils/asset-loading';
 
 // Mock the asset loading manager
 const mockAssetLoadingManager = {

@@ -18,7 +18,7 @@ import {
   TooManyRequestsError
 } from '../../../utils/logger';
 
-import { ErrorSeverity } from '../../../core/error';
+import { ErrorSeverity } from '@client/core/error';
 
 export function normalizeError(
   error: any,

@@ -23,8 +23,8 @@ import {
   waitFor,
   userEvent
 } from '../../test-utilities';
-import { BillCard } from '../../../components/bills/BillCard';
-import type { Bill } from '../../../types/bill';
+import { BillCard } from '@client/components/bills/BillCard';
+import type { Bill } from '@client/types/bill';
 
 describe('BillCard Component - Comprehensive Tests', () => {
   let mockBill: Bill;

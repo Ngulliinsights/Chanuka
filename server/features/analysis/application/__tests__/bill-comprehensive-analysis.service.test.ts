@@ -7,7 +7,7 @@ import { publicInterestAnalysisService } from '../public-interest-analysis.servi
 import { sponsorConflictAnalysisService } from '../../../sponsors/application/sponsor-conflict-analysis.service'; // Updated path
 import { analysisRepository } from '../../infrastructure/repositories/analysis-repository-impl'; // Import repo to mock save
 import { readDatabase } from '@shared/database/connection'; // Mock DB for sponsor lookup
-import * as schema from '../../../../../shared/schema';
+import * as schema from '@shared/schema';
 
 // --- Mock Dependencies ---
 vi.mock('../../../../db', () => ({ readDatabase: vi.fn() }));

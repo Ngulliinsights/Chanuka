@@ -6,8 +6,8 @@
  * and community analytics.
  */
 
-import { communityApiService } from '../core/api/community';
-import { UnifiedWebSocketManager } from '../core/api/websocket';
+import { communityApiService } from '@client/core/api/community';
+import { UnifiedWebSocketManager } from '@client/core/api/websocket';
 import {
   ActivityItem,
   TrendingTopic,
@@ -22,8 +22,8 @@ import {
   CommentReport,
   ModerationViolationType
 } from '../types/discussion';
-import { Expert } from '../types/expert';
-import { logger } from '../utils/logger';
+import { Expert } from '@client/types/expert';
+import { logger } from '@client/utils/logger';
 
 interface ApiResponse<T> {
   success: boolean;

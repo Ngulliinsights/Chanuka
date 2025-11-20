@@ -22,7 +22,7 @@ import {
   Settings
 } from 'lucide-react';
 import { getSecuritySystem } from '../../security';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface SecuritySettingsProps {
   className?: string;

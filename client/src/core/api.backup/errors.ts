@@ -2,7 +2,7 @@
 // Based on the consolidated API client design specifications
 
 // Error types imported from types.ts for consistency
-import { ErrorCode, ErrorDomain, ErrorSeverity, UnifiedError } from './types';
+import { ErrorCode, ErrorDomain, ErrorSeverity, UnifiedError } from '@client/types';
 export { ErrorCode, ErrorDomain, ErrorSeverity };
 export type { UnifiedError };
 

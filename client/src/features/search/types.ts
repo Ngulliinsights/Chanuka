@@ -119,6 +119,11 @@ export interface SavedSearch {
   lastUsed?: string;
   useCount: number;
   is_public: boolean;
+  emailAlerts?: {
+    enabled: boolean;
+    frequency: 'immediate' | 'daily' | 'weekly';
+    threshold: number;
+  };
 }
 
 export interface SearchHistory {

@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import type { TrackedTopic, TopicCategory } from '../types';
+import type { TrackedTopic, TopicCategory } from '@client/types';
 import { validateTrackedTopic } from '../validation';
 import { DashboardTopicError } from '../errors';
 

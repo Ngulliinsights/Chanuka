@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { authService } from '../core/auth/auth-service.js';
-import { logger   } from '../../shared/core/src/index.js';
+import { authService } from '@client/core/auth/auth-service.js';
+import { logger   } from '@shared/core/src/index.js';
 
 // Extend Express User type to match our auth service
 declare global {

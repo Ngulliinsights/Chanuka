@@ -2,7 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { BarChart3, X, Search, Settings } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 import { Logo } from '../ui/logo';
 import { 
   MobileHeaderProps, 

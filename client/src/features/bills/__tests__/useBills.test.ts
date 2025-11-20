@@ -65,7 +65,7 @@ describe('useBills Hooks', () => {
         hasMore: false
       };
 
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getAll as any).mockResolvedValue(mockBillsResponse);
 
       const { result } = renderHook(() => useBills(), { wrapper });
@@ -86,7 +86,7 @@ describe('useBills Hooks', () => {
         hasMore: false
       };
 
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getAll as any).mockResolvedValue(mockBillsResponse);
 
       const { result } = renderHook(() => useBills(params), { wrapper });
@@ -100,7 +100,7 @@ describe('useBills Hooks', () => {
 
     it('should handle API errors', async () => {
       const errorMessage = 'Failed to fetch bills';
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getAll as any).mockRejectedValue(new Error(errorMessage));
 
       const { result } = renderHook(() => useBills(), { wrapper });
@@ -116,7 +116,7 @@ describe('useBills Hooks', () => {
   describe('useBill', () => {
     it('should fetch a single bill by ID', async () => {
       const mockBill = { id: '1', title: 'Test Bill', summary: 'Test summary' };
-      const billApi = (await import('../services/bill-api')).billApi;
+      const billApi = (await import('@client/services/bill-api')).billApi;
       (billApi.getById as any).mockResolvedValue(mockBill);
 
       const { result } = renderHook(() => useBill('1'), { wrapper });
@@ -130,7 +130,7 @@ describe('useBills Hooks', () => {
     });
 
     it('should not fetch when ID is undefined', () => {
-      const billApi = (await import('../services/bill-api')).billApi;
+      const billApi = (await import('@client/services/bill-api')).billApi;
 
       renderHook(() => useBill(undefined), { wrapper });
 
@@ -139,7 +139,7 @@ describe('useBills Hooks', () => {
 
     it('should handle numeric IDs', async () => {
       const mockBill = { id: 123, title: 'Test Bill' };
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getById as any).mockResolvedValue(mockBill);
 
       const { result } = renderHook(() => useBill(123), { wrapper });
@@ -157,7 +157,7 @@ describe('useBills Hooks', () => {
       const mockComments = [
         { id: '1', content: 'Test comment', authorId: 'user1' }
       ];
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getComments as any).mockResolvedValue(mockComments);
 
       const { result } = renderHook(() => useBillComments('1'), { wrapper });
@@ -171,7 +171,7 @@ describe('useBills Hooks', () => {
     });
 
     it('should not fetch when bill_id is undefined', () => {
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
 
       renderHook(() => useBillComments(undefined), { wrapper });
 
@@ -184,7 +184,7 @@ describe('useBills Hooks', () => {
       const mockSponsors = [
         { id: '1', name: 'John Doe', party: 'Democrat' }
       ];
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getSponsors as any).mockResolvedValue(mockSponsors);
 
       const { result } = renderHook(() => useBillSponsors('1'), { wrapper });
@@ -205,7 +205,7 @@ describe('useBills Hooks', () => {
         keyPoints: ['Point 1', 'Point 2'],
         generatedAt: '2024-01-01T00:00:00Z'
       };
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getAnalysis as any).mockResolvedValue(mockAnalysis);
 
       const { result } = renderHook(() => useBillAnalysis('1'), { wrapper });
@@ -224,7 +224,7 @@ describe('useBills Hooks', () => {
       const mockCategories = {
         categories: ['health', 'education', 'environment']
       };
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getCategories as any).mockResolvedValue(mockCategories);
 
       const { result } = renderHook(() => useBillCategories(), { wrapper });
@@ -243,7 +243,7 @@ describe('useBills Hooks', () => {
       const mockStatuses = {
         statuses: ['introduced', 'committee', 'passed', 'failed']
       };
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.getStatuses as any).mockResolvedValue(mockStatuses);
 
       const { result } = renderHook(() => useBillStatuses(), { wrapper });
@@ -260,7 +260,7 @@ describe('useBills Hooks', () => {
   describe('useAddBillComment', () => {
     it('should add a comment successfully', async () => {
       const mockComment = { id: '1', content: 'Test comment', authorId: 'user1' };
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.addComment as any).mockResolvedValue(mockComment);
 
       const { result } = renderHook(() => useAddBillComment('1'), { wrapper });
@@ -280,7 +280,7 @@ describe('useBills Hooks', () => {
 
     it('should invalidate queries on success', async () => {
       const mockComment = { id: '1', content: 'Test comment', authorId: 'user1' };
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.addComment as any).mockResolvedValue(mockComment);
 
       const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
@@ -305,7 +305,7 @@ describe('useBills Hooks', () => {
 
   describe('useRecordBillEngagement', () => {
     it('should record engagement without retry', async () => {
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.recordEngagement as any).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useRecordBillEngagement('1'), { wrapper });
@@ -324,7 +324,7 @@ describe('useBills Hooks', () => {
     });
 
     it('should not retry on failure', async () => {
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.recordEngagement as any).mockRejectedValue(new Error('Network error'));
 
       const { result } = renderHook(() => useRecordBillEngagement('1'), { wrapper });
@@ -346,7 +346,7 @@ describe('useBills Hooks', () => {
 
   describe('useTrackBill', () => {
     it('should track a bill', async () => {
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.trackBill as any).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useTrackBill('1'), { wrapper });
@@ -359,7 +359,7 @@ describe('useBills Hooks', () => {
     });
 
     it('should untrack a bill', async () => {
-      const { billApi } = await import('../services/bill-api');
+      const { billApi } = await import('@client/services/bill-api');
       (billApi.untrackBill as any).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useTrackBill('1'), { wrapper });

@@ -8,9 +8,9 @@ declare const window: Window & typeof globalThis;
  */
 
 import React, { useEffect, useState } from 'react';
-import { getBrowserInfo, isBrowserSupported, BrowserInfo } from '../../utils/browser-compatibility';
-import { loadPolyfills, getPolyfillStatus } from '../../utils/polyfills';
-import { logger } from '../../utils/logger';
+import { getBrowserInfo, isBrowserSupported, BrowserInfo } from '@client/utils/browser-compatibility';
+import { loadPolyfills, getPolyfillStatus } from '@client/utils/polyfills';
+import { logger } from '@client/utils/logger';
 
 interface BrowserCompatibilityCheckerProps {
   children: React.ReactNode;

@@ -68,7 +68,7 @@ const IMPORT_MAPPINGS = {
   '@/hooks/use-bill-analysis': './hooks/use-bill-analysis',
   '@/hooks/use-online-status': './hooks/use-online-status',
   '@/hooks/use-toast': './hooks/use-toast',
-  '@/hooks/use-bills': './hooks/use-bills',
+  '@/features/bills/hooks/useBills': './features/bills/hooks/useBills',
   '@/hooks/use-navigation-preferences': './hooks/use-navigation-preferences',
   '@/hooks/useConnectionAware': './hooks/useConnectionAware',
   

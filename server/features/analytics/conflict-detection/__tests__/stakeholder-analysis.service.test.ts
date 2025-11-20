@@ -57,7 +57,7 @@ describe('StakeholderAnalysisService', () => {
     };
 
     it('should identify stakeholders from bill content', async () => {
-      const { getDefaultCache } = await import('../../../../shared/core/src/caching/index.js');
+      const { getDefaultCache } = await import('@shared/core/src/caching/index.js');
       const mockCache = vi.mocked(getDefaultCache)();
       vi.mocked(mockCache.get).mockResolvedValue(null);
 
@@ -76,7 +76,7 @@ describe('StakeholderAnalysisService', () => {
     });
 
     it('should use cached results when available', async () => {
-      const { getDefaultCache } = await import('../../../../shared/core/src/caching/index.js');
+      const { getDefaultCache } = await import('@shared/core/src/caching/index.js');
       const mockCache = vi.mocked(getDefaultCache)();
       const cachedStakeholders = [
         {

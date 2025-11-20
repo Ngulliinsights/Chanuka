@@ -6,8 +6,8 @@
  */
 
 import React from 'react';
-import { UserDashboard } from '../components/dashboard/UserDashboard';
-import { logger } from '../utils/logger';
+import { UserDashboard } from '@client/components/dashboard/UserDashboard';
+import { logger } from '@client/utils/logger';
 
 export default function Dashboard() {
   React.useEffect(() => {

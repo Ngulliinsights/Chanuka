@@ -1,415 +1,765 @@
+
+// Development mode detection - prevent SW conflicts
+(function() {
+  const isDevelopment = 
+    location.hostname === 'localhost' || 
+    location.hostname === '127.0.0.1' ||
+    location.port === '5173' ||
+    location.port === '4200' ||
+    location.port === '3000';
+    
+  if (isDevelopment) {
+    console.log('[SW] Development mode detected - minimal functionality');
+    
+    // Override fetch handler to be passive in development
+    
 /**
- * Service Worker for Push Notifications
- * 
- * Handles push notification events and provides offline functionality
- * for the Chanuka notification system.
+ * Enhanced fetch handler with chrome-extension filtering
  */
-
-const CACHE_NAME = 'chanuka-notifications-v1';
-const NOTIFICATION_CACHE = 'chanuka-notification-cache';
-
-// Install event - cache essential resources
-self.addEventListener('install', (event) => {
-  console.log('Service Worker installing...');
+self.addEventListener('fetch', (event) => {
+  // Only handle GET requests
+  if (event.request.method !== 'GET') return;
   
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll([
-        '/',
-        '/favicon.ico',
-        '/manifest.json'
-      ]);
-    })
-  );
+  const url = new URL(event.request.url);
   
-  // Skip waiting to activate immediately
-  self.skipWaiting();
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker activating...');
-  
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== NOTIFICATION_CACHE) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-  
-  // Claim all clients immediately
-  self.clients.claim();
-});
-
-// Push event - handle incoming push notifications
-self.addEventListener('push', (event) => {
-  console.log('Push notification received:', event);
-  
-  let notificationData = {
-    title: 'Chanuka Notification',
-    body: 'You have a new notification',
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
-    tag: 'chanuka-notification',
-    data: {}
-  };
-  
-  // Parse notification data if available
-  if (event.data) {
-    try {
-      const payload = event.data.json();
-      notificationData = {
-        title: payload.title || notificationData.title,
-        body: payload.message || payload.body || notificationData.body,
-        icon: payload.icon || notificationData.icon,
-        badge: payload.badge || notificationData.badge,
-        tag: payload.tag || payload.id || notificationData.tag,
-        data: payload.data || payload,
-        actions: payload.actions || [],
-        requireInteraction: payload.priority === 'urgent',
-        silent: payload.priority === 'low'
-      };
-    } catch (error) {
-      console.error('Error parsing push notification data:', error);
-    }
+  // Skip chrome-extension URLs to prevent caching errors
+  if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') {
+    return;
   }
   
-  // Show notification
+  // Skip invalid URLs that cause network errors
+  if (url.href.includes('chrome-extension://invalid/')) {
+    return;
+  }
+  
+  // Notification API requests: Network-first with cache fallback
+  if (url.pathname.includes('/api/notifications')) {
+    event.respondWith(networkFirstStrategy(event.request));
+    return;
+  }
+  
+  // Static assets: Cache-first for better performance
+  if (isStaticAsset(url.pathname)) {
+    event.respondWith(cacheFirstStrategy(event.request));
+    return;
+  }
+  
+  // Everything else: Network-only (like API calls, HTML pages)
+  event.respondWith(fetch(event.request));
+});
+    
+    return; // Skip the rest of the service worker setup
+  }
+})();
+
+/**
+ * Service Worker for Push Notifications
+ * Optimized version with improved caching, error handling, and performance
+ */
+
+// Configuration constants - centralized for easy maintenance
+const CONFIG = {
+  CACHE_NAME: 'chanuka-notifications-v2',
+  NOTIFICATION_CACHE: 'chanuka-notification-cache-v2',
+  STATIC_CACHE_DURATION: 7 * 24 * 60 * 60 * 1000, // 7 days
+  NOTIFICATION_CACHE_LIMIT: 100, // Maximum cached notifications
+  API_TIMEOUT: 10000, // 10 seconds
+  STATIC_ASSETS: [
+    '/',
+    '/favicon.ico',
+    '/manifest.json'
+  ]
+};
+
+// Default notification configuration
+const DEFAULT_NOTIFICATION = {
+  title: 'Chanuka Notification',
+  body: 'You have a new notification',
+  icon: '/favicon.ico',
+  badge: '/favicon.ico',
+  tag: 'chanuka-notification',
+  data: {},
+  requireInteraction: false,
+  silent: false
+};
+
+/**
+ * Installation phase - prepare the service worker
+ * This happens when the service worker is first registered or updated
+ */
+self.addEventListener('install', (event) => {
+  console.log('[SW] Installing service worker...');
+  
   event.waitUntil(
-    self.registration.showNotification(notificationData.title, {
-      body: notificationData.body,
-      icon: notificationData.icon,
-      badge: notificationData.badge,
-      tag: notificationData.tag,
-      data: notificationData.data,
-      actions: notificationData.actions,
-      requireInteraction: notificationData.requireInteraction,
-      silent: notificationData.silent,
-      timestamp: Date.now(),
-      renotify: true
-    }).then(() => {
-      // Cache notification for offline access
-      return cacheNotification(notificationData);
-    })
+    (async () => {
+      try {
+        // Open cache and pre-cache essential resources
+        const cache = await caches.open(CONFIG.CACHE_NAME);
+        await cache.addAll(CONFIG.STATIC_ASSETS);
+        console.log('[SW] Static assets cached successfully');
+        
+        // Force immediate activation without waiting for old service worker to close
+        await self.skipWaiting();
+      } catch (error) {
+        console.error('[SW] Installation failed:', error);
+        // Don't throw - allow installation to complete even if caching fails
+      }
+    })()
   );
 });
 
-// Notification click event - handle user interaction
+/**
+ * Activation phase - clean up old resources
+ * This is the perfect time to remove outdated caches
+ */
+self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating service worker...');
+  
+  event.waitUntil(
+    (async () => {
+      try {
+        // Remove outdated caches
+        const cacheNames = await caches.keys();
+        const validCaches = [CONFIG.CACHE_NAME, CONFIG.NOTIFICATION_CACHE];
+        
+        await Promise.all(
+          cacheNames
+            .filter(name => !validCaches.includes(name))
+            .map(async (name) => {
+              console.log('[SW] Deleting old cache:', name);
+              return caches.delete(name);
+            })
+        );
+        
+        // Take control of all pages immediately
+        await self.clients.claim();
+        console.log('[SW] Service worker activated and claimed clients');
+      } catch (error) {
+        console.error('[SW] Activation error:', error);
+      }
+    })()
+  );
+});
+
+/**
+ * Push notification handler - the core of our notification system
+ * Receives push messages from the server and displays them to the user
+ */
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push notification received');
+  
+  event.waitUntil(
+    (async () => {
+      try {
+        // Parse and validate notification data
+        const notificationData = parseNotificationData(event.data);
+        
+        // Display the notification with all configuration options
+        await self.registration.showNotification(notificationData.title, {
+          body: notificationData.body,
+          icon: notificationData.icon,
+          badge: notificationData.badge,
+          tag: notificationData.tag,
+          data: notificationData.data,
+          actions: notificationData.actions || [],
+          requireInteraction: notificationData.requireInteraction,
+          silent: notificationData.silent,
+          timestamp: Date.now(),
+          renotify: true,
+          vibrate: notificationData.silent ? undefined : [200, 100, 200]
+        });
+        
+        // Cache notification for offline viewing and history
+        await cacheNotification(notificationData);
+        
+        console.log('[SW] Notification displayed successfully');
+      } catch (error) {
+        console.error('[SW] Push notification error:', error);
+        // Show fallback notification so user isn't left in the dark
+        await self.registration.showNotification(
+          DEFAULT_NOTIFICATION.title,
+          { body: 'Error displaying notification. Please check the app.' }
+        );
+      }
+    })()
+  );
+});
+
+/**
+ * Notification click handler - responds when user interacts with notifications
+ * This is where we route users to the appropriate content
+ */
 self.addEventListener('notificationclick', (event) => {
-  console.log('Notification clicked:', event);
+  console.log('[SW] Notification clicked');
   
   const notification = event.notification;
   const action = event.action;
   const data = notification.data || {};
   
-  // Close the notification
   notification.close();
   
-  // Determine the URL to open
-  let urlToOpen = '/';
-  
-  if (data.actionUrl) {
-    urlToOpen = data.actionUrl;
-  } else if (data.billId) {
-    urlToOpen = `/bills/${data.billId}`;
-  } else if (data.communityContext?.billId) {
-    urlToOpen = `/bills/${data.communityContext.billId}`;
-  }
-  
-  // Handle specific actions
-  if (action === 'view') {
-    urlToOpen = data.actionUrl || urlToOpen;
-  } else if (action === 'dismiss') {
-    // Just close the notification (already done above)
-    return;
-  }
-  
-  // Open or focus the app
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Check if there's already a window open with the target URL
-      for (const client of clientList) {
-        if (client.url === urlToOpen && 'focus' in client) {
-          return client.focus();
+    (async () => {
+      try {
+        // Determine the destination URL based on notification data
+        const targetUrl = resolveTargetUrl(data, action);
+        
+        // Find or create appropriate window
+        await focusOrOpenWindow(targetUrl);
+        
+        // Mark notification as read if we have an ID
+        if (data.id) {
+          await markNotificationAsRead(data.id);
         }
+      } catch (error) {
+        console.error('[SW] Notification click handling error:', error);
       }
-      
-      // Check if there's any window open to the app
-      for (const client of clientList) {
-        if (client.url.includes(self.location.origin) && 'navigate' in client) {
-          client.navigate(urlToOpen);
-          return client.focus();
-        }
-      }
-      
-      // Open a new window
-      if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
-      }
-    }).then(() => {
-      // Mark notification as read via API
-      return markNotificationAsRead(data.id);
-    })
+    })()
   );
 });
 
-// Notification close event - handle notification dismissal
+/**
+ * Notification close handler - tracks when users dismiss notifications
+ * Useful for analytics and understanding user engagement
+ */
 self.addEventListener('notificationclose', (event) => {
-  console.log('Notification closed:', event);
+  const data = event.notification.data || {};
   
-  const notification = event.notification;
-  const data = notification.data || {};
-  
-  // Track notification dismissal
   event.waitUntil(
-    trackNotificationEvent('dismissed', data.id)
+    (async () => {
+      try {
+        if (data.id) {
+          await trackNotificationEvent('dismissed', data.id);
+        }
+      } catch (error) {
+        console.error('[SW] Notification close tracking error:', error);
+      }
+    })()
   );
 });
 
-// Background sync event - sync notifications when back online
+/**
+ * Background sync handler - synchronizes data when connection is restored
+ * Ensures notifications stay up-to-date even after offline periods
+ */
 self.addEventListener('sync', (event) => {
-  console.log('Background sync triggered:', event.tag);
+  console.log('[SW] Background sync triggered:', event.tag);
   
   if (event.tag === 'notification-sync') {
     event.waitUntil(syncNotifications());
   }
 });
 
-// Message event - handle messages from the main thread
+/**
+ * Message handler - enables communication between main thread and service worker
+ * Allows the app to control service worker behavior
+ */
 self.addEventListener('message', (event) => {
-  console.log('Service Worker received message:', event.data);
+  const { type, data } = event.data || {};
   
-  const { type, data } = event.data;
+  const handlers = {
+    'SKIP_WAITING': () => self.skipWaiting(),
+    'CACHE_NOTIFICATION': () => cacheNotification(data),
+    'CLEAR_NOTIFICATION_CACHE': () => clearNotificationCache(),
+    'GET_CACHE_STATUS': async () => {
+      const status = await getCacheStatus();
+      event.ports[0]?.postMessage(status);
+    }
+  };
   
-  switch (type) {
-    case 'SKIP_WAITING':
-      self.skipWaiting();
-      break;
-    case 'CACHE_NOTIFICATION':
-      event.waitUntil(cacheNotification(data));
-      break;
-    case 'CLEAR_NOTIFICATION_CACHE':
-      event.waitUntil(clearNotificationCache());
-      break;
-    default:
-      console.log('Unknown message type:', type);
+  const handler = handlers[type];
+  if (handler) {
+    event.waitUntil(handler());
+  } else {
+    console.warn('[SW] Unknown message type:', type);
   }
 });
-
-// Fetch event - handle network requests with caching
-self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-  
-  // Handle notification API requests
-  if (event.request.url.includes('/api/notifications')) {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          // Cache successful responses
-          if (response.ok) {
-            const responseClone = response.clone();
-            caches.open(NOTIFICATION_CACHE).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // Return cached response if network fails
-          return caches.match(event.request);
-        })
-    );
-    return;
-  }
-  
-  // Handle other requests with cache-first strategy for static assets
-  if (event.request.url.includes('.js') || 
-      event.request.url.includes('.css') || 
-      event.request.url.includes('.png') || 
-      event.request.url.includes('.jpg') || 
-      event.request.url.includes('.ico')) {
-    event.respondWith(
-      caches.match(event.request).then((response) => {
-        return response || fetch(event.request);
-      })
-    );
-  }
-});
-
-// Helper Functions
 
 /**
- * Cache notification data for offline access
+ * Fetch handler - implements smart caching strategies with extension filtering
+ * Different strategies for different resource types optimize performance
+ */
+self.addEventListener('fetch', (event) => {
+  // Only handle GET requests
+  if (event.request.method !== 'GET') return;
+  
+  const url = new URL(event.request.url);
+  
+  // Skip chrome-extension URLs to prevent caching errors
+  if (url.protocol === 'chrome-extension:' || 
+      url.protocol === 'moz-extension:' || 
+      url.href.includes('chrome-extension://invalid/')) {
+    return;
+  }
+  
+  // Notification API requests: Network-first with cache fallback
+  if (url.pathname.includes('/api/notifications')) {
+    event.respondWith(networkFirstStrategy(event.request));
+    return;
+  }
+  
+  // Static assets: Cache-first for better performance
+  if (isStaticAsset(url.pathname)) {
+    event.respondWith(cacheFirstStrategy(event.request));
+    return;
+  }
+  
+  // Everything else: Network-only (like API calls, HTML pages)
+  event.respondWith(fetch(event.request));
+});
+
+// ============================================================================
+// Helper Functions - Supporting utilities for the main event handlers
+// ============================================================================
+
+/**
+ * Parses incoming push notification data with validation and defaults
+ */
+function parseNotificationData(pushData) {
+  let parsed = { ...DEFAULT_NOTIFICATION };
+  
+  if (!pushData) return parsed;
+  
+  try {
+    const payload = pushData.json();
+    
+    return {
+      title: payload.title || parsed.title,
+      body: payload.message || payload.body || parsed.body,
+      icon: payload.icon || parsed.icon,
+      badge: payload.badge || parsed.badge,
+      tag: payload.tag || payload.id || `notification-${Date.now()}`,
+      data: payload.data || payload,
+      actions: payload.actions || [],
+      requireInteraction: payload.priority === 'urgent',
+      silent: payload.priority === 'low'
+    };
+  } catch (error) {
+    console.error('[SW] Error parsing notification data:', error);
+    return parsed;
+  }
+}
+
+/**
+ * Determines the target URL based on notification data and user action
+ */
+function resolveTargetUrl(data, action) {
+  // Handle explicit dismiss action
+  if (action === 'dismiss') return null;
+  
+  // Priority order for URL resolution
+  if (action === 'view' && data.actionUrl) {
+    return data.actionUrl;
+  }
+  
+  if (data.billId) {
+    return `${self.location.origin}/bills/${data.billId}`;
+  }
+  
+  if (data.communityContext?.billId) {
+    return `${self.location.origin}/bills/${data.communityContext.billId}`;
+  }
+  
+  if (data.actionUrl) {
+    return data.actionUrl;
+  }
+  
+  return self.location.origin + '/';
+}
+
+/**
+ * Focuses existing window or opens new one for the target URL
+ * Improves UX by reusing existing tabs when possible
+ */
+async function focusOrOpenWindow(targetUrl) {
+  if (!targetUrl) return;
+  
+  const allClients = await clients.matchAll({ 
+    type: 'window', 
+    includeUncontrolled: true 
+  });
+  
+  // Try to find and focus exact URL match
+  for (const client of allClients) {
+    if (client.url === targetUrl) {
+      return client.focus();
+    }
+  }
+  
+  // Try to navigate existing app window
+  for (const client of allClients) {
+    if (client.url.startsWith(self.location.origin)) {
+      await client.navigate(targetUrl);
+      return client.focus();
+    }
+  }
+  
+  // Open new window as last resort
+  if (clients.openWindow) {
+    return clients.openWindow(targetUrl);
+  }
+}
+
+/**
+ * Caches notification for offline access and history
+ * Implements size limit to prevent unbounded cache growth
  */
 async function cacheNotification(notificationData) {
   try {
-    const cache = await caches.open(NOTIFICATION_CACHE);
-    const cacheKey = `notification-${notificationData.tag || Date.now()}`;
+    const cache = await caches.open(CONFIG.NOTIFICATION_CACHE);
+    const cacheKey = new Request(`notification-${notificationData.tag}`);
     
-    const response = new Response(JSON.stringify(notificationData), {
+    const response = new Response(JSON.stringify({
+      ...notificationData,
+      cachedAt: Date.now()
+    }), {
       headers: { 'Content-Type': 'application/json' }
     });
     
     await cache.put(cacheKey, response);
-    console.log('Notification cached:', cacheKey);
+    
+    // Enforce cache size limit
+    await enforceNotificationCacheLimit(cache);
+    
+    console.log('[SW] Notification cached:', notificationData.tag);
   } catch (error) {
-    console.error('Error caching notification:', error);
+    console.error('[SW] Caching notification error:', error);
   }
 }
 
 /**
- * Clear notification cache
+ * Enforces maximum cache size by removing oldest entries
+ */
+async function enforceNotificationCacheLimit(cache) {
+  try {
+    const keys = await cache.keys();
+    const notificationKeys = keys.filter(req => 
+      req.url.includes('notification-')
+    );
+    
+    if (notificationKeys.length <= CONFIG.NOTIFICATION_CACHE_LIMIT) {
+      return;
+    }
+    
+    // Get all notifications with timestamps
+    const notifications = await Promise.all(
+      notificationKeys.map(async (key) => {
+        const response = await cache.match(key);
+        const data = await response.json();
+        return { key, cachedAt: data.cachedAt || 0 };
+      })
+    );
+    
+    // Sort by age and remove oldest
+    notifications.sort((a, b) => a.cachedAt - b.cachedAt);
+    const toDelete = notifications
+      .slice(0, notifications.length - CONFIG.NOTIFICATION_CACHE_LIMIT);
+    
+    await Promise.all(toDelete.map(item => cache.delete(item.key)));
+    
+    console.log(`[SW] Removed ${toDelete.length} old notifications from cache`);
+  } catch (error) {
+    console.error('[SW] Cache limit enforcement error:', error);
+  }
+}
+
+/**
+ * Clears all cached notifications
  */
 async function clearNotificationCache() {
   try {
-    const cache = await caches.open(NOTIFICATION_CACHE);
-    const keys = await cache.keys();
-    
-    const deletePromises = keys
-      .filter(key => key.url.includes('notification-'))
-      .map(key => cache.delete(key));
-    
-    await Promise.all(deletePromises);
-    console.log('Notification cache cleared');
+    const deleted = await caches.delete(CONFIG.NOTIFICATION_CACHE);
+    console.log('[SW] Notification cache cleared:', deleted);
+    return deleted;
   } catch (error) {
-    console.error('Error clearing notification cache:', error);
+    console.error('[SW] Clear cache error:', error);
+    return false;
   }
 }
 
 /**
- * Mark notification as read via API
+ * Network-first caching strategy for API requests
+ * Tries network first, falls back to cache if offline
  */
-async function markNotificationAsRead(notificationId) {
-  if (!notificationId) return;
-  
+async function networkFirstStrategy(request) {
   try {
-    const response = await fetch(`/api/notifications/${notificationId}/read`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${await getAuthToken()}`
+    const response = await fetchWithTimeout(request, CONFIG.API_TIMEOUT);
+    
+    // Cache successful responses
+    if (response.ok) {
+      const cache = await caches.open(CONFIG.NOTIFICATION_CACHE);
+      cache.put(request, response.clone());
+    }
+    
+    return response;
+  } catch (error) {
+    console.log('[SW] Network failed, trying cache:', request.url);
+    const cached = await caches.match(request);
+    
+    if (cached) return cached;
+    
+    // Return offline response as last resort
+    return new Response(
+      JSON.stringify({ error: 'Offline', cached: false }), 
+      { 
+        status: 503, 
+        headers: { 'Content-Type': 'application/json' } 
       }
-    });
+    );
+  }
+}
+
+/**
+ * Cache-first strategy for static assets with extension URL filtering
+ * Serves from cache for speed, updates cache in background
+ */
+
+/**
+ * Cache-first strategy for static assets with extension URL filtering
+ * Serves from cache for speed, updates cache in background
+ */
+async function cacheFirstStrategy(request) {
+  try {
+    const url = new URL(request.url);
+    
+    // Skip chrome-extension and other browser extension URLs
+    if (url.protocol === 'chrome-extension:' || 
+        url.protocol === 'moz-extension:' || 
+        url.href.includes('chrome-extension://invalid/')) {
+      throw new Error('Unsupported URL scheme: ' + url.protocol);
+    }
+    
+    const cached = await caches.match(request);
+    
+    if (cached) {
+      // Return cached version immediately
+      // Update cache in background (stale-while-revalidate pattern)
+      fetchAndUpdateCache(request);
+      return cached;
+    }
+    
+    // Not in cache, fetch from network
+    const response = await fetch(request);
     
     if (response.ok) {
-      console.log('Notification marked as read:', notificationId);
+      const cache = await caches.open(CONFIG.CACHE_NAME);
+      await cache.put(request, response.clone());
     }
+    
+    return response;
   } catch (error) {
-    console.error('Error marking notification as read:', error);
+    console.log('[SW] Cache-first strategy skipped for:', request.url, error.message);
+    // Return a basic response for unsupported schemes
+    return new Response('', { status: 200 });
   }
 }
 
 /**
- * Track notification event for analytics
+ * Updates cache in background without blocking response
  */
-async function trackNotificationEvent(eventType, notificationId) {
-  if (!notificationId) return;
+function fetchAndUpdateCache(request) {
+  fetch(request)
+    .then(response => {
+      if (response.ok) {
+        caches.open(CONFIG.CACHE_NAME)
+          .then(cache => cache.put(request, response));
+      }
+    })
+    .catch(error => {
+      console.log('[SW] Background update failed:', error.message);
+    });
+}
+
+/**
+ * Fetch with timeout to prevent hanging requests
+ */
+async function fetchWithTimeout(request, timeout) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
   
   try {
-    await fetch('/api/notifications/events', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${await getAuthToken()}`
-      },
-      body: JSON.stringify({
-        eventType,
-        notificationId,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
-      })
-    });
+    const response = await fetch(request, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    return response;
   } catch (error) {
-    console.error('Error tracking notification event:', error);
+    clearTimeout(timeoutId);
+    throw error;
   }
 }
 
 /**
- * Sync notifications when back online
+ * Checks if a path represents a static asset
+ */
+function isStaticAsset(pathname) {
+  const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'];
+  return staticExtensions.some(ext => pathname.endsWith(ext));
+}
+
+/**
+ * Marks notification as read via API
+ */
+async function markNotificationAsRead(notificationId) {
+  try {
+    const token = await getAuthToken();
+    
+    const response = await fetchWithTimeout(
+      new Request(`/api/notifications/${notificationId}/read`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      }),
+      CONFIG.API_TIMEOUT
+    );
+    
+    if (response.ok) {
+      console.log('[SW] Notification marked as read:', notificationId);
+    }
+  } catch (error) {
+    console.error('[SW] Mark as read error:', error);
+  }
+}
+
+/**
+ * Tracks notification events for analytics
+ */
+async function trackNotificationEvent(eventType, notificationId) {
+  try {
+    const token = await getAuthToken();
+    
+    await fetchWithTimeout(
+      new Request('/api/notifications/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({
+          eventType,
+          notificationId,
+          timestamp: new Date().toISOString(),
+          userAgent: self.navigator.userAgent
+        })
+      }),
+      CONFIG.API_TIMEOUT
+    );
+  } catch (error) {
+    console.error('[SW] Event tracking error:', error);
+  }
+}
+
+/**
+ * Synchronizes notifications when coming back online
  */
 async function syncNotifications() {
   try {
-    const response = await fetch('/api/notifications/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${await getAuthToken()}`
-      },
-      body: JSON.stringify({
-        lastSync: await getLastSyncTime(),
-        timestamp: new Date().toISOString()
-      })
-    });
+    const token = await getAuthToken();
+    const lastSync = await getLastSyncTime();
+    
+    const response = await fetchWithTimeout(
+      new Request('/api/notifications/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({
+          lastSync,
+          timestamp: new Date().toISOString()
+        })
+      }),
+      CONFIG.API_TIMEOUT
+    );
     
     if (response.ok) {
       const data = await response.json();
-      console.log('Notifications synced:', data);
-      
-      // Update last sync time
       await setLastSyncTime(new Date().toISOString());
       
-      // Notify main thread about sync
-      const clients = await self.clients.matchAll();
-      clients.forEach(client => {
+      // Notify all clients about successful sync
+      const allClients = await self.clients.matchAll();
+      allClients.forEach(client => {
         client.postMessage({
           type: 'NOTIFICATIONS_SYNCED',
-          data: data
+          data
         });
       });
+      
+      console.log('[SW] Notifications synced:', data);
     }
   } catch (error) {
-    console.error('Error syncing notifications:', error);
+    console.error('[SW] Sync error:', error);
   }
 }
 
 /**
- * Get authentication token from storage
+ * Retrieves authentication token
+ * Note: Implementation depends on your auth strategy
  */
 async function getAuthToken() {
-  // This would need to be implemented based on your auth storage strategy
-  // For now, return empty string
+  try {
+    const cache = await caches.open(CONFIG.NOTIFICATION_CACHE);
+    const response = await cache.match('auth-token');
+    
+    if (response) {
+      return await response.text();
+    }
+  } catch (error) {
+    console.error('[SW] Get auth token error:', error);
+  }
+  
   return '';
 }
 
 /**
- * Get last sync time from storage
+ * Gets last sync timestamp from cache
  */
 async function getLastSyncTime() {
   try {
-    const cache = await caches.open(NOTIFICATION_CACHE);
+    const cache = await caches.open(CONFIG.NOTIFICATION_CACHE);
     const response = await cache.match('last-sync-time');
     
     if (response) {
-      const data = await response.text();
-      return data;
+      return await response.text();
     }
   } catch (error) {
-    console.error('Error getting last sync time:', error);
+    console.error('[SW] Get last sync time error:', error);
   }
   
   return null;
 }
 
 /**
- * Set last sync time in storage
+ * Saves last sync timestamp to cache
  */
 async function setLastSyncTime(timestamp) {
   try {
-    const cache = await caches.open(NOTIFICATION_CACHE);
-    const response = new Response(timestamp);
-    await cache.put('last-sync-time', response);
+    const cache = await caches.open(CONFIG.NOTIFICATION_CACHE);
+    await cache.put('last-sync-time', new Response(timestamp));
   } catch (error) {
-    console.error('Error setting last sync time:', error);
+    console.error('[SW] Set last sync time error:', error);
   }
 }
 
-console.log('Service Worker loaded and ready for push notifications');
+/**
+ * Gets current cache status for debugging
+ */
+async function getCacheStatus() {
+  try {
+    const cacheNames = await caches.keys();
+    const status = await Promise.all(
+      cacheNames.map(async (name) => {
+        const cache = await caches.open(name);
+        const keys = await cache.keys();
+        return { name, entries: keys.length };
+      })
+    );
+    
+    return status;
+  } catch (error) {
+    console.error('[SW] Get cache status error:', error);
+    return [];
+  }
+}
+
+console.log('[SW] Service worker initialized and ready');

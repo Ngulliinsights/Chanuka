@@ -8,7 +8,7 @@ import { inputSanitizer } from './input-sanitizer';
 import { csrfProtection, setupCSRFInterceptor } from './csrf-protection';
 import { clientRateLimiter, RateLimitConfigs } from './rate-limiter';
 import { vulnerabilityScanner, SecurityThreat } from './vulnerability-scanner';
-import { SecurityEvent } from './types';
+import { SecurityEvent } from '@client/types';
 
 export interface SecurityConfig {
   enableCSP: boolean;

@@ -4,7 +4,7 @@
  * Provides comprehensive input sanitization and XSS prevention
  */
 
-import type { SecurityEvent } from '../types/security-types';
+import type { SecurityEvent } from '@client/types/security-types';
 import { securityConfig } from '../config/security-config';
 import { SecurityMonitor } from '../monitoring/SecurityMonitor';
 

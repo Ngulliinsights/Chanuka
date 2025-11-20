@@ -21,8 +21,8 @@ import {
   DropdownMenuSeparator
 } from '../ui/dropdown-menu';
 import { ExpertBadge } from '../verification/ExpertBadge';
-import { cn } from '../../lib/utils';
-import { Comment, ModerationViolationType } from '../../types/discussion';
+import { cn } from '@client/lib/utils';
+import { Comment, ModerationViolationType } from '@client/types/discussion';
 
 interface CommentItemProps {
   comment: Comment;

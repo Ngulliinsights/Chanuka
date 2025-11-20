@@ -9,8 +9,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tool
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { Progress } from './progress';
 import { Badge } from './badge';
-import { cn } from '../../lib/utils';
-import { logger } from '../../utils/logger';
+import { cn } from '@client/lib/utils';
+import { logger } from '@client/utils/logger';
 import { UIComponentError } from './errors';
 import { attemptUIRecovery } from './recovery';
 

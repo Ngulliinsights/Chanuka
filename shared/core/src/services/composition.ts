@@ -19,7 +19,7 @@
 import { Result, ok, err, isOk, isErr } from '../primitives/types/result';
 import { BaseError, BaseErrorOptions } from '../observability/error-management';
 import { logger, MetricsCollector, Tracer, CorrelationManager } from '../observability';
-import { retry, timeout, delay } from '../utils/async-utils';
+import { retry, timeout, delay } from '@client/utils/async-utils';
 import { MiddlewareServices } from '../middleware/factory';
 
 // ==================== Core Composition Types ====================

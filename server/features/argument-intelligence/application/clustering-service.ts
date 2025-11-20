@@ -3,7 +3,7 @@
 // ============================================================================
 // Clusters similar arguments using semantic similarity to reveal patterns
 
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import { SimilarityCalculator } from '../infrastructure/nlp/similarity-calculator.js';
 
 export interface ArgumentCluster {

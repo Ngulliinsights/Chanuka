@@ -15,7 +15,7 @@ import {
   CardContent,
   CardFooter
 } from '../card';
-import { renderWithWrapper } from './test-utils';
+import { renderWithWrapper } from '@client/test-utils';
 
 // Mock dependencies
 vi.mock('../../../lib/utils', () => ({

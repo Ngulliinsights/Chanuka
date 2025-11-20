@@ -34,8 +34,8 @@ const formatDistanceToNow = (date: Date) => {
   if (days < 7) return `${days}d ago`;
   return date.toLocaleDateString();
 };
-import { useBillAnalysis } from '../../hooks/use-bill-analysis';
-import { logger } from '../../utils/logger';
+import { useBillAnalysis } from '@client/features/bills/hooks/useBills';
+import { logger } from '@client/utils/logger';
 
 interface Comment { id: string;
   user_id: number;

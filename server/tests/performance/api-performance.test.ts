@@ -19,12 +19,12 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
-import { router as billsRouter } from '../../features/bills/presentation/bills-router.js';
-import { router as sponsorsRouter } from '../../features/bills/sponsors.js';
-import { createFinancialDisclosureRouter } from '../../features/analytics/financial-disclosure/index.js';
-import { router as authRouter } from '../../core/auth/auth.js';
+import { router as billsRouter } from '@client/features/bills/presentation/bills-router.js';
+import { router as sponsorsRouter } from '@client/features/bills/sponsors.js';
+import { createFinancialDisclosureRouter } from '@client/features/analytics/financial-disclosure/index.js';
+import { router as authRouter } from '@client/core/auth/auth.js';
 import { PerformanceMetrics, performanceMonitor } from '@/utils/test-helpers.js';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 describe('API Performance Tests', () => {
   let app: express.Application;

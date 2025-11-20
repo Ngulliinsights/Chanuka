@@ -22,9 +22,9 @@ import type {
 } from '../../types/auth';
 
 // Import the actual implementations to test type compatibility
-import { AuthService } from '../../services/AuthService';
+import { AuthService } from '@client/services/AuthService';
 import { AuthRepository, type AuthRepositoryConfig, UserRepository, type UserRepositoryConfig, type IAuthRepository, type IUserRepository } from '../mocks/services';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@client/hooks/useAuth';
 
 // Mock dependencies for type testing
 vi.mock('../../utils/logger', () => ({

@@ -14,7 +14,7 @@ import {
   Clock
 } from 'lucide-react';
 import { ExpertBadge } from '../verification/ExpertBadge';
-import { Expert } from '../../types/expert';
+import { Expert } from '@client/types/expert';
 
 interface ExpertAnalysisData {
   id: string;

@@ -7,7 +7,7 @@
 import 'reflect-metadata';
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
-import { ValidationError, ValidationOptions, ValidationContext } from './types';
+import { ValidationError, ValidationOptions, ValidationContext } from '@client/types';
 import { validationService } from './validation-service';
 import { logger } from '../observability/logging';
 

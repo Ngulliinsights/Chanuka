@@ -1,12 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { billApi } from '../services/bill-api';
-import { useToast } from '@/hooks/use-toast';
+import { billsApiService } from '@client/core/api/bills';
+import { useToast } from '@client/hooks/use-toast';
 import type {
   BillsQueryParams,
-  Bill,
   CommentPayload,
-  EngagementPayload,
-  Comment
+  EngagementPayload
 } from '../types';
 
 /**
@@ -21,7 +19,7 @@ import type {
 export function useBills(params: BillsQueryParams = {}) {
   return useQuery({
     queryKey: ['bills', params],
-    queryFn: () => billApi.getAll(params),
+    queryFn: () => billsApiService.getBills(params),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -43,7 +41,7 @@ export function useBills(params: BillsQueryParams = {}) {
 export function useBill(id: string | number | undefined) {
   return useQuery({
     queryKey: ['bills', id],
-    queryFn: () => billApi.getById(id!),
+    queryFn: () => billsApiService.getBillById(Number(id!)),
     enabled: !!id,
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
@@ -62,7 +60,7 @@ export function useBill(id: string | number | undefined) {
  */
 export function useBillComments(bill_id: string | number | undefined) { return useQuery({
     queryKey: ['bills', bill_id, 'comments'],
-    queryFn: () => billApi.getComments(bill_id!),
+    queryFn: () => billsApiService.getBillComments(Number(bill_id!)),
     enabled: !!bill_id,
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
@@ -80,7 +78,7 @@ export function useBillComments(bill_id: string | number | undefined) { return u
  */
 export function useBillSponsors(bill_id: string | number | undefined) { return useQuery({
     queryKey: ['bills', bill_id, 'sponsors'],
-    queryFn: () => billApi.getSponsors(bill_id!),
+    queryFn: () => billsApiService.getBillSponsors(Number(bill_id!)),
     enabled: !!bill_id,
     staleTime: 15 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
@@ -99,7 +97,7 @@ export function useBillSponsors(bill_id: string | number | undefined) { return u
  */
 export function useBillAnalysis(bill_id: string | number | undefined) { return useQuery({
     queryKey: ['bills', bill_id, 'analysis'],
-    queryFn: () => billApi.getAnalysis(bill_id!),
+    queryFn: () => billsApiService.getBillAnalysis(Number(bill_id!)),
     enabled: !!bill_id,
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
@@ -120,7 +118,7 @@ export function useBillAnalysis(bill_id: string | number | undefined) { return u
 export function useBillCategories() {
   return useQuery({
     queryKey: ['bills', 'categories'],
-    queryFn: () => billApi.getCategories(),
+    queryFn: () => billsApiService.getBillCategories(),
     staleTime: 60 * 60 * 1000,
     gcTime: 2 * 60 * 60 * 1000,
   });
@@ -139,7 +137,7 @@ export function useBillCategories() {
 export function useBillStatuses() {
   return useQuery({
     queryKey: ['bills', 'statuses'],
-    queryFn: () => billApi.getStatuses(),
+    queryFn: () => billsApiService.getBillStatuses(),
     staleTime: 60 * 60 * 1000,
     gcTime: 2 * 60 * 60 * 1000,
   });
@@ -164,7 +162,7 @@ export function useAddBillComment(bill_id: string | number) {
   const { toast } = useToast();
 
   return useMutation({ mutationFn: (comment: CommentPayload) =>
-      billApi.addComment(bill_id, comment),
+      billsApiService.addBillComment(Number(bill_id), comment.content),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -208,7 +206,7 @@ export function useRecordBillEngagement(bill_id: string | number) { const queryC
 
   return useMutation({
     mutationFn: (engagement: EngagementPayload) =>
-      billApi.recordEngagement(bill_id, engagement),
+      billsApiService.recordEngagement(Number(bill_id), engagement.engagement_type as 'view' | 'save' | 'share'),
 
     retry: false,
 
@@ -225,37 +223,131 @@ export function useRecordBillEngagement(bill_id: string | number) { const queryC
 }
 
 /**
- * Mutation hook for tracking/untracking bills for notifications
+ * Mutation hook for voting on comments (upvote/downvote).
  */
-export function useTrackBill(bill_id: string | number) {
+export function useVoteOnComment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ commentId, voteType }: { commentId: string; voteType: 'up' | 'down' }) =>
+      billsApiService.voteOnComment(commentId, voteType),
+
+    onSuccess: () => {
+      // Invalidate comments queries to refresh vote counts
+      queryClient.invalidateQueries({ queryKey: ['bills'] });
+    },
+
+    onError: (error: Error) => {
+      console.error('Failed to vote on comment:', error);
+    },
+  });
+}
+
+/**
+ * Mutation hook for endorsing comments.
+ */
+export function useEndorseComment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ commentId, endorsements }: { commentId: string; endorsements: number }) =>
+      billsApiService.endorseComment(commentId, endorsements),
+
+    onSuccess: () => {
+      // Invalidate comments queries to refresh endorsement counts
+      queryClient.invalidateQueries({ queryKey: ['bills'] });
+    },
+
+    onError: (error: Error) => {
+      console.error('Failed to endorse comment:', error);
+    },
+  });
+}
+
+/**
+ * Mutation hook for creating polls on bills.
+ */
+export function useCreateBillPoll(bill_id: string | number) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  return useMutation({ mutationFn: (track: boolean) =>
-      track ? billApi.trackBill(bill_id) : billApi.untrackBill(bill_id),
+  return useMutation({
+    mutationFn: ({ question, options, section }: { question: string; options: string[]; section?: string }) =>
+      billsApiService.createBillPoll(Number(bill_id), question, options, section),
 
-    onSuccess: (_, track) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['bills', bill_id]
-       });
+        queryKey: ['bills', bill_id, 'comments']
+      });
 
       toast({
-        title: track ? "Bill tracked" : "Bill untracked",
-        description: track
-          ? "You'll receive notifications about this bill's progress."
-          : "You will no longer receive notifications about this bills.",
+        title: "Poll created",
+        description: "Your poll has been added to the discussion.",
       });
     },
 
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to update bill tracking. Please try again.",
+        description: error.message || "Failed to create poll. Please try again.",
         variant: "destructive",
       });
     },
   });
 }
+
+/**
+ * Hook for fetching sponsorship analysis of a bill.
+ */
+export function useBillSponsorshipAnalysis(bill_id: string | number | undefined) {
+  return useQuery({
+    queryKey: ['sponsorship-analysis', bill_id],
+    queryFn: () => billsApiService.getBillSponsorshipAnalysis(Number(bill_id!)),
+    enabled: !!bill_id,
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  });
+}
+
+/**
+ * Hook for fetching primary sponsor analysis of a bill.
+ */
+export function useBillPrimarySponsorAnalysis(bill_id: string | number | undefined) {
+  return useQuery({
+    queryKey: ['primary-sponsor-analysis', bill_id],
+    queryFn: () => billsApiService.getBillPrimarySponsorAnalysis(Number(bill_id!)),
+    enabled: !!bill_id,
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  });
+}
+
+/**
+ * Hook for fetching co-sponsors analysis of a bill.
+ */
+export function useBillCoSponsorsAnalysis(bill_id: string | number | undefined) {
+  return useQuery({
+    queryKey: ['co-sponsors-analysis', bill_id],
+    queryFn: () => billsApiService.getBillCoSponsorsAnalysis(Number(bill_id!)),
+    enabled: !!bill_id,
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  });
+}
+
+/**
+ * Hook for fetching financial network analysis of a bill.
+ */
+export function useBillFinancialNetworkAnalysis(bill_id: string | number | undefined) {
+  return useQuery({
+    queryKey: ['financial-network-analysis', bill_id],
+    queryFn: () => billsApiService.getBillFinancialNetworkAnalysis(Number(bill_id!)),
+    enabled: !!bill_id,
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  });
+}
+
 
 
 

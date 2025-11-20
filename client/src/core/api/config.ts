@@ -19,7 +19,7 @@ import {
   ConfigObserver,
   LogLevel
 } from './types';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Configuration Service Implementation
@@ -288,14 +288,14 @@ export class ConfigurationService {
    */
   private getDefaultApiUrl(): string {
     if (typeof window === 'undefined') {
-      return 'http://localhost:5000';
+      return 'http://localhost:3000';
     }
 
     const isDevelopment = window.location.hostname === 'localhost' || 
                          window.location.hostname === '127.0.0.1';
     
     return isDevelopment 
-      ? 'http://localhost:5000' 
+      ? 'http://localhost:3000' 
       : `${window.location.protocol}//${window.location.host}/api`;
   }
 
@@ -707,19 +707,19 @@ export class EnvironmentConfigLoader {
   static load(): Partial<ServiceConfig> {
     return {
       api: {
-        baseUrl: this.getEnvString('REACT_APP_API_URL') || 'http://localhost:5000',
-        timeout: this.getEnvNumber('REACT_APP_API_TIMEOUT') || 10000,
+        baseUrl: this.getEnvString('VITE_API_URL') || 'http://localhost:3000',
+        timeout: this.getEnvNumber('VITE_API_TIMEOUT') || 10000,
         retry: {
-          maxRetries: this.getEnvNumber('REACT_APP_API_MAX_RETRIES') || 3,
-          baseDelay: this.getEnvNumber('REACT_APP_API_RETRY_BASE_DELAY') || 1000,
-          maxDelay: this.getEnvNumber('REACT_APP_API_RETRY_MAX_DELAY') || 10000,
-          backoffMultiplier: this.getEnvNumber('REACT_APP_API_RETRY_BACKOFF') || 2,
+          maxRetries: this.getEnvNumber('VITE_API_MAX_RETRIES') || 3,
+          baseDelay: this.getEnvNumber('VITE_API_RETRY_BASE_DELAY') || 1000,
+          maxDelay: this.getEnvNumber('VITE_API_RETRY_MAX_DELAY') || 10000,
+          backoffMultiplier: this.getEnvNumber('VITE_API_RETRY_BACKOFF') || 2,
           retryableStatusCodes: [408, 429, 500, 502, 503, 504],
           retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND']
         },
         cache: {
-          defaultTTL: this.getEnvNumber('REACT_APP_CACHE_TTL') || 5 * 60 * 1000,
-          maxSize: this.getEnvNumber('REACT_APP_CACHE_MAX_SIZE') || 100,
+          defaultTTL: this.getEnvNumber('VITE_CACHE_TTL') || 5 * 60 * 1000,
+          maxSize: this.getEnvNumber('VITE_CACHE_MAX_SIZE') || 100,
           storage: (this.getEnvString('REACT_APP_CACHE_STORAGE') || 'memory') as any,
           compression: this.getEnvBoolean('REACT_APP_CACHE_COMPRESSION', false),
           encryption: this.getEnvBoolean('REACT_APP_CACHE_ENCRYPTION', false),

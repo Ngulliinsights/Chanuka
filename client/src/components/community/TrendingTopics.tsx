@@ -27,8 +27,8 @@ import {
   Flame,
   Activity
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { TrendingTopic } from '../../types/community';
+import { cn } from '@client/lib/utils';
+import { TrendingTopic } from '@client/types/community';
 import { formatDistanceToNow } from 'date-fns';
 
 interface TrendingTopicsProps {

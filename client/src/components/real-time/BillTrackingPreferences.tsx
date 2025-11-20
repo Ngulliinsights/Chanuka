@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Bell, Clock, Mail, Smartphone, Volume2, VolumeX } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { logger } from '../../utils/logger';
+import { cn } from '@client/lib/utils';
+import { logger } from '@client/utils/logger';
 
 interface BillTrackingPreferences {
   statusChanges: boolean;

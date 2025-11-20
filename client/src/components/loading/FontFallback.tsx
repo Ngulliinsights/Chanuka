@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 
 /**
  * Font fallback configuration for different font families

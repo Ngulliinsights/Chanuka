@@ -3,7 +3,7 @@
  * Following navigation component patterns for core functionality
  */
 
-import { LoadingOperation, LoadingConfig, LoadingStats } from '../types';
+import { LoadingOperation, LoadingConfig, LoadingStats } from '@client/types';
 import { LoadingError } from '../errors';
 import { validateLoadingOperation } from '../validation';
 import { DEFAULT_LOADING_CONFIG } from '../constants';

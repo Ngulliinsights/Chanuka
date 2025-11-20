@@ -1,6 +1,6 @@
 import { apmService } from '../monitoring';
-import { errorTracker } from '../../core/errors/error-tracker';
-import { logger   } from '../../../shared/core/src/index.js';
+import { errorTracker } from '@client/core/errors/error-tracker';
+import { logger   } from '@shared/core/src/index.js';
 import { createObservabilityStack  } from '@shared/core/observability';
 
 export interface AlertRule {

@@ -1,4 +1,4 @@
-import { HealthCheck } from './types';
+import { HealthCheck } from '@client/types';
 
 // ==================== Built-in Health Checks ====================
 

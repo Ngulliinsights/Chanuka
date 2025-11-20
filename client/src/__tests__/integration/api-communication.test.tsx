@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll,
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
@@ -128,7 +128,7 @@ describe('API Communication Integration Tests', () => {
 
   describe('API Client Configuration', () => {
     test('should configure API client with correct base URL', async () => {
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       
       // Mock successful API call
       mockFetch.mockResolvedValueOnce({
@@ -143,7 +143,7 @@ describe('API Communication Integration Tests', () => {
     });
 
     test('should handle API client initialization errors', async () => {
-      const { createApiClient } = await import('../../services/api');
+      const { createApiClient } = await import('@client/services/api');
 
       // Mock API client creation failure
       mockCreateApiClient.mockImplementationOnce(() => {
@@ -165,7 +165,7 @@ describe('API Communication Integration Tests', () => {
         )
       );
 
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       
       await expect(apiClient.get('/slow-endpoint')).rejects.toThrow();
     });
@@ -176,7 +176,7 @@ describe('API Communication Integration Tests', () => {
       expect(MAX_RETRIES).toBe(3);
       
       // Mock API client with retry logic
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       
       // Mock first two calls to fail, third to succeed
       mockApiClient.get
@@ -217,7 +217,7 @@ describe('API Communication Integration Tests', () => {
         json: async () => mockResponse
       });
 
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       mockApiClient.get.mockResolvedValueOnce({ data: mockResponse });
 
       const response = await apiClient.get('/bills');
@@ -247,7 +247,7 @@ describe('API Communication Integration Tests', () => {
         json: async () => mockErrorResponse
       });
 
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       mockApiClient.get.mockRejectedValueOnce({
         response: {
           status: 400,
@@ -269,7 +269,7 @@ describe('API Communication Integration Tests', () => {
     test('should handle network errors', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       mockApiClient.get.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(apiClient.get('/network-test')).rejects.toThrow('Network error');
@@ -287,7 +287,7 @@ describe('API Communication Integration Tests', () => {
         }
       });
 
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       mockApiClient.get.mockRejectedValueOnce(new Error('Invalid JSON response'));
 
       await expect(apiClient.get('/invalid-json')).rejects.toThrow('Invalid JSON response');
@@ -325,7 +325,7 @@ describe('API Communication Integration Tests', () => {
     test('should handle CORS errors', async () => {
       mockFetch.mockRejectedValueOnce(new Error('CORS policy violation'));
 
-      const { handleApiError } = await import('../../services/api');
+      const { handleApiError } = await import('@client/services/api');
       mockHandleApiError.mockImplementationOnce((error) => {
         if (error.message.includes('CORS')) {
           return {
@@ -373,7 +373,7 @@ describe('API Communication Integration Tests', () => {
 
   describe('Authentication Integration', () => {
     test('should include authentication headers in requests', async () => {
-      const { authenticatedApi } = await import('../../utils/authenticated-api');
+      const { authenticatedApi } = await import('@client/utils/authenticated-api');
 
       mockAuthenticatedApi.get.mockResolvedValueOnce({
         data: { success: true, user: { id: 1, name: 'Test User' } }
@@ -387,7 +387,7 @@ describe('API Communication Integration Tests', () => {
     });
 
     test('should handle authentication errors', async () => {
-      const { authenticatedApi } = await import('../../utils/authenticated-api');
+      const { authenticatedApi } = await import('@client/utils/authenticated-api');
 
       mockAuthenticatedApi.get.mockRejectedValueOnce({
         response: {
@@ -411,7 +411,7 @@ describe('API Communication Integration Tests', () => {
     });
 
     test('should refresh tokens when needed', async () => {
-      const { authenticatedApi } = await import('../../utils/authenticated-api');
+      const { authenticatedApi } = await import('@client/utils/authenticated-api');
       
       // Mock token refresh scenario
       mockAuthenticatedApi.get
@@ -431,7 +431,7 @@ describe('API Communication Integration Tests', () => {
 
   describe('Error Handling and Recovery', () => {
     test('should categorize different types of API errors', async () => {
-      const { ApiErrorHandler } = await import('../../services/api-error-handling');
+      const { ApiErrorHandler } = await import('@client/services/api-error-handling');
       
       // Test different error types
       const networkError = new Error('Network error');
@@ -452,7 +452,7 @@ describe('API Communication Integration Tests', () => {
     });
 
     test('should determine which errors are retryable', async () => {
-      const { ApiErrorHandler } = await import('../../services/api-error-handling');
+      const { ApiErrorHandler } = await import('@client/services/api-error-handling');
       
       const networkError = new Error('Network error');
       const timeoutError = new Error('Request timeout');
@@ -472,7 +472,7 @@ describe('API Communication Integration Tests', () => {
     });
 
     test('should provide fallback data when API fails', async () => {
-      const { useApiWithFallback } = await import('../../hooks/use-api-with-fallback');
+      const { useApiWithFallback } = await import('@client/hooks/use-api-with-fallback');
       
       const fallbackData = {
         bills: [
@@ -509,7 +509,7 @@ describe('API Communication Integration Tests', () => {
     });
 
     test('should handle API errors gracefully in components', async () => {
-      const { useSafeQuery } = await import('../../hooks/use-safe-query');
+      const { useSafeQuery } = await import('@client/hooks/use-safe-query');
       
       mockUseSafeQuery.mockReturnValue({
         data: null,
@@ -659,7 +659,7 @@ describe('API Communication Integration Tests', () => {
     });
 
     test('should handle concurrent API requests efficiently', async () => {
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       
       // Mock multiple concurrent requests
       const requests = [
@@ -682,7 +682,7 @@ describe('API Communication Integration Tests', () => {
     });
 
     test('should implement request deduplication', async () => {
-      const { apiClient } = await import('../../services/api');
+      const { apiClient } = await import('@client/services/api');
       
       // Mock the same request made multiple times
       mockApiClient.get.mockResolvedValue({ data: { result: 'deduplicated' } });

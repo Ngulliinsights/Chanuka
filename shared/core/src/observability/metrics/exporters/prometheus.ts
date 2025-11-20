@@ -1,9 +1,10 @@
-import { Metric, MetricsExporter, PrometheusConfig } from '../types';
-import { Result, Ok, Err } from '@/primitives/types/result';
+import { Metric, PrometheusConfig } from '@client/types';
+import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
 
 // ==================== Enhanced Prometheus Exporter ====================
 
-export interface EnhancedPrometheusConfig extends PrometheusConfig {
+export interface EnhancedPrometheusConfig extends Omit<PrometheusConfig, 'gatewayUrl'> {
+  gatewayUrl: string;
   batchSize?: number;
   flushInterval?: number;
   retryAttempts?: number;
@@ -19,10 +20,13 @@ export class EnhancedPrometheusExporter {
 
   private config: EnhancedPrometheusConfig;
   private buffer: Metric[] = [];
-  private flushTimer?: NodeJS.Timeout;
+  private flushTimer: NodeJS.Timeout | null = null;
   private isExporting = false;
 
-  constructor(config: EnhancedPrometheusConfig = {}) {
+  constructor(config: Partial<EnhancedPrometheusConfig> = {}) {
+    if (!config.gatewayUrl) {
+      throw new Error('gatewayUrl is required');
+    }
     this.config = {
       gatewayUrl: config.gatewayUrl,
       jobName: config.jobName || 'app',
@@ -189,7 +193,7 @@ export class EnhancedPrometheusExporter {
     try {
       if (this.flushTimer) {
         clearInterval(this.flushTimer);
-        this.flushTimer = undefined;
+        this.flushTimer = null;
       }
 
       // Final flush

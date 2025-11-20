@@ -16,7 +16,7 @@ import { Badge } from '../ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar as CalendarComponent } from '../ui/calendar';
 import { format } from 'date-fns';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface SearchFilters {
   query: string;

@@ -47,7 +47,7 @@ import sessionSlice, {
   selectSessionStatus,
   selectRecentActivity
 } from '../sessionSlice';
-import { SessionInfo } from '../../../types/auth';
+import { SessionInfo } from '@client/types/auth';
 
 // Mock dependencies
 vi.mock('../../../utils/logger', () => ({
@@ -112,7 +112,7 @@ Object.defineProperty(window, 'crypto', {
   writable: true
 });
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 describe('Session Slice', () => {
   let store: any;

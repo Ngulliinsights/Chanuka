@@ -8,7 +8,7 @@
  * @deprecated Use conflictDetectionOrchestratorService from './conflict-detection/index.js' instead
  */
 
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import {
   conflictDetectionOrchestratorService,
   ConflictAnalysis,

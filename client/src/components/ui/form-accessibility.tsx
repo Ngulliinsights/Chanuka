@@ -4,7 +4,7 @@
  */
 
 import React, { useRef, useCallback, useEffect } from "react";
-import { cn } from "../../lib/utils";
+import { cn } from "@client/lib/utils";
 
 // Keyboard navigation hook for forms
 export const useFormKeyboardNavigation = (

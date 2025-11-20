@@ -41,10 +41,11 @@ export default defineConfig({
       reportsDirectory: coverageConfig.reportsDirectory,
       
       // Coverage thresholds
-      thresholds: {
+      // Cast to `any` to accommodate custom per-file threshold mapping
+      thresholds: ({
         global: coverageConfig.global,
         perFile: coverageConfig.perFile,
-      },
+      } as any),
       
       // Files to include/exclude
       include: coverageConfig.collectCoverageFrom,
@@ -56,7 +57,7 @@ export default defineConfig({
       clean: true,
     },
     
-    reporter: ['verbose'],
+    reporters: ['verbose'],
     
     // Retry configuration
     retry: process.env.CI ? 2 : 0,
@@ -74,6 +75,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(resolve(fileURLToPath(import.meta.url), '..'), './src'),
+      '@client': resolve(resolve(fileURLToPath(import.meta.url), '..'), './src'),
       '@chanuka/shared': resolve(resolve(fileURLToPath(import.meta.url), '..'), '../shared'),
     },
   },

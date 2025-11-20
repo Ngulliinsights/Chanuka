@@ -16,7 +16,7 @@
  */
 
 import React, { useCallback, useMemo } from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@client/lib/utils';
 import { useResponsive } from '../responsive';
 import { inputUtils } from './input';
 

@@ -2,7 +2,6 @@
 // Centralized exports for user-related functionality
 
 // Routes
-export { router as usersRouter } from './application/users';
 export { router as profileRouter } from './application/profile';
 export { router as verificationRouter } from './application/verification';
 

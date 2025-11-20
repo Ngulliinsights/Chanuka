@@ -14,7 +14,7 @@ import {
   UIFormError,
   UIComponentError
 } from '../errors';
-import { ValidationState } from '../types';
+import { ValidationState } from '@client/types';
 
 /**
  * Test wrapper component for providing context

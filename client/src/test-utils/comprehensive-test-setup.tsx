@@ -3,37 +3,13 @@
  * Enhanced testing utilities for the Chanuka client UI upgrade
  */
 
-import React from 'react';
+
 import { render, RenderOptions, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ReactElement, ReactNode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
 import { vi, expect } from 'vitest';
-
-// Import store slices
-import { billsSlice } from '../store/slices/billsSlice';
-import uiSlice from '../store/slices/uiSlice';
-
-// =============================================================================
-// TEST STORE SETUP
-// =============================================================================
-
-export const createTestStore = (initialState = {}) => {
-  return configureStore({
-    reducer: {
-      bills: billsSlice.reducer,
-      ui: uiSlice,
-    },
-    preloadedState: initialState,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: false,
-      }),
-  });
-};
 
 // =============================================================================
 // TEST PROVIDERS
@@ -41,13 +17,11 @@ export const createTestStore = (initialState = {}) => {
 
 interface TestProvidersProps {
   children: ReactNode;
-  initialState?: any;
   queryClient?: QueryClient;
 }
 
-export const TestProviders = ({ 
-  children, 
-  initialState = {},
+export const TestProviders = ({
+  children,
   queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -55,16 +29,12 @@ export const TestProviders = ({
     },
   })
 }: TestProvidersProps) => {
-  const store = createTestStore(initialState);
-
   return (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          {children}
-        </BrowserRouter>
-      </QueryClientProvider>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        {children}
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
@@ -73,7 +43,6 @@ export const TestProviders = ({
 // =============================================================================
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  initialState?: any;
   queryClient?: QueryClient;
   route?: string;
 }
@@ -82,7 +51,7 @@ export const renderWithProviders = (
   ui: ReactElement,
   options: CustomRenderOptions = {}
 ) => {
-  const { initialState, queryClient, route = '/', ...renderOptions } = options;
+  const { queryClient, route = '/', ...renderOptions } = options;
 
   // Set initial route if specified
   if (route !== '/') {
@@ -90,7 +59,7 @@ export const renderWithProviders = (
   }
 
   const Wrapper = ({ children }: { children: ReactNode }) => (
-    <TestProviders initialState={initialState} queryClient={queryClient}>
+    <TestProviders queryClient={queryClient}>
       {children}
     </TestProviders>
   );
@@ -99,7 +68,6 @@ export const renderWithProviders = (
 
   return {
     user,
-    store: createTestStore(initialState),
     ...render(ui, { wrapper: Wrapper, ...renderOptions }),
   };
 };
@@ -214,7 +182,7 @@ export const AccessibilityTestUtils = {
   /**
    * Test color contrast ratios
    */
-  testColorContrast(element: HTMLElement, minRatio = 4.5) {
+  testColorContrast(element: HTMLElement, _minRatio = 4.5) {
     const styles = window.getComputedStyle(element);
     const color = styles.color;
     const backgroundColor = styles.backgroundColor;
@@ -228,8 +196,8 @@ export const AccessibilityTestUtils = {
    * Test screen reader announcements
    */
   async testScreenReaderAnnouncements(expectedText: string) {
-    const liveRegion = screen.getByRole('status', { hidden: true }) || 
-                      screen.getByLabelText(/live region/i, { hidden: true });
+    const liveRegion = screen.getByRole('status') || 
+                      screen.getByLabelText(/live region/i);
     
     await waitFor(() => {
       expect(liveRegion).toHaveTextContent(expectedText);
@@ -357,7 +325,7 @@ export const IntegrationTestUtils = {
       },
       
       simulateClose: () => {
-        mockWs.readyState = WebSocket.CLOSED;
+        mockWs.readyState = 3; // WebSocket.CLOSED
         const event = new CloseEvent('close');
         mockWs.addEventListener.mock.calls
           .filter(([type]) => type === 'close')

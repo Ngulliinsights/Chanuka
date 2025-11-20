@@ -11,7 +11,7 @@ import {
 import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
 import { globalCache, CacheKeyGenerator } from './cache';
 import { globalConfig } from './config';
-import { logger, validationService } from '../../utils/logger';
+import { logger, validationService } from '@client/utils/logger';
 
 // Request Interceptor Interface
 interface RequestInterceptor {

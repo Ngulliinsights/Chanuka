@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import type { ITestDataFactory } from '../../../../shared/core/src/testing/test-data-factory';
-import type { IServiceContainer } from '../../../../shared/core/src/testing/dependency-injection-container';
-import type { IBillService } from '../../../../shared/core/src/services/interfaces/bill-service.interface';
-import type { ISponsorRepository } from '../../../../shared/core/src/repositories/interfaces/sponsor-repository.interface';
+import type { ITestDataFactory } from '@shared/core/src/testing/test-data-factory';
+import type { IServiceContainer } from '@shared/core/src/testing/dependency-injection-container';
+import type { IBillService } from '@shared/core/src/services/interfaces/bill-service.interface';
+import type { ISponsorRepository } from '@shared/core/src/repositories/interfaces/sponsor-repository.interface';
 
 /**
  * Performance benchmarks for Bills domain migration to direct Drizzle usage

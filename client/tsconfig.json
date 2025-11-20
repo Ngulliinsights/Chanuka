@@ -36,11 +36,16 @@
 
     // Project Structure
     "baseUrl": ".",
-    "ignoreDeprecations": "5.0",
+    // Silence TypeScript 7.0 deprecation warnings for `baseUrl` until migration
+    "ignoreDeprecations": "6.0",
+    // Keep TypeScript deprecation warnings suppressed until planned migration to TS 7.0
+    // Upgrade this to "5.6" when preparing for TS7, or remove once migrated.
 
     // Path Mappings
     "paths": {
       "@/*": ["src/*"],
+      "@client/*": ["src/*"],
+      "@shared/*": ["src/shared/*"],
       "@chanuka/shared": ["../shared"],
       "@chanuka/shared/*": ["../shared/*"]
     },

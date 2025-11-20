@@ -5,7 +5,7 @@
  * subscriptions, and real-time data processing.
  */
 
-import { UnifiedWebSocketManager } from '../core/api/websocket';
+import { UnifiedWebSocketManager } from '@client/core/api/websocket';
 import { billTrackingService } from './billTrackingService';
 import { stateManagementService } from './stateManagementService';
 import { 
@@ -16,7 +16,7 @@ import {
   ConnectionState,
   RealTimeHandlers 
 } from '../types/api';
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export class WebSocketService {
   private wsManager: UnifiedWebSocketManager;

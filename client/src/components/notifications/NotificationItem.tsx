@@ -17,7 +17,7 @@ import {
   Trash2,
   Check
 } from 'lucide-react';
-import { Notification, NotificationType } from '../../services/notification-service';
+import { Notification, NotificationType } from '@client/services/notification-service';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Checkbox } from '../ui/checkbox';

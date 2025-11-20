@@ -3,8 +3,8 @@
  * Provides token-based CSRF protection for forms and API requests
  */
 
-import { logger } from '../utils/logger';
-import { SecurityEvent } from './types';
+import { logger } from '@client/utils/logger';
+import { SecurityEvent } from '@client/types';
 
 export interface CSRFConfig {
   enabled: boolean;
@@ -104,6 +104,12 @@ export class CSRFProtection {
   }
 
   private async fetchTokenFromServer(): Promise<string | null> {
+    // In development mode, skip server fetch and generate client-side token
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('Development mode: using client-side CSRF token generation');
+      return this.generateToken();
+    }
+
     try {
       const response = await fetch('/api/security/csrf-token', {
         method: 'GET',
@@ -197,40 +203,33 @@ export class CSRFProtection {
     const self = this; // Capture the class instance for use in the interceptor
     
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-      // Create a new request object to work with
-      const request = new Request(input, init);
+      // Convert input to URL string to avoid Request reuse issues
+      const url = typeof input === 'string' ? input : 
+                  input instanceof URL ? input.toString() : 
+                  input.url;
+      
+      // Create fresh init object to avoid modifying original
+      const freshInit: RequestInit = {
+        method: 'GET',
+        ...init,
+        headers: new Headers(init?.headers || {})
+      };
       
       // Only add CSRF token to same-origin requests that need protection
-      if (self.shouldAddToken(request)) {
+      const tempRequest = new Request(url, { method: freshInit.method || 'GET' });
+      if (self.shouldAddToken(tempRequest)) {
         const token = self.getToken();
         if (token) {
-          // If init was provided, modify it; otherwise create new init
-          const modifiedInit: RequestInit = {
-            ...init,
-            headers: {
-              ...(init?.headers || {}),
-              [self.config.headerName]: token
-            }
-          };
-          
-          // Make the request with the modified headers
-          const response = await originalFetch(input, modifiedInit);
-          
-          // Check for CSRF validation errors
-          if (response.status === 403 && response.headers.get('X-CSRF-Error')) {
-            self.handleCSRFError(request);
-          }
-          
-          return response;
+          (freshInit.headers as Headers).set(self.config.headerName, token);
         }
       }
       
-      // If no token needed, proceed with original request
-      const response = await originalFetch(request);
+      // Make the request with fresh objects
+      const response = await originalFetch(url, freshInit);
       
-      // Still check for CSRF errors even on unmodified requests
+      // Check for CSRF validation errors
       if (response.status === 403 && response.headers.get('X-CSRF-Error')) {
-        self.handleCSRFError(request);
+        self.handleCSRFError(tempRequest);
       }
       
       return response;

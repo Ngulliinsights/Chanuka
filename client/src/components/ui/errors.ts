@@ -42,7 +42,7 @@ export class UIError extends Error {
 }
 
 // Import ValidationError from client logger where it's defined
-import type { ValidationError } from '../../utils/logger';
+import type { ValidationError } from '@client/utils/logger';
 
 // Re-export for backward compatibility
 export type { ValidationError };

@@ -8,20 +8,17 @@ import {
   User, 
   MapPin, 
   Calendar, 
-  ExternalLink, 
   Mail, 
-  Linkedin,
-  Globe,
   ChevronDown,
   ChevronUp,
   CheckCircle,
   Building,
-  GraduationCap,
   Award,
   Clock
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { Expert, ExpertCredential, ExpertAffiliation } from '../../types/expert';
+import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/SimpleIcons';
+import { cn } from '@client/lib/utils';
+import { Expert, ExpertCredential, ExpertAffiliation } from '@client/types/expert';
 import { ExpertBadge } from './ExpertBadge';
 import { CredibilityIndicator } from './CredibilityScoring';
 

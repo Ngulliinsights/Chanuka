@@ -1,5 +1,5 @@
 
-import { database as db } from '../shared/database/connection';
+import { database as db } from '@shared/database/connection';
 import { 
   social_shares,
   bills,
@@ -7,7 +7,7 @@ import {
   type InsertSocialShare
 } from '@shared/schema';
 import { eq, desc, sql } from 'drizzle-orm';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 import { BaseStorage } from '../../infrastructure/database/base/BaseStorage.js';
 
 const CACHE_TTL = 3600; // 1 hour in seconds

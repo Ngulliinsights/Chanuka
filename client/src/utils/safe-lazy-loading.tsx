@@ -279,49 +279,79 @@ export function createSafeLazyPage<P extends object = {}>(
     // Use dynamic import with proper path resolution
     switch (path) {
       case "@/pages/home":
-        return import("../pages/home");
+        return import("@client/pages/home");
       case "@/pages/dashboard":
-        return import("../pages/dashboard");
+        return import("@client/pages/dashboard");
       case "@/pages/bills-dashboard":
-        return import("../pages/bills-dashboard-page");
+        return import("@client/pages/bills-dashboard-page");
+      case "@/pages/bills-dashboard-page":
+        return import("@client/pages/bills-dashboard-page");
       case "@/pages/enhanced-bills-dashboard":
-        return import("../pages/bills-dashboard-page");
+        return import("@client/pages/bills-dashboard-page");
       case "@/pages/enhanced-bills-dashboard-page":
-        return import("../pages/bills-dashboard-page");
+        return import("@client/pages/bills-dashboard-page");
       case "@/pages/auth-page":
-        return import("../pages/auth-page");
+        return import("@client/pages/auth-page");
       case "@/pages/authentication":
-        return import("../pages/AuthenticationPage");
+        // Redirect old AuthenticationPage imports to the new consolidated auth page
+        return import("@client/pages/auth-page");
+      // Legal / compliance pages
+      case "@/pages/terms":
+        return import("@client/pages/legal/terms");
+      case "@/pages/privacy":
+        return import("@client/pages/legal/privacy");
+      case "@/pages/cookie-policy":
+        return import("@client/pages/legal/cookie-policy");
+      case "@/pages/data-retention":
+        return import("@client/pages/legal/data-retention");
+      case "@/pages/accessibility":
+        return import("@client/pages/legal/accessibility");
+      case "@/pages/security":
+        return import("@client/pages/legal/security");
+      case "@/pages/acceptable-use":
+        return import("@client/pages/legal/acceptable-use");
+      case "@/pages/dmca":
+        return import("@client/pages/legal/dmca");
+      case "@/pages/compliance-ccpa":
+        return import("@client/pages/legal/compliance-ccpa");
+      case "@/pages/contact-legal":
+        return import("@client/pages/legal/contact-legal");
       case "@/pages/bill-detail":
-        return import("../pages/bill-detail");
+        return import("@client/pages/bill-detail");
       case "@/pages/bill-analysis":
-        return import("../pages/bill-analysis");
+        return import("@client/pages/bill-analysis");
       case "@/pages/community-input":
-        return import("../pages/community-input");
+        return import("@client/pages/community-input");
       case "@/pages/expert-verification":
-        return import("../pages/expert-verification");
+        return import("@client/pages/expert-verification");
       case "@/pages/search":
-        return import("../pages/search");
+        return import("@client/pages/search");
       case "@/pages/profile":
-        return import("../pages/profile");
+        return import("@client/pages/UserAccountPage");
       case "@/pages/user-profile":
-        return import("../pages/UserProfilePage");
+        return import("@client/pages/UserAccountPage");
       case "@/pages/user-dashboard":
-        return import("../pages/UserDashboardPage");
+        return import("@client/pages/UserAccountPage");
       case "@/pages/onboarding":
-        return import("../pages/onboarding");
+        return import("@client/pages/onboarding");
       case "@/pages/admin":
-        return import("../pages/admin");
+        return import("@client/pages/admin");
       case "@/pages/database-manager":
-        return import("../pages/database-manager");
+        return import("@client/pages/database-manager");
       case "@/pages/bill-sponsorship-analysis":
-        return import("../pages/bill-sponsorship-analysis");
+        return import("@client/pages/bill-sponsorship-analysis");
       case "@/pages/comments":
-        return import("../pages/comments");
+        return import("@client/pages/comments");
       case "@/pages/not-found":
-        return import("../pages/not-found");
+        return import("@client/pages/not-found");
       default:
-        return Promise.reject(new Error(`Unknown page path: ${path}`));
+        // Try to resolve the path by removing @/ and adding ../
+        const relativePath = path.replace('@/', '../');
+        console.warn(`Unknown page path: ${path}, attempting to load from ${relativePath}`);
+        return import(/* @vite-ignore */ relativePath).catch(error => {
+          console.error(`Failed to load page from ${relativePath}:`, error);
+          return Promise.reject(new Error(`Unknown page path: ${path}`));
+        });
     }
   }) as () => Promise<{
     default: ComponentType<P>;
@@ -495,25 +525,26 @@ export const SafeLazyPages = {
     enablePreloading: false,
     displayName: "AuthPage",
   }),
-  AuthenticationPage: createSafeLazyPage("@/pages/authentication", "default", {
+  // Legacy key kept but pointed to the consolidated auth page
+  AuthenticationPage: createSafeLazyPage("@/pages/auth-page", "default", {
     preloadPriority: "low",
     enablePreloading: false,
-    displayName: "AuthenticationPage",
+    displayName: "AuthPage",
   }),
   Profile: createSafeLazyPage("@/pages/profile", "default", {
-    preloadPriority: "low",
-    enablePreloading: false,
-    displayName: "Profile",
+    preloadPriority: "medium",
+    enablePreloading: true,
+    displayName: "UserAccount",
   }),
   UserProfilePage: createSafeLazyPage("@/pages/user-profile", "default", {
-    preloadPriority: "low",
-    enablePreloading: false,
-    displayName: "UserProfilePage",
+    preloadPriority: "medium",
+    enablePreloading: true,
+    displayName: "UserAccount",
   }),
   UserDashboard: createSafeLazyPage("@/pages/user-dashboard", "default", {
     preloadPriority: "medium",
     enablePreloading: true,
-    displayName: "UserDashboard",
+    displayName: "UserAccount",
   }),
   Onboarding: createSafeLazyPage("@/pages/onboarding", "default", {
     preloadPriority: "low",
@@ -549,10 +580,61 @@ export const SafeLazyPages = {
     enablePreloading: false,
     displayName: "NotFound",
   }),
-  PrivacySettings: createSafeLazyPage("@/pages/PrivacySettingsPage", "default", {
+  // Legal / compliance pages
+  Terms: createSafeLazyPage("@/pages/terms", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "Terms",
+  }),
+  Privacy: createSafeLazyPage("@/pages/privacy", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "Privacy",
+  }),
+  CookiePolicy: createSafeLazyPage("@/pages/cookie-policy", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "CookiePolicy",
+  }),
+  DataRetention: createSafeLazyPage("@/pages/data-retention", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "DataRetention",
+  }),
+  Accessibility: createSafeLazyPage("@/pages/accessibility", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "Accessibility",
+  }),
+  Security: createSafeLazyPage("@/pages/security", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "Security",
+  }),
+  AcceptableUse: createSafeLazyPage("@/pages/acceptable-use", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "AcceptableUse",
+  }),
+  DMCA: createSafeLazyPage("@/pages/dmca", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "DMCA",
+  }),
+  CCPA: createSafeLazyPage("@/pages/compliance-ccpa", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "CCPA",
+  }),
+  ContactLegal: createSafeLazyPage("@/pages/contact-legal", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "ContactLegal",
+  }),
+  PrivacySettings: createSafeLazyPage("@/pages/profile", "default", {
     preloadPriority: "medium",
     enablePreloading: true,
-    displayName: "PrivacySettings",
+    displayName: "UserAccount",
   }),
 } as const;
 
@@ -562,22 +644,22 @@ export const SafeLazyPages = {
  */
 export const DynamicFeatureImports = {
   // Heavy analysis components
-  ArchitecturePlanning: () => import("../components/architecture-planning"),
+  ArchitecturePlanning: () => import("@client/components/architecture-planning"),
 
   // Complex form components
-  MobileOptimizedForms: () => import("../components/mobile/mobile-optimized-forms"),
+  MobileOptimizedForms: () => import("@client/components/mobile/mobile-optimized-forms"),
 
   // Large analysis components
-  AnalysisComponents: () => import("../components/analysis/comments"),
-  AnalysisStats: () => import("../components/analysis/stats"),
-  AnalysisTimeline: () => import("../components/analysis/timeline"),
-  AnalysisSection: () => import("../components/analysis/section"),
+  AnalysisComponents: () => import("@client/components/analysis/comments"),
+  AnalysisStats: () => import("@client/components/analysis/stats"),
+  AnalysisTimeline: () => import("@client/components/analysis/timeline"),
+  AnalysisSection: () => import("@client/components/analysis/section"),
 
   // Bill tracking components
-  BillCard: () => import("../components/bills/bill-card"),
-  BillList: () => import("../components/bills/bill-list"),
-  BillTracking: () => import("../components/bills/bill-tracking"),
-  BillImplementation: () => import("../components/bills/implementation-workarounds"),
+  BillCard: () => import("@client/components/bills/bill-card"),
+  BillList: () => import("@client/components/bills/bill-list"),
+  BillTracking: () => import("@client/components/bills/bill-tracking"),
+  BillImplementation: () => import("@client/components/bills/implementation-workarounds"),
 
   // Chart and visualization libraries (if used)
   Charts: () => import("recharts"),

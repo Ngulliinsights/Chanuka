@@ -17,9 +17,9 @@ import {
   Download,
   Settings
 } from 'lucide-react';
-import { useWebVitals, usePerformanceBudget } from '../../hooks/use-web-vitals';
-import { performanceMonitoring } from '../../services/performance-monitoring';
-import type { WebVitalsMetrics } from '../../hooks/use-web-vitals';
+import { useWebVitals, usePerformanceBudget } from '@client/hooks/use-web-vitals';
+import { performanceMonitoring } from '@client/services/performance-monitoring';
+import type { WebVitalsMetrics } from '@client/hooks/use-web-vitals';
 
 interface PerformanceViolation {
   metric: string;

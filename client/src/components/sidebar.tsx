@@ -1,34 +1,70 @@
 import { Gauge, Milestone, ToggleLeft, BarChart3, GitBranch, Layers, Flag, Split } from "lucide-react";
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export default function Sidebar() {
   return (
     <aside className="w-64 bg-background border-r border-border h-[calc(100vh-73px)] p-4 space-y-2">
       <nav className="space-y-1">
-        <a href="#overview" className="flex items-center space-x-3 px-3 py-2 rounded-lg bg-accent text-accent-foreground font-medium">
+        <button 
+          onClick={() => {
+            const section = document.getElementById('overview');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg bg-accent text-accent-foreground font-medium w-full text-left"
+        >
           <Gauge className="w-4 h-4" />
           <span>Overview</span>
-        </a>
-        <a href="#checkpoints" className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors">
+        </button>
+        <button 
+          onClick={() => {
+            const section = document.getElementById('checkpoints');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors w-full text-left"
+        >
           <Milestone className="w-4 h-4" />
           <span>Checkpoints</span>
-        </a>
-        <a href="#features" className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors">
+        </button>
+        <button 
+          onClick={() => {
+            const section = document.getElementById('features');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors w-full text-left"
+        >
           <ToggleLeft className="w-4 h-4" />
           <span>Feature Flags</span>
-        </a>
-        <a href="#analytics" className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors">
+        </button>
+        <button 
+          onClick={() => {
+            const section = document.getElementById('analytics');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors w-full text-left"
+        >
           <BarChart3 className="w-4 h-4" />
           <span>Analytics</span>
-        </a>
-        <a href="#decisions" className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors">
+        </button>
+        <button 
+          onClick={() => {
+            const section = document.getElementById('decisions');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors w-full text-left"
+        >
           <GitBranch className="w-4 h-4" />
           <span>Decision Points</span>
-        </a>
-        <a href="#architecture" className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors">
+        </button>
+        <button 
+          onClick={() => {
+            const section = document.getElementById('architecture');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors w-full text-left"
+        >
           <Layers className="w-4 h-4" />
           <span>Architecture</span>
-        </a>
+        </button>
       </nav>
       
       <hr className="border-border my-4" />

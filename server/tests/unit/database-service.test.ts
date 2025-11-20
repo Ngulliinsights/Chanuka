@@ -10,7 +10,7 @@ vi.mock('../../config/index.ts');
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { DatabaseService } from '../../infrastructure/database/database-service';
 import * as pg from 'pg';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 // Mock pg module
 vi.mock('pg', () => ({

@@ -12,12 +12,12 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { 
-  Filter, 
-  X, 
-  ChevronDown, 
-  ChevronUp, 
-  AlertTriangle, 
+import {
+  Filter,
+  X,
+  ChevronDown,
+  ChevronUp,
+  AlertTriangle,
   Flag,
   Tag,
   Settings,
@@ -31,16 +31,16 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../u
 import { Separator } from '../ui/separator';
 import { Checkbox } from '../ui/checkbox';
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { cn } from '../../lib/utils';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store';
-import { setFilters, type BillsFilter } from '../../store/slices/billsSlice';
+import { cn } from '@client/lib/utils';
+import type { BillsQueryParams } from '@client/features/bills/types';
 
 interface FilterPanelProps {
   className?: string;
   isMobile?: boolean;
   resultCount?: number;
   totalCount?: number;
+  filters: BillsQueryParams;
+  onFiltersChange: (filters: BillsQueryParams) => void;
 }
 
 interface FilterOption {
@@ -102,218 +102,238 @@ const STATUS_OPTIONS: FilterOption[] = [
   { value: 'vetoed', label: 'Vetoed' },
 ];
 
-export function FilterPanel({ className, isMobile = false, resultCount = 0, totalCount = 0 }: FilterPanelProps) {
-  const dispatch = useDispatch();
-  const filters = useSelector((state: RootState) => state.bills.filters);
-  
-  const handleSetFilters = (newFilters: BillsFilter) => {
-    dispatch(setFilters(newFilters));
+export function FilterPanel({ className, isMobile = false, resultCount = 0, totalCount = 0, filters, onFiltersChange }: FilterPanelProps) {
+  // Safe defaults for optional filter properties
+  const safeFilters = {
+    status: filters.status || [],
+    urgency: filters.urgency || [],
+    policyAreas: filters.policyAreas || [],
+    sponsors: filters.sponsors || [],
+    constitutionalFlags: filters.constitutionalFlags || false,
+    controversyLevels: filters.controversyLevels || [],
+    dateRange: filters.dateRange || { start: undefined, end: undefined },
   };
-  
-  const clearFilters = () => {
-    dispatch(setFilters({}));
-  };
+
+  const handleSetFilters = React.useCallback((newFilters: BillsQueryParams) => {
+    onFiltersChange(newFilters);
+  }, [onFiltersChange]);
+
+  const clearFilters = React.useCallback(() => {
+    onFiltersChange({});
+  }, [onFiltersChange]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['status', 'urgency']));
   const [isOpen, setIsOpen] = useState(false);
 
-  // Sync filters with URL parameters
+  // Sync filters with URL parameters (only on mount and URL changes)
   useEffect(() => {
-    const urlFilters: Partial<BillsFilter> = {};
-    
+    const urlFilters: Partial<BillsQueryParams> = {};
+
     // Parse URL parameters into filters
     const statusParam = searchParams.get('status');
     if (statusParam) {
       urlFilters.status = statusParam.split(',');
     }
-    
+
     const urgencyParam = searchParams.get('urgency');
     if (urgencyParam) {
       urlFilters.urgency = urgencyParam.split(',');
     }
-    
+
     const policyAreasParam = searchParams.get('policyAreas');
     if (policyAreasParam) {
       urlFilters.policyAreas = policyAreasParam.split(',');
     }
-    
+
     const sponsorsParam = searchParams.get('sponsors');
     if (sponsorsParam) {
       urlFilters.sponsors = sponsorsParam.split(',');
     }
-    
+
     const constitutionalFlagsParam = searchParams.get('constitutionalFlags');
     if (constitutionalFlagsParam) {
       urlFilters.constitutionalFlags = constitutionalFlagsParam === 'true';
     }
-    
+
     const controversyParam = searchParams.get('controversyLevels');
     if (controversyParam) {
       urlFilters.controversyLevels = controversyParam.split(',');
     }
-    
+
     const dateStartParam = searchParams.get('dateStart');
     const dateEndParam = searchParams.get('dateEnd');
     if (dateStartParam || dateEndParam) {
       urlFilters.dateRange = {
-        start: dateStartParam || null,
-        end: dateEndParam || null,
+        start: dateStartParam || undefined,
+        end: dateEndParam || undefined,
       };
     }
 
-    // Update filters if URL has parameters
+    // Update filters if URL has parameters and they're different from current filters
     if (Object.keys(urlFilters).length > 0) {
-      handleSetFilters(urlFilters as BillsFilter);
+      const filtersChanged = JSON.stringify(urlFilters) !== JSON.stringify(filters);
+      if (filtersChanged) {
+        onFiltersChange(urlFilters as BillsQueryParams);
+      }
     }
-  }, [searchParams]);
+  }, [searchParams]); // Remove handleSetFilters and filters from dependencies
 
-  // Update URL when filters change
+  // Update URL when filters change (debounced to prevent loops)
   useEffect(() => {
-    const newSearchParams = new URLSearchParams();
-    
-    if (filters.status.length > 0) {
-      newSearchParams.set('status', filters.status.join(','));
-    }
-    
-    if (filters.urgency.length > 0) {
-      newSearchParams.set('urgency', filters.urgency.join(','));
-    }
-    
-    if (filters.policyAreas.length > 0) {
-      newSearchParams.set('policyAreas', filters.policyAreas.join(','));
-    }
-    
-    if (filters.sponsors.length > 0) {
-      newSearchParams.set('sponsors', filters.sponsors.join(','));
-    }
-    
-    if (filters.constitutionalFlags) {
-      newSearchParams.set('constitutionalFlags', 'true');
-    }
-    
-    if (filters.controversyLevels.length > 0) {
-      newSearchParams.set('controversyLevels', filters.controversyLevels.join(','));
-    }
-    
-    if (filters.dateRange.start) {
-      newSearchParams.set('dateStart', filters.dateRange.start);
-    }
-    
-    if (filters.dateRange.end) {
-      newSearchParams.set('dateEnd', filters.dateRange.end);
-    }
+    const timeoutId = setTimeout(() => {
+      const newSearchParams = new URLSearchParams();
 
-    setSearchParams(newSearchParams, { replace: true });
-  }, [filters, setSearchParams]);
+      if (safeFilters.status.length > 0) {
+        newSearchParams.set('status', safeFilters.status.join(','));
+      }
+
+      if (safeFilters.urgency.length > 0) {
+        newSearchParams.set('urgency', safeFilters.urgency.join(','));
+      }
+
+      if (safeFilters.policyAreas.length > 0) {
+        newSearchParams.set('policyAreas', safeFilters.policyAreas.join(','));
+      }
+
+      if (safeFilters.sponsors.length > 0) {
+        newSearchParams.set('sponsors', safeFilters.sponsors.join(','));
+      }
+
+      if (safeFilters.constitutionalFlags) {
+        newSearchParams.set('constitutionalFlags', 'true');
+      }
+
+      if (safeFilters.controversyLevels.length > 0) {
+        newSearchParams.set('controversyLevels', safeFilters.controversyLevels.join(','));
+      }
+
+      if (safeFilters.dateRange.start) {
+        newSearchParams.set('dateStart', safeFilters.dateRange.start);
+      }
+
+      if (safeFilters.dateRange.end) {
+        newSearchParams.set('dateEnd', safeFilters.dateRange.end);
+      }
+
+      // Only update URL if it's actually different
+      const currentParams = searchParams.toString();
+      const newParams = newSearchParams.toString();
+      if (currentParams !== newParams) {
+        setSearchParams(newSearchParams, { replace: true });
+      }
+    }, 100); // Debounce by 100ms
+
+    return () => clearTimeout(timeoutId);
+  }, [safeFilters]); // Remove setSearchParams from dependencies
 
   // Calculate active filter count
   const activeFilterCount = useMemo(() => {
     let count = 0;
-    count += filters.status.length;
-    count += filters.urgency.length;
-    count += filters.policyAreas.length;
-    count += filters.sponsors.length;
-    count += filters.constitutionalFlags ? 1 : 0;
-    count += filters.controversyLevels.length;
-    count += (filters.dateRange.start || filters.dateRange.end) ? 1 : 0;
+    count += safeFilters.status.length;
+    count += safeFilters.urgency.length;
+    count += safeFilters.policyAreas.length;
+    count += safeFilters.sponsors.length;
+    count += safeFilters.constitutionalFlags ? 1 : 0;
+    count += safeFilters.controversyLevels.length;
+    count += (safeFilters.dateRange.start || safeFilters.dateRange.end) ? 1 : 0;
     return count;
-  }, [filters]);
+  }, [safeFilters]);
 
   // Generate active filter chips
   const activeFilterChips = useMemo(() => {
     const chips: Array<{ key: string; label: string; onRemove: () => void }> = [];
-    
+
     // Status chips
-    filters.status.forEach(status => {
+    safeFilters.status.forEach(status => {
       const option = STATUS_OPTIONS.find(opt => opt.value === status);
       if (option) {
         chips.push({
           key: `status-${status}`,
           label: option.label,
-          onRemove: () => handleSetFilters({ 
-            ...filters,
-            status: filters.status.filter(s => s !== status) 
+          onRemove: () => handleSetFilters({
+            ...safeFilters,
+            status: safeFilters.status.filter(s => s !== status)
           })
         });
       }
     });
-    
+
     // Urgency chips
-    filters.urgency.forEach(urgency => {
+    safeFilters.urgency.forEach(urgency => {
       const option = URGENCY_LEVELS.find(opt => opt.value === urgency);
       if (option) {
         chips.push({
           key: `urgency-${urgency}`,
           label: `${option.label} Priority`,
-          onRemove: () => handleSetFilters({ 
-            ...filters,
-            urgency: filters.urgency.filter(u => u !== urgency) 
+          onRemove: () => handleSetFilters({
+            ...safeFilters,
+            urgency: safeFilters.urgency.filter(u => u !== urgency)
           })
         });
       }
     });
-    
+
     // Policy area chips
-    filters.policyAreas.forEach(area => {
+    safeFilters.policyAreas.forEach(area => {
       const option = POLICY_AREAS.find(opt => opt.value === area);
       if (option) {
         chips.push({
           key: `policy-${area}`,
           label: option.label,
-          onRemove: () => handleSetFilters({ 
-            ...filters,
-            policyAreas: filters.policyAreas.filter(p => p !== area) 
+          onRemove: () => handleSetFilters({
+            ...safeFilters,
+            policyAreas: safeFilters.policyAreas.filter(p => p !== area)
           })
         });
       }
     });
-    
+
     // Constitutional flags chip
-    if (filters.constitutionalFlags) {
+    if (safeFilters.constitutionalFlags) {
       chips.push({
         key: 'constitutional-flags',
         label: 'Constitutional Issues',
-        onRemove: () => handleSetFilters({ ...filters, constitutionalFlags: false })
+        onRemove: () => handleSetFilters({ ...safeFilters, constitutionalFlags: false })
       });
     }
-    
+
     // Controversy level chips
-    filters.controversyLevels.forEach(level => {
+    safeFilters.controversyLevels.forEach(level => {
       const option = CONTROVERSY_LEVELS.find(opt => opt.value === level);
       if (option) {
         chips.push({
           key: `controversy-${level}`,
           label: option.label,
-          onRemove: () => handleSetFilters({ 
-            ...filters,
-            controversyLevels: filters.controversyLevels.filter(c => c !== level) 
+          onRemove: () => handleSetFilters({
+            ...safeFilters,
+            controversyLevels: safeFilters.controversyLevels.filter(c => c !== level)
           })
         });
       }
     });
-    
+
     // Date range chip
-    if (filters.dateRange.start || filters.dateRange.end) {
-      const startDate = filters.dateRange.start ? new Date(filters.dateRange.start).toLocaleDateString() : '';
-      const endDate = filters.dateRange.end ? new Date(filters.dateRange.end).toLocaleDateString() : '';
-      const dateLabel = startDate && endDate 
+    if (safeFilters.dateRange.start || safeFilters.dateRange.end) {
+      const startDate = safeFilters.dateRange.start ? new Date(safeFilters.dateRange.start).toLocaleDateString() : '';
+      const endDate = safeFilters.dateRange.end ? new Date(safeFilters.dateRange.end).toLocaleDateString() : '';
+      const dateLabel = startDate && endDate
         ? `${startDate} - ${endDate}`
-        : startDate 
+        : startDate
         ? `From ${startDate}`
         : `Until ${endDate}`;
-      
+
       chips.push({
         key: 'date-range',
         label: dateLabel,
-        onRemove: () => handleSetFilters({ 
-          ...filters,
-          dateRange: { start: null, end: null } 
+        onRemove: () => handleSetFilters({
+          ...safeFilters,
+          dateRange: { start: undefined, end: undefined }
         })
       });
     }
-    
+
     return chips;
-  }, [filters, setFilters]);
+  }, [safeFilters, handleSetFilters]);
 
   const toggleSection = (sectionKey: string) => {
     setExpandedSections(prev => {
@@ -328,16 +348,16 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
   };
 
   const handleArrayFilterChange = (
-    filterKey: keyof BillsFilter,
+    filterKey: 'status' | 'urgency' | 'policyAreas' | 'sponsors' | 'controversyLevels',
     value: string,
     checked: boolean
   ) => {
-    const currentArray = filters[filterKey] as string[];
+    const currentArray = safeFilters[filterKey];
     const newArray = checked
       ? [...currentArray, value]
       : currentArray.filter(item => item !== value);
-    
-    handleSetFilters({ ...filters, [filterKey]: newArray });
+
+    handleSetFilters({ ...safeFilters, [filterKey]: newArray });
   };
 
   const FilterSection = ({ 
@@ -446,8 +466,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
             <div key={option.value} className="flex items-center space-x-2">
               <Checkbox
                 id={`status-${option.value}`}
-                checked={filters.status.includes(option.value)}
-                onCheckedChange={(checked) => 
+                checked={safeFilters.status.includes(option.value)}
+                onCheckedChange={(checked) =>
                   handleArrayFilterChange('status', option.value, checked as boolean)
                 }
               />
@@ -471,8 +491,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
             <div key={option.value} className="flex items-center space-x-2">
               <Checkbox
                 id={`urgency-${option.value}`}
-                checked={filters.urgency.includes(option.value)}
-                onCheckedChange={(checked) => 
+                checked={safeFilters.urgency.includes(option.value)}
+                onCheckedChange={(checked) =>
                   handleArrayFilterChange('urgency', option.value, checked as boolean)
                 }
               />
@@ -501,8 +521,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
             <div key={option.value} className="flex items-center space-x-2">
               <Checkbox
                 id={`policy-${option.value}`}
-                checked={filters.policyAreas.includes(option.value)}
-                onCheckedChange={(checked) => 
+                checked={safeFilters.policyAreas.includes(option.value)}
+                onCheckedChange={(checked) =>
                   handleArrayFilterChange('policyAreas', option.value, checked as boolean)
                 }
               />
@@ -524,9 +544,9 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
         <div className="flex items-center space-x-2">
           <Checkbox
             id="constitutional-flags"
-            checked={filters.constitutionalFlags}
-            onCheckedChange={(checked) => 
-              handleSetFilters({ ...filters, constitutionalFlags: checked as boolean })
+            checked={safeFilters.constitutionalFlags}
+            onCheckedChange={(checked) =>
+              handleSetFilters({ ...safeFilters, constitutionalFlags: checked as boolean })
             }
           />
           <Label 
@@ -547,8 +567,8 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
             <div key={option.value} className="flex items-center space-x-2">
               <Checkbox
                 id={`controversy-${option.value}`}
-                checked={filters.controversyLevels.includes(option.value)}
-                onCheckedChange={(checked) => 
+                checked={safeFilters.controversyLevels.includes(option.value)}
+                onCheckedChange={(checked) =>
                   handleArrayFilterChange('controversyLevels', option.value, checked as boolean)
                 }
               />

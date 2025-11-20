@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { UserDashboard } from '../UserDashboard';
-import { useAuthStore } from '../../../store/slices/authSlice';
+import { useAuthStore } from '@client/store/slices/authSlice';
 
 // Mock the auth store
 vi.mock('../../../store/slices/authSlice');

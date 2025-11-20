@@ -1,4 +1,4 @@
-import { database as db } from '../../shared/database/connection';
+import { database as db } from '@shared/database/connection';
 import {
   user_progress,
   type UserProgress,
@@ -6,7 +6,7 @@ import {
 } from '@shared/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 import { BaseStorage } from '@/infrastructure/database/base/BaseStorage';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 // Constants for cache configuration
 const CACHE_PREFIX = 'progress:';

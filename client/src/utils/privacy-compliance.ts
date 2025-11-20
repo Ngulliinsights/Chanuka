@@ -3,7 +3,7 @@
  * GDPR, CCPA, and other privacy regulation compliance tools
  */
 
-import { ConsentRecord, DataExportRequest, DataDeletionRequest, PrivacySettings } from '../types/auth';
+import { ConsentRecord, DataExportRequest, DataDeletionRequest, PrivacySettings } from '@client/types/auth';
 import { logger } from './logger';
 
 interface ConsentVersion {

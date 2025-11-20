@@ -2,7 +2,7 @@
  * Authenticated API utility to prevent security vulnerabilities
  * and race conditions in API calls
  */
-import { navigationService } from '../services/navigation';
+import { navigationService } from '@client/services/navigation';
 
 export interface APIResponse<T = any> {
   data?: T;

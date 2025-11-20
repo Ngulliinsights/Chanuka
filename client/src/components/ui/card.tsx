@@ -1,7 +1,7 @@
 import { forwardRef, HTMLAttributes } from "react"
 
-import { cn } from '../../lib/utils'
-import { logger } from '../../utils/logger';
+import { cn } from '@client/lib/utils'
+import { logger } from '@client/utils/logger';
 
 const Card = forwardRef<
   HTMLDivElement,

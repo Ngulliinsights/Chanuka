@@ -15,7 +15,7 @@ import { Progress } from './progress';
 import { Alert, AlertDescription } from './alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './dialog';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from './form';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 
 /**
  * BEFORE: Custom Button Implementation

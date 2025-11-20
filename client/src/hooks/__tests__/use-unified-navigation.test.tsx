@@ -16,9 +16,9 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { renderHook } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { useUnifiedNavigation } from '../use-unified-navigation';
-import { createNavigationProvider } from '../../core/navigation/context';
+import { createNavigationProvider } from '@client/core/navigation/context';
 import React from 'react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (

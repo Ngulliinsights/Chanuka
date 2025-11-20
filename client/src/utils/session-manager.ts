@@ -4,7 +4,8 @@
  */
 
 import { logger } from './logger';
-import { authApiService, SessionInfo } from '../core/api/auth';
+import { authApiService, SessionInfo } from '@client/core/api/auth';
+import { setCSRFToken as setCSRFTokenSafe } from './meta-tag-manager';
 
 export interface SessionConfig {
   // Cookie settings
@@ -317,6 +318,11 @@ class SessionManager {
 
     // Throttle activity recording to prevent excessive updates
     if (now - this.lastActivity < 1000) return; // Max once per second
+    
+    // Additional check to prevent infinite loops
+    if (this.activityLog.length > 100) {
+      this.activityLog = this.activityLog.slice(-50); // Keep only last 50 entries
+    }
 
     this.lastActivity = now;
 
@@ -574,13 +580,8 @@ class SessionManager {
       httpOnly: false,
     });
 
-    let metaTag = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement;
-    if (!metaTag) {
-      metaTag = document.createElement('meta');
-      metaTag.name = 'csrf-token';
-      document.head.appendChild(metaTag);
-    }
-    metaTag.content = token;
+    // Use centralized meta tag manager to prevent DOM conflicts
+    setCSRFTokenSafe(token);
   }
 
   /**

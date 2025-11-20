@@ -5,11 +5,10 @@
  * intelligent prefetching, and optimized memory management for large datasets.
  */
 
-import { billsApiService, BillsSearchParams, PaginatedBillsResponse } from './billsApiService';
+import { billsApiService, BillsSearchParams, PaginatedBillsResponse } from '@client/core/api/bills';
 import { billsDataCache } from './billsDataCache';
-import { getStore } from '../store';
-import { setBills, updateBill, Bill } from '../store/slices/billsSlice';
-import { logger } from '../utils/logger';
+import { Bill } from '@client/core/api/types';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Type Definitions
@@ -165,10 +164,8 @@ class BillsPaginationService {
         this.state.currentPage = nextPage;
         this.updateStateFromResponse(response, nextPage);
 
-        // Add bills to store (append mode for infinite scroll)
-        response.bills.forEach(bill => {
-          getStore().dispatch(updateBill({ id: bill.id, updates: bill }));
-        });
+        // Note: Bills are now managed by React Query hooks
+        // No need to dispatch to Redux store
 
         // Continue prefetching
         this.startPrefetching();
@@ -176,8 +173,7 @@ class BillsPaginationService {
         logger.info('Next page loaded successfully', {
           component: 'BillsPaginationService',
           page: nextPage,
-          billsCount: response.bills.length,
-          totalLoaded: getStore().getState().bills.bills.length
+          billsCount: response.bills.length
         });
 
         return response.bills;
@@ -229,7 +225,13 @@ class BillsPaginationService {
           hasNext: page < this.state.totalPages,
           hasPrevious: page > 1
         },
-        stats: getStore().getState().bills.stats
+        stats: {
+          totalBills: this.state.totalItems,
+          urgentCount: 0,
+          constitutionalFlags: 0,
+          trendingCount: 0,
+          lastUpdated: new Date().toISOString()
+        }
       };
     }
 
@@ -277,11 +279,8 @@ class BillsPaginationService {
 
       const response = await billsApiService.getBills(params);
       
-      if (response.success) {
-        return response.data;
-      } else {
-        throw new Error(response.error?.message || 'API request failed');
-      }
+      // The billsApiService.getBills() returns PaginatedBillsResponse directly
+      return response;
     } catch (error) {
       if (attempt < this.config.retryAttempts) {
         const delay = this.config.retryDelayMs * Math.pow(2, attempt - 1); // Exponential backoff
@@ -393,6 +392,7 @@ class BillsPaginationService {
     containerHeight: number,
     itemHeight: number,
     totalItems: number,
+    bills: Bill[],
     overscan = 5
   ): VirtualScrollData {
     const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
@@ -401,8 +401,7 @@ class BillsPaginationService {
       Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
     );
 
-    const billsState = getStore().getState().bills;
-    const visibleItems = billsState.bills.slice(startIndex, endIndex + 1);
+    const visibleItems = bills.slice(startIndex, endIndex + 1);
 
     return {
       startIndex,
@@ -584,15 +583,7 @@ class BillsPaginationService {
 }
 
 // ============================================================================
-// Export singleton instance and types
+// Export singleton instance
 // ============================================================================
 
 export const billsPaginationService = new BillsPaginationService();
-
-// Export types for use in components
-export type {
-  PaginationConfig,
-  PaginationState,
-  PageData,
-  VirtualScrollData
-};

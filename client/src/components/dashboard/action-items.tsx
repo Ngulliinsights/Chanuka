@@ -2,9 +2,9 @@ import React from "react";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { AlertCircle, RefreshCw, CheckCircle, Clock } from "lucide-react";
-import { useDashboard } from "./hooks/useDashboard";
-import { useDashboardActions } from "./hooks/useDashboardActions";
-import type { DashboardComponentProps, ActionPriority } from "./types";
+import { useDashboard } from "@client/hooks/useDashboard";
+import { useDashboardActions } from "@client/hooks/useDashboardActions";
+import type { DashboardComponentProps, ActionPriority } from "@client/types";
 import { validateActionItem } from "./validation";
 
 export const ActionItems: React.FC<DashboardComponentProps> = ({

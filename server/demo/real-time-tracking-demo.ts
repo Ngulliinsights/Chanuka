@@ -9,11 +9,11 @@
 
 import { webSocketService } from '../infrastructure/websocket.js';
 // bill-status-monitor exports the singleton instance as `billStatusMonitorService`
-import { billStatusMonitorService as billStatusMonitor } from '../features/bills/bill-status-monitor.js';
-import { userPreferencesService } from '../features/users/domain/user-preferences.js';
+import { billStatusMonitorService as billStatusMonitor } from '@client/features/bills/bill-status-monitor.js';
+import { userPreferencesService } from '@client/features/users/domain/user-preferences.js';
 import { createServer } from 'http';
 import express from 'express';
-import { logger   } from '../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 async function runDemo() {
   logger.info('🚀 Starting Real-Time Bill Tracking Demo...\n', { component: 'Chanuka' });

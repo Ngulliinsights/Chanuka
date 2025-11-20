@@ -3,8 +3,8 @@
  * Implements CSP with nonce-based script execution and violation reporting
  */
 
-import { logger } from '../utils/logger';
-import { SecurityEvent, CSPViolation } from './types';
+import { logger } from '@client/utils/logger';
+import { SecurityEvent, CSPViolation } from '@client/types';
 
 export interface CSPConfig {
   enabled: boolean;
@@ -44,7 +44,8 @@ export class CSPManager {
         nonce: this.nonce.substring(0, 8) + '...'
       });
     } catch (error) {
-      logger.error('Failed to initialize CSP Manager', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Failed to initialize CSP Manager', { error: errorMessage });
       throw error;
     }
   }
@@ -56,25 +57,13 @@ export class CSPManager {
   }
 
   private setupCSP(): void {
-    const policy = this.buildCSPPolicy();
-    const headerName = this.config.reportOnly 
-      ? 'Content-Security-Policy-Report-Only' 
-      : 'Content-Security-Policy';
+    // CSP is now handled server-side via HTTP headers
+    // Client-side CSP management is disabled to avoid conflicts
 
-    // Apply CSP via meta tag (for client-side enforcement)
-    const existingMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-    if (existingMeta) {
-      existingMeta.setAttribute('content', policy);
-    } else {
-      const meta = document.createElement('meta');
-      meta.setAttribute('http-equiv', headerName);
-      meta.setAttribute('content', policy);
-      document.head.appendChild(meta);
-    }
-
-    // Store policy for reference
-    (window as any).__CSP_POLICY__ = policy;
+    // Store nonce for reference (scripts should already have nonces from server)
     (window as any).__CSP_NONCE__ = this.nonce;
+
+    logger.info('CSP Manager initialized - using server-side CSP headers');
   }
 
   private buildCSPPolicy(): string {
@@ -177,19 +166,27 @@ export class CSPManager {
   }
 
   private handleCSPViolation(event: SecurityPolicyViolationEvent | CSPViolation): void {
-    const violation: CSPViolation = {
-      documentUri: 'documentURI' in event ? event.documentURI : event.documentUri,
-      referrer: 'referrer' in event ? event.referrer : event.referrer,
-      violatedDirective: 'violatedDirective' in event ? event.violatedDirective : event.violatedDirective,
-      effectiveDirective: 'effectiveDirective' in event ? event.effectiveDirective : event.effectiveDirective,
-      originalPolicy: 'originalPolicy' in event ? event.originalPolicy : event.originalPolicy,
-      disposition: 'disposition' in event ? event.disposition as 'enforce' | 'report' : event.disposition,
-      blockedUri: 'blockedURI' in event ? event.blockedURI : event.blockedUri,
-      lineNumber: 'lineNumber' in event ? event.lineNumber : event.lineNumber,
-      columnNumber: 'columnNumber' in event ? event.columnNumber : event.columnNumber,
-      sourceFile: 'sourceFile' in event ? event.sourceFile : event.sourceFile,
-      statusCode: 'statusCode' in event ? event.statusCode : event.statusCode
-    };
+    let violation: CSPViolation;
+    
+    if ('documentURI' in event) {
+      // SecurityPolicyViolationEvent
+      violation = {
+        documentUri: event.documentURI,
+        referrer: event.referrer,
+        violatedDirective: event.violatedDirective,
+        effectiveDirective: event.effectiveDirective,
+        originalPolicy: event.originalPolicy,
+        disposition: event.disposition as 'enforce' | 'report',
+        blockedUri: event.blockedURI,
+        lineNumber: event.lineNumber,
+        columnNumber: event.columnNumber,
+        sourceFile: event.sourceFile,
+        statusCode: event.statusCode
+      };
+    } else {
+      // Already a CSPViolation object
+      violation = event;
+    }
 
     this.violations.push(violation);
 
@@ -240,7 +237,8 @@ export class CSPManager {
         body: JSON.stringify(violation)
       });
     } catch (error) {
-      logger.error('Failed to report CSP violation to backend', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Failed to report CSP violation to backend', { error: errorMessage });
     }
   }
 

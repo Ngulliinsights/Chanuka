@@ -11,11 +11,11 @@ import {
   screen,
   waitFor
 } from '../../test-utils/comprehensive-test-setup';
-import { BillCard } from '../../components/bills/BillCard';
-import { BillsDashboard } from '../../components/bills/bills-dashboard';
-import { IntelligentSearchPage } from '../../pages/IntelligentSearchPage';
-import { ExpertBadge } from '../../components/verification/ExpertBadge';
-import { DiscussionThread } from '../../components/community/DiscussionThread';
+import { BillCard } from '@client/components/bills/BillCard';
+import { BillsDashboard } from '@client/components/bills/bills-dashboard';
+import { IntelligentSearchPage } from '@client/pages/IntelligentSearchPage';
+import { ExpertBadge } from '@client/components/verification/ExpertBadge';
+import { DiscussionThread } from '@client/components/community/DiscussionThread';
 
 // Mock router
 vi.mock('react-router-dom', () => ({

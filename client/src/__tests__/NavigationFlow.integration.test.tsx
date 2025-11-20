@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { createNavigationProvider } from '../core/navigation/context';
+import { createNavigationProvider } from '@client/core/navigation/context';
 import AppLayout from '@/components/layout/app-layout';
-import HomePage from '../pages/home';
+import HomePage from '@client/pages/home';
 import { logger } from '@/utils/logger';
 
 // Mock pages for testing navigation

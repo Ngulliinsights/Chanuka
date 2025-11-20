@@ -13,9 +13,9 @@ import { BrowserRouter } from 'react-router-dom';
 import React from 'react';
 
 // Import the actual components and services
-import { AuthProvider, useAuth } from '../../hooks/useAuth';
-import { authService } from '../../services/AuthService';
-import { userService } from '../../services/userService';
+import { AuthProvider, useAuth } from '@client/hooks/useAuth';
+import { authService } from '@client/services/AuthService';
+import { userService } from '@client/services/userService';
 
 // Mock all external dependencies
 vi.mock('../../utils/logger', () => ({
@@ -134,14 +134,14 @@ vi.mock('../../utils/rbac', () => ({
 }));
 
 // Import mocks for direct manipulation
-import { securityMonitor } from '../../utils/security-monitoring';
-import { privacyCompliance } from '../../utils/privacy-compliance';
-import { validatePassword } from '../../utils/password-validation';
-import { authApiService } from '../../core/api/auth';
-import { globalApiClient } from '../../core/api/client';
-import { tokenManager } from '../../utils/tokenManager';
-import { sessionManager } from '../../utils/session-manager';
-import { rbacManager } from '../../utils/rbac';
+import { securityMonitor } from '@client/utils/security-monitoring';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { validatePassword } from '@client/utils/password-validation';
+import { authApiService } from '@client/core/api/auth';
+import { globalApiClient } from '@client/core/api/client';
+import { tokenManager } from '@client/utils/tokenManager';
+import { sessionManager } from '@client/utils/session-manager';
+import { rbacManager } from '@client/utils/rbac';
 
 // Test component that uses the auth hook
 const TestAuthComponent: React.FC = () => {

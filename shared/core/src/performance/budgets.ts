@@ -11,7 +11,7 @@ export interface PerformanceBudget {
   /** Human-readable description */
   description: string;
   /** Budget category */
-  category: 'core-web-vitals' | 'bundle-size' | 'resource-size' | 'custom';
+  category: 'core-web-vitals' | 'bundle-size' | 'resource-size' | 'styling' | 'custom';
   /** Metric to measure against */
   metric: string;
   /** Budget threshold value */
@@ -54,11 +54,26 @@ export interface BundleSizeBudgets {
   totalAssets: PerformanceBudget;
 }
 
+export interface StylingBudgets {
+  /** Total Tailwind CSS size */
+  totalTailwind: PerformanceBudget;
+  /** Design system CSS size */
+  designSystemCss: PerformanceBudget;
+  /** Component styles size */
+  componentStyles: PerformanceBudget;
+  /** Total styling bundle size */
+  totalStylingBundle: PerformanceBudget;
+  /** Gzipped styling size */
+  stylingGzip: PerformanceBudget;
+}
+
 export interface PerformanceBudgetConfig {
   /** Core Web Vitals budgets */
   coreWebVitals: CoreWebVitalsBudgets;
   /** Bundle size budgets */
   bundleSize: BundleSizeBudgets;
+  /** Styling budgets */
+  styling: StylingBudgets;
   /** Custom performance budgets */
   custom: PerformanceBudget[];
   /** Global configuration */
@@ -205,6 +220,67 @@ export const DEFAULT_BUNDLE_SIZE_BUDGETS: BundleSizeBudgets = {
 };
 
 /**
+ * Default styling budgets
+ */
+export const DEFAULT_STYLING_BUDGETS: StylingBudgets = {
+  totalTailwind: {
+    name: 'Total Tailwind CSS Size',
+    description: 'Total size of Tailwind CSS and related utilities',
+    category: 'styling',
+    metric: 'totalTailwindSize',
+    threshold: 100, // 100KB
+    unit: 'KB',
+    operator: 'less-than',
+    failOnViolation: false,
+    warningThreshold: 80,
+  },
+  designSystemCss: {
+    name: 'Design System CSS Size',
+    description: 'Size of design system CSS (chanuka-design-system.css)',
+    category: 'styling',
+    metric: 'designSystemCssSize',
+    threshold: 50, // 50KB
+    unit: 'KB',
+    operator: 'less-than',
+    failOnViolation: false,
+    warningThreshold: 40,
+  },
+  componentStyles: {
+    name: 'Component Styles Size',
+    description: 'Total size of component-specific styles',
+    category: 'styling',
+    metric: 'componentStylesSize',
+    threshold: 25, // 25KB
+    unit: 'KB',
+    operator: 'less-than',
+    failOnViolation: false,
+    warningThreshold: 20,
+  },
+  totalStylingBundle: {
+    name: 'Total Styling Bundle Size',
+    description: 'Total size of all styling assets combined',
+    category: 'styling',
+    metric: 'totalStylingBundleSize',
+    threshold: 200, // 200KB
+    unit: 'KB',
+    operator: 'less-than',
+    failOnViolation: true,
+    warningThreshold: 150,
+  },
+  stylingGzip: {
+    name: 'Styling Gzip Size',
+    description: 'Gzipped size of all styling assets combined',
+    category: 'styling',
+    metric: 'stylingGzipSize',
+    threshold: 50, // 50KB
+    unit: 'KB',
+    operator: 'less-than',
+    failOnViolation: false,
+    warningThreshold: 40,
+  },
+};
+
+/**
  * Production-optimized budgets (stricter than defaults)
  */
 export const PRODUCTION_BUDGETS: PerformanceBudgetConfig = {
@@ -219,6 +295,11 @@ export const PRODUCTION_BUDGETS: PerformanceBudgetConfig = {
     totalJs: { ...DEFAULT_BUNDLE_SIZE_BUDGETS.totalJs, threshold: 800, warningThreshold: 600 },
     initialChunk: { ...DEFAULT_BUNDLE_SIZE_BUDGETS.initialChunk, threshold: 400, warningThreshold: 300 },
   },
+  styling: {
+    ...DEFAULT_STYLING_BUDGETS,
+    totalStylingBundle: { ...DEFAULT_STYLING_BUDGETS.totalStylingBundle, threshold: 150, warningThreshold: 120 },
+    stylingGzip: { ...DEFAULT_STYLING_BUDGETS.stylingGzip, threshold: 40, warningThreshold: 30 },
+  },
   custom: [],
   config: {
     environment: 'production',
@@ -226,7 +307,6 @@ export const PRODUCTION_BUDGETS: PerformanceBudgetConfig = {
     enableTrendAnalysis: true,
     alerts: {
       emailRecipients: [],
-      slackWebhook: undefined,
       alertOnWarnings: true,
     },
   },
@@ -247,6 +327,10 @@ export const DEVELOPMENT_BUDGETS: PerformanceBudgetConfig = {
     totalJs: { ...DEFAULT_BUNDLE_SIZE_BUDGETS.totalJs, threshold: 1536, failOnViolation: false },
     initialChunk: { ...DEFAULT_BUNDLE_SIZE_BUDGETS.initialChunk, threshold: 768, failOnViolation: false },
   },
+  styling: {
+    ...DEFAULT_STYLING_BUDGETS,
+    totalStylingBundle: { ...DEFAULT_STYLING_BUDGETS.totalStylingBundle, threshold: 300, failOnViolation: false },
+  },
   custom: [],
   config: {
     environment: 'development',
@@ -254,7 +338,6 @@ export const DEVELOPMENT_BUDGETS: PerformanceBudgetConfig = {
     enableTrendAnalysis: false,
     alerts: {
       emailRecipients: [],
-      slackWebhook: undefined,
       alertOnWarnings: false,
     },
   },
@@ -293,6 +376,13 @@ export function validateBudgetConfig(config: PerformanceBudgetConfig): { valid: 
 
   // Validate bundle size budgets
   Object.entries(config.bundleSize).forEach(([key, budget]) => {
+    if (budget.threshold <= 0) {
+      errors.push(`${budget.name}: threshold must be positive`);
+    }
+  });
+
+  // Validate styling budgets
+  Object.entries(config.styling).forEach(([key, budget]) => {
     if (budget.threshold <= 0) {
       errors.push(`${budget.name}: threshold must be positive`);
     }

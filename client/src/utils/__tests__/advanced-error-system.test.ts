@@ -11,7 +11,7 @@ import { errorHandler, createNetworkError, createAuthError } from '../unified-er
 import { smartRecoveryEngine } from '../advanced-error-recovery';
 import { errorRateLimiter } from '../error-rate-limiter';
 import { errorAnalytics } from '../error-analytics';
-import { ErrorMonitoringDashboard } from '../../components/error/ErrorMonitoringDashboard';
+import { ErrorMonitoringDashboard } from '@client/components/error/ErrorMonitoringDashboard';
 import React from 'react';
 
 // Mock environment variables

@@ -11,8 +11,8 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Alert, AlertDescription } from '../ui/alert';
 import { DiscussionThread } from './DiscussionThread';
-import { useDiscussion } from '../../hooks/useDiscussion';
-import { cn } from '../../lib/utils';
+import { useDiscussion } from '@client/hooks/useDiscussion';
+import { cn } from '@client/lib/utils';
 
 interface DiscussionIntegrationProps {
   billId: number;

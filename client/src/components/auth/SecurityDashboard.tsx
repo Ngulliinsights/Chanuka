@@ -24,10 +24,10 @@ import {
   Trash2,
   RefreshCw
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@client/hooks/useAuth';
 import { TwoFactorSetup } from './TwoFactorSetup';
-import { SecurityEvent, SuspiciousActivityAlert, SessionInfo } from '../../types/auth';
-import { logger } from '../../utils/logger';
+import { SecurityEvent, SuspiciousActivityAlert, SessionInfo } from '@client/types/auth';
+import { logger } from '@client/utils/logger';
 
 interface SecurityDashboardProps {
   className?: string;

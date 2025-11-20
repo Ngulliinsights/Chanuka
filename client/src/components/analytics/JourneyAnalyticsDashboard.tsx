@@ -31,10 +31,10 @@ import {
   Download,
   RefreshCw
 } from 'lucide-react';
-import { useJourneyAnalytics } from '../../hooks/use-journey-tracker';
-import { JourneyAnalytics, JourneyOptimization, PathAnalytics, DropOffPoint, ConversionFunnel } from '../../services/UserJourneyTracker';
-import { UserRole } from '../../types/navigation';
-import { logger } from '../../utils/logger';
+import { useJourneyAnalytics } from '@client/hooks/use-journey-tracker';
+import { JourneyAnalytics, JourneyOptimization, PathAnalytics, DropOffPoint, ConversionFunnel } from '@client/services/UserJourneyTracker';
+import { UserRole } from '@client/types/navigation';
+import { logger } from '@client/utils/logger';
 
 interface JourneyAnalyticsDashboardProps {
   className?: string;

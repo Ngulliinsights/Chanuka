@@ -31,7 +31,7 @@ import {
   Info,
   AlertTriangle
 } from 'lucide-react';
-import { PrivacyControls } from '../../../types/user-dashboard';
+import { PrivacyControls } from '@client/types/user-dashboard';
 
 interface PrivacyControlsModalProps {
   open: boolean;

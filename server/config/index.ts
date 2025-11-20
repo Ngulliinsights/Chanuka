@@ -244,7 +244,7 @@ const securityConfigSchema = z.object({
     styleSrc: z.array(z.string()).default(["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"]),
     fontSrc: z.array(z.string()).default(["'self'", "https://fonts.gstatic.com"]),
     imgSrc: z.array(z.string()).default(["'self'", "data:", "https:"]),
-    scriptSrc: z.array(z.string()).default(["'self'"]),
+    scriptSrc: z.array(z.string()).default(["'self'", "'strict-dynamic'"]),
     connectSrc: z.array(z.string()).default(["'self'"]),
     objectSrc: z.array(z.string()).default(["'none'"]),
     frameAncestors: z.array(z.string()).default(["'none'"]),

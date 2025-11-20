@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Calendar, Users, FileText, AlertTriangle } from 'lucide-react';
-import { Bill } from '../../store/slices/billsSlice';
+import { Bill } from '@/core/api/types';
 import { EducationalTooltip } from '../education/EducationalTooltip';
 
 interface BillOverviewTabProps {
@@ -180,13 +180,13 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
               {bill.constitutionalFlags.map((flag, index) => (
                 <div key={flag.id || index} className="p-3 bg-white rounded-lg border border-yellow-200">
                   <div className="flex items-start justify-between mb-2">
-                    <div className="font-medium text-yellow-900">{flag.category}</div>
+                    <div className="font-medium text-yellow-900">{flag.type}</div>
                     <Badge 
                       variant="outline"
                       className={`
                         ${flag.severity === 'critical' ? 'border-red-300 text-red-700 bg-red-50' : ''}
                         ${flag.severity === 'high' ? 'border-orange-300 text-orange-700 bg-orange-50' : ''}
-                        ${flag.severity === 'moderate' ? 'border-yellow-300 text-yellow-700 bg-yellow-50' : ''}
+                        ${flag.severity === 'medium' ? 'border-yellow-300 text-yellow-700 bg-yellow-50' : ''}
                         ${flag.severity === 'low' ? 'border-blue-300 text-blue-700 bg-blue-50' : ''}
                       `}
                     >
@@ -216,7 +216,7 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
                 <div>
                   <div className="font-medium">{sponsor.name}</div>
                   <div className="text-sm text-muted-foreground">
-                    {sponsor.party} • {sponsor.role === 'primary' ? 'Primary Sponsor' : 'Co-sponsor'}
+                    {sponsor.party} • {sponsor.isPrimary ? 'Primary Sponsor' : 'Co-sponsor'}
                   </div>
                 </div>
                 <Button variant="outline" size="sm">

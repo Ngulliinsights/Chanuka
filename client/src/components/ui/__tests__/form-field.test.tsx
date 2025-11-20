@@ -12,7 +12,7 @@ import {
   EnhancedFormSelect
 } from '../form-field';
 import { Label } from '../label';
-import { cn } from '../../../lib/utils';
+import { cn } from '@client/lib/utils';
 
 // FormFieldWrapper tests replaced with direct implementations
 describe('FormFieldWrapper equivalent', () => {

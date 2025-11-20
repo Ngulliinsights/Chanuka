@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { AlertCircle, RefreshCw, TrendingUp } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useDashboard } from './hooks/useDashboard';
-import type { DashboardComponentProps } from './types';
+import { useDashboard } from '@client/hooks/useDashboard';
+import type { DashboardComponentProps } from '@client/types';
 import { validateActivitySummary } from './validation';
 import { DashboardError } from './errors';
 

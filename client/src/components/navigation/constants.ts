@@ -1,5 +1,5 @@
 import { Building, FileText, Users, Shield, Search, User, Settings, BarChart3 } from 'lucide-react';
-import type { NavigationItem, NavigationSection } from './types';
+import type { NavigationItem, NavigationSection } from '@client/types';
 
 export const SECTION_TITLES: Record<NavigationSection, string> = {
   legislative: 'Legislative Data',
@@ -18,7 +18,7 @@ export const DEFAULT_NAVIGATION_MAP: NavigationItem[] = [
   { id: 'expert', label: 'Expert Verification', href: '/expert-verification', icon: Shield, section: 'community', allowedRoles: ['expert', 'admin'], priority: 2 },
   { id: 'search', label: 'Search', href: '/search', icon: Search, section: 'tools', priority: 1 },
   { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: User, section: 'user', requiresAuth: true, priority: 1 },
-  { id: 'profile', label: 'Profile', href: '/profile', icon: Settings, section: 'user', requiresAuth: true, priority: 2 },
+  { id: 'profile', label: 'Profile', href: '/account', icon: Settings, section: 'user', requiresAuth: true, priority: 2 },
   { id: 'admin', label: 'Admin Panel', href: '/admin', icon: Settings, section: 'admin', adminOnly: true, priority: 1 },
 ];
 

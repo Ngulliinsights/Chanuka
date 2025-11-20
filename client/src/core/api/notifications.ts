@@ -13,7 +13,7 @@
  */
 
 import { globalApiClient } from './client';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 import { globalErrorHandler } from './errors';
 
 // ============================================================================

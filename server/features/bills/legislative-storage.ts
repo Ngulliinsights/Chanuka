@@ -9,7 +9,7 @@ import { bill as bills, users as users, comments as comments, user_profiles as u
  } from '../shared/schema';
 import { eq, desc, and, or, like, count, asc, sql } from "drizzle-orm";
 import { readDatabase } from '@shared/database';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 // Enhanced engagement statistics interface with more detailed metrics
 export interface BillEngagementStats {

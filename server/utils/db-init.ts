@@ -1,5 +1,5 @@
 import { pool } from "@shared/database/connection.js";
-import { logger } from "../../shared/core/index.js";
+import { logger } from "@shared/core/index.js";
 
 export async function initializeDatabase(): Promise<boolean> {
   try {

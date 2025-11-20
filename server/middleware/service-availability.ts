@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 interface ServiceStatus {
   isHealthy: boolean;

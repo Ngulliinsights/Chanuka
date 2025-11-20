@@ -9,7 +9,7 @@
  * - Intelligent cache invalidation based on data freshness
  */
 
-import { CacheService } from '../core/interfaces';
+import { CacheService } from '@client/core/interfaces';
 import { getDefaultCache } from '../../cache/index';
 import { performance } from 'perf_hooks';
 import { logger } from '../../observability/logging';

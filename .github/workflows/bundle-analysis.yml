@@ -31,6 +31,11 @@ jobs:
         BUNDLE_FAIL_SIZE: 3.0
         BUNDLE_VERBOSE: true
 
+    - name: Analyze Radix UI bundle sizes
+      run: npm run analyze:radix
+      env:
+        CI: true
+
     - name: Enforce performance budgets
       run: node scripts/performance-budget-enforcer.cjs
       env:
@@ -56,6 +61,11 @@ jobs:
       env:
         CI: true
 
+    - name: Run Design System Audit
+      run: npm run audit:design-system
+      env:
+        CI: true
+
     - name: Upload performance reports
       uses: actions/upload-artifact@v4
       if: always()
@@ -73,6 +83,11 @@ jobs:
           performance-regression-report.md
           performance-data/
           performance-reports/
+          reports/radix-analysis/
+          reports/radix-bundle-analysis.json
+          reports/radix-bundle-analysis.md
+          reports/design-system-audit-report.json
+          reports/design-system-audit-report.md
         retention-days: 30
 
     - name: Comment PR with bundle analysis
@@ -83,25 +98,37 @@ jobs:
           const fs = require('fs');
           const path = require('path');
 
-          // Read the markdown report
-          const reportPath = path.join(process.cwd(), 'bundle-analysis.md');
-          if (!fs.existsSync(reportPath)) {
-            console.log('Bundle analysis report not found');
-            return;
+          let body = '## 📦 Bundle Analysis Report\n\n';
+
+          // Read the main bundle analysis report
+          const bundleReportPath = path.join(process.cwd(), 'bundle-analysis.md');
+          if (fs.existsSync(bundleReportPath)) {
+            const bundleReport = fs.readFileSync(bundleReportPath, 'utf8');
+            body += bundleReport + '\n\n---\n\n';
           }
 
-          const report = fs.readFileSync(reportPath, 'utf8');
+          // Read the Radix analysis report
+          const radixReportPath = path.join(process.cwd(), 'reports/radix-bundle-analysis.md');
+          if (fs.existsSync(radixReportPath)) {
+            const radixReport = fs.readFileSync(radixReportPath, 'utf8');
+            body += '## 🔍 Radix UI Bundle Analysis\n\n' + radixReport + '\n\n---\n\n';
+          }
+
+          // Read the Design System audit report
+          const designSystemReportPath = path.join(process.cwd(), 'reports/design-system-audit-report.md');
+          if (fs.existsSync(designSystemReportPath)) {
+            const designSystemReport = fs.readFileSync(designSystemReportPath, 'utf8');
+            body += '## 🎨 Design System Audit\n\n' + designSystemReport + '\n\n---\n\n';
+          }
+
+          body += `[View detailed reports](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
 
           // Post comment on PR
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: `## 📦 Bundle Analysis Report
-
-${report}
-
-[View detailed HTML report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+            body: body
           });
 
   bundle-baseline-update:

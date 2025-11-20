@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import express from 'express';
-import { migratedBillsRouter } from '../../features/bills/presentation/bills-router-migrated.js';
+import { migratedBillsRouter } from '@client/features/bills/presentation/bills-router-migrated.js';
 import { boomErrorMiddleware, errorContextMiddleware } from '../../middleware/boom-error-middleware.js';
 
 // Mock the bill service
@@ -80,7 +80,7 @@ describe('Migrated Route Handlers Integration Tests', () => {
     app.use(boomErrorMiddleware);
 
     // Get the mocked bill service
-    const { billService: mockBillService } = await import('../../features/bills/application/bills.js');
+    const { billService: mockBillService } = await import('@client/features/bills/application/bills.js');
     billService = mockBillService;
   });
 
@@ -207,7 +207,7 @@ describe('Migrated Route Handlers Integration Tests', () => {
     });
 
     it('should return not found error for non-existent bill', async () => {
-      const { BillNotFoundError } = await import('../../features/bills/application/bills.js');
+      const { BillNotFoundError } = await import('@client/features/bills/application/bills.js');
       billService.getBill.mockRejectedValue(new BillNotFoundError('Bill not found'));
 
       const response = await request(app)
@@ -255,7 +255,7 @@ describe('Migrated Route Handlers Integration Tests', () => {
     });
 
     it('should handle validation errors during bill creation', async () => {
-      const { ValidationError } = await import('../../features/bills/application/bills.js');
+      const { ValidationError } = await import('@client/features/bills/application/bills.js');
       billService.createBill.mockRejectedValue(new ValidationError('Title is required'));
 
       const response = await request(app)

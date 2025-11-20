@@ -13,7 +13,7 @@ import { BrowserRouter } from 'react-router-dom';
 import React from 'react';
 
 // Import the actual hook and components
-import { AuthProvider, useAuth } from '../../hooks/useAuth';
+import { AuthProvider, useAuth } from '@client/hooks/useAuth';
 
 // Mock all dependencies
 vi.mock('../../utils/logger', () => ({

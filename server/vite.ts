@@ -2,11 +2,8 @@ import express, { type Express, type Request, type Response, type NextFunction }
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { createServer } from "vite";
+import { createServer, type ViteDevServer } from '../node_modules/vite';
 import { type Server } from "http";
-
-// Extract the ViteDevServer type from the return type of createServer
-type ViteDevServer = Awaited<ReturnType<typeof createServer>>;
 
 /**
  * Centralized configuration that's determined once at startup for optimal performance.
@@ -61,7 +58,7 @@ const MIME_TYPES: Record<string, string> = {
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
   '.otf': 'font/otf',
-  // '.eot': 'application/vnd.ms-fontobject',
+  '.eot': 'application/vnd.ms-fontobject',
   
   // Documents
   '.json': 'application/json; charset=utf-8',
@@ -87,13 +84,8 @@ let viteShutdownLock = false;
  * Lightweight logger that formats timestamps consistently across the application.
  */
 export function log(message: string, source = "express"): void {
-  const timestamp = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-  console.log(`${timestamp} [${source}] ${message}`);
+  // eslint-disable-next-line no-console
+  console.log(`[${source}] ${message}`);
 }
 
 /**
@@ -218,6 +210,8 @@ export async function setupVite(app: Express, server: Server): Promise<void> {
           port: hmrPort,
           overlay: true,
           clientPort: hmrPort,
+          host: 'localhost',
+          protocol: 'ws'
         },
         cors: {
           origin: true,
@@ -228,27 +222,30 @@ export async function setupVite(app: Express, server: Server): Promise<void> {
           usePolling: CONFIG.polling,
         },
         fs: {
-          allow: ['..'] // Allow serving files from the entire project
+          allow: ['..']
         }
       },
       appType: "custom",
       optimizeDeps: {
         include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
       },
-      esbuild: {
-        jsx: 'automatic',
-        jsxImportSource: 'react'
-      }
+      esbuild: {}
     });
+
+    // Enhanced WebSocket error handling with proper type annotations
+    if (viteDevServer && viteDevServer.ws) {
+      viteDevServer.ws.on('connection', () => {
+      });
+    }
 
     // Set up development monitoring if debug mode is enabled
     if (CONFIG.debug.all) {
-      setupDevelopmentMonitoring(viteDevServer);
+      setupDevelopmentMonitoring(viteDevServer!);
     }
 
     // Register middleware in the correct order
-    registerViteMiddleware(app, viteDevServer);
-    registerSPAMiddleware(app, viteDevServer, hmrPort);
+    registerViteMiddleware(app, viteDevServer!);
+    registerSPAMiddleware(app, viteDevServer!, hmrPort);
 
     log("Vite development server initialized successfully", "vite");
 
@@ -268,11 +265,11 @@ export async function setupVite(app: Express, server: Server): Promise<void> {
  */
 function createViteLogger() {
   const baseLogger = {
-    info: (msg: string) => console.log(`[VITE INFO] ${msg}`),
-    warn: (msg: string) => console.warn(`[VITE WARN] ${msg}`),
-    error: (msg: string) => console.error(`[VITE ERROR] ${msg}`),
-    debug: (msg: string) => console.log(`[VITE DEBUG] ${msg}`),
-    warnOnce: (msg: string) => console.warn(`[VITE WARN] ${msg}`),
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    warnOnce: () => {},
     clearScreen: () => {},
     hasErrorLogged: () => false,
     hasWarned: false
@@ -280,7 +277,7 @@ function createViteLogger() {
 
   return {
     ...baseLogger,
-    error: (msg: string, _options?: any) => {
+    error: (msg: string) => {
       const errorType = categorizeError(msg);
       log(`Vite ${errorType} error: ${msg}`, "vite-error");
 
@@ -289,19 +286,19 @@ function createViteLogger() {
         void attemptHMRRecovery();
       }
 
-      baseLogger.error(msg);
+      baseLogger.error();
     },
-    warn: (msg: string, _options?: any) => {
+    warn: (msg: string) => {
       debugLog('warnings', `Vite warning: ${msg}`, "vite-warn");
-      baseLogger.warn(msg);
+      baseLogger.warn();
     },
-    info: (msg: string, _options?: any) => {
+    info: (msg: string) => {
       // Filter out noisy HMR update messages that clutter the console
       if (!msg.toLowerCase().includes('hmr update') &&
           !msg.toLowerCase().includes('page reload')) {
         log(`Vite: ${msg}`, "vite-info");
       }
-      baseLogger.info(msg);
+      baseLogger.info();
     },
   };
 }
@@ -333,18 +330,34 @@ function registerViteMiddleware(app: Express, vite: ViteDevServer): void {
 
     res.once('finish', () => clearTimeout(timeout));
 
-    vite.middlewares(req, res, (err?: any) => {
+    vite.middlewares(req, res, (err?: unknown) => {
       clearTimeout(timeout);
       
       if (err && !res.headersSent) {
-        const errorType = categorizeError(err.message || String(err));
-        log(`Vite middleware error [${errorType}]: ${err.message}`, "vite-error");
-        res.status(500).json({ error: err.message, type: errorType });
+        const errorType = categorizeError((err as Error).message || String(err));
+        log(`Vite middleware error [${errorType}]: ${(err as Error).message}`, "vite-error");
+        res.status(500).json({ error: (err as Error).message, type: errorType });
       } else {
         next(err);
       }
     });
   });
+}
+
+/**
+ * Generates a cryptographically secure nonce for CSP
+ */
+function generateCSPNonce(): string {
+  const array = new Uint8Array(16);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(array);
+  } else {
+    // Fallback for environments without crypto
+    for (let i = 0; i < array.length; i++) {
+      array[i] = Math.floor(Math.random() * 256);
+    }
+  }
+  return btoa(String.fromCharCode(...array)).replace(/[+/=]/g, '').substring(0, 16);
 }
 
 /**
@@ -359,13 +372,18 @@ function registerSPAMiddleware(app: Express, vite: ViteDevServer, hmrPort: numbe
     }
 
     const startTime = Date.now();
+    const nonce = generateCSPNonce();
 
     try {
-      const template = await loadAndEnhanceTemplate(req.originalUrl, startTime, hmrPort);
+      const template = await loadAndEnhanceTemplate(req.originalUrl, startTime, hmrPort, nonce);
       const page = await vite.transformIndexHtml(req.originalUrl, template);
+
+      // Set CSP header with nonce - more permissive for development
+      const cspHeader = `default-src 'self'; script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' https://cdn.chanuka.ke http://localhost:* ws://localhost:* wss://localhost:*; script-src-elem 'self' 'unsafe-inline' http://localhost:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.chanuka.ke wss://ws.chanuka.ke http://localhost:* ws://localhost:* wss://localhost:*; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; report-uri /api/security/csp-report`;
 
       res.status(200).set({
         "Content-Type": "text/html; charset=utf-8",
+        "Content-Security-Policy": cspHeader,
         "Cache-Control": CONFIG.cache.none,
         "X-Response-Time": `${Date.now() - startTime}ms`,
       }).end(page);
@@ -393,7 +411,7 @@ function shouldSkipSPAHandling(url: string): boolean {
  * Loads the HTML template and enhances it with development utilities.
  * This adds debugging tools and cache-busting for optimal development experience.
  */
-async function loadAndEnhanceTemplate(url: string, startTime: number, hmrPort: number): Promise<string> {
+async function loadAndEnhanceTemplate(url: string, startTime: number, hmrPort: number, nonce?: string): Promise<string> {
   const templatePath = path.resolve(import.meta.dirname, "..", "client", "index.html");
 
   if (!existsSync(templatePath)) {
@@ -408,6 +426,14 @@ async function loadAndEnhanceTemplate(url: string, startTime: number, hmrPort: n
     `src="/src/main.tsx"`,
     `src="/src/main.tsx?v=${cacheVersion}"`
   );
+
+  // Add nonce to script tags if provided
+  if (nonce) {
+    template = template.replace(
+      /<script([^>]*)>/g,
+      `<script$1 nonce="${nonce}">`
+    );
+  }
 
   // Inject development utilities
   template = enhanceTemplateForDevelopment(template, url, startTime, hmrPort);
@@ -490,16 +516,8 @@ function handleSPAError(error: Error, res: Response, vite: ViteDevServer): void 
  * This only activates when debug mode is enabled to minimize overhead.
  */
 function setupDevelopmentMonitoring(vite: ViteDevServer): void {
-  vite.ws.on('connection', (socket: any) => {
+  vite.ws.on('connection', () => {
     log("HMR client connected", "vite-hmr");
-    
-    socket.on('message', (data: any) => {
-      log(`HMR message: ${data}`, "vite-hmr");
-    });
-    
-    socket.on('close', (code: any, reason: any) => {
-      log(`HMR client disconnected: ${code} - ${reason}`, "vite-hmr");
-    });
   });
 
   if (CONFIG.debug.fileChanges) {
@@ -801,17 +819,17 @@ function setStaticFileHeaders(res: Response, filePath: string): void {
   let cacheStrategy: keyof typeof CONFIG.cache;
 
   if (ext === '.html') {
-    cacheStrategy = 'none'; // HTML files should never be cached
+    cacheStrategy = 'none';
   } else if (isHashed && /\.(js|mjs|css)$/.test(ext)) {
-    cacheStrategy = 'immutable'; // Hashed assets can be cached forever
+    cacheStrategy = 'immutable';
   } else if (/\.(woff2?|ttf|eot|otf)$/.test(ext)) {
-    cacheStrategy = 'immutable'; // Fonts are immutable
+    cacheStrategy = 'immutable';
     res.setHeader('Access-Control-Allow-Origin', '*');
   } else if (/\.(png|jpg|jpeg|gif|svg|webp|avif)$/.test(ext)) {
     cacheStrategy = isHashed ? 'immutable' : 'medium';
   } else if (/\.(mp3|mp4|webm|ogg)$/.test(ext)) {
     cacheStrategy = 'long';
-    res.setHeader('Accept-Ranges', 'bytes'); // Enable range requests for media
+    res.setHeader('Accept-Ranges', 'bytes');
   } else {
     cacheStrategy = 'short';
   }

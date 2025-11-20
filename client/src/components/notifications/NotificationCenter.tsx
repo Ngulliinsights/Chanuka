@@ -7,8 +7,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Bell, Filter, Settings, Archive, Trash2, CheckCheck, X } from 'lucide-react';
-import { useNotifications, useNotificationHistory } from '../../hooks/useNotifications';
-import { NotificationCategory, NotificationType } from '../../services/notification-service';
+import { useNotifications, useNotificationHistory } from '@client/hooks/useNotifications';
+import { NotificationCategory, NotificationType } from '@client/services/notification-service';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { 
@@ -21,7 +21,7 @@ import {
 } from '../ui/dropdown-menu';
 import { NotificationItem } from './NotificationItem';
 import { NotificationPreferences } from './NotificationPreferences';
-import { LoadingSpinner } from '../../core/loading/components/LoadingSpinner';
+import { LoadingSpinner } from '@client/core/loading/components/LoadingSpinner';
 
 interface NotificationCenterProps {
   className?: string;

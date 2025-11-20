@@ -8,7 +8,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { intelligentSearch } from '../services/intelligent-search';
-import { useDebounce } from '../../../hooks/useDebounce';
+import { useDebounce } from '@client/hooks/useDebounce';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/utils/logger';
 import type { 

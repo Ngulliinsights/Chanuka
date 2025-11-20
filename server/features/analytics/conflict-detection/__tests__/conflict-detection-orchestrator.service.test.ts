@@ -89,7 +89,7 @@ describe('ConflictDetectionOrchestratorService', () => {
       const { conflictResolutionRecommendationService } = await import('../conflict-resolution-recommendation.service.js');
 
       // Mock database responses
-      const { database } = await import('../../../../shared/database/connection');
+      const { database } = await import('@shared/database/connection');
       vi.mocked(database.select).mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockResolvedValue([{ id: 123, name: 'Test Sponsor' }])
@@ -115,7 +115,7 @@ describe('ConflictDetectionOrchestratorService', () => {
     });
 
     it('should handle sponsor not found error', async () => {
-      const { database } = await import('../../../../shared/database/connection');
+      const { database } = await import('@shared/database/connection');
 
       vi.mocked(database.select).mockReturnValue({
         from: vi.fn().mockReturnValue({
@@ -134,7 +134,7 @@ describe('ConflictDetectionOrchestratorService', () => {
 
   describe('analyzeStakeholders', () => {
     it('should analyze stakeholders for a bill', async () => {
-      const { database } = await import('../../../../shared/database/connection');
+      const { database } = await import('@shared/database/connection');
       const { stakeholderAnalysisService } = await import('../stakeholder-analysis.service.js');
 
       const mockBill = { id: 456, title: 'Test Bill', summary: 'Test summary', category: 'Test' };
@@ -160,7 +160,7 @@ describe('ConflictDetectionOrchestratorService', () => {
     });
 
     it('should handle bill not found error', async () => {
-      const { database } = await import('../../../../shared/database/connection');
+      const { database } = await import('@shared/database/connection');
 
       vi.mocked(database.select).mockReturnValue({
         from: vi.fn().mockReturnValue({

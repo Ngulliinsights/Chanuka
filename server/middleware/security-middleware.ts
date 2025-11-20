@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import { encryptionService } from '../features/security/encryption-service.js';
-import { inputValidationService } from '../core/validation/input-validation-service.js';
-import { secureSessionService } from '../core/auth/secure-session-service.js';
-import { securityAuditService } from '../features/security/security-audit-service.js';
+import { encryptionService } from '@client/features/security/encryption-service.js';
+import { inputValidationService } from '@client/core/validation/input-validation-service.js';
+import { secureSessionService } from '@client/core/auth/secure-session-service.js';
+import { securityAuditService } from '@client/features/security/security-audit-service.js';
 import { createRateLimit } from './rate-limiter.js';
 import { logger } from '@shared/core';
-import { getClientIP } from '../utils/request-utils.js';
+import { getClientIP } from '@client/utils/request-utils.js';
 
 export interface SecurityMiddlewareOptions {
   enableCSP: boolean;

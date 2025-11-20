@@ -6,7 +6,7 @@
 import React from 'react';
 import { vi } from 'vitest';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
-import { NavigationState, NavigationPreferences, UserRole } from '../core/navigation/types';
+import { NavigationState, NavigationPreferences, UserRole } from '@client/core/navigation/types';
 
 // Enhanced mock factories for different navigation scenarios
 export class NavigationMockFactory {
@@ -114,7 +114,7 @@ export class NavigationTestContexts {
     const mockUseMediaQuery = vi.fn(() => NavigationMockFactory.createMockMediaQuery(isMobile));
 
     // Import the actual provider factory
-    const { createNavigationProvider } = require('../core/navigation/context');
+    const { createNavigationProvider } = require('@client/core/navigation/context');
     return createNavigationProvider(mockUseLocation, mockUseNavigate, mockUseAuth, mockUseMediaQuery);
   }
 }

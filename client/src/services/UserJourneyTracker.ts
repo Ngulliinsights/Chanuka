@@ -1,4 +1,4 @@
-import { UserRole, NavigationSection } from '../types/navigation';
+import { UserRole, NavigationSection } from '@client/types/navigation';
 
 /**
  * Represents a single step in a user journey
@@ -632,5 +632,76 @@ export class UserJourneyTracker {
         }
       }
     }
+  }
+
+  /**
+   * Get goal completion rate for a specific goal
+   */
+  public getGoalCompletionRate(goalName: string): number {
+    const goalSteps = this.journeyGoals.get(goalName);
+    if (!goalSteps) return 0;
+
+    const relevantJourneys = Array.from(this.journeys.values()).filter(journey => {
+      const journeyPages = journey.steps.map(step => step.pageId);
+      return goalSteps.some(step => journeyPages.includes(step) || 
+        (step.includes(':id') && journeyPages.some(page => page.includes('bills/'))));
+    });
+
+    if (relevantJourneys.length === 0) return 0;
+
+    const completedGoals = relevantJourneys.filter(journey => {
+      const journeyPages = journey.steps.map(step => step.pageId);
+      let matchedSteps = 0;
+      
+      for (const goalStep of goalSteps) {
+        if (journeyPages.includes(goalStep) || 
+          (goalStep.includes(':id') && journeyPages.some(page => page.includes('bills/')))) {
+          matchedSteps++;
+        }
+      }
+      
+      return matchedSteps === goalSteps.length;
+    });
+
+    return completedGoals.length / relevantJourneys.length;
+  }
+
+  /**
+   * Export journey data in specified format
+   */
+  public exportJourneyData(format: 'json' | 'csv' = 'json'): string {
+    const journeys = Array.from(this.journeys.values());
+    
+    if (format === 'json') {
+      return JSON.stringify(journeys, null, 2);
+    }
+    
+    if (format === 'csv') {
+      if (journeys.length === 0) return '';
+      
+      const headers = [
+        'session_id', 'user_id', 'user_role', 'startTime', 'endTime', 
+        'completed', 'goalAchieved', 'totalTimeSpent', 'bounceRate', 
+        'stepCount', 'conversionEvents'
+      ];
+      
+      const rows = journeys.map(journey => [
+        journey.session_id,
+        journey.user_id || '',
+        journey.user_role,
+        journey.startTime.toISOString(),
+        journey.endTime?.toISOString() || '',
+        journey.completed,
+        journey.goalAchieved || false,
+        journey.totalTimeSpent,
+        journey.bounceRate || 0,
+        journey.steps.length,
+        journey.conversionEvents.join(';')
+      ]);
+      
+      return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+    }
+    
+    return '';
   }
 }

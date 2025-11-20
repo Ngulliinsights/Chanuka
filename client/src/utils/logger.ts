@@ -514,7 +514,7 @@ const renderTracker = new RenderTracker();
 // ============================================================================
 
 // Import error constants from core error module
-import { ErrorDomain, ErrorSeverity } from '../core/error/constants';
+import { ErrorDomain, ErrorSeverity } from '@client/core/error/constants';
 
 // Re-export for backward compatibility
 export { ErrorDomain, ErrorSeverity };

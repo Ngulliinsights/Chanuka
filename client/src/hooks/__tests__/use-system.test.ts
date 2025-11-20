@@ -57,7 +57,7 @@ describe('useSystem Hooks', () => {
         timestamp: Date.now()
       };
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getHealth as any).mockResolvedValue(mockHealthData);
 
       const { result } = renderHook(() => useSystemHealth(), { wrapper });
@@ -74,7 +74,7 @@ describe('useSystem Hooks', () => {
 
     it('should handle health check errors', async () => {
       const errorMessage = 'Service unavailable';
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getHealth as any).mockRejectedValue(new Error(errorMessage));
 
       const { result } = renderHook(() => useSystemHealth(), { wrapper });
@@ -89,7 +89,7 @@ describe('useSystem Hooks', () => {
     it('should refetch every 30 seconds', async () => {
       vi.useFakeTimers();
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getHealth as any).mockResolvedValue({ status: 'healthy' });
 
       renderHook(() => useSystemHealth(), { wrapper });
@@ -118,7 +118,7 @@ describe('useSystem Hooks', () => {
         memoryUsage: 0.78
       };
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getStats as any).mockResolvedValue(mockStatsData);
 
       const { result } = renderHook(() => useSystemStats(), { wrapper });
@@ -134,7 +134,7 @@ describe('useSystem Hooks', () => {
     it('should refetch every minute', async () => {
       vi.useFakeTimers();
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getStats as any).mockResolvedValue({ totalUsers: 1000 });
 
       renderHook(() => useSystemStats(), { wrapper });
@@ -162,7 +162,7 @@ describe('useSystem Hooks', () => {
         activeConnections: 45
       };
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getActivity as any).mockResolvedValue(mockActivityData);
 
       const { result } = renderHook(() => useSystemActivity(), { wrapper });
@@ -178,7 +178,7 @@ describe('useSystem Hooks', () => {
     it('should refetch every 30 seconds', async () => {
       vi.useFakeTimers();
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getActivity as any).mockResolvedValue({ recentLogins: 25 });
 
       renderHook(() => useSystemActivity(), { wrapper });
@@ -204,7 +204,7 @@ describe('useSystem Hooks', () => {
         lastMigration: '2024-01-15T10:30:00Z'
       };
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getSchema as any).mockResolvedValue(mockSchemaData);
 
       const { result } = renderHook(() => useSystemSchema(), { wrapper });
@@ -220,7 +220,7 @@ describe('useSystem Hooks', () => {
     it('should not refetch automatically', async () => {
       vi.useFakeTimers();
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getSchema as any).mockResolvedValue({ version: '1.2.3' });
 
       renderHook(() => useSystemSchema(), { wrapper });
@@ -251,7 +251,7 @@ describe('useSystem Hooks', () => {
         }
       };
 
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getEnvironment as any).mockResolvedValue(mockEnvData);
 
       const { result } = renderHook(() => useSystemEnvironment(), { wrapper });
@@ -268,7 +268,7 @@ describe('useSystem Hooks', () => {
   describe('error handling', () => {
     it('should handle network errors consistently across hooks', async () => {
       const errorMessage = 'Network Error';
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
 
       // Test each hook with network error
       const hooks = [
@@ -294,7 +294,7 @@ describe('useSystem Hooks', () => {
 
     it('should handle API response errors', async () => {
       const errorResponse = { message: 'Internal Server Error', status: 500 };
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getHealth as any).mockRejectedValue(errorResponse);
 
       const { result } = renderHook(() => useSystemHealth(), { wrapper });
@@ -317,7 +317,7 @@ describe('useSystem Hooks', () => {
     });
 
     it('should transition from loading to success', async () => {
-      const { systemApi } = await import('../services/api');
+      const { systemApi } = await import('@client/services/api');
       (systemApi.getHealth as any).mockResolvedValue({ status: 'healthy' });
 
       const { result } = renderHook(() => useSystemHealth(), { wrapper });

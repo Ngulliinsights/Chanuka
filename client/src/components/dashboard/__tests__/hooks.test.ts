@@ -11,7 +11,7 @@ import { useDashboardTopics } from '@/hooks/useDashboardTopics';
 import { useDashboardConfig } from '@/hooks/useDashboardConfig';
 
 // Mock the useBills hook
-vi.mock('@/hooks/use-bills', () => ({
+vi.mock('@/features/bills/hooks/useBills', () => ({
   useBills: vi.fn(() => ({
     summary: {
       billsTracked: 5,

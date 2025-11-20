@@ -8,13 +8,19 @@
  * - Multi-dimensional filtering logic
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { useBillsStore, useBillsSelectors } from '../../../store/slices/billsSlice';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 describe('Advanced Multi-Dimensional Filtering System', () => {
+  const createTestQueryClient = () => new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
   beforeEach(() => {
-    // Reset store state before each test
-    useBillsStore.getState().reset();
+    vi.clearAllMocks();
   });
 
   describe('Filter State Management', () => {

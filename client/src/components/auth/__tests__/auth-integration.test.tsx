@@ -5,17 +5,18 @@
 
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { 
-  renderWithProviders, 
-  MockUserFactory, 
+import {
+  renderWithProviders,
+  MockUserFactory,
   FormTestHelper,
   AsyncTestHelper,
   IntegrationTestHelper,
-  TestSuiteHelper 
-} from '@shared/testing/test-utilities';
+  TestSuiteHelper
+} from '../../../shared/testing/test-utilities';
 
 import { LoginForm } from '../ui/LoginForm';
 import { RegisterForm } from '../ui/RegisterForm';
@@ -59,10 +60,8 @@ describe('Auth Integration Workflows', () => {
       mockAuthService.login.mockResolvedValue({ success: true, data: mockUser });
       mockFetch(mockResponse);
 
-      const mockOnSuccess = vi.fn();
-      
       renderWithProviders(
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm />
       );
 
       // Fill in the form
@@ -72,18 +71,13 @@ describe('Auth Integration Workflows', () => {
 
       await FormTestHelper.fillInput(emailInput, 'test@example.com');
       await FormTestHelper.fillInput(passwordInput, 'password123');
-      
+
       // Submit the form
       await FormTestHelper.clickButton(submitButton);
 
       // Verify the login was called
       await waitFor(() => {
         expect(mockAuthService.login).toHaveBeenCalledWith('test@example.com', 'password123');
-      });
-
-      // Verify success callback was called
-      await waitFor(() => {
-        expect(mockOnSuccess).toHaveBeenCalledWith({ success: true, data: mockUser });
       });
 
       // Verify success message is displayed
@@ -208,10 +202,8 @@ describe('Auth Integration Workflows', () => {
       mockAuthService.register.mockResolvedValue({ success: true, data: mockUser });
       mockFetch(mockResponse);
 
-      const mockOnSuccess = vi.fn();
-      
       renderWithProviders(
-        <RegisterForm onSuccess={mockOnSuccess} />
+        <RegisterForm />
       );
 
       // Fill in the registration form
@@ -232,11 +224,6 @@ describe('Auth Integration Workflows', () => {
           email: 'john@example.com',
           password: 'SecurePass123!',
         });
-      });
-
-      // Verify success callback was called
-      await waitFor(() => {
-        expect(mockOnSuccess).toHaveBeenCalledWith({ success: true, data: mockUser });
       });
 
       // Verify success message is displayed

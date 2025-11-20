@@ -37,7 +37,7 @@ vi.mock('../../../../../shared/database/pool', () => ({
   checkPoolHealth: vi.fn(),
 }));
 
-import { pool, checkPoolHealth } from '../../../../../shared/database/pool';
+import { pool, checkPoolHealth } from '@shared/database/pool';
 
 // Type assertion to help TypeScript understand our mock structure
 const mockPool = pool as unknown as MockPool;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { useAssetLoading, LoadingProgress } from '../../utils/asset-loading';
-import { logger } from '../../utils/logger';
-import { AssetLoadingIndicatorProps as TypesAssetLoadingIndicatorProps } from './types';
+import { cn } from '@client/lib/utils';
+import { useAssetLoading, LoadingProgress } from '@client/utils/asset-loading';
+import { logger } from '@client/utils/logger';
+import { AssetLoadingIndicatorProps as TypesAssetLoadingIndicatorProps } from '@client/types';
 import { 
   validateLoadingProgress, 
   safeValidateLoadingProgress,
@@ -16,7 +16,7 @@ import {
   getErrorDisplayMessage,
   getErrorRecoveryStrategy 
 } from './errors';
-import { useLoadingRecovery } from './hooks/useLoadingRecovery';
+import { useLoadingRecovery } from '@client/hooks/useLoadingRecovery';
 
 export interface AssetLoadingIndicatorProps {
   className?: string;

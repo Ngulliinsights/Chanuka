@@ -7,8 +7,8 @@ function apiRequest(method: string, url: string, data?: any): Promise<any> {
     json: () => Promise.resolve({}),
   });
 }
-import { cache   } from '../../../shared/core/src/index.js';
-import { logger   } from '../../../shared/core/src/index.js';
+import { cache   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 interface VerificationRule {
   id: string;

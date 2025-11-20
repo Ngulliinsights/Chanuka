@@ -6,9 +6,9 @@
  */
 
 import React, { useEffect, useCallback } from 'react';
-import { useAuthStore } from '../../store/slices/authSlice';
-import { authService } from '../../services/authService';
-import { logger } from '../../utils/logger';
+import { useAuthStore } from '@client/store/slices/authSlice';
+import { authService } from '@client/services/authService';
+import { logger } from '@client/utils/logger';
 
 interface SessionManagerProps {
   children: React.ReactNode;

@@ -9,10 +9,10 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 import { Smartphone, Monitor, Network, Gauge, RotateCcw, User, AlertTriangle, CheckCircle, X } from 'lucide-react';
-import { MobileTouchUtils } from '../../utils/mobile-touch-handler';
-import { useResponsiveLayout } from '../../utils/responsive-layout';
-import { useMobileErrorHandler } from '../../utils/mobile-error-handler';
-import { logger } from '../../utils/logger';
+import { MobileTouchUtils } from '@client/utils/mobile-touch-handler';
+import { useResponsiveLayout } from '@client/utils/responsive-layout';
+import { useMobileErrorHandler } from '@client/utils/mobile-error-handler';
+import { logger } from '@client/utils/logger';
 
 interface TestResult {
   name: string;

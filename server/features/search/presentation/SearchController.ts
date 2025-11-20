@@ -5,9 +5,13 @@ import {
   getPopularSearchTerms,
   rebuildSearchIndexes,
   getSearchIndexHealth,
+  streamSearchBills,
+  cancelSearch,
+  getSearchAnalytics,
+  getSearchMetrics,
 } from '../application/SearchService';
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api';
-import { logger   } from '../../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 const router = Router();
 
@@ -71,6 +75,86 @@ router.post('/admin/rebuild-index', async (req, res) => {
 router.get('/admin/index-health', async (_req, res) => {
   const health = await getSearchIndexHealth();
   return ApiSuccess(res, health);
+});
+
+// ============================================================================
+// PHASE 3: ADVANCED FEATURES - Streaming and Analytics Endpoints
+// ============================================================================
+
+router.get('/stream', async (req, res) => {
+  try {
+    const filters: any = {};
+    if (req.query.category) filters.category = String(req.query.category).split(',');
+    if (req.query.status) filters.status = String(req.query.status).split(',');
+    if (req.query.sponsor_id) filters.sponsor_id = String(req.query.sponsor_id).split(',').map(Number);
+    if (req.query.dateFrom) filters.dateFrom = new Date(String(req.query.dateFrom));
+    if (req.query.dateTo) filters.dateTo = new Date(String(req.query.dateTo));
+    if (req.query.tags) filters.tags = String(req.query.tags).split(',');
+    if (req.query.complexityMin) filters.complexityMin = Number(req.query.complexityMin);
+    if (req.query.complexityMax) filters.complexityMax = Number(req.query.complexityMax);
+
+    const options: any = {};
+    if (req.query.snippets) options.includeSnippets = req.query.snippets === 'true';
+    if (req.query.highlights) options.includeHighlights = req.query.highlights === 'true';
+    if (req.query.minScore) options.minRelevanceScore = Number(req.query.minScore);
+    if (req.query.searchType) options.searchType = req.query.searchType;
+
+    const query: Parameters<typeof searchBills>[0] = {
+      text: (req.query.q as string) ?? '',
+      filters,
+      pagination: {
+        page: req.query.page ? Number(req.query.page) : 1,
+        limit: req.query.limit ? Number(req.query.limit) : 10,
+        sortBy: (req.query.sortBy as any) ?? 'relevance',
+        sortOrder: (req.query.sortOrder as any) ?? 'desc',
+      },
+      options,
+    };
+
+    if (!query.text.trim()) return ApiValidationError(res, { field: 'q', message: 'Query parameter "q" is required' });
+
+    // Start streaming search
+    await streamSearchBills(query, res, req);
+  } catch (e) {
+    logger.error('Streaming search controller error', { error: e });
+    return ApiError(res, { code: 'INTERNAL_ERROR', message: (e as Error).message }, 500);
+  }
+});
+
+router.delete('/cancel/:searchId', async (req, res) => {
+  try {
+    const { searchId } = req.params;
+    if (!searchId) return ApiValidationError(res, { field: 'searchId', message: 'Search ID is required' });
+
+    const result = await cancelSearch(searchId);
+    return ApiSuccess(res, result);
+  } catch (e) {
+    logger.error('Cancel search controller error', { error: e });
+    return ApiError(res, { code: 'INTERNAL_ERROR', message: (e as Error).message }, 500);
+  }
+});
+
+router.get('/analytics', async (req, res) => {
+  try {
+    const startDate = req.query.startDate ? new Date(String(req.query.startDate)) : undefined;
+    const endDate = req.query.endDate ? new Date(String(req.query.endDate)) : undefined;
+
+    const analytics = await getSearchAnalytics(startDate, endDate);
+    return ApiSuccess(res, analytics);
+  } catch (e) {
+    logger.error('Search analytics controller error', { error: e });
+    return ApiError(res, { code: 'INTERNAL_ERROR', message: (e as Error).message }, 500);
+  }
+});
+
+router.get('/analytics/metrics', async (_req, res) => {
+  try {
+    const metrics = await getSearchMetrics();
+    return ApiSuccess(res, metrics);
+  } catch (e) {
+    logger.error('Search metrics controller error', { error: e });
+    return ApiError(res, { code: 'INTERNAL_ERROR', message: (e as Error).message }, 500);
+  }
 });
 
 export { router };

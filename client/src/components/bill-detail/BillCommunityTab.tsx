@@ -1,7 +1,6 @@
-import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { MessageCircle, Users, TrendingUp, Award } from 'lucide-react';
-import { Bill } from '../../store/slices/billsSlice';
+import { Bill } from '@/core/api/types';
 
 interface BillCommunityTabProps {
   bill: Bill;
@@ -29,8 +28,8 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
               💬 Community Features Coming Soon
             </h3>
             <p className="text-blue-800 mb-4">
-              Discussion threads, expert verification, and community engagement 
-              features will be implemented in future tasks.
+              Discussion threads, expert verification, and community engagement features will be
+              implemented in future tasks.
             </p>
             <div className="text-sm text-blue-700">
               <strong>Planned Features:</strong>
@@ -53,9 +52,7 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
             <TrendingUp className="h-5 w-5" style={{ color: 'hsl(var(--civic-expert))' }} />
             Engagement Analytics
           </CardTitle>
-          <CardDescription>
-            Community participation and sentiment metrics
-          </CardDescription>
+          <CardDescription>Community participation and sentiment metrics</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -72,13 +69,19 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
               <div className="text-sm text-muted-foreground">Expert Contributors</div>
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold" style={{ color: 'hsl(var(--civic-transparency))' }}>
+              <div
+                className="text-2xl font-bold"
+                style={{ color: 'hsl(var(--civic-transparency))' }}
+              >
                 78%
               </div>
               <div className="text-sm text-muted-foreground">Positive Sentiment</div>
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold" style={{ color: 'hsl(var(--civic-constitutional))' }}>
+              <div
+                className="text-2xl font-bold"
+                style={{ color: 'hsl(var(--civic-constitutional))' }}
+              >
                 156
               </div>
               <div className="text-sm text-muted-foreground">Participants</div>
@@ -94,9 +97,7 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
             <Award className="h-5 w-5" style={{ color: 'hsl(var(--civic-expert))' }} />
             Expert Insights
           </CardTitle>
-          <CardDescription>
-            Verified expert analysis and commentary
-          </CardDescription>
+          <CardDescription>Verified expert analysis and commentary</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -116,8 +117,8 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground italic">
-                "This legislation raises important questions about federal vs. state authority. 
-                The provisions in Section 3 may require careful constitutional review..."
+                "This legislation raises important questions about federal vs. state authority. The
+                provisions in Section 3 may require careful constitutional review..."
               </p>
             </div>
 
@@ -137,8 +138,8 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground italic">
-                "Our analysis indicates this bill could significantly improve healthcare access 
-                for underserved communities while maintaining fiscal responsibility..."
+                "Our analysis indicates this bill could significantly improve healthcare access for
+                underserved communities while maintaining fiscal responsibility..."
               </p>
             </div>
           </div>

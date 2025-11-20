@@ -6,7 +6,7 @@
 import React from 'react';
 import { vi } from 'vitest';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
-import { createNavigationProvider } from '../core/navigation/context';
+import { createNavigationProvider } from '@client/core/navigation/context';
 
 // Mock hooks - defined before any imports that might use them
 const mockUseAuth = vi.fn();

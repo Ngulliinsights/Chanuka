@@ -16,7 +16,7 @@ import {
   AlertCircle,
   Info
 } from 'lucide-react';
-import { CivicActionStep, ActionType, DifficultyLevel, ImpactLevel } from '../../types/constitutional';
+import { CivicActionStep, ActionType, DifficultyLevel, ImpactLevel } from '@client/types/constitutional';
 
 interface CivicActionGuidanceProps {
   billId: string;

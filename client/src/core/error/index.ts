@@ -44,10 +44,14 @@ export {
 // ============================================================================
 
 export {
-  EnhancedErrorBoundary,
-  useErrorBoundary,
-  withErrorBoundary,
-} from './ErrorBoundary';
+  ErrorBoundary as EnhancedErrorBoundary,
+} from '../../components/error-handling';
+
+// ============================================================================
+// Error Fallback Components
+// ============================================================================
+
+export { ErrorFallback } from '../../components/error-handling';
 
 // ============================================================================
 // Recovery Strategies
@@ -76,7 +80,7 @@ import { registerDefaultRecoveryStrategies } from './recovery';
  * Initialize the core error management system
  * This should be called during application startup
  */
-export function initializeCoreErrorHandling(config?: import('./types').ErrorHandlerConfig): void {
+export function initializeCoreErrorHandling(config?: import('@client/types').ErrorHandlerConfig): void {
   coreErrorHandler.initialize(config);
   registerDefaultRecoveryStrategies();
 
@@ -116,7 +120,7 @@ export function initializeCoreErrorHandling(config?: import('./types').ErrorHand
 /**
  * Get error statistics (from unified handler)
  */
-export function getErrorStats(): import('./types').ErrorStats {
+export function getErrorStats(): import('@client/types').ErrorStats {
   return coreErrorHandler.getErrorStats();
 }
 
@@ -130,14 +134,14 @@ export function getRecentErrors(limit = 10): any[] {
 /**
  * Get errors by type (bridged from unified handler)
  */
-export function getErrorsByType(type: import('./types').ErrorDomain, limit = 10): any[] {
+export function getErrorsByType(type: import('@client/types').ErrorDomain, limit = 10): any[] {
   return coreErrorHandler.getErrorsByType(type, limit);
 }
 
 /**
  * Get errors by severity (bridged from unified handler)
  */
-export function getErrorsBySeverity(severity: import('./types').ErrorSeverity, limit = 10): any[] {
+export function getErrorsBySeverity(severity: import('@client/types').ErrorSeverity, limit = 10): any[] {
   return coreErrorHandler.getErrorsBySeverity(severity, limit);
 }
 
@@ -151,7 +155,7 @@ export function clearErrors(): void {
 /**
  * Handle an error through the core system (with unified integration)
  */
-export function handleError(errorData: Partial<import('./types').AppError>): import('./types').AppError {
+export function handleError(errorData: Partial<import('@client/types').AppError>): import('@client/types').AppError {
   return coreErrorHandler.handleError(errorData);
 }
 
@@ -166,12 +170,12 @@ import { useCallback } from 'react';
  */
 export function useCoreErrorHandler() {
   return {
-    handleError: useCallback((errorData: Partial<import('./types').AppError>) =>
+    handleError: useCallback((errorData: Partial<import('@client/types').AppError>) =>
       coreErrorHandler.handleError(errorData), []),
     getErrorStats: useCallback(() => coreErrorHandler.getErrorStats(), []),
-    addErrorListener: useCallback((listener: import('./types').ErrorListener) =>
+    addErrorListener: useCallback((listener: import('@client/types').ErrorListener) =>
       coreErrorHandler.addErrorListener(listener), []),
-    removeErrorListener: useCallback((listener: import('./types').ErrorListener) =>
+    removeErrorListener: useCallback((listener: import('@client/types').ErrorListener) =>
       coreErrorHandler.removeErrorListener(listener), []),
   };
 }
@@ -184,16 +188,16 @@ export function useCoreErrorHandler() {
  * Create a standardized error object
  */
 export function createError(
-  type: import('./types').ErrorDomain,
-  severity: import('./types').ErrorSeverity,
+  type: import('@client/types').ErrorDomain,
+  severity: import('@client/types').ErrorSeverity,
   message: string,
   options?: {
     details?: any;
-    context?: Partial<import('./types').ErrorContext>;
+    context?: Partial<import('@client/types').ErrorContext>;
     recoverable?: boolean;
     retryable?: boolean;
   }
-): import('./types').AppError {
+): import('@client/types').AppError {
   return coreErrorHandler.handleError({
     type,
     severity,
@@ -209,12 +213,12 @@ export function createError(
  * Log an error without throwing
  */
 export function logError(
-  type: import('./types').ErrorDomain,
-  severity: import('./types').ErrorSeverity,
+  type: import('@client/types').ErrorDomain,
+  severity: import('@client/types').ErrorSeverity,
   message: string,
   details?: any,
-  context?: Partial<import('./types').ErrorContext>
-): import('./types').AppError {
+  context?: Partial<import('@client/types').ErrorContext>
+): import('@client/types').AppError {
   return coreErrorHandler.handleError({
     type,
     severity,

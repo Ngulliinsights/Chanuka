@@ -4,7 +4,7 @@
  * Client-side rate limiting for API requests and user actions
  */
 
-import type { RateLimitConfig, SecurityEvent } from '../types/security-types';
+import type { RateLimitConfig, SecurityEvent } from '@client/types/security-types';
 import { securityConfig } from '../config/security-config';
 import { SecurityMonitor } from '../monitoring/SecurityMonitor';
 

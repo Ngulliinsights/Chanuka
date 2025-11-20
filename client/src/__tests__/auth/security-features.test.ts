@@ -6,15 +6,15 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AuthService } from '../../services/AuthService';
+import { AuthService } from '@client/services/AuthService';
 import { AuthRepository } from '../mocks/services';
-import { authApiService } from '../../core/api/auth';
-import { securityMonitor } from '../../utils/security-monitoring';
-import { privacyCompliance } from '../../utils/privacy-compliance';
-import { tokenManager } from '../../utils/tokenManager';
-import { sessionManager } from '../../utils/session-manager';
-import { rbacManager } from '../../utils/rbac';
-import type { User } from '../../types/auth';
+import { authApiService } from '@client/core/api/auth';
+import { securityMonitor } from '@client/utils/security-monitoring';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { tokenManager } from '@client/utils/tokenManager';
+import { sessionManager } from '@client/utils/session-manager';
+import { rbacManager } from '@client/utils/rbac';
+import type { User } from '@client/types/auth';
 
 // Mock all dependencies
 vi.mock('../../utils/logger', () => ({

@@ -1,5 +1,5 @@
-import { PageRelationshipService } from '../../services/PageRelationshipService';
-import { RelatedPage, UserRole } from '../../core/navigation/types';
+import { PageRelationshipService } from '@client/services/PageRelationshipService';
+import { RelatedPage, UserRole } from '@client/core/navigation/types';
 // import { logger } from '../logger';
 
 /**

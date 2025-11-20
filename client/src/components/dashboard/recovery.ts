@@ -4,7 +4,7 @@
  */
 
 import { DashboardError, DashboardErrorType } from './errors';
-import type { DashboardData, DashboardConfig } from './types';
+import type { DashboardData, DashboardConfig } from '@client/types';
 
 export interface RecoveryStrategy {
   canRecover: boolean;

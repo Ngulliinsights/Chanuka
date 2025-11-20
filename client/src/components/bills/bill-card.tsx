@@ -17,8 +17,8 @@ import {
   Clock,
   Flag
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { Bill } from '../../store/slices/billsSlice';
+import { cn } from '@client/lib/utils';
+import { Bill } from '@/core/api/types';
 
 interface BillCardProps {
   bill: Bill;
@@ -28,13 +28,30 @@ interface BillCardProps {
   isSaved?: boolean;
 }
 
+const statusLabels = {
+  introduced: 'Introduced',
+  committee: 'Committee',
+  floor_debate: 'Floor Debate',
+  passed_house: 'Passed House',
+  passed_senate: 'Passed Senate',
+  passed: 'Passed',
+  failed: 'Failed',
+  signed: 'Signed',
+  vetoed: 'Vetoed',
+  override_attempt: 'Override Attempt',
+};
+
 const statusColors = {
   introduced: 'chanuka-status-badge bg-[hsl(var(--status-introduced))] text-white',
   committee: 'chanuka-status-badge bg-[hsl(var(--status-committee))] text-white',
+  floor_debate: 'chanuka-status-badge bg-[hsl(var(--status-committee))] text-white',
+  passed_house: 'chanuka-status-badge bg-[hsl(var(--status-passed))] text-white',
+  passed_senate: 'chanuka-status-badge bg-[hsl(var(--status-passed))] text-white',
   passed: 'chanuka-status-badge bg-[hsl(var(--status-passed))] text-white',
   failed: 'chanuka-status-badge bg-[hsl(var(--status-failed))] text-white',
   signed: 'chanuka-status-badge bg-[hsl(var(--status-signed))] text-white',
   vetoed: 'chanuka-status-badge bg-[hsl(var(--status-vetoed))] text-white',
+  override_attempt: 'chanuka-status-badge bg-[hsl(var(--status-vetoed))] text-white',
 };
 
 const urgencyColors = {
@@ -56,7 +73,6 @@ export function BillCard({ bill, onSave, onShare, onComment, isSaved = false }: 
 
   const statusColor = statusColors[bill.status] || statusColors.introduced;
   const urgencyColor = urgencyColors[bill.urgencyLevel];
-  const conflictColor = bill.conflict_level ? conflictColors[bill.conflict_level] : '';
 
   const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -167,20 +183,13 @@ export function BillCard({ bill, onSave, onShare, onComment, isSaved = false }: 
         {/* Status and Urgency Badges */}
         <div className="flex flex-wrap gap-2">
           <Badge className={statusColor}>
-            {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
+            {statusLabels[bill.status] || bill.status}
           </Badge>
           
           <Badge className={urgencyColor}>
             {bill.urgencyLevel.charAt(0).toUpperCase() + bill.urgencyLevel.slice(1)} Priority
           </Badge>
-          
-          {bill.conflict_level && (
-            <Badge className={conflictColor}>
-              <AlertCircle className="h-3 w-3 mr-1" />
-              {bill.conflict_level.charAt(0).toUpperCase() + bill.conflict_level.slice(1)} Risk
-            </Badge>
-          )}
-          
+
           {bill.constitutionalFlags.length > 0 && (
             <Badge className="chanuka-status-badge bg-[hsl(var(--civic-constitutional))] text-white">
               <Flag className="h-3 w-3 mr-1" />

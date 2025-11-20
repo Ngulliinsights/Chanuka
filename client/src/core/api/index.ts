@@ -3,6 +3,7 @@ export * from './cache';
 export * from './client';
 export * from './config';
 export * from './errors';
+export * from './hooks';
 export * from './interceptors';
 export * from './registry';
 export * from './types';

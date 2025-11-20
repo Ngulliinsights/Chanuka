@@ -14,8 +14,8 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { CommunityValidation as CommunityValidationType } from '../../types/expert';
+import { cn } from '@client/lib/utils';
+import { CommunityValidation as CommunityValidationType } from '@client/types/expert';
 
 interface CommunityValidationProps {
   validation: CommunityValidationType;

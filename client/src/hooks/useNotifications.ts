@@ -12,7 +12,7 @@ import {
   NotificationCategory,
   NotificationType 
 } from '../services/notification-service';
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 /**
  * Main notification hook - provides access to notifications and core functionality

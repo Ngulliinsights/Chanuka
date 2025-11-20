@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { serviceRecovery } from '../utils/service-recovery';
+import { serviceRecovery } from '@client/utils/service-recovery';
 
 interface ServiceStatus {
   isOnline: boolean;

@@ -7,9 +7,9 @@
  */
 
 import { Middleware } from '@reduxjs/toolkit';
-import { logger } from '../../utils/logger';
-import { UnifiedWebSocketManager, globalWebSocketPool } from '../../core/api/websocket';
-import { ConnectionState } from '../../core/api/types';
+import { logger } from '@client/utils/logger';
+import { UnifiedWebSocketManager, globalWebSocketPool } from '@client/core/api/websocket';
+import { ConnectionState } from '@client/core/api/types';
 import {
   CivicWebSocketMessage,
   CivicWebSocketState,

@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import type { ActionItem, ActionPriority } from '../types';
+import type { ActionItem, ActionPriority } from '@client/types';
 import { validateActionItem } from '../validation';
 import { DashboardActionError } from '../errors';
 

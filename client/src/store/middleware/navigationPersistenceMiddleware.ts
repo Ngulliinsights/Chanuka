@@ -6,8 +6,8 @@
  */
 
 import { Middleware } from '@reduxjs/toolkit';
-import { NavigationState } from '../../types/navigation';
-import { logger } from '../../utils/logger';
+import { NavigationState } from '@client/types/navigation';
+import { logger } from '@client/utils/logger';
 
 // Storage keys
 const STORAGE_KEYS = {

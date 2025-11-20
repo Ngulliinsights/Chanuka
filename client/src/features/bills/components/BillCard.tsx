@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, AlertCircle, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Bill } from '../types';
+import type { Bill } from '@client/types';
 
 interface BillCardProps {
   bill: Bill;

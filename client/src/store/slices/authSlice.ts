@@ -8,10 +8,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
-import { User, RegisterData } from '../../types/auth';
-import { LoginCredentials } from '../../core/api/auth';
-import { authApiService as authService } from '../../core/api';
-import { logger } from '../../utils/logger';
+import { User, RegisterData } from '@client/types/auth';
+import { LoginCredentials } from '@client/core/api/auth';
+import { authApiService as authService } from '@client/core/api';
+import { logger } from '@client/utils/logger';
 
 export interface AuthState {
   user: User | null;

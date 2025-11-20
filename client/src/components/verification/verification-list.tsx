@@ -3,8 +3,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { LoadingSpinner } from '../ui/spinner';
-import { useBills } from '../../hooks/use-bills';
-import { logger } from '../../utils/logger';
+import { useBills } from '@client/features/bills/hooks/useBills';
+import { logger } from '@client/utils/logger';
 
 interface VerificationItem { id: number;
   bill_id: number;
@@ -160,6 +160,10 @@ export const VerificationsList = () => {
                     variant="outline" 
                     size="sm"
                     disabled={item.status !== 'pending'}
+                    onClick={() => {
+                      // Navigate to review page
+                      window.location.href = `/verification/review/${item.id}`;
+                    }}
                   >
                     Review
                   </Button>

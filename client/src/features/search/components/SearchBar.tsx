@@ -4,8 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '../hooks/useSearch';
-import type { SearchSuggestion } from '../types';
+import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '@client/hooks/useSearch';
+import type { SearchSuggestion } from '@client/types';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;

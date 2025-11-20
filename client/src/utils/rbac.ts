@@ -3,8 +3,8 @@
  * Comprehensive permission management system
  */
 
-import { User } from '../types/auth';
-// import { authService } from '../services/AuthService';
+import { User } from '@client/types/auth';
+// import { authService } from '@client/services/AuthService';
 
 export interface RBACContext {
   user: User;
@@ -175,12 +175,8 @@ class RBACManager {
       }
 
       // Fall back to backend check for complex permissions
-      const _context: RBACContext = {
-        user,
-        resource,
-        action,
-        conditions
-      };
+      // TODO: Implement backend permission checking when available
+      // const context: RBACContext = { user, resource, action, conditions };
 
       // For now, use local permission checking since the backend service doesn't have this method
       // In a full implementation, you would call the backend here
@@ -356,7 +352,7 @@ class RBACManager {
     
     const expertiseAreas = Array.isArray(user.expertise) 
       ? user.expertise 
-      : user.expertise.split(',').map(s => s.trim());
+      : user.expertise.split(',').map((s: string) => s.trim());
       
     return expertiseAreas.includes(area);
   }
@@ -499,7 +495,7 @@ export const rbacManager = new RBACManager();
 // ============================================================================
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@client/features/users/hooks/useAuth';
 
 /**
  * Hook to check if user has permission

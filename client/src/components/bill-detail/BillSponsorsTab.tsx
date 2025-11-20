@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Users, DollarSign, Eye } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { Bill } from '../../store/slices/billsSlice';
+import { Bill } from '@/core/api/types';
 import { ConflictOfInterestAnalysis } from '../conflict-of-interest/ConflictOfInterestAnalysis';
 
 interface BillSponsorsTabProps {
@@ -34,13 +34,13 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="font-medium text-lg">{sponsor.name}</div>
-                    <Badge 
-                      variant={sponsor.role === 'primary' ? 'default' : 'secondary'}
-                      style={{ 
-                        backgroundColor: sponsor.role === 'primary' ? 'hsl(var(--civic-expert))' : undefined 
+                    <Badge
+                      variant={sponsor.isPrimary ? 'default' : 'secondary'}
+                      style={{
+                        backgroundColor: sponsor.isPrimary ? 'hsl(var(--civic-expert))' : undefined
                       }}
                     >
-                      {sponsor.role === 'primary' ? 'Primary Sponsor' : 'Co-sponsor'}
+                      {sponsor.isPrimary ? 'Primary Sponsor' : 'Co-sponsor'}
                     </Badge>
                   </div>
                   <div className="text-sm text-muted-foreground mb-2">

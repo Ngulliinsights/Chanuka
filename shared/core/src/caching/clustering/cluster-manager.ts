@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-import type { CacheAdapter } from '../core/interfaces';
+import type { CacheAdapter } from '@client/core/interfaces';
 
 export interface ClusterNode {
   id: string;

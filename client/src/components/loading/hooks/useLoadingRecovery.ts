@@ -6,7 +6,7 @@ import {
   LoadingTimeoutError,
   LoadingNetworkError 
 } from '../errors';
-import { LoadingOperation } from '../types';
+import { LoadingOperation } from '@client/types';
 
 export interface LoadingRecoveryState {
   canRecover: boolean;

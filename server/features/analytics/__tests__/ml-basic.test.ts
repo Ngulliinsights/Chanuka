@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { realMLAnalysisService } from '../services/real-ml.service.js';
-import { MLServiceAdapter } from '../services/ml-adapter.service.js';
+import { realMLAnalysisService } from '@client/services/real-ml.service.js';
+import { MLServiceAdapter } from '@client/services/ml-adapter.service.js';
 
 /**
  * Basic ML Service Tests

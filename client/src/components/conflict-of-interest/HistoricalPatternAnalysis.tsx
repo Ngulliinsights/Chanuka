@@ -25,7 +25,7 @@ import {
   Area,
   AreaChart
 } from 'recharts';
-import { VotingPattern, ConflictAnalysis } from '../../types/conflict-of-interest';
+import { VotingPattern, ConflictAnalysis } from '@client/types/conflict-of-interest';
 
 interface HistoricalPatternAnalysisProps {
   conflictAnalysis: ConflictAnalysis;

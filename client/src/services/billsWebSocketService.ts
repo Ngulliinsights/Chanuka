@@ -14,11 +14,9 @@
  * This file will be removed in a future version.
  */
 
-import { globalWebSocketPool } from '../core/api/websocket';
-import { getStore } from '../store';
-import { subscribe, unsubscribe } from '../store/slices/realTimeSlice';
-import { updateBill } from '../store/slices/billsSlice';
-import { logger } from '../utils/logger';
+import { globalWebSocketPool } from '@client/core/api/websocket';
+import { useQueryClient } from '@tanstack/react-query';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Type Definitions
@@ -85,8 +83,9 @@ class BillsWebSocketService {
   private updateQueue: BillRealTimeUpdate[] = [];
   private batchTimer: NodeJS.Timeout | null = null;
   private connectionRetryCount = 0;
+  private queryClient: any = null;
 
-  constructor(config: Partial<BillsWebSocketConfig> = {}) {
+  constructor(config: Partial<BillsWebSocketConfig> = {}, queryClient?: any) {
     this.config = {
       autoReconnect: true,
       maxReconnectAttempts: 5,
@@ -96,6 +95,7 @@ class BillsWebSocketService {
       maxBatchSize: 50,
       ...config
     };
+    this.queryClient = queryClient;
   }
 
   /**
@@ -180,15 +180,12 @@ class BillsWebSocketService {
 
       // Subscribe via WebSocket client
       wsManager.subscribeToBill(billId, updateTypes as any);
-      
+
       // Track subscription locally
       this.subscribedBills.add(billId);
 
-      // Update real-time store
-      getStore().dispatch(subscribe({
-        type: 'bill',
-        id: billId.toString()
-      }));
+      // Note: Real-time subscriptions are now handled by React Query hooks
+      // No need to dispatch to Redux store
 
       logger.info('Subscribed to bill updates', {
         component: 'BillsWebSocketService',
@@ -226,11 +223,8 @@ class BillsWebSocketService {
       // Remove from local tracking
       this.subscribedBills.delete(billId);
 
-      // Update real-time store
-      getStore().dispatch(unsubscribe({
-        type: 'bill',
-        id: billId.toString()
-      }));
+      // Note: Real-time subscriptions are now handled by React Query hooks
+      // No need to dispatch to Redux store
 
       logger.info('Unsubscribed from bill updates', {
         component: 'BillsWebSocketService',
@@ -467,11 +461,13 @@ class BillsWebSocketService {
       // store.dispatch(addBillUpdate(update));
     });
 
-    // Update bills store if there are changes
-    if (Object.keys(billUpdates).length > 0) {
-      getStore().dispatch(updateBill({ id: billId, updates: billUpdates }));
+    // Invalidate React Query cache for the updated bill
+    if (Object.keys(billUpdates).length > 0 && this.queryClient) {
+      this.queryClient.invalidateQueries({
+        queryKey: ['bills', billId]
+      });
 
-      logger.debug('Bill updated in store', {
+      logger.debug('Bill cache invalidated for real-time update', {
         component: 'BillsWebSocketService',
         billId,
         updates: Object.keys(billUpdates),

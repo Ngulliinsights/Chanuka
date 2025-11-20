@@ -7,43 +7,75 @@
  */
 
 import { Component, ReactNode, ErrorInfo } from 'react';
-import { logger } from '../../utils/logger';
-import { getBrowserInfo } from '../../utils/browser-compatibility';
-import { performanceMonitor } from '../../utils/performance-monitor';
+import { logger } from '@client/utils/logger';
+import { startTrace, finishTrace } from '@client/utils/tracing';
+import { getBrowserInfo } from '@client/utils/browser-compatibility';
+import { performanceMonitor } from '@client/utils/performance-monitor';
 
 // Import unified error types
-import { ErrorDomain, ErrorSeverity } from '../../core/error';
-import { BaseError } from '../../utils/logger';
-import { errorHandler } from '../../utils/unified-error-handler';
+import { ErrorDomain, ErrorSeverity } from '@client/core/error';
+import { BaseError } from '@client/utils/logger';
+import { errorHandler } from '@client/utils/unified-error-handler';
 
+/**
+ * Represents a recovery option for error handling
+ */
 export interface RecoveryOption {
+  /** Unique identifier for the recovery option */
   id: string;
+  /** Display label for the recovery option */
   label: string;
+  /** Description of what the recovery option does */
   description: string;
+  /** Function to execute the recovery action */
   action: () => void | Promise<void>;
+  /** Whether this recovery should be attempted automatically */
   automatic: boolean;
+  /** Priority order for recovery attempts (lower numbers = higher priority) */
   priority: number;
 }
 
+/**
+ * User feedback data structure for error reporting
+ */
 export interface UserFeedback {
+  /** User's rating of the error experience (1-5) */
   rating?: number;
+  /** User's comment about the error */
   comment?: string;
+  /** Timestamp when feedback was submitted */
   timestamp?: Date;
+  /** User's browser user agent string */
   userAgent?: string;
+  /** Session identifier for tracking */
   sessionId?: string;
 }
 
+/**
+ * Props passed to error fallback components
+ */
 export interface ErrorFallbackProps {
+  /** The error that occurred */
   error: BaseError;
+  /** Unique identifier for this error instance */
   errorId: string;
+  /** Available recovery options for this error */
   recoveryOptions: RecoveryOption[];
+  /** Callback to retry the failed operation */
   onRetry: () => void;
+  /** Callback to submit user feedback about the error */
   onFeedback: (feedback: UserFeedback) => void;
+  /** Callback to reload the page */
   onReload: () => void;
+  /** Callback to contact support */
   onContactSupport: () => void;
+  /** Whether recovery has been attempted */
   recoveryAttempted: boolean;
+  /** Whether recovery was successful */
   recoverySuccessful: boolean;
+  /** Whether user feedback has been submitted */
   userFeedbackSubmitted: boolean;
+  /** Whether to show technical details (for development) */
   showTechnicalDetails?: boolean;
 }
 
@@ -147,6 +179,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
    * Enhanced error processing with automatic recovery and metrics collection
    */
   override async componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Start a trace for this error handling flow
+    const trace = startTrace('ErrorBoundary.componentDidCatch', {
+      component: this.props.context || 'ErrorBoundary',
+      url: typeof window !== 'undefined' ? window.location.href : undefined,
+    });
+
     // Use unified error handler for comprehensive error processing
     const appError = errorHandler.handleError({
       type: ErrorDomain.SYSTEM,
@@ -245,6 +283,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // Report metrics
     if (this.props.onMetricsCollected) {
       this.props.onMetricsCollected(metrics);
+    }
+
+    // Finish trace with outcome
+    try {
+      finishTrace(trace, { errorId: errorId, recovered: this.recoveryAttempts > 0 });
+    } catch (e) {
+      logger.debug('Trace finish failed in ErrorBoundary', { error: e });
     }
   }
 

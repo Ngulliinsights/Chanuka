@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { PretextScore, BillAnalysis, CivicAction, RightsCard } from '../types';
-import { PretextAnalysisService } from '../services/PretextAnalysisService';
+import { PretextScore, BillAnalysis, CivicAction, RightsCard } from '@client/types';
+import { PretextAnalysisService } from '@client/services/PretextAnalysisService';
 
 // Default configuration
 const DEFAULT_CONFIG = {

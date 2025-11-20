@@ -18,8 +18,9 @@ import type {
   TemporalFilter,
   DashboardPreferences
 } from '../../types/user-dashboard';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 import type { RootState } from '../index';
+import { useAppSelector, useAppDispatch } from '../hooks';
 
 interface UserDashboardState {
   // Core data
@@ -475,42 +476,52 @@ export const selectDashboardMeta = createSelector(
 
 // Hook for components that need to interact with the user dashboard store
 export const useUserDashboardStore = () => {
+  const dispatch = useAppDispatch();
+
   return {
-    untrackBill: (billId: number) => {
-      // This would dispatch the untrackBill action
-      // For now, we'll provide a no-op implementation
-      console.warn('useUserDashboardStore.untrackBill called but not implemented');
-    },
-    updateBillNotifications: (billId: number, notifications: any) => {
-      // This would dispatch the updateBillNotifications action
-      // For now, we'll provide a no-op implementation
-      console.warn('useUserDashboardStore.updateBillNotifications called but not implemented');
-    }
+    trackBill: (billId: number, notifications?: TrackedBill['notifications']) =>
+      dispatch(trackBill({ billId, notifications })),
+    untrackBill: (billId: number) => dispatch(untrackBill(billId)),
+    updateBillNotifications: (billId: number, notifications: TrackedBill['notifications']) =>
+      dispatch(updateBillNotifications({ billId, notifications })),
+    addEngagementItem: (item: EngagementHistoryItem) => dispatch(addEngagementItem(item)),
+    dismissRecommendation: (billId: number) => dispatch(dismissRecommendation(billId)),
+    updatePreferences: (preferences: Partial<DashboardPreferences>) =>
+      dispatch(updatePreferences(preferences)),
+    updatePrivacyControls: (controls: Partial<PrivacyControls>) =>
+      dispatch(updatePrivacyControls(controls)),
+    setDashboardData: (data: UserDashboardData) => dispatch(setDashboardData(data)),
+    requestDataExport: (request: DataExportRequest) => dispatch(requestDataExport(request))
   };
 };
 
 // Hook for components that need to access user dashboard selectors
 export const useUserDashboardSelectors = () => {
+  const dispatch = useAppDispatch();
+
+  const dashboardData = useAppSelector(selectDashboardData);
+  const loading = useAppSelector(state => state.userDashboard.loading);
+  const error = useAppSelector(state => state.userDashboard.error);
+  const timeFilter = useAppSelector(state => state.userDashboard.timeFilter);
+  const preferences = useAppSelector(state => state.userDashboard.preferences);
+  const privacyControls = useAppSelector(state => state.userDashboard.privacyControls);
+  const filteredEngagementHistory = useAppSelector(selectFilteredEngagementHistory);
+  const engagementStats = useAppSelector(selectEngagementStats);
+  const { hasData, isDataStale } = useAppSelector(selectDashboardMeta);
+
   return {
-    dashboardData: null,
-    loading: false,
-    error: null,
-    timeFilter: { period: 'month' as const },
-    preferences: {
-      layout: 'cards' as const,
-      showWelcomeMessage: true,
-      defaultTimeFilter: 'month' as const,
-      pinnedSections: ['tracked-bills', 'civic-metrics'],
-      hiddenSections: [],
-      refreshInterval: 15
-    },
-    privacyControls: {
-      profileVisibility: 'public' as const,
-      showActivity: true,
-      showMetrics: true,
-      showRecommendations: true,
-      allowDataExport: true,
-      allowAnalytics: true
-    }
+    dashboardData,
+    loading,
+    error,
+    preferences,
+    privacyControls,
+    timeFilter,
+    hasData,
+    isDataStale,
+    filteredEngagementHistory,
+    engagementStats,
+    refreshDashboard: () => dispatch(refreshDashboard()),
+    setTimeFilter: (filter: TemporalFilter) => dispatch(setTimeFilter(filter)),
+    setError: (error: string | null) => dispatch(setError(error))
   };
 };

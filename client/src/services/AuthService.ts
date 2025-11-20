@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 import {
   User,
   RegisterData,
@@ -11,18 +11,18 @@ import {
   DataExportRequest,
   DataDeletionRequest,
 } from '../types/auth';
-import { LoginCredentials } from '../core/api/auth';
-import { securityMonitor } from '../utils/security-monitoring';
-import { privacyCompliance } from '../utils/privacy-compliance';
-import { validatePassword } from '../utils/password-validation';
-import { authApiService } from '../core/api/auth';
-import { globalApiClient } from '../core/api/client';
-import { tokenManager, JWTTokens } from '../utils/tokenManager';
-import { sessionManager } from '../utils/session-manager';
-import { setCurrentSession, recordActivity } from '../store/slices/sessionSlice';
-import { getStore } from '../store';
-import { rbacManager } from '../utils/rbac';
-import { AuthUser } from '../core/api/auth';
+import { LoginCredentials } from '@client/core/api/auth';
+import { securityMonitor } from '@client/utils/security-monitoring';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { validatePassword } from '@client/utils/password-validation';
+import { authApiService } from '@client/core/api/auth';
+import { globalApiClient } from '@client/core/api/client';
+import { tokenManager, JWTTokens } from '@client/utils/tokenManager';
+import { sessionManager } from '@client/utils/session-manager';
+import { setCurrentSession, recordActivity } from '@client/store/slices/sessionSlice';
+import { getStore } from '@client/store';
+import { rbacManager } from '@client/utils/rbac';
+import { AuthUser } from '@client/core/api/auth';
 
 /**
  * Configuration for AuthService token refresh behavior

@@ -17,9 +17,9 @@ import {
   ExternalLink,
   Loader2
 } from 'lucide-react';
-import { SocialLoginProvider } from '../../types/auth';
-import { authService, OAuthProvider } from '../../services/authService';
-import { logger } from '../../utils/logger';
+import { SocialLoginProvider } from '@client/types/auth';
+import { authService, OAuthProvider } from '@client/services/authService';
+import { logger } from '@client/utils/logger';
 
 interface SocialLoginProps {
   onSuccess?: (data: any) => void;

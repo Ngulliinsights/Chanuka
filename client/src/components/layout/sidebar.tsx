@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 import { Logo } from '../ui/logo';
 import { Building, BarChart3, FileText, Users, Search, Settings, HelpCircle, MessageSquare, Shield, TrendingUp, User } from 'lucide-react';
 import { 
@@ -16,10 +16,14 @@ const DEFAULT_NAVIGATION: NavigationItem[] = [
   { id: 'home', label: 'Home', href: '/', icon: <Building className="h-4 w-4" /> },
   { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: <BarChart3 className="h-4 w-4" /> },
   { id: 'bills', label: 'Bills', href: '/bills', icon: <FileText className="h-4 w-4" /> },
+  { id: 'search', label: 'Search', href: '/search', icon: <Search className="h-4 w-4" /> },
   { id: 'community', label: 'Community', href: '/community', icon: <Users className="h-4 w-4" /> },
   { id: 'verification', label: 'Expert Verification', href: '/expert-verification', icon: <Shield className="h-4 w-4" /> },
   { id: 'sponsorship', label: 'Sponsorship Analysis', href: '/bill-sponsorship-analysis', icon: <TrendingUp className="h-4 w-4" /> },
-  { id: 'profile', label: 'Profile', href: '/profile', icon: <User className="h-4 w-4" /> },
+  { id: 'user-dashboard', label: 'My Dashboard', href: '/user-dashboard', icon: <User className="h-4 w-4" />, requiresAuth: true },
+  { id: 'profile', label: 'Profile', href: '/profile', icon: <User className="h-4 w-4" />, requiresAuth: true },
+  { id: 'privacy-settings', label: 'Privacy Settings', href: '/privacy-settings', icon: <Settings className="h-4 w-4" />, requiresAuth: true },
+  { id: 'admin', label: 'Admin', href: '/admin', icon: <Settings className="h-4 w-4" />, adminOnly: true },
 ];
 
 export function Sidebar({ 

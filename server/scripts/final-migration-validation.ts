@@ -8,7 +8,7 @@
  */
 
 import { logger } from '@shared/core/observability/logging';
-import { database as db } from '../../shared/database/connection.js';
+import { database as db } from '@shared/database/connection.js';
 import { webSocketService } from '../infrastructure/websocket.js';
 import { BatchingService } from '../infrastructure/batching-service.js';
 
@@ -258,7 +258,7 @@ export class FinalMigrationValidator {
       // Validate that repository abstractions are removed
       try {
         // This should fail if repository files still exist
-        await import('../features/users/infrastructure/user-repository.js');
+        await import('@client/features/users/infrastructure/user-repository.js');
         this.addValidationResult('phase4_repository', 'cleanup', 'failed', 'Repository abstractions still exist');
       } catch {
         this.addValidationResult('phase4_repository', 'cleanup', 'passed', 'Repository abstractions successfully removed');

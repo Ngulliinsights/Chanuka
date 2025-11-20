@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { CoverageAnalyzer } from '../../services/coverage-analyzer';
+import { CoverageAnalyzer } from '@client/services/coverage-analyzer';
 import { exec } from 'child_process';
 import fs from 'fs/promises';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 // Mock dependencies
 vi.mock('child_process');

@@ -1,1 +1,0 @@
-logger.info('Integration test', { component: 'Chanuka' });

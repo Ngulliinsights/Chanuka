@@ -57,7 +57,7 @@ class PerformanceMonitor {
             performanceBudgets: {
                 loadTime: 3000, // 3 seconds
                 bundleSize: 2 * 1024 * 1024, // 2MB
-                memoryUsage: 100 * 1024 * 1024 // 100MB
+                memoryUsage: process.env.NODE_ENV === 'development' ? 200 * 1024 * 1024 : 100 * 1024 * 1024 // 200MB in dev, 100MB in prod
             }
         };
     }

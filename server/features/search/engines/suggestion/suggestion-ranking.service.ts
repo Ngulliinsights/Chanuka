@@ -1,4 +1,4 @@
-import { SearchSuggestion, SearchContext } from "./types/search.types";
+import { SearchSuggestion, SearchContext } from "@client/types/search.types";
 
 export interface RankingWeights {
   exactMatch: number;

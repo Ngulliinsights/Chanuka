@@ -4,7 +4,7 @@
  */
 
 import { LoadingError, LoadingTimeoutError, LoadingNetworkError, isRetryableError } from './errors';
-import { LoadingConfig, ConnectionType } from './types';
+import { LoadingConfig, ConnectionType } from '@client/types';
 
 export interface RecoveryContext {
   operationId: string;

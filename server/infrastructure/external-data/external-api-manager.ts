@@ -14,9 +14,9 @@
 import { EventEmitter } from 'events';
 // Note: ioredis needs to be installed: npm install ioredis @types/ioredis
 // import { Redis } from 'ioredis';
-import { ExternalAPIErrorHandler, ErrorSeverity } from '../../services/external-api-error-handler';
-import { APICostMonitoringService } from '../../services/api-cost-monitoring';
-import { logger   } from '../../../shared/core/src/index.js';
+import { ExternalAPIErrorHandler, ErrorSeverity } from '@client/services/external-api-error-handler';
+import { APICostMonitoringService } from '@client/services/api-cost-monitoring';
+import { logger   } from '@shared/core/src/index.js';
 
 // ============================================================================
 // Core Types and Interfaces

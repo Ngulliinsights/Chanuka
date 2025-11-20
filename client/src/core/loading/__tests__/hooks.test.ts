@@ -6,9 +6,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { LoadingProvider } from '../context';
-import { useLoadingOperation } from '../hooks';
-import { useProgressiveLoading } from '../hooks';
-import { useTimeoutAwareLoading } from '../hooks';
+import { useLoadingOperation } from '@client/hooks';
+import { useProgressiveLoading } from '@client/hooks';
+import { useTimeoutAwareLoading } from '@client/hooks';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <LoadingProvider>{children}</LoadingProvider>

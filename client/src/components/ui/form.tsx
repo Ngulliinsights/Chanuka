@@ -6,10 +6,10 @@ import { Slot } from "@radix-ui/react-slot"
 import { Controller, FormProvider, useFormContext, type ControllerProps, type FieldPath, type FieldValues } from "react-hook-form"
 import { z } from "zod"
 
-import { cn } from '../../lib/utils'
+import { cn } from '@client/lib/utils'
 import { Label } from './label'
-import { logger } from '../../utils/logger';
-import { FormValidationConfig } from './types';
+import { logger } from '@client/utils/logger';
+import { FormValidationConfig } from '@client/types';
 import { validateFormData, safeValidateFormData, FormValidationConfigSchema } from './validation';
 import { UIFormError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';

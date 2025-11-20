@@ -6,8 +6,15 @@
  */
 
 import { faker } from '@faker-js/faker';
-import { Bill as ReadonlyBill } from '../../core/api/types';
-import { BillsStats } from '../../store/slices/billsSlice';
+import { Bill as ReadonlyBill, BillStatus, UrgencyLevel, ComplexityLevel, ConstitutionalFlag, Severity } from '@client/core/api/types';
+
+interface BillsStats {
+  totalBills: number;
+  urgentCount: number;
+  constitutionalFlags: number;
+  trendingCount: number;
+  lastUpdated: string;
+}
 import {
   generateId,
   generateDateInRange,
@@ -35,17 +42,17 @@ const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low'
     { category: 'Separation of Powers', description: 'Executive authority concerns' }
   ];
 
-  const severityLevels: Array<'critical' | 'high' | 'moderate' | 'low'> = 
+  const severityLevels: Array<Severity> =
     severity === 'high' ? ['critical', 'high'] :
-    severity === 'medium' ? ['high', 'moderate'] :
-    ['moderate', 'low'];
+    severity === 'medium' ? ['high', 'medium'] :
+    ['medium', 'low'];
 
   const flagCount = severity === 'high' ? faker.number.int({ min: 2, max: 4 }) :
                    severity === 'medium' ? faker.number.int({ min: 1, max: 2 }) :
                    faker.number.int({ min: 0, max: 1 });
 
   return faker.helpers.arrayElements(flagTypes, flagCount).map(flag => ({
-    id: generateId('flag'),
+    id: faker.number.int({ min: 1, max: 1000 }),
     type: flag.category,
     description: flag.description,
     severity: faker.helpers.arrayElement(severityLevels),
@@ -92,14 +99,14 @@ const generateSponsors = (count: number = 3) => {
  * Generate a single mock bill
  */
 export const generateMockBill = (id: number, options: {
-  urgency?: 'low' | 'medium' | 'high' | 'critical';
-  status?: 'introduced' | 'committee' | 'passed' | 'failed' | 'signed' | 'vetoed';
+  urgency?: UrgencyLevel;
+  status?: BillStatus;
   popularity?: number;
   constitutionalConcerns?: 'low' | 'medium' | 'high';
 } = {}): ReadonlyBill => {
   const {
-    urgency = weightedRandom(['low', 'medium', 'high', 'critical'], [40, 35, 20, 5]),
-    status = weightedRandom(['introduced', 'committee', 'floor_debate', 'passed_house', 'passed_senate', 'passed', 'failed', 'signed', 'vetoed'], [25, 30, 10, 8, 7, 10, 5, 3, 2]),
+    urgency = weightedRandom([UrgencyLevel.LOW, UrgencyLevel.MEDIUM, UrgencyLevel.HIGH, UrgencyLevel.CRITICAL], [40, 35, 20, 5]),
+    status = weightedRandom([BillStatus.INTRODUCED, BillStatus.COMMITTEE, BillStatus.FLOOR_DEBATE, BillStatus.PASSED_HOUSE, BillStatus.PASSED_SENATE, BillStatus.PASSED, BillStatus.FAILED, BillStatus.SIGNED, BillStatus.VETOED], [25, 30, 10, 8, 7, 10, 5, 3, 2]),
     popularity = faker.number.float({ min: 0.1, max: 2.0 }),
     constitutionalConcerns = weightedRandom(['low', 'medium', 'high'], [70, 25, 5])
   } = options;
@@ -124,7 +131,7 @@ export const generateMockBill = (id: number, options: {
     constitutionalFlags,
     ...engagement,
     policyAreas,
-    complexity: weightedRandom(['low', 'medium', 'high', 'expert'], [30, 40, 25, 5]),
+    complexity: weightedRandom([ComplexityLevel.LOW, ComplexityLevel.MEDIUM, ComplexityLevel.HIGH, ComplexityLevel.EXPERT], [30, 40, 25, 5]),
     readingTime: faker.number.int({ min: 5, max: 45 })
   };
 };
@@ -141,27 +148,27 @@ export const generateMockBills = (count: number = 50): ReadonlyBill[] => {
     
     // Make some bills more urgent/popular for testing
     if (i <= 5) {
-      options.urgency = 'critical';
+      options.urgency = UrgencyLevel.CRITICAL;
       options.popularity = faker.number.float({ min: 1.5, max: 2.0 });
     } else if (i <= 15) {
-      options.urgency = 'high';
+      options.urgency = UrgencyLevel.HIGH;
       options.popularity = faker.number.float({ min: 1.0, max: 1.8 });
     }
-    
+
     // Add some constitutional concerns
     if (i <= 8) {
       options.constitutionalConcerns = 'high';
     } else if (i <= 20) {
       options.constitutionalConcerns = 'medium';
     }
-    
+
     // Vary status distribution
     if (i <= 3) {
-      options.status = 'signed';
+      options.status = BillStatus.SIGNED;
     } else if (i <= 8) {
-      options.status = 'passed';
+      options.status = BillStatus.PASSED;
     } else if (i <= 12) {
-      options.status = 'failed';
+      options.status = BillStatus.FAILED;
     }
     
     bills.push(generateMockBill(i, options));
@@ -221,8 +228,8 @@ export const getMockBillsWithConstitutionalConcerns = (count: number = 5): Reado
  * Get mock bills with high urgency
  */
 export const getMockUrgentBills = (count: number = 5): ReadonlyBill[] => {
-  return Array.from({ length: count }, (_, i) => 
-    generateMockBill(i + 2000, { urgency: 'critical', popularity: 2.0 })
+  return Array.from({ length: count }, (_, i) =>
+    generateMockBill(i + 2000, { urgency: UrgencyLevel.CRITICAL, popularity: 2.0 })
   );
 };
 

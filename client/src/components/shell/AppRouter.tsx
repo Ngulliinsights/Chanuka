@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { LoadingStateManager } from '../loading/LoadingStates';
 import { ProtectedRoute, AdminRoute, ModeratorRoute, VerifiedUserRoute } from './ProtectedRoute';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Enhanced lazy loading with retry mechanism
 const createLazyComponent = (importFn: () => Promise<any>, componentName: string) => {
@@ -39,17 +39,21 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
 };
 
 // Lazy-loaded page components with enhanced error handling
-const HomePage = createLazyComponent(() => import('../../pages/home'), 'Home Page');
-const BillsDashboard = createLazyComponent(() => import('../../pages/bills-dashboard-page'), 'Bills Dashboard');
-const BillDetail = createLazyComponent(() => import('../../pages/bill-detail'), 'Bill Detail');
-const BillAnalysis = createLazyComponent(() => import('../../pages/bill-analysis'), 'Bill Analysis');
-const CommunityHub = createLazyComponent(() => import('../../pages/community-input'), 'Community Hub');
-const SearchPage = createLazyComponent(() => import('../../pages/search'), 'Search Page');
-const AuthPage = createLazyComponent(() => import('../../pages/auth-page'), 'Authentication');
-const UserProfile = createLazyComponent(() => import('../../pages/profile'), 'User Profile');
-const UserDashboard = createLazyComponent(() => import('../../pages/dashboard'), 'User Dashboard');
-const AdminDashboard = createLazyComponent(() => import('../../pages/admin'), 'Admin Dashboard');
-const NotFoundPage = createLazyComponent(() => import('../../pages/not-found'), 'Not Found');
+const HomePage = createLazyComponent(() => import('@client/pages/home'), 'Home Page');
+const BillsDashboard = createLazyComponent(() => import('@client/pages/bills-dashboard-page'), 'Bills Dashboard');
+const BillDetail = createLazyComponent(() => import('@client/pages/bill-detail'), 'Bill Detail');
+const BillAnalysis = createLazyComponent(() => import('@client/pages/bill-analysis'), 'Bill Analysis');
+const CommunityHub = createLazyComponent(() => import('@client/pages/community-input'), 'Community Hub');
+const SearchPage = createLazyComponent(() => import('@client/pages/search'), 'Search Page');
+const AuthPage = createLazyComponent(() => import('@client/pages/auth-page'), 'Authentication');
+const TermsPage = createLazyComponent(() => import('@client/pages/legal/terms'), 'Terms');
+const PrivacyPage = createLazyComponent(() => import('@client/pages/legal/privacy'), 'Privacy');
+const CookiePolicyPage = createLazyComponent(() => import('@client/pages/legal/cookie-policy'), 'Cookie Policy');
+// Consolidated user account page
+const UserProfile = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Account');
+const UserDashboard = createLazyComponent(() => import('@client/pages/dashboard'), 'User Dashboard');
+const AdminDashboard = createLazyComponent(() => import('@client/pages/admin'), 'Admin Dashboard');
+const NotFoundPage = createLazyComponent(() => import('@client/pages/not-found'), 'Not Found');
 
 interface RouteConfig {
   path: string;
@@ -199,6 +203,16 @@ const routes: RouteConfig[] = [
     path: '/auth',
     element: <AuthPage />
   },
+  {
+    id: 'terms',
+    path: '/terms',
+    element: <TermsPage />
+  },
+  {
+    id: 'privacy',
+    path: '/privacy',
+    element: <PrivacyPage />
+  },
 
   // Protected routes - require authentication
   {
@@ -211,9 +225,10 @@ const routes: RouteConfig[] = [
     ),
     protected: true
   },
+  // Consolidated account route. Keep legacy /profile as redirect below.
   {
-    id: 'user-profile',
-    path: '/profile',
+    id: 'user-account',
+    path: '/account',
     element: (
       <ProtectedRoute>
         <UserProfile />
@@ -225,7 +240,7 @@ const routes: RouteConfig[] = [
   // Verified user routes
   {
     id: 'user-settings',
-    path: '/settings',
+    path: '/account/settings',
     element: (
       <VerifiedUserRoute>
         <UserProfile />
@@ -256,6 +271,13 @@ const routes: RouteConfig[] = [
     element: <NotFoundPage />
   }
 ];
+
+// Add a small in-memory redirect map for legacy routes to preserve links
+routes.unshift({
+  id: 'legacy-profile-redirect',
+  path: '/profile',
+  element: <Navigate to="/account" replace />,
+});
 
 /**
  * AppRouter component handles all application routing with lazy loading and protection
@@ -292,9 +314,9 @@ export function AppRouter() {
           // Trigger lazy loading for critical routes
           // This is done by accessing the component, which triggers the import
           if (route.id === 'home') {
-            import('../../pages/home');
+            import('@client/pages/home');
           } else if (route.id === 'bills-dashboard') {
-            import('../../pages/bills-dashboard-page');
+            import('@client/pages/bills-dashboard-page');
           }
         } catch (error) {
           logger.warn(`Failed to preload route ${route.id}:`, { component: 'AppRouter' }, error);

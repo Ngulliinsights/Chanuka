@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Textarea } from '../ui/textarea';
 import { AlertTriangle, Eye, CheckCircle, X, Clock, FileText, Users, Calendar, ArrowLeft, Shield, Building, Settings } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {

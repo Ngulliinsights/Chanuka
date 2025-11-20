@@ -3,7 +3,7 @@
 // ============================================================================
 // Extracts named entities and domain-specific entities from text
 
-import { logger  } from '../../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 export interface ExtractedEntity {
   text: string;

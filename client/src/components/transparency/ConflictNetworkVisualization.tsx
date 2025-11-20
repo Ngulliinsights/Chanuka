@@ -13,7 +13,7 @@ import {
   Info,
   AlertTriangle
 } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface ConflictNode {
   id: string;

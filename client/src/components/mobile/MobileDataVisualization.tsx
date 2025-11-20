@@ -14,7 +14,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { BarChart3, PieChart, TrendingUp, Info, ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';

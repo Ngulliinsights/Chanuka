@@ -17,7 +17,7 @@ import { describe, it, expect, beforeAll } from '@jest/globals';
 import { execSync } from 'child_process';
 import { readFileSync, existsSync, statSync } from 'fs';
 import { join } from 'path';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 describe('Bundle Size Monitoring and Regression Tests', () => {
   const BUNDLE_SIZE_LIMITS = {

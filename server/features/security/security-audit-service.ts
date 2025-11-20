@@ -1,8 +1,8 @@
 import { Request } from 'express';
-import { database as db } from '../../../shared/database';
-import { system_audit_log } from '../../../shared/schema';
+import { database as db } from '@shared/database';
+import { system_audit_log } from '@shared/schema';
 import { eq, and, gte, lte, desc, sql, count, inArray } from 'drizzle-orm';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 /**
  * SecurityAuditService - The System's Black Box Recorder

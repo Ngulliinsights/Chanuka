@@ -22,7 +22,7 @@ import {
   Info,
   Calendar
 } from 'lucide-react';
-import { CivicImpactMetrics } from '../../../types/user-dashboard';
+import { CivicImpactMetrics } from '@client/types/user-dashboard';
 import { format } from 'date-fns';
 
 interface CivicMetricsSectionProps {

@@ -12,7 +12,7 @@ import {
   usePushNotifications, 
   useEmailNotifications 
 } from '../../hooks/useNotifications';
-import { NotificationCategory } from '../../services/notification-service';
+import { NotificationCategory } from '@client/services/notification-service';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Switch } from '../ui/switch';
@@ -25,7 +25,7 @@ import {
   SelectValue 
 } from '../ui/select';
 import { Input } from '../ui/input';
-import { LoadingSpinner } from '../../core/loading/components/LoadingSpinner';
+import { LoadingSpinner } from '@client/core/loading/components/LoadingSpinner';
 
 interface NotificationPreferencesProps {
   isOpen: boolean;

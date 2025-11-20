@@ -12,23 +12,22 @@
  * - Mobile data visualizations
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
-  Heart, 
   Share2, 
-  MessageCircle, 
   Bell, 
   Eye,
-  Calendar,
   Users,
   AlertTriangle,
   FileText,
   BarChart3,
   User,
-  Globe
+  // Use alternative icon names that exist in lucide-react
+  MessageSquare,  // Replaces MessageCircle
 } from 'lucide-react';
+import { Globe, BookmarkPlus } from '../icons/SimpleIcons';
 import {
   MobileLayout,
   MobileContainer,
@@ -46,7 +45,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 
 interface BillData {
   id: number;
@@ -88,7 +87,7 @@ interface BillData {
   };
 }
 
-// Mock bill data
+// Mock bill data - in production, this would come from an API
 const mockBillData: BillData = {
   id: 1,
   title: 'Healthcare Access Reform Act',
@@ -145,6 +144,7 @@ const mockBillData: BillData = {
   }
 };
 
+// Status badge color mapping
 const statusColors = {
   introduced: 'bg-blue-100 text-blue-800',
   committee: 'bg-yellow-100 text-yellow-800',
@@ -154,6 +154,7 @@ const statusColors = {
   vetoed: 'bg-red-100 text-red-800',
 };
 
+// Urgency badge color mapping
 const urgencyColors = {
   low: 'bg-gray-100 text-gray-800',
   medium: 'bg-yellow-100 text-yellow-800',
@@ -164,22 +165,30 @@ const urgencyColors = {
 export function MobileBillDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  
+  // Component state
   const [bill] = useState<BillData>(mockBillData);
   const [isSaved, setIsSaved] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // Mobile tabs for different sections
+  // Configure tabs for different sections of the bill detail page
   const tabs: MobileTab[] = [
     { id: 'overview', label: 'Overview', icon: <FileText className="h-4 w-4" /> },
     { id: 'analysis', label: 'Analysis', icon: <BarChart3 className="h-4 w-4" /> },
     { id: 'sponsors', label: 'Sponsors', icon: <User className="h-4 w-4" /> },
-    { id: 'community', label: 'Community', icon: <Users className="h-4 w-4" />, badge: bill.commentCount.toString() },
+    { 
+      id: 'community', 
+      label: 'Community', 
+      icon: <Users className="h-4 w-4" />, 
+      badge: bill.commentCount.toString() 
+    },
     { id: 'related', label: 'Related', icon: <Globe className="h-4 w-4" /> },
   ];
 
   const { activeTab, changeTab } = useMobileTabs('overview');
 
-  // Handle swipe navigation between tabs
+  // Swipe gesture handlers for intuitive mobile navigation
+  // Swipe left moves to the next tab, swipe right moves to the previous tab
   const handleSwipeLeft = useCallback(() => {
     const currentIndex = tabs.findIndex(tab => tab.id === activeTab);
     if (currentIndex < tabs.length - 1) {
@@ -194,39 +203,44 @@ export function MobileBillDetail() {
     }
   }, [activeTab, tabs, changeTab]);
 
-  // Handle actions
+  // Navigation and action handlers
   const handleBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
 
   const handleSave = useCallback(() => {
-    setIsSaved(!isSaved);
-    // TODO: Implement save functionality
-  }, [isSaved]);
+    setIsSaved(prev => !prev);
+    // TODO: Integrate with backend API to persist saved bills
+  }, []);
 
   const handleShare = useCallback(() => {
+    // Use native Web Share API if available for a better mobile experience
     if (navigator.share) {
       navigator.share({
         title: bill.title,
         text: bill.summary,
         url: window.location.href,
+      }).catch((error) => {
+        // User cancelled sharing or an error occurred
+        console.log('Share failed:', error);
       });
     } else {
-      // Fallback for browsers without Web Share API
+      // Fallback: Copy URL to clipboard for browsers without Web Share API
       navigator.clipboard.writeText(window.location.href);
+      // TODO: Show toast notification confirming URL was copied
     }
-  }, [bill]);
+  }, [bill.title, bill.summary]);
 
   const handleFollow = useCallback(() => {
-    setIsFollowing(!isFollowing);
-    // TODO: Implement follow functionality
-  }, [isFollowing]);
+    setIsFollowing(prev => !prev);
+    // TODO: Integrate with backend API to manage bill notifications
+  }, []);
 
   const handleComment = useCallback(() => {
     navigate(`/bills/${id}/comments`);
   }, [navigate, id]);
 
-  // Chart data for analysis
+  // Chart configuration for the analysis tab
   const supportChart: ChartData = {
     title: 'Community Support',
     type: 'pie',
@@ -247,13 +261,13 @@ export function MobileBillDetail() {
     ],
   };
 
-  // Render tab content
+  // Dynamic content renderer based on active tab
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
         return (
           <div className="space-y-6">
-            {/* Bill Summary */}
+            {/* Bill Summary Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Summary</CardTitle>
@@ -263,7 +277,7 @@ export function MobileBillDetail() {
               </CardContent>
             </Card>
 
-            {/* Key Metrics */}
+            {/* Key Engagement Metrics Grid */}
             <div className="grid grid-cols-2 gap-3">
               <MobileMetricCard
                 title="Views"
@@ -273,12 +287,12 @@ export function MobileBillDetail() {
               <MobileMetricCard
                 title="Saves"
                 value={bill.saveCount}
-                icon={<Heart className="h-4 w-4" />}
+                icon={<BookmarkPlus className="h-4 w-4" />}
               />
               <MobileMetricCard
                 title="Comments"
                 value={bill.commentCount}
-                icon={<MessageCircle className="h-4 w-4" />}
+                icon={<MessageSquare className="h-4 w-4" />}
               />
               <MobileMetricCard
                 title="Shares"
@@ -287,7 +301,7 @@ export function MobileBillDetail() {
               />
             </div>
 
-            {/* Policy Areas */}
+            {/* Policy Areas Tags */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Policy Areas</CardTitle>
@@ -303,7 +317,7 @@ export function MobileBillDetail() {
               </CardContent>
             </Card>
 
-            {/* Constitutional Flags */}
+            {/* Constitutional Considerations - Only shown if flags exist */}
             {bill.constitutionalFlags.length > 0 && (
               <Card>
                 <CardHeader>
@@ -343,9 +357,13 @@ export function MobileBillDetail() {
       case 'analysis':
         return (
           <div className="space-y-6">
+            {/* Community support visualization */}
             <MobilePieChart data={supportChart} />
+            
+            {/* Engagement metrics visualization */}
             <MobileBarChart data={engagementChart} />
             
+            {/* Expert Analysis Section - placeholder for future content */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Expert Analysis</CardTitle>
@@ -390,12 +408,12 @@ export function MobileBillDetail() {
       case 'community':
         return (
           <div className="space-y-6">
-            {/* Community Stats */}
+            {/* Community Statistics Summary */}
             <div className="grid grid-cols-2 gap-3">
               <MobileMetricCard
                 title="Support"
                 value={`${bill.communityEngagement.supportPercentage}%`}
-                icon={<Heart className="h-4 w-4" />}
+                icon={<BookmarkPlus className="h-4 w-4" />}
               />
               <MobileMetricCard
                 title="Participants"
@@ -404,14 +422,14 @@ export function MobileBillDetail() {
               />
             </div>
 
-            {/* Discussion Placeholder */}
+            {/* Community Discussion Entry Point */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Community Discussion</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8 text-muted-foreground">
-                  <MessageCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p className="text-sm mb-4">Join the conversation about this bill</p>
                   <Button onClick={handleComment} className="w-full">
                     View Comments ({bill.commentCount})
@@ -426,7 +444,11 @@ export function MobileBillDetail() {
         return (
           <div className="space-y-4">
             {bill.relatedBills.map((relatedBill) => (
-              <Card key={relatedBill.id} className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card 
+                key={relatedBill.id} 
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => navigate(`/bills/${relatedBill.id}`)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
@@ -451,8 +473,9 @@ export function MobileBillDetail() {
 
   return (
     <MobileLayout>
+      {/* Sticky Header with Bill Information and Actions */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b">
-        {/* Header */}
+        {/* Navigation and Title Bar */}
         <div className="flex items-center gap-3 p-4">
           <Button
             variant="ghost"
@@ -477,7 +500,7 @@ export function MobileBillDetail() {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Action Buttons with 44px Touch Targets */}
         <div className="flex items-center justify-between px-4 pb-3">
           <div className="flex items-center gap-2">
             <Button
@@ -486,7 +509,7 @@ export function MobileBillDetail() {
               onClick={handleSave}
               className="h-9"
             >
-              <Heart className={cn('h-4 w-4 mr-1', isSaved && 'fill-current')} />
+              <BookmarkPlus className={cn('h-4 w-4 mr-1', isSaved && 'fill-current')} />
               Save
             </Button>
             <Button
@@ -511,7 +534,7 @@ export function MobileBillDetail() {
           </Button>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation with Underline Indicator */}
         <div className="px-4 pb-2">
           <MobileTabSelector
             tabs={tabs}
@@ -522,7 +545,7 @@ export function MobileBillDetail() {
         </div>
       </div>
 
-      {/* Tab Content with Swipe Navigation */}
+      {/* Main Content Area with Swipe Navigation Support */}
       <SwipeGestures
         onSwipeLeft={handleSwipeLeft}
         onSwipeRight={handleSwipeRight}

@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AuthService } from '../../services/AuthService';
+import { AuthService } from '@client/services/AuthService';
 import { AuthRepository, UserRepository } from '../mocks/services';
 
 // Mock all dependencies
@@ -144,14 +144,14 @@ vi.mock('../../utils/rbac', () => ({
 }));
 
 // Import mocks for direct manipulation
-import { securityMonitor } from '../../utils/security-monitoring';
-import { privacyCompliance } from '../../utils/privacy-compliance';
-import { validatePassword } from '../../utils/password-validation';
-import { authApiService } from '../../core/api/auth';
-import { globalApiClient } from '../../core/api/client';
-import { tokenManager } from '../../utils/tokenManager';
-import { sessionManager } from '../../utils/session-manager';
-import { rbacManager } from '../../utils/rbac';
+import { securityMonitor } from '@client/utils/security-monitoring';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { validatePassword } from '@client/utils/password-validation';
+import { authApiService } from '@client/core/api/auth';
+import { globalApiClient } from '@client/core/api/client';
+import { tokenManager } from '@client/utils/tokenManager';
+import { sessionManager } from '@client/utils/session-manager';
+import { rbacManager } from '@client/utils/rbac';
 
 describe('Service Integration', () => {
   let authService: AuthService;

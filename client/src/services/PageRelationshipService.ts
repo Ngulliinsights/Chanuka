@@ -1,5 +1,5 @@
-import { RelatedPage, PageRelationship, UserRole } from '../types/navigation';
-import { logger } from '../utils/logger';
+import { RelatedPage, PageRelationship, UserRole } from '@client/types/navigation';
+import { logger } from '@client/utils/logger';
 
 /**
  * Configuration for page relationships

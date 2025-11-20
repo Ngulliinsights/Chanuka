@@ -8,8 +8,8 @@
 import { describe, it, expect, vi } from 'vitest';
 
 // Import the hook and types
-import { useAuth } from '../../hooks/useAuth';
-import type { User, AuthResponse, LoginCredentials, RegisterData } from '../../types/auth';
+import { useAuth } from '@client/hooks/useAuth';
+import type { User, AuthResponse, LoginCredentials, RegisterData } from '@client/types/auth';
 
 // Mock React to avoid DOM dependencies
 vi.mock('react', () => ({

@@ -12,16 +12,16 @@ import {
   TestSuiteHelper
 } from './test-helpers';
 
-import { useAuthForm } from '@/hooks/useAuthForm';
-import { usePasswordStrength, usePasswordVisibility, usePasswordValidation } from '@/hooks/usePasswordUtils';
+import { useAuthForm } from '../hooks/useAuthForm';
+import { usePasswordStrength, usePasswordVisibility, usePasswordValidation } from '../hooks/usePasswordUtils';
 import { AuthError, AuthValidationError } from '../errors';
-// AuthMode should be defined locally in auth components
+import { AuthMode } from '../types';
 
 // Mock the auth hook
 const mockLogin = vi.fn();
 const mockRegister = vi.fn();
 
-vi.mock('@/hooks/useAuth', () => ({
+vi.mock('../../../features/users/hooks/useAuth', () => ({
   useAuth: () => ({
     login: mockLogin,
     register: mockRegister,
@@ -87,7 +87,7 @@ describe('useAuthForm Hook', () => {
     expect(result.current.apiResponse).toBeNull();
   });
 
-  it('should handle field updates', () => {
+  it('should handle field updates', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
     await act(() => {
@@ -112,7 +112,7 @@ describe('useAuthForm Hook', () => {
     }, { timeout: 200 });
   });
 
-  it('should handle form reset', () => {
+  it('should handle form reset', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
     await act(() => {
@@ -137,7 +137,7 @@ describe('useAuthForm Hook', () => {
     expect(result.current.formData.password).toBe('');
   });
 
-  it('should handle error clearing', () => {
+  it('should handle error clearing', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
     // Simulate errors
@@ -318,7 +318,7 @@ describe('useAuthForm Hook', () => {
     expect(mockRegister).not.toHaveBeenCalled();
   });
 
-  it('should handle mode switching', () => {
+  it('should handle mode switching', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
     expect(result.current.mode).toBe('login');
@@ -341,7 +341,7 @@ describe('useAuthForm Hook', () => {
     expect(result.current.apiResponse).toBeNull();
   });
 
-  it('should handle input sanitization', () => {
+  it('should handle input sanitization', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
     await act(() => {
@@ -367,7 +367,7 @@ describe('useAuthForm Hook', () => {
     expect(fieldProps.required).toBe(true);
   });
 
-  it('should handle form validation state', () => {
+  it('should handle form validation state', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
     // Initially invalid (empty fields)
@@ -431,7 +431,7 @@ describe('usePasswordVisibility Hook', () => {
     expect(result.current.type).toBe('password');
   });
 
-  it('should handle visibility toggle', () => {
+  it('should handle visibility toggle', async () => {
     const { result } = renderHookWithProviders(() => usePasswordVisibility(false));
 
     await act(() => {
@@ -442,7 +442,7 @@ describe('usePasswordVisibility Hook', () => {
     expect(result.current.type).toBe('text');
   });
 
-  it('should handle show and hide methods', () => {
+  it('should handle show and hide methods', async () => {
     const { result } = renderHookWithProviders(() => usePasswordVisibility(false));
 
     await act(() => {

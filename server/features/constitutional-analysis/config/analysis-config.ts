@@ -3,7 +3,7 @@
 // ============================================================================
 // Configuration settings for the constitutional analysis feature
 
-import { AnalysisConfiguration } from '../types/index.js';
+import { AnalysisConfiguration } from '@client/types/index.js';
 
 /**
  * Production configuration for constitutional analysis

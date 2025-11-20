@@ -18,8 +18,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog';
-import { cn } from '../../lib/utils';
-import { ModerationViolationType, CommentReport } from '../../types/discussion';
+import { cn } from '@client/lib/utils';
+import { ModerationViolationType, CommentReport } from '@client/types/discussion';
 
 interface CommunityReportingProps {
   commentId: string;

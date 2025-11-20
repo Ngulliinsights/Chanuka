@@ -3,8 +3,8 @@
  * Manages automatic data cleanup and retention policies
  */
 
-import { logger } from '../utils/logger';
-import { privacyCompliance } from '../utils/privacy-compliance';
+import { logger } from '@client/utils/logger';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
 
 interface RetentionPolicy {
   id: string;

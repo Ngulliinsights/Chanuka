@@ -4,7 +4,7 @@
  * Provides Cross-Site Request Forgery protection with token validation
  */
 
-import type { CSRFToken, SecurityEvent } from '../types/security-types';
+import type { CSRFToken, SecurityEvent } from '@client/types/security-types';
 import { securityConfig } from '../config/security-config';
 import { SecurityMonitor } from '../monitoring/SecurityMonitor';
 

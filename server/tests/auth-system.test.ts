@@ -16,12 +16,12 @@ vi.mock('../../shared/core/src/observability/logging', () => ({
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import { authService } from '../core/auth/auth-service';
+import { authService } from '@client/core/auth/auth-service';
 import { getEmailService } from '../infrastructure/notifications/email-service';
 import { database as db, user as users, session as sessions, passwordReset as passwordResets } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
-import { router as authRouter } from '../core/auth/auth.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { router as authRouter } from '@client/core/auth/auth.js';
+import { logger  } from '@shared/core/src/index.js';
 
 // Create test app
 const app = express();

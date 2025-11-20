@@ -19,8 +19,8 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { privacyCompliance } from '../../utils/privacy-compliance';
-import { logger } from '../../utils/logger';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { logger } from '@client/utils/logger';
 
 interface CookieCategory {
   id: string;

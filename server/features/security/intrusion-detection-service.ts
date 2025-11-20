@@ -1,12 +1,12 @@
 import { Request } from 'express';
-import { database as db } from '../../../shared/database';
+import { database as db } from '@shared/database';
 import { securityAuditService, SecurityEvent } from './security-audit-service.js';
 import { SecurityIncident } from './security-monitoring-service.js';
 import { getEmailService } from '../../infrastructure/notifications/email-service.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';
-import { logger   } from '../../../shared/core/src/index.js';
-import { system_audit_log } from '../../../shared/schema';
+import { logger   } from '@shared/core/src/index.js';
+import { system_audit_log } from '@shared/schema';
 
 // Threat intelligence table
 const threatIntelligence = pgTable("threat_intelligence", {

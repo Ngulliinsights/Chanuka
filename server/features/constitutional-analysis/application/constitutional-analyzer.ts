@@ -3,7 +3,7 @@
 // ============================================================================
 // Main service that orchestrates constitutional analysis of bills
 
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import { ConstitutionalProvision, LegalPrecedent, ConstitutionalAnalysis } from '@shared/schema/index.js';
 import { ProvisionMatcherService } from './provision-matcher.js';
 import { PrecedentFinderService } from './precedent-finder.js';

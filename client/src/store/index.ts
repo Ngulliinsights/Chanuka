@@ -7,13 +7,26 @@
  */
 
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
+
+import { isPlainObject } from '@reduxjs/toolkit';
+
+// Custom serialization check that allows ISO date strings
+const customSerializationCheck = {
+  isSerializable: (value: any): boolean => {
+    // Allow ISO date strings
+    if (typeof value === 'string' && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+      return true;
+    }
+    return isPlainObject(value) || typeof value === 'undefined' || typeof value === 'string' || 
+           typeof value === 'boolean' || typeof value === 'number' || Array.isArray(value);
+  }
+};
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { createTransform } from 'redux-persist';
-import { logger } from '../utils/logger';
+
+import { logger } from '@client/utils/logger';
 
 // Import slices - auth and session slices are lazy loaded
-import billsSlice from './slices/billsSlice';
 import navigationSlice from './slices/navigationSlice';
 import uiSlice from './slices/uiSlice';
 import realTimeSlice from './slices/realTimeSlice';
@@ -50,9 +63,9 @@ const createSafeStorage = () => {
     
     // Fallback to memory storage
     const memoryStorage = {
-      getItem: (key: string) => Promise.resolve(null),
-      setItem: (key: string, value: string) => Promise.resolve(),
-      removeItem: (key: string) => Promise.resolve(),
+      getItem: (_key: string) => Promise.resolve(null),
+      setItem: (_key: string, _value: string) => Promise.resolve(),
+      removeItem: (_key: string) => Promise.resolve(),
     };
     
     return memoryStorage;
@@ -78,7 +91,6 @@ export const createStore = async () => {
 
   // Root reducer with lazy loaded slices
   const rootReducer = combineReducers({
-    bills: billsSlice,
     auth: authSlice,
     session: sessionSlice,
     navigation: navigationSlice,
@@ -102,6 +114,23 @@ export const createStore = async () => {
         serializableCheck: {
           ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
           ignoredPaths: ['register'],
+          // Custom serialization check that allows ISO date strings
+          isSerializable: (value: any): boolean => {
+            // Allow ISO date strings (they're serializable)
+            if (typeof value === 'string' && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+              return true;
+            }
+            // Use default serialization check for other values
+            return (
+              typeof value === 'undefined' ||
+              typeof value === 'string' ||
+              typeof value === 'boolean' ||
+              typeof value === 'number' ||
+              value === null ||
+              Array.isArray(value) ||
+              (typeof value === 'object' && value.constructor === Object)
+            );
+          },
         },
         immutableCheck: {
           ignoredPaths: ['realTime.notifications', 'realTime.expertActivities'],
@@ -153,7 +182,6 @@ const initializeStore = async () => {
       // Create a fallback store without persistence if initialization fails
       const fallbackStore = configureStore({
         reducer: combineReducers({
-          bills: billsSlice,
           navigation: navigationSlice,
           ui: uiSlice,
           realTime: realTimeSlice,
@@ -194,7 +222,6 @@ export const getStore = () => {
     if (!_store) {
       _store = configureStore({
         reducer: combineReducers({
-          bills: billsSlice,
           navigation: navigationSlice,
           ui: uiSlice,
           realTime: realTimeSlice,
@@ -204,7 +231,10 @@ export const getStore = () => {
           discussion: discussionSlice,
           userDashboard: userDashboardSlice,
         }),
-        middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+        middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: customSerializationCheck,
+    }),
         devTools: process.env.NODE_ENV !== 'production',
       });
     }
@@ -245,9 +275,9 @@ export const store = {
 } as any;
 
 export const persistor = {
-  pause: (...args: any[]) => getPersistor().pause.apply(getPersistor(), args as any),
-  persist: (...args: any[]) => getPersistor().persist.apply(getPersistor(), args as any),
-  purge: (...args: any[]) => getPersistor().purge.apply(getPersistor(), args as any),
-  flush: (...args: any[]) => getPersistor().flush.apply(getPersistor(), args as any),
-  subscribe: (...args: any[]) => getPersistor().subscribe.apply(getPersistor(), args as any),
+  pause: (...args: any[]) => getPersistor()?.pause.apply(getPersistor(), args as any),
+  persist: (...args: any[]) => getPersistor()?.persist.apply(getPersistor(), args as any),
+  purge: (...args: any[]) => getPersistor()?.purge.apply(getPersistor(), args as any),
+  flush: (...args: any[]) => getPersistor()?.flush.apply(getPersistor(), args as any),
+  subscribe: (...args: any[]) => getPersistor()?.subscribe.apply(getPersistor(), args as any),
 } as any;

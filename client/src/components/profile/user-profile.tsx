@@ -18,8 +18,8 @@ import { Badge } from '../ui/badge';
 import { Switch } from '../ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from '../../hooks/use-toast';
-import { logger } from '../../utils/logger';
+import { useToast } from '@client/hooks/use-toast';
+import { logger } from '@client/utils/logger';
 
 // Main user profile interface - this represents the complete profile from the API
 interface UserProfile {

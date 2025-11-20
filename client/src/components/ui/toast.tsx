@@ -3,8 +3,8 @@ import { Provider, Viewport, Root, Action, Close, Title, Description } from "@ra
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
-import { cn } from '../../lib/utils'
-import { logger } from '../../utils/logger';
+import { cn } from '@client/lib/utils'
+import { logger } from '@client/utils/logger';
 
 const ToastProvider = Provider
 

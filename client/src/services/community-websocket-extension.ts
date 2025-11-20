@@ -5,8 +5,8 @@
  * including discussion threads, expert verification, and community analytics.
  */
 
-import { UnifiedWebSocketManager } from '../core/api/websocket';
-import { logger } from '../utils/logger';
+import { UnifiedWebSocketManager } from '@client/core/api/websocket';
+import { logger } from '@client/utils/logger';
 
 // Community-specific WebSocket message types
 interface CommunityWebSocketEvents {

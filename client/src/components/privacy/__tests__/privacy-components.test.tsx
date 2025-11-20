@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { CookieConsentBanner } from '../CookieConsentBanner';
 import { DataUsageReportDashboard } from '../DataUsageReportDashboard';
-import { GDPRComplianceManager } from '../GDPRComplianceManager';
+import GDPRComplianceManager from '../GDPRComplianceManager';
 
 // Mock the auth hook
 vi.mock('../../../hooks/useAuth', () => ({

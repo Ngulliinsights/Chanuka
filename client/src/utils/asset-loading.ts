@@ -1,5 +1,5 @@
 import { logger } from './logger';
-import type { OfflineDetectionState } from '../hooks/useOfflineDetection';
+import type { OfflineDetectionState } from '@client/hooks/useOfflineDetection';
 import {
   DEFAULT_ASSET_FALLBACKS,
   getAssetFallback,

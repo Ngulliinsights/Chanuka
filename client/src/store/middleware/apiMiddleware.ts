@@ -5,7 +5,7 @@
  */
 
 import { Middleware } from '@reduxjs/toolkit';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export const apiMiddleware: Middleware = (store) => (next) => (action) => {
   // Handle API-related actions

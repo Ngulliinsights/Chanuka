@@ -3,7 +3,7 @@ import { authenticateToken, AuthenticatedRequest } from '../../../middleware/aut
 import { user_profileservice } from '../domain/user-profile.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api-utils';
-import { logger   } from '../../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 export const router = Router();
 
@@ -396,6 +396,86 @@ router.post('/me/engagement/:bill_id', authenticateToken, async (req: Authentica
 // ============================================================================
 
 /**
+ * GET /profile - Alias for /me (for client compatibility)
+ * This route provides backward compatibility with clients expecting /api/users/profile
+ */
+router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const user_id = req.user!.id;
+    const profile = await user_profileservice.getUserProfile(user_id);
+    
+    return ApiSuccess(
+      res, 
+      profile, 
+      ApiResponseWrapper.createMetadata(startTime, 'getUserProfile')
+    );
+   } catch (error) {
+    logger.error('Error fetching profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
+    
+    return ApiError(res, {
+      code: 'PROFILE_FETCH_ERROR',
+      message: 'Failed to fetch profile'
+    }, 500);
+  }
+});
+
+/**
+ * GET /preferences - Alias for /me/preferences (for client compatibility)
+ */
+router.get('/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const user_id = req.user!.id;
+    const preferences = await user_profileservice.getUserPreferences(user_id);
+    
+    return ApiSuccess(
+      res, 
+      preferences, 
+      ApiResponseWrapper.createMetadata(startTime, 'getUserPreferences')
+    );
+   } catch (error) {
+    logger.error('Error fetching preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
+    return ApiError(res, {
+      code: 'PREFERENCES_FETCH_ERROR',
+      message: 'Failed to fetch preferences'
+    }, 500);
+  }
+});
+
+/**
+ * PUT /preferences - Alias for /me/preferences (for client compatibility)
+ */
+router.put('/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const user_id = req.user!.id;
+    const preferences = updatePreferencesSchema.parse(req.body);
+
+    const updatedPreferences = await user_profileservice.updateUserPreferences(user_id, preferences);
+    
+    return ApiSuccess(
+      res, 
+      updatedPreferences, 
+      ApiResponseWrapper.createMetadata(startTime, 'updateUserPreferences')
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return ApiValidationError(res, formatZodErrors(error.errors));
+    }
+    
+    logger.error('Error updating preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
+    return ApiError(res, {
+      code: 'PREFERENCES_UPDATE_ERROR',
+      message: 'Failed to update preferences'
+    }, 500);
+  }
+});
+
+/**
  * GET /search/:query - Search for users by name or username
  */
 router.get('/search/:query', async (req, res) => {
@@ -425,6 +505,31 @@ router.get('/search/:query', async (req, res) => {
     return ApiError(res, {
       code: 'USER_SEARCH_ERROR',
       message: 'User search failed'
+    }, 500);
+  }
+});
+
+/**
+ * GET /:user_id/profile - Get specific user's profile (for client compatibility)
+ * This provides an explicit /profile suffix for clarity
+ */
+router.get('/:user_id/profile', async (req, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const user_id = req.params.user_id;
+    const profile = await user_profileservice.getUserPublicProfile(user_id);
+    
+    return ApiSuccess(
+      res, 
+      profile, 
+      ApiResponseWrapper.createMetadata(startTime, 'getPublicProfile')
+    );
+  } catch (error) {
+    logger.error('Error fetching public profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
+    return ApiError(res, {
+      code: 'PUBLIC_PROFILE_FETCH_ERROR',
+      message: 'Failed to fetch profile'
     }, 500);
   }
 });

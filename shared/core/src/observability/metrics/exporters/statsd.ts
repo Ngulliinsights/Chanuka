@@ -1,5 +1,5 @@
-import { Metric, MetricsExporter } from '../types';
-import { Result, Ok, Err } from '@/primitives/types/result';
+import { Metric, MetricsExporter } from '@client/types';
+import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
 import * as dgram from 'dgram';
 import * as net from 'net';
 

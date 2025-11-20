@@ -1,8 +1,8 @@
 // services/passwordReset.ts
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '@shared/database/connection.js';
 // Import specific tables and functions needed from the consolidated schema
-import { users } from '../../../shared/schema';
-import { ValidationError } from '../../../shared/core/src/observability/error-management/errors/specialized-errors.js';
+import { users } from '@shared/schema';
+import { ValidationError } from '@shared/core/src/observability/error-management/errors/specialized-errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { and, eq, gt } from 'drizzle-orm';

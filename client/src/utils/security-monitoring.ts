@@ -3,7 +3,7 @@
  * Detects and tracks suspicious activities and security events
  */
 
-import { SecurityEvent, SuspiciousActivityAlert } from '../types/auth';
+import { SecurityEvent, SuspiciousActivityAlert } from '@client/types/auth';
 import { logger } from './logger';
 
 interface DeviceFingerprint {

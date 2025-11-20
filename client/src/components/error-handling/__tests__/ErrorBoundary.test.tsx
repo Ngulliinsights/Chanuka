@@ -9,8 +9,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ErrorBoundary, { EnhancedErrorFallback } from '../ErrorBoundary';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../../../utils/logger';
-import type { AppError } from '../../../core/error';
+import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+import type { AppError } from '@client/core/error';
 import { renderWithWrapper } from '../../ui/__tests__/test-utils';
 
 // Mock dependencies
@@ -323,7 +323,7 @@ describe('ErrorBoundary', () => {
   
       it('handles network failures during error reporting', async () => {
         // Mock network failure for error reporting
-        const mockLogger = vi.mocked(require('../../../utils/logger').logger);
+        const mockLogger = vi.mocked(require('@client/utils/logger').logger);
         mockLogger.error.mockImplementation(() => {
           throw new Error('Network error during logging');
         });
@@ -343,7 +343,7 @@ describe('ErrorBoundary', () => {
   
       it('handles performance monitor failures gracefully', () => {
         // Mock performance monitor failure
-        const mockPerformanceMonitor = vi.mocked(require('../../../utils/performance-monitor').performanceMonitor);
+        const mockPerformanceMonitor = vi.mocked(require('@client/utils/performance-monitor').performanceMonitor);
         mockPerformanceMonitor.getMetrics.mockImplementation(() => {
           throw new Error('Performance monitor unavailable');
         });
@@ -363,7 +363,7 @@ describe('ErrorBoundary', () => {
   
       it('handles browser compatibility check failures', () => {
         // Mock browser compatibility failure
-        const mockGetBrowserInfo = vi.mocked(require('../../../utils/browser-compatibility').getBrowserInfo);
+        const mockGetBrowserInfo = vi.mocked(require('@client/utils/browser-compatibility').getBrowserInfo);
         mockGetBrowserInfo.mockImplementation(() => {
           throw new Error('Browser detection failed');
         });
@@ -413,7 +413,7 @@ describe('ErrorBoundary', () => {
   
       it('handles memory pressure scenarios', () => {
         // Mock high memory usage
-        const mockPerformanceMonitor = vi.mocked(require('../../../utils/performance-monitor').performanceMonitor);
+        const mockPerformanceMonitor = vi.mocked(require('@client/utils/performance-monitor').performanceMonitor);
         mockPerformanceMonitor.getMetrics.mockReturnValue({
           memoryUsage: 95, // Very high memory usage
           renderTime: 100

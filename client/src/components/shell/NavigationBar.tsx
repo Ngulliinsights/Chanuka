@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Bell, User, Settings, LogOut, Home } from 'lucide-react';
+import { Search, Bell, User, Settings } from 'lucide-react';
+import { Menu as MenuIcon, LogOut as LogOutIcon, Home as HomeIcon } from '../icons/SimpleIcons';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -13,11 +14,11 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Badge } from '../ui/badge';
-import { useAuth } from '../../hooks/useAuth';
-import { useNavigation } from '../../core/navigation/context';
-import { useMediaQuery } from '../../hooks/use-mobile';
-import { cn } from '../../lib/utils';
-import { logger } from '../../utils/logger';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useNavigation } from '@client/core/navigation/context';
+import { useMediaQuery } from '@client/hooks/use-mobile';
+import { cn } from '@client/lib/utils';
+import { logger } from '@client/utils/logger';
 
 interface NavigationBarProps {
   className?: string;
@@ -57,7 +58,7 @@ export function NavigationBar({
   searchPlaceholder = "Search bills, topics, or representatives..."
 }: NavigationBarProps) {
   const { user, isAuthenticated, logout } = useAuth();
-  const { currentPath, navigateTo, toggleMobileMenu } = useNavigation();
+  const { navigateTo, toggleMobileMenu } = useNavigation();
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 767px)');
 
@@ -78,7 +79,10 @@ export function NavigationBar({
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
-  // Handle mobile menu toggle
+  /**
+   * Handles mobile menu toggle action
+   * Uses provided callback or falls back to navigation context method
+   */
   const handleMobileMenuToggle = useCallback(() => {
     if (onMobileMenuToggle) {
       onMobileMenuToggle();
@@ -87,7 +91,12 @@ export function NavigationBar({
     }
   }, [onMobileMenuToggle, toggleMobileMenu]);
 
-  // Search functionality
+  /**
+   * Performs search operation with mock data
+   * In production, this would call a real search API
+   * 
+   * @param query - The search query string
+   */
   const performSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -96,26 +105,26 @@ export function NavigationBar({
 
     setIsSearching(true);
     try {
-      // Mock search results - in real app, this would be an API call
+      // Mock search results - properly typed to match SearchResult interface
       const mockResults: SearchResult[] = [
         {
           id: '1',
           title: `Bill HB-${Math.floor(Math.random() * 1000)}`,
-          type: 'bill',
+          type: 'bill' as const, // Use 'as const' to ensure literal type
           path: '/bills/1',
           description: 'Healthcare reform legislation'
         },
         {
           id: '2',
           title: 'Bills Dashboard',
-          type: 'page',
+          type: 'page' as const,
           path: '/bills',
           description: 'View all active legislation'
         },
         {
           id: '3',
           title: 'Community Discussion',
-          type: 'page',
+          type: 'page' as const,
           path: '/community',
           description: 'Join the conversation'
         }
@@ -133,7 +142,10 @@ export function NavigationBar({
     }
   }, []);
 
-  // Debounced search
+  /**
+   * Debounced search effect
+   * Delays search execution until user stops typing (300ms delay)
+   */
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       performSearch(searchQuery);
@@ -142,14 +154,19 @@ export function NavigationBar({
     return () => clearTimeout(timeoutId);
   }, [searchQuery, performSearch]);
 
-  // Handle search input changes
+  /**
+   * Handles search input changes
+   */
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
     setShowSearchResults(value.length > 0);
   }, []);
 
-  // Handle search result selection
+  /**
+   * Handles selection of a search result
+   * Clears search state and navigates to selected result
+   */
   const handleSearchResultSelect = useCallback((result: SearchResult) => {
     setSearchQuery('');
     setShowSearchResults(false);
@@ -157,7 +174,10 @@ export function NavigationBar({
     searchInputRef.current?.blur();
   }, [navigateTo]);
 
-  // Handle search form submission
+  /**
+   * Handles search form submission
+   * Redirects to full search results page
+   */
   const handleSearchSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -167,35 +187,40 @@ export function NavigationBar({
     }
   }, [searchQuery, navigate]);
 
-  // Handle keyboard navigation in search results
+  /**
+   * Handles keyboard navigation in search input
+   * Supports: Escape (close), ArrowDown (focus first result)
+   */
   const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setShowSearchResults(false);
       searchInputRef.current?.blur();
     } else if (e.key === 'ArrowDown' && showSearchResults && searchResults.length > 0) {
       e.preventDefault();
-      // Focus first search result
-      const firstResult = searchResultsRef.current?.querySelector('button');
-      firstResult?.focus();
+      // focus the first option (use role selector to match listbox options)
+      const firstResult = searchResultsRef.current?.querySelector('[role="option"]');
+      (firstResult as HTMLElement | null)?.focus();
     }
   }, [showSearchResults, searchResults.length]);
 
-  // Handle keyboard navigation within search results
+  /**
+   * Handles keyboard navigation within search results
+   * Supports: ArrowUp/ArrowDown (navigate), Escape (close)
+   */
   const handleResultKeyDown = useCallback((e: React.KeyboardEvent, index: number) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       const nextIndex = Math.min(index + 1, searchResults.length - 1);
-      const nextButton = searchResultsRef.current?.querySelectorAll('button')[nextIndex];
-      nextButton?.focus();
+      const nextOption = searchResultsRef.current?.querySelectorAll('[role="option"]')[nextIndex];
+      (nextOption as HTMLElement | undefined)?.focus();
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (index === 0) {
-        // Return to search input
         searchInputRef.current?.focus();
       } else {
         const prevIndex = index - 1;
-        const prevButton = searchResultsRef.current?.querySelectorAll('button')[prevIndex];
-        prevButton?.focus();
+        const prevOption = searchResultsRef.current?.querySelectorAll('[role="option"]')[prevIndex];
+        (prevOption as HTMLElement | undefined)?.focus();
       }
     } else if (e.key === 'Escape') {
       setShowSearchResults(false);
@@ -203,7 +228,10 @@ export function NavigationBar({
     }
   }, [searchResults.length]);
 
-  // Handle user logout
+  /**
+   * Handles user logout
+   * Clears authentication and redirects to home
+   */
   const handleLogout = useCallback(async () => {
     try {
       await logout();
@@ -213,7 +241,9 @@ export function NavigationBar({
     }
   }, [logout, navigateTo]);
 
-  // Close search results when clicking outside
+  /**
+   * Closes search results when clicking outside the search area
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -228,6 +258,14 @@ export function NavigationBar({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  /**
+   * Gets user's avatar URL, with fallback to undefined if not available
+   * This handles cases where User type may not have avatar property
+   */
+  const getUserAvatar = () => {
+    return (user as any)?.avatar as string | undefined;
+  };
 
   return (
     <nav
@@ -251,7 +289,7 @@ export function NavigationBar({
                 className="mr-2 p-2"
                 aria-label="Toggle mobile menu"
               >
-                <Menu className="h-5 w-5" />
+                <MenuIcon className="h-5 w-5" />
               </Button>
             )}
 
@@ -261,7 +299,7 @@ export function NavigationBar({
               className="flex items-center space-x-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
               aria-label="Chanuka home"
             >
-              <Home className="h-6 w-6" />
+              <HomeIcon className="h-6 w-6" />
               <span className="hidden sm:block">Chanuka</span>
             </Link>
           </div>
@@ -282,14 +320,16 @@ export function NavigationBar({
                     className="pl-10 pr-4 w-full"
                     aria-label="Search"
                     aria-expanded={showSearchResults}
-                    aria-haspopup="listbox"
-                    role="searchbox"
+                    aria-controls="search-results"
+                    aria-autocomplete="list"
+                    role="combobox"
                   />
                 </div>
 
-                {/* Search results dropdown */}
+                {/* Search results dropdown - using proper combobox pattern */}
                 {showSearchResults && (
                   <div
+                    id="search-results"
                     ref={searchResultsRef}
                     className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto"
                     role="listbox"
@@ -302,13 +342,14 @@ export function NavigationBar({
                     ) : searchResults.length > 0 ? (
                       <>
                         {searchResults.map((result, index) => (
-                          <button
+                          <div
                             key={result.id}
                             onClick={() => handleSearchResultSelect(result)}
                             onKeyDown={(e) => handleResultKeyDown(e, index)}
                             className="w-full text-left p-3 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset border-b border-gray-100 last:border-b-0"
                             role="option"
-                            type="button"
+                            tabIndex={0}
+                            aria-selected={false}
                           >
                             <div className="flex items-center justify-between">
                               <div>
@@ -325,16 +366,26 @@ export function NavigationBar({
                                 {result.type}
                               </Badge>
                             </div>
-                          </button>
+                          </div>
                         ))}
                         <div className="p-2 border-t border-gray-100">
-                          <button
-                            onClick={handleSearchSubmit}
+                          <div
+                            role="option"
+                            tabIndex={0}
+                            onClick={() => {
+                              navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                              setShowSearchResults(false);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                                setShowSearchResults(false);
+                              }
+                            }}
                             className="w-full text-left p-2 text-sm text-blue-600 hover:bg-blue-50 rounded focus:outline-none focus:bg-blue-50 focus:ring-2 focus:ring-blue-500"
-                            type="button"
                           >
                             View all results for "{searchQuery}"
-                          </button>
+                          </div>
                         </div>
                       </>
                     ) : (
@@ -424,7 +475,7 @@ export function NavigationBar({
                         aria-label="User menu"
                       >
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
+                          <AvatarImage src={getUserAvatar()} alt={user?.name || 'User'} />
                           <AvatarFallback>
                             {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                           </AvatarFallback>
@@ -444,20 +495,20 @@ export function NavigationBar({
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/profile" className="flex items-center">
+                        <Link to="/account" className="flex items-center">
                           <User className="mr-2 h-4 w-4" />
                           Profile
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/settings" className="flex items-center">
+                        <Link to="/account/settings" className="flex items-center">
                           <Settings className="mr-2 h-4 w-4" />
                           Settings
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleLogout} className="flex items-center">
-                        <LogOut className="mr-2 h-4 w-4" />
+                        <LogOutIcon className="mr-2 h-4 w-4" />
                         Log out
                       </DropdownMenuItem>
                     </DropdownMenuContent>

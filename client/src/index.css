@@ -1,26 +1,35 @@
-/* Chanuka Design System - Core imports */
-@import './styles/chanuka-design-system.css';
+/* Design Tokens - Must come first */
+@import './styles/design-tokens.css';
 
-/* Existing styles */
-@import './styles/base/variables.css';
+/* Tailwind CSS - Base layer */
+@tailwind base;
+
+/* Design System Imports */
+@import './styles/chanuka-design-system.css';
 @import './styles/base/base.css';
 @import './styles/themes/dark.css';
+@import './shared/design-system/responsive.css';
+
+/* Component Styles */
 @import './styles/components/buttons.css';
 @import './styles/components/forms.css';
 @import './styles/components/layout.css';
 @import './styles/components/ui.css';
 @import './styles/components/progressive-disclosure.css';
+
+/* Responsive Styles */
 @import './styles/responsive/mobile.css';
 @import './styles/responsive/tablet.css';
 @import './styles/responsive/desktop.css';
 @import './styles/responsive/special.css';
+
+/* Utilities */
 @import './styles/utilities/animations.css';
 @import './styles/utilities/accessibility.css';
 @import './styles/accessibility.css';
 @import './styles/fallbacks.css';
-@import './shared/design-system/responsive.css';
 
-@tailwind base;
+/* Tailwind Components and Utilities - After custom styles */
 @tailwind components;
 @tailwind utilities;
 

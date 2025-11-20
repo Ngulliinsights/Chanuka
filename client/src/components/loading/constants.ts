@@ -3,7 +3,7 @@
  * Following navigation component patterns for constants
  */
 
-import type { LoadingConfig, LoadingSize, LoadingType, LoadingPriority } from './types';
+import type { LoadingConfig, LoadingSize, LoadingType, LoadingPriority } from '@client/types';
 
 export const DEFAULT_LOADING_SIZE: LoadingSize = 'md';
 export const DEFAULT_LOADING_TYPE: LoadingType = 'component';

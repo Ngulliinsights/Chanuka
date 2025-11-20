@@ -22,8 +22,8 @@ import {
   RefreshCw,
   Info
 } from 'lucide-react';
-import { BillRecommendation } from '../../../types/user-dashboard';
-import { useUserDashboardStore } from '../../../store/slices/userDashboardSlice';
+import { BillRecommendation } from '@client/types/user-dashboard';
+import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
 
 interface RecommendationsSectionProps {
   recommendations: BillRecommendation[];

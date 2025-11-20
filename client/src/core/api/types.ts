@@ -178,6 +178,7 @@ export interface Sponsor {
   readonly district?: string;
   readonly position: string;
   readonly isPrimary?: boolean;
+  readonly state?: string;
 }
 
 export interface ConstitutionalFlag {

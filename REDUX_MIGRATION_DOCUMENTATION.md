@@ -272,15 +272,15 @@ function BillsList() {
 ```typescript
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { loadBillsFromAPI, selectFilteredBills } from '../store/slices/billsSlice';
+import { loadUsersFromAPI, selectFilteredUsers } from '../store/slices/userSlice';
 
-function BillsList() {
+function UsersList() {
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector(state => state.bills);
-  const filteredBills = useAppSelector(selectFilteredBills);
+  const { loading, error } = useAppSelector(state => state.users);
+  const filteredUsers = useAppSelector(selectFilteredUsers);
 
   useEffect(() => {
-    dispatch(loadBillsFromAPI());
+    dispatch(loadUsersFromAPI());
   }, [dispatch]);
 
   if (loading) return <div>Loading...</div>;
@@ -288,8 +288,8 @@ function BillsList() {
 
   return (
     <ul>
-      {filteredBills.map(bill => (
-        <li key={bill.id}>{bill.title}</li>
+      {filteredUsers.map(user => (
+        <li key={user.id}>{user.name}</li>
       ))}
     </ul>
   );
@@ -383,14 +383,14 @@ const slice = createSlice({
 #### WebSocket Integration
 ```typescript
 import { useAppDispatch } from '../store/hooks';
-import { handleRealTimeUpdate } from '../store/slices/billsSlice';
+import { handleRealTimeUpdate } from '../store/slices/notificationSlice';
 
-function RealTimeBills() {
+function RealTimeNotifications() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     // Subscribe to real-time updates
-    const unsubscribe = webSocketService.subscribe('bills', (update) => {
+    const unsubscribe = webSocketService.subscribe('notifications', (update) => {
       dispatch(handleRealTimeUpdate(update));
     });
 
@@ -406,23 +406,23 @@ function RealTimeBills() {
 #### Testing Slices
 ```typescript
 import { configureStore } from '@reduxjs/toolkit';
-import billsSlice, { loadBillsFromAPI } from './billsSlice';
+import authSlice, { loginUser } from './authSlice';
 
-describe('billsSlice', () => {
+describe('authSlice', () => {
   let store: any;
 
   beforeEach(() => {
     store = configureStore({
-      reducer: { bills: billsSlice }
+      reducer: { auth: authSlice }
     });
   });
 
-  it('should handle loadBillsFromAPI.fulfilled', () => {
-    const mockBills = [{ id: 1, title: 'Test Bill' }];
-    store.dispatch(loadBillsFromAPI.fulfilled(mockBills, 'requestId', {}));
+  it('should handle loginUser.fulfilled', () => {
+    const mockUser = { id: 1, name: 'Test User' };
+    store.dispatch(loginUser.fulfilled(mockUser, 'requestId', {}));
 
-    const state = store.getState().bills;
-    expect(state.bills).toEqual(mockBills);
+    const state = store.getState().auth;
+    expect(state.user).toEqual(mockUser);
     expect(state.loading).toBe(false);
   });
 });
@@ -430,21 +430,21 @@ describe('billsSlice', () => {
 
 #### Testing Selectors
 ```typescript
-import { selectFilteredBills } from './billsSlice';
+import { selectFilteredUsers } from './userSlice';
 
 describe('selectors', () => {
-  it('should filter bills correctly', () => {
+  it('should filter users correctly', () => {
     const mockState = {
-      bills: {
-        bills: [
-          { id: 1, title: 'Bill 1', status: 'active' },
-          { id: 2, title: 'Bill 2', status: 'draft' }
+      users: {
+        users: [
+          { id: 1, name: 'User 1', role: 'admin' },
+          { id: 2, name: 'User 2', role: 'user' }
         ],
-        filters: { status: ['active'] }
+        filters: { role: ['admin'] }
       }
     };
 
-    const result = selectFilteredBills(mockState);
+    const result = selectFilteredUsers(mockState);
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe(1);
   });
@@ -815,10 +815,10 @@ export default domainSlice.reducer;
 ```
 
 #### Naming Conventions
-- **Slices**: `domainSlice.ts` (e.g., `billsSlice.ts`)
-- **Actions**: `camelCase` (e.g., `setBills`)
-- **Async Thunks**: `camelCase` (e.g., `loadBillsFromAPI`)
-- **Selectors**: `selectCamelCase` (e.g., `selectFilteredBills`)
+- **Slices**: `domainSlice.ts` (e.g., `userSlice.ts`)
+- **Actions**: `camelCase` (e.g., `setUsers`)
+- **Async Thunks**: `camelCase` (e.g., `loadUsersFromAPI`)
+- **Selectors**: `selectCamelCase` (e.g., `selectFilteredUsers`)
 
 ### Testing Standards
 

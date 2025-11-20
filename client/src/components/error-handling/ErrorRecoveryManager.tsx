@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export interface ErrorRecoveryManagerProps {
   children: React.ReactNode;

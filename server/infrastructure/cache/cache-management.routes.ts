@@ -130,7 +130,7 @@ router.post('/warm', async (req, res) => {
         switch (target) {
           case 'bills':
             // Import and warm up bill cache
-            const { cachedBillService } = await import('../../features/bills/application/bill-service');
+            const { cachedBillService } = await import('@client/features/bills/application/bill-service');
             await cachedBillService.warmUpCache();
             results[target] = 'success';
             break;

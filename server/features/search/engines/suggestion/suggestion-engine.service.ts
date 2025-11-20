@@ -1,7 +1,7 @@
 import { readDatabase } from '@shared/database';
 import { databaseService } from '@/infrastructure/database/database-service.js';
 import { cacheService } from '@/infrastructure/cache/cache-service.js';
-import { logger  } from '../../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import * as schema from "@shared/schema";
 import { eq, desc, and, sql, count, like, or, gte } from "drizzle-orm";
 
@@ -13,7 +13,7 @@ import {
   SearchAnalytics
 } from "./types/search.types";
 // Query builder service removed - using direct Drizzle queries
-import { parallelQueryExecutor, QueryTask } from "../utils/parallel-query-executor";
+import { parallelQueryExecutor, QueryTask } from "@client/utils/parallel-query-executor";
 import { suggestionRankingService, type RankingContext } from "./suggestion-ranking.service";
 
 /**
@@ -67,10 +67,12 @@ const CONFIG = {
   // Distribution of suggestion types (must sum to 1.0)
   // These weights determine how many suggestions come from each source
   SUGGESTION_DISTRIBUTION: {
-    BILL_TITLES: 0.5,
-    CATEGORIES: 0.2,
-    SPONSORS: 0.2,
-    TAGS: 0.1
+    BILL_TITLES: 0.4,
+    CATEGORIES: 0.15,
+    SPONSORS: 0.15,
+    TAGS: 0.1,
+    AI_CORRECTIONS: 0.1,
+    RELATED_TERMS: 0.1
   },
 
   // Facet limits to prevent overwhelming the user interface
@@ -82,7 +84,19 @@ const CONFIG = {
     STARTS_WITH: 0.9,
     CONTAINS: 0.7,
     LEVENSHTEIN_THRESHOLD: 0.5,
-    MIN_SCORE: 0.1
+    MIN_SCORE: 0.1,
+    AI_CORRECTION_BOOST: 0.8,
+    CONTEXTUAL_BOOST: 0.6
+  },
+
+  // AI-powered features configuration
+  AI: {
+    ENABLE_CORRECTIONS: true,
+    ENABLE_EXPANSION: true,
+    ENABLE_CONTEXTUAL: true,
+    MAX_CORRECTIONS: 3,
+    MAX_EXPANSIONS: 5,
+    CONTEXT_WINDOW_DAYS: 7
   }
 } as const;
 
@@ -202,7 +216,7 @@ export class SuggestionEngineService {
 
   /**
    * Generate search suggestions from multiple sources in parallel
-   * This orchestrates fetching suggestions from bills, categories, sponsors, and tags
+   * This orchestrates fetching suggestions from bills, categories, sponsors, tags, and AI-powered sources
    * Uses Promise.allSettled to ensure partial results even if some queries fail
    */
   private async generateSuggestions(query: string, limit: number): Promise<SearchSuggestion[]> {
@@ -215,6 +229,8 @@ export class SuggestionEngineService {
     const categoryLimit = Math.ceil(limit * distribution.CATEGORIES);
     const sponsorLimit = Math.ceil(limit * distribution.SPONSORS);
     const tagLimit = Math.ceil(limit * distribution.TAGS);
+    const aiCorrectionLimit = Math.ceil(limit * distribution.AI_CORRECTIONS);
+    const relatedTermsLimit = Math.ceil(limit * distribution.RELATED_TERMS);
 
     // Execute all suggestion queries concurrently for better performance
     // Promise.allSettled ensures we get results from successful queries even if others fail
@@ -222,11 +238,13 @@ export class SuggestionEngineService {
       this.getBillTitleSuggestions(query, billTitleLimit),
       this.getCategorySuggestions(query, categoryLimit),
       this.getSponsorSuggestions(query, sponsorLimit),
-      this.getTagSuggestions(query, tagLimit)
+      this.getTagSuggestions(query, tagLimit),
+      this.getAICorrections(query, aiCorrectionLimit),
+      this.getRelatedTerms(query, relatedTermsLimit)
     ]);
 
     // Collect successful results and log failures for monitoring
-    const [billSuggestions, categorySuggestions, sponsorSuggestions, tagSuggestions] = results;
+    const [billSuggestions, categorySuggestions, sponsorSuggestions, tagSuggestions, aiCorrections, relatedTerms] = results;
 
     if (billSuggestions.status === 'fulfilled') {
       suggestions.push(...billSuggestions.value);
@@ -264,6 +282,24 @@ export class SuggestionEngineService {
       });
     }
 
+    if (aiCorrections.status === 'fulfilled') {
+      suggestions.push(...aiCorrections.value);
+    } else {
+      logger.error('Failed to fetch AI corrections', {
+        error: aiCorrections.reason,
+        query
+      });
+    }
+
+    if (relatedTerms.status === 'fulfilled') {
+      suggestions.push(...relatedTerms.value);
+    } else {
+      logger.error('Failed to fetch related terms', {
+        error: relatedTerms.reason,
+        query
+      });
+    }
+
     // Create ranking context with user behavior data for personalization
     const context: RankingContextInternal = {
       searchContext: this.getSearchContext(),
@@ -275,13 +311,13 @@ export class SuggestionEngineService {
     // the internal searchContext's popularTerms array into a Map to match
     // the RankingContext shape used by the ranking algorithms.
     const popularTermsMap = new Map<string, number>(
-      (context.searchContext.popularTerms || []).map(pt => [pt.term, pt.frequency])
+      (context.searchContext.popularTerms || []).map((pt: any) => [pt.term, pt.frequency])
     );
 
     const rankingContext: RankingContext = {
       query: context.query,
       searchContext: context.searchContext,
-      userHistory: (context.searchContext.userHistory || []).map(h => h.query),
+      userHistory: (context.searchContext.userHistory || []).map((h: any) => h.query),
       popularTerms: popularTermsMap
     };
 
@@ -548,6 +584,256 @@ export class SuggestionEngineService {
       logger.error('Failed to get tag facets', { error });
       return [];
     }
+  }
+
+  /**
+   * Get AI-powered query corrections for typos and misspellings
+   * Uses fuzzy matching and common typo patterns
+   */
+  private async getAICorrections(query: string, limit: number): Promise<SearchSuggestion[]> {
+    if (!CONFIG.AI.ENABLE_CORRECTIONS) return [];
+
+    const corrections: SearchSuggestion[] = [];
+    const lowerQuery = query.toLowerCase();
+
+    // Common typo corrections (could be enhanced with ML model)
+    const commonCorrections: Record<string, string[]> = {
+      'healtcare': ['healthcare'],
+      'heathcare': ['healthcare'],
+      'helthcare': ['healthcare'],
+      'eduction': ['education'],
+      'enviornment': ['environment'],
+      'climat': ['climate'],
+      'chang': ['change'],
+      'taxs': ['taxes'],
+      'polciy': ['policy'],
+      'goverment': ['government'],
+      'parliment': ['parliament'],
+      'legistation': ['legislation'],
+      'amendmant': ['amendment'],
+      'constituion': ['constitution'],
+      'electon': ['election'],
+      'votng': ['voting']
+    };
+
+    // Check for exact matches in common corrections
+    for (const [typo, correctionsList] of Object.entries(commonCorrections)) {
+      if (lowerQuery.includes(typo)) {
+        for (const correction of correctionsList.slice(0, CONFIG.AI.MAX_CORRECTIONS)) {
+          corrections.push({
+            term: correction,
+            frequency: 1,
+            score: CONFIG.SCORING.AI_CORRECTION_BOOST,
+            type: 'ai_correction',
+            id: `correction-${correction}`,
+            metadata: {
+              originalQuery: query,
+              correctionType: 'typo',
+              confidence: 0.8
+            }
+          });
+        }
+      }
+    }
+
+    // Phonetic matching for names (simplified Soundex-like approach)
+    const phoneticMatches = await this.getPhoneticCorrections(query, limit - corrections.length);
+    corrections.push(...phoneticMatches);
+
+    return corrections.slice(0, limit);
+  }
+
+  /**
+   * Get related terms and query expansions
+   * Suggests semantically related terms and broader/narrower concepts
+   */
+  private async getRelatedTerms(query: string, limit: number): Promise<SearchSuggestion[]> {
+    if (!CONFIG.AI.ENABLE_EXPANSION) return [];
+
+    const expansions: SearchSuggestion[] = [];
+    const lowerQuery = query.toLowerCase();
+
+    // Semantic expansions (could be enhanced with word embeddings)
+    const semanticExpansions: Record<string, string[]> = {
+      'healthcare': ['medical', 'health', 'insurance', 'hospital', 'doctor', 'patient'],
+      'education': ['school', 'student', 'teacher', 'university', 'learning', 'curriculum'],
+      'climate': ['environment', 'global warming', 'carbon', 'emission', 'sustainability'],
+      'tax': ['revenue', 'finance', 'budget', 'income', 'economic', 'fiscal'],
+      'infrastructure': ['transport', 'road', 'railway', 'bridge', 'construction', 'development'],
+      'security': ['safety', 'protection', 'defense', 'law enforcement', 'crime prevention'],
+      'agriculture': ['farming', 'food', 'crop', 'farmer', 'rural development'],
+      'technology': ['digital', 'innovation', 'internet', 'computer', 'software', 'ai']
+    };
+
+    // Find matching expansions
+    for (const [term, relatedTerms] of Object.entries(semanticExpansions)) {
+      if (lowerQuery.includes(term) || term.includes(lowerQuery)) {
+        for (const relatedTerm of relatedTerms.slice(0, CONFIG.AI.MAX_EXPANSIONS)) {
+          expansions.push({
+            term: relatedTerm,
+            frequency: 1,
+            score: CONFIG.SCORING.CONTEXTUAL_BOOST,
+            type: 'related_term',
+            id: `expansion-${relatedTerm}`,
+            metadata: {
+              originalQuery: query,
+              expansionType: 'semantic',
+              confidence: 0.7
+            }
+          });
+        }
+      }
+    }
+
+    // Contextual suggestions based on user history
+    if (CONFIG.AI.ENABLE_CONTEXTUAL) {
+      const contextualSuggestions = await this.getContextualSuggestions(query, limit - expansions.length);
+      expansions.push(...contextualSuggestions);
+    }
+
+    return expansions.slice(0, limit);
+  }
+
+  /**
+   * Get phonetic corrections using simplified Soundex algorithm
+   */
+  private async getPhoneticCorrections(query: string, limit: number): Promise<SearchSuggestion[]> {
+    // Simplified phonetic matching - in production, use proper phonetic algorithms
+    const phoneticMap: Record<string, string> = {
+      'a': '0', 'e': '0', 'i': '0', 'o': '0', 'u': '0', 'y': '0',
+      'b': '1', 'f': '1', 'p': '1', 'v': '1',
+      'c': '2', 'g': '2', 'j': '2', 'k': '2', 'q': '2', 's': '2', 'x': '2', 'z': '2',
+      'd': '3', 't': '3',
+      'l': '4',
+      'm': '5', 'n': '5',
+      'r': '6'
+    };
+
+    const corrections: SearchSuggestion[] = [];
+    const queryPhonetic = this.generatePhoneticCode(query);
+
+    // Check against known terms (simplified - would query database in production)
+    const knownTerms = ['healthcare', 'education', 'environment', 'infrastructure', 'government'];
+
+    for (const term of knownTerms) {
+      if (this.generatePhoneticCode(term) === queryPhonetic && term !== query.toLowerCase()) {
+        corrections.push({
+          term,
+          frequency: 1,
+          score: CONFIG.SCORING.AI_CORRECTION_BOOST * 0.8,
+          type: 'phonetic_correction',
+          id: `phonetic-${term}`,
+          metadata: {
+            originalQuery: query,
+            correctionType: 'phonetic',
+            confidence: 0.6
+          }
+        });
+      }
+    }
+
+    return corrections.slice(0, limit);
+  }
+
+  /**
+   * Generate simplified phonetic code
+   */
+  private generatePhoneticCode(word: string): string {
+    if (!word) return '';
+
+    const phoneticMap: Record<string, string> = {
+      'a': '0', 'e': '0', 'i': '0', 'o': '0', 'u': '0', 'y': '0',
+      'b': '1', 'f': '1', 'p': '1', 'v': '1',
+      'c': '2', 'g': '2', 'j': '2', 'k': '2', 'q': '2', 's': '2', 'x': '2', 'z': '2',
+      'd': '3', 't': '3',
+      'l': '4',
+      'm': '5', 'n': '5',
+      'r': '6'
+    };
+
+    const cleaned = word.toLowerCase().replace(/[^a-z]/g, '');
+    if (cleaned.length === 0) return '';
+
+    let code: string = cleaned.charAt(0); // Keep first letter
+    let prevCode = '';
+
+    for (let i = 1; i < cleaned.length && code.length < 4; i++) {
+      const charCode = phoneticMap[cleaned[i]] || '';
+      if (charCode && charCode !== '0' && charCode !== prevCode) {
+        code += charCode;
+        prevCode = charCode;
+      }
+    }
+
+    // Pad with zeros to make 4 characters
+    while (code.length < 4) {
+      code += '0';
+    }
+
+    return code;
+  }
+
+  /**
+   * Get contextual suggestions based on user search history
+   */
+  private async getContextualSuggestions(query: string, limit: number): Promise<SearchSuggestion[]> {
+    const suggestions: SearchSuggestion[] = [];
+    const searchContext = this.getSearchContext();
+
+    // Analyze recent searches for patterns
+    const recentQueries = searchContext.userHistory || [];
+    const recentTerms = new Set<string>();
+
+    // Extract terms from recent queries within context window
+    const contextWindow = Date.now() - (CONFIG.AI.CONTEXT_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+
+    for (const historyItem of recentQueries) {
+      if (historyItem.timestamp > contextWindow) {
+        const terms = historyItem.query.toLowerCase().split(/\s+/);
+        terms.forEach(term => {
+          if (term.length >= CONFIG.MIN_TERM_LENGTH) {
+            recentTerms.add(term);
+          }
+        });
+      }
+    }
+
+    // Find related terms based on co-occurrence in user history
+    const currentTerms = query.toLowerCase().split(/\s+/);
+    for (const currentTerm of currentTerms) {
+      for (const recentTerm of recentTerms) {
+        if (recentTerm !== currentTerm && this.calculateSemanticSimilarity(currentTerm, recentTerm) > 0.3) {
+          suggestions.push({
+            term: recentTerm,
+            frequency: 1,
+            score: CONFIG.SCORING.CONTEXTUAL_BOOST,
+            type: 'contextual_suggestion',
+            id: `contextual-${recentTerm}`,
+            metadata: {
+              originalQuery: query,
+              suggestionType: 'user_history',
+              confidence: 0.5
+            }
+          });
+        }
+      }
+    }
+
+    return suggestions.slice(0, limit);
+  }
+
+  /**
+   * Calculate semantic similarity between terms (simplified)
+   */
+  private calculateSemanticSimilarity(term1: string, term2: string): number {
+    // Simple Jaccard similarity for demonstration
+    const set1 = new Set(term1.split(''));
+    const set2 = new Set(term2.split(''));
+
+    const intersection = new Set([...set1].filter(x => set2.has(x)));
+    const union = new Set([...set1, ...set2]);
+
+    return intersection.size / union.size;
   }
 
   /**

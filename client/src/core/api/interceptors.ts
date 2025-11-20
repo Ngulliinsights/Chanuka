@@ -12,8 +12,8 @@
  * - Built-in common interceptors (auth, logging, headers)
  */
 
-import { logger } from '../../utils/logger';
-import type { RequestInterceptor, ResponseInterceptor } from './types';
+import { logger } from '@client/utils/logger';
+import type { RequestInterceptor, ResponseInterceptor } from '@client/types';
 
 // ============================================================================
 // Interceptor Configuration

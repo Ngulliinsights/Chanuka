@@ -1,7 +1,7 @@
 // Unified Caching Service for API Client Architecture
 // Based on the consolidated API client design specifications
 
-import { CacheConfig, CacheEntry } from './types';
+import { CacheConfig, CacheEntry } from '@client/types';
 import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
 
 // Persistent Cache Adapters

@@ -8,7 +8,7 @@
 import { EventEmitter } from 'events';
 import * as cron from 'node-cron';
 // Import the database instance properly - adjust path as needed
-import { database as db } from '../shared/database/connection';
+import { database as db } from '@shared/database/connection';
 import {
   DataSource,
   SyncJob,
@@ -22,7 +22,7 @@ import { GovernmentDataService } from './government-data-service.js';
 import { ConflictResolutionService } from './conflict-resolution-service.js';
 import { bills, sponsors, bill_cosponsors, sync_jobs, data_sources } from '@shared/schema';
 import { eq, and, gte, desc } from 'drizzle-orm';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 export class DataSynchronizationService extends EventEmitter {
   private governmentDataService: GovernmentDataService;

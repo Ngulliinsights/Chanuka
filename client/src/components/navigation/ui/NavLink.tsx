@@ -1,5 +1,5 @@
 import { Link, LinkProps } from 'react-router-dom';
-import { cn } from '../../../lib/utils';
+import { cn } from '@client/lib/utils';
 import React from 'react';
 
 interface NavLinkProps extends LinkProps {

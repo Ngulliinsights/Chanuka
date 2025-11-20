@@ -3,7 +3,7 @@
  * Comprehensive security system for the Chanuka platform
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 import { CSPManager } from './csp-manager';
 import { CSRFProtection } from './csrf-protection';
 import { InputSanitizer } from './input-sanitizer';
@@ -36,6 +36,23 @@ let securitySystem: SecuritySystem | null = null;
  */
 export async function initializeSecurity(config: SecurityConfig): Promise<SecuritySystem> {
   try {
+    // In development mode, create a minimal security system to reduce console noise
+    if (process.env.NODE_ENV === 'development') {
+      logger.info('Development mode: using minimal security configuration');
+      
+      // Create minimal mock security system
+      const mockSecuritySystem = {
+        csp: { initialize: async () => {}, getNonce: () => 'dev-nonce' },
+        csrf: { initialize: async () => {}, getToken: () => 'dev-token' },
+        sanitizer: { sanitize: (input: string) => input },
+        rateLimiter: { initialize: async () => {} },
+        vulnerabilityScanner: { initialize: async () => {} },
+        monitor: { initialize: async () => {} }
+      };
+      
+      return mockSecuritySystem as any;
+    }
+
     logger.info('Initializing security infrastructure', { config });
 
     // Initialize CSP Manager

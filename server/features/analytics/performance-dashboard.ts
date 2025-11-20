@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { performanceMonitor   } from '../../../shared/core/src/index.js';
-import { logger   } from '../../../shared/core/src/index.js';
-import { errorTracker } from '../../core/errors/error-tracker.js';
+import { performanceMonitor   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
+import { errorTracker } from '@client/core/errors/error-tracker.js';
 
 export const router = Router();
 

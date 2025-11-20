@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { LoadingComponentProps } from '../types';
+import { LoadingComponentProps } from '@client/types';
 
 export interface LoadingSpinnerProps extends LoadingComponentProps {
   variant?: 'primary' | 'secondary' | 'white';

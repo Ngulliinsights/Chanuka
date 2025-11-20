@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { intelligentSearch } from '../services/intelligent-search';
-import { useDebounce } from '../../../hooks/useDebounce';
+import { useDebounce } from '@/hooks/useDebounce';
 import { logger } from '@/utils/logger';
 import type { SearchSuggestion, AutocompleteResult } from '../types';
 

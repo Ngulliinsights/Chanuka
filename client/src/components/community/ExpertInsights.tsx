@@ -30,8 +30,8 @@ import {
   FileText,
   Link as LinkIcon
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { ExpertInsight } from '../../types/community';
+import { cn } from '@client/lib/utils';
+import { ExpertInsight } from '@client/types/community';
 import { ExpertBadge } from '../verification/ExpertBadge';
 import { formatDistanceToNow } from 'date-fns';
 

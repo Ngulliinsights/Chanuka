@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AuthService } from '../../services/AuthService';
+import { AuthService } from '@client/services/AuthService';
 import { AuthRepository, type AuthRepositoryConfig, UserRepository, type UserRepositoryConfig, type IAuthRepository, type IUserRepository } from '../mocks/services';
 
 // Mock all dependencies

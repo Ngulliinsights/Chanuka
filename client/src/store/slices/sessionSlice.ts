@@ -7,9 +7,9 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
-import { SessionInfo } from '../../types/auth';
-import { authApiService } from '../../core/api';
-import { logger } from '../../utils/logger';
+import { SessionInfo } from '@client/types/auth';
+import { authApiService } from '@client/core/api';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Types and Interfaces

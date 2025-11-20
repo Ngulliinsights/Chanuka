@@ -2092,12 +2092,12 @@ Your client application has a more subtle but important relationship to this cha
 Currently, your client imports types like this:
 
 typescript
-// client/src/hooks/use-bills.tsx
+// client/src/features/bills/hooks/useBills.tsx
 import type { Bill, Comment, User } from '@shared/schema';
 With the new structure, type imports become more specific and reveal the domain architecture:
 
 typescript
-// client/src/hooks/use-bills.tsx
+// client/src/features/bills/hooks/useBills.tsx
 import type { Bill } from '@shared/schema/operational/foundation';
 import type { Comment } from '@shared/schema/operational/participation';
 import type { ConstitutionalAnalysis } from '@shared/schema/operational/constitutional';

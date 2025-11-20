@@ -22,9 +22,9 @@ import {
   MessageSquare,
   AlertTriangle
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { useCommunityStore } from '../../store/slices/communitySlice';
-import { useWebSocket } from '../../hooks/useWebSocket';
+import { cn } from '@client/lib/utils';
+import { useCommunityStore } from '@client/store/slices/communitySlice';
+import { useWebSocket } from '@client/hooks/useWebSocket';
 
 interface SentimentData {
   positive: number;

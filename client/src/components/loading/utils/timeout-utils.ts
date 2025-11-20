@@ -3,7 +3,7 @@
  * Following navigation component patterns for utility organization
  */
 
-import { LoadingOperation } from '../types';
+import { LoadingOperation } from '@client/types';
 import { LOADING_TIMEOUTS } from '../constants';
 
 export interface TimeoutConfig {

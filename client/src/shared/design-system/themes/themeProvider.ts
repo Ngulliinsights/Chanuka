@@ -6,7 +6,7 @@
 import { lightTheme } from './light';
 import { darkTheme } from './dark';
 import { highContrastTheme, darkHighContrastTheme } from './high-contrast';
-import { validateThemeContrast, generateContrastCSS } from '../utils/contrast';
+import { validateThemeContrast, generateContrastCSS } from '@client/utils/contrast';
 
 export type ThemeName = 'light' | 'dark' | 'high-contrast' | 'dark-high-contrast';
 export type Theme = typeof lightTheme | typeof darkTheme | typeof highContrastTheme | typeof darkHighContrastTheme;

@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 import { apiService, ApiResponse, ApiError } from './apiService';
 
 /**

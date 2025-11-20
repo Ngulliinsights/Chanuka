@@ -1,4 +1,4 @@
-import { LoadingOperation } from '../core/loading/types';
+import { LoadingOperation } from '@client/core/loading/types';
 
 // Utility functions for comprehensive loading management
 

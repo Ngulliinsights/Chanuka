@@ -18,7 +18,7 @@ import {
   Cookie,
   ExternalLink
 } from 'lucide-react';
-import { ConsentRecord } from '../../types/auth';
+import { ConsentRecord } from '@client/types/auth';
 
 interface ConsentModalProps {
   isOpen: boolean;

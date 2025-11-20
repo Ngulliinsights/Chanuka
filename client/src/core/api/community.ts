@@ -22,7 +22,7 @@
  */
 
 import { globalApiClient } from './client';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 import { globalErrorHandler } from './errors';
 
 // ============================================================================
@@ -41,7 +41,7 @@ export type {
 
 export type { Expert } from '../../types/expert';
 
-import type { ExpertInsight, ActivityItem, TrendingTopic, CommunityStats, LocalImpactMetrics } from '../../types/community';
+import type { ExpertInsight, ActivityItem, TrendingTopic, CommunityStats, LocalImpactMetrics } from '@client/types/community';
 
 export type {
   ActivityItem,

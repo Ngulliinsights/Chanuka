@@ -1,10 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userApi } from '../services/user-api';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../../../hooks/use-toast';
 import type {
-  User,
-  UserProfile,
-  UserPreferences,
   LoginCredentials,
   RegisterData,
   UpdateProfileData,
@@ -105,7 +102,7 @@ export function useProfile(user_id?: string) {
   const { toast } = useToast();
 
   const profile = useQuery({ queryKey: ['profile', user_id],
-    queryFn: () => userApi.getProfile(user_id),
+    queryFn: () => userApi.getUserProfile(user_id),
     enabled: !!user_id || !user_id, // Always enabled for current user, conditional for others
     staleTime: 10 * 60 * 1000, // 10 minutes
    });

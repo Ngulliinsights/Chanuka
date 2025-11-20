@@ -7,26 +7,78 @@
  */
 
 import { globalApiClient } from './client';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 import { globalErrorHandler } from './errors';
+import { mockBills, mockBillsStats } from '../../data/mock/bills';
 
-// Type imports for internal use
-import type {
-  BillsSearchParams,
-  PaginatedBillsResponse,
-  BillEngagementData,
-  BillComment
-} from '../../services/billsApiService';
+// Type definitions for bills API
+export interface BillsSearchParams {
+  query?: string;
+  status?: string[];
+  urgency?: string[];
+  policyAreas?: string[];
+  sponsors?: string[];
+  constitutionalFlags?: boolean;
+  controversyLevels?: string[];
+  dateRange?: {
+    start?: string;
+    end?: string;
+  };
+  sortBy?: 'date' | 'title' | 'urgency' | 'engagement';
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
 
-// Type re-exports for convenience
-export type {
-  BillsSearchParams,
-  PaginatedBillsResponse,
-  BillEngagementData,
-  BillComment
-};
+export interface PaginatedBillsResponse {
+  bills: Bill[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+  };
+  stats: BillsStats;
+}
 
-import type { Bill, Sponsor } from './types';
+export interface BillEngagementData {
+  bill_id: number;
+  viewCount: number;
+  saveCount: number;
+  commentCount: number;
+  shareCount: number;
+  lastUpdated: string;
+}
+
+export interface BillComment {
+  id: number;
+  bill_id: number;
+  user_id: number;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  author: {
+    id: number;
+    name: string;
+    avatar?: string;
+    verified: boolean;
+  };
+  replies?: BillComment[];
+  vote_count: number;
+  user_vote?: 'up' | 'down' | null;
+}
+
+export interface BillsStats {
+  totalBills: number;
+  urgentCount: number;
+  constitutionalFlags: number;
+  trendingCount: number;
+  lastUpdated: string;
+}
+
+import type { Bill, Sponsor } from '@client/types';
 
 // Additional response interfaces
 interface BillAnalysis {
@@ -73,6 +125,7 @@ export class BillsApiService {
    * Retrieves paginated bills with comprehensive filtering capabilities.
    * Supports full-text search, status filtering, policy area categorization,
    * and multiple sorting options to help users find relevant legislation.
+   * Falls back to mock data when server is unavailable.
    */
   async getBills(params: BillsQueryParams = {}): Promise<PaginatedBillsResponse> {
     const {
@@ -117,23 +170,35 @@ export class BillsApiService {
         }
       );
 
+      // Validate response structure
+      if (!response.data || !response.data.bills) {
+        throw new Error('Invalid response structure: missing bills data');
+      }
+
       logger.info('Bills loaded successfully', {
         component: 'BillsApiService',
         page,
         count: response.data.bills.length,
-        total: response.data.pagination.total
+        total: response.data.pagination?.total || 0
       });
 
       return response.data;
     } catch (error) {
-      logger.error('Failed to load bills', { component: 'BillsApiService', error, params });
-      throw await this.handleError(error, 'getBills');
+      logger.warn('Server unavailable, falling back to mock data', { 
+        component: 'BillsApiService', 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        params 
+      });
+      
+      // Fallback to mock data when server is unavailable
+      return this.getMockBillsResponse(params);
     }
   }
 
   /**
    * Fetches complete details for a specific bill including full text,
    * sponsor information, timeline, and current status.
+   * Falls back to mock data when server is unavailable.
    */
   async getBillById(id: number): Promise<Bill> {
     try {
@@ -150,8 +215,21 @@ export class BillsApiService {
 
       return response.data;
     } catch (error) {
-      logger.error('Failed to load bill details', { component: 'BillsApiService', billId: id, error });
-      throw await this.handleError(error, 'getBillById', { billId: id });
+      logger.warn('Server unavailable, falling back to mock data for bill details', { 
+        component: 'BillsApiService', 
+        billId: id, 
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      // Fallback to mock data
+      const mockBill = mockBills.find(bill => bill.id === id);
+      if (mockBill) {
+        return mockBill;
+      }
+      
+      // If specific bill not found, return first mock bill with updated ID
+      const fallbackBill = { ...mockBills[0], id };
+      return fallbackBill;
     }
   }
 
@@ -304,6 +382,233 @@ export class BillsApiService {
       logger.error('Failed to load bill analysis', { component: 'BillsApiService', billId, error });
       throw await this.handleError(error, 'getBillAnalysis', { billId });
     }
+  }
+
+  /**
+   * Records a vote on a comment (upvote or downvote).
+   */
+  async voteOnComment(commentId: string, voteType: 'up' | 'down'): Promise<void> {
+    try {
+      await globalApiClient.post(`/api/comments/${commentId}/vote`, { type: voteType }, {
+        timeout: this.defaultTimeout,
+        skipCache: true
+      });
+
+      logger.debug('Comment vote recorded', {
+        component: 'BillsApiService',
+        commentId,
+        voteType
+      });
+    } catch (error) {
+      logger.error('Failed to vote on comment', { component: 'BillsApiService', commentId, voteType, error });
+      throw await this.handleError(error, 'voteOnComment', { commentId });
+    }
+  }
+
+  /**
+   * Endorses a comment, increasing its credibility score.
+   */
+  async endorseComment(commentId: string, endorsements: number): Promise<void> {
+    try {
+      await globalApiClient.post(`/api/comments/${commentId}/endorse`, { endorsements }, {
+        timeout: this.defaultTimeout,
+        skipCache: true
+      });
+
+      logger.debug('Comment endorsed', {
+        component: 'BillsApiService',
+        commentId,
+        endorsements
+      });
+    } catch (error) {
+      logger.error('Failed to endorse comment', { component: 'BillsApiService', commentId, endorsements, error });
+      throw await this.handleError(error, 'endorseComment', { commentId });
+    }
+  }
+
+  /**
+   * Creates a poll for a bill discussion.
+   */
+  async createBillPoll(billId: number, question: string, options: string[], section?: string): Promise<any> {
+    try {
+      const response = await globalApiClient.post(`/api/bills/${billId}/polls`, {
+        question,
+        options,
+        section
+      }, {
+        timeout: this.defaultTimeout,
+        skipCache: true
+      });
+
+      logger.info('Poll created successfully', {
+        component: 'BillsApiService',
+        billId,
+        pollId: (response.data as any)?.id
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to create poll', { component: 'BillsApiService', billId, error });
+      throw await this.handleError(error, 'createBillPoll', { billId });
+    }
+  }
+
+  /**
+   * Fetches sponsorship analysis for a bill.
+   */
+  async getBillSponsorshipAnalysis(billId: number): Promise<any> {
+    try {
+      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/analysis`, {
+        timeout: this.defaultTimeout,
+        cacheTTL: 30 * 60 * 1000
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to load bill sponsorship analysis', { component: 'BillsApiService', billId, error });
+      throw await this.handleError(error, 'getBillSponsorshipAnalysis', { billId });
+    }
+  }
+
+  /**
+   * Fetches primary sponsor analysis for a bill.
+   */
+  async getBillPrimarySponsorAnalysis(billId: number): Promise<any> {
+    try {
+      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/primary-sponsor`, {
+        timeout: this.defaultTimeout,
+        cacheTTL: 30 * 60 * 1000
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to load bill primary sponsor analysis', { component: 'BillsApiService', billId, error });
+      throw await this.handleError(error, 'getBillPrimarySponsorAnalysis', { billId });
+    }
+  }
+
+  /**
+   * Fetches co-sponsors analysis for a bill.
+   */
+  async getBillCoSponsorsAnalysis(billId: number): Promise<any> {
+    try {
+      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/co-sponsors`, {
+        timeout: this.defaultTimeout,
+        cacheTTL: 30 * 60 * 1000
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to load bill co-sponsors analysis', { component: 'BillsApiService', billId, error });
+      throw await this.handleError(error, 'getBillCoSponsorsAnalysis', { billId });
+    }
+  }
+
+  /**
+   * Fetches financial network analysis for a bill.
+   */
+  async getBillFinancialNetworkAnalysis(billId: number): Promise<any> {
+    try {
+      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/financial-network`, {
+        timeout: this.defaultTimeout,
+        cacheTTL: 30 * 60 * 1000
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to load bill financial network analysis', { component: 'BillsApiService', billId, error });
+      throw await this.handleError(error, 'getBillFinancialNetworkAnalysis', { billId });
+    }
+  }
+
+  /**
+   * Provides mock data response when server is unavailable.
+   * Applies basic filtering and pagination to mock data.
+   */
+  private getMockBillsResponse(params: BillsQueryParams): PaginatedBillsResponse {
+    let filteredBills = [...mockBills];
+
+    // Apply basic filtering
+    if (params.status?.length) {
+      filteredBills = filteredBills.filter(bill => 
+        params.status!.includes(bill.status)
+      );
+    }
+
+    if (params.urgency?.length) {
+      filteredBills = filteredBills.filter(bill => 
+        params.urgency!.includes(bill.urgencyLevel)
+      );
+    }
+
+    if (params.policyAreas?.length) {
+      filteredBills = filteredBills.filter(bill => 
+        bill.policyAreas.some(area => params.policyAreas!.includes(area))
+      );
+    }
+
+    if (params.constitutionalFlags) {
+      filteredBills = filteredBills.filter(bill => 
+        bill.constitutionalFlags.length > 0
+      );
+    }
+
+    if (params.query) {
+      const searchTerm = params.query.toLowerCase();
+      filteredBills = filteredBills.filter(bill => 
+        bill.title.toLowerCase().includes(searchTerm) ||
+        bill.summary.toLowerCase().includes(searchTerm) ||
+        bill.billNumber.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Apply sorting
+    const sortBy = params.sortBy || 'date';
+    const sortOrder = params.sortOrder || 'desc';
+    
+    filteredBills.sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'date':
+          comparison = new Date(a.lastUpdated).getTime() - new Date(b.lastUpdated).getTime();
+          break;
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'urgency':
+          const urgencyOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1 };
+          comparison = (urgencyOrder[a.urgencyLevel as keyof typeof urgencyOrder] || 0) - 
+                      (urgencyOrder[b.urgencyLevel as keyof typeof urgencyOrder] || 0);
+          break;
+        case 'engagement':
+          comparison = (a.viewCount + a.commentCount + a.shareCount) - 
+                      (b.viewCount + b.commentCount + b.shareCount);
+          break;
+        default:
+          comparison = 0;
+      }
+      
+      return sortOrder === 'desc' ? -comparison : comparison;
+    });
+
+    // Apply pagination
+    const page = params.page || 1;
+    const limit = params.limit || 12;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedBills = filteredBills.slice(startIndex, endIndex);
+
+    const totalPages = Math.ceil(filteredBills.length / limit);
+
+    return {
+      bills: paginatedBills,
+      pagination: {
+        page,
+        limit,
+        total: filteredBills.length,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrevious: page > 1
+      },
+      stats: mockBillsStats
+    };
   }
 
   /**

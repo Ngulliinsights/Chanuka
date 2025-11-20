@@ -5,7 +5,7 @@
  * and provides runtime checks for architectural compliance.
  */
 
-import { globalServiceLocator } from '../core/api/registry';
+import { globalServiceLocator } from '@client/core/api/registry';
 import { logger } from './logger';
 
 interface ArchitectureValidationResult {
@@ -146,7 +146,7 @@ export class ArchitectureValidator {
 
     try {
       // Check if standardized types are available
-      const apiTypes = require('../types/api');
+      const apiTypes = require('@client/types/api');
       
       const requiredTypes = [
         'BillUpdate',

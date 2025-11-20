@@ -20,13 +20,13 @@ import {
   waitFor
 } from '../test-utilities';
 import { visualRegressionConfig } from '../comprehensive-test-config';
-import { BillCard } from '../../components/bills/BillCard';
-import { BillsDashboard } from '../../components/bills/BillsDashboard';
-import { FilterPanel } from '../../components/bills/FilterPanel';
-import { IntelligentSearchPage } from '../../pages/IntelligentSearchPage';
-import { BillDetailView } from '../../components/bill-detail/BillDetailView';
-import { DiscussionThread } from '../../components/community/DiscussionThread';
-import { ExpertBadge } from '../../components/verification/ExpertBadge';
+import { BillCard } from '@client/components/bills/BillCard';
+import { BillsDashboard } from '@client/components/bills/BillsDashboard';
+import { FilterPanel } from '@client/components/bills/FilterPanel';
+import { IntelligentSearchPage } from '@client/pages/IntelligentSearchPage';
+import { BillDetailView } from '@client/components/bill-detail/BillDetailView';
+import { DiscussionThread } from '@client/components/community/DiscussionThread';
+import { ExpertBadge } from '@client/components/verification/ExpertBadge';
 
 // Mock screenshot utilities for testing
 const mockScreenshots: Record<string, string> = {};

@@ -5,7 +5,7 @@
  * and integrates with existing WebSocket client for real-time updates.
  */
 
-import { UnifiedWebSocketManager } from '../core/api/websocket';
+import { UnifiedWebSocketManager } from '@client/core/api/websocket';
 import { 
   DiscussionThread, 
   Comment, 

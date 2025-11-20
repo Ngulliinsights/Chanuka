@@ -2,7 +2,7 @@ import { database as db } from '@shared/database';
 import { notifications, users, bills, bill_engagement } from '@shared/schema';
 import { eq, and, lt, gte, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
-import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
+import { userPreferencesService, type BillTrackingPreferences } from '@client/features/users/domain/user-preferences.js';
 // import { enhancedNotificationService, type EnhancedNotificationData } from './enhanced-notification';
 
 // Temporary stub implementation until enhanced-notification service is created
@@ -13,7 +13,7 @@ const enhancedNotificationService = {
 };
 
 type EnhancedNotificationData = any;
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 export interface ScheduledDigest { user_id: string;
   frequency: 'daily' | 'weekly' | 'monthly';

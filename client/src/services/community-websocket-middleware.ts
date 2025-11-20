@@ -6,11 +6,11 @@
  * community analytics.
  */
 
-import { UnifiedWebSocketManager } from '../core/api/websocket';
+import { UnifiedWebSocketManager } from '@client/core/api/websocket';
 import { communityWebSocketExtension } from './community-websocket-extension';
 import { communityBackendService } from './community-backend-service';
 import { notificationService } from './notification-service';
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface CommunityWebSocketConfig {
   enableDiscussions: boolean;

@@ -2,7 +2,7 @@
 // ADVOCACY COORDINATION - Action Item Entity
 // ============================================================================
 
-import { ActionTemplate } from '../../types/index.js';
+import { ActionTemplate } from '@client/types/index.js';
 
 export interface ActionItem {
   id: string;

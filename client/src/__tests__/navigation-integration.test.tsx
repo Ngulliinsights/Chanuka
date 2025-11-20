@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { BrowserRouter, Routes, Route, MemoryRouter } from 'react-router-dom';
-import NavigationBar from '../components/shell/NavigationBar';
+import NavigationBar from '@client/components/shell/NavigationBar';
 import '@testing-library/jest-dom';
 import {
   setupTestEnvironment,

@@ -1,7 +1,7 @@
 // Disclosure Validation Service
 // Handles completeness scoring, validation logic, and compliance assessment
 
-import { cache, logger, DatabaseError  } from '../../../../../shared/core/src/index.js';
+import { cache, logger, DatabaseError  } from '@shared/core/src/index.js';
 import { FinancialDisclosureConfig } from '../config';
 import { disclosureProcessingService } from './disclosure-processing.service';
 import type {

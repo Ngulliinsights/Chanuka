@@ -1,4 +1,4 @@
-import type { NavigationItem, UserRole, RelatedPage } from '../types';
+import type { NavigationItem, UserRole, RelatedPage } from '@client/types';
 import { findNavigationItemByPath } from './navigation-utils';
 import { validateNavigationPath, validateUserRole, validateRelatedPage } from '../validation';
 import { NavigationValidationError } from '../errors';
@@ -29,10 +29,10 @@ const PAGE_RELATIONSHIPS: Record<string, Record<string, { type: 'parent' | 'chil
     '/': { type: 'parent', weight: 7, context: 'Return to home' }
   },
   '/dashboard': {
-    '/profile': { type: 'sibling', weight: 9, context: 'Manage profile settings' },
+    '/account': { type: 'sibling', weight: 9, context: 'Manage profile settings' },
     '/': { type: 'parent', weight: 8, context: 'Return to home' }
   },
-  '/profile': {
+  '/account': {
     '/dashboard': { type: 'sibling', weight: 9, context: 'View dashboard' },
     '/': { type: 'parent', weight: 8, context: 'Return to home' }
   },

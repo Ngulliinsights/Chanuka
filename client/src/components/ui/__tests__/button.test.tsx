@@ -10,7 +10,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Button, EnhancedButton, buttonVariants } from '../button';
 import { attemptUIRecovery, getUIRecoverySuggestions } from '../recovery';
-import { renderWithWrapper, createMockComponentError, spyOnConsole } from './test-utils';
+import { renderWithWrapper, createMockComponentError, spyOnConsole } from '@client/test-utils';
 
 // Mock dependencies
 vi.mock('../../../lib/utils', () => ({

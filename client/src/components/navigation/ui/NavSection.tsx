@@ -1,5 +1,5 @@
 import { SECTION_TITLES } from '../constants';
-import type { NavigationItem, NavigationSection } from '../types';
+import type { NavigationItem, NavigationSection } from '@client/types';
 import { NavLink } from './NavLink';
 
 interface Props {

@@ -1,5 +1,6 @@
 // Enhanced Error Boundary - Main error boundary component
 export { default as ErrorBoundary } from './ErrorBoundary';
+export { SimpleErrorBoundary } from './SimpleErrorBoundary';
 export type {
   ErrorFallbackProps,
   ErrorBoundaryProps,
@@ -7,14 +8,17 @@ export type {
 } from './ErrorBoundary';
 
 // Error Fallback Components - Specialized fallback UIs
-export { 
-  ErrorFallback, 
-  ApiErrorFallback, 
+export {
+  ErrorFallback,
+  ApiErrorFallback,
   ComponentErrorFallback,
   ChunkErrorFallback,
   NetworkErrorFallback,
   CriticalErrorFallback
 } from './ErrorFallback';
+
+// Service Unavailable Component - Specialized service outage display
+export { ServiceUnavailable } from './ServiceUnavailable';
 
 // Error Recovery Manager - Recovery strategies and management
 export { ErrorRecoveryManager } from './ErrorRecoveryManager';
@@ -60,6 +64,9 @@ export { createErrorReporter } from './utils/error-reporter';
 export { normalizeError } from './utils/error-normalizer';
 export { getContextualMessage } from './utils/contextual-messages';
 export { getErrorIcon } from './utils/error-icons';
+
+// Lightweight tracing utilities (uses existing logger under the hood)
+export { startTrace, finishTrace, getActiveTracesCount } from '../../utils/tracing';
 
 
 

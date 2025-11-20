@@ -11,9 +11,9 @@ import { Label } from '../ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Checkbox } from '../ui/checkbox';
-import { useAuth } from '../../hooks/useAuth';
-import { LoginCredentials } from '../../types/auth';
-import { rateLimiter } from '../../utils/security-monitoring';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { LoginCredentials } from '@client/types/auth';
+import { rateLimiter } from '@client/utils/security-monitoring';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -27,7 +27,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister, onForgotPassword }: L
   const [formData, setFormData] = useState<LoginCredentials>({
     email: '',
     password: '',
-    remember_me: false,
+    rememberMe: false,
   });
   
   const [showPassword, setShowPassword] = useState(false);
@@ -73,7 +73,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister, onForgotPassword }: L
       return false;
     }
 
-    if (show2FA && !formData.two_factor_code) {
+    if (show2FA && !formData.twoFactorToken) {
       setError('Two-factor authentication code is required');
       return false;
     }
@@ -218,8 +218,8 @@ export function LoginForm({ onSuccess, onSwitchToRegister, onForgotPassword }: L
                 id="two-factor-code"
                 type="text"
                 placeholder="Enter 6-digit code"
-                value={formData.two_factor_code || ''}
-                onChange={(e) => handleInputChange('two_factor_code', e.target.value)}
+                value={formData.twoFactorToken || ''}
+                onChange={(e) => handleInputChange('twoFactorToken', e.target.value)}
                 disabled={loading}
                 maxLength={6}
                 pattern="[0-9]{6}"
@@ -235,8 +235,8 @@ export function LoginForm({ onSuccess, onSwitchToRegister, onForgotPassword }: L
           <div className="flex items-center space-x-2">
             <Checkbox
               id="remember-me"
-              checked={formData.remember_me}
-              onCheckedChange={(checked) => handleInputChange('remember_me', !!checked)}
+              checked={formData.rememberMe}
+              onCheckedChange={(checked) => handleInputChange('rememberMe', !!checked)}
               disabled={loading || isRateLimited}
             />
             <Label 

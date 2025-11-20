@@ -10,8 +10,15 @@ import {
   Users,
   Activity
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { BillsStats } from '../../store/slices/billsSlice';
+import { cn } from '@client/lib/utils';
+// Define BillsStats locally as per migration instructions
+interface BillsStats {
+  totalBills: number;
+  urgentCount: number;
+  constitutionalFlags: number;
+  trendingCount: number;
+  lastUpdated: string;
+}
 
 interface StatsOverviewProps {
   stats: BillsStats;

@@ -1,4 +1,4 @@
-import { BreadcrumbItem } from '../../types/navigation';
+import { BreadcrumbItem } from '@client/types/navigation';
 
 // Route configuration for breadcrumb generation
 const routeConfig: Record<string, { label: string; parent?: string }> = {

@@ -32,9 +32,9 @@ import {
   Building,
   BarChart3
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { useCommunityStore } from '../../store/slices/communitySlice';
-import { LocalImpactMetrics } from '../../types/community';
+import { cn } from '@client/lib/utils';
+import { useCommunityStore } from '@client/store/slices/communitySlice';
+import { LocalImpactMetrics } from '@client/types/community';
 
 interface LocalImpactPanelProps {
   onClose?: () => void;

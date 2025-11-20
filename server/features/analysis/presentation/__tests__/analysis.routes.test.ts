@@ -7,7 +7,7 @@ import { billComprehensiveAnalysisService } from '../../application/bill-compreh
 // Mock the repository for history endpoint
 import { analysisRepository } from '../../infrastructure/repositories/analysis-repository-impl';
 import { authenticateToken } from '@/components/auth'; // Import or mock auth
-import * as schema from '../../../../../shared/schema'; // For mock types
+import * as schema from '@shared/schema'; // For mock types
 
 // --- Mock Dependencies ---
 vi.mock('../../application/bill-comprehensive-analysis.service');

@@ -21,7 +21,7 @@ import {
 } from '../ui/select';
 import { CommentItem } from './CommentItem';
 import { CommentForm } from './CommentForm';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 import { 
   DiscussionThread as DiscussionThreadType, 
   Comment, 

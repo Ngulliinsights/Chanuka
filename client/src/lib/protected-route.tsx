@@ -1,9 +1,9 @@
 
 import { ReactNode } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@client/features/users/hooks/useAuth';
 import { Loader2 } from "lucide-react";
 import { Navigate } from "react-router-dom";
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // TEMPORARY: Authentication bypass for preview purposes
 // Set to false to enable authentication in production

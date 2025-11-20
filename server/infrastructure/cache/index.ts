@@ -5,7 +5,7 @@
 export * from '../../../shared/core/src/caching';
 
 // Legacy compatibility - create default cache service
-import { createCacheService } from '../../../shared/core/src/cache';
+import { createCacheService } from '@shared/core/src/cache';
 
 // Create default cache instance for backward compatibility with memory pressure monitoring
 const defaultCacheConfig = {

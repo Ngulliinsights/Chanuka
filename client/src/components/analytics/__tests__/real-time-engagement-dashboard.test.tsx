@@ -9,8 +9,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { RealTimeEngagementDashboard } from '../real-time-engagement-dashboard';
-import { useRealTimeEngagement } from '../../../hooks/useRealTimeEngagement';
-import { useWebSocket } from '../../../hooks/useWebSocket';
+import { useRealTimeEngagement } from '@client/hooks/useRealTimeEngagement';
+import { useWebSocket } from '@client/hooks/useWebSocket';
 
 // Mock the hooks
 vi.mock('../../../hooks/useRealTimeEngagement');

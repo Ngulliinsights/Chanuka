@@ -4,8 +4,8 @@
  */
 
 import { AlertTriangle, Network, Server, Database, Shield } from 'lucide-react';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../../../utils/logger';
-import type { AppError } from '../../../core/error';
+import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+import type { AppError } from '@client/core/error';
 
 export function getErrorIcon(error: BaseError): JSX.Element {
   const domain = (error.metadata?.domain as ErrorDomain | undefined) || ErrorDomain.UNKNOWN;

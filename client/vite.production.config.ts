@@ -85,7 +85,6 @@ export default defineConfig({
           'bills-feature': [
             './src/components/bills',
             './src/pages/bills',
-            './src/store/slices/billsSlice',
           ],
           'community-feature': [
             './src/components/community',

@@ -20,9 +20,9 @@ jest.mock('../utils/backgroundSyncManager', () => ({
   },
 }));
 
-const mockUseOfflineDetection = require('../hooks/useOfflineDetection').useOfflineDetection;
-const mockBackgroundSyncManager = require('../utils/backgroundSyncManager').backgroundSyncManager;
-const mockLogger = require('../../utils/logger').logger;
+const mockUseOfflineDetection = require('@client/hooks/useOfflineDetection').useOfflineDetection;
+const mockBackgroundSyncManager = require('@client/utils/backgroundSyncManager').backgroundSyncManager;
+const mockLogger = require('@client/utils/logger').logger;
 
 describe('OfflineIndicator', () => {
   beforeEach(() => {
