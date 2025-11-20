@@ -284,10 +284,11 @@ export function BillTrackingPreferences({ className, onSave }: BillTrackingPrefe
           <div className="ml-7 space-y-3">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="start-time" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Start time
                 </label>
                 <input
+                  id="start-time"
                   type="time"
                   value={preferences.quietHours.startTime}
                   onChange={(e) => updateQuietHours('startTime', e.target.value)}
@@ -295,10 +296,11 @@ export function BillTrackingPreferences({ className, onSave }: BillTrackingPrefe
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="end-time" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                   End time
                 </label>
                 <input
+                  id="end-time"
                   type="time"
                   value={preferences.quietHours.endTime}
                   onChange={(e) => updateQuietHours('endTime', e.target.value)}

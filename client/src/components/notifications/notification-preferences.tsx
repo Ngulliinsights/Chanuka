@@ -8,11 +8,8 @@ import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Progress } from '../ui/progress';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Bell, Mail, MessageSquare, Smartphone, Clock, Filter, Settings, TestTube, Save, CheckCircle, X, Network, TrendingUp, Users, Calendar, AlertTriangle, Info } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Smartphone, Filter, Settings, TestTube, Save, CheckCircle, X } from 'lucide-react';
 import { useToast } from '@client/hooks/use-toast';
-import { logger } from '@client/utils/logger';
 
 // --- INTERFACES ---
 
@@ -56,22 +53,7 @@ interface NotificationPreferences {
 }
 
 // These interfaces were in the enhanced file and may be used elsewhere or in future features
-interface EngagementProfile { user_id: string;
-  topCategories: Array<{ category: string; score: number  }>;
-  topSponsors: Array<{ sponsor_id: number; name: string; score: number }>;
-  engagementLevel: 'low' | 'medium' | 'high';
-  preferredNotificationTimes: Array<{ hour: number; frequency: number }>;
-  averageResponseTime: number;
-}
 
-interface ChannelInfo {
-  type: string;
-  name: string;
-  description: string;
-  supported: boolean;
-  requiresSetup: boolean;
-  setupInstructions?: string;
-}
 
 // --- CONSTANTS ---
 
@@ -518,7 +500,7 @@ export function NotificationPreferences() {
                 {preferences.interests.map((interest) => (
                   <Badge key={interest} variant="secondary" className="flex items-center gap-1">
                     {interest}
-                    <button onClick={() => removeInterest(interest)} className="ml-1 hover:text-red-600">
+                    <button onClick={() => removeInterest(interest)} className="ml-1 hover:text-red-600" aria-label={`Remove interest: ${interest}`}>
                       <X className="h-3 w-3" />
                     </button>
                   </Badge>
@@ -753,7 +735,7 @@ function FilterBadgeList({ items, onRemove }: FilterBadgeListProps) {
       {items.map((item) => (
         <Badge key={item} variant="secondary" className="flex items-center gap-1">
           {item}
-          <button onClick={() => onRemove(item)} className="ml-1 hover:text-red-600">
+          <button onClick={() => onRemove(item)} className="ml-1 hover:text-red-600" aria-label={`Remove filter: ${item}`}>
             <X className="h-3 w-3" />
           </button>
         </Badge>

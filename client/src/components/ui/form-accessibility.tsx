@@ -86,7 +86,6 @@ export const ScreenReaderAnnouncement: React.FC<
       className={cn("sr-only", className)}
       aria-live={ariaLive}
       aria-atomic="true"
-      role={roleValue}
     >
       {message}
     </div>

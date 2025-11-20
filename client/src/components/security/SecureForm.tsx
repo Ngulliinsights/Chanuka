@@ -4,15 +4,22 @@
  */
 
 import React, { useState } from 'react';
-import { useSecureForm, useSecurity } from '@client/hooks/useSecurity';
-import { ValidationSchemas } from '../../security';
+import { useSecureForm, useSecurity, ValidationSchemas } from '@client/hooks/useSecurity';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Badge } from '../ui/badge';
-import { Shield, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Shield, CheckCircle, AlertTriangle } from 'lucide-react';
+
+interface UserFormValues {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  acceptTerms: boolean;
+}
 
 interface SecureFormProps {
   onSubmit?: (data: any) => void;
@@ -34,7 +41,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
     validate,
     reset,
     hasErrors
-  } = useSecureForm(
+  } = useSecureForm<UserFormValues>(
     ValidationSchemas.User.registration,
     {
       email: '',
@@ -48,7 +55,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
   const [securityWarnings, setSecurityWarnings] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: keyof UserFormValues, value: any) => {
     setValue(field, value);
     
     // Perform real-time security check for text inputs
@@ -69,7 +76,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
     e.preventDefault();
     
     // Check rate limit
-    const rateLimitResult = checkRateLimit('form-submission', 'registration');
+    const rateLimitResult = checkRateLimit('form-submission', 'normal');
     if (!rateLimitResult.allowed) {
       alert(`Rate limit exceeded. Please wait ${rateLimitResult.retryAfter} seconds.`);
       return;
@@ -110,10 +117,10 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
 
   const getSecurityStatusIcon = () => {
     if (securityWarnings.length > 0) {
-      return <ShieldAlert className="h-4 w-4 text-red-500" />;
+      return <AlertTriangle className="h-4 w-4 text-red-500" />;
     }
     if (status.csrf.hasValidToken && status.inputSanitization.enabled) {
-      return <ShieldCheck className="h-4 w-4 text-green-500" />;
+      return <CheckCircle className="h-4 w-4 text-green-500" />;
     }
     return <Shield className="h-4 w-4 text-yellow-500" />;
   };
@@ -149,7 +156,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
           {/* Security Warnings */}
           {securityWarnings.length > 0 && (
             <Alert>
-              <ShieldAlert className="h-4 w-4" />
+              <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
                 <div className="font-medium mb-1">Security Warnings:</div>
                 <ul className="list-disc list-inside text-sm">
@@ -168,6 +175,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
               id="email"
               type="email"
               value={values.email}
+              placeholder="you@example.com"
               onChange={(e) => handleInputChange('email', e.target.value)}
               className={errors.email ? 'border-red-500' : ''}
             />
@@ -185,6 +193,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
               id="password"
               type="password"
               value={values.password}
+              placeholder="Enter a strong password"
               onChange={(e) => handleInputChange('password', e.target.value)}
               className={errors.password ? 'border-red-500' : ''}
             />
@@ -201,6 +210,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
             <Input
               id="firstName"
               value={values.firstName}
+              placeholder="First name"
               onChange={(e) => handleInputChange('firstName', e.target.value)}
               className={errors.firstName ? 'border-red-500' : ''}
             />
@@ -217,6 +227,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
             <Input
               id="lastName"
               value={values.lastName}
+              placeholder="Last name"
               onChange={(e) => handleInputChange('lastName', e.target.value)}
               className={errors.lastName ? 'border-red-500' : ''}
             />
@@ -232,6 +243,8 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
             <input
               id="acceptTerms"
               type="checkbox"
+              aria-label="Accept terms and conditions"
+              title="Accept terms and conditions"
               checked={values.acceptTerms}
               onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
               className="rounded border-gray-300"

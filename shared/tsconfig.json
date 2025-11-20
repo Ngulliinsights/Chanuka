@@ -8,8 +8,7 @@
     "declaration": true,
     "declarationMap": true,
   // Suppress baseUrl deprecation warnings until migration to TS7 is planned.
-  // Use "6.0" per TypeScript guidance to silence messages related to baseUrl.
-  "ignoreDeprecations": "6.0",
+  "ignoreDeprecations": "5.0",
     "paths": {
       "@/*": ["./*"]
     }
