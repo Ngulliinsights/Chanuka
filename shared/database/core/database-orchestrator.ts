@@ -9,7 +9,7 @@
 import { UnifiedConnectionManager } from './connection-manager';
 import { UnifiedHealthMonitor } from './health-monitor';
 import { DatabaseConfigManager } from './unified-config';
-import { UnifiedLogger } from '@client/core/src/observability/logging';
+import { UnifiedLogger } from '@/core/src/observability/logging';
 
 // ============================================================================
 // Types and Interfaces

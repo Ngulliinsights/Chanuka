@@ -6,9 +6,9 @@
  * connection management across the platform.
  */
 
-import { DatabaseOrchestrator } from '@client/core/database-orchestrator';
-import { DatabaseConfigManager } from '@client/core/unified-config';
-import { Logger } from '@client/core/src/observability/logging';
+import { DatabaseOrchestrator } from '../../database/core/database-orchestrator';
+import { DatabaseConfigManager } from '../../database/core/unified-config';
+import { logger, LoggerChild } from '../../core/src/observability/logging';
 
 // ============================================================================
 // Types and Interfaces
@@ -44,14 +44,14 @@ export interface ScriptContext {
 // ============================================================================
 
 export class DatabaseScriptLogger {
-  private logger: Logger;
+  private logger: LoggerChild;
   private scriptName: string;
   private verbose: boolean;
 
   constructor(scriptName: string, verbose = false) {
     this.scriptName = scriptName;
     this.verbose = verbose;
-    this.logger = new Logger(`database-script:${scriptName}`);
+    this.logger = logger.child({ scriptName });
   }
 
   /**
@@ -157,7 +157,7 @@ export abstract class BaseDatabaseScript {
 
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
-      
+
       switch (arg) {
         case '--dry-run':
           options.dryRun = true;
@@ -171,17 +171,24 @@ export abstract class BaseDatabaseScript {
           options.force = true;
           break;
         case '--timeout':
-          options.timeout = parseInt(args[++i]) || 300000;
+          const timeoutArg = args[++i];
+          if (timeoutArg === undefined) {
+            console.log('DEBUG: args[++i] is undefined for --timeout');
+          }
+          options.timeout = parseInt(timeoutArg || '300000');
           break;
         case '--environment':
         case '--env':
-          options.environment = args[++i];
+          const envArg = args[++i];
+          if (envArg === undefined) {
+            console.log('DEBUG: args[++i] is undefined for --environment');
+          }
+          if (envArg !== undefined) options.environment = envArg;
           break;
         case '--help':
         case '-h':
           this.showHelp();
           process.exit(0);
-          break;
       }
     }
 
@@ -391,8 +398,7 @@ Examples:
       this.context?.logger.logSuccess(`${operation} completed`, { duration });
       return { result, duration };
     } catch (error) {
-      const duration = Date.now() - startTime;
-      this.context?.logger.logError(`${operation} failed`, error);
+      this.context?.logger.logError(`${operation} failed after ${Date.now() - startTime}ms`, error);
       throw error;
     }
   }

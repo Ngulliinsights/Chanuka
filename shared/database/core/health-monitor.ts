@@ -7,7 +7,7 @@
  * - scripts/database/health-check.ts
  */
 
-import { logger } from '@client/core/src/index.js';
+import { logger } from '@/core/src/index.js';
 import { UnifiedConnectionManager } from './connection-manager.js';
 
 // ============================================================================

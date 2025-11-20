@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Tests for enhanced form field components
@@ -12,15 +13,15 @@ import {
   EnhancedFormSelect
 } from '../form-field';
 import { Label } from '../label';
-import { cn } from '@client/lib/utils';
+import { cn } from '../../lib/utils';
 
 // FormFieldWrapper tests replaced with direct implementations
 describe('FormFieldWrapper equivalent', () => {
   it('renders label and children', () => {
     render(
       <div>
-        <Label htmlFor="test">Test Field</Label>
-        <input id="test" />
+        <Label htmlFor="test-input">Test Field</Label>
+        <input id="test-input" placeholder="Test input" />
       </div>
     );
 
@@ -131,8 +132,8 @@ describe('EnhancedFormInput', () => {
     );
     
     const input = screen.getByLabelText('Required Field');
-    await users.click(input);
-    await users.tab(); // Trigger blur
+    await user.click(input);
+    await user.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Required Field is required')).toBeInTheDocument();
@@ -153,8 +154,8 @@ describe('EnhancedFormInput', () => {
     );
     
     const input = screen.getByLabelText('Email');
-    await users.click(input);
-    await users.tab(); // Trigger blur
+    await user.click(input);
+    await user.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Please enter a valid email address')).toBeInTheDocument();
@@ -165,11 +166,10 @@ describe('EnhancedFormInput', () => {
     const user = userEvent.setup();
     
     render(
-      <EnhancedFormInput 
+      <EnhancedFormInput
         id="password-input"
         type="password"
         label="Password"
-        showPasswordToggle
         value="secret"
         onChange={() => {}}
       />
@@ -180,7 +180,7 @@ describe('EnhancedFormInput', () => {
     
     expect(input).toHaveAttribute('type', 'password');
     
-    await users.click(toggleButton);
+    await user.click(toggleButton);
     
     expect(input).toHaveAttribute('type', 'text');
     expect(screen.getByLabelText('Hide password')).toBeInTheDocument();
@@ -201,7 +201,7 @@ describe('EnhancedFormInput', () => {
     );
     
     const input = screen.getByLabelText('Test');
-    await users.type(input, 'valid input');
+    await user.type(input, 'valid input');
     
     expect(onValidationChange).toHaveBeenCalled();
   });
@@ -264,8 +264,8 @@ describe('EnhancedFormTextarea', () => {
     );
     
     const textarea = screen.getByLabelText('Required Textarea');
-    await users.click(textarea);
-    await users.tab(); // Trigger blur
+    await user.click(textarea);
+    await user.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Required Textarea is required')).toBeInTheDocument();
@@ -286,8 +286,8 @@ describe('EnhancedFormTextarea', () => {
     );
     
     const textarea = screen.getByLabelText('Length Textarea');
-    await users.click(textarea);
-    await users.tab(); // Trigger blur
+    await user.click(textarea);
+    await user.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Maximum 10 characters allowed')).toBeInTheDocument();
@@ -313,7 +313,7 @@ describe('EnhancedFormTextarea', () => {
     );
     
     const textarea = screen.getByLabelText('Dynamic Textarea');
-    await users.type(textarea, 'Hello');
+    await user.type(textarea, 'Hello');
     
     // Rerender with updated value
     rerender(
@@ -385,8 +385,8 @@ describe('EnhancedFormSelect', () => {
     );
     
     const select = screen.getByLabelText('Required Select');
-    await users.click(select);
-    await users.tab(); // Trigger blur
+    await user.click(select);
+    await user.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Required Select is required')).toBeInTheDocument();
@@ -424,7 +424,7 @@ describe('EnhancedFormSelect', () => {
     );
     
     const select = screen.getByLabelText('Callback Select');
-    await users.selectOptions(select, 'option1');
+    await user.selectOptions(select, 'option1');
     
     expect(onValidationChange).toHaveBeenCalled();
   });

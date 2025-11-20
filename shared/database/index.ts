@@ -9,55 +9,27 @@
 // Import types and classes for re-export
 import type {
   DatabaseConfig,
-  ConnectionConfig,
   FeatureConfig,
-  MigrationConfig,
-  MonitoringConfig,
-  BackupConfig,
-  SecurityConfig,
-  EnvironmentConfig,
 } from './core/unified-config';
 import {
   DatabaseConfigManager,
-  initializeDatabaseConfig,
   getDatabaseConfig,
   createTestDatabaseConfig,
 } from './core/unified-config';
 import {
   DatabaseOrchestrator,
-  createDatabaseOrchestrator,
   getDatabaseOrchestrator,
-  initializeDatabaseOrchestrator,
   shutdownDatabaseOrchestrator,
 } from './core/database-orchestrator';
 import type {
-  DatabaseOrchestrationConfig,
   DatabaseStatus,
   DatabaseMetrics,
 } from './core/database-orchestrator';
 import {
   UnifiedConnectionManager,
-  createConnectionManager,
-  getConnectionManager,
   closeConnectionManager,
 } from './core/connection-manager';
-import type {
-  ConnectionManagerConfig,
-  ConnectionMetrics,
-  DatabaseHealthStatus,
-  DatabaseTransaction,
-  TransactionOptions,
-} from './core/connection-manager';
-import type {
-  UnifiedHealthMonitor,
-  HealthCheckResult,
-  HealthMetrics,
-  HealthMonitorConfig,
-  Alert,
-  AlertRule,
-} from './core/health-monitor';
-import { BaseDatabaseScript, DatabaseScriptLogger, runDatabaseScript, createScriptResult } from '@client/utils/base-script';
-import type { ScriptOptions, ScriptResult, ScriptContext } from '@client/utils/base-script';
+import { BaseDatabaseScript } from './utils/base-script';
 
 // ============================================================================
 // Core Infrastructure Exports
@@ -66,27 +38,17 @@ import type { ScriptOptions, ScriptResult, ScriptContext } from '@client/utils/b
 // Configuration Management
 export {
   DatabaseConfigManager,
-  initializeDatabaseConfig,
   getDatabaseConfig,
   createTestDatabaseConfig,
   type DatabaseConfig,
-  type ConnectionConfig,
   type FeatureConfig,
-  type MigrationConfig,
-  type MonitoringConfig,
-  type BackupConfig,
-  type SecurityConfig,
-  type EnvironmentConfig,
 } from './core/unified-config';
 
 // Database Orchestration
 export {
   DatabaseOrchestrator,
-  createDatabaseOrchestrator,
   getDatabaseOrchestrator,
-  initializeDatabaseOrchestrator,
   shutdownDatabaseOrchestrator,
-  type DatabaseOrchestrationConfig,
   type DatabaseStatus,
   type DatabaseMetrics,
 } from './core/database-orchestrator';
@@ -94,28 +56,10 @@ export {
 // Connection Management (re-export existing)
 export {
   UnifiedConnectionManager,
-  createConnectionManager,
-  getConnectionManager,
   closeConnectionManager,
-  type ConnectionManagerConfig,
-  type ConnectionMetrics,
-  type DatabaseHealthStatus,
-  type DatabaseTransaction,
-  type TransactionOptions,
 } from './core/connection-manager';
 
 // Health Monitoring (re-export existing)
-export {
-  UnifiedHealthMonitor,
-  createHealthMonitor,
-  getHealthMonitor,
-  stopHealthMonitor,
-  type HealthCheckResult,
-  type HealthMetrics,
-  type HealthMonitorConfig,
-  type Alert,
-  type AlertRule,
-} from './core/health-monitor';
 
 // ============================================================================
 // Utility Exports
@@ -124,12 +68,6 @@ export {
 // Script Infrastructure
 export {
   BaseDatabaseScript,
-  DatabaseScriptLogger,
-  runDatabaseScript,
-  createScriptResult,
-  type ScriptOptions,
-  type ScriptResult,
-  type ScriptContext,
 } from './utils/base-script';
 
 // ============================================================================
@@ -441,7 +379,6 @@ export async function resetDatabaseForTesting(): Promise<void> {
   }
   
   const orchestrator = getDatabaseOrchestrator();
-  const connectionManager = orchestrator.getConnectionManager();
   
   // Implementation would depend on your specific reset requirements
   // This is a placeholder for the actual reset logic

@@ -1,4 +1,4 @@
-import { logger } from '@client/core/index.js';
+import { logger } from '@/core/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS

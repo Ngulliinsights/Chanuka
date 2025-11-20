@@ -61,9 +61,9 @@ export function createDatabaseConfig(environment?: string): ConnectionManagerCon
       : [],
     
     // Multi-database architecture
-    operationalDbUrl: process.env.DB_OPERATIONAL_URL,
-    analyticsDbUrl: process.env.DB_ANALYTICS_URL,
-    securityDbUrl: process.env.DB_SECURITY_URL,
+    ...(process.env.DB_OPERATIONAL_URL && { operationalDbUrl: process.env.DB_OPERATIONAL_URL }),
+    ...(process.env.DB_ANALYTICS_URL && { analyticsDbUrl: process.env.DB_ANALYTICS_URL }),
+    ...(process.env.DB_SECURITY_URL && { securityDbUrl: process.env.DB_SECURITY_URL }),
   };
 
   // Environment-specific overrides
