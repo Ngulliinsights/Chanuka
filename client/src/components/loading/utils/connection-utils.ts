@@ -3,7 +3,7 @@
  * Following navigation component patterns for utility organization
  */
 
-import { ConnectionType } from '../types';
+import { ConnectionType } from '@client/types';
 import { CONNECTION_THRESHOLDS } from '../constants';
 
 export interface ConnectionInfo {

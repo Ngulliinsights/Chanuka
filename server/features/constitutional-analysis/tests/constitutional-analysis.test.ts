@@ -4,8 +4,8 @@
 // Comprehensive tests for the constitutional analysis feature
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createConstitutionalAnalyzer, createAnalysisServices } from '../services/constitutional-analysis-factory.js';
-import { AnalysisRequest } from '../types/index.js';
+import { createConstitutionalAnalyzer, createAnalysisServices } from '@client/services/constitutional-analysis-factory.js';
+import { AnalysisRequest } from '@client/types/index.js';
 
 // Mock data for testing
 const mockBillContent = `

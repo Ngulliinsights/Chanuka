@@ -5,11 +5,11 @@
  * Covers authentication, bill operations, community interactions, and error analytics.
  */
 
+import React from 'react';
 import { jest, describe, beforeEach, afterEach, it, expect } from '@jest/globals';
-import { configureStore } from '@reduxjs/toolkit';
-import { billsSlice, loadBillsFromAPI, recordEngagement } from '../store/slices/billsSlice';
-import { authSlice, login, logout } from '../store/slices/authSlice';
-import { errorAnalyticsSlice, fetchOverviewMetrics } from '../store/slices/errorAnalyticsSlice';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
 
 // Mock all external dependencies
 jest.mock('../services', () => ({
@@ -81,21 +81,27 @@ jest.mock('../utils/logger', () => ({
 }));
 
 describe('End-to-End API Flow Tests', () => {
-  let store: ReturnType<typeof configureStore>;
+  let queryClient: QueryClient;
 
   beforeEach(() => {
-    store = configureStore({
-      reducer: {
-        bills: billsSlice.reducer,
-        auth: authSlice.reducer,
-        errorAnalytics: errorAnalyticsSlice.reducer
-      }
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    queryClient.clear();
   });
+
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
 
   describe('User Authentication and Bill Interaction Flow', () => {
     const mockUser = {
@@ -152,10 +158,10 @@ describe('End-to-End API Flow Tests', () => {
     };
 
     it('should complete full user journey: login -> browse bills -> engage -> logout', async () => {
-      const { authService } = require('../services/AuthService');
-      const { billsRepository } = require('../services');
-      const { billsPaginationService } = require('../services/billsPaginationService');
-      const { billsDataCache } = require('../services/billsDataCache');
+      const { authService } = require('@client/services/AuthService');
+      const { billsRepository } = require('@client/services');
+      const { billsPaginationService } = require('@client/services/billsPaginationService');
+      const { billsDataCache } = require('@client/services/billsDataCache');
 
       // Step 1: User logs in
       authService.login = vi.fn().mockResolvedValue(mockAuthResponse);
@@ -212,10 +218,10 @@ describe('End-to-End API Flow Tests', () => {
     });
 
     it('should handle error scenarios gracefully throughout the flow', async () => {
-      const { authService } = require('../services/AuthService');
-      const { billsRepository } = require('../services');
-      const { billsPaginationService } = require('../services/billsPaginationService');
-      const { mockDataService } = require('../services/mockDataService');
+      const { authService } = require('@client/services/AuthService');
+      const { billsRepository } = require('@client/services');
+      const { billsPaginationService } = require('@client/services/billsPaginationService');
+      const { mockDataService } = require('@client/services/mockDataService');
 
       // Step 1: Login fails
       authService.login = vi.fn().mockRejectedValue(new Error('Invalid credentials'));
@@ -272,7 +278,7 @@ describe('End-to-End API Flow Tests', () => {
     };
 
     it('should complete community interaction flow: view discussion -> add comment -> vote', async () => {
-      const { communityRepository } = require('../services');
+      const { communityRepository } = require('@client/services');
 
       // Step 1: User views discussion thread
       const mockDiscussionThread = {
@@ -336,7 +342,7 @@ describe('End-to-End API Flow Tests', () => {
     };
 
     it('should complete error analytics workflow: fetch metrics -> update filters -> monitor real-time', async () => {
-      const { errorAnalyticsRepository } = require('../services');
+      const { errorAnalyticsRepository } = require('@client/services');
 
       // Step 1: Load overview metrics
       errorAnalyticsRepository.getOverviewMetrics.mockResolvedValue(mockOverviewMetrics);
@@ -393,8 +399,8 @@ describe('End-to-End API Flow Tests', () => {
 
   describe('Cross-Feature Integration Flow', () => {
     it('should demonstrate unified error handling across features', async () => {
-      const { authService } = require('../services/AuthService');
-      const { billsRepository, errorAnalyticsRepository } = require('../services');
+      const { authService } = require('@client/services/AuthService');
+      const { billsRepository, errorAnalyticsRepository } = require('@client/services');
 
       // Simulate network errors across different features
       const networkError = new Error('Network connection failed');
@@ -407,7 +413,7 @@ describe('End-to-End API Flow Tests', () => {
       expect(authState.error).toBe('Network connection failed');
 
       // Bills error (with fallback)
-      const { billsPaginationService, mockDataService } = require('../services/mockDataService');
+      const { billsPaginationService, mockDataService } = require('@client/services/mockDataService');
       billsPaginationService.loadFirstPage.mockRejectedValue(networkError);
       mockDataService.loadData.mockResolvedValue([]);
 
@@ -443,14 +449,14 @@ describe('End-to-End API Flow Tests', () => {
     });
 
     it('should demonstrate caching benefits across user sessions', async () => {
-      const { billsRepository } = require('../services');
-      const { billsDataCache } = require('../services/billsDataCache');
+      const { billsRepository } = require('@client/services');
+      const { billsDataCache } = require('@client/services/billsDataCache');
 
       // First session - cache miss, API call
       billsDataCache.getCachedBills.mockResolvedValue(null);
       billsDataCache.getCachedBillsStats.mockResolvedValue(null);
 
-      const { billsPaginationService } = require('../services/billsPaginationService');
+      const { billsPaginationService } = require('@client/services/billsPaginationService');
       billsPaginationService.loadFirstPage.mockResolvedValue({
         bills: [{ id: 1, title: 'Cached Bill' }],
         stats: { totalBills: 1, urgentCount: 0, constitutionalFlags: 0, trendingCount: 0, lastUpdated: new Date().toISOString() }
@@ -469,7 +475,6 @@ describe('End-to-End API Flow Tests', () => {
       // Reset store for second session
       store = configureStore({
         reducer: {
-          bills: billsSlice.reducer,
           auth: authSlice.reducer,
           errorAnalytics: errorAnalyticsSlice.reducer
         }
@@ -487,7 +492,7 @@ describe('End-to-End API Flow Tests', () => {
       // This would test the circuit breaker functionality
       // For now, we'll test the error handling resilience
 
-      const { billsRepository } = require('../services');
+      const { billsRepository } = require('@client/services');
 
       // Simulate multiple failures that would trigger circuit breaker in real implementation
       for (let i = 0; i < 3; i++) {
@@ -505,7 +510,7 @@ describe('End-to-End API Flow Tests', () => {
     });
 
     it('should demonstrate WebSocket integration for real-time features', async () => {
-      const { billsRepository } = require('../services');
+      const { billsRepository } = require('@client/services');
 
       // Simulate WebSocket real-time updates
       const realTimeUpdate = {
@@ -513,8 +518,9 @@ describe('End-to-End API Flow Tests', () => {
         data: { bill_id: 1, newStatus: 'passed' }
       };
 
-      // Add a bill first
-      store.dispatch(billsSlice.actions.addBill({
+      // Add a bill first (simulated through service)
+      const { billsRepository } = require('@client/services');
+      billsRepository.getBillById.mockResolvedValue({
         id: 1,
         billNumber: 'HB-001',
         title: 'Test Bill',
@@ -532,14 +538,14 @@ describe('End-to-End API Flow Tests', () => {
         policyAreas: [],
         complexity: 'medium',
         readingTime: 5
-      }));
+      });
 
-      // Simulate real-time update
-      store.dispatch(billsSlice.actions.handleRealTimeUpdate(realTimeUpdate));
+      // Simulate real-time update through service
+      billsRepository.recordEngagement.mockResolvedValue(undefined);
 
-      const billsState = store.getState().bills;
-      expect(billsState.bills[0].status).toBe('passed');
-      expect(billsState.lastUpdateTime).toBeDefined();
+      // Verify the bill was retrieved and engagement was recorded
+      expect(billsRepository.getBillById).toHaveBeenCalledWith(1);
+      expect(billsRepository.recordEngagement).toHaveBeenCalledWith(1, 'view');
     });
   });
 });

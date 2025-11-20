@@ -13,9 +13,9 @@
  */
 
 // Remove repository interfaces - using services directly
-import { globalConfig } from '../core/api/config';
-import { logger } from '../utils/logger';
-import { EngagementHistoryFilters } from '../core/api/user';
+import { globalConfig } from '@client/core/api/config';
+import { logger } from '@client/utils/logger';
+import { EngagementHistoryFilters } from '@client/core/api/user';
 
 // ============================================================================
 // Type Definitions (Consolidated from all user services)
@@ -626,7 +626,7 @@ class UserService {
     return { exportId: `export_${Date.now()}` };
   }
 
-  async recordActivity(userId: string, activity: any): Promise<void> {
+  async recordActivity(activity: { action_type: string; entity_type: string; entity_id: string; metadata?: any }): Promise<void> {
     // Mock implementation for now
     return Promise.resolve();
   }
@@ -637,8 +637,8 @@ class UserService {
 // ============================================================================
 
 import { authService } from './AuthService';
-import { userApiService } from '../core/api/user';
+import { userApi } from '@client/features/users/services/user-api';
 
-export const userService = new UserService(authService, userApiService);
+export const userService = new UserService(authService, userApi);
 
 // Types are exported at the top of the file

@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi, beforeAll } from 'vitest';
 import { UnifiedWebSocketManager, WebSocketConnectionPool, globalWebSocketPool } from '../websocket';
-import { WebSocketConfig, ConnectionState, BillUpdate, WebSocketNotification } from '../types';
+import { WebSocketConfig, ConnectionState, BillUpdate, WebSocketNotification } from '@client/types';
 
 // Mock WebSocket
 const mockWebSocket = {

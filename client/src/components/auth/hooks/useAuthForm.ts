@@ -4,57 +4,12 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useAuth } from '../../../hooks/useAuth';
-import { validatePassword } from '../../../utils/password-validation';
-import { validateEmail } from '../../../utils/input-validation';
-import { logger } from '../../../utils/logger';
-import { LoginCredentials, RegisterData } from '../../../types/auth';
-
-export interface FormData {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  first_name: string;
-  last_name: string;
-  remember_me: boolean;
-  two_factor_code: string;
-}
-
-export type FormFieldName = keyof FormData;
-
-export interface UseAuthFormOptions {
-  initialMode?: 'login' | 'register';
-  onSuccess?: (data: any) => void;
-  onError?: (error: string) => void;
-  onModeChange?: (mode: 'login' | 'register') => void;
-  realTimeValidation?: boolean;
-}
-
-export interface UseAuthFormReturn {
-  mode: 'login' | 'register';
-  formData: FormData;
-  errors: Partial<Record<FormFieldName, string>>;
-  loading: boolean;
-  apiResponse: { success?: string; error?: string } | null;
-  showPassword: boolean;
-  isRegisterMode: boolean;
-  isValid: boolean;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
-  handleSubmit: (e: React.FormEvent) => Promise<void>;
-  toggleMode: () => void;
-  setShowPassword: (show: boolean) => void;
-  clearErrors: () => void;
-  resetForm: () => void;
-  getFieldError: (field: FormFieldName) => string | undefined;
-  getFieldProps: (field: FormFieldName) => {
-    value: string | boolean;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
-    error: string | undefined;
-  };
-  retry: () => void;
-}
+import { useAuth } from '../../../features/users/hooks/useAuth';
+import { validatePassword } from '@/utils/password-validation';
+import { validateEmail } from '@/utils/input-validation';
+import { logger } from '@/utils/logger';
+import { LoginCredentials, RegisterData } from '@/types/auth';
+import { UseAuthFormOptions, UseAuthFormReturn, FormData, FormFieldName } from '../types';
 
 const initialFormData: FormData = {
   email: '',
@@ -239,8 +194,9 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormReturn
         const credentials: LoginCredentials = {
           email: formData.email,
           password: formData.password,
-          remember_me: formData.remember_me,
-          two_factor_code: formData.two_factor_code || undefined,
+          // map form snake_case -> API camelCase
+          rememberMe: formData.remember_me,
+          twoFactorToken: formData.two_factor_code || undefined,
         };
 
         const result = await auth.login(credentials);
@@ -256,32 +212,14 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormReturn
           onError?.(result.error || 'Login failed');
         }
       } else {
+        // Map form data to the shared RegisterData shape
         const registerData: RegisterData = {
           email: formData.email,
           password: formData.password,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          privacy_settings: {
-            profile_visibility: 'registered',
-            email_visibility: 'private',
-            activity_tracking: true,
-            analytics_consent: false, // Will be asked separately
-            marketing_consent: false,
-            data_sharing_consent: false,
-            location_tracking: false,
-            personalized_content: true,
-            third_party_integrations: false,
-            notification_preferences: {
-              email_notifications: true,
-              push_notifications: false,
-              sms_notifications: false,
-              bill_updates: true,
-              comment_replies: true,
-              expert_insights: true,
-              security_alerts: true,
-              privacy_updates: true,
-            },
-          },
+          name: `${formData.first_name} ${formData.last_name}`.trim(),
+          confirmPassword: formData.confirmPassword,
+          // acceptTerms isn't part of the form currently; default to true to proceed
+          acceptTerms: true,
         };
 
         const result = await auth.register(registerData);
@@ -341,13 +279,20 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormReturn
 
   // Get props for field (useful for form libraries)
   const getFieldProps = useCallback((field: FormFieldName) => {
+    const requiredFields = mode === 'login'
+      ? ['email', 'password']
+      : ['email', 'password', 'confirmPassword', 'first_name', 'last_name'];
+
     return {
+      name: field,
       value: formData[field],
       onChange: handleInputChange,
       onBlur: handleBlur,
       error: errors[field],
+      disabled: false,
+      required: requiredFields.includes(field),
     };
-  }, [formData, errors, handleInputChange, handleBlur]);
+  }, [formData, errors, handleInputChange, handleBlur, mode]);
 
   // Retry last submission
   const retry = useCallback(() => {
@@ -389,6 +334,7 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormReturn
     showPassword,
     isRegisterMode,
     isValid: isValid(),
+    canSubmit: isValid() && !loading,
     handleInputChange,
     handleBlur,
     handleSubmit,
@@ -398,6 +344,7 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormReturn
     resetForm,
     getFieldError,
     getFieldProps,
+    validateField,
     retry,
   };
 }

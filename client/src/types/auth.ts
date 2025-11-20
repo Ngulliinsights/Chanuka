@@ -15,6 +15,8 @@ export interface User {
   permissions: string[];
   lastLogin: string;
   createdAt: string;
+  verification_status?: 'pending' | 'verified' | 'rejected';
+  expertise?: string | string[];
 }
 
 export interface PrivacySettings {

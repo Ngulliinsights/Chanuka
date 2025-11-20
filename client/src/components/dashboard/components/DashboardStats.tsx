@@ -17,7 +17,7 @@ import {
   Users,
   Target
 } from 'lucide-react';
-import { UserDashboardData, CivicImpactMetrics } from '../../../types/user-dashboard';
+import { UserDashboardData, CivicImpactMetrics } from '@client/types/user-dashboard';
 import { formatDistanceToNow } from 'date-fns';
 
 interface DashboardStatsProps {

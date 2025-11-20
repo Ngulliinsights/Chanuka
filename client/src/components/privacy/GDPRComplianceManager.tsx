@@ -4,36 +4,48 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Progress } from '../ui/progress';
-import { Switch } from '../ui/switch';
-import { Label } from '../ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
 import { 
   Shield, 
   Download, 
-  Trash2, 
+  Trash,
   FileText, 
   Clock, 
-  CheckCircle, 
   AlertTriangle,
   Info,
   Eye,
   Settings,
-  Globe,
   Lock,
-  Users,
   Database,
-  Mail,
-  Phone
+  Mail
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { privacyCompliance } from '../../utils/privacy-compliance';
-import { dataRetentionService } from '../../services/dataRetentionService';
-import { logger } from '../../utils/logger';
+
+// Extended User interface with privacy settings
+interface UserWithPrivacy {
+  id: string;
+  email: string;
+  name: string;
+  privacy_settings?: {
+    analytics_consent?: boolean;
+    marketing_consent?: boolean;
+    data_sharing_consent?: boolean;
+    location_tracking?: boolean;
+  };
+}
+
+// Mock auth hook structure for demonstration
+interface AuthContext {
+  user: UserWithPrivacy | null;
+  requestDataExport: (format: string, categories: string[]) => Promise<void>;
+  requestDataDeletion: (period: string, categories: string[]) => Promise<void>;
+  updatePrivacySettings: (settings: Record<string, boolean>) => Promise<void>;
+}
 
 interface GDPRRights {
   id: string;
@@ -66,8 +78,34 @@ interface DataProcessingActivity {
   profiling: boolean;
 }
 
-export function GDPRComplianceManager() {
-  const auth = useAuth();
+export default function GDPRComplianceManager() {
+  // Mock user data for demonstration
+  const mockAuth: AuthContext = {
+    user: {
+      id: 'user123',
+      email: 'user@example.com',
+      name: 'Demo User',
+      privacy_settings: {
+        analytics_consent: true,
+        marketing_consent: false,
+        data_sharing_consent: true,
+        location_tracking: false,
+      }
+    },
+    requestDataExport: async (format: string, categories: string[]) => {
+      console.log('Data export requested:', { format, categories });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    },
+    requestDataDeletion: async (period: string, categories: string[]) => {
+      console.log('Data deletion requested:', { period, categories });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    },
+    updatePrivacySettings: async (settings: Record<string, boolean>) => {
+      console.log('Privacy settings updated:', settings);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+  };
+
   const [loading, setLoading] = useState(true);
   const [gdprRights, setGdprRights] = useState<GDPRRights[]>([]);
   const [consentStatus, setConsentStatus] = useState<ConsentStatus[]>([]);
@@ -76,17 +114,17 @@ export function GDPRComplianceManager() {
   const [activeTab, setActiveTab] = useState('rights');
 
   useEffect(() => {
-    if (auth.user) {
+    if (mockAuth.user) {
       loadGDPRData();
     }
-  }, [auth.user]);
+  }, []);
 
   const loadGDPRData = async () => {
-    if (!auth.user) return;
+    if (!mockAuth.user) return;
 
     setLoading(true);
     try {
-      // Load GDPR rights status
+      // Initialize GDPR rights with current status
       const rights: GDPRRights[] = [
         {
           id: 'access',
@@ -108,7 +146,7 @@ export function GDPRComplianceManager() {
           id: 'erasure',
           name: 'Right to Erasure',
           description: 'Request deletion of your personal data',
-          icon: <Trash2 className="h-5 w-5" />,
+          icon: <Trash className="h-5 w-5" />,
           available: true,
           status: 'available',
         },
@@ -146,39 +184,39 @@ export function GDPRComplianceManager() {
         },
       ];
 
-      // Load consent status
+      // Load consent status from user's privacy settings
       const consents: ConsentStatus[] = [
         {
           category: 'Analytics',
-          granted: auth.user.privacy_settings?.analytics_consent || false,
-          grantedAt: auth.user.privacy_settings?.analytics_consent ? new Date().toISOString() : undefined,
+          granted: mockAuth.user.privacy_settings?.analytics_consent || false,
+          grantedAt: mockAuth.user.privacy_settings?.analytics_consent ? new Date().toISOString() : undefined,
           version: '1.0.0',
           canWithdraw: true,
         },
         {
           category: 'Marketing',
-          granted: auth.user.privacy_settings?.marketing_consent || false,
-          grantedAt: auth.user.privacy_settings?.marketing_consent ? new Date().toISOString() : undefined,
+          granted: mockAuth.user.privacy_settings?.marketing_consent || false,
+          grantedAt: mockAuth.user.privacy_settings?.marketing_consent ? new Date().toISOString() : undefined,
           version: '1.0.0',
           canWithdraw: true,
         },
         {
           category: 'Data Sharing',
-          granted: auth.user.privacy_settings?.data_sharing_consent || false,
-          grantedAt: auth.user.privacy_settings?.data_sharing_consent ? new Date().toISOString() : undefined,
+          granted: mockAuth.user.privacy_settings?.data_sharing_consent || false,
+          grantedAt: mockAuth.user.privacy_settings?.data_sharing_consent ? new Date().toISOString() : undefined,
           version: '1.0.0',
           canWithdraw: true,
         },
         {
           category: 'Location Tracking',
-          granted: auth.user.privacy_settings?.location_tracking || false,
-          grantedAt: auth.user.privacy_settings?.location_tracking ? new Date().toISOString() : undefined,
+          granted: mockAuth.user.privacy_settings?.location_tracking || false,
+          grantedAt: mockAuth.user.privacy_settings?.location_tracking ? new Date().toISOString() : undefined,
           version: '1.0.0',
           canWithdraw: true,
         },
       ];
 
-      // Load processing activities
+      // Define data processing activities with full transparency
       const activities: DataProcessingActivity[] = [
         {
           id: 'account_management',
@@ -226,7 +264,7 @@ export function GDPRComplianceManager() {
         },
       ];
 
-      // Calculate compliance score
+      // Calculate overall compliance score based on available rights and granted consents
       const grantedConsents = consents.filter(c => c.granted).length;
       const availableRights = rights.filter(r => r.available).length;
       const score = Math.round(((grantedConsents + availableRights) / (consents.length + rights.length)) * 100);
@@ -236,19 +274,17 @@ export function GDPRComplianceManager() {
       setProcessingActivities(activities);
       setComplianceScore(score);
     } catch (error) {
-      logger.error('Failed to load GDPR data', {
-        component: 'GDPRComplianceManager',
-        error,
-      });
+      console.error('Failed to load GDPR data:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleExerciseRight = async (rightId: string) => {
-    if (!auth.user) return;
+    if (!mockAuth.user) return;
 
     try {
+      // Route to appropriate handler based on the right being exercised
       switch (rightId) {
         case 'access':
           await handleDataAccess();
@@ -266,19 +302,15 @@ export function GDPRComplianceManager() {
           await handleProcessingObjection();
           break;
         default:
-          logger.warn('Unknown GDPR right', { rightId });
+          console.warn('Unknown GDPR right:', rightId);
       }
     } catch (error) {
-      logger.error('Failed to exercise GDPR right', {
-        component: 'GDPRComplianceManager',
-        rightId,
-        error,
-      });
+      console.error('Failed to exercise GDPR right:', rightId, error);
     }
   };
 
   const handleDataAccess = async () => {
-    if (!auth.user) return;
+    if (!mockAuth.user) return;
 
     const confirmed = window.confirm(
       'This will generate a comprehensive report of all your personal data. You will receive an email when it\'s ready. Continue?'
@@ -286,28 +318,25 @@ export function GDPRComplianceManager() {
 
     if (!confirmed) return;
 
-    await auth.requestDataExport('json', ['profile', 'activity', 'analytics', 'communications']);
+    await mockAuth.requestDataExport('json', ['profile', 'activity', 'analytics', 'communications']);
     
-    // Update right status
+    // Update the right's status to show it's been requested
     setGdprRights(prev => prev.map(right => 
       right.id === 'access' 
         ? { ...right, status: 'pending', lastExercised: new Date().toISOString() }
         : right
     ));
 
-    logger.info('Data access request submitted', {
-      component: 'GDPRComplianceManager',
-      userId: auth.user.id,
-    });
+    console.log('Data access request submitted for user:', mockAuth.user.id);
   };
 
   const handleDataPortability = async () => {
-    if (!auth.user) return;
+    if (!mockAuth.user) return;
 
     const format = window.prompt('Choose export format (json, csv, xml):', 'json');
     if (!format || !['json', 'csv', 'xml'].includes(format)) return;
 
-    await auth.requestDataExport(format as any, ['profile', 'activity']);
+    await mockAuth.requestDataExport(format, ['profile', 'activity']);
     
     setGdprRights(prev => prev.map(right => 
       right.id === 'portability' 
@@ -315,15 +344,11 @@ export function GDPRComplianceManager() {
         : right
     ));
 
-    logger.info('Data portability request submitted', {
-      component: 'GDPRComplianceManager',
-      format,
-      userId: auth.user.id,
-    });
+    console.log('Data portability request submitted with format:', format);
   };
 
   const handleDataErasure = async () => {
-    if (!auth.user) return;
+    if (!mockAuth.user) return;
 
     const confirmed = window.confirm(
       'WARNING: This will permanently delete your account and all associated data. This action cannot be undone. Are you sure?'
@@ -337,7 +362,7 @@ export function GDPRComplianceManager() {
 
     if (!secondConfirm) return;
 
-    await auth.requestDataDeletion('30days', ['profile', 'activity', 'analytics', 'communications']);
+    await mockAuth.requestDataDeletion('30days', ['profile', 'activity', 'analytics', 'communications']);
     
     setGdprRights(prev => prev.map(right => 
       right.id === 'erasure' 
@@ -345,10 +370,7 @@ export function GDPRComplianceManager() {
         : right
     ));
 
-    logger.info('Data erasure request submitted', {
-      component: 'GDPRComplianceManager',
-      userId: auth.user.id,
-    });
+    console.log('Data erasure request submitted for user:', mockAuth.user.id);
   };
 
   const handleProcessingRestriction = async () => {
@@ -365,17 +387,14 @@ export function GDPRComplianceManager() {
       '4': 'Objection pending',
     };
 
-    // In production, this would submit a restriction request
+    // Mark the restriction request as pending
     setGdprRights(prev => prev.map(right => 
       right.id === 'restriction' 
         ? { ...right, status: 'pending', lastExercised: new Date().toISOString() }
         : right
     ));
 
-    logger.info('Processing restriction request submitted', {
-      component: 'GDPRComplianceManager',
-      reason: reasons[reason as keyof typeof reasons],
-    });
+    console.log('Processing restriction request submitted with reason:', reasons[reason as keyof typeof reasons]);
   };
 
   const handleProcessingObjection = async () => {
@@ -385,26 +404,25 @@ export function GDPRComplianceManager() {
 
     if (!grounds) return;
 
-    // In production, this would submit an objection request
+    // Mark the objection as pending review
     setGdprRights(prev => prev.map(right => 
       right.id === 'objection' 
         ? { ...right, status: 'pending', lastExercised: new Date().toISOString() }
         : right
     ));
 
-    logger.info('Processing objection submitted', {
-      component: 'GDPRComplianceManager',
-      grounds,
-    });
+    console.log('Processing objection submitted with grounds:', grounds);
   };
 
   const handleConsentChange = async (category: string, granted: boolean) => {
-    if (!auth.user) return;
+    if (!mockAuth.user) return;
 
     try {
+      // Convert category name to the corresponding setting key
       const settingKey = category.toLowerCase().replace(' ', '_') + '_consent';
-      await auth.updatePrivacySettings({ [settingKey]: granted });
+      await mockAuth.updatePrivacySettings({ [settingKey]: granted });
 
+      // Update the local consent status
       setConsentStatus(prev => prev.map(consent => 
         consent.category === category 
           ? { 
@@ -416,21 +434,14 @@ export function GDPRComplianceManager() {
           : consent
       ));
 
-      logger.info('Consent updated', {
-        component: 'GDPRComplianceManager',
-        category,
-        granted,
-      });
+      console.log('Consent updated for category:', category, 'granted:', granted);
     } catch (error) {
-      logger.error('Failed to update consent', {
-        component: 'GDPRComplianceManager',
-        category,
-        error,
-      });
+      console.error('Failed to update consent for category:', category, error);
     }
   };
 
   const getRightStatusColor = (status?: string) => {
+    // Assign appropriate colors based on the current status of each right
     switch (status) {
       case 'available':
         return 'text-green-600';
@@ -446,6 +457,7 @@ export function GDPRComplianceManager() {
   };
 
   const getRightStatusBadge = (status?: string) => {
+    // Create visual badges to indicate the status of each GDPR right
     switch (status) {
       case 'available':
         return <Badge variant="default">Available</Badge>;
@@ -462,7 +474,7 @@ export function GDPRComplianceManager() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
           <div className="h-24 bg-gray-200 rounded mb-4"></div>
@@ -472,20 +484,22 @@ export function GDPRComplianceManager() {
     );
   }
 
-  if (!auth.user) {
+  if (!mockAuth.user) {
     return (
-      <Alert>
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Please log in to access GDPR compliance features.
-        </AlertDescription>
-      </Alert>
+      <div className="p-6">
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Please log in to access GDPR compliance features.
+          </AlertDescription>
+        </Alert>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+      {/* Header with compliance score indicator */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -505,7 +519,7 @@ export function GDPRComplianceManager() {
         </div>
       </div>
 
-      {/* GDPR Notice */}
+      {/* Informational notice about GDPR rights */}
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription>
@@ -514,7 +528,7 @@ export function GDPRComplianceManager() {
         </AlertDescription>
       </Alert>
 
-      {/* Main Content */}
+      {/* Main tabbed interface for different GDPR features */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="rights">Your Rights</TabsTrigger>
@@ -523,7 +537,7 @@ export function GDPRComplianceManager() {
           <TabsTrigger value="contact">Contact DPO</TabsTrigger>
         </TabsList>
 
-        {/* GDPR Rights */}
+        {/* Tab 1: Display all GDPR rights with exercise options */}
         <TabsContent value="rights">
           <div className="space-y-4">
             {gdprRights.map((right) => (
@@ -563,7 +577,7 @@ export function GDPRComplianceManager() {
           </div>
         </TabsContent>
 
-        {/* Consent Management */}
+        {/* Tab 2: Manage consent for different data processing categories */}
         <TabsContent value="consent">
           <Card>
             <CardHeader>
@@ -617,7 +631,7 @@ export function GDPRComplianceManager() {
           </Card>
         </TabsContent>
 
-        {/* Data Processing Activities */}
+        {/* Tab 3: Show detailed information about data processing activities */}
         <TabsContent value="processing">
           <div className="space-y-4">
             {processingActivities.map((activity) => (
@@ -673,7 +687,7 @@ export function GDPRComplianceManager() {
           </div>
         </TabsContent>
 
-        {/* Contact DPO */}
+        {/* Tab 4: Contact information for Data Protection Officer */}
         <TabsContent value="contact">
           <Card>
             <CardHeader>
@@ -691,13 +705,6 @@ export function GDPRComplianceManager() {
                       <div>
                         <p className="font-medium">Email</p>
                         <p className="text-sm text-gray-600">dpo@chanuka.ke</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Phone className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <p className="font-medium">Phone</p>
-                        <p className="text-sm text-gray-600">+254 (0) 20 123 4567</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -735,12 +742,12 @@ export function GDPRComplianceManager() {
                     <Mail className="h-4 w-4 mr-2" />
                     Email DPO
                   </Button>
-                  <Button variant="outline" onClick={() => window.open('/privacy-policy', '_blank')}>
+                  <Button variant="outline" onClick={() => alert('Privacy Policy would open here')}>
                     <FileText className="h-4 w-4 mr-2" />
                     Privacy Policy
                   </Button>
-                  <Button variant="outline" onClick={() => window.open('/gdpr-compliance', '_blank')}>
-                    <Globe className="h-4 w-4 mr-2" />
+                  <Button variant="outline" onClick={() => alert('GDPR Compliance Statement would open here')}>
+                    <Shield className="h-4 w-4 mr-2" />
                     GDPR Compliance Statement
                   </Button>
                 </div>

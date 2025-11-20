@@ -1,11 +1,11 @@
 
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { Progress } from '../../components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { logger } from '../../utils/logger';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Button } from '@client/components/ui/button';
+import { Badge } from '@client/components/ui/badge';
+import { Progress } from '@client/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { logger } from '@client/utils/logger';
 import {
   ArrowLeft,
   Search, 

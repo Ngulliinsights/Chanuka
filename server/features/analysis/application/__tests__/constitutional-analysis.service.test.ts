@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { constitutionalAnalysisService, ConstitutionalAnalysisService } from '../constitutional-analysis.service';
 import { readDatabase } from '@shared/database/connection';
-import * as schema from '../../../../../shared/schema';
+import * as schema from '@shared/schema';
 
 // --- Mock Dependencies ---
 vi.mock('../../../../db', () => ({ readDatabase: vi.fn() }));

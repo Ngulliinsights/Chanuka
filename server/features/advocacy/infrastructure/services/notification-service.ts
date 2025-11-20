@@ -2,8 +2,8 @@
 // ADVOCACY COORDINATION - Notification Service
 // ============================================================================
 
-import { NotificationPreferences } from '../../types/index.js';
-import { logger  } from '../../../../../shared/core/src/index.js';
+import { NotificationPreferences } from '@client/types/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 export interface NotificationConfig {
   enableEmail: boolean;

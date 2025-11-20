@@ -3,7 +3,7 @@ import { users, bill, comments, analysis, notification  } from '@/shared/schema'
 import { eq, count, desc, sql, and, gte } from 'drizzle-orm';
 // import { systemHealthService } from '../../infrastructure/monitoring/system-health.js'; // TODO: Create system health service
 import { alertingService, notificationSchedulerService } from '../../infrastructure/notifications/index.js';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 export interface AdminStats {
   users: {

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { Avatar, AvatarFallback } from '../../components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Progress } from '../../components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Button } from '@client/components/ui/button';
+import { Badge } from '@client/components/ui/badge';
+import { Avatar, AvatarFallback } from '@client/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { Progress } from '@client/components/ui/progress';
 import {
   ArrowLeft,
   Users,
@@ -20,7 +20,7 @@ import {
   TrendingUp,
   AlertTriangle
 } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface CosponsorProps { bill_id?: string;
  }
@@ -163,14 +163,14 @@ export default function CosponsorAnalysis({ bill_id  }: CosponsorProps) { const 
         <span>›</span>
         <Link to={ `/bills/${bill_id }`} className="hover:text-primary">Bills</Link>
         <span>›</span>
-        <Link to={ `/bills/${bill_id }/sponsorhip-analysis`} className="hover:text-primary">sponsorhip Analysis</Link>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
         <span>›</span>
-        <span className="text-foreground">Co-sponsor</span>
+        <span className="text-foreground">Co-sponsors</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={ `/bills/${bill_id }/sponsorhip-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
@@ -289,7 +289,15 @@ export default function CosponsorAnalysis({ bill_id  }: CosponsorProps) { const 
                         </div>
                       )}
 
-                      <Button variant="outline" size="sm" className="w-full mt-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full mt-3"
+                        onClick={() => {
+                          // Navigate to detailed sponsor profile
+                          window.open(`/sponsors/${sponsor.id}`, '_blank');
+                        }}
+                      >
                         View Detailed Profile
                       </Button>
                     </CardContent>
@@ -443,11 +451,31 @@ export default function CosponsorAnalysis({ bill_id  }: CosponsorProps) { const 
             {/* Individual Details Tab */}
             <TabsContent value="details" className="space-y-4">
               <div className="flex items-center gap-2 mb-4">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    // Toggle risk filter dropdown
+                    const filterDropdown = document.getElementById('risk-filter-dropdown');
+                    if (filterDropdown) {
+                      filterDropdown.style.display = filterDropdown.style.display === 'none' ? 'block' : 'none';
+                    }
+                  }}
+                >
                   <Filter className="h-4 w-4 mr-2" />
                   Filter by Risk
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    // Focus on search input
+                    const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+                    if (searchInput) {
+                      searchInput.focus();
+                    }
+                  }}
+                >
                   <Search className="h-4 w-4 mr-2" />
                   Search
                 </Button>
@@ -507,10 +535,29 @@ export default function CosponsorAnalysis({ bill_id  }: CosponsorProps) { const 
                         )}
 
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" className="flex-1">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={() => {
+                              // Navigate to full sponsor profile
+                              window.open(`/sponsors/${sponsor.id}/profile`, '_blank');
+                            }}
+                          >
                             View Full Profile
                           </Button>
-                          <Button variant="outline" size="sm" className="flex-1">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={() => {
+                              // Download sponsor analysis report
+                              const link = document.createElement('a');
+                              link.href = `/api/sponsors/${sponsor.id}/report.pdf`;
+                              link.download = `sponsor-${sponsor.id}-report.pdf`;
+                              link.click();
+                            }}
+                          >
                             Download Report
                           </Button>
                         </div>
@@ -526,13 +573,13 @@ export default function CosponsorAnalysis({ bill_id  }: CosponsorProps) { const 
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={ `/bills/${bill_id }/sponsorhip-analysis/primary-sponsor`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/primary-sponsor`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Primary Sponsor
           </Button>
         </Link>
-        <Link to={ `/bills/${bill_id }/sponsorhip-analysis/financial-network`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/financial-network`}>
           <Button>
             Next: Financial Network
             <ChevronRight className="h-4 w-4 ml-2" />

@@ -6,10 +6,10 @@
  * work together to provide real-time community features.
  */
 
-import { communityWebSocketMiddleware } from '../services/community-websocket-middleware';
-import { communityBackendService } from '../services/community-backend-service';
-import { notificationService } from '../services/notification-service';
-import { logger } from '../utils/logger';
+import { communityWebSocketMiddleware } from '@client/services/community-websocket-middleware';
+import { communityBackendService } from '@client/services/community-backend-service';
+import { notificationService } from '@client/services/notification-service';
+import { logger } from '@client/utils/logger';
 
 /**
  * Demo class to showcase community data integration

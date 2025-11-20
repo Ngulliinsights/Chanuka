@@ -12,7 +12,7 @@ import { NotificationService } from './infrastructure/services/notification-serv
 import { RepresentativeContactService } from './infrastructure/services/representative-contact-service.js';
 import { InMemoryAdvocacyEventPublisher } from './domain/events/advocacy-events.js';
 import { getAdvocacyConfig } from './config/advocacy-config.js';
-import { database } from '../../shared/core/index.js';
+import { database } from '@shared/core/index.js';
 
 export interface AdvocacyServiceDependencies {
   campaignService: CampaignService;

@@ -35,7 +35,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import { ImplementationWorkaround, ConflictAnalysis } from '../../types/conflict-of-interest';
+import { ImplementationWorkaround, ConflictAnalysis } from '@client/types/conflict-of-interest';
 
 interface ImplementationWorkaroundsTrackerProps {
   conflictAnalysis: ConflictAnalysis;

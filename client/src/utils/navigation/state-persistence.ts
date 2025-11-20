@@ -1,4 +1,4 @@
-import { NavigationState, NavigationPreferences, RecentPage } from '../../types/navigation';
+import { NavigationState, NavigationPreferences, RecentPage } from '@client/types/navigation';
 import { logger } from '../logger';
 
 // Keys for localStorage

@@ -15,8 +15,8 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useMediaQuery } from '../../hooks/use-mobile';
-import { cn } from '../../lib/utils';
+import { useMediaQuery } from '@client/hooks/use-mobile';
+import { cn } from '@client/lib/utils';
 import { MobileNavigationDrawer, useMobileNavigationDrawer } from './MobileNavigationDrawer';
 import { MobileBottomSheet, useBottomSheet } from './MobileBottomSheet';
 import { PullToRefresh } from './PullToRefresh';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { systemApi } from '../../services/api';
-import { logger } from '../../utils/logger';
+import { systemApi } from '@client/services/api';
+import { logger } from '@client/utils/logger';
 
 interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';

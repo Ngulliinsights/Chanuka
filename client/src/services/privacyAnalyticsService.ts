@@ -3,9 +3,9 @@
  * Analytics with user consent and privacy protection
  */                                                                                
 
-import { logger } from '../utils/logger';
-import { privacyUtils } from '../utils/privacy-compliance';
-import { privacyAnalyticsApiService } from '../core/api/privacy';
+import { logger } from '@client/utils/logger';
+import { privacyUtils } from '@client/utils/privacy-compliance';
+import { privacyAnalyticsApiService } from '@client/core/api/privacy';
 
 interface AnalyticsEvent {
   id: string;

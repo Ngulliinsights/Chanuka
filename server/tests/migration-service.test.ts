@@ -15,10 +15,10 @@ vi.mock('../../shared/core/src/observability/logging', () => ({
 
 import { Pool } from 'pg';
 import { MigrationService } from '../infrastructure/database/migration-service.js';
-import { DataIntegrityValidationService } from '../core/validation/data-validation-service.js';
+import { DataIntegrityValidationService } from '@client/core/validation/data-validation-service.js';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 // Mock pool for testing
 const mockPool = {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { createNavigationProvider } from '../core/navigation/context';
+import { createNavigationProvider } from '@client/core/navigation/context';
 import AppLayout from '@/components/layout/app-layout';
 import { logger } from '@/utils/logger';
 

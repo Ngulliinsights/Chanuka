@@ -3,7 +3,7 @@ import { billTrackingService, BillTrackingService } from '../bill-tracking.servi
 import { databaseService } from '../../../../infrastructure/database/database-service';
 import { cacheService } from '../../../../infrastructure/cache/cache-service';
 import { notificationService } from '../../../../infrastructure/notifications/notification-service';
-import * as schema from '../../../../../shared/schema';
+import * as schema from '@shared/schema';
 import { readDatabase } from '@shared/database/connection'; // Mock this
 
 // --- Mock Dependencies ---

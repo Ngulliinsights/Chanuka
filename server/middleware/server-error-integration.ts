@@ -7,7 +7,7 @@
 
 import { Express } from 'express';
 import { boomErrorMiddleware, errorContextMiddleware } from './boom-error-middleware.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 /**
  * Configure error handling for the Express app

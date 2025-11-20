@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { NotificationServiceClass } from '../../infrastructure/notifications/notification-service';
-import type { ITestDataFactory } from '../../../shared/core/src/testing/test-data-factory';
-import type { INotificationService } from '../../../shared/core/src/services/interfaces/notification-service.interface';
-import type { IServiceContainer } from '../../../shared/core/src/testing/dependency-injection-container';
+import type { ITestDataFactory } from '@shared/core/src/testing/test-data-factory';
+import type { INotificationService } from '@shared/core/src/services/interfaces/notification-service.interface';
+import type { IServiceContainer } from '@shared/core/src/testing/dependency-injection-container';
 
 /**
  * SMS and Push Notification Integration Tests

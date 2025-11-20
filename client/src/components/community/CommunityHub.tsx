@@ -11,9 +11,8 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { 
   Activity, 
@@ -22,16 +21,12 @@ import {
   MapPin, 
   Filter,
   RefreshCw,
-  Settings,
-  Bell,
   MessageSquare,
-  Heart,
-  Share2,
-  ExternalLink
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { useCommunityStore, useCommunitySelectors } from '../../store/slices/communitySlice';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { cn } from '@client/lib/utils';
+import { useCommunityStore, useCommunitySelectors } from '@client/store/slices/communitySlice';
+import { useCommunityData } from '@client/hooks/useCommunityIntegration';
+import { useMediaQuery } from '@client/hooks/useMediaQuery';
 import { ActivityFeed } from './ActivityFeed';
 import { TrendingTopics } from './TrendingTopics';
 import { ExpertInsights } from './ExpertInsights';
@@ -50,16 +45,20 @@ export function CommunityHub({ className }: CommunityHubProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [showLocalImpact, setShowLocalImpact] = useState(false);
 
+  // Use integrated hooks for data fetching
+  const { 
+    isLoading, 
+    error, 
+    refetchAll, 
+  } = useCommunityData();
+
   const {
-    loading,
-    error,
-    stats,
-    isConnected,
     setLoading,
     setError,
-    handleRealTimeUpdate,
     setConnectionStatus,
     updateTrendingScores,
+    loading,
+    isConnected,
   } = useCommunityStore();
 
   const {
@@ -69,50 +68,35 @@ export function CommunityHub({ className }: CommunityHubProps) {
     filteredCampaigns,
     filteredPetitions,
     hasMoreItems,
+    stats,
   } = useCommunitySelectors();
 
-  // Initialize data and real-time connection
+  // Sync loading state
   useEffect(() => {
-    const initializeCommunityHub = async () => {
-      setLoading(true);
-      try {
-        // TODO: Load initial data from API
-        await loadInitialData();
-        
-        // TODO: Establish WebSocket connection for real-time updates
-        setupRealTimeConnection();
-        
-        // Update trending scores periodically
-        const trendingInterval = setInterval(() => {
-          updateTrendingScores();
-        }, 5 * 60 * 1000); // Every 5 minutes
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
-        return () => {
-          clearInterval(trendingInterval);
-          // TODO: Cleanup WebSocket connection
-        };
-      } catch (err) {
-        setError('Failed to load community data');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Sync error state
+  useEffect(() => {
+    if (error) {
+      setError(error);
+    }
+  }, [error, setError]);
 
-    initializeCommunityHub();
-  }, [setLoading, setError, updateTrendingScores]);
-
-  const loadInitialData = async () => {
-    // TODO: Implement API calls to load:
-    // - Activity feed
-    // - Trending topics
-    // - Expert insights
-    // - Campaigns and petitions
-    // - Community stats
-    // - Local impact data
+  // Initialize real-time connection
+  useEffect(() => {
+    setupRealTimeConnection();
     
-    // Mock data for now
-    console.log('Loading initial community data...');
-  };
+    // Update trending scores periodically
+    const trendingInterval = setInterval(() => {
+      updateTrendingScores();
+    }, 5 * 60 * 1000); // Every 5 minutes
+
+    return () => {
+      clearInterval(trendingInterval);
+      // TODO: Cleanup WebSocket connection
+    };
+  }, [updateTrendingScores]);
 
   const setupRealTimeConnection = () => {
     // TODO: Implement WebSocket connection
@@ -124,20 +108,14 @@ export function CommunityHub({ className }: CommunityHubProps) {
   };
 
   const handleRefresh = async () => {
-    setLoading(true);
-    try {
-      await loadInitialData();
-      updateTrendingScores();
-    } catch (err) {
-      setError('Failed to refresh community data');
-    } finally {
-      setLoading(false);
-    }
+    await refetchAll();
+    updateTrendingScores();
   };
 
   const handleLoadMore = () => {
-    if (hasMoreItems && !loading) {
-      useCommunityStore.getState().loadMoreItems();
+    if (hasMoreItems && !isLoading) {
+      const { setPage, currentPage } = useCommunityStore.getState();
+      setPage(currentPage + 1);
     }
   };
 
@@ -149,7 +127,7 @@ export function CommunityHub({ className }: CommunityHubProps) {
             <div className="text-center space-y-4">
               <p className="text-destructive">Error loading community data: {error}</p>
               <Button onClick={handleRefresh} variant="outline">
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="w-4 h-4 mr-2" />
                 Try Again
               </Button>
             </div>
@@ -207,8 +185,8 @@ export function CommunityHub({ className }: CommunityHubProps) {
               Filters
             </Button>
 
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading}>
-              <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
+              <RefreshCw className={cn('h-4 w-4 mr-2', isLoading && 'animate-spin')} />
               Refresh
             </Button>
           </div>
@@ -239,13 +217,11 @@ export function CommunityHub({ className }: CommunityHubProps) {
           <div className="lg:col-span-1 space-y-6">
             {/* Trending Topics */}
             <Card className="chanuka-card">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
+              <CardContent className="pt-6">
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                   <TrendingUp className="h-5 w-5 text-orange-500" />
                   Trending Now
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </h3>
                 <TrendingTopics 
                   topics={filteredTrendingTopics.slice(0, 5)} 
                   compact={true}
@@ -255,13 +231,11 @@ export function CommunityHub({ className }: CommunityHubProps) {
 
             {/* Expert Insights Preview */}
             <Card className="chanuka-card">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
+              <CardContent className="pt-6">
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                   <Users className="h-5 w-5 text-blue-500" />
                   Expert Insights
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </h3>
                 <ExpertInsights 
                   insights={filteredExpertInsights.slice(0, 3)} 
                   compact={true}
@@ -271,13 +245,11 @@ export function CommunityHub({ className }: CommunityHubProps) {
 
             {/* Action Center Preview */}
             <Card className="chanuka-card">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
+              <CardContent className="pt-6">
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                   <Activity className="h-5 w-5 text-green-500" />
                   Take Action
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </h3>
                 <ActionCenter 
                   campaigns={filteredCampaigns.slice(0, 2)}
                   petitions={filteredPetitions.slice(0, 2)}

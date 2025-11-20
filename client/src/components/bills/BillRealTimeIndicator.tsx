@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useBillRealTime } from '../../hooks/useWebSocket';
+import { useBillRealTime } from '@client/hooks/useWebSocket';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { 
@@ -18,8 +18,8 @@ import {
   Clock,
   Eye
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { BillRealTimeUpdate, EngagementMetricsUpdate } from '../../types/realtime';
+import { cn } from '@client/lib/utils';
+import { BillRealTimeUpdate, EngagementMetricsUpdate } from '@client/types/realtime';
 
 interface BillRealTimeIndicatorProps {
   billId: number;

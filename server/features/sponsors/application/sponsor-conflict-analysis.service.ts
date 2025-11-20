@@ -1,6 +1,6 @@
 // Import the NEW service for data access
 import { sponsorService } from './sponsor-service-direct';
-import { logger   } from '../../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 const loggerAny = logger as any;
 import type { Sponsor, Bill } from '@shared/schema';
 // Local helper types used by this service but not exported elsewhere in repo

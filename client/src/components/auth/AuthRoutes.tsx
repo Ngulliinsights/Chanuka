@@ -9,13 +9,13 @@ import { AuthGuard, RequireAuth, RequireRole } from './AuthGuard';
 import { OAuthCallback } from './OAuthCallback';
 
 // Lazy load auth pages
-const LoginPage = React.lazy(() => import('../../pages/auth/LoginPage'));
-const RegisterPage = React.lazy(() => import('../../pages/auth/RegisterPage'));
-const ForgotPasswordPage = React.lazy(() => import('../../pages/auth/ForgotPasswordPage'));
-const ResetPasswordPage = React.lazy(() => import('../../pages/auth/ResetPasswordPage'));
-const ProfilePage = React.lazy(() => import('../../pages/auth/ProfilePage'));
-const SecurityPage = React.lazy(() => import('../../pages/auth/SecurityPage'));
-const PrivacyPage = React.lazy(() => import('../../pages/auth/PrivacyPage'));
+const LoginPage = React.lazy(() => import('@client/pages/auth/LoginPage'));
+const RegisterPage = React.lazy(() => import('@client/pages/auth/RegisterPage'));
+const ForgotPasswordPage = React.lazy(() => import('@client/pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = React.lazy(() => import('@client/pages/auth/ResetPasswordPage'));
+const ProfilePage = React.lazy(() => import('@client/pages/auth/ProfilePage'));
+const SecurityPage = React.lazy(() => import('@client/pages/auth/SecurityPage'));
+const PrivacyPage = React.lazy(() => import('@client/pages/auth/PrivacyPage'));
 
 export function AuthRoutes() {
   return (

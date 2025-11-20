@@ -22,7 +22,7 @@ vi.mock('../../../../../shared/database/pool', () => ({
   checkPoolHealth: vi.fn(),
 }));
 
-import { pool, checkPoolHealth } from '../../../../../shared/database/pool';
+import { pool, checkPoolHealth } from '@shared/database/pool';
 
 describe('ConnectionManager Performance Tests', () => {
   let manager: ConnectionManager;

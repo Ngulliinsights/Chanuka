@@ -5,14 +5,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Alert, AlertDescription } from '../../components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Button } from '@client/components/ui/button';
+import { Input } from '@client/components/ui/input';
+import { Label } from '@client/components/ui/label';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
 import { Shield, Eye, EyeOff, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { validatePassword } from '../../utils/password-validation';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { validatePassword } from '@client/utils/password-validation';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();

@@ -14,7 +14,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { buildTimeThreshold, normalizeRowNumbers, groupByTime } from '../db-helpers';
-import { logger  } from '../../../shared/core/src/observability/logging';
+import { logger  } from '@shared/core/src/observability/logging';
 
 describe('Database Helpers', () => {
   describe('buildTimeThreshold', () => {

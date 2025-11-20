@@ -3,7 +3,7 @@
  * Following navigation component configuration patterns
  */
 
-import type { DashboardConfig, DashboardSection } from '../types';
+import type { DashboardConfig, DashboardSection } from '@client/types';
 import { validateDashboardConfig } from '../validation';
 import { DashboardConfigurationError } from '../errors';
 import { dashboardConstants } from './dashboard-constants';

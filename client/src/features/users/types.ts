@@ -150,6 +150,65 @@ export interface VerificationResponse {
   nextSteps?: string[];
 }
 
+// Additional types for consolidated API features
+export interface SavedBillsFilters {
+  status?: string;
+  urgency?: string;
+  tags?: string[];
+  policyArea?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface SavedBillsResponse {
+  bills: any[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
+export interface EngagementHistoryFilters {
+  action_type?: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
+  entity_type?: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
+  date_from?: string;
+  date_to?: string;
+}
+
+export interface EngagementHistoryResponse {
+  history: any[];
+  total: number;
+  page: number;
+  totalPages: number;
+  analytics: {
+    most_active_day: string;
+    total_actions: number;
+    action_breakdown: Record<string, number>;
+    entity_breakdown: Record<string, number>;
+  };
+}
+
+export interface EngagementAction {
+  action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
+  entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
+  entity_id: string;
+  metadata?: Record<string, any>;
+}
+
+export interface DashboardData {
+  profile: any;
+  recent_activity: any[];
+  saved_bills: any[];
+  trending_bills: any[];
+  recommendations: any[];
+  notifications: any[];
+  civic_score_trend: Array<{ date: string; score: number }>;
+  achievements_progress: {
+    recent_badges: any[];
+    next_milestones: any[];
+  };
+}
+
 
 
 

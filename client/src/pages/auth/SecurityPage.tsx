@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Alert, AlertDescription } from '../../components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
 import { Shield, Lock, AlertTriangle } from 'lucide-react';
 
 export default function SecurityPage() {

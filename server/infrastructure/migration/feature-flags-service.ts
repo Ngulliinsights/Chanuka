@@ -8,7 +8,7 @@
  * - Integration with A/B testing framework
  */
 
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import { 
   AsyncServiceResult, 
   withResultHandling 

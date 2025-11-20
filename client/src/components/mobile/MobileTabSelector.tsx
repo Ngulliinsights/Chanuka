@@ -14,7 +14,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 import { Button } from '../ui/button';
 
 export interface MobileTab {

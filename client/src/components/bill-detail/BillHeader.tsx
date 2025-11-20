@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge } from '../ui/badge';
 import { Calendar, Clock, Users, Eye, Bookmark, MessageCircle, Share2 } from 'lucide-react';
-import { Bill } from '../../store/slices/billsSlice';
+import { Bill } from '@/core/api/types';
 
 interface BillHeaderProps {
   bill: Bill;

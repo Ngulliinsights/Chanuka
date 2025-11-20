@@ -20,8 +20,8 @@ import {
   Clock,
   TrendingUp
 } from 'lucide-react';
-import { TrackedBill } from '../../../types/user-dashboard';
-import { useUserDashboardStore } from '../../../store/slices/userDashboardSlice';
+import { TrackedBill } from '@client/types/user-dashboard';
+import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
 import { formatDistanceToNow } from 'date-fns';
 
 interface TrackedBillsSectionProps {

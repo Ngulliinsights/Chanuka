@@ -12,7 +12,7 @@ const ZUSTAND_TO_REDUX_PATTERNS = [
   // Discussion store patterns
   {
     from: /import\s*{\s*useDiscussionStore[^}]*}\s*from\s*['"][^'"]*discussionSlice['"];?/g,
-    to: `import { useAppSelector, useAppDispatch } from '../store/hooks';
+    to: `import { useAppSelector, useAppDispatch } from '@client/store/hooks';
 import { 
   selectDiscussionState, 
   selectThread, 
@@ -30,7 +30,7 @@ import {
   // User dashboard store patterns
   {
     from: /import\s*{\s*useUserDashboardStore[^}]*}\s*from\s*['"][^'"]*userDashboardSlice['"];?/g,
-    to: `import { useAppSelector, useAppDispatch } from '../store/hooks';
+    to: `import { useAppSelector, useAppDispatch } from '@client/store/hooks';
 import { 
   selectUserDashboardState,
   selectDashboardData,

@@ -17,11 +17,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Menu, Home, FileText, Users, Search, User, Settings, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@client/hooks/useAuth';
 import { SwipeGestures } from './SwipeGestures';
 
 interface NavigationItem {
@@ -275,7 +275,7 @@ export function MobileNavigationDrawer({
           {isAuthenticated && (
             <div className="border-t p-2 space-y-1">
               <Link
-                to="/profile"
+                to="/account"
                 onClick={onClose}
                 className={cn(
                   'flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium',
@@ -289,7 +289,7 @@ export function MobileNavigationDrawer({
               </Link>
               
               <Link
-                to="/settings"
+                to="/account/settings"
                 onClick={onClose}
                 className={cn(
                   'flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium',

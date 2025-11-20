@@ -4,9 +4,9 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { UseLoadingResult, LoadingOperation, LoadingConfig, LoadingStats } from '../types';
+import { UseLoadingResult, LoadingOperation, LoadingConfig, LoadingStats } from '@client/types';
 import { LoadingError, LoadingOperationFailedError } from '../errors';
-import { createLoadingOperation, generateOperationId } from '../utils/loading-utils';
+import { createLoadingOperation, generateOperationId } from '@client/utils/loading-utils';
 import { createRecoveryContext, useLoadingRecovery } from '../recovery';
 import { validateLoadingOperation, safeValidateLoadingOperation } from '../validation';
 import { DEFAULT_LOADING_CONFIG } from '../constants';

@@ -5,8 +5,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ThumbsUp, ThumbsDown, Reply, MoreVertical, Edit, Trash } from 'lucide-react';
-import { useComments } from '../hooks/useCommunity';
-import type { Comment, CreateCommentRequest } from '../types';
+import { useComments } from '@client/hooks/useCommunity';
+import type { Comment, CreateCommentRequest } from '@client/types';
 
 interface CommentThreadProps { bill_id?: string;
   comments: Comment[];

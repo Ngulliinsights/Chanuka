@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AppLayout from '../app-layout';
-import { LayoutConfig } from '../types';
+import { LayoutConfig } from '@client/types';
 import { LayoutError } from '../errors';
 import { LayoutRenderError, LayoutResponsiveError } from '../errors';
 

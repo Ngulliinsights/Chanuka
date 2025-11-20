@@ -2,8 +2,8 @@ import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { BillCard } from '../components/BillCard';
-import type { Bill } from '../types';
+import { BillCard } from '@client/components/BillCard';
+import type { Bill } from '@client/types';
 
 describe('BillCard', () => {
   const mockBill: Bill = {

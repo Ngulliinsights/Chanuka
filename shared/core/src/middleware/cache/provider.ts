@@ -1,5 +1,5 @@
-import { MiddlewareProvider } from '../types';
-import { CacheService } from '../../services/cache';
+import { MiddlewareProvider } from '@client/types';
+import { CacheService } from '@client/services/cache';
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../../observability/logging';
 

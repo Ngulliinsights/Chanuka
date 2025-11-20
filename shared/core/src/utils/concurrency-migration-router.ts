@@ -4,7 +4,7 @@
  * Routes between legacy and new concurrency implementations based on feature flags
  */
 
-import type { FeatureFlagsService } from '../types/feature-flags.js';
+import type { FeatureFlagsService } from '@client/types/feature-flags.js';
 import { ConcurrencyAdapter, Mutex as NewMutex, Semaphore as NewSemaphore } from './concurrency-adapter.js';
 import { 
   Mutex as LegacyMutex, 

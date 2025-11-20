@@ -6,8 +6,8 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { mockDataService, dataLoaders, RealTimeEvent } from '../services/mockDataService';
-import { logger } from '../utils/logger';
+import { mockDataService, dataLoaders, RealTimeEvent } from '@client/services/mockDataService';
+import { logger } from '@client/utils/logger';
 
 /**
  * Hook state interface

@@ -4,7 +4,7 @@
  * Demonstrates the ML service migration functionality
  */
 
-import { RealMLAnalysisService } from '../services/real-ml.service.js';
+import { RealMLAnalysisService } from '@client/services/real-ml.service.js';
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import MLMigrationConfigurator from './configure-ml-migration.js';
 

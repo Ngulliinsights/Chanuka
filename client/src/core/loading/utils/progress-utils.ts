@@ -2,7 +2,7 @@
  * Progress tracking utilities for loading operations
  */
 
-import { ProgressiveStage } from '../types';
+import { ProgressiveStage } from '@client/types';
 
 /**
  * Progress tracker for multi-stage operations

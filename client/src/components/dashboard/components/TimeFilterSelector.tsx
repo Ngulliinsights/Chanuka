@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '../../ui/select';
 import { Calendar, Clock } from 'lucide-react';
-import { TemporalFilter } from '../../../types/user-dashboard';
+import { TemporalFilter } from '@client/types/user-dashboard';
 
 interface TimeFilterSelectorProps {
   value: TemporalFilter;

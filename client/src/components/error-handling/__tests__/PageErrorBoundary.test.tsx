@@ -16,7 +16,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import PageErrorBoundary from '../ErrorBoundary';
 import { ErrorFallback } from '../ErrorFallback';
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Mock component that throws an error
 const ThrowError = ({ shouldThrow = false }: { shouldThrow?: boolean }) => {

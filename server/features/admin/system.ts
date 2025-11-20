@@ -1,11 +1,11 @@
 import express from 'express';
 import { sql } from 'drizzle-orm';
-import { database as db } from '../../../shared/database/index.js';
-import { HealthCheckResponse } from '../../types/api.js';
-import { ResponseHelper } from '../../../shared/core/src/utils/response-helpers.js';
-import { errorTracker } from '../../core/errors/error-tracker.js';
-import { schemaValidationService } from '../../core/validation/schema-validation-service.js';
-import { validationMetricsCollector } from '../../core/validation/validation-metrics.js';
+import { database as db } from '@shared/database/index.js';
+import { HealthCheckResponse } from '@client/types/api.js';
+import { ResponseHelper } from '@shared/core/src/utils/response-helpers.js';
+import { errorTracker } from '@client/core/errors/error-tracker.js';
+import { schemaValidationService } from '@client/core/validation/schema-validation-service.js';
+import { validationMetricsCollector } from '@client/core/validation/validation-metrics.js';
 
 // Define interfaces for type safety
 interface SchemaIssue {

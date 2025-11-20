@@ -86,7 +86,7 @@ describe('Backward Compatibility', () => {
 
       // The hook should still work with legacy implementation
       // This is tested by the fact that the hook exists and has the same interface
-      const { useAuth } = require('../../hooks/useAuth');
+      const { useAuth } = require('@client/hooks/useAuth');
 
       expect(typeof useAuth).toBe('function');
       expect(useAuth.name).toBe('useAuth');
@@ -327,7 +327,7 @@ describe('Backward Compatibility', () => {
 
     it('should handle async operation errors consistently', async () => {
       // Mock a service that rejects
-      const { authService } = require('../../services/AuthService');
+      const { authService } = require('@client/services/AuthService');
       (authService.login as any).mockRejectedValue(new Error('Network error'));
 
       // Dispatch action that will fail
@@ -391,7 +391,7 @@ describe('Backward Compatibility', () => {
 
     it('should work with existing type definitions', () => {
       // Test compatibility with existing auth types
-      const { User } = require('../../types/auth');
+      const { User } = require('@client/types/auth');
 
       // Create a user object matching the type
       const testUser: User = {

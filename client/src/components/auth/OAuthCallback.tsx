@@ -15,9 +15,9 @@ import {
   ArrowLeft,
   Shield
 } from 'lucide-react';
-import { authService } from '../../services/authService';
-import { useAuth } from '../../hooks/useAuth';
-import { logger } from '../../utils/logger';
+import { authService } from '@client/services/authService';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { logger } from '@client/utils/logger';
 
 interface CallbackState {
   status: 'loading' | 'success' | 'error';

@@ -6,7 +6,7 @@
  */
 
 import { Redis } from 'ioredis';
-import { RateLimitStore, RateLimitConfig } from './types';
+import { RateLimitStore, RateLimitConfig } from '@client/types';
 import { SlidingWindowStore } from './algorithms/sliding-window';
 import { TokenBucketStore } from './algorithms/token-bucket';
 import { FixedWindowStore } from './algorithms/fixed-window';

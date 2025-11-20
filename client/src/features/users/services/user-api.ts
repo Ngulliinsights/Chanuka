@@ -1,4 +1,5 @@
-import { api } from '@/services/api';
+import { globalApiClient } from '@/core/api/client';
+import { logger } from '@client/utils/logger';
 import type {
   User,
   UserProfile,
@@ -11,7 +12,13 @@ import type {
   AuthResponse,
   ProfileResponse,
   VerificationResponse,
-  VerificationStatus
+  VerificationStatus,
+  SavedBillsFilters,
+  SavedBillsResponse,
+  EngagementHistoryFilters,
+  EngagementHistoryResponse,
+  EngagementAction,
+  DashboardData
 } from '../types';
 
 /**
@@ -21,61 +28,72 @@ import type {
 export const userApi = {
   // Authentication endpoints
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    return api.post('/api/auth/login', credentials);
+    const response = await globalApiClient.post<AuthResponse>('/api/auth/login', credentials);
+    return response.data;
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {
-    return api.post('/api/auth/register', data);
+    const response = await globalApiClient.post<AuthResponse>('/api/auth/register', data);
+    return response.data;
   },
 
   async logout(): Promise<void> {
-    return api.post('/api/auth/logout');
+    await globalApiClient.post('/api/auth/logout');
   },
 
   async refreshToken(refresh_token: string): Promise<AuthResponse> {
-    return api.post('/api/auth/refresh', { refresh_token });
+    const response = await globalApiClient.post<AuthResponse>('/api/auth/refresh', { refresh_token });
+    return response.data;
   },
 
   async getCurrentUser(): Promise<User> {
-    return api.get('/api/auth/me');
+    const response = await globalApiClient.get<User>('/api/auth/me');
+    return response.data;
   },
 
   // Profile endpoints
-  async getProfile(user_id?: string): Promise<ProfileResponse> { const endpoint = user_id ? `/api/users/${user_id }/profile` : '/api/users/profile';
-    return api.get(endpoint);
+  async getUserProfile(user_id?: string): Promise<ProfileResponse> {
+    const endpoint = user_id ? `/api/users/${user_id}/profile` : '/api/users/profile';
+    const response = await globalApiClient.get<ProfileResponse>(endpoint);
+    return response.data;
   },
 
   async updateProfile(data: UpdateProfileData): Promise<UserProfile> {
-    return api.put('/api/users/profile', data);
+    const response = await globalApiClient.put<UserProfile>('/api/users/profile', data);
+    return response.data;
   },
 
   async updateAvatar(file: File): Promise<{ avatar: string }> {
     const formData = new FormData();
     formData.append('avatar', file);
 
-    return api.post('/api/users/profile/avatar', formData, {
+    const response = await globalApiClient.post<{ avatar: string }>('/api/users/profile/avatar', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return response.data;
   },
 
   async deleteAccount(): Promise<void> {
-    return api.delete('/api/users/profile');
+    await globalApiClient.delete('/api/users/profile');
   },
 
   // Preferences endpoints
   async getPreferences(): Promise<UserPreferences> {
-    return api.get('/api/users/preferences');
+    const response = await globalApiClient.get<UserPreferences>('/api/users/preferences');
+    return response.data;
   },
 
   async updatePreferences(data: UpdatePreferencesData): Promise<UserPreferences> {
-    return api.put('/api/users/preferences', data);
+    const response = await globalApiClient.put<UserPreferences>('/api/users/preferences', data);
+    return response.data;
   },
 
   // Verification endpoints
   async getVerificationStatus(): Promise<VerificationStatus> {
-    return api.get('/api/users/verification');
+    const response = await globalApiClient.get<VerificationStatus>('/api/users/verification');
+    return response.data;
   },
 
   async submitVerification(data: VerificationRequest): Promise<VerificationResponse> {
@@ -90,49 +108,187 @@ export const userApi = {
       formData.append('notes', data.notes);
     }
 
-    return api.post('/api/users/verification', formData, {
+    const response = await globalApiClient.post<VerificationResponse>('/api/users/verification', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return response.data;
   },
 
   async verifyPhone(code: string): Promise<{ verified: boolean }> {
-    return api.post('/api/users/verify-phone', { code });
+    const response = await globalApiClient.post<{ verified: boolean }>('/api/users/verify-phone', { code });
+    return response.data;
   },
 
   async resendPhoneVerification(): Promise<void> {
-    return api.post('/api/users/verify-phone/resend');
+    await globalApiClient.post('/api/users/verify-phone/resend');
   },
 
   // Password management
   async changePassword(data: { currentPassword: string; newPassword: string }): Promise<void> {
-    return api.put('/api/users/password', data);
+    await globalApiClient.put('/api/users/password', data);
   },
 
   async requestPasswordReset(email: string): Promise<void> {
-    return api.post('/api/auth/forgot-password', { email });
+    await globalApiClient.post('/api/auth/forgot-password', { email });
   },
 
   async resetPassword(data: { token: string; newPassword: string }): Promise<void> {
-    return api.post('/api/auth/reset-password', data);
+    await globalApiClient.post('/api/auth/reset-password', data);
   },
 
   // User search and discovery
   async searchUsers(query: string, limit = 20): Promise<User[]> {
-    return api.get(`/api/users/search?q=${encodeURIComponent(query)}&limit=${limit}`);
+    const response = await globalApiClient.get<User[]>(`/api/users/search?q=${encodeURIComponent(query)}&limit=${limit}`);
+    return response.data;
   },
 
-  async getUserById(user_id: string): Promise<User> { return api.get(`/api/users/${user_id }`);
+  async getUserById(user_id: string): Promise<User> {
+    const response = await globalApiClient.get<User>(`/api/users/${user_id}`);
+    return response.data;
   },
 
   // Activity and engagement
-  async getUserActivity(user_id?: string, limit = 50): Promise<any[]> { const endpoint = user_id ? `/api/users/${user_id }/activity` : '/api/users/activity';
-    return api.get(`${endpoint}?limit=${limit}`);
+  async getUserActivity(user_id?: string, limit = 50): Promise<any[]> {
+    const endpoint = user_id ? `/api/users/${user_id}/activity` : '/api/users/activity';
+    const response = await globalApiClient.get<any[]>(`${endpoint}?limit=${limit}`);
+    return response.data;
   },
 
-  async getUserStats(user_id?: string): Promise<any> { const endpoint = user_id ? `/api/users/${user_id }/stats` : '/api/users/stats';
-    return api.get(endpoint);
+  async getUserStats(user_id?: string): Promise<any> {
+    const endpoint = user_id ? `/api/users/${user_id}/stats` : '/api/users/stats';
+    const response = await globalApiClient.get<any>(endpoint);
+    return response.data;
+  },
+
+  // Saved bills management
+  async getSavedBills(
+    page = 1,
+    limit = 20,
+    filters?: SavedBillsFilters
+  ): Promise<SavedBillsResponse> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    });
+
+    // Add filters only if they have values
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (Array.isArray(value)) {
+            params.append(key, value.join(','));
+          } else {
+            params.append(key, value.toString());
+          }
+        }
+      });
+    }
+
+    const response = await globalApiClient.get<SavedBillsResponse>(
+      `/api/users/saved-bills?${params.toString()}`,
+      { cacheTTL: 3 * 60 * 1000 } // 3 minutes cache
+    );
+    return response.data;
+  },
+
+  async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<any> {
+    const response = await globalApiClient.post('/api/users/saved-bills', {
+      bill_id: billId,
+      notes,
+      tags,
+      notification_enabled: true
+    }, { skipCache: true });
+    return response.data;
+  },
+
+  async unsaveBill(billId: string): Promise<void> {
+    await globalApiClient.delete(`/api/users/saved-bills/${billId}`, { skipCache: true });
+  },
+
+  async updateSavedBill(
+    billId: string,
+    updates: {
+      notes?: string;
+      tags?: string[];
+      notification_enabled?: boolean;
+    }
+  ): Promise<any> {
+    const response = await globalApiClient.patch(`/api/users/saved-bills/${billId}`, updates, { skipCache: true });
+    return response.data;
+  },
+
+  // Engagement tracking
+  async getEngagementHistory(
+    page = 1,
+    limit = 50,
+    filters?: EngagementHistoryFilters
+  ): Promise<EngagementHistoryResponse> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    });
+
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, value.toString());
+        }
+      });
+    }
+
+    const response = await globalApiClient.get<EngagementHistoryResponse>(
+      `/api/users/engagement-history?${params.toString()}`,
+      { cacheTTL: 5 * 60 * 1000 } // 5 minutes cache
+    );
+    return response.data;
+  },
+
+  async trackEngagement(action: EngagementAction): Promise<void> {
+    try {
+      await globalApiClient.post('/api/users/engagement', action, {
+        timeout: 5000, // Shorter timeout for tracking
+        skipCache: true
+      });
+      logger.debug('Engagement tracked', {
+        component: 'UserApiService',
+        action: action.action_type,
+        entity: action.entity_type,
+        entityId: action.entity_id
+      });
+    } catch (error) {
+      // Silent failure - tracking should never block user actions
+      logger.warn('Engagement tracking failed (non-blocking)', {
+        component: 'UserApiService',
+        action: action.action_type,
+        entity: action.entity_type,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  },
+
+  // Achievements and gamification
+  async getAchievements(): Promise<{
+    badges: any[];
+    achievements: any[];
+    next_milestones: any[];
+  }> {
+    const response = await globalApiClient.get<{
+      badges: any[];
+      achievements: any[];
+      next_milestones: any[];
+    }>('/api/users/achievements', { cacheTTL: 10 * 60 * 1000 }); // 10 minutes cache
+    return response.data;
+  },
+
+  // Dashboard data
+  async getDashboardData(): Promise<DashboardData> {
+    const response = await globalApiClient.get<DashboardData>('/api/users/dashboard', {
+      timeout: 15000, // Longer timeout for aggregated data
+      cacheTTL: 2 * 60 * 1000 // 2 minutes cache
+    });
+    return response.data;
   }
 };
 

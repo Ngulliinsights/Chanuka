@@ -6,7 +6,7 @@ import { NotificationChannelService } from '@/infrastructure/notifications/notif
 import { DomainEventPublisher } from '../domain/events/bill-events';
 import { DatabaseService } from '@/infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
-import { Result, Ok, Err  } from '../../../../shared/core/src/index.js';
+import { Result, Ok, Err  } from '@shared/core/src/index.js';
 import { BillServiceError } from '../domain/errors/bill-errors';
 import { eq, and, sql } from 'drizzle-orm';
 import { bills } from '@shared/schema/foundation';

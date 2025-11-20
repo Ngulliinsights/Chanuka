@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@client/features/users/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { LoadingSpinner } from '../ui/loading-spinner';
 import { toast } from 'sonner';
-import { UserProfile as UserProfileType, UserPreferences } from '../../services/userProfileService';
+import { UserProfile as UserProfileType, UserPreferences } from '@client/services/userProfileService';
 
 /**
  * Custom hook to manage user profile state

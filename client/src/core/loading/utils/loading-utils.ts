@@ -3,7 +3,7 @@
  * Consolidated from multiple implementations
  */
 
-import { LoadingOperation, LoadingType, LoadingPriority, LoadingScenario, ProgressiveStage, RetryStrategy } from '../types';
+import { LoadingOperation, LoadingType, LoadingPriority, LoadingScenario, ProgressiveStage, RetryStrategy } from '@client/types';
 
 // Predefined loading scenarios
 export const LOADING_SCENARIOS: Record<string, LoadingScenario> = {

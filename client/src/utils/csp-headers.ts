@@ -4,6 +4,8 @@
  * Prevents XSS attacks and other code injection vulnerabilities
  */
 
+import { setCSPHeader as setCSPHeaderSafe } from './meta-tag-manager';
+
 export interface CSPDirectives {
   'default-src'?: string[];
   'script-src'?: string[];
@@ -44,15 +46,16 @@ export const CSP_CONFIGS = {
   // Development CSP (more permissive)
   development: {
     'default-src': ["'self'"],
-    'script-src': ["'self'", "'unsafe-eval'", "'unsafe-inline'"], // Allow eval and inline for dev tools
+    'script-src': ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'http://localhost:*', 'ws://localhost:*', 'wss://localhost:*'], // Allow eval and inline for dev tools
+    'script-src-elem': ["'self'", "'unsafe-inline'", 'http://localhost:*'], // Allow dynamic script loading
     'style-src': ["'self'", "'unsafe-inline'"],
     'img-src': ["'self'", 'data:', 'https:', 'http:'],
     'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
     'connect-src': ["'self'", 'ws:', 'wss:', 'http:', 'https:'],
     'media-src': ["'self'", 'data:', 'blob:'],
-    'object-src': ["'self'"],
-    'frame-src': ["'self'"],
-    'frame-ancestors': ["'self'"],
+    'object-src': ["'none'"],
+    'frame-src': ["'none'"],
+    'frame-ancestors': ["'none'"],
     'form-action': ["'self'"],
     'worker-src': ["'self'", 'blob:'],
     'child-src': ["'self'", 'blob:'],
@@ -128,28 +131,47 @@ export function applyCSPNonce(element: HTMLScriptElement | HTMLStyleElement, non
  * Note: This is mainly for development/testing. CSP should be set server-side.
  * Some directives like frame-ancestors are not supported in meta tags and will be filtered out.
  */
-export function setCSPHeader(directives: CSPDirectives): void {
-  // Filter out directives not supported in meta tags
-  const metaCompatibleDirectives = { ...directives };
-  delete metaCompatibleDirectives['frame-ancestors']; // Not supported in meta tags
-  delete metaCompatibleDirectives['report-uri']; // Not supported in meta tags
-  delete metaCompatibleDirectives['report-to']; // Not supported in meta tags
-  
-  const cspString = generateCSPHeader(metaCompatibleDirectives);
-  const metaTag = document.querySelector('meta[http-equiv="Content-Security-Policy"]') as HTMLMetaElement;
 
-  if (metaTag) {
-    metaTag.content = cspString;
-  } else {
-    const newMetaTag = document.createElement('meta');
-    newMetaTag.httpEquiv = 'Content-Security-Policy';
-    newMetaTag.content = cspString;
-    document.head.appendChild(newMetaTag);
-  }
-  
-  // Log warning about filtered directives
-  if (directives['frame-ancestors'] || directives['report-uri'] || directives['report-to']) {
-    console.warn('CSP: Some directives (frame-ancestors, report-uri, report-to) are not supported in meta tags and were filtered out. These should be set via HTTP headers.');
+export function setCSPHeader(policy: string | CSPDirectives): void {
+  try {
+    // Convert CSPDirectives to string if needed
+    let policyString: string;
+    if (typeof policy === 'string') {
+      policyString = policy;
+    } else {
+      policyString = generateCSPHeader(policy);
+    }
+    
+    // Validate that we have a string
+    if (!policyString || typeof policyString !== 'string') {
+      console.warn('CSP: Invalid policy provided, skipping CSP header setup');
+      return;
+    }
+    
+    // Filter out directives not supported in meta tags
+    const unsupportedInMeta = ['frame-ancestors', 'report-uri', 'report-to'];
+    const filteredPolicy = policyString
+      .split(';')
+      .filter(directive => {
+        const directiveName = directive.trim().split(' ')[0];
+        return !unsupportedInMeta.includes(directiveName);
+      })
+      .join(';');
+    
+    if (filteredPolicy.trim()) {
+      const metaTag = document.createElement('meta');
+      metaTag.httpEquiv = 'Content-Security-Policy';
+      metaTag.content = filteredPolicy;
+      document.head.appendChild(metaTag);
+    }
+    
+    // Log info about filtered directives (not a warning)
+    const filtered = policyString.split(';').length - filteredPolicy.split(';').length;
+    if (filtered > 0) {
+      console.info(`CSP: ${filtered} directives filtered for meta tag compatibility`);
+    }
+  } catch (error) {
+    console.error('Failed to set CSP header:', error);
   }
 }
 

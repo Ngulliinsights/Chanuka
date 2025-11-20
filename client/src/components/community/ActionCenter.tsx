@@ -29,9 +29,9 @@ import {
   Share2,
   ChevronRight
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { Campaign, Petition } from '../../types/community';
-import { useCommunityStore } from '../../store/slices/communitySlice';
+import { cn } from '@client/lib/utils';
+import { Campaign, Petition } from '@client/types/community';
+import { useCommunityStore } from '@client/store/slices/communitySlice';
 import { formatDistanceToNow, format } from 'date-fns';
 
 interface ActionCenterProps {

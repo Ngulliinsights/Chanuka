@@ -1,5 +1,5 @@
-import { logger } from '../../shared/core/index.js';
-import { schemaValidationService } from '../core/validation/schema-validation-service.js';
+import { logger } from '@shared/core/index.js';
+import { schemaValidationService } from '@client/core/validation/schema-validation-service.js';
 
 /**
  * Schema validation service integration

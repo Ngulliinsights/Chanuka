@@ -17,8 +17,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useProfile, useVerification } from '../hooks/useUsers';
-import type { UserProfile as UserProfileType, UpdateProfileData } from '../types';
+import { useProfile, useVerification } from '@client/hooks/useUsers';
+import type { UserProfile as UserProfileType, UpdateProfileData } from '@client/types';
 
 const UserProfile: FC = () => {
   const [isEditing, setIsEditing] = useState(false);

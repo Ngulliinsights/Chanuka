@@ -1,7 +1,7 @@
 import { readDatabase } from '@shared/database';
 import * as schema from '@/shared/schema';
 import { eq, and } from 'drizzle-orm';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import { databaseService } from '@/infrastructure/database/database-service.js'; // For storing results
 
 

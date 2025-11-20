@@ -20,7 +20,7 @@ vi.mock('@shared/core', () => ({
 }));
 
 import { 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
   BrowserDetector, 
   FeatureDetector, 
   getBrowserInfo, 

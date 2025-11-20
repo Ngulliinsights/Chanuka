@@ -5,8 +5,8 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
-import { mockDataService } from '../../services/mockDataService';
-import { communityBackendService } from '../../services/community-backend-service';
+import { mockDataService } from '@client/services/mockDataService';
+import { communityBackendService } from '@client/services/community-backend-service';
 import {
   DiscussionThread,
   Comment,
@@ -17,7 +17,7 @@ import {
   CommentFormData,
   ModerationViolationType
 } from '../../types/discussion';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 import type { RootState } from '../index';
 
 // State interface with clear organization

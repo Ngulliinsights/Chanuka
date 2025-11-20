@@ -5,8 +5,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Shield, AlertTriangle } from 'lucide-react';
 import { PretextWatchCard } from './PretextWatchCard';
 import { CivicActionToolbox } from './CivicActionToolbox';
-import { usePretextAnalysis } from '../hooks/usePretextAnalysis';
-import { CivicAction, RightsCard } from '../types';
+import { usePretextAnalysis } from '@client/hooks/usePretextAnalysis';
+import { CivicAction, RightsCard } from '@client/types';
 
 interface PretextDetectionPanelProps {
   billId: string;

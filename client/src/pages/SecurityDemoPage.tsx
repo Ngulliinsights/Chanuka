@@ -4,13 +4,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Textarea } from '../components/ui/textarea';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { Badge } from '../components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Button } from '@client/components/ui/button';
+import { Input } from '@client/components/ui/input';
+import { Textarea } from '@client/components/ui/textarea';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Badge } from '@client/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import { 
   Shield, 
   AlertTriangle, 
@@ -20,10 +20,10 @@ import {
   Zap,
   Activity
 } from 'lucide-react';
-import { SecurityDashboard } from '../components/security/SecurityDashboard';
-import { SecuritySettings } from '../components/security/SecuritySettings';
+import { SecurityDashboard } from '@client/components/security/SecurityDashboard';
+import { SecuritySettings } from '@client/components/security/SecuritySettings';
 import { getSecuritySystem } from '../security';
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export default function SecurityDemoPage() {
   const [testInput, setTestInput] = useState('');

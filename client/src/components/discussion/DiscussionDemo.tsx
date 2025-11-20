@@ -10,8 +10,8 @@ import { MessageSquare, Users, Settings } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { DiscussionIntegration } from './DiscussionIntegration';
-import { useDiscussion } from '../../hooks/useDiscussion';
-import { cn } from '../../lib/utils';
+import { useDiscussion } from '@client/hooks/useDiscussion';
+import { cn } from '@client/lib/utils';
 
 interface DiscussionDemoProps {
   className?: string;

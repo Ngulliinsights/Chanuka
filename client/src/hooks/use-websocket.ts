@@ -6,9 +6,9 @@
  */
 
 import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
-import { webSocketService } from '../services/webSocketService';
-import { billTrackingService } from '../services/billTrackingService';
-import { stateManagementService } from '../services/stateManagementService';
+import { webSocketService } from '@client/services/webSocketService';
+import { billTrackingService } from '@client/services/billTrackingService';
+import { stateManagementService } from '@client/services/stateManagementService';
 import {
   ConnectionState,
   BillUpdate,
@@ -19,7 +19,7 @@ import {
   ConnectionQuality,
   BillTrackingPreferences
 } from '../types/api';
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Hook-specific types (UI-focused)
 export interface UseWebSocketOptions {

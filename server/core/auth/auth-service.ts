@@ -4,16 +4,16 @@ import * as crypto from 'crypto';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import { eq, and, gt, lt, isNotNull, desc, ne } from 'drizzle-orm';
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '@shared/database/connection.js';
 
-import { users, sessions, oauth_providers, oauth_tokens, user_sessions } from '../../../shared/schema';
+import { users, sessions, oauth_providers, oauth_tokens, user_sessions } from '@shared/schema';
 import { getEmailService } from '../../infrastructure/notifications/email-service';
-import { encryptionService } from '../../features/security/encryption-service.js';
+import { encryptionService } from '@client/features/security/encryption-service.js';
 import { inputValidationService } from '../validation/input-validation-service.js';
-import { securityAuditService } from '../../features/security/security-audit-service.js';
+import { securityAuditService } from '@client/features/security/security-audit-service.js';
 import { Request } from 'express';
 import { z } from 'zod';
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/src/index.js';
 
 // Validation schemas
 export const registerSchema = z.object({

@@ -2,7 +2,7 @@
  * Client Loading Utilities - Helper functions for loading operations
  */
 
-import { LoadingType, LoadingPriority, LoadingOperation } from './types';
+import { LoadingType, LoadingPriority, LoadingOperation } from '@client/types';
 import { 
   getAdjustedTimeout,
   calculateRetryDelay as coreCalculateRetryDelay,

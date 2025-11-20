@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { securityAuditService } from './security-audit-service.js';
 import { intrusionDetectionService, ThreatDetectionResult } from './intrusion-detection-service.js';
-import { database as db } from '../../../shared/database';
+import { database as db } from '@shared/database';
 import { pgTable, text, serial, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, desc, eq, or, count } from 'drizzle-orm';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 /**
  * SecurityMonitoringService - The Active Intelligence Layer

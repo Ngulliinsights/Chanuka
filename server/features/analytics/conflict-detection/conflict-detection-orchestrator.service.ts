@@ -12,7 +12,7 @@ import {
 } from '@/shared/schema';
 import { eq } from 'drizzle-orm';
 import { getDefaultCache } from '@shared/core/caching/index.js';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import {
   ConflictAnalysis,
   ConflictDetectionError,

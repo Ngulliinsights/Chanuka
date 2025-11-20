@@ -1,5 +1,5 @@
-import { useAuth } from '@/hooks/useAuth';
-import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
+import { useAuth } from '@/features/users/hooks';
+import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
 import { getPageRelationships, generateBreadcrumbRelationships } from '../utils/page-relationships';
 import { validateNavigationPath, validateUserRole, validateUseRelatedPagesOptions } from '../validation';
 import { NavigationValidationError } from '../errors';

@@ -13,13 +13,13 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Import components for keyboard testing
-import NavigationBar from '../../components/shell/NavigationBar';
-import { BillsDashboard } from '../../components/bills/bills-dashboard';
-import { FilterPanel } from '../../components/bills/filter-panel';
-import BillDetailView from '../../pages/bill-detail';
-import { DiscussionThread } from '../../components/discussion/DiscussionThread';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
+import NavigationBar from '@client/components/shell/NavigationBar';
+import { BillsDashboard } from '@client/components/bills/bills-dashboard';
+import { FilterPanel } from '@client/components/bills/filter-panel';
+import BillDetailView from '@client/pages/bill-detail';
+import { DiscussionThread } from '@client/components/discussion/DiscussionThread';
+import { Button } from '@client/components/ui/button';
+import { Input } from '@client/components/ui/input';
 
 // Test wrapper
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {

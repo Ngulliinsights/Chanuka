@@ -10,12 +10,14 @@ export type {
   PerformanceBudget,
   CoreWebVitalsBudgets,
   BundleSizeBudgets,
+  StylingBudgets,
   PerformanceBudgetConfig,
 } from './budgets';
 
 export {
   DEFAULT_CORE_WEB_VITALS_BUDGETS,
   DEFAULT_BUNDLE_SIZE_BUDGETS,
+  DEFAULT_STYLING_BUDGETS,
   PRODUCTION_BUDGETS,
   DEVELOPMENT_BUDGETS,
   getPerformanceBudgets,

@@ -1,42 +1,6 @@
-// Analytics feature barrel exports
-export * from './types';
-export * from './services/analytics';
-export * from './hooks/useAnalytics';
-export * from './components/AnalyticsDashboard';
+/**
+ * Analytics Feature
+ * User journey tracking, error analytics, and performance monitoring
+ */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export * from './hooks';

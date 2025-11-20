@@ -5,9 +5,9 @@
 import { Campaign, NewCampaign } from '../domain/entities/campaign.js';
 // Repository interface removed - using direct service calls
 import { CampaignDomainService } from '../domain/services/campaign-domain-service.js';
-import { CampaignFilters, PaginationOptions, CampaignMetrics } from '../types/index.js';
+import { CampaignFilters, PaginationOptions, CampaignMetrics } from '@client/types/index.js';
 import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 export class CampaignService {
   constructor(

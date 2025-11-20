@@ -11,7 +11,7 @@ import {
   globalMutex,
   apiSemaphore 
 } from '../concurrency-adapter';
-import { FeatureFlagsService, MockFeatureFlagsService } from '../types/feature-flags.js';
+import { FeatureFlagsService, MockFeatureFlagsService } from '@client/types/feature-flags.js';
 
 // Example 1: Direct usage of new concurrency utilities
 export async function directUsageExample() {

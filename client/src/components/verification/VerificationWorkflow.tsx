@@ -1,24 +1,22 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Textarea } from '../ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  AlertCircle, 
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import {
+  CheckCircle,
+  Circle,
+  Clock,
+  AlertCircle,
   Eye,
   MessageSquare,
   User,
-  Calendar,
   FileText,
-  Send,
   RotateCcw
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { VerificationWorkflow as VerificationWorkflowType, VerificationStatus } from '../../types/expert';
+import { cn } from '@client/lib/utils';
+import { VerificationWorkflow as VerificationWorkflowType, VerificationStatus } from '@client/types/expert';
 
 interface VerificationWorkflowProps {
   workflow: VerificationWorkflowType;
@@ -81,7 +79,7 @@ export function VerificationWorkflow({
         };
       case 'rejected':
         return {
-          icon: XCircle,
+          icon: Circle,
           label: 'Rejected',
           color: 'text-red-600',
           bgColor: 'bg-red-50',
@@ -251,7 +249,7 @@ export function VerificationWorkflow({
                   disabled={!reviewNotes.trim() || isReviewing}
                   className="text-xs"
                 >
-                  <XCircle className="h-3 w-3 mr-1" />
+                  <Circle className="h-3 w-3 mr-1" />
                   Reject
                 </Button>
                 <Button
@@ -341,7 +339,7 @@ export function VerificationWorkflow({
                     onClick={() => setSelectedVote('reject')}
                     className="text-xs"
                   >
-                    <XCircle className="h-3 w-3 mr-1" />
+                    <Circle className="h-3 w-3 mr-1" />
                     Reject
                   </Button>
                 </div>
@@ -364,7 +362,6 @@ export function VerificationWorkflow({
                     disabled={!communityFeedback.trim() || !selectedVote || isSubmittingFeedback}
                     className="text-xs"
                   >
-                    <Send className="h-3 w-3 mr-1" />
                     Submit Feedback
                   </Button>
                 </div>

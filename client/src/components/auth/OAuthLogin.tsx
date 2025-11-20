@@ -17,9 +17,9 @@ import {
   ExternalLink,
   Loader2
 } from 'lucide-react';
-import { authService, OAuthProvider } from '../../services/authService';
-import { useAuth } from '../../hooks/useAuth';
-import { logger } from '../../utils/logger';
+import { authService, OAuthProvider } from '@client/services/authService';
+import { useAuth } from '@client/hooks/useAuth';
+import { logger } from '@client/utils/logger';
 
 interface OAuthLoginProps {
   onSuccess?: (data: any) => void;

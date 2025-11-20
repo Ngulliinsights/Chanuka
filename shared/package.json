@@ -6,6 +6,7 @@
   "main": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./core": "./core/index.ts",
     "./schema": "./schema/index.ts",
     "./database": "./database/index.ts",
     "./utils": "./utils/index.ts"

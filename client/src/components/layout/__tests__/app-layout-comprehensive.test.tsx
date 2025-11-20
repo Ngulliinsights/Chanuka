@@ -37,11 +37,11 @@ jest.mock('../accessibility/accessibility-manager', () => ({
   useAccessibility: jest.fn(),
 }));
 
-const mockUseUnifiedNavigation = require('../../../hooks/use-unified-navigation').useUnifiedNavigation;
-const mockUseNavigationPerformance = require('../../../hooks/use-navigation-performance').useNavigationPerformance;
-const mockUseNavigationAccessibility = require('../../../hooks/use-navigation-accessibility').useNavigationAccessibility;
-const mockUseNavigationKeyboardShortcuts = require('../../../hooks/use-navigation-accessibility').useNavigationKeyboardShortcuts;
-const mockUseAccessibility = require('../../../hooks/use-accessibility').useAccessibility;
+const mockUseUnifiedNavigation = require('@client/hooks/use-unified-navigation').useUnifiedNavigation;
+const mockUseNavigationPerformance = require('@client/hooks/use-navigation-performance').useNavigationPerformance;
+const mockUseNavigationAccessibility = require('@client/hooks/use-navigation-accessibility').useNavigationAccessibility;
+const mockUseNavigationKeyboardShortcuts = require('@client/hooks/use-navigation-accessibility').useNavigationKeyboardShortcuts;
+const mockUseAccessibility = require('@client/hooks/use-accessibility').useAccessibility;
 
 describe('AppLayout', () => {
   const TestChild = () => <div data-testid="test-child">Test Content</div>;

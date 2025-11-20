@@ -4,7 +4,7 @@
 
 import { useCallback } from 'react';
 import { useDashboard } from './context';
-import { WidgetConfig, WidgetType, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from './types';
+import { WidgetConfig, WidgetType, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from '@client/types';
 
 /**
  * Main dashboard hook - provides all dashboard functionality

@@ -35,27 +35,27 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
   const isProduction = process.env.NODE_ENV === 'production';
   
   const config = {
-    apiUrl: process.env.REACT_APP_API_URL || (isDevelopment ? 'http://localhost:5000' : ''),
-    wsUrl: process.env.REACT_APP_WS_URL || (isDevelopment ? 'ws://localhost:5000' : ''),
+    apiUrl: import.meta.env.VITE_API_URL || (isDevelopment ? 'http://localhost:3000' : ''),
+    wsUrl: import.meta.env.VITE_WS_URL || (isDevelopment ? 'ws://localhost:3000' : ''),
     environment: isProduction ? 'production' : isDevelopment ? 'development' : 'staging',
-    enableAnalytics: process.env.REACT_APP_ENABLE_ANALYTICS === 'true',
-    enableSecurityMonitoring: process.env.REACT_APP_ENABLE_SECURITY_MONITORING !== 'false',
-    logLevel: (process.env.REACT_APP_LOG_LEVEL as any) || (isDevelopment ? 'debug' : 'info'),
+    enableAnalytics: import.meta.env.VITE_ENABLE_ANALYTICS === 'true',
+    enableSecurityMonitoring: import.meta.env.VITE_ENABLE_SECURITY_MONITORING !== 'false',
+    logLevel: (import.meta.env.VITE_LOG_LEVEL as any) || (isDevelopment ? 'debug' : 'info'),
     oauth: {
       google: {
-        clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
-        enabled: !!process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
+        enabled: !!import.meta.env.VITE_GOOGLE_CLIENT_ID,
       },
       github: {
-        clientId: process.env.REACT_APP_GITHUB_CLIENT_ID || '',
-        enabled: !!process.env.REACT_APP_GITHUB_CLIENT_ID,
+        clientId: import.meta.env.VITE_GITHUB_CLIENT_ID || '',
+        enabled: !!import.meta.env.VITE_GITHUB_CLIENT_ID,
       },
     },
     security: {
-      enableCSP: process.env.REACT_APP_ENABLE_CSP !== 'false',
-      enableHSTS: process.env.REACT_APP_ENABLE_HSTS !== 'false',
-      sessionTimeout: parseInt(process.env.REACT_APP_SESSION_TIMEOUT || '1800000', 10), // 30 minutes
-      maxLoginAttempts: parseInt(process.env.REACT_APP_MAX_LOGIN_ATTEMPTS || '5', 10),
+      enableCSP: import.meta.env.VITE_ENABLE_CSP !== 'false',
+      enableHSTS: import.meta.env.VITE_ENABLE_HSTS !== 'false',
+      sessionTimeout: parseInt(import.meta.env.VITE_SESSION_TIMEOUT || '1800000', 10), // 30 minutes
+      maxLoginAttempts: parseInt(import.meta.env.VITE_MAX_LOGIN_ATTEMPTS || '5', 10),
     },
   } as const;
 

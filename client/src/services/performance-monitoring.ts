@@ -11,7 +11,7 @@
 
 import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 import type { Metric } from 'web-vitals';
-import { performanceApiService } from '../core/api/performance';
+import { performanceApiService } from '@client/core/api/performance';
 
 interface PerformanceMetric {
   name: string;

@@ -17,8 +17,8 @@ import {
   Info,
   Zap
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { ExpertConsensus as ExpertConsensusType } from '../../types/expert';
+import { cn } from '@client/lib/utils';
+import { ExpertConsensus as ExpertConsensusType } from '@client/types/expert';
 
 interface ExpertConsensusProps {
   consensus: ExpertConsensusType;

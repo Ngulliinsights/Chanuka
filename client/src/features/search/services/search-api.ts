@@ -2,7 +2,7 @@
  * @deprecated This file has been moved to client/src/core/api/search.ts
  * 
  * Please update your imports to use:
- * import { searchApiClient } from '../../../core/api/search';
+ * import { searchApiClient } from '@client/core/api/search';
  * 
  * This file will be removed in a future version.
  */

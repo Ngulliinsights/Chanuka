@@ -9,7 +9,7 @@ import {
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
-import { useNavigationPreferences } from "../../hooks/use-navigation-preferences";
+import { useNavigationPreferences } from "@/core/navigation/hooks";
 
 interface NavigationPreferencesDialogProps {
   trigger: React.ReactNode;

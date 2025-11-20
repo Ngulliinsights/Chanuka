@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, TrendingUp, Users, AlertTriangle, Download } from 'lucide-react';
-import { useAnalyticsDashboard, useAnalyticsExport } from '../hooks/useAnalytics';
-import type { AnalyticsFilters } from '../types';
+import { useAnalyticsDashboard, useAnalyticsExport } from '@client/hooks/useAnalytics';
+import type { AnalyticsFilters } from '@client/types';
 
 export function AnalyticsDashboard() {
   const [filters, setFilters] = useState<AnalyticsFilters>({

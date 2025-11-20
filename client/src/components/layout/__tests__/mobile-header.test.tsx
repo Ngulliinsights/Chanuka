@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MobileHeader } from '../mobile-header';
-import { HeaderAction } from '../types';
+import { HeaderAction } from '@client/types';
 import { LayoutRenderError } from '../errors';
 
 // Mock dependencies

@@ -128,7 +128,7 @@ vi.mock('../../App', () => ({
 }));
 
 // Import after mocks
-import { renderWithProviders } from '../../test-utils';
+import { renderWithProviders } from '@client/test-utils';
 
 describe('End-to-End User Flow Integration Tests', () => {
   beforeEach(() => {

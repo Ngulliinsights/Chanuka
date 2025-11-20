@@ -10,7 +10,7 @@ describe('Privacy Components Import Test', () => {
     // Test that the components can be imported without errors
     const { CookieConsentBanner } = await import('../CookieConsentBanner');
     const { DataUsageReportDashboard } = await import('../DataUsageReportDashboard');
-    const { GDPRComplianceManager } = await import('../GDPRComplianceManager');
+    const GDPRComplianceManager = (await import('../GDPRComplianceManager')).default;
 
     expect(CookieConsentBanner).toBeDefined();
     expect(DataUsageReportDashboard).toBeDefined();

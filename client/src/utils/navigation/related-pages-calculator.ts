@@ -1,4 +1,4 @@
-import { RelatedPage, UserRole } from '../../core/navigation/types';
+import { RelatedPage, UserRole } from '@client/core/navigation/types';
 
 // Page relationship mapping
 interface PageRelationship {

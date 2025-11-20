@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { engagementAnalyticsService } from '../services/engagement.service.js';
+import { engagementAnalyticsService } from '@client/services/engagement.service.js';
 import { AuthenticatedRequest } from '@/middleware/auth.js';
 
 // Validation schemas for engagement endpoints

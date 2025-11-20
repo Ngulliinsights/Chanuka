@@ -1,22 +1,21 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
-import { 
-  Scale, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
-  Info, 
+import {
+  Scale,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Info,
   TrendingUp,
   Users,
   BookOpen,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { Bill } from '../../store/slices/billsSlice';
-import { ConstitutionalAnalysisData, SeverityLevel } from '../../types/constitutional';
+import { Bill } from '@/core/api/types';
+import { ConstitutionalAnalysisData, SeverityLevel } from '@client/types/constitutional';
 
 interface ConstitutionalAnalysisPanelProps {
   bill: Bill;
@@ -44,7 +43,10 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
       ]
     },
     flags: bill.constitutionalFlags.map(flag => ({
-      ...flag,
+      id: flag.id.toString(),
+      severity: flag.severity === 'medium' ? 'moderate' as SeverityLevel : flag.severity as SeverityLevel,
+      category: flag.type,
+      description: flag.description,
       affectedProvisions: [
         {
           id: 'provision-1',
@@ -229,7 +231,7 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
 
       {/* Constitutional Flags Summary */}
       <Card className="chanuka-card">
-        <CardHeader 
+        <CardHeader
           className="chanuka-card-header cursor-pointer"
           onClick={() => toggleSection('flags')}
         >
@@ -237,7 +239,7 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6" style={{ color: 'hsl(var(--status-moderate))' }} />
               <div>
-                <CardTitle>Constitutional Flags ({bill.constitutionalFlags.length})</CardTitle>
+                <CardTitle>Constitutional Flags ({analysisData.flags.length})</CardTitle>
                 <CardDescription>
                   Identified constitutional concerns requiring attention
                 </CardDescription>
@@ -253,11 +255,11 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
 
         {expandedSections.has('flags') && (
           <CardContent className="chanuka-card-content">
-            {bill.constitutionalFlags.length > 0 ? (
+            {analysisData.flags.length > 0 ? (
               <div className="space-y-4">
-                {bill.constitutionalFlags.map((flag, index) => (
-                  <div 
-                    key={flag.id || index}
+                {analysisData.flags.map((flag) => (
+                  <div
+                    key={flag.id}
                     className="flex items-start gap-3 p-4 rounded-lg border"
                     style={{ borderColor: getSeverityColor(flag.severity) + '40' }}
                   >
@@ -267,10 +269,10 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2">
                         <h5 className="font-medium">{flag.category}</h5>
-                        <Badge 
+                        <Badge
                           variant="outline"
                           className="text-xs"
-                          style={{ 
+                          style={{
                             borderColor: getSeverityColor(flag.severity),
                             color: getSeverityColor(flag.severity)
                           }}

@@ -7,8 +7,8 @@ import React, {
   useMemo,
 } from "react";
 import { BarChart3, X, Building, FileText, Search, User, Settings, ArrowLeft, Bell,  } from 'lucide-react';
-import { cn } from "../../lib/utils";
-import { logger } from '../../utils/logger';
+import { cn } from "@client/lib/utils";
+import { logger } from '@client/utils/logger';
 import {
   MobileTouchHandler,
   MobileTouchUtils,
@@ -22,7 +22,7 @@ import { Link, useLocation } from "react-router-dom";
 import NotificationCenter from "../notifications/notification-center";
 import NavigationPreferencesDialog from "../navigation/navigation-preferences-dialog";
 import QuickAccessNav from "../navigation/quick-access-nav";
-import { useNavigationPreferences } from "../../hooks/use-navigation-preferences";
+import { useNavigationPreferences } from "@client/hooks/use-navigation-preferences";
 import {
   ResponsiveLayoutProvider,
   useResponsiveLayoutContext,

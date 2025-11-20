@@ -4,9 +4,9 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
-import { useResponsiveLayout, ResponsiveState } from '../../utils/responsive-layout';
-import { MobileTouchUtils } from '../../utils/mobile-touch-handler';
-import { logger } from '../../utils/logger';
+import { useResponsiveLayout, ResponsiveState } from '@client/utils/responsive-layout';
+import { MobileTouchUtils } from '@client/utils/mobile-touch-handler';
+import { logger } from '@client/utils/logger';
 
 interface ResponsiveLayoutContextType {
   state: ResponsiveState;

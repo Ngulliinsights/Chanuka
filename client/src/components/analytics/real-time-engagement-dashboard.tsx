@@ -56,9 +56,9 @@ import {
   Eye,
   Share2
 } from 'lucide-react';
-import { useRealTimeEngagement } from '../../hooks/useRealTimeEngagement';
-import { logger } from '../../utils/logger';
-import { cn } from '../../lib/utils';
+import { useRealTimeEngagement } from '@client/hooks/useRealTimeEngagement';
+import { logger } from '@client/utils/logger';
+import { cn } from '@client/lib/utils';
 
 // Types for real-time engagement analytics
 interface LiveMetrics {

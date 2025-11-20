@@ -230,7 +230,7 @@ export const INTEGRATION_EXAMPLES = {
   // AppLayout component integration
   appLayout: `
 // Add to AppLayout component
-import { trackRender, trackLifecycle } from '../utils/render-tracking-integration';
+import { trackRender, trackLifecycle } from '@client/utils/render-tracking-integration';
 
 function AppLayout() {
   useEffect(() => {
@@ -252,7 +252,7 @@ function AppLayout() {
   // WebSocket component integration
   webSocket: `
 // Add to WebSocket components
-import { trackRender, trackLifecycle, measurePerformance } from '../utils/render-tracking-integration';
+import { trackRender, trackLifecycle, measurePerformance } from '@client/utils/render-tracking-integration';
 
 function WebSocketClient() {
   useEffect(() => {
@@ -278,7 +278,7 @@ function WebSocketClient() {
   // Performance monitoring setup
   monitoring: `
 // Add to main App component or index.tsx
-import { setupMonitoring } from '../utils/render-tracking-integration';
+import { setupMonitoring } from '@client/utils/render-tracking-integration';
 
 // In development mode
 if (process.env.NODE_ENV === 'development') {

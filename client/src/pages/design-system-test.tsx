@@ -1,5 +1,5 @@
 import React from 'react';
-import HybridDesignSystemTest from '../components/ui/test-components';
+import HybridDesignSystemTest from '@client/components/ui/test-components';
 
 /**
  * Design System Test Page

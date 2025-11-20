@@ -6,10 +6,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { getBrowserInfo, browserDetector } from '../../utils/browser-compatibility';
-import { runBrowserCompatibilityTests, CompatibilityTestSuite } from '../../utils/browser-compatibility-tests';
+import { getBrowserInfo, browserDetector } from '@client/utils/browser-compatibility';
+import { runBrowserCompatibilityTests, CompatibilityTestSuite } from '@client/utils/browser-compatibility-tests';
 import BrowserCompatibilityTester from './BrowserCompatibilityTester';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface BrowserCompatibilityReportProps {
   showFullReport?: boolean;

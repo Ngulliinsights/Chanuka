@@ -56,8 +56,8 @@ import type {
   Alert,
   AlertRule,
 } from './core/health-monitor';
-import { BaseDatabaseScript, DatabaseScriptLogger, runDatabaseScript, createScriptResult } from './utils/base-script';
-import type { ScriptOptions, ScriptResult, ScriptContext } from './utils/base-script';
+import { BaseDatabaseScript, DatabaseScriptLogger, runDatabaseScript, createScriptResult } from '@client/utils/base-script';
+import type { ScriptOptions, ScriptResult, ScriptContext } from '@client/utils/base-script';
 
 // ============================================================================
 // Core Infrastructure Exports

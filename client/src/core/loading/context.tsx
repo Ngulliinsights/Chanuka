@@ -7,8 +7,8 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef, useMemo } from 'react';
 import { LoadingStateData, LoadingAction, LoadingOperation, LoadingOptions, LoadingPriority, LoadingType, LoadingContextValue, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats, LoadingError, LoadingTimeoutError, LoadingRetryError, LoadingConnectionError } from './types';
 import { loadingReducer } from './reducer';
-import { logger } from '../../utils/logger';
-import { useErrorAnalytics } from '../../hooks/useErrorAnalytics';
+import { logger } from '@client/utils/logger';
+import { useErrorAnalytics } from '@client/features/analytics/hooks/useErrorAnalytics';
 
 const initialState: LoadingStateData = {
   operations: {},
@@ -93,10 +93,10 @@ export function LoadingProvider({
   // Monitor operations for timeouts and warnings
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = Date.now();
-
-      Object.entries(state.operations).forEach(([id, operation]) => {
-        const elapsed = now - operation.startTime;
+      // Narrow the entries to the expected LoadingOperation shape so TypeScript knows
+      // what fields exist on each operation.
+      (Object.entries(state.operations) as [string, LoadingOperation][]).forEach(([id, operation]) => {
+        const elapsed = Date.now() - operation.startTime;
         const timeout = operation.timeout || state.adaptiveSettings.defaultTimeout;
         const warningThreshold = timeout * state.adaptiveSettings.timeoutWarningThreshold;
 
@@ -118,8 +118,8 @@ export function LoadingProvider({
             payload: { id },
           });
 
-          // Report to error analytics
-          errorAnalyticsRef.current?.trackError(timeoutError, {
+          // Report to error analytics (use `any` to avoid mismatched analytics type shape)
+          (errorAnalyticsRef.current as any)?.trackError(timeoutError, {
             component: 'LoadingProvider',
             operation: operation,
             context: 'timeout',
@@ -156,10 +156,11 @@ export function LoadingProvider({
         connectionInfo,
       });
 
-      logger.warn(`Skipping operation ${operation.id} due to connection constraints`, connectionError);
+      // Logger and analytics may expect different shapes; cast to `any` for safety.
+      logger.warn(`Skipping operation ${operation.id} due to connection constraints`, connectionError as any);
 
       // Report to error analytics
-      errorAnalyticsRef.current?.trackError(connectionError, {
+      (errorAnalyticsRef.current as any)?.trackError(connectionError, {
         component: 'LoadingProvider',
         operation: operation,
         context: 'connection-constraint',
@@ -183,9 +184,10 @@ export function LoadingProvider({
       const loadingError = error instanceof LoadingError ? error :
         new LoadingError(id, error.message, 'OPERATION_FAILED', { originalError: error });
 
-      errorAnalyticsRef.current?.trackError(loadingError, {
+      // Analytics object shape can vary; cast to `any` for tracking calls
+      (errorAnalyticsRef.current as any)?.trackError(loadingError, {
         component: 'LoadingProvider',
-        operation: state.operations[id],
+        operation: state.operations[id] as any,
         context: 'operation-failure',
       });
     }
@@ -246,11 +248,13 @@ export function LoadingProvider({
   }, [state.operations]);
 
   const getOperationsByType = useCallback((type: LoadingType) => {
-    return Object.values(state.operations).filter(op => op.type === type);
+    const ops = Object.values(state.operations) as LoadingOperation[];
+    return ops.filter(op => op.type === type);
   }, [state.operations]);
 
   const getOperationsByPriority = useCallback((priority: LoadingPriority) => {
-    return Object.values(state.operations).filter(op => op.priority === priority);
+    const ops = Object.values(state.operations) as LoadingOperation[];
+    return ops.filter(op => op.priority === priority);
   }, [state.operations]);
 
   const isOperationActive = useCallback((id: string) => {

@@ -3,7 +3,7 @@
  * Following navigation component patterns for utility organization
  */
 
-import { LoadingOperation, LoadingStage, LoadingProgress, LoadingPriority, LoadingType } from '../types';
+import { LoadingOperation, LoadingStage, LoadingProgress, LoadingPriority, LoadingType } from '@client/types';
 import { LOADING_PRIORITIES, LOADING_TIMEOUTS, RETRY_DELAYS } from '../constants';
 import { validateLoadingOperation, validateLoadingStage } from '../validation';
 

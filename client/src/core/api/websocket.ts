@@ -457,12 +457,15 @@ export class UnifiedWebSocketManager {
   private onError(error: Event | Error): void {
     this.connectionState = ConnectionState.FAILED;
 
-    globalErrorHandler.handleError(error as Error, {
+    // Convert Event to Error if needed
+    const errorObj = error instanceof Error ? error : new Error('WebSocket connection error');
+
+    globalErrorHandler.handleError(errorObj, {
       component: 'websocket',
       operation: 'connection'
     });
 
-    this.eventEmitter.emit('error', error);
+    this.eventEmitter.emit('error', errorObj);
   }
 
   private routeMessage(message: any): void {

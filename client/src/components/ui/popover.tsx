@@ -1,8 +1,8 @@
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { AlertCircle } from "lucide-react"
-import { cn } from '../../lib/utils'
-import { logger } from '../../utils/logger';
+import { cn } from '@client/lib/utils'
+import { logger } from '@client/utils/logger';
 import { UIComponentError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
 

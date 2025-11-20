@@ -2,7 +2,7 @@
  * User-related utility functions for auth components
  */
 
-import { AuthConfig } from '../types';
+import { AuthConfig } from '@client/types';
 
 export function formatDisplayName(first_name: string, last_name: string): string {
   const first = first_name.trim();

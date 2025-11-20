@@ -65,6 +65,23 @@ export const searchApiClient = {
   },
 
   /**
+   * Perform streaming search with real-time results
+   */
+  async streamSearch(params: Record<string, string | number | boolean>): Promise<any> {
+    return api.get('/api/search/stream', {
+      params,
+      timeout: 30000
+    });
+  },
+
+  /**
+   * Cancel a streaming search
+   */
+  async cancelSearch(searchId: string): Promise<any> {
+    return api.delete(`/api/search/cancel/${searchId}`);
+  },
+
+  /**
    * Get search data for fuzzy matching
    */
   async getSearchData(type?: string): Promise<any> {
@@ -195,6 +212,8 @@ export const searchApiClient = {
 export const {
   search,
   searchPostgreSQL,
+  streamSearch,
+  cancelSearch,
   getSearchData,
   getSuggestions,
   getRecentSearches,

@@ -516,7 +516,7 @@ describe('AssetLoadingIndicator', () => {
     it('should handle recovery process', async () => {
       const mockRecover = vi.fn().mockResolvedValue(true);
       
-      vi.mocked(require('../hooks/useLoadingRecovery').useLoadingRecovery).mockReturnValue({
+      vi.mocked(require('@client/hooks/useLoadingRecovery').useLoadingRecovery).mockReturnValue({
         recoveryState: {
           canRecover: true,
           suggestions: ['Retry loading'],
@@ -550,7 +550,7 @@ describe('AssetLoadingIndicator', () => {
     });
 
     it('should show recovery in progress state', async () => {
-      vi.mocked(require('../hooks/useLoadingRecovery').useLoadingRecovery).mockReturnValue({
+      vi.mocked(require('@client/hooks/useLoadingRecovery').useLoadingRecovery).mockReturnValue({
         recoveryState: {
           canRecover: true,
           suggestions: ['Retrying...'],

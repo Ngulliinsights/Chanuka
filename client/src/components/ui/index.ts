@@ -9,7 +9,21 @@ export * from './errors';
 export * from './validation';
 export * from './recovery';
 
-// Enhanced components with validation
+// Unified Components (Recommended)
+export {
+  UnifiedButton,
+  unifiedButtonVariants,
+  UnifiedCard,
+  UnifiedCardHeader,
+  UnifiedCardTitle,
+  UnifiedCardDescription,
+  UnifiedCardContent,
+  UnifiedCardFooter,
+  UnifiedBadge,
+  unifiedBadgeVariants
+} from './unified-components';
+
+// Legacy components (for backward compatibility)
 export { Input, EnhancedInput } from './input';
 export { 
   Form, 

@@ -23,9 +23,9 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { TwoFactorSetup as TwoFactorSetupType } from '../../types/auth';
-import { logger } from '../../utils/logger';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { TwoFactorSetup as TwoFactorSetupType } from '@client/types/auth';
+import { logger } from '@client/utils/logger';
 
 interface TwoFactorSetupProps {
   isOpen: boolean;

@@ -14,7 +14,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 describe('Memory Usage Profiling for Caching Layer', () => {
   const MEMORY_THRESHOLDS = {

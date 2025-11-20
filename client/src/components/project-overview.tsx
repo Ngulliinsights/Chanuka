@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AnalyticsMetric, Checkpoint, FeatureFlag } from "@shared/schema";
 import { Calendar, CheckCircle, Flag, Milestone, TrendingUp } from "lucide-react";
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface ProjectOverviewProps {
   projectId: number;

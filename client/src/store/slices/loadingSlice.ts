@@ -6,8 +6,8 @@
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { LoadingStateData, LoadingOperation, LoadingAction, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats, LoadingType, LoadingPriority, RetryStrategy } from '../../core/loading/types';
-import { logger } from '../../utils/logger';
+import { LoadingStateData, LoadingOperation, LoadingAction, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats, LoadingType, LoadingPriority, RetryStrategy } from '@client/core/loading/types';
+import { logger } from '@client/utils/logger';
 
 // Initial state based on core loading types
 const initialState: LoadingStateData = {

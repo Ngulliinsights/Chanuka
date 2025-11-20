@@ -15,15 +15,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Import components for testing
 import App from '../../App';
-import NavigationBar from '../../components/shell/NavigationBar';
-import BillCard from '../../components/bills/BillCard';
-import FilterPanel from '../../components/bills/FilterPanel';
-import BillDetailView from '../../components/bill-detail/BillDetailView';
-import DiscussionThread from '../../components/discussion/DiscussionThread';
-import ExpertBadge from '../../components/verification/ExpertBadge';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Select } from '../../components/ui/select';
+import NavigationBar from '@client/components/shell/NavigationBar';
+import BillCard from '@client/components/bills/BillCard';
+import FilterPanel from '@client/components/bills/FilterPanel';
+import BillDetailView from '@client/components/bill-detail/BillDetailView';
+import DiscussionThread from '@client/components/discussion/DiscussionThread';
+import ExpertBadge from '@client/components/verification/ExpertBadge';
+import { Button } from '@client/components/ui/button';
+import { Input } from '@client/components/ui/input';
+import { Select } from '@client/components/ui/select';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);

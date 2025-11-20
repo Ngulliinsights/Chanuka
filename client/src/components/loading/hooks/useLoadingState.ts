@@ -4,9 +4,9 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { LoadingState, LoadingType, LoadingPriority } from '../types';
+import { LoadingState, LoadingType, LoadingPriority } from '@client/types';
 import { LoadingError } from '../errors';
-import { debounce } from '../utils/loading-utils';
+import { debounce } from '@client/utils/loading-utils';
 
 export interface LoadingStateOptions {
   initialState?: LoadingState;

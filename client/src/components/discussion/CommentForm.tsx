@@ -2,8 +2,8 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Send, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { cn } from '../../lib/utils';
-import { CommentFormData, CommentValidation } from '../../types/discussion';
+import { cn } from '@client/lib/utils';
+import { CommentFormData, CommentValidation } from '@client/types/discussion';
 
 interface CommentFormProps {
   billId: number;

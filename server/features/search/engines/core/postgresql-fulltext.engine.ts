@@ -1,31 +1,24 @@
 // ============================================================================
-// POSTGRESQL FULL-TEXT SEARCH ENGINE - ENHANCED
+// POSTGRESQL FULL-TEXT SEARCH ENGINE - PHASE 2 ENHANCED
 // ============================================================================
 // Advanced search using PostgreSQL's ts_vector and ts_query with:
-// - GIN indexes for optimal performance
-// - Enhanced ts_rank scoring with multiple factors
-// - Query expansion with synonyms and stemming
-// - Performance monitoring and analytics
+// - Weighted search vectors (Title A, Summary B, Content C, Comments D)
+// - Advanced ranking using ts_rank_cd() with custom weighting
+// - Field-specific search prefixes (title:, sponsor:, status:)
+// - Boolean operators (AND, OR, NOT) and parentheses grouping
+// - Proximity search for phrase matching
+// - Dual-engine integration capabilities
 
-import { database } from '@shared/database';
-import { bills, sponsors, comments, users } from '@shared/schema';
-import { sql, desc } from 'drizzle-orm';
-import { SearchQuery, SearchResult } from '../types/search.types.js';
-import { logger  } from '../../../../../shared/core/src/index.js';
+import { SearchQuery, SearchResult } from '@client/types/search.types.js';
+import { logger } from '@shared/core/src/index.js';
 import { databaseService } from '@/infrastructure/database/database-service';
+import { searchSyntaxParser, ParsedQuery } from '@client/utils/search-syntax-parser';
 
 interface QueryExpansionOptions {
   enableSynonyms: boolean;
   enableStemming: boolean;
   category?: string;
   maxExpansions: number;
-}
-
-interface SearchPerformanceMetrics {
-  executionTime: number;
-  resultsCount: number;
-  queryComplexity: number;
-  indexUsage: boolean;
 }
 
 export class PostgreSQLFullTextEngine {
@@ -36,8 +29,14 @@ export class PostgreSQLFullTextEngine {
   };
 
   /**
-   * Execute enhanced PostgreSQL full-text search with improved relevance ranking.
+   * Execute enhanced PostgreSQL full-text search with Phase 2 capabilities.
    * Features:
+   * - Advanced search syntax parsing (field searches, boolean operators, phrases)
+   * - Weighted search vectors (Title A, Summary B, Content C, Comments D)
+   * - Advanced ranking using ts_rank_cd() with custom weighting
+   * - Field-specific search prefixes (title:, sponsor:, status:)
+   * - Boolean operators (AND, OR, NOT) and parentheses grouping
+   * - Proximity search for phrase matching
    * - Query expansion with synonyms
    * - Multi-factor ts_rank scoring
    * - Performance monitoring
@@ -48,48 +47,57 @@ export class PostgreSQLFullTextEngine {
     const results: SearchResult[] = [];
 
     try {
+      // Parse query using advanced syntax parser
+      const parsedQuery: ParsedQuery = searchSyntaxParser.parse(query.query);
+
       // Extract and expand search terms
       const searchTerms = this.extractSearchTerms(query.query);
       const expandedQuery = await this.expandQuery(query.query, this.defaultExpansionOptions);
-      
+
       // Build optimized ts_query with both original and expanded terms
       const tsQuery = this.buildOptimizedTsQuery(searchTerms, expandedQuery);
-      
+
+      // Build field-specific and boolean query components
+      const queryComponents = this.buildAdvancedQueryComponents(parsedQuery, tsQuery);
+
       // Execute searches in parallel for better performance
       const searchPromises = [];
 
       if (this.shouldSearchType(query, 'bills')) {
-        searchPromises.push(this.searchBillsEnhanced(tsQuery, searchTerms, query));
+        searchPromises.push(this.searchBillsEnhanced(queryComponents, searchTerms, query));
       }
 
       if (this.shouldSearchType(query, 'sponsors')) {
-        searchPromises.push(this.searchSponsorsEnhanced(tsQuery, searchTerms, query));
+        searchPromises.push(this.searchSponsorsEnhanced(queryComponents, searchTerms, query));
       }
 
       if (this.shouldSearchType(query, 'comments')) {
-        searchPromises.push(this.searchCommentsEnhanced(tsQuery, searchTerms, query));
+        searchPromises.push(this.searchCommentsEnhanced(queryComponents, searchTerms, query));
       }
 
       const allResults = await Promise.all(searchPromises);
       results.push(...allResults.flat());
 
-      // Apply enhanced relevance scoring
-      const scoredResults = this.applyEnhancedScoring(results, query.query, searchTerms);
+      // Apply enhanced relevance scoring with Phase 2 ranking
+      const scoredResults = this.applyPhase2Scoring(results, parsedQuery, searchTerms);
+
+      // Apply result diversity and quality filtering
+      const filteredResults = this.applyResultFiltering(scoredResults, parsedQuery);
 
       // Log performance metrics
       const executionTime = Date.now() - startTime;
-      await this.logSearchPerformance(query.query, 'fulltext', scoredResults.length, executionTime);
+      await this.logSearchPerformance(query.query, 'full-text-phase2', filteredResults.length, executionTime);
 
       // Sort by enhanced relevance score descending
-      return scoredResults.sort((a, b) => b.relevanceScore - a.relevanceScore);
+      return filteredResults.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
     } catch (error) {
-      logger.error('PostgreSQL full-text search failed', { 
+      logger.error('PostgreSQL full-text search failed', {
         error: (error as Error).message,
         query: query.query,
         executionTime: Date.now() - startTime
       });
-      
+
       // Fallback to empty results on error
       return [];
     }
@@ -99,54 +107,65 @@ export class PostgreSQLFullTextEngine {
 
 
   /**
-   * Enhanced bills search with improved ts_rank scoring
+   * Enhanced bills search with Phase 2 capabilities
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async searchBillsEnhanced(
-    tsQuery: string,
+    queryComponents: any,
     searchTerms: string[],
     query: SearchQuery
   ): Promise<SearchResult[]> {
+    // Build dynamic WHERE clause from query components
+    const whereConditions = [`b.search_vector @@ to_tsquery('english', $1)`];
+
+    // Add field-specific conditions
+    if (queryComponents.fieldConditions.length > 0) {
+      whereConditions.push(...queryComponents.fieldConditions);
+    }
+
+    // Add proximity queries
+    if (queryComponents.proximityQueries.length > 0) {
+      whereConditions.push(...queryComponents.proximityQueries);
+    }
+
+    const whereClause = whereConditions.join(' AND ');
+
     const result = await databaseService.executeRawQuery(
       `
-      SELECT 
-        id,
-        bill_number,
-        title,
-        summary,
-        status,
-        chamber,
-        created_at,
-        -- Enhanced ts_rank with multiple factors
+      SELECT
+        b.id,
+        b.bill_number,
+        b.title,
+        b.summary,
+        b.status,
+        b.chamber,
+        b.created_at,
+        -- Enhanced ts_rank with Phase 2 weighted vectors
         (
-          -- Base relevance score
-          ts_rank_cd(
-            to_tsvector('english', title || ' ' || COALESCE(summary, '') || ' ' || COALESCE(full_text, '')),
-            to_tsquery('english', $1),
-            32 -- Use cover density ranking
-          ) * 1.0 +
+          -- Base relevance score with custom weights (A=title, B=summary, C=content, D=tags)
+          ts_rank_cd(b.search_vector, to_tsquery('english', $1), '{0.1, 0.2, 0.4, 1.0}') * 1.0 +
           -- Title match bonus (higher weight for title matches)
-          CASE WHEN to_tsvector('english', title) @@ to_tsquery('english', $1) 
+          CASE WHEN b.search_vector @@ to_tsquery('english', $2 || ':A')
                THEN 0.5 ELSE 0.0 END +
           -- Exact phrase match bonus
-          CASE WHEN title ILIKE '%' || $2 || '%' OR summary ILIKE '%' || $2 || '%'
+          CASE WHEN b.title ILIKE '%' || $3 || '%' OR b.summary ILIKE '%' || $3 || '%'
                THEN 0.3 ELSE 0.0 END +
           -- Recency bonus (newer bills get slight boost)
-          CASE WHEN created_at > NOW() - INTERVAL '6 months' 
+          CASE WHEN b.created_at > NOW() - INTERVAL '6 months'
                THEN 0.1 ELSE 0.0 END +
           -- Engagement bonus
-          (COALESCE(engagement_score, 0) / 1000.0) * 0.2
+          (COALESCE(b.engagement_score, 0) / 1000.0) * 0.2
         ) as relevance_score
-      FROM bills
-      WHERE 
-        to_tsvector('english', title || ' ' || COALESCE(summary, '') || ' ' || COALESCE(full_text, '')) 
-        @@ to_tsquery('english', $1)
-        AND ($3::text IS NULL OR status = ANY(string_to_array($3, ',')))
-        AND ($4::text IS NULL OR chamber = ANY(string_to_array($4, ',')))
+      FROM bills b
+      WHERE ${whereClause}
+        AND ($4::text IS NULL OR b.status = ANY(string_to_array($4, ',')))
+        AND ($5::text IS NULL OR b.chamber = ANY(string_to_array($5, ',')))
       ORDER BY relevance_score DESC
-      LIMIT $5
+      LIMIT $6
       `,
       [
-        tsQuery,
+        queryComponents.tsQuery,
+        query.query,
         query.query,
         query.filters?.status?.join(',') || null,
         query.filters?.chamber?.join(',') || null,
@@ -156,6 +175,7 @@ export class PostgreSQLFullTextEngine {
       'searchBillsEnhanced'
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return result.data.map((bill: any) => ({
       id: bill.id,
       type: 'bill' as const,
@@ -176,50 +196,62 @@ export class PostgreSQLFullTextEngine {
   }
 
   /**
-   * Enhanced sponsors search with improved ts_rank scoring
+   * Enhanced sponsors search with Phase 2 capabilities
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async searchSponsorsEnhanced(
-    tsQuery: string,
+    queryComponents: any,
     searchTerms: string[],
     query: SearchQuery
   ): Promise<SearchResult[]> {
+    // Build dynamic WHERE clause from query components
+    const whereConditions = [`s.search_vector @@ to_tsquery('english', $1)`];
+
+    // Add field-specific conditions
+    if (queryComponents.fieldConditions.length > 0) {
+      whereConditions.push(...queryComponents.fieldConditions);
+    }
+
+    // Add proximity queries
+    if (queryComponents.proximityQueries.length > 0) {
+      whereConditions.push(...queryComponents.proximityQueries);
+    }
+
+    const whereClause = whereConditions.join(' AND ');
+
     const result = await databaseService.executeRawQuery(
       `
-      SELECT 
-        id,
-        name,
-        party,
-        county,
-        chamber,
-        bio,
-        -- Enhanced ts_rank with multiple factors
+      SELECT
+        s.id,
+        s.name,
+        s.party,
+        s.county,
+        s.chamber,
+        s.bio,
+        -- Enhanced ts_rank with Phase 2 weighted vectors
         (
-          -- Base relevance score
-          ts_rank_cd(
-            to_tsvector('english', name || ' ' || COALESCE(bio, '')),
-            to_tsquery('english', $1),
-            32
-          ) * 1.0 +
+          -- Base relevance score with custom weights
+          ts_rank_cd(s.search_vector, to_tsquery('english', $1), '{0.1, 0.2, 0.4, 1.0}') * 1.0 +
           -- Name match bonus (exact name matches get higher score)
-          CASE WHEN to_tsvector('english', name) @@ to_tsquery('english', $1) 
+          CASE WHEN s.search_vector @@ to_tsquery('english', $2 || ':A')
                THEN 0.8 ELSE 0.0 END +
           -- Exact phrase match bonus
-          CASE WHEN name ILIKE '%' || $2 || '%' OR bio ILIKE '%' || $2 || '%'
+          CASE WHEN s.name ILIKE '%' || $3 || '%' OR s.bio ILIKE '%' || $3 || '%'
                THEN 0.4 ELSE 0.0 END +
           -- Active sponsor bonus
-          CASE WHEN is_active = true THEN 0.2 ELSE 0.0 END
+          CASE WHEN s.is_active = true THEN 0.2 ELSE 0.0 END
         ) as relevance_score
-      FROM sponsors
-      WHERE 
-        to_tsvector('english', name || ' ' || COALESCE(bio, '')) @@ to_tsquery('english', $1)
-        AND ($3::text IS NULL OR chamber = ANY(string_to_array($3, ',')))
-        AND ($4::text IS NULL OR county = ANY(string_to_array($4, ',')))
-        AND is_active = true
+      FROM sponsors s
+      WHERE ${whereClause}
+        AND ($4::text IS NULL OR s.chamber = ANY(string_to_array($4, ',')))
+        AND ($5::text IS NULL OR s.county = ANY(string_to_array($5, ',')))
+        AND s.is_active = true
       ORDER BY relevance_score DESC
-      LIMIT $5
+      LIMIT $6
       `,
       [
-        tsQuery,
+        queryComponents.tsQuery,
+        query.query,
         query.query,
         query.filters?.chamber?.join(',') || null,
         query.filters?.county?.join(',') || null,
@@ -229,6 +261,7 @@ export class PostgreSQLFullTextEngine {
       'searchSponsorsEnhanced'
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return result.data.map((sponsor: any) => ({
       id: sponsor.id,
       type: 'sponsor' as const,
@@ -248,45 +281,56 @@ export class PostgreSQLFullTextEngine {
   }
 
   /**
-   * Enhanced comments search with improved ts_rank scoring
+   * Enhanced comments search with Phase 2 capabilities
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async searchCommentsEnhanced(
-    tsQuery: string,
+    queryComponents: any,
     searchTerms: string[],
     query: SearchQuery
   ): Promise<SearchResult[]> {
+    // Build dynamic WHERE clause from query components
+    const whereConditions = [`c.search_vector @@ to_tsquery('english', $1)`];
+
+    // Add field-specific conditions
+    if (queryComponents.fieldConditions.length > 0) {
+      whereConditions.push(...queryComponents.fieldConditions);
+    }
+
+    // Add proximity queries
+    if (queryComponents.proximityQueries.length > 0) {
+      whereConditions.push(...queryComponents.proximityQueries);
+    }
+
+    const whereClause = whereConditions.join(' AND ');
+
     const result = await databaseService.executeRawQuery(
       `
-      SELECT 
+      SELECT
         c.id,
         c.content,
         c.bill_id,
         c.created_at,
         u.email as user_name,
-        -- Enhanced ts_rank for comments
+        -- Enhanced ts_rank for comments with Phase 2 weighted vectors
         (
-          ts_rank_cd(
-            to_tsvector('english', c.content),
-            to_tsquery('english', $1),
-            32
-          ) * 1.0 +
+          ts_rank_cd(c.search_vector, to_tsquery('english', $1), '{0.1, 0.2, 0.4, 1.0}') * 1.0 +
           -- Exact phrase match bonus
           CASE WHEN c.content ILIKE '%' || $2 || '%' THEN 0.3 ELSE 0.0 END +
           -- Recency bonus for comments
-          CASE WHEN c.created_at > NOW() - INTERVAL '30 days' 
+          CASE WHEN c.created_at > NOW() - INTERVAL '30 days'
                THEN 0.2 ELSE 0.0 END
         ) as relevance_score
       FROM comments c
       INNER JOIN users u ON c.user_id = u.id
-      WHERE 
-        to_tsvector('english', c.content) @@ to_tsquery('english', $1)
+      WHERE ${whereClause}
         AND ($3::timestamp IS NULL OR c.created_at >= $3)
         AND ($4::timestamp IS NULL OR c.created_at <= $4)
       ORDER BY relevance_score DESC
       LIMIT $5
       `,
       [
-        tsQuery,
+        queryComponents.tsQuery,
         query.query,
         query.filters?.dateRange?.start || null,
         query.filters?.dateRange?.end || null,
@@ -296,6 +340,7 @@ export class PostgreSQLFullTextEngine {
       'searchCommentsEnhanced'
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return result.data.map((comment: any) => ({
       id: comment.id,
       type: 'comment' as const,
@@ -330,13 +375,15 @@ export class PostgreSQLFullTextEngine {
         'expandQuery'
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (result.data.length > 0 && (result.data[0] as any)?.expanded_query) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (result.data[0] as any).expanded_query.split(' | ').slice(0, options.maxExpansions);
       }
     } catch (error) {
-      logger.warn('Query expansion failed, using original query', { 
+      logger.warn('Query expansion failed, using original query', {
         error: (error as Error).message,
-        query: originalQuery 
+        query: originalQuery
       });
     }
 
@@ -349,64 +396,18 @@ export class PostgreSQLFullTextEngine {
   private buildOptimizedTsQuery(searchTerms: string[], expandedTerms: string[]): string {
     // Start with original terms (higher weight)
     const originalQuery = searchTerms.map(term => `${term}:*`).join(' & ');
-    
+
     if (expandedTerms.length === 0) {
       return originalQuery;
     }
 
     // Add expanded terms with OR logic (lower weight)
     const expandedQuery = expandedTerms.map(term => `${term}:*`).join(' | ');
-    
+
     // Combine: (original terms) OR (expanded terms with lower weight)
     return `(${originalQuery}) | (${expandedQuery})`;
   }
 
-  /**
-   * Apply enhanced relevance scoring with multiple factors
-   */
-  private applyEnhancedScoring(
-    results: SearchResult[],
-    originalQuery: string,
-    searchTerms: string[]
-  ): SearchResult[] {
-    const queryLower = originalQuery.toLowerCase();
-    
-    return results.map(result => {
-      let enhancedScore = result.relevanceScore;
-      
-      // Boost exact matches in title
-      if (result.title.toLowerCase().includes(queryLower)) {
-        enhancedScore += 0.5;
-      }
-      
-      // Boost results with multiple term matches
-      const titleLower = result.title.toLowerCase();
-      const summaryLower = (result.summary || '').toLowerCase();
-      const matchingTerms = searchTerms.filter(term => 
-        titleLower.includes(term) || summaryLower.includes(term)
-      );
-      
-      enhancedScore += (matchingTerms.length / searchTerms.length) * 0.3;
-      
-      // Boost based on result type priority
-      switch (result.type) {
-        case 'bill':
-          enhancedScore += 0.1; // Bills are most important
-          break;
-        case 'sponsor':
-          enhancedScore += 0.05;
-          break;
-        case 'comment':
-          // Comments get no additional boost
-          break;
-      }
-      
-      return {
-        ...result,
-        relevanceScore: enhancedScore
-      };
-    });
-  }
 
   /**
    * Log search performance for monitoring and optimization
@@ -426,8 +427,8 @@ export class PostgreSQLFullTextEngine {
       );
     } catch (error) {
       // Don't fail search if logging fails
-      logger.warn('Failed to log search performance', { 
-        error: (error as Error).message 
+      logger.warn('Failed to log search performance', {
+        error: (error as Error).message
       });
     }
   }
@@ -492,8 +493,163 @@ export class PostgreSQLFullTextEngine {
   }
 
   /**
+   * Build advanced query components from parsed query
+   */
+  private buildAdvancedQueryComponents(parsedQuery: ParsedQuery, baseTsQuery: string): {
+    tsQuery: string;
+    fieldConditions: string[];
+    booleanQuery: string;
+    proximityQueries: string[];
+  } {
+    const components = {
+      tsQuery: baseTsQuery,
+      fieldConditions: [] as string[],
+      booleanQuery: '',
+      proximityQueries: [] as string[],
+    };
+
+    // Handle field-specific searches
+    for (const [field, value] of Object.entries(parsedQuery.fieldQueries)) {
+      if (value) {
+        switch (field) {
+          case 'title':
+            components.fieldConditions.push(`search_vector @@ to_tsquery('english', '${value}:A')`);
+            break;
+          case 'sponsor':
+            components.fieldConditions.push(`sponsors.name ILIKE '%${value}%'`);
+            break;
+          case 'status':
+            components.fieldConditions.push(`bills.status = '${value}'`);
+            break;
+          case 'content':
+            components.fieldConditions.push(`search_vector @@ to_tsquery('english', '${value}:C')`);
+            break;
+          case 'comments':
+            components.fieldConditions.push(`search_vector @@ to_tsquery('english', '${value}:D')`);
+            break;
+        }
+      }
+    }
+
+    // Handle exact phrases with proximity
+    for (const phrase of parsedQuery.exactPhrases) {
+      components.proximityQueries.push(`search_vector @@ phraseto_tsquery('english', '${phrase}')`);
+    }
+
+    // Build boolean query from operators
+    if (parsedQuery.metadata.hasBooleanOperators) {
+      components.booleanQuery = this.buildBooleanQuery(parsedQuery);
+    }
+
+    return components;
+  }
+
+  /**
+   * Build boolean query from parsed operators
+   */
+  private buildBooleanQuery(parsedQuery: ParsedQuery): string {
+    // For now, use PostgreSQL's built-in boolean query parsing
+    // In a more advanced implementation, we could construct complex boolean expressions
+    const terms = [];
+
+    if (parsedQuery.traditionalQuery) {
+      terms.push(parsedQuery.traditionalQuery);
+    }
+
+    for (const exclusion of parsedQuery.exclusions) {
+      terms.push(`NOT ${exclusion}`);
+    }
+
+    return terms.join(' AND ');
+  }
+
+  /**
+   * Apply Phase 2 enhanced scoring with configurable weights
+   */
+  private applyPhase2Scoring(
+    results: SearchResult[],
+    parsedQuery: ParsedQuery,
+    searchTerms: string[]
+  ): SearchResult[] {
+    const weights = parsedQuery.metadata;
+
+    return results.map(result => {
+      let enhancedScore = result.relevanceScore;
+
+      // Apply semantic vs traditional weight balance
+      enhancedScore *= weights.semanticWeight + weights.traditionalWeight;
+
+      // Boost exact matches in title
+      if (result.title.toLowerCase().includes(parsedQuery.originalQuery.toLowerCase())) {
+        enhancedScore += 0.5;
+      }
+
+      // Boost results with multiple term matches
+      const titleLower = result.title.toLowerCase();
+      const summaryLower = (result.summary || '').toLowerCase();
+      const matchingTerms = searchTerms.filter(term =>
+        titleLower.includes(term) || summaryLower.includes(term)
+      );
+
+      enhancedScore += (matchingTerms.length / searchTerms.length) * 0.3;
+
+      // Apply result type priority
+      switch (result.type) {
+        case 'bill':
+          enhancedScore += 0.1;
+          break;
+        case 'sponsor':
+          enhancedScore += 0.05;
+          break;
+        case 'comment':
+          // Comments get no additional boost
+          break;
+      }
+
+      return {
+        ...result,
+        relevanceScore: enhancedScore
+      };
+    });
+  }
+
+  /**
+   * Apply result diversity and quality filtering
+   */
+  private applyResultFiltering(results: SearchResult[], parsedQuery: ParsedQuery): SearchResult[] {
+    let filtered = results;
+
+    // Remove excluded terms
+    if (parsedQuery.exclusions.length > 0) {
+      filtered = filtered.filter(result => {
+        const content = `${result.title} ${result.summary || ''}`.toLowerCase();
+        return !parsedQuery.exclusions.some((exclusion: string) =>
+          content.includes(exclusion.toLowerCase())
+        );
+      });
+    }
+
+    // Apply diversity filtering (limit results per type)
+    const maxPerType = 10;
+    const typeCounts = new Map<string, number>();
+    filtered = filtered.filter(result => {
+      const count = typeCounts.get(result.type) || 0;
+      if (count >= maxPerType) return false;
+      typeCounts.set(result.type, count + 1);
+      return true;
+    });
+
+    // Apply quality threshold
+    const minScore = 0.01;
+    filtered = filtered.filter(result => result.relevanceScore >= minScore);
+
+    return filtered;
+  }
+
+  /**
    * Get search performance statistics for monitoring
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getPerformanceStats(hoursBack: number = 24): Promise<any[]> {
     const result = await databaseService.executeRawQuery(
       `SELECT * FROM get_search_performance_stats($1)`,

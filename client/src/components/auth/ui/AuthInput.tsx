@@ -8,8 +8,8 @@ import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
-import { AuthInputProps } from '../types';
-import { usePasswordVisibility } from '../hooks/usePasswordUtils';
+import { AuthInputProps } from '@client/types';
+import { usePasswordVisibility } from '@client/hooks/usePasswordUtils';
 
 export const AuthInput: React.FC<AuthInputProps> = ({
   name,

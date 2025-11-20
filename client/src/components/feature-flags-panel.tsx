@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FeatureFlag } from "@shared/schema";
 import { Settings } from "lucide-react";
-import { apiRequest } from '../lib/queryClient';
-import { useToast } from '../hooks/use-toast';
+import { apiRequest } from '@client/lib/queryClient';
+import { useToast } from '@client/hooks/use-toast';
 
 interface FeatureFlagsPanelProps {
   projectId: number;

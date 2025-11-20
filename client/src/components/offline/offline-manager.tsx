@@ -12,7 +12,7 @@ import React, {
   useRef 
 } from 'react';
 import { Network, Database, RefreshCw } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface OfflineData {
   bills: any[];

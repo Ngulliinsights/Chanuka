@@ -5,7 +5,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Eye, EyeOff, AlertCircle, CheckCircle, HelpCircle } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 import { Input } from './input';
 import { Label } from './label';
 import { Button } from './button';

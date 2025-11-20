@@ -22,7 +22,7 @@ import {
   Clock,
   TrendingUp
 } from 'lucide-react';
-import { EngagementHistoryItem } from '../../../types/user-dashboard';
+import { EngagementHistoryItem } from '@client/types/user-dashboard';
 import { formatDistanceToNow, format } from 'date-fns';
 
 interface EngagementHistorySectionProps {

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
-import { Button } from '../../components/ui/button';
-import { logger } from '../../utils/logger';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { logger } from '@client/utils/logger';
 import {
   ArrowLeft,
   ChevronLeft, 
@@ -219,14 +219,14 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
         <span>›</span>
         <Link to={ `/bills/${bill_id }`} className="hover:text-primary transition-colors">Bills</Link>
         <span>›</span>
-        <Link to={ `/bills/${bill_id }/sponsorhip-analysis`} className="hover:text-primary transition-colors">sponsorhip Analysis</Link>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary transition-colors">Sponsorship Analysis</Link>
         <span>›</span>
         <span className="text-foreground">Primary Sponsor</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={ `/bills/${bill_id }/sponsorhip-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
@@ -424,15 +424,15 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={ `/bills/${bill_id }/sponsorhip-analysis/overview`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/overview`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Overview
           </Button>
         </Link>
-        <Link to={ `/bills/${bill_id }/sponsorhip-analysis/co-sponsor`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/co-sponsors`}>
           <Button>
-            Next: Co-sponsor
+            Next: Co-sponsors
             <ChevronRight className="h-4 w-4 ml-2" />
           </Button>
         </Link>

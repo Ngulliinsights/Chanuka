@@ -35,7 +35,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import WebSocket from 'ws';
 import { app } from '../../index.ts';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 describe('WebSocket and Real-Time Features Integration Tests', () => {
   let server: any;

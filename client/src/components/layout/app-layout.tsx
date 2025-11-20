@@ -6,12 +6,9 @@ import React, {
   ErrorInfo,
   useMemo,
 } from "react";
-import { useUnifiedNavigation } from "../../hooks/use-unified-navigation";
-import { useNavigationPerformance } from "../../hooks/use-navigation-performance";
-import {
-  useNavigationAccessibility,
-  useNavigationKeyboardShortcuts,
-} from "../../hooks/use-navigation-accessibility";
+import { useUnifiedNavigation } from "@client/core/navigation/hooks/use-unified-navigation";
+import { useNavigationPerformance } from "@client/core/navigation/hooks/use-navigation-performance";
+import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from "@client/core/navigation/hooks/use-navigation-accessibility";
 import { DesktopSidebar } from "../navigation";
 import MobileNavigation from "./mobile-navigation";
 import {
@@ -26,7 +23,7 @@ import {
   safeValidateLayoutConfig,
 } from "./index";
 
-// Default layout configuration
+// Default layout configuration with comprehensive settings
 const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
   type: "app",
   showSidebar: true,
@@ -40,6 +37,9 @@ const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
   enablePerformanceOptimization: true,
 };
 
+// Transition timing constant for consistent animations
+const TRANSITION_DURATION = 300;
+
 const AppLayout = React.memo(function AppLayout({
   children,
   config,
@@ -47,40 +47,16 @@ const AppLayout = React.memo(function AppLayout({
   onLayoutChange,
   onError,
 }: AppLayoutProps) {
+  // Core navigation and state management hooks
   const { isMobile, mounted, sidebarCollapsed } = useUnifiedNavigation();
+  const { announceToScreenReader } = useAccessibility();
+  
+  // Layout state management
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [previousIsMobile, setPreviousIsMobile] = useState<boolean | null>(
-    null
-  );
   const [layoutError, setLayoutError] = useState<LayoutError | null>(null);
   const [layoutConfig, setLayoutConfig] = useState<LayoutConfig>(
     DEFAULT_LAYOUT_CONFIG
   );
-
-  // Move useAccessibility to the top with other hooks
-  const { announceToScreenReader } = useAccessibility();
-
-  // Validate and merge layout configuration
-  useEffect(() => {
-    if (config) {
-      const validation = safeValidateLayoutConfig({
-        ...DEFAULT_LAYOUT_CONFIG,
-        ...config,
-      });
-      if (validation.success) {
-        setLayoutConfig(validation.data);
-        onLayoutChange?.(validation.data);
-      } else {
-        const error = new LayoutRenderError(
-          `Invalid layout configuration: ${validation.error?.message}`,
-          "AppLayout",
-          { config, validationError: validation.error }
-        );
-        setLayoutError(error);
-        onError?.(error);
-      }
-    }
-  }, [config, onLayoutChange, onError]);
 
   // Performance and accessibility hooks
   const {
@@ -91,62 +67,97 @@ const AppLayout = React.memo(function AppLayout({
   } = useNavigationPerformance();
 
   const { announce } = useNavigationAccessibility();
-
   const { registerShortcut } = useNavigationKeyboardShortcuts();
 
-  // Refs for accessibility and performance
+  // Refs for DOM elements and stable values to prevent unnecessary re-renders
   const layoutRef = useRef<HTMLDivElement>(null);
   const mainContentRef = useRef<HTMLElement>(null);
   const isMobileRef = useRef(isMobile);
-  
-  // Keep isMobile ref in sync
+  const previousIsMobileRef = useRef<boolean | null>(null);
+  const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Keep mobile state ref synchronized with prop changes
   useEffect(() => {
     isMobileRef.current = isMobile;
   }, [isMobile]);
 
-  // Error recovery function
+  // Validate and merge layout configuration when config prop changes
+  useEffect(() => {
+    if (!config) {
+      return;
+    }
+
+    const mergedConfig = { ...DEFAULT_LAYOUT_CONFIG, ...config };
+    const validation = safeValidateLayoutConfig(mergedConfig);
+    
+    if (validation.success) {
+      setLayoutConfig(validation.data);
+      onLayoutChange?.(validation.data);
+    } else {
+      const error = new LayoutRenderError(
+        `Invalid layout configuration: ${validation.error?.message}`,
+        "AppLayout",
+        { config, validationError: validation.error }
+      );
+      setLayoutError(error);
+      onError?.(error);
+    }
+  }, [config, onLayoutChange, onError]);
+
+  // Error handling callback with proper typing and context
   const handleLayoutError = useCallback(
     (error: Error, errorInfo?: ErrorInfo) => {
-      const layoutError = new LayoutRenderError(error.message, "AppLayout", {
-        error: error.stack,
-        errorInfo,
-      });
+      const layoutError = new LayoutRenderError(
+        error.message,
+        "AppLayout",
+        {
+          error: error.stack,
+          errorInfo,
+        }
+      );
       setLayoutError(layoutError);
       onError?.(layoutError);
     },
     [onError]
   );
 
-  // Recovery function to reset layout to default state
+  // Recovery function to reset layout to pristine state
   const recoverFromError = useCallback(() => {
     setLayoutError(null);
     setLayoutConfig(DEFAULT_LAYOUT_CONFIG);
     setIsTransitioning(false);
-    setPreviousIsMobile(null);
+    previousIsMobileRef.current = null;
+    
+    // Clear any pending transition timers to prevent memory leaks
+    if (transitionTimerRef.current) {
+      clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = null;
+    }
   }, []);
 
-  // Performance optimization: Memoize main content classes
+  // Memoized main content classes for optimal rendering performance
   const mainContentClasses = useMemo(() => {
     if (isMobile) {
       return "flex-1 flex flex-col chanuka-content-transition";
     }
 
-    // Desktop: adjust for sidebar width with smooth transitions
+    // Desktop mode adjusts margin based on sidebar state with smooth transitions
     const sidebarWidth = sidebarCollapsed ? "ml-16" : "ml-64";
     return `flex-1 flex flex-col chanuka-content-transition ${sidebarWidth}`;
   }, [isMobile, sidebarCollapsed]);
 
-  // Accessibility: Keyboard navigation for layout - stable callback
+  // Keyboard navigation handler using stable ref to prevent dependency issues
   const handleLayoutKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
-      // Alt + M to focus main content
+      // Alt + M focuses the main content area
       if (event.altKey && event.key === "m") {
         event.preventDefault();
         mainContentRef.current?.focus();
+        announceToScreenReader("Focused main content");
         return;
       }
 
-      // Alt + N to focus navigation (if not mobile)
+      // Alt + N focuses navigation sidebar (desktop only)
       if (event.altKey && event.key === "n" && !isMobileRef.current) {
         event.preventDefault();
         const sidebarNav = document.querySelector(
@@ -154,11 +165,12 @@ const AppLayout = React.memo(function AppLayout({
         );
         if (sidebarNav) {
           (sidebarNav as HTMLElement).focus();
+          announceToScreenReader("Focused navigation menu");
         }
         return;
       }
 
-      // Alt + S to focus search
+      // Alt + S focuses the search input if available
       if (event.altKey && event.key === "s") {
         event.preventDefault();
         const searchInput = document.querySelector(
@@ -166,84 +178,87 @@ const AppLayout = React.memo(function AppLayout({
         );
         if (searchInput) {
           (searchInput as HTMLElement).focus();
+          announceToScreenReader("Focused search");
         }
       }
     },
-    [] // Removed isMobile dependency since we use ref
+    [announceToScreenReader]
   );
 
-  // Stable refs for performance functions to avoid dependency issues
-  const performanceFunctionsRef = useRef({
-    startTransition: null as typeof startTransition,
-    endTransition: null as typeof endTransition,
-    enableGPUAcceleration: null as typeof enableGPUAcceleration,
-    disableGPUAcceleration: null as typeof disableGPUAcceleration,
-    announce: null as typeof announce
-  });
-  
-  // Update refs when functions change - using individual dependencies to prevent circular updates
-  performanceFunctionsRef.current.startTransition = startTransition;
-  performanceFunctionsRef.current.endTransition = endTransition;
-  performanceFunctionsRef.current.enableGPUAcceleration = enableGPUAcceleration;
-  performanceFunctionsRef.current.disableGPUAcceleration = disableGPUAcceleration;
-  performanceFunctionsRef.current.announce = announce;
-
-  // Handle responsive breakpoint transitions with performance optimization
+  // Handle responsive breakpoint transitions with GPU acceleration
   useEffect(() => {
-    if (!mounted) return;
-    
-    // Only trigger transition if isMobile actually changed
-    if (previousIsMobile !== null && previousIsMobile !== isMobile) {
-      const funcs = performanceFunctionsRef.current;
-      
-      // Start performance-optimized transition
-      if (funcs.startTransition) funcs.startTransition(300);
-      setIsTransitioning(true);
-
-      // Announce layout change to screen readers
-      if (funcs.announce) {
-        funcs.announce(`Layout changed to ${isMobile ? "mobile" : "desktop"} view`);
-      }
-
-      // Enable GPU acceleration during transition
-      if (layoutRef.current && funcs.enableGPUAcceleration) {
-        funcs.enableGPUAcceleration(layoutRef.current);
-      }
-
-      const timer = setTimeout(() => {
-        setIsTransitioning(false);
-        if (funcs.endTransition) funcs.endTransition();
-
-        // Disable GPU acceleration after transition
-        if (layoutRef.current && funcs.disableGPUAcceleration) {
-          funcs.disableGPUAcceleration(layoutRef.current);
-        }
-      }, 300);
-
-      return () => clearTimeout(timer);
+    if (!mounted) {
+      return;
     }
 
-    // Update previous state only after processing
-    setPreviousIsMobile(isMobile);
-  }, [isMobile, mounted]); // Removed previousIsMobile from dependencies to prevent loops
-
-  // Register keyboard shortcuts for navigation - memoized to prevent re-registration
-  const keyboardShortcuts = useCallback(() => {
-    const funcs = performanceFunctionsRef.current;
-    if (!registerShortcut || !funcs.announce) return [];
+    const previousMobile = previousIsMobileRef.current;
     
-    return [
-      // Alt + M to focus main content
+    // Only trigger transition when breakpoint actually changes
+    if (previousMobile !== null && previousMobile !== isMobile) {
+      // Start performance-optimized transition sequence
+      startTransition(TRANSITION_DURATION);
+      setIsTransitioning(true);
+
+      // Announce layout change for screen reader users
+      announce(`Layout changed to ${isMobile ? "mobile" : "desktop"} view`);
+
+      // Enable GPU acceleration for smoother animations
+      if (layoutRef.current) {
+        enableGPUAcceleration(layoutRef.current);
+      }
+
+      // Schedule transition cleanup
+      transitionTimerRef.current = setTimeout(() => {
+        setIsTransitioning(false);
+        endTransition();
+
+        // Disable GPU acceleration to conserve resources
+        if (layoutRef.current) {
+          disableGPUAcceleration(layoutRef.current);
+        }
+        
+        transitionTimerRef.current = null;
+      }, TRANSITION_DURATION);
+
+      // Cleanup function to prevent memory leaks
+      return () => {
+        if (transitionTimerRef.current) {
+          clearTimeout(transitionTimerRef.current);
+          transitionTimerRef.current = null;
+        }
+      };
+    }
+
+    // Update reference for next comparison
+    previousIsMobileRef.current = isMobile;
+  }, [
+    isMobile,
+    mounted,
+    startTransition,
+    endTransition,
+    enableGPUAcceleration,
+    disableGPUAcceleration,
+    announce,
+  ]);
+
+  // Register global keyboard shortcuts for navigation
+  useEffect(() => {
+    if (!registerShortcut) {
+      return;
+    }
+
+    const unregisterShortcuts = [
+      // Alt + M shortcut for main content
       registerShortcut(
         "m",
         () => {
           mainContentRef.current?.focus();
-          funcs.announce("Focused main content");
+          announce("Focused main content");
         },
         { alt: true }
       ),
 
-      // Alt + N to focus navigation
+      // Alt + N shortcut for navigation menu (desktop only)
       registerShortcut(
         "n",
         () => {
@@ -253,14 +268,14 @@ const AppLayout = React.memo(function AppLayout({
             );
             if (sidebarNav) {
               (sidebarNav as HTMLElement).focus();
-              funcs.announce("Focused navigation menu");
+              announce("Focused navigation menu");
             }
           }
         },
         { alt: true }
       ),
 
-      // Alt + S to focus search (if available)
+      // Alt + S shortcut for search functionality
       registerShortcut(
         "s",
         () => {
@@ -269,39 +284,35 @@ const AppLayout = React.memo(function AppLayout({
           );
           if (searchInput) {
             (searchInput as HTMLElement).focus();
-            funcs.announce("Focused search");
+            announce("Focused search");
           }
         },
         { alt: true }
       ),
     ];
-  }, [registerShortcut]); // Removed isMobile dependency since we use ref
 
-  useEffect(() => {
-    const unregisterShortcuts = keyboardShortcuts();
-    
+    // Cleanup all registered shortcuts when component unmounts
     return () => {
       unregisterShortcuts.forEach((unregister) => unregister?.());
     };
-  }, [keyboardShortcuts]);
+  }, [registerShortcut, announce]);
 
-  // Announce layout changes to screen readers - consolidated with transition effect
-  // This is now handled in the transition effect above to prevent duplicate announcements
-
-  // Error boundary rendering
+  // Error boundary UI with recovery option
   if (layoutError) {
     return (
       <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
           <div className="text-center">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <div className="text-red-500 text-6xl mb-4" role="img" aria-label="Warning">
+              ⚠️
+            </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Layout Error
             </h2>
             <p className="text-gray-600 mb-4">{layoutError.message}</p>
             <button
               onClick={recoverFromError}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               type="button"
             >
               Recover Layout
@@ -312,27 +323,22 @@ const AppLayout = React.memo(function AppLayout({
     );
   }
 
-  // Prevent layout shift during hydration with proper SSR placeholder
+  // Server-side rendering placeholder to prevent hydration mismatch
   if (!mounted) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex">
-          {/* SSR Placeholder - matches expected desktop layout */}
           {layoutConfig.showSidebar && (
             <div className="hidden lg:block w-64 bg-white border-r border-gray-200 transition-all duration-300" />
           )}
 
-          {/* Main content area with proper spacing */}
           <div className="flex-1 flex flex-col">
-            {/* Mobile header placeholder */}
             {layoutConfig.showHeader && isMobile && (
               <div className="lg:hidden bg-white border-b border-gray-200 h-16" />
             )}
 
-            {/* Main content */}
             <main className="flex-1 min-h-screen">{children}</main>
 
-            {/* Footer placeholder */}
             {layoutConfig.showFooter && (
               <footer className="bg-white border-t mt-auto">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -346,7 +352,6 @@ const AppLayout = React.memo(function AppLayout({
               </footer>
             )}
 
-            {/* Mobile bottom nav placeholder */}
             {isMobile && <div className="lg:hidden h-16 bg-white border-t" />}
           </div>
         </div>
@@ -354,6 +359,7 @@ const AppLayout = React.memo(function AppLayout({
     );
   }
 
+  // Main layout render with proper error handling
   try {
     return (
       <div
@@ -363,7 +369,6 @@ const AppLayout = React.memo(function AppLayout({
         }`}
         onKeyDown={handleLayoutKeyDown}
       >
-        {/* Skip Links for Accessibility */}
         {layoutConfig.enableAccessibility && (
           <>
             <SkipLink href="#main-content">Skip to main content</SkipLink>
@@ -373,7 +378,6 @@ const AppLayout = React.memo(function AppLayout({
         )}
 
         <div className="relative chanuka-layout-transition">
-          {/* Desktop Sidebar - Fixed positioning for smooth transitions */}
           {!isMobile &&
             layoutConfig.showSidebar &&
             layoutConfig.sidebarState !== "hidden" && (
@@ -382,9 +386,7 @@ const AppLayout = React.memo(function AppLayout({
               </div>
             )}
 
-          {/* Main content area with responsive positioning */}
           <div className={mainContentClasses}>
-            {/* Mobile Navigation - Only shown on mobile */}
             {isMobile && layoutConfig.showHeader && (
               <div
                 className={`chanuka-layout-transition ${
@@ -397,7 +399,6 @@ const AppLayout = React.memo(function AppLayout({
               </div>
             )}
 
-            {/* Main Content with proper spacing and transitions */}
             <main
               ref={mainContentRef}
               id="main-content"
@@ -411,7 +412,6 @@ const AppLayout = React.memo(function AppLayout({
               <div className="w-full">{children}</div>
             </main>
 
-            {/* Footer with responsive behavior */}
             {layoutConfig.showFooter && (
               <footer
                 className={`bg-white border-t mt-auto chanuka-layout-transition ${

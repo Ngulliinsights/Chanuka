@@ -22,10 +22,10 @@ import {
   FileText,
   Star
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { useWebSocket } from '../../hooks/useWebSocket';
+import { cn } from '@client/lib/utils';
+import { useWebSocket } from '@client/hooks/useWebSocket';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { RootState } from '@client/store';
 import { EngagementMetricsChart } from './EngagementMetricsChart';
 import { CivicScoreCard } from './CivicScoreCard';
 import { SentimentTracker } from './SentimentTracker';

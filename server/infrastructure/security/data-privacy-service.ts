@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { logger  } from '../../../shared/core/src/index.js';
-import { securityAuditService } from '../../features/security/security-audit-service.js';
+import { logger  } from '@shared/core/src/index.js';
+import { securityAuditService } from '@client/features/security/security-audit-service.js';
 
 /**
  * Data Privacy Service

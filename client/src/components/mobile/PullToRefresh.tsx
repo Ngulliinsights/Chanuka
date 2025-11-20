@@ -14,7 +14,7 @@
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { RefreshCw, ArrowDown } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void> | void;

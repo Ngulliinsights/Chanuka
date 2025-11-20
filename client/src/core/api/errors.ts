@@ -339,8 +339,8 @@ export class UnifiedErrorHandler {
    * This provides consistent error identification across the application.
    */
   private mapErrorToCode(error: Error): ErrorCode {
-    const message = error.message.toLowerCase();
-    const name = error.name.toLowerCase();
+    const message = error?.message?.toLowerCase() || '';
+    const name = error?.name?.toLowerCase() || '';
 
     // Network-related errors
     if (name === 'timeouterror' || message.includes('timeout')) {

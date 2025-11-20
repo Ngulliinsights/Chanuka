@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@client/lib/utils';
 import { useResponsive, type Breakpoint } from '../responsive';
 
 export interface ResponsiveContainerProps {

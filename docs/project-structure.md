@@ -1152,7 +1152,6 @@ client/
 │   │   │   │   ├── authSlice.test.ts
 │   │   │   │   ├── sessionSlice.test.ts
 │   │   │   ├── authSlice.ts
-│   │   │   ├── billsSlice.ts
 │   │   │   ├── discussionSlice.redux.ts
 │   │   │   ├── discussionSlice.ts
 │   │   │   ├── errorAnalyticsSlice.ts

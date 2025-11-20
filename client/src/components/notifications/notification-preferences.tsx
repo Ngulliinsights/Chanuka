@@ -11,8 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Progress } from '../ui/progress';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Bell, Mail, MessageSquare, Smartphone, Clock, Filter, Settings, TestTube, Save, CheckCircle, X, Network, TrendingUp, Users, Calendar, AlertTriangle, Info } from 'lucide-react';
-import { useToast } from '../../hooks/use-toast';
-import { logger } from '../../utils/logger';
+import { useToast } from '@client/hooks/use-toast';
+import { logger } from '@client/utils/logger';
 
 // --- INTERFACES ---
 

@@ -4,8 +4,8 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AlertCircle, CheckCircle as CheckCircle, Mail, Shield, User, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { useAuthForm } from './hooks/useAuthForm';
-import { FormData, FormFieldName } from './types';
+import { useAuthForm } from '@client/hooks/useAuthForm';
+import { FormData, FormFieldName } from '@client/types';
 import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
 import { SocialLogin } from './SocialLogin';
 

@@ -6,9 +6,9 @@
  */
 
 import { useEffect, useState } from 'react';
-import { globalServiceLocator } from '../core/api/registry';
-import { ApiService } from '../core/api/types';
-import { logger } from '../utils/logger';
+import { globalServiceLocator } from '@client/core/api/registry';
+import { ApiService } from '@client/core/api/types';
+import { logger } from '@client/utils/logger';
 
 /**
  * Hook to get a service from the registry

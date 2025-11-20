@@ -1,7 +1,7 @@
 import { GovernmentDataIntegrationService } from '../infrastructure/external-data/government-data-integration.js';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/external-api-manager.js';
 import { ExternalAPIErrorHandler } from './external-api-error-handler.js';
-import { logger   } from '../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 import { z } from 'zod';
 
 /**

@@ -1,14 +1,14 @@
 import { Express } from 'express';
 import { encryptionService } from './encryption-service';
-// import { inputValidationService } from '../core/validation/input-validation-service.ts'; // TODO: Fix missing module
-// import { secureSessionService } from '../core/auth/secure-session-service.ts'; // TODO: Fix missing module
+// import { inputValidationService } from '@client/core/validation/input-validation-service.ts'; // TODO: Fix missing module
+// import { secureSessionService } from '@client/core/auth/secure-session-service.ts'; // TODO: Fix missing module
 import { securityAuditService } from './security-audit-service';
 import { tlsConfigService } from './tls-config-service';
 // import { securityMiddleware } from '../middleware/security-middleware.ts'; // TODO: Fix missing module
 // import { authRateLimit, apiRateLimit } from '../middleware/rate-limiter.ts'; // TODO: Fix missing module
 import https from 'https';
 import fs from 'fs';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 /**
  * Security initialization service that sets up all security components

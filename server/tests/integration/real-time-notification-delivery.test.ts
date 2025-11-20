@@ -29,16 +29,16 @@ import cors from 'cors';
 import WebSocket, { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 import { router as notificationsRouter } from '../../infrastructure/notifications/notifications';
-// import { router as realTimeTrackingRouter } from '../../features/bills/real-time-tracking.js'; // TODO: Implement real-time tracking router
-import { router as billTrackingRouter } from '../../features/bills/bill-tracking.js';
+// import { router as realTimeTrackingRouter } from '@client/features/bills/real-time-tracking.js'; // TODO: Implement real-time tracking router
+import { router as billTrackingRouter } from '@client/features/bills/bill-tracking.js';
 
 // Mock realTimeTrackingRouter
 const realTimeTrackingRouter = express.Router();
-import { router as authRouter } from '../../core/auth/auth.js';
+import { router as authRouter } from '@client/core/auth/auth.js';
 import { database as db, users, bills, notifications, bill_engagement } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 describe('Real-Time Notification Delivery Tests', () => {
   let app: express.Application;

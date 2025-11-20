@@ -8,7 +8,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Badge } from './badge';
 import { Progress } from './progress';
 import { Alert, AlertDescription } from './alert';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 
 /**
  * Test Components for Hybrid Design System Verification

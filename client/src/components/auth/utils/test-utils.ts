@@ -5,7 +5,7 @@
 
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import { ReactElement } from 'react';
-import { AuthMode, LoginFormData, RegisterFormData, AuthConfig } from '../types';
+import { AuthMode, LoginFormData, RegisterFormData, AuthConfig } from '@client/types';
 import { AUTH_CONFIG_DEFAULTS } from '../constants';
 
 // Mock function type for testing

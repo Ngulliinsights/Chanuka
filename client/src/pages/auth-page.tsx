@@ -1,20 +1,435 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
+/**
+ * Comprehensive Authentication Page
+ * 
+ * Complete authentication flow with login, registration, password reset,
+ * and OAuth integration. Includes proper error handling, accessibility,
+ * and security features.
+ */
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { AlertTriangle, CheckCircle, ArrowLeft, Shield, Mail } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Button } from '@client/components/ui/button';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { LoginForm } from '@client/components/auth/LoginForm';
+import { RegisterForm } from '@client/components/auth/ui/RegisterForm';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { logger } from '@client/utils/logger';
+
+type AuthMode = 'login' | 'register' | 'forgot-password' | 'reset-password' | 'verify-email' | 'oauth-callback';
 
 export default function AuthPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user, isAuthenticated, verifyEmail, resetPassword, requestPasswordReset, loginWithOAuth, register } = useAuth();
+
+  // Determine initial mode from URL parameters
+  const getInitialMode = (): AuthMode => {
+    if (searchParams.get('mode') === 'register') return 'register';
+    if (searchParams.get('mode') === 'forgot-password') return 'forgot-password';
+    if (searchParams.get('mode') === 'reset-password') return 'reset-password';
+    if (searchParams.get('mode') === 'verify-email') return 'verify-email';
+    if (searchParams.get('code') && searchParams.get('state')) return 'oauth-callback';
+    return 'login';
+  };
+
+  const [mode, setMode] = useState<AuthMode>(getInitialMode());
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [email, setEmail] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const redirectTo = searchParams.get('redirect') || '/dashboard';
+      navigate(redirectTo, { replace: true });
+    }
+  }, [isAuthenticated, user, navigate, searchParams]);
+
+  // Handle URL parameter changes
+  useEffect(() => {
+    const token = searchParams.get('token');
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
+    const error = searchParams.get('error');
+
+    if (error) {
+      setMessage({ type: 'error', text: decodeURIComponent(error) });
+      return;
+    }
+
+    if (token && mode === 'verify-email') {
+      handleEmailVerification(token);
+    } else if (token && mode === 'reset-password') {
+      setResetToken(token);
+    } else if (code && state && mode === 'oauth-callback') {
+      handleOAuthCallback(code, state);
+    }
+  }, [searchParams, mode]);
+
+  const handleEmailVerification = async (token: string) => {
+    setLoading(true);
+    try {
+      const result = await verifyEmail(token);
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Email verified successfully! You can now sign in.' });
+        setMode('login');
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Email verification failed' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Email verification failed' });
+      logger.error('Email verification error', { error });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOAuthCallback = async (code: string, state: string) => {
+    setLoading(true);
+    try {
+      const result = await loginWithOAuth(code, state);
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Successfully signed in! Redirecting...' });
+        setTimeout(() => {
+          const redirectTo = searchParams.get('redirect') || '/dashboard';
+          navigate(redirectTo, { replace: true });
+        }, 1000);
+      } else {
+        setMessage({ type: 'error', text: result.error || 'OAuth authentication failed' });
+        setMode('login');
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'OAuth authentication failed' });
+      setMode('login');
+      logger.error('OAuth callback error', { error });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setMessage({ type: 'error', text: 'Please enter your email address' });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await requestPasswordReset(email, `${window.location.origin}/auth?mode=reset-password`);
+      if (result.success) {
+        setMessage({ 
+          type: 'success', 
+          text: 'Password reset instructions have been sent to your email address.' 
+        });
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to send reset email' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to send reset email' });
+      logger.error('Password reset request error', { error });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || !confirmPassword) {
+      setMessage({ type: 'error', text: 'Please fill in all fields' });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setMessage({ type: 'error', text: 'Passwords do not match' });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setMessage({ type: 'error', text: 'Password must be at least 8 characters long' });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await resetPassword(resetToken, newPassword, confirmPassword);
+      if (result.success) {
+        setMessage({ 
+          type: 'success', 
+          text: 'Password reset successfully! You can now sign in with your new password.' 
+        });
+        setMode('login');
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Password reset failed' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Password reset failed' });
+      logger.error('Password reset error', { error });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    const redirectTo = searchParams.get('redirect') || '/dashboard';
+    navigate(redirectTo, { replace: true });
+  };
+
+  const clearMessage = () => setMessage(null);
+
+  const renderHeader = () => {
+    const titles = {
+      login: 'Welcome Back',
+      register: 'Create Your Account',
+      'forgot-password': 'Reset Your Password',
+      'reset-password': 'Set New Password',
+      'verify-email': 'Verify Your Email',
+      'oauth-callback': 'Completing Sign In...'
+    };
+
+    const descriptions = {
+      login: 'Sign in to access your Chanuka Platform account',
+      register: 'Join Chanuka to engage with legislative processes',
+      'forgot-password': 'Enter your email to receive reset instructions',
+      'reset-password': 'Choose a strong new password for your account',
+      'verify-email': 'Verifying your email address...',
+      'oauth-callback': 'Please wait while we complete your authentication...'
+    };
+
+    return (
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center mb-4">
+          <Shield className="h-12 w-12 text-primary" />
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {titles[mode]}
+        </h1>
+        <p className="text-gray-600">
+          {descriptions[mode]}
+        </p>
+      </div>
+    );
+  };
+
+  const renderBackButton = () => {
+    if (mode === 'login') return null;
+
+    return (
+      <Button
+        variant="ghost"
+        onClick={() => {
+          setMode('login');
+          setMessage(null);
+        }}
+        className="mb-4"
+        disabled={loading}
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Sign In
+      </Button>
+    );
+  };
+
+  const renderContent = () => {
+    if (loading && (mode === 'verify-email' || mode === 'oauth-callback')) {
+      return (
+        <Card className="w-full max-w-md mx-auto">
+          <CardContent className="flex items-center justify-center py-12">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <p className="text-muted-foreground">
+                {mode === 'verify-email' ? 'Verifying your email...' : 'Completing authentication...'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    switch (mode) {
+      case 'login':
+        return (
+          <LoginForm
+            onSuccess={handleAuthSuccess}
+            onSwitchToRegister={() => {
+              setMode('register');
+              clearMessage();
+            }}
+            onForgotPassword={() => {
+              setMode('forgot-password');
+              clearMessage();
+            }}
+          />
+        );
+
+      case 'register':
+        return (
+          <RegisterForm
+            onSubmit={async (data) => {
+              setLoading(true);
+              try {
+                // call central register API via useAuth
+                const result = await register({
+                  email: data.email,
+                  password: data.password,
+                  first_name: data.first_name,
+                  last_name: data.last_name,
+                } as any);
+
+                if (result.success) {
+                  // on successful registration navigate/notify
+                  setMessage({ type: 'success', text: result.requiresVerification ? 'Account created! Please check your email to verify your account.' : 'Account created successfully! Redirecting...' });
+                  // short delay to show message then redirect
+                  setTimeout(() => handleAuthSuccess(), 800);
+                }
+
+                return { success: !!result.success, error: result.error };
+              } catch (err: any) {
+                const text = err instanceof Error ? err.message : 'Registration failed';
+                setMessage({ type: 'error', text });
+                return { success: false, error: text };
+              } finally {
+                setLoading(false);
+              }
+            }}
+            onError={(err) => setMessage({ type: 'error', text: err })}
+          />
+        );
+
+      case 'forgot-password':
+        return (
+          <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Mail className="h-5 w-5" />
+                <span>Reset Password</span>
+              </CardTitle>
+              <CardDescription>
+                Enter your email address and we'll send you instructions to reset your password.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium">
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Enter your email address"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Sending...' : 'Send Reset Instructions'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        );
+
+      case 'reset-password':
+        return (
+          <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle>Set New Password</CardTitle>
+              <CardDescription>
+                Choose a strong password for your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handlePasswordReset} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="new-password" className="text-sm font-medium">
+                    New Password
+                  </label>
+                  <input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Enter new password"
+                    required
+                    disabled={loading}
+                    minLength={8}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="confirm-password" className="text-sm font-medium">
+                    Confirm Password
+                  </label>
+                  <input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Confirm new password"
+                    required
+                    disabled={loading}
+                    minLength={8}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Resetting...' : 'Reset Password'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-16 max-w-md">
-      <Card>
-        <CardHeader>
-          <CardTitle>Sign In</CardTitle>
-          <CardDescription>Access your Chanuka Platform account</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button className="w-full">Sign In with Email</Button>
-          <Button variant="outline" className="w-full">Create Account</Button>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {renderHeader()}
+        
+        {message && (
+          <Alert 
+            variant={message.type === 'error' ? 'destructive' : 'default'} 
+            className="mb-6"
+          >
+            {message.type === 'error' ? (
+              <AlertTriangle className="h-4 w-4" />
+            ) : (
+              <CheckCircle className="h-4 w-4" />
+            )}
+            <AlertDescription>{message.text}</AlertDescription>
+          </Alert>
+        )}
+
+        {renderBackButton()}
+        {renderContent()}
+
+        {/* Footer */}
+        <div className="text-center mt-8 text-sm text-gray-600">
+          <p>
+            By using Chanuka, you agree to our{' '}
+            <a href="/terms" className="text-primary hover:underline">
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a href="/privacy" className="text-primary hover:underline">
+              Privacy Policy
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -31,8 +31,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
-import type { SearchResult, SearchResponse } from '../types';
-import type { CombinedSearchResult } from '../services/intelligent-search';
+import type { SearchResult, SearchResponse } from '@client/types';
+import type { CombinedSearchResult } from '@client/services/intelligent-search';
 
 interface SearchResultsProps {
   results: CombinedSearchResult | null;

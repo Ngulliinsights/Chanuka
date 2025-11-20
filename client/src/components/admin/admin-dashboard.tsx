@@ -8,8 +8,8 @@ import { Progress } from '../ui/progress';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { MonitoringDashboard } from '../monitoring/monitoring-dashboard';
-import AuthenticatedAPI from '../../utils/authenticated-api';
-import { logger } from '../../utils/logger';
+import AuthenticatedAPI from '@client/utils/authenticated-api';
+import { logger } from '@client/utils/logger';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { AlertTriangle, Scale, Users, TrendingUp, Shield, BookOpen, Lightbulb } from 'lucide-react';
-import { Bill } from '../../store/slices/billsSlice';
+import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 'lucide-react';
+import { UnifiedAccordionGroup, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '../ui/unified-components';
+import { Bill } from '@/core/api/types';
 import { ConstitutionalAnalysisPanel } from './ConstitutionalAnalysisPanel';
 import { ConstitutionalFlagCard } from './ConstitutionalFlagCard';
 import { ExpertAnalysisCard } from './ExpertAnalysisCard';
@@ -85,7 +86,7 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
   ];
 
   // Extract constitutional concerns for civic action guidance
-  const constitutionalConcerns = bill.constitutionalFlags.map(flag => flag.category);
+  const constitutionalConcerns = bill.constitutionalFlags.map(flag => flag.type || 'General');
   const recommendations = [
     'Review income-based eligibility criteria for equal protection compliance',
     'Clarify federal-state authority boundaries in healthcare regulation',
@@ -111,7 +112,7 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
             Experts
           </TabsTrigger>
           <TabsTrigger value="education" className="text-xs lg:text-sm">
-            <Lightbulb className="h-4 w-4 mr-1 lg:mr-2" />
+            <Star className="h-4 w-4 mr-1 lg:mr-2" />
             Learn
           </TabsTrigger>
           <TabsTrigger value="action" className="text-xs lg:text-sm">
@@ -145,9 +146,9 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
                 <ConstitutionalFlagCard
                   key={flag.id || index}
                   flag={{
-                    id: flag.id || `flag-${index}`,
-                    severity: flag.severity,
-                    category: flag.category,
+                    id: String(flag.id || `flag-${index}`),
+                    severity: flag.severity === 'medium' ? 'moderate' : flag.severity,
+                    category: flag.type || 'General',
                     description: flag.description
                   }}
                   expandable={true}
@@ -196,7 +197,7 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
           {/* Placeholder for additional expert analyses */}
           <Card className="border-dashed">
             <CardContent className="text-center py-8">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-lg font-semibold mb-2">More Expert Analysis Coming</h3>
               <p className="text-muted-foreground mb-4">
                 Additional expert reviews are being prepared for this legislation.

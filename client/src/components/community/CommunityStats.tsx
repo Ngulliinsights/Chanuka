@@ -21,8 +21,8 @@ import {
   Clock,
   Activity
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { CommunityStats as CommunityStatsType } from '../../types/community';
+import { cn } from '@client/lib/utils';
+import { CommunityStats as CommunityStatsType } from '@client/types/community';
 import { formatDistanceToNow } from 'date-fns';
 
 interface CommunityStatsProps {

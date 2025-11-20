@@ -7,7 +7,7 @@ import React from 'react';
 import { Mail, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LoginFormProps } from '../types';
-import { useLoginForm } from '../hooks/useAuthForm';
+import { useLoginForm } from '../hooks/useLoginForm';
 import { AuthInput } from './AuthInput';
 import { SubmitButton } from './AuthButton';
 import { AuthAlert } from './AuthAlert';

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, ChevronRight, Clock, MapPin, ArrowRight, Menu } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 import { Progress } from '../ui/progress';
 import { Button } from '../ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';

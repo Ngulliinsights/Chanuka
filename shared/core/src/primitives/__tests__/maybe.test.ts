@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { some, none, isSome, isNone, fromNullable, toNullable, toUndefined, Maybe } from '../types/maybe';
+import { some, none, isSome, isNone, fromNullable, toNullable, toUndefined, Maybe } from '@client/types/maybe';
 
 describe('Maybe<T>', () => {
   describe('Some variant', () => {

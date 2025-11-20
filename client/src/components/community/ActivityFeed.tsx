@@ -30,10 +30,10 @@ import {
   Bookmark,
   MoreHorizontal
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { ActivityItem } from '../../types/community';
+import { cn } from '@client/lib/utils';
+import { ActivityItem } from '@client/types/community';
 import { ExpertBadge } from '../verification/ExpertBadge';
-import { useCommunityStore } from '../../store/slices/communitySlice';
+import { useCommunityStore } from '@client/store/slices/communitySlice';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ActivityFeedProps {

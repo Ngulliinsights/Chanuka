@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWebSocket } from './useWebSocket';
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 import {
   LiveEngagementMetrics,
   PersonalEngagementScore,

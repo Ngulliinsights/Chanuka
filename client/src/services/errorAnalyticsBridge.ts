@@ -6,8 +6,8 @@
  * methods that integrate with the existing error management system.
  */
 
-import { coreErrorHandler } from '../core/error/handler';
-import { ErrorDomain, ErrorSeverity } from '../core/error/types';
+import { coreErrorHandler } from '@client/core/error/handler';
+import { ErrorDomain, ErrorSeverity } from '@client/core/error/types';
 
 // Import analytics types
 interface TimeRange {

@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { createRoot } from 'react-dom/client';
 import '@testing-library/jest-dom';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Mock modules that are imported in main.tsx
 vi.mock('../../utils/serviceWorker', () => ({
@@ -232,7 +232,7 @@ describe('React Application Initialization Integration Tests', () => {
         const root = createRoot(rootElement);
         
         await act(async () => {
-          const { AssetLoadingProvider } = await import('../../components/loading/AssetLoadingIndicator');
+          const { AssetLoadingProvider } = await import('@client/components/loading/AssetLoadingIndicator');
           const App = (await import('../../App')).default;
           
           root.render(
@@ -427,7 +427,7 @@ describe('React Application Initialization Integration Tests', () => {
 
   describe('Browser Compatibility and Polyfills', () => {
     test('should initialize browser compatibility manager', async () => {
-      const { initializeBrowserCompatibility } = await import('../../utils/browser-compatibility-manager');
+      const { initializeBrowserCompatibility } = await import('@client/utils/browser-compatibility-manager');
       
       const compatibilityStatus = await initializeBrowserCompatibility({
         autoLoadPolyfills: true,
@@ -451,7 +451,7 @@ describe('React Application Initialization Integration Tests', () => {
     });
 
     test('should load polyfills when needed', async () => {
-      const { loadPolyfills } = await import('../../utils/polyfills');
+      const { loadPolyfills } = await import('@client/utils/polyfills');
       
       await loadPolyfills();
       
@@ -460,7 +460,7 @@ describe('React Application Initialization Integration Tests', () => {
 
     test('should handle browser compatibility warnings', async () => {
       // Mock browser compatibility with warnings
-      vi.mocked(await import('../../utils/browser-compatibility-manager')).initializeBrowserCompatibility
+      vi.mocked(await import('@client/utils/browser-compatibility-manager')).initializeBrowserCompatibility
         .mockResolvedValueOnce({
           browserInfo: { name: 'IE', version: '11.0' },
           isSupported: false,
@@ -468,7 +468,7 @@ describe('React Application Initialization Integration Tests', () => {
           warnings: ['Browser version is outdated', 'Some features may not work']
         });
 
-      const { initializeBrowserCompatibility } = await import('../../utils/browser-compatibility-manager');
+      const { initializeBrowserCompatibility } = await import('@client/utils/browser-compatibility-manager');
       
       const compatibilityStatus = await initializeBrowserCompatibility({
         autoLoadPolyfills: true,
@@ -486,7 +486,7 @@ describe('React Application Initialization Integration Tests', () => {
 
   describe('Asset Loading and Performance', () => {
     test('should preload critical assets', async () => {
-      const { assetLoadingManager, setupAssetPreloading } = await import('../../utils/asset-loading');
+      const { assetLoadingManager, setupAssetPreloading } = await import('@client/utils/asset-loading');
       
       setupAssetPreloading();
       await assetLoadingManager.preloadCriticalAssets();
@@ -497,17 +497,17 @@ describe('React Application Initialization Integration Tests', () => {
 
     test('should handle asset loading failures gracefully', async () => {
       // Mock asset loading failure
-      vi.mocked(await import('../../utils/asset-loading')).assetLoadingManager.preloadCriticalAssets
+      vi.mocked(await import('@client/utils/asset-loading')).assetLoadingManager.preloadCriticalAssets
         .mockRejectedValueOnce(new Error('Asset loading failed'));
 
-      const { assetLoadingManager } = await import('../../utils/asset-loading');
+      const { assetLoadingManager } = await import('@client/utils/asset-loading');
       
       // Should not throw error, just log warning
       await expect(assetLoadingManager.preloadCriticalAssets()).rejects.toThrow('Asset loading failed');
     });
 
     test('should initialize performance monitoring', async () => {
-      const { performanceMonitor } = await import('../../utils/performanceMonitoring');
+      const { performanceMonitor } = await import('@client/utils/performanceMonitoring');
       
       const measureRouteChange = performanceMonitor.measureRouteChange('initial-load');
       
@@ -522,7 +522,7 @@ describe('React Application Initialization Integration Tests', () => {
       const originalNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'production';
 
-      const { registerServiceWorker } = await import('../../utils/serviceWorker');
+      const { registerServiceWorker } = await import('@client/utils/serviceWorker');
       
       await registerServiceWorker({
         onUpdate: vi.fn(),
@@ -545,7 +545,7 @@ describe('React Application Initialization Integration Tests', () => {
       const originalNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
 
-      const { registerServiceWorker } = await import('../../utils/serviceWorker');
+      const { registerServiceWorker } = await import('@client/utils/serviceWorker');
       
       // In development, service worker registration should be skipped
       // This test verifies the conditional logic would work
@@ -564,7 +564,7 @@ describe('React Application Initialization Integration Tests', () => {
       const originalNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
 
-      const { DevelopmentErrorRecovery } = await import('../../utils/development-error-recovery');
+      const { DevelopmentErrorRecovery } = await import('@client/utils/development-error-recovery');
       
       const instance = DevelopmentErrorRecovery.getInstance();
       
@@ -578,7 +578,7 @@ describe('React Application Initialization Integration Tests', () => {
       const originalNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
 
-      const DevelopmentDebugger = (await import('../../utils/development-debug')).default;
+      const DevelopmentDebugger = (await import('@client/utils/development-debug')).default;
       
       const instance = DevelopmentDebugger.getInstance();
       

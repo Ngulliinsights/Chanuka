@@ -13,8 +13,8 @@ import {
   HardDrive,
   Settings
 } from "lucide-react";
-import { cn, formatRelativeTime } from '../lib/utils';
-import { logger } from '../utils/logger';
+import { cn, formatRelativeTime } from '@client/lib/utils';
+import { logger } from '@client/utils/logger';
 
 interface SystemHealthProps {
   health?: any;

@@ -5,15 +5,15 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Alert, AlertDescription } from '../../components/ui/alert';
-import { SocialLogin } from '../../components/auth/SocialLogin';
-import { useAuth } from '../../hooks/useAuth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Button } from '@client/components/ui/button';
+import { Input } from '@client/components/ui/input';
+import { Label } from '@client/components/ui/label';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { SocialLogin } from '@client/components/auth/SocialLogin';
+import { useAuth } from '@client/features/users/hooks/useAuth';
 import { Shield, Eye, EyeOff, Loader2, AlertTriangle } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface LoginForm {
   email: string;
@@ -46,7 +46,7 @@ export default function LoginPage() {
       const result = await login({
         email: form.email,
         password: form.password,
-        remember_me: form.rememberMe
+        rememberMe: form.rememberMe
       });
 
       if (result.success) {
@@ -141,6 +141,7 @@ export default function LoginPage() {
                   required
                   autoComplete="email"
                   placeholder="Enter your email"
+                  title="Email address"
                   disabled={loading}
                 />
               </div>
@@ -156,6 +157,7 @@ export default function LoginPage() {
                     required
                     autoComplete="current-password"
                     placeholder="Enter your password"
+                    title="Password"
                     disabled={loading}
                   />
                   <Button
@@ -184,6 +186,7 @@ export default function LoginPage() {
                     onChange={handleInputChange('rememberMe')}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     disabled={loading}
+                    title="Remember me"
                   />
                   <Label htmlFor="remember-me" className="ml-2 block text-sm">
                     Remember me

@@ -17,8 +17,8 @@ import {
   Award,
   Calendar
 } from 'lucide-react';
-import { User } from '../../../store/slices/authSlice';
-import { UserDashboardData } from '../../../types/user-dashboard';
+import { User } from '@client/store/slices/authSlice';
+import { UserDashboardData } from '@client/types/user-dashboard';
 import { formatDistanceToNow } from 'date-fns';
 
 interface WelcomeMessageProps {

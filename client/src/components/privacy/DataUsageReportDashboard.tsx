@@ -3,33 +3,30 @@
  * Transparent reporting of how user data is collected, used, and shared
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Progress } from '../ui/progress';
-import { 
-  Database, 
-  BarChart3, 
-  Shield, 
-  Download, 
-  Eye, 
-  Clock, 
-  Users, 
-  Globe,
+import {
+  Database,
+  BarChart3,
+  Shield,
+  Download,
+  Eye,
   AlertTriangle,
   CheckCircle,
   Info,
-  Trash2,
+  Trash,
   RefreshCw
 } from 'lucide-react';
-import { dataRetentionService, retentionUtils } from '../../services/dataRetentionService';
-import { privacyAnalyticsService, analyticsUtils } from '../../services/privacyAnalyticsService';
-import { privacyCompliance } from '../../utils/privacy-compliance';
-import { useAuth } from '../../hooks/useAuth';
-import { logger } from '../../utils/logger';
+import { Globe } from '../icons/SimpleIcons';
+import { dataRetentionService, retentionUtils } from '@client/services/dataRetentionService';
+import { privacyAnalyticsService } from '@client/services/privacyAnalyticsService';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { useAuth } from '@client/features/users/hooks';
+import { logger } from '@client/utils/logger';
 
 interface DataUsageStats {
   totalDataPoints: number;
@@ -58,6 +55,7 @@ interface DataCategory {
 export function DataUsageReportDashboard() {
   const auth = useAuth();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<DataUsageStats | null>(null);
   const [categories, setCategories] = useState<DataCategory[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
@@ -68,35 +66,45 @@ export function DataUsageReportDashboard() {
   }, [selectedPeriod, auth.user]);
 
   const loadDataUsageReport = async () => {
-    if (!auth.user) return;
+    if (!auth.user) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
+    setError(null);
+    
     try {
-      // Load data retention summary
+      // Load data retention summary with error handling
       const retentionSummary = await dataRetentionService.getUserDataSummary(auth.user.id);
       
-      // Load analytics metrics
-      const analyticsMetrics = privacyAnalyticsService.getAnalyticsMetrics();
+      // Load analytics metrics with fallback to empty metrics
+      const analyticsMetrics = privacyAnalyticsService.getAnalyticsMetrics() || {
+        totalEvents: 0,
+        anonymizedEvents: 0,
+        consentedEvents: 0
+      };
       
       // Load privacy compliance data
-      const privacyPolicySummary = privacyCompliance.generatePrivacyPolicySummary();
+      privacyCompliance.generatePrivacyPolicySummary();
 
-      // Transform data for display
-      const transformedCategories: DataCategory[] = Object.entries(retentionSummary.categories).map(([id, data]) => ({
+      // Transform data for display with safe fallbacks
+      const transformedCategories: DataCategory[] = Object.entries(retentionSummary.categories || {}).map(([id, data]) => ({
         id,
         name: id.charAt(0).toUpperCase() + id.slice(1).replace('_', ' '),
         description: getDataCategoryDescription(id),
-        dataPoints: data.recordCount,
-        sizeBytes: data.sizeBytes,
-        lastAccessed: new Date().toISOString(), // Would be actual last access time
-        retentionExpiry: data.retentionExpiry,
+        dataPoints: data.recordCount || 0,
+        sizeBytes: data.sizeBytes || 0,
+        lastAccessed: new Date().toISOString(),
+        retentionExpiry: data.retentionExpiry || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         purposes: getDataCategoryPurposes(id),
         legalBasis: getDataCategoryLegalBasis(id),
         thirdPartySharing: getThirdPartySharing(id),
-        canExport: data.canDelete, // Simplified mapping
-        canDelete: data.canDelete,
+        canExport: data.canDelete !== false,
+        canDelete: data.canDelete !== false,
       }));
 
+      // Calculate statistics with safe math operations
       const totalDataPoints = transformedCategories.reduce((sum, cat) => sum + cat.dataPoints, 0);
       const retentionCompliant = transformedCategories.filter(cat => 
         new Date(cat.retentionExpiry) > new Date()
@@ -105,18 +113,26 @@ export function DataUsageReportDashboard() {
       const usageStats: DataUsageStats = {
         totalDataPoints,
         categoriesTracked: transformedCategories.length,
-        retentionCompliance: Math.round((retentionCompliant / transformedCategories.length) * 100),
-        anonymizedPercentage: Math.round((analyticsMetrics.anonymizedEvents / Math.max(analyticsMetrics.totalEvents, 1)) * 100),
-        consentedPercentage: Math.round((analyticsMetrics.consentedEvents / Math.max(analyticsMetrics.totalEvents, 1)) * 100),
+        retentionCompliance: transformedCategories.length > 0 
+          ? Math.round((retentionCompliant / transformedCategories.length) * 100) 
+          : 100,
+        anonymizedPercentage: analyticsMetrics.totalEvents > 0
+          ? Math.round((analyticsMetrics.anonymizedEvents / analyticsMetrics.totalEvents) * 100)
+          : 0,
+        consentedPercentage: analyticsMetrics.totalEvents > 0
+          ? Math.round((analyticsMetrics.consentedEvents / analyticsMetrics.totalEvents) * 100)
+          : 0,
         lastUpdated: new Date().toISOString(),
       };
 
       setStats(usageStats);
       setCategories(transformedCategories);
-    } catch (error) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load data usage report';
+      setError(errorMessage);
       logger.error('Failed to load data usage report', {
         component: 'DataUsageReportDashboard',
-        error,
+        error: err,
       });
     } finally {
       setLoading(false);
@@ -133,26 +149,31 @@ export function DataUsageReportDashboard() {
     if (!auth.user) return;
 
     try {
-      const categories = categoryId ? [categoryId] : ['profile', 'activity', 'analytics', 'communications'];
+      const categories = categoryId 
+        ? [categoryId] 
+        : ['profile', 'activity', 'analytics', 'communications'];
+      
       await auth.requestDataExport('json', categories);
       
       logger.info('Data export requested', {
         component: 'DataUsageReportDashboard',
         categories,
       });
-    } catch (error) {
+    } catch (err) {
       logger.error('Data export failed', {
         component: 'DataUsageReportDashboard',
-        error,
+        error: err,
       });
+      alert('Failed to export data. Please try again or contact support.');
     }
   };
 
   const handleDeleteData = async (categoryId: string) => {
     if (!auth.user) return;
 
+    const categoryName = categories.find(c => c.id === categoryId)?.name || categoryId;
     const confirmed = window.confirm(
-      `Are you sure you want to delete all ${categoryId} data? This action cannot be undone.`
+      `Are you sure you want to delete all ${categoryName} data? This action cannot be undone.`
     );
 
     if (!confirmed) return;
@@ -165,16 +186,18 @@ export function DataUsageReportDashboard() {
         category: categoryId,
       });
 
-      // Refresh the report
+      // Refresh the report to show updated data
       await loadDataUsageReport();
-    } catch (error) {
+    } catch (err) {
       logger.error('Data deletion failed', {
         component: 'DataUsageReportDashboard',
-        error,
+        error: err,
       });
+      alert('Failed to delete data. Please try again or contact support.');
     }
   };
 
+  // Helper function to provide clear descriptions for each data category
   const getDataCategoryDescription = (id: string): string => {
     const descriptions: Record<string, string> = {
       profile: 'Basic account information including name, email, and preferences',
@@ -187,6 +210,7 @@ export function DataUsageReportDashboard() {
     return descriptions[id] || 'Data category information';
   };
 
+  // Helper function to explain what each data category is used for
   const getDataCategoryPurposes = (id: string): string[] => {
     const purposes: Record<string, string[]> = {
       profile: ['Account management', 'Personalization', 'Communication'],
@@ -199,6 +223,7 @@ export function DataUsageReportDashboard() {
     return purposes[id] || ['Platform functionality'];
   };
 
+  // Helper function to identify the legal justification for processing each data type
   const getDataCategoryLegalBasis = (id: string): string => {
     const legalBasis: Record<string, string> = {
       profile: 'Contract performance',
@@ -211,11 +236,12 @@ export function DataUsageReportDashboard() {
     return legalBasis[id] || 'Legitimate interest';
   };
 
+  // Helper function to indicate whether data is shared with third parties
   const getThirdPartySharing = (id: string): boolean => {
     const sharing: Record<string, boolean> = {
       profile: false,
       activity: false,
-      analytics: true,
+      analytics: true, // Analytics data is shared with analytics providers
       security: false,
       communications: false,
       temporary: false,
@@ -223,6 +249,7 @@ export function DataUsageReportDashboard() {
     return sharing[id] || false;
   };
 
+  // Loading state with skeleton UI
   if (loading) {
     return (
       <div className="space-y-6">
@@ -239,6 +266,27 @@ export function DataUsageReportDashboard() {
     );
   }
 
+  // Error state with helpful message
+  if (error) {
+    return (
+      <Alert>
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          Failed to load data usage report: {error}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefresh}
+            className="ml-4"
+          >
+            Retry
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  // Not authenticated state
   if (!auth.user || !stats) {
     return (
       <Alert>
@@ -252,7 +300,7 @@ export function DataUsageReportDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header with period selector and refresh button */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -264,10 +312,15 @@ export function DataUsageReportDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <label htmlFor="period-select" className="sr-only">
+            Select time period
+          </label>
           <select
+            id="period-select"
             value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value as any)}
+            onChange={(e) => setSelectedPeriod(e.target.value as typeof selectedPeriod)}
             className="border rounded-md px-3 py-2 text-sm"
+            aria-label="Select reporting period"
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
@@ -279,13 +332,14 @@ export function DataUsageReportDashboard() {
             size="sm"
             onClick={handleRefresh}
             disabled={refreshing}
+            aria-label="Refresh data"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
 
-      {/* Stats Overview */}
+      {/* Stats Overview - Key metrics at a glance */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -336,7 +390,7 @@ export function DataUsageReportDashboard() {
         </Card>
       </div>
 
-      {/* Detailed Report */}
+      {/* Detailed Report Tabs */}
       <Tabs defaultValue="categories" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="categories">Data Categories</TabsTrigger>
@@ -345,7 +399,7 @@ export function DataUsageReportDashboard() {
           <TabsTrigger value="sharing">Third-Party Sharing</TabsTrigger>
         </TabsList>
 
-        {/* Data Categories */}
+        {/* Data Categories Tab - Shows what data we have about the user */}
         <TabsContent value="categories">
           <div className="space-y-4">
             {categories.map((category) => (
@@ -416,7 +470,7 @@ export function DataUsageReportDashboard() {
                         onClick={() => handleDeleteData(category.id)}
                         className="text-red-600 hover:text-red-700"
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
+                        <Trash className="h-4 w-4 mr-2" />
                         Delete
                       </Button>
                     )}
@@ -427,7 +481,7 @@ export function DataUsageReportDashboard() {
           </div>
         </TabsContent>
 
-        {/* Usage Purposes */}
+        {/* Usage Purposes Tab - Explains why we collect data */}
         <TabsContent value="purposes">
           <Card>
             <CardHeader>
@@ -507,7 +561,7 @@ export function DataUsageReportDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Retention Policy */}
+        {/* Retention Policy Tab - Shows how long data is kept */}
         <TabsContent value="retention">
           <Card>
             <CardHeader>
@@ -558,7 +612,7 @@ export function DataUsageReportDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Third-Party Sharing */}
+        {/* Third-Party Sharing Tab - Transparency about data sharing */}
         <TabsContent value="sharing">
           <Card>
             <CardHeader>
@@ -637,7 +691,7 @@ export function DataUsageReportDashboard() {
         </TabsContent>
       </Tabs>
 
-      {/* Actions */}
+      {/* Actions section - Quick access to data rights */}
       <Card>
         <CardHeader>
           <CardTitle>Data Management Actions</CardTitle>
@@ -663,7 +717,7 @@ export function DataUsageReportDashboard() {
         </CardContent>
       </Card>
 
-      {/* Last Updated */}
+      {/* Last Updated timestamp */}
       <div className="text-center text-sm text-gray-500">
         Last updated: {new Date(stats.lastUpdated).toLocaleString()}
       </div>

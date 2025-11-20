@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../../shared/core/src/index.js';
-import { ApiValidationError } from '../../../shared/core/src/utils/api-utils.js';
+import { logger } from '@shared/core/src/index.js';
+import { ApiValidationError } from '@shared/core/src/utils/api-utils.js';
 import { validationMetricsCollector } from './validation-metrics.js';
 import {
   validateEmail,

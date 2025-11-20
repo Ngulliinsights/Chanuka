@@ -1,13 +1,13 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { Loader2, Network, AlertCircle, Clock, X, RefreshCw } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { useLoading } from '../../core/loading';
+import { cn } from '@client/lib/utils';
+import { useLoading } from '@client/core/loading';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { Card, CardContent } from '../ui/card';
-import { logger } from '../../utils/logger';
-import { GlobalLoadingIndicatorProps } from './types';
+import { logger } from '@client/utils/logger';
+import { GlobalLoadingIndicatorProps } from '@client/types';
 
 export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
   position = 'top-right',

@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { ImageFallback, SafeImage } from '../ImageFallback';
 import { FontFallback } from '../FontFallback';
 import { ScriptFallback } from '../ScriptFallback';
-import { assetLoadingManager } from '../../../utils/asset-loading';
+import { assetLoadingManager } from '@client/utils/asset-loading';
 
 // Mock the asset loading manager
 vi.mock('../../../utils/asset-loading', () => ({

@@ -4,7 +4,7 @@
  * Manages CSP headers, nonce generation, and violation reporting
  */
 
-import type { CSPDirectives, SecurityEvent } from '../types/security-types';
+import type { CSPDirectives, SecurityEvent } from '@client/types/security-types';
 import { securityConfig } from '../config/security-config';
 import { SecurityMonitor } from '../monitoring/SecurityMonitor';
 

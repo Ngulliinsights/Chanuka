@@ -35,7 +35,7 @@ import {
   Maximize,
   RefreshCw
 } from 'lucide-react';
-import { DashboardPreferences } from '../../../types/user-dashboard';
+import { DashboardPreferences } from '@client/types/user-dashboard';
 
 interface DashboardPreferencesModalProps {
   open: boolean;

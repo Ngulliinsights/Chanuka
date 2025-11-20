@@ -6,8 +6,8 @@
 // responses, and maintain contact history.
 // ============================================================================
 
-import { RepresentativeContact } from '../../types/index.js';
-import { logger  } from '../../../../../shared/core/src/index.js';
+import { RepresentativeContact } from '@client/types/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 // ============================================================================
 // Configuration Types

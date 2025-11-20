@@ -15,69 +15,56 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       
-      // Chanuka Design System - Colors
+      // Unified Design System Colors
       colors: {
-        // Base colors
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        // Base colors using design tokens
+        background: "hsl(var(--color-background))",
+        foreground: "hsl(var(--color-foreground))",
         
         // Card components
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "hsl(var(--color-background))",
+          foreground: "hsl(var(--color-foreground))",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "hsl(var(--color-background))",
+          foreground: "hsl(var(--color-foreground))",
         },
         
         // Brand colors
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "hsl(var(--color-primary))",
+          foreground: "hsl(var(--color-primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "hsl(var(--color-secondary))",
+          foreground: "hsl(var(--color-secondary-foreground))",
         },
+        accent: {
+          DEFAULT: "hsl(var(--color-accent))",
+          foreground: "hsl(var(--color-accent-foreground))",
+        },
+        
+        // Semantic colors
+        success: "hsl(var(--color-success))",
+        warning: "hsl(var(--color-warning))",
+        error: "hsl(var(--color-error))",
+        info: "hsl(var(--color-info))",
         
         // Utility colors
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "hsl(var(--color-muted))",
+          foreground: "hsl(var(--color-muted-foreground))",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "hsl(var(--color-error))",
+          foreground: "hsl(var(--color-primary-foreground))",
         },
         
         // Form elements
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        
-        // Chanuka-specific civic engagement colors
-        civic: {
-          urgent: "hsl(var(--civic-urgent, 0 84% 60%))", // Red for urgent bills
-          constitutional: "hsl(var(--civic-constitutional, 45 93% 47%))", // Gold for constitutional flags
-          expert: "hsl(var(--civic-expert, 217 91% 60%))", // Blue for expert verification
-          community: "hsl(var(--civic-community, 142 76% 36%))", // Green for community engagement
-          transparency: "hsl(var(--civic-transparency, 262 83% 58%))", // Purple for transparency scores
-        },
-        
-        // Status colors for bills
-        status: {
-          introduced: "hsl(var(--status-introduced, 210 40% 50%))",
-          committee: "hsl(var(--status-committee, 45 93% 47%))",
-          passed: "hsl(var(--status-passed, 142 76% 36%))",
-          failed: "hsl(var(--status-failed, 0 84% 60%))",
-          signed: "hsl(var(--status-signed, 142 76% 36%))",
-          vetoed: "hsl(var(--status-vetoed, 0 84% 60%))",
-        },
+        border: "hsl(var(--color-border))",
+        input: "hsl(var(--color-border))",
+        ring: "hsl(var(--color-accent))",
         
         // Chart colors for data visualization
         chart: {

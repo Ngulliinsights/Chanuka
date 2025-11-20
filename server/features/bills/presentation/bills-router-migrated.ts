@@ -12,7 +12,7 @@ import { authenticateToken } from '../../../middleware/auth.js';
 import { asyncErrorHandler } from '../../../middleware/boom-error-middleware.js';
 import type { AuthenticatedRequest } from '../../../middleware/auth.js';
 import { errorAdapter } from '@/infrastructure/errors/error-adapter.js';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import { securityAuditService } from '../../security/security-audit-service.js';
 import type { Bill, BillComment } from '@shared/schema';
 

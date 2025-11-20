@@ -1,76 +1,75 @@
 import { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import AppProviders from './components/AppProviders';
-import AppLayout from './components/layout/app-layout';
-import AccessibilitySettingsPanel from './components/accessibility/accessibility-settings-panel';
-import { OfflineStatus } from './components/offline/offline-manager';
-import { LoadingStateManager } from './components/loading/LoadingStates';
-import { GlobalLoadingIndicator } from './components/loading/GlobalLoadingIndicator';
-import { Toaster } from './components/ui/toaster';
-import {
-  CriticalAssetLoader,
-  DevAssetLoadingDebug,
-} from './components/loading/AssetLoadingIndicator';
-import PerformanceMetricsCollector from './components/performance/PerformanceMetricsCollector';
-import BrowserCompatibilityChecker from './components/compatibility/BrowserCompatibilityChecker';
-import { Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import React, { Suspense, useEffect, useMemo } from 'react';
 import { lazy } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useLoadingOperation } from './core/loading/hooks';
-import { logger } from './utils/logger';
-import { SafeLazyPages, SafeLazySponsorshipPages } from './utils/safe-lazy-loading';
-import { SimpleLazyPages, LazyPageWrapper } from './utils/simple-lazy-pages';
-import { createNavigationProvider } from './core/navigation/context';
-import { useAuth } from './hooks/useAuth';
-import { useMediaQuery } from './hooks/use-mobile';
-import { useWebVitals } from './hooks/use-web-vitals';
 
-import { performanceMonitor } from './utils/performance-monitor';
+// Core Providers and Layout
+import AppProviders from '@client/components/AppProviders';
+import SimpleAppLayout from '@client/components/layout/SimpleAppLayout';
+import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
 
-// Import test page for design system verification
-const DesignSystemTestPage = lazy(() => import('./pages/design-system-test'));
-// Import consolidated core error management system
-import { initializeCoreErrorHandling, EnhancedErrorBoundary } from './core/error';
+// UI Components
+// AccessibilitySettingsPanel is now integrated into UserAccountPage
+import { OfflineStatus } from '@client/components/offline/offline-manager';
+import { LoadingStateManager } from '@client/components/loading/LoadingStates';
+import { Toaster } from '@client/components/ui/toaster';
 
-// Import security system
-import { initializeSecurity } from './security';
+// Hooks
+import { useLoadingOperation } from '@client/core/loading/hooks';
+import { useAuth } from '@client/features/users/hooks';
+import { useMediaQuery } from '@client/hooks/use-mobile';
+import { useWebVitals } from '@client/features/analytics/hooks';
 
-// Import privacy components
-import { CookieConsentBanner } from './components/privacy';
+// Utils
+import { logger } from '@client/utils/logger';
+import { SafeLazyPages, SafeLazySponsorshipPages } from '@client/utils/safe-lazy-loading';
+import { SimpleLazyPages, LazyPageWrapper } from '@client/utils/simple-lazy-pages';
+
+// Core Systems
+import { createNavigationProvider } from '@client/core/navigation/context';
+import { CookieConsentBanner } from '@client/components/privacy';
+
+// Test Pages (lazy loaded only when needed)
+const DesignSystemTestPage = lazy(() => import('@client/pages/design-system-test'));
+const TestStylingPage = lazy(() => import('@client/pages/test-styling'));
 
 // =============================================================================
-// CONFIGURATION
+// CONFIGURATION - Centralized configuration for easy maintenance
 // =============================================================================
 
 const CONFIG = {
   query: {
     retry: 1,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh
+    gcTime: 10 * 60 * 1000, // 10 minutes - garbage collection
+    refetchOnWindowFocus: false, // Prevent unnecessary refetches
   },
   loading: {
-    pageTimeout: 15000,
-    connectionAware: true,
-    showTimeoutWarning: true,
+    pageTimeout: 15000, // 15 seconds max loading time
+    connectionAware: true, // Adjust timeouts based on connection speed
+    showTimeoutWarning: true, // User feedback for slow loads
   },
   dev: {
-    showAssetDebug: true,
-    showSidebarDebug: true,
-    showPerformanceMetrics: true,
-    metricsRefreshInterval: 30000,
+    enableDevTools: true,
+    logLevel: 'info',
   },
 } as const;
 
+// Environment detection - single source of truth
 const IS_DEV = process.env.NODE_ENV === 'development';
 
 // =============================================================================
-// QUERY CLIENT SINGLETON
+// QUERY CLIENT - Singleton pattern ensures one instance across app
 // =============================================================================
 
 let queryClientInstance: QueryClient | null = null;
 
+/**
+ * Get or create the QueryClient instance. Using a singleton pattern here
+ * prevents creating multiple QueryClient instances which could lead to
+ * cache inconsistencies and memory leaks.
+ */
 const getQueryClient = (): QueryClient => {
   if (!queryClientInstance) {
     queryClientInstance = new QueryClient({
@@ -80,8 +79,8 @@ const getQueryClient = (): QueryClient => {
           staleTime: CONFIG.query.staleTime,
           gcTime: CONFIG.query.gcTime,
           refetchOnWindowFocus: CONFIG.query.refetchOnWindowFocus,
-          throwOnError: false,
-          networkMode: 'online',
+          throwOnError: false, // Handle errors gracefully at component level
+          networkMode: 'online', // Only run queries when online
         },
         mutations: {
           retry: CONFIG.query.retry,
@@ -94,38 +93,62 @@ const getQueryClient = (): QueryClient => {
 };
 
 // =============================================================================
-// PAGE LOADER
+// PAGE LOADER - Handles loading states with timeouts and error handling
 // =============================================================================
 
+/**
+ * PageLoader provides intelligent loading states with timeout detection.
+ * It adjusts behavior based on connection speed and provides clear feedback
+ * to users when pages take longer than expected to load.
+ */
 function PageLoader() {
-  const { error, isTimeout } = useLoadingOperation('app-page-loading', {
-    timeout: CONFIG.loading.pageTimeout,
-    connectionAware: CONFIG.loading.connectionAware,
-    showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
-  });
+  try {
+    const { error, isTimeout } = useLoadingOperation('app-page-loading', {
+      timeout: CONFIG.loading.pageTimeout,
+      connectionAware: CONFIG.loading.connectionAware,
+      showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
+    });
 
-  const currentState = isTimeout ? 'timeout' : 'loading';
-  const loadingMessage = error?.message || 'Loading page...';
+    const currentState = isTimeout ? 'timeout' : 'loading';
+    const loadingMessage = error?.message || 'Loading page...';
 
-  return (
-    <LoadingStateManager
-      type="page"
-      state={currentState}
-      message={loadingMessage}
-      error={error ?? undefined}
-      timeout={CONFIG.loading.pageTimeout}
-      className="min-h-screen"
-      showDetails={IS_DEV}
-    />
-  );
+    return (
+      <LoadingStateManager
+        type="page"
+        state={currentState}
+        message={loadingMessage}
+        error={error ?? undefined}
+        timeout={CONFIG.loading.pageTimeout}
+        className="min-h-screen"
+        showDetails={IS_DEV}
+      />
+    );
+  } catch (error) {
+    // Fallback loading state if hooks fail
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 }
 
 // =============================================================================
-// ROUTE DEFINITIONS
+// ROUTE DEFINITIONS - Centralized routing configuration
 // =============================================================================
 
+/**
+ * Route configuration is defined as a constant to enable:
+ * 1. Easy maintenance - all routes in one place
+ * 2. Type safety - TypeScript can infer route types
+ * 3. Code splitting - each route lazy loads only when needed
+ * 4. Performance - reduces initial bundle size significantly
+ */
 const ROUTES = [
-  // Main routes
+  // Main Application Routes
   {
     path: '/',
     element: (
@@ -135,9 +158,13 @@ const ROUTES = [
     ),
     id: 'home',
   },
-  { path: '/dashboard', element: <SafeLazyPages.Dashboard />, id: 'dashboard' },
+  { 
+    path: '/dashboard', 
+    element: <SafeLazyPages.Dashboard />, 
+    id: 'dashboard' 
+  },
 
-  // Bill routes
+  // Bill Management Routes - Core feature set
   {
     path: '/bills',
     element: <SafeLazyPages.BillsDashboard />,
@@ -159,7 +186,7 @@ const ROUTES = [
     id: 'bill-comments',
   },
 
-  // Sponsorship routes
+  // Sponsorship Analysis Routes - Advanced features
   {
     path: '/bill-sponsorship-analysis',
     element: <SafeLazyPages.BillSponsorshipAnalysis />,
@@ -196,7 +223,7 @@ const ROUTES = [
     id: 'methodology',
   },
 
-  // Community routes
+  // Community and Engagement Routes
   {
     path: '/community',
     element: <SafeLazyPages.CommunityInput />,
@@ -208,9 +235,23 @@ const ROUTES = [
     id: 'expert-verification',
   },
 
-  // User routes
-  { path: '/auth', element: <SafeLazyPages.AuthPage />, id: 'auth' },
-  { path: '/profile', element: <SafeLazyPages.Profile />, id: 'profile' },
+  // User Management Routes
+  { 
+    path: '/auth', 
+    element: <SafeLazyPages.AuthPage />, 
+    id: 'auth' 
+  },
+  { 
+    path: '/account', 
+    element: <SafeLazyPages.Profile />, 
+    id: 'account' 
+  },
+  // Legacy routes redirect to unified account page
+  { 
+    path: '/profile', 
+    element: <SafeLazyPages.Profile />, 
+    id: 'profile' 
+  },
   {
     path: '/user-profile',
     element: <SafeLazyPages.UserProfilePage />,
@@ -222,126 +263,73 @@ const ROUTES = [
     id: 'user-dashboard',
   },
   {
+    path: '/privacy-settings',
+    element: <SafeLazyPages.Profile />,
+    id: 'privacy-settings',
+  },
+  {
     path: '/onboarding',
     element: <SafeLazyPages.Onboarding />,
     id: 'onboarding',
   },
-  {
-    path: '/privacy-settings',
-    element: <SafeLazyPages.PrivacySettings />,
-    id: 'privacy-settings',
-  },
 
-  // System routes
-  { path: '/search', element: <SafeLazyPages.SearchPage />, id: 'search' },
-  { path: '/admin', element: <SafeLazyPages.AdminPage />, id: 'admin' },
+  // System and Admin Routes
+  { 
+    path: '/search', 
+    element: <SafeLazyPages.SearchPage />, 
+    id: 'search' 
+  },
+  { 
+    path: '/admin', 
+    element: <SafeLazyPages.AdminPage />, 
+    id: 'admin' 
+  },
   {
     path: '/admin/database',
     element: <SafeLazyPages.DatabaseManager />,
     id: 'database-manager',
   },
-  {
-    path: '/design-system-test',
-    element: <DesignSystemTestPage />,
-    id: 'design-system-test',
+
+  // Development and Testing Routes (only loaded in dev mode)
+  ...(IS_DEV ? [
+    {
+      path: '/design-system-test',
+      element: <DesignSystemTestPage />,
+      id: 'design-system-test',
+    },
+    {
+      path: '/test-styling',
+      element: <TestStylingPage />,
+      id: 'test-styling',
+    },
+  ] : []),
+
+  // 404 Catch-all - must be last
+  { 
+    path: '*', 
+    element: <SafeLazyPages.NotFound />, 
+    id: 'not-found' 
   },
-  { path: '*', element: <SafeLazyPages.NotFound />, id: 'not-found' },
 ] as const;
 
 // =============================================================================
-// DEVELOPMENT TOOLS
+// WEB VITALS MONITORING - Performance tracking for Core Web Vitals
 // =============================================================================
 
-function DevelopmentTools() {
-  if (!IS_DEV) return null;
-
-  return (
-    <>
-      {CONFIG.dev.showAssetDebug && (
-        <>
-          <CriticalAssetLoader />
-          <DevAssetLoadingDebug />
-        </>
-      )}
-      {CONFIG.dev.showPerformanceMetrics && (
-        <PerformanceMetricsCollector
-          showDetails={true}
-          autoRefresh={true}
-          refreshInterval={CONFIG.dev.metricsRefreshInterval}
-        />
-      )}
-    </>
-  );
-}
-
-// =============================================================================
-// APP CONTENT
-// =============================================================================
-
-function AppContent() {
-  return (
-    <>
-      <GlobalLoadingIndicator
-        position="top-right"
-        showDetails={IS_DEV}
-        showProgress={true}
-        showConnectionStatus={true}
-        maxVisible={3}
-      />
-
-      <DevelopmentTools />
-
-      <AppLayout>
-        <Suspense fallback={<PageLoader />}>
-          <EnhancedErrorBoundary enableRecovery={true} context="Routes">
-            <Routes>
-              {ROUTES.map(({ path, element, id }) => (
-                <Route
-                  key={id}
-                  path={path}
-                  element={
-                    <EnhancedErrorBoundary enableRecovery={true} context={`Route-${id}`}>
-                      {element}
-                    </EnhancedErrorBoundary>
-                  }
-                />
-              ))}
-            </Routes>
-          </EnhancedErrorBoundary>
-        </Suspense>
-      </AppLayout>
-    </>
-  );
-}
-
-// =============================================================================
-// MAIN APP
-// =============================================================================
-
-// Create NavigationProvider outside component to prevent recreation on every render
-const NavigationProvider = createNavigationProvider(
-  useLocation,
-  useNavigate,
-  useAuth,
-  useMediaQuery
-);
-
-// Wrapper component that provides router hooks to NavigationProvider
-function NavigationWrapper({ children }: { children: React.ReactNode }) {
-  return <NavigationProvider>{children}</NavigationProvider>;
-}
-
-// Web Vitals monitoring component
+/**
+ * WebVitalsMonitor tracks Core Web Vitals (LCP, FID, CLS) which are
+ * Google's key metrics for user experience. This data helps identify
+ * performance bottlenecks and monitor real-world user experience.
+ */
 function WebVitalsMonitor() {
   useWebVitals({
     enabled: true,
     onAllMetrics: metrics => {
       if (IS_DEV) {
+        // In development, log to console for immediate feedback
         logger.info('Core Web Vitals collected', undefined, metrics as Record<string, unknown>);
-      }
-      // In production, this could send to analytics service
-      if (!IS_DEV && (window as any).gtag) {
-        // Send to Google Analytics
+      } else if (typeof (window as any).gtag !== 'undefined') {
+        // In production, send to Google Analytics for tracking trends
         Object.entries(metrics).forEach(([name, value]) => {
           if (value !== undefined) {
             (window as any).gtag('event', 'web_vitals', {
@@ -357,95 +345,131 @@ function WebVitalsMonitor() {
     reportTo: IS_DEV ? undefined : '/api/analytics/web-vitals',
   });
 
-  return null; // This component doesn't render anything
+  return null; // Monitoring component - renders nothing
 }
 
+// =============================================================================
+// APP CONTENT - Main routing component
+// =============================================================================
+
+/**
+ * AppContent wraps the routing logic in our layout and suspense boundary.
+ * The Suspense boundary catches lazy-loaded components during loading
+ * and shows the PageLoader component instead of a blank screen.
+ */
+function AppContent() {
+  return (
+    <SimpleAppLayout>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {ROUTES.map(({ path, element, id }) => {
+            try {
+              return <Route key={id} path={path} element={element} />;
+            } catch (error) {
+              logger.error(`Failed to render route ${id}:`, { component: 'App' }, error);
+              return (
+                <Route 
+                  key={id} 
+                  path={path} 
+                  element={
+                    <div className="min-h-screen flex items-center justify-center">
+                      <div className="text-center">
+                        <h2 className="text-xl font-semibold text-red-600 mb-2">Page Load Error</h2>
+                        <p className="text-gray-600 mb-4">Failed to load {id} page</p>
+                        <button 
+                          type="button"
+                          onClick={() => window.location.reload()} 
+                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                          Refresh Page
+                        </button>
+                      </div>
+                    </div>
+                  } 
+                />
+              );
+            }
+          })}
+        </Routes>
+      </Suspense>
+    </SimpleAppLayout>
+  );
+}
+
+// =============================================================================
+// NAVIGATION WRAPPER - Provides router context to navigation system
+// =============================================================================
+
+/**
+ * NavigationWrapper bridges React Router's hooks with our custom navigation
+ * system. It's separated into its own component so the navigation provider
+ * only has access to hooks after the Router is mounted.
+ */
+function NavigationWrapper({ children }: { children: React.ReactNode }) {
+  // Create the navigation provider with all necessary hooks
+  // Using useMemo ensures we only create this once, not on every render
+  const NavigationProvider = useMemo(
+    () => createNavigationProvider(useLocation, useNavigate, useAuth, useMediaQuery),
+    []
+  );
+
+  return <NavigationProvider>{children}</NavigationProvider>;
+}
+
+// =============================================================================
+// MAIN APP COMPONENT
+// =============================================================================
+
+/**
+ * The main App component orchestrates all providers and global components.
+ * The order of providers matters - each inner component can access the
+ * context from providers that wrap it.
+ * 
+ * Provider hierarchy:
+ * 1. AppProviders (React Query, Theme, etc.)
+ * 2. BrowserRouter (routing)
+ * 3. NavigationWrapper (navigation context)
+ * 4. AppContent (actual application)
+ */
 export default function App() {
-  const queryClient = getQueryClient();
+  // Get QueryClient instance once at app root
+  const queryClient = useMemo(() => getQueryClient(), []);
 
+  // Simple initialization logging for debugging
   useEffect(() => {
-    let isInitialized = false;
-    
-    const initializeApp = async () => {
-      if (isInitialized) return;
-      isInitialized = true;
-
-      try {
-        // Initialize consolidated core error handling system
-        initializeCoreErrorHandling({
-          enableGlobalHandlers: true,
-          enableRecovery: true,
-          logErrors: true,
-          maxErrors: 100,
-          enableAnalytics: process.env.NODE_ENV === 'production',
-        });
-
-        // Initialize security system
-        await initializeSecurity({
-          enableCSP: true,
-          enableCSRF: true,
-          enableRateLimit: true,
-          enableVulnerabilityScanning: true,
-          enableInputSanitization: true,
-          scanInterval: IS_DEV ? 60000 : 300000, // 1 min dev, 5 min prod
-        });
-
-        // Initialize performance monitoring (already started in main.tsx, but ensure config is set)
-        performanceMonitor.updateConfig({
-          enableBundleAnalysis: true,
-          enableAssetOptimization: true,
-          enableWebVitalsMonitoring: true,
-          enableRealtimeOptimization: true,
-          reportingInterval: IS_DEV ? 10000 : 30000, // More frequent in dev
-          performanceBudgets: {
-            loadTime: IS_DEV ? 5000 : 3000, // More lenient in dev
-            bundleSize: 2 * 1024 * 1024, // 2MB
-            memoryUsage: IS_DEV ? 200 * 1024 * 1024 : 100 * 1024 * 1024, // 200MB dev, 100MB prod
-          },
-        });
-
-        if (IS_DEV) {
-          logger.info('App initialized with unified error handling and security', {
-            component: 'Chanuka',
-            routeCount: ROUTES.length,
-            errorHandlingEnabled: true,
-            coreErrorSystemEnabled: true,
-            securitySystemEnabled: true,
-            advancedFeaturesEnabled: true,
-          });
-        }
-      } catch (error) {
-        logger.error('Failed to initialize app systems', { error });
-      }
-    };
-
-    initializeApp();
-
-    // Cleanup function
-    return () => {
-      isInitialized = false;
-    };
+    if (IS_DEV) {
+      logger.info('Application initialized', {
+        component: 'App',
+        routeCount: ROUTES.length,
+        environment: 'development',
+        timestamp: new Date().toISOString(),
+      });
+    }
   }, []);
 
   return (
-    <EnhancedErrorBoundary enableRecovery={true} context="App-Root" showTechnicalDetails={IS_DEV}>
-      <BrowserCompatibilityChecker showWarnings={true} blockUnsupported={false}>
-        <AppProviders queryClient={queryClient}>
-          <BrowserRouter>
-            <NavigationWrapper>
-              <WebVitalsMonitor />
-              <EnhancedErrorBoundary enableRecovery={true} context="AppContent">
-                <AppContent />
-              </EnhancedErrorBoundary>
-              <Toaster />
-              <AccessibilitySettingsPanel />
-              <OfflineStatus showDetails={true} />
-              <CookieConsentBanner />
-              {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
-            </NavigationWrapper>
-          </BrowserRouter>
-        </AppProviders>
-      </BrowserCompatibilityChecker>
-    </EnhancedErrorBoundary>
+    <ErrorBoundary>
+      <AppProviders queryClient={queryClient}>
+        <BrowserRouter>
+          <NavigationWrapper>
+            <ErrorBoundary>
+              {/* Main application content */}
+              <AppContent />
+            </ErrorBoundary>
+            
+            {/* Global UI components that overlay the main content */}
+            <Toaster />
+            <OfflineStatus showDetails={false} />
+            <CookieConsentBanner />
+            <WebVitalsMonitor />
+            
+            {/* Development tools - only in dev mode */}
+            {IS_DEV && CONFIG.dev.enableDevTools && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
+          </NavigationWrapper>
+        </BrowserRouter>
+      </AppProviders>
+    </ErrorBoundary>
   );
 }

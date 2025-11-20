@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import HomePage from '../pages/home';
+import HomePage from '@client/pages/home';
 import { logger } from '@/utils/logger';
 
 // Mock hooks with minimal setup

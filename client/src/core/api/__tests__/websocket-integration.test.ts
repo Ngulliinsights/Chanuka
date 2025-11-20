@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi, beforeAll } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { UnifiedWebSocketManager, globalWebSocketPool } from '../websocket';
-import { WebSocketConfig, ConnectionState } from '../types';
+import { WebSocketConfig, ConnectionState } from '@client/types';
 
 // Mock WebSocket
 const mockWebSocket = {

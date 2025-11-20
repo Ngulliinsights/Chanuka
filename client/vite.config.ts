@@ -168,6 +168,7 @@ export default defineConfig(({ mode }) => {
       // Path aliases let you use cleaner imports like '@/components' instead of '../../../components'
       alias: {
         '@': path.resolve(rootDir, './src'),
+        '@client': path.resolve(rootDir, './src'),
         '@chanuka/shared': path.resolve(rootDir, '../shared'),
         '@shared': path.resolve(rootDir, '../shared'),
         '@shared/*': path.resolve(rootDir, '../shared/*'),
@@ -183,33 +184,42 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       host: true, // Listen on all addresses for network access
-      
+
       // CORS settings control which origins can make requests to your dev server
       // Wide open in development for ease of use, locked down in production
       cors: {
         origin: isDevelopment ? '*' : false,
         credentials: true,
       },
-      
+
       // Content Security Policy helps prevent XSS attacks
       // Development needs looser policies for hot module replacement
       headers: {
-        'Content-Security-Policy': isDevelopment 
+        'Content-Security-Policy': isDevelopment
           ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss: http://localhost:* https://localhost:*; worker-src 'self' blob:; child-src 'self' blob:;"
           : "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; child-src 'self' blob:;",
       },
-      
+
       // Hot Module Replacement keeps your app state while updating code
       hmr: {
         overlay: true, // Show compilation errors as an overlay in the browser
       },
-      
+
       // File watching configuration for detecting changes
       watch: {
         // Polling checks files periodically instead of using filesystem events
         // Only needed in containers or network drives where events don't work
         usePolling: process.env.USE_POLLING === 'true',
         ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**'],
+      },
+
+      // Proxy configuration to route API calls to the backend
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+        },
       },
     },
 

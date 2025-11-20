@@ -13,7 +13,7 @@ import {
   IValidationServiceConfig,
   ValidationErrorDetail,
 } from '../core/interfaces';
-import { CoreValidationService } from '../core/validation-service';
+import { CoreValidationService } from '@client/core/validation-service';
 
 /**
  * Custom validation function type

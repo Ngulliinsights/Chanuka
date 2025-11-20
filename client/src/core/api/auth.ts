@@ -4,8 +4,8 @@
  * Provides type-safe, consistent interface for all auth operations
  */
 
-import type { UnifiedApiClient } from './types';
-import { logger } from '../../utils/logger';
+import type { UnifiedApiClient } from '@client/types';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Core Authentication Types

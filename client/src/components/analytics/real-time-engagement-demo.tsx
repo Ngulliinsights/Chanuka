@@ -12,7 +12,7 @@ import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Alert, AlertDescription } from '../ui/alert';
 import { RealTimeEngagementDashboard } from './real-time-engagement-dashboard';
-import { generateMockEngagementData } from '../../hooks/useRealTimeEngagement';
+import { generateMockEngagementData } from '@client/hooks/useRealTimeEngagement';
 import { 
   Play, 
   Pause, 
@@ -24,7 +24,7 @@ import {
   TrendingUp,
   Award
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 
 interface RealTimeEngagementDemoProps {
   className?: string;

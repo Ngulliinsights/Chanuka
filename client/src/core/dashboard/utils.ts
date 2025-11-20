@@ -2,7 +2,7 @@
  * Dashboard Utilities - Helper functions for dashboard operations
  */
 
-import { WidgetConfig, DashboardLayout, WidgetSize, ChartData } from './types';
+import { WidgetConfig, DashboardLayout, WidgetSize, ChartData } from '@client/types';
 
 /**
  * Calculate widget dimensions based on size

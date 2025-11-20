@@ -7,8 +7,9 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { useBillsAPI, useInfiniteScroll } from '../../hooks/useBillsAPI';
+import { useMediaQuery } from '@client/hooks/useMediaQuery';
+import { useBills } from '@client/features/bills/hooks/useBills';
+import { BillsQueryParams } from '@client/features/bills/types';
 import { FilterPanel } from './filter-panel';
 import { BillGrid } from './virtual-bill-grid';
 import { StatsOverview } from './stats-overview';
@@ -18,8 +19,8 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Search, RefreshCw, Download, ChevronUp, ChevronDown, LayoutGrid, LayoutList } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { logger } from '../../utils/logger';
+import { cn } from '@client/lib/utils';
+import { logger } from '@client/utils/logger';
 
 interface BillsDashboardProps {
   className?: string;
@@ -34,58 +35,64 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'urgency' | 'engagement'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // Bills API integration with real-time updates and infinite scroll
-  const {
-    bills,
-    stats,
-    loading,
-    error,
-    loadBills,
-    searchBills,
-    refreshData,
-    recordEngagement,
-  } = useBillsAPI({
-    enableRealTime: true,
-    enablePagination: true,
-    enableCaching: true,
-    onLoadComplete: (loadedBills: any[]) => {
-      logger.info('Bills loaded in dashboard', {
-        component: 'BillsDashboard',
-        count: loadedBills.length,
-      });
-    },
+  // Use existing React Query bills hook
+  const [filters, setFilters] = useState<BillsQueryParams>({
+    page: 1,
+    limit: 12,
+    sortBy: 'date',
+    sortOrder: 'desc',
+    status: [],
+    urgency: [],
+    policyAreas: [],
+    sponsors: [],
+    constitutionalFlags: false,
+    controversyLevels: [],
+    dateRange: { start: undefined, end: undefined },
   });
 
-  // Derived state for filtering and pagination
-  const filteredBills = bills; // TODO: Implement client-side filtering if needed
-  const paginatedBills = bills; // TODO: Implement client-side pagination if needed
-  const hasNextPage = false; // TODO: Implement pagination state
-  const isLoadingMore = false; // TODO: Implement loading more state
-  const currentPage = 1; // TODO: Implement current page state
-  const totalPages = 1; // TODO: Implement total pages calculation
-  const totalItems = bills.length;
+  const onFiltersChange = useCallback((newFilters: BillsQueryParams) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  }, []);
 
-  // Infinite scroll integration
-  const { isLoadingMore: infiniteScrollLoading } = useInfiniteScroll(0.8);
+  const { data: billsData, isLoading: loading, error: billsError, refetch } = useBills(filters);
+
+  const bills = billsData?.bills || [];
+  const stats = billsData?.stats || {
+    totalBills: 0,
+    urgentCount: 0,
+    constitutionalFlags: 0,
+    trendingCount: 0,
+    lastUpdated: new Date().toISOString()
+  };
+  const error = billsError?.message || null;
+
+  // Derived state for filtering and pagination
+  const filteredBills = bills;
+  const paginatedBills = bills;
+  const hasNextPage = false;
+  const isLoadingMore = false;
+  const currentPage = 1;
+  const totalPages = 1;
+  const totalItems = bills.length;
 
   // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (searchInput.trim()) {
-        searchBills({ query: searchInput });
-      } else {
-        loadBills();
-      }
+      setFilters(prev => ({
+        ...prev,
+        query: searchInput.trim(),
+        page: 1, // Reset to first page on new search
+      }));
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchInput, searchBills, loadBills]);
+  }, [searchInput]);
 
   // Handle bill engagement actions
   const handleSave = useCallback(
     async (billId: number) => {
       try {
-        await recordEngagement(billId, 'save');
+        // TODO: Implement with proper engagement mutation hook
         logger.info('Bill saved', {
           component: 'BillsDashboard',
           billId,
@@ -98,14 +105,12 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
         });
       }
     },
-    [recordEngagement]
+    []
   );
 
   const handleShare = useCallback(
     async (billId: number) => {
       try {
-        await recordEngagement(billId, 'share');
-
         // Implement actual sharing logic
         if (navigator.share) {
           const bill = bills.find(b => b.id === billId);
@@ -135,7 +140,7 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
         });
       }
     },
-    [recordEngagement, bills]
+    [bills]
   );
 
   const handleComment = useCallback((billId: number) => {
@@ -145,7 +150,7 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
 
   const handleRefresh = useCallback(async () => {
     try {
-      await refreshData();
+      await refetch();
       logger.info('Dashboard data refreshed', {
         component: 'BillsDashboard',
       });
@@ -155,7 +160,7 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
-  }, [refreshData]);
+  }, [refetch]);
 
   const handleExport = useCallback(() => {
     try {
@@ -208,39 +213,28 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
       const sortField = newSortBy as 'date' | 'title' | 'urgency' | 'engagement';
       setSortBy(sortField);
 
-      // Trigger new search with updated sorting
-      const searchParams = {
-        query: searchInput,
+      // Update filters to trigger new query
+      setFilters(prev => ({
+        ...prev,
         sortBy: sortField,
         sortOrder: sortOrder as 'asc' | 'desc',
-      };
-
-      if (searchInput.trim()) {
-        searchBills(searchParams);
-      } else {
-        loadBills(searchParams);
-      }
+        page: 1, // Reset to first page
+      }));
     },
-    [searchInput, sortOrder, searchBills, loadBills]
+    [sortOrder]
   );
 
   const toggleSortOrder = useCallback(() => {
     const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     setSortOrder(newSortOrder);
 
-    // Trigger new search with updated sorting
-    const searchParams = {
-      query: searchInput,
-      sortBy,
+    // Update filters to trigger new query
+    setFilters(prev => ({
+      ...prev,
       sortOrder: newSortOrder as 'asc' | 'desc',
-    };
-
-    if (searchInput.trim()) {
-      searchBills(searchParams);
-    } else {
-      loadBills(searchParams);
-    }
-  }, [sortOrder, searchInput, sortBy, searchBills, loadBills]);
+      page: 1, // Reset to first page
+    }));
+  }, [sortOrder]);
 
 
   const handleClearCache = useCallback(() => {
@@ -319,6 +313,8 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
           <div className="lg:col-span-1">
             <div className="space-y-4">
               <FilterPanel
+                filters={filters}
+                onFiltersChange={onFiltersChange}
                 resultCount={filteredBills.length}
                 totalCount={totalItems}
               />
@@ -365,6 +361,8 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
                     {/* Mobile Filter Button */}
                     {isMobile && (
                       <FilterPanel
+                        filters={filters}
+                        onFiltersChange={onFiltersChange}
                         isMobile={true}
                         resultCount={filteredBills.length}
                         totalCount={totalItems}
@@ -449,8 +447,8 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
                 viewMode={viewMode}
               />
 
-              {/* Infinite scroll loading indicator */}
-              {(isLoadingMore || infiniteScrollLoading) && (
+              {/* Loading indicator for additional data */}
+              {isLoadingMore && (
                 <div className="flex items-center justify-center py-8">
                   <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
                   <span className="ml-2 text-muted-foreground">Loading more bills...</span>

@@ -1,4 +1,4 @@
-import { logger } from '../core/src/observability/logging';
+import { logger } from '@client/core/src/observability/logging';
 import { monitorPoolHealth, checkPoolHealth } from './pool.js';
 
 // Performance monitoring is optional and loaded dynamically

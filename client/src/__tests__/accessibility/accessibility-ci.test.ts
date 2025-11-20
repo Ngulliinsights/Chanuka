@@ -7,7 +7,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import axe from 'axe-core';
-import NavigationBar from '../../components/shell/NavigationBar';
+import NavigationBar from '@client/components/shell/NavigationBar';
 import { createBasicNavigationContext, createMobileNavigationContext, createAuthenticatedNavigationContext } from '../navigation-test-contexts.test';
 
 // Mock axe-core

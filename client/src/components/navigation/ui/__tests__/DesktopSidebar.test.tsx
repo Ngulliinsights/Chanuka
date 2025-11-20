@@ -52,7 +52,7 @@ describe('DesktopSidebar', () => {
   });
 
   it('handles navigation state changes without re-rendering unnecessarily', () => {
-    const { useNav } = require('../hooks/useNav');
+    const { useNav } = require('@client/hooks/useNav');
     let renderCount = 0;
     
     const TestWrapper = () => {
@@ -83,7 +83,7 @@ describe('DesktopSidebar', () => {
   });
 
   it('handles rapid navigation changes gracefully', async () => {
-    const { useNav } = require('../hooks/useNav');
+    const { useNav } = require('@client/hooks/useNav');
     
     render(<DesktopSidebar />);
     
@@ -109,7 +109,7 @@ describe('DesktopSidebar', () => {
   });
 
   it('maintains stable references during navigation transitions', () => {
-    const { useNav } = require('../hooks/useNav');
+    const { useNav } = require('@client/hooks/useNav');
     
     const mockItems = [
       { id: '1', section: 'legislative', label: 'Bills', href: '/bills' },
@@ -143,7 +143,7 @@ describe('DesktopSidebar', () => {
   });
 
   it('handles empty navigation items gracefully', () => {
-    const { useNav } = require('../hooks/useNav');
+    const { useNav } = require('@client/hooks/useNav');
     
     useNav.mockReturnValue({
       items: [],

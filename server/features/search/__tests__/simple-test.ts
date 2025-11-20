@@ -6,8 +6,8 @@
 
 // Query builder service removed - using direct Drizzle queries
 import { suggestionRankingService } from '../engines/suggestion/index.js';
-import { historyCleanupService } from '../services/history-cleanup.service.js';
-import { parallelQueryExecutor } from '../utils/parallel-query-executor.js';
+import { historyCleanupService } from '@client/services/history-cleanup.service.js';
+import { parallelQueryExecutor } from '@client/utils/parallel-query-executor.js';
 
 async function runTests() {
   console.log('🔍 Testing Search Services...');

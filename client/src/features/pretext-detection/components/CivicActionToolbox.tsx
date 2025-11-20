@@ -13,7 +13,7 @@ import {
   Clock,
   TrendingUp
 } from 'lucide-react';
-import { CivicAction, RightsCard } from '../types';
+import { CivicAction, RightsCard } from '@client/types';
 
 interface CivicActionToolboxProps {
   billId: string;

@@ -34,7 +34,7 @@ export interface NavigationPreferences {
 export interface RecentPage {
   path: string;
   title: string;
-  visitedAt: Date;
+  visitedAt: string; // ISO date string for Redux serialization
   visitCount: number;
 }
 

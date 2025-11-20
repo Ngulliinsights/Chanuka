@@ -31,10 +31,10 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { intelligentSearch } from '../services/intelligent-search';
+import { intelligentSearch } from '@client/services/intelligent-search';
 import { useToast } from '@/hooks/use-toast';
-import type { DualSearchRequest } from '../services/intelligent-search';
-import type { SearchFilters, AdvancedSearchOptions } from '../types';
+import type { DualSearchRequest } from '@client/services/intelligent-search';
+import type { SearchFilters, AdvancedSearchOptions } from '@client/types';
 
 interface SearchField {
   id: string;

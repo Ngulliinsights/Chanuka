@@ -1,4 +1,4 @@
-import type { NavigationItem, UserRole, AccessDenialReason } from '../types';
+import type { NavigationItem, UserRole, AccessDenialReason } from '@client/types';
 import { findNavigationItemByPath } from './navigation-utils';
 import { validateNavigationPath, validateUserRole } from '../validation';
 import { NavigationAccessDeniedError, InvalidNavigationPathError } from '../errors';

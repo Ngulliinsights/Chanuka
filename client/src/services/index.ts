@@ -7,6 +7,7 @@
 export { authService } from './AuthService';
 export { userService } from './userService';
 export { mockDataService } from './mockDataService';
+export { api } from './api';
 
 // Export types that were in repositories
 export interface DashboardFilters {

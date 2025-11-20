@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useWebSocket } from "../../hooks/use-websocket";
-import { BillTrackingPreferences } from "../../types/api";
+import { useWebSocket } from "@client/hooks/use-websocket";
+import { BillTrackingPreferences } from "@client/types/api";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -14,7 +14,7 @@ import {
 } from "../ui/select";
 import { Bell, Network, Settings, Clock, AlertCircle } from 'lucide-react';
 import { toast } from "sonner";
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface RealTimeBillTrackerProps {
   billId?: number;

@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
 import { notificationService } from './notification-service.js';
-import { userPreferencesService } from '../../features/users/domain/user-preferences.js';
+import { userPreferencesService } from '@client/features/users/domain/user-preferences.js';
 import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api-utils';
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 export const router = Router();
 

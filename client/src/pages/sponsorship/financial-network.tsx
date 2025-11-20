@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { Progress } from '../../components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Button } from '@client/components/ui/button';
+import { Badge } from '@client/components/ui/badge';
+import { Progress } from '@client/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import {
   ArrowLeft,
   Network,
@@ -17,7 +17,7 @@ import {
   Share2,
   Target
 } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface FinancialNetworkProps { bill_id?: string;
  }
@@ -416,7 +416,14 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                     <p className="text-muted-foreground mb-4">
                       Visual representation of connections between sponsors, organizations, and financial interests
                     </p>
-                    <Button variant="outline">
+                    <Button 
+                      variant="outline"
+                      onClick={() => {
+                        // Launch interactive network diagram in modal or new window
+                        const diagramUrl = `/bills/${bill_id}/sponsorship-analysis/financial-network/interactive`;
+                        window.open(diagramUrl, '_blank', 'width=1200,height=800');
+                      }}
+                    >
                       Launch Interactive Diagram
                     </Button>
                   </div>

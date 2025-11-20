@@ -563,7 +563,7 @@ export * from './use${this.toPascalCase(componentName)}';
     const camelName = this.toCamelCase(componentName);
     
     const content = `import { useState, useEffect, useCallback } from 'react';
-import { ${pascalName}Data, ${pascalName}Error, Use${pascalName}Options, Use${pascalName}Result } from '../types';
+import { ${pascalName}Data, ${pascalName}Error, Use${pascalName}Options, Use${pascalName}Result } from '@client/types';
 ${this.config.hasValidation ? `import { validate${pascalName}Data } from '../validation';` : ''}
 ${this.config.hasErrorHandling ? `import { ${camelName}RecoveryManager } from '../recovery';` : ''}
 
@@ -708,7 +708,7 @@ export * from './${this.toCamelCase(componentName)}-utils';
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
     
-    const content = `import { ${pascalName}Data, ${pascalName}Config } from '../types';
+    const content = `import { ${pascalName}Data, ${pascalName}Config } from '@client/types';
 
 /**
  * ${pascalName} utility functions
@@ -875,8 +875,8 @@ export * from './${pascalName}UI';
     const pascalName = this.toPascalCase(componentName);
     
     const content = `import React from 'react';
-import { ${pascalName}Props } from '../types';
-${this.config.hasHooks ? `import { use${pascalName} } from '../hooks';` : ''}
+import { ${pascalName}Props } from '@client/types';
+${this.config.hasHooks ? `import { use${pascalName} } from '@client/hooks';` : ''}
 
 /**
  * ${pascalName} UI component
@@ -1004,7 +1004,7 @@ export default ${pascalName}UI;
     const pascalName = this.toPascalCase(componentName);
     const camelName = this.toCamelCase(componentName);
     
-    const content = `import { ${pascalName}Data, ${pascalName}Config, ${pascalName}Error } from '../types';
+    const content = `import { ${pascalName}Data, ${pascalName}Config, ${pascalName}Error } from '@client/types';
 ${this.config.hasValidation ? `import { validate${pascalName}Data, validate${pascalName}Config } from '../validation';` : ''}
 
 /**
@@ -1189,7 +1189,7 @@ describe('${pascalName}UI Component', () => {
     const pascalName = this.toPascalCase(componentName);
     
     const content = `import { renderHook, act } from '@testing-library/react';
-import { use${pascalName} } from '../hooks/use${pascalName}';
+import { use${pascalName} } from '@client/hooks/use${pascalName}';
 
 describe('use${pascalName} Hook', () => {
   it('should initialize with default state', () => {
@@ -1297,7 +1297,7 @@ describe('use${pascalName} Hook', () => {
   is${pascalName}Loading,
   has${pascalName}Error,
 } from '../utils/${this.toCamelCase(componentName)}-utils';
-import { ${pascalName}Data, ${pascalName}Config } from '../types';
+import { ${pascalName}Data, ${pascalName}Config } from '@client/types';
 
 describe('${this.toCamelCase(componentName)}-utils', () => {
   const mockData: ${pascalName}Data = {

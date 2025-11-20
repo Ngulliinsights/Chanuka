@@ -87,7 +87,6 @@ export class PerformanceMonitoringService extends EventEmitter {
     // Set alert configuration
     this.alertConfig = {
       emailRecipients: [],
-      slackWebhook: undefined,
       alertOnWarnings: true,
       throttleMs: 5 * 60 * 1000, // 5 minutes
       ...alertConfig,
@@ -176,12 +175,64 @@ export class PerformanceMonitoringService extends EventEmitter {
   }
 
   /**
+   * Record design system audit results
+   */
+  recordDesignSystemAudit(auditResults: {
+    violationsFound: number;
+    warningsFound: number;
+    filesScanned: number;
+  }, metadata?: Record<string, any>): void {
+    // Record violations as a metric
+    this.recordMetric({
+      name: 'design-system-violations',
+      value: auditResults.violationsFound,
+      unit: 'count',
+      metadata: {
+        ...metadata,
+        audit: true,
+        type: 'violations',
+        warnings: auditResults.warningsFound,
+        filesScanned: auditResults.filesScanned,
+      },
+    });
+
+    // Record warnings as a separate metric
+    this.recordMetric({
+      name: 'design-system-warnings',
+      value: auditResults.warningsFound,
+      unit: 'count',
+      metadata: {
+        ...metadata,
+        audit: true,
+        type: 'warnings',
+        violations: auditResults.violationsFound,
+        filesScanned: auditResults.filesScanned,
+      },
+    });
+
+    // Record coverage (files scanned) as a metric
+    this.recordMetric({
+      name: 'design-system-coverage',
+      value: auditResults.filesScanned,
+      unit: 'files',
+      metadata: {
+        ...metadata,
+        audit: true,
+        type: 'coverage',
+        violations: auditResults.violationsFound,
+        warnings: auditResults.warningsFound,
+      },
+    });
+  }
+
+  /**
    * Check if a metric violates any budgets
    */
   private checkBudgetViolation(metric: PerformanceMetric): void {
     const allBudgets = [
       ...Object.values(this.budgets.coreWebVitals),
       ...Object.values(this.budgets.bundleSize),
+      ...Object.values(this.budgets.styling),
       ...this.budgets.custom,
     ];
 
@@ -371,6 +422,9 @@ export class PerformanceMonitoringService extends EventEmitter {
     if (errorBudgets.includes('core-web-vitals')) {
       recommendations.push('Audit and optimize Core Web Vitals metrics');
     }
+    if (errorBudgets.includes('styling')) {
+      recommendations.push('Optimize styling bundle size through CSS purging, compression, and lazy loading');
+    }
 
     return recommendations;
   }
@@ -555,7 +609,7 @@ Time: ${new Date(violation.timestamp).toISOString()}`;
     metricsCount: number;
     violationsCount: number;
     healthScore: number;
-    lastMetricTime?: number;
+    lastMetricTime: number | undefined;
   } {
     const recentMetrics = this.getRecentMetrics(60 * 60 * 1000); // Last hour
     const recentViolations = this.getRecentViolations(60 * 60 * 1000);
@@ -565,7 +619,7 @@ Time: ${new Date(violation.timestamp).toISOString()}`;
       metricsCount: this.metrics.length,
       violationsCount: this.violations.length,
       healthScore: this.calculateHealthScore(recentMetrics, recentViolations),
-      lastMetricTime: this.metrics.length > 0 ? this.metrics[this.metrics.length - 1].timestamp : undefined,
+      lastMetricTime: this.metrics.length > 0 ? this.metrics[this.metrics.length - 1]?.timestamp : undefined,
     };
   }
 

@@ -3,7 +3,7 @@
  * Handles all loading state transitions with optimized logic and error integration
  */
 
-import { LoadingStateData, LoadingAction, LoadingOperation, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats } from './types';
+import { LoadingStateData, LoadingAction, LoadingOperation, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats } from '@client/types';
 
 export function loadingReducer(state: LoadingStateData, action: LoadingAction): LoadingStateData {
   switch (action.type) {

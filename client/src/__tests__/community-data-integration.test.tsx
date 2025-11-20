@@ -8,10 +8,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
-import { CommunityDataIntegration } from '../components/community/CommunityDataIntegration';
-import { communityWebSocketMiddleware } from '../services/community-websocket-middleware';
-import { communityBackendService } from '../services/community-backend-service';
-import { notificationService } from '../services/notification-service';
+import { CommunityDataIntegration } from '@client/components/community/CommunityDataIntegration';
+import { communityWebSocketMiddleware } from '@client/services/community-websocket-middleware';
+import { communityBackendService } from '@client/services/community-backend-service';
+import { notificationService } from '@client/services/notification-service';
 
 // Mock services
 vi.mock('../services/community-websocket-middleware');

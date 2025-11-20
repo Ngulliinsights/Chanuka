@@ -1,5 +1,5 @@
-import { logger  } from '../../../shared/core/src/index.js';
-import { schemaValidationService } from '../../core/validation/schema-validation-service.js';
+import { logger  } from '@shared/core/src/index.js';
+import { schemaValidationService } from '@client/core/validation/schema-validation-service.js';
 
 export class MonitoringScheduler {
   private intervals: Map<string, NodeJS.Timeout> = new Map();

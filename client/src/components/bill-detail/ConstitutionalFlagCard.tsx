@@ -14,7 +14,7 @@ import {
   Users,
   ExternalLink
 } from 'lucide-react';
-import { ConstitutionalFlag, SeverityLevel } from '../../types/constitutional';
+import { ConstitutionalFlag, SeverityLevel } from '@client/types/constitutional';
 
 interface ConstitutionalFlagCardProps {
   flag: ConstitutionalFlag;

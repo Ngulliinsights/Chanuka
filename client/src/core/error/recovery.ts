@@ -5,7 +5,7 @@
  * Provides retry, cache clear, and reload functionality.
  */
 
-import { ErrorDomain, ErrorSeverity } from '../../utils/logger';
+import { ErrorDomain, ErrorSeverity } from './constants';
 import { coreErrorHandler } from './handler';
 import { ErrorRecoveryStrategy, RecoveryAction, RecoveryResult } from './types';
 

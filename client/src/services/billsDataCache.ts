@@ -5,8 +5,9 @@
  * intelligent cache invalidation, and background synchronization.
  */
 
-import { Bill, BillsStats } from '../store/slices/billsSlice';
-import { logger } from '../utils/logger';
+import { Bill } from '@shared/schema/foundation';
+import { BillsStats } from '@client/core/api/bills';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Type Definitions
@@ -583,7 +584,6 @@ class BillsDataCacheService {
    * Clean up expired cache entries
    */
   private async cleanupExpiredEntries(): Promise<void> {
-    const now = Date.now();
     const expiredKeys: string[] = [];
     let reclaimedSize = 0;
 
@@ -776,10 +776,4 @@ class BillsDataCacheService {
 
 export const billsDataCache = new BillsDataCacheService();
 
-// Export types for use in components
-export type {
-  CacheEntry,
-  CacheConfig,
-  CacheStats,
-  OfflineQueueItem
-};
+// Types are already exported at their definitions above

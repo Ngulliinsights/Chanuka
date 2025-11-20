@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import type { DashboardConfig, DashboardSection } from '../types';
+import type { DashboardConfig, DashboardSection } from '@client/types';
 import { validateDashboardConfig, safeValidateDashboardConfig } from '../validation';
 import { DashboardConfigurationError } from '../errors';
 

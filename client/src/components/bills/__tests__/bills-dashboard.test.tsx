@@ -1,43 +1,52 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import BillsDashboardPage from '../../../pages/bills-dashboard-page';
-import { useBillsStore } from '../../../store/slices/billsSlice';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import BillsDashboardPage from '@client/pages/bills-dashboard-page';
+import { vi } from 'vitest';
 
 // Mock the WebSocket hook
-jest.mock('../../../services/websocket-client', () => ({
+vi.mock('../../../services/websocket-client', () => ({
   useWebSocket: () => ({
     isConnected: false,
-    on: jest.fn(() => jest.fn()),
+    on: vi.fn(() => vi.fn()),
   }),
 }));
 
-// Mock react-window for testing
-jest.mock('react-window', () => ({
-  FixedSizeGrid: ({ children, itemData, columnCount, rowCount }: any) => (
+// Mock react-virtualized for testing
+vi.mock('react-virtualized', () => ({
+  Grid: ({ cellRenderer, columnCount, rowCount }: any) => (
     <div data-testid="virtual-grid">
       {Array.from({ length: Math.min(rowCount * columnCount, 6) }).map((_, index) => {
         const rowIndex = Math.floor(index / columnCount);
         const columnIndex = index % columnCount;
-        return children({
+        return cellRenderer({
           columnIndex,
           rowIndex,
+          key: `cell-${rowIndex}-${columnIndex}`,
           style: {},
-          data: itemData,
         });
       })}
     </div>
   ),
 }));
 
+const createTestQueryClient = () => new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+    mutations: { retry: false },
+  },
+});
+
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
-  <BrowserRouter>{children}</BrowserRouter>
+  <QueryClientProvider client={createTestQueryClient()}>
+    <BrowserRouter>{children}</BrowserRouter>
+  </QueryClientProvider>
 );
 
 describe('EnhancedBillsDashboard', () => {
   beforeEach(() => {
-    // Reset store state before each test
-    useBillsStore.getState().reset();
+    vi.clearAllMocks();
   });
 
   it('renders the dashboard header', async () => {

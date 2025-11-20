@@ -12,7 +12,7 @@ export default defineConfig({
   out: "./drizzle",
   schema: [
     "./shared/schema/foundation.ts",
-    "./shared/schema/citizen_participation.ts", 
+    "./shared/schema/citizen_participation.ts",
     "./shared/schema/parliamentary_process.ts",
     "./shared/schema/constitutional_intelligence.ts",
     "./shared/schema/argument_intelligence.ts",
@@ -22,6 +22,7 @@ export default defineConfig({
     "./shared/schema/impact_measurement.ts",
     "./shared/schema/integrity_operations.ts",
     "./shared/schema/platform_operations.ts",
+    "./shared/schema/search_system.ts",
     "./shared/schema/enum.ts"
   ],
   dialect: "postgresql",

@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { 
   BookOpen, 
   Scale, 
-  History, 
-  Gavel, 
+  Clock, 
+  Hammer, 
   Lightbulb,
   Users,
   HelpCircle,
-  ExternalLink,
-  CheckCircle,
-  Info
+  ExternalLink
 } from 'lucide-react';
 
 import { PlainLanguageSummary } from './PlainLanguageSummary';
@@ -21,7 +18,7 @@ import { ConstitutionalContext } from './ConstitutionalContext';
 import { HistoricalPrecedents } from './HistoricalPrecedents';
 import { ProcessEducation } from './ProcessEducation';
 import { EducationalTooltip } from './EducationalTooltip';
-import { Bill } from '../../store/slices/billsSlice';
+import { Bill } from '@/core/api/types';
 
 interface EducationalFrameworkProps {
   bill: Bill;
@@ -291,12 +288,12 @@ export function EducationalFramework({ bill, className = "" }: EducationalFramew
               <div className="text-xs text-muted-foreground">Legal context</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-emerald-50">
-              <History className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+              <Clock className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
               <div className="text-sm font-medium">Historical</div>
               <div className="text-xs text-muted-foreground">Past outcomes</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-emerald-50">
-              <Gavel className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+              <Hammer className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
               <div className="text-sm font-medium">Process</div>
               <div className="text-xs text-muted-foreground">How it works</div>
             </div>
@@ -316,11 +313,11 @@ export function EducationalFramework({ bill, className = "" }: EducationalFramew
             Constitutional
           </TabsTrigger>
           <TabsTrigger value="historical" className="text-xs lg:text-sm">
-            <History className="h-4 w-4 mr-1 lg:mr-2" />
+            <Clock className="h-4 w-4 mr-1 lg:mr-2" />
             Historical
           </TabsTrigger>
           <TabsTrigger value="process" className="text-xs lg:text-sm">
-            <Gavel className="h-4 w-4 mr-1 lg:mr-2" />
+            <Hammer className="h-4 w-4 mr-1 lg:mr-2" />
             Process
           </TabsTrigger>
         </TabsList>

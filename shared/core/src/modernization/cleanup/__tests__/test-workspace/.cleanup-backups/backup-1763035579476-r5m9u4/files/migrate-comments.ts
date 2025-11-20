@@ -1,1 +1,0 @@
-logger.info('Migrating comments', { component: 'Chanuka' });

@@ -1,4 +1,4 @@
-import { NavigationSection } from '../../types/navigation';
+import { NavigationSection } from '@client/types/navigation';
 
 /**
  * Determines the current navigation section based on the path

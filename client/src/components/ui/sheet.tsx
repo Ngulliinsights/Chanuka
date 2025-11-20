@@ -3,8 +3,8 @@ import { Root, Trigger, Close, Portal, Content, Overlay, Title, Description } fr
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
-import { cn } from '../../lib/utils'
-import { logger } from '../../utils/logger';
+import { cn } from '@client/lib/utils'
+import { logger } from '@client/utils/logger';
 
 const Sheet = Root
 

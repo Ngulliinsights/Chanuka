@@ -2,10 +2,11 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BillCard } from './BillCard';
-import { Loader2, AlertCircle, Filter } from 'lucide-react';
+import { Loader2, Filter } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { SharedErrorDisplay, ErrorDisplayConfig } from '@client/components/error-handling/utils/shared-error-display';
 import type { Bill, BillsQueryParams } from '../types';
 
 interface BillListProps {
@@ -29,7 +30,7 @@ export const BillList = ({
   filters = {},
   onFiltersChange
 }: BillListProps) => {
-  const [view, setView] = useState<'card' | 'list'>('list');
+  const [view] = useState<'card' | 'list'>('list');
 
   // Memoize status styles to avoid recreating the object on every render
   const getStatusStyle = useMemo(() => (status: string) => {
@@ -56,22 +57,23 @@ export const BillList = ({
   };
 
   if (error) {
+    const errorDisplayConfig: ErrorDisplayConfig = {
+      variant: 'inline',
+      severity: 'high',
+      showIcon: true,
+      showRetry: true,
+      showReport: false,
+      showGoHome: false,
+      customMessage: `Error Loading ${title}: ${error.message}`,
+    };
+
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
-        <div className="flex items-center mb-2">
-          <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
-          <h3 className="font-semibold">Error Loading bill</h3>
-        </div>
-        <p className="text-sm pl-7">{error.message}</p>
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-2 ml-7 border-red-300 text-red-700 hover:bg-red-100"
-          onClick={() => window.location.reload()}
-        >
-          Retry
-        </Button>
-      </div>
+      <SharedErrorDisplay
+        error={error}
+        config={errorDisplayConfig}
+        onRetry={() => window.location.reload()}
+        context={`BillList-${title}`}
+      />
     );
   }
 
@@ -95,13 +97,13 @@ export const BillList = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: 'introduced' })}>
+              <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: ['introduced'] })}>
                 Introduced bill
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: 'committee' })}>
+              <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: ['committee'] })}>
                 In Committee
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: 'passed' })}>
+              <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: ['passed'] })}>
                 Passed bill
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onFiltersChange?.({})}>

@@ -3,7 +3,7 @@
  * Analyzes voting patterns and correlations between sponsors
  */
 
-import { logger   } from '../../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 export interface VotingPattern {
   sponsor_id: number;

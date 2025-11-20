@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArchitectureComponent } from "@shared/schema";
 import { ArrowLeft, Layers } from 'lucide-react';
-import { sanitizeHTML, createSanitizedElement } from '../utils/dom-sanitizer';
+import { sanitizeHTML, createSanitizedElement } from '@client/utils/dom-sanitizer';
 
 
 interface ArchitecturePlanningProps {

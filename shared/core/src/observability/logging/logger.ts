@@ -1,8 +1,7 @@
 // `pino` is an optional runtime dependency; if not available fall back to console-based logger
 let pino: any = null;
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  pino = require('pino');
+  pino = (await import('pino')).default;
 } catch (_err) {
   pino = null;
 }
@@ -19,13 +18,16 @@ const isNode = typeof process !== 'undefined' && process.versions && process.ver
 
 if (isNode) {
   try {
-    AsyncLocalStorage = require('async_hooks').AsyncLocalStorage;
-    fs = require('fs').promises;
-    fsSync = require('fs');
-    path = require('path');
-    crypto = require('crypto');
-    perf_hooks = require('perf_hooks');
+    const asyncHooks = await import('node:async_hooks');
+    AsyncLocalStorage = asyncHooks.AsyncLocalStorage;
+    const fsModule = await import('fs');
+    fs = fsModule.promises;
+    fsSync = fsModule;
+    path = (await import('path')).default;
+    crypto = (await import('crypto')).default;
+    perf_hooks = (await import('perf_hooks')).default;
   } catch (_err) {
+    console.error('Failed to load Node.js modules:', _err);
     // Fallback if modules not available
   }
 } else {

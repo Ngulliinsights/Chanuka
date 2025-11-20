@@ -12,7 +12,7 @@ import { Progress } from '../ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { DollarSign, TrendingUp, AlertTriangle, Building, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { FinancialInterest, ConflictAnalysis } from '../../types/conflict-of-interest';
+import { FinancialInterest, ConflictAnalysis } from '@client/types/conflict-of-interest';
 
 interface FinancialExposureTrackerProps {
   conflictAnalysis: ConflictAnalysis;

@@ -20,7 +20,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Mock browser environment
 const mockUserAgent = (user_agent: string) => {
@@ -67,7 +67,7 @@ describe('Browser Compatibility Detection', () => {
     it('should detect Chrome correctly', async () => {
       mockUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
       
-      const { getBrowserInfo } = await import('../utils/browser-compatibility');
+      const { getBrowserInfo } = await import('@client/utils/browser-compatibility');
       const browserInfo = getBrowserInfo();
       
       expect(browserInfo.name).toBe('chrome');
@@ -78,7 +78,7 @@ describe('Browser Compatibility Detection', () => {
     it('should detect Firefox correctly', async () => {
       mockUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0');
       
-      const { getBrowserInfo } = await import('../utils/browser-compatibility');
+      const { getBrowserInfo } = await import('@client/utils/browser-compatibility');
       const browserInfo = getBrowserInfo();
       
       expect(browserInfo.name).toBe('firefox');
@@ -89,7 +89,7 @@ describe('Browser Compatibility Detection', () => {
     it('should detect Safari correctly', async () => {
       mockUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15');
       
-      const { getBrowserInfo } = await import('../utils/browser-compatibility');
+      const { getBrowserInfo } = await import('@client/utils/browser-compatibility');
       const browserInfo = getBrowserInfo();
       
       expect(browserInfo.name).toBe('safari');
@@ -100,7 +100,7 @@ describe('Browser Compatibility Detection', () => {
     it('should detect Internet Explorer as unsupported', async () => {
       mockUserAgent('Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko');
       
-      const { getBrowserInfo } = await import('../utils/browser-compatibility');
+      const { getBrowserInfo } = await import('@client/utils/browser-compatibility');
       const browserInfo = getBrowserInfo();
       
       expect(browserInfo.name).toBe('ie');
@@ -112,7 +112,7 @@ describe('Browser Compatibility Detection', () => {
     it('should handle unknown browsers', async () => {
       mockUserAgent('UnknownBrowser/1.0');
       
-      const { getBrowserInfo } = await import('../utils/browser-compatibility');
+      const { getBrowserInfo } = await import('@client/utils/browser-compatibility');
       const browserInfo = getBrowserInfo();
       
       expect(browserInfo.name).toBe('unknown');
@@ -123,14 +123,14 @@ describe('Browser Compatibility Detection', () => {
 
   describe('Feature Detection', () => {
     it('should detect ES6 support correctly', async () => {
-      const { featureDetector } = await import('../utils/browser-compatibility');
+      const { featureDetector } = await import('@client/utils/browser-compatibility');
       
       // Modern browser should support ES6
       expect(featureDetector.detectES6Support()).toBe(true);
     });
 
     it('should detect Fetch API support', async () => {
-      const { featureDetector } = await import('../utils/browser-compatibility');
+      const { featureDetector } = await import('@client/utils/browser-compatibility');
       
       // Mock fetch availability
       mockWindowFeature('fetch', vi.fn());
@@ -141,19 +141,19 @@ describe('Browser Compatibility Detection', () => {
     });
 
     it('should detect Promise support', async () => {
-      const { featureDetector } = await import('../utils/browser-compatibility');
+      const { featureDetector } = await import('@client/utils/browser-compatibility');
       
       expect(featureDetector.detectPromiseSupport()).toBe(true);
     });
 
     it('should detect localStorage support', async () => {
-      const { featureDetector } = await import('../utils/browser-compatibility');
+      const { featureDetector } = await import('@client/utils/browser-compatibility');
       
       expect(featureDetector.detectLocalStorageSupport()).toBe(true);
     });
 
     it('should handle missing features gracefully', async () => {
-      const { featureDetector } = await import('../utils/browser-compatibility');
+      const { featureDetector } = await import('@client/utils/browser-compatibility');
       
       // Mock missing fetch
       delete (window as any).fetch;
@@ -172,7 +172,7 @@ describe('Browser Compatibility Detection', () => {
       delete (window as any).fetch;
       delete (window as any).Promise;
       
-      const { loadPolyfills } = await import('../utils/polyfills');
+      const { loadPolyfills } = await import('@client/utils/polyfills');
       
       await expect(loadPolyfills()).resolves.not.toThrow();
       
@@ -186,7 +186,7 @@ describe('Browser Compatibility Detection', () => {
     });
 
     it('should skip polyfills when features are available', async () => {
-      const { polyfillManager } = await import('../utils/polyfills');
+      const { polyfillManager } = await import('@client/utils/polyfills');
       
       const originalFetch = window.fetch;
       await polyfillManager.loadFetchPolyfill();
@@ -196,7 +196,7 @@ describe('Browser Compatibility Detection', () => {
     });
 
     it('should handle polyfill loading errors gracefully', async () => {
-      const { polyfillManager } = await import('../utils/polyfills');
+      const { polyfillManager } = await import('@client/utils/polyfills');
       
       // Mock a polyfill that throws
       const originalEval = window.eval;
@@ -212,7 +212,7 @@ describe('Browser Compatibility Detection', () => {
 
   describe('Compatibility Testing', () => {
     it('should run compatibility tests successfully', async () => {
-      const { runBrowserCompatibilityTests } = await import('../utils/browser-compatibility-tests');
+      const { runBrowserCompatibilityTests } = await import('@client/utils/browser-compatibility-tests');
       
       const results = await runBrowserCompatibilityTests();
       
@@ -237,7 +237,7 @@ describe('Browser Compatibility Detection', () => {
       delete (window as any).Promise;
       delete (window as any).fetch;
       
-      const { runBrowserCompatibilityTests } = await import('../utils/browser-compatibility-tests');
+      const { runBrowserCompatibilityTests } = await import('@client/utils/browser-compatibility-tests');
       
       const results = await runBrowserCompatibilityTests();
       
@@ -252,7 +252,7 @@ describe('Browser Compatibility Detection', () => {
     it('should generate appropriate recommendations', async () => {
       mockUserAgent('Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'); // IE 11
       
-      const { runBrowserCompatibilityTests } = await import('../utils/browser-compatibility-tests');
+      const { runBrowserCompatibilityTests } = await import('@client/utils/browser-compatibility-tests');
       
       const results = await runBrowserCompatibilityTests();
       
@@ -265,7 +265,7 @@ describe('Browser Compatibility Detection', () => {
 
   describe('Browser Compatibility Manager', () => {
     it('should initialize successfully', async () => {
-      const { initializeBrowserCompatibility } = await import('../utils/browser-compatibility-manager');
+      const { initializeBrowserCompatibility } = await import('@client/utils/browser-compatibility-manager');
       
       const status = await initializeBrowserCompatibility({
         autoLoadPolyfills: true,
@@ -288,7 +288,7 @@ describe('Browser Compatibility Detection', () => {
     it('should determine when to block browsers', async () => {
       mockUserAgent('Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'); // IE 11
       
-      const { BrowserCompatibilityManager } = await import('../utils/browser-compatibility-manager');
+      const { BrowserCompatibilityManager } = await import('@client/utils/browser-compatibility-manager');
       
       const manager = BrowserCompatibilityManager.getInstance({
         blockUnsupportedBrowsers: true
@@ -303,7 +303,7 @@ describe('Browser Compatibility Detection', () => {
     it('should generate appropriate warnings', async () => {
       mockUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Safari/605.1.15'); // Old Safari
       
-      const { BrowserCompatibilityManager } = await import('../utils/browser-compatibility-manager');
+      const { BrowserCompatibilityManager } = await import('@client/utils/browser-compatibility-manager');
       
       const manager = BrowserCompatibilityManager.getInstance({
         showWarnings: true
@@ -321,24 +321,24 @@ describe('Browser Compatibility Components', () => {
   it('should render BrowserCompatibilityChecker without errors', async () => {
     // This would require a more complex test setup with React Testing Library
     // For now, we'll just test that the component can be imported
-    const { default: BrowserCompatibilityChecker } = await import('../components/compatibility/BrowserCompatibilityChecker');
+    const { default: BrowserCompatibilityChecker } = await import('@client/components/compatibility/BrowserCompatibilityChecker');
     expect(BrowserCompatibilityChecker).toBeDefined();
   });
 
   it('should render BrowserCompatibilityTester without errors', async () => {
-    const { default: BrowserCompatibilityTester } = await import('../components/compatibility/BrowserCompatibilityTester');
+    const { default: BrowserCompatibilityTester } = await import('@client/components/compatibility/BrowserCompatibilityTester');
     expect(BrowserCompatibilityTester).toBeDefined();
   });
 
   it('should render BrowserCompatibilityReport without errors', async () => {
-    const { default: BrowserCompatibilityReport } = await import('../components/compatibility/BrowserCompatibilityReport');
+    const { default: BrowserCompatibilityReport } = await import('@client/components/compatibility/BrowserCompatibilityReport');
     expect(BrowserCompatibilityReport).toBeDefined();
   });
 });
 
 describe('Feature Fallbacks', () => {
   it('should provide fallback components', async () => {
-    const fallbacks = await import('../components/compatibility/FeatureFallbacks');
+    const fallbacks = await import('@client/components/compatibility/FeatureFallbacks');
     
     expect(fallbacks.LazyImage).toBeDefined();
     expect(fallbacks.ClipboardButton).toBeDefined();

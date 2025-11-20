@@ -6,10 +6,11 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useWebSocket, useBillRealTime, useNotifications } from '../hooks/useWebSocket';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
+import { useWebSocket } from '@client/hooks/use-websocket';
+import { useNotifications } from '@client/hooks/useNotifications';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Button } from '@client/components/ui/button';
+import { Badge } from '@client/components/ui/badge';
 import { 
   Activity, 
   Bell, 

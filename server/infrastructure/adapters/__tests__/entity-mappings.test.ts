@@ -9,8 +9,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { User } from '../../../features/users/domain/entities/user';
-import { Notification } from '../../../features/notifications/domain/entities/notification';
+import { User } from '@client/features/users/domain/entities/user';
+import { Notification } from '@client/features/notifications/domain/entities/notification';
 import {
   UserEntityMapping,
   CommentEntityMapping,

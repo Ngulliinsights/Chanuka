@@ -1,9 +1,9 @@
 import { forwardRef, HTMLAttributes, ThHTMLAttributes, TdHTMLAttributes, useState, useCallback, useEffect } from "react"
 import { AlertCircle, RefreshCw } from "lucide-react"
 
-import { cn } from '../../lib/utils'
-import { logger } from '../../utils/logger';
-import { TableValidationProps, ValidationError } from './types';
+import { cn } from '@client/lib/utils'
+import { logger } from '@client/utils/logger';
+import { TableValidationProps, ValidationError } from '@client/types';
 import { validateTableData } from './validation';
 import { UITableError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';

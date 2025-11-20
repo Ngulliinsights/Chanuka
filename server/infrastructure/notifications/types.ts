@@ -1,4 +1,4 @@
-import { BillTrackingPreferences as GlobalBillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
+import { BillTrackingPreferences as GlobalBillTrackingPreferences } from '@client/features/users/domain/user-preferences.js';
 
 /**
  * Combined preference type that merges global and per-bill settings.

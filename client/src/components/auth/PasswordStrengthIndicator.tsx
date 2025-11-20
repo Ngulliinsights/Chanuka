@@ -7,7 +7,7 @@ import React from 'react';
 import { Progress } from '../ui/progress';
 import { Badge } from '../ui/badge';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { validatePassword, PASSWORD_STRENGTH_CONFIG } from '../../utils/password-validation';
+import { validatePassword, PASSWORD_STRENGTH_CONFIG } from '@client/utils/password-validation';
 
 interface PasswordStrengthIndicatorProps {
   password: string;

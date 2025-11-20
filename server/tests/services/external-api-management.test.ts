@@ -14,7 +14,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 // Mock fetch globally
 global.fetch = vi.fn();

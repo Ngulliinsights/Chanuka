@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AuthRepository, type AuthRepositoryConfig } from '../mocks/services';
-import { LoginCredentials } from '../../core/api/auth';
+import { LoginCredentials } from '@client/core/api/auth';
 
 // Mock all dependencies
 vi.mock('../../utils/logger', () => ({
@@ -43,8 +43,8 @@ vi.mock('../../core/api/client', () => ({
 }));
 
 // Import mocks for direct manipulation
-import { UnifiedApiClientImpl, globalApiClient } from '../../core/api/client';
-import { logger } from '../../utils/logger';
+import { UnifiedApiClientImpl, globalApiClient } from '@client/core/api/client';
+import { logger } from '@client/utils/logger';
 
 describe('AuthRepository', () => {
   let authRepository: AuthRepository;

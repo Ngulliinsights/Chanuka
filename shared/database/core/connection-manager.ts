@@ -10,7 +10,7 @@
  */
 
 import { Pool, PoolClient, PoolConfig } from 'pg';
-import { logger } from '../../core/src/index.js';
+import { logger } from '@client/core/src/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS

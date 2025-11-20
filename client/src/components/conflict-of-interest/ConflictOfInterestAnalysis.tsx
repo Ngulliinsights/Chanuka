@@ -5,22 +5,21 @@
  * historical patterns, and implementation workarounds into a comprehensive analysis.
  */
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
-import { 
-  Network, 
-  DollarSign, 
-  Eye, 
-  TrendingUp, 
-  FileText, 
+import {
+  Network,
+  DollarSign,
+  Eye,
+  TrendingUp,
+  FileText,
   AlertTriangle,
-  Info,
   Download,
-  Share
+  Share2
 } from 'lucide-react';
 
 import { ConflictNetworkVisualization } from './ConflictNetworkVisualization';
@@ -29,8 +28,8 @@ import { TransparencyScoring } from './TransparencyScoring';
 import { HistoricalPatternAnalysis } from './HistoricalPatternAnalysis';
 import { ImplementationWorkaroundsTracker } from './ImplementationWorkaroundsTracker';
 
-import { ConflictAnalysis, NetworkNode, NetworkLink } from '../../types/conflict-of-interest';
-import { Bill } from '../../store/slices/billsSlice';
+import { ConflictAnalysis, NetworkNode, NetworkLink } from '@client/types/conflict-of-interest';
+import { Bill } from '@/core/api/types';
 
 interface ConflictOfInterestAnalysisProps {
   bill: Bill;
@@ -256,7 +255,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
                 Export
               </Button>
               <Button variant="outline" size="sm">
-                <Share className="h-4 w-4 mr-2" />
+                <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
             </div>

@@ -5,4 +5,4 @@
 
 export { CookieConsentBanner } from './CookieConsentBanner';
 export { DataUsageReportDashboard } from './DataUsageReportDashboard';
-export { GDPRComplianceManager } from './GDPRComplianceManager';
+export { default as GDPRComplianceManager } from './GDPRComplianceManager';

@@ -6,7 +6,7 @@
  */
 
 import { Redis, Cluster } from 'ioredis';
-import { HealthCheck, HealthResult, HealthStatus } from '../types';
+import { HealthCheck, HealthResult, HealthStatus } from '@client/types';
 import { logger } from '../../observability/logging';
 
 export interface RedisHealthConfig {

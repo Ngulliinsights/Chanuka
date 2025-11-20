@@ -5,13 +5,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { rbacManager, usePermission, useMinimumRole } from '../../utils/rbac';
+import { useAuth } from '@client/hooks/useAuth';
+import { rbacManager, usePermission, useMinimumRole } from '@client/utils/rbac';
 import { LoadingSpinner } from '../ui/loading-spinner';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Button } from '../ui/button';
 import { Shield, Lock, AlertTriangle, ArrowLeft } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface AuthGuardProps {
   children: React.ReactNode;

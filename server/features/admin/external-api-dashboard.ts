@@ -13,7 +13,7 @@ import { ApiSuccess, ApiResponseWrapper  } from '@shared/core/utils/api';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
 import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
 // import { advancedCachingService } from '../../infrastructure/cache/advanced-caching.js'; // TODO: Create advanced caching service
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '@shared/core/src/index.js';
 
 export const router = Router();
 

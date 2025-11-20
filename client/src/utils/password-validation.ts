@@ -3,7 +3,7 @@
  * Comprehensive password strength validation and security requirements
  */
 
-import { PasswordRequirements, PasswordValidationResult } from '../types/auth';
+import { PasswordRequirements, PasswordValidationResult } from '@client/types/auth';
 
 // Default password requirements based on security best practices
 export const DEFAULT_PASSWORD_REQUIREMENTS: PasswordRequirements = {

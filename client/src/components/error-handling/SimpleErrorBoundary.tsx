@@ -1,81 +1,79 @@
 import React, { Component, ReactNode } from 'react';
+import { SharedErrorDisplay, ErrorDisplayConfig } from './utils/shared-error-display';
 
+/**
+ * Simple Error Boundary Component
+ *
+ * A lightweight error boundary that provides basic error catching and display.
+ * Uses shared error display utilities for consistent UI patterns.
+ */
 interface Props {
+  /** Child components to wrap with error boundary */
   children: ReactNode;
+  /** Custom fallback component to render on error */
   fallback?: ReactNode;
+  /** Context string for error identification */
+  context?: string;
 }
 
 interface State {
+  /** Whether an error has occurred */
   hasError: boolean;
+  /** The error that occurred */
   error?: Error;
 }
 
+/**
+ * SimpleErrorBoundary provides basic error boundary functionality with consistent UI.
+ * It catches JavaScript errors in the component tree and displays a user-friendly error message.
+ */
 export class SimpleErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
   }
 
+  /**
+   * Updates state when an error is caught
+   */
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
+  /**
+   * Logs error information when an error occurs
+   */
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    console.error('Error caught by SimpleErrorBoundary:', error, errorInfo);
   }
 
+  /**
+   * Renders either the error fallback or the children components
+   */
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
+      // Use shared error display for consistent UI
+      const displayConfig: ErrorDisplayConfig = {
+        variant: 'page',
+        severity: 'high',
+        showIcon: true,
+        showRetry: false,
+        showReport: false,
+        showGoHome: true,
+        customMessage: 'Something went wrong',
+      };
+
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
-            <div className="mb-4">
-              <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                <svg 
-                  className="w-8 h-8 text-red-600" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" 
-                  />
-                </svg>
-              </div>
-              <h1 className="text-xl font-bold text-gray-900 mb-2">
-                Something went wrong
-              </h1>
-              <p className="text-gray-600 mb-4">
-                The application encountered an unexpected error. Please try refreshing the page.
-              </p>
-            </div>
-
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Refresh Page
-            </button>
-
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mt-4 text-left">
-                <summary className="cursor-pointer text-sm text-gray-500">
-                  Error Details (Development)
-                </summary>
-                <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">
-                  {this.state.error.stack}
-                </pre>
-              </details>
-            )}
-          </div>
-        </div>
+        <SharedErrorDisplay
+          error={this.state.error || new Error('Unknown error')}
+          config={displayConfig}
+          onGoHome={() => window.location.reload()}
+          context={this.props.context || 'SimpleErrorBoundary'}
+        />
       );
     }
 

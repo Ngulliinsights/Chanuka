@@ -4,7 +4,7 @@
  */
 
 import { logger } from './logger-simple';
-import { authApiService as authService } from '../core/api';
+import { authApiService as authService } from '@client/core/api';
 
 export interface JWTTokens {
   accessToken: string;

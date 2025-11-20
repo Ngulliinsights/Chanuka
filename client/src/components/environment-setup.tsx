@@ -4,8 +4,8 @@ import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
 import { Settings, CheckCircle, Clock, HelpCircle, TrendingUp, Database, FileText, Shield, Server } from 'lucide-react';
-import { cn, getStatusColor } from '../lib/utils';
-import { logger } from '../utils/logger';
+import { cn, getStatusColor } from '@client/lib/utils';
+import { logger } from '@client/utils/logger';
 
 interface EnvironmentSetupProps {
   environment?: any;

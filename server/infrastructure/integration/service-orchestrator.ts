@@ -3,14 +3,14 @@
 // ============================================================================
 // Coordinates interactions between different services and ensures data consistency
 
-import { logger } from '../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { databaseService } from '../database/database-service.js';
-import { CampaignDomainService } from '../../features/advocacy/domain/services/campaign-domain-service.js';
-import { searchService } from '../../features/search/application/search-service.js';
-import { RecommendationService } from '../../features/recommendation/application/RecommendationService.js';
-import { ConstitutionalAnalyzer } from '../../features/constitutional-analysis/application/constitutional-analyzer.js';
-import { StructureExtractorService } from '../../features/argument-intelligence/application/structure-extractor.js';
-import { governmentDataIntegrationService } from '../../features/government-data/services/government-data-integration.service.js';
+import { CampaignDomainService } from '@client/features/advocacy/domain/services/campaign-domain-service.js';
+import { searchService } from '@client/features/search/application/search-service.js';
+import { RecommendationService } from '@client/features/recommendation/application/RecommendationService.js';
+import { ConstitutionalAnalyzer } from '@client/features/constitutional-analysis/application/constitutional-analyzer.js';
+import { StructureExtractorService } from '@client/features/argument-intelligence/application/structure-extractor.js';
+import { governmentDataIntegrationService } from '@client/features/government-data/services/government-data-integration.service.js';
 
 export interface ServiceHealth {
   serviceName: string;

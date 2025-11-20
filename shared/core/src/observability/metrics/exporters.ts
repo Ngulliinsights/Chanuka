@@ -1,4 +1,4 @@
-import { Metric, MetricsExporter, PrometheusConfig, OpenTelemetryConfig } from './types';
+import { Metric, MetricsExporter, PrometheusConfig, OpenTelemetryConfig } from '@client/types';
 
 // ==================== Prometheus Exporter ====================
 

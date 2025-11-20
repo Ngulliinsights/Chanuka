@@ -3,11 +3,13 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": ".",
-    "baseUrl": ".",
+  "baseUrl": ".",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-    "ignoreDeprecations": "5.0",
+  // Suppress baseUrl deprecation warnings until migration to TS7 is planned.
+  // Use "6.0" per TypeScript guidance to silence messages related to baseUrl.
+  "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./*"]
     }

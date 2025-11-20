@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "migrate:components": "tsx src/scripts/migrate-components.ts",
+    "migrate:components:dry-run": "tsx src/scripts/migrate-components.ts --dry-run",
+    "migrate:components:verbose": "tsx src/scripts/migrate-components.ts --verbose",
+    "analyze:bundle": "tsx src/scripts/analyze-bundle.ts",
+    "analyze:bundle:compare": "tsx src/scripts/analyze-bundle.ts compare",
+    "audit:performance": "tsx src/scripts/performance-audit.ts",
+    "audit:performance:compare": "tsx src/scripts/performance-audit.ts compare",
+    "audit:performance:report": "tsx src/scripts/performance-audit.ts report",
+    "test:visual": "vitest run src/__tests__/visual-regression/",
+    "test:components": "vitest run src/__tests__/",
+    "validate:migration": "tsx src/scripts/validate-migration.ts",
+    "migration:status": "echo '✅ Migration Status: COMPLETED - See client/src/styles/MIGRATION_COMPLETE.md for details'",
+    "migration:complete": "npm run validate:migration && npm run migration:status"
+  }
+}

@@ -1,11 +1,11 @@
 
 import { Router, Request, Response } from "express";
 import { authService } from "./auth-service.js";
-import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized  } from '../../../shared/core/src/utils/api-utils.js';
-import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '../../../shared/core/src/utils/api-utils.js';
+import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized  } from '@shared/core/src/utils/api-utils.js';
+import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '@shared/core/src/utils/api-utils.js';
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from "../../middleware/rate-limiter.js";
 import { errorTracker } from '../errors/error-tracker.js';
-import { securityAuditService } from '../../features/security/security-audit-service.js';
+import { securityAuditService } from '@client/features/security/security-audit-service.js';
 
 export const router: Router = Router();
 

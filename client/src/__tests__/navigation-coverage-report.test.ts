@@ -5,8 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import NavigationBar from '../components/shell/NavigationBar';
-import { useNavigation } from '../core/navigation/context';
+import NavigationBar from '@client/components/shell/NavigationBar';
+import { useNavigation } from '@client/core/navigation/context';
 import { createBasicNavigationContext, createAuthenticatedNavigationContext } from './navigation-test-contexts.test';
 
 // Mock coverage reporting utilities

@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { AuthConfig } from '../types';
+import { AuthConfig } from '@client/types';
 
 // Simple password strength calculation
 function calculatePasswordStrength(password: string) {

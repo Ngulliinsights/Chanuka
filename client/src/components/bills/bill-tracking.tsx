@@ -7,10 +7,10 @@ import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useToast } from '../../hooks/use-toast';
-import { useSafeQuery } from '../../hooks/use-safe-query';
-import AuthenticatedAPI from '../../utils/authenticated-api';
-import { logger } from '../../utils/logger';
+import { useToast } from '@client/hooks/use-toast';
+import { useSafeQuery } from '@client/hooks/use-safe-query';
+import AuthenticatedAPI from '@client/utils/authenticated-api';
+import { logger } from '@client/utils/logger';
 
 interface Bill {
   id: number;

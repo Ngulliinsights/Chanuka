@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Skeleton } from './ui/skeleton';
 import { Search, AlertCircle, AlertTriangle, Info, Settings, ArrowLeft } from 'lucide-react';
-import { cn, getStatusColor, getStatusBgColor } from '../lib/utils';
+import { cn, getStatusColor, getStatusBgColor } from '@client/lib/utils';
 
 interface HealthStatus {
   status: string;
@@ -191,7 +191,7 @@ export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }
   );
 }
 import { useQuery } from "@tanstack/react-query";
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export function useDatabaseStatus() {
   // Updated database status endpoint to match refactored routes

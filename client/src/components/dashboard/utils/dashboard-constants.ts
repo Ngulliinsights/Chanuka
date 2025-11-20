@@ -3,7 +3,7 @@
  * Following navigation component constants patterns
  */
 
-import type { DashboardConfig, ActionPriority, TopicCategory, DashboardSection } from '../types';
+import type { DashboardConfig, ActionPriority, TopicCategory, DashboardSection } from '@client/types';
 
 export const dashboardConstants = {
   // Default configuration values

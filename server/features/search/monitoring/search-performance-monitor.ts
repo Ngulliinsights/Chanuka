@@ -5,7 +5,7 @@
  * relevance measurement, and automated alerting for search system validation.
  */
 
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import { searchService } from '../application/search-service.js';
 
 export interface SearchMetrics {

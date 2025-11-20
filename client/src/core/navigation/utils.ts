@@ -2,7 +2,7 @@
  * Navigation Utilities - Helper functions for navigation operations
  */
 
-import { BreadcrumbItem, RelatedPage, NavigationSection, UserRole } from './types';
+import { BreadcrumbItem, RelatedPage, NavigationSection, UserRole } from '@client/types';
 
 /**
  * Generate breadcrumbs from a path

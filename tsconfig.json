@@ -28,6 +28,13 @@
     /* Modules */
     "module": "ES2022",
     "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@shared/*": ["shared/*"],
+      "@server/*": ["server/*"],
+      "@client/*": ["client/*"]
+    },
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,
     "allowJs": true,

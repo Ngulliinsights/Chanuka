@@ -92,9 +92,9 @@ jest.mock('../core/navigation/context', () => ({
 // Test component that consumes contexts
 const ContextConsumer = () => {
   const { useQueryClient } = require('@tanstack/react-query');
-  const { useAuth } = require('../hooks/useAuth');
+  const { useAuth } = require('@client/hooks/useAuth');
   const { useTheme } = require('../contexts/ThemeContext');
-  const { useLoading } = require('../core/loading');
+  const { useLoading } = require('@client/core/loading');
   const { useAccessibility } = require('./accessibility/accessibility-manager');
   const { useOffline } = require('./offline/offline-manager');
 
@@ -198,7 +198,7 @@ describe('AppProviders', () => {
   it('applies provider overrides and maintains context propagation', async () => {
     const MockAuthProvider = ({ children }: any) => {
       const mockAuthValue = { user: { name: 'Override User' }, isAuthenticated: true };
-      const { useAuth } = require('../hooks/useAuth');
+      const { useAuth } = require('@client/hooks/useAuth');
       // Override the hook to return different value
       useAuth.mockReturnValue(mockAuthValue);
 

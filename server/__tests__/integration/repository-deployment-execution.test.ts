@@ -5,7 +5,7 @@ import {
   executeRepositoryDeploymentTask,
   DeploymentExecutionResult
 } from '../../infrastructure/migration/repository-deployment-executor.js';
-import { logger } from '../../../shared/core';
+import { logger } from '@shared/core';
 
 describe('Repository Deployment Execution - Task 5.6 Implementation', () => {
   let executor: RepositoryDeploymentExecutor;

@@ -67,14 +67,18 @@ export interface EngagementMetrics {
 
 // Query parameters
 export interface BillsQueryParams {
-  search?: string;
-  category?: string;
-  status?: string;
-  sponsor?: string;
-  limit?: number;
-  offset?: number;
-  sortBy?: 'introduced_date' | 'last_action_date' | 'title';
+  query?: string;
+  status?: string[];
+  urgency?: string[];
+  policyAreas?: string[];
+  sponsors?: string[];
+  constitutionalFlags?: boolean;
+  controversyLevels?: string[];
+  dateRange?: { start?: string; end?: string };
+  sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
 }
 
 // Mutation payloads

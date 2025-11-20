@@ -6,7 +6,7 @@ import { cacheService } from '@/infrastructure/cache';
 import * as schema from '@shared/schema';
 import { Bill } from '@shared/schema'; // Ensure Bill type is correctly imported
 import { z } from 'zod';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 // Import the status monitor service if it exists at this path
 import { billStatusMonitorService } from '../bill-status-monitor.js'; // Adjust path if needed
 

@@ -14,7 +14,7 @@ import {
   IValidationServiceConfig,
   ValidationErrorDetail,
 } from '../core/interfaces';
-import { CoreValidationService } from '../core/validation-service';
+import { CoreValidationService } from '@client/core/validation-service';
 
 /**
  * Joi schema adapter implementing the ISchemaAdapter interface

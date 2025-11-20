@@ -15,9 +15,9 @@ import {
   useCommunityNotifications,
   useCommunityBackend 
 } from '../../hooks/useCommunityWebSocket';
-import { useCommunityStore } from '../../store/slices/communitySlice';
-import { useDiscussionStore } from '../../store/slices/discussionSlice';
-import { logger } from '../../utils/logger';
+import { useCommunityStore } from '@client/store/slices/communitySlice';
+import { useDiscussionStore } from '@client/store/slices/discussionSlice';
+import { logger } from '@client/utils/logger';
 
 interface CommunityDataIntegrationProps {
   billId?: number;

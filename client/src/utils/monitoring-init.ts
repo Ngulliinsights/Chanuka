@@ -8,8 +8,8 @@
  * - Custom metrics collection
  */
 
-import { errorMonitoring } from '../services/error-monitoring';
-import { performanceMonitoring } from '../services/performance-monitoring';
+import { errorMonitoring } from '@client/services/error-monitoring';
+import { performanceMonitoring } from '@client/services/performance-monitoring';
 
 interface MonitoringConfig {
   environment: string;

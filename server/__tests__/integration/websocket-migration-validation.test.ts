@@ -12,7 +12,7 @@ import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } fr
 import { WebSocketPerformanceValidator } from '../../scripts/websocket-performance-validation.js';
 import { FinalMigrationValidator } from '../../scripts/final-migration-validation.js';
 import { LegacyWebSocketCleanup } from '../../scripts/legacy-websocket-cleanup.js';
-import { logger } from '../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/src/observability/logging/index.js';
 
 describe('WebSocket Migration Validation - Task 6.6', () => {
   let performanceValidator: WebSocketPerformanceValidator;

@@ -15,10 +15,10 @@ vi.mock('../../shared/core/src/observability/logging', () => ({
 
 import request from 'supertest';
 import express from 'express';
-import { createFinancialDisclosureRouter } from '../features/analytics/financial-disclosure/index.js';
-import { FinancialDisclosureMonitoringService } from '../features/analytics/financial-disclosure/monitoring.js';
-import { financialDisclosureAnalyticsService } from '../features/analytics/services/financial-disclosure.service.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { createFinancialDisclosureRouter } from '@client/features/analytics/financial-disclosure/index.js';
+import { FinancialDisclosureMonitoringService } from '@client/features/analytics/financial-disclosure/monitoring.js';
+import { financialDisclosureAnalyticsService } from '@client/features/analytics/services/financial-disclosure.service.js';
+import { logger  } from '@shared/core/src/index.js';
 
 // Create mock monitoring service for tests
 const mockDependencies = {

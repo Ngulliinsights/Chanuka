@@ -65,7 +65,7 @@ const mockUseBills = {
   refetch: vi.fn().mockResolvedValue(undefined)
 };
 
-vi.mock('@/hooks/use-bills', () => ({
+vi.mock('@/features/bills/hooks/useBills', () => ({
   useBills: () => mockUseBills
 }));
 
@@ -108,7 +108,7 @@ describe('Dashboard Integration Tests', () => {
         summary: null
       };
 
-      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(loadingMockUseBills);
+      vi.mocked(require('@/features/bills/hooks/useBills').useBills).mockReturnValue(loadingMockUseBills);
 
       render(<ActivitySummary />);
 
@@ -137,7 +137,7 @@ describe('Dashboard Integration Tests', () => {
         summary: null
       };
 
-      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
+      vi.mocked(require('@/features/bills/hooks/useBills').useBills).mockReturnValue(errorMockUseBills);
 
       render(<ActivitySummary />);
 
@@ -152,7 +152,7 @@ describe('Dashboard Integration Tests', () => {
         error: new Error('Test error')
       };
 
-      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
+      vi.mocked(require('@/features/bills/hooks/useBills').useBills).mockReturnValue(errorMockUseBills);
 
       render(<ActivitySummary onError={onError} />);
 
@@ -386,7 +386,7 @@ describe('Dashboard Integration Tests', () => {
         error: new Error('Consistent error')
       };
 
-      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
+      vi.mocked(require('@/features/bills/hooks/useBills').useBills).mockReturnValue(errorMockUseBills);
 
       render(
         <div>
@@ -519,7 +519,7 @@ describe('Dashboard Integration Tests', () => {
         actionItems: largeActionItems
       };
 
-      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(largeMockUseBills);
+      vi.mocked(require('@/features/bills/hooks/useBills').useBills).mockReturnValue(largeMockUseBills);
 
       const startTime = performance.now();
       render(<ActionItems />);

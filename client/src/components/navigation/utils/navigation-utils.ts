@@ -1,4 +1,4 @@
-import type { NavigationItem, UserRole } from '../types';
+import type { NavigationItem, UserRole } from '@client/types';
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
 import { validateNavigationPath } from '../validation';
 import { InvalidNavigationPathError } from '../errors';

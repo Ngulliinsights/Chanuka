@@ -605,8 +605,8 @@ export class DevelopmentErrorRecovery {
   }
 }
 
-// Initialize development error recovery in development mode
-if (process.env.NODE_ENV === 'development') {
+// Initialize development error recovery in development mode - TEMPORARILY DISABLED
+if (false && process.env.NODE_ENV === 'development') {
   DevelopmentErrorRecovery.getInstance();
   
   // Expose to global scope for debugging

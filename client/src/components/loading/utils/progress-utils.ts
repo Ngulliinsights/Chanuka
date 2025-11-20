@@ -3,7 +3,7 @@
  * Following navigation component patterns for utility organization
  */
 
-import { LoadingProgress, LoadingStage } from '../types';
+import { LoadingProgress, LoadingStage } from '@client/types';
 import { validateLoadingProgress } from '../validation';
 
 /**

@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { useSecureForm, useSecurity } from '../../hooks/useSecurity';
+import { useSecureForm, useSecurity } from '@client/hooks/useSecurity';
 import { ValidationSchemas } from '../../security';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';

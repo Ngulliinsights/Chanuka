@@ -57,7 +57,7 @@ export class ConfigurationService {
   loadFromEnvironment(): void {
     const envConfig: Partial<ServiceConfig> = {
       api: {
-        baseUrl: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+        baseUrl: process.env.REACT_APP_API_URL || 'http://localhost:4200',
         timeout: parseInt(process.env.REACT_APP_API_TIMEOUT || '10000'),
         retry: this.config.api.retry, // Keep existing retry config
         cache: this.config.api.cache   // Keep existing cache config
@@ -93,7 +93,7 @@ export class ConfigurationService {
   private mergeWithDefaults(partialConfig: Partial<ServiceConfig>): ServiceConfig {
     const defaults: ServiceConfig = {
       api: {
-        baseUrl: 'http://localhost:5000',
+        baseUrl: 'http://localhost:4200',
         timeout: 10000,
         retry: {
           maxRetries: 3,
@@ -318,7 +318,7 @@ export class EnvironmentConfigLoader {
   static load(): Partial<ServiceConfig> {
     return {
       api: {
-        baseUrl: this.getEnvString('REACT_APP_API_URL', 'http://localhost:5000'),
+        baseUrl: this.getEnvString('REACT_APP_API_URL', 'http://localhost:4200'),
         timeout: this.getEnvNumber('REACT_APP_API_TIMEOUT', 10000),
         retry: {
           maxRetries: this.getEnvNumber('REACT_APP_API_MAX_RETRIES', 3),

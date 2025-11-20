@@ -8,7 +8,7 @@ import request from 'supertest';
 import { app } from '../../index.js';
 import { TestDataManager, ApiResponseValidator, SecurityTestHelper } from '../../tests/utils/test-helpers.js';
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 describe('API Integration Tests', () => {
   let testDataManager: TestDataManager;

@@ -5,7 +5,7 @@
  * for mock data integration throughout the application.
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Import all mock data
 import { mockBills, mockBillsStats } from './bills';

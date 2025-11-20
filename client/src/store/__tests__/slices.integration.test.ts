@@ -6,10 +6,13 @@
  */
 
 import { jest, describe, beforeEach, afterEach, it, expect } from '@jest/globals';
-import { configureStore } from '@reduxjs/toolkit';
-import { billsSlice, loadBillsFromAPI, recordEngagement } from '../slices/billsSlice';
-import { authSlice, login, logout } from '../slices/authSlice';
-import { errorAnalyticsSlice, fetchOverviewMetrics } from '../slices/errorAnalyticsSlice';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { vi } from 'vitest';
+
+// Import store and slices
+import { store } from '../index';
+import { login, logout, setUser, setError, clearError } from '../slices/authSlice';
+import { fetchOverviewMetrics, setActiveTab, setLoading, setError as setErrorAnalyticsError, updateFilters, resetFilters, updateRealTimeMetrics, addRealTimeError, addRealTimeAlert } from '../slices/errorAnalyticsSlice';
 
 // Mock services
 jest.mock('../../services', () => ({
@@ -81,157 +84,22 @@ jest.mock('../../utils/logger', () => ({
 }));
 
 describe('Store Slices Integration', () => {
-  let store: ReturnType<typeof configureStore>;
+  let queryClient: QueryClient;
 
   beforeEach(() => {
-    store = configureStore({
-      reducer: {
-        bills: billsSlice.reducer,
-        auth: authSlice.reducer,
-        errorAnalytics: errorAnalyticsSlice.reducer
-      }
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    queryClient.clear();
   });
 
-  describe('Bills Slice Integration', () => {
-    const mockBillsData = {
-      bills: [
-        {
-          id: 1,
-          billNumber: 'HB-001',
-          title: 'Test Bill 1',
-          summary: 'A test bill',
-          status: 'introduced',
-          urgencyLevel: 'medium',
-          introducedDate: '2024-01-01',
-          lastUpdated: '2024-01-01T00:00:00Z',
-          sponsors: [{ id: 1, name: 'Test Sponsor', party: 'Independent', position: 'Representative' }],
-          constitutionalFlags: [],
-          viewCount: 100,
-          saveCount: 20,
-          commentCount: 5,
-          shareCount: 3,
-          policyAreas: ['Environment'],
-          complexity: 'medium',
-          readingTime: 10
-        }
-      ],
-      stats: {
-        totalBills: 1,
-        urgentCount: 0,
-        constitutionalFlags: 0,
-        trendingCount: 0,
-        lastUpdated: '2024-01-01T00:00:00Z'
-      }
-    };
-
-    it('should load bills from API and update state', async () => {
-      const { billsRepository } = require('../../services');
-      const { billsPaginationService } = require('../../services/billsPaginationService');
-      const { billsDataCache } = require('../../services/billsDataCache');
-
-      // Mock cache miss
-      billsDataCache.getCachedBills.mockResolvedValue(null);
-      billsDataCache.getCachedBillsStats.mockResolvedValue(null);
-
-      // Mock successful API response
-      billsPaginationService.loadFirstPage.mockResolvedValue(mockBillsData);
-
-      await store.dispatch(loadBillsFromAPI());
-
-      const state = store.getState().bills;
-
-      expect(state.bills).toEqual(mockBillsData.bills);
-      expect(state.stats).toEqual(mockBillsData.stats);
-      expect(state.loading).toBe(false);
-      expect(state.error).toBe(null);
-    });
-
-    it('should handle API errors gracefully', async () => {
-      const { billsPaginationService } = require('../../services/billsPaginationService');
-      const { mockDataService } = require('../../services/mockDataService');
-
-      // Mock API failure and fallback to mock data
-      billsPaginationService.loadFirstPage.mockRejectedValue(new Error('API Error'));
-      mockDataService.loadData
-        .mockResolvedValueOnce(mockBillsData.bills)
-        .mockResolvedValueOnce(mockBillsData.stats);
-
-      await store.dispatch(loadBillsFromAPI());
-
-      const state = store.getState().bills;
-
-      expect(state.bills).toEqual(mockBillsData.bills);
-      expect(state.stats).toEqual(mockBillsData.stats);
-      expect(state.loading).toBe(false);
-    });
-
-    it('should record engagement and update state', async () => {
-      const { billsRepository } = require('../../services');
-
-      billsRepository.recordEngagement.mockResolvedValue(undefined);
-
-      await store.dispatch(recordEngagement({ billId: 1, type: 'view' }));
-
-      expect(billsRepository.recordEngagement).toHaveBeenCalledWith(1, 'view');
-    });
-
-    it('should handle engagement recording failures silently', async () => {
-      const { billsRepository } = require('../../services');
-
-      billsRepository.recordEngagement.mockRejectedValue(new Error('API Error'));
-
-      // Should not throw error
-      await expect(store.dispatch(recordEngagement({ billId: 1, type: 'view' }))).resolves.toBeDefined();
-
-      const state = store.getState().bills;
-      expect(state.error).toBeUndefined(); // Silent failure
-    });
-
-    it('should update bill filters', () => {
-      const filters = {
-        status: ['introduced', 'committee'],
-        urgency: ['high'],
-        policyAreas: ['Environment']
-      };
-
-      store.dispatch(billsSlice.actions.setFilters(filters));
-
-      const state = store.getState().bills;
-      expect(state.filters).toEqual({ ...state.filters, ...filters });
-      expect(state.currentPage).toBe(1); // Should reset page
-    });
-
-    it('should update search query and reset page', () => {
-      store.dispatch(billsSlice.actions.setSearchQuery('environment'));
-
-      const state = store.getState().bills;
-      expect(state.searchQuery).toBe('environment');
-      expect(state.currentPage).toBe(1);
-    });
-
-    it('should handle real-time bill updates', () => {
-      const initialState = store.getState().bills;
-      expect(initialState.bills).toEqual([]);
-
-      // Add a bill first
-      store.dispatch(billsSlice.actions.addBill(mockBillsData.bills[0]));
-
-      // Simulate real-time status change
-      store.dispatch(billsSlice.actions.handleRealTimeUpdate({
-        type: 'bill_status_change',
-        data: { bill_id: 1, newStatus: 'passed' }
-      }));
-
-      const state = store.getState().bills;
-      expect(state.bills[0].status).toBe('passed');
-      expect(state.lastUpdateTime).toBeDefined();
-    });
-  });
 
   describe('Auth Slice Integration', () => {
     const mockUser = {
@@ -257,7 +125,7 @@ describe('Store Slices Integration', () => {
     };
 
     it('should handle successful login', async () => {
-      const { authService } = require('../../services/AuthService');
+      const { authService } = require('@client/services/AuthService');
 
       authService.login = jest.fn().mockResolvedValue(mockAuthResponse);
 
@@ -272,7 +140,7 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle login failure', async () => {
-      const { authService } = require('../../services/AuthService');
+      const { authService } = require('@client/services/AuthService');
 
       authService.login = jest.fn().mockRejectedValue(new Error('Invalid credentials'));
 
@@ -286,7 +154,7 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle logout', async () => {
-      const { authService } = require('../../services/AuthService');
+      const { authService } = require('@client/services/AuthService');
 
       // First login
       authService.login = jest.fn().mockResolvedValue(mockAuthResponse);
@@ -304,7 +172,7 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle logout API failure gracefully', async () => {
-      const { authService } = require('../../services/AuthService');
+      const { authService } = require('@client/services/AuthService');
 
       // First login
       authService.login = jest.fn().mockResolvedValue(mockAuthResponse);
@@ -320,7 +188,7 @@ describe('Store Slices Integration', () => {
     });
 
     it('should update user profile', async () => {
-      const { authService } = require('../../services/AuthService');
+      const { authService } = require('@client/services/AuthService');
 
       // First login
       authService.login = jest.fn().mockResolvedValue(mockAuthResponse);
@@ -359,7 +227,7 @@ describe('Store Slices Integration', () => {
     };
 
     it('should fetch overview metrics successfully', async () => {
-      const { errorAnalyticsRepository } = require('../../services');
+      const { errorAnalyticsRepository } = require('@client/services');
 
       errorAnalyticsRepository.getOverviewMetrics.mockResolvedValue(mockOverviewMetrics);
 
@@ -373,7 +241,7 @@ describe('Store Slices Integration', () => {
     });
 
     it('should handle fetch errors', async () => {
-      const { errorAnalyticsRepository } = require('../../services');
+      const { errorAnalyticsRepository } = require('@client/services');
 
       errorAnalyticsRepository.getOverviewMetrics.mockRejectedValue(new Error('API Error'));
 
@@ -458,27 +326,21 @@ describe('Store Slices Integration', () => {
   describe('Cross-Slice State Management', () => {
     it('should maintain independent state between slices', () => {
       // Dispatch actions to different slices
-      store.dispatch(billsSlice.actions.setSearchQuery('test query'));
       store.dispatch(authSlice.actions.setUser(mockUser));
       store.dispatch(errorAnalyticsSlice.actions.setActiveTab('trends'));
 
       const state = store.getState();
 
-      expect(state.bills.searchQuery).toBe('test query');
       expect(state.auth.user).toEqual(mockUser);
       expect(state.errorAnalytics.activeTab).toBe('trends');
     });
 
     it('should handle loading states independently', () => {
-      // Start loading in bills slice
-      store.dispatch(billsSlice.actions.setLoading(true));
-
       // Start loading in error analytics slice
       store.dispatch(errorAnalyticsSlice.actions.setLoading(true));
 
       const state = store.getState();
 
-      expect(state.bills.loading).toBe(true);
       expect(state.errorAnalytics.isLoading).toBe(true);
       expect(state.auth.isLoading).toBe(false); // Should remain false
     });
@@ -496,7 +358,6 @@ describe('Store Slices Integration', () => {
 
       expect(state.auth.error).toBe('Login failed');
       expect(state.errorAnalytics.error).toBe('Failed to fetch data');
-      expect(state.bills.error).toBe(null);
     });
 
     it('should clear errors independently', () => {

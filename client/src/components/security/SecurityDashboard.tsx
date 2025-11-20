@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { getSecuritySystem } from '../../security';
 import { SecurityMetrics, SecurityAlert, SecurityEvent, VulnerabilityReport } from '../../security/types';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface SecurityDashboardProps {
   className?: string;

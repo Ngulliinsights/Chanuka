@@ -8,7 +8,7 @@
  * - Real-time metrics collection and analysis
  */
 
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 import { 
   AsyncServiceResult, 
   withResultHandling 

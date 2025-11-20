@@ -33,7 +33,7 @@ import {
   Loader2,
   Info
 } from 'lucide-react';
-import { DataExportRequest } from '../../../types/user-dashboard';
+import { DataExportRequest } from '@client/types/user-dashboard';
 
 interface DataExportModalProps {
   open: boolean;

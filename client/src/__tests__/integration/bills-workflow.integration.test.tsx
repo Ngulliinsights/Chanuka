@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { screen, waitFor, fireEvent, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders, MockDataFactory, IntegrationTestUtils } from '../../test-utils/comprehensive-test-setup';
+import { renderWithProviders, MockDataFactory, IntegrationTestUtils } from '@client/test-utils/comprehensive-test-setup';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from '../../App';
 

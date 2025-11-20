@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { AlertCircle, RefreshCw, CheckCircle, X, Edit, Search, Tag } from 'lucide-react';
-import { useDashboard } from './hooks/useDashboard';
-import { useDashboardTopics } from './hooks/useDashboardTopics';
-import type { DashboardComponentProps, TrackedTopic, TopicCategory } from './types';
+import { useDashboard } from '@client/hooks/useDashboard';
+import { useDashboardTopics } from '@client/hooks/useDashboardTopics';
+import type { DashboardComponentProps, TrackedTopic, TopicCategory } from '@client/types';
 import { validateTrackedTopic } from './validation';
 
 export const TrackedTopics: React.FC<DashboardComponentProps> = ({ 

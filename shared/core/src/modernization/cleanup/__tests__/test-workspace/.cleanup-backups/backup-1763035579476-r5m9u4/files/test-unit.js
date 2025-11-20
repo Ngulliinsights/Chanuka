@@ -1,1 +1,0 @@
-logger.info('Unit test', { component: 'Chanuka' });

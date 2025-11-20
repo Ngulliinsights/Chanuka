@@ -17,7 +17,7 @@ import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/src/index.js';
 
 describe('Simple Integration Tests', () => {
   let app: express.Application;

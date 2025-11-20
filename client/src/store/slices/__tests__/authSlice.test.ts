@@ -51,7 +51,7 @@ import authSlice, {
   selectAuthStatus,
   selectUserProfile
 } from '../authSlice';
-import { User, RegisterData } from '../../../types/auth';
+import { User, RegisterData } from '@client/types/auth';
 
 // Mock the auth service
 vi.mock('../../../services/AuthService', () => ({
@@ -93,8 +93,8 @@ vi.mock('../../../utils/logger', () => ({
   }
 }));
 
-import { authService } from '../../../services/AuthService';
-import { logger } from '../../../utils/logger';
+import { authService } from '@client/services/AuthService';
+import { logger } from '@client/utils/logger';
 
 describe('Auth Slice', () => {
   let store: any;

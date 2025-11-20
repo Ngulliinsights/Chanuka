@@ -6,12 +6,12 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { logger } from "../utils/logger";
+import { logger } from "@client/utils/logger";
 import {
   useRenderTracker,
   withRenderTracking,
   usePerformanceMeasurement,
-} from "../hooks/use-render-tracker";
+} from "../features/analytics/hooks/use-render-tracker";
 
 // Example 1: Manual render tracking in a component
 export function ManualRenderTrackingExample() {
@@ -242,7 +242,7 @@ export function IntegrateWithAppLayout() {
 
         <h5>1. Add to AppLayout component:</h5>
         <pre style={{ backgroundColor: "#fff", padding: "10px" }}>
-          {`import { useRenderTracker } from '../hooks/use-render-tracker';
+          {`import { useRenderTracker } from '@client/features/analytics/hooks/use-render-tracker';
 
 function AppLayout() {
   const renderTracker = useRenderTracker({
@@ -262,7 +262,7 @@ function AppLayout() {
 
         <h5>2. Add to WebSocket components:</h5>
         <pre style={{ backgroundColor: "#fff", padding: "10px" }}>
-          {`import { logger } from '../utils/logger';
+          {`import { logger } from '@client/utils/logger';
 
 function WebSocketClient() {
   useEffect(() => {

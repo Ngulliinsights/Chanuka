@@ -7,10 +7,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import { renderWithProviders, MockDataFactory, AccessibilityTestUtils } from '../../test-utils/comprehensive-test-setup';
-import { BillsDashboard } from '../../components/bills/bills-dashboard';
-import { BillDetailView } from '../../components/bill-detail/BillDetailView';
-import { IntelligentSearchPage } from '../../pages/IntelligentSearchPage';
+import { renderWithProviders, MockDataFactory, AccessibilityTestUtils } from '@client/test-utils/comprehensive-test-setup';
+import { BillsDashboard } from '@client/components/bills/bills-dashboard';
+import { BillDetailView } from '@client/components/bill-detail/BillDetailView';
+import { IntelligentSearchPage } from '@client/pages/IntelligentSearchPage';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
@@ -415,7 +415,7 @@ describe('Comprehensive Accessibility Tests', () => {
   describe('Error Handling and Feedback', () => {
     it('should provide accessible error messages', async () => {
       // Mock API error
-      vi.mocked(require('../../hooks/useBillsAPI').useBillsAPI).mockReturnValue({
+      vi.mocked(require('@client/hooks/useBillsAPI').useBillsAPI).mockReturnValue({
         bills: [],
         loading: false,
         error: new Error('Failed to load bills'),
@@ -456,7 +456,7 @@ describe('Comprehensive Accessibility Tests', () => {
 
     it('should provide accessible loading states', () => {
       // Mock loading state
-      vi.mocked(require('../../hooks/useBillsAPI').useBillsAPI).mockReturnValue({
+      vi.mocked(require('@client/hooks/useBillsAPI').useBillsAPI).mockReturnValue({
         bills: [],
         loading: true,
         error: null,

@@ -1,6 +1,6 @@
-import { useToast } from '../../hooks/use-toast'
+import { useToast } from '@client/hooks/use-toast'
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from './toast'
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export function Toaster() {
   const { toasts } = useToast()

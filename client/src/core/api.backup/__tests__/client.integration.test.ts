@@ -7,7 +7,7 @@
 
 import { jest, describe, beforeEach, afterEach, it, expect } from '@jest/globals';
 import { UnifiedApiClientImpl, globalApiClient } from '../client';
-import { ApiResponse } from '../types';
+import { ApiResponse } from '@client/types';
 
 // Mock fetch globally
 const mockFetch = jest.fn();

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { logger } from '../utils/logger';
+import { logger } from '@client/utils/logger';
 
 /**
  * @deprecated Use useOfflineDetection instead. This hook is deprecated and will be removed in a future version.

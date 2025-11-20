@@ -6,30 +6,16 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useUserDashboardSelectors, useUserDashboardStore } from '../../store/slices/userDashboardSlice';
-import { useAuthStore } from '../../store/slices/authSlice';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { useUserDashboardSelectors, useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
+import { useAuthStore } from '@client/store/slices/authSlice';
 import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { 
-  Calendar,
-  TrendingUp,
-  Bell,
+import {
   Settings,
   Download,
   RefreshCw,
   Eye,
   EyeOff,
-  Filter,
-  BarChart3,
-  BookOpen,
-  MessageSquare,
-  Share2,
-  Heart,
-  Award,
-  Users,
-  Clock,
   AlertCircle
 } from 'lucide-react';
 import { TrackedBillsSection } from './sections/TrackedBillsSection';
@@ -42,7 +28,7 @@ import { DashboardPreferencesModal } from './modals/DashboardPreferencesModal';
 import { TimeFilterSelector } from './components/TimeFilterSelector';
 import { DashboardStats } from './components/DashboardStats';
 import { WelcomeMessage } from './components/WelcomeMessage';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface UserDashboardProps {
   className?: string;
@@ -65,6 +51,8 @@ export function UserDashboard({ className = '' }: UserDashboardProps) {
     setTimeFilter,
     setError
   } = useUserDashboardSelectors();
+
+  const dashboardStore = useUserDashboardStore();
 
   // Modal states
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -96,7 +84,7 @@ export function UserDashboard({ className = '' }: UserDashboardProps) {
       // In a real implementation, this would fetch from API
       // For now, we'll use mock data
       const mockData = await generateMockDashboardData();
-      useUserDashboardStore.getState().setDashboardData(mockData);
+      dashboardStore.setDashboardData(mockData);
     } catch (error) {
       logger.error('Failed to load dashboard data', { error });
       setError(error instanceof Error ? error.message : 'Failed to load dashboard');
@@ -203,8 +191,8 @@ export function UserDashboard({ className = '' }: UserDashboardProps) {
         <WelcomeMessage
           user={user}
           stats={dashboardData?.stats}
-          onDismiss={() => 
-            useUserDashboardStore.getState().updatePreferences({ showWelcomeMessage: false })
+          onDismiss={() =>
+            dashboardStore.updatePreferences({ showWelcomeMessage: false })
           }
         />
       )}
@@ -331,25 +319,26 @@ export function UserDashboard({ className = '' }: UserDashboardProps) {
         open={showPrivacyModal}
         onOpenChange={setShowPrivacyModal}
         controls={privacyControls}
-        onUpdate={(controls) => 
-          useUserDashboardStore.getState().updatePrivacyControls(controls)
+        onUpdate={(controls) =>
+          dashboardStore.updatePrivacyControls(controls)
         }
       />
 
       <DataExportModal
         open={showExportModal}
         onOpenChange={setShowExportModal}
-        onExport={(request) => 
-          useUserDashboardStore.getState().requestDataExport(request)
-        }
+        onExport={async (request) => {
+          const result = await dashboardStore.requestDataExport(request);
+          return result.payload as string;
+        }}
       />
 
       <DashboardPreferencesModal
         open={showPreferencesModal}
         onOpenChange={setShowPreferencesModal}
         preferences={preferences}
-        onUpdate={(prefs) => 
-          useUserDashboardStore.getState().updatePreferences(prefs)
+        onUpdate={(prefs) =>
+          dashboardStore.updatePreferences(prefs)
         }
       />
     </div>

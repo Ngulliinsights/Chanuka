@@ -73,7 +73,7 @@ describe('useCommunity Hooks', () => {
         ]
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getComments as any).mockResolvedValue(mockComments);
 
       const { result } = renderHook(() => useComments('bill1'), { wrapper });
@@ -94,7 +94,7 @@ describe('useCommunity Hooks', () => {
         bill_id: 'bill1'
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.createComment as any).mockResolvedValue(mockComment);
 
       const { result } = renderHook(() => useComments('bill1'), { wrapper });
@@ -121,7 +121,7 @@ describe('useCommunity Hooks', () => {
         bill_id: 'bill1'
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.updateComment as any).mockResolvedValue(updatedComment);
 
       const { result } = renderHook(() => useComments('bill1'), { wrapper });
@@ -139,7 +139,7 @@ describe('useCommunity Hooks', () => {
     });
 
     it('should delete a comment', async () => {
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.deleteComment as any).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useComments('bill1'), { wrapper });
@@ -158,7 +158,7 @@ describe('useCommunity Hooks', () => {
         bill_id: 'bill1'
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.voteOnComment as any).mockResolvedValue(updatedComment);
 
       const { result } = renderHook(() => useComments('bill1'), { wrapper });
@@ -187,7 +187,7 @@ describe('useCommunity Hooks', () => {
         ]
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getThreads as any).mockResolvedValue(mockThreads);
 
       const { result } = renderHook(() => useThreads(), { wrapper });
@@ -208,7 +208,7 @@ describe('useCommunity Hooks', () => {
         authorId: 'user1'
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.createThread as any).mockResolvedValue(mockThread);
 
       const { result } = renderHook(() => useThreads(), { wrapper });
@@ -229,7 +229,7 @@ describe('useCommunity Hooks', () => {
     });
 
     it('should update a thread', async () => {
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.updateThread as any).mockResolvedValue({ id: '1', title: 'Updated' });
 
       const { result } = renderHook(() => useThreads(), { wrapper });
@@ -247,7 +247,7 @@ describe('useCommunity Hooks', () => {
     });
 
     it('should delete a thread', async () => {
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.deleteThread as any).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useThreads(), { wrapper });
@@ -269,7 +269,7 @@ describe('useCommunity Hooks', () => {
         authorId: 'user1'
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getThread as any).mockResolvedValue(mockThread);
 
       const { result } = renderHook(() => useThread('1'), { wrapper });
@@ -283,7 +283,7 @@ describe('useCommunity Hooks', () => {
     });
 
     it('should not fetch when threadId is undefined', () => {
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
 
       renderHook(() => useThread(undefined), { wrapper });
 
@@ -300,7 +300,7 @@ describe('useCommunity Hooks', () => {
         user_id: 'user1'
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.shareContent as any).mockResolvedValue(mockShare);
 
       const { result } = renderHook(() => useSocialSharing(), { wrapper });
@@ -321,7 +321,7 @@ describe('useCommunity Hooks', () => {
     });
 
     it('should track share clicks', async () => {
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.trackShareClick as any).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useSocialSharing(), { wrapper });
@@ -343,7 +343,7 @@ describe('useCommunity Hooks', () => {
         totalShares: 89
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getCommunityStats as any).mockResolvedValue(mockStats);
 
       const { result } = renderHook(() => useCommunityStats(), { wrapper });
@@ -360,7 +360,7 @@ describe('useCommunity Hooks', () => {
         { userId: 'user1', commentCount: 25, threadCount: 5 }
       ];
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getTopContributors as any).mockResolvedValue(mockContributors);
 
       const { result } = renderHook(() => useCommunityStats(), { wrapper });
@@ -377,7 +377,7 @@ describe('useCommunity Hooks', () => {
         { type: 'comment', userId: 'user1', timestamp: '2024-01-01T00:00:00Z' }
       ];
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getRecentActivity as any).mockResolvedValue(mockActivity);
 
       const { result } = renderHook(() => useCommunityStats(), { wrapper });
@@ -396,7 +396,7 @@ describe('useCommunity Hooks', () => {
         { userId: 'user1', joinedAt: '2024-01-01T00:00:00Z' }
       ];
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getThreadParticipants as any).mockResolvedValue(mockParticipants);
 
       const { result } = renderHook(() => useThreadParticipation('thread1'), { wrapper });
@@ -409,7 +409,7 @@ describe('useCommunity Hooks', () => {
     });
 
     it('should join a thread', async () => {
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.joinThread as any).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useThreadParticipation('thread1'), { wrapper });
@@ -422,7 +422,7 @@ describe('useCommunity Hooks', () => {
     });
 
     it('should leave a thread', async () => {
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.leaveThread as any).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useThreadParticipation('thread1'), { wrapper });
@@ -443,7 +443,7 @@ describe('useCommunity Hooks', () => {
         total: 0
       };
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.searchCommunity as any).mockResolvedValue(mockResults);
 
       const { result } = renderHook(() => useCommunitySearch('test query'), { wrapper });
@@ -457,7 +457,7 @@ describe('useCommunity Hooks', () => {
     });
 
     it('should not search when query is too short', () => {
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
 
       renderHook(() => useCommunitySearch('ab'), { wrapper });
 
@@ -472,7 +472,7 @@ describe('useCommunity Hooks', () => {
         { tag: 'policy', count: 89 }
       ];
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getPopularTags as any).mockResolvedValue(mockTags);
 
       const { result } = renderHook(() => usePopularTags(), { wrapper });
@@ -488,7 +488,7 @@ describe('useCommunity Hooks', () => {
     it('should accept custom limit', async () => {
       const mockTags = [{ tag: 'test', count: 10 }];
 
-      const communityApi = (await import('../services/community-api')).communityApi;
+      const communityApi = (await import('@client/services/community-api')).communityApi;
       (communityApi.getPopularTags as any).mockResolvedValue(mockTags);
 
       const { result } = renderHook(() => usePopularTags(10), { wrapper });

@@ -5,10 +5,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
-import { renderWithProviders, MockDataFactory } from '../../test-utils/comprehensive-test-setup';
-import { performanceTestUtils, CORE_WEB_VITALS_THRESHOLDS } from '../../test-utils/setup-performance';
-import { BillsDashboard } from '../../components/bills/bills-dashboard';
-import { BillDetailView } from '../../components/bill-detail/BillDetailView';
+import { renderWithProviders, MockDataFactory } from '@client/test-utils/comprehensive-test-setup';
+import { performanceTestUtils, CORE_WEB_VITALS_THRESHOLDS } from '@client/test-utils/setup-performance';
+import { BillsDashboard } from '@client/components/bills/bills-dashboard';
+import { BillDetailView } from '@client/components/bill-detail/BillDetailView';
 
 describe('Core Web Vitals Performance Tests', () => {
   beforeEach(() => {
@@ -56,7 +56,7 @@ describe('Core Web Vitals Performance Tests', () => {
       const largeBillsDataset = Array.from({ length: 1000 }, () => MockDataFactory.createMockBill());
       
       // Mock API to return large dataset
-      vi.mocked(require('../../hooks/useBillsAPI').useBillsAPI).mockReturnValue({
+      vi.mocked(require('@client/hooks/useBillsAPI').useBillsAPI).mockReturnValue({
         bills: largeBillsDataset,
         loading: false,
         error: null,
@@ -136,7 +136,7 @@ describe('Core Web Vitals Performance Tests', () => {
   describe('Cumulative Layout Shift (CLS)', () => {
     it('should have minimal layout shifts during loading', async () => {
       // Start with loading state
-      vi.mocked(require('../../hooks/useBillsAPI').useBillsAPI).mockReturnValue({
+      vi.mocked(require('@client/hooks/useBillsAPI').useBillsAPI).mockReturnValue({
         bills: [],
         loading: true,
         error: null,
@@ -150,7 +150,7 @@ describe('Core Web Vitals Performance Tests', () => {
       expect(screen.getByTestId('bills-loading-skeleton')).toBeInTheDocument();
       
       // Simulate data loading
-      vi.mocked(require('../../hooks/useBillsAPI').useBillsAPI).mockReturnValue({
+      vi.mocked(require('@client/hooks/useBillsAPI').useBillsAPI).mockReturnValue({
         bills: Array.from({ length: 10 }, () => MockDataFactory.createMockBill()),
         loading: false,
         error: null,
@@ -178,7 +178,7 @@ describe('Core Web Vitals Performance Tests', () => {
         })
       );
 
-      vi.mocked(require('../../hooks/useBillsAPI').useBillsAPI).mockReturnValue({
+      vi.mocked(require('@client/hooks/useBillsAPI').useBillsAPI).mockReturnValue({
         bills: billsWithImages,
         loading: false,
         error: null,
@@ -319,7 +319,7 @@ describe('Core Web Vitals Performance Tests', () => {
       // Create large dataset
       const largeBillsDataset = Array.from({ length: 5000 }, () => MockDataFactory.createMockBill());
       
-      vi.mocked(require('../../hooks/useBillsAPI').useBillsAPI).mockReturnValue({
+      vi.mocked(require('@client/hooks/useBillsAPI').useBillsAPI).mockReturnValue({
         bills: largeBillsDataset,
         loading: false,
         error: null,

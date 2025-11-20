@@ -14,9 +14,9 @@
  * - Decorators for simplified service registration
  */
 
-import { ApiService } from './types';
+import { ApiService } from '@client/types';
 import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Type Definitions
@@ -694,9 +694,9 @@ export const globalServiceLocator = ServiceLocator.getInstance();
 // Register core services - using dynamic imports to avoid circular dependencies
 const registerCoreServices = async () => {
   try {
-    const { StateManagementService } = await import('../../services/stateManagementService');
-    const { BillTrackingService } = await import('../../services/billTrackingService');
-    const { WebSocketService } = await import('../../services/webSocketService');
+    const { StateManagementService } = await import('@client/services/stateManagementService');
+    const { BillTrackingService } = await import('@client/services/billTrackingService');
+    const { WebSocketService } = await import('@client/services/webSocketService');
 
     // Register services with the global locator
     globalServiceLocator.registerService('stateManagementService', StateManagementService);

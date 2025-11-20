@@ -4,11 +4,11 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { LoadingStage, LoadingState } from '../types';
+import { LoadingStage, LoadingState } from '@client/types';
 import { LoadingError, LoadingStageError } from '../errors';
 import { validateLoadingStage } from '../validation';
-import { calculateStageProgress, ProgressTracker } from '../utils/progress-utils';
-import { createTimeoutManager } from '../utils/timeout-utils';
+import { calculateStageProgress, ProgressTracker } from '@client/utils/progress-utils';
+import { createTimeoutManager } from '@client/utils/timeout-utils';
 
 export interface UseProgressiveLoadingOptions {
   stages: LoadingStage[];

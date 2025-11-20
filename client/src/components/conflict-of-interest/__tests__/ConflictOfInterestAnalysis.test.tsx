@@ -7,8 +7,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConflictOfInterestAnalysis } from '../ConflictOfInterestAnalysis';
-import { Bill } from '../../../store/slices/billsSlice';
+import { Bill, BillStatus, UrgencyLevel, ComplexityLevel } from '@client/core/api/types';
 
 // Mock the recharts components to avoid canvas issues in tests
 vi.mock('recharts', () => ({
@@ -89,8 +90,8 @@ const mockBill: Bill = {
   billNumber: 'HB-2024-001',
   title: 'Test Healthcare Bill',
   summary: 'A test bill for healthcare reform',
-  status: 'committee',
-  urgencyLevel: 'medium',
+  status: BillStatus.COMMITTEE,
+  urgencyLevel: UrgencyLevel.MEDIUM,
   introducedDate: '2024-01-15',
   lastUpdated: '2024-01-20',
   sponsors: [
@@ -98,7 +99,8 @@ const mockBill: Bill = {
       id: 1,
       name: 'Rep. Jane Smith',
       party: 'D',
-      role: 'primary'
+      position: 'Representative',
+      isPrimary: true
     }
   ],
   constitutionalFlags: [],
@@ -107,37 +109,47 @@ const mockBill: Bill = {
   commentCount: 15,
   shareCount: 5,
   policyAreas: ['Healthcare'],
-  complexity: 'medium',
-  readingTime: 10,
-  category: 'Healthcare',
-  conflict_level: 'medium',
-  sponsor_count: 1
+  complexity: ComplexityLevel.MEDIUM,
+  readingTime: 10
 };
+
+const createTestQueryClient = () => new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+    mutations: { retry: false },
+  },
+});
+
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={createTestQueryClient()}>
+    {children}
+  </QueryClientProvider>
+);
 
 describe('ConflictOfInterestAnalysis', () => {
   it('renders without crashing', () => {
-    render(<ConflictOfInterestAnalysis bill={mockBill} />);
-    
+    render(<ConflictOfInterestAnalysis bill={mockBill} />, { wrapper: TestWrapper });
+
     expect(screen.getByText('Conflict of Interest Analysis')).toBeInTheDocument();
   });
 
   it('displays the sponsor name', () => {
-    render(<ConflictOfInterestAnalysis bill={mockBill} />);
-    
+    render(<ConflictOfInterestAnalysis bill={mockBill} />, { wrapper: TestWrapper });
+
     expect(screen.getByText(/Rep\. Jane Smith/)).toBeInTheDocument();
   });
 
   it('shows risk assessment information', () => {
-    render(<ConflictOfInterestAnalysis bill={mockBill} />);
-    
+    render(<ConflictOfInterestAnalysis bill={mockBill} />, { wrapper: TestWrapper });
+
     expect(screen.getByText('Overall Risk Level')).toBeInTheDocument();
     expect(screen.getByText('Financial Exposure')).toBeInTheDocument();
     expect(screen.getByText('Transparency Score')).toBeInTheDocument();
   });
 
   it('displays navigation tabs', () => {
-    render(<ConflictOfInterestAnalysis bill={mockBill} />);
-    
+    render(<ConflictOfInterestAnalysis bill={mockBill} />, { wrapper: TestWrapper });
+
     expect(screen.getByText('Overview')).toBeInTheDocument();
     expect(screen.getByText('Network')).toBeInTheDocument();
     expect(screen.getByText('Financial')).toBeInTheDocument();
@@ -147,22 +159,22 @@ describe('ConflictOfInterestAnalysis', () => {
   });
 
   it('shows export and share buttons', () => {
-    render(<ConflictOfInterestAnalysis bill={mockBill} />);
-    
+    render(<ConflictOfInterestAnalysis bill={mockBill} />, { wrapper: TestWrapper });
+
     expect(screen.getByText('Export')).toBeInTheDocument();
     expect(screen.getByText('Share')).toBeInTheDocument();
   });
 
   it('displays analysis summary', () => {
-    render(<ConflictOfInterestAnalysis bill={mockBill} />);
-    
+    render(<ConflictOfInterestAnalysis bill={mockBill} />, { wrapper: TestWrapper });
+
     expect(screen.getByText('Analysis Summary')).toBeInTheDocument();
     expect(screen.getByText('Key Findings')).toBeInTheDocument();
   });
 
   it('shows quick navigation buttons', () => {
-    render(<ConflictOfInterestAnalysis bill={mockBill} />);
-    
+    render(<ConflictOfInterestAnalysis bill={mockBill} />, { wrapper: TestWrapper });
+
     expect(screen.getByText('View Network Visualization')).toBeInTheDocument();
     expect(screen.getByText('Analyze Financial Exposure')).toBeInTheDocument();
     expect(screen.getByText('Review Transparency Score')).toBeInTheDocument();

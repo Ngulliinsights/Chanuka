@@ -7,7 +7,7 @@
 
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { UnifiedWebSocketManager } from '../../core/api/websocket';
+import { UnifiedWebSocketManager } from '@client/core/api/websocket';
 
 // Mock the UnifiedWebSocketManager
 vi.mock('../../core/api/websocket', () => ({

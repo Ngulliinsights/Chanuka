@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { useJourneyTracker, useJourneyAnalytics } from '../use-journey-tracker';
-import { createNavigationProvider } from '../../core/navigation/context';
-import { UserJourneyTracker } from '../../services/UserJourneyTracker';
+import { createNavigationProvider } from '@client/core/navigation/context';
+import { UserJourneyTracker } from '@client/services/UserJourneyTracker';
 import React from 'react';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Mock the UserJourneyTracker
 vi.mock('@/services/UserJourneyTracker');

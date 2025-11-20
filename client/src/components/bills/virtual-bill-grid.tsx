@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback } from 'react';
-import { FixedSizeGrid } from 'react-window';
+import { Grid as FixedSizeGrid } from 'react-virtualized';
 import { BillCard } from './bill-card';
-import { Bill } from '../../store/slices/billsSlice';
-import { cn } from '../../lib/utils';
+import { Bill } from '@/core/api/types';
+import { cn } from '@client/lib/utils';
 
 interface VirtualBillGridProps {
   bills: Bill[];
@@ -12,6 +12,20 @@ interface VirtualBillGridProps {
   savedBills?: Set<number>;
   className?: string;
   height?: number;
+}
+
+interface GridItemProps {
+  columnIndex: number;
+  rowIndex: number;
+  style: React.CSSProperties;
+  data: {
+    bills: Bill[];
+    columnsPerRow: number;
+    onSave?: (billId: number) => void;
+    onShare?: (billId: number) => void;
+    onComment?: (billId: number) => void;
+    savedBills?: Set<number>;
+  };
 }
 
 interface GridItemProps {
@@ -66,31 +80,6 @@ export function VirtualBillGrid({
     return 1; // Mobile: 1 column
   }, []);
 
-  // Calculate grid dimensions
-  const gridData = useMemo(() => {
-    const containerWidth = typeof window !== 'undefined' ? window.innerWidth - 64 : 1200; // Account for padding
-    const columnsPerRow = getColumnsPerRow(containerWidth);
-    const rowCount = Math.ceil(bills.length / columnsPerRow);
-    const columnWidth = Math.floor(containerWidth / columnsPerRow);
-    const rowHeight = 320; // Fixed height for bill cards
-
-    return {
-      columnsPerRow,
-      rowCount,
-      columnWidth,
-      rowHeight,
-      containerWidth,
-    };
-  }, [bills.length, getColumnsPerRow]);
-
-  const itemData = useMemo(() => ({
-    bills,
-    columnsPerRow: gridData.columnsPerRow,
-    onSave,
-    onShare,
-    onComment,
-    savedBills,
-  }), [bills, gridData.columnsPerRow, onSave, onShare, onComment, savedBills]);
 
   // Handle window resize for responsive columns
   const [windowWidth, setWindowWidth] = React.useState(
@@ -147,18 +136,24 @@ export function VirtualBillGrid({
 
   return (
     <div className={cn("w-full", className)}>
-      <Grid
+      <FixedSizeGrid
+        cellRenderer={({ columnIndex, rowIndex, key, style }) => (
+          <GridItem
+            key={key}
+            columnIndex={columnIndex}
+            rowIndex={rowIndex}
+            style={style}
+            data={responsiveItemData}
+          />
+        )}
         columnCount={responsiveGridData.columnsPerRow}
         columnWidth={responsiveGridData.columnWidth}
         height={height}
         rowCount={responsiveGridData.rowCount}
         rowHeight={responsiveGridData.rowHeight}
-        itemData={responsiveItemData}
         width={responsiveGridData.containerWidth}
         className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
-      >
-        {GridItem}
-      </Grid>
+      />
     </div>
   );
 }

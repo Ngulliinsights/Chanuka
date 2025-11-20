@@ -5,7 +5,7 @@
 
 import { Router } from 'express';
 import { cacheMiddleware, createCacheMiddleware } from '../middleware/cache-middleware';
-import { cachedBillService } from '../features/bills/application/bill-service';
+import { cachedBillService } from '@client/features/bills/application/bill-service';
 
 const router = Router();
 

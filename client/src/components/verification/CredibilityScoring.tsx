@@ -9,7 +9,7 @@ import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { Star, Info, TrendingUp, Users, Award } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@client/lib/utils';
 
 interface CredibilityIndicatorProps {
   score: number;

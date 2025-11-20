@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import {
-import { logger } from '../../utils/logger';
+import { logger } from '@client/utils/logger';
   fetchWithFallback,
   ApiService,
   FallbackDataManager,

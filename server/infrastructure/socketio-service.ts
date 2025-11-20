@@ -10,7 +10,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { Server } from 'http';
 import * as jwt from 'jsonwebtoken';
 import Redis from 'ioredis';
-import { database as db } from '../../shared/database/connection.js';
+import { database as db } from '@shared/database/connection.js';
 import { User, users } from '@shared/schema/foundation';
 import { eq } from 'drizzle-orm';
 import { logger } from '@shared/core/observability/logging';

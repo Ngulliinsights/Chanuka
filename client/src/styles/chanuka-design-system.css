@@ -1,34 +1,34 @@
-/* Chanuka Design System - CSS Custom Properties */
+o/* Chanuka Design System - CSS Custom Properties */
 
 :root {
-  /* Base colors */
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
+  /* Use unified design tokens - these map to the new system */
+  --background: var(--color-background);
+  --foreground: var(--color-foreground);
 
   /* Card components */
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
+  --card: var(--color-background);
+  --card-foreground: var(--color-foreground);
+  --popover: var(--color-background);
+  --popover-foreground: var(--color-foreground);
 
   /* Brand colors */
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222.2 84% 4.9%;
+  --primary: var(--color-primary);
+  --primary-foreground: var(--color-primary-foreground);
+  --secondary: var(--color-secondary);
+  --secondary-foreground: var(--color-secondary-foreground);
 
   /* Utility colors */
-  --muted: 210 40% 96%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222.2 84% 4.9%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
+  --muted: var(--color-muted);
+  --muted-foreground: var(--color-muted-foreground);
+  --accent: var(--color-accent);
+  --accent-foreground: var(--color-accent-foreground);
+  --destructive: var(--color-error);
+  --destructive-foreground: var(--color-primary-foreground);
 
   /* Form elements */
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 221.2 83.2% 53.3%;
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--color-accent);
 
   /* Chanuka-specific civic engagement colors */
   --civic-urgent: 0 84% 60%;
@@ -37,6 +37,16 @@
   --civic-community: 142 76% 36%;
   --civic-transparency: 262 83% 58%;
 
+  /* Legislative content type colors */
+  --content-bill: 210 40% 50%;
+  --content-amendment: 45 93% 47%;
+  --content-resolution: 142 76% 36%;
+  --content-motion: 262 83% 58%;
+  --content-petition: 0 84% 60%;
+  --content-report: 197 37% 24%;
+  --content-hearing: 43 74% 66%;
+  --content-vote: 27 87% 67%;
+
   /* Status colors for bills */
   --status-introduced: 210 40% 50%;
   --status-committee: 45 93% 47%;
@@ -44,6 +54,16 @@
   --status-failed: 0 84% 60%;
   --status-signed: 142 76% 36%;
   --status-vetoed: 0 84% 60%;
+  --status-draft: 217 32.6% 17.5%;
+  --status-filed: 210 40% 60%;
+  --status-referred: 45 93% 57%;
+  --status-reported: 142 76% 46%;
+  --status-engrossed: 262 83% 68%;
+  --status-enrolled: 0 84% 70%;
+  --status-presented: 197 37% 34%;
+  --status-conference: 43 74% 76%;
+  --status-withdrawn: 0 62.8% 30.6%;
+  --status-table: 27 87% 77%;
 
   /* Chart colors */
   --chart-1: 12 76% 61%;
@@ -124,6 +144,16 @@
   --civic-community: 142 76% 46%;
   --civic-transparency: 262 83% 68%;
 
+  /* Dark mode legislative content type colors */
+  --content-bill: 210 40% 60%;
+  --content-amendment: 45 93% 57%;
+  --content-resolution: 142 76% 46%;
+  --content-motion: 262 83% 68%;
+  --content-petition: 0 84% 70%;
+  --content-report: 197 37% 34%;
+  --content-hearing: 43 74% 76%;
+  --content-vote: 27 87% 77%;
+
   /* Dark mode status colors */
   --status-introduced: 210 40% 60%;
   --status-committee: 45 93% 57%;
@@ -131,6 +161,16 @@
   --status-failed: 0 84% 70%;
   --status-signed: 142 76% 46%;
   --status-vetoed: 0 84% 70%;
+  --status-draft: 217 32.6% 27.5%;
+  --status-filed: 210 40% 70%;
+  --status-referred: 45 93% 67%;
+  --status-reported: 142 76% 56%;
+  --status-engrossed: 262 83% 78%;
+  --status-enrolled: 0 84% 80%;
+  --status-presented: 197 37% 44%;
+  --status-conference: 43 74% 86%;
+  --status-withdrawn: 0 62.8% 40.6%;
+  --status-table: 27 87% 87%;
 }
 
 /* Accessibility improvements */
@@ -578,6 +618,33 @@
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+/* Radix Collapsible Animations */
+@keyframes collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes collapsible-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+  }
+}
+
+.animate-collapsible-up {
+  animation: collapsible-up 0.2s ease-out;
+}
+
+.animate-collapsible-down {
+  animation: collapsible-down 0.2s ease-out;
 }
 
 /* Reduced motion support */
