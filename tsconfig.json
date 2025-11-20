@@ -33,7 +33,7 @@
       "@/*": ["./*"],
       "@shared/*": ["shared/*"],
       "@server/*": ["server/*"],
-      "@client/*": ["client/*"]
+      "@client/*": ["client/src/*"]
     },
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,

@@ -6,27 +6,17 @@
  */
 
 import { useEffect, useCallback, useState, useRef } from 'react';
-import { useAppSelector, useAppDispatch } from '@client/store/hooks';
-import { 
-  selectDiscussionState, 
-  selectThread, 
-  selectComment, 
-  selectThreadComments,
-  loadDiscussionData,
-  addCommentAsync,
-  voteCommentAsync,
-  reportCommentAsync,
-  setLoading,
-  setError
-} from '../store/slices/discussionSlice';
+import { useDiscussionSelectors } from '../../../store/slices/discussionSlice';
 import { discussionService } from '@client/services/discussion-service';
 import { 
+  Comment,
+  DiscussionThread,
   CommentFormData, 
   ModerationViolationType,
   CommentUpdateEvent,
   ModerationEvent,
   TypingIndicator
-} from '../types/discussion';
+} from '../../../types/discussion';
 
 interface UseDiscussionOptions {
   billId: number;
@@ -36,8 +26,8 @@ interface UseDiscussionOptions {
 
 interface UseDiscussionReturn {
   // Data
-  thread: ReturnType<typeof useDiscussionSelectors>['getThread'];
-  comments: ReturnType<typeof useDiscussionSelectors>['getThreadComments'];
+  thread: DiscussionThread | null;
+  comments: Comment[];
   typingIndicators: TypingIndicator[];
   
   // State

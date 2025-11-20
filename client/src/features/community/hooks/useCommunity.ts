@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { communityApi } from '@client/services/community-api';
+import { communityApi } from '../services/community-api';
 import { useToast } from '@/hooks/use-toast';
 import type {
   Comment,
@@ -9,7 +9,8 @@ import type {
   CreateThreadRequest,
   UpdateCommentRequest,
   VoteRequest,
-  ShareRequest
+  ShareRequest,
+  SocialShare
 } from '../types';
 
 /**
@@ -23,7 +24,7 @@ export function useComments(bill_id?: string, filters?: CommunityFilters) { cons
     staleTime: 2 * 60 * 1000, // 2 minutes
    });
 
-  const createComment = useMutation({
+  const createComment = useMutation<Comment, Error, CreateCommentRequest>({
     mutationFn: (request: CreateCommentRequest) => communityApi.createComment(request),
     onSuccess: (newComment) => {
       queryClient.invalidateQueries({
@@ -42,7 +43,7 @@ export function useComments(bill_id?: string, filters?: CommunityFilters) { cons
     },
   });
 
-  const updateComment = useMutation({
+  const updateComment = useMutation<Comment, Error, { comment_id: string; request: UpdateCommentRequest }>({
     mutationFn: ({ comment_id, request }: { comment_id: string; request: UpdateCommentRequest }) =>
       communityApi.updateComment(comment_id, request),
     onSuccess: (updatedComment) => {
@@ -72,7 +73,7 @@ export function useComments(bill_id?: string, filters?: CommunityFilters) { cons
     },
   });
 
-  const voteOnComment = useMutation({
+  const voteOnComment = useMutation<Comment, Error, VoteRequest>({
     mutationFn: (request: VoteRequest) => communityApi.voteOnComment(request),
     onSuccess: (updatedComment) => {
       queryClient.invalidateQueries({
@@ -175,7 +176,7 @@ export function useThread(threadId: string | undefined) {
 export function useSocialSharing() {
   const { toast } = useToast();
 
-  const shareContent = useMutation({
+  const shareContent = useMutation<SocialShare, Error, ShareRequest>({
     mutationFn: (request: ShareRequest) => communityApi.shareContent(request),
     onSuccess: (share) => {
       toast({
@@ -320,15 +321,15 @@ export function usePopularTags(limit = 20) {
 /**
  * Hook for real-time community updates (would integrate with WebSocket)
  */
-export function useRealtimeCommunity(threadId?: string) {
+export function useRealtimeCommunity(_threadId?: string) {
   // This would integrate with WebSocket for real-time updates
   // For now, return a placeholder structure
 
   return {
     isConnected: false,
     connectionStatus: 'disconnected' as const,
-    subscribeToThread: (id: string) => {},
-    subscribeToComments: (bill_id?: string) => {},
+    subscribeToThread: (_id: string) => {},
+    subscribeToComments: (_bill_id?: string) => {},
     unsubscribe: () => {},
   };
 }

@@ -14,20 +14,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { 
-  Megaphone, 
-  PenTool, 
-  Users, 
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import {
+  Megaphone,
+  PenTool,
+  Users,
   Target,
   Calendar,
   MapPin,
-  TrendingUp,
-  ExternalLink,
   CheckCircle,
   Clock,
   Share2,
-  ChevronRight
 } from 'lucide-react';
 import { cn } from '@client/lib/utils';
 import { Campaign, Petition } from '@client/types/community';
