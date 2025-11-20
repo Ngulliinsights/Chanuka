@@ -3,7 +3,7 @@
  * Allows users to configure security preferences
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Switch } from '../ui/switch';
@@ -106,7 +106,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
         setConfig(JSON.parse(savedConfig));
       }
     } catch (error) {
-      logger.error('Failed to load security configuration', error);
+      logger.error('Failed to load security configuration', undefined, error);
     }
   };
 
@@ -140,7 +140,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
-      logger.error('Failed to save security configuration', error);
+      logger.error('Failed to save security configuration', undefined, error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {

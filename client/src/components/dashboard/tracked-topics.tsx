@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { AlertCircle, RefreshCw, CheckCircle, X, Edit, Search, Tag } from 'lucide-react';
-import { useDashboard } from '@client/hooks/useDashboard';
-import { useDashboardTopics } from '@client/hooks/useDashboardTopics';
-import type { DashboardComponentProps, TrackedTopic, TopicCategory } from '@client/types';
+import { useDashboard } from '@/components/dashboard/hooks/useDashboard';
+import { useDashboardTopics } from '@/components/dashboard/hooks/useDashboardTopics';
+import type { DashboardComponentProps, TrackedTopic, TopicCategory } from './types';
 import { validateTrackedTopic } from './validation';
 
 export const TrackedTopics: React.FC<DashboardComponentProps> = ({ 
@@ -209,6 +209,7 @@ export const TrackedTopics: React.FC<DashboardComponentProps> = ({
             </div>
             
             <select
+              aria-label="Filter topics by category"
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value as TopicCategory | 'all')}
               className="text-xs border border-slate-300 rounded px-2 py-1 h-7"
@@ -240,6 +241,7 @@ export const TrackedTopics: React.FC<DashboardComponentProps> = ({
                     onKeyPress={(e) => e.key === 'Enter' && handleAddTopic()}
                   />
                   <select
+                    aria-label="Select category for new topic"
                     value={newTopicCategory}
                     onChange={(e) => setNewTopicCategory(e.target.value as TopicCategory)}
                     className="text-xs border border-slate-300 rounded px-2 py-1 h-7"
