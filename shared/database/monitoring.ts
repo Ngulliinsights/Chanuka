@@ -1,20 +1,12 @@
-import { logger } from '@client/core/src/observability/logging';
-import { monitorPoolHealth, checkPoolHealth } from './pool.js';
+import { monitorPoolHealth } from './pool.js';
+import { logger } from '../core/src/observability/logging';
 
 // Performance monitoring is optional and loaded dynamically
-let performanceMonitoring: any = null;
-const getPerformanceMonitoring = async () => {
-  if (!performanceMonitoring) {
-    try {
-      // Note: Performance monitoring service is not available in shared context
-      // This would be injected from the server layer when needed
-      logger.debug('Performance monitoring not available in shared context');
-    } catch (error) {
-      // Performance monitoring not available, continue without it
-      logger.debug('Performance monitoring service not found');
-    }
-  }
-  return performanceMonitoring;
+const getPerformanceMonitoring = async (): Promise<any> => {
+  // Note: Performance monitoring service is not available in shared context
+  // This would be injected from the server layer when needed
+  logger.debug('Performance monitoring not available in shared context');
+  return null;
 };
 
 /**
@@ -684,13 +676,18 @@ class DatabaseMonitoringService {
 export const databaseMonitor = new DatabaseMonitoringService();
 
 // Export the class for custom instances with different configurations
-export { 
-  DatabaseMonitoringService, 
-  MonitoringConfig, 
-  PoolHealthStatus, 
-  CriticalIssue, 
-  MonitoringMetrics 
+export {
+  DatabaseMonitoringService
 };
+
+export type {
+  MonitoringConfig,
+  PoolHealthStatus,
+  CriticalIssue,
+  MonitoringMetrics
+};
+
+
 
 
 

@@ -137,3 +137,4 @@ export interface IBillService {
     affected_counties?: string[];
   }): Promise<Result<number, Error>>;
 }
+

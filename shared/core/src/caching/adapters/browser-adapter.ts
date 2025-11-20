@@ -5,8 +5,8 @@
  * with automatic fallback and storage quota management
  */
 
-import { BaseCacheAdapter } from '@client/core/base-adapter';
-import { CacheAdapterConfig } from '@client/core/interfaces';
+import { BaseCacheAdapter } from '/core/base-adapter';
+import { CacheAdapterConfig } from '/core/interfaces';
 
 export interface BrowserAdapterConfig extends CacheAdapterConfig {
   storageType?: 'localStorage' | 'sessionStorage' | 'indexedDB';
@@ -675,3 +675,5 @@ export class BrowserAdapter extends BaseCacheAdapter {
     this.updateMetrics('delete');
   }
 }
+
+

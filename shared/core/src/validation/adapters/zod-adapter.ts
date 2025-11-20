@@ -18,7 +18,7 @@ import {
   IValidationMetrics,
   ValidationErrorDetail,
 } from '../core/interfaces';
-import { CoreValidationService } from '@client/core/validation-service';
+import { CoreValidationService } from '/core/validation-service';
 
 /**
  * Zod schema adapter implementing the ISchemaAdapter interface
@@ -284,6 +284,8 @@ export const zodValidationService = new ZodValidationService();
 export function createZodValidationService(config: IValidationServiceConfig): ZodValidationService {
   return new ZodValidationService(config);
 }
+
+
 
 
 

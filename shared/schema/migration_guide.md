@@ -249,3 +249,4 @@ If you encounter issues:
 4. Consider running migrations in smaller batches for large datasets
 
 This migration represents a major architectural upgrade that transforms the platform from a basic bill tracker to a comprehensive civic engagement platform. Take time to test thoroughly and plan for user communication about new features.
+

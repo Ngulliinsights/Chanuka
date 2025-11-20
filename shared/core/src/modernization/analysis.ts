@@ -8,8 +8,8 @@ type LoggerLike = {
   debug?: (meta: unknown, message?: string) => void;
 };
 
-import type { AnalysisResult, Finding, Recommendation } from '@client/types';
-import { AnalysisType, FindingType, FindingSeverity, RecommendedAction, TaskPriority, AnalysisError } from '@client/types';
+import type { AnalysisResult, Finding, Recommendation } from '/types';
+import { AnalysisType, FindingType, FindingSeverity, RecommendedAction, TaskPriority, AnalysisError } from '/types';
 
 export interface AnalysisEngineOptions {
   config: {
@@ -757,6 +757,8 @@ export class AnalysisEngine extends EventEmitter {
     return [];
   }
 }
+
+
 
 
 

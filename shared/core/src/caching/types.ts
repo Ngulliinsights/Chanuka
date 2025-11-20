@@ -5,7 +5,7 @@
  * Based on consolidation of existing implementations and refined_cross_cutting.ts patterns
  */
 
-import type { CacheMetrics, CacheHealthStatus } from '@client/core/interfaces';
+import type { CacheMetrics, CacheHealthStatus } from '/core/interfaces';
 
 // Core cache service interface
 export interface CacheService {
@@ -197,6 +197,8 @@ export interface CacheStatsAggregation {
     errorRate: number;
   };
 }
+
+
 
 
 

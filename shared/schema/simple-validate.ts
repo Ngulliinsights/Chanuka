@@ -97,3 +97,4 @@ try {
   console.error("❌ Schema validation failed:", error);
   process.exit(1);
 }
+

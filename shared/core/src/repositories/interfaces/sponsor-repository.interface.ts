@@ -146,3 +146,4 @@ export interface ISponsorRepository {
     is_active?: boolean;
   }): Promise<Result<number, Error>>;
 }
+

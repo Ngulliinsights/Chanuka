@@ -3,7 +3,7 @@
  * Adapts the existing TokenBucketStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '@client/core/interfaces';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '/core/interfaces';
 import { TokenBucketStore } from '../algorithms/token-bucket';
 
 export class TokenBucketAdapter implements RateLimitStore {
@@ -69,6 +69,8 @@ export function createTokenBucketAdapter(redis: any): TokenBucketAdapter {
   const store = new TokenBucketStore(redis);
   return new TokenBucketAdapter(store);
 }
+
+
 
 
 

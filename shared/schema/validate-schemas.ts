@@ -66,3 +66,4 @@ console.log(`✅ Total tables across all domains: ${totalTables}`);
 console.log("🎉 Schema validation completed successfully!");
 
 export { schemas };
+

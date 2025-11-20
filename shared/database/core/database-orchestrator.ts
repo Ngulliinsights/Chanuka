@@ -471,3 +471,4 @@ export async function shutdownDatabaseOrchestrator(): Promise<void> {
   const orchestrator = DatabaseOrchestrator.getInstance();
   await orchestrator.shutdown();
 }
+

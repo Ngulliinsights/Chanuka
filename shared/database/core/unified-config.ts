@@ -509,3 +509,4 @@ export function createTestDatabaseConfig(): DatabaseConfig {
   const configManager = new DatabaseConfigManager();
   return configManager['createDefaultConfig']();
 }
+

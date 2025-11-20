@@ -3,8 +3,6 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
 import { GitBranch, CheckCircle, Clock, FileText, AlertTriangle } from 'lucide-react';
-import { cn, formatRelativeTime } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
 
 interface Migration {
   name: string;
@@ -64,7 +62,6 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
   }
 
   const pendingMigrations = migrations.filter(m => m.status === 'pending' || m.status === 'ready');
-  const appliedMigrations = migrations.filter(m => m.status === 'applied');
 
   return (
     <Card>
@@ -104,8 +101,8 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
                     )}
                   </div>
                   <p className="text-sm text-gray-600 mt-1">
-                    {migration.appliedAt 
-                      ? `Applied ${formatRelativeTime(migration.appliedAt)}`
+                    {migration.appliedAt
+                      ? `Applied at ${migration.appliedAt}`
                       : migration.status === 'pending'
                         ? 'Pending - Conflicts detected'
                         : 'Ready to apply'

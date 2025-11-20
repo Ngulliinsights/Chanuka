@@ -686,3 +686,5 @@ export function setServerSyncEnabled(enabled: boolean, logger: BrowserLogger = b
 if (typeof window !== 'undefined') {
   setupGlobalErrorHandling();
 }
+
+

@@ -9,7 +9,7 @@ import type {
   RetentionPolicy,
   VerificationConfig,
 } from './types';
-import { BackupStrategy, BackupStatus, BackupError, BackupScope } from '@client/types';
+import { BackupStrategy, BackupStatus, BackupError, BackupScope } from '/types';
 
 // Lightweight logger interface used by the BackupManager. Keep intentionally small to reduce runtime
 // coupling on a specific logging implementation.
@@ -607,6 +607,8 @@ export class BackupManager extends EventEmitter {
     this.logger.info({ backupId: backup.id }, 'Restoring from snapshot backup');
   }
 }
+
+
 
 
 

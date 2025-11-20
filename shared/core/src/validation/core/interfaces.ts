@@ -316,3 +316,5 @@ export type ICachingConfig = ValidationServiceConfig['cache'];  // Changed to po
 
 // Type alias for backward compatibility - ValidationError now points to ValidationErrorDetail
 export type ValidationError = ValidationErrorDetail;
+
+

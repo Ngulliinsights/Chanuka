@@ -192,3 +192,4 @@ export const QueryType = {
 } as const;
 
 export type QueryType = typeof QueryType[keyof typeof QueryType];
+

@@ -1,4 +1,4 @@
-import { MiddlewareProvider } from '@client/types';
+import { MiddlewareProvider } from '/types';
 import { Request, Response, NextFunction } from 'express';
 import { createErrorMiddleware } from '../../observability/error-management/middleware/express-error-middleware.js';
 
@@ -18,6 +18,8 @@ export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
     });
   }
 }
+
+
 
 
 

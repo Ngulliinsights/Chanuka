@@ -448,3 +448,5 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
     }, timeout / 2); // Clean up every half timeout period
   }
 }
+
+

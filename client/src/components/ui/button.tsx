@@ -5,10 +5,25 @@ import { Loader2, AlertCircle, CheckCircle } from "lucide-react"
 
 import { cn } from '@client/lib/utils'
 import { logger } from '@client/utils/logger';
-import { EnhancedButtonProps, ButtonState } from '@client/types';
 import { ButtonStateSchema, ButtonVariantSchema, ButtonSizeSchema } from './validation';
 import { UIComponentError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
+
+// Define types locally
+type ButtonState = {
+  loading?: boolean;
+  error?: boolean;
+  success?: boolean;
+};
+
+export interface EnhancedButtonProps
+  extends ButtonProps {
+  state?: ButtonState;
+  loadingText?: string;
+  errorText?: string;
+  successText?: string;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
+}
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -85,7 +100,7 @@ const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
 
     const handleValidationError = useCallback(async (error: UIComponentError) => {
       try {
-        const recoveryResult = await attemptUIRecovery(error);
+        const recoveryResult = await attemptUIRecovery('enhanced-button', error, retryCount);
 
         if (recoveryResult.success) {
           setRetryCount(0);
@@ -93,10 +108,10 @@ const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
         } else {
           setRetryCount(prev => prev + 1);
           const suggestions = getUIRecoverySuggestions(error);
-          logger.warn('Button recovery failed, suggestions:', suggestions);
+          logger.warn('Button recovery failed', { suggestions });
         }
       } catch (recoveryError) {
-        logger.error('Button recovery error:', recoveryError);
+        logger.error('Button recovery error', undefined, recoveryError);
       }
     }, [retryCount]);
 
@@ -138,8 +153,8 @@ const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
         }
 
       } catch (error) {
-        logger.error('Button click error:', error);
-        
+        logger.error('Button click error', undefined, error);
+
         if (!state) {
           setInternalState({ error: true });
           setTimeout(() => setInternalState({}), 3000);

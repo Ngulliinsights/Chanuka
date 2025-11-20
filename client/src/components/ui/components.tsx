@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
+import { Tabs } from './tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { Progress } from './progress';
@@ -60,7 +60,7 @@ export const EnhancedTabs: React.FC<EnhancedTabsProps> = ({
         });
       }
     } catch (error) {
-      logger.error('Tab change error:', error);
+      logger.error('Tab change error:', {}, error);
       const componentError = new UIComponentError('enhanced-tabs', 'change', error instanceof Error ? error.message : 'Tab change failed');
       
       try {
@@ -69,7 +69,7 @@ export const EnhancedTabs: React.FC<EnhancedTabsProps> = ({
           setRetryCount(prev => prev + 1);
         }
       } catch (recoveryError) {
-        logger.error('Tab recovery error:', recoveryError);
+        logger.error('Tab recovery error:', {}, recoveryError);
       }
     }
   }, [activeTab, tabStartTime, previousTab, trackAnalytics, onTabChange, onValueChange, retryCount]);
@@ -91,10 +91,6 @@ interface EnhancedTooltipProps {
   content: React.ReactNode;
   side?: 'top' | 'right' | 'bottom' | 'left';
   align?: 'start' | 'center' | 'end';
-  delayDuration?: number;
-  trackInteractions?: boolean;
-  onShow?: () => void;
-  onHide?: () => void;
 }
 
 export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
@@ -102,44 +98,12 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
   content,
   side = 'top',
   align = 'center',
-  delayDuration = 200,
-  trackInteractions = false,
-  onShow,
-  onHide,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const showTimeRef = useRef<number>(0);
 
-  const handleOpenChange = useCallback((open: boolean) => {
-    setIsOpen(open);
-    
-    if (open) {
-      showTimeRef.current = Date.now();
-      onShow?.();
-      
-      if (trackInteractions) {
-        logger.info('Tooltip shown', { 
-          component: 'EnhancedTooltip',
-          timestamp: new Date().toISOString()
-        });
-      }
-    } else {
-      const viewDuration = Date.now() - showTimeRef.current;
-      onHide?.();
-      
-      if (trackInteractions && viewDuration > 100) { // Only track if viewed for more than 100ms
-        logger.info('Tooltip hidden', { 
-          component: 'EnhancedTooltip',
-          viewDuration,
-          timestamp: new Date().toISOString()
-        });
-      }
-    }
-  }, [onShow, onHide, trackInteractions]);
 
   return (
-    <TooltipProvider delayDuration={delayDuration}>
-      <Tooltip open={isOpen} onOpenChange={handleOpenChange}>
+    <TooltipProvider>
+      <Tooltip>
         <TooltipTrigger asChild>
           {children}
         </TooltipTrigger>
@@ -158,7 +122,6 @@ interface EnhancedAvatarProps {
   fallback?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
-  onLoadError?: (error: Event) => void;
   showLoadingState?: boolean;
   status?: 'online' | 'offline' | 'away' | 'busy';
 }
@@ -169,12 +132,11 @@ export const EnhancedAvatar: React.FC<EnhancedAvatarProps> = ({
   fallback,
   size = 'md',
   className,
-  onLoadError,
   showLoadingState = true,
   status,
 }) => {
-  const [isLoading, setIsLoading] = useState(!!src);
-  const [hasError, setHasError] = useState(false);
+  const [isLoading] = useState(!!src);
+  const [hasError] = useState(false);
 
   const sizeClasses = {
     sm: 'h-8 w-8',
@@ -190,22 +152,7 @@ export const EnhancedAvatar: React.FC<EnhancedAvatarProps> = ({
     busy: 'bg-red-500',
   };
 
-  const handleImageLoad = useCallback(() => {
-    setIsLoading(false);
-    setHasError(false);
-  }, []);
 
-  const handleImageError = useCallback((error: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    setIsLoading(false);
-    setHasError(true);
-    onLoadError?.(error.nativeEvent);
-    
-    logger.warn('Avatar image failed to load', {
-      component: 'EnhancedAvatar',
-      src,
-      alt
-    });
-  }, [onLoadError, src, alt]);
 
   return (
     <div className={cn('relative', className)}>
@@ -214,8 +161,6 @@ export const EnhancedAvatar: React.FC<EnhancedAvatarProps> = ({
           <AvatarImage
             src={src}
             alt={alt}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
           />
         )}
         <AvatarFallback className={isLoading ? 'bg-muted' : ''}>

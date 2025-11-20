@@ -4,10 +4,9 @@
  * Routes between legacy and new concurrency implementations based on feature flags
  */
 
-import type { FeatureFlagsService } from '@client/types/feature-flags.js';
 import { ConcurrencyAdapter, Mutex as NewMutex, Semaphore as NewSemaphore } from './concurrency-adapter.js';
-import { 
-  Mutex as LegacyMutex, 
+import {
+  Mutex as LegacyMutex,
   Semaphore as LegacySemaphore,
   globalMutex as legacyGlobalMutex,
   apiMutex as legacyApiMutex,
@@ -15,6 +14,7 @@ import {
   apiSemaphore as legacyApiSemaphore,
   fileSemaphore as legacyFileSemaphore
 } from './race-condition-prevention.js';
+import type { FeatureFlagsService } from '../types/feature-flags.js';
 
 export interface MigrationMetrics {
   startTime: number;
@@ -26,7 +26,7 @@ export interface MigrationMetrics {
 }
 
 export class ConcurrencyMigrationRouter {
-  private featureFlagsService?: FeatureFlagsService;
+  private featureFlagsService?: FeatureFlagsService | undefined;
   private metrics: MigrationMetrics[] = [];
   
   // New implementations
@@ -270,3 +270,4 @@ export function getConcurrencyRouter(featureFlagsService?: FeatureFlagsService):
 export function setConcurrencyRouter(router: ConcurrencyMigrationRouter): void {
   globalRouter = router;
 }
+

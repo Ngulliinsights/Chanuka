@@ -1,7 +1,7 @@
 // Cache migration validation utilities
 // Validates behavior equivalence between legacy and modern cache implementations
 
-import { CacheService } from '@client/types';
+import { CacheService } from '/types';
 import { logger } from '../observability/logging';
 
 export interface CacheValidationResult {
@@ -417,3 +417,5 @@ export function createCacheMigrationValidator(
 ): CacheMigrationValidator {
   return new CacheMigrationValidator(legacyCache, modernCache);
 }
+
+

@@ -3,7 +3,7 @@
  * Adapts the existing MemoryRateLimitStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '@client/core/interfaces';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '/core/interfaces';
 import { MemoryRateLimitStore } from '../stores/memory-store';
 
 export class MemoryAdapter implements RateLimitStore {
@@ -47,6 +47,8 @@ export function createMemoryAdapter(): MemoryAdapter {
   const store = new MemoryRateLimitStore();
   return new MemoryAdapter(store);
 }
+
+
 
 
 

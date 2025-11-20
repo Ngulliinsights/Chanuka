@@ -5,7 +5,7 @@
  * Based on patterns from optimized_health_system.md
  */
 
-import { HealthCheck, HealthResult, HealthStatus } from '@client/types';
+import { HealthCheck, HealthResult, HealthStatus } from '/types';
 import { logger } from '../../observability/logging';
 
 export interface DatabaseHealthConfig {
@@ -173,6 +173,8 @@ export function createDatabaseHealthCheck(
   
   return new DatabaseHealthCheck(db, config);
 }
+
+
 
 
 

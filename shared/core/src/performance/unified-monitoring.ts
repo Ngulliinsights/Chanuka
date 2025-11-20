@@ -627,3 +627,5 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
 
 // Export singleton instance
 export const unifiedPerformanceMonitor = new UnifiedPerformanceMonitoringService();
+
+

@@ -1,5 +1,5 @@
 import { Result, ok, err } from '../../primitives/types/result';
-import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions, RateLimitResult } from '@client/types';
+import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions, RateLimitResult } from '/types';
 
 export class MemoryRateLimitStore implements IRateLimitStore, RateLimitStore {
   private data = new Map<string, RateLimitData>();
@@ -198,4 +198,6 @@ export class MemoryRateLimitStore implements IRateLimitStore, RateLimitStore {
     this.locks.clear();
   }
 }
+
+
 

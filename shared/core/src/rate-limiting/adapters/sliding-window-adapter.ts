@@ -3,7 +3,7 @@
  * Adapts the existing SlidingWindowStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '@client/core/interfaces';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '/core/interfaces';
 import { SlidingWindowStore } from '../algorithms/sliding-window';
 
 export class SlidingWindowAdapter implements RateLimitStore {
@@ -67,6 +67,8 @@ export function createSlidingWindowAdapter(redis: any): SlidingWindowAdapter {
   const store = new SlidingWindowStore(redis);
   return new SlidingWindowAdapter(store);
 }
+
+
 
 
 

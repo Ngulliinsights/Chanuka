@@ -456,3 +456,5 @@ export function setGlobalMethodTimingService(service: MethodTimingService): void
 
 // Export singleton instance
 export const methodTimingService = getGlobalMethodTimingService();
+
+

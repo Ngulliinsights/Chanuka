@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-import type { CacheAdapter } from '@client/core/interfaces';
+import type { CacheAdapter } from '/core/interfaces';
 
 export interface WarmingStrategy {
   keys?: string[];
@@ -81,3 +81,4 @@ export class CacheWarmer extends EventEmitter {
     return { ...this.strategy };
   }
 }
+

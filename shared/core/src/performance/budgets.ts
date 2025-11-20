@@ -403,3 +403,4 @@ export function validateBudgetConfig(config: PerformanceBudgetConfig): { valid: 
     errors,
   };
 }
+

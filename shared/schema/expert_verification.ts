@@ -219,3 +219,4 @@ export type NewPeerValidation = typeof peerValidations.$inferInsert;
 
 export type ExpertActivity = typeof expertActivity.$inferSelect;
 export type NewExpertActivity = typeof expertActivity.$inferInsert;
+

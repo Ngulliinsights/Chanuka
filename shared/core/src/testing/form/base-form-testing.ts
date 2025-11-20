@@ -3,8 +3,8 @@
  * Provides the core interfaces and abstract classes for form testing
  */
 
-import { ValidationType } from '@client/types/validation-types';
-import { ValidationRule as BaseValidationRule } from '@client/types/validation-types';
+import { ValidationType } from '/types/validation-types';
+import { ValidationRule as BaseValidationRule } from '/types/validation-types';
 import { logger } from '../../observability/logging';
 
 // Re-export the base validation rule type with extensions for form testing
@@ -275,6 +275,8 @@ export abstract class BaseFormTestingUtils {
     return errors;
   }
 }
+
+
 
 
 

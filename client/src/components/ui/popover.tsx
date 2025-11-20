@@ -38,10 +38,7 @@ interface EnhancedPopoverProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const EnhancedPopover = React.forwardRef<
-  React.ElementRef<typeof PopoverPrimitive.Root>,
-  EnhancedPopoverProps & React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>
->(({ children, onError, fallbackContent, open, onOpenChange, ...props }, ref) => {
+const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>> = ({ children, onError, fallbackContent, open, onOpenChange, ...props }) => {
   const [error, setError] = React.useState<UIComponentError | null>(null);
   const [retryCount, setRetryCount] = React.useState(0);
 
@@ -59,10 +56,10 @@ const EnhancedPopover = React.forwardRef<
         setRetryCount(prev => prev + 1);
       } else {
         const suggestions = getUIRecoverySuggestions(componentError);
-        logger.warn('Popover recovery failed, suggestions:', suggestions);
+        logger.warn('Popover recovery failed', { suggestions });
       }
     } catch (recoveryError) {
-      logger.error('Popover recovery error:', recoveryError);
+      logger.error('Popover recovery error', undefined, recoveryError);
     }
   }, [onError, retryCount]);
 
@@ -114,7 +111,7 @@ const EnhancedPopover = React.forwardRef<
       </ErrorBoundary>
     </PopoverPrimitive.Root>
   );
-});
+};
 EnhancedPopover.displayName = "EnhancedPopover";
 
 // Enhanced popover content with error handling
@@ -138,7 +135,7 @@ const EnhancedPopoverContent = React.forwardRef<
         setRetryCount(prev => prev + 1);
       }
     } catch (recoveryError) {
-      logger.error('Popover content recovery error:', recoveryError);
+      logger.error('Popover content recovery error', undefined, recoveryError);
     }
   }, [onError, retryCount]);
 

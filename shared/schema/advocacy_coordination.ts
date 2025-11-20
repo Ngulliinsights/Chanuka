@@ -468,3 +468,4 @@ export type NewCampaignImpactMetrics = typeof campaign_impact_metrics.$inferInse
 
 export type CoalitionRelationship = typeof coalition_relationships.$inferSelect;
 export type NewCoalitionRelationship = typeof coalition_relationships.$inferInsert;
+

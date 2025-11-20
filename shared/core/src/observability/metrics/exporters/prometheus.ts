@@ -1,4 +1,4 @@
-import { Metric, PrometheusConfig } from '@client/types';
+import { Metric, PrometheusConfig } from '/types';
 import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
 
 // ==================== Enhanced Prometheus Exporter ====================
@@ -214,3 +214,5 @@ export class EnhancedPrometheusExporter {
 export function createEnhancedPrometheusExporter(config?: EnhancedPrometheusConfig): EnhancedPrometheusExporter {
   return new EnhancedPrometheusExporter(config);
 }
+
+

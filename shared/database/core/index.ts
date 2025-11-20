@@ -1,10 +1,15 @@
 /**
  * Unified Database Core Module
- * 
+ *
  * Main entry point for the consolidated database infrastructure.
  * Provides a clean, consistent API that combines the best features
  * from both existing database systems.
  */
+
+import type { ConnectionManagerConfig } from './connection-manager.js';
+import { createConnectionManager, closeConnectionManager } from './connection-manager.js';
+import { createDatabaseConfig } from './config.js';
+import { createHealthMonitor, stopHealthMonitor } from './health-monitor.js';
 
 // ============================================================================
 // CONNECTION MANAGEMENT
@@ -162,31 +167,6 @@ export async function quickSetup(environment: 'development' | 'test' = 'developm
 }
 
 // ============================================================================
-// TYPE EXPORTS FOR EXTERNAL USE
-// ============================================================================
-
-// Re-export commonly used types for convenience
-export type {
-  // Connection types
-  DatabaseOperation,
-  TransactionOptions,
-  DatabaseTransaction,
-  ConnectionManagerConfig,
-  ConnectionMetrics,
-  DatabaseHealthStatus,
-  
-  // Configuration types
-  DatabaseEnvironmentConfig,
-  
-  // Health monitoring types
-  HealthCheckResult,
-  HealthMetrics,
-  AlertRule,
-  Alert,
-  HealthMonitorConfig,
-} from './connection-manager.js';
-
-// ============================================================================
 // VERSION AND METADATA
 // ============================================================================
 
@@ -208,3 +188,4 @@ export const FEATURES = {
   METRICS_COLLECTION: true,
   ALERT_SYSTEM: true,
 } as const;
+

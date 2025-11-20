@@ -9,7 +9,6 @@
 import { database, readDatabase, writeDatabase, withTransaction } from './connection.js';
 import { executeQuery } from './pool.js';
 import { initializeDatabaseSafety, shutdownDatabaseSafety } from './init.js';
-import { logger } from '@client/core/src/observability/logging';
 import { bills as userTable } from '../schema/foundation';
 
 /**
@@ -147,6 +146,8 @@ export const examples = {
   shutdownApp,
   errorHandlingExample,
 };
+
+
 
 
 

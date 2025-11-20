@@ -5,7 +5,7 @@
  * Based on patterns from optimized_health_system.md
  */
 
-import { HealthCheck, HealthResult, HealthStatus } from '@client/types';
+import { HealthCheck, HealthResult, HealthStatus } from '/types';
 import { logger } from '../../observability/logging';
 
 export interface MemoryHealthConfig {
@@ -205,6 +205,8 @@ export function createMemoryHealthCheck(options: Partial<MemoryHealthConfig> = {
   
   return new MemoryHealthCheck(config);
 }
+
+
 
 
 

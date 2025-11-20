@@ -6,7 +6,7 @@
  */
 
 import { Redis, Cluster } from 'ioredis';
-import { HealthCheck, HealthResult, HealthStatus } from '@client/types';
+import { HealthCheck, HealthResult, HealthStatus } from '/types';
 import { logger } from '../../observability/logging';
 
 export interface RedisHealthConfig {
@@ -219,6 +219,8 @@ export class RedisHealthCheck implements HealthCheck {
     return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
   }
 }
+
+
 
 
 

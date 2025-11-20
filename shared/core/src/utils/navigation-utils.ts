@@ -72,3 +72,5 @@ export function generateBreadcrumbs(path: string): Array<{label: string; path: s
 
   return breadcrumbs;
 }
+
+

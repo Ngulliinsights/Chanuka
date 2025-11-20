@@ -110,3 +110,5 @@ export class FixedWindow implements RateLimitAlgorithm {
 
 // Export alias for backward compatibility
 export { FixedWindow as FixedWindowStore };
+
+

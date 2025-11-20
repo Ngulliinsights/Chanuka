@@ -955,3 +955,4 @@ export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
 export async function closeDatabaseConnections(): Promise<void> {
   return closeConnectionManager();
 }
+

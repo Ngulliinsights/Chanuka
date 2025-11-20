@@ -68,3 +68,5 @@ export function shouldRouteToModernCache(flags: CacheFeatureFlags, requestId?: s
   const seed = requestId ? parseInt(requestId.slice(-4), 16) : Math.random() * 100;
   return seed < percentage;
 }
+
+

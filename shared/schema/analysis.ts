@@ -22,3 +22,5 @@ export const analysis = pgTable("analysis", {
 // Types
 export type Analysis = typeof analysis.$inferSelect;
 export type NewAnalysis = typeof analysis.$inferInsert;
+
+

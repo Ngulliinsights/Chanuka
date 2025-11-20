@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { MiddlewareProvider } from '@client/types';
-import { Services } from '@client/types/services';
+import { MiddlewareProvider } from '/types';
+import { Services } from '/types/services';
 import { logger } from '../../observability/logging';
 
 export class AuthMiddlewareProvider implements MiddlewareProvider {
@@ -30,6 +30,8 @@ export class AuthMiddlewareProvider implements MiddlewareProvider {
     };
   }
 }
+
+
 
 
 

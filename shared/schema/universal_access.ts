@@ -697,3 +697,4 @@ export const offline_sync_queue = pgTable('offline_sync_queue', {
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
 });
+

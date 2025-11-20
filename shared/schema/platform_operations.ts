@@ -909,3 +909,4 @@ export type NewPlatformHealthMetrics = typeof platform_health_metrics.$inferInse
 
 export type ContentPerformance = typeof content_performance.$inferSelect;
 export type NewContentPerformance = typeof content_performance.$inferInsert;
+

@@ -1,4 +1,4 @@
-import { Metric } from '@client/types';
+import { Metric } from '/types';
 import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
 
 // ==================== CloudWatch Configuration ====================
@@ -292,3 +292,5 @@ export class EnhancedCloudWatchExporter {
 export function createEnhancedCloudWatchExporter(config?: CloudWatchConfig): EnhancedCloudWatchExporter {
   return new EnhancedCloudWatchExporter(config);
 }
+
+

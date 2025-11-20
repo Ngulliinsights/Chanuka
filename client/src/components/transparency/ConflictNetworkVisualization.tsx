@@ -13,7 +13,6 @@ import {
   Info,
   AlertTriangle
 } from 'lucide-react';
-import { logger } from '@client/utils/logger';
 
 interface ConflictNode {
   id: string;
@@ -67,8 +66,7 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({ bil
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<ConflictNode | null>(null);
-  const [layoutType, setLayoutType] = useState<string>('force-directed');
-  const [showClusters, setShowClusters] = useState(true);
+  const [showClusters] = useState(true);
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
   
   const svgRef = useRef<SVGSVGElement>(null);
@@ -134,14 +132,14 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({ bil
     return baseSizes[node.type] * severityMultiplier[node.conflict_level];
   };
 
-  const calculateNodePositions = (nodes: ConflictNode[], edges: ConflictEdge[]) => {
+  const calculateNodePositions = (nodes: ConflictNode[]) => {
     // Simplified force-directed layout calculation
     const positions = new Map<string, { x: number; y: number }>();
     const width = 800;
     const height = 600;
     
     // Initialize random positions
-    nodes.forEach((node, index) => {
+    nodes.forEach((node) => {
       positions.set(node.id, {
         x: Math.random() * width,
         y: Math.random() * height
@@ -241,7 +239,7 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({ bil
     filteredNodes.some(n => n.id === e.target)
   );
 
-  const nodePositions = calculateNodePositions(filteredNodes, filteredEdges);
+  const nodePositions = calculateNodePositions(filteredNodes);
 
   return (
     <div className="space-y-4">

@@ -4,7 +4,7 @@
  */
 
 import { MemoryAdapter } from './adapters/memory-adapter';
-import type { CacheAdapter } from '@client/core/interfaces';
+import type { CacheAdapter } from '/core/interfaces';
 
 export interface SimpleCacheConfig {
   provider: 'memory';
@@ -103,3 +103,4 @@ export class SimpleCacheFactory {
 
 // Export a default instance
 export const cacheFactory = SimpleCacheFactory.getInstance();
+

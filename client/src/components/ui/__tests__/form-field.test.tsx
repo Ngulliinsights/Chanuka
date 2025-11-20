@@ -13,7 +13,7 @@ import {
   EnhancedFormSelect
 } from '../form-field';
 import { Label } from '../label';
-import { cn } from '../../lib/utils';
+import { cn } from '../../../lib/utils';
 
 // FormFieldWrapper tests replaced with direct implementations
 describe('FormFieldWrapper equivalent', () => {
@@ -32,11 +32,11 @@ describe('FormFieldWrapper equivalent', () => {
   it('shows required indicator', () => {
     render(
       <div>
-        <Label htmlFor="test">
+        <Label htmlFor="test-required">
           Required Field
           <span className="text-destructive ml-1" aria-label="required">*</span>
         </Label>
-        <input id="test" />
+        <input id="test-required" aria-label="Required Field" />
       </div>
     );
 
@@ -46,11 +46,11 @@ describe('FormFieldWrapper equivalent', () => {
   it('shows optional indicator', () => {
     render(
       <div>
-        <Label htmlFor="test">
+        <Label htmlFor="test-optional">
           Optional Field
           <span className="text-muted-foreground">(optional)</span>
         </Label>
-        <input id="test" />
+        <input id="test-optional" aria-label="Optional Field" />
       </div>
     );
 
@@ -60,8 +60,8 @@ describe('FormFieldWrapper equivalent', () => {
   it('displays error message', () => {
     render(
       <div>
-        <Label htmlFor="test">Field</Label>
-        <input id="test" />
+        <Label htmlFor="test-error">Field</Label>
+        <input id="test-error" aria-label="Field" />
         <div role="alert" className="text-sm text-destructive">
           This field is required
         </div>
@@ -75,8 +75,8 @@ describe('FormFieldWrapper equivalent', () => {
   it('displays success message', () => {
     render(
       <div>
-        <Label htmlFor="test">Field</Label>
-        <input id="test" />
+        <Label htmlFor="test-success">Field</Label>
+        <input id="test-success" aria-label="Field" />
         <div role="status" className="text-sm text-green-700">
           Valid input
         </div>
@@ -90,11 +90,11 @@ describe('FormFieldWrapper equivalent', () => {
   it('shows description text', () => {
     render(
       <div>
-        <Label htmlFor="test">Field</Label>
+        <Label htmlFor="test-description">Field</Label>
         <p className="text-sm text-muted-foreground">
           This is a helpful description
         </p>
-        <input id="test" />
+        <input id="test-description" aria-label="Field" />
       </div>
     );
 

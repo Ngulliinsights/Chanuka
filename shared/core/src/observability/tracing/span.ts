@@ -292,3 +292,5 @@ export function generateSpanId(): string {
 export function generateTraceId(): string {
   return randomBytes(16).toString('hex');
 }
+
+
