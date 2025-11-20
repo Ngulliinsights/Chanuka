@@ -4,8 +4,8 @@ import { DayPicker, DateRange } from "react-day-picker"
 import { cn } from '@client/lib/utils'
 import { buttonVariants } from './button'
 import { logger } from '@client/utils/logger';
-import { DateValidationProps, ValidationState } from '@client/types';
-import { validateDate, safeValidateDate } from './validation';
+import { DateValidationProps, ValidationState } from './types';
+import { safeValidateDate } from './validation';
 import { UIDateError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
 
@@ -189,7 +189,7 @@ const EnhancedCalendar = React.forwardRef<
 
       return { isValid: true, touched: validationState.touched };
     } catch (error) {
-      logger.error('Calendar validation error:', error);
+      logger.error('Calendar validation error', undefined, error);
       return {
         isValid: false,
         error: 'Date validation error occurred',
@@ -208,10 +208,10 @@ const EnhancedCalendar = React.forwardRef<
         setRetryCount(prev => prev + 1);
       } else {
         const suggestions = getUIRecoverySuggestions(error);
-        logger.warn('Calendar recovery failed, suggestions:', suggestions);
+        logger.warn('Calendar recovery failed', { suggestions });
       }
     } catch (recoveryError) {
-      logger.error('Calendar recovery error:', recoveryError);
+      logger.error('Calendar recovery error', undefined, recoveryError);
     }
   }, [retryCount]);
 

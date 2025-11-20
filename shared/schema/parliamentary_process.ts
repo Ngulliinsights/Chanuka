@@ -563,3 +563,4 @@ export type NewPublicSubmission = typeof public_submissions.$inferInsert;
 
 export type PublicHearing = typeof public_hearings.$inferSelect;
 export type NewPublicHearing = typeof public_hearings.$inferInsert;
+

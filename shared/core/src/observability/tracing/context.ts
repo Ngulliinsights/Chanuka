@@ -308,3 +308,5 @@ export function extractTraceContext(carrier: any, format?: string): TraceContext
 export function injectTraceContext(context: TraceContext, carrier: any, format?: string): void {
   return traceContextManager.inject(context, carrier, format);
 }
+
+

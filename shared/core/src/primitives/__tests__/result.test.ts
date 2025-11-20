@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ok, err, isOk, isErr, Result } from '@client/types/result';
+import { ok, err, isOk, isErr, Result } from '/types/result';
 
 describe('Result<T, E>', () => {
   describe('Ok variant', () => {
@@ -143,6 +143,8 @@ describe('Result<T, E>', () => {
     });
   });
 });
+
+
 
 
 

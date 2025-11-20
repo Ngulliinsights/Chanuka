@@ -6,7 +6,7 @@ import { X, AlertCircle, Loader2 } from "lucide-react"
 
 import { cn } from '@client/lib/utils'
 import { logger } from '@client/utils/logger';
-import { DialogValidationProps } from '@client/types';
+import { DialogValidationProps } from './types';
 import { DialogPropsSchema } from './validation';
 import { UIDialogError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
@@ -157,10 +157,10 @@ const EnhancedDialog = React.forwardRef<
         setRetryCount(prev => prev + 1);
       } else {
         const suggestions = getUIRecoverySuggestions(dialogError);
-        logger.warn('Dialog recovery failed, suggestions:', suggestions);
+        logger.warn('Dialog recovery failed, suggestions:', { component: 'enhanced-dialog' }, { suggestions });
       }
     } catch (recoveryError) {
-      logger.error('Dialog recovery error:', recoveryError);
+      logger.error('Dialog recovery error:', { component: 'enhanced-dialog' }, recoveryError);
     }
   }, [retryCount]);
 
@@ -196,7 +196,7 @@ const EnhancedDialog = React.forwardRef<
       // Close dialog on successful confirmation
       onOpenChange?.(false);
     } catch (confirmError) {
-      logger.error('Dialog confirm error:', confirmError);
+      logger.error('Dialog confirm error:', { component: 'enhanced-dialog' }, confirmError);
       const errorMessage = confirmError instanceof Error ? confirmError.message : 'Confirmation failed';
       setInternalError(errorMessage);
       
@@ -214,7 +214,7 @@ const EnhancedDialog = React.forwardRef<
       onCancel?.();
       onOpenChange?.(false);
     } catch (cancelError) {
-      logger.error('Dialog cancel error:', cancelError);
+      logger.error('Dialog cancel error:', { component: 'enhanced-dialog' }, cancelError);
       const errorMessage = cancelError instanceof Error ? cancelError.message : 'Cancel failed';
       const dialogError = new UIDialogError('enhanced-dialog', 'cancel', errorMessage);
       handleValidationError(dialogError);

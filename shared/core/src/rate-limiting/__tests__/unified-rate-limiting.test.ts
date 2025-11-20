@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createMemoryAdapter } from '../adapters/memory-adapter';
-import { UnifiedRateLimitService } from '@client/core/service';
+import { UnifiedRateLimitService } from '/core/service';
 import { createExpressRateLimitMiddleware } from '../middleware/express-middleware';
 import { resetMetricsCollector } from '../metrics';
 
@@ -253,6 +253,8 @@ describe('Unified Rate Limiting System', () => {
     });
   });
 });
+
+
 
 
 

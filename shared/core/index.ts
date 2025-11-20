@@ -373,7 +373,7 @@ export interface ErrorBoundaryProps {
 }
 
 export const ErrorBoundary = ({ children }: ErrorBoundaryProps) => {
-  // This is a simplified version - the full implementation should be in the client
+  // This is a simplified version - the full implementation should be in 
   return children;
 };
 
@@ -434,3 +434,5 @@ export type { ValidationResult as CoreValidationResult } from './src/validation/
 export type { ValidationResult as TypesValidationResult } from './src/types/validation-types';
 export type { ValidationResult as MiddlewareValidationResult } from './src/middleware/types';
 export type { ValidationResult as ServicesValidationResult } from './src/types/services';
+
+

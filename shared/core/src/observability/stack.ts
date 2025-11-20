@@ -499,3 +499,5 @@ export function createObservabilityStack(config: ObservabilityConfig = {}): Obse
 // ==================== Default Export ====================
 
 export default ObservabilityStack;
+
+

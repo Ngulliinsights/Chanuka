@@ -369,3 +369,4 @@ export interface LoadTestSuite {
     averageResponseTime: number;
   };
 }
+

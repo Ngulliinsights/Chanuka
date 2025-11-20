@@ -364,3 +364,4 @@ export class SponsorTestRepository implements ISponsorRepository {
     return Array.from(this.sponsors.values());
   }
 }
+

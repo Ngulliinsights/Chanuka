@@ -722,3 +722,4 @@ export const userSessionsRelations = relations(user_sessions, ({ one }) => ({
     references: [users.id],
   }),
 }));
+

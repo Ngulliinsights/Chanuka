@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Skeleton } from './ui/skeleton';
 import { Search, AlertCircle, AlertTriangle, Info, Settings, ArrowLeft } from 'lucide-react';
-import { cn, getStatusColor, getStatusBgColor } from '@client/lib/utils';
+import { cn } from '@client/lib/utils';
 
 interface HealthStatus {
   status: string;
@@ -66,7 +66,7 @@ const getSeverityBadge = (severity: string) => {
   }
 };
 
-export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }: DatabaseStatusProps) {
+export default function DatabaseStatus({ stats, schemaCheck, isLoading }: DatabaseStatusProps) {
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -145,10 +145,7 @@ export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }
               schemaCheck?.issues.map((issue, index) => (
                 <div
                   key={index}
-                  className={cn(
-                    "flex items-start space-x-3 p-4 rounded-lg border",
-                    getStatusBgColor(issue.severity)
-                  )}
+                  className="flex items-start space-x-3 p-4 rounded-lg border"
                 >
                   {getSeverityIcon(issue.severity)}
                   <div className="flex-1">
@@ -191,7 +188,6 @@ export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }
   );
 }
 import { useQuery } from "@tanstack/react-query";
-import { logger } from '@client/utils/logger';
 
 export function useDatabaseStatus() {
   // Updated database status endpoint to match refactored routes

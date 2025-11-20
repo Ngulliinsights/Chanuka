@@ -5,13 +5,10 @@
  * to gradually migrate from legacy to new implementations.
  */
 
-import { 
-  ConcurrencyAdapter, 
-  getConcurrencyRouter,
-  globalMutex,
-  apiSemaphore 
-} from '../concurrency-adapter';
-import { FeatureFlagsService, MockFeatureFlagsService } from '@client/types/feature-flags.js';
+import { ConcurrencyAdapter } from '../concurrency-adapter';
+import { getConcurrencyRouter } from '../concurrency-migration-router';
+import { globalMutex, apiSemaphore } from '../race-condition-prevention';
+import { MockFeatureFlagsService } from '../../types/feature-flags';
 
 // Example 1: Direct usage of new concurrency utilities
 export async function directUsageExample() {
@@ -75,7 +72,7 @@ export async function migrationRouterExample() {
       console.log(`Processing for ${user_id}`);
       await new Promise(resolve => setTimeout(resolve, 10));
       return `processed-${ user_id }`;
-    }, 'global', userId);
+    }, 'global', user_id);
     
     console.log(`Result for ${user_id}:`, result);
   }
@@ -115,7 +112,7 @@ export async function gradualRolloutExample() {
     for (const user_id of testUsers) {
       await router.withMutexLock(async () => {
         return `test-${ user_id }`;
-      }, 'global', userId);
+      }, 'global', user_id);
     }
     
     const metrics = router.getMetrics();
@@ -154,7 +151,7 @@ export async function errorHandlingExample() {
     
     console.log('Operation succeeded');
   } catch (error) {
-    console.log('Operation failed:', error.message);
+    console.log('Operation failed:', (error as Error).message);
     
     // Rollback to legacy implementation
     console.log('Rolling back to legacy implementation...');
@@ -245,5 +242,7 @@ export {
   ConcurrencyAdapter,
   getConcurrencyRouter,
   globalMutex,
-  apiSemaphore
+  apiSemaphore,
+  MockFeatureFlagsService
 };
+

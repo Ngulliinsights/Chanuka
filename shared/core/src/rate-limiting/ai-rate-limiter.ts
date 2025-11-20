@@ -1,7 +1,7 @@
 /**
  * AI Rate Limiter - specialized rate limiter for AI/ML operations
  */
-import { RateLimitStore, AIRateLimitOptions, RateLimitResult } from '@client/types';
+import { RateLimitStore, AIRateLimitOptions, RateLimitResult } from '/types';
 
 export class AIRateLimiter {
   constructor(
@@ -25,3 +25,5 @@ export class AIRateLimiter {
     return this.store.reset(key);
   }
 }
+
+

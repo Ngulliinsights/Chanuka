@@ -136,3 +136,4 @@ export interface IBillRepository {
     affected_counties?: string[];
   }): Promise<Result<number, Error>>;
 }
+

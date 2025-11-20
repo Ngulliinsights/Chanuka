@@ -486,3 +486,4 @@ export type NewCrossSectorOwnership = typeof cross_sector_ownership.$inferInsert
 
 export type RegulatoryCaptureIndicator = typeof regulatory_capture_indicators.$inferSelect;
 export type NewRegulatoryCaptureIndicator = typeof regulatory_capture_indicators.$inferInsert;
+

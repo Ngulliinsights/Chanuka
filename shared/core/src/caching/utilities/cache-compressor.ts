@@ -200,3 +200,5 @@ export function isCompressed(data: Buffer): CompressionAlgorithm {
 
   return 'none';
 }
+
+

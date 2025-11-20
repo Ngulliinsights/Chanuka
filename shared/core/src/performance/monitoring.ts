@@ -635,3 +635,5 @@ Time: ${new Date(violation.timestamp).toISOString()}`;
 
 // Export singleton instance
 export const performanceMonitor = new PerformanceMonitoringService();
+
+

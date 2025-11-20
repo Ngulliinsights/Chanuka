@@ -1,4 +1,4 @@
-import { Metric, MetricsExporter } from '@client/types';
+import { Metric, MetricsExporter } from '/types';
 import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
 import * as dgram from 'dgram';
 import * as net from 'net';
@@ -271,3 +271,5 @@ export class EnhancedStatsDExporter {
 export function createEnhancedStatsDExporter(config?: StatsDConfig): EnhancedStatsDExporter {
   return new EnhancedStatsDExporter(config);
 }
+
+

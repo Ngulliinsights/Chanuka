@@ -5,7 +5,7 @@
  * Based on existing patterns from server/cache/CacheService.ts
  */
 
-import type { CacheKeyGenerator } from '@client/types';
+import type { CacheKeyGenerator } from '/types';
 import { logger } from '../observability/logging';
 
 export class CacheKeys implements CacheKeyGenerator {
@@ -360,6 +360,8 @@ export class CacheKeys implements CacheKeyGenerator {
 
 // Export singleton instance
 export const cacheKeys = CacheKeys.getInstance();
+
+
 
 
 

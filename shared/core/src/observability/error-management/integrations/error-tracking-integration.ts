@@ -468,3 +468,5 @@ export function createConsoleIntegration(config: IntegrationConfig = {}): ErrorT
 export function createIntegrationManager(): ErrorTrackingIntegrationManager {
   return new ErrorTrackingIntegrationManager();
 }
+
+

@@ -1,4 +1,4 @@
-import { HealthCheck } from '@client/types';
+import { HealthCheck } from '/types';
 
 // ==================== Built-in Health Checks ====================
 
@@ -663,6 +663,8 @@ export const defaultHealthChecks = {
   disk: createDiskHealthCheck(),
   process: createProcessHealthCheck(),
 } as const;
+
+
 
 
 

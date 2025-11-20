@@ -4,7 +4,7 @@
  * Factory functions for creating and managing cache services
  */
 
-import type { CacheService, CacheConfig } from '@client/core/interfaces';
+import type { CacheService, CacheConfig } from '/core/interfaces';
 import { MemoryAdapter, type MemoryAdapterConfig } from './adapters/memory-adapter';
 import { RedisAdapter, type RedisAdapterConfig } from './adapters/redis-adapter';
 import { MultiTierAdapter, type MultiTierAdapterConfig } from './adapters/multi-tier-adapter';
@@ -179,6 +179,8 @@ export function resetDefaultCache(): void {
 export function createCacheManager(cache?: CacheService): CacheManager {
   return new CacheManager(cache || getDefaultCache());
 }
+
+
 
 
 

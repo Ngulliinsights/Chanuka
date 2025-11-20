@@ -863,3 +863,5 @@ export { configSchema, defaultFeatures };
 
 // Export default instance for convenience
 export default configManager;
+
+

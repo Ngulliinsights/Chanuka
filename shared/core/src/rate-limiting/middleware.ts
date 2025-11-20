@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { RateLimitStore, RateLimitOptions, RateLimitHeaders } from '@client/types';
+import { RateLimitStore, RateLimitOptions, RateLimitHeaders } from '/types';
 
 export class RateLimitMiddleware {
   private store: RateLimitStore;
@@ -138,6 +138,8 @@ export function createRegistrationRateLimit(store: RateLimitStore) {
     message: 'Too many registration attempts from this IP'
   });
 }
+
+
 
 
 

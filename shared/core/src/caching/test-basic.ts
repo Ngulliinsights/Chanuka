@@ -16,3 +16,4 @@ async function testBasicCaching() {
 }
 
 export { testBasicCaching };
+

@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-import type { CacheMetrics } from '@client/types';
+import type { CacheMetrics } from '/types';
 
 export interface MetricsCollectorConfig {
   enableAdvancedMetrics?: boolean;
@@ -135,3 +135,4 @@ export class CacheMetricsCollector extends EventEmitter {
     this.metrics.clear();
   }
 }
+

@@ -7,7 +7,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Result, ok, err } from '../../primitives/types/result';
 import { logger } from '../../observability/logging/logger';
 import { getMetricsCollector } from '../metrics';
-import { IRateLimitStore, RateLimitOptions, RateLimitResult, RateLimitHeaders } from '@client/types';
+import { IRateLimitStore, RateLimitOptions, RateLimitResult, RateLimitHeaders } from '/types';
 
 export interface ExpressRateLimitOptions extends RateLimitOptions {
   store: IRateLimitStore;
@@ -279,4 +279,6 @@ export function createSearchRateLimitMiddleware(store: IRateLimitStore) {
     message: 'Too many search requests from this IP'
   });
 }
+
+
 

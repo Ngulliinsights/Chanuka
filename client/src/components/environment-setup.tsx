@@ -4,8 +4,6 @@ import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
 import { Settings, CheckCircle, Clock, HelpCircle, TrendingUp, Database, FileText, Shield, Server } from 'lucide-react';
-import { cn, getStatusColor } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
 
 interface EnvironmentSetupProps {
   environment?: any;
@@ -81,7 +79,7 @@ export default function EnvironmentSetup({ environment, health }: EnvironmentSet
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {setupSteps.map((step, index) => (
+            {setupSteps.map((step) => (
               <div key={step.id} className="flex items-start space-x-4">
                 <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
                   {getStepIcon(step)}

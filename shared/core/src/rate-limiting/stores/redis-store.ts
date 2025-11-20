@@ -1,6 +1,6 @@
 import { Result, ok, err } from '../../primitives/types/result';
-import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions } from '@client/types';
-import { RateLimitResult } from '@client/core/interfaces';
+import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions } from '/types';
+import { RateLimitResult } from '/core/interfaces';
 import Redis from 'ioredis';
 
 export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
@@ -318,3 +318,5 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
    }
  }
 }
+
+

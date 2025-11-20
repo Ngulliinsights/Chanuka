@@ -15,7 +15,7 @@
 import { ZodSchema, ZodError } from 'zod';
 import * as crypto from 'crypto';
 import { logger } from '../observability/logging';
-import { ValidationError } from '@client/types';
+import { ValidationError } from '/types';
 import { commonSchemas } from './schemas/common';
 import {
   ValidationOptions,
@@ -872,3 +872,4 @@ export function createValidationService(
 ): ValidationService {
   return new ValidationService(config);
 }
+

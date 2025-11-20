@@ -8,7 +8,7 @@
 import Redis, { RedisOptions } from 'ioredis';
 import { gzip, gunzip } from 'zlib';
 import { promisify } from 'util';
-import { BaseCacheAdapter } from '@client/core/base-adapter';
+import { BaseCacheAdapter } from '/core/base-adapter';
 import type {
   CacheAdapterConfig,
   CacheHealthStatus
@@ -43,7 +43,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Initialize Redis connection with optimized settings
    * The definite assignment assertion (!) on client is safe because
-   * this method is called in the constructor and always assigns the client
+   * this method is called in the constructor and always assigns 
    */
   private initializeRedis(): void {
     const redisOptions: RedisOptions = {
@@ -645,6 +645,8 @@ export class RedisAdapter extends BaseCacheAdapter {
     await this.disconnect();
   }
 }
+
+
 
 
 

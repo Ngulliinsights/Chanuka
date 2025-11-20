@@ -74,3 +74,5 @@ export function shouldRouteToModernMiddleware(flags: MiddlewareFeatureFlags, req
   const seed = requestId ? parseInt(requestId.slice(-4), 16) : Math.random() * 100;
   return seed < percentage;
 }
+
+

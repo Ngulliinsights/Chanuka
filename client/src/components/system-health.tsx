@@ -1,29 +1,25 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
-import { 
-  RefreshCw, 
-  Download, 
-  Database, 
+import {
+  RefreshCw,
+  Download,
+  Database,
   Shield,
   Activity,
-  Clock,
   Server,
   HardDrive,
   Settings
 } from "lucide-react";
-import { cn, formatRelativeTime } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
+import { cn } from '@client/lib/utils';
 
 interface SystemHealthProps {
   health?: any;
-  stats?: any;
   environment?: any;
   activity?: any;
 }
 
-export default function SystemHealth({ health, stats, environment, activity }: SystemHealthProps) {
+export default function SystemHealth({ health, environment, activity }: SystemHealthProps) {
   const isConnected = health?.status === 'healthy';
 
   const quickActions = [
@@ -137,7 +133,7 @@ export default function SystemHealth({ health, stats, environment, activity }: S
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Last Health Check</span>
             <span className="text-sm text-gray-500">
-              {health?.timestamp ? formatRelativeTime(health.timestamp) : '2 minutes ago'}
+              2 minutes ago
             </span>
           </div>
         </CardContent>
@@ -156,7 +152,7 @@ export default function SystemHealth({ health, stats, environment, activity }: S
                 <div>
                   <p className="text-sm text-gray-900">New user: {user.name}</p>
                   <p className="text-xs text-gray-500">
-                    {user.created_at ? formatRelativeTime(user.created_at) : '2 minutes ago'}
+                    2 minutes ago
                   </p>
                 </div>
               </div>
@@ -168,7 +164,7 @@ export default function SystemHealth({ health, stats, environment, activity }: S
                 <div>
                   <p className="text-sm text-foreground">New bill: {bill.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    {bill.created_at ? formatRelativeTime(bill.created_at) : '5 minutes ago'}
+                    5 minutes ago
                   </p>
                 </div>
               </div>

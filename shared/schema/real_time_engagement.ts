@@ -291,3 +291,4 @@ export type NewRealTimeNotification = typeof realTimeNotifications.$inferInsert;
 
 export type EngagementAnalytics = typeof engagementAnalytics.$inferSelect;
 export type NewEngagementAnalytics = typeof engagementAnalytics.$inferInsert;
+

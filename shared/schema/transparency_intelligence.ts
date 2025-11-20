@@ -179,3 +179,4 @@ export type NewInfluenceNetwork = typeof influenceNetworks.$inferInsert;
 
 export type ImplementationWorkaround = typeof implementationWorkarounds.$inferSelect;
 export type NewImplementationWorkaround = typeof implementationWorkarounds.$inferInsert;
+

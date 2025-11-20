@@ -284,3 +284,4 @@ export class NotificationTestService implements INotificationService {
     this.userPreferences.set(userId, preferences);
   }
 }
+

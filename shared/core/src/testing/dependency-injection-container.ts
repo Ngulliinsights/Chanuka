@@ -391,3 +391,4 @@ export interface TestExecutionContext {
   /** Test metadata */
   metadata: Record<string, unknown>;
 }
+
