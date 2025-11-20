@@ -10,7 +10,7 @@
  */
 
 import { Pool, PoolClient, PoolConfig } from 'pg';
-import { logger } from '@client/core/src/index.js';
+import { logger } from '@/core/src/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -113,14 +113,14 @@ export interface DatabaseHealthStatus {
 // ============================================================================
 
 export class UnifiedConnectionManager {
-  private primaryPool: Pool;
+  private primaryPool!: Pool;
   private readPools: Pool[] = [];
   private operationalPool?: Pool;
   private analyticsPool?: Pool;
   private securityPool?: Pool;
-  
+
   private config: Required<ConnectionManagerConfig>;
-  private metrics: ConnectionMetrics;
+  private metrics!: ConnectionMetrics;
   private healthCheckTimer?: NodeJS.Timeout;
   private startTime: Date;
   private queryTimes: number[] = [];
@@ -258,7 +258,7 @@ export class UnifiedConnectionManager {
   }
 
   private setupPoolEventHandlers(pool: Pool, poolName: string): void {
-    pool.on('connect', (client: PoolClient) => {
+    pool.on('connect', (_client: PoolClient) => {
       logger.debug(`New client connected to ${poolName} pool`, {
         component: 'ConnectionManager',
         pool: poolName
@@ -266,14 +266,14 @@ export class UnifiedConnectionManager {
       this.updateConnectionMetrics();
     });
 
-    pool.on('acquire', (client: PoolClient) => {
+    pool.on('acquire', (_client: PoolClient) => {
       logger.debug(`Client acquired from ${poolName} pool`, {
         component: 'ConnectionManager',
         pool: poolName
       });
     });
 
-    pool.on('remove', (client: PoolClient) => {
+    pool.on('remove', (_client: PoolClient) => {
       logger.debug(`Client removed from ${poolName} pool`, {
         component: 'ConnectionManager',
         pool: poolName
@@ -281,7 +281,7 @@ export class UnifiedConnectionManager {
       this.updateConnectionMetrics();
     });
 
-    pool.on('error', (err: Error, client: PoolClient) => {
+    pool.on('error', (err: Error, _client: PoolClient) => {
       logger.error(`Database pool error in ${poolName}`, {
         component: 'ConnectionManager',
         pool: poolName,
@@ -306,8 +306,8 @@ export class UnifiedConnectionManager {
     );
 
     const failedChecks = healthChecks
-      .map((result, index) => ({ result, name: pools[index].name }))
-      .filter(({ result }) => result.status === 'rejected' || !result.value);
+      .map((result, index) => ({ result, name: pools[index]!.name }))
+      .filter(({ result }) => result.status === 'rejected' || (result.status === 'fulfilled' && !result.value));
 
     if (failedChecks.length > 0) {
       const failedNames = failedChecks.map(({ name }) => name);
@@ -370,7 +370,7 @@ export class UnifiedConnectionManager {
     if (this.readPools.length > 0 && Math.random() < this.config.readWriteRatio) {
       const randomIndex = Math.floor(Math.random() * this.readPools.length);
       try {
-        return await this.readPools[randomIndex].connect();
+        return await this.readPools[randomIndex]!.connect();
       } catch (error) {
         logger.warn('Read replica connection failed, falling back to primary', {
           component: 'ConnectionManager',
@@ -537,7 +537,7 @@ export class UnifiedConnectionManager {
         if (!isActive) {
           throw new Error('Transaction is no longer active');
         }
-        return await client.query(sql, params);
+        return await client.query(sql, params) as T;
       },
 
       async commit(): Promise<void> {
