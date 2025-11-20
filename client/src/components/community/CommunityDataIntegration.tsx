@@ -14,7 +14,7 @@ import {
   useCommunityAnalytics,
   useCommunityNotifications,
   useCommunityBackend 
-} from '../../hooks/useCommunityWebSocket';
+} from '../../features/community/hooks/useCommunityWebSocket';
 import { useCommunityStore } from '@client/store/slices/communitySlice';
 import { useDiscussionStore } from '@client/store/slices/discussionSlice';
 import { logger } from '@client/utils/logger';
@@ -188,17 +188,35 @@ export const CommunityDataIntegration: React.FC<CommunityDataIntegrationProps> =
     if (!selectedBillId || !backendInitialized) return;
 
     try {
-      const insight = {
-        billId: selectedBillId,
+      const content = `Expert insight from integration demo - ${new Date().toISOString()}`;
+
+      // Build a full ExpertInsight-compatible payload (omit id/timestamps)
+      const insight: Omit<import('../../types/community').ExpertInsight, 'id' | 'timestamp' | 'lastUpdated'> = {
         expertId: 'demo-expert',
+        expertName: 'Demo Expert',
+        expertAvatar: undefined,
+        verificationType: 'identity',
+        credibilityScore: 0.5,
+        specializations: ['demo', 'integration'],
+
         title: 'Demo Expert Analysis',
-        content: `Expert insight from integration demo - ${new Date().toISOString()}`,
-        category: 'constitutional' as const,
-        severity: 'medium' as const,
-        tags: ['demo', 'integration']
+        content,
+        summary: content.slice(0, 200),
+        confidence: 0.7,
+        methodology: 'Automated integration demo',
+        sources: [],
+
+        billId: selectedBillId,
+        billTitle: undefined,
+        policyAreas: [],
+
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        communityValidation: { upvotes: 0, downvotes: 0, validationScore: 0 },
       };
 
-      const newInsight = await communityBackendService.submitExpertInsight(insight);
+      const newInsight = await communityBackendService.submitExpertInsight(insight as any);
       logger.info('Test expert insight submitted', { 
         component: 'CommunityDataIntegration',
         insightId: newInsight.id 
@@ -463,9 +481,9 @@ export const CommunityDataIntegration: React.FC<CommunityDataIntegrationProps> =
               <h4 className="font-medium text-gray-700 mb-2">Store State</h4>
               <pre className="bg-white p-2 rounded border overflow-auto max-h-40">
                 {JSON.stringify({
-                  activityFeedCount: activityFeed.length,
-                  trendingTopicsCount: storeTrendingTopics.length,
-                  expertInsightsCount: expertInsights.length,
+                  activityFeedCount: activityFeed?.data?.data?.length ?? activityFeed?.data?.pagination?.totalItems ?? 0,
+                  trendingTopicsCount: storeTrendingTopics?.data?.length ?? 0,
+                  expertInsightsCount: expertInsights?.data?.length ?? 0,
                   threadsCount: Object.keys(threads).length,
                   commentsCount: Object.keys(comments).length,
                   typingIndicatorsCount: typingIndicators.length

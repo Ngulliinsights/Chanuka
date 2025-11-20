@@ -17,7 +17,6 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Checkbox } from '../ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
 import { 
@@ -45,7 +44,7 @@ interface CommunityFiltersProps {
 }
 
 export function CommunityFilters({ onClose, className }: CommunityFiltersProps) {
-  const { filters, setFilters, clearFilters } = useCommunityStore();
+  const { filters, setFilters, resetToDefaults } = useCommunityStore();
   const [localFilters, setLocalFilters] = useState<CommunityFiltersType>(filters);
 
   // Mock data for policy areas - in real app, this would come from API
@@ -157,8 +156,18 @@ export function CommunityFilters({ onClose, className }: CommunityFiltersProps) 
   };
 
   const handleResetFilters = () => {
-    clearFilters();
-    setLocalFilters(filters);
+    // Reset UI filters to defaults in the global store, then reflect defaults locally
+    resetToDefaults();
+    setLocalFilters(prev => ({
+      ...prev,
+      contentTypes: ['comments','discussions','expert_insights','campaigns','petitions'],
+      policyAreas: [],
+      timeRange: 'week',
+      geography: { states: [], districts: [], counties: [] },
+      expertLevel: ['official','domain','identity','community'],
+      sortBy: 'trending',
+      showLocalOnly: false
+    } as CommunityFiltersType));
   };
 
   const getActiveFilterCount = () => {

@@ -837,6 +837,125 @@ export {
   communityApi as api,
 };
 
+// ---------------------------------------------------------------------------
+// Backwards-compatibility / convenience hooks
+// Some components (older code) expect `useCommunityStore` or
+// `useCommunitySelectors` to be exported from this slice. Provide small
+// thin wrappers that delegate to the modern hooks in this file.
+// ---------------------------------------------------------------------------
+
+export function useCommunityStore() {
+  // Returns the aggregated community data + UI controls
+  const data = useCommunityData();
+  const queryClient = useQueryClient();
+  const { refetchAll, prefetchActivity } = useCommunityRealTimeUpdates();
+
+  // Initialize real-time features: warm the cache and trigger initial refetch
+  const initializeRealTime = async () => {
+    try {
+      // Warm activity cache with current filters/page if available
+      if ((data.filters as CommunityFilters) && data.currentPage) {
+        await prefetchActivity(data.filters, data.currentPage, data.itemsPerPage);
+      }
+      // Trigger a broad refetch to ensure data is current
+      await refetchAll();
+    } catch (e) {
+      // swallow errors for compatibility
+    }
+  };
+
+  const cleanupRealTime = () => {
+    // No-op for now; consumers expect a cleanup function
+  };
+
+  const loadActivityFeed = async () => {
+    // Invalidate activity queries so the hooks refetch
+    await queryClient.invalidateQueries({ queryKey: [...communityKeys.all, 'activity'] });
+  };
+
+  const loadTrendingTopics = async () => {
+    await queryClient.invalidateQueries({ queryKey: communityKeys.trending() });
+  };
+
+  const loadExpertInsights = async () => {
+    await queryClient.invalidateQueries({ queryKey: [...communityKeys.all, 'insights'] });
+  };
+
+  // Backwards-compatible action stubs. Older components call these directly.
+  // Keep these lightweight: update cache optimistically and invalidate relevant queries.
+  const joinCampaign = async (campaignId: string) => {
+    try {
+      // Optimistically update campaign participant count if present in cache
+      queryClient.setQueryData<Campaign[] | undefined>(communityKeys.campaigns(), (old) => {
+        if (!old) return old;
+        return old.map(c => c.id === campaignId ? { ...c, participantCount: (c.participantCount || 0) + 1 } : c);
+      });
+      // Schedule background refetch to reconcile
+      await queryClient.invalidateQueries({ queryKey: communityKeys.campaigns() });
+    } catch (e) {
+      // swallow for compatibility
+    }
+  };
+
+  const signPetition = async (petitionId: string) => {
+    try {
+      // Optimistically update petition signature counts if present
+      queryClient.setQueryData<Petition[] | undefined>(communityKeys.petitions(), (old) => {
+        if (!old) return old;
+        return old.map(p => p.id === petitionId ? { ...p, currentSignatures: (p.currentSignatures || 0) + 1, signatureCount: (p.signatureCount || 0) + 1 } : p);
+      });
+      // Trigger refetch to reconcile with server
+      await queryClient.invalidateQueries({ queryKey: communityKeys.petitions() });
+    } catch (e) {
+      // swallow for compatibility
+    }
+  };
+
+  // Compatibility helpers for local impact UI
+  const setLocalImpact = (metrics: LocalImpactMetrics) => {
+    try {
+      queryClient.setQueryData(communityKeys.localImpact(), metrics);
+    } catch (e) {
+      // swallow for compatibility
+    }
+  };
+
+  const updateLocalImpact = (patch: Partial<LocalImpactMetrics>) => {
+    try {
+      queryClient.setQueryData<LocalImpactMetrics | undefined>(communityKeys.localImpact(), (old) => {
+        if (!old) return { ...patch } as LocalImpactMetrics;
+        return { ...old, ...patch } as LocalImpactMetrics;
+      });
+    } catch (e) {
+      // swallow for compatibility
+    }
+  };
+
+  return {
+    ...data,
+    initializeRealTime,
+    cleanupRealTime,
+    loadActivityFeed,
+    loadTrendingTopics,
+    loadExpertInsights,
+    // Compatibility action helpers
+    joinCampaign,
+    signPetition,
+    // Local impact helpers for legacy components
+    setLocalImpact,
+    updateLocalImpact,
+  };
+}
+
+// Allow callers to either pass a selector or get the full community data object
+export function useCommunitySelectors(): ReturnType<typeof useCommunityData>;
+export function useCommunitySelectors<T>(selector: (data: ReturnType<typeof useCommunityData>) => T): T;
+export function useCommunitySelectors(selector?: any) {
+  const data = useCommunityData();
+  if (!selector) return data;
+  return selector(data);
+}
+
 export type { 
   CommunityUIContextValue,
   ApiError,

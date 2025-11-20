@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@client/lib/utils';
 import { useCommunityStore, useCommunitySelectors } from '@client/store/slices/communitySlice';
+import { useCommunityRealTime } from '@client/features/community/hooks/useCommunityRealTime';
 import { useCommunityData } from '@client/hooks/useCommunityIntegration';
 import { useMediaQuery } from '@client/hooks/useMediaQuery';
 import { ActivityFeed } from './ActivityFeed';
@@ -52,36 +53,21 @@ export function CommunityHub({ className }: CommunityHubProps) {
     refetchAll, 
   } = useCommunityData();
 
-  const {
-    setLoading,
-    setError,
-    setConnectionStatus,
-    updateTrendingScores,
-    loading,
-    isConnected,
-  } = useCommunityStore();
+  const communityStore = useCommunityStore();
+  const community = useCommunitySelectors();
+  const { isConnected } = useCommunityRealTime({});
 
-  const {
-    paginatedActivityFeed,
-    filteredTrendingTopics,
-    filteredExpertInsights,
-    filteredCampaigns,
-    filteredPetitions,
-    hasMoreItems,
-    stats,
-  } = useCommunitySelectors();
+  // Map legacy prop names to the actual data returned by `useCommunityData`
+  const paginatedActivityFeed = community.activityFeed?.data?.data || [];
+  const filteredTrendingTopics = community.trendingTopics?.data || [];
+  const filteredExpertInsights = community.expertInsights?.data || [];
+  const filteredCampaigns = community.campaigns?.data || [];
+  const filteredPetitions = community.petitions?.data || [];
+  const hasMoreItems = community.activityFeed?.data?.pagination?.hasMore ?? false;
+  const stats = community.stats?.data ?? ({} as any);
 
   // Sync loading state
-  useEffect(() => {
-    setLoading(isLoading);
-  }, [isLoading, setLoading]);
-
-  // Sync error state
-  useEffect(() => {
-    if (error) {
-      setError(error);
-    }
-  }, [error, setError]);
+  // Note: we now derive loading/error directly from `useCommunityData` (isLoading / error)
 
   // Initialize real-time connection
   useEffect(() => {
@@ -89,33 +75,33 @@ export function CommunityHub({ className }: CommunityHubProps) {
     
     // Update trending scores periodically
     const trendingInterval = setInterval(() => {
-      updateTrendingScores();
+      communityStore.loadTrendingTopics();
     }, 5 * 60 * 1000); // Every 5 minutes
 
     return () => {
       clearInterval(trendingInterval);
       // TODO: Cleanup WebSocket connection
     };
-  }, [updateTrendingScores]);
+  }, [communityStore.loadTrendingTopics, communityStore.initializeRealTime]);
 
   const setupRealTimeConnection = () => {
     // TODO: Implement WebSocket connection
     // This would connect to the existing WebSocket infrastructure
     // and handle real-time updates for community features
     
-    setConnectionStatus(true);
+    // Initialize the compatibility layer's real-time features
+    communityStore.initializeRealTime().catch(() => {});
     console.log('Setting up real-time connection...');
   };
 
   const handleRefresh = async () => {
     await refetchAll();
-    updateTrendingScores();
+    communityStore.loadTrendingTopics();
   };
 
   const handleLoadMore = () => {
     if (hasMoreItems && !isLoading) {
-      const { setPage, currentPage } = useCommunityStore.getState();
-      setPage(currentPage + 1);
+      communityStore.setPage((communityStore.currentPage || 1) + 1);
     }
   };
 
@@ -286,11 +272,11 @@ export function CommunityHub({ className }: CommunityHubProps) {
 
               <TabsContent value="feed" className="mt-4">
                 <ActivityFeed 
-                  activities={paginatedActivityFeed}
-                  loading={loading}
-                  hasMore={hasMoreItems}
-                  onLoadMore={handleLoadMore}
-                />
+                    activities={paginatedActivityFeed}
+                    loading={isLoading}
+                    hasMore={hasMoreItems}
+                    onLoadMore={handleLoadMore}
+                  />
               </TabsContent>
 
               <TabsContent value="trending" className="mt-4">
@@ -312,7 +298,7 @@ export function CommunityHub({ className }: CommunityHubProps) {
             // Desktop: Activity Feed
             <ActivityFeed 
               activities={paginatedActivityFeed}
-              loading={loading}
+              loading={isLoading}
               hasMore={hasMoreItems}
               onLoadMore={handleLoadMore}
             />

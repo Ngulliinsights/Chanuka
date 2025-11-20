@@ -6,10 +6,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { communityWebSocketExtension, CommunityWebSocketEvents } from '@client/services/community-websocket-extension';
+import { communityWebSocketExtension } from '@client/services/community-websocket-extension';
 import { useCommunityStore } from '@client/store/slices/communitySlice';
-import { useAppSelector, useAppDispatch } from '@client/store/hooks';
-import { selectDiscussionState } from '@client/store/slices/discussionSlice';
+import { useDiscussionStore } from '@client/store/slices/discussionSlice';
 import { logger } from '@client/utils/logger';
 
 interface UseCommunityRealTimeOptions {
@@ -52,8 +51,7 @@ export function useCommunityRealTime(options: UseCommunityRealTimeOptions = {}):
 
   const [isConnected, setIsConnected] = useState(false);
   const communityStore = useCommunityStore();
-  const dispatch = useAppDispatch();
-  const discussionState = useAppSelector(selectDiscussionState);
+  const discussionStore = useDiscussionStore();
   
   // Track active subscriptions to avoid duplicates
   const subscriptionsRef = useRef<Set<string>>(new Set());

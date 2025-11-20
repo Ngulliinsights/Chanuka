@@ -16,21 +16,17 @@ import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { 
-  MapPin, 
-  X, 
-  Users, 
-  MessageSquare,
+import {
+  MapPin,
+  X,
   TrendingUp,
-  Award,
   Megaphone,
   PenTool,
-  Phone,
   Mail,
   ExternalLink,
   Search,
   Building,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
 import { cn } from '@client/lib/utils';
 import { useCommunityStore } from '@client/store/slices/communitySlice';
@@ -55,9 +51,10 @@ interface Representative {
 
 export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) {
   const { localImpact, setLocalImpact, updateLocalImpact } = useCommunityStore();
-  const [selectedState, setSelectedState] = useState(localImpact?.state || '');
-  const [selectedDistrict, setSelectedDistrict] = useState(localImpact?.district || '');
-  const [selectedCounty, setSelectedCounty] = useState(localImpact?.county || '');
+  const [selectedState, setSelectedState] = useState(localImpact?.data?.state || '');
+  const [selectedDistrict, setSelectedDistrict] = useState(localImpact?.data?.district || '');
+  const [selectedCounty, setSelectedCounty] = useState(localImpact?.data?.county || '');
+  const impact: LocalImpactMetrics = localImpact?.data ?? ({} as LocalImpactMetrics);
   const [loading, setLoading] = useState(false);
   const [representatives, setRepresentatives] = useState<Representative[]>([]);
 
@@ -268,38 +265,38 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
         {localImpact && !loading && (
           <>
             <div className="space-y-4">
-              <h4 className="font-medium text-sm flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Community Activity in {localImpact.state}
-                {localImpact.district && ` - ${localImpact.district}`}
-              </h4>
+                    <h4 className="font-medium text-sm flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" />
+                      Community Activity in {impact.state}
+                      {impact.district && ` - ${impact.district}`}
+                    </h4>
 
               {/* Activity Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary">
-                    {localImpact.totalActivity.toLocaleString()}
+                    {impact.totalActivity?.toLocaleString?.() ?? 0}
                   </div>
                   <div className="text-xs text-muted-foreground">Total Activity</div>
                 </div>
 
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary">
-                    {localImpact.uniqueParticipants.toLocaleString()}
+                    {impact.uniqueParticipants?.toLocaleString?.() ?? 0}
                   </div>
                   <div className="text-xs text-muted-foreground">Participants</div>
                 </div>
 
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary">
-                    {localImpact.expertParticipants}
+                    {impact.expertParticipants ?? 0}
                   </div>
                   <div className="text-xs text-muted-foreground">Experts</div>
                 </div>
 
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <div className="text-2xl font-bold text-primary">
-                    {localImpact.averageEngagement.toFixed(1)}
+                    {(impact.averageEngagement ?? 0).toFixed(1)}
                   </div>
                   <div className="text-xs text-muted-foreground">Avg Engagement</div>
                 </div>
@@ -311,15 +308,15 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
                 <div className="grid grid-cols-3 gap-2 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Discussed:</span>
-                    <span className="font-medium">{localImpact.billsDiscussed}</span>
+                    <span className="font-medium">{impact.billsDiscussed ?? 0}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Saved:</span>
-                    <span className="font-medium">{localImpact.billsSaved}</span>
+                    <span className="font-medium">{impact.billsSaved ?? 0}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Shared:</span>
-                    <span className="font-medium">{localImpact.billsShared}</span>
+                    <span className="font-medium">{impact.billsShared ?? 0}</span>
                   </div>
                 </div>
               </div>
@@ -329,7 +326,7 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
                 <div className="flex items-center gap-2">
                   <Megaphone className="h-4 w-4 text-blue-600" />
                   <div>
-                    <div className="font-medium text-sm">{localImpact.campaignsActive}</div>
+                    <div className="font-medium text-sm">{impact.campaignsActive ?? 0}</div>
                     <div className="text-xs text-muted-foreground">Active Campaigns</div>
                   </div>
                 </div>
@@ -337,7 +334,7 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
                 <div className="flex items-center gap-2">
                   <PenTool className="h-4 w-4 text-purple-600" />
                   <div>
-                    <div className="font-medium text-sm">{localImpact.petitionsActive}</div>
+                    <div className="font-medium text-sm">{impact.petitionsActive ?? 0}</div>
                     <div className="text-xs text-muted-foreground">Active Petitions</div>
                   </div>
                 </div>
@@ -345,7 +342,7 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
             </div>
 
             {/* Top Local Topics */}
-            {localImpact.topTopics.length > 0 && (
+            {impact.topTopics && impact.topTopics.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-medium text-sm flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
@@ -353,7 +350,7 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
                 </h4>
                 
                 <div className="space-y-2">
-                  {localImpact.topTopics.map((topic, index) => (
+                  {impact.topTopics.map((topic: { title: string; score: number; category: string }, index: number) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">
@@ -366,9 +363,9 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
                           </Badge>
                         </div>
                       </div>
-                      <div className="text-sm font-medium text-primary">
-                        {Math.round(topic.score * 100)}%
-                      </div>
+                        <div className="text-sm font-medium text-primary">
+                          {Math.round(topic.score * 100)}%
+                        </div>
                     </div>
                   ))}
                 </div>
@@ -403,7 +400,7 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
                         {rep.phone && (
                           <Button variant="outline" size="sm" asChild>
                             <a href={`tel:${rep.phone}`}>
-                              <Phone className="h-3 w-3 mr-1" />
+                              <span className="h-3 w-3 mr-1 inline-block">📞</span>
                               Call
                             </a>
                           </Button>

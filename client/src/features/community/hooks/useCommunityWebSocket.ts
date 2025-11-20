@@ -8,7 +8,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { communityWebSocketMiddleware } from '@client/services/community-websocket-middleware';
 import { communityBackendService } from '@client/services/community-backend-service';
-import { notificationService } from '@client/services/notification-service';
+import notificationService from '@client/services/notification-service';
 import { logger } from '@client/utils/logger';
 
 interface CommunityWebSocketState {
@@ -148,8 +148,8 @@ export function useDiscussionUpdates(billId?: number) {
   billIdRef.current = billId;
 
   useEffect(() => {
-    const handleCommentAdded = (event: CustomEvent) => {
-      const data = event.detail;
+    const handleCommentAdded: EventListener = (evt) => {
+      const data = (evt as CustomEvent<any>).detail;
       if (!billIdRef.current || data.billId === billIdRef.current) {
         setUpdates(prev => [{
           billId: data.billId,
@@ -160,8 +160,8 @@ export function useDiscussionUpdates(billId?: number) {
       }
     };
 
-    const handleCommentUpdated = (event: CustomEvent) => {
-      const data = event.detail;
+    const handleCommentUpdated: EventListener = (evt) => {
+      const data = (evt as CustomEvent<any>).detail;
       if (!billIdRef.current || data.billId === billIdRef.current) {
         setUpdates(prev => [{
           billId: data.billId,
@@ -172,8 +172,8 @@ export function useDiscussionUpdates(billId?: number) {
       }
     };
 
-    const handleCommentVoted = (event: CustomEvent) => {
-      const data = event.detail;
+    const handleCommentVoted: EventListener = (evt) => {
+      const data = (evt as CustomEvent<any>).detail;
       if (!billIdRef.current || data.billId === billIdRef.current) {
         setUpdates(prev => [{
           billId: data.billId,
@@ -184,8 +184,8 @@ export function useDiscussionUpdates(billId?: number) {
       }
     };
 
-    const handleTypingIndicator = (event: CustomEvent) => {
-      const data = event.detail;
+    const handleTypingIndicator: EventListener = (evt) => {
+      const data = (evt as CustomEvent<any>).detail;
       if (!billIdRef.current || data.billId === billIdRef.current) {
         setTypingUsers(prev => {
           if (data.isTyping) {
@@ -197,17 +197,17 @@ export function useDiscussionUpdates(billId?: number) {
       }
     };
 
-    // Add event listeners
-    window.addEventListener('community:comment_added', handleCommentAdded);
-    window.addEventListener('community:comment_updated', handleCommentUpdated);
-    window.addEventListener('community:comment_voted', handleCommentVoted);
-    window.addEventListener('community:typing_indicator', handleTypingIndicator);
+    // Add event listeners (cast window to any to avoid overload resolution issues for custom event names)
+    (window as any).addEventListener('community:comment_added', handleCommentAdded as EventListenerOrEventListenerObject);
+    (window as any).addEventListener('community:comment_updated', handleCommentUpdated as EventListenerOrEventListenerObject);
+    (window as any).addEventListener('community:comment_voted', handleCommentVoted as EventListenerOrEventListenerObject);
+    (window as any).addEventListener('community:typing_indicator', handleTypingIndicator as EventListenerOrEventListenerObject);
 
     return () => {
-      window.removeEventListener('community:comment_added', handleCommentAdded);
-      window.removeEventListener('community:comment_updated', handleCommentUpdated);
-      window.removeEventListener('community:comment_voted', handleCommentVoted);
-      window.removeEventListener('community:typing_indicator', handleTypingIndicator);
+      (window as any).removeEventListener('community:comment_added', handleCommentAdded as EventListenerOrEventListenerObject);
+      (window as any).removeEventListener('community:comment_updated', handleCommentUpdated as EventListenerOrEventListenerObject);
+      (window as any).removeEventListener('community:comment_voted', handleCommentVoted as EventListenerOrEventListenerObject);
+      (window as any).removeEventListener('community:typing_indicator', handleTypingIndicator as EventListenerOrEventListenerObject);
     };
   }, []);
 
@@ -229,8 +229,8 @@ export function useExpertUpdates() {
   const [updates, setUpdates] = useState<ExpertUpdate[]>([]);
 
   useEffect(() => {
-    const handleVerificationUpdate = (event: CustomEvent) => {
-      const data = event.detail;
+    const handleVerificationUpdate: EventListener = (evt) => {
+      const data = (evt as CustomEvent<any>).detail;
       setUpdates(prev => [{
         type: 'verification_updated',
         data: {
@@ -242,8 +242,8 @@ export function useExpertUpdates() {
       }, ...prev.slice(0, 29)]); // Keep last 30 updates
     };
 
-    const handleInsightAdded = (event: CustomEvent) => {
-      const data = event.detail;
+    const handleInsightAdded: EventListener = (evt) => {
+      const data = (evt as CustomEvent<any>).detail;
       setUpdates(prev => [{
         type: 'insight_added',
         data: {
@@ -254,12 +254,12 @@ export function useExpertUpdates() {
       }, ...prev.slice(0, 29)]);
     };
 
-    window.addEventListener('community:expert_verification_updated', handleVerificationUpdate);
-    window.addEventListener('community:expert_insight_added', handleInsightAdded);
+    (window as any).addEventListener('community:expert_verification_updated', handleVerificationUpdate as EventListenerOrEventListenerObject);
+    (window as any).addEventListener('community:expert_insight_added', handleInsightAdded as EventListenerOrEventListenerObject);
 
     return () => {
-      window.removeEventListener('community:expert_verification_updated', handleVerificationUpdate);
-      window.removeEventListener('community:expert_insight_added', handleInsightAdded);
+      (window as any).removeEventListener('community:expert_verification_updated', handleVerificationUpdate as EventListenerOrEventListenerObject);
+      (window as any).removeEventListener('community:expert_insight_added', handleInsightAdded as EventListenerOrEventListenerObject);
     };
   }, []);
 
@@ -281,8 +281,8 @@ export function useCommunityAnalytics() {
   const [trendingTopics, setTrendingTopics] = useState<any[]>([]);
 
   useEffect(() => {
-    const handleActivityUpdate = (event: CustomEvent) => {
-      const data = event.detail;
+    const handleActivityUpdate: EventListener = (evt) => {
+      const data = (evt as CustomEvent<any>).detail;
       setAnalytics(prev => [{
         type: 'activity_update',
         data: data.data,
@@ -290,8 +290,8 @@ export function useCommunityAnalytics() {
       }, ...prev.slice(0, 19)]); // Keep last 20 updates
     };
 
-    const handleTrendingUpdate = (event: CustomEvent) => {
-      const data = event.detail;
+    const handleTrendingUpdate: EventListener = (evt) => {
+      const data = (evt as CustomEvent<any>).detail;
       setTrendingTopics(data.topics);
       setAnalytics(prev => [{
         type: 'trending_update',
@@ -300,12 +300,12 @@ export function useCommunityAnalytics() {
       }, ...prev.slice(0, 19)]);
     };
 
-    window.addEventListener('community:activity_update', handleActivityUpdate);
-    window.addEventListener('community:trending_update', handleTrendingUpdate);
+    (window as any).addEventListener('community:activity_update', handleActivityUpdate as EventListenerOrEventListenerObject);
+    (window as any).addEventListener('community:trending_update', handleTrendingUpdate as EventListenerOrEventListenerObject);
 
     return () => {
-      window.removeEventListener('community:activity_update', handleActivityUpdate);
-      window.removeEventListener('community:trending_update', handleTrendingUpdate);
+      (window as any).removeEventListener('community:activity_update', handleActivityUpdate as EventListenerOrEventListenerObject);
+      (window as any).removeEventListener('community:trending_update', handleTrendingUpdate as EventListenerOrEventListenerObject);
     };
   }, []);
 
@@ -331,20 +331,20 @@ export function useCommunityNotifications() {
     // Get initial notifications
     const loadNotifications = async () => {
       try {
-        const initialNotifications = notificationService.getNotifications();
+        const initialNotifications = (notificationService as any).getNotifications() as any[];
         const communityNotifications = initialNotifications
-          .filter(n => n.isCommunityRelated)
-          .map(n => ({
+          .filter((n: any) => !!n.isCommunityRelated)
+          .map((n: any) => ({
             id: n.id,
             type: n.type,
             title: n.title,
             message: n.message,
             data: n.data,
-            timestamp: n.createdAt,
+            timestamp: n.createdAt ?? n.timestamp,
           }));
 
         setNotifications(communityNotifications);
-        setUnreadCount(notificationService.getUnreadCount());
+        setUnreadCount((notificationService as any).getUnreadCount());
       } catch (error) {
         logger.error('Failed to load community notifications', { component: 'useCommunityNotifications' }, error);
       }
@@ -370,8 +370,8 @@ export function useCommunityNotifications() {
       setUnreadCount(count);
     };
 
-    const unsubscribeReceived = notificationService.on('notification:received', handleNotificationReceived);
-    const unsubscribeCount = notificationService.on('unread_count:changed', handleUnreadCountChanged);
+    const unsubscribeReceived = (notificationService as any).on('notification:received', handleNotificationReceived);
+    const unsubscribeCount = (notificationService as any).on('unread_count:changed', handleUnreadCountChanged);
 
     return () => {
       unsubscribeReceived();
@@ -381,7 +381,7 @@ export function useCommunityNotifications() {
 
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      await notificationService.markAsRead(notificationId);
+      await (notificationService as any).markAsRead(notificationId);
     } catch (error) {
       logger.error('Failed to mark notification as read', { component: 'useCommunityNotifications' }, error);
     }
@@ -389,7 +389,7 @@ export function useCommunityNotifications() {
 
   const markAllAsRead = useCallback(async () => {
     try {
-      await notificationService.markAllAsRead();
+      await (notificationService as any).markAllAsRead();
     } catch (error) {
       logger.error('Failed to mark all notifications as read', { component: 'useCommunityNotifications' }, error);
     }
@@ -397,7 +397,7 @@ export function useCommunityNotifications() {
 
   const deleteNotification = useCallback(async (notificationId: string) => {
     try {
-      await notificationService.deleteNotification(notificationId);
+      await (notificationService as any).deleteNotification(notificationId);
     } catch (error) {
       logger.error('Failed to delete notification', { component: 'useCommunityNotifications' }, error);
     }
