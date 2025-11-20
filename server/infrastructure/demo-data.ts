@@ -1,7 +1,7 @@
 import type { Bill, BillComment, Sponsor, BillEngagement } from '@shared/schema';
 // Import analysis types from their respective domain features
-import type { BillAnalysis } from '@client/features/bills/types/analysis.js';
-import type { SponsorshipAnalysis } from '@client/features/sponsors/types/analysis.js';
+import type { BillAnalysis } from '@server/features/bills/types/analysis.ts';
+import type { SponsorshipAnalysis } from '@server/features/sponsors/types/analysis.ts';
 import { logger   } from '@shared/core/src/index.js';
 
 // Enhanced types for demo data that match API responses
@@ -805,6 +805,7 @@ export class DemoDataService {
 
 // Export singleton instance for convenient access
 export const demoDataService = DemoDataService.getInstance();
+
 
 
 

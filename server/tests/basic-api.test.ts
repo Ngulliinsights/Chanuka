@@ -25,3 +25,4 @@ describe('Basic API endpoints', () => {
     expect(res.body).toMatchObject({ status: 'online' })
   })
 })
+

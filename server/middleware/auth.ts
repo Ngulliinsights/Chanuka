@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { authService } from '@client/core/auth/auth-service.js';
+import { authService } from '@server/core/auth/auth-service.ts';
 import { logger   } from '@shared/core/src/index.js';
 
 // Extend Express User type to match our auth service
@@ -59,6 +59,7 @@ export const requireRole = (roles: string[]) => {
     next();
   };
 };
+
 
 
 

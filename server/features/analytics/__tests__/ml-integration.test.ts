@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { MLServiceAdapter } from '@client/services/ml-adapter.service.js';
-import { realMLAnalysisService } from '@client/services/real-ml.service.js';
+import { MLServiceAdapter } from '@server/services/ml-adapter.service.ts';
+import { realMLAnalysisService } from '@server/services/real-ml.service.ts';
 import { featureFlagsService } from '../../../infrastructure/migration/feature-flags.service.js';
 
 /**

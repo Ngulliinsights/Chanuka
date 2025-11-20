@@ -4,7 +4,7 @@
 
 // Repository interfaces removed - using direct service calls
 import { AdvocacyEventPublisher, ImpactAchievedEvent } from '../domain/events/advocacy-events.js';
-import { ImpactAssessment } from '@client/types/index.js';
+import { ImpactAssessment } from '@server/types/index.ts';
 import { logger  } from '@shared/core/src/index.js';
 
 export interface ImpactMetric {

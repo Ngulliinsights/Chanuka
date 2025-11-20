@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { CoverageAnalyzer } from '@client/services/coverage-analyzer';
+import { CoverageAnalyzer } from '@server/services/coverage-analyzer';
 import { exec } from 'child_process';
 import fs from 'fs/promises';
 import { logger  } from '@shared/core/src/index.js';
@@ -220,6 +220,7 @@ describe('CoverageAnalyzer', () => {
     });
   });
 });
+
 
 
 

@@ -240,3 +240,4 @@ export type FinancialDisclosureConfigType = typeof FinancialDisclosureConfig;
 
 
 
+

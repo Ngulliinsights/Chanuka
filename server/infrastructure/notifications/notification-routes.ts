@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
 import { notificationService } from './notification-service.js';
-import { userPreferencesService } from '@client/features/users/domain/user-preferences.js';
+import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
 import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
@@ -333,6 +333,7 @@ router.get('/status', async (req: Request, res: Response) => {
 });
 
 export default router;
+
 
 
 

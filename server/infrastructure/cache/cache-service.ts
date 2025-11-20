@@ -5,7 +5,7 @@
 
 import { cacheFactory } from '@shared/core/src/caching';
 import type { CacheAdapter } from '@shared/core/src/caching';
-import { logger } from '@client/utils/shared-core-fallback.js';
+import { logger } from '@server/utils/shared-core-fallback.ts';
 
 // Re-export types for backward compatibility
 export interface CacheOptions {

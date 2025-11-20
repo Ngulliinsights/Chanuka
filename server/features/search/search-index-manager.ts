@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { databaseService } from "@client/services/database-service.js";
+import { databaseService } from "@server/services/database-service.ts";
 import { readDatabase } from '@shared/database';
 import { cacheService } from "../../infrastructure/cache/cache-service.js";
 import { demoDataService } from "../../infrastructure/demo-data.js";
@@ -762,6 +762,7 @@ export class SearchIndexManager {
 
 // Export singleton instance
 export const searchIndexManager = new SearchIndexManager();
+
 
 
 

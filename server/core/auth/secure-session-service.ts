@@ -3,8 +3,8 @@ import { Request, Response } from 'express';
 import { getLegacyDatabase } from '@shared/database';
 import { sessions, users } from '@shared/schema';
 import { eq, and, lt, gt } from 'drizzle-orm';
-import { encryptionService } from '@client/features/security/encryption-service.js';
-import { securityAuditService } from '@client/features/security/security-audit-service.js';
+import { encryptionService } from '@server/features/security/encryption-service.ts';
+import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 import { logger  } from '@shared/core/src/index.js';
 
 // Get database instance
@@ -426,6 +426,7 @@ export class SecureSessionService {
 
 // Singleton instance
 export const secureSessionService = new SecureSessionService();
+
 
 
 

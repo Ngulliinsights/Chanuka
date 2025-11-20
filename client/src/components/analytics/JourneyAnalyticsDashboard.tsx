@@ -31,9 +31,9 @@ import {
   Download,
   RefreshCw
 } from 'lucide-react';
-import { useJourneyAnalytics } from '@client/hooks/use-journey-tracker';
+import { useJourneyAnalytics } from '@/hooks/use-journey-tracker';
 import { JourneyAnalytics, JourneyOptimization, PathAnalytics, DropOffPoint, ConversionFunnel } from '@client/services/UserJourneyTracker';
-import { UserRole } from '@client/types/navigation';
+import { UserRole } from '@clien/types/navigation';
 import { logger } from '@client/utils/logger';
 
 interface JourneyAnalyticsDashboardProps {

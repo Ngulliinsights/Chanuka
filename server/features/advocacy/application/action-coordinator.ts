@@ -4,7 +4,7 @@
 
 import { ActionItem, NewActionItem, ActionItemEntity } from '../domain/entities/action-item.js';
 // Repository interfaces removed - using direct service calls
-import { ActionFilters, PaginationOptions, ActionTemplate } from '@client/types/index.js';
+import { ActionFilters, PaginationOptions, ActionTemplate } from '@server/types/index.ts';
 import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
 import { logger  } from '@shared/core/src/index.js';
 

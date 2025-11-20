@@ -201,3 +201,4 @@ export async function getSectionConflictsForBill(bill_id: number): Promise<any[]
     description: r.impact_description ?? r.description ?? null
   }));
 }
+

@@ -5,7 +5,7 @@
  */
 
 import { performance } from 'perf_hooks';
-// import { performanceMonitoring } from '@client/services/performance-monitoring.js'; // TODO: Fix missing module
+// import { performanceMonitoring } from '@server/services/performance-monitoring.ts'; // TODO: Fix missing module
 import { logger   } from '@shared/core/src/index.js';
 // import { createObservabilityStack   } from '@shared/core/src/index.js'; // TODO: Fix missing export
 
@@ -184,6 +184,7 @@ export function recordGauge(name: string, value: number, tags?: Record<string, a
 
 // Export legacy interface for backward compatibility
 export type { MetricData };
+
 
 
 

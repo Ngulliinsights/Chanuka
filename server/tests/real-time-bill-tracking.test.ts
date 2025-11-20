@@ -26,8 +26,8 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/glo
 import WebSocket from 'ws';
 import jwt from 'jsonwebtoken';
 import { webSocketService } from '../infrastructure/websocket.js';
-import { billStatusMonitorService } from '@client/features/bills/bill-status-monitor.js';
-import { userPreferencesService } from '@client/features/users/domain/user-preferences.js';
+import { billStatusMonitorService } from '@server/features/bills/bill-status-monitor.ts';
+import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
 import { database as db, user as users, bill as bills, bill_engagement } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { logger  } from '@shared/core/src/index.js';
@@ -511,6 +511,7 @@ describe('Real-Time Bill Tracking System', () => {
     });
   });
 });
+
 
 
 

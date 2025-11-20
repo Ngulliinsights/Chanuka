@@ -7,7 +7,7 @@
 import Fuse from 'fuse.js';
 import { database } from '@shared/database';
 import { bills, sponsors, comments, users } from '@shared/schema';
-import { SearchQuery, SearchResult, SearchEngine } from '@client/types/search.types.js';
+import { SearchQuery, SearchResult, SearchEngine } from '@server/types/search.types.ts';
 import { sql } from 'drizzle-orm';
 
 interface FuseSearchOptions {

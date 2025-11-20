@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { suggestionEngineService } from '../engines/suggestion/index.js';
-import { parallelQueryExecutor } from '@client/utils/parallel-query-executor';
-import { historyCleanupService } from '@client/services/history-cleanup.service';
+import { parallelQueryExecutor } from '@server/utils/parallel-query-executor';
+import { historyCleanupService } from '@server/services/history-cleanup.service';
 import { suggestionRankingService } from '../engines/suggestion/index.js';
 
 describe('Search Performance Tests', () => {

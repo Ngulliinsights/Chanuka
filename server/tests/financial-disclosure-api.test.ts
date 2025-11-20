@@ -15,9 +15,9 @@ vi.mock('../../shared/core/src/observability/logging', () => ({
 
 import request from 'supertest';
 import express from 'express';
-import { createFinancialDisclosureRouter } from '@client/features/analytics/financial-disclosure/index.js';
-import { FinancialDisclosureMonitoringService } from '@client/features/analytics/financial-disclosure/monitoring.js';
-import { financialDisclosureAnalyticsService } from '@client/features/analytics/services/financial-disclosure.service.js';
+import { createFinancialDisclosureRouter } from '@server/features/analytics/financial-disclosure/index.ts';
+import { FinancialDisclosureMonitoringService } from '@server/features/analytics/financial-disclosure/monitoring.ts';
+import { financialDisclosureAnalyticsService } from '@server/features/analytics/services/financial-disclosure.service.ts';
 import { logger  } from '@shared/core/src/index.js';
 
 // Create mock monitoring service for tests
@@ -261,6 +261,7 @@ describe('Financial Disclosure API Endpoints', () => {
     });
   });
 });
+
 
 
 

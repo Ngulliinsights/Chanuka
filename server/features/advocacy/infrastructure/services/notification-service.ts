@@ -2,7 +2,7 @@
 // ADVOCACY COORDINATION - Notification Service
 // ============================================================================
 
-import { NotificationPreferences } from '@client/types/index.js';
+import { NotificationPreferences } from '@server/types/index.ts';
 import { logger  } from '@shared/core/src/index.js';
 
 export interface NotificationConfig {

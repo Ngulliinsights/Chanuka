@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import { encryptionService } from './encryption-service';
-// import { inputValidationService } from '@client/core/validation/input-validation-service.ts'; // TODO: Fix missing module
-// import { secureSessionService } from '@client/core/auth/secure-session-service.ts'; // TODO: Fix missing module
+// import { inputValidationService } from '@server/core/validation/input-validation-service.ts'; // TODO: Fix missing module
+// import { secureSessionService } from '@server/core/auth/secure-session-service.ts'; // TODO: Fix missing module
 import { securityAuditService } from './security-audit-service';
 import { tlsConfigService } from './tls-config-service';
 // import { securityMiddleware } from '../middleware/security-middleware.ts'; // TODO: Fix missing module
@@ -437,6 +437,7 @@ export class SecurityInitializationService {
 export const createSecurityInitializationService = (app: Express) => {
   return new SecurityInitializationService(app);
 };
+
 
 
 

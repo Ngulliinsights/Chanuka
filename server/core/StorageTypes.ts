@@ -1,5 +1,5 @@
 import { QueryResult, QueryResultRow } from 'pg';
-import { InsertUser, User, UserProgress, InsertUserProgress } from '@client/types';
+import { InsertUser, User, UserProgress, InsertUserProgress } from '@server/types';
 
 export interface TransactionClient {
   query<T extends QueryResultRow>(queryText: string, values?: any[]): Promise<QueryResult<T>>;
@@ -34,6 +34,7 @@ export interface Storage { // Progress-related methods (now aligned with shared/
   updateUserReputation(user_id: string, change: number): Promise<User>;
   updateUserLastActive(user_id: string): Promise<User>;
 }
+
 
 
 

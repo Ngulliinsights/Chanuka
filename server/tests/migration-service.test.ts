@@ -15,7 +15,7 @@ vi.mock('../../shared/core/src/observability/logging', () => ({
 
 import { Pool } from 'pg';
 import { MigrationService } from '../infrastructure/database/migration-service.js';
-import { DataIntegrityValidationService } from '@client/core/validation/data-validation-service.js';
+import { DataIntegrityValidationService } from '@server/core/validation/data-validation-service.ts';
 import * as fs from 'fs';
 import * as path from 'path';
 import { logger  } from '@shared/core/src/index.js';
@@ -297,6 +297,7 @@ describe('DataIntegrityValidationService', () => {
     });
   });
 });
+
 
 
 

@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { regulatoryChangeMonitoringService } from '@client/features/analytics/regulatory-change-monitoring.js';
+import { regulatoryChangeMonitoringService } from '@server/features/analytics/regulatory-change-monitoring.ts';
 import { z } from 'zod'; // For runtime validation
-import { errorTracker } from '@client/core/errors/error-tracker.js';
+import { errorTracker } from '@server/core/errors/error-tracker.ts';
 import { ApiResponseWrapper   } from '@shared/core/src/index.js';
 import { logger   } from '@shared/core/src/index.js';
 
@@ -396,6 +396,7 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 export default router;
+
 
 
 

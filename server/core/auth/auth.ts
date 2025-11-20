@@ -5,7 +5,7 @@ import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized  } from '@sha
 import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '@shared/core/src/utils/api-utils.js';
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from "../../middleware/rate-limiter.js";
 import { errorTracker } from '../errors/error-tracker.js';
-import { securityAuditService } from '@client/features/security/security-audit-service.js';
+import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 
 export const router: Router = Router();
 
@@ -842,6 +842,7 @@ router.get("/security/suspicious-activity", async (req: Request, res: Response) 
     }, HttpStatus.INTERNAL_SERVER_ERROR, ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
+
 
 
 

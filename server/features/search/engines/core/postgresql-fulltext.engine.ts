@@ -9,10 +9,10 @@
 // - Proximity search for phrase matching
 // - Dual-engine integration capabilities
 
-import { SearchQuery, SearchResult } from '@client/types/search.types.js';
+import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
 import { logger } from '@shared/core/src/index.js';
 import { databaseService } from '@/infrastructure/database/database-service';
-import { searchSyntaxParser, ParsedQuery } from '@client/utils/search-syntax-parser';
+import { searchSyntaxParser, ParsedQuery } from '@server/utils/search-syntax-parser';
 
 interface QueryExpansionOptions {
   enableSynonyms: boolean;

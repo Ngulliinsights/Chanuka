@@ -5,7 +5,7 @@ import { argumentTable } from '@shared/schema/argument_intelligence';
 import { evaluations, departments } from '@shared/schema/platform_operations';
 import type { DepartmentStat, RadarDatum } from '@shared/schema/platform_operations';
 import { logger   } from '@shared/core/src/index.js';
-import { errorTracker } from '@client/core/errors/error-tracker.js';
+import { errorTracker } from '@server/core/errors/error-tracker.ts';
 
 // Security Services
 import { dataPrivacyService } from '../../infrastructure/security/data-privacy-service.js';
@@ -703,6 +703,7 @@ export const getCacheStats = () => {
 export const shutdownDashboardStorage = (): void => {
   dashboardStorage.shutdown();
 };
+
 
 
 

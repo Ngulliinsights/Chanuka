@@ -5,12 +5,12 @@
 
 import { logger } from '@shared/core/index.js';
 import { databaseService } from '../database/database-service.js';
-import { CampaignDomainService } from '@client/features/advocacy/domain/services/campaign-domain-service.js';
-import { searchService } from '@client/features/search/application/search-service.js';
-import { RecommendationService } from '@client/features/recommendation/application/RecommendationService.js';
-import { ConstitutionalAnalyzer } from '@client/features/constitutional-analysis/application/constitutional-analyzer.js';
-import { StructureExtractorService } from '@client/features/argument-intelligence/application/structure-extractor.js';
-import { governmentDataIntegrationService } from '@client/features/government-data/services/government-data-integration.service.js';
+import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service.ts';
+import { searchService } from '@server/features/search/application/search-service.ts';
+import { RecommendationService } from '@server/features/recommendation/application/RecommendationService.ts';
+import { ConstitutionalAnalyzer } from '@server/features/constitutional-analysis/application/constitutional-analyzer.ts';
+import { StructureExtractorService } from '@server/features/argument-intelligence/application/structure-extractor.ts';
+import { governmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service.ts';
 
 export interface ServiceHealth {
   serviceName: string;

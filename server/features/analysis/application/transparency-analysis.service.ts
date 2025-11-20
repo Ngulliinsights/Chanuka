@@ -159,3 +159,4 @@ export class TransparencyAnalysisService {
 }
 
 export const transparencyAnalysisService = new TransparencyAnalysisService();
+

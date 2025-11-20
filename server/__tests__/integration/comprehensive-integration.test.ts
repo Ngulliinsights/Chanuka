@@ -7,7 +7,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { serviceOrchestrator } from '../../infrastructure/integration/service-orchestrator.js';
 import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
 import { errorHandler } from '../../infrastructure/errors/error-standardization.js';
-import { TestDataManager } from '@client/utils/test-helpers.js';
+import { TestDataManager } from '@server/utils/test-helpers.ts';
 import { databaseService } from '../../infrastructure/database/database-service.js';
 import { logger } from '@shared/core/index.js';
 
@@ -371,7 +371,7 @@ describe('Comprehensive Integration Tests', () => {
 
   describe('Search Integration', () => {
     it('should integrate search across all content types', async () => {
-      const { searchService } = await import('@client/features/search/application/search-service.js');
+      const { searchService } = await import('@server/features/search/application/search-service.ts');
 
       // Test search functionality
       const searchQuery = {

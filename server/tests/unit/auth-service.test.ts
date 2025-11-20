@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { AuthService, registerSchema, loginSchema } from '@client/core/auth/auth-service.js';
+import { AuthService, registerSchema, loginSchema } from '@server/core/auth/auth-service.ts';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
@@ -111,7 +111,7 @@ describe('AuthService', () => {
 
     beforeEach(() => {
       // Mock input validation service
-      const { inputValidationService } = require('@client/core/validation/input-validation-service.js');
+      const { inputValidationService } = require('@server/core/validation/input-validation-service.ts');
       inputValidationService.validateRequest.mockReturnValue({
         success: true,
         data: validRegistrationData
@@ -122,7 +122,7 @@ describe('AuthService', () => {
       });
 
       // Mock encryption service
-      const { encryptionService } = require('@client/features/security/encryption-service.js');
+      const { encryptionService } = require('@server/features/security/encryption-service.ts');
       encryptionService.hashPassword.mockResolvedValue('hashed-password');
 
       // Mock email service
@@ -169,7 +169,7 @@ describe('AuthService', () => {
     });
 
     it('should fail registration for invalid input', async () => {
-      const { inputValidationService } = require('@client/core/validation/input-validation-service.js');
+      const { inputValidationService } = require('@server/core/validation/input-validation-service.ts');
       inputValidationService.validateRequest.mockReturnValue({
         success: false,
         errors: ['Invalid email format']
@@ -182,7 +182,7 @@ describe('AuthService', () => {
     });
 
     it('should fail registration for invalid email', async () => {
-      const { inputValidationService } = require('@client/core/validation/input-validation-service.js');
+      const { inputValidationService } = require('@server/core/validation/input-validation-service.ts');
       inputValidationService.validateEmail.mockReturnValue({
         isValid: false,
         error: 'Invalid email format'
@@ -642,6 +642,7 @@ describe('AuthService', () => {
     });
   });
 });
+
 
 
 

@@ -1,4 +1,4 @@
-import { sponsorConflictAnalysisService } from '@client/features/bills/sponsor-conflict-analysis.js';
+import { sponsorConflictAnalysisService } from '@server/features/bills/sponsor-conflict-analysis.ts';
 import { logger   } from '@shared/core/src/index.js';
 
 async function testConflictAnalysis() {
@@ -103,6 +103,7 @@ testConflictAnalysis().then(() => {
   logger.error('💥 Test script failed:', { component: 'Chanuka' }, error);
   process.exit(1);
 });
+
 
 
 

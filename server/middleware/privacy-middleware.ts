@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth.js';
-import { privacyService } from '@client/features/privacy/privacy-service.js';
+import { privacyService } from '@server/features/privacy/privacy-service.ts';
 import { auditLogger } from '../infrastructure/monitoring/audit-log.js';
 import { logger   } from '@shared/core/src/index.js';
 
@@ -269,6 +269,7 @@ export const anonymizeIP = (req: Request, res: Response, next: NextFunction) => 
 
   next();
 };
+
 
 
 

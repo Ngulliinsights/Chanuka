@@ -44,3 +44,4 @@ router.delete('/cache/clear', async (req, res) => {
     });
   }
 });
+

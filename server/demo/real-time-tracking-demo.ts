@@ -9,8 +9,8 @@
 
 import { webSocketService } from '../infrastructure/websocket.js';
 // bill-status-monitor exports the singleton instance as `billStatusMonitorService`
-import { billStatusMonitorService as billStatusMonitor } from '@client/features/bills/bill-status-monitor.js';
-import { userPreferencesService } from '@client/features/users/domain/user-preferences.js';
+import { billStatusMonitorService as billStatusMonitor } from '@server/features/bills/bill-status-monitor.ts';
+import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
 import { createServer } from 'http';
 import express from 'express';
 import { logger   } from '@shared/core/src/index.js';
@@ -274,6 +274,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export { runDemo };
+
 
 
 

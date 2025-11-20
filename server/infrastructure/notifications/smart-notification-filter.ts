@@ -756,3 +756,4 @@ export class SmartNotificationFilterService {
 
 // Export singleton instance
 export const smartNotificationFilterService = new SmartNotificationFilterService();
+

@@ -2,7 +2,7 @@ import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
-import { BaseStorage, type StorageConfig } from '@server/infrastructure/database/base/BaseStorage.js';
+import { BaseStorage, type StorageConfig } from '@server/infrastructure/database/base/BaseStorage.ts';
 import { readDatabase } from '@shared/database';
 import {
   bill as bills,
@@ -469,6 +469,7 @@ export class BillStorage extends BaseStorage<Bill> {
 
 // Export singleton instance for consistent usage across the application
 export const billStorage = BillStorage.getInstance();
+
 
 
 

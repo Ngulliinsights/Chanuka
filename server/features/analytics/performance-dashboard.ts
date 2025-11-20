@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { performanceMonitor   } from '@shared/core/src/index.js';
 import { logger   } from '@shared/core/src/index.js';
-import { errorTracker } from '@client/core/errors/error-tracker.js';
+import { errorTracker } from '@server/core/errors/error-tracker.ts';
 
 export const router = Router();
 
@@ -301,3 +301,4 @@ router.get('/health', async (req, res) => {
 });
 
 export default router;
+

@@ -18,10 +18,10 @@ import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
 import { router as authRouter } from '@/components/auth';
-import { router as billsRouter } from '@client/features/bills/presentation/bills-router.js';
-import { router as sponsorsRouter } from '@client/features/bills/sponsors.js';
-import { router as profileRouter } from '@client/features/users/application/profile.js';
-import { router as adminRouter } from '@client/features/admin/admin.js';
+import { router as billsRouter } from '@server/features/bills/presentation/bills-router.ts';
+import { router as sponsorsRouter } from '@server/features/bills/sponsors.ts';
+import { router as profileRouter } from '@server/features/users/application/profile.ts';
+import { router as adminRouter } from '@server/features/admin/admin.ts';
 import { database as db, users } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
@@ -796,6 +796,7 @@ describe('Authentication Flow Validation Tests', () => {
     });
   });
 });
+
 
 
 

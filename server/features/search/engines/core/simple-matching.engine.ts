@@ -7,7 +7,7 @@
 import { database } from '@shared/database';
 import { bills, sponsors, comments } from '@shared/schema';
 import { ilike, or, sql, desc } from 'drizzle-orm';
-import { SearchQuery, SearchResult } from '@client/types/search.types.js';
+import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
 // Simple logger for search engine
 const logger = {
   debug: (message: string, meta?: any) => console.log(`[DEBUG] ${message}`, meta || ''),

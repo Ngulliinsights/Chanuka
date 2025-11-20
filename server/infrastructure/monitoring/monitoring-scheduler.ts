@@ -1,5 +1,5 @@
 import { logger  } from '@shared/core/src/index.js';
-import { schemaValidationService } from '@client/core/validation/schema-validation-service.js';
+import { schemaValidationService } from '@server/core/validation/schema-validation-service.ts';
 
 export class MonitoringScheduler {
   private intervals: Map<string, NodeJS.Timeout> = new Map();
@@ -131,3 +131,4 @@ export class MonitoringScheduler {
 }
 
 export const monitoringScheduler = new MonitoringScheduler();
+

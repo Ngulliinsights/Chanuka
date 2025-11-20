@@ -1,5 +1,5 @@
 import { apmService } from '../monitoring';
-import { errorTracker } from '@client/core/errors/error-tracker';
+import { errorTracker } from '@server/core/errors/error-tracker';
 import { logger   } from '@shared/core/src/index.js';
 import { createObservabilityStack  } from '@shared/core/observability';
 
@@ -499,6 +499,7 @@ class AlertingService {
 
 // Export singleton instance
 export const alertingService = new AlertingService();
+
 
 
 

@@ -8,9 +8,9 @@ import { database as db } from '@shared/database/connection.js';
 
 import { users, sessions, oauth_providers, oauth_tokens, user_sessions } from '@shared/schema';
 import { getEmailService } from '../../infrastructure/notifications/email-service';
-import { encryptionService } from '@client/features/security/encryption-service.js';
+import { encryptionService } from '@server/features/security/encryption-service.ts';
 import { inputValidationService } from '../validation/input-validation-service.js';
-import { securityAuditService } from '@client/features/security/security-audit-service.js';
+import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 import { Request } from 'express';
 import { z } from 'zod';
 import { logger } from '@shared/core/src/index.js';
@@ -1485,6 +1485,7 @@ export class AuthService {
 }
 
 export const authService = new AuthService();
+
 
 
 

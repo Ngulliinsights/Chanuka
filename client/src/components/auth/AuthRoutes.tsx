@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { AuthGuard, RequireAuth, RequireRole } from './AuthGuard';
+import { AuthGuard, RequireAuth } from './AuthGuard';
 import { OAuthCallback } from './OAuthCallback';
 
 // Lazy load auth pages
@@ -13,9 +13,9 @@ const LoginPage = React.lazy(() => import('@client/pages/auth/LoginPage'));
 const RegisterPage = React.lazy(() => import('@client/pages/auth/RegisterPage'));
 const ForgotPasswordPage = React.lazy(() => import('@client/pages/auth/ForgotPasswordPage'));
 const ResetPasswordPage = React.lazy(() => import('@client/pages/auth/ResetPasswordPage'));
-const ProfilePage = React.lazy(() => import('@client/pages/auth/ProfilePage'));
 const SecurityPage = React.lazy(() => import('@client/pages/auth/SecurityPage'));
 const PrivacyPage = React.lazy(() => import('@client/pages/auth/PrivacyPage'));
+const AuthPage = React.lazy(() => import('@client/pages/auth-page'));
 
 export function AuthRoutes() {
   return (
@@ -63,7 +63,7 @@ export function AuthRoutes() {
         path="/auth/profile" 
         element={
           <RequireAuth>
-            <ProfilePage />
+            <AuthPage />
           </RequireAuth>
         } 
       />
@@ -139,7 +139,7 @@ export const authRouteConfig = [
     path: '/auth/profile',
     element: (
       <RequireAuth>
-        <ProfilePage />
+        <AuthPage />
       </RequireAuth>
     ),
     id: 'auth-profile'

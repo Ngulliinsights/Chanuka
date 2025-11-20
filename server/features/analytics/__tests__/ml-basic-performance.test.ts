@@ -24,7 +24,7 @@ describe('ML Basic Performance Test', () => {
     describe('Mock ML Service Performance', () => {
         it('should perform stakeholder influence analysis', async () => {
             // Import dynamically to avoid import issues
-            const { MLAnalysisService } = await import('@client/services/ml.service.js');
+            const { MLAnalysisService } = await import('@server/services/ml.service.ts');
             
             const startTime = Date.now();
             const result = await MLAnalysisService.analyzeStakeholderInfluence(sampleBillContent);
@@ -39,7 +39,7 @@ describe('ML Basic Performance Test', () => {
         });
 
         it('should perform conflict detection', async () => {
-            const { MLAnalysisService } = await import('@client/services/ml.service.js');
+            const { MLAnalysisService } = await import('@server/services/ml.service.ts');
             
             const startTime = Date.now();
             const result = await MLAnalysisService.detectConflictsOfInterest(sampleBillContent, sampleSponsorData);
@@ -54,7 +54,7 @@ describe('ML Basic Performance Test', () => {
         });
 
         it('should perform beneficiary analysis', async () => {
-            const { MLAnalysisService } = await import('@client/services/ml.service.js');
+            const { MLAnalysisService } = await import('@server/services/ml.service.ts');
             
             const startTime = Date.now();
             const result = await MLAnalysisService.analyzeBeneficiaries(sampleBillContent);
@@ -72,7 +72,7 @@ describe('ML Basic Performance Test', () => {
     describe('Real ML Service Performance', () => {
         it('should initialize and perform stakeholder analysis', async () => {
             try {
-                const { RealMLAnalysisService } = await import('@client/services/real-ml.service.js');
+                const { RealMLAnalysisService } = await import('@server/services/real-ml.service.ts');
                 const realMLService = RealMLAnalysisService.getInstance();
                 
                 await realMLService.initialize();
@@ -96,7 +96,7 @@ describe('ML Basic Performance Test', () => {
 
         it('should perform conflict detection with real ML', async () => {
             try {
-                const { RealMLAnalysisService } = await import('@client/services/real-ml.service.js');
+                const { RealMLAnalysisService } = await import('@server/services/real-ml.service.ts');
                 const realMLService = RealMLAnalysisService.getInstance();
                 
                 const startTime = Date.now();
@@ -117,7 +117,7 @@ describe('ML Basic Performance Test', () => {
 
         it('should perform beneficiary analysis with real ML', async () => {
             try {
-                const { RealMLAnalysisService } = await import('@client/services/real-ml.service.js');
+                const { RealMLAnalysisService } = await import('@server/services/real-ml.service.ts');
                 const realMLService = RealMLAnalysisService.getInstance();
                 
                 const startTime = Date.now();
@@ -171,8 +171,8 @@ describe('ML Basic Performance Test', () => {
     describe('Performance Comparison', () => {
         it('should compare mock vs real ML performance', async () => {
             try {
-                const { MLAnalysisService } = await import('@client/services/ml.service.js');
-                const { RealMLAnalysisService } = await import('@client/services/real-ml.service.js');
+                const { MLAnalysisService } = await import('@server/services/ml.service.ts');
+                const { RealMLAnalysisService } = await import('@server/services/real-ml.service.ts');
                 
                 const realMLService = RealMLAnalysisService.getInstance();
                 await realMLService.initialize();

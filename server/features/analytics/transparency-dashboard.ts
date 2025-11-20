@@ -4,9 +4,9 @@ import {
 import { eq, desc, and, gte, lte, count } from "drizzle-orm";
 import { readDatabase } from "@shared/database/connection";
 import { cacheService } from '@server/infrastructure/cache';
-import { financialDisclosureAnalyticsService } from "@client/services/financial-disclosure.service.js";
+import { financialDisclosureAnalyticsService } from "@server/services/financial-disclosure.service.ts";
 import { logger   } from '@shared/core/src/index.js';
-import { errorTracker } from '@client/core/errors/error-tracker.js';
+import { errorTracker } from '@server/core/errors/error-tracker.ts';
 
 export interface TransparencyScoreResult {
   overallScore: number;
@@ -645,6 +645,7 @@ export class SimpleTransparencyDashboardService {
 }
 
 export const simpleTransparencyDashboardService = new SimpleTransparencyDashboardService();
+
 
 
 

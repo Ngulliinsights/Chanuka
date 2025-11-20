@@ -10,7 +10,7 @@ import { PrecedentFinderService } from '../application/precedent-finder.js';
 import { ExpertFlaggingService } from '../application/expert-flagging-service.js';
 import { constitutionalAnalysisServiceComplete } from '../application/constitutional-analysis-service-complete.js';
 import { LegalDatabaseClient } from '../infrastructure/external/legal-database-client.js';
-import { AnalysisConfiguration } from '@client/types/index.js';
+import { AnalysisConfiguration } from '@server/types/index.ts';
 
 /**
  * Default configuration for constitutional analysis

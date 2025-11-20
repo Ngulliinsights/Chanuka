@@ -139,3 +139,4 @@ describe('AnalysisRepositoryImpl', () => {
 
   // Add tests for findByAnalysisId and findHistoryByBillId if needed
 });
+

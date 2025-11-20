@@ -6,7 +6,7 @@
 // responses, and maintain contact history.
 // ============================================================================
 
-import { RepresentativeContact } from '@client/types/index.js';
+import { RepresentativeContact } from '@server/types/index.ts';
 import { logger  } from '@shared/core/src/index.js';
 
 // ============================================================================

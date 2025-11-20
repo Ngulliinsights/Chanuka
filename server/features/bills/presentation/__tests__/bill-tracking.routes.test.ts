@@ -189,3 +189,4 @@ describe('Bill Tracking API Routes', () => { const mockUserId = 'mock-user-id';
   // - GET /analytics
   // - GET /recommended
 });
+

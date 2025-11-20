@@ -2,7 +2,7 @@
 // ADVOCACY COORDINATION - Action Item Entity
 // ============================================================================
 
-import { ActionTemplate } from '@client/types/index.js';
+import { ActionTemplate } from '../../types/index.js';
 
 export interface ActionItem {
   id: string;
@@ -32,7 +32,7 @@ export interface ActionItem {
     body?: string;
     personalMessage?: string;
     attachments?: string[];
-  };
+  } | undefined;
   
   // Target and context
   targetRepresentative?: string;
@@ -47,7 +47,7 @@ export interface ActionItem {
     rating: number;
     comments?: string;
     suggestions?: string;
-  };
+  } | undefined;
   
   // Results and impact
   outcome?: {
@@ -160,12 +160,12 @@ export class ActionItemEntity {
     }
   }
 
-  updateCustomizedContent(content: ActionItem['customizedContent']): void {
-    this.actionItem.customizedContent = { ...this.actionItem.customizedContent, ...content };
+  updateCustomizedContent(content: Partial<NonNullable<ActionItem['customizedContent']>>): void {
+    this.actionItem.customizedContent = { ...(this.actionItem.customizedContent ?? {}), ...content };
     this.actionItem.updated_at = new Date();
   }
 
-  addFeedback(feedback: ActionItem['userFeedback']): void {
+  addFeedback(feedback: NonNullable<ActionItem['userFeedback']>): void {
     if (!this.isCompleted()) {
       throw new Error('Feedback can only be added to completed actions');
     }
@@ -211,14 +211,26 @@ export class ActionItemEntity {
   static create(data: NewActionItem): ActionItemEntity {
     const actionItem: ActionItem = {
       id: '', // Will be set by repository
-      ...data,
+      campaign_id: data.campaign_id,
+      user_id: data.user_id,
+      actionType: data.actionType,
+      title: data.title,
+      description: data.description,
+      instructions: data.instructions,
       status: 'pending',
       priority: data.priority || 'medium',
-      difficulty: data.difficulty || 'medium',
       assignedAt: new Date(),
+      due_date: data.due_date,
+      estimatedTimeMinutes: data.estimatedTimeMinutes,
+      difficulty: data.difficulty || 'medium',
+      template: data.template,
+      customizedContent: data.customizedContent ?? undefined,
+      targetRepresentative: data.targetRepresentative,
+      targetCommittee: data.targetCommittee,
+      relatedBillSection: data.relatedBillSection,
       created_at: new Date(),
       updated_at: new Date()
-    };
+    } as ActionItem;
 
     return new ActionItemEntity(actionItem);
   }

@@ -6,10 +6,13 @@
  * with all safety mechanisms in place.
  */
 
-import { database, readDatabase, writeDatabase, withTransaction } from './connection.js';
+import { readDatabase, withTransaction } from './connection.js';
 import { executeQuery } from './pool.js';
 import { initializeDatabaseSafety, shutdownDatabaseSafety } from './init.js';
 import { bills as userTable } from '../schema/foundation';
+import { eq } from 'drizzle-orm';
+import { logger } from '@/core/index.js';
+import { users } from '../schema/foundation';
 
 /**
  * Example: Safe database initialization
@@ -21,7 +24,7 @@ export const initializeApp = async () => {
 
     logger.info('Application database layer initialized safely');
   } catch (error) {
-    logger.error('Error initializing app:', error);
+    logger.error('Error initializing app', { error });
     throw error;
   }
 };
@@ -33,12 +36,12 @@ export const safeReadExample = async (user_id: string) => {
   try {
     // Use read database for read operations
     const result = await readDatabase.query.users.findFirst({
-      where: (user, { eq }) => eq(user.id, user_id),
+      where: (user: typeof users, { eq }: { eq: (left: any, right: any) => any }) => eq(user.id, user_id),
     });
 
     return result;
   } catch (error) {
-    logger.error('Error in safeReadExample:', error);
+    logger.error('Error in safeReadExample', { error });
     throw error;
   }
 };
@@ -59,7 +62,7 @@ export const safeWriteExample = async (userData: any) => {
       return insertedUserRows[0];
     });
   } catch (error) {
-    logger.error('Error in safeWriteExample:', error);
+    logger.error('Error in safeWriteExample', { error });
     throw error;
   }
 };
@@ -77,7 +80,7 @@ export const safeRawQueryExample = async (bill_id: number) => {
 
     return result.rows;
   } catch (error) {
-    logger.error('Error in safeRawQueryExample:', error);
+    logger.error('Error in safeRawQueryExample', { error });
     throw error;
   }
 };
@@ -99,7 +102,7 @@ export const safeConcurrentExample = async () => {
     const results = await Promise.all(promises);
     return results.map(r => r.rows[0]);
   } catch (error) {
-    logger.error('Error in safeConcurrentExample:', error);
+    logger.error('Error in safeConcurrentExample', { error });
     throw error;
   }
 };
@@ -112,7 +115,7 @@ export const shutdownApp = async () => {
     await shutdownDatabaseSafety();
     logger.info('Application database layer shut down safely');
   } catch (error) {
-    logger.error('Error in shutdownApp:', error);
+    logger.error('Error in shutdownApp', { error });
     throw error;
   }
 };
@@ -130,7 +133,7 @@ export const errorHandlingExample = async () => {
     });
   } catch (error) {
     // Error is automatically classified and logged
-    logger.info('Error was handled gracefully:', {
+    logger.info('Error was handled gracefully', {
       message: error instanceof Error ? error.message : String(error),
     });
   }
@@ -146,6 +149,7 @@ export const examples = {
   shutdownApp,
   errorHandlingExample,
 };
+
 
 
 

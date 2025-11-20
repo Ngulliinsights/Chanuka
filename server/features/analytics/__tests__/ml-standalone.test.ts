@@ -14,7 +14,7 @@ vi.mock('../../../../shared/core/src/index.js', () => ({
     error: vi.fn()
   }
 }));
-import { realMLAnalysisService } from '@client/services/real-ml.service.js';
+import { realMLAnalysisService } from '@server/services/real-ml.service.ts';
 
 describe('ML Service Standalone Tests', () => {
   const testBillContent = `

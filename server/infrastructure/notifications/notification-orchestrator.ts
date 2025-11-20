@@ -3,7 +3,7 @@ import { notifications, users, bill_tracking_preferences, bills } from '@shared/
 import { eq, and } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
-import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '@client/features/users/domain/user-preferences.js';
+import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '@server/features/users/domain/user-preferences.ts';
 import { CombinedBillTrackingPreferences } from './types.js';
 import { logger   } from '@shared/core/src/index.js';
 
@@ -1515,3 +1515,4 @@ export class NotificationOrchestratorService {
  * handling and shared state management.
  */
 export const notificationOrchestratorService = new NotificationOrchestratorService();
+

@@ -12,10 +12,10 @@ import { initializeServer, setupGracefulShutdown } from './server-startup.js';
 
 // Replace direct service imports with initialization-based access
 // Instead of:
-// import { validationMetricsCollector } from '@client/core/validation/validation-metrics.js';
+// import { validationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
 
 // Use:
-import { serverValidationServices } from '@client/core/services-init.js';
+import { serverValidationServices } from '@server/core/services-init.ts';
 
 // Example of how to modify your server startup:
 async function startApplication() {

@@ -3,13 +3,12 @@
  * Consolidates profile management, dashboard, privacy, and accessibility settings
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
+import { Card, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Shield, User, BarChart3, Settings, Eye } from 'lucide-react';
+import { Shield, User, BarChart3, Eye } from 'lucide-react';
 import AppLayout from '@client/components/layout/app-layout';
 
 // Import consolidated components

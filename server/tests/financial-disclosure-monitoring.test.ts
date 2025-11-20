@@ -14,7 +14,7 @@ vi.mock('../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import { FinancialDisclosureMonitoringService } from '@client/features/analytics/financial-disclosure/monitoring.js';
+import { FinancialDisclosureMonitoringService } from '@server/features/analytics/financial-disclosure/monitoring.ts';
 import { cacheService } from '@server/infrastructure/cache';
 import { logger  } from '@shared/core/src/index.js';
 
@@ -282,6 +282,7 @@ describe('Financial Disclosure Monitoring Service', () => {
     });
   });
 });
+
 
 
 

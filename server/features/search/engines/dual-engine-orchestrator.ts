@@ -4,7 +4,7 @@
 // Orchestrates PostgreSQL full-text and semantic search engines in parallel
 // Implements intelligent query classification, failover, and result fusion
 
-import { PostgreSQLFullTextEngine } from '@client/features/search/engines/core/postgresql-fulltext.engine';
+import { PostgreSQLFullTextEngine } from '@server/features/search/engines/core/postgresql-fulltext.engine';
 import { semanticSearchEngine, SearchOptions, SearchResponse } from './semantic-search-engine';
 import { searchSyntaxParser, ParsedQuery } from './search-syntax-parser';
 import { logger } from '@shared/core';

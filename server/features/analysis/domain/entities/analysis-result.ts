@@ -118,3 +118,4 @@ export interface ConstitutionalConcern {
     //   return this.conflictAnalysisSummary.overallRisk === 'critical' || this.constitutionalAnalysis.riskAssessment === 'high';
     // }
   }
+
