@@ -9,7 +9,6 @@
  * - Compact and full view modes
  */
 
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -38,15 +37,12 @@ interface ActionCenterProps {
   className?: string;
 }
 
-export function ActionCenter({ 
-  campaigns, 
-  petitions, 
+export function ActionCenter({
+  campaigns,
+  petitions,
   compact = false,
-  className 
+  className
 }: ActionCenterProps) {
-  const [joinedCampaigns, setJoinedCampaigns] = useState<Set<string>>(new Set());
-  const [signedPetitions, setSignedPetitions] = useState<Set<string>>(new Set());
-  
   const { joinCampaign, signPetition } = useCommunityStore();
 
   const getCampaignTypeColor = (type: Campaign['type']) => {
@@ -105,17 +101,11 @@ export function ActionCenter({
   };
 
   const handleJoinCampaign = (campaign: Campaign) => {
-    if (!joinedCampaigns.has(campaign.id)) {
-      joinCampaign(campaign.id);
-      setJoinedCampaigns(prev => new Set(prev).add(campaign.id));
-    }
+    joinCampaign(campaign.id);
   };
 
   const handleSignPetition = (petition: Petition) => {
-    if (!signedPetitions.has(petition.id)) {
-      signPetition(petition.id);
-      setSignedPetitions(prev => new Set(prev).add(petition.id));
-    }
+    signPetition(petition.id);
   };
 
   const handleShare = (item: Campaign | Petition, type: 'campaign' | 'petition') => {
@@ -141,7 +131,8 @@ export function ActionCenter({
       <div className={cn('space-y-3', className)}>
         {/* Campaigns */}
         {campaigns.slice(0, 2).map((campaign) => {
-          const hasJoined = joinedCampaigns.has(campaign.id);
+          // Note: User participation state should be tracked in user-specific store
+          // For now, showing actions as always available with optimistic updates
           
           return (
             <div
@@ -176,19 +167,12 @@ export function ActionCenter({
 
                     <Button
                       size="sm"
-                      variant={hasJoined ? "outline" : "default"}
+                      variant="default"
                       onClick={() => handleJoinCampaign(campaign)}
-                      disabled={hasJoined}
                       className="text-xs h-6"
                     >
-                      {hasJoined ? (
-                        <>
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Joined
-                        </>
-                      ) : (
-                        'Join'
-                      )}
+                      <Users className="h-3 w-3 mr-1" />
+                      Join
                     </Button>
                   </div>
                 </div>
@@ -199,7 +183,8 @@ export function ActionCenter({
 
         {/* Petitions */}
         {petitions.slice(0, 2).map((petition) => {
-          const hasSigned = signedPetitions.has(petition.id);
+          // Note: User participation state should be tracked in user-specific store
+          // For now, showing actions as always available with optimistic updates
           
           return (
             <div
@@ -235,19 +220,12 @@ export function ActionCenter({
 
                     <Button
                       size="sm"
-                      variant={hasSigned ? "outline" : "default"}
+                      variant="default"
                       onClick={() => handleSignPetition(petition)}
-                      disabled={hasSigned}
                       className="text-xs h-6"
                     >
-                      {hasSigned ? (
-                        <>
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Signed
-                        </>
-                      ) : (
-                        'Sign'
-                      )}
+                      <PenTool className="h-3 w-3 mr-1" />
+                      Sign
                     </Button>
                   </div>
                 </div>
@@ -271,7 +249,8 @@ export function ActionCenter({
           
           <div className="space-y-4">
             {campaigns.map((campaign) => {
-              const hasJoined = joinedCampaigns.has(campaign.id);
+              // Note: User participation state should be tracked in user-specific store
+              // For now, showing actions as always available with optimistic updates
               
               return (
                 <Card key={campaign.id} className="chanuka-card">
@@ -396,20 +375,9 @@ export function ActionCenter({
                       <div className="flex items-center gap-2">
                         <Button
                           onClick={() => handleJoinCampaign(campaign)}
-                          disabled={hasJoined}
-                          className={cn(hasJoined && 'bg-green-600 hover:bg-green-700')}
                         >
-                          {hasJoined ? (
-                            <>
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Joined
-                            </>
-                          ) : (
-                            <>
-                              <Users className="h-4 w-4 mr-2" />
-                              Join Campaign
-                            </>
-                          )}
+                          <Users className="h-4 w-4 mr-2" />
+                          Join Campaign
                         </Button>
 
                         <Button
@@ -443,7 +411,8 @@ export function ActionCenter({
           
           <div className="space-y-4">
             {petitions.map((petition) => {
-              const hasSigned = signedPetitions.has(petition.id);
+              // Note: User participation state should be tracked in user-specific store
+              // For now, showing actions as always available with optimistic updates
               
               return (
                 <Card key={petition.id} className="chanuka-card">
@@ -562,20 +531,10 @@ export function ActionCenter({
                       <div className="flex items-center gap-2">
                         <Button
                           onClick={() => handleSignPetition(petition)}
-                          disabled={hasSigned || petition.status !== 'active'}
-                          className={cn(hasSigned && 'bg-green-600 hover:bg-green-700')}
+                          disabled={petition.status !== 'active'}
                         >
-                          {hasSigned ? (
-                            <>
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Signed
-                            </>
-                          ) : (
-                            <>
-                              <PenTool className="h-4 w-4 mr-2" />
-                              Sign Petition
-                            </>
-                          )}
+                          <PenTool className="h-4 w-4 mr-2" />
+                          Sign Petition
                         </Button>
 
                         <Button

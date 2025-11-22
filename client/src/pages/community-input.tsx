@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import AppLayout from '@client/components/layout/app-layout';
-import { CommunityHub } from '@client/components/community/CommunityHub';
+import CommunityHub from '@client/components/community/CommunityHub';
 import { MessageSquare, BarChart3, Megaphone, Send } from 'lucide-react';
 
 /**

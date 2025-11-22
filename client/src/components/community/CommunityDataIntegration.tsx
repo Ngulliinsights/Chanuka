@@ -6,17 +6,18 @@
  * example of how community data flows through the system.
  */
 
-import React, { useEffect, useState } from 'react';
-import { 
-  useCommunityWebSocket, 
-  useDiscussionUpdates, 
-  useExpertUpdates, 
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  useCommunityWebSocket,
+  useDiscussionUpdates,
+  useExpertUpdates,
   useCommunityAnalytics,
   useCommunityNotifications,
-  useCommunityBackend 
+  useCommunityBackend
 } from '../../features/community/hooks/useCommunityWebSocket';
-import { useCommunityStore } from '@client/store/slices/communitySlice';
-import { useDiscussionStore } from '@client/store/slices/discussionSlice';
+import { useActivityFeed, useTrendingTopics, useExpertInsights, useCommunityStats } from '@client/features/community/hooks/useCommunity';
+import { useCommunityUI } from '@client/store/slices/communitySlice';
+import { useSafeEffect } from '@client/hooks/useSafeEffect';
 import { logger } from '@client/utils/logger';
 
 interface CommunityDataIntegrationProps {
@@ -50,103 +51,32 @@ export const CommunityDataIntegration: React.FC<CommunityDataIntegrationProps> =
   // Backend integration
   const { isInitialized: backendInitialized, error: backendError, communityBackendService } = useCommunityBackend();
 
-  // Store integration
-  const {
-    activityFeed,
-    trendingTopics: storeTrendingTopics,
-    expertInsights,
-    stats,
-    initializeRealTime: initializeCommunityRealTime,
-    cleanupRealTime: cleanupCommunityRealTime,
-    loadActivityFeed,
-    loadTrendingTopics,
-    loadExpertInsights
-  } = useCommunityStore();
+  // UI state
+  const ui = useCommunityUI();
 
-  const {
-    threads,
-    comments,
-    typingIndicators,
-    initializeRealTime: initializeDiscussionRealTime,
-    cleanupRealTime: cleanupDiscussionRealTime,
-    loadThread,
-    loadComments
-  } = useDiscussionStore();
+  // Server state hooks
+  const activityFeed = useActivityFeed(ui.filters, ui.currentPage, ui.itemsPerPage);
+  const trendingTopicsQuery = useTrendingTopics();
+  const expertInsights = useExpertInsights(selectedBillId);
+  const stats = useCommunityStats();
 
-  // Initialize real-time features
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        // Initialize community real-time features
-        await initializeCommunityRealTime();
-        
-        // Initialize discussion real-time features
-        await initializeDiscussionRealTime();
+  // Refs to track latest state values to prevent race conditions
+  const isConnectedRef = useRef(isConnected);
+  const backendInitializedRef = useRef(backendInitialized);
+  const selectedBillIdRef = useRef(selectedBillId);
 
-        logger.info('Community data integration initialized', { 
-          component: 'CommunityDataIntegration',
-          billId: selectedBillId 
-        });
-      } catch (error) {
-        logger.error('Failed to initialize community data integration', { 
-          component: 'CommunityDataIntegration' 
-        }, error);
-      }
-    };
+  // Update refs when state changes
+  isConnectedRef.current = isConnected;
+  backendInitializedRef.current = backendInitialized;
+  selectedBillIdRef.current = selectedBillId;
 
-    initialize();
-
-    return () => {
-      cleanupCommunityRealTime();
-      cleanupDiscussionRealTime();
-    };
-  }, [initializeCommunityRealTime, initializeDiscussionRealTime, cleanupCommunityRealTime, cleanupDiscussionRealTime]);
-
-  // Subscribe to discussion updates for selected bill
-  useEffect(() => {
+  // Subscribe to discussion updates when connected and bill selected
+  useSafeEffect(() => {
     if (isConnected && selectedBillId) {
       subscribeToDiscussion(selectedBillId);
-      
-      return () => {
-        unsubscribeFromDiscussion(selectedBillId);
-      };
+      return () => unsubscribeFromDiscussion(selectedBillId);
     }
-  }, [isConnected, selectedBillId, subscribeToDiscussion, unsubscribeFromDiscussion]);
-
-  // Load initial data
-  useEffect(() => {
-    const loadData = async () => {
-      if (!backendInitialized) return;
-
-      try {
-        // Load community data
-        await Promise.all([
-          loadActivityFeed(),
-          loadTrendingTopics(),
-          loadExpertInsights()
-        ]);
-
-        // Load discussion data for selected bill
-        if (selectedBillId) {
-          await Promise.all([
-            loadThread(selectedBillId),
-            loadComments(selectedBillId)
-          ]);
-        }
-
-        logger.info('Community data loaded', { 
-          component: 'CommunityDataIntegration',
-          billId: selectedBillId 
-        });
-      } catch (error) {
-        logger.error('Failed to load community data', { 
-          component: 'CommunityDataIntegration' 
-        }, error);
-      }
-    };
-
-    loadData();
-  }, [backendInitialized, selectedBillId, loadActivityFeed, loadTrendingTopics, loadExpertInsights, loadThread, loadComments]);
+  }, [selectedBillId, isConnected, subscribeToDiscussion, unsubscribeFromDiscussion]);
 
   // Handle typing indicators
   const handleStartTyping = () => {
@@ -478,15 +408,13 @@ export const CommunityDataIntegration: React.FC<CommunityDataIntegrationProps> =
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div>
-              <h4 className="font-medium text-gray-700 mb-2">Store State</h4>
+              <h4 className="font-medium text-gray-700 mb-2">Query State</h4>
               <pre className="bg-white p-2 rounded border overflow-auto max-h-40">
                 {JSON.stringify({
-                  activityFeedCount: activityFeed?.data?.data?.length ?? activityFeed?.data?.pagination?.totalItems ?? 0,
-                  trendingTopicsCount: storeTrendingTopics?.data?.length ?? 0,
-                  expertInsightsCount: expertInsights?.data?.length ?? 0,
-                  threadsCount: Object.keys(threads).length,
-                  commentsCount: Object.keys(comments).length,
-                  typingIndicatorsCount: typingIndicators.length
+                  activityFeedCount: activityFeed.data?.length ?? 0,
+                  trendingTopicsCount: trendingTopicsQuery.data?.length ?? 0,
+                  expertInsightsCount: expertInsights.data?.length ?? 0,
+                  statsLoaded: !!stats.stats.data
                 }, null, 2)}
               </pre>
             </div>

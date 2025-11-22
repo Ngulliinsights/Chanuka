@@ -4,15 +4,14 @@ Maximum depth: 7 levels
 
 ```
 .
-chanuka-ui-ux-specification.md
 client/
 ├── CLEANUP_SUMMARY.md
-├── IMMEDIATE_ACTIONS_SUMMARY.md
+├── console errors.js
 ├── index.html
 ├── jest.a11y.config.js
-├── MIGRATION_COMPLETED.md
 ├── migration-helper.js
 ├── package.json
+├── package-scripts.json
 ├── playwright.config.ts
 ├── playwright.visual.config.ts
 ├── postcss.config.js
@@ -30,14 +29,23 @@ client/
 │   ├── manifest.webmanifest
 │   ├── offline.html
 │   ├── sw.js
+├── reports/
+│   ├── design-system-audit-report.json
+│   ├── design-system-audit-report.md
+│   ├── radix-analysis/
+│   │   ├── radix-bundle-analysis.json
+│   │   ├── radix-bundle-analysis.md
 ├── run-triage.js
 ├── scripts/
 │   ├── advanced-bundle-analyzer.js
 │   ├── check-performance-budget.js
 │   ├── consolidate-client.js
+│   ├── contrast-check.js
 │   ├── deployment-integration.ts
+│   ├── design-system-audit.js
 │   ├── optimize-assets.js
 │   ├── performance-budget-check.js
+│   ├── radix-bundle-analyzer.js
 │   ├── unregister-sw.js
 ├── src/
 │   ├── __tests__/
@@ -133,16 +141,16 @@ client/
 │   │   │   ├── bills-dashboard.visual.test.ts
 │   │   │   ├── ui-consistency.visual.test.tsx
 │   │   │   ├── visual-regression.test.tsx
+│   │   ├── visual-regression/
+│   │   │   ├── unified-components.test.tsx
 │   ├── App.tsx
 │   ├── components/
 │   │   ├── __tests__/
 │   │   │   ├── AppProviders.test.tsx
-│   │   │   ├── error-boundary.test.tsx
 │   │   │   ├── OfflineIndicator.test.tsx
 │   │   │   ├── system-health.test.tsx
 │   │   ├── accessibility/
 │   │   │   ├── accessibility-manager.tsx
-│   │   │   ├── accessibility-settings-panel.tsx
 │   │   ├── admin/
 │   │   │   ├── admin-dashboard.tsx
 │   │   ├── analysis/
@@ -196,7 +204,10 @@ client/
 │   │   │   ├── hooks/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useAuthForm.ts
+│   │   │   │   ├── useLoginForm.ts
 │   │   │   │   ├── usePasswordUtils.ts
+│   │   │   │   ├── usePrivacySettings.ts
+│   │   │   │   ├── useRegisterForm.ts
 │   │   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   │   ├── index.ts
 │   │   │   ├── LoginForm.tsx
@@ -205,7 +216,6 @@ client/
 │   │   │   ├── PasswordStrengthIndicator.tsx
 │   │   │   ├── PrivacyControls.tsx
 │   │   │   ├── recovery.ts
-│   │   │   ├── RegisterForm.tsx
 │   │   │   ├── SecurityDashboard.tsx
 │   │   │   ├── SessionManager.tsx
 │   │   │   ├── SocialLogin.tsx
@@ -265,6 +275,7 @@ client/
 │   │   │   ├── ActionCenter.tsx
 │   │   │   ├── ActivityFeed.tsx
 │   │   │   ├── CommunityDataIntegration.tsx
+│   │   │   ├── CommunityErrorBoundary.tsx
 │   │   │   ├── CommunityFilters.tsx
 │   │   │   ├── CommunityHub.tsx
 │   │   │   ├── CommunityStats.tsx
@@ -355,18 +366,7 @@ client/
 │   │   │   ├── README.md
 │   │   ├── environment-setup.tsx
 │   │   ├── error/
-│   │   │   ├── ErrorAnalyticsDashboard.tsx
-│   │   │   ├── ErrorBoundary.tsx
-│   │   │   ├── ErrorFallback.tsx
-│   │   │   ├── ErrorModal.tsx
-│   │   │   ├── ErrorMonitoringDashboard.tsx
-│   │   │   ├── ErrorToast.tsx
 │   │   │   ├── index.ts
-│   │   │   ├── INTEGRATION_GUIDE.md
-│   │   │   ├── migration-guide.md
-│   │   │   ├── REDUNDANCY_CLEANUP.md
-│   │   │   ├── unified-error-integration.tsx
-│   │   ├── error-boundary.tsx
 │   │   ├── error-handling/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── ErrorBoundary.test.tsx
@@ -385,7 +385,10 @@ client/
 │   │   │   │   ├── error-icons.tsx
 │   │   │   │   ├── error-normalizer.ts
 │   │   │   │   ├── error-reporter.ts
+│   │   │   │   ├── shared-error-display.tsx
 │   │   ├── feature-flags-panel.tsx
+│   │   ├── icons/
+│   │   │   ├── SimpleIcons.tsx
 │   │   ├── implementation/
 │   │   │   ├── workarounds.tsx
 │   │   ├── index.ts
@@ -412,6 +415,7 @@ client/
 │   │   │   ├── mobile-header.tsx
 │   │   │   ├── mobile-navigation.tsx
 │   │   │   ├── sidebar.tsx
+│   │   │   ├── SimpleAppLayout.tsx
 │   │   │   ├── types.ts
 │   │   │   ├── validation.ts
 │   │   ├── loading/
@@ -532,6 +536,7 @@ client/
 │   │   │   ├── NotificationPreferences.tsx
 │   │   ├── offline/
 │   │   │   ├── offline-manager.tsx
+│   │   │   ├── OfflineModal.tsx
 │   │   ├── OfflineIndicator.tsx
 │   │   ├── OfflineModal.tsx
 │   │   ├── performance/
@@ -557,7 +562,9 @@ client/
 │   │   ├── realtime/
 │   │   ├── real-time/
 │   │   │   ├── BillTrackingPreferences.tsx
+│   │   │   ├── index.ts
 │   │   │   ├── RealTimeDashboard.tsx
+│   │   │   ├── RealTimeNotifications.tsx
 │   │   │   ├── RealTimeNotifications.tsx
 │   │   ├── search/
 │   │   │   ├── advanced-search.tsx
@@ -595,6 +602,7 @@ client/
 │   │   │   │   ├── recovery.test.ts
 │   │   │   │   ├── test-utils.test.tsx
 │   │   │   │   ├── test-utils.tsx
+│   │   │   │   ├── unified-components.test.tsx
 │   │   │   │   ├── validation.test.ts
 │   │   │   ├── alert.tsx
 │   │   │   ├── avatar.tsx
@@ -647,11 +655,23 @@ client/
 │   │   │   ├── toaster.tsx
 │   │   │   ├── tooltip.tsx
 │   │   │   ├── types.ts
+│   │   │   ├── unified-button.tsx
+│   │   │   ├── unified-components.tsx
+│   │   │   ├── unified-examples.tsx
 │   │   │   ├── validation.ts
 │   │   ├── user/
-│   │   │   ├── UserDashboard.tsx
-│   │   │   ├── UserDashboardIntegration.tsx
+│   │   │   ├── __tests__/
+│   │   │   │   ├── AccessibilitySettingsSection.test.tsx
+│   │   │   │   ├── PrivacySettingsSection.test.tsx
+│   │   │   │   ├── UserAccountIntegration.test.tsx
+│   │   │   │   ├── UserDashboardSection.test.tsx
+│   │   │   │   ├── UserProfileSection.test.tsx
+│   │   │   ├── AccessibilitySettingsSection.tsx
+│   │   │   ├── PrivacySettingsSection.tsx
+│   │   │   ├── UserAccountIntegration.tsx
+│   │   │   ├── UserDashboardSection.tsx
 │   │   │   ├── UserProfile.tsx
+│   │   │   ├── UserProfileSection.tsx
 │   │   ├── verification/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── ExpertBadge.test.tsx
@@ -667,6 +687,7 @@ client/
 │   │   │   ├── VerificationWorkflow.tsx
 │   ├── config/
 │   │   ├── api.ts
+│   │   ├── development.ts
 │   │   ├── feature-flags.ts
 │   │   ├── onboarding.ts
 │   ├── contexts/
@@ -704,6 +725,7 @@ client/
 │   │   │   │   ├── websocket-manager.test.ts
 │   │   │   │   ├── websocket-message-routing.test.ts
 │   │   │   │   ├── websocket-performance.test.ts
+│   │   │   ├── analytics.ts
 │   │   │   ├── auth.ts
 │   │   │   ├── bills.ts
 │   │   │   ├── cache.ts
@@ -711,12 +733,19 @@ client/
 │   │   │   ├── community.ts
 │   │   │   ├── config.ts
 │   │   │   ├── errors.ts
+│   │   │   ├── hooks/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useApiConnection.ts
+│   │   │   │   ├── use-api-with-fallback.ts
+│   │   │   │   ├── use-safe-mutation.ts
+│   │   │   │   ├── use-safe-query.ts
 │   │   │   ├── index.ts
 │   │   │   ├── interceptors.ts
 │   │   │   ├── notifications.ts
 │   │   │   ├── performance.ts
 │   │   │   ├── privacy.ts
 │   │   │   ├── registry.ts
+│   │   │   ├── search.ts
 │   │   │   ├── system.ts
 │   │   │   ├── types.ts
 │   │   │   ├── user.ts
@@ -734,7 +763,6 @@ client/
 │   │   │   │   ├── ErrorBoundary.test.tsx
 │   │   │   │   ├── handler.test.ts
 │   │   │   ├── constants.ts
-│   │   │   ├── ErrorBoundary.tsx
 │   │   │   ├── handler.ts
 │   │   │   ├── index.ts
 │   │   │   ├── recovery.ts
@@ -753,7 +781,10 @@ client/
 │   │   │   ├── context.tsx
 │   │   │   ├── examples/
 │   │   │   │   ├── README.md
+│   │   │   ├── hooks/
 │   │   │   ├── hooks.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useTimeoutAwareLoading.ts
 │   │   │   ├── index.ts
 │   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   ├── README.md
@@ -769,7 +800,13 @@ client/
 │   │   │   ├── validation.ts
 │   │   ├── navigation/
 │   │   │   ├── context.tsx
+│   │   │   ├── hooks/
 │   │   │   ├── hooks.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── use-navigation-accessibility.ts
+│   │   │   │   ├── use-navigation-performance.ts
+│   │   │   │   ├── use-navigation-preferences.tsx
+│   │   │   │   ├── use-unified-navigation.ts
 │   │   │   ├── index.ts
 │   │   │   ├── persistence.ts
 │   │   │   ├── reducer.ts
@@ -789,6 +826,7 @@ client/
 │   │   │   ├── users.ts
 │   ├── demo/
 │   │   ├── community-integration-demo.ts
+│   ├── DevWrapper.tsx
 │   ├── docs/
 │   │   ├── accessibility-guide.md
 │   │   ├── community-data-integration-summary.md
@@ -800,10 +838,15 @@ client/
 │   │   │   ├── components/
 │   │   │   │   ├── AnalyticsDashboard.tsx
 │   │   │   ├── hooks/
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── useAnalytics.ts
+│   │   │   │   ├── useErrorAnalytics.ts
+│   │   │   │   ├── use-journey-tracker.ts
+│   │   │   │   ├── use-render-tracker.ts
+│   │   │   │   ├── use-web-vitals.ts
 │   │   │   ├── index.ts
 │   │   │   ├── services/
-│   │   │   │   ├── analytics-api.ts
+│   │   │   │   ├── analytics.ts
 │   │   │   ├── types.ts
 │   │   ├── bills/
 │   │   │   ├── __tests__/
@@ -813,10 +856,10 @@ client/
 │   │   │   │   ├── BillCard.tsx
 │   │   │   │   ├── BillList.tsx
 │   │   │   ├── hooks/
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── useBills.ts
 │   │   │   ├── index.ts
 │   │   │   ├── services/
-│   │   │   │   ├── bill-api.ts
 │   │   │   ├── types.ts
 │   │   ├── community/
 │   │   │   ├── __tests__/
@@ -824,7 +867,11 @@ client/
 │   │   │   ├── components/
 │   │   │   │   ├── CommentThread.tsx
 │   │   │   ├── hooks/
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── useCommunity.ts
+│   │   │   │   ├── useCommunityRealTime.ts
+│   │   │   │   ├── useCommunityWebSocket.ts
+│   │   │   │   ├── useDiscussion.ts
 │   │   │   ├── index.ts
 │   │   │   ├── services/
 │   │   │   │   ├── community-api.ts
@@ -849,25 +896,37 @@ client/
 │   │   │   │   ├── AdvancedSearchInterface.tsx
 │   │   │   │   ├── IntelligentAutocomplete.tsx
 │   │   │   │   ├── SavedSearches.tsx
+│   │   │   │   ├── SearchAnalyticsDashboard.tsx
 │   │   │   │   ├── SearchBar.tsx
+│   │   │   │   ├── SearchFilters.tsx
+│   │   │   │   ├── SearchProgressIndicator.tsx
+│   │   │   │   ├── SearchResultCard.tsx
 │   │   │   │   ├── SearchResults.tsx
+│   │   │   │   ├── SearchTips.tsx
 │   │   │   ├── hooks/
 │   │   │   │   ├── useIntelligentSearch.ts
 │   │   │   │   ├── useSearch.ts
+│   │   │   │   ├── useStreamingSearch.ts
 │   │   │   ├── index.ts
+│   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   ├── services/
 │   │   │   │   ├── intelligent-search.ts
 │   │   │   │   ├── search-api.ts
+│   │   │   │   ├── streaming-search.ts
 │   │   │   ├── types.ts
 │   │   ├── users/
 │   │   │   ├── components/
 │   │   │   │   ├── UserProfile.tsx
 │   │   │   ├── hooks/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useAuth.tsx
+│   │   │   │   ├── useUserAPI.ts
 │   │   │   │   ├── useUsers.ts
 │   │   │   ├── index.ts
 │   │   │   ├── services/
 │   │   │   │   ├── user-api.ts
 │   │   │   ├── types.ts
+│   ├── funding2.js
 │   ├── hooks/
 │   │   ├── __tests__/
 │   │   │   ├── use-api-with-fallback.integration.test.tsx
@@ -882,28 +941,16 @@ client/
 │   │   │   ├── useWebSocket.test.ts
 │   │   │   ├── useWebSocket-integration.test.tsx
 │   │   ├── index.ts
-│   │   ├── useApiConnection.ts
-│   │   ├── use-api-with-fallback.ts
-│   │   ├── useAuth.tsx
-│   │   ├── use-bill-analysis.tsx
-│   │   ├── use-bills.tsx
-│   │   ├── useBillsAPI.ts
-│   │   ├── useCommunityRealTime.ts
-│   │   ├── useCommunityWebSocket.ts
+│   │   ├── useCleanup.tsx
+│   │   ├── useCommunityIntegration.ts
 │   │   ├── useConnectionAware.tsx
 │   │   ├── useDebounce.ts
-│   │   ├── useDiscussion.ts
-│   │   ├── useErrorAnalytics.ts
 │   │   ├── useErrorRecovery.ts
 │   │   ├── use-i18n.tsx
-│   │   ├── use-journey-tracker.ts
 │   │   ├── use-keyboard-focus.ts
 │   │   ├── useMediaQuery.ts
 │   │   ├── use-mobile.tsx
 │   │   ├── useMockData.ts
-│   │   ├── use-navigation-accessibility.ts
-│   │   ├── use-navigation-performance.ts
-│   │   ├── use-navigation-preferences.tsx
 │   │   ├── useNotifications.ts
 │   │   ├── useOfflineCapabilities.ts
 │   │   ├── useOfflineDetection.tsx
@@ -911,25 +958,20 @@ client/
 │   │   ├── use-online-status.tsx
 │   │   ├── useProgressiveDisclosure.ts
 │   │   ├── useRealTimeEngagement.ts
-│   │   ├── use-render-tracker.ts
-│   │   ├── use-safe-mutation.ts
-│   │   ├── use-safe-query.ts
 │   │   ├── useSecurity.ts
 │   │   ├── useService.ts
 │   │   ├── useServiceStatus.ts
 │   │   ├── use-system.tsx
-│   │   ├── useTimeoutAwareLoading.ts
 │   │   ├── use-toast.ts
-│   │   ├── use-unified-navigation.ts
-│   │   ├── useUserAPI.ts
 │   │   ├── use-websocket.ts
-│   │   ├── use-web-vitals.ts
 │   ├── index.css
 │   ├── lib/
 │   │   ├── protected-route.tsx
 │   │   ├── queryClient.ts
 │   │   ├── utils.ts
+│   ├── lucide.d.ts
 │   ├── main.tsx
+│   ├── main-restored.tsx
 │   ├── monitoring/
 │   │   ├── error-monitoring.ts
 │   │   ├── index.ts
@@ -941,21 +983,19 @@ client/
 │   │   │   ├── bill-analysis.test.tsx
 │   │   │   ├── bill-detail.test.tsx
 │   │   │   ├── HomePage.test.tsx
+│   │   │   ├── UserAccountPage.test.tsx
 │   │   ├── admin/
 │   │   ├── admin.tsx
 │   │   ├── auth/
 │   │   │   ├── ForgotPasswordPage.tsx
 │   │   │   ├── LoginPage.tsx
 │   │   │   ├── PrivacyPage.tsx
-│   │   │   ├── ProfilePage.tsx
 │   │   │   ├── RegisterPage.tsx
 │   │   │   ├── ResetPasswordPage.tsx
 │   │   │   ├── SecurityPage.tsx
-│   │   ├── AuthenticationPage.tsx
 │   │   ├── auth-page.tsx
 │   │   ├── bill-analysis.tsx
 │   │   ├── bill-detail.tsx
-│   │   ├── bill-detail-redesigned.tsx
 │   │   ├── bills-dashboard-page.tsx
 │   │   ├── bill-sponsorship-analysis.tsx
 │   │   ├── comments.tsx
@@ -966,10 +1006,19 @@ client/
 │   │   ├── expert-verification.tsx
 │   │   ├── home.tsx
 │   │   ├── IntelligentSearchPage.tsx
+│   │   ├── legal/
+│   │   │   ├── acceptable-use.tsx
+│   │   │   ├── accessibility.tsx
+│   │   │   ├── compliance-ccpa.tsx
+│   │   │   ├── contact-legal.tsx
+│   │   │   ├── cookie-policy.tsx
+│   │   │   ├── data-retention.tsx
+│   │   │   ├── dmca.tsx
+│   │   │   ├── privacy.tsx
+│   │   │   ├── security.tsx
+│   │   │   ├── terms.tsx
 │   │   ├── not-found.tsx
 │   │   ├── onboarding.tsx
-│   │   ├── PrivacySettingsPage.tsx
-│   │   ├── profile.tsx
 │   │   ├── search.tsx
 │   │   ├── SecurityDemoPage.tsx
 │   │   ├── sponsorship/
@@ -978,11 +1027,16 @@ client/
 │   │   │   ├── methodology.tsx
 │   │   │   ├── overview.tsx
 │   │   │   ├── primary-sponsor.tsx
-│   │   ├── UserDashboardPage.tsx
-│   │   ├── user-profile.tsx
+│   │   ├── test-styling.tsx
+│   │   ├── UserAccountPage.tsx
 │   │   ├── UserProfilePage.tsx
 │   ├── scripts/
+│   │   ├── analyze-bundle.ts
+│   │   ├── migrate-components.ts
+│   │   ├── performance-audit.ts
+│   │   ├── README.md
 │   │   ├── run-emergency-triage.ts
+│   │   ├── validate-migration.ts
 │   ├── security/
 │   │   ├── __tests__/
 │   │   │   ├── security-basic.test.ts
@@ -1013,7 +1067,6 @@ client/
 │   │   │   ├── security-types.ts
 │   │   ├── vulnerability-scanner.ts
 │   ├── services/
-│   ├── services.backup/
 │   │   ├── __tests__/
 │   │   │   ├── analysis.test.ts
 │   │   │   ├── api-error-handling.integration.test.ts
@@ -1025,10 +1078,10 @@ client/
 │   │   │   ├── UserJourneyTracker.test.ts
 │   │   │   ├── websocket-client.test.ts
 │   │   ├── analysis.ts
+│   │   ├── api.ts
 │   │   ├── apiInterceptors.ts
 │   │   ├── AuthService.ts
 │   │   ├── auth-service-init.ts
-│   │   ├── billsApiService.ts
 │   │   ├── billsDataCache.ts
 │   │   ├── billsPaginationService.ts
 │   │   ├── billsWebSocketService.ts
@@ -1091,10 +1144,12 @@ client/
 │   │   │   ├── index.ts
 │   │   │   ├── lib/
 │   │   │   │   ├── utils.ts
+│   │   │   ├── README.md
 │   │   │   ├── responsive.css
 │   │   │   ├── responsive.ts
 │   │   │   ├── themes/
 │   │   │   │   ├── dark.ts
+│   │   │   │   ├── high-contrast.ts
 │   │   │   │   ├── highContrast.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── light.ts
@@ -1110,6 +1165,7 @@ client/
 │   │   │   │   ├── typography.ts
 │   │   │   ├── utils/
 │   │   │   │   ├── classNames.ts
+│   │   │   │   ├── contrast.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── performance.ts
 │   │   │   │   ├── responsive.ts
@@ -1152,7 +1208,7 @@ client/
 │   │   │   │   ├── authSlice.test.ts
 │   │   │   │   ├── sessionSlice.test.ts
 │   │   │   ├── authSlice.ts
-│   │   │   ├── discussionSlice.redux.ts
+│   │   │   ├── communitySlice.tsx
 │   │   │   ├── discussionSlice.ts
 │   │   │   ├── errorAnalyticsSlice.ts
 │   │   │   ├── errorHandlingSlice.ts
@@ -1176,12 +1232,16 @@ client/
 │   │   │   ├── progressive-disclosure.css
 │   │   │   ├── ui.css
 │   │   ├── design-system.ts
+│   │   ├── design-tokens.css
 │   │   ├── fallbacks.css
+│   │   ├── MIGRATION_COMPLETE.md
+│   │   ├── MIGRATION_GUIDE.md
 │   │   ├── responsive/
 │   │   │   ├── desktop.css
 │   │   │   ├── mobile.css
 │   │   │   ├── special.css
 │   │   │   ├── tablet.css
+│   │   ├── STYLE_GUIDE.md
 │   │   ├── themes/
 │   │   │   ├── dark.css
 │   │   ├── utilities/
@@ -1241,12 +1301,18 @@ client/
 │   │   ├── bundle-analyzer.ts
 │   │   ├── cacheInvalidation.ts
 │   │   ├── cn.ts
+│   │   ├── comprehensive-error-suppressor.ts
 │   │   ├── comprehensiveLoading.ts
 │   │   ├── connectionAwareLoading.ts
 │   │   ├── console-error-log.md
 │   │   ├── csp-headers.ts
 │   │   ├── development-debug.ts
 │   │   ├── development-error-recovery.ts
+│   │   ├── development-error-suppressor.ts
+│   │   ├── development-overrides.ts
+│   │   ├── dev-error-suppressor.ts
+│   │   ├── dev-mode.ts
+│   │   ├── dev-server-check.ts
 │   │   ├── dom-sanitizer.ts
 │   │   ├── emergency-triage.ts
 │   │   ├── env-config.ts
@@ -1255,12 +1321,15 @@ client/
 │   │   ├── error-rate-limiter.ts
 │   │   ├── error-reporting.ts
 │   │   ├── error-setup.ts
+│   │   ├── error-suppression.ts
 │   │   ├── error-system-initialization.ts
+│   │   ├── extension-error-suppressor.ts
 │   │   ├── i18n.ts
 │   │   ├── index.ts
 │   │   ├── input-validation.ts
 │   │   ├── logger.ts
 │   │   ├── logger-simple.ts
+│   │   ├── meta-tag-manager.ts
 │   │   ├── mobile-error-handler.ts
 │   │   ├── mobile-touch-handler.ts
 │   │   ├── monitoring-init.ts
@@ -1298,31 +1367,32 @@ client/
 │   │   ├── safe-lazy-loading.tsx
 │   │   ├── secure-storage.ts
 │   │   ├── security-monitoring.ts
+│   │   ├── server-status.ts
 │   │   ├── service-recovery.ts
 │   │   ├── serviceWorker.ts
 │   │   ├── session-management.ts
 │   │   ├── session-manager.ts
-│   │   ├── sessionManager.ts
 │   │   ├── simple-lazy-pages.tsx
+│   │   ├── style-performance.ts
+│   │   ├── super-aggressive-suppressor.ts
 │   │   ├── test-imports.ts
 │   │   ├── tokenManager.ts
+│   │   ├── tracing.ts
 │   │   ├── unified-error-handler.ts
 │   │   ├── validateArchitecture.ts
 │   │   ├── web-vitals-monitor.ts
 │   ├── vite-env.d.ts
-├── tailwind.config.minimal.ts
 ├── tailwind.config.ts
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── validate-fixes.cjs
 ├── vite.config.ts
 ├── vite.production.config.ts
+├── vite-plugin-suppress-warnings.js
 ├── vitest.config.ts
 ├── vitest.integration.config.ts
 ├── vitest.performance.config.ts
-client-migration-analysis-report.md
 components.json
-CONSOLE_ERRORS_FIXED.md
 cspell.config.yaml
 deployment/
 ├── cdn-config.js
@@ -1335,6 +1405,7 @@ deployment/
 ├── README.md
 docker-compose.yml
 Dockerfile
+Dockerfile.client
 docs/
 ├── analysis/
 │   ├── chanuka_implementation_guide.md
@@ -1374,7 +1445,6 @@ docs/
 │   ├── Kenyan_constitution_2010.md
 │   ├── merged_bill_sponsorship.html
 │   ├── missing-strategic-features-analysis.md
-│   ├── Module 12 Discussion - ECON 310 (Annette)..docx
 │   ├── philosophical_connections_analysis.md
 │   ├── philosophical_threshold_poems.md
 │   ├── README.md
@@ -1383,6 +1453,7 @@ docs/
 │   ├── strategic-ui-features-analysis.md
 ├── chanuka_architecture.txt
 ├── Chanuka_Funding_Pitch.md
+├── client-module.md
 ├── configuration-assessment.md
 ├── core-error-handling-architecture.md
 ├── database-cohesion-implementation-summary.md
@@ -1392,9 +1463,12 @@ docs/
 ├── database-consolidation-plan.md
 ├── database-consolidation-refined-strategy.md
 ├── database-integration-implementation-summary.md
+├── deployment-module.md
 ├── DIGITAL LAW 2018.pdf
 ├── DIGITAL LAW AMENDMENTS AMENDMENTS (2025).pdf
+├── docs-module.md
 ├── domain-integration-completion-summary.md
+├── drizzle-module.md
 ├── environment-config-assessment.md
 ├── error-analytics-dashboard-architecture.md
 ├── error-analytics-dashboard-types.md
@@ -1410,14 +1484,20 @@ docs/
 │   ├── brand-roadmap.md
 │   ├── manifesto.md
 │   ├── problem-statement.md
+├── project-overview.md
 ├── project-structure.md
 ├── README.md
 ├── schema-domain-relationships.md
+├── scripts-module.md
 ├── secure-environment-setup.md
+├── server-module.md
 ├── setup.md
+├── shared-module.md
 ├── structure_tools_guide.md
+├── tests-module.md
 ├── ui-design-plan.md
 ├── unified-api-client-architecture.md
+├── unified-components-documentation.md
 ├── validation-services.md
 drizzle/
 drizzle.config.ts
@@ -1432,6 +1512,8 @@ drizzle.config.ts
 ├── 20251104110150_real_time_engagement.sql
 ├── 20251104110151_transparency_intelligence.sql
 ├── 20251104110152_expert_verification.sql
+├── 20251117080000_intelligent_search_phase2.sql
+├── 20251117104802_intelligent_search_system.sql
 ├── COMPREHENSIVE_MIGRATION_SUMMARY.md
 ├── LEGACY_MIGRATION_ARCHIVE.md
 ├── legacy_migration_validation.sql
@@ -1442,13 +1524,11 @@ drizzle.config.ts
 │   ├── 0002_snapshot.json
 │   ├── 0021_snapshot.json
 │   ├── 20251104110148_snapshot.json
-ERROR_CLASSES_IMPLEMENTATION_SUMMARY.md
-FIXES_SUMMARY.md
+fix-imports.js
 generate_concept_note.py
 generate_invitation.py
 generate_overview.py
 generate-structure-to-file.sh
-INITIALIZATION_FIX_SUMMARY.md
 logs/
 ├── app.log
 ├── error.log
@@ -1457,11 +1537,12 @@ logs/
 ├── logger_files_clean.txt
 ├── performance.log
 ├── security.log
-MIGRATION_GUIDE.md
 nginx.conf
 nx.json
 package.json
 performance-baselines.json
+performance-budget-report.json
+performance-budget-report.md
 performance-budgets.json
 playwright.config.ts
 playwright-report/
@@ -1470,9 +1551,6 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 postcss.config.js
 README.md
-REDUX_MIGRATION_DOCUMENTATION.md
-REDUX_TYPE_FIXES_SUMMARY.md
-RENDERING_ISSUES_RESOLVED.md
 scripts/
 ├── accessibility/
 │   ├── accessibility-reporter.test.js
@@ -1529,6 +1607,7 @@ scripts/
 ├── deploy-production.js
 ├── deploy-repository-migration.ts
 ├── deploy-search-optimization.ts
+├── design-system-audit.js
 ├── diagnose-503-issues.js
 ├── domain-type-migration-plan.md
 ├── drop-schema.ts
@@ -1568,6 +1647,7 @@ scripts/
 ├── migrate-codebase-utilities.ts
 ├── migrate-console-logs.ts
 ├── migrate-error-handling.ts
+├── migrate-imports.js
 ├── migrate-logging.js
 ├── migrate-shared-types.ts
 ├── ml-service-demo.ts
@@ -1583,6 +1663,7 @@ scripts/
 │   ├── seed.ts
 │   ├── simple-seed.ts
 ├── setup-playwright.js
+├── strategic-contrast-migration.js
 ├── test-backend-only.js
 ├── testing/
 │   ├── bug-detector.ts
@@ -1708,7 +1789,6 @@ scripts/
 ├── verify-cleanup.ts
 ├── verify-project-structure.ts
 ├── web-vitals-checker.js
-SEPARATION_OF_CONCERNS_COMPLETE.md
 server/
 ├── __tests__/
 │   ├── integration/
@@ -1727,6 +1807,7 @@ server/
 │   │   ├── websocket-migration-validation.test.ts
 │   ├── load/
 │   │   ├── websocket-load.test.ts
+│   ├── search-system.test.ts
 │   ├── unit/
 │   │   ├── notification-service-unit.test.ts
 ├── config/
@@ -2057,14 +2138,12 @@ server/
 │   │   ├── __tests__/
 │   │   │   ├── comment-service-integration.test.ts
 │   │   ├── comment.ts
-│   │   ├── comment-storage.ts
 │   │   ├── comment-voting.ts
 │   │   ├── community.ts
 │   │   ├── index.ts
 │   │   ├── social-integration.ts
 │   │   ├── social-share-storage.d.ts
 │   │   ├── social-share-storage.ts
-│   │   ├── stakeholder-storage.ts
 │   ├── constitutional-analysis/
 │   │   ├── application/
 │   │   │   ├── constitutional-analysis-service-complete.ts
@@ -2099,16 +2178,11 @@ server/
 │   │   ├── domain/
 │   │   │   ├── entities/
 │   │   │   │   ├── constitutional-provision.ts
-│   ├── DRIZZLE_MIGRATION_FINAL_REPORT.md
-│   ├── DRIZZLE_MIGRATION_PLAN.md
-│   ├── DRIZZLE_MIGRATION_PROGRESS.md
-│   ├── FUNCTIONALITY_COMPARISON_ANALYSIS.md
 │   ├── government-data/
 │   │   ├── routes.ts
 │   │   ├── services/
 │   │   │   ├── government-data-integration.service.ts
 │   ├── index.ts
-│   ├── MIGRATION_COMPLETION_SUMMARY.md
 │   ├── notifications/
 │   │   ├── __tests__/
 │   │   │   ├── notification-service-integration.test.ts
@@ -2116,6 +2190,8 @@ server/
 │   │   │   ├── entities/
 │   │   │   │   ├── notification.ts
 │   │   ├── index.ts
+│   │   ├── notification-router.ts
+│   │   ├── notification-service.ts
 │   ├── privacy/
 │   │   ├── privacy-routes.ts
 │   │   ├── privacy-scheduler.ts
@@ -2135,8 +2211,6 @@ server/
 │   │   │   ├── RecommendationRepository.ts
 │   │   ├── presentation/
 │   │   │   ├── RecommendationController.ts
-│   ├── REPOSITORY_MIGRATION_COMPLETE.md
-│   ├── REPOSITORY_PATTERN_ANALYSIS.md
 │   ├── repository-cleanup.ts
 │   ├── search/
 │   │   ├── __tests__/
@@ -2146,6 +2220,7 @@ server/
 │   │   │   ├── fuse-relevance-comparison.test.ts
 │   │   │   ├── fuse-standalone.test.ts
 │   │   │   ├── MIGRATION_SUMMARY.md
+│   │   │   ├── phase3-integration.test.ts
 │   │   │   ├── postgresql-basic.test.ts
 │   │   │   ├── postgresql-fulltext-integration.test.ts
 │   │   │   ├── postgresql-fulltext-performance.test.ts
@@ -2168,10 +2243,12 @@ server/
 │   │   │   ├── search-deployment-orchestrator.ts
 │   │   │   ├── search-rollback.service.ts
 │   │   ├── domain/
+│   │   │   ├── QueryIntentService.ts
 │   │   │   ├── RelevanceScorer.ts
 │   │   │   ├── search.dto.ts
 │   │   │   ├── SearchAnalytics.ts
 │   │   │   ├── SearchValidator.ts
+│   │   │   ├── TypoCorrectionService.ts
 │   │   ├── engines/
 │   │   │   ├── core/
 │   │   │   │   ├── fuse-search.engine.ts
@@ -2179,7 +2256,9 @@ server/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── postgresql-fulltext.engine.ts
 │   │   │   │   ├── simple-matching.engine.ts
+│   │   │   ├── dual-engine-orchestrator.ts
 │   │   │   ├── index.ts
+│   │   │   ├── semantic-search.engine.ts
 │   │   │   ├── suggestion/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── suggestion-engine.service.ts
@@ -2201,9 +2280,11 @@ server/
 │   │   │   ├── SearchController.ts
 │   │   ├── search-index-manager.ts
 │   │   ├── services/
+│   │   │   ├── embedding.service.ts
 │   │   │   ├── history-cleanup.service.ts
 │   │   ├── utils/
 │   │   │   ├── parallel-query-executor.ts
+│   │   │   ├── search-syntax-parser.ts
 │   ├── search-suggestions.ts
 │   ├── security/
 │   │   ├── encryption-service.ts
@@ -2311,8 +2392,6 @@ server/
 │   │   ├── cache-service.ts
 │   │   ├── index.ts
 │   │   ├── query-cache.ts
-│   ├── CACHING_INTEGRATION.md
-│   ├── connection-migration-summary.md
 │   ├── connection-migrator.ts
 │   ├── database/
 │   │   ├── backup-recovery.ts
@@ -2425,6 +2504,7 @@ server/
 │   │   ├── notification-service.ts
 │   │   ├── refactored_summary.md
 │   │   ├── smart-notification-filter.ts
+│   │   ├── types.ts
 │   ├── security/
 │   │   ├── data-privacy-service.ts
 │   │   ├── input-validation-service.ts
@@ -2557,6 +2637,7 @@ server/
 │   ├── errors.ts
 │   ├── featureFlags.ts
 │   ├── metrics.ts
+│   ├── request-utils.ts
 │   ├── shared-core-fallback.ts
 │   ├── validation.ts
 ├── vite.ts
@@ -2668,9 +2749,6 @@ shared/
 │   │   │   │   ├── __tests__/
 │   │   │   │   │   ├── consolidation-integration.test.ts
 │   │   │   │   │   ├── orchestrator.test.ts
-│   │   │   │   │   ├── test-workspace/
-│   │   │   │   │   │   ├── docs/
-│   │   │   │   │   │   ├── scripts/
 │   │   │   │   ├── backup-system.ts
 │   │   │   │   ├── cli.ts
 │   │   │   │   ├── executor.ts
@@ -2953,7 +3031,6 @@ shared/
 │   ├── example-usage.ts
 │   ├── index.ts
 │   ├── init.ts
-│   ├── MIGRATION_GUIDE.md
 │   ├── monitoring.ts
 │   ├── pool.ts
 │   ├── utils/
@@ -2985,13 +3062,10 @@ shared/
 │   ├── analysis.ts
 │   ├── argument_intelligence.ts
 │   ├── citizen_participation.ts
-│   ├── COMPREHENSIVE_GAPS_ADDRESSED.md
 │   ├── constitutional_intelligence.ts
-│   ├── CRITICAL_GAPS_FIXED.md
 │   ├── database_architecture.md
 │   ├── enum.ts
 │   ├── expert_verification.ts
-│   ├── FINAL_ARCHITECTURE_SUMMARY.md
 │   ├── foundation.ts
 │   ├── graph_database_strategy.md
 │   ├── impact_measurement.ts
@@ -3001,10 +3075,7 @@ shared/
 │   ├── parliamentary_process.ts
 │   ├── platform_operations.ts
 │   ├── real_time_engagement.ts
-│   ├── schema_redesign.md
-│   ├── SCHEMA_TRANSFORMATION_COMPLETE.md
-│   ├── SCHEMA_VERIFICATION_COMPLETE.md
-│   ├── simple-validate.js
+│   ├── search_system.ts
 │   ├── simple-validate.ts
 │   ├── transparency_analysis.ts
 │   ├── transparency_intelligence.ts
@@ -3015,11 +3086,8 @@ shared/
 │   ├── anonymity-helper.ts
 ├── vitest.config.ts
 start-dev.js
-startup-validation.js
 tailwind.config.js
-test-auth-compile.ts
 test-connection.html
-test-race-prevention.ts
 test-results/
 ├── results.json
 ├── results.xml
@@ -3045,13 +3113,12 @@ tests/
 │   ├── components.spec.ts
 tsconfig.json
 tsconfig.server.json
+tsconfig.server.tsbuildinfo
 tsconfig.tsbuildinfo
-validation-report.js
-verify-fixes.js
 vitest.setup.ts
 vitest.workspace.config.ts
 ```
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-11-15 10:40:13
+Generated on: 2025-11-21 17:58:27

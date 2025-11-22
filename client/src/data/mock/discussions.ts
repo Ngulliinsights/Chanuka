@@ -13,7 +13,7 @@ import {
   ModerationAction,
   ModerationFlag,
   TypingIndicator
-} from '../../types/discussion';
+} from '../../types/community';
 import {
   generateId,
   generateDateInRange,
@@ -54,7 +54,7 @@ const generateNestedComments = (
       billId,
       parentId,
       authorId: user.id,
-      authorName: user.name || `${user.first_name} ${user.last_name}`,
+      authorName: user.name || (user as any).name || 'Anonymous',
       authorAvatar: (user as any).avatar || faker.image.avatar(),
       content: generateCommentContent(isExpert),
       createdAt: generateDateInRange(30, 0),
@@ -154,7 +154,7 @@ export const generateCommentReports = (commentIds: string[], count: number = 10)
   return Array.from({ length: count }, () => {
     const commentId = faker.helpers.arrayElement(commentIds);
     const violationType = faker.helpers.arrayElement(violationTypes);
-    const status = weightedRandom(statuses, [30, 20, 35, 15]);
+    const status = weightedRandom([...statuses], [30, 20, 35, 15]) as typeof statuses[number];
 
     return {
       id: generateId('report'),
@@ -227,7 +227,7 @@ export const generateModerationFlags = (commentIds: string[], count: number = 8)
   const statuses = ['pending', 'reviewed', 'dismissed', 'upheld'] as const;
 
   return Array.from({ length: count }, () => {
-    const status = weightedRandom(statuses, [40, 25, 20, 15]);
+    const status = weightedRandom([...statuses], [40, 25, 20, 15]) as typeof statuses[number];
     
     return {
       id: generateId('flag'),

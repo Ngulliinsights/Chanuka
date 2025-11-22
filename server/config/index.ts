@@ -639,7 +639,7 @@ function createBaseConfig(): AppConfig {
       ...baseConfig,
       server: {
         ...baseConfig.server,
-        port: getEnvNumber('PORT', 4200), // Different default port for dev
+        port: getEnvNumber('PORT', 3000), // Default port for dev to match frontend proxy
       },
       cors: {
         ...baseConfig.cors,

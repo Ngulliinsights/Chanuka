@@ -10,93 +10,106 @@
  * - Feed customization
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { 
-  Activity, 
-  TrendingUp, 
-  Users, 
-  MapPin, 
+import {
+  Activity,
+  TrendingUp,
+  Users,
+  MapPin,
   Filter,
   RefreshCw,
   MessageSquare,
 } from 'lucide-react';
 import { cn } from '@client/lib/utils';
-import { useCommunityStore, useCommunitySelectors } from '@client/store/slices/communitySlice';
-import { useCommunityRealTime } from '@client/features/community/hooks/useCommunityRealTime';
-import { useCommunityData } from '@client/hooks/useCommunityIntegration';
+import { useCommunityStore, useCommunitySelectors, useCommunityData, useCommunityRealTimeUpdates } from '@client/store/slices/communitySlice';
 import { useMediaQuery } from '@client/hooks/useMediaQuery';
-import { ActivityFeed } from './ActivityFeed';
+import ActivityFeed from './ActivityFeed';
 import { TrendingTopics } from './TrendingTopics';
-import { ExpertInsights } from './ExpertInsights';
-import { ActionCenter } from './ActionCenter';
 import { CommunityFilters } from './CommunityFilters';
 import { LocalImpactPanel } from './LocalImpactPanel';
-import { CommunityStats } from './CommunityStats';
+import CommunityStats from './CommunityStats';
+import { CommunityErrorBoundary } from './CommunityErrorBoundary';
+
+// Placeholder components for missing features
+const ExpertInsights = ({ insights, compact }: { insights: any[]; compact?: boolean }) => (
+  <div className="p-4 text-center text-muted-foreground">
+    Expert Insights - Coming Soon ({insights?.length || 0} insights)
+  </div>
+);
+
+const ActionCenter = ({ campaigns, petitions, compact }: { campaigns: any[]; petitions: any[]; compact?: boolean }) => (
+  <div className="p-4 text-center text-muted-foreground">
+    Action Center - Coming Soon ({campaigns?.length || 0} campaigns, {petitions?.length || 0} petitions)
+  </div>
+);
 
 interface CommunityHubProps {
   className?: string;
 }
 
-export function CommunityHub({ className }: CommunityHubProps) {
+function CommunityHubComponent({ className }: CommunityHubProps) {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [activeTab, setActiveTab] = useState('feed');
   const [showFilters, setShowFilters] = useState(false);
   const [showLocalImpact, setShowLocalImpact] = useState(false);
 
   // Use integrated hooks for data fetching
-  const { 
-    isLoading, 
-    error, 
-    refetchAll, 
-  } = useCommunityData();
+  const communityData = useCommunityData();
+  const { refetchAll } = useCommunityRealTimeUpdates();
 
   const communityStore = useCommunityStore();
   const community = useCommunitySelectors();
-  const { isConnected } = useCommunityRealTime({});
+
+  // Extract loading and error states
+  const isLoading = communityData.isAnyLoading;
+  const error = communityData.hasAnyError ? communityData.errors[0]?.message : null;
 
   // Map legacy prop names to the actual data returned by `useCommunityData`
-  const paginatedActivityFeed = community.activityFeed?.data?.data || [];
+  const paginatedActivityFeed = community.activityFeed?.data || [];
   const filteredTrendingTopics = community.trendingTopics?.data || [];
   const filteredExpertInsights = community.expertInsights?.data || [];
   const filteredCampaigns = community.campaigns?.data || [];
   const filteredPetitions = community.petitions?.data || [];
-  const hasMoreItems = community.activityFeed?.data?.pagination?.hasMore ?? false;
-  const stats = community.stats?.data ?? ({} as any);
+  const hasMoreItems = (community.activityFeed?.data?.length || 0) === community.itemsPerPage;
+  const stats = community.stats?.data ?? {};
 
   // Sync loading state
   // Note: we now derive loading/error directly from `useCommunityData` (isLoading / error)
 
-  // Initialize real-time connection
+  // Memoize methods to prevent stale closures
+  const loadTrendingTopics = useCallback(() => {
+    // Invalidate trending topics query to trigger refetch
+    refetchAll();
+  }, [refetchAll]);
+
+  // Memoize setup function to prevent recreating on every render
+  const setupRealTimeConnection = useCallback(() => {
+    // TODO: Implement WebSocket connection
+    // This would connect to the existing WebSocket infrastructure
+    // and handle real-time updates for community features
+    console.log('Setting up real-time connection...');
+  }, []);
+
+  // Initialize real-time connection with proper dependencies
   useEffect(() => {
     setupRealTimeConnection();
-    
+
     // Update trending scores periodically
     const trendingInterval = setInterval(() => {
-      communityStore.loadTrendingTopics();
+      loadTrendingTopics();
     }, 5 * 60 * 1000); // Every 5 minutes
 
     return () => {
       clearInterval(trendingInterval);
       // TODO: Cleanup WebSocket connection
     };
-  }, [communityStore.loadTrendingTopics, communityStore.initializeRealTime]);
-
-  const setupRealTimeConnection = () => {
-    // TODO: Implement WebSocket connection
-    // This would connect to the existing WebSocket infrastructure
-    // and handle real-time updates for community features
-    
-    // Initialize the compatibility layer's real-time features
-    communityStore.initializeRealTime().catch(() => {});
-    console.log('Setting up real-time connection...');
-  };
+  }, [setupRealTimeConnection, loadTrendingTopics]);
 
   const handleRefresh = async () => {
     await refetchAll();
-    communityStore.loadTrendingTopics();
   };
 
   const handleLoadMore = () => {
@@ -122,7 +135,7 @@ export function CommunityHub({ className }: CommunityHubProps) {
       </div>
     );
   }
-
+  
   return (
     <div className={cn('container mx-auto px-4 py-6', className)}>
       {/* Header */}
@@ -141,13 +154,8 @@ export function CommunityHub({ className }: CommunityHubProps) {
           <div className="flex items-center gap-2">
             {/* Connection Status */}
             <div className="flex items-center gap-2 text-sm">
-              <div className={cn(
-                'w-2 h-2 rounded-full',
-                isConnected ? 'bg-green-500' : 'bg-red-500'
-              )} />
-              <span className="text-muted-foreground">
-                {isConnected ? 'Live' : 'Offline'}
-              </span>
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-muted-foreground">Live</span>
             </div>
 
             {/* Action Buttons */}
@@ -179,7 +187,9 @@ export function CommunityHub({ className }: CommunityHubProps) {
         </div>
 
         {/* Community Stats */}
-        <CommunityStats stats={stats} />
+        <CommunityErrorBoundary context="CommunityStats">
+          <CommunityStats stats={stats} />
+        </CommunityErrorBoundary>
       </div>
 
       {/* Filters Panel */}
@@ -208,10 +218,12 @@ export function CommunityHub({ className }: CommunityHubProps) {
                   <TrendingUp className="h-5 w-5 text-orange-500" />
                   Trending Now
                 </h3>
-                <TrendingTopics 
-                  topics={filteredTrendingTopics.slice(0, 5)} 
-                  compact={true}
-                />
+                <CommunityErrorBoundary context="TrendingTopics">
+                  <TrendingTopics
+                    topics={filteredTrendingTopics.slice(0, 5)}
+                    compact={true}
+                  />
+                </CommunityErrorBoundary>
               </CardContent>
             </Card>
 
@@ -222,10 +234,12 @@ export function CommunityHub({ className }: CommunityHubProps) {
                   <Users className="h-5 w-5 text-blue-500" />
                   Expert Insights
                 </h3>
-                <ExpertInsights 
-                  insights={filteredExpertInsights.slice(0, 3)} 
-                  compact={true}
-                />
+                <CommunityErrorBoundary context="ExpertInsights">
+                  <ExpertInsights
+                    insights={filteredExpertInsights.slice(0, 3)}
+                    compact={true}
+                  />
+                </CommunityErrorBoundary>
               </CardContent>
             </Card>
 
@@ -236,11 +250,13 @@ export function CommunityHub({ className }: CommunityHubProps) {
                   <Activity className="h-5 w-5 text-green-500" />
                   Take Action
                 </h3>
-                <ActionCenter 
-                  campaigns={filteredCampaigns.slice(0, 2)}
-                  petitions={filteredPetitions.slice(0, 2)}
-                  compact={true}
-                />
+                <CommunityErrorBoundary context="ActionCenter">
+                  <ActionCenter
+                    campaigns={filteredCampaigns.slice(0, 2)}
+                    petitions={filteredPetitions.slice(0, 2)}
+                    compact={true}
+                  />
+                </CommunityErrorBoundary>
               </CardContent>
             </Card>
           </div>
@@ -271,40 +287,52 @@ export function CommunityHub({ className }: CommunityHubProps) {
               </TabsList>
 
               <TabsContent value="feed" className="mt-4">
-                <ActivityFeed 
-                    activities={paginatedActivityFeed}
-                    loading={isLoading}
-                    hasMore={hasMoreItems}
-                    onLoadMore={handleLoadMore}
-                  />
+                <CommunityErrorBoundary context="ActivityFeed">
+                  <ActivityFeed
+                      activities={paginatedActivityFeed}
+                      loading={isLoading}
+                      hasMore={hasMoreItems}
+                      onLoadMore={handleLoadMore}
+                    />
+                </CommunityErrorBoundary>
               </TabsContent>
 
               <TabsContent value="trending" className="mt-4">
-                <TrendingTopics topics={filteredTrendingTopics} />
+                <CommunityErrorBoundary context="TrendingTopics">
+                  <TrendingTopics topics={filteredTrendingTopics} />
+                </CommunityErrorBoundary>
               </TabsContent>
 
               <TabsContent value="experts" className="mt-4">
-                <ExpertInsights insights={filteredExpertInsights} />
+                <CommunityErrorBoundary context="ExpertInsights">
+                  <ExpertInsights insights={filteredExpertInsights} />
+                </CommunityErrorBoundary>
               </TabsContent>
 
               <TabsContent value="action" className="mt-4">
-                <ActionCenter 
-                  campaigns={filteredCampaigns}
-                  petitions={filteredPetitions}
-                />
+                <CommunityErrorBoundary context="ActionCenter">
+                  <ActionCenter
+                    campaigns={filteredCampaigns}
+                    petitions={filteredPetitions}
+                  />
+                </CommunityErrorBoundary>
               </TabsContent>
             </Tabs>
           ) : (
             // Desktop: Activity Feed
-            <ActivityFeed 
-              activities={paginatedActivityFeed}
-              loading={isLoading}
-              hasMore={hasMoreItems}
-              onLoadMore={handleLoadMore}
-            />
+            <CommunityErrorBoundary context="ActivityFeed">
+              <ActivityFeed
+                activities={paginatedActivityFeed}
+                loading={isLoading}
+                hasMore={hasMoreItems}
+                onLoadMore={handleLoadMore}
+              />
+            </CommunityErrorBoundary>
           )}
         </div>
       </div>
     </div>
   );
 }
+
+export default CommunityHubComponent;

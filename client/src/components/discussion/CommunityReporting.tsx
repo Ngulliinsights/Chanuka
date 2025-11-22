@@ -19,7 +19,7 @@ import {
   DialogTrigger,
 } from '../ui/dialog';
 import { cn } from '@client/lib/utils';
-import { ModerationViolationType, CommentReport } from '@client/types/discussion';
+import { ModerationViolationType, CommentReport } from '@client/types/community';
 
 interface CommunityReportingProps {
   commentId: string;

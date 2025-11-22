@@ -22,7 +22,7 @@ import {
 } from '../ui/dropdown-menu';
 import { ExpertBadge } from '../verification/ExpertBadge';
 import { cn } from '@client/lib/utils';
-import { Comment, ModerationViolationType } from '@client/types/discussion';
+import { Comment, ModerationViolationType } from '@client/types/community';
 
 interface CommentItemProps {
   comment: Comment;

@@ -29,26 +29,92 @@ import { globalErrorHandler } from './errors';
 // Type Re-exports and Definitions
 // ============================================================================
 
-// Import types from their canonical locations
-export type {
-  DiscussionThread,
+// Import all community types from the consolidated location
+import type {
+  ActivityItem,
+  TrendingTopic,
+  CommunityStats,
+  LocalImpactMetrics,
   Comment,
+  DiscussionThread,
   CommentFormData,
   CommentReport,
   ModerationAction,
-  ModerationViolationType
-} from '../../types/discussion';
-
-export type { Expert } from '../../types/expert';
-
-import type { ExpertInsight, ActivityItem, TrendingTopic, CommunityStats, LocalImpactMetrics } from '@client/types/community';
+  ModerationViolationType,
+  ExpertInsight,
+  Attachment,
+  Mention,
+  ThreadParticipant,
+  SocialShare,
+  Contributor,
+  CreateCommentRequest,
+  CreateThreadRequest,
+  UpdateCommentRequest,
+  VoteRequest,
+  ShareRequest,
+  CommentsResponse,
+  ThreadsResponse,
+  CommentEvent,
+  ThreadEvent,
+  UserEvent,
+  CommentValidation,
+  ModerationFlag,
+  ModerationStats,
+  CommunityGuidelines,
+  UserModerationHistory,
+  CommentUpdateEvent,
+  ModerationEvent,
+  TypingIndicator,
+  CommentQualityMetrics,
+  QualityThresholds,
+  ModerationAppeal,
+  CommentSortOption,
+  CommentFilterOption
+} from '@client/types/community';
 
 export type {
   ActivityItem,
   TrendingTopic,
   CommunityStats,
-  LocalImpactMetrics
-} from '../../types/community';
+  LocalImpactMetrics,
+  Comment,
+  DiscussionThread,
+  CommentFormData,
+  CommentReport,
+  ModerationAction,
+  ModerationViolationType,
+  ExpertInsight,
+  Attachment,
+  Mention,
+  ThreadParticipant,
+  SocialShare,
+  Contributor,
+  CreateCommentRequest,
+  CreateThreadRequest,
+  UpdateCommentRequest,
+  VoteRequest,
+  ShareRequest,
+  CommentsResponse,
+  ThreadsResponse,
+  CommentEvent,
+  ThreadEvent,
+  UserEvent,
+  CommentValidation,
+  ModerationFlag,
+  ModerationStats,
+  CommunityGuidelines,
+  UserModerationHistory,
+  CommentUpdateEvent,
+  ModerationEvent,
+  TypingIndicator,
+  CommentQualityMetrics,
+  QualityThresholds,
+  ModerationAppeal,
+  CommentSortOption,
+  CommentFilterOption
+} from '@client/types/community';
+
+export type { Expert } from '../../types/expert';
 
 /**
  * Comprehensive options for retrieving and filtering comments.
@@ -198,20 +264,52 @@ export interface ExpertInsightSubmissionResponse {
  * trigger cache invalidation for related read operations in a production system.
  */
 export class CommunityApiService {
-  private readonly baseUrl: string;
-  private readonly defaultTimeout = 10000;
-  
-  // Differentiated cache TTLs based on content volatility and user expectations
-  private readonly discussionCacheTTL = 2 * 60 * 1000;      // 2 minutes
-  private readonly commentsCacheTTL = 1 * 60 * 1000;        // 1 minute - needs freshness
-  private readonly expertInsightsCacheTTL = 15 * 60 * 1000; // 15 minutes - stable content
-  private readonly expertVerifyCacheTTL = 30 * 60 * 1000;   // 30 minutes - rarely changes
-  private readonly activityCacheTTL = 3 * 60 * 1000;        // 3 minutes
-  private readonly trendingCacheTTL = 5 * 60 * 1000;        // 5 minutes
-  private readonly statsCacheTTL = 10 * 60 * 1000;          // 10 minutes
+   private readonly baseUrl: string;
+   private readonly defaultTimeout = 10000;
+
+   // Abort controller management for request cancellation
+   private abortControllers: Map<string, AbortController> = new Map();
+
+   // Differentiated cache TTLs based on content volatility and user expectations
+   private readonly discussionCacheTTL = 2 * 60 * 1000;      // 2 minutes
+   private readonly commentsCacheTTL = 1 * 60 * 1000;        // 1 minute - needs freshness
+   private readonly expertInsightsCacheTTL = 15 * 60 * 1000; // 15 minutes - stable content
+   private readonly expertVerifyCacheTTL = 30 * 60 * 1000;   // 30 minutes - rarely changes
+   private readonly activityCacheTTL = 3 * 60 * 1000;        // 3 minutes
+   private readonly trendingCacheTTL = 5 * 60 * 1000;        // 5 minutes
+   private readonly statsCacheTTL = 10 * 60 * 1000;          // 10 minutes
 
   constructor(baseUrl: string = '/api') {
     this.baseUrl = baseUrl;
+  }
+
+  /**
+   * Creates a unique key for abort controller tracking
+   */
+  private getRequestKey(endpoint: string, options?: RequestInit): string {
+    return `${endpoint}-${JSON.stringify(options?.body || '')}`;
+  }
+
+  /**
+   * Cancels an in-flight request if it exists
+   */
+  public cancelRequest(endpoint: string, options?: RequestInit): void {
+    const key = this.getRequestKey(endpoint, options);
+    const controller = this.abortControllers.get(key);
+    if (controller) {
+      controller.abort();
+      this.abortControllers.delete(key);
+    }
+  }
+
+  /**
+   * Cleanup method to abort all pending requests and clear the abort controllers map
+   */
+  cleanup(): void {
+    for (const controller of this.abortControllers.values()) {
+      controller.abort();
+    }
+    this.abortControllers.clear();
   }
 
   // ==========================================================================
@@ -229,15 +327,22 @@ export class CommunityApiService {
    * @param billId - ID of the bill to get discussion for
    * @returns Discussion thread metadata and statistics
    */
-  async getDiscussionThread(billId: number): Promise<DiscussionThreadMetadata> {
+   async getDiscussionThread(billId: number): Promise<DiscussionThreadMetadata> {
+    const requestKey = this.getRequestKey(`${this.baseUrl}/bills/${billId}/discussion`);
+    const abortController = new AbortController();
+    this.abortControllers.set(requestKey, abortController);
+
     try {
       const response = await globalApiClient.get<DiscussionThreadMetadata>(
         `${this.baseUrl}/bills/${billId}/discussion`,
         {
           timeout: this.defaultTimeout,
-          cacheTTL: this.discussionCacheTTL
+          cacheTTL: this.discussionCacheTTL,
+          signal: abortController.signal
         }
       );
+
+      this.abortControllers.delete(requestKey);
 
       logger.info('Discussion thread loaded', {
         component: 'CommunityApiService',
@@ -356,7 +461,7 @@ export class CommunityApiService {
       logger.info('Comment created successfully', {
         component: 'CommunityApiService',
         billId: data.billId,
-        commentId: comment.id,
+        commentId: (comment as any).id,
         isReply: !!data.parentId,
         hasMentions: (data.mentions?.length || 0) > 0
       });

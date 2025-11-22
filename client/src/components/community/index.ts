@@ -10,3 +10,4 @@ export { ActionCenter } from './ActionCenter';
 export { CommunityFilters } from './CommunityFilters';
 export { LocalImpactPanel } from './LocalImpactPanel';
 export { CommunityStats } from './CommunityStats';
+export { CommunityErrorBoundary, withCommunityErrorBoundary } from './CommunityErrorBoundary';

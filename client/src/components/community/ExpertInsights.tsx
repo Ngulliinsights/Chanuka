@@ -9,7 +9,7 @@
  * - Compact and full view modes
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -41,13 +41,21 @@ interface ExpertInsightsProps {
   className?: string;
 }
 
-export function ExpertInsights({ 
-  insights, 
+export function ExpertInsights({
+  insights,
   compact = false,
-  className 
+  className
 }: ExpertInsightsProps) {
-  const [expandedInsights, setExpandedInsights] = useState<Set<string>>(new Set());
-  const [votedInsights, setVotedInsights] = useState<Map<string, 'up' | 'down'>>(new Map());
+  const [expandedInsights, setExpandedInsights] = useState<Set<string>>(() => new Set());
+  const [votedInsights, setVotedInsights] = useState<Map<string, 'up' | 'down'>>(() => new Map());
+
+  // Cleanup state on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      setExpandedInsights(new Set());
+      setVotedInsights(new Map());
+    };
+  }, []);
 
   const getConfidenceColor = (confidence: number) => {
     if (confidence >= 0.8) return 'text-green-600';
@@ -84,33 +92,37 @@ export function ExpertInsights({
       .slice(0, 2);
   };
 
-  const toggleExpanded = (insightId: string) => {
-    const newExpanded = new Set(expandedInsights);
-    if (newExpanded.has(insightId)) {
-      newExpanded.delete(insightId);
-    } else {
-      newExpanded.add(insightId);
-    }
-    setExpandedInsights(newExpanded);
-  };
+  const toggleExpanded = useCallback((insightId: string) => {
+    setExpandedInsights(prev => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(insightId)) {
+        newExpanded.delete(insightId);
+      } else {
+        newExpanded.add(insightId);
+      }
+      return newExpanded;
+    });
+  }, []);
 
-  const handleVote = (insightId: string, voteType: 'up' | 'down') => {
-    const currentVote = votedInsights.get(insightId);
-    const newVotes = new Map(votedInsights);
-    
-    if (currentVote === voteType) {
-      // Remove vote if clicking the same vote
-      newVotes.delete(insightId);
-    } else {
-      // Set new vote
-      newVotes.set(insightId, voteType);
-    }
-    
-    setVotedInsights(newVotes);
-    
+  const handleVote = useCallback((insightId: string, voteType: 'up' | 'down') => {
+    setVotedInsights(prev => {
+      const currentVote = prev.get(insightId);
+      const newVotes = new Map(prev);
+
+      if (currentVote === voteType) {
+        // Remove vote if clicking the same vote
+        newVotes.delete(insightId);
+      } else {
+        // Set new vote
+        newVotes.set(insightId, voteType);
+      }
+
+      return newVotes;
+    });
+
     // TODO: Send vote to API
     console.log(`Voted ${voteType} on insight ${insightId}`);
-  };
+  }, []);
 
   const handleShare = (insight: ExpertInsight) => {
     // TODO: Implement sharing functionality

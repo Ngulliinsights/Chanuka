@@ -3,7 +3,7 @@ import { Send, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { cn } from '@client/lib/utils';
-import { CommentFormData, CommentValidation } from '@client/types/discussion';
+import { CommentFormData, CommentValidation } from '@client/types/community';
 
 interface CommentFormProps {
   billId: number;

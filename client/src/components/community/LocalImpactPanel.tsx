@@ -9,7 +9,7 @@
  * - Community engagement statistics
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -50,13 +50,25 @@ interface Representative {
 }
 
 export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) {
-  const { localImpact, setLocalImpact, updateLocalImpact } = useCommunityStore();
-  const [selectedState, setSelectedState] = useState(localImpact?.data?.state || '');
-  const [selectedDistrict, setSelectedDistrict] = useState(localImpact?.data?.district || '');
-  const [selectedCounty, setSelectedCounty] = useState(localImpact?.data?.county || '');
-  const impact: LocalImpactMetrics = localImpact?.data ?? ({} as LocalImpactMetrics);
-  const [loading, setLoading] = useState(false);
-  const [representatives, setRepresentatives] = useState<Representative[]>([]);
+   const { localImpact, setLocalImpact, updateLocalImpact } = useCommunityStore();
+   const [selectedState, setSelectedState] = useState(localImpact?.data?.state || '');
+   const [selectedDistrict, setSelectedDistrict] = useState(localImpact?.data?.district || '');
+   const [selectedCounty, setSelectedCounty] = useState(localImpact?.data?.county || '');
+   const impact: LocalImpactMetrics = localImpact?.data ?? ({} as LocalImpactMetrics);
+   const [loading, setLoading] = useState(false);
+   const [representatives, setRepresentatives] = useState<Representative[]>([]);
+
+   // Memoize the setLocalImpact function to prevent useEffect dependency issues
+   const memoizedSetLocalImpact = useCallback((metrics: LocalImpactMetrics) => {
+     setLocalImpact(metrics);
+   }, [setLocalImpact]);
+
+   // Memoize location data to prevent unnecessary effect runs
+   const locationData = useMemo(() => ({
+     state: selectedState,
+     district: selectedDistrict,
+     county: selectedCounty
+   }), [selectedState, selectedDistrict, selectedCounty]);
 
   // Mock data for states and districts
   const states = [
@@ -152,21 +164,23 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
     if (selectedState) {
       setLoading(true);
       // Simulate API call
-      setTimeout(() => {
-        setLocalImpact(mockLocalImpactData);
+      const timeoutId = setTimeout(() => {
+        memoizedSetLocalImpact(mockLocalImpactData);
         setRepresentatives(mockRepresentatives);
         setLoading(false);
       }, 1000);
-    }
-  }, [selectedState, selectedDistrict, selectedCounty, setLocalImpact]);
 
-  const handleLocationUpdate = () => {
+      return () => clearTimeout(timeoutId);
+    }
+  }, [locationData, memoizedSetLocalImpact]);
+
+  const handleLocationUpdate = useCallback(() => {
     updateLocalImpact({
       state: selectedState,
       district: selectedDistrict,
       county: selectedCounty
     });
-  };
+  }, [selectedState, selectedDistrict, selectedCounty, updateLocalImpact]);
 
   const getPartyColor = (party: string) => {
     switch (party.toLowerCase()) {

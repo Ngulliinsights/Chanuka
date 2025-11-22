@@ -7,7 +7,10 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'citizen' | 'expert' | 'official' | 'admin';
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  role: 'citizen' | 'expert' | 'official' | 'admin' | 'moderator';
   verified: boolean;
   twoFactorEnabled: boolean;
   avatar_url?: string;
@@ -17,6 +20,17 @@ export interface User {
   createdAt: string;
   verification_status?: 'pending' | 'verified' | 'rejected';
   expertise?: string | string[];
+  is_active?: boolean;
+  reputation?: number;
+  two_factor_enabled?: boolean;
+  last_login?: string;
+  login_count?: number;
+  account_locked?: boolean;
+  locked_until?: string | null;
+  password_changed_at?: string;
+  privacy_settings?: PrivacySettings;
+  consent_given?: ConsentRecord[];
+  data_retention_preference?: DataRetentionPreference;
 }
 
 export interface PrivacySettings {

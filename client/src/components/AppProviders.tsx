@@ -15,6 +15,7 @@ import { SimpleErrorBoundary } from './error-handling/SimpleErrorBoundary';
 import { initializeStore } from '../store';
 import { loadingStateUtils } from '../shared/design-system/components/loading-states';
 import { errorStateUtils } from '../shared/design-system/components/error-states';
+import { CommunityUIProvider } from '@client/store/slices/communitySlice';
 
 // =============================================================================
 // TYPE DEFINITIONS
@@ -36,6 +37,7 @@ interface ProviderOverrides {
   QueryClientProvider?: React.ComponentType<{ client: QueryClient; children: React.ReactNode }>;
   ErrorBoundary?: React.ComponentType<{ children: React.ReactNode }>;
   AuthProvider?: React.ComponentType<{ children: React.ReactNode }>;
+  CommunityUIProvider?: React.ComponentType<{ children: React.ReactNode }>;
   ThemeProvider?: React.ComponentType<{ children: React.ReactNode }>;
   LoadingProvider?: React.ComponentType<{ children: React.ReactNode }>;
   AccessibilityProvider?: React.ComponentType<{ children: React.ReactNode }>;
@@ -349,6 +351,7 @@ const PROVIDERS: ProviderConfig[] = [
   { name: 'QueryClientProvider', component: QueryClientProvider },
   { name: 'ErrorBoundary', component: SimpleErrorBoundary },
   { name: 'AuthProvider', component: AuthProvider },
+  { name: 'CommunityUIProvider', component: CommunityUIProvider },
   { name: 'ThemeProvider', component: ThemeProvider },
   { name: 'LoadingProvider', component: LoadingProviderWithDeps },
   { name: 'AccessibilityProvider', component: AccessibilityProvider },

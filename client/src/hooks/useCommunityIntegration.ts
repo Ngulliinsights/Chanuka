@@ -130,10 +130,18 @@ export function useReportContent() {
  * Composite hook that loads all community data
  */
 export function useCommunityData() {
+  console.log('[useCommunityData-integration] Hook called, calling individual hooks');
   const activityFeed = useActivityFeed();
   const trendingTopics = useTrendingTopics();
   const expertInsights = useExpertInsights();
   const stats = useCommunityStats();
+
+  console.log('[useCommunityData-integration] Individual hook results:', {
+    activityFeed: { isLoading: activityFeed.isLoading, error: !!activityFeed.error, dataLength: activityFeed.data?.data?.length },
+    trendingTopics: { isLoading: trendingTopics.isLoading, error: !!trendingTopics.error, dataLength: trendingTopics.data?.length },
+    expertInsights: { isLoading: expertInsights.isLoading, error: !!expertInsights.error, dataLength: expertInsights.data?.length },
+    stats: { isLoading: stats.isLoading, error: !!stats.error, data: !!stats.data }
+  });
 
   const isLoading = 
     activityFeed.isLoading ||

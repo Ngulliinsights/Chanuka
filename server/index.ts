@@ -12,38 +12,39 @@ import express, { Request, Response, NextFunction, Express } from 'express';
 import cors from 'cors';
 import { createServer, Server } from 'http';
 import helmet from 'helmet';
-import { pool } from '@shared/database/pool.js';
+import { pool } from '@shared/database';
 import { config } from './config/index.js';
 
 // Feature Routes
-import { router as systemRouter } from '@server/features/admin/system.ts';
-import { router as billsRouter } from '@server/features/bills/presentation/bills-router.ts';
-import { router as sponsorshipRouter } from '@server/features/bills/presentation/sponsorship.routes.ts';
-import { realTimeTrackingRouter } from '@server/features/bills/index.ts';
-import { analysisRouter } from '@server/features/analysis/presentation/analysis.routes.ts';
-import { billTrackingRouter } from '@server/features/bills/presentation/bill-tracking.routes.ts';
-import analyticsRouter from '@server/features/analytics/analytics.ts';
-import { sponsorsRouter } from '@server/features/sponsors/presentation/sponsors.routes.ts';
-import { router as authRouter } from '@server/core/auth/auth.ts';
-import { router as usersRouter } from '@server/features/users/application/profile.ts';
-import { router as verificationRouter } from '@server/features/users/application/verification.ts';
-import { router as communityRouter } from '@server/features/community/community.ts';
+import { router as systemRouter } from '@server/features/admin/system';
+import { router as billsRouter } from '@server/features/bills/presentation/bills-router';
+import { router as sponsorshipRouter } from '@server/features/bills/presentation/sponsorship.routes';
+import { realTimeTrackingRouter } from '@server/features/bills';
+import { analysisRouter } from '@server/features/analysis/presentation/analysis.routes';
+import { billTrackingRouter } from '@server/features/bills/presentation/bill-tracking.routes';
+import analyticsRouter from '@server/features/analytics/analytics';
+import { sponsorsRouter } from '@server/features/sponsors/presentation/sponsors.routes';
+import { router as authRouter } from '@server/core/auth/auth';
+import { router as usersRouter } from '@server/features/users/application/profile';
+import { router as verificationRouter } from '@server/features/users/application/verification';
+import { router as communityRouter } from '@server/features/community/community';
 import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
-import { router as searchRouter } from '@server/features/search/presentation/SearchController.ts';
-import { router as privacyRouter } from '@server/features/privacy/privacy-routes.ts';
-import { router as adminRouter } from '@server/features/admin/admin.ts';
+import { router as searchRouter } from '@server/features/search/presentation/SearchController';
+import { router as privacyRouter } from '@server/features/privacy/privacy-routes';
+import { router as adminRouter } from '@server/features/admin/admin';
 import { router as cacheRouter } from './infrastructure/cache/cache.js';
 import { cacheCoordinator } from './infrastructure/cache/index.js';
 import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
-import { router as externalApiDashboardRouter } from '@server/features/admin/external-api-dashboard.ts';
-import coverageRouter from '@server/features/coverage/coverage-routes.ts';
-import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/presentation/constitutional-analysis-router.ts';
-import { argumentIntelligenceRouter } from '@server/features/argument-intelligence/presentation/argument-intelligence-router.ts';
+import { router as externalApiDashboardRouter } from '@server/features/admin/external-api-dashboard';
+import coverageRouter from '@server/features/coverage/coverage-routes';
+import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/presentation/constitutional-analysis-router';
+import { argumentIntelligenceRouter } from '@server/features/argument-intelligence/presentation/argument-intelligence-router';
+import { router as recommendationRouter } from '@server/features/recommendation/presentation/RecommendationController';
 
 // Middleware imports
 import { migratedApiRateLimit } from './middleware/migration-wrapper.js';
-import { enhancedSecurityService } from '@server/features/security/enhanced-security-service.ts';
-import { SecuritySchemas, createValidationMiddleware } from '@server/core/validation/security-schemas.ts';
+import { enhancedSecurityService } from '@server/features/security/enhanced-security-service';
+import { SecuritySchemas, createValidationMiddleware } from '@server/core/validation/security-schemas';
 
 // Infrastructure Services
 import { auditMiddleware } from './infrastructure/monitoring/audit-log.js';
@@ -72,10 +73,10 @@ import { databaseFallbackService } from "./infrastructure/database/database-fall
 import { webSocketService } from './infrastructure/websocket.js';
 import { notificationSchedulerService } from './infrastructure/notifications/index.js';
 import { monitoringScheduler } from './infrastructure/monitoring/monitoring-scheduler.js';
-import { sessionCleanupService } from '@server/core/auth/session-cleanup.ts';
-import { securityMonitoringService } from '@server/features/security/security-monitoring-service.ts';
-import { privacySchedulerService } from '@server/features/privacy/privacy-scheduler.ts';
-import { schemaValidationService } from '@server/core/validation/schema-validation-service.ts';
+import { sessionCleanupService } from '@server/core/auth/session-cleanup';
+import { securityMonitoringService } from '@server/features/security/security-monitoring-service';
+import { privacySchedulerService } from '@server/features/privacy/privacy-scheduler';
+import { schemaValidationService } from '@server/core/validation/schema-validation-service';
 
 // Unified utilities
 import { logger, Performance, ApiResponse } from '@shared/core/index.js';
@@ -478,6 +479,7 @@ app.use('/api/admin/external-api', externalApiDashboardRouter);
 app.use('/api/coverage', coverageRouter);
 app.use('/api/constitutional-analysis', constitutionalAnalysisRouter);
 app.use('/api/argument-intelligence', argumentIntelligenceRouter);
+app.use('/api/recommendation', recommendationRouter);
 
 // API-specific error handling middleware
 app.use('/api', (error: AppError, req: Request, res: Response, next: NextFunction) => {

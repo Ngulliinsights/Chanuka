@@ -9,22 +9,22 @@
  * - Compact and full view modes
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
-import { 
-  TrendingUp, 
+import {
+  TrendingUp,
   TrendingDown,
-  Users, 
-  MessageSquare, 
+  Users,
+  MessageSquare,
   Clock,
   MapPin,
   BarChart3,
   ExternalLink,
   ChevronRight,
-  Flame,
+  Zap,
   Activity
 } from 'lucide-react';
 import { cn } from '@client/lib/utils';
@@ -38,29 +38,30 @@ interface TrendingTopicsProps {
   className?: string;
 }
 
-export function TrendingTopics({ 
-  topics, 
-  compact = false, 
+export function TrendingTopics({
+  topics,
+  compact = false,
   showDetails = false,
-  className 
+  className
 }: TrendingTopicsProps) {
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
 
-  const getTrendingIcon = (score: number) => {
-    if (score > 0.8) return Flame;
+  // Memoize utility functions to prevent unnecessary recalculations
+  const getTrendingIcon = useCallback((score: number) => {
+    if (score > 0.8) return Zap;
     if (score > 0.6) return TrendingUp;
     if (score > 0.4) return Activity;
     return TrendingDown;
-  };
+  }, []);
 
-  const getTrendingColor = (score: number) => {
+  const getTrendingColor = useCallback((score: number) => {
     if (score > 0.8) return 'text-red-500';
     if (score > 0.6) return 'text-orange-500';
     if (score > 0.4) return 'text-yellow-500';
     return 'text-gray-500';
-  };
+  }, []);
 
-  const getCategoryColor = (category: TrendingTopic['category']) => {
+  const getCategoryColor = useCallback((category: TrendingTopic['category']) => {
     switch (category) {
       case 'bill':
         return 'bg-blue-100 text-blue-800';
@@ -73,26 +74,26 @@ export function TrendingTopics({
       default:
         return 'bg-gray-100 text-gray-800';
     }
-  };
+  }, []);
 
-  const formatTimeAgo = (timestamp: string) => {
+  const formatTimeAgo = useCallback((timestamp: string) => {
     try {
       return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     } catch {
       return 'recently';
     }
-  };
+  }, []);
 
-  const calculateVelocityTrend = (hourlyActivity: number[]) => {
+  const calculateVelocityTrend = useCallback((hourlyActivity: number[]) => {
     if (hourlyActivity.length < 2) return 0;
     const recent = hourlyActivity.slice(-3).reduce((sum, val) => sum + val, 0);
     const previous = hourlyActivity.slice(-6, -3).reduce((sum, val) => sum + val, 0);
     return previous > 0 ? ((recent - previous) / previous) * 100 : 0;
-  };
+  }, []);
 
-  const toggleExpanded = (topicId: string) => {
-    setExpandedTopic(expandedTopic === topicId ? null : topicId);
-  };
+  const toggleExpanded = useCallback((topicId: string) => {
+    setExpandedTopic(prev => prev === topicId ? null : topicId);
+  }, []);
 
   if (topics.length === 0) {
     return (

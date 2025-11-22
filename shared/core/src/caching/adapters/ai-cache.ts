@@ -9,8 +9,7 @@
  * - Intelligent cache invalidation based on data freshness
  */
 
-import { CacheService } from '/core/interfaces';
-import { getDefaultCache } from '../../cache/index';
+import { CacheService, getDefaultCache } from '../../cache/index';
 import { performance } from 'perf_hooks';
 import { logger } from '../../observability/logging';
 
@@ -139,11 +138,7 @@ export class AICache {
 
       // If semantic similarity is enabled, try to find similar requests
       if (this.options.enableSemanticSimilarity && inputData) {
-        const similarResult = await this.findSimilarCachedResult(
-          service,
-          operation,
-          inputData
-        );
+        const similarResult = await this.findSimilarCachedResult();
 
         if (similarResult) {
           this.recordCacheHit(service, similarResult.cost, performance.now() - startTime);
@@ -414,11 +409,7 @@ export class AICache {
     return Math.abs(hash).toString(36);
   }
 
-  private async findSimilarCachedResult(
-    _service: string,
-    _operation: string,
-    _inputData: any
-  ): Promise<AICacheEntry | null> {
+  private async findSimilarCachedResult(): Promise<AICacheEntry | null> {
     // This would implement semantic similarity search
     // For now, return null as it requires complex NLP processing
     return null;

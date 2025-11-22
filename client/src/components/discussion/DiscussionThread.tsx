@@ -3,7 +3,6 @@ import {
   MessageSquare, 
   Users, 
   Filter, 
-  SortAsc, 
   Lock,
   AlertTriangle,
   RefreshCw,
@@ -29,7 +28,7 @@ import {
   CommentSortOption,
   CommentFilterOption,
   ModerationViolationType
-} from '../../types/discussion';
+} from '../../types/community';
 
 interface DiscussionThreadProps {
   thread: DiscussionThreadType;
@@ -209,7 +208,7 @@ export function DiscussionThread({
       <div className="flex items-center gap-3">
         {/* Sort Options */}
         <div className="flex items-center gap-2">
-          <SortAsc className="h-4 w-4 text-gray-500" />
+          <Filter className="h-4 w-4 text-gray-500" />
           <Select value={sortBy} onValueChange={(value: CommentSortOption) => setSortBy(value)}>
             <SelectTrigger className="w-32 h-8 text-xs">
               <SelectValue />
