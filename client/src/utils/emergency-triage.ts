@@ -5,6 +5,7 @@
  * the worst offending components causing infinite renders and race conditions.
  */
 
+import React from 'react';
 import { logger } from './logger';
 
 export interface ComponentError {

@@ -8,7 +8,7 @@
  * @deprecated Use moderationOrchestratorService from './moderation/index.js' instead
  */
 
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { 
   moderationOrchestratorService,
   ContentModerationFilters,

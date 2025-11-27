@@ -31,9 +31,22 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@shared": ["shared"],
       "@shared/*": ["shared/*"],
+      "@shared/core": ["shared/core"],
+      "@shared/core/*": ["shared/core/*"],
+      "@shared/database": ["shared/database"],
+      "@shared/database/*": ["shared/database/*"],
+      "@shared/schema": ["shared/schema"],
+      "@shared/schema/*": ["shared/schema/*"],
+      "@shared/utils": ["shared/utils"],
+      "@shared/utils/*": ["shared/utils/*"],
+      "@server": ["server"],
       "@server/*": ["server/*"],
-      "@client/*": ["client/src/*"]
+      "@client": ["client/src"],
+      "@client/*": ["client/src/*"],
+      "@tests": ["tests"],
+      "@tests/*": ["tests/*"]
     },
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,

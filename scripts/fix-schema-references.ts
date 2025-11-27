@@ -39,7 +39,7 @@ const fixes: FixPattern[] = [
   {
     description: "Fix schema imports",
     pattern: /import\s*{\s*([^}]*)\buser\b([^}]*)\s*}\s*from\s*['"][^'"]*schema['"]/g,
-    replacement: "import { $1users$2 } from '../shared/schema'"
+    replacement: "import { $1users$2 } from '@shared/shared/schema'"
   },
   
   // Column reference fixes in object destructuring

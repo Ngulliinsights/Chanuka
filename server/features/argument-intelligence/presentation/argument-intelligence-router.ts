@@ -4,19 +4,19 @@
 // Complete REST API for argument intelligence operations
 
 import { Router } from 'express';
-import { logger  } from '@shared/core/src/index.js';
-import { ArgumentProcessor } from '../application/argument-processor.js';
-import { StructureExtractorService } from '../application/structure-extractor.js';
-import { ClusteringService } from '../application/clustering-service.js';
-import { CoalitionFinderService } from '../application/coalition-finder.js';
-import { EvidenceValidatorService } from '../application/evidence-validator.js';
-import { BriefGeneratorService } from '../application/brief-generator.js';
-import { PowerBalancerService } from '../application/power-balancer.js';
-import { argumentIntelligenceService } from '../application/argument-intelligence-service.js';
-import { SentenceClassifier } from '../infrastructure/nlp/sentence-classifier.js';
-import { EntityExtractor } from '../infrastructure/nlp/entity-extractor.js';
-import { SimilarityCalculator } from '../infrastructure/nlp/similarity-calculator.js';
-import { db  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
+import { ArgumentProcessor } from '@shared/application/argument-processor.js';
+import { StructureExtractorService } from '@shared/application/structure-extractor.js';
+import { ClusteringService } from '@shared/application/clustering-service.js';
+import { CoalitionFinderService } from '@shared/application/coalition-finder.js';
+import { EvidenceValidatorService } from '@shared/application/evidence-validator.js';
+import { BriefGeneratorService } from '@shared/application/brief-generator.js';
+import { PowerBalancerService } from '@shared/application/power-balancer.js';
+import { argumentIntelligenceService } from '@shared/application/argument-intelligence-service.js';
+import { SentenceClassifier } from '@shared/infrastructure/nlp/sentence-classifier.js';
+import { EntityExtractor } from '@shared/infrastructure/nlp/entity-extractor.js';
+import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator.js';
+import { db  } from '@shared/core/index.js';
 
 export const router = Router();
 

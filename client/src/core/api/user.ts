@@ -26,7 +26,7 @@ export type {
   SavedBill,
   UserEngagementHistory,
   UserPreferences
-} from '../../services/userService';
+} from '@client/services/userService';
 
 // ============================================================================
 // Request/Response Type Definitions

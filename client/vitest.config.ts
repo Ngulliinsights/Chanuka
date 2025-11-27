@@ -16,11 +16,12 @@ export default defineConfig({
     testTimeout: 10000,
     hookTimeout: 5000,
     
-    // Test file patterns
+    // Test file patterns - ONLY .test.{ts,tsx} files for Vitest
     include: ['**/*.test.{ts,tsx}'],
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
+      '**/*.spec.{ts,tsx}', // Exclude Playwright spec files
       '**/*.integration.test.{ts,tsx}',
       '**/*.e2e.test.{ts,tsx}',
       '**/*.performance.test.{ts,tsx}',
@@ -77,6 +78,8 @@ export default defineConfig({
       '@': resolve(resolve(fileURLToPath(import.meta.url), '..'), './src'),
       '@client': resolve(resolve(fileURLToPath(import.meta.url), '..'), './src'),
       '@chanuka/shared': resolve(resolve(fileURLToPath(import.meta.url), '..'), '../shared'),
+      '@shared': resolve(resolve(fileURLToPath(import.meta.url), '..'), '../shared'),
+      '@tests': resolve(resolve(fileURLToPath(import.meta.url), '..'), '../tests'),
     },
   },
 });

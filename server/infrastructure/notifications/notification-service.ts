@@ -1,6 +1,6 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import * as admin from 'firebase-admin';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { 
   NotificationChannelService, 
   ChannelDeliveryRequest, 

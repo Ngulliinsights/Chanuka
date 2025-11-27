@@ -26,11 +26,11 @@ export type {
   TypingIndicator,
   CommentSortOption,
   CommentFilterOption,
-} from '../../types/community';
+} from '@client/types/community';
 
 // Store and hooks - Redux version
-export * from '../../store/slices/discussionSlice';
+export * from '@client/store/slices/discussionSlice';
 // export { useDiscussion } from '../../hooks/useDiscussion'; // Not implemented yet
 
 // Services
-// export { discussionService } from '../../services/discussion-service'; // Not implemented yet
+// export { discussionService } from '@client/services/discussion-service'; // Not implemented yet

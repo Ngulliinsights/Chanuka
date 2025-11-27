@@ -15,7 +15,7 @@ import type {
   AnalyticsResponse,
   UserActivity,
   AnalyticsAlert
-} from '../types';
+} from '@client/types';
 
 /**
  * Configuration interface for cache behavior

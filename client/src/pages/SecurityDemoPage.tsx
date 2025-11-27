@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { SecurityDashboard } from '@client/components/security/SecurityDashboard';
 import { SecuritySettings } from '@client/components/security/SecuritySettings';
-import { getSecuritySystem } from '../security';
+import { getSecuritySystem } from '@client/security';
 import { logger } from '@client/utils/logger';
 
 export default function SecurityDemoPage() {

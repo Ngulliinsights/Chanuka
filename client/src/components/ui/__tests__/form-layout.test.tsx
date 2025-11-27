@@ -13,7 +13,7 @@ import {
   FormValidationSummary,
   FormSuccessIndicator,
   FormHelpText 
-} from '../form-layout';
+} from '@client/form-layout';
 
 describe('FormSection', () => {
   it('renders with title and children', () => {

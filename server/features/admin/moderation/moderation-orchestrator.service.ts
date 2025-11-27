@@ -5,7 +5,7 @@
  * This service acts as the primary interface for moderation operations.
  */
 
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { 
   ContentModerationFilters, 
   ModerationItem, 

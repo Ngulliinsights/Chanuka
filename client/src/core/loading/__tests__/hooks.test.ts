@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { LoadingProvider } from '../context';
+import { LoadingProvider } from '@client/context';
 import { useLoadingOperation } from '@client/hooks';
 import { useProgressiveLoading } from '@client/hooks';
 import { useTimeoutAwareLoading } from '@client/hooks';

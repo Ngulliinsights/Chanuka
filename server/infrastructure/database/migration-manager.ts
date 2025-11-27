@@ -13,7 +13,7 @@ import { Pool } from 'pg';
 import { readdir, readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { createHash } from 'crypto';
-import { logger } from '@shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 
 export interface MigrationFile {
   filename: string;

@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { billService, BillNotFoundError, CommentNotFoundError, ValidationError } from '../application/bills.js';
+import { billService, BillNotFoundError, CommentNotFoundError, ValidationError } from '@shared/application/bills.js';
 import { authenticateToken } from '../../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../../middleware/auth.js';
 import { ApiResponse, ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '@shared/core/index.js';

@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { useAuthForm } from '@/hooks/useAuthForm';
-import { AUTH_ACCESSIBILITY, AUTH_TEST_IDS } from '../constants';
+import { AUTH_ACCESSIBILITY, AUTH_TEST_IDS } from '@client/constants';
 import { createMockUseAuth } from '@/utils/test-utils';
 
 // Extend Jest matchers

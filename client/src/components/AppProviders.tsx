@@ -7,14 +7,14 @@ import { LoadingProvider } from '@/core/loading';
 import { AuthProvider } from '@/features/users/hooks';
 import { useConnectionAware } from '@/hooks/useConnectionAware';
 import { useOfflineDetection } from '@/hooks/useOfflineDetection';
-import { assetLoadingManager } from '../utils/asset-loading';
+import { assetLoadingManager } from '@client/utils/asset-loading';
 import { AccessibilityProvider } from './accessibility/accessibility-manager';
 import { OfflineProvider } from './offline/offline-manager';
-import { ThemeProvider } from '../contexts/ThemeContext';
+import { ThemeProvider } from '@client/contexts/ThemeContext';
 import { SimpleErrorBoundary } from './error-handling/SimpleErrorBoundary';
-import { initializeStore } from '../store';
-import { loadingStateUtils } from '../shared/design-system/components/loading-states';
-import { errorStateUtils } from '../shared/design-system/components/error-states';
+import { initializeStore } from '@client/store';
+// import { loadingStateUtils } from '@shared/shared/design-system/components/loading-states';
+// import { errorStateUtils } from '@shared/shared/design-system/components/error-states';
 import { CommunityUIProvider } from '@client/store/slices/communitySlice';
 
 // =============================================================================

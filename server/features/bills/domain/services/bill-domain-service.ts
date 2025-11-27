@@ -1,9 +1,9 @@
-import { Bill, BillNumber, BillTitle, BillSummary } from '../entities/bill';
+import { Bill, BillNumber, BillTitle, BillSummary } from '@shared/entities/bill';
 // Repository pattern removed - using direct service calls
 import { UserService } from '@/users/application/user-service-direct';
 import { NotificationService } from '@/notifications/domain/services/notification-service';
-import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '../events/bill-events';
-import { DomainEventPublisher } from '../events/bill-events';
+import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@shared/events/bill-events';
+import { DomainEventPublisher } from '@shared/events/bill-events';
 import { databaseService } from '@/infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
 import { eq, and, sql, count, desc } from 'drizzle-orm';

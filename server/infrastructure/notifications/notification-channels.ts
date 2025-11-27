@@ -1,6 +1,6 @@
 import { getEmailService } from './email-service';
-import { webSocketService } from '../websocket.js';
-import { logger  } from '@shared/core/src/index.js';
+import { webSocketService } from '@shared/websocket.js';
+import { logger  } from '@shared/core/index.js';
 import { Notification } from '@server/features/notifications/domain/entities/notification';
 import { database as db } from '@shared/database';
 import { notifications, users, user_profiles } from '@shared/schema';

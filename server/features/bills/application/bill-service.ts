@@ -3,7 +3,7 @@ import { eq, desc, and, sql, count, or, inArray } from "drizzle-orm";
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { bills, sponsors, Bill } from '@shared/schema/foundation.js';
 import { bill_engagement, comments } from '@shared/schema/citizen_participation.js';
-import { logger } from '@shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import type { AsyncServiceResult } from '../../../infrastructure/errors/result-adapter.js';
 import { withResultHandling } from '../../../infrastructure/errors/result-adapter.js';
 import { QueryCache, CacheHelpers, Cached } from '../../../infrastructure/cache/query-cache';

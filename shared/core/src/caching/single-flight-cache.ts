@@ -7,7 +7,7 @@
  * Based on patterns from refined_cross_cutting.ts
  */
 
-import { logger } from '../observability/logging';
+import { logger as _logger } from '../observability/logging';
 import type {
   CacheService,
   CacheMetrics,
@@ -195,7 +195,7 @@ export class SingleFlightCache implements CacheService {
 
     // Create and store the promise
     const promise = this.executeWithCircuitBreaker(
-      availableKeys[0], // Use first key for circuit breaker
+      availableKeys[0]!, // Use first key for circuit breaker
       () => this.adapter.mget ? this.adapter.mget<T>(availableKeys) : this.fallbackMget<T>(availableKeys)
     );
     
@@ -210,7 +210,7 @@ export class SingleFlightCache implements CacheService {
       
       for (let i = 0; i < keys.length; i++) {
         if (!blockedIndices.includes(i)) {
-          results[i] = availableResults[availableIndex++];
+          results[i] = availableResults[availableIndex++] ?? null;
         }
       }
       
@@ -234,7 +234,7 @@ export class SingleFlightCache implements CacheService {
     }
 
     return this.executeWithCircuitBreaker(
-      availableEntries[0][0], // Use first key for circuit breaker
+      availableEntries[0]![0], // Use first key for circuit breaker
       () => this.adapter.mset ? this.adapter.mset(availableEntries) : this.fallbackMset(availableEntries)
     );
   }
@@ -297,8 +297,25 @@ export class SingleFlightCache implements CacheService {
   /**
    * Get metrics from underlying adapter
    */
-  getMetrics(): CacheMetrics | undefined {
-    return this.adapter.getMetrics?.();
+  getMetrics(): CacheMetrics {
+    const adapterMetrics = this.adapter.getMetrics?.();
+    if (adapterMetrics) {
+      return adapterMetrics;
+    }
+
+    return {
+      hits: 0,
+      misses: 0,
+      hitRate: 0,
+      operations: 0,
+      errors: 0,
+      memoryUsage: 0,
+      keyCount: 0,
+      avgLatency: 0,
+      maxLatency: 0,
+      minLatency: 0,
+      avgResponseTime: 0,
+    };
   }
 
   // Circuit breaker implementation
@@ -507,42 +524,18 @@ export class SingleFlightCache implements CacheService {
   /**
    * Get health status with circuit breaker information
    */
-  async getHealth(): Promise<CacheHealthStatus & { circuitBreakers?: Record<string, CircuitBreakerState> }> {
+  async getHealth(): Promise<CacheHealthStatus> {
     try {
       const baseHealth = this.adapter.getHealth ? await this.adapter.getHealth() : {
-        connected: true,
+        status: 'healthy' as const,
         latency: 0,
-        stats: this.getMetrics() || {
-          hits: 0,
-          misses: 0,
-          hitRate: 0,
-          operations: 0,
-          avgResponseTime: 0,
-          errors: 0,
-        },
       };
 
-      const circuitBreakers: Record<string, CircuitBreakerState> = {};
-      for (const [key, state] of Array.from(this.circuitBreakers.entries())) {
-        circuitBreakers[key] = state;
-      }
-
-      return {
-        ...baseHealth,
-        circuitBreakers: Object.keys(circuitBreakers).length > 0 ? circuitBreakers : undefined,
-      };
+      return baseHealth;
     } catch (error) {
       return {
-        connected: false,
+        status: 'unhealthy' as const,
         latency: -1,
-        stats: this.getMetrics() || {
-          hits: 0,
-          misses: 0,
-          hitRate: 0,
-          operations: 0,
-          avgResponseTime: 0,
-          errors: 0,
-        },
         errors: [error instanceof Error ? error.message : String(error)],
       };
     }
@@ -649,7 +642,7 @@ export class SingleFlightCache implements CacheService {
     const now = Date.now();
     const resetThreshold = this.options.circuitBreakerTimeout * 2; // Reset after 2x timeout
 
-    for (const [key, circuit] of Array.from(this.circuitBreakers.entries())) {
+    for (const [_key, circuit] of Array.from(this.circuitBreakers.entries())) {
       if (
         circuit.state === 'open' && 
         now - circuit.lastFailure > resetThreshold

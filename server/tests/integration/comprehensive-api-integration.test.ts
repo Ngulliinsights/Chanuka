@@ -20,7 +20,7 @@ import cors from 'cors';
 import { router as billsRouter } from '@server/features/bills/presentation/bills-router';
 import { router as sponsorsRouter } from '@server/features/bills/sponsors.ts';
 import { router as authRouter } from '@/components/auth';
-import { router as healthRouter } from '../../infrastructure/monitoring/health.js';
+import { router as healthRouter } from '@server/infrastructure/monitoring/health.js';
 import { database as db, users, bills, sponsors } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';

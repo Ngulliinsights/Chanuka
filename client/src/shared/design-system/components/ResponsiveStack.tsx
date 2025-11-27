@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { cn } from '@client/lib/utils';
-import { useResponsive, type Breakpoint } from '../responsive';
+import { useResponsive, type Breakpoint } from '@client/responsive';
 
 export interface ResponsiveStackProps {
   children: React.ReactNode;

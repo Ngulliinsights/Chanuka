@@ -24,7 +24,7 @@ interface LoadingOperation {
 }
 
 type LoadingStage = 'initializing' | 'loading' | 'processing' | 'complete' | 'error';
-import { LOADING_TIMEOUTS, RETRY_DELAYS } from '../constants';
+import { LOADING_TIMEOUTS, RETRY_DELAYS } from '@client/constants';
 
 describe('Loading Utils', () => {
   describe('generateOperationId', () => {

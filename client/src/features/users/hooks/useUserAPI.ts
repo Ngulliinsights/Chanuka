@@ -14,12 +14,12 @@ import { logger } from '@client/utils/logger';
 import type {
   UserProfile,
   NotificationPreferences,
-} from '../../../services/userService';
+} from '@client/services/userService';
 import type {
   PrivacyControls,
   DataExportRequest,
   DashboardPreferences
-} from '../../../types/user-dashboard';
+} from '@client/types/user-dashboard';
 
 // Query Keys - These create consistent cache keys for React Query
 export const userQueryKeys = {

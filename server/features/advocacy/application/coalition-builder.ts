@@ -3,10 +3,10 @@
 // ============================================================================
 
 // Repository interfaces removed - using direct service calls
-import { AdvocacyEventPublisher, CoalitionOpportunityIdentifiedEvent, CoalitionFormedEvent } from '../domain/events/advocacy-events.js';
+import { AdvocacyEventPublisher, CoalitionOpportunityIdentifiedEvent, CoalitionFormedEvent } from '@shared/domain/events/advocacy-events.js';
 import { CoalitionOpportunity } from '@server/types/index.ts';
-import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
-import { logger  } from '@shared/core/src/index.js';
+import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface CoalitionProposal {
   id: string;

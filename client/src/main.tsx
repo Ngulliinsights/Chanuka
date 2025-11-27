@@ -5,8 +5,9 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 import { registerServiceWorker } from '@client/utils/serviceWorker';
-import { logger } from '../src/utils/logger';
+import { logger } from '@client/utils/logger';
 import { initPerformanceMonitoring, performanceMonitor } from '@client/utils/performance-monitor';
+import { ErrorBoundaryProvider } from './components/error-boundaries/ErrorBoundaryProvider';
 
 // Initialize error suppression in development
 DevErrorSuppressor.init();
@@ -456,7 +457,12 @@ async function mountReactApp(rootElement: HTMLElement): Promise<void> {
     const root = createRoot(rootElement);
 
     // Render immediately for better Largest Contentful Paint (LCP) score
-    root.render(<App />);
+    // Wrap App with ErrorBoundaryProvider for comprehensive error handling
+    root.render(
+      <ErrorBoundaryProvider>
+        <App />
+      </ErrorBoundaryProvider>
+    );
 
     // Initialize performance monitoring after the initial render
     await initPerformanceMonitoring();

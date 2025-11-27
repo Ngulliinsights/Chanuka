@@ -15,7 +15,7 @@ import {
   UnifiedCardContent,
   UnifiedCardFooter,
   UnifiedBadge
-} from '../../components/ui/unified-components';
+} from '@client/components/ui/unified-components';
 
 // Mock CSS custom properties for testing
 const mockCSSProperties = {

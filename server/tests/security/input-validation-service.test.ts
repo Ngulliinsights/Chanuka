@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { inputValidationService } from '../../infrastructure/security/input-validation-service.js';
+import { inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
 
 describe('InputValidationService', () => {
   describe('validateApiInput', () => {

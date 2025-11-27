@@ -11,14 +11,14 @@ import {
   canAutoRecoverUI,
   createRecoveryContext,
   initializeUIRecoveryStrategies
-} from '../recovery';
+} from '@client/recovery';
 import { 
   UIError, 
   UIValidationError, 
   UIInputError, 
   UIFormError, 
   UIComponentError 
-} from '../errors';
+} from '@client/errors';
 
 describe('UI Recovery Utilities', () => {
   let recoveryManager: UIRecoveryManager;

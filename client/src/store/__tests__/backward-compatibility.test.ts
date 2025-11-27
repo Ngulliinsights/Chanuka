@@ -33,7 +33,7 @@ vi.mock('../../utils/logger', () => ({
   }
 }));
 
-import { isFeatureEnabled } from '../../config/feature-flags';
+import { isFeatureEnabled } from '@client/config/feature-flags';
 
 describe('Backward Compatibility', () => {
   let store: any;

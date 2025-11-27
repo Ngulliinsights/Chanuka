@@ -9,7 +9,7 @@ import React, {
 import { useUnifiedNavigation } from "@client/core/navigation/hooks/use-unified-navigation";
 import { useNavigationPerformance } from "@client/core/navigation/hooks/use-navigation-performance";
 import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from "@client/core/navigation/hooks/use-navigation-accessibility";
-import { DesktopSidebar } from "../navigation";
+import { DesktopSidebar } from '@client/navigation';
 import MobileNavigation from "./mobile-navigation";
 import {
   SkipLink,

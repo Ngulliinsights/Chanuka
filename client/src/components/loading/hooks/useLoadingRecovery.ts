@@ -5,7 +5,7 @@ import {
   getErrorRecoveryStrategy,
   LoadingTimeoutError,
   LoadingNetworkError 
-} from '../errors';
+} from '@client/errors';
 import { LoadingOperation } from '@client/types';
 
 export interface LoadingRecoveryState {

@@ -11,7 +11,7 @@ global.WebSocket = vi.fn().mockImplementation(() => ({
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '@client/test-utils';
-import App from '../../App';
+import App from '@client/App';
 import { logger } from '@client/utils/logger';
 import { navigationService } from '@client/services/navigation';
 

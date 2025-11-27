@@ -4,10 +4,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { SecurityService } from '../security-service';
-import { inputSanitizer } from '../input-sanitizer';
-import { csrfProtection } from '../csrf-protection';
-import { clientRateLimiter } from '../rate-limiter';
+import { SecurityService } from '@client/security-service';
+import { inputSanitizer } from '@client/input-sanitizer';
+import { csrfProtection } from '@client/csrf-protection';
+import { clientRateLimiter } from '@client/rate-limiter';
 
 // Mock crypto for testing
 Object.defineProperty(global, 'crypto', {

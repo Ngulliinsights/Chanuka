@@ -3,8 +3,8 @@ import {
   PerformanceMonitor,
   performanceMonitor,
   initPerformanceMonitoring,
-} from '../performance-monitor';
-import { logger } from '../logger';
+} from '@client/performance-monitor';
+import { logger } from '@client/utils/logger';
 
 // Mock logger
 vi.mock('../logger', () => ({

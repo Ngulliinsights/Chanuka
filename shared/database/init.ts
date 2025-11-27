@@ -1,4 +1,4 @@
-import { logger } from '@/core/src/observability/logging';
+import { logger } from '../core/src/observability/logging';
 import { databaseMonitor } from './monitoring.js';
 // Note: Global error handlers setup is handled elsewhere
 // import { setupGlobalErrorHandlers } from '@/utils/error-handler.js';

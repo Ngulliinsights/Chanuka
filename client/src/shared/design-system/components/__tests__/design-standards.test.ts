@@ -13,7 +13,7 @@ import {
   cardUtils,
   inputUtils,
   typographyUtils,
-} from '../index';
+} from '@client/index';
 
 describe('Interactive State Utils', () => {
   describe('getStateClasses', () => {

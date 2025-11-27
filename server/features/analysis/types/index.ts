@@ -44,8 +44,8 @@ export type {
   LegalPrecedent,
   ComprehensiveBillAnalysis,
   ConstitutionalConcern
-} from '../application/constitutional-analysis.service';
+} from '@shared/application/constitutional-analysis.service';
 
 export type {
   ComprehensiveBillAnalysis as BillComprehensiveAnalysis
-} from '../application/bill-comprehensive-analysis.service';
+} from '@shared/application/bill-comprehensive-analysis.service';

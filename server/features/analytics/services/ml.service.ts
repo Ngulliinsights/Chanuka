@@ -1,12 +1,12 @@
 import { database as db } from '@shared/database';
 import { eq, desc } from 'drizzle-orm';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 import type {
   AnalysisResult,
   SimilarityAnalysis,
   ImplementationWorkaroundDetection,
   ComprehensiveAnalysisResult
-} from '../types';
+} from '@shared/types';
 
 // New interface for enhanced error handling and logging
 interface AnalysisError {

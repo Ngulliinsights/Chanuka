@@ -16,7 +16,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import { app } from '../../index';
-import { databaseService } from '../../infrastructure/database/database-service.js';
+import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { logger  } from '@shared/core/src/index.js';
 
 describe('API Endpoints Integration Tests', () => {

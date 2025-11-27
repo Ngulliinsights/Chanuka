@@ -145,7 +145,7 @@ class SchemaImportFixer {
     // Fix main schema import with improved regex
     const schemaImportPattern = /import\s+\*\s+as\s+schema\s+from\s+['"]\.\.\/types['"]/g;
     if (schemaImportPattern.test(content)) {
-      newContent = newContent.replace(schemaImportPattern, "import * as schema from '../schema'");
+      newContent = newContent.replace(schemaImportPattern, "import * as schema from '@shared/schema'");
       modified = true;
       result.details.push('Updated schema import path from ../types to ../schema');
     }
@@ -153,7 +153,7 @@ class SchemaImportFixer {
     // Fix schema re-export with improved specificity
     const exportPattern = /export\s+\*\s+from\s+['"]\.\.\/types['"]/g;
     if (exportPattern.test(content)) {
-      newContent = newContent.replace(exportPattern, "export * from '../schema'");
+      newContent = newContent.replace(exportPattern, "export * from '@shared/schema'");
       modified = true;
       result.details.push('Updated schema export path from ../types to ../schema');
     }

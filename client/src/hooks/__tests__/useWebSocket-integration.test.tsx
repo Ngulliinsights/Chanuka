@@ -66,7 +66,7 @@ vi.mock('react', async () => {
 });
 
 // Import after mocking
-import { useWebSocket, useBillRealTime } from '../useWebSocket';
+import { useWebSocket, useBillRealTime } from '@client/useWebSocket';
 
 describe('WebSocket React Hooks Integration', () => {
   let mockManager: any;

@@ -50,7 +50,7 @@ import authSlice, {
   selectTwoFactorRequired,
   selectAuthStatus,
   selectUserProfile
-} from '../authSlice';
+} from '@client/authSlice';
 import { User, RegisterData } from '@client/types/auth';
 
 // Mock the auth service

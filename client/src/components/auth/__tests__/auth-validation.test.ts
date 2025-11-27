@@ -20,8 +20,8 @@ import {
   NameSchema,
   LoginSchema,
   RegisterSchema
-} from '../validation';
-import { AuthValidationError } from '../errors';
+} from '@client/validation';
+import { AuthValidationError } from '@client/errors';
 
 describe('Auth Validation Utilities', () => {
   describe('Email Validation', () => {

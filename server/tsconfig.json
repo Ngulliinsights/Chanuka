@@ -6,11 +6,22 @@
     "composite": true,
     "paths": {
       "@/*": ["./*"],
+      "@server": ["."],
       "@server/*": ["./*"],
-      "@chanuka/shared": ["../shared"],
-      "@chanuka/shared/*": ["../shared/*"],
       "@shared": ["../shared"],
-      "@shared/*": ["../shared/*"]
+      "@shared/*": ["../shared/*"],
+      "@shared/core": ["../shared/core"],
+      "@shared/core/*": ["../shared/core/*"],
+      "@shared/database": ["../shared/database"],
+      "@shared/database/*": ["../shared/database/*"],
+      "@shared/schema": ["../shared/schema"],
+      "@shared/schema/*": ["../shared/schema/*"],
+      "@shared/utils": ["../shared/utils"],
+      "@shared/utils/*": ["../shared/utils/*"],
+      "@client": ["../client/src"],
+      "@client/*": ["../client/src/*"],
+      "@tests": ["../tests"],
+      "@tests/*": ["../tests/*"]
     }
   },
   "references": [

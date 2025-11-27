@@ -6,7 +6,7 @@
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import { ReactElement } from 'react';
 import { AuthMode, LoginFormData, RegisterFormData, AuthConfig } from '@client/types';
-import { AUTH_CONFIG_DEFAULTS } from '../constants';
+import { AUTH_CONFIG_DEFAULTS } from '@client/constants';
 
 // Mock function type for testing
 type MockFn = (...args: any[]) => any;

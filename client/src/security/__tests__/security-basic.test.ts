@@ -29,7 +29,7 @@ Object.defineProperty(global, 'crypto', {
   }
 });
 
-import { initializeSecurity, getSecuritySystem, shutdownSecurity } from '../index';
+import { initializeSecurity, getSecuritySystem, shutdownSecurity } from '@client/index';
 
 describe('Security System Basic Tests', () => {
   beforeEach(() => {

@@ -7,9 +7,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ActivitySummary } from '../activity-summary';
-import { ActionItems } from '../action-items';
-import { TrackedTopics } from '../tracked-topics';
+import { ActivitySummary } from '@client/activity-summary';
+import { ActionItems } from '@client/action-items';
+import { TrackedTopics } from '@client/tracked-topics';
 
 // Mock the useBills hook
 const mockUseBills = {

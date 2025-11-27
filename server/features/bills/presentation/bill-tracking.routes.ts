@@ -3,9 +3,9 @@ import { authenticateToken, AuthenticatedRequest } from '../../../middleware/aut
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
 // cspell:words untracking
 // Correct import path for the new service location
-import { billTrackingService } from '../application/bill-tracking.service.js';
+import { billTrackingService } from '@shared/application/bill-tracking.service.js';
 import { z } from 'zod';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 const router = Router();
 

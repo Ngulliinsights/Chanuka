@@ -8,7 +8,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 const { Pool } = pg;
-import * as schema from '../shared/schema';
+import * as schema from '@shared/shared/schema';
 import { financialDisclosureIntegrationService } from './services/financial-disclosure-integration.js';
 import { logger } from '@shared/core';
 

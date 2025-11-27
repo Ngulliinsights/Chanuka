@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { analysisService } from '../analysis';
+import { analysisService } from '@client/analysis';
 
 // Mock dependencies
 vi.mock('../utils/logger', () => ({

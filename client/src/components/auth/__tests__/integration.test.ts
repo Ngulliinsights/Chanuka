@@ -10,17 +10,17 @@ import {
   validateRegisterData,
   safeValidateEmail,
   safeValidatePassword
-} from '../validation';
+} from '@client/validation';
 import {
   getRecoveryStrategy,
   createRecoveryContext
-} from '../recovery';
+} from '@client/recovery';
 import {
   AuthCredentialsError,
   AuthNetworkError,
   AuthValidationError,
   getUserFriendlyMessage
-} from '../errors';
+} from '@client/errors';
 import {
   checkPasswordStrength,
   validateFormBatch,

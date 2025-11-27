@@ -1,6 +1,6 @@
 import express from 'express';
-import { sponsorService, SponsorAffiliationInput, SponsorTransparencyInput } from '../application/sponsor-service-direct';
-import { sponsorConflictAnalysisService } from '../application/sponsor-conflict-analysis.service';
+import { sponsorService, SponsorAffiliationInput, SponsorTransparencyInput } from '@shared/application/sponsor-service-direct';
+import { sponsorConflictAnalysisService } from '@shared/application/sponsor-conflict-analysis.service';
 // Note: Validation schemas need to be created in the new schema structure
 // import { insertSponsorSchema } from '@shared/schema/validation';
 import { z } from 'zod';

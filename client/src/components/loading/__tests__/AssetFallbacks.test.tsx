@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { ImageFallback, SafeImage } from '../ImageFallback';
-import { FontFallback } from '../FontFallback';
-import { ScriptFallback } from '../ScriptFallback';
+import { ImageFallback, SafeImage } from '@client/ImageFallback';
+import { FontFallback } from '@client/FontFallback';
+import { ScriptFallback } from '@client/ScriptFallback';
 import { assetLoadingManager } from '@client/utils/asset-loading';
 
 // Mock the asset loading manager

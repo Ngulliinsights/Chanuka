@@ -16,7 +16,7 @@ import {
   ValidationError,
   ConflictError,
   TooManyRequestsError
-} from '../../../utils/logger';
+} from '@client/utils/logger';
 
 import { ErrorSeverity } from '@client/core/error';
 

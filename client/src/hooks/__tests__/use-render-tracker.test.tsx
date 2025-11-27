@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useRenderTracker } from '../use-render-tracker';
+import { useRenderTracker } from '@client/use-render-tracker';
 import { logger } from '@client/utils/logger';
 
 // Mock the logger

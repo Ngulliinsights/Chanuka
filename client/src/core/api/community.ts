@@ -114,7 +114,7 @@ export type {
   CommentFilterOption
 } from '@client/types/community';
 
-export type { Expert } from '../../types/expert';
+export type { Expert } from '@client/types/expert';
 
 /**
  * Comprehensive options for retrieving and filtering comments.

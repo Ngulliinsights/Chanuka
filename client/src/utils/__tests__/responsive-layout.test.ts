@@ -7,7 +7,7 @@ import {
   ResponsiveUtils,
   createResponsiveStyles,
   BREAKPOINTS,
-} from '../responsive-layout';
+} from '@client/responsive-layout';
 
 // Mock ResizeObserver
 const mockResizeObserver = vi.fn();

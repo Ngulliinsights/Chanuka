@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { logger   } from '@shared/core/src/index.js';
-import { httpUtils   } from '@shared/core/src/index.js';
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../external-data/external-api-manager.js';
+import { logger   } from '@shared/core/index.js';
+import { httpUtils   } from '@shared/core/index.js';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@shared/external-data/external-api-manager.js';
 
 // Helper functions using shared utilities
 const sendResponse = (res: any, data: any, message: string = 'Success') => {

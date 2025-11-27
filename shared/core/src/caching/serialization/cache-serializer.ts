@@ -3,11 +3,7 @@
  * Handles serialization and deserialization of cache data
  */
 
-export interface SerializationOptions {
-  format?: 'json' | 'msgpack' | 'binary';
-  preserveTypes?: boolean;
-  dateHandling?: 'iso' | 'timestamp' | 'preserve';
-}
+import type { SerializationOptions } from '../types';
 
 export class CacheSerializer {
   private options: SerializationOptions;
@@ -17,7 +13,11 @@ export class CacheSerializer {
       format: options.format || 'json',
       preserveTypes: options.preserveTypes ?? true,
       dateHandling: options.dateHandling || 'iso',
+      enableBinaryMode: options.enableBinaryMode ?? false,
     };
+    if (options.customSerializer !== undefined) {
+      this.options.customSerializer = options.customSerializer;
+    }
   }
 
   /**
@@ -68,7 +68,7 @@ export class CacheSerializer {
       return JSON.stringify(data);
     }
 
-    return JSON.stringify(data, (key, value) => {
+    return JSON.stringify(data, (_key, value) => {
       // Handle dates
       if (value instanceof Date) {
         switch (this.options.dateHandling) {
@@ -110,7 +110,7 @@ export class CacheSerializer {
       return JSON.parse(serializedData);
     }
 
-    return JSON.parse(serializedData, (key, value) => {
+    return JSON.parse(serializedData, (_key, value) => {
       if (value && typeof value === 'object' && value.__type) {
         switch (value.__type) {
           case 'Date':

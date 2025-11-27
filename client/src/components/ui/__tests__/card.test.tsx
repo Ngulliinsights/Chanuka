@@ -14,7 +14,7 @@ import {
   CardDescription,
   CardContent,
   CardFooter
-} from '../card';
+} from '@client/card';
 import { renderWithWrapper } from '@client/test-utils';
 
 // Mock dependencies

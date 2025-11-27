@@ -5,8 +5,8 @@
 // Supports hybrid ranking combining semantic and traditional search
 
 import {
-  pgTable, text, integer, boolean, timestamp, jsonb, uuid, varchar,
-  index, unique, date, decimal
+  pgTable, text, integer, timestamp, jsonb, uuid, varchar,
+  index, unique, decimal, boolean, date
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";

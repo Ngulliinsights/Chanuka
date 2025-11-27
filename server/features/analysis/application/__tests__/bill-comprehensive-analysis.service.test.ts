@@ -5,7 +5,7 @@ import { stakeholderAnalysisService } from '../stakeholder-analysis.service';
 import { transparencyAnalysisService } from '../transparency-analysis.service';
 import { publicInterestAnalysisService } from '../public-interest-analysis.service';
 import { sponsorConflictAnalysisService } from '../../../sponsors/application/sponsor-conflict-analysis.service'; // Updated path
-import { analysisRepository } from '../../infrastructure/repositories/analysis-repository-impl'; // Import repo to mock save
+import { analysisRepository } from '@server/infrastructure/repositories/analysis-repository-impl'; // Import repo to mock save
 import { readDatabase } from '@shared/database/connection'; // Mock DB for sponsor lookup
 import * as schema from '@shared/schema';
 

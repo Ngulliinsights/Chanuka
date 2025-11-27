@@ -24,7 +24,7 @@ import {
   AccessibilityTestHelper,
   IntegrationTestHelper,
   TestSuiteHelper,
-} from '../test-utilities';
+} from '@client/test-utilities';
 import { BaseValidationError } from '../../validation/base-validation';
 
 describe('MockDataGenerator', () => {

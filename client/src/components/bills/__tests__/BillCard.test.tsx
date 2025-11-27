@@ -12,8 +12,8 @@ import {
   screen,
   waitFor,
   userEvent
-} from '../../test-utils/comprehensive-test-setup';
-import { BillCard } from '../BillCard';
+} from '@client/test-utils/comprehensive-test-setup';
+import { BillCard } from '@client/BillCard';
 
 // Mock the router hook
 vi.mock('react-router-dom', async () => {

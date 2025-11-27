@@ -5,8 +5,8 @@
 
 import { useState, useCallback } from 'react';
 import type { TrackedTopic, TopicCategory } from '@client/types';
-import { validateTrackedTopic } from '../validation';
-import { DashboardTopicError } from '../errors';
+import { validateTrackedTopic } from '@client/validation';
+import { DashboardTopicError } from '@client/errors';
 
 export interface UseDashboardTopicsResult {
   topics: TrackedTopic[];

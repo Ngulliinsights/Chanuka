@@ -18,7 +18,7 @@ import {
   NetworkLink, 
   ConflictVisualizationProps,
   AccessibilityFallbackData 
-} from '../../types/conflict-of-interest';
+} from '@client/types/conflict-of-interest';
 
 interface ConflictNetworkVisualizationProps extends ConflictVisualizationProps {
   showAccessibilityFallback?: boolean;

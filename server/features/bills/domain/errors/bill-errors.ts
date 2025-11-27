@@ -1,4 +1,4 @@
-import { BaseError  } from '@shared/core/src/index.js';
+import { BaseError  } from '@shared/core/index.js';
 
 /**
  * Custom error classes for bill domain operations

@@ -27,7 +27,7 @@ import { logger } from '@client/utils/logger';
   isBrowserSupported,
   getBrowserWarnings,
   getBrowserRecommendations
-} from '../../utils/browser-compatibility';
+} from '@client/utils/browser-compatibility';
 
 // Mock navigator and window objects
 const mockNavigator = {

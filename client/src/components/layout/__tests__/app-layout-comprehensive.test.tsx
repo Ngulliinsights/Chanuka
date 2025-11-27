@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { AppLayout } from '../app-layout';
-import { LayoutConfig } from '../index';
+import { AppLayout } from '@client/app-layout';
+import { LayoutConfig } from '@client/index';
 
 // Mock all dependencies
 jest.mock('../../../hooks/use-unified-navigation', () => ({

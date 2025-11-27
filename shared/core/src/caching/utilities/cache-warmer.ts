@@ -153,7 +153,7 @@ export class CacheWarmer extends EventEmitter {
   stopBackgroundWarming(): void {
     if (this.backgroundTimer) {
       clearInterval(this.backgroundTimer);
-      this.backgroundTimer = undefined;
+      this.backgroundTimer = null as any;
       this.emit('background:stop');
     }
   }
@@ -272,7 +272,7 @@ export class CacheWarmer extends EventEmitter {
     });
   }
 
-  private async executeWithRetry<T>(
+  private async _executeWithRetry<T>(
     operation: () => Promise<T>,
     attempts: number,
     delayMs: number

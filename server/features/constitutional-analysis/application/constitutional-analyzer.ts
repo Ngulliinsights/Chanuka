@@ -3,14 +3,14 @@
 // ============================================================================
 // Main service that orchestrates constitutional analysis of bills
 
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { ConstitutionalProvision, LegalPrecedent, ConstitutionalAnalysis } from '@shared/schema/index.js';
 import { ProvisionMatcherService } from './provision-matcher.js';
 import { PrecedentFinderService } from './precedent-finder.js';
 import { ExpertFlaggingService } from './expert-flagging-service.js';
-import { ConstitutionalProvisionsRepository } from '../infrastructure/repositories/constitutional-provisions-repository.js';
-import { LegalPrecedentsRepository } from '../infrastructure/repositories/legal-precedents-repository.js';
-import { ConstitutionalAnalysesRepository } from '../infrastructure/repositories/constitutional-analyses-repository.js';
+import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository.js';
+import { LegalPrecedentsRepository } from '@shared/infrastructure/repositories/legal-precedents-repository.js';
+import { ConstitutionalAnalysesRepository } from '@shared/infrastructure/repositories/constitutional-analyses-repository.js';
 
 export interface AnalysisRequest {
   bill_id: string;

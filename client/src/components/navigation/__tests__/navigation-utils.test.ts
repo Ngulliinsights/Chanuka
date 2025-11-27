@@ -8,7 +8,7 @@ import {
   getPageTitle,
   isValidNavigationPath,
 } from '@/utils/navigation-utils';
-import { InvalidNavigationPathError } from '../errors';
+import { InvalidNavigationPathError } from '@client/errors';
 
 describe('navigation-utils', () => {
   describe('findNavigationItemByPath', () => {

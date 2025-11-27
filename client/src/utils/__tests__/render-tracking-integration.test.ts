@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { RenderTrackingIntegration, trackRender, trackLifecycle, measurePerformance } from '../render-tracking-integration';
-import { logger } from '../logger';
+import { RenderTrackingIntegration, trackRender, trackLifecycle, measurePerformance } from '@client/render-tracking-integration';
+import { logger } from '@client/utils/logger';
 
 // Mock the logger
 vi.mock('../logger', () => ({

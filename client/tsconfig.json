@@ -37,15 +37,27 @@
     // Project Structure
     "baseUrl": ".",
     // Silence TypeScript 7.0 deprecation warnings for `baseUrl` until migration
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
 
     // Path Mappings
     "paths": {
       "@/*": ["src/*"],
+      "@client": ["src"],
       "@client/*": ["src/*"],
-      "@shared/*": ["src/shared/*"],
-      "@chanuka/shared": ["../shared"],
-      "@chanuka/shared/*": ["../shared/*"]
+      "@shared": ["../shared"],
+      "@shared/*": ["../shared/*"],
+      "@shared/core": ["../shared/core"],
+      "@shared/core/*": ["../shared/core/*"],
+      "@shared/database": ["../shared/database"],
+      "@shared/database/*": ["../shared/database/*"],
+      "@shared/schema": ["../shared/schema"],
+      "@shared/schema/*": ["../shared/schema/*"],
+      "@shared/utils": ["../shared/utils"],
+      "@shared/utils/*": ["../shared/utils/*"],
+      "@server": ["../server"],
+      "@server/*": ["../server/*"],
+      "@tests": ["../tests"],
+      "@tests/*": ["../tests/*"]
     },
 
     // Type Definitions

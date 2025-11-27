@@ -13,8 +13,8 @@ import {
   LayoutConfigSchema,
   NavigationItemSchema,
   UserSchema
-} from '../validation';
-import { LayoutValidationError } from '../errors';
+} from '@client/validation';
+import { LayoutValidationError } from '@client/errors';
 
 describe('Layout Validation', () => {
   describe('validateLayoutConfig', () => {

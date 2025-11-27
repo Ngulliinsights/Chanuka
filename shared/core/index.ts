@@ -43,33 +43,12 @@ export const logger: Logger = {
 
 // Logger is already exported above
 
-// Error enums and types
-export enum ErrorSeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
-}
-
-export enum ErrorDomain {
-  SYSTEM = 'system',
-  VALIDATION = 'validation',
-  AUTHENTICATION = 'authentication',
-  AUTHORIZATION = 'authorization',
-  DATABASE = 'database',
-  CACHE = 'cache',
-  NETWORK = 'network',
-  EXTERNAL_SERVICE = 'external_service',
-  BUSINESS_LOGIC = 'business_logic',
-  INFRASTRUCTURE = 'infrastructure',
-  SECURITY = 'security',
-  DATA = 'data',
-  INTEGRATION = 'integration'
-}
-
 // Export the full error management system
 export * from './src/observability/error-management/errors/base-error';
 export * from './src/observability/error-management/errors/specialized-errors';
+
+// Export logging system
+export * from './src/observability/logging';
 
 // Type-safe API response utilities
 interface ApiSuccessResponse<T = unknown> {

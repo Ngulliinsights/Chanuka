@@ -6,8 +6,9 @@
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { circuitBreakerRequest, retryWithCircuitBreaker } from '@server/middleware/circuit-breaker-middleware';
 import { EventEmitter } from 'events';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 import { httpUtils } from '@shared/core/utils/http-utils';
 import {
   DataSource,
@@ -123,7 +124,7 @@ export class GovernmentDataService extends EventEmitter {
   addDataSource(dataSource: DataSource): void {
     this.dataSources.set(dataSource.id, dataSource);
     
-    // Create API client
+    // Create API client with circuit breaker integration
     const client = axios.create({
       baseURL: dataSource.baseUrl,
       timeout: 30000,
@@ -204,17 +205,31 @@ export class GovernmentDataService extends EventEmitter {
     }
 
     try {
-      const config: AxiosRequestConfig = {
-        method: endpoint.method,
-        url: endpoint.path,
-        params: { ...endpoint.parameters, ...params }
-      };
-
-      const response = await client.request(config);
+      // Use circuit breaker for external API calls
+      const response = await retryWithCircuitBreaker(
+        async () => {
+          return await circuitBreakerRequest({
+            url: `${dataSource.baseUrl}${endpoint.path}`,
+            method: endpoint.method,
+            headers: {
+              'User-Agent': 'Chanuka-Legislative-Platform/1.0',
+              'Accept': 'application/json',
+              ...(dataSource.authType === 'api_key' && dataSource.apiKey ? {
+                'X-API-Key': dataSource.apiKey
+              } : {}),
+            },
+            data: endpoint.method !== 'GET' ? { ...endpoint.parameters, ...params } : undefined,
+            timeout: 30000,
+          }, { ...endpoint.parameters, ...params });
+        },
+        'government-data',
+        3, // max attempts
+        1000 // base delay
+      );
       
       return {
         success: true,
-        data: response.data,
+        data: response,
         metadata: {
           source: dataSourceId,
           timestamp: new Date(),

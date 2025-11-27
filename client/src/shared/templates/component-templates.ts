@@ -564,8 +564,8 @@ export * from './use${this.toPascalCase(componentName)}';
     
     const content = `import { useState, useEffect, useCallback } from 'react';
 import { ${pascalName}Data, ${pascalName}Error, Use${pascalName}Options, Use${pascalName}Result } from '@client/types';
-${this.config.hasValidation ? `import { validate${pascalName}Data } from '../validation';` : ''}
-${this.config.hasErrorHandling ? `import { ${camelName}RecoveryManager } from '../recovery';` : ''}
+${this.config.hasValidation ? `import { validate${pascalName}Data } from '@shared/validation';` : ''}
+${this.config.hasErrorHandling ? `import { ${camelName}RecoveryManager } from '@shared/recovery';` : ''}
 
 /**
  * Main ${componentName} hook following navigation component patterns
@@ -1005,7 +1005,7 @@ export default ${pascalName}UI;
     const camelName = this.toCamelCase(componentName);
     
     const content = `import { ${pascalName}Data, ${pascalName}Config, ${pascalName}Error } from '@client/types';
-${this.config.hasValidation ? `import { validate${pascalName}Data, validate${pascalName}Config } from '../validation';` : ''}
+${this.config.hasValidation ? `import { validate${pascalName}Data, validate${pascalName}Config } from '@shared/validation';` : ''}
 
 /**
  * ${pascalName} core business logic
@@ -1106,7 +1106,7 @@ export const create${pascalName}Core = (config: ${pascalName}Config): ${pascalNa
     const pascalName = this.toPascalCase(componentName);
     
     const content = `import { render, screen } from '@testing-library/react';
-import { ${pascalName}UI } from '../ui/${pascalName}UI';
+import { ${pascalName}UI } from '@shared/ui/${pascalName}UI';
 import { ComponentTestHelper } from 'shared/testing';
 
 describe('${pascalName}UI Component', () => {
@@ -1296,7 +1296,7 @@ describe('use${pascalName} Hook', () => {
   get${pascalName}DisplayName,
   is${pascalName}Loading,
   has${pascalName}Error,
-} from '../utils/${this.toCamelCase(componentName)}-utils';
+} from '@shared/utils/${this.toCamelCase(componentName)}-utils';
 import { ${pascalName}Data, ${pascalName}Config } from '@client/types';
 
 describe('${this.toCamelCase(componentName)}-utils', () => {

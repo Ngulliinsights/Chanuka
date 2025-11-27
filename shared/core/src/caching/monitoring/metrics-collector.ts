@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-import type { CacheMetrics } from '/types';
+import type { CacheMetrics } from '../core/interfaces';
 
 export interface MetricsCollectorConfig {
   enableAdvancedMetrics?: boolean;
@@ -41,7 +41,7 @@ export class CacheMetricsCollector extends EventEmitter {
   stop(): void {
     if (this.intervalId) {
       clearInterval(this.intervalId);
-      this.intervalId = undefined;
+      this.intervalId = null as any;
     }
   }
 

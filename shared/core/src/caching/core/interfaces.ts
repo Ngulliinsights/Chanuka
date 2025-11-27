@@ -72,22 +72,25 @@ export interface CacheHealthStatus {
 }
 
 export interface CacheMetrics {
-  hits: number;
-  misses: number;
-  hitRate: number;
-  operations: number;
-  errors: number;
-  memoryUsage: number;
-  keyCount: number;
-  avgLatency: number;
-  maxLatency: number;
-  minLatency: number;
-  // Additional properties for compatibility
-  avgResponseTime: number;
-  totalSize?: number;
-  totalEntries?: number;
-  l1Stats?: CacheTierStats;
-  l2Stats?: CacheTierStats;
+   hits: number;
+   misses: number;
+   hitRate: number;
+   operations: number;
+   errors: number;
+   memoryUsage: number;
+   keyCount: number;
+   avgLatency: number;
+   maxLatency: number;
+   minLatency: number;
+   // Additional properties for compatibility
+   avgResponseTime: number;
+   totalSize?: number;
+   totalEntries?: number;
+   l1Stats?: CacheTierStats;
+   l2Stats?: CacheTierStats;
+   totalOperations?: number;
+   totalErrors?: number;
+   uptime?: number;
 }
 
 export interface CacheTierStats {

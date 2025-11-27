@@ -6,7 +6,7 @@
  */
 
 import { comments } from '@shared/schema';
-import { EntityMapping } from '../drizzle-adapter';
+import { EntityMapping } from '@shared/drizzle-adapter';
 // CommentWithUser type moved to direct service layer
 type CommentWithUser = any; // TODO: Define proper type in service layer
 

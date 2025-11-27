@@ -4,10 +4,10 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import AppLayout from '../app-layout';
-import { MobileHeader } from '../mobile-header';
-import MobileNavigation from '../mobile-navigation';
-import { Sidebar } from '../sidebar';
+import AppLayout from '@client/app-layout';
+import { MobileHeader } from '@client/mobile-header';
+import MobileNavigation from '@client/mobile-navigation';
+import { Sidebar } from '@client/sidebar';
 import { LayoutConfig, User, NavigationItem } from '@client/types';
 
 // Mock dependencies

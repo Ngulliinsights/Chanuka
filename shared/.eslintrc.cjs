@@ -4,8 +4,17 @@ module.exports = {
     node: true,
     es2022: true,
   },
+  settings: {
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: './tsconfig.json',
+      },
+    },
+  },
   rules: {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    'import/no-unresolved': 'error',
   },
 };
 

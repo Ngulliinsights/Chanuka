@@ -8,7 +8,7 @@ import { screen, waitFor, fireEvent, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders, MockDataFactory, IntegrationTestUtils } from '@client/test-utils/comprehensive-test-setup';
 import { BrowserRouter } from 'react-router-dom';
-import { App } from '../../App';
+import { App } from '@client/App';
 
 describe('Bills Workflow Integration', () => {
   let user: ReturnType<typeof userEvent.setup>;

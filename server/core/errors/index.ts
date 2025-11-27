@@ -7,7 +7,7 @@ export {
   UnauthorizedError,
   ForbiddenError
 } from '@shared/core/index.js';
-export * from '../../utils/errors.js';
+export * from '@server/utils/errors.js';
 
 // Re-export server-specific error handling
 export { errorTracker } from './error-tracker.js';

@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AppLayout from '../app-layout';
-import { MobileHeader } from '../mobile-header';
-import MobileNavigation from '../mobile-navigation';
-import { Sidebar } from '../sidebar';
+import AppLayout from '@client/app-layout';
+import { MobileHeader } from '@client/mobile-header';
+import MobileNavigation from '@client/mobile-navigation';
+import { Sidebar } from '@client/sidebar';
 import { LayoutConfig } from '@client/types';
 
 // Mock window.matchMedia for responsive testing

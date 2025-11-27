@@ -7,7 +7,7 @@ import {
   testRoutePattern,
   testCases,
   RouteDefinition,
-} from '../route-validation';
+} from '@client/route-validation';
 
 describe('Route Validation', () => {
   describe('allRoutes', () => {

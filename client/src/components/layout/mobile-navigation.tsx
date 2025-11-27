@@ -12,7 +12,7 @@ import { logger } from '@client/utils/logger';
 import {
   MobileTouchHandler,
   MobileTouchUtils,
-} from "../../utils/mobile-touch-handler";
+} from '@client/utils/mobile-touch-handler';
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Badge } from "../ui/badge";

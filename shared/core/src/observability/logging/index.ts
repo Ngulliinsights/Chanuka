@@ -1,4 +1,5 @@
 // Re-export the unified logger as the primary logging interface
+console.log('DEBUG: Loading logging module from shared/core');
 export { UnifiedLogger, logger } from './logger';
 
 // Re-export types for consumers

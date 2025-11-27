@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { pool } from '../shared/database/pool.js';
-import { logger } from '../shared/core/src/observability/logging';
+import { pool } from '@shared/shared/database/pool.js';
+import { logger } from '@shared/shared/core/src/observability/logging';
 
 async function dropAndRecreateSchema() {
   try {

@@ -8,7 +8,7 @@
 import type {
   ConflictIndicator,
   SentimentAnalysis
-} from '../../types/common.js';
+} from '@server/types/common.js';
 
 export interface BillAnalysis { id: number;
   bill_id: number;

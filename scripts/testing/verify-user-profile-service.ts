@@ -1,6 +1,6 @@
 import { user_profileservice } from './services/user-profile.js';
 import { db } from '@shared/database/pool.js';
-import { users } from '../shared/schema';
+import { users } from '@shared/shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '@shared/core';
 

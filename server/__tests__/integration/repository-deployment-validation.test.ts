@@ -3,13 +3,13 @@ import {
   RepositoryDeploymentValidator,
   createRepositoryDeploymentValidator,
   DeploymentValidationConfig
-} from '../../infrastructure/migration/repository-deployment-validator.js';
+} from '@server/infrastructure/migration/repository-deployment-validator.js';
 import {
   DeploymentOrchestrator,
   createDeploymentOrchestrator,
   DeploymentPlan
-} from '../../infrastructure/migration/deployment-orchestrator.js';
-import { databaseService } from '../../infrastructure/database/database-service.js';
+} from '@server/infrastructure/migration/deployment-orchestrator.js';
+import { databaseService } from '@server/infrastructure/database/database-service.js';
 
 describe('Repository Deployment Validation Integration Tests', () => {
   let validator: RepositoryDeploymentValidator;

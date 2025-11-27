@@ -8,8 +8,8 @@ import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button, EnhancedButton, buttonVariants } from '../button';
-import { attemptUIRecovery, getUIRecoverySuggestions } from '../recovery';
+import { Button, EnhancedButton, buttonVariants } from '@client/button';
+import { attemptUIRecovery, getUIRecoverySuggestions } from '@client/recovery';
 import { renderWithWrapper, createMockComponentError, spyOnConsole } from '@client/test-utils';
 
 // Mock dependencies

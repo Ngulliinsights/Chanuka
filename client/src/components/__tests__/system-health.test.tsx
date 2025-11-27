@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import SystemHealth from '../system-health';
+import SystemHealth from '@client/system-health';
 
 // Mock dependencies
 jest.mock('../ui/card', () => ({

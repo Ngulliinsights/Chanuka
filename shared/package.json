@@ -12,7 +12,7 @@
     "./utils": "./utils/index.ts"
   },
   "scripts": {
-    "build": "echo 'Shared build skipped - using TypeScript directly'",
+    "build": "tsc --project tsconfig.json",
     "type-check": "tsc --noEmit --project tsconfig.json"
   }
 }

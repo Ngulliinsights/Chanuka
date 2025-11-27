@@ -10,7 +10,7 @@ import {
   filterOperationsByConnection,
   analyzeLoadingPerformance,
   createOperationFromScenario
-} from '../../utils/comprehensiveLoading';
+} from '@client/utils/comprehensiveLoading';
 
 // Re-export cross-cutting utilities
 export const calculateEstimatedTime = (operation: LoadingOperation) => operation.estimatedTime || 5000;

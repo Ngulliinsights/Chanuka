@@ -46,7 +46,7 @@ import sessionSlice, {
   selectTimeUntilExpiry,
   selectSessionStatus,
   selectRecentActivity
-} from '../sessionSlice';
+} from '@client/sessionSlice';
 import { SessionInfo } from '@client/types/auth';
 
 // Mock dependencies

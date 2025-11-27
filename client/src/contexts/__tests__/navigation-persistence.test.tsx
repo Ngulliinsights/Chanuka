@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { NavigationProvider, useNavigation } from '../NavigationContext';
+import { NavigationProvider, useNavigation } from '@client/NavigationContext';
 import { useNavigation } from '@client/core/navigation/context';
 import { NavigationStatePersistence } from '@client/utils/navigation/state-persistence';
 // Note: AuthProvider moved to components/auth

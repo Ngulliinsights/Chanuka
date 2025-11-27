@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { getEnvConfig, envConfig } from '../env-config';
+import { getEnvConfig, envConfig } from '@client/env-config';
 
 // Mock import.meta.env
 const mockImportMetaEnv = {

@@ -10,7 +10,7 @@
  */
 
 import { test, expect, type Page, type BrowserContext } from '@playwright/test';
-import { e2eConfig } from '../comprehensive-test-config';
+import { e2eConfig } from '@client/comprehensive-test-config';
 
 // Configure test settings
 test.use({

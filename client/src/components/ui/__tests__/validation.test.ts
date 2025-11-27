@@ -20,8 +20,8 @@ import {
   PhoneSchema,
   URLSchema,
   NumberInputSchema
-} from '../validation';
-import { UIInputError, UIValidationError, UIFormError, UIDateError } from '../errors';
+} from '@client/validation';
+import { UIInputError, UIValidationError, UIFormError, UIDateError } from '@client/errors';
 
 describe('UI Validation Utilities', () => {
   describe('Input Validation', () => {

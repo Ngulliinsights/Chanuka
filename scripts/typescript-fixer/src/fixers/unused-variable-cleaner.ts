@@ -10,7 +10,7 @@
  */
 
 import * as ts from 'typescript';
-import { ErrorFixer, TypeScriptError, FixResult, CodeChange, ProcessingContext } from '../types/core';
+import { ErrorFixer, TypeScriptError, FixResult, CodeChange, ProcessingContext } from '@shared/types/core';
 
 export class UnusedVariableCleaner implements ErrorFixer {
   private readonly UNUSED_ERROR_CODE = 6133;

@@ -9,10 +9,11 @@
  * - Intelligent cache invalidation based on data freshness
  */
 
-import { CacheService, CacheHealthStatus } from '/types';
-import { getDefaultCache } from './index';
+// CacheHealthStatus is not used in this file
+import { CacheService } from './types';
+import { cacheFactory } from './simple-factory';
 import { performance } from 'perf_hooks';
-import { logger } from '../observability/logging';
+import { logger } from '../../../core';
 
 export interface AICacheOptions {
   baseCache?: CacheService;
@@ -71,7 +72,7 @@ export class AICache {
   private warmingQueue = new Set<string>();
 
   constructor(options: AICacheOptions = {}) {
-    this.baseCache = options.baseCache || getDefaultCache();
+    this.baseCache = options.baseCache || cacheFactory.createCache('ai-cache', { provider: 'memory', defaultTtlSec: 300 }) as unknown as CacheService;
     this.options = {
       baseCache: this.baseCache,
       enableSemanticSimilarity: false, // Disabled by default due to complexity
@@ -185,14 +186,14 @@ export class AICache {
         data,
         timestamp: Date.now(),
         cost: options.cost || 1,
-        accuracy: options.accuracy,
+        ...(options.accuracy !== undefined && { accuracy: options.accuracy }),
         hitCount: 0,
         lastAccessed: Date.now(),
         ttl,
         service,
         operation,
         inputHash: this.hashInput(options.inputData),
-        metadata: options.metadata
+        ...(options.metadata && { metadata: options.metadata })
       };
 
       await this.baseCache.set(cacheKey, entry, ttl);
@@ -337,10 +338,10 @@ export class AICache {
     warmingQueueSize: number;
   }> {
     try {
-      const baseCacheHealth = this.baseCache.getHealth 
+      const baseCacheHealth = this.baseCache.getHealth
         ? await this.baseCache.getHealth()
         : { connected: true, latency: 0, stats: { hits: 0, misses: 0, hitRate: 0, operations: 0, errors: 0, memoryUsage: 0, keyCount: 0, avgLatency: 0, maxLatency: 0, minLatency: 0, avgResponseTime: 0 } };
-      const baseCacheHealthy = baseCacheHealth.connected;
+      const baseCacheHealthy = baseCacheHealth?.connected ?? true;
 
       return {
         healthy: baseCacheHealthy,
@@ -366,7 +367,7 @@ export class AICache {
 
   private calculateTTL(
     service: string,
-    operation: string,
+    _operation: string,
     cost?: number,
     accuracy?: number
   ): number {
@@ -394,8 +395,9 @@ export class AICache {
       'recommendation': 1.5 // Recommendations can be cached moderately
     };
 
-    if (serviceMultipliers[service]) {
-      ttl = ttl * serviceMultipliers[service];
+    const multiplier = serviceMultipliers[service];
+    if (multiplier) {
+      ttl = ttl * multiplier;
     }
 
     return Math.max(this.options.minTTL, Math.min(this.options.maxTTL, Math.floor(ttl)));
@@ -415,9 +417,9 @@ export class AICache {
   }
 
   private async findSimilarCachedResult(
-    service: string,
-    operation: string,
-    inputData: any
+    _service: string,
+    _operation: string,
+    _inputData: any
   ): Promise<AICacheEntry | null> {
     // This would implement semantic similarity search
     // For now, return null as it requires complex NLP processing
@@ -425,16 +427,16 @@ export class AICache {
   }
 
   private scheduleRelatedCacheWarming(
-    service: string,
-    operation: string,
-    inputData: any
+    _service: string,
+    _operation: string,
+    _inputData: any
   ): void {
     // This would implement intelligent cache warming based on patterns
     // For now, just log the warming opportunity
     logger.info('Cache warming opportunity detected', { component: 'Chanuka' }, {
-      service,
-      operation,
-      inputHash: this.hashInput(inputData)
+      service: _service,
+      operation: _operation,
+      inputHash: this.hashInput(_inputData)
     });
   }
 
@@ -469,14 +471,14 @@ export class AICache {
       };
     }
 
-    const serviceMetrics = this.metrics.serviceBreakdown[service];
+    const serviceMetrics = this.metrics.serviceBreakdown[service]!;
     serviceMetrics.requests++;
-    
+
     if (hit) {
       serviceMetrics.hits++;
       serviceMetrics.costSaved += costSaved;
     }
-    
+
     serviceMetrics.hitRate = serviceMetrics.hits / serviceMetrics.requests;
   }
 }

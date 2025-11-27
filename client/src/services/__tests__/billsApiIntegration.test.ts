@@ -6,10 +6,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { billsApiService } from '../billsApiService';
-import { billsWebSocketService } from '../billsWebSocketService';
-import { billsDataCache } from '../billsDataCache';
-import { billsPaginationService } from '../billsPaginationService';
+import { billsApiService } from '@client/billsApiService';
+import { billsWebSocketService } from '@client/billsWebSocketService';
+import { billsDataCache } from '@client/billsDataCache';
+import { billsPaginationService } from '@client/billsPaginationService';
 
 // Mock the logger
 vi.mock('../../utils/logger', () => ({

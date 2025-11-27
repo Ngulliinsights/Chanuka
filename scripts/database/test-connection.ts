@@ -8,8 +8,8 @@
  */
 
 import { config } from 'dotenv';
-import { database, pool } from '../../shared/database/connection.js';
-import { monitorPoolHealth } from '../../shared/database/pool.js';
+import { database, pool } from '@shared/database/connection.js';
+import { monitorPoolHealth } from '@shared/database/pool.js';
 import { logger } from '@shared/core';
 
 // Load environment variables

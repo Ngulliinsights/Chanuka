@@ -23,7 +23,7 @@ import { logger } from '@client/utils/logger';
   isClientError,
   getErrorMessage,
   ApiError,
-} from '../api-error-handling';
+} from '@client/api-error-handling';
 
 // Mock fetch with more realistic network conditions
 const createMockFetch = () => {

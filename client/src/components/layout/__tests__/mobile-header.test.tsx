@@ -3,9 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MobileHeader } from '../mobile-header';
+import { MobileHeader } from '@client/mobile-header';
 import { HeaderAction } from '@client/types';
-import { LayoutRenderError } from '../errors';
+import { LayoutRenderError } from '@client/errors';
 
 // Mock dependencies
 vi.mock('@/components/ui/logo', () => ({

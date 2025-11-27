@@ -18,8 +18,8 @@ import {
   screen,
   fireEvent,
   waitFor
-} from '../test-utilities';
-import { visualRegressionConfig } from '../comprehensive-test-config';
+} from '@client/test-utilities';
+import { visualRegressionConfig } from '@client/comprehensive-test-config';
 import { BillCard } from '@client/components/bills/BillCard';
 import { BillsDashboard } from '@client/components/bills/BillsDashboard';
 import { FilterPanel } from '@client/components/bills/FilterPanel';

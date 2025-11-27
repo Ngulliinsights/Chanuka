@@ -4,11 +4,10 @@
  * Factory functions for creating and managing cache services
  */
 
-import type { CacheService, CacheConfig } from '/core/interfaces';
-import { MemoryAdapter, type MemoryAdapterConfig } from './adapters/memory-adapter';
-import { RedisAdapter, type RedisAdapterConfig } from './adapters/redis-adapter';
-import { MultiTierAdapter, type MultiTierAdapterConfig } from './adapters/multi-tier-adapter';
-import { SingleFlightCache } from './single-flight-cache';
+import type { CacheService, CacheConfig } from './core/interfaces';
+import { MemoryAdapter } from './adapters/memory-adapter';
+import { RedisAdapter } from './adapters/redis-adapter';
+import { MultiTierAdapter } from './adapters/multi-tier-adapter';
 
 // Cache manager for cache operations
 export class CacheManager {
@@ -23,7 +22,7 @@ export class CacheManager {
     ttl?: number;
     tags?: string[];
   }>): Promise<void> {
-    const promises = entries.map(async ({ key, factory, ttl, tags }) => {
+    const promises = entries.map(async ({ key, factory, ttl, tags: _tags }) => {
       try {
         const exists = await this.cache.exists?.(key);
         if (!exists) {
@@ -87,48 +86,48 @@ export function createCacheService(config: CacheConfig): CacheService {
   switch (config.provider) {
     case 'memory':
       baseAdapter = new MemoryAdapter({
-        maxMemoryMB: config.maxMemoryMB,
-        enableMetrics: config.enableMetrics,
-        keyPrefix: config.keyPrefix,
-        defaultTtlSec: config.defaultTtlSec,
-        enableCompression: config.enableCompression,
-        compressionThreshold: config.compressionThreshold,
+        ...(config.maxMemoryMB !== undefined && { maxMemoryMB: config.maxMemoryMB }),
+        ...(config.enableMetrics !== undefined && { enableMetrics: config.enableMetrics }),
+        ...(config.keyPrefix !== undefined && { keyPrefix: config.keyPrefix }),
+        ...(config.defaultTtlSec !== undefined && { defaultTtlSec: config.defaultTtlSec }),
+        ...(config.enableCompression !== undefined && { enableCompression: config.enableCompression }),
+        ...(config.compressionThreshold !== undefined && { compressionThreshold: config.compressionThreshold }),
       });
       break;
 
     case 'redis':
       baseAdapter = new RedisAdapter({
         redisUrl: config.redisUrl!,
-        maxMemoryMB: config.maxMemoryMB,
-        enableMetrics: config.enableMetrics,
-        keyPrefix: config.keyPrefix,
-        defaultTtlSec: config.defaultTtlSec,
-        enableCompression: config.enableCompression,
-        compressionThreshold: config.compressionThreshold,
+        ...(config.maxMemoryMB !== undefined && { maxMemoryMB: config.maxMemoryMB }),
+        ...(config.enableMetrics !== undefined && { enableMetrics: config.enableMetrics }),
+        ...(config.keyPrefix !== undefined && { keyPrefix: config.keyPrefix }),
+        ...(config.defaultTtlSec !== undefined && { defaultTtlSec: config.defaultTtlSec }),
+        ...(config.enableCompression !== undefined && { enableCompression: config.enableCompression }),
+        ...(config.compressionThreshold !== undefined && { compressionThreshold: config.compressionThreshold }),
       });
       break;
 
     case 'multi-tier':
       baseAdapter = new MultiTierAdapter({
         l1Config: {
-          maxMemoryMB: config.l1MaxSizeMB || Math.floor(config.maxMemoryMB * 0.2),
-          enableMetrics: config.enableMetrics,
-          keyPrefix: config.keyPrefix,
-          defaultTtlSec: config.defaultTtlSec,
+          maxMemoryMB: config.l1MaxSizeMB || Math.floor((config.maxMemoryMB || 100) * 0.2),
+          ...(config.enableMetrics !== undefined && { enableMetrics: config.enableMetrics }),
+          ...(config.keyPrefix !== undefined && { keyPrefix: config.keyPrefix }),
+          ...(config.defaultTtlSec !== undefined && { defaultTtlSec: config.defaultTtlSec }),
           enableCompression: false, // Disable compression for L1
-          compressionThreshold: config.compressionThreshold,
+          ...(config.compressionThreshold !== undefined && { compressionThreshold: config.compressionThreshold }),
         },
         l2Config: {
           redisUrl: config.redisUrl!,
-          maxMemoryMB: config.maxMemoryMB,
-          enableMetrics: config.enableMetrics,
-          keyPrefix: config.keyPrefix,
-          defaultTtlSec: config.defaultTtlSec,
-          enableCompression: config.enableCompression,
-          compressionThreshold: config.compressionThreshold,
+          ...(config.maxMemoryMB !== undefined && { maxMemoryMB: config.maxMemoryMB }),
+          ...(config.enableMetrics !== undefined && { enableMetrics: config.enableMetrics }),
+          ...(config.keyPrefix !== undefined && { keyPrefix: config.keyPrefix }),
+          ...(config.defaultTtlSec !== undefined && { defaultTtlSec: config.defaultTtlSec }),
+          ...(config.enableCompression !== undefined && { enableCompression: config.enableCompression }),
+          ...(config.compressionThreshold !== undefined && { compressionThreshold: config.compressionThreshold }),
         },
-        enableMetrics: config.enableMetrics,
-        keyPrefix: config.keyPrefix,
+        ...(config.enableMetrics !== undefined && { enableMetrics: config.enableMetrics }),
+        ...(config.keyPrefix !== undefined && { keyPrefix: config.keyPrefix }),
       });
       break;
 

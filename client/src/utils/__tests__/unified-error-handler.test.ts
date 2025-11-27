@@ -30,7 +30,7 @@ import {
   createAuthError,
   createPermissionError,
   createServerError,
-} from '../unified-error-handler';
+} from '@client/unified-error-handler';
 
 describe('Unified Error Handler', () => {
   beforeEach(() => {

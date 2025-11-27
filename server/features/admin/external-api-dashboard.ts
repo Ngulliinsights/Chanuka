@@ -10,10 +10,10 @@
 
 import { Router, Request, Response } from 'express';
 import { ApiSuccess, ApiResponseWrapper  } from '@shared/core/utils/api';
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
-import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
-// import { advancedCachingService } from '../../infrastructure/cache/advanced-caching.js'; // TODO: Create advanced caching service
-import { logger   } from '@shared/core/src/index.js';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@server/infrastructure/external-data/external-api-manager.js';
+import { performanceMonitor } from '@server/infrastructure/monitoring/performance-monitor.js';
+// import { advancedCachingService } from '@server/infrastructure/cache/advanced-caching.js'; // TODO: Create advanced caching service
+import { logger   } from '@shared/core/index.js';
 
 export const router = Router();
 

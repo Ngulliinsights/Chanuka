@@ -3,7 +3,7 @@ import { analyticsService } from '../services/analytics';
 import { useToast } from '@/hooks/use-toast';
 import type {
   AnalyticsFilters
-} from '../types';
+} from '@client/types';
 
 /**
  * Hook for analytics dashboard data

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { NotificationServiceClass } from '../../infrastructure/notifications/notification-service';
+import { NotificationServiceClass } from '@server/infrastructure/notifications/notification-service';
 
 /**
  * Unit Tests for NotificationService Core Functionality

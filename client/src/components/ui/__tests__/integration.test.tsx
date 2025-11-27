@@ -15,7 +15,7 @@ import {
   EnhancedButton,
   EnhancedDialog,
   initializeUIRecoveryStrategies
-} from '../index';
+} from '@client/index';
 
 describe('UI Components Integration', () => {
   beforeEach(() => {

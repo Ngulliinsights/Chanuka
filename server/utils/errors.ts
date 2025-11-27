@@ -2,63 +2,48 @@ import { NextFunction, Request, Response } from 'express';
 import { logger } from '@shared/core';
 import { 
   BaseError,
+  ErrorDomain,
+  ErrorSeverity,
   ValidationError,
   NotFoundError,
   UnauthorizedError,
-  ForbiddenError
-} from '../../shared/core/index.js';
+  ForbiddenError,
+  ConflictError,
+  DatabaseError,
+  ExternalServiceError,
+  NetworkError,
+  CacheError,
+  TooManyRequestsError,
+  ServiceUnavailableError
+} from '@shared/core';
 
-// Simple error domain and severity enums
-export enum ErrorDomain {
-  SYSTEM = 'system',
-  BUSINESS = 'business',
-  EXTERNAL = 'external',
-  SECURITY = 'security',
-  VALIDATION = 'validation',
-  AUTHENTICATION = 'authentication'
-}
-
-export enum ErrorSeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
-}
-
-// Additional error classes
-export class ConflictError extends BaseError {
-  constructor(message: string = 'Conflict') {
-    super(message, 409, 'CONFLICT');
-  }
-}
-
-export class DatabaseError extends BaseError {
-  constructor(message: string = 'Database error') {
-    super(message, 500, 'DATABASE_ERROR');
-  }
-}
-
-// Re-export the unified error classes
+// Re-export the unified error classes from shared/core
 export { 
   BaseError,
+  ErrorDomain,
+  ErrorSeverity,
   ValidationError,
   NotFoundError,
   UnauthorizedError,
-  ForbiddenError
+  ForbiddenError,
+  ConflictError,
+  DatabaseError,
+  ExternalServiceError,
+  NetworkError,
+  CacheError,
+  TooManyRequestsError,
+  ServiceUnavailableError
 };
 
 /**
- * Authentication error - extends UnauthorizedError
+ * Authentication error - extends UnauthorizedError using shared BaseError system
  */
 export class AuthError extends UnauthorizedError {
   constructor(
     message: string,
-    statusCode = 401,
-    code = 'AUTH_ERROR'
+    details?: Record<string, any>
   ) {
-    super(message);
-    this.statusCode = statusCode;
-    this.code = code;
+    super(message, details);
     this.name = 'AuthError';
   }
 }
@@ -68,7 +53,8 @@ export class AuthError extends UnauthorizedError {
  */
 export class InvalidCredentialsError extends AuthError {
   constructor(message = 'Invalid credentials') {
-    super(message, 401, 'AUTH_INVALID');
+    super(message, { code: 'AUTH_INVALID' });
+    this.name = 'InvalidCredentialsError';
   }
 }
 
@@ -77,8 +63,7 @@ export class InvalidCredentialsError extends AuthError {
  */
 export class UserExistsError extends ConflictError {
   constructor(message = 'User already exists') {
-    super(message);
-    this.code = 'ALREADY_EXISTS';
+    super(message, 'user', { code: 'ALREADY_EXISTS' });
     this.name = 'UserExistsError';
   }
 }
@@ -88,7 +73,10 @@ export class UserExistsError extends ConflictError {
  */
 export class OAuthError extends AuthError {
   constructor(message: string, statusCode = 401) {
-    super(message, statusCode, 'AUTH_OAUTH_ERROR');
+    super(message, { 
+      code: 'AUTH_OAUTH_ERROR',
+      statusCode 
+    });
     this.name = 'OAuthError';
   }
 }
@@ -98,8 +86,10 @@ export class OAuthError extends AuthError {
  */
 export class SponsorNotFoundError extends NotFoundError {
   constructor(message = 'Sponsor not found') {
-    super(message);
-    this.code = 'SPONSOR_NOT_FOUND';
+    super('sponsor', undefined, { 
+      code: 'SPONSOR_NOT_FOUND',
+      message 
+    });
     this.name = 'SponsorNotFoundError';
   }
 }

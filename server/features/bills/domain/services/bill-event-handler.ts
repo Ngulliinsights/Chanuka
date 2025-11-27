@@ -1,4 +1,4 @@
-import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '../events/bill-events';
+import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@shared/events/bill-events';
 import { BillNotificationService } from './bill-notification-service';
 import { logger } from '@shared/core/index';
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useRouteAccess } from '@/hooks/useRouteAccess';
-import { NavigationValidationError } from '../errors';
+import { NavigationValidationError } from '@client/errors';
 
 // Mock the auth hook
 vi.mock('@/hooks/useAuth', () => ({

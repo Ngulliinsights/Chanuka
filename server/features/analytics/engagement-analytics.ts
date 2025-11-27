@@ -6,13 +6,13 @@ import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheKeys  } from '@shared/core/caching/key-generator';
 import { getDefaultCache  } from '@shared/core/caching';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api-utils';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 import { AuthenticatedRequest  } from '@shared/core/types/auth.types';
 import { z } from 'zod';
 
 // Security Services
-import { dataPrivacyService } from '../../infrastructure/security/data-privacy-service.js';
-import { inputValidationService } from '../../infrastructure/security/input-validation-service.js';
+import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service.js';
+import { inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
 import type {
   UserEngagementMetrics,
   BillEngagementMetrics,

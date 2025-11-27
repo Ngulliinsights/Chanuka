@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import axe from 'axe-core';
 import NavigationBar from '@client/components/shell/NavigationBar';
-import { createBasicNavigationContext, createMobileNavigationContext, createAuthenticatedNavigationContext } from '../navigation-test-contexts.test';
+import { createBasicNavigationContext, createMobileNavigationContext, createAuthenticatedNavigationContext } from '@client/navigation-test-contexts.test';
 
 // Mock axe-core
 vi.mock('axe-core', () => ({

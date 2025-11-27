@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi, Mock } from 'vitest';
 import { ErrorDomain, ErrorSeverity } from '@client/utils/logger';
-import { coreErrorHandler } from '../handler';
+import { coreErrorHandler } from '@client/handler';
 import { AppError } from '@client/types';
 
 // Mock the unified error handler

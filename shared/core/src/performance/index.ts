@@ -4,6 +4,7 @@
  * Comprehensive performance budget system with Core Web Vitals tracking,
  * automated monitoring, and CI/CD integration.
  */
+console.log('DEBUG: Loading performance module from shared/core');
 
 // Budget configuration and types
 export type {

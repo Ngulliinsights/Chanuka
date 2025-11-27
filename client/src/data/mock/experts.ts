@@ -14,7 +14,7 @@ import {
   ExpertConsensus,
   CredibilityMetrics,
   CommunityValidation
-} from '../../types/expert';
+} from '@client/types/expert';
 import {
   generateId,
   generateDateInRange,

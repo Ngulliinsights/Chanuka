@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { glob } from 'glob';
-import { ProjectStructure } from '../types/core';
+import { ProjectStructure } from '@shared/types/core';
 import { SchemaDefinitionParser } from './schema-parser';
 import { DatabasePatternDetector } from './database-pattern-detector';
 

@@ -24,7 +24,7 @@ import { AuthButton } from '../ui/AuthButton';
 import { AuthAlert } from '../ui/AuthAlert';
 import { PasswordStrengthIndicator } from '../ui/PasswordStrengthIndicator';
 
-import { AuthError, AuthValidationError } from '../errors';
+import { AuthError, AuthValidationError } from '@client/errors';
 // AuthInputProps and AuthButtonProps should be defined locally in auth components
 
 // Mock the auth hook

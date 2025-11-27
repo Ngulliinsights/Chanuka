@@ -15,7 +15,7 @@ import {
   gridSystem,
   responsiveSpacing,
   responsiveTypography,
-} from '../responsive';
+} from '@client/responsive';
 
 // Mock window.matchMedia
 const mockMatchMedia = vi.fn();

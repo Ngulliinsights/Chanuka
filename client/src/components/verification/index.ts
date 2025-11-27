@@ -40,4 +40,4 @@ export type {
   ExpertVerificationType,
   ContributionType,
   VerificationStatus
-} from '../../types/expert';
+} from '@client/types/expert';

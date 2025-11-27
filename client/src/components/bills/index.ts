@@ -12,8 +12,8 @@ export { FilterPanel } from './filter-panel';
 export { BillsDashboard } from './bills-dashboard';
 
 // Re-export React Query hooks for convenience
-export { useBills, useBill, useBillComments, useBillSponsors, useBillAnalysis, useBillCategories, useBillStatuses, useAddBillComment, useRecordBillEngagement, useVoteOnComment, useEndorseComment, useCreateBillPoll, useBillSponsorshipAnalysis, useBillPrimarySponsorAnalysis, useBillCoSponsorsAnalysis, useBillFinancialNetworkAnalysis } from '../../features/bills/hooks/useBills';
-export type { BillsQueryParams, CommentPayload, EngagementPayload } from '../../features/bills/types';
+export { useBills, useBill, useBillComments, useBillSponsors, useBillAnalysis, useBillCategories, useBillStatuses, useAddBillComment, useRecordBillEngagement, useVoteOnComment, useEndorseComment, useCreateBillPoll, useBillSponsorshipAnalysis, useBillPrimarySponsorAnalysis, useBillCoSponsorsAnalysis, useBillFinancialNetworkAnalysis } from '@client/features/bills/hooks/useBills';
+export type { BillsQueryParams, CommentPayload, EngagementPayload } from '@client/features/bills/types';
 
 // Define BillsStats locally as per migration instructions
 interface BillsStats {

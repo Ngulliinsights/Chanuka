@@ -21,7 +21,7 @@ import {
   CommunityValidation as CommunityValidationType,
   VerificationWorkflow as VerificationWorkflowType,
   ExpertConsensus as ExpertConsensusType
-} from '../../types/expert';
+} from '@client/types/expert';
 
 /**
  * ExpertVerificationDemo - Comprehensive demo of the expert verification system

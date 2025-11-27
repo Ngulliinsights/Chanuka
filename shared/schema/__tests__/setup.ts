@@ -4,9 +4,9 @@
 // Configuration and utilities for testing the Kenya Legislative Platform schema
 
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
+// import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
-import { sql } from 'drizzle-orm';
+// import { sql } from 'drizzle-orm';
 
 // Test database configuration
 const testConfig = {
@@ -121,7 +121,7 @@ export const testUtils = {
       await setupPool.end();
     } catch (error) {
       // Database might already exist, continue
-      console.log('Test database setup:', error.message);
+      console.log('Test database setup:', error instanceof Error ? error.message : String(error));
     }
   },
 

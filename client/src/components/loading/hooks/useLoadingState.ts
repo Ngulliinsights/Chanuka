@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { LoadingState, LoadingType, LoadingPriority } from '@client/types';
-import { LoadingError } from '../errors';
+import { LoadingError } from '@client/errors';
 import { debounce } from '@client/utils/loading-utils';
 
 export interface LoadingStateOptions {

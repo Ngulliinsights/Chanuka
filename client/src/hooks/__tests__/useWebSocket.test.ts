@@ -6,7 +6,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { useWebSocket, useBillRealTime, useNotifications } from '../useWebSocket';
+import { useWebSocket, useBillRealTime, useNotifications } from '@client/useWebSocket';
 
 // Mock the WebSocket client
 vi.mock('../../store/middleware/webSocketMiddleware', () => ({

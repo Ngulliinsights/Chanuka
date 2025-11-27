@@ -8,11 +8,11 @@
  * - Real-time metrics collection and analysis
  */
 
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { 
   AsyncServiceResult, 
   withResultHandling 
-} from '../errors/result-adapter.js';
+} from '@shared/errors/result-adapter.js';
 
 // Types for A/B testing
 export interface ABTestConfig {

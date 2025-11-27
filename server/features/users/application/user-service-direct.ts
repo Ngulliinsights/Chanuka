@@ -1,12 +1,12 @@
 import { db } from '@shared/database/pool';
 import { users, user_profiles } from '@shared/schema';
 import { eq, sql, like, and, or } from 'drizzle-orm';
-import { User } from '../domain/entities/user';
-import { UserProfile, UserInterest } from '../domain/entities/user-profile';
-import { CitizenVerification } from '../domain/entities/citizen-verification';
-import { UserAggregate } from '../domain/aggregates/user-aggregate';
+import { User } from '@shared/domain/entities/user';
+import { UserProfile, UserInterest } from '@shared/domain/entities/user-profile';
+import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
+import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
 import { databaseService } from '@/infrastructure/database/database-service';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 /**
  * UserService - Direct Drizzle implementation replacing UserRepository

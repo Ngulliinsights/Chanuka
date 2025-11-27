@@ -13,7 +13,7 @@ import {
   UIInputError,
   UIFormError,
   UIComponentError
-} from '../errors';
+} from '@client/errors';
 import { ValidationState } from '@client/types';
 
 /**

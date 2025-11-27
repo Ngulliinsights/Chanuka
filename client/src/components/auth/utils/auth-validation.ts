@@ -9,9 +9,9 @@ import {
   validateName,
   safeValidateEmail,
   safeValidatePassword 
-} from '../validation';
-import { AuthValidationError } from '../errors';
-import { AUTH_VALIDATION_RULES, AUTH_ERROR_MESSAGES } from '../constants';
+} from '@client/validation';
+import { AuthValidationError } from '@client/errors';
+import { AUTH_VALIDATION_RULES, AUTH_ERROR_MESSAGES } from '@client/constants';
 
 /**
  * Password strength checker

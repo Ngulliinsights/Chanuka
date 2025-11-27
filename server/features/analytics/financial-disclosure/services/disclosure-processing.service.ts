@@ -6,13 +6,13 @@ import {
 } from "@shared/foundation";
 import { eq, desc, and, sql, count } from "drizzle-orm";
 import { readDatabase } from '@shared/database';
-import { cache, logger, NotFoundError, DatabaseError  } from '@shared/core/src/index.js';
-import { FinancialDisclosureConfig } from '../config';
+import { cache, logger, NotFoundError, DatabaseError  } from '@shared/core/index.js';
+import { FinancialDisclosureConfig } from '@shared/config';
 import type {
   FinancialDisclosure,
   SponsorInfo,
   SponsorAffiliation
-} from '../../types/index.js';
+} from '@server/types/index.js';
 
 /**
  * Disclosure Processing Service

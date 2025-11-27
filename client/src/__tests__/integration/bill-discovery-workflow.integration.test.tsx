@@ -20,8 +20,8 @@ import {
   waitFor,
   userEvent,
   within
-} from '../test-utilities';
-import { App } from '../../App';
+} from '@client/test-utilities';
+import { App } from '@client/App';
 import { BrowserRouter } from 'react-router-dom';
 
 describe('Bill Discovery Workflow - Integration Tests', () => {

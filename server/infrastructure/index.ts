@@ -34,7 +34,7 @@ export {
   database,
   withTransaction,
   withReadConnection
-} from '../../shared/database/connection';
+} from '@shared/database/connection';
 
 // Legacy compatibility exports
 export { cacheService } from './cache';

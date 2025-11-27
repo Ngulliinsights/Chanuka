@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useToast, toast } from '../use-toast';
+import { useToast, toast } from '@client/use-toast';
 
 // Mock the toast component types
 vi.mock('../components/ui/toast', () => ({

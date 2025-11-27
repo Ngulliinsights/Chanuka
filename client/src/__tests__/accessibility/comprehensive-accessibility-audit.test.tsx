@@ -14,7 +14,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Import components for testing
-import App from '../../App';
+import App from '@client/App';
 import NavigationBar from '@client/components/shell/NavigationBar';
 import BillCard from '@client/components/bills/BillCard';
 import FilterPanel from '@client/components/bills/FilterPanel';

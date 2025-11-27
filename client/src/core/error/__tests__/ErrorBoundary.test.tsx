@@ -8,8 +8,8 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ErrorDomain, ErrorSeverity } from '@client/utils/logger';
-import { EnhancedErrorBoundary } from '../ErrorBoundary';
-import { coreErrorHandler } from '../handler';
+import { EnhancedErrorBoundary } from '@client/ErrorBoundary';
+import { coreErrorHandler } from '@client/handler';
 
 // Mock the core error handler
 vi.mock('../handler', () => ({

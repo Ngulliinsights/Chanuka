@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { cn } from '@client/lib/utils';
-import { useResponsive, type ResponsiveValue } from '../responsive';
+import { useResponsive, type ResponsiveValue } from '@client/responsive';
 
 export interface ResponsiveGridProps {
   children: React.ReactNode;

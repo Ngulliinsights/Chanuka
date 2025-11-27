@@ -18,7 +18,7 @@ import {
   CommentUpdateEvent,
   ModerationEvent,
   TypingIndicator
-} from '../../../types/discussion';
+} from '@client/types/discussion';
 
 interface UseDiscussionOptions {
   billId: number;

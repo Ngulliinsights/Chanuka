@@ -2,11 +2,11 @@
 // ADVOCACY COORDINATION - Action Coordinator Service
 // ============================================================================
 
-import { ActionItem, NewActionItem, ActionItemEntity } from '../domain/entities/action-item.js';
+import { ActionItem, NewActionItem, ActionItemEntity } from '@shared/domain/entities/action-item.js';
 // Repository interfaces removed - using direct service calls
 import { ActionFilters, PaginationOptions, ActionTemplate } from '@server/types/index.ts';
-import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
-import { logger  } from '@shared/core/src/index.js';
+import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors.js';
+import { logger  } from '@shared/core/index.js';
 
 export class ActionCoordinator {
   constructor(

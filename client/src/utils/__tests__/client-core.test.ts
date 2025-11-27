@@ -4,7 +4,7 @@ import {
   BaseError,
   ValidationError,
   performanceMonitor,
-} from '../logger';
+} from '@client/utils/logger';
 
 // Mock console methods
 const consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => { });

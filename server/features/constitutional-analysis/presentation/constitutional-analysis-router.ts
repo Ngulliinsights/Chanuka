@@ -5,7 +5,7 @@
 
 import { Router } from 'express';
 import { z } from 'zod';
-import { logger, ApiResponse  } from '@shared/core/src/index.js';
+import { logger, ApiResponse  } from '@shared/core/index.js';
 import { createAnalysisServices } from '@server/services/constitutional-analysis-factory.ts';
 import { ConstitutionalAnalysis } from '@shared/schema/index.js';
 

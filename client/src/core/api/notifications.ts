@@ -26,7 +26,7 @@ export type {
   NotificationPreferences,
   NotificationType,
   NotificationCategory
-} from '../../services/notification-service';
+} from '@client/services/notification-service';
 
 // ============================================================================
 // Notification Types

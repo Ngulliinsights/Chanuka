@@ -3,7 +3,7 @@
  * Provides enhanced touch interaction support for mobile devices
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export interface TouchHandlerOptions {
   preventScroll?: boolean;

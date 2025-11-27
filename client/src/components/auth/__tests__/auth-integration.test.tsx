@@ -20,7 +20,7 @@ import {
 
 import { LoginForm } from '../ui/LoginForm';
 import { RegisterForm } from '../ui/RegisterForm';
-import { AuthError, AuthValidationError } from '../errors';
+import { AuthError, AuthValidationError } from '@client/errors';
 
 // Mock the auth service
 const mockAuthService = {

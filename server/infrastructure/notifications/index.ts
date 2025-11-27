@@ -88,7 +88,7 @@ export { notificationChannelService } from './notification-channels.js';
 // Export the core service as default for simple use cases
 export { notificationService as default } from './notification-service.js';
 
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 
 logger.info('📦 Notifications module loaded - Clean architecture implemented successfully', { component: 'Chanuka' });
 

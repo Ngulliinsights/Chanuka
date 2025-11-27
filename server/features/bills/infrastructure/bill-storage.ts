@@ -10,7 +10,7 @@ import {
   type Bill,
   type InsertBill
 } from '@shared/schema';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Cache configuration constants - these control cache behavior across the application
 const CACHE_TTL = 300; // Cache time-to-live in seconds (5 minutes default)

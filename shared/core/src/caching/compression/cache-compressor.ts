@@ -4,7 +4,7 @@
  */
 
 export interface CompressionOptions {
-  algorithm?: 'gzip' | 'deflate' | 'none';
+   algorithm?: 'gzip' | 'deflate' | 'brotli' | 'none';
   threshold?: number; // Minimum size to compress (bytes)
   level?: number; // Compression level (1-9)
 }

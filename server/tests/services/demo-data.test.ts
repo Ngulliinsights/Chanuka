@@ -14,7 +14,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { demoDataService } from '../../infrastructure/demo-data.js';
+import { demoDataService } from '@server/infrastructure/demo-data.js';
 import { logger  } from '@shared/core/src/index.js';
 
 describe('DemoDataService', () => {

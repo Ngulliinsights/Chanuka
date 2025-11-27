@@ -13,14 +13,14 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { 
 import { logger } from '../../logger';
-  determineNavigationSection, 
-  getSectionDisplayName, 
+import {
+  determineNavigationSection,
+  getSectionDisplayName,
   getSectionDescription,
   sectionRequiresAuth,
   sectionRequiresAdmin
-} from '../section-detector';
+} from '@client/section-detector';
 
 describe('section-detector', () => {
   describe('determineNavigationSection', () => {

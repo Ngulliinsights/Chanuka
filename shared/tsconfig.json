@@ -7,7 +7,23 @@
     "declaration": true,
     "declarationMap": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@shared": ["."],
+      "@shared/*": ["./*"],
+      "@shared/core": ["./core/src"],
+      "@shared/core/*": ["./core/src/*"],
+      "@shared/database": ["./database"],
+      "@shared/database/*": ["./database/*"],
+      "@shared/schema": ["./schema"],
+      "@shared/schema/*": ["./schema/*"],
+      "@shared/utils": ["./utils"],
+      "@shared/utils/*": ["./utils/*"],
+      "@server": ["../server"],
+      "@server/*": ["../server/*"],
+      "@client": ["../client/src"],
+      "@client/*": ["../client/src/*"],
+      "@tests": ["../tests"],
+      "@tests/*": ["../tests/*"]
     }
   },
   "include": [

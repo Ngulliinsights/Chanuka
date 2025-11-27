@@ -50,13 +50,29 @@ declare module '@shared/core' {
   // Lightweight error hierarchy used by the client
   export class BaseError extends Error {
     code?: string;
-    metadata?: Record<string, any>;
+    metadata?: { correlationId: string; retryable: boolean; };
     constructor(message?: string, code?: string, metadata?: Record<string, any>);
   }
 
   export class ValidationError extends BaseError {
     fields?: Record<string, string[]>;
     constructor(message?: string, fields?: Record<string, string[]>);
+  }
+
+  export enum ErrorDomain {
+    SYSTEM = 'system',
+    VALIDATION = 'validation',
+    AUTHENTICATION = 'authentication',
+    AUTHORIZATION = 'authorization',
+    DATABASE = 'database',
+    CACHE = 'cache',
+    NETWORK = 'network',
+    EXTERNAL_SERVICE = 'external_service',
+    BUSINESS_LOGIC = 'business_logic',
+    INFRASTRUCTURE = 'infrastructure',
+    SECURITY = 'security',
+    DATA = 'data',
+    INTEGRATION = 'integration'
   }
 
   export const DEFAULT_CONFIG: any;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { EducationalFramework } from '../EducationalFramework';
+import { EducationalFramework } from '@client/EducationalFramework';
 import { Bill, BillStatus, UrgencyLevel, ComplexityLevel } from '@client/core/api/types';
 
 // Mock the UI components

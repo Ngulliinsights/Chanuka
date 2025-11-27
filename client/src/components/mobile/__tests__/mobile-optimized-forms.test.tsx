@@ -15,7 +15,7 @@ import {
   MobileSelect,
   MobileTextarea,
   MobileForm,
-} from '../mobile-optimized-forms';
+} from '@client/mobile-optimized-forms';
 import { renderWithWrapper } from '../../ui/__tests__/test-utils';
 
 // Mock the responsive layout context

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { UserJourneyTracker } from '../UserJourneyTracker';
+import { UserJourneyTracker } from '@client/UserJourneyTracker';
 
 // Mock Date to control timestamps
 const mockDate = new Date('2023-01-01T00:00:00Z');

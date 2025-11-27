@@ -5,8 +5,8 @@
  * with automatic fallback and storage quota management
  */
 
-import { BaseCacheAdapter } from '../../core/base-adapter';
-import { CacheAdapterConfig } from '../../core/interfaces';
+import { BaseCacheAdapter } from '../core/base-adapter';
+import { CacheAdapterConfig } from '../core/interfaces';
 
 export interface BrowserAdapterConfig extends CacheAdapterConfig {
   storageType?: 'localStorage' | 'sessionStorage' | 'indexedDB';
@@ -644,34 +644,34 @@ export class BrowserAdapter extends BaseCacheAdapter {
     return this.metrics.keyCount * 1024; // Rough estimate: 1KB per entry
   }
 
-  // Helper methods
-  protected validateKey(key: string): void {
+  // Helper methods that call base class methods
+  private validateKey(key: string): void {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid key');
     }
   }
 
-  protected validateTtl(ttl?: number): number {
+  private validateTtl(ttl?: number): number {
     return ttl || this.config.defaultTtlSec || 300;
   }
 
-  protected async measureOperation<T>(operation: () => Promise<T>, _operationType: string, _key: string): Promise<T> {
+  private async measureOperation<T>(operation: () => Promise<T>, _operationType: string, _key: string): Promise<T> {
     return this.measureLatency(operation);
   }
 
-  protected recordHit(_key: string): void {
+  private recordHit(_key: string): void {
     this.updateMetrics('hit');
   }
 
-  protected recordMiss(_key: string): void {
+  private recordMiss(_key: string): void {
     this.updateMetrics('miss');
   }
 
-  protected recordSet(_key: string, _size: number): void {
+  private recordSet(_key: string, _size: number): void {
     this.updateMetrics('set');
   }
 
-  protected recordDelete(_key: string): void {
+  private recordDelete(_key: string): void {
     this.updateMetrics('delete');
   }
 }

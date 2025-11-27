@@ -8,10 +8,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Server } from 'http';
 import { createServer } from 'http';
-import { ConnectionMigrator } from '../../infrastructure/connection-migrator.js';
-import { webSocketService } from '../../infrastructure/websocket.js';
-import { socketIOService } from '../../infrastructure/socketio-service.js';
-import { featureFlagService } from '../../infrastructure/feature-flags.js';
+import { ConnectionMigrator } from '@server/infrastructure/connection-migrator.js';
+import { webSocketService } from '@server/infrastructure/websocket.js';
+import { socketIOService } from '@server/infrastructure/socketio-service.js';
+import { featureFlagService } from '@server/infrastructure/feature-flags.js';
 
 describe('Connection Migration Stability Integration Tests', () => {
   let server: Server;

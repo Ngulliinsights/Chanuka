@@ -16,9 +16,9 @@ import {
   CommentFilterOption,
   CommentFormData,
   ModerationViolationType
-} from '../../types/community';
+} from '@client/types/community';
 import { logger } from '@client/utils/logger';
-import type { RootState } from '../index';
+import type { RootState } from '@client/index';
 
 // State interface with clear organization
 interface DiscussionState {

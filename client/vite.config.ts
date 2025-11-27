@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type ConfigEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -60,7 +60,7 @@ function validateEnvironmentVariables(env: Record<string, string>, mode: string)
 
 // Vite configuration for a React application with optimized builds
 // This configuration provides separate optimizations for development and production
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }: ConfigEnv) => {
   const env = loadEnv(mode, process.cwd(), '')
   const isProduction = mode === 'production'
   const isDevelopment = mode === 'development'
@@ -87,7 +87,7 @@ export default defineConfig(({ mode }) => {
       // CSP Plugin for environment-aware Content Security Policy
       {
         name: 'csp-plugin',
-        transformIndexHtml(html) {
+        transformIndexHtml(html: string) {
           const csp = isDevelopment ? devCSP : prodCSP
           return html
             .replace(
@@ -96,7 +96,7 @@ export default defineConfig(({ mode }) => {
             )
             .replace(
               /<script>([\s\S]*?)<\/script>/g,
-              (match, content) => {
+              (match: string, content: string) => {
                 if (isProduction && content.trim()) {
                   return `<script nonce="${nonce}">${content}</script>`
                 }
@@ -169,9 +169,18 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': path.resolve(rootDir, './src'),
         '@client': path.resolve(rootDir, './src'),
+        '@client/*': path.resolve(rootDir, './src/*'),
         '@chanuka/shared': path.resolve(rootDir, '../shared'),
         '@shared': path.resolve(rootDir, '../shared'),
         '@shared/*': path.resolve(rootDir, '../shared/*'),
+        '@shared/core': path.resolve(rootDir, '../shared/core'),
+        '@shared/core/*': path.resolve(rootDir, '../shared/core/*'),
+        '@shared/database': path.resolve(rootDir, '../shared/database'),
+        '@shared/database/*': path.resolve(rootDir, '../shared/database/*'),
+        '@shared/schema': path.resolve(rootDir, '../shared/schema'),
+        '@shared/schema/*': path.resolve(rootDir, '../shared/schema/*'),
+        '@shared/utils': path.resolve(rootDir, '../shared/utils'),
+        '@shared/utils/*': path.resolve(rootDir, '../shared/utils/*'),
       },
       // Extension resolution order affects lookup speed
       // More common extensions first means fewer failed lookups
@@ -368,7 +377,7 @@ export default defineConfig(({ mode }) => {
         },
 
         // Warning filtering keeps your build output clean and actionable
-        onwarn(warning, warn) {
+        onwarn(warning: any, warn: (warning: any) => void) {
           // Circular dependencies are common in React apps and usually harmless
           if (warning.code === 'CIRCULAR_DEPENDENCY') return
           // This warning appears with some libraries but doesn't affect functionality

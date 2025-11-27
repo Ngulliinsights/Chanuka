@@ -5,7 +5,7 @@
 import { readDatabase } from '@shared/database';
 import { sponsors } from "@shared/foundation";
 import { eq, desc } from "drizzle-orm";
-import { cache, logger, DatabaseError  } from '@shared/core/src/index.js';
+import { cache, logger, DatabaseError  } from '@shared/core/index.js';
 import { FinancialDisclosureConfig } from './config';
 
 // Import decomposed services
@@ -21,7 +21,7 @@ import type {
   RelationshipMapping,
   CompletenessReport,
   TransparencyDashboard
-} from '../types/index.js';
+} from '@shared/types/index.js';
 
 /**
  * Financial Disclosure Orchestrator Service

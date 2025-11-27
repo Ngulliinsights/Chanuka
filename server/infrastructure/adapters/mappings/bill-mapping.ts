@@ -6,7 +6,7 @@
  */
 
 import { bills } from '@shared/schema';
-import { EntityMapping } from '../drizzle-adapter';
+import { EntityMapping } from '@shared/drizzle-adapter';
 
 type BillRow = typeof bills.$inferSelect;
 type BillInsert = typeof bills.$inferInsert;

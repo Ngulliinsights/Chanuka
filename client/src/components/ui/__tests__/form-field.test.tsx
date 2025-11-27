@@ -11,8 +11,8 @@ import {
   EnhancedFormInput,
   EnhancedFormTextarea,
   EnhancedFormSelect
-} from '../form-field';
-import { Label } from '../label';
+} from '@client/form-field';
+import { Label } from '@client/label';
 import { cn } from '../../../lib/utils';
 
 // FormFieldWrapper tests replaced with direct implementations

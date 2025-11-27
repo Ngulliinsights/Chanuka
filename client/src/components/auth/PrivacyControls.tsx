@@ -28,7 +28,7 @@ import {
   DataExportRequest, 
   DataDeletionRequest,
   ConsentRecord 
-} from '../../types/auth';
+} from '@client/types/auth';
 import { privacyCompliance } from '@client/utils/privacy-compliance';
 import { logger } from '@client/utils/logger';
 

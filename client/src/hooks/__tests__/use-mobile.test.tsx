@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import { renderHook } from '@testing-library/react';
-import { useMediaQuery } from '../use-mobile';
+import { useMediaQuery } from '@client/use-mobile';
 import { logger } from '@client/utils/logger';
 
 // Mock matchMedia

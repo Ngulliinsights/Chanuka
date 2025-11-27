@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { renderHook, act } from '@testing-library/react';
 import { useLoading, useLoadingState, useProgressiveLoading } from '@/hooks';
-import { LoadingError } from '../errors';
+import { LoadingError } from '@client/errors';
 import { createCommonStages } from '@/utils/loading-utils';
 
 // Mock timers for testing

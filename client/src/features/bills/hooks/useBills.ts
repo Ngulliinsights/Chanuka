@@ -5,7 +5,7 @@ import type {
   BillsQueryParams,
   CommentPayload,
   EngagementPayload
-} from '../types';
+} from '@client/types';
 
 /**
  * Fetches a filtered and paginated list of bills. This is your main bills

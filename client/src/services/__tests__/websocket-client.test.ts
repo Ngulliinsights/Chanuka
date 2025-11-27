@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { WebSocketClient, webSocketClient, useWebSocket, useBillUpdates } from '../websocket-client';
+import { WebSocketClient, webSocketClient, useWebSocket, useBillUpdates } from '@client/websocket-client';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock WebSocket

@@ -5,7 +5,7 @@ import { analysisRouter } from '../analysis.routes'; // Import the NEW router
 // Mock the NEW comprehensive analysis service
 import { billComprehensiveAnalysisService } from '../../application/bill-comprehensive-analysis.service';
 // Mock the repository for history endpoint
-import { analysisRepository } from '../../infrastructure/repositories/analysis-repository-impl';
+import { analysisRepository } from '@server/infrastructure/repositories/analysis-repository-impl';
 import { authenticateToken } from '@/components/auth'; // Import or mock auth
 import * as schema from '@shared/schema'; // For mock types
 

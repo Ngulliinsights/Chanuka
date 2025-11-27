@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool, type PoolConfig } from 'pg';
 import * as schema from "@shared/schema";
 import { databaseFallbackService as fallbackService } from './infrastructure/database/database-fallback.js';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Connection state management with clear separation of concerns
 interface DatabaseState {
@@ -374,7 +374,7 @@ export {
   sponsorTransparency,
   billSectionConflict as billSectionConflicts,
   user_interest as user_interests
-} from '../shared/schema';
+} from '@shared/shared/schema';
 
 
 

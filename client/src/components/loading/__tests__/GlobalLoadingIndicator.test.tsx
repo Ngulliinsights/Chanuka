@@ -11,8 +11,8 @@ import {
   GlobalLoadingIndicator,
   MinimalGlobalLoadingIndicator,
   useGlobalLoadingIndicator,
-} from '../GlobalLoadingIndicator';
-import { LoadingOperationFailedError } from '../errors';
+} from '@client/GlobalLoadingIndicator';
+import { LoadingOperationFailedError } from '@client/errors';
 
 // Mock loading context
 const mockLoadingContext = {

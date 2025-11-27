@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 
 /**

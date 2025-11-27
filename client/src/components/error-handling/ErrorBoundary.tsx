@@ -12,9 +12,8 @@ import { startTrace, finishTrace } from '@client/utils/tracing';
 import { getBrowserInfo } from '@client/utils/browser-compatibility';
 import { performanceMonitor } from '@client/utils/performance-monitor';
 
-// Import unified error types
-import { ErrorDomain, ErrorSeverity } from '@client/core/error';
-import { BaseError } from '@client/utils/logger';
+// Import unified error system from shared/core
+import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
 import { errorHandler } from '@client/utils/unified-error-handler';
 
 /**
@@ -146,11 +145,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
    * Updates state when an error is caught with enhanced error context
    */
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    // Convert to BaseError with enhanced context
+    // Convert to BaseError with enhanced context using shared BaseError system
     const baseError =
       error instanceof BaseError
         ? error
-        : new BaseError(error.message, 'REACT_ERROR_BOUNDARY', {
+        : new BaseError(error.message, {
+            statusCode: 500,
             code: 'REACT_ERROR_BOUNDARY',
             domain: ErrorDomain.SYSTEM,
             severity: ErrorSeverity.HIGH,
@@ -205,12 +205,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       retryable: false,
     });
 
-    // Update state with unified error data
+    // Update state with unified error data using shared BaseError system
     this.setState({
-      error: new BaseError(appError.message, 'REACT_ERROR_BOUNDARY', {
+      error: new BaseError(appError.message, {
+        statusCode: 500,
+        code: 'REACT_ERROR_BOUNDARY',
         domain: ErrorDomain.SYSTEM,
         severity: ErrorSeverity.HIGH,
-        appError,
+        context: { appError },
       }),
       errorId: appError.id,
     });
@@ -218,9 +220,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     const baseError = this.state.error!;
     const errorId = appError.id;
 
-    // Enhance error with React-specific and environment context
-    const enhancedError = new BaseError(baseError.message, baseError.code, {
-      ...baseError.metadata,
+    // Enhance error with React-specific and environment context using shared BaseError system
+    const enhancedError = new BaseError(baseError.message, {
+      statusCode: baseError.statusCode,
+      code: baseError.code,
+      domain: baseError.metadata.domain,
+      severity: baseError.metadata.severity,
       context: {
         ...baseError.metadata?.context,
         componentStack: errorInfo.componentStack,

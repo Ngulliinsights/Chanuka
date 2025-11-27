@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { emergencyTriage, startEmergencyTriage, stopEmergencyTriage, getTriageStatus } from '../emergency-triage';
+import { emergencyTriage, startEmergencyTriage, stopEmergencyTriage, getTriageStatus } from '@client/emergency-triage';
 
 // Mock console methods
 const originalConsoleError = console.error;

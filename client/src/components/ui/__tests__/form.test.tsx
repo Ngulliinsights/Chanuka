@@ -9,8 +9,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { z } from 'zod';
-import { EnhancedForm } from '../form';
-import { UIFormError } from '../errors';
+import { EnhancedForm } from '@client/form';
+import { UIFormError } from '@client/errors';
 
 describe('EnhancedForm', () => {
   const TestSchema = z.object({

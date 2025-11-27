@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { cn } from '@client/lib/utils';
-import { useResponsive } from '../responsive';
+import { useResponsive } from '@client/responsive';
 import { buttonUtils } from './button';
 
 export interface ResponsiveButtonProps {

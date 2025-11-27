@@ -163,7 +163,7 @@ export function canPerformAction(
   userProfile: UserProfile,
   action: 'comment' | 'vote' | 'create_campaign' | 'moderate' | 'expert_review'
 ): boolean {
-  const { anonymity_level, user_id } = userProfile;
+  const { anonymity_level } = userProfile;
   
   // Get user role from the users table (would need to join in real implementation)
   // For now, assume citizen role for anonymous users

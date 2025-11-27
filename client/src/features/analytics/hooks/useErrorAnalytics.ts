@@ -28,7 +28,7 @@ import {
   selectLastRefresh,
   selectIsRealTimeEnabled,
   selectConnectionStatus,
-} from '../../../store/slices/errorAnalyticsSlice';
+} from '@client/store/slices/errorAnalyticsSlice';
 import { useWebSocket } from '@client/hooks/use-websocket';
 
 interface UseErrorAnalyticsOptions {

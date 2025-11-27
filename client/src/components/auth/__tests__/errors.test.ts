@@ -22,7 +22,7 @@ import {
   getErrorMessage,
   getErrorDetails,
   getUserFriendlyMessage
-} from '../errors';
+} from '@client/errors';
 
 describe('Auth Errors', () => {
   describe('AuthError base class', () => {

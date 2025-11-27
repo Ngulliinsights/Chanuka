@@ -12,13 +12,13 @@ import {
   screen,
   waitFor,
   userEvent
-} from '../../test-utils/comprehensive-test-setup';
+} from '@client/test-utils/comprehensive-test-setup';
 import { BillCard } from '@client/components/bills/BillCard';
 import { BillsDashboard } from '@client/components/bills/bills-dashboard';
 import { IntelligentSearchPage } from '@client/pages/IntelligentSearchPage';
 import { ExpertBadge } from '@client/components/verification/ExpertBadge';
 import { DiscussionThread } from '@client/components/community/DiscussionThread';
-import { App } from '../../App';
+import { App } from '@client/App';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);

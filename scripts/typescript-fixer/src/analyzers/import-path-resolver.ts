@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { ProjectStructure } from '../types/core';
+import { ProjectStructure } from '@shared/types/core';
 
 /**
  * Result of import path resolution

@@ -10,7 +10,7 @@ import {
   VisualTestUtils,
   screen,
   waitFor
-} from '../../test-utils/comprehensive-test-setup';
+} from '@client/test-utils/comprehensive-test-setup';
 import { BillCard } from '@client/components/bills/BillCard';
 import { BillsDashboard } from '@client/components/bills/bills-dashboard';
 import { IntelligentSearchPage } from '@client/pages/IntelligentSearchPage';

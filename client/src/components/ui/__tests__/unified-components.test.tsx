@@ -35,7 +35,7 @@ import {
   UnifiedToolbar,
   UnifiedToolbarButton,
   UnifiedToolbarSeparator
-} from '../unified-components';
+} from '@client/unified-components';
 import { renderWithWrapper, spyOnConsole } from '@client/test-utils';
 
 // Mock dependencies

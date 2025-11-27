@@ -19,7 +19,7 @@ import {
 import {
   MobileTouchHandler,
   MobileTouchUtils,
-} from "../../utils/mobile-touch-handler";
+} from '@client/utils/mobile-touch-handler';
 import { Link, useLocation } from "react-router-dom";
 import { logger } from '@client/utils/logger';
 

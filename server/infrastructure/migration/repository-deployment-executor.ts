@@ -16,7 +16,7 @@ import {
   AsyncServiceResult,
   withResultHandling,
   ResultAdapter
-} from '../errors/result-adapter.js';
+} from '@shared/errors/result-adapter.js';
 
 export interface RepositoryDeploymentConfig {
   rolloutPercentage: number;

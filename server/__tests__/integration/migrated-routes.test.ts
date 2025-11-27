@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 import { migratedBillsRouter } from '@server/features/bills/presentation/bills-router-migrated.ts';
-import { boomErrorMiddleware, errorContextMiddleware } from '../../middleware/boom-error-middleware.js';
+import { boomErrorMiddleware, errorContextMiddleware } from '@server/middleware/boom-error-middleware.js';
 
 // Mock the bill service
 vi.mock('../../features/bills/application/bills.js', () => ({

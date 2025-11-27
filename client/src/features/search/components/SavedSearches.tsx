@@ -30,7 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useSavedSearches } from '../hooks/useSearch';
 import { intelligentSearch } from '../services/intelligent-search';
 import { format } from 'date-fns';
-import type { SavedSearch } from '../types';
+import type { SavedSearch } from '@client/types';
 
 interface SavedSearchesProps {
   onExecuteSearch?: (search: SavedSearch) => void;

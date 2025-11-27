@@ -10,7 +10,7 @@ import type {
   VoteRequest,
   ShareRequest,
   SocialShare
-} from '../types';
+} from '@client/types';
 import type {
   ActivityItem,
   TrendingTopic,

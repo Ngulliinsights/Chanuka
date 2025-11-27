@@ -14,9 +14,9 @@ import {
   normalizeLoadingSize,
   normalizeLoadingType,
   isValidProgressPercentage,
-} from '../validation';
-import { LoadingValidationError } from '../errors';
-import { DEFAULT_LOADING_CONFIG } from '../constants';
+} from '@client/validation';
+import { LoadingValidationError } from '@client/errors';
+import { DEFAULT_LOADING_CONFIG } from '@client/constants';
 
 describe('Loading Validation', () => {
   describe('validateLoadingProgress', () => {

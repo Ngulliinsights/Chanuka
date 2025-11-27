@@ -28,7 +28,7 @@ import {
   CommentSortOption,
   CommentFilterOption,
   ModerationViolationType
-} from '../../types/community';
+} from '@client/types/community';
 
 interface DiscussionThreadProps {
   thread: DiscussionThreadType;

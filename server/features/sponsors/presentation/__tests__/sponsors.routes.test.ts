@@ -3,7 +3,7 @@ import request from 'supertest';
 import express, { Express } from 'express';
 import { sponsorsRouter } from '../sponsors.routes'; // Import the NEW router
 // Mock the NEW repository and analysis service
-import { sponsorRepository } from '../../infrastructure/repositories/sponsors.repository';
+import { sponsorRepository } from '@server/infrastructure/repositories/sponsors.repository';
 import { sponsorConflictAnalysisService } from '../../application/sponsor-conflict-analysis.service';
 import { authenticateToken } from '@/components/auth'; // Mock auth if needed
 import * as schema from '@shared/schema';

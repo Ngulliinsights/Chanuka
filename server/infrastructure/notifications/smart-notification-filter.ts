@@ -3,7 +3,7 @@ import { users, bills, bill_engagement, user_interests, comments, sponsors, bill
 import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 // Import the *combined* preference type, NOT the global one directly
 import type { CombinedBillTrackingPreferences } from './types.js';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 import { getDefaultCache  } from '@shared/core/caching';
 
 // Cache key constants (moved from cache-service.ts)

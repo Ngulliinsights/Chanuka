@@ -1,287 +1,66 @@
 /**
- * Core Utilities - Main Entry Point
- *
- * Consolidated cross-cutting utilities for the Chanuka platform
- * Only exports modules that actually exist (no adapters/legacy code)
+ * Shared Core - Main Export File
  */
 
-// Configuration Management
-import { configManager, getConfig } from './config';
-export {
-  ConfigManager,
-  configManager,
-  getConfig,
-  configSchema,
-  defaultFeatures
-} from './config';
-export type {
-  AppConfig,
-  ConfigLoadOptions,
-  ConfigChangeEvent,
-  FeatureFlagContext,
-  FeatureFlagResult,
-  ConfigValidationResult,
-  DependencyValidationResult
-} from './config/types';
+// Error management
+export * from './observability/error-management/errors/base-error';
+export * from './observability/error-management/errors/specialized-errors';
+export * from './observability/error-management/types';
 
-// Core modules with explicit re-exports to resolve conflicts
+// Logging
+export * from './observability/logging';
 
-// Caching module (primary for caching-related exports)
-export type {
-  CacheOptions,
-  CacheMetrics,
-  CacheEvent,
-  SingleFlightOptions,
-  CacheService
-} from './caching/types';
-export type {
-  CacheHealthStatus
-} from './caching/core/interfaces';
-export {
-  MemoryAdapter
-} from './caching';
+// Types and enums
+export enum ErrorDomain {
+  SYSTEM = 'system',
+  VALIDATION = 'validation',
+  AUTHENTICATION = 'authentication',
+  AUTHORIZATION = 'authorization',
+  DATABASE = 'database',
+  CACHE = 'cache',
+  NETWORK = 'network',
+  EXTERNAL_SERVICE = 'external_service',
+  BUSINESS_LOGIC = 'business_logic',
+  INFRASTRUCTURE = 'infrastructure',
+  SECURITY = 'security',
+  DATA = 'data',
+  INTEGRATION = 'integration'
+}
 
-// Observability module (primary for observability-related exports)
-export type {
-  LogLevel,
-  LogContext,
-  LogMetrics,
-  RequestLogData,
-  DatabaseQueryLogData,
-  CacheOperationLogData,
-  SecurityEventLogData,
-  BusinessEventLogData,
-  PerformanceLogData,
-  StoredLogEntry,
-  LogQueryFilters,
-  LogAggregation,
-  LogRotationConfig,
-  LoggerOptions,
-  ErrorTrackerInterface,
-  LogTransport,
-  LoggerChild
-} from './observability/types';
-export {
-  UnifiedLogger,
-  logger
-} from './observability';
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical'
+}
 
-// Middleware module (primary for middleware-related exports)
-export type {
-  RegularMiddleware,
-  ErrorMiddleware,
-  AnyMiddleware,
-  CacheService as MiddlewareCacheService,
-  ValidationService as MiddlewareValidationService,
-  HealthChecker,
-  HealthStatus as MiddlewareHealthStatus,
-  RateLimitStore as MiddlewareRateLimitStore,
-  ValidationResult as MiddlewareValidationResult
-} from './middleware/types';
-
-// Primitives module
+// Primitives
 export * from './primitives';
 
-// Types module
-export type {
-  FeatureFlagsService,
-  FeatureFlagConfig
-} from './types/feature-flags';
+// Validation - selective exports to avoid conflicts
 export {
-  MockFeatureFlagsService
-} from './types/feature-flags';
+  validateRequest,
+  ValidationError as CoreValidationError
+} from './validation';
 
-// Validation module (primary for validation-related exports)
-export type {
-  ValidationOptions,
-  BatchValidationResult,
-  CachedValidationResult,
-  SchemaRegistration,
-  ValidationContext,
-  ValidationMetrics,
-  ValidationServiceConfig,
-  ValidationErrorDetail,
-  LegacyValidationResult,
-  ValidationResult as ValidationResult
-} from './validation/types';
-export {
-  ValidationError
-} from './validation/types';
+// Utilities
+export * from './utils/api-utils';
+export * from './utils/cache-utils';
+export * from './utils/correlation-id';
 
-// Rate limiting module (primary for rate-limiting-related exports)
-export type {
-  RateLimitOptions,
-  RateLimitResult,
-  RateLimitHeaders,
-  RateLimitBucket,
-  RateLimitData,
-  IRateLimitStore,
-  RateLimitConfig,
-  AIRateLimitOptions
-} from './rate-limiting/types';
-export {
-  RateLimitFactory,
-  AIRateLimiter,
-  RateLimitMiddleware,
-  rateLimitMiddleware
-} from './rate-limiting';
+// Services
+export * from './services';
 
-// Utils module (primary for utility-related exports)
-export * from './utils';
+// Rate limiting
+export * from './rate-limiting';
 
-// Concurrency utilities (migration support)
-export type {
-  RaceConditionPreventionOptions
-} from './utils/concurrency-adapter';
-export {
-  Mutex,
-  Semaphore,
-  ConcurrencyAdapter,
-  globalMutex,
-  apiMutex,
-  cacheMutex,
-  apiSemaphore,
-  fileSemaphore,
-  concurrencyAdapter,
-  cleanup
-} from './utils/concurrency-adapter';
-export {
-  ConcurrencyMigrationRouter,
-  getConcurrencyRouter,
-  setConcurrencyRouter
-} from './utils/concurrency-migration-router';
+// Performance monitoring
+export * from './performance';
 
-// Performance module (primary for performance-related exports)
-export type {
-  PerformanceBudget,
-  CoreWebVitalsBudgets,
-  BundleSizeBudgets,
-  StylingBudgets,
-  PerformanceBudgetConfig
-} from './performance/budgets';
-export {
-  DEFAULT_CORE_WEB_VITALS_BUDGETS,
-  DEFAULT_BUNDLE_SIZE_BUDGETS,
-  DEFAULT_STYLING_BUDGETS,
-  PRODUCTION_BUDGETS,
-  DEVELOPMENT_BUDGETS,
-  getPerformanceBudgets,
-  validateBudgetConfig
-} from './performance/budgets';
-export type {
-  PerformanceMetric,
-  BudgetViolation,
-  PerformanceReport,
-  AlertConfig
-} from './performance/monitoring';
-export {
-  PerformanceMonitoringService,
-  performanceMonitor
-} from './performance/monitoring';
-export type {
-  MethodTimingData,
-  MethodTimingStats,
-  MethodTimingConfig,
-  TimingHandle
-} from './performance/method-timing';
-export {
-  MethodTimingService,
-  methodTimingService,
-  timed,
-  timeMethod,
-  getGlobalMethodTimingService,
-  setGlobalMethodTimingService
-} from './performance/method-timing';
-export type {
-  UnifiedPerformanceMetric,
-  EnvironmentPerformanceReport,
-  PerformanceInsight,
-  CrossEnvironmentComparison,
-  UnifiedMonitoringConfig
-} from './performance/unified-monitoring';
-export {
-  UnifiedPerformanceMonitoringService,
-  unifiedPerformanceMonitor
-} from './performance/unified-monitoring';
-export {
-  createPerformanceMonitor,
-  startPerformanceMonitoring
-} from './performance';
+// Types - selective to avoid conflicts
+export type { Result } from './primitives/types/result';
 
-// Modernization module
-export * from './modernization';
-
-// Testing utilities (development only)
-export type * as Testing from './testing';
-
-// Version information
-export const VERSION = '1.0.0';
-export const CORE_UTILITIES_VERSION = VERSION;
-
-// Feature detection (only for modules that exist)
-export const FEATURES = {
-  CONFIG_MANAGEMENT: true,
-  CACHE_SERVICE: true,
-  OBSERVABILITY: true,
-  VALIDATION_SERVICE: true,
-  RATE_LIMITING: true,
-  PERFORMANCE_TESTING: true,
-  MODERNIZATION_INFRASTRUCTURE: true,
-} as const;
-
-// Logger is already exported from the main shared/core/index.ts file
-
-// Default export for convenience
-export default {
-  configManager,
-  getConfig,
-  VERSION,
-  FEATURES,
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Re-export commonly used types
+export type { BaseError } from './observability/error-management/errors/base-error';
+export type { ValidationError, NetworkError } from './observability/error-management/errors/specialized-errors';
+export type { ApiResponse, ApiError, ErrorResponse } from './utils/api-utils';

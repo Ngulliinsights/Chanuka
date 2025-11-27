@@ -11,7 +11,7 @@ import {
   BundleMetrics,
   CacheMetrics,
   OptimizationRecommendations,
-} from "../../utils/performance-optimizer";
+} from '@client/utils/performance-optimizer';
 
 interface PerformanceMetricsProps {
   showDetails?: boolean;

@@ -14,7 +14,7 @@ import {
   Petition,
   CommunityStats,
   LocalImpactMetrics
-} from '../../types/community';
+} from '@client/types/community';
 import {
   generateId,
   generateDateInRange,
@@ -76,7 +76,7 @@ export const generateActivityItems = (count: number = 50): ActivityItem[] => {
       id: generateId('activity'),
       type,
       userId: user.id,
-      userName: user.name || `${user.first_name} ${user.last_name}`,
+      userName: user.name || `User ${user.id}`,
       userAvatar: (user as any).avatar || faker.image.avatar(),
       expertInfo,
       title: titles[type],

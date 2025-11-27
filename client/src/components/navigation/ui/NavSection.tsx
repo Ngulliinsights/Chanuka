@@ -1,4 +1,4 @@
-import { SECTION_TITLES } from '../constants';
+import { SECTION_TITLES } from '@client/constants';
 import type { NavigationItem, NavigationSection } from '@client/types';
 import { NavLink } from './NavLink';
 

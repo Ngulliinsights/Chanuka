@@ -3,7 +3,7 @@
  * Fallback implementation to avoid complex dynamic imports
  */
 
-import { lazy, Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 // import type { ComponentType } from 'react';
 
 // Simple loading component

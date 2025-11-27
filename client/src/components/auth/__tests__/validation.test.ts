@@ -13,8 +13,8 @@ import {
   safeValidateEmail,
   safeValidatePassword,
   validateField
-} from '../validation';
-import { AuthValidationError } from '../errors';
+} from '@client/validation';
+import { AuthValidationError } from '@client/errors';
 import { TEST_DATA_SETS } from '@/utils/test-utils';
 
 describe('Auth Validation', () => {

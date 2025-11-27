@@ -15,8 +15,8 @@ import {
   CriticalAssetLoader,
   InlineAssetLoader,
   DevAssetLoadingDebug,
-} from '../AssetLoadingIndicator';
-import { LoadingAssetError, LoadingValidationError } from '../errors';
+} from '@client/AssetLoadingIndicator';
+import { LoadingAssetError, LoadingValidationError } from '@client/errors';
 
 // Mock asset loading hook
 const mockUseAssetLoading = {

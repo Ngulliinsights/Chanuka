@@ -1,6 +1,6 @@
 import { billTrackingService } from './services/bill-tracking.js';
 import { db } from '@shared/database/pool.js';
-import { users, bills, user_interests } from '../shared/schema';
+import { users, bills, user_interests } from '@shared/shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '@shared/core';
 

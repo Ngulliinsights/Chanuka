@@ -13,7 +13,7 @@ import type {
   ActionPriority,
   TopicCategory,
   DashboardSection
-} from '../types';
+} from '@client/types';
 
 describe('Dashboard Types', () => {
   describe('ActionItem', () => {

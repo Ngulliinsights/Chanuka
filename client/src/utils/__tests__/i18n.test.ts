@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { en, TranslationKey, Translations } from '../i18n';
+import { en, TranslationKey, Translations } from '@client/i18n';
 
 describe('i18n', () => {
   describe('en translations', () => {

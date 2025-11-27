@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { streamingSearchService } from '../services/streaming-search';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/utils/logger';
-import type { SearchResult, SearchQuery } from '../types';
+import type { SearchResult, SearchQuery } from '@client/types';
 import type {
   StreamingSearchOptions,
   StreamingSearchSession,

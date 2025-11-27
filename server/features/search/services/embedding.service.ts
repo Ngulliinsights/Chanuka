@@ -5,7 +5,7 @@
 // Supports batch processing and error handling with fallback mechanisms
 
 import OpenAI from 'openai';
-import { cacheService } from '../infrastructure/cache/cache-service';
+import { cacheService } from '@shared/infrastructure/cache/cache-service';
 import { database } from '@shared/database';
 import { content_embeddings, ContentType, ProcessingStatus } from '@shared/schema/search_system';
 import { eq, and, sql } from 'drizzle-orm';

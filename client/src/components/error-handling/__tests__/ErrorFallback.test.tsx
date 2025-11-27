@@ -14,7 +14,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { ErrorFallback, ApiErrorFallback, ComponentErrorFallback } from '../ErrorFallback';
+import { ErrorFallback, ApiErrorFallback, ComponentErrorFallback } from '@client/ErrorFallback';
 import { logger } from '@client/utils/logger';
 
 // Mock window.location

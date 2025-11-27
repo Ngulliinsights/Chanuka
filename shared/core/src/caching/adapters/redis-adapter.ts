@@ -8,7 +8,7 @@
 import Redis, { RedisOptions } from 'ioredis';
 import { gzip, gunzip } from 'zlib';
 import { promisify } from 'util';
-import { BaseCacheAdapter } from '/core/base-adapter';
+import { BaseCacheAdapter } from '../core/base-adapter';
 import type {
   CacheAdapterConfig,
   CacheHealthStatus

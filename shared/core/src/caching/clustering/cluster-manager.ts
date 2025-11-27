@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-import type { CacheAdapter } from '/core/interfaces';
+import type { CacheAdapter } from '../core/interfaces';
 
 export interface ClusterNode {
   id: string;
@@ -55,7 +55,7 @@ export class CacheClusterManager extends EventEmitter {
   /**
    * Wrap an adapter with cluster functionality
    */
-  async wrapAdapter(adapter: CacheAdapter, name: string): Promise<CacheAdapter> {
+  async wrapAdapter(adapter: CacheAdapter, _name: string): Promise<CacheAdapter> {
     // In a real implementation, this would create a cluster-aware adapter
     // For now, return the original adapter
     return adapter;
@@ -142,7 +142,7 @@ export class CacheClusterManager extends EventEmitter {
     if (!this.options.consistentHashing) {
       // Simple round-robin or random selection
       const index = this.hashKey(key) % activeNodes.length;
-      return activeNodes[index];
+      return activeNodes[index] || null;
     }
 
     // Simplified consistent hashing
@@ -158,7 +158,7 @@ export class CacheClusterManager extends EventEmitter {
     }
 
     // Wrap around to first node
-    return sortedNodes[0];
+    return sortedNodes[0] || null;
   }
 
   /**
@@ -207,7 +207,7 @@ export class CacheClusterManager extends EventEmitter {
   /**
    * Ping a node to check if it's healthy
    */
-  private async pingNode(node: ClusterNode): Promise<boolean> {
+  private async pingNode(_node: ClusterNode): Promise<boolean> {
     // In a real implementation, you'd make an HTTP request or TCP connection
     // For now, simulate a health check
     return new Promise((resolve) => {
@@ -237,7 +237,7 @@ export class CacheClusterManager extends EventEmitter {
   async shutdown(): Promise<void> {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
-      this.healthCheckInterval = undefined;
+      this.healthCheckInterval = null as any;
     }
 
     this.emit('cluster:event', {

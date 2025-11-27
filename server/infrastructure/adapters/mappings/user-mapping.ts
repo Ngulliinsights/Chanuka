@@ -7,7 +7,7 @@
 
 import { User } from '@/features/users/domain/entities/user';
 import { users } from '@shared/schema';
-import { EntityMapping } from '../drizzle-adapter';
+import { EntityMapping } from '@shared/drizzle-adapter';
 
 type UserRow = typeof users.$inferSelect;
 

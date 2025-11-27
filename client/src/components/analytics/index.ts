@@ -26,7 +26,7 @@ export type {
   UserEngagementProfile,
   EngagementNotification,
   AnalyticsExportData
-} from '../../types/engagement-analytics';
+} from '@client/types/engagement-analytics';
 
 // Re-export hooks
 export { useRealTimeEngagement, generateMockEngagementData } from '../../hooks/useRealTimeEngagement';

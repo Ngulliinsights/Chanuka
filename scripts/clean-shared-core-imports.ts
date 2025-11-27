@@ -81,8 +81,8 @@ async function cleanSharedCoreImports(): Promise<void> {
       }
       
       // Fix specific known issues
-      if (content.includes("from '../health'")) {
-        content = content.replace(/from ['"]\.\.\/health['"];?/g, "from '../observability/health';");
+      if (content.includes("from '@shared/health'")) {
+        content = content.replace(/from ['"]\.\.\/health['"];?/g, "from '@shared/observability/health';");
         modified = true;
       }
       

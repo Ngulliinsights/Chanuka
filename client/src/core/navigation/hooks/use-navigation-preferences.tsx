@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { logger } from '@/utils/logger';
-import { useNavigation } from '../context';
+import { useNavigation } from '@client/context';
 import { NavigationPreferences } from '@client/types/navigation';
 
 const PREFERENCES_STORAGE_KEY = 'navigation-preferences';

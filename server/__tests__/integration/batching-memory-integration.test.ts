@@ -5,8 +5,8 @@
 // Verifies memory optimization triggers and message batching efficiency
 
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
-import { BatchingService, BatchableMessage } from '../../infrastructure/batching-service.js';
-import { MemoryAwareSocketService } from '../../infrastructure/memory-aware-socket-service.js';
+import { BatchingService, BatchableMessage } from '@server/infrastructure/batching-service.js';
+import { MemoryAwareSocketService } from '@server/infrastructure/memory-aware-socket-service.js';
 import { logger } from '@shared/core/src/observability/logging/index.js';
 
 describe('Batching & Memory Integration Tests', () => {

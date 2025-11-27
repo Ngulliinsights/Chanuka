@@ -1,10 +1,7 @@
-// Global test setup
-import { beforeAll, afterAll } from 'vitest';
+// =============================================================================
+// GLOBAL VITEST SETUP
+// Configures global test environment for all modules
+// =============================================================================
 
-beforeAll(() => {
-  // Setup global test environment
-});
-
-afterAll(() => {
-  // Cleanup global test environment
-});
+// Import unified test environment setup
+import './tests/setup/test-environment';

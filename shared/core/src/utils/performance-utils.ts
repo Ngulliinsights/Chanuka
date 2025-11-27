@@ -99,8 +99,8 @@ export class PerformanceMonitor {
       value,
       unit,
       timestamp: Date.now(),
-      tags,
-      metadata
+      ...(tags && { tags }),
+      ...(metadata && { metadata })
     };
 
     this.metrics.push(metric);
@@ -132,9 +132,9 @@ export class PerformanceMonitor {
       endpoint,
       statusCode,
       responseTime,
-      requestSize,
-      responseSize,
-      tags
+      ...(requestSize !== undefined && { requestSize }),
+      ...(responseSize !== undefined && { responseSize }),
+      ...(tags && { tags })
     };
 
     this.apiMetrics.push(metric);
@@ -289,7 +289,7 @@ export class PerformanceMonitor {
     };
   }
 
-  private checkThresholds(metric: PerformanceMetric): void {
+  private checkThresholds(_metric: PerformanceMetric): void {
     // Implement threshold checking logic here
     // This could be extended based on specific metric types
   }

@@ -24,12 +24,12 @@ export {
   ROLES,
   RESOURCES,
   ACTIONS
-} from '../../utils/rbac';
+} from '@client/utils/rbac';
 
 // Re-export auth services
-export { authService } from '../../services/authService';
-export { tokenManager } from '../../utils/tokenManager';
-export { sessionManager } from '../../utils/session-manager';
+export { authService } from '@client/services/authService';
+export { tokenManager } from '@client/utils/tokenManager';
+export { sessionManager } from '@client/utils/session-manager';
 
 // Re-export auth types
 export type { 
@@ -42,8 +42,8 @@ export type {
   SessionInfo,
   SecurityEvent,
   SuspiciousActivityAlert
-} from '../../types/auth';
+} from '@client/types/auth';
 
 // Re-export middleware
-export { authMiddleware, createAuthMiddleware } from '../../store/middleware/authMiddleware';
-export type { AuthMiddlewareConfig } from '../../store/middleware/authMiddleware';
+export { authMiddleware, createAuthMiddleware } from '@client/store/middleware/authMiddleware';
+export type { AuthMiddlewareConfig } from '@client/store/middleware/authMiddleware';

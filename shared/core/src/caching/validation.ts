@@ -1,8 +1,8 @@
 // Cache migration validation utilities
 // Validates behavior equivalence between legacy and modern cache implementations
 
-import { CacheService } from '/types';
-import { logger } from '../observability/logging';
+import { CacheService } from './types';
+import { logger as _logger } from '../observability/logging';
 
 export interface CacheValidationResult {
   test: string;

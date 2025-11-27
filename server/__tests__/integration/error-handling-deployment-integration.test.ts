@@ -12,11 +12,11 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
-import { errorHandlingDeploymentService } from '../../infrastructure/migration/error-handling-deployment.service.js';
-import { featureFlagsService } from '../../infrastructure/migration/feature-flags.service.js';
-import { abTestingService } from '../../infrastructure/migration/ab-testing.service.js';
-import { boomErrorMiddleware, errorContextMiddleware } from '../../middleware/boom-error-middleware.js';
-import { errorAdapter } from '../../infrastructure/errors/error-adapter.js';
+import { errorHandlingDeploymentService } from '@server/infrastructure/migration/error-handling-deployment.service.js';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service.js';
+import { abTestingService } from '@server/infrastructure/migration/ab-testing.service.js';
+import { boomErrorMiddleware, errorContextMiddleware } from '@server/middleware/boom-error-middleware.js';
+import { errorAdapter } from '@server/infrastructure/errors/error-adapter.js';
 import * as Boom from '@hapi/boom';
 
 describe('Error Handling Deployment Integration', () => {

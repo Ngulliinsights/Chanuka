@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import * as path from 'path';
-import { TypeScriptError, ProjectStructure, ProcessingContext } from '../types/core';
+import { TypeScriptError, ProjectStructure, ProcessingContext } from '@shared/types/core';
 
 /**
  * Represents a detected schema import issue

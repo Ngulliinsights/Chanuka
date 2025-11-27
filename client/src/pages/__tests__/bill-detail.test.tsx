@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import BillDetail from '../bill-detail';
+import BillDetail from '@client/bill-detail';
 
 describe('BillDetail', () => {
   const renderBillDetail = (billId = '123') => {

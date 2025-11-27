@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 
 /**
  * Validation Metrics Collector Service

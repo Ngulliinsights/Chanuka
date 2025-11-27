@@ -13,7 +13,9 @@
  * - Better async handling
  */
 
-import { logger, ErrorDomain, ErrorSeverity } from './logger';
+import React from 'react';
+import { logger } from './logger';
+import { ErrorDomain, ErrorSeverity} from '../core/error/index';
 import { tokenStorage } from './secure-storage';
 
 // Advanced error handling modules - lazy loaded to avoid circular dependencies
@@ -55,7 +57,7 @@ const loadAdvancedModules = async () => {
 // Type Definitions (using existing logger types where possible)
 // ============================================================================
 
-export { ErrorDomain, ErrorSeverity } from './logger';
+export { ErrorDomain, ErrorSeverity };
 
 export interface ErrorContext {
   component?: string;

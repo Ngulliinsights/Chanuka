@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { ExpertBadge, ExpertBadgeGroup } from '../ExpertBadge';
+import { ExpertBadge, ExpertBadgeGroup } from '@client/ExpertBadge';
 
 describe('ExpertBadge', () => {
   it('renders official expert badge correctly', () => {

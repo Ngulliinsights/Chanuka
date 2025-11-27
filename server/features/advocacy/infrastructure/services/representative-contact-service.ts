@@ -7,7 +7,7 @@
 // ============================================================================
 
 import { RepresentativeContact } from '@server/types/index.ts';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // ============================================================================
 // Configuration Types

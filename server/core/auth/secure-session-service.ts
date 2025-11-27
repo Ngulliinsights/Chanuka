@@ -5,7 +5,7 @@ import { sessions, users } from '@shared/schema';
 import { eq, and, lt, gt } from 'drizzle-orm';
 import { encryptionService } from '@server/features/security/encryption-service.ts';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Get database instance
 const db = getLegacyDatabase();

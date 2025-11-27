@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
-import { NotificationService, NotificationServiceClass } from '../../infrastructure/notifications/notification-service';
-import { notificationChannelService } from '../../infrastructure/notifications/notification-channels';
+import { NotificationService, NotificationServiceClass } from '@server/infrastructure/notifications/notification-service';
+import { notificationChannelService } from '@server/infrastructure/notifications/notification-channels';
 import { database as db } from '@shared/database/connection';
 import { users, user_profiles, notifications } from '@shared/schema';
 import { eq } from 'drizzle-orm';

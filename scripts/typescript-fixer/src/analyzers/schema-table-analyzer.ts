@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { ProjectStructure } from '../types/core';
+import { ProjectStructure } from '@shared/types/core';
 
 /**
  * Represents a schema table usage found in code

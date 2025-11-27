@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { OfflineIndicator } from '../OfflineIndicator';
+import { OfflineIndicator } from '@client/OfflineIndicator';
 
 // Mock dependencies
 jest.mock('../../utils/logger', () => ({

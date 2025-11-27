@@ -1,19 +1,19 @@
-import { SearchCache } from '../infrastructure/SearchCache';
-import { SearchIndexManager } from '../infrastructure/SearchIndexManager';
-import { suggestionEngineService } from '../engines/suggestion/suggestion-engine.service';
-import { SearchAnalytics, SearchMetrics } from '../domain/SearchAnalytics';
-import { SearchValidator } from '../domain/SearchValidator';
-import { queryIntentService } from '../domain/QueryIntentService';
-import { typoCorrectionService } from '../domain/TypoCorrectionService';
-import { dualEngineOrchestrator } from '../engines/dual-engine-orchestrator';
-import { logger   } from '@shared/core/src/index.js';
+import { SearchCache } from '@shared/infrastructure/SearchCache';
+import { SearchIndexManager } from '@shared/infrastructure/SearchIndexManager';
+import { suggestionEngineService } from '@shared/engines/suggestion/suggestion-engine.service';
+import { SearchAnalytics, SearchMetrics } from '@shared/domain/SearchAnalytics';
+import { SearchValidator } from '@shared/domain/SearchValidator';
+import { queryIntentService } from '@shared/domain/QueryIntentService';
+import { typoCorrectionService } from '@shared/domain/TypoCorrectionService';
+import { dualEngineOrchestrator } from '@shared/engines/dual-engine-orchestrator';
+import { logger   } from '@shared/core/index.js';
 import type { Request, Response } from 'express';
 import type {
   SearchQuery,
   SearchResponseDto,
   SearchResultDto,
   PlainBill,
-} from '../domain/search.dto';
+} from '@shared/domain/search.dto';
 
 // Define types for better type safety
 interface OrchestratorResult {

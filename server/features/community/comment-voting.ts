@@ -1,10 +1,10 @@
-import { databaseService } from '../../infrastructure/database/database-service';
-import { db } from '@chanuka/shared/schema';
-import { comments, comment_votes } from '@chanuka/shared/schema';
+import { databaseService } from '@server/infrastructure/database/database-service';
+import { db } from '@shared/schema';
+import { comments, comment_votes } from '@shared/schema';
 import { eq, and, sql, desc } from 'drizzle-orm';
-import { cacheService } from '../../infrastructure/cache/cache-service';
-import { CACHE_KEYS } from '@chanuka/shared/core/index';
-import { CACHE_TTL_SHORT } from '@chanuka/shared/core/src/primitives';
+import { cacheService } from '@server/infrastructure/cache/cache-service';
+import { CACHE_KEYS } from '@shared/core/index';
+import { CACHE_TTL_SHORT } from '@shared/core/primitives';
 
 export interface VoteResult {
   success: boolean;

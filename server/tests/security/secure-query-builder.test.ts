@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { secureQueryBuilder } from '../../infrastructure/security/secure-query-builder.js';
+import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder.js';
 
 describe('SecureQueryBuilder', () => {
   describe('validateInputs', () => {

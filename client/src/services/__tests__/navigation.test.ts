@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { navigationService, BrowserNavigationService, NavigationService } from '../navigation';
+import { navigationService, BrowserNavigationService, NavigationService } from '@client/navigation';
 
 // Mock window.location
 const mockLocation = {

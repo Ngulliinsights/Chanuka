@@ -14,7 +14,7 @@ import {
   ErrorCode,
   ErrorDomain,
   ErrorSeverity
-} from '../index';
+} from '@client/index';
 
 export interface UseApiOptions extends Omit<RequestOptions, 'method'> {
   enabled?: boolean;

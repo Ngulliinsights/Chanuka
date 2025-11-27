@@ -11,20 +11,20 @@ import type {
   UseDashboardResult,
   ActionItem,
   TrackedTopic 
-} from '../types';
+} from '@client/types';
 import { 
   validateDashboardData, 
   validateActionItem, 
   validateTrackedTopic,
   safeValidateDashboardConfig 
-} from '../validation';
+} from '@client/validation';
 import { 
   DashboardError, 
   DashboardDataFetchError, 
   DashboardActionError,
   DashboardTopicError 
-} from '../errors';
-import { getRecoveryStrategy, executeRecovery } from '../recovery';
+} from '@client/errors';
+import { getRecoveryStrategy, executeRecovery } from '@client/recovery';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds

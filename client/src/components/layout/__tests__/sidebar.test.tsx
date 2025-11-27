@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { Sidebar } from '../sidebar';
+import { Sidebar } from '@client/sidebar';
 
 // Mock dependencies
 jest.mock('../../../lib/utils', () => ({

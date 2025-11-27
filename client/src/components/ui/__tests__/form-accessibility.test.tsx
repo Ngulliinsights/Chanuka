@@ -14,7 +14,7 @@ import {
   RequiredFieldIndicator,
   AccessibleForm,
   useFormKeyboardNavigation
-} from '../form-accessibility';
+} from '@client/form-accessibility';
 
 describe('ScreenReaderAnnouncement', () => {
   it('renders with polite priority by default', () => {

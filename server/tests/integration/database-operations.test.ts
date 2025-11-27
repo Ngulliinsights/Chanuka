@@ -14,7 +14,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
-import { databaseService } from '../../infrastructure/database/database-service.js';
+import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { logger  } from '@shared/core/src/index.js';
 
 describe('Database Operations Integration Tests', () => {

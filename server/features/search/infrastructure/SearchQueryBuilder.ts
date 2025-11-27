@@ -3,7 +3,7 @@ import { bills } from '@shared/schema';
 
 // Alias for backward compatibility
 const bills = bill;
-import type { SearchFilters } from '../domain/search.dto';
+import type { SearchFilters } from '@shared/domain/search.dto';
 
 export class SearchQueryBuilder {
   static buildVector(query: string, type: 'simple' | 'phrase' | 'boolean' = 'simple'): SQL | undefined {

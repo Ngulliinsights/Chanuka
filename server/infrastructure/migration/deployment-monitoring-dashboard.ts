@@ -4,7 +4,7 @@ import { logger } from '@/shared/core';
 import {
   AsyncServiceResult,
   withResultHandling
-} from '../errors/result-adapter.js';
+} from '@shared/errors/result-adapter.js';
 
 export interface DashboardMetrics {
   deployment: {

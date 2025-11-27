@@ -1,11 +1,11 @@
 
-import { databaseService } from '../../infrastructure/database/database-service.js';
+import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { database as db } from '@shared/database';
 import { comments } from '@shared/schema/citizen_participation';
 import { users, user_profiles } from '@shared/schema/foundation';
 import { bills } from '@shared/schema/foundation';
 import { eq, and, desc, asc, sql, count, isNull, or, inArray } from 'drizzle-orm';
-import { cacheService } from '../../infrastructure/cache/cache-service';
+import { cacheService } from '@server/infrastructure/cache/cache-service';
 import { cacheKeys } from '@shared/core/caching/key-generator';
 import { logger } from '@/shared/core';
 

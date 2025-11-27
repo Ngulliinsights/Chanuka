@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useOfflineDetection } from '../useOfflineDetection';
+import { useOfflineDetection } from '@client/useOfflineDetection';
 
 // Mock fetch globally
 const mockFetch = vi.fn();

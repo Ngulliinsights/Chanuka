@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SharedErrorDisplay, ErrorDisplayConfig } from '@client/components/error-handling/utils/shared-error-display';
-import type { Bill, BillsQueryParams } from '../types';
+import type { Bill, BillsQueryParams } from '@client/types';
 
 interface BillListProps {
   bill: Bill[];

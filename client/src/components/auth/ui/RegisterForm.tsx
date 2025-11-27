@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { Mail, Eye, User, Shield, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { RegisterFormProps, RegisterFormData } from '../types';
+import { RegisterFormProps, RegisterFormData } from '@client/types';
 import { useRegisterForm } from '../hooks/useRegisterForm';
 import { AuthInput } from './AuthInput';
 import { SubmitButton } from './AuthButton';

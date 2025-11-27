@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import { router as externalApiManagementRouter } from '../../infrastructure/monitoring/external-api-management';
+import { router as externalApiManagementRouter } from '@server/infrastructure/monitoring/external-api-management';
 
 // Mock fetch globally
 global.fetch = vi.fn();

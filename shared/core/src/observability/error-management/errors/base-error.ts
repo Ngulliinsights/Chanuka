@@ -94,7 +94,7 @@ export class BaseError extends Error {
   public readonly details: Record<string, any> | undefined;
   public readonly isOperational: boolean;
   public readonly metadata: ErrorMetadata;
-  public readonly cause?: Error;
+  public override readonly cause?: Error | undefined;
 
   // Cache for computed properties
   private _userMessage?: string;

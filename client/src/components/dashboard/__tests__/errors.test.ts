@@ -12,7 +12,7 @@ import {
   DashboardActionError,
   DashboardTopicError,
   DashboardErrorType
-} from '../errors';
+} from '@client/errors';
 
 describe('Dashboard Errors', () => {
   describe('DashboardError', () => {

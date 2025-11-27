@@ -13,8 +13,8 @@ import {
   safeValidateActionItem,
   safeValidateTrackedTopic,
   safeValidateDashboardConfig
-} from '../validation';
-import { DashboardValidationError } from '../errors';
+} from '@client/validation';
+import { DashboardValidationError } from '@client/errors';
 
 describe('Dashboard Validation', () => {
   describe('validateActionItem', () => {

@@ -13,8 +13,8 @@ import { Server } from 'http';
 import { io as SocketIOClient, Socket as ClientSocket } from 'socket.io-client';
 import * as jwt from 'jsonwebtoken';
 import { logger } from '@shared/core/observability/logging';
-import { BatchingService } from '../infrastructure/batching-service.js';
-import { webSocketService } from '../infrastructure/websocket.js';
+import { BatchingService } from '@shared/infrastructure/batching-service.js';
+import { webSocketService } from '@shared/infrastructure/websocket.js';
 
 interface PerformanceMetrics {
   messageDeliveryRate: number;

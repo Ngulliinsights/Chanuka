@@ -13,14 +13,14 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { 
 import { logger } from '../../logger';
-  isNavigationPathActive, 
+import {
+  isNavigationPathActive,
   getActiveStateClasses,
   getActiveIconClasses,
   getActiveTextClasses,
   getRoleBasedActiveClasses
-} from '../active-state';
+} from '@client/active-state';
 
 describe('Active State Utilities', () => {
   describe('isNavigationPathActive', () => {

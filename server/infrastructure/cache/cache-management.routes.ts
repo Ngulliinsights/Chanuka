@@ -5,7 +5,7 @@
 
 import { Router } from 'express';
 import { serverCache } from './cache-service';
-import { cacheMiddleware } from '../../middleware/cache-middleware';
+import { cacheMiddleware } from '@server/middleware/cache-middleware';
 
 const router = Router();
 

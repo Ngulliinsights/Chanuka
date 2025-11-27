@@ -3,7 +3,7 @@ import {
   RepositoryDeploymentExecutor,
   createRepositoryDeploymentExecutor,
   executeRepositoryDeploymentTask
-} from '../../infrastructure/migration/repository-deployment-executor.js';
+} from '@server/infrastructure/migration/repository-deployment-executor.js';
 
 // Mock the database service to avoid schema import issues
 vi.mock('../../infrastructure/database/database-service.js', () => ({

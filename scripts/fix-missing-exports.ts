@@ -25,7 +25,7 @@ function fixValidationImports(): void {
   complianceCheck, social_share, verification, user_progress, comments,
   bill_sponsorship, comment_votes, bill_tag, user_interest,
   content_report // <-- REFINED: Replaces contentFlag, moderationFlag, moderationQueue
- } from '../shared/schema';`;
+ } from '@shared/shared/schema';`;
 
   const newImport = `import {
   users, user_profiles, bills, sponsors, notifications,

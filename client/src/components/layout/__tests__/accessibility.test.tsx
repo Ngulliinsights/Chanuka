@@ -3,9 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AppLayout from '../app-layout';
-import { MobileHeader } from '../mobile-header';
-import { Sidebar } from '../sidebar';
+import AppLayout from '@client/app-layout';
+import { MobileHeader } from '@client/mobile-header';
+import { Sidebar } from '@client/sidebar';
 import { LayoutConfig } from '@client/types';
 
 // Mock axe-core for accessibility testing

@@ -22,8 +22,8 @@ import {
   executeRepositoryDeploymentTask,
   createRepositoryDeploymentExecutor,
   RepositoryDeploymentExecutor
-} from '../server/infrastructure/migration/repository-deployment-executor.js';
-import { logger } from '../shared/core/index.js';
+} from '@shared/server/infrastructure/migration/repository-deployment-executor.js';
+import { logger } from '@shared/shared/core/index.js';
 
 interface DeploymentOptions {
   rolloutPercentage: number;

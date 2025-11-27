@@ -4,8 +4,8 @@
  */
 
 import type { DashboardConfig, DashboardSection } from '@client/types';
-import { validateDashboardConfig } from '../validation';
-import { DashboardConfigurationError } from '../errors';
+import { validateDashboardConfig } from '@client/validation';
+import { DashboardConfigurationError } from '@client/errors';
 import { dashboardConstants } from './dashboard-constants';
 
 /**

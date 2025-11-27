@@ -13,7 +13,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { PageRelationshipUtils } from '../page-relationship-utils';
+import { PageRelationshipUtils } from '@client/page-relationship-utils';
 import { logger } from '../../logger';
 
 describe('PageRelationshipUtils', () => {

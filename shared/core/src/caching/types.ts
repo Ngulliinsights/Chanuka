@@ -5,7 +5,7 @@
  * Based on consolidation of existing implementations and refined_cross_cutting.ts patterns
  */
 
-import type { CacheMetrics, CacheHealthStatus } from '/core/interfaces';
+import type { CacheMetrics, CacheHealthStatus } from './core/interfaces';
 
 // Core cache service interface
 export interface CacheService {
@@ -135,7 +135,7 @@ export interface SingleFlightOptions {
 }
 
 // Multi-tier cache promotion strategy
-export type PromotionStrategy = 'lru' | 'frequency' | 'size' | 'hybrid';
+export type PromotionStrategy = 'lru' | 'frequency' | 'size' | 'hybrid' | 'ttl';
 
 // Multi-tier cache options
 export interface MultiTierOptions {
@@ -157,11 +157,14 @@ export interface CompressionOptions {
 
 // Cache serialization options
 export interface SerializationOptions {
-  enableBinaryMode: boolean;
-  customSerializer?: {
-    serialize: (data: any) => string | Buffer;
-    deserialize: (data: string | Buffer) => any;
-  };
+   format?: 'json' | 'msgpack' | 'binary';
+   preserveTypes?: boolean;
+   dateHandling?: 'iso' | 'timestamp' | 'preserve';
+   enableBinaryMode?: boolean;
+   customSerializer?: {
+     serialize: (data: any) => string | Buffer;
+     deserialize: (data: string | Buffer) => any;
+   };
 }
 
 // Cache warming strategy

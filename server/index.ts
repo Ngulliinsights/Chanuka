@@ -45,6 +45,7 @@ import { router as recommendationRouter } from '@server/features/recommendation/
 import { migratedApiRateLimit } from './middleware/migration-wrapper.js';
 import { enhancedSecurityService } from '@server/features/security/enhanced-security-service';
 import { SecuritySchemas, createValidationMiddleware } from '@server/core/validation/security-schemas';
+import { commandInjectionPrevention, fileUploadSecurity, securityRateLimit } from './middleware/command-injection-prevention.js';
 
 // Infrastructure Services
 import { auditMiddleware } from './infrastructure/monitoring/audit-log.js';
@@ -239,6 +240,20 @@ app.use(performanceMiddleware);
 app.use(migratedApiRateLimit);
 app.use(auditMiddleware);
 app.use(securityMonitoringMiddleware.initializeAll());
+
+// Command injection prevention middleware (strict mode for production)
+app.use(commandInjectionPrevention({
+  mode: isDevelopment ? 'sanitize' : 'strict',
+  whitelist: ['/api/health', '/api/frontend-health', '/api/service-status'],
+  maxViolations: 10
+}));
+
+// File upload security middleware
+app.use(fileUploadSecurity({
+  allowedExtensions: ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx', '.txt'],
+  maxFileSize: 10 * 1024 * 1024, // 10MB
+  scanContent: true
+}));
 
 // Enhanced security middleware
 app.use(enhancedSecurityService.csrfProtection());
@@ -456,6 +471,25 @@ app.get('/api/debug/memory-analysis', (req: Request, res: Response) => {
   }
 });
 
+// Security-sensitive endpoints with additional rate limiting
+app.use('/api/auth', securityRateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 5, // 5 auth attempts per 15 minutes
+  skipSuccessfulRequests: true
+}), authRouter);
+
+app.use('/api/admin', securityRateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  maxRequests: 10, // 10 admin requests per 5 minutes
+  skipSuccessfulRequests: false
+}), adminRouter);
+
+app.use('/api/verification', securityRateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  maxRequests: 3, // 3 verification attempts per 10 minutes
+  skipSuccessfulRequests: true
+}), verificationRouter);
+
 // API Routes registration
 app.use('/api/system', systemRouter);
 app.use('/api/bills', billsRouter);
@@ -465,14 +499,11 @@ app.use('/api/analysis', analysisRouter);
 app.use('/api/bill-tracking', billTrackingRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/sponsors', sponsorsRouter);
-app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/verification', verificationRouter);
 app.use('/api/community', communityRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/privacy', privacyRouter);
-app.use('/api/admin', adminRouter);
 app.use('/api/cache', cacheRouter);
 app.use('/api/external-api', externalApiManagementRouter);
 app.use('/api/admin/external-api', externalApiDashboardRouter);

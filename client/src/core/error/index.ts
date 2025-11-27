@@ -45,13 +45,13 @@ export {
 
 export {
   ErrorBoundary as EnhancedErrorBoundary,
-} from '../../components/error-handling';
+} from '@client/components/error-handling';
 
 // ============================================================================
 // Error Fallback Components
 // ============================================================================
 
-export { ErrorFallback } from '../../components/error-handling';
+export { ErrorFallback } from '@client/components/error-handling';
 
 // ============================================================================
 // Recovery Strategies

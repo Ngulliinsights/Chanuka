@@ -1,11 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
 // Import the NEW comprehensive analysis service
-import { billComprehensiveAnalysisService } from '../application/bill-comprehensive-analysis.service.js';
+import { billComprehensiveAnalysisService } from '@shared/application/bill-comprehensive-analysis.service.js';
 // Import repository for fetching historical data
-import { analysisService } from '../application/analysis-service-direct.js';
+import { analysisService } from '@shared/application/analysis-service-direct.js';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js'; // Use if auth needed
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 import { z } from 'zod';
 
 const router = Router();

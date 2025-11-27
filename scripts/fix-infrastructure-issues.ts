@@ -58,18 +58,18 @@ class InfrastructureFixer {
       let modified = false;
 
       // This is the ONLY import path that should be changed - it's importing from the wrong location
-      if (content.includes("import * as schema from '../types';")) {
+      if (content.includes("import * as schema from '@shared/types';")) {
         content = content.replace(
-          "import * as schema from '../types';",
-          "import * as schema from '../schema';"
+          "import * as schema from '@shared/types';",
+          "import * as schema from '@shared/schema';"
         );
         modified = true;
       }
 
-      if (content.includes("export * from '../types';")) {
+      if (content.includes("export * from '@shared/types';")) {
         content = content.replace(
-          "export * from '../types';",
-          "export * from '../schema';"
+          "export * from '@shared/types';",
+          "export * from '@shared/schema';"
         );
         modified = true;
       }

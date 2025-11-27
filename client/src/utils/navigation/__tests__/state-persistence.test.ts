@@ -13,8 +13,8 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { NavigationStatePersistence } from '../state-persistence';
-import { NavigationState, NavigationPreferences } from '@/components/navigation';
+import { NavigationStatePersistence } from '@client/state-persistence';
+import { NavigationState, NavigationPreferences } from '../../../../types/navigation';
 import { logger } from '../../logger';
 
 // Mock localStorage

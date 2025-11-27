@@ -19,7 +19,7 @@ import {
   ContributionQualityMetrics,
   CommunityImpactMetrics,
   EngagementTrend
-} from '../../types/engagement-analytics';
+} from '@client/types/engagement-analytics';
 import {
   generateId,
   generateDateInRange,

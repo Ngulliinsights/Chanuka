@@ -8,9 +8,9 @@ import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } fr
 import WebSocket from 'ws';
 import { Server } from 'http';
 import jwt from 'jsonwebtoken';
-import { BatchingService } from '../../infrastructure/batching-service.js';
-import { MemoryAwareSocketService } from '../../infrastructure/memory-aware-socket-service.js';
-import { webSocketService } from '../../infrastructure/websocket.js';
+import { BatchingService } from '@server/infrastructure/batching-service.js';
+import { MemoryAwareSocketService } from '@server/infrastructure/memory-aware-socket-service.js';
+import { webSocketService } from '@server/infrastructure/websocket.js';
 import { logger } from '@shared/core/src/observability/logging/index.js';
 
 interface LoadTestConfig {

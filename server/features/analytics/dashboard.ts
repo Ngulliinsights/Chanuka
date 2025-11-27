@@ -4,12 +4,12 @@ import { bills } from '@shared/schema/foundation';
 import { argumentTable } from '@shared/schema/argument_intelligence';
 import { evaluations, departments } from '@shared/schema/platform_operations';
 import type { DepartmentStat, RadarDatum } from '@shared/schema/platform_operations';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 import { errorTracker } from '@server/core/errors/error-tracker.ts';
 
 // Security Services
-import { dataPrivacyService } from '../../infrastructure/security/data-privacy-service.js';
-import { inputValidationService } from '../../infrastructure/security/input-validation-service.js';
+import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service.js';
+import { inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
 
 /**
  * Type definitions for domain entities.

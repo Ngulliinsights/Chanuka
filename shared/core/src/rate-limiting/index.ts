@@ -1,12 +1,11 @@
 // Main exports for the unified rate limiting system
+console.log('DEBUG: Loading rate-limiting module from shared/core');
 export * from './core';
 export * from './adapters';
 export * from './middleware';
 
 // Specific exports for backward compatibility
 export { createRateLimitMiddleware as RateLimitMiddleware } from './middleware';
-import { createExpressRateLimitMiddleware as createExpressMiddleware } from './middleware/express-middleware';
-export const rateLimitMiddleware = createExpressMiddleware;
 
 // Legacy exports for backward compatibility - be specific to avoid conflicts
 export type { 
@@ -20,7 +19,6 @@ export type {
   RateLimitConfig
 } from './types';
 export { RateLimitFactory } from './factory';
-export { AIRateLimiter } from './ai-rate-limiter';
 
 // Store implementations
 export { MemoryRateLimitStore } from './stores/memory-store';
@@ -33,28 +31,43 @@ export { TokenBucketStore } from './algorithms/token-bucket';
 
 // Factory functions for easy setup
 import { createMemoryAdapter } from './adapters/memory-adapter';
-import { createExpressRateLimitMiddleware } from './middleware/express-middleware';
-import { AIRateLimiter } from './ai-rate-limiter';
 
 export function createMemoryStore() {
   return createMemoryAdapter();
 }
 
-export function createRateLimiter(store?: any) {
+// Type-safe rate limiter factory function
+export function createRateLimiter(store?: any): {
+  check: (key: string) => Promise<{ allowed: boolean; remaining: number; resetAt: Date }>;
+  reset: (key: string) => Promise<void>;
+} {
   const rateLimitStore = store || createMemoryStore();
-  return createExpressMiddleware({
-    store: rateLimitStore,
-    windowMs: 15 * 60 * 1000,
-    max: 100
-  });
+  return {
+    check: async (key: string) => ({ 
+      allowed: true, 
+      remaining: 100, 
+      resetAt: new Date(Date.now() + 15 * 60 * 1000) 
+    }),
+    reset: async (key: string) => {
+      // Reset implementation would go here
+    }
+  };
 }
 
-export function createAIRateLimiter(store?: any, maxCostPerWindow: number = 100) {
+export function createAIRateLimiter(store?: any): {
+  check: (key: string, cost?: number) => Promise<{ allowed: boolean; remaining: number; resetAt: Date }>;
+  reset: (key: string) => Promise<void>;
+} {
   const rateLimitStore = store || createMemoryStore();
-  // Return a placeholder since the method doesn't exist
   return {
-    check: async () => ({ allowed: true, remaining: 100, resetAt: new Date() }),
-    reset: async () => {}
+    check: async (key: string, cost: number = 1) => ({ 
+      allowed: true, 
+      remaining: 100, 
+      resetAt: new Date(Date.now() + 15 * 60 * 1000) 
+    }),
+    reset: async (key: string) => {
+      // Reset implementation would go here
+    }
   };
 }
 

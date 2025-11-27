@@ -10,13 +10,13 @@
  * - Run cross-phase data validation ensuring consistency between error handling and repository layers
  */
 
-import { logger  } from '@shared/core/src/index.js';
-import { performanceMonitor, monitorOperation } from '../monitoring/performance-monitor.js';
+import { logger  } from '@shared/core/index.js';
+import { performanceMonitor, monitorOperation } from '@shared/monitoring/performance-monitor.js';
 import { 
   AsyncServiceResult, 
   withResultHandling,
   ResultAdapter 
-} from '../errors/result-adapter.js';
+} from '@shared/errors/result-adapter.js';
 
 // Types for deployment and validation
 export interface DeploymentMetrics {

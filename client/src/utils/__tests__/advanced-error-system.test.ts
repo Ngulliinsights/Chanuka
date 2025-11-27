@@ -6,11 +6,11 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { initializeForEnvironment, getErrorSystemStatus, resetErrorSystem } from '../error-system-initialization';
-import { errorHandler, createNetworkError, createAuthError } from '../unified-error-handler';
-import { smartRecoveryEngine } from '../advanced-error-recovery';
-import { errorRateLimiter } from '../error-rate-limiter';
-import { errorAnalytics } from '../error-analytics';
+import { initializeForEnvironment, getErrorSystemStatus, resetErrorSystem } from '@client/error-system-initialization';
+import { errorHandler, createNetworkError, createAuthError } from '@client/unified-error-handler';
+import { smartRecoveryEngine } from '@client/advanced-error-recovery';
+import { errorRateLimiter } from '@client/error-rate-limiter';
+import { errorAnalytics } from '@client/error-analytics';
 import { ErrorMonitoringDashboard } from '@client/components/error/ErrorMonitoringDashboard';
 import React from 'react';
 

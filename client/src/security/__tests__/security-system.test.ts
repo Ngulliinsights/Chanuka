@@ -3,13 +3,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { initializeSecurity, getSecuritySystem, shutdownSecurity } from '../index';
-import { CSPManager } from '../csp-manager';
-import { CSRFProtection } from '../csrf-protection';
-import { InputSanitizer } from '../input-sanitizer';
-import { RateLimiter } from '../rate-limiter';
-import { VulnerabilityScanner } from '../vulnerability-scanner';
-import { SecurityMonitor } from '../security-monitor';
+import { initializeSecurity, getSecuritySystem, shutdownSecurity } from '@client/index';
+import { CSPManager } from '@client/csp-manager';
+import { CSRFProtection } from '@client/csrf-protection';
+import { InputSanitizer } from '@client/input-sanitizer';
+import { RateLimiter } from '@client/rate-limiter';
+import { VulnerabilityScanner } from '@client/vulnerability-scanner';
+import { SecurityMonitor } from '@client/security-monitor';
 
 // Mock fetch for testing
 global.fetch = vi.fn();

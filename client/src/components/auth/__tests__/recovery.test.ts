@@ -10,7 +10,7 @@ import {
   getRecoveryDelay,
   createRecoveryContext,
   updateRecoveryContext
-} from '../recovery';
+} from '@client/recovery';
 import {
   AuthError,
   AuthValidationError,
@@ -20,7 +20,7 @@ import {
   AuthRateLimitError,
   AuthSessionError,
   AuthErrorType
-} from '../errors';
+} from '@client/errors';
 
 // Mock window.location for tests
 const mockLocation = {

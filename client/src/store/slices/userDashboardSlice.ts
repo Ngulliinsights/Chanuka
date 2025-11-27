@@ -17,7 +17,7 @@ import type {
   DataExportRequest,
   TemporalFilter,
   DashboardPreferences
-} from '../../types/user-dashboard';
+} from '@client/types/user-dashboard';
 import { logger } from '@client/utils/logger';
 import type { RootState } from '../index';
 import { useAppSelector, useAppDispatch } from '../hooks';

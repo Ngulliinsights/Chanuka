@@ -1,7 +1,7 @@
 // Repository interfaces removed - using direct Drizzle queries
-import { CitizenVerification, VerificationType } from '../entities/citizen-verification';
-import { Evidence, ExpertiseLevel } from '../entities/value-objects';
-import { UserAggregate } from '../aggregates/user-aggregate';
+import { CitizenVerification, VerificationType } from '@shared/entities/citizen-verification';
+import { Evidence, ExpertiseLevel } from '@shared/entities/value-objects';
+import { UserAggregate } from '@shared/aggregates/user-aggregate';
 import { ProfileDomainService } from './profile-domain-service';
 import { UserService } from '../../application/user-service-direct';
 import { database as db } from '@shared/database';

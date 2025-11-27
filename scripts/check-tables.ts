@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { pool } from '../shared/database/pool.js';
+import { pool } from '@shared/shared/database/pool.js';
 
 async function checkTables() {
   try {

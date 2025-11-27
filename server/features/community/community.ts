@@ -3,9 +3,9 @@ import { z } from "zod";
 import { ApiSuccess, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
 import { commentService } from "./comment.js";
 import { commentVotingService } from "./comment-voting.js";
-import { contentModerationService } from "../admin/content-moderation.js";
-import { authenticateToken as requireAuth } from "../../middleware/auth.js";
-import { logger   } from '@shared/core/src/index.js';
+import { contentModerationService } from '@shared/admin/content-moderation.js';
+import { authenticateToken as requireAuth } from '@server/middleware/auth.js';
+import { logger   } from '@shared/core/index.js';
 
 export const router = Router();
 

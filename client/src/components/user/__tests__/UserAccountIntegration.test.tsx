@@ -8,7 +8,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 
-import UserAccountIntegration from '../UserAccountIntegration';
+import UserAccountIntegration from '@client/UserAccountIntegration';
 import { AuthProvider } from '@client/features/users/hooks/useAuth';
 import { MockUserFactory } from '@client/test-utils';
 

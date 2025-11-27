@@ -15,7 +15,7 @@ import {
   UIDateError,
   UIConfigurationError,
   UIErrorType
-} from '../errors';
+} from '@client/errors';
 
 describe('UI Error Classes', () => {
   describe('UIError (Base Class)', () => {

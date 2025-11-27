@@ -7,7 +7,7 @@
 
 import * as ts from 'typescript';
 import * as path from 'path';
-import { ProjectStructure, Configuration } from '../types/core';
+import { ProjectStructure, Configuration } from '@shared/types/core';
 
 export interface ProgramLoadResult {
   program: ts.Program;

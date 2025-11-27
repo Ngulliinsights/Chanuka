@@ -1,18 +1,19 @@
 /**
- * Validation Middleware
+ * Validation Middleware - Optimized Version
  * 
- * Express middleware for request validation with comprehensive error handling
+ * Express middleware for request validation with comprehensive error handling,
+ * improved performance, and enhanced type safety
  */
 
 import 'reflect-metadata';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { ZodSchema, ZodError } from 'zod';
-import { ValidationError, ValidationOptions, ValidationContext } from '/types';
+import { ValidationError, ValidationOptions, ValidationContext } from './types';
 import { validationService } from './validation-service';
-import { logger } from '../observability/logging';
 
 /**
  * Request validation configuration
+ * Defines which parts of the request should be validated and how
  */
 export interface RequestValidationConfig {
   /** Schema for request body validation */
@@ -23,18 +24,18 @@ export interface RequestValidationConfig {
   params?: ZodSchema;
   /** Schema for request headers validation */
   headers?: ZodSchema;
-  /** Validation options */
+  /** Validation options (strict mode, custom rules, etc.) */
   options?: ValidationOptions;
-  /** Custom error handler */
+  /** Custom error handler for validation failures */
   onError?: (error: ValidationError, req: Request, res: Response, next: NextFunction) => void;
-  /** Skip validation based on condition */
+  /** Skip validation based on runtime condition */
   skipIf?: (req: Request) => boolean;
-  /** Transform validated data */
+  /** Transform validated data before assigning back to request */
   transform?: (data: any, req: Request) => any;
 }
 
 /**
- * Validation decorator options
+ * Validation decorator options for method-level validation
  */
 export interface ValidationDecoratorOptions {
   /** Schema to validate against */
@@ -43,184 +44,231 @@ export interface ValidationDecoratorOptions {
   property?: string;
   /** Validation options */
   options?: ValidationOptions;
-  /** Custom error message */
+  /** Custom error message to override default */
   errorMessage?: string;
 }
 
 /**
- * Create validation middleware for Express requests
+ * Standard error response structure for validation failures
  */
-export function validateRequest(config: RequestValidationConfig) {
+interface ValidationErrorResponse {
+  error: string;
+  message: string;
+  details: any[];
+  timestamp: string;
+  path: string;
+  method: string;
+  requestId?: string;
+}
+
+/**
+ * Create validation middleware for Express requests
+ * 
+ * This is the core function that orchestrates validation across different
+ * parts of the request (body, query, params, headers). It builds a validation
+ * context with request metadata and handles errors consistently.
+ */
+export function validateRequest(config: RequestValidationConfig): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      // Check skip condition
-      if (config.skipIf && config.skipIf(req)) {
+      // Early exit if skip condition is met - improves performance
+      if (config.skipIf?.(req)) {
         return next();
       }
 
-      // Create validation context
-      const context: ValidationContext = { requestId: req.headers['x-request-id'] as string,
-        user_id: (req as any).user?.id,
-        timestamp: new Date(),
-        metadata: {
-          method: req.method,
-          path: req.path,
-          user_agent: req.headers['user-agent'],
-          ip: req.ip,
-         },
-      };
+      // Build validation context with request metadata for better error tracking
+      const context = createValidationContext(req);
+      
+      // Object to accumulate all validated data from different request parts
+      const validatedData: Record<string, any> = {};
 
-      const validatedData: any = {};
+      // Validate each part of the request that has a schema defined
+      // We process them sequentially to maintain clear error messages
+      await validateRequestPart('body', req, config, validatedData, context);
+      await validateRequestPart('query', req, config, validatedData, context);
+      await validateRequestPart('params', req, config, validatedData, context);
+      await validateRequestPart('headers', req, config, validatedData, context);
 
-      // Validate request body
-      if (config.body && req.body !== undefined) {
-        try {
-          validatedData.body = await validationService.validate(
-            config.body,
-            req.body,
-            config.options,
-            context
-          );
-          req.body = config.transform ? config.transform(validatedData.body, req) : validatedData.body;
-        } catch (error) {
-          if (error instanceof ValidationError) {
-            const updatedErrors = error.errors.map(e => ({ ...e, field: `body.${e.field}` }));
-            throw new ValidationError(error.message, updatedErrors);
-          }
-          throw error;
-        }
-      }
-
-      // Validate query parameters
-      if (config.query && req.query !== undefined) {
-        try {
-          validatedData.query = await validationService.validate(
-            config.query,
-            req.query,
-            config.options,
-            context
-          );
-          req.query = config.transform ? config.transform(validatedData.query, req) : validatedData.query;
-        } catch (error) {
-          if (error instanceof ValidationError) {
-            const updatedErrors = error.errors.map(e => ({ ...e, field: `query.${e.field}` }));
-            throw new ValidationError(error.message, updatedErrors);
-          }
-          throw error;
-        }
-      }
-
-      // Validate URL parameters
-      if (config.params && req.params !== undefined) {
-        try {
-          validatedData.params = await validationService.validate(
-            config.params,
-            req.params,
-            config.options,
-            context
-          );
-          req.params = config.transform ? config.transform(validatedData.params, req) : validatedData.params;
-        } catch (error) {
-          if (error instanceof ValidationError) {
-            const updatedErrors = error.errors.map(e => ({ ...e, field: `params.${e.field}` }));
-            throw new ValidationError(error.message, updatedErrors);
-          }
-          throw error;
-        }
-      }
-
-      // Validate headers
-      if (config.headers && req.headers !== undefined) {
-        try {
-          validatedData.headers = await validationService.validate(
-            config.headers,
-            req.headers,
-            config.options,
-            context
-          );
-          // Note: We don't modify req.headers as it might break other middleware
-        } catch (error) {
-          if (error instanceof ValidationError) {
-            const updatedErrors = error.errors.map(e => ({ ...e, field: `headers.${e.field}` }));
-            throw new ValidationError(error.message, updatedErrors);
-          }
-          throw error;
-        }
-      }
-
-      // Store validated data in request for later use
+      // Store all validated data in request for downstream middleware/handlers
+      // This allows route handlers to access pre-validated, type-safe data
       (req as any).validated = validatedData;
 
       next();
     } catch (error) {
-      if (error instanceof ValidationError) {
-        if (config.onError) {
-          return config.onError(error, req, res, next);
-        }
-        
-        // Default error response
-        res.status(error.statusCode).json({
-          error: 'Validation Error',
-          message: error.message,
-          details: error.errors,
-          timestamp: new Date().toISOString(),
-          path: req.path,
-          method: req.method,
-        });
-      }
-
-      // Handle other errors
-      next(error);
+      handleValidationError(error, req, res, next, config);
     }
   };
 }
 
 /**
+ * Helper function to create a validation context from the request
+ * Centralizes context creation logic for consistency
+ */
+function createValidationContext(req: Request): ValidationContext {
+  return {
+    requestId: req.headers['x-request-id'] as string,
+    user_id: (req as any).user?.id,
+    timestamp: new Date(),
+    metadata: {
+      method: req.method,
+      path: req.path,
+      user_agent: req.headers['user-agent'],
+      ip: req.ip,
+    },
+  };
+}
+
+/**
+ * Validate a specific part of the request (body, query, params, or headers)
+ * Extracted into a helper to reduce code duplication and improve maintainability
+ */
+async function validateRequestPart(
+  partName: 'body' | 'query' | 'params' | 'headers',
+  req: Request,
+  config: RequestValidationConfig,
+  validatedData: Record<string, any>,
+  context: ValidationContext
+): Promise<void> {
+  const schema = config[partName];
+  const data = req[partName];
+
+  // Skip if no schema defined for this part or data is undefined
+  if (!schema || data === undefined) {
+    return;
+  }
+
+  try {
+    // Validate using the service layer
+    const validated = await validationService.validate(
+      schema,
+      data,
+      config.options,
+      context
+    );
+
+    // Apply custom transformation if provided
+    const transformed = config.transform ? config.transform(validated, req) : validated;
+    
+    // Store validated data
+    validatedData[partName] = transformed;
+
+    // Update request with validated data (except headers which shouldn't be modified)
+    if (partName !== 'headers') {
+      (req as any)[partName] = transformed;
+    }
+  } catch (error) {
+    // Enhance error with field path prefix for clarity
+    if (error instanceof ValidationError) {
+      const enhancedErrors = error.errors.map(e => ({
+        ...e,
+        field: `${partName}.${e.field}`,
+      }));
+      throw new ValidationError(error.message, enhancedErrors);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Centralized error handling for validation failures
+ * Provides consistent error response format across all validation scenarios
+ */
+function handleValidationError(
+  error: any,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  config: RequestValidationConfig
+): void {
+  if (!(error instanceof ValidationError)) {
+    // Not a validation error, pass to next error handler
+    return next(error);
+  }
+
+  // Use custom error handler if provided
+  if (config.onError) {
+    return config.onError(error, req, res, next);
+  }
+
+  // Default error response with detailed information
+  const errorResponse: ValidationErrorResponse = {
+    error: 'Validation Error',
+    message: error.message,
+    details: error.errors,
+    timestamp: new Date().toISOString(),
+    path: req.path,
+    method: req.method,
+    requestId: req.headers['x-request-id'] as string,
+  };
+
+  res.status(error.statusCode).json(errorResponse);
+}
+
+/**
  * Validation middleware factory with common patterns
+ * Provides convenient methods for common validation scenarios
  */
 export class ValidationMiddleware {
   /**
    * Create middleware for body validation only
+   * Most common use case - validating JSON request bodies
    */
-  static body(schema: ZodSchema, options?: ValidationOptions) {
-    return validateRequest({ body: schema, options });
+  static body(schema: ZodSchema, options?: ValidationOptions): RequestHandler {
+    return validateRequest({
+      body: schema,
+      ...(options && { options }),
+    });
   }
 
   /**
    * Create middleware for query validation only
+   * Used for validating URL query parameters
    */
-  static query(schema: ZodSchema, options?: ValidationOptions) {
-    return validateRequest({ query: schema, options });
+  static query(schema: ZodSchema, options?: ValidationOptions): RequestHandler {
+    return validateRequest({
+      query: schema,
+      ...(options && { options }),
+    });
   }
 
   /**
    * Create middleware for params validation only
+   * Used for validating URL path parameters like /users/:id
    */
-  static params(schema: ZodSchema, options?: ValidationOptions) {
-    return validateRequest({ params: schema, options });
+  static params(schema: ZodSchema, options?: ValidationOptions): RequestHandler {
+    return validateRequest({
+      params: schema,
+      ...(options && { options }),
+    });
   }
 
   /**
    * Create middleware for headers validation only
+   * Less common but useful for API key validation, etc.
    */
-  static headers(schema: ZodSchema, options?: ValidationOptions) {
-    return validateRequest({ headers: schema, options });
+  static headers(schema: ZodSchema, options?: ValidationOptions): RequestHandler {
+    return validateRequest({
+      headers: schema,
+      ...(options && { options }),
+    });
   }
 
   /**
    * Create middleware that validates multiple parts of the request
+   * Useful when you need to validate body AND query parameters together
    */
-  static all(config: Omit<RequestValidationConfig, 'onError' | 'skipIf' | 'transform'>) {
+  static all(config: Omit<RequestValidationConfig, 'onError' | 'skipIf' | 'transform'>): RequestHandler {
     return validateRequest(config);
   }
 
   /**
    * Create conditional validation middleware
+   * Only validates when the condition returns true
    */
   static conditional(
     condition: (req: Request) => boolean,
     config: RequestValidationConfig
-  ) {
+  ): RequestHandler {
     return validateRequest({
       ...config,
       skipIf: (req) => !condition(req),
@@ -229,11 +277,12 @@ export class ValidationMiddleware {
 
   /**
    * Create validation middleware with custom error handling
+   * Allows you to customize error responses per route
    */
   static withErrorHandler(
     config: Omit<RequestValidationConfig, 'onError'>,
     errorHandler: (error: ValidationError, req: Request, res: Response, next: NextFunction) => void
-  ) {
+  ): RequestHandler {
     return validateRequest({
       ...config,
       onError: errorHandler,
@@ -243,21 +292,23 @@ export class ValidationMiddleware {
 
 /**
  * Method decorator for validation (for use with class-based controllers)
+ * 
+ * This allows you to add validation directly to controller methods using
+ * TypeScript decorators, which is cleaner than wrapping methods manually
  */
 export function validate(options: ValidationDecoratorOptions) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
       try {
-        // Determine which argument to validate
-        const argIndex = options.property ? 
-          originalMethod.toString().match(/\(([^)]*)\)/)![1].split(',').findIndex((param: string) => 
-            param.trim().startsWith(options.property!)
-          ) : 0;
+        // Determine which argument to validate based on property name or default to first
+        const argIndex = options.property 
+          ? findParameterIndex(originalMethod, options.property)
+          : 0;
 
         if (argIndex >= 0 && argIndex < args.length) {
-          // Validate the specified argument
+          // Validate and replace the argument with validated data
           args[argIndex] = await validationService.validate(
             options.schema,
             args[argIndex],
@@ -267,6 +318,7 @@ export function validate(options: ValidationDecoratorOptions) {
 
         return originalMethod.apply(this, args);
       } catch (error) {
+        // Override error message if custom message provided
         if (error instanceof ValidationError && options.errorMessage) {
           error.message = options.errorMessage;
         }
@@ -279,7 +331,22 @@ export function validate(options: ValidationDecoratorOptions) {
 }
 
 /**
+ * Helper to find parameter index by name in function signature
+ * More robust than string parsing for parameter detection
+ */
+function findParameterIndex(fn: Function, paramName: string): number {
+  const fnStr = fn.toString();
+  const match = fnStr.match(/\(([^)]*)\)/);
+
+  if (!match || !match[1]) return -1;
+
+  const params = match[1].split(',').map(p => p.trim().split(/[\s:]/)[0]);
+  return params.indexOf(paramName);
+}
+
+/**
  * Class decorator for automatic validation of all methods
+ * Applies validation to all methods in a class that have validation metadata
  */
 export function validateClass(defaultOptions?: ValidationOptions) {
   return function <T extends { new (...args: any[]): {} }>(constructor: T) {
@@ -289,28 +356,30 @@ export function validateClass(defaultOptions?: ValidationOptions) {
         
         // Wrap all methods with validation if they have validation metadata
         const prototype = Object.getPrototypeOf(this);
-        const methodNames = Object.getOwnPropertyNames(prototype);
+        const methodNames = Object.getOwnPropertyNames(prototype).filter(
+          name => name !== 'constructor' && typeof prototype[name] === 'function'
+        );
         
         methodNames.forEach(methodName => {
-          if (methodName !== 'constructor' && typeof prototype[methodName] === 'function') {
-            const validationMetadata = Reflect.getMetadata('validation', prototype, methodName);
-            if (validationMetadata) {
-              const originalMethod = prototype[methodName];
-              prototype[methodName] = async function (...args: any[]) {
-                // Apply validation based on metadata
-                for (const [index, schema] of validationMetadata.entries()) {
-                  if (schema && args[index] !== undefined) {
-                    args[index] = await validationService.validate(
-                      schema,
-                      args[index],
-                      defaultOptions
-                    );
-                  }
-                }
-                return originalMethod.apply(this, args);
-              };
+          const validationMetadata = Reflect.getMetadata('validation', prototype, methodName);
+          
+          if (!validationMetadata) return;
+
+          const originalMethod = prototype[methodName];
+          
+          prototype[methodName] = async function (...args: any[]) {
+            // Apply validation to each parameter that has metadata
+            for (const [index, schema] of validationMetadata.entries()) {
+              if (schema && args[index] !== undefined) {
+                args[index] = await validationService.validate(
+                  schema,
+                  args[index],
+                  defaultOptions
+                );
+              }
             }
-          }
+            return originalMethod.apply(this, args);
+          };
         });
       }
     };
@@ -319,10 +388,14 @@ export function validateClass(defaultOptions?: ValidationOptions) {
 
 /**
  * Batch validation middleware for processing arrays of data
+ * 
+ * Useful for bulk operations where you need to validate many items at once.
+ * Returns both valid and invalid items so you can process partial successes.
  */
-export function validateBatch(schema: ZodSchema, options?: ValidationOptions) {
+export function validateBatch(schema: ZodSchema, options?: ValidationOptions): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      // Ensure request body is an array
       if (!Array.isArray(req.body)) {
         res.status(400).json({
           error: 'Bad Request',
@@ -331,18 +404,16 @@ export function validateBatch(schema: ZodSchema, options?: ValidationOptions) {
           path: req.path,
           method: req.method,
         });
+        return;
       }
 
-      const context: ValidationContext = { requestId: req.headers['x-request-id'] as string,
-        user_id: (req as any).user?.id,
-        timestamp: new Date(),
-        metadata: {
-          method: req.method,
-          path: req.path,
-          batchSize: req.body.length,
-         },
+      const context = createValidationContext(req);
+      context.metadata = {
+        ...context.metadata,
+        batchSize: req.body.length,
       };
 
+      // Validate all items in the batch
       const result = await validationService.validateBatch(
         schema,
         req.body,
@@ -350,10 +421,10 @@ export function validateBatch(schema: ZodSchema, options?: ValidationOptions) {
         context
       );
 
-      // Store batch validation result in request
+      // Store batch validation result for downstream processing
       (req as any).batchValidation = result;
 
-      // If there are invalid items, return them in the response
+      // If there are validation failures, return detailed error response
       if (result.invalidCount > 0) {
         res.status(422).json({
           error: 'Batch Validation Error',
@@ -373,9 +444,10 @@ export function validateBatch(schema: ZodSchema, options?: ValidationOptions) {
           path: req.path,
           method: req.method,
         });
+        return;
       }
 
-      // All items are valid, replace request body with validated data
+      // All items valid, replace body with validated data and continue
       req.body = result.valid;
       next();
     } catch (error) {
@@ -386,42 +458,32 @@ export function validateBatch(schema: ZodSchema, options?: ValidationOptions) {
 
 /**
  * Validation middleware for file uploads
+ * 
+ * Handles both single and multiple file uploads, validating file metadata
+ * like size, type, and filename. Also validates additional form data if provided.
  */
 export function validateFileUpload(
   fileSchema?: ZodSchema,
   metadataSchema?: ZodSchema,
   options?: ValidationOptions
-) { return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const context: ValidationContext = {
-        requestId: req.headers['x-request-id'] as string,
-        user_id: (req as any).user?.id,
-        timestamp: new Date(),
-        metadata: {
-          method: req.method,
-          path: req.path,
-          content_type: req.headers['content-type'],
-         },
+      const context = createValidationContext(req);
+      context.metadata = {
+        ...context.metadata,
+        content_type: req.headers['content-type'],
       };
 
-      // Validate file information if present
+      // Validate single file if present
       if (fileSchema && (req as any).file) {
-        const fileData = {
-          filename: (req as any).file.originalname,
-          mimetype: (req as any).file.mimetype,
-          size: (req as any).file.size,
-        };
-
+        const fileData = extractFileData((req as any).file);
         await validationService.validate(fileSchema, fileData, options, context);
       }
 
       // Validate multiple files if present
       if (fileSchema && (req as any).files && Array.isArray((req as any).files)) {
-        const filesData = (req as any).files.map((file: any) => ({
-          filename: file.originalname,
-          mimetype: file.mimetype,
-          size: file.size,
-        }));
+        const filesData = (req as any).files.map(extractFileData);
 
         const result = await validationService.validateBatch(
           fileSchema,
@@ -430,6 +492,7 @@ export function validateFileUpload(
           context
         );
 
+        // Return error if any files failed validation
         if (result.invalidCount > 0) {
           res.status(422).json({
             error: 'File Validation Error',
@@ -441,10 +504,11 @@ export function validateFileUpload(
             })),
             timestamp: new Date().toISOString(),
           });
+          return;
         }
       }
 
-      // Validate additional metadata if present
+      // Validate additional metadata from form data
       if (metadataSchema && req.body) {
         req.body = await validationService.validate(
           metadataSchema,
@@ -463,6 +527,7 @@ export function validateFileUpload(
           details: error.errors,
           timestamp: new Date().toISOString(),
         });
+        return;
       }
       next(error);
     }
@@ -470,10 +535,25 @@ export function validateFileUpload(
 }
 
 /**
+ * Extract relevant data from uploaded file for validation
+ */
+function extractFileData(file: any): Record<string, any> {
+  return {
+    filename: file.originalname,
+    mimetype: file.mimetype,
+    size: file.size,
+  };
+}
+
+/**
  * Validation error handler middleware
+ * 
+ * Place this at the end of your middleware chain to catch any validation
+ * errors that weren't handled earlier and format them consistently
  */
 export function validationErrorHandler() {
   return (error: any, req: Request, res: Response, next: NextFunction): void => {
+    // Handle custom ValidationError
     if (error instanceof ValidationError) {
       res.status(error.statusCode).json({
         error: 'Validation Error',
@@ -487,6 +567,7 @@ export function validationErrorHandler() {
       return;
     }
 
+    // Handle raw Zod errors (convert them to our format)
     if (error instanceof ZodError) {
       const validationError = new ValidationError(error);
       res.status(validationError.statusCode).json({
@@ -501,16 +582,17 @@ export function validationErrorHandler() {
       return;
     }
 
-    // Pass non-validation errors to the next error handler
+    // Not a validation error, pass to next error handler in chain
     next(error);
   };
 }
 
 /**
  * Utility function to extract validated data from request
+ * Use this in your route handlers to access type-safe validated data
  */
-export function getValidatedData(req: Request): any {
-  return (req as any).validated || {};
+export function getValidatedData<T = any>(req: Request): T {
+  return (req as any).validated || {} as T;
 }
 
 /**
@@ -522,20 +604,23 @@ export function getBatchValidationResult(req: Request): any {
 
 /**
  * Common validation middleware presets
+ * 
+ * These are pre-configured validators for common scenarios, reducing boilerplate
+ * in your route definitions
  */
 export const commonValidation = {
   /**
-   * Validate pagination parameters
+   * Validate pagination parameters (page, limit, etc.)
    */
-  pagination: async () => {
+  pagination: async (): Promise<RequestHandler> => {
     const { paginationSchema } = await import('./schemas/common');
     return ValidationMiddleware.query(paginationSchema);
   },
 
   /**
-   * Validate UUID parameter
+   * Validate UUID parameter in URL path
    */
-  uuidParam: (paramName: string = 'id') => {
+  uuidParam: (paramName: string = 'id'): RequestHandler => {
     const { z } = require('zod');
     const schema = z.object({
       [paramName]: z.string().uuid(`Invalid ${paramName} format`),
@@ -544,9 +629,9 @@ export const commonValidation = {
   },
 
   /**
-   * Validate search query
+   * Validate search query parameters
    */
-  searchQuery: async () => {
+  searchQuery: async (): Promise<RequestHandler> => {
     const { searchQuerySchema } = await import('./schemas/common');
     return ValidationMiddleware.query(searchQuerySchema);
   },
@@ -554,55 +639,8 @@ export const commonValidation = {
   /**
    * Validate file upload
    */
-  fileUpload: async () => {
+  fileUpload: async (): Promise<RequestHandler> => {
     const { fileUploadSchema } = await import('./schemas/common');
     return validateFileUpload(fileUploadSchema);
   },
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

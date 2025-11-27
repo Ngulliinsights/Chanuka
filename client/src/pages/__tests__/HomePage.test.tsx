@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import HomePage from '../home';
+import HomePage from '@client/home';
 import { renderWithProviders } from '@client/test-utils';
 
 // Mock hooks

@@ -49,7 +49,7 @@ import type {
   CommunityFilters,
   LocalImpactMetrics,
   TrendingAlgorithmConfig
-} from '../../types/community';
+} from '@client/types/community';
 
 // ============================================================================
 // Type Definitions

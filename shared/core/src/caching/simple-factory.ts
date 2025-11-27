@@ -4,7 +4,7 @@
  */
 
 import { MemoryAdapter } from './adapters/memory-adapter';
-import type { CacheAdapter } from '/core/interfaces';
+import type { CacheAdapter } from './core/interfaces';
 
 export interface SimpleCacheConfig {
   provider: 'memory';

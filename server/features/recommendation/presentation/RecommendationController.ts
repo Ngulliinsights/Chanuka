@@ -4,8 +4,8 @@ import {
   getSimilarBills,
   getTrendingBills,
   getCollaborativeRecommendations,
-} from '../application/RecommendationService';
-import { trackEngagement } from '../application/EngagementTracker';
+} from '@shared/application/RecommendationService';
+import { trackEngagement } from '@shared/application/EngagementTracker';
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api';
 
 const router = Router();

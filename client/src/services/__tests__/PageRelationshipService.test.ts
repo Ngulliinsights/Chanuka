@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { PageRelationshipService } from '../PageRelationshipService';
+import { PageRelationshipService } from '@client/PageRelationshipService';
 
 describe('PageRelationshipService', () => {
   let service: PageRelationshipService;

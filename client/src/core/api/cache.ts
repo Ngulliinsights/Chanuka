@@ -26,7 +26,7 @@
  * @module UnifiedCaching
  */
 
-import { CacheConfig, CacheEntry } from '@client/types';
+import { CacheConfig, CacheEntry } from './types';
 import { globalErrorHandler } from './errors';
 
 // ============================================================================

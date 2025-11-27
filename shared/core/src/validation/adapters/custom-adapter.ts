@@ -12,34 +12,30 @@ import {
   IBatchValidationResult,
   IValidationServiceConfig,
   ValidationErrorDetail,
+  ValidationSchema,
+  ValidationOptions,
 } from '../core/interfaces';
-import { CoreValidationService } from '/core/validation-service';
+import { CoreValidationService } from '../core/validation-service';
 
 /**
  * Custom validation function type
  */
-export type CustomValidationFunction<T = any> = (data: unknown) => T;
+export type CustomValidationFunction<T = any> = (data: unknown) => IValidationResult<T>;
 
 /**
  * Custom validation schema type
  */
-export interface CustomValidationSchema<T = any> {
+export interface CustomValidationSchema<T = any> extends ValidationSchema {
   validate: CustomValidationFunction<T>;
-  description?: string | undefined;
-  version?: string | undefined;
 }
 
 /**
- * Custom schema adapter implementing the ISchemaAdapter interface
+ * Custom schema adapter
  */
-export class CustomSchemaAdapter implements ISchemaAdapter {
-  getName(): string {
-    return 'custom';
-  }
-
-  getVersion(): string {
-    return '1.0.0';
-  }
+export class CustomSchemaAdapter {
+  readonly name = 'custom';
+  readonly version = '1.0.0';
+  readonly config: any = {};
 
   supports(schema: any): boolean {
     return schema && typeof schema === 'object' && typeof schema.validate === 'function';
@@ -47,7 +43,12 @@ export class CustomSchemaAdapter implements ISchemaAdapter {
 
   async validate<T>(schema: CustomValidationSchema<T>, data: unknown): Promise<T> {
     try {
-      return schema.validate(data);
+      const result = schema.validate(data);
+      if (result.success) {
+        return result.data!;
+      } else {
+        throw new ValidationError('Validation failed', result.errors || [], { schema: schema.description });
+      }
     } catch (error) {
       if (error instanceof ValidationError) {
         throw error;
@@ -65,8 +66,8 @@ export class CustomSchemaAdapter implements ISchemaAdapter {
 
   async validateSafe<T>(schema: CustomValidationSchema<T>, data: unknown): Promise<IValidationResult<T>> {
     try {
-      const result = await this.validate(schema, data);
-      return { success: true, data: result };
+      const result = schema.validate(data);
+      return { success: result.success, data: result.data!, errors: result.errors || [] };
     } catch (error) {
       if (error instanceof ValidationError) {
         return { success: false, errors: error.errors.map(err => ({
@@ -106,7 +107,7 @@ export class CustomValidationService extends CoreValidationService implements IV
   }
 
   async validate<T>(
-    schema: CustomValidationSchema<T>,
+    schema: ValidationSchema,
     data: unknown,
     options: any = {},
     context?: any
@@ -139,7 +140,7 @@ export class CustomValidationService extends CoreValidationService implements IV
       }
 
       // Perform validation using custom adapter
-      const result = await this.adapter.validate(schema, processedData);
+      const result = await this.adapter.validate(schema as CustomValidationSchema<T>, processedData);
 
       // Cache successful result
       if (mergedOptions.useCache && this.config.cache?.enabled) {
@@ -174,7 +175,7 @@ export class CustomValidationService extends CoreValidationService implements IV
   }
 
   async validateSafe<T>(
-    schema: CustomValidationSchema<T>,
+    schema: ValidationSchema,
     data: unknown,
     options: any = {},
     context?: any
@@ -203,7 +204,7 @@ export class CustomValidationService extends CoreValidationService implements IV
       }
 
       // Perform validation using custom adapter
-      const result = await this.adapter.validateSafe(schema, processedData);
+      const result = await this.adapter.validateSafe(schema as CustomValidationSchema<T>, processedData);
 
       // Cache result
       if (mergedOptions.useCache && this.config.cache?.enabled) {
@@ -212,7 +213,7 @@ export class CustomValidationService extends CoreValidationService implements IV
       }
 
       this.updateMetrics(result.success ? 'success' : 'failure', startTime, context);
-      return result;
+      return result as IValidationResult<T>;
 
     } catch (error) {
       // Handle unexpected errors
@@ -241,7 +242,7 @@ export class CustomValidationService extends CoreValidationService implements IV
   }
 
   async validateBatch<T>(
-    schema: CustomValidationSchema<T>,
+    schema: ValidationSchema,
     dataArray: unknown[],
     options: any = {},
     context?: any
@@ -265,7 +266,7 @@ export class CustomValidationService extends CoreValidationService implements IV
       if (promiseResult.status === 'fulfilled') {
         const { result, index, data } = promiseResult.value;
         if (result.success && result.data) {
-          valid.push(result.data);
+          valid.push(result.data as T);
         } else if (!result.success && result.errors && result.errors.length > 0) {
           invalid.push({
             index,
@@ -307,6 +308,15 @@ export class CustomValidationService extends CoreValidationService implements IV
       },
     };
   }
+
+  validateSync<T>(schema: ValidationSchema, data: unknown, options?: ValidationOptions): T {
+    const result = schema.validate(data);
+    if (result.success) {
+      return result.data as T;
+    } else {
+      throw new ValidationError('Validation failed', result.errors || [], { schema: schema.description });
+    }
+  }
 }
 
 /**
@@ -333,7 +343,7 @@ export function createCustomSchema<T>(
     validate: validateFn,
     description,
     version,
-  };
+  } as CustomValidationSchema<T>;
 }
 
 

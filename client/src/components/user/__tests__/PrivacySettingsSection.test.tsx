@@ -8,7 +8,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import PrivacySettingsSection from '../PrivacySettingsSection';
+import PrivacySettingsSection from '@client/PrivacySettingsSection';
 import { MockUserFactory } from '@client/test-utils';
 
 // Mock the services

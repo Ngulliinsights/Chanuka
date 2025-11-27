@@ -20,7 +20,7 @@ import {
   updatePreferences,
   addToRecentPages,
   clearPersistedState,
-} from '../../store/slices/navigationSlice';
+} from '@client/store/slices/navigationSlice';
 import { NavigationContextValue, UserRole, BreadcrumbItem, RelatedPage } from './types';
 import { generateBreadcrumbs, calculateRelatedPages, determineNavigationSection, isNavigationPathActive } from './utils';
 // navigationPersistenceUtils intentionally unused here

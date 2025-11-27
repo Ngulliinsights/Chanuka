@@ -9,7 +9,7 @@ import { Pool, neonConfig } from '@neondatabase/serverless';
 import ws from "ws";
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 // Load environment variables
 dotenv.config();

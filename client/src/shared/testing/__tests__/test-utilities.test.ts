@@ -18,7 +18,7 @@ import {
   useMockAuth,
   useMockTheme,
   useMockLocale
-} from '../test-utilities';
+} from '@client/test-utilities';
 
 describe('Test Utilities', () => {
   describe('MockDataGenerator', () => {

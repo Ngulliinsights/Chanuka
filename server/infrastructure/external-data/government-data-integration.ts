@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { database as db } from '@shared/database';
 import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@shared/schema';
 import { eq, and, or } from 'drizzle-orm';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 
 // Data source configuration
 interface DataSourceConfig {
@@ -596,10 +596,13 @@ export class GovernmentDataIntegrationService {
           headers['Authorization'] = `Bearer ${source.apiKey}`;
         }
 
-        const response = await fetch(url, {
+        // Import circuit breaker middleware
+        const { circuitBreakerFetch } = await import('../../middleware/circuit-breaker-middleware');
+        
+        const response = await circuitBreakerFetch(url, {
           headers,
           signal: controller.signal
-        });
+        }, 'government-data');
 
         clearTimeout(timeoutId);
 

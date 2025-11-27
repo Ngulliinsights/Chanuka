@@ -3,6 +3,8 @@
  * Helpers for optimizing CSS performance and reducing layout shifts
  */
 
+import React from 'react';
+
 /**
  * Preload critical CSS custom properties
  * Ensures design tokens are available immediately

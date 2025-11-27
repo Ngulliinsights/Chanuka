@@ -34,7 +34,7 @@ export interface ApiResponse<T = any> {
   data?: T;
   error?: {
     message: string;
-    code?: string;
+    code?: string | undefined;
     details?: any;
   };
   meta?: {
@@ -172,14 +172,23 @@ export class HttpClient {
     url: string,
     options: HttpRequestOptions = {}
   ): Promise<HttpResponse<T>> {
-    const config = await this.applyRequestInterceptors({
+    const mergedConfig: HttpRequestOptions = {
       method: 'GET',
       headers: { ...this.config.headers },
-      timeout: this.config.timeout,
-      retries: this.config.retries,
-      retryDelay: this.config.retryDelay,
       ...options
-    });
+    };
+
+    if (this.config.timeout !== undefined) {
+      mergedConfig.timeout = this.config.timeout;
+    }
+    if (this.config.retries !== undefined) {
+      mergedConfig.retries = this.config.retries;
+    }
+    if (this.config.retryDelay !== undefined) {
+      mergedConfig.retryDelay = this.config.retryDelay;
+    }
+
+    const config = await this.applyRequestInterceptors(mergedConfig);
 
     const fullUrl = this.config.baseURL ? `${this.config.baseURL}${url}` : url;
 
@@ -239,12 +248,20 @@ export class HttpClient {
     const timeoutId = setTimeout(() => controller.abort(), config.timeout || 30000);
 
     try {
-      const response = await fetch(url, {
+      const fetchOptions: RequestInit = {
         method: config.method || 'GET',
-        headers: config.headers,
-        body: config.body ? JSON.stringify(config.body) : undefined,
         signal: controller.signal
-      });
+      };
+
+      if (config.headers) {
+        fetchOptions.headers = config.headers;
+      }
+
+      if (config.body) {
+        fetchOptions.body = JSON.stringify(config.body);
+      }
+
+      const response = await fetch(url, fetchOptions);
 
       clearTimeout(timeoutId);
 

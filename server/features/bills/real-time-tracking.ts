@@ -1,17 +1,17 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { authenticateToken } from '../../middleware/auth.js';
-import type { AuthenticatedRequest } from '../../middleware/auth.js';
+import { authenticateToken } from '@server/middleware/auth.js';
+import type { AuthenticatedRequest } from '@server/middleware/auth.js';
 import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '@shared/core/utils/api';
-import { logger   } from '@shared/core/src/index.js';
-import { webSocketService } from '../../infrastructure/websocket.js';
-// import { billService } from '../application/bills';
+import { logger   } from '@shared/core/index.js';
+import { webSocketService } from '@server/infrastructure/websocket.js';
+// import { billService } from '@shared/application/bills';
 const billService = {
   getBills: async () => [] as any[],
   getBill: async (id: number) => ({ id, title: 'Mock Bill', status: 'introduced', updated_at: new Date(), views: 0, comments: 0 }),
   incrementBillViews: async (id: number) => ({ id, views: 1 }),
   incrementBillShares: async (id: number) => ({ id, shares: 1 })
 };
-import { createRateLimit } from '../../middleware/rate-limiter.js';
+import { createRateLimit } from '@server/middleware/rate-limiter.js';
 
 const router = Router();
 

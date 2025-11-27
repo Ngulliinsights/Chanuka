@@ -754,6 +754,211 @@ class PolyfillManager {
   }
 
   /**
+   * AbortController polyfill for request cancellation support
+   */
+  async loadAbortControllerPolyfill(): Promise<void> {
+    await this.loadPolyfillIfNeeded(
+      'abortController',
+      () => typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined',
+      () => {
+        if (typeof AbortController !== 'undefined') return;
+
+        // Simple AbortController polyfill
+        class AbortSignalPolyfill extends EventTarget {
+          public aborted: boolean = false;
+          public reason: any = undefined;
+
+          constructor() {
+            super();
+          }
+
+          throwIfAborted(): void {
+            if (this.aborted) {
+              throw this.reason || new Error('AbortError');
+            }
+          }
+
+          static timeout(delay: number): AbortSignalPolyfill {
+            const signal = new AbortSignalPolyfill();
+            setTimeout(() => {
+              signal.aborted = true;
+              signal.reason = new Error('TimeoutError');
+              signal.dispatchEvent(new Event('abort'));
+            }, delay);
+            return signal;
+          }
+        }
+
+        class AbortControllerPolyfill {
+          public signal: AbortSignalPolyfill;
+
+          constructor() {
+            this.signal = new AbortSignalPolyfill();
+          }
+
+          abort(reason?: any): void {
+            if (this.signal.aborted) return;
+            
+            this.signal.aborted = true;
+            this.signal.reason = reason || new Error('AbortError');
+            this.signal.dispatchEvent(new Event('abort'));
+          }
+        }
+
+        (window as any).AbortController = AbortControllerPolyfill;
+        (window as any).AbortSignal = AbortSignalPolyfill;
+      }
+    );
+  }
+
+  /**
+   * URL and URLSearchParams polyfills for URL manipulation
+   */
+  async loadURLPolyfills(): Promise<void> {
+    await this.loadPolyfillIfNeeded(
+      'urlSearchParams',
+      () => typeof URLSearchParams !== 'undefined',
+      () => {
+        if (typeof URLSearchParams !== 'undefined') return;
+
+        (window as any).URLSearchParams = class URLSearchParamsPolyfill {
+          private params: Map<string, string[]> = new Map();
+
+          constructor(init?: string | URLSearchParamsPolyfill | Record<string, string>) {
+            if (typeof init === 'string') {
+              this.parseString(init);
+            } else if (init instanceof URLSearchParamsPolyfill) {
+              this.params = new Map(init.params);
+            } else if (init && typeof init === 'object') {
+              Object.entries(init).forEach(([key, value]) => {
+                this.append(key, value);
+              });
+            }
+          }
+
+          private parseString(str: string): void {
+            const pairs = str.replace(/^\?/, '').split('&');
+            pairs.forEach(pair => {
+              if (pair) {
+                const [key, value = ''] = pair.split('=');
+                this.append(decodeURIComponent(key), decodeURIComponent(value));
+              }
+            });
+          }
+
+          append(name: string, value: string): void {
+            const values = this.params.get(name) || [];
+            values.push(String(value));
+            this.params.set(name, values);
+          }
+
+          delete(name: string): void {
+            this.params.delete(name);
+          }
+
+          get(name: string): string | null {
+            const values = this.params.get(name);
+            return values ? values[0] : null;
+          }
+
+          getAll(name: string): string[] {
+            return this.params.get(name) || [];
+          }
+
+          has(name: string): boolean {
+            return this.params.has(name);
+          }
+
+          set(name: string, value: string): void {
+            this.params.set(name, [String(value)]);
+          }
+
+          toString(): string {
+            const pairs: string[] = [];
+            this.params.forEach((values, name) => {
+              values.forEach(value => {
+                pairs.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
+              });
+            });
+            return pairs.join('&');
+          }
+
+          *[Symbol.iterator](): Iterator<[string, string]> {
+            for (const [name, values] of this.params) {
+              for (const value of values) {
+                yield [name, value];
+              }
+            }
+          }
+        };
+      }
+    );
+  }
+
+  /**
+   * FormData polyfill for form handling
+   */
+  async loadFormDataPolyfill(): Promise<void> {
+    await this.loadPolyfillIfNeeded(
+      'formData',
+      () => typeof FormData !== 'undefined',
+      () => {
+        if (typeof FormData !== 'undefined') return;
+
+        (window as any).FormData = class FormDataPolyfill {
+          private data: Map<string, (string | File)[]> = new Map();
+
+          append(name: string, value: string | File, filename?: string): void {
+            const values = this.data.get(name) || [];
+            if (value instanceof File && filename) {
+              // Create a new File with the specified filename
+              const newFile = new File([value], filename, { type: value.type });
+              values.push(newFile);
+            } else {
+              values.push(value);
+            }
+            this.data.set(name, values);
+          }
+
+          delete(name: string): void {
+            this.data.delete(name);
+          }
+
+          get(name: string): string | File | null {
+            const values = this.data.get(name);
+            return values ? values[0] : null;
+          }
+
+          getAll(name: string): (string | File)[] {
+            return this.data.get(name) || [];
+          }
+
+          has(name: string): boolean {
+            return this.data.has(name);
+          }
+
+          set(name: string, value: string | File, filename?: string): void {
+            if (value instanceof File && filename) {
+              const newFile = new File([value], filename, { type: value.type });
+              this.data.set(name, [newFile]);
+            } else {
+              this.data.set(name, [value]);
+            }
+          }
+
+          *[Symbol.iterator](): Iterator<[string, string | File]> {
+            for (const [name, values] of this.data) {
+              for (const value of values) {
+                yield [name, value];
+              }
+            }
+          }
+        };
+      }
+    );
+  }
+
+  /**
    * Load all critical polyfills in parallel for optimal performance.
    * This method orchestrates loading all necessary polyfills while handling
    * failures gracefully to prevent blocking application startup.
@@ -767,6 +972,9 @@ class PolyfillManager {
     // Load remaining polyfills in parallel for best performance
     const polyfillPromises = [
       this.loadFetchPolyfill(),
+      this.loadAbortControllerPolyfill(),
+      this.loadURLPolyfills(),
+      this.loadFormDataPolyfill(),
       this.loadStoragePolyfills(),
       this.loadArrayPolyfills(),
       this.loadObjectPolyfills(),
@@ -858,6 +1066,18 @@ export async function loadPromisePolyfill(): Promise<void> {
 
 export async function loadStoragePolyfills(): Promise<void> {
   return polyfillManager.loadStoragePolyfills();
+}
+
+export async function loadAbortControllerPolyfill(): Promise<void> {
+  return polyfillManager.loadAbortControllerPolyfill();
+}
+
+export async function loadURLPolyfills(): Promise<void> {
+  return polyfillManager.loadURLPolyfills();
+}
+
+export async function loadFormDataPolyfill(): Promise<void> {
+  return polyfillManager.loadFormDataPolyfill();
 }
 
 // Export status checking functions for monitoring

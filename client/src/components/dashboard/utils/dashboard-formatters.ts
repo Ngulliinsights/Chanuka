@@ -9,7 +9,7 @@ import type {
   TrackedTopic, 
   ActionPriority,
   TopicCategory 
-} from '../types';
+} from '@client/types';
 
 /**
  * Format activity summary for display

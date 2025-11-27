@@ -5,7 +5,7 @@ import {
   generateComponentTemplate,
   type ComponentTemplateConfig,
   type TemplateFile
-} from '../component-templates';
+} from '@client/component-templates';
 
 describe('Component Template System', () => {
   describe('ComponentTemplateGenerator', () => {

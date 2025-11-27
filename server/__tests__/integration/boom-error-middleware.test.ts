@@ -10,8 +10,8 @@ import request from 'supertest';
 import express from 'express';
 import * as Boom from '@hapi/boom';
 import { ZodError } from 'zod';
-import { boomErrorMiddleware, asyncErrorHandler, errorContextMiddleware } from '../../middleware/boom-error-middleware.js';
-import { errorAdapter } from '../../infrastructure/errors/error-adapter.js';
+import { boomErrorMiddleware, asyncErrorHandler, errorContextMiddleware } from '@server/middleware/boom-error-middleware.js';
+import { errorAdapter } from '@server/infrastructure/errors/error-adapter.js';
 
 describe('Boom Error Middleware Integration Tests', () => {
   let app: express.Express;

@@ -4,7 +4,7 @@
  */
 
 import { LoadingProgress, LoadingStage } from '@client/types';
-import { validateLoadingProgress } from '../validation';
+import { validateLoadingProgress } from '@client/validation';
 
 /**
  * Progress calculation utilities

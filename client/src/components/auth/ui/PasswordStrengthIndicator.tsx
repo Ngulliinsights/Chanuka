@@ -7,7 +7,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { AuthConfig } from '@client/types';
 import { usePasswordStrength } from '@client/hooks/usePasswordUtils';
-import { PASSWORD_STRENGTH_LEVELS, PASSWORD_STRENGTH_LABELS, PASSWORD_STRENGTH_COLORS } from '../constants';
+import { PASSWORD_STRENGTH_LEVELS, PASSWORD_STRENGTH_LABELS, PASSWORD_STRENGTH_COLORS } from '@client/constants';
 
 export interface PasswordStrengthIndicatorProps {
   password: string;

@@ -16,8 +16,8 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { databaseFallbackService } from '../../infrastructure/database/database-fallback.ts';
-import { demoDataService } from '../../infrastructure/demo-data.js';
+import { databaseFallbackService } from '@server/infrastructure/database/database-fallback.ts';
+import { demoDataService } from '@server/infrastructure/demo-data.js';
 import request from 'supertest';
 import { app } from '../../index.js';
 import { logger  } from '@shared/core/src/index.js';

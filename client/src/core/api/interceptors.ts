@@ -12,24 +12,213 @@
  * - Built-in common interceptors (auth, logging, headers)
  */
 
-import { logger } from '@client/utils/logger';
-import type { RequestInterceptor, ResponseInterceptor } from '@client/types';
+import { logger, BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+
+// Define interceptor types locally since @client/types is not available
+type RequestInterceptor = (config: RequestInit & { url: string }) => Promise<RequestInit & { url: string }> | RequestInit & { url: string };
+type ResponseInterceptor = (response: Response) => Promise<Response> | Response;
+
+// ============================================================================
+// Circuit Breaker Implementation
+// ============================================================================
+
+interface CircuitBreakerState {
+  state: 'closed' | 'open' | 'half-open';
+  failureCount: number;
+  lastFailureTime?: number;
+  nextRetryTime?: number;
+  successCount: number;
+  // Additional properties for monitoring
+  failures: number;
+  successes: number;
+  rejected: number;
+  failureRate: number;
+  averageResponseTime: number;
+}
+
+interface CircuitBreakerConfig {
+  failureThreshold: number;
+  recoveryTimeout: number;
+  monitoringPeriod: number;
+  halfOpenMaxCalls: number;
+}
+
+class CircuitBreaker {
+  private states = new Map<string, CircuitBreakerState>();
+  private config: CircuitBreakerConfig;
+
+  constructor(config: Partial<CircuitBreakerConfig> = {}) {
+    this.config = {
+      failureThreshold: 5,
+      recoveryTimeout: 60000, // 1 minute
+      monitoringPeriod: 10000, // 10 seconds
+      halfOpenMaxCalls: 3,
+      ...config
+    };
+  }
+
+  private getServiceKey(url: string): string {
+    try {
+      const urlObj = new URL(url);
+      return `${urlObj.protocol}//${urlObj.host}`;
+    } catch {
+      return url;
+    }
+  }
+
+  private getState(serviceKey: string): CircuitBreakerState {
+    if (!this.states.has(serviceKey)) {
+      this.states.set(serviceKey, {
+        state: 'closed',
+        failureCount: 0,
+        successCount: 0,
+        failures: 0,
+        successes: 0,
+        rejected: 0,
+        failureRate: 0,
+        averageResponseTime: 0
+      });
+    }
+    return this.states.get(serviceKey)!;
+  }
+
+  private updateState(serviceKey: string, state: Partial<CircuitBreakerState>): void {
+    const currentState = this.getState(serviceKey);
+    this.states.set(serviceKey, { ...currentState, ...state });
+  }
+
+  canExecute(url: string): { allowed: boolean; reason?: string } {
+    const serviceKey = this.getServiceKey(url);
+    const state = this.getState(serviceKey);
+    const now = Date.now();
+
+    switch (state.state) {
+      case 'closed':
+        return { allowed: true };
+
+      case 'open':
+        if (state.nextRetryTime && now >= state.nextRetryTime) {
+          // Transition to half-open
+          this.updateState(serviceKey, {
+            state: 'half-open',
+            successCount: 0
+          });
+          return { allowed: true };
+        }
+        return {
+          allowed: false,
+          reason: `Circuit breaker is open for ${serviceKey}. Next retry at ${new Date(state.nextRetryTime || 0).toISOString()}`
+        };
+
+      case 'half-open':
+        if (state.successCount < this.config.halfOpenMaxCalls) {
+          return { allowed: true };
+        }
+        return {
+          allowed: false,
+          reason: `Circuit breaker is half-open and has reached max calls for ${serviceKey}`
+        };
+
+      default:
+        return { allowed: true };
+    }
+  }
+
+  recordSuccess(url: string): void {
+    const serviceKey = this.getServiceKey(url);
+    const state = this.getState(serviceKey);
+
+    // Update monitoring properties
+    const newSuccesses = state.successes + 1;
+    const totalRequests = state.failures + newSuccesses;
+    const newFailureRate = totalRequests > 0 ? (state.failures / totalRequests) * 100 : 0;
+
+    if (state.state === 'half-open') {
+      const newSuccessCount = state.successCount + 1;
+      if (newSuccessCount >= this.config.halfOpenMaxCalls) {
+        // Transition back to closed
+        this.updateState(serviceKey, {
+          state: 'closed',
+          failureCount: 0,
+          successCount: 0,
+          lastFailureTime: undefined,
+          nextRetryTime: undefined,
+          successes: newSuccesses,
+          failureRate: newFailureRate
+        });
+      } else {
+        this.updateState(serviceKey, { 
+          successCount: newSuccessCount,
+          successes: newSuccesses,
+          failureRate: newFailureRate
+        });
+      }
+    } else if (state.state === 'closed') {
+      // Reset failure count on success
+      this.updateState(serviceKey, { 
+        failureCount: 0,
+        successes: newSuccesses,
+        failureRate: newFailureRate
+      });
+    }
+  }
+
+  recordFailure(url: string): void {
+    const serviceKey = this.getServiceKey(url);
+    const state = this.getState(serviceKey);
+    const now = Date.now();
+
+    const newFailureCount = state.failureCount + 1;
+    
+    // Update monitoring properties
+    const newFailures = state.failures + 1;
+    const totalRequests = newFailures + state.successes;
+    const newFailureRate = totalRequests > 0 ? (newFailures / totalRequests) * 100 : 0;
+
+    if (state.state === 'half-open') {
+      // Transition back to open
+      this.updateState(serviceKey, {
+        state: 'open',
+        failureCount: newFailureCount,
+        lastFailureTime: now,
+        nextRetryTime: now + this.config.recoveryTimeout,
+        successCount: 0,
+        failures: newFailures,
+        failureRate: newFailureRate
+      });
+    } else if (newFailureCount >= this.config.failureThreshold) {
+      // Transition to open
+      this.updateState(serviceKey, {
+        state: 'open',
+        failureCount: newFailureCount,
+        lastFailureTime: now,
+        nextRetryTime: now + this.config.recoveryTimeout,
+        failures: newFailures,
+        failureRate: newFailureRate
+      });
+    } else {
+      this.updateState(serviceKey, {
+        failureCount: newFailureCount,
+        lastFailureTime: now,
+        failures: newFailures,
+        failureRate: newFailureRate
+      });
+    }
+  }
+
+  getStats(): Record<string, CircuitBreakerState> {
+    return Object.fromEntries(this.states.entries());
+  }
+}
+
+// Global circuit breaker instance
+const circuitBreaker = new CircuitBreaker();
 
 // ============================================================================
 // Interceptor Configuration
 // ============================================================================
 
-interface InterceptorConfig {
-  readonly enabled: boolean;
-  readonly priority?: number;
-  readonly name?: string;
-}
-
-interface InterceptorContext {
-  readonly requestId: string;
-  readonly timestamp: number;
-  readonly metadata: Record<string, unknown>;
-}
+// Removed unused interfaces InterceptorConfig and InterceptorContext
 
 // ============================================================================
 // Utility Functions
@@ -53,9 +242,36 @@ function getMetaTagContent(name: string): string | null {
   if (typeof document === 'undefined') {
     return null;
   }
-  
+
   const element = document.querySelector(`meta[name="${name}"]`);
   return element?.getAttribute('content') ?? null;
+}
+
+/**
+ * Extracts service name from URL for circuit breaker monitoring
+ */
+function getServiceNameFromUrl(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+
+    // Map common API paths to service names
+    if (pathname.startsWith('/api/government')) return 'government-data';
+    if (pathname.startsWith('/api/social')) return 'social-media';
+    if (pathname.startsWith('/api/external')) return 'external-api';
+    if (pathname.startsWith('/api/admin')) return 'admin-api';
+    if (pathname.startsWith('/api/auth')) return 'auth-api';
+    if (pathname.startsWith('/api/')) return 'internal-api';
+
+    // For external URLs, use the hostname
+    if (urlObj.hostname !== window.location.hostname) {
+      return urlObj.hostname.replace(/\./g, '-');
+    }
+
+    return 'default';
+  } catch {
+    return 'default';
+  }
 }
 
 /**
@@ -127,10 +343,10 @@ export const headerInterceptor: RequestInterceptor = (config) => {
  * can be disabled entirely for performance.
  */
 export const loggingInterceptor: RequestInterceptor = (config) => {
-  const headers = config.headers instanceof Headers 
-    ? config.headers 
+  const headers = config.headers instanceof Headers
+    ? config.headers
     : new Headers(config.headers);
-  
+
   const requestId = headers.get('X-Request-ID') || 'unknown';
 
   logger.debug('Outgoing API Request', {
@@ -182,7 +398,7 @@ export const sanitizationInterceptor: RequestInterceptor = (config) => {
   // Remove any potential password fields from URL params
   const url = new URL(config.url, window.location.origin);
   const sensitiveParams = ['password', 'token', 'secret', 'key'];
-  
+
   sensitiveParams.forEach(param => {
     if (url.searchParams.has(param)) {
       url.searchParams.delete(param);
@@ -216,6 +432,40 @@ export const compressionInterceptor: RequestInterceptor = (config) => {
     ...config,
     headers
   };
+};
+
+/**
+ * Circuit Breaker Interceptor
+ * 
+ * Implements circuit breaker pattern to prevent cascading failures.
+ * Monitors service health and temporarily blocks requests to failing services.
+ */
+export const circuitBreakerInterceptor: RequestInterceptor = (config) => {
+  const { allowed, reason } = circuitBreaker.canExecute(config.url);
+
+  if (!allowed) {
+    logger.warn('Circuit breaker blocked request', {
+      component: 'CircuitBreakerInterceptor',
+      url: config.url,
+      reason
+    });
+
+    // Throw a BaseError with circuit breaker information
+    throw new BaseError('Service temporarily unavailable', {
+      statusCode: 503,
+      code: 'CIRCUIT_BREAKER_OPEN',
+      domain: ErrorDomain.NETWORK,
+      severity: ErrorSeverity.HIGH,
+      retryable: true,
+      context: {
+        url: config.url,
+        reason,
+        circuitBreakerStats: circuitBreaker.getStats()
+      }
+    });
+  }
+
+  return config;
 };
 
 // ============================================================================
@@ -253,7 +503,7 @@ export const responseLoggingInterceptor: ResponseInterceptor = async (response) 
 export const errorResponseInterceptor: ResponseInterceptor = async (response) => {
   if (!response.ok) {
     const requestId = response.headers.get('X-Request-ID') || 'unknown';
-    
+
     logger.warn('API Request Failed', {
       component: 'ResponseInterceptor',
       requestId,
@@ -264,7 +514,7 @@ export const errorResponseInterceptor: ResponseInterceptor = async (response) =>
 
     // Clone response before reading body (can only be read once)
     const clonedResponse = response.clone();
-    
+
     try {
       const errorData = await clonedResponse.json();
       logger.debug('Error Response Body', {
@@ -303,9 +553,91 @@ export const cacheHeaderInterceptor: ResponseInterceptor = (response) => {
       lastModified,
       timestamp: Date.now()
     };
-    
+
     // Store metadata on the response object for later use
     (response as any).__cacheMetadata = metadata;
+  }
+
+  return response;
+};
+
+/**
+ * Circuit Breaker Response Interceptor
+ * 
+ * Records success/failure results for circuit breaker monitoring.
+ * Updates circuit breaker state based on response status.
+ */
+export const circuitBreakerResponseInterceptor: ResponseInterceptor = (response) => {
+  const serviceName = getServiceNameFromUrl(response.url);
+  const correlationId = response.headers.get('X-Correlation-ID') || response.headers.get('X-Request-ID') || undefined;
+
+  if (response.ok) {
+    circuitBreaker.recordSuccess(response.url);
+    logger.debug('Circuit breaker recorded success', {
+      component: 'CircuitBreakerResponseInterceptor',
+      url: response.url,
+      status: response.status,
+      serviceName,
+      correlationId
+    });
+
+    // Record success event for monitoring
+    if (typeof window !== 'undefined') {
+      import('./circuit-breaker-monitor').then(({ recordCircuitBreakerEvent }) => {
+        const stats = circuitBreaker.getStats();
+        const serviceStats = stats[serviceName];
+
+        if (serviceStats) {
+          recordCircuitBreakerEvent({
+            serviceName,
+            state: serviceStats.state as 'open' | 'closed' | 'half-open',
+            timestamp: new Date(),
+            metrics: {
+              failures: serviceStats.failures,
+              successes: serviceStats.successes,
+              rejected: serviceStats.rejected,
+              failureRate: serviceStats.failureRate,
+              averageResponseTime: serviceStats.averageResponseTime
+            },
+            correlationId
+          });
+        }
+      });
+    }
+  } else if (response.status >= 500) {
+    // Only record server errors as circuit breaker failures
+    circuitBreaker.recordFailure(response.url);
+    logger.warn('Circuit breaker recorded failure', {
+      component: 'CircuitBreakerResponseInterceptor',
+      url: response.url,
+      status: response.status,
+      serviceName,
+      correlationId
+    });
+
+    // Record failure event for monitoring
+    if (typeof window !== 'undefined') {
+      import('./circuit-breaker-monitor').then(({ recordCircuitBreakerEvent }) => {
+        const stats = circuitBreaker.getStats();
+        const serviceStats = stats[serviceName];
+
+        if (serviceStats) {
+          recordCircuitBreakerEvent({
+            serviceName,
+            state: serviceStats.state as 'open' | 'closed' | 'half-open',
+            timestamp: new Date(),
+            metrics: {
+              failures: serviceStats.failures,
+              successes: serviceStats.successes,
+              rejected: serviceStats.rejected,
+              failureRate: serviceStats.failureRate,
+              averageResponseTime: serviceStats.averageResponseTime
+            },
+            correlationId
+          });
+        }
+      });
+    }
   }
 
   return response;
@@ -323,6 +655,7 @@ export const cacheHeaderInterceptor: ResponseInterceptor = (response) => {
  * To disable an interceptor, remove it from the array.
  */
 export const requestInterceptors: RequestInterceptor[] = [
+  circuitBreakerInterceptor, // Check circuit breaker first
   headerInterceptor,
   sanitizationInterceptor,
   compressionInterceptor,
@@ -338,6 +671,7 @@ export const requestInterceptors: RequestInterceptor[] = [
  * or perform side effects like logging or caching.
  */
 export const responseInterceptors: ResponseInterceptor[] = [
+  circuitBreakerResponseInterceptor, // Record circuit breaker results first
   cacheHeaderInterceptor,
   errorResponseInterceptor,
   responseLoggingInterceptor
@@ -569,4 +903,20 @@ export function clearRequestInterceptors(): void {
  */
 export function clearResponseInterceptors(): void {
   responseInterceptors.length = 0;
+}
+
+// ============================================================================
+// Circuit Breaker Exports
+// ============================================================================
+
+/**
+ * Export circuit breaker instance for monitoring and manual control
+ */
+export { circuitBreaker };
+
+/**
+ * Get circuit breaker statistics for monitoring dashboards
+ */
+export function getCircuitBreakerStats(): Record<string, CircuitBreakerState> {
+  return circuitBreaker.getStats();
 }

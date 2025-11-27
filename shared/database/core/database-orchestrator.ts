@@ -1,15 +1,15 @@
 /**
  * Database Orchestrator
- * 
+ *
  * Central coordination point for all database operations across the Chanuka platform.
  * This orchestrator unifies connection management, migrations, health monitoring,
  * and operational tasks into a single, cohesive interface.
  */
 
+import { logger } from '../../core/src';
 import { UnifiedConnectionManager } from './connection-manager';
 import { UnifiedHealthMonitor } from './health-monitor';
 import { DatabaseConfigManager } from './unified-config';
-import { UnifiedLogger } from '@/core/src/observability/logging';
 
 // ============================================================================
 // Types and Interfaces
@@ -66,16 +66,15 @@ export interface DatabaseMetrics {
 
 export class DatabaseOrchestrator {
   private static instance: DatabaseOrchestrator;
-  
+
   private connectionManager: UnifiedConnectionManager | null = null;
   private healthMonitor: UnifiedHealthMonitor | null = null;
   private configManager: DatabaseConfigManager;
-  private logger: UnifiedLogger;
-  
+
   private initialized = false;
   private startTime: Date | null = null;
   private shutdownPromise: Promise<void> | null = null;
-  
+
   private config: DatabaseOrchestrationConfig = {
     autoInitialize: true,
     enableHealthMonitoring: true,
@@ -87,7 +86,6 @@ export class DatabaseOrchestrator {
   constructor(config?: Partial<DatabaseOrchestrationConfig>) {
     this.config = { ...this.config, ...config };
     this.configManager = DatabaseConfigManager.getInstance();
-    this.logger = new UnifiedLogger({ name: 'database-orchestrator' });
   }
 
   /**
@@ -105,17 +103,17 @@ export class DatabaseOrchestrator {
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
-      this.logger.warn('Database orchestrator already initialized');
+      logger.warn('Database orchestrator already initialized');
       return;
     }
 
     try {
-      this.logger.info('🚀 Initializing database orchestrator');
+      logger.info('🚀 Initializing database orchestrator');
       this.startTime = new Date();
 
       // Initialize configuration if not already done
       if (!this.configManager['config']) {
-        this.logger.info('📋 Loading database configuration from environment');
+        logger.info('📋 Loading database configuration from environment');
         this.configManager.loadFromEnvironment();
       }
 
@@ -133,10 +131,10 @@ export class DatabaseOrchestrator {
       }
 
       this.initialized = true;
-      this.logger.info('✅ Database orchestrator initialized successfully');
+      logger.info('✅ Database orchestrator initialized successfully');
 
     } catch (error) {
-      this.logger.error('❌ Failed to initialize database orchestrator', { error });
+      logger.error('❌ Failed to initialize database orchestrator', { error });
       await this.cleanup();
       throw error;
     }
@@ -151,7 +149,7 @@ export class DatabaseOrchestrator {
     }
 
     const timeout = timeoutMs || this.config.gracefulShutdownTimeout!;
-    
+
     this.shutdownPromise = this.performShutdown(timeout);
     return this.shutdownPromise;
   }
@@ -204,7 +202,7 @@ export class DatabaseOrchestrator {
         status.connections.analytics = healthStatus.analytics;
         status.connections.security = healthStatus.security;
       } catch (error) {
-        this.logger.error('Failed to get connection status', { error });
+        logger.error('Failed to get connection status', { error });
       }
     }
 
@@ -246,7 +244,7 @@ export class DatabaseOrchestrator {
         metrics.performance.averageQueryTime = connectionMetrics.averageQueryTime;
         metrics.performance.errorRate = connectionMetrics.errorCount / Math.max(connectionMetrics.totalQueries, 1);
       } catch (error) {
-        this.logger.error('Failed to get connection metrics', { error });
+        logger.error('Failed to get connection metrics', { error });
         metrics.health.issues.push('Failed to retrieve connection metrics');
       }
     }
@@ -257,7 +255,7 @@ export class DatabaseOrchestrator {
         metrics.health.status = healthSummary.status as 'healthy' | 'degraded' | 'unhealthy';
         metrics.health.lastCheck = new Date(healthSummary.lastCheck);
       } catch (error) {
-        this.logger.error('Failed to get health metrics', { error });
+        logger.error('Failed to get health metrics', { error });
         metrics.health.issues.push('Failed to retrieve health metrics');
       }
     }
@@ -298,7 +296,7 @@ export class DatabaseOrchestrator {
     } catch (error) {
       healthy = false;
       issues.push(`Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      this.logger.error('Health check failed', { error });
+      logger.error('Health check failed', { error });
     }
 
     return { healthy, issues };
@@ -326,7 +324,7 @@ export class DatabaseOrchestrator {
    * Initialize the connection manager
    */
   private async initializeConnectionManager(): Promise<void> {
-    this.logger.info('🔌 Initializing connection manager');
+    logger.info('🔌 Initializing connection manager');
 
     const connectionConfig = this.configManager.getConnectionConfig();
 
@@ -338,7 +336,7 @@ export class DatabaseOrchestrator {
       await this.connectionManager.initialize();
     }
 
-    this.logger.info('✅ Connection manager initialized');
+    logger.info('✅ Connection manager initialized');
   }
 
   /**
@@ -349,29 +347,29 @@ export class DatabaseOrchestrator {
       throw new Error('Connection manager must be initialized before health monitoring');
     }
 
-    this.logger.info('🏥 Initializing health monitoring');
-    
+    logger.info('🏥 Initializing health monitoring');
+
     const monitoringConfig = this.configManager.getMonitoringConfig();
-    
+
     if (!monitoringConfig.enabled) {
-      this.logger.info('Health monitoring disabled by configuration');
+      logger.info('Health monitoring disabled by configuration');
       return;
     }
 
     // Import and create health monitor
     const { createHealthMonitor } = await import('./health-monitor');
     this.healthMonitor = createHealthMonitor(this.connectionManager, monitoringConfig);
-    
+
     this.healthMonitor.start();
-    
-    this.logger.info('✅ Health monitoring initialized');
+
+    logger.info('✅ Health monitoring initialized');
   }
 
   /**
    * Initialize migrations (placeholder for future implementation)
    */
   private async initializeMigrations(): Promise<void> {
-    this.logger.info('📦 Migration system ready (implementation pending)');
+    logger.info('📦 Migration system ready (implementation pending)');
     // TODO: Implement migration initialization when migration service is moved to shared
   }
 
@@ -379,26 +377,26 @@ export class DatabaseOrchestrator {
    * Perform the actual shutdown process
    */
   private async performShutdown(timeoutMs: number): Promise<void> {
-    this.logger.info('🛑 Shutting down database orchestrator');
+    logger.info('🛑 Shutting down database orchestrator');
 
     const shutdownPromises: Promise<void>[] = [];
 
     // Stop health monitoring
     if (this.healthMonitor) {
-      this.logger.info('Stopping health monitor');
+      logger.info('Stopping health monitor');
       shutdownPromises.push(
         Promise.resolve(this.healthMonitor.stop()).catch(error => {
-          this.logger.error('Error stopping health monitor', { error });
+          logger.error('Error stopping health monitor', { error });
         })
       );
     }
 
     // Close connection manager
     if (this.connectionManager) {
-      this.logger.info('Closing connection manager');
+      logger.info('Closing connection manager');
       shutdownPromises.push(
         this.connectionManager.close().catch(error => {
-          this.logger.error('Error closing connection manager', { error });
+          logger.error('Error closing connection manager', { error });
         })
       );
     }
@@ -407,14 +405,14 @@ export class DatabaseOrchestrator {
     try {
       await Promise.race([
         Promise.all(shutdownPromises),
-        new Promise((_, reject) => 
+        new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Shutdown timeout')), timeoutMs)
         ),
       ]);
-      
-      this.logger.info('✅ Database orchestrator shutdown completed');
+
+      logger.info('✅ Database orchestrator shutdown completed');
     } catch (error) {
-      this.logger.error('⚠️ Database orchestrator shutdown completed with errors', { error });
+      logger.error('⚠️ Database orchestrator shutdown completed with errors', { error });
     } finally {
       await this.cleanup();
     }

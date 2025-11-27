@@ -8,7 +8,7 @@ import type {
   SavedSearch,
   SearchHistory,
   SaveSearchRequest
-} from '../types';
+} from '@client/types';
 
 /**
  * Hook for performing search queries

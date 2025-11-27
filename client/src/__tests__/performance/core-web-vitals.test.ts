@@ -10,8 +10,8 @@ import {
   PerformanceTestUtils,
   screen,
   waitFor
-} from '../../test-utils/comprehensive-test-setup';
-import { App } from '../../App';
+} from '@client/test-utils/comprehensive-test-setup';
+import { App } from '@client/App';
 
 // Mock performance APIs
 const mockPerformanceObserver = vi.fn();

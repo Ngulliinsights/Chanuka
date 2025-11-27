@@ -8,7 +8,7 @@ import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PerformanceDashboard } from '../PerformanceDashboard';
+import { PerformanceDashboard } from '@client/PerformanceDashboard';
 import { renderWithWrapper } from '../../ui/__tests__/test-utils';
 
 // Mock the monitoring service

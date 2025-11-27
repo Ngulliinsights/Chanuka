@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 
 // Import store and slices
-import { store } from '../index';
+import { store } from '@client/index';
 import { login, logout, setUser, setError, clearError } from '../slices/authSlice';
 import { fetchOverviewMetrics, setActiveTab, setLoading, setError as setErrorAnalyticsError, updateFilters, resetFilters, updateRealTimeMetrics, addRealTimeError, addRealTimeAlert } from '../slices/errorAnalyticsSlice';
 

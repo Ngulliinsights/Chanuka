@@ -7,9 +7,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from '@testing-library/react';
-import { LoadingStateManager } from '../LoadingStates';
-import { AssetLoadingProvider, useAssetLoadingContext } from '../AssetLoadingIndicator';
-import { LoadingError, LoadingTimeoutError, LoadingNetworkError } from '../errors';
+import { LoadingStateManager } from '@client/LoadingStates';
+import { AssetLoadingProvider, useAssetLoadingContext } from '@client/AssetLoadingIndicator';
+import { LoadingError, LoadingTimeoutError, LoadingNetworkError } from '@client/errors';
 
 // Mock timers for integration tests
 vi.useFakeTimers();

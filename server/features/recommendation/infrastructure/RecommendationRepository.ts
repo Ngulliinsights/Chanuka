@@ -9,7 +9,7 @@ import {
   sponsors,
 } from '@shared/schema';
 import { eq, and, inArray, or, sql, SQL, gt, desc, count } from 'drizzle-orm';
-import type { PlainBill } from '../domain/recommendation.dto';
+import type { PlainBill } from '@shared/domain/recommendation.dto';
 
 export class RecommendationRepository {
   private get db() {

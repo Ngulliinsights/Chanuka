@@ -10,11 +10,11 @@ import {
   type InsertUser,
   type UserProfile,
   type InsertUserProfile
-} from '../shared/database/connection';
+} from '@shared/shared/database/connection';
 import { eq, and, or, sql } from 'drizzle-orm';
 import type { StorageConfig } from '@/infrastructure/database/base/BaseStorage.js';
 import { BaseStorage } from '@/infrastructure/database/base/BaseStorage.js';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';

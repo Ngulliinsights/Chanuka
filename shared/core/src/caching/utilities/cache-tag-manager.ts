@@ -5,7 +5,7 @@
  * tag patterns, and efficient storage in various cache backends
  */
 
-import { CacheAdapter } from '/core/interfaces';
+import { CacheAdapter } from '../core/interfaces';
 
 export interface TagEntry {
   key: string;

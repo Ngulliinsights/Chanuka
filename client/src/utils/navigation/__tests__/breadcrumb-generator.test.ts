@@ -13,7 +13,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { generateBreadcrumbs, getPageTitle } from '../breadcrumb-generator';
+import { generateBreadcrumbs, getPageTitle } from '@client/breadcrumb-generator';
 import { logger } from '../../logger';
 
 describe('breadcrumb-generator', () => {

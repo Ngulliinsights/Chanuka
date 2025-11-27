@@ -12,8 +12,8 @@ import {
   getDatabaseIntegration,
   closeDatabaseIntegration,
   defaultDatabaseConfig 
-} from '../../server/infrastructure/database/index.js';
-import { logger } from '../../shared/core/src/index.js';
+} from '@server/infrastructure/database/index.js';
+import { logger } from '@shared/core/src/index.js';
 
 // Load environment variables
 config();

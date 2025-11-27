@@ -3,10 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AppLayout from '../app-layout';
-import { MobileHeader } from '../mobile-header';
-import { Sidebar } from '../sidebar';
-import MobileNavigation from '../mobile-navigation';
+import AppLayout from '@client/app-layout';
+import { MobileHeader } from '@client/mobile-header';
+import { Sidebar } from '@client/sidebar';
+import MobileNavigation from '@client/mobile-navigation';
 import { LayoutConfig, NavigationItem, User, HeaderAction } from '@client/types';
 
 // Mock dependencies

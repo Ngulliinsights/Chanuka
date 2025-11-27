@@ -19,7 +19,7 @@ import {
   usePrivacyControls,
   useTrackEngagement,
   useRecordActivity
-} from '../../features/users/hooks/useUserAPI';
+} from '@client/features/users/hooks/useUserAPI';
 import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
 import { notificationService } from '@client/services/notification-service';
 import { logger } from '@client/utils/logger';

@@ -15,7 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { intelligentSearch } from '../services/intelligent-search';
 import { useDebounce } from '@/hooks/useDebounce';
 import { logger } from '@/utils/logger';
-import type { SearchSuggestion, AutocompleteResult } from '../types';
+import type { SearchSuggestion, AutocompleteResult } from '@client/types';
 
 interface IntelligentAutocompleteProps {
   onSearch: (query: string) => void;

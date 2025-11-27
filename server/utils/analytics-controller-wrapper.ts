@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 import { ApiValidationError, ApiError, ApiSuccess } from './api-response.js';
-import { logger   } from '@shared/core/src/index.js';
-import { AuthenticatedRequest } from '../middleware/auth.js';
+import { logger   } from '@shared/core/index.js';
+import { AuthenticatedRequest } from '@shared/middleware/auth.js';
 
 /**
  * Options for configuring the controller wrapper

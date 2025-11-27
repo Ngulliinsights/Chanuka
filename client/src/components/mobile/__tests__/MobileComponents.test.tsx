@@ -12,14 +12,14 @@ import { BrowserRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 // Import mobile components
-import { MobileBottomSheet, useBottomSheet } from '../MobileBottomSheet';
-import { MobileTabSelector, useMobileTabs } from '../MobileTabSelector';
-import { PullToRefresh } from '../PullToRefresh';
-import { InfiniteScroll } from '../InfiniteScroll';
-import { SwipeGestures } from '../SwipeGestures';
-import { MobileNavigationDrawer } from '../MobileNavigationDrawer';
-import { MobileLayout } from '../MobileLayout';
-import { MobileBarChart, MobilePieChart, MobileMetricCard } from '../MobileDataVisualization';
+import { MobileBottomSheet, useBottomSheet } from '@client/MobileBottomSheet';
+import { MobileTabSelector, useMobileTabs } from '@client/MobileTabSelector';
+import { PullToRefresh } from '@client/PullToRefresh';
+import { InfiniteScroll } from '@client/InfiniteScroll';
+import { SwipeGestures } from '@client/SwipeGestures';
+import { MobileNavigationDrawer } from '@client/MobileNavigationDrawer';
+import { MobileLayout } from '@client/MobileLayout';
+import { MobileBarChart, MobilePieChart, MobileMetricCard } from '@client/MobileDataVisualization';
 
 // Mock hooks
 vi.mock('../../../hooks/use-mobile', () => ({

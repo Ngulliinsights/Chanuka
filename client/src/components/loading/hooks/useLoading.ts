@@ -5,11 +5,11 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { UseLoadingResult, LoadingOperation, LoadingConfig, LoadingStats } from '@client/types';
-import { LoadingError, LoadingOperationFailedError } from '../errors';
+import { LoadingError, LoadingOperationFailedError } from '@client/errors';
 import { createLoadingOperation, generateOperationId } from '@client/utils/loading-utils';
-import { createRecoveryContext, useLoadingRecovery } from '../recovery';
-import { validateLoadingOperation, safeValidateLoadingOperation } from '../validation';
-import { DEFAULT_LOADING_CONFIG } from '../constants';
+import { createRecoveryContext, useLoadingRecovery } from '@client/recovery';
+import { validateLoadingOperation, safeValidateLoadingOperation } from '@client/validation';
+import { DEFAULT_LOADING_CONFIG } from '@client/constants';
 
 export interface UseLoadingOptions {
   config?: Partial<LoadingConfig>;

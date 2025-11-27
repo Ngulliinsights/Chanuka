@@ -10,7 +10,7 @@ import {
   getBrowserRecommendations,
   hasFeature,
   hasCriticalFeatures,
-} from '../browser-compatibility';
+} from '@client/browser-compatibility';
 
 // Mock environment
 const mockNavigator = {

@@ -23,7 +23,7 @@ import type {
   SearchAnalytics,
   SearchHighlight,
   SearchQuery
-} from '../types';
+} from '@client/types';
 
 // ============================================================================
 // Type Definitions

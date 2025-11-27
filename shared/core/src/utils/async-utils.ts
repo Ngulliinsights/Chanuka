@@ -8,7 +8,7 @@
  * and other sources into a unified, framework-agnostic interface.
  */
 
-import { logger } from '../observability/logging';
+import { logger } from '@shared/observability/logging';
 
 // ==================== Type Definitions ====================
 

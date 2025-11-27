@@ -14,8 +14,8 @@ import {
 
 import { useAuthForm } from '../hooks/useAuthForm';
 import { usePasswordStrength, usePasswordVisibility, usePasswordValidation } from '../hooks/usePasswordUtils';
-import { AuthError, AuthValidationError } from '../errors';
-import { AuthMode } from '../types';
+import { AuthError, AuthValidationError } from '@client/errors';
+import { AuthMode } from '@client/types';
 
 // Mock the auth hook
 const mockLogin = vi.fn();

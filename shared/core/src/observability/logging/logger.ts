@@ -1,10 +1,13 @@
 // `pino` is an optional runtime dependency; if not available fall back to console-based logger
 let pino: any = null;
-try {
-  pino = (await import('pino')).default;
-} catch (_err) {
-  pino = null;
+async function initPino() {
+  try {
+    pino = await import('pino');
+  } catch (_err) {
+    pino = null;
+  }
 }
+initPino();
 
 // Conditionally import Node.js specific modules only when not in browser
 let AsyncLocalStorage: any = null;
@@ -16,22 +19,27 @@ let perf_hooks: any = null;
 
 const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
 
-if (isNode) {
-  try {
-    const asyncHooks = await import('node:async_hooks');
-    AsyncLocalStorage = asyncHooks.AsyncLocalStorage;
-    const fsModule = await import('fs');
-    fs = fsModule.promises;
-    fsSync = fsModule;
-    path = (await import('path')).default;
-    crypto = (await import('crypto')).default;
-    perf_hooks = (await import('perf_hooks')).default;
-  } catch (_err) {
-    console.error('Failed to load Node.js modules:', _err);
-    // Fallback if modules not available
+async function initNodeModules() {
+  if (isNode) {
+    try {
+      const asyncHooks = await import('node:async_hooks');
+      AsyncLocalStorage = asyncHooks.AsyncLocalStorage;
+      const fsModule = await import('fs');
+      fs = fsModule.promises;
+      fsSync = fsModule;
+      path = await import('path');
+      crypto = await import('crypto');
+      perf_hooks = await import('perf_hooks');
+    } catch (_err) {
+      console.error('Failed to load Node.js modules:', _err);
+      // Fallback if modules not available
+    }
   }
-} else {
-  // Browser-compatible fallback for AsyncLocalStorage
+}
+initNodeModules();
+
+// Browser-compatible fallback for AsyncLocalStorage
+if (!AsyncLocalStorage) {
   AsyncLocalStorage = class BrowserAsyncLocalStorage<T> {
     private store: T | undefined;
 

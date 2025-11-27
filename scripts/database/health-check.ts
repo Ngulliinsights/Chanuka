@@ -12,7 +12,7 @@
  *   npm run db:health -- --json --performance
  */
 
-import { BaseDatabaseScript, ScriptContext, ScriptResult, ScriptOptions } from '../../shared/database/utils/base-script';
+import { BaseDatabaseScript, ScriptContext, ScriptResult, ScriptOptions } from '@shared/database/utils/base-script';
 
 // ============================================================================
 // Enhanced Health Check Configuration

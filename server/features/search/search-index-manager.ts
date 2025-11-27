@@ -1,10 +1,10 @@
 import { sql } from "drizzle-orm";
 import { databaseService } from "@server/services/database-service.ts";
 import { readDatabase } from '@shared/database';
-import { cacheService } from "../../infrastructure/cache/cache-service.js";
-import { demoDataService } from "../../infrastructure/demo-data.js";
+import { cacheService } from '@server/infrastructure/cache/cache-service.js';
+import { demoDataService } from '@server/infrastructure/demo-data.js';
 import * as schema from "@shared/schema";
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 
 // Search index health status
 export interface SearchIndexHealth {

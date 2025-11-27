@@ -1,7 +1,7 @@
 import { readDatabase } from '@shared/database';
 import { databaseService } from '@/infrastructure/database/database-service.js';
 import { cacheService } from '@/infrastructure/cache/cache-service.js';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import * as schema from "@shared/schema";
 import { eq, desc, and, sql, count, like, or, gte } from "drizzle-orm";
 

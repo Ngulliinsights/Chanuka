@@ -6,7 +6,7 @@
  */
 
 import { jest, describe, beforeEach, afterEach, it, expect } from '@jest/globals';
-import { UnifiedApiClientImpl, globalApiClient } from '../client';
+import { UnifiedApiClientImpl, globalApiClient } from '@client/client';
 import { ApiResponse } from '@client/types';
 
 // Mock fetch globally

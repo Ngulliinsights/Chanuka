@@ -9,7 +9,7 @@ import { validatePassword } from '@/utils/password-validation';
 import { validateEmail } from '@/utils/input-validation';
 import { logger } from '@/utils/logger';
 import { LoginCredentials, RegisterData } from '@/types/auth';
-import { UseAuthFormOptions, UseAuthFormReturn, FormData, FormFieldName } from '../types';
+import { UseAuthFormOptions, UseAuthFormReturn, FormData, FormFieldName } from '@client/types';
 
 const initialFormData: FormData = {
   email: '',

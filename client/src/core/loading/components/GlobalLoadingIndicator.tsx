@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { useLoading } from '../context';
+import { useLoading } from '@client/context';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LoadingProgress } from './LoadingProgress';
 

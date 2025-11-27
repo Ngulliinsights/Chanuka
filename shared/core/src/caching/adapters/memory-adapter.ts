@@ -4,8 +4,8 @@
  * High-performance in-memory cache with LRU eviction and TTL support
  */
 
-import { BaseCacheAdapter } from '/core/base-adapter.js';
-import { CacheAdapterConfig } from '/core/interfaces.js';
+import { BaseCacheAdapter } from '../core/base-adapter';
+import { CacheAdapterConfig } from '../core/interfaces';
 
 export interface MemoryAdapterConfig extends CacheAdapterConfig {
   maxSize?: number;

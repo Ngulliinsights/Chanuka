@@ -3,10 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AppLayout from '../app-layout';
+import AppLayout from '@client/app-layout';
 import { LayoutConfig } from '@client/types';
-import { LayoutError } from '../errors';
-import { LayoutRenderError, LayoutResponsiveError } from '../errors';
+import { LayoutError } from '@client/errors';
+import { LayoutRenderError, LayoutResponsiveError } from '@client/errors';
 
 // Mock dependencies
 vi.mock('@/hooks/use-unified-navigation', () => ({

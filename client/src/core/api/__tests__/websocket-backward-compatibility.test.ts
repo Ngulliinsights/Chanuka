@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { UnifiedWebSocketManager, globalWebSocketPool } from '../websocket';
+import { UnifiedWebSocketManager, globalWebSocketPool } from '@client/websocket';
 import { WebSocketClient, webSocketClient } from '@client/services/websocket-client';
 import { ConnectionState } from '@client/types';
 

@@ -18,7 +18,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import MobileNavigation from '../mobile-navigation';
+import MobileNavigation from '@client/mobile-navigation';
 import { NavigationItem, User } from '@client/types';
 
 // Mock dependencies

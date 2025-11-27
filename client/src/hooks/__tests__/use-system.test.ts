@@ -8,7 +8,7 @@ import {
   useSystemActivity,
   useSystemSchema,
   useSystemEnvironment
-} from '../use-system';
+} from '@client/use-system';
 
 // Mock the API service
 vi.mock('../services/api', () => ({

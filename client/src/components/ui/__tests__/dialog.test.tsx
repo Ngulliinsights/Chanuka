@@ -6,8 +6,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { EnhancedDialog } from '../dialog';
-import { UIDialogError } from '../errors';
+import { EnhancedDialog } from '@client/dialog';
+import { UIDialogError } from '@client/errors';
 
 describe('EnhancedDialog', () => {
   const defaultProps = {

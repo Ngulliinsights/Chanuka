@@ -4,8 +4,8 @@
  */
 
 import { LoadingOperation, LoadingStage, LoadingProgress, LoadingPriority, LoadingType } from '@client/types';
-import { LOADING_PRIORITIES, LOADING_TIMEOUTS, RETRY_DELAYS } from '../constants';
-import { validateLoadingOperation, validateLoadingStage } from '../validation';
+import { LOADING_PRIORITIES, LOADING_TIMEOUTS, RETRY_DELAYS } from '@client/constants';
+import { validateLoadingOperation, validateLoadingStage } from '@client/validation';
 
 /**
  * Generate unique operation ID

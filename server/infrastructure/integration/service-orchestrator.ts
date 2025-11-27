@@ -4,7 +4,7 @@
 // Coordinates interactions between different services and ensures data consistency
 
 import { logger } from '@shared/core/index.js';
-import { databaseService } from '../database/database-service.js';
+import { databaseService } from '@shared/database/database-service.js';
 import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service.ts';
 import { searchService } from '@server/features/search/application/search-service.ts';
 import { RecommendationService } from '@server/features/recommendation/application/RecommendationService.ts';

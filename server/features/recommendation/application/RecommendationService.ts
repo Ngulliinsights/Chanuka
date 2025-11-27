@@ -7,11 +7,11 @@ import {
   type Bill,
 } from '@shared/schema';
 import { readDatabase } from '@shared/database';
-import { logger   } from '@shared/core/src/index.js';
-import { RecommendationEngine } from '../domain/RecommendationEngine';
-import { RecommendationValidator } from '../domain/RecommendationValidator';
-import { RecommendationRepository } from '../infrastructure/RecommendationRepository';
-import { RecommendationCache } from '../infrastructure/RecommendationCache';
+import { logger   } from '@shared/core/index.js';
+import { RecommendationEngine } from '@shared/domain/RecommendationEngine';
+import { RecommendationValidator } from '@shared/domain/RecommendationValidator';
+import { RecommendationRepository } from '@shared/infrastructure/RecommendationRepository';
+import { RecommendationCache } from '@shared/infrastructure/RecommendationCache';
 
 /**
  * Recommendation Service

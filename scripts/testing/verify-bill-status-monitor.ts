@@ -2,7 +2,7 @@ import { billStatusMonitorService } from './services/bill-status-monitor.js';
 import { billService } from './services/bill-service.js';
 import { webSocketService } from './services/websocket.js';
 import { db } from '@shared/database/pool.js';
-import { users, bills } from '../shared/schema';
+import { users, bills } from '@shared/shared/schema';
 import { logger } from '@shared/core';
 
 async function verifyBillStatusMonitor() {

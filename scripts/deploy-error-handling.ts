@@ -16,8 +16,8 @@
  * at each step to ensure quality and consistency throughout the migration.
  */
 
-import { errorHandlingDeploymentService } from '../server/infrastructure/migration/error-handling-deployment.service.js';
-import { logger } from '../shared/core/src/index.js';
+import { errorHandlingDeploymentService } from '@shared/server/infrastructure/migration/error-handling-deployment.service.js';
+import { logger } from '@shared/shared/core/src/index.js';
 
 /**
  * Formats a percentage value for display with consistent precision

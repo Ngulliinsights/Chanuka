@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useEffect } from 'react';
-import { SECTION_ORDER } from '../constants';
+import { SECTION_ORDER } from '@client/constants';
 import { useNav } from '../hooks/useNav';
 import { NavSection } from './NavSection';
 

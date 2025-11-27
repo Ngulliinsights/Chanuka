@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
-import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from '@shared/core/src/utils/api';
+import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api';
 import { notificationService } from "./notification-service";
-import { authenticateToken as requireAuth } from "../../middleware/auth";
-import { logger } from '@shared/core/src/index.js';
+import { authenticateToken as requireAuth } from '@server/middleware/auth';
+import { logger } from '@shared/core/index.js';
 
 export const router: Router = Router();
 

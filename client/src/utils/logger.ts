@@ -12,9 +12,11 @@
  * - Type-safe error handling with recovery strategies
  * - CSP violation reporting and monitoring
  * - Performance impact tracking with frame rate analysis
+ * - Browser-compatible (no Node.js dependencies)
  */
 
-import { initializeCSPReporting, getCSPConfig, setCSPHeader } from './csp-headers';
+// Import browser-compatible utilities
+import { logger as browserLogger } from './browser-logger';
 
 // ============================================================================
 // Core Logger Interfaces
@@ -513,11 +515,196 @@ const renderTracker = new RenderTracker();
 // Error Handling System
 // ============================================================================
 
-// Import error constants from core error module
-import { ErrorDomain, ErrorSeverity } from '@client/core/error/constants';
+// Import browser-compatible error system
+import {
+    ErrorDomain,
+    ErrorSeverity,
+    BrowserError,
+    logger as baseBrowserLogger
+} from './browser-logger';
+import { setCSPHeader } from './meta-tag-manager';
+import { getCSPConfig } from './csp-headers';
+import { initializeCSPReporting } from './csp-headers';
 
 // Re-export for backward compatibility
-export { ErrorDomain, ErrorSeverity };
+export {
+    ErrorDomain,
+    ErrorSeverity,
+    BrowserError
+};
+
+// Browser-compatible error classes
+export class BaseError extends Error {
+    public readonly errorId: string;
+    public readonly statusCode: number;
+    public readonly code: string;
+    public readonly domain: ErrorDomain;
+    public readonly severity: ErrorSeverity;
+    public readonly timestamp: Date;
+    public readonly retryable: boolean;
+    public readonly context?: Record<string, unknown>;
+    public readonly metadata: {
+        correlationId?: string;
+        timestamp: Date;
+        domain: ErrorDomain;
+        severity: ErrorSeverity;
+        retryable: boolean;
+    };
+
+    constructor(
+        message: string,
+        options: {
+            statusCode?: number;
+            code?: string;
+            domain?: ErrorDomain;
+            severity?: ErrorSeverity;
+            retryable?: boolean;
+            context?: Record<string, unknown>;
+            correlationId?: string;
+        } = {}
+    ) {
+        super(message);
+        this.name = this.constructor.name;
+        this.errorId = `err_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+        this.statusCode = options.statusCode || 500;
+        this.code = options.code || 'INTERNAL_ERROR';
+        this.domain = options.domain || ErrorDomain.COMPONENT;
+        this.severity = options.severity || ErrorSeverity.MEDIUM;
+        this.retryable = options.retryable || false;
+        this.context = options.context;
+        this.timestamp = new Date();
+
+        // Create metadata object for compatibility
+        this.metadata = {
+            correlationId: options.correlationId,
+            timestamp: this.timestamp,
+            domain: this.domain,
+            severity: this.severity,
+            retryable: this.retryable
+        };
+    }
+}
+
+export class ValidationError extends BaseError {
+    constructor(message: string, public details?: Record<string, string[]>) {
+        super(message, {
+            statusCode: 400,
+            code: 'VALIDATION_ERROR',
+            domain: ErrorDomain.VALIDATION,
+            severity: ErrorSeverity.MEDIUM
+        });
+    }
+}
+
+export class NotFoundError extends BaseError {
+    constructor(message: string = 'Resource not found') {
+        super(message, {
+            statusCode: 404,
+            code: 'NOT_FOUND',
+            domain: ErrorDomain.API,
+            severity: ErrorSeverity.LOW
+        });
+    }
+}
+
+export class UnauthorizedError extends BaseError {
+    constructor(message: string = 'Unauthorized') {
+        super(message, {
+            statusCode: 401,
+            code: 'UNAUTHORIZED',
+            domain: ErrorDomain.AUTHENTICATION,
+            severity: ErrorSeverity.HIGH
+        });
+    }
+}
+
+export class ForbiddenError extends BaseError {
+    constructor(message: string = 'Forbidden') {
+        super(message, {
+            statusCode: 403,
+            code: 'FORBIDDEN',
+            domain: ErrorDomain.AUTHENTICATION,
+            severity: ErrorSeverity.HIGH
+        });
+    }
+}
+
+export class ConflictError extends BaseError {
+    constructor(message: string = 'Conflict') {
+        super(message, {
+            statusCode: 409,
+            code: 'CONFLICT',
+            domain: ErrorDomain.API,
+            severity: ErrorSeverity.MEDIUM
+        });
+    }
+}
+
+export class TooManyRequestsError extends BaseError {
+    constructor(message: string = 'Too many requests') {
+        super(message, {
+            statusCode: 429,
+            code: 'TOO_MANY_REQUESTS',
+            domain: ErrorDomain.API,
+            severity: ErrorSeverity.MEDIUM
+        });
+    }
+}
+
+export class ServiceUnavailableError extends BaseError {
+    constructor(message: string = 'Service unavailable') {
+        super(message, {
+            statusCode: 503,
+            code: 'SERVICE_UNAVAILABLE',
+            domain: ErrorDomain.API,
+            severity: ErrorSeverity.HIGH
+        });
+    }
+}
+
+export class DatabaseError extends BaseError {
+    constructor(message: string = 'Database error') {
+        super(message, {
+            statusCode: 500,
+            code: 'DATABASE_ERROR',
+            domain: ErrorDomain.API,
+            severity: ErrorSeverity.HIGH
+        });
+    }
+}
+
+export class ExternalServiceError extends BaseError {
+    constructor(message: string = 'External service error') {
+        super(message, {
+            statusCode: 502,
+            code: 'EXTERNAL_SERVICE_ERROR',
+            domain: ErrorDomain.API,
+            severity: ErrorSeverity.HIGH
+        });
+    }
+}
+
+export class NetworkError extends BaseError {
+    constructor(message: string = 'Network error') {
+        super(message, {
+            statusCode: 0,
+            code: 'NETWORK_ERROR',
+            domain: ErrorDomain.NETWORK,
+            severity: ErrorSeverity.MEDIUM
+        });
+    }
+}
+
+export class CacheError extends BaseError {
+    constructor(message: string = 'Cache error') {
+        super(message, {
+            statusCode: 500,
+            code: 'CACHE_ERROR',
+            domain: ErrorDomain.STORAGE,
+            severity: ErrorSeverity.LOW
+        });
+    }
+}
 
 /**
  * Rich metadata that can be attached to errors for better debugging.
@@ -565,254 +752,12 @@ export interface BaseErrorJSON {
  * Base error class with enhanced metadata and serialization support.
  * Provides a foundation for building domain-specific error types.
  */
-export class BaseError extends Error {
-    public readonly code: string;
-    public readonly status?: number;
-    public readonly details?: Record<string, unknown>;
-    public readonly metadata: ErrorMetadata;
+// BaseError now imported from shared core
 
-    constructor(
-        message: string,
-        code = 'UNKNOWN_ERROR',
-        metadata?: ErrorMetadata,
-        details?: Record<string, unknown>
-    ) {
-        super(message);
-        this.name = this.constructor.name;
-        this.code = code;
-        this.metadata = {
-            timestamp: new Date(),
-            ...metadata
-        };
-        this.details = details;
+// ValidationError is now imported from shared/core with unified BaseError system
 
-        // Maintain proper prototype chain for instanceof checks
-        Object.setPrototypeOf(this, new.target.prototype);
-
-        // Capture stack trace in V8 engines (Chrome, Node.js)
-        if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, this.constructor);
-        }
-    }
-
-    /**
-     * Serializes the error to a JSON-compatible object.
-     * Useful for logging and error reporting systems.
-     */
-    public toJSON(): BaseErrorJSON {
-        return {
-            name: this.name,
-            message: this.message,
-            code: this.code,
-            status: this.status,
-            details: this.details,
-            metadata: {
-                ...this.metadata,
-                timestamp: this.metadata.timestamp?.toISOString(),
-                // Exclude non-serializable recovery strategies
-                recoveryStrategies: this.metadata.recoveryStrategies?.map(s => ({
-                    type: s.type,
-                    label: s.label
-                }))
-            },
-            stack: this.stack
-        };
-    }
-}
-
-/**
- * Validation Error - for input validation failures
- * Compatible with the logger's BaseError class
- */
-export class ValidationError extends BaseError {
-    public readonly errors: Array<{
-        field?: string;
-        code: string;
-        message: string;
-        value?: unknown;
-    }>;
-
-    public readonly field?: string;
-
-    constructor(
-        messageOrZodError: string | any, 
-        errors?: any[], 
-        details?: Record<string, any>
-    ) {
-        let message: string;
-        let validationErrors: Array<{
-            field?: string;
-            code: string;
-            message: string;
-            value?: unknown;
-        }>;
-
-        // Handle ZodError input
-        if (typeof messageOrZodError === 'object' && messageOrZodError?.issues) {
-            message = 'Validation failed';
-            validationErrors = messageOrZodError.issues.map((issue: any) => ({
-                field: issue.path?.join('.') || '',
-                code: issue.code || 'invalid',
-                message: issue.message || 'Invalid value',
-                value: issue.received
-            }));
-        } else {
-            // Handle string message + errors array
-            message = messageOrZodError;
-            validationErrors = errors || [];
-        }
-
-        super(
-            message,
-            'VALIDATION_ERROR',
-            {
-                domain: ErrorDomain.VALIDATION,
-                severity: ErrorSeverity.LOW,
-            },
-            {
-                errors: validationErrors,
-                ...details
-            }
-        );
-
-        this.errors = validationErrors;
-
-        // Set unified interface properties for compatibility
-        if (validationErrors.length === 1 && validationErrors[0]?.field !== undefined) {
-            this.field = validationErrors[0].field;
-        }
-    }
-}
-
-/**
- * Network Error - for network-related failures
- */
-export class NetworkError extends BaseError {
-    constructor(message: string = 'Network error occurred', code: string = 'NETWORK_ERROR', status?: number) {
-        super(message, code, {
-            domain: ErrorDomain.NETWORK,
-            severity: ErrorSeverity.MEDIUM,
-        }, { status });
-        this.name = 'NetworkError';
-    }
-}
-
-/**
- * External Service Error - for third-party service failures
- */
-export class ExternalServiceError extends BaseError {
-    constructor(message: string = 'External service error', code: string = 'EXTERNAL_SERVICE_ERROR', status?: number) {
-        super(message, code, {
-            domain: ErrorDomain.EXTERNAL_SERVICE,
-            severity: ErrorSeverity.MEDIUM,
-        }, { status });
-        this.name = 'ExternalServiceError';
-    }
-}
-
-/**
- * Service Unavailable Error - for 503 errors
- */
-export class ServiceUnavailableError extends BaseError {
-    constructor(message: string = 'Service unavailable', code: string = 'SERVICE_UNAVAILABLE') {
-        super(message, code, {
-            domain: ErrorDomain.NETWORK,
-            severity: ErrorSeverity.HIGH,
-        }, { status: 503 });
-        this.name = 'ServiceUnavailableError';
-    }
-}
-
-/**
- * Database Error - for database-related failures
- */
-export class DatabaseError extends BaseError {
-    constructor(message: string = 'Database error occurred', code: string = 'DATABASE_ERROR') {
-        super(message, code, {
-            domain: ErrorDomain.DATABASE,
-            severity: ErrorSeverity.HIGH,
-        });
-        this.name = 'DatabaseError';
-    }
-}
-
-/**
- * Cache Error - for cache-related failures
- */
-export class CacheError extends BaseError {
-    constructor(message: string = 'Cache error occurred', code: string = 'CACHE_ERROR') {
-        super(message, code, {
-            domain: ErrorDomain.CACHE,
-            severity: ErrorSeverity.LOW,
-        });
-        this.name = 'CacheError';
-    }
-}
-
-/**
- * Unauthorized Error - for 401 errors
- */
-export class UnauthorizedError extends BaseError {
-    constructor(message: string = 'Unauthorized access', code: string = 'UNAUTHORIZED') {
-        super(message, code, {
-            domain: ErrorDomain.AUTHENTICATION,
-            severity: ErrorSeverity.MEDIUM,
-        }, { status: 401 });
-        this.name = 'UnauthorizedError';
-    }
-}
-
-/**
- * Forbidden Error - for 403 errors
- */
-export class ForbiddenError extends BaseError {
-    constructor(message: string = 'Access forbidden', code: string = 'FORBIDDEN') {
-        super(message, code, {
-            domain: ErrorDomain.AUTHORIZATION,
-            severity: ErrorSeverity.MEDIUM,
-        }, { status: 403 });
-        this.name = 'ForbiddenError';
-    }
-}
-
-/**
- * Not Found Error - for 404 errors
- */
-export class NotFoundError extends BaseError {
-    constructor(message: string = 'Resource not found', code: string = 'NOT_FOUND') {
-        super(message, code, {
-            domain: ErrorDomain.RESOURCE,
-            severity: ErrorSeverity.LOW,
-        }, { status: 404 });
-        this.name = 'NotFoundError';
-    }
-}
-
-/**
- * Conflict Error - for 409 errors
- */
-export class ConflictError extends BaseError {
-    constructor(message: string = 'Resource conflict', code: string = 'CONFLICT') {
-        super(message, code, {
-            domain: ErrorDomain.BUSINESS_LOGIC,
-            severity: ErrorSeverity.MEDIUM,
-        }, { status: 409 });
-        this.name = 'ConflictError';
-    }
-}
-
-/**
- * Too Many Requests Error - for 429 errors
- */
-export class TooManyRequestsError extends BaseError {
-    constructor(message: string = 'Too many requests', code: string = 'TOO_MANY_REQUESTS') {
-        super(message, code, {
-            domain: ErrorDomain.RATE_LIMITING,
-            severity: ErrorSeverity.MEDIUM,
-        }, { status: 429 });
-        this.name = 'TooManyRequestsError';
-    }
-}
+// All error classes are now imported from shared/core with unified BaseError system
+// This provides consistent error handling with correlation IDs, recovery strategies, and proper serialization
 
 // ============================================================================
 // Performance Monitoring
@@ -909,147 +854,7 @@ const formatContext = (context?: LogContext): string => {
     }
 };
 
-/**
- * Creates the complete logger implementation with all features.
- * This combines basic logging with advanced render tracking capabilities.
- */
-function createLogger(): ExtendedLogger {
-    return {
-        // Basic logging methods
-        debug: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
-            // Debug logs are completely stripped in production for zero overhead
-            if (process.env.NODE_ENV === 'development') {
-                const contextStr = formatContext(context);
-                const metaStr = meta ? JSON.stringify(meta) : '';
-                console.debug(`[DEBUG] ${message}`, contextStr, metaStr);
-            }
-        },
-
-        info: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
-            const contextStr = formatContext(context);
-            const metaStr = meta ? JSON.stringify(meta) : '';
-            console.info(`[INFO] ${message}`, contextStr, metaStr);
-        },
-
-        warn: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
-            const contextStr = formatContext(context);
-            const metaStr = meta ? JSON.stringify(meta) : '';
-            console.warn(`[WARN] ${message}`, contextStr, metaStr);
-        },
-
-        error: (message: string, context?: LogContext, error?: Error | unknown) => {
-            const contextStr = formatContext(context);
-            console.error(`[ERROR] ${message}`, contextStr, error);
-        },
-
-        // Render tracking methods
-        trackRender: (data: RenderTrackingData) => {
-            try {
-                renderTracker.trackRender(data);
-
-                if (process.env.NODE_ENV === 'development') {
-                    console.debug('[RENDER_TRACK]', {
-                        component: data.component,
-                        renderCount: data.renderCount,
-                        trigger: data.trigger,
-                        timestamp: new Date(data.timestamp).toISOString()
-                    });
-                }
-
-                // Automatically detect potential infinite render loops
-                renderTracker.detectInfiniteRender(data.component);
-            } catch (error) {
-                console.warn('Failed to track render', { component: data.component, error });
-            }
-        },
-
-        trackLifecycle: (data: ComponentLifecycleData) => {
-            try {
-                renderTracker.trackLifecycle(data);
-
-                if (process.env.NODE_ENV === 'development') {
-                    console.debug('[LIFECYCLE_TRACK]', {
-                        component: data.component,
-                        action: data.action,
-                        timestamp: new Date(data.timestamp).toISOString()
-                    });
-                }
-            } catch (error) {
-                console.warn('Failed to track lifecycle', { component: data.component, error });
-            }
-        },
-
-        trackPerformanceImpact: (data: PerformanceImpactData) => {
-            try {
-                renderTracker.trackPerformanceImpact(data);
-
-                if (process.env.NODE_ENV === 'development') {
-                    const memoryStr = data.memoryUsage
-                        ? `${(data.memoryUsage / 1024 / 1024).toFixed(2)}MB`
-                        : 'N/A';
-
-                    console.debug('[PERFORMANCE_TRACK]', {
-                        component: data.component,
-                        renderDuration: `${data.renderDuration.toFixed(2)}ms`,
-                        memoryUsage: memoryStr,
-                        timestamp: new Date(data.timestamp).toISOString()
-                    });
-                }
-
-                // Alert when renders are slow enough to cause visible frame drops
-                if (data.renderDuration > CONFIG.SLOW_RENDER_THRESHOLD) {
-                    console.warn('[SLOW_RENDER]', {
-                        component: data.component,
-                        duration: `${data.renderDuration.toFixed(2)}ms`,
-                        threshold: `${CONFIG.SLOW_RENDER_THRESHOLD}ms`,
-                        estimatedFPS: `${(1000 / data.renderDuration).toFixed(1)}`
-                    });
-                }
-            } catch (error) {
-                console.warn('Failed to track performance impact', {
-                    component: data.component,
-                    error
-                });
-            }
-        },
-
-        detectInfiniteRender: (component: string, threshold?: number) => {
-            try {
-                return renderTracker.detectInfiniteRender(component, threshold);
-            } catch (error) {
-                console.warn('Failed to detect infinite render', { component, error });
-                return false;
-            }
-        },
-
-        getRenderStats: (component?: string) => {
-            try {
-                return renderTracker.getRenderStats(component);
-            } catch (error) {
-                console.warn('Failed to get render stats', { component, error });
-                return {
-                    totalRenders: 0,
-                    averageRenderTime: 0,
-                    lastRenderTime: 0,
-                    infiniteRenderAlerts: 0,
-                    mountCount: 0,
-                    unmountCount: 0
-                };
-            }
-        },
-
-        clearRenderStats: (component?: string) => {
-            try {
-                renderTracker.clearRenderStats(component);
-                console.info('[RENDER_STATS_CLEARED]', {
-                    component: component ?? 'all'
-                });
-            } catch (error) {
-                console.warn('Failed to clear render stats', { component, error });
-            }
-        }
-    };
-}
+// createLogger function removed - now using browser-compatible implementation directly
 
 /**
  * Main logger instance - the primary export that should be used throughout your application.
@@ -1068,7 +873,126 @@ function createLogger(): ExtendedLogger {
  *   const stats = logger.getRenderStats('UserProfile');
  *   console.log(`Total renders: ${stats.totalRenders}`);
  */
-export const logger: ExtendedLogger = createLogger();
+/**
+ * Main logger instance - uses browser-compatible implementation
+ * 
+ * This logger provides all the same functionality as the original but without
+ * Node.js dependencies, making it safe for browser environments.
+ */
+export const logger: ExtendedLogger = {
+    // Delegate basic logging to browser logger
+    debug: baseBrowserLogger.debug,
+    info: baseBrowserLogger.info,
+    warn: baseBrowserLogger.warn,
+    error: baseBrowserLogger.error,
+
+    // Render tracking methods
+    trackRender: (data: RenderTrackingData) => {
+        try {
+            renderTracker.trackRender(data);
+
+            if (process.env.NODE_ENV === 'development') {
+                console.debug('[RENDER_TRACK]', {
+                    component: data.component,
+                    renderCount: data.renderCount,
+                    trigger: data.trigger,
+                    timestamp: new Date(data.timestamp).toISOString()
+                });
+            }
+
+            // Automatically detect potential infinite render loops
+            renderTracker.detectInfiniteRender(data.component);
+        } catch (error) {
+            console.warn('Failed to track render', { component: data.component, error });
+        }
+    },
+
+    trackLifecycle: (data: ComponentLifecycleData) => {
+        try {
+            renderTracker.trackLifecycle(data);
+
+            if (process.env.NODE_ENV === 'development') {
+                console.debug('[LIFECYCLE_TRACK]', {
+                    component: data.component,
+                    action: data.action,
+                    timestamp: new Date(data.timestamp).toISOString()
+                });
+            }
+        } catch (error) {
+            console.warn('Failed to track lifecycle', { component: data.component, error });
+        }
+    },
+
+    trackPerformanceImpact: (data: PerformanceImpactData) => {
+        try {
+            renderTracker.trackPerformanceImpact(data);
+
+            if (process.env.NODE_ENV === 'development') {
+                const memoryStr = data.memoryUsage
+                    ? `${(data.memoryUsage / 1024 / 1024).toFixed(2)}MB`
+                    : 'N/A';
+
+                console.debug('[PERFORMANCE_TRACK]', {
+                    component: data.component,
+                    renderDuration: `${data.renderDuration.toFixed(2)}ms`,
+                    memoryUsage: memoryStr,
+                    timestamp: new Date(data.timestamp).toISOString()
+                });
+            }
+
+            // Alert when renders are slow enough to cause visible frame drops
+            if (data.renderDuration > CONFIG.SLOW_RENDER_THRESHOLD) {
+                console.warn('[SLOW_RENDER]', {
+                    component: data.component,
+                    duration: `${data.renderDuration.toFixed(2)}ms`,
+                    threshold: `${CONFIG.SLOW_RENDER_THRESHOLD}ms`,
+                    estimatedFPS: `${(1000 / data.renderDuration).toFixed(1)}`
+                });
+            }
+        } catch (error) {
+            console.warn('Failed to track performance impact', {
+                component: data.component,
+                error
+            });
+        }
+    },
+
+    detectInfiniteRender: (component: string, threshold?: number) => {
+        try {
+            return renderTracker.detectInfiniteRender(component, threshold);
+        } catch (error) {
+            console.warn('Failed to detect infinite render', { component, error });
+            return false;
+        }
+    },
+
+    getRenderStats: (component?: string) => {
+        try {
+            return renderTracker.getRenderStats(component);
+        } catch (error) {
+            console.warn('Failed to get render stats', { component, error });
+            return {
+                totalRenders: 0,
+                averageRenderTime: 0,
+                lastRenderTime: 0,
+                infiniteRenderAlerts: 0,
+                mountCount: 0,
+                unmountCount: 0
+            };
+        }
+    },
+
+    clearRenderStats: (component?: string) => {
+        try {
+            renderTracker.clearRenderStats(component);
+            console.info('[RENDER_STATS_CLEARED]', {
+                component: component ?? 'all'
+            });
+        } catch (error) {
+            console.warn('Failed to clear render stats', { component, error });
+        }
+    }
+};
 
 // ============================================================================
 // CSP Initialization

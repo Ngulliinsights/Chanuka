@@ -2,16 +2,16 @@ import { Router, Request, Response } from 'express';
 import { sql, eq, and, or, ilike, desc, count } from 'drizzle-orm';
 
 // Local Application Imports
-import { authenticateToken, requireRole } from '../../middleware/auth.js';
+import { authenticateToken, requireRole } from '@server/middleware/auth.js';
 // TODO: Fix bil
-//import { billService } from '../bills/application/bill-service.js';
+//import { billService } from '@shared/bills/application/bill-service.js';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 import { ApiSuccess, ApiError, ApiForbidden } from '@shared/core/utils/api-utils';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Security Services
-import { secureQueryBuilder } from '../../infrastructure/security/secure-query-builder.js';
-import { inputValidationService, commonSchemas } from '../../infrastructure/security/input-validation-service.js';
+import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder.js';
+import { inputValidationService, commonSchemas } from '@server/infrastructure/security/input-validation-service.js';
 
 // Database & Schema Imports
 import { database as db } from '@shared/database';

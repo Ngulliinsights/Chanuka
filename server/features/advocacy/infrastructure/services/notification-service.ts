@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { NotificationPreferences } from '@server/types/index.ts';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface NotificationConfig {
   enableEmail: boolean;

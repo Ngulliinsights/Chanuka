@@ -30,7 +30,7 @@ import {
   isLayoutNavigationError,
   isLayoutUserError,
   isLayoutBreakpointError
-} from '../errors';
+} from '@client/errors';
 
 describe('Layout Errors', () => {
   describe('LayoutError', () => {

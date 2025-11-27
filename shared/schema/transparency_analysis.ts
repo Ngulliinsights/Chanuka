@@ -5,13 +5,13 @@
 // This schema enables "follow the money" accountability features
 
 import {
-  pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-  index, date, check
+  pgTable, text, integer, timestamp, jsonb, numeric, uuid, varchar,
+  index, boolean, date, check
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 
-import { bills, sponsors, users } from "./foundation";
+import { bills, sponsors } from "./foundation";
 
 // ============================================================================
 // CORPORATE ENTITIES - Companies, organizations, and institutions

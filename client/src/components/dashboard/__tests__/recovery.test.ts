@@ -8,7 +8,7 @@ import {
   getRecoveryStrategy,
   executeRecovery,
   formatRecoverySuggestions
-} from '../recovery';
+} from '@client/recovery';
 import {
   DashboardError,
   DashboardDataFetchError,
@@ -17,7 +17,7 @@ import {
   DashboardActionError,
   DashboardTopicError,
   DashboardErrorType
-} from '../errors';
+} from '@client/errors';
 // Define type locally to avoid shared/core dependency
 interface DashboardData {
   id: string;

@@ -14,8 +14,8 @@ import {
   ServiceWorkerUpdateNotifier,
   isOnline,
   addNetworkStatusListener,
-} from '../serviceWorker';
-import { logger } from '../logger';
+} from '@client/serviceWorker';
+import { logger } from '@client/utils/logger';
 
 // Mock logger
 vi.mock('../logger', () => ({

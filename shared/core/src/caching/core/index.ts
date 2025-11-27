@@ -22,7 +22,7 @@ export type {
 } from '../interfaces';
 
 // Base implementation
-export { BaseCacheAdapter } from '../base-cache-adapter';
+export { BaseCacheAdapter } from './base-adapter';
 
 // Re-export Result types for convenience
 export type { Result } from '../../primitives/types/result';

@@ -4,14 +4,13 @@
 // Content moderation, verification, and platform integrity infrastructure
 
 import {
-  pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-  index, uniqueIndex, date, smallint
+  pgTable, text, integer, timestamp, jsonb, numeric, uuid, varchar,
+  index, uniqueIndex, smallint, boolean, date
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 
 import {
-  kenyanCountyEnum,
   moderationStatusEnum,
   verificationStatusEnum,
   severityEnum

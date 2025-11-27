@@ -16,7 +16,7 @@ import type {
   CombinedSearchResult,
   SearchEngineResult 
 } from '../services/intelligent-search';
-import type { AutocompleteResult, SearchSuggestion } from '../types';
+import type { AutocompleteResult, SearchSuggestion } from '@client/types';
 
 interface UseIntelligentSearchOptions {
   debounceMs?: number;

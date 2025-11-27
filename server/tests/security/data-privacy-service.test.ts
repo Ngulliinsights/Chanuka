@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { dataPrivacyService } from '../../infrastructure/security/data-privacy-service.js';
+import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service.js';
 
 // Mock the security audit service
 vi.mock('../../features/security/security-audit-service.js', () => ({

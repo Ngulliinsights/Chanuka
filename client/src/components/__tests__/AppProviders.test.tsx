@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient } from '@tanstack/react-query';
-import { AppProviders } from '../AppProviders';
+import { AppProviders } from '@client/AppProviders';
 
 // Mock all the provider dependencies with context support
 const mockQueryClient = {};

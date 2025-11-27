@@ -8,8 +8,8 @@
 import { abTestingService } from '@/infrastructure/migration/ab-testing.service.js';
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import { dashboardService } from '@/infrastructure/migration/dashboard.service.js';
-import { searchService } from '../application/search-service.js';
-import { logger  } from '@shared/core/src/index.js';
+import { searchService } from '@shared/application/search-service.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface SearchDeploymentConfig {
   component: string;

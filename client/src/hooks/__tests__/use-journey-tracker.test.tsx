@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { useJourneyTracker, useJourneyAnalytics } from '../use-journey-tracker';
+import { useJourneyTracker, useJourneyAnalytics } from '@client/use-journey-tracker';
 import { createNavigationProvider } from '@client/core/navigation/context';
 import { UserJourneyTracker } from '@client/services/UserJourneyTracker';
 import React from 'react';

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { sponsorConflictAnalysisService, SponsorConflictAnalysisService, ConflictDetectionResult, ConflictType, ConflictSeverity, RiskProfile } from '../sponsor-conflict-analysis.service';
 // Mock the NEW repository
-import { sponsorRepository, SponsorRepository } from '../../infrastructure/repositories/sponsors.repository';
+import { sponsorRepository, SponsorRepository } from '@server/infrastructure/repositories/sponsors.repository';
 import * as schema from '@shared/schema'; // Adjusted path
 
 // --- Mock Dependencies ---

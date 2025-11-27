@@ -13,8 +13,8 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { calculateRelatedPages, getContextualSuggestions } from '../related-pages-calculator';
-import { UserRole } from '@/components/navigation';
+import { calculateRelatedPages, getContextualSuggestions } from '@client/related-pages-calculator';
+import { UserRole } from '@client/components/navigation';
 import { logger } from '../../logger';
 
 describe('related-pages-calculator', () => {

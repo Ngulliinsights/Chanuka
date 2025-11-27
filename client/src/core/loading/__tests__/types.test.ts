@@ -25,7 +25,7 @@ import {
   LoadingConnectionError,
   LoadingHookOptions,
   LoadingComponentProps,
-} from '../types';
+} from '@client/types';
 
 describe('Loading Types', () => {
   describe('Type Definitions', () => {

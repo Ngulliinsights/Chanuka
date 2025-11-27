@@ -21,7 +21,7 @@ import {
   validateText,
   sanitizeInput,
   ValidationResult
-} from "../../utils/input-validation";
+} from '@client/utils/input-validation';
 
 interface MobileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;

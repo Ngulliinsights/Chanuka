@@ -1,11 +1,11 @@
 import express from 'express';
 import { sql } from 'drizzle-orm';
-import { database as db } from '@shared/database/index.js';
-import { HealthCheckResponse } from '@server/types/api.ts';
-import { ResponseHelper } from '@shared/core/src/utils/response-helpers.js';
-import { errorTracker } from '@server/core/errors/error-tracker.ts';
-import { schemaValidationService } from '@server/core/validation/schema-validation-service.ts';
-import { validationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
+import { database as db } from '../../../shared/database/index';
+import { HealthCheckResponse } from '../../types/api';
+import { ResponseHelper } from '../../../shared/core/src/utils/response-helpers';
+import { errorTracker } from '../../core/errors/error-tracker';
+import { schemaValidationService } from '../../core/validation/schema-validation-service';
+import { validationMetricsCollector } from '../../core/validation/validation-metrics';
 
 // Define interfaces for type safety
 interface SchemaIssue {
@@ -55,24 +55,20 @@ export function setupSystemRoutes(app: express.Router): void {
 
       // Organize columns by their parent table for easier consumption
       const tables: Record<string, TableColumn[]> = {};
-      
+
       // We explicitly type the parameter here to tell TypeScript what structure to expect
       // This is safer than using 'any' and provides proper autocomplete and error checking
       tableInfo.rows.forEach((row: unknown) => {
         const dbRow = row as DatabaseRow;
-        
+
         // Guard against undefined values - defensive programming for database queries
         if (!dbRow || !dbRow.table_name) {
           return; // Skip malformed rows
         }
-        
+
         // Initialize the table array if this is the first column we've seen for this table
-        if (!tables[dbRow.table_name]) {
-          tables[dbRow.table_name] = [];
-        }
-        
-        // Add this column's information to the appropriate table array
-        tables[dbRow.table_name].push({
+        const tableArray = tables[dbRow.table_name] || (tables[dbRow.table_name] = []);
+        tableArray.push({
           column: dbRow.column_name,
           type: dbRow.data_type,
           nullable: dbRow.is_nullable === 'YES',
@@ -198,7 +194,7 @@ export function setupSystemRoutes(app: express.Router): void {
         const dbRow = row as DatabaseRow;
         return dbRow.table_name;
       });
-      
+
       const expectedTables = ['users', 'bills', 'bill_comments', 'user_profiles', 'bill_engagement'];
 
       // Check for missing required tables
@@ -280,7 +276,7 @@ export function setupSystemRoutes(app: express.Router): void {
         'high',
         'database'
       );
-      
+
       // Return error response while maintaining type consistency
       return ResponseHelper.error(res, {
         statusCode: 500,

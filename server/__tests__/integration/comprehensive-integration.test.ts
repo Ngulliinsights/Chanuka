@@ -4,11 +4,11 @@
 // End-to-end validation of all system integrations and cross-service operations
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { serviceOrchestrator } from '../../infrastructure/integration/service-orchestrator.js';
-import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
-import { errorHandler } from '../../infrastructure/errors/error-standardization.js';
+import { serviceOrchestrator } from '@server/infrastructure/integration/service-orchestrator.js';
+import { performanceMonitor } from '@server/infrastructure/monitoring/performance-monitor.js';
+import { errorHandler } from '@server/infrastructure/errors/error-standardization.js';
 import { TestDataManager } from '@server/utils/test-helpers.ts';
-import { databaseService } from '../../infrastructure/database/database-service.js';
+import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { logger } from '@shared/core/index.js';
 
 describe('Comprehensive Integration Tests', () => {

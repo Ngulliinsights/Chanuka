@@ -14,7 +14,7 @@ import {
   useCommunityAnalytics,
   useCommunityNotifications,
   useCommunityBackend
-} from '../../features/community/hooks/useCommunityWebSocket';
+} from '@client/features/community/hooks/useCommunityWebSocket';
 import { useActivityFeed, useTrendingTopics, useExpertInsights, useCommunityStats } from '@client/features/community/hooks/useCommunity';
 import { useCommunityUI } from '@client/store/slices/communitySlice';
 import { useSafeEffect } from '@client/hooks/useSafeEffect';

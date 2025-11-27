@@ -2,9 +2,9 @@ import express, { Router } from 'express';
 import { bills, bill_sponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '@shared/schema/index.ts';
 import { eq, desc, count, sql, and } from 'drizzle-orm';
 import { asyncHandler } from '@shared/core/observability/error-management/middleware/express-error-middleware';
-import { SponsorshipAnalysisService } from '../application/sponsorship-analysis.service';
+import { SponsorshipAnalysisService } from '@shared/application/sponsorship-analysis.service';
 import { ApiSuccess, ApiError, ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 
 const router = Router();
 

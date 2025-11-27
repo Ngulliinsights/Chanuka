@@ -35,13 +35,13 @@ export type {
   ErrorBoundaryProps as CoreErrorBoundaryProps,
   ErrorFallbackProps as CoreErrorFallbackProps,
   RecoveryResult
-} from '../../core/error/types';
+} from '@client/core/error/types';
 
 export { 
   ErrorDomain, 
   ErrorSeverity, 
   RecoveryAction 
-} from '../../core/error/constants';
+} from '@client/core/error/constants';
 
 // Re-export all error classes from logger where they are defined
 export { 
@@ -57,7 +57,7 @@ export {
   NotFoundError,
   ConflictError,
   TooManyRequestsError,
-} from '../../utils/logger';
+} from '@client/utils/logger';
 
 // Export utility functions
 export { createErrorReporter } from './utils/error-reporter';
@@ -66,7 +66,7 @@ export { getContextualMessage } from './utils/contextual-messages';
 export { getErrorIcon } from './utils/error-icons';
 
 // Lightweight tracing utilities (uses existing logger under the hood)
-export { startTrace, finishTrace, getActiveTracesCount } from '../../utils/tracing';
+export { startTrace, finishTrace, getActiveTracesCount } from '@client/utils/tracing';
 
 
 

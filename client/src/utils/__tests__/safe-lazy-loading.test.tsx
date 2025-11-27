@@ -15,7 +15,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { render, screen, waitFor } from '@testing-library/react';
 import { Suspense } from 'react';
-import { logger } from '../logger';
+import { logger } from '@client/utils/logger';
 import {
   createSafeLazyPage,
   createSafeLazyComponent,
@@ -23,7 +23,7 @@ import {
   createRetryableLazyComponent,
   PageLoader,
   ComponentLoader,
-} from '../safe-lazy-loading';
+} from '@client/safe-lazy-loading';
 
 // Mock components for testing
 const MockSuccessComponent = () => <div>Mock component loaded</div>;

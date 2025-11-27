@@ -23,7 +23,7 @@ import {
   validateComponentConfig,
   validateBatch,
   validateWithWarnings,
-} from '../base-validation';
+} from '@client/base-validation';
 
 describe('BaseValidationError', () => {
   it('should create error with correct properties', () => {

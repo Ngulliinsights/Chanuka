@@ -3,6 +3,9 @@
  * and race conditions in API calls
  */
 import { navigationService } from '@client/services/navigation';
+import { CircuitBreakerClient, createCircuitBreakerClient, ApiResponse as CircuitBreakerResponse } from '@client/core/api/circuit-breaker-client';
+import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+import { logger } from '@client/utils/logger';
 
 export interface APIResponse<T = any> {
   data?: T;
@@ -21,10 +24,32 @@ export class AuthenticatedAPI {
   private static readonly DEFAULT_RETRIES = 3;
   private static readonly DEFAULT_RETRY_DELAY = 1000; // 1 second
 
+  // Circuit breaker client for authenticated requests
+  private static circuitBreakerClient = createCircuitBreakerClient({
+    serviceName: 'authenticated-api',
+    baseUrl: '',
+    timeout: 10000,
+    retryConfig: {
+      maxAttempts: 3,
+      baseDelay: 1000,
+      maxDelay: 15000,
+      backoffMultiplier: 2
+    },
+    defaultHeaders: {
+      'Content-Type': 'application/json'
+    }
+  });
+
   private static getAuthHeaders(): Record<string, string> {
     const token = localStorage.getItem('token');
     if (!token) {
-      throw new Error('Authentication token not found. Please log in.');
+      throw new BaseError('Authentication token not found. Please log in.', {
+        statusCode: 401,
+        code: 'TOKEN_MISSING',
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.HIGH,
+        retryable: false
+      });
     }
 
     return {
@@ -44,70 +69,75 @@ export class AuthenticatedAPI {
       ...fetchOptions
     } = options;
 
-    // Create AbortController for request cancellation
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    try {
+      // Use circuit breaker client for enhanced reliability
+      const response = await this.circuitBreakerClient.request<T>(endpoint, {
+        ...fetchOptions,
+        timeout,
+        headers: {
+          ...this.getAuthHeaders(),
+          ...fetchOptions.headers
+        }
+      });
 
-    let lastError: Error | null = null;
+      logger.debug('Authenticated API request successful', {
+        component: 'AuthenticatedAPI',
+        endpoint,
+        status: response.status,
+        correlationId: response.correlationId
+      });
 
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        const response = await fetch(endpoint, {
-          ...fetchOptions,
-          headers: {
-            ...this.getAuthHeaders(),
-            ...fetchOptions.headers
-          },
-          signal: controller.signal
-        });
+      return { 
+        data: response.data, 
+        status: response.status 
+      };
 
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            // Clear invalid token and redirect to login
-            localStorage.removeItem('token');
-            navigationService.navigate('/auth');
-            throw new Error('Authentication expired. Please log in again.');
-          }
-
-          if (response.status === 403) {
-            throw new Error('Access denied. Insufficient permissions.');
-          }
-
-          if (response.status >= 500 && attempt < retries) {
-            // Retry on server errors
-            await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
-            continue;
-          }
-
-          throw new Error(`Request failed with status ${response.status}`);
+    } catch (error) {
+      if (error instanceof BaseError) {
+        // Handle authentication errors
+        if (error.statusCode === 401 || error.code === 'TOKEN_MISSING') {
+          localStorage.removeItem('token');
+          navigationService.navigate('/auth');
+          
+          throw new BaseError('Authentication expired. Please log in again.', {
+            statusCode: 401,
+            code: 'AUTHENTICATION_EXPIRED',
+            domain: ErrorDomain.AUTHENTICATION,
+            severity: ErrorSeverity.HIGH,
+            correlationId: error.metadata.correlationId,
+            retryable: false
+          });
         }
 
-        const data = await response.json();
-        return { data, status: response.status };
-
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error');
-
-        if (error instanceof Error && error.name === 'AbortError') {
-          throw new Error('Request timeout');
+        // Handle authorization errors
+        if (error.statusCode === 403) {
+          throw new BaseError('Access denied. Insufficient permissions.', {
+            statusCode: 403,
+            code: 'ACCESS_DENIED',
+            domain: ErrorDomain.AUTHORIZATION,
+            severity: ErrorSeverity.HIGH,
+            correlationId: error.metadata.correlationId,
+            retryable: false
+          });
         }
 
-        if (attempt === retries) {
-          break;
-        }
-
-        // Wait before retry
-        await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
+        // Re-throw BaseError as is
+        throw error;
       }
-    }
 
-    clearTimeout(timeoutId);
-    return {
-      error: lastError?.message || 'Request failed',
-      status: 0
-    };
+      // Handle non-BaseError instances
+      const errorMessage = error instanceof Error ? error.message : 'Request failed';
+      logger.error('Authenticated API request failed', {
+        component: 'AuthenticatedAPI',
+        endpoint,
+        error: errorMessage
+      });
+
+      return {
+        error: errorMessage,
+        status: 0
+      };
+    }
   }
 
   /**
@@ -262,6 +292,14 @@ export function useCoordinatedRequest() {
 export const authenticatedApi = AuthenticatedAPI;
 
 export default AuthenticatedAPI;
+
+// Export circuit breaker functionality for enhanced API reliability
+export { 
+  apiClients, 
+  createCircuitBreakerClient,
+  getServiceHealth,
+  getMonitoringStatus 
+} from '@client/core/api';
 
 
 

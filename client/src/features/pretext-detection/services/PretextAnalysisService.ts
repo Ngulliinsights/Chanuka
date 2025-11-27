@@ -5,7 +5,7 @@ import {
   TimelineEvent, 
   Stakeholder,
   Source 
-} from '../types';
+} from '@client/types';
 
 export class PretextAnalysisService {
   private config: AnalysisConfig;

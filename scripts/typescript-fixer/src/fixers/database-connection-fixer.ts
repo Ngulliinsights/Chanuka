@@ -1,5 +1,5 @@
 import { SourceFile, SyntaxKind, Node, ImportDeclaration, Identifier } from 'typescript';
-import { ErrorFixer, TypeScriptError, FixResult, CodeChange, ProcessingContext } from '../types/core';
+import { ErrorFixer, TypeScriptError, FixResult, CodeChange, ProcessingContext } from '@shared/types/core';
 
 /**
  * Fixes database connection import issues in the Chanuka project

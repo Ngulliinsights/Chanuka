@@ -5,8 +5,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import type { DashboardConfig, DashboardSection } from '@client/types';
-import { validateDashboardConfig, safeValidateDashboardConfig } from '../validation';
-import { DashboardConfigurationError } from '../errors';
+import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/validation';
+import { DashboardConfigurationError } from '@client/errors';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds

@@ -1,7 +1,7 @@
 import { engagementAnalyticsService } from './services/engagement-analytics.js';
 import { billService } from './services/bill-service.js';
 import { db } from '@shared/database/pool.js';
-import { users, bills, bill_engagement } from '../shared/schema';
+import { users, bills, bill_engagement } from '@shared/shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '@shared/core';
 

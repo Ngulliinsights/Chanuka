@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { votingPatternAnalysisService } from './voting-pattern-analysis.js';
-import { authenticateToken } from '../../middleware/auth.js';
-import type { AuthenticatedRequest } from '../../middleware/auth.js';
+import { authenticateToken } from '@server/middleware/auth.js';
+import type { AuthenticatedRequest } from '@server/middleware/auth.js';
 import { UnifiedApiResponse  } from '@shared/core/utils/api';
-import { logger   } from '@shared/core/src/index.js';
-import { securityAuditService } from '../security/security-audit-service.js';
+import { logger   } from '@shared/core/index.js';
+import { securityAuditService } from '@shared/security/security-audit-service.js';
 
 const router = Router();
 

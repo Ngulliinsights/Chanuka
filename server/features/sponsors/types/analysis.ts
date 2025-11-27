@@ -12,7 +12,7 @@ import type {
   TimelineEvent,
   ImplementationWorkarounds,
   AnalysisMethodology
-} from '../../types/common.js';
+} from '@server/types/common.js';
 
 export interface SponsorshipAnalysis { bill_id: number;
   title: string;

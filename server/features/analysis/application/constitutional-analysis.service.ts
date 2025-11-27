@@ -1,7 +1,7 @@
 import { readDatabase } from '@shared/database';
 import * as schema from '@shared/schema';
 import { eq } from 'drizzle-orm';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { constitutionalAnalysisServiceComplete } from '../../constitutional-analysis/application/constitutional-analysis-service-complete.js';
 
 // ============================================================================

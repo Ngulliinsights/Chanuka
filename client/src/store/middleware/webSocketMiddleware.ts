@@ -16,7 +16,7 @@ import {
   WebSocketSubscription,
   PollingFallbackConfig,
   RealTimeHandlers
-} from '../../types/realtime';
+} from '@client/types/realtime';
 import {
   updateConnectionState,
   addBillUpdate,

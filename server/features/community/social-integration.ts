@@ -286,13 +286,16 @@ export class SocialIntegrationService {
     });
 
     try {
-      const response = await fetch(tokenEndpoints[platform.toLowerCase()], {
+      // Import circuit breaker middleware
+      const { circuitBreakerFetch } = await import('../../middleware/circuit-breaker-middleware');
+      
+      const response = await circuitBreakerFetch(tokenEndpoints[platform.toLowerCase()], {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: params.toString(),
-      });
+      }, 'social-media');
 
       if (!response.ok) {
         throw new Error(`Failed to exchange code: ${response.statusText}`);
@@ -343,11 +346,14 @@ export class SocialIntegrationService {
     };
 
     try {
-      const response = await fetch(profileEndpoints[platform.toLowerCase()], {
+      // Import circuit breaker middleware
+      const { circuitBreakerFetch } = await import('../../middleware/circuit-breaker-middleware');
+      
+      const response = await circuitBreakerFetch(profileEndpoints[platform.toLowerCase()], {
         headers: {
           Authorization: `Bearer ${ access_token }`,
         },
-      });
+      }, 'social-media');
 
       if (!response.ok) {
         throw new Error(`Failed to fetch profile: ${response.statusText}`);
@@ -471,14 +477,17 @@ export class SocialIntegrationService {
     }
 
     try {
-      const response = await fetch(endpoint, {
+      // Import circuit breaker middleware
+      const { circuitBreakerFetch } = await import('../../middleware/circuit-breaker-middleware');
+      
+      const response = await circuitBreakerFetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${access_token}`,
         },
         body: JSON.stringify(payload),
-      });
+      }, 'social-media');
 
       if (!response.ok) {
         const errorData = await response.json();

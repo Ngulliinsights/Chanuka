@@ -9,7 +9,7 @@
 import { globalApiClient } from './client';
 import { logger } from '@client/utils/logger';
 import { globalErrorHandler } from './errors';
-import { mockBills, mockBillsStats } from '../../data/mock/bills';
+import { mockBills, mockBillsStats } from '@client/data/mock/bills';
 
 // Type definitions for bills API
 export interface BillsSearchParams {

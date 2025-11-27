@@ -19,7 +19,7 @@ import type {
   DataExportRequest,
   DataDeletionRequest,
   AuthContextType,
-} from '../../types/auth';
+} from '@client/types/auth';
 
 // Import the actual implementations to test type compatibility
 import { AuthService } from '@client/services/AuthService';

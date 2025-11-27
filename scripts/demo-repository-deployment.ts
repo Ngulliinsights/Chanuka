@@ -7,7 +7,7 @@
  * It shows all the key components working together without complex database dependencies.
  */
 
-import { logger } from '../shared/core/index.js';
+import { logger } from '@shared/shared/core/index.js';
 
 // Mock implementations for demonstration
 class MockRepositoryDeploymentValidator {

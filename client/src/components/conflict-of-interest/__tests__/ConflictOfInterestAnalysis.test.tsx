@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConflictOfInterestAnalysis } from '../ConflictOfInterestAnalysis';
+import { ConflictOfInterestAnalysis } from '@client/ConflictOfInterestAnalysis';
 import { Bill, BillStatus, UrgencyLevel, ComplexityLevel } from '@client/core/api/types';
 
 // Mock the recharts components to avoid canvas issues in tests

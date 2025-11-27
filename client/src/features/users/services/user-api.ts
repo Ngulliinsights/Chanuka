@@ -19,7 +19,7 @@ import type {
   EngagementHistoryResponse,
   EngagementAction,
   DashboardData
-} from '../types';
+} from '@client/types';
 
 /**
  * Users API service - handles all user-related API calls

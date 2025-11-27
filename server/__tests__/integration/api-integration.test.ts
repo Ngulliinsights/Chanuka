@@ -7,7 +7,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '../../index.js';
 import { TestDataManager, ApiResponseValidator, SecurityTestHelper } from '../../tests/utils/test-helpers.js';
-import { databaseService } from '../../infrastructure/database/database-service.js';
+import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { logger } from '@shared/core/index.js';
 
 describe('API Integration Tests', () => {

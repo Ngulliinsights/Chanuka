@@ -13,7 +13,7 @@ import {
   ModerationAction,
   ModerationFlag,
   TypingIndicator
-} from '../../types/community';
+} from '@client/types/community';
 import {
   generateId,
   generateDateInRange,

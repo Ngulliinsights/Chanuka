@@ -5,7 +5,7 @@
  * to prevent circular dependencies and ensure services start in correct order.
  */
 
-import { logger } from '@shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { initializeServerServices, shutdownServerServices } from '@server/core/services-init.ts';
 
 /**

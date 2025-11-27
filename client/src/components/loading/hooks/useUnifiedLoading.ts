@@ -6,12 +6,12 @@ import {
   UseLoadingResult,
   LoadingType,
   LoadingPriority 
-} from '../types';
+} from '@client/types';
 import { 
   LoadingError, 
   LoadingOperationFailedError,
   LoadingTimeoutError 
-} from '../errors';
+} from '@client/errors';
 import { 
   createLoadingOperation, 
   generateOperationId,
@@ -19,8 +19,8 @@ import {
   canRetryOperation,
   calculateRetryDelay 
 } from '../utils/loading-utils';
-import { DEFAULT_LOADING_CONFIG } from '../constants';
-import { safeValidateLoadingOperation } from '../validation';
+import { DEFAULT_LOADING_CONFIG } from '@client/constants';
+import { safeValidateLoadingOperation } from '@client/validation';
 
 export interface UseUnifiedLoadingOptions {
   config?: Partial<LoadingConfig>;

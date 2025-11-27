@@ -5,7 +5,7 @@
  */
 
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { webSocketMiddleware, wsAdapter } from '../webSocketMiddleware';
+import { webSocketMiddleware, wsAdapter } from '@client/webSocketMiddleware';
 
 // Mock WebSocket
 global.WebSocket = vi.fn().mockImplementation(() => ({

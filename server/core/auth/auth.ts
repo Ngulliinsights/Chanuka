@@ -1,10 +1,10 @@
 
 import { Router, Request, Response } from "express";
 import { authService } from "./auth-service.js";
-import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized  } from '@shared/core/src/utils/api-utils.js';
-import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '@shared/core/src/utils/api-utils.js';
-import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from "../../middleware/rate-limiter.js";
-import { errorTracker } from '../errors/error-tracker.js';
+import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized  } from '@shared/core/utils/api-utils.js';
+import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
+import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from '@server/middleware/rate-limiter.js';
+import { errorTracker } from '@shared/errors/error-tracker.js';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 
 export const router: Router = Router();

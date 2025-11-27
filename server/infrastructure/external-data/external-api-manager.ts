@@ -16,7 +16,7 @@ import { EventEmitter } from 'events';
 // import { Redis } from 'ioredis';
 import { ExternalAPIErrorHandler, ErrorSeverity } from '@server/services/external-api-error-handler';
 import { APICostMonitoringService } from '@server/services/api-cost-monitoring';
-import { logger   } from '@shared/core/src/index.js';
+import { logger   } from '@shared/core/index.js';
 
 // ============================================================================
 // Core Types and Interfaces
@@ -494,12 +494,15 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     const timeoutId = setTimeout(() => controller.abort(), config.timeout);
 
     try {
-      const response = await fetch(url, {
+      // Import circuit breaker middleware
+      const { circuitBreakerFetch } = await import('../../middleware/circuit-breaker-middleware');
+      
+      const response = await circuitBreakerFetch(url, {
         method: options.method || 'GET',
         headers,
         body: options.body ? JSON.stringify(options.body) : undefined,
         signal: controller.signal
-      });
+      }, 'external-api');
 
       clearTimeout(timeoutId);
 

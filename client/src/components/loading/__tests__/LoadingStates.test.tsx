@@ -18,8 +18,8 @@ import {
   Skeleton,
   CardSkeleton,
   ListSkeleton,
-} from '../LoadingStates';
-import { LoadingError, LoadingStageError } from '../errors';
+} from '@client/LoadingStates';
+import { LoadingError, LoadingStageError } from '@client/errors';
 import { createCommonStages } from '@/utils/loading-utils';
 
 // Mock hooks

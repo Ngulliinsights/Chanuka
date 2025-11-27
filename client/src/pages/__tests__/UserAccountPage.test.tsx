@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 
-import UserAccountPage from '../UserAccountPage';
+import UserAccountPage from '@client/UserAccountPage';
 import { AuthProvider } from '@client/features/users/hooks/useAuth';
 import { MockUserFactory } from '@client/test-utils';
 
