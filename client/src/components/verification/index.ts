@@ -12,7 +12,7 @@
 
 // Core verification components
 export { ExpertBadge, ExpertBadgeGroup } from './ExpertBadge';
-export { CredibilityScoring, CredibilityIndicator } from './CredibilityScoring';
+export { CredibilityIndicator, CredibilityBreakdown } from './CredibilityScoring';
 export { ExpertProfileCard } from './ExpertProfileCard';
 
 // Community validation components

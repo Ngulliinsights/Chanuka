@@ -7,23 +7,20 @@
 import { ZodSchema, ZodError } from 'zod';
 import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
-  ISchemaAdapter,
-  IValidationResult,
-  IValidationOptions,
-  IValidationContext,
-  IValidationService,
-  IBatchValidationResult,
-  IValidationServiceConfig,
-  ISchemaRegistration,
-  IValidationMetrics,
+  ValidationSchema,
+  ValidationOptions,
+  ValidationResult,
+  BatchValidationResult,
+  PreprocessingRules,
+  ValidationServiceConfig,
   ValidationErrorDetail,
 } from '../core/interfaces';
-import { CoreValidationService } from '/core/validation-service';
+import { CoreValidationService } from '../core/validation-service';
 
 /**
- * Zod schema adapter implementing the ISchemaAdapter interface
+ * Zod schema adapter implementing the ValidationAdapter interface
  */
-export class ZodSchemaAdapter implements ISchemaAdapter {
+export class ZodSchemaAdapter {
   getName(): string {
     return 'zod';
   }
@@ -36,22 +33,22 @@ export class ZodSchemaAdapter implements ISchemaAdapter {
     return schema && typeof schema === 'object' && '_def' in schema;
   }
 
-  async validate<T>(schema: ZodSchema<T>, data: unknown): Promise<T> {
-    return schema.parse(data);
+  async validate<T>(schema: ValidationSchema, data: unknown, _options?: ValidationOptions): Promise<T> {
+    const zodSchema = schema as any as ZodSchema<T>;
+    return zodSchema.parse(data);
   }
 
-  async validateSafe<T>(schema: ZodSchema<T>, data: unknown): Promise<IValidationResult<T>> {
+  async validateSafe<T>(schema: ValidationSchema, data: unknown, _options?: ValidationOptions): Promise<ValidationResult<T>> {
     try {
-      const result = await this.validate(schema, data);
+      const result = await this.validate(schema, data) as T;
       return { success: true, data: result };
     } catch (error) {
       if (error instanceof ZodError) {
-        const validationError = new ValidationError(error, undefined, { zodError: error });
-        const errorDetails: ValidationErrorDetail[] = validationError.errors.map(err => ({
-          field: err.field || '',
+        const errorDetails: ValidationErrorDetail[] = error.errors.map(err => ({
+          field: err.path.join('.') || '',
           message: err.message,
           code: err.code,
-          value: err.value,
+          value: 'received' in err ? err.received : undefined,
           context: { zodError: error }
         }));
         return { success: false, errors: errorDetails };
@@ -59,24 +56,28 @@ export class ZodSchemaAdapter implements ISchemaAdapter {
       throw error;
     }
   }
+
+  validateSync<T>(schema: ValidationSchema, data: unknown, _options?: ValidationOptions): T {
+    const zodSchema = schema as any as ZodSchema<T>;
+    return zodSchema.parse(data);
+  }
 }
 
 /**
  * Zod-based validation service extending the core validation service
  */
-export class ZodValidationService extends CoreValidationService implements IValidationService {
+export class ZodValidationService extends CoreValidationService {
   private adapter: ZodSchemaAdapter;
 
-  constructor(config: IValidationServiceConfig = {}) {
+  constructor(config: ValidationServiceConfig = {}) {
     super(config);
     this.adapter = new ZodSchemaAdapter();
   }
 
   async validate<T>(
-    schema: ZodSchema<T>,
+    schema: ValidationSchema,
     data: unknown,
-    options: IValidationOptions = {},
-    context?: IValidationContext
+    options?: ValidationOptions
   ): Promise<T> {
     const startTime = performance.now();
     const mergedOptions = { ...this.config.defaultOptions, ...options };
@@ -91,11 +92,6 @@ export class ZodValidationService extends CoreValidationService implements IVali
           this.updateMetrics('cacheHit', startTime);
           if (cached.success && cached.data) {
             return cached.data;
-          } else if (!cached.success && cached.errors && cached.errors.length > 0) {
-            const validationError = new ValidationError('Cached validation error', undefined, {
-              cachedErrors: cached.errors
-            });
-            throw validationError;
           }
         } else {
           this.updateMetrics('cacheMiss');
@@ -117,102 +113,82 @@ export class ZodValidationService extends CoreValidationService implements IVali
         this.setCache(cacheKey, { success: true, data: result }, mergedOptions.cacheTtl);
       }
 
-      this.updateMetrics('success', startTime, context);
-      return result;
+      this.updateMetrics('success', startTime);
+      return result as T;
 
     } catch (error) {
-      if (error instanceof ValidationError) {
-        // Cache validation error
-        if (mergedOptions.useCache && this.config.cache?.enabled) {
-          const cacheKey = this.generateCacheKey(schema, data, mergedOptions);
-          const errorDetails: ValidationErrorDetail[] = error.errors.map(err => ({
-            field: err.field || '',
-            message: err.message,
-            code: err.code,
-            value: err.value,
-            context: { cached: true }
-          }));
-          this.setCache(cacheKey, { success: false, errors: errorDetails }, mergedOptions.cacheTtl);
-        }
+      if (error instanceof ZodError) {
+        const errorDetails: ValidationErrorDetail[] = error.errors.map(err => ({
+          field: err.path.join('.') || '',
+          message: err.message,
+          code: err.code,
+          value: 'received' in err ? err.received : undefined,
+          context: { expected: 'expected' in err ? err.expected : undefined }
+        }));
 
-        this.updateMetrics('failure', startTime, context, error);
-        throw error;
+        this.updateMetrics('failure', startTime);
+        throw new ValidationError('Zod validation failed', undefined, { zodError: error, errors: errorDetails });
       }
 
       // Re-throw non-validation errors
-      this.updateMetrics('failure', startTime, context);
+      this.updateMetrics('failure', startTime);
       throw error;
     }
   }
 
-  async validateSafe<T>(
-    schema: ZodSchema<T>,
+  validateSync<T>(
+    schema: any,
     data: unknown,
-    options: IValidationOptions = {},
-    context?: IValidationContext
-  ): Promise<IValidationResult<T>> {
-    const startTime = performance.now();
+    options?: ValidationOptions
+  ): T {
     const mergedOptions = { ...this.config.defaultOptions, ...options };
+    
+    // Preprocess data if enabled
+    let processedData = data;
+    if (mergedOptions.preprocess) {
+      processedData = this.preprocessData(data);
+    }
 
+    return (schema as any as ZodSchema<T>).parse(processedData);
+  }
+
+  async validateSafe<T>(
+    schema: ValidationSchema,
+    data: unknown,
+    options?: ValidationOptions
+  ): Promise<ValidationResult<T>> {
     try {
-      // Check cache first if enabled
-      if (mergedOptions.useCache && this.config.cache?.enabled) {
-        const cacheKey = this.generateCacheKey(schema, data, mergedOptions);
-        const cached = this.getFromCache<T>(cacheKey);
-
-        if (cached) {
-          this.updateMetrics('cacheHit', startTime);
-          return cached;
-        } else {
-          this.updateMetrics('cacheMiss');
-        }
-      }
-
-      // Preprocess data if enabled
-      let processedData = data;
-      if (mergedOptions.preprocess) {
-        processedData = this.preprocessData(data);
-      }
-
-      // Perform validation using Zod adapter
-      const result = await this.adapter.validateSafe(schema, processedData);
-
-      // Cache result
-      if (mergedOptions.useCache && this.config.cache?.enabled) {
-        const cacheKey = this.generateCacheKey(schema, data, mergedOptions);
-        this.setCache(cacheKey, result, mergedOptions.cacheTtl);
-      }
-
-      this.updateMetrics(result.success ? 'success' : 'failure', startTime, context);
-      return result;
-
+      const result = await this.validate<T>(schema, data, options);
+      return { success: true, data: result };
     } catch (error) {
-      // Handle unexpected errors
-      const validationError = new ValidationError(
-        error instanceof Error ? error.message : 'Unknown validation error',
-        undefined,
-        { originalError: error }
-      );
-      const errorDetails: ValidationErrorDetail[] = validationError.errors.map(err => ({
-        field: err.field || '',
-        message: err.message,
-        code: err.code,
-        value: err.value,
-        context: { originalError: error }
-      }));
-      const errorResult = { success: false, errors: errorDetails } as IValidationResult<T>;
-
-      this.updateMetrics('failure', startTime, context, validationError);
-      return errorResult;
+      if (error instanceof ZodError) {
+        const errorDetails: ValidationErrorDetail[] = error.errors.map(err => ({
+          field: err.path.join('.') || '',
+          message: err.message,
+          code: err.code,
+          value: 'received' in err ? err.received : undefined,
+          context: { expected: 'expected' in err ? err.expected : undefined }
+        }));
+        return { success: false, errors: errorDetails };
+      }
+      
+      // Handle other errors
+      return { 
+        success: false, 
+        errors: [{ 
+          field: '', 
+          message: error instanceof Error ? error.message : 'Unknown error', 
+          code: 'UNKNOWN_ERROR' 
+        }] 
+      };
     }
   }
 
   async validateBatch<T>(
-    schema: ZodSchema<T>,
+    schema: ValidationSchema,
     dataArray: unknown[],
-    options: IValidationOptions = {},
-    context?: IValidationContext
-  ): Promise<IBatchValidationResult<T>> {
+    options?: ValidationOptions
+  ): Promise<BatchValidationResult<T>> {
     const valid: T[] = [];
     const invalid: Array<{
       index: number;
@@ -223,7 +199,7 @@ export class ZodValidationService extends CoreValidationService implements IVali
     // Process all items
     const results = await Promise.allSettled(
       dataArray.map((data, index) =>
-        this.validateSafe(schema, data, options, context).then(result => ({ result, index, data }))
+        this.validateSafe(schema, data, options).then(result => ({ result, index, data }))
       )
     );
 
@@ -231,8 +207,8 @@ export class ZodValidationService extends CoreValidationService implements IVali
     results.forEach((promiseResult) => {
       if (promiseResult.status === 'fulfilled') {
         const { result, index, data } = promiseResult.value;
-        if (result.success && result.data) {
-          valid.push(result.data);
+        if (result.success && result.data !== undefined) {
+          valid.push(result.data as T);
         } else if (!result.success && result.errors && result.errors.length > 0) {
           invalid.push({
             index,
@@ -242,20 +218,15 @@ export class ZodValidationService extends CoreValidationService implements IVali
         }
       } else {
         // Handle promise rejection (shouldn't happen with validateSafe, but just in case)
-        const validationError = new ValidationError('Batch validation promise rejected', undefined, {
-          reason: promiseResult.reason
-        });
-        const errorDetails: ValidationErrorDetail[] = validationError.errors.map(err => ({
-          field: err.field || '',
-          message: err.message,
-          code: err.code,
-          value: err.value,
-          context: { reason: promiseResult.reason }
-        }));
         invalid.push({
           index: -1,
           data: null,
-          errors: errorDetails,
+          errors: [{
+            field: '',
+            message: 'Batch validation promise rejected',
+            code: 'PROMISE_REJECTED',
+            context: { reason: promiseResult.reason }
+          }],
         });
       }
     });
@@ -271,6 +242,11 @@ export class ZodValidationService extends CoreValidationService implements IVali
       },
     };
   }
+
+  // Implement the preprocess method required by ValidationService interface
+  override preprocess(data: unknown, _rules: PreprocessingRules): unknown {
+    return this.preprocessData(data);
+  }
 }
 
 /**
@@ -281,7 +257,7 @@ export const zodValidationService = new ZodValidationService();
 /**
  * Create a new Zod validation service with custom configuration
  */
-export function createZodValidationService(config: IValidationServiceConfig): ZodValidationService {
+export function createZodValidationService(config: ValidationServiceConfig): ZodValidationService {
   return new ZodValidationService(config);
 }
 

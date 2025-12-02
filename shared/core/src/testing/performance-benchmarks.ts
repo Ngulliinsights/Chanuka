@@ -1,6 +1,6 @@
 import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
-import { LoadTester } from './load-tester';
+// import { LoadTester } from './load-tester'; // Unused import
 import type { CacheService } from '../caching/core/interfaces';
 import type { RateLimitStore } from '../rate-limiting/types';
 import type { UnifiedLogger } from '../observability/logging/logger';
@@ -10,12 +10,10 @@ import type { ValidationService } from '../validation/validation-service';
  * Comprehensive performance benchmarking suite for core utilities
  */
 export class PerformanceBenchmarks extends EventEmitter {
-  private loadTester: LoadTester;
-  private results: Map<string, BenchmarkResult> = new Map();
+  // private results: Map<string, BenchmarkResult> = new Map(); // Unused variable
 
   constructor(private config: BenchmarkConfig = {}) {
     super();
-    this.loadTester = new LoadTester();
   }
 
   /**
@@ -307,7 +305,7 @@ export class PerformanceBenchmarks extends EventEmitter {
 
     return this.runConcurrentBenchmark('cache:mixed-operations', async () => {
       const operation = operations[Math.floor(Math.random() * operations.length)];
-      await operation();
+      await operation?.();
     }, {
       concurrency: this.config.concurrency?.cache?.mixed || 30,
       totalOperations: this.config.iterations?.cache?.mixed || 3000
@@ -677,9 +675,8 @@ export class PerformanceBenchmarks extends EventEmitter {
     });
   }
 
-  private async benchmarkValidationSchemaCompilation(validator: ValidationService): Promise<BenchmarkResult> {
+  private async benchmarkValidationSchemaCompilation(_validator: ValidationService): Promise<BenchmarkResult> {
     return this.runBenchmark('validation:schema-compilation', async () => {
-      const schemaName = `dynamic-schema-${Math.random()}`;
       // This would require a method to register schemas dynamically
       // For now, we'll simulate the compilation time
       await new Promise(resolve => setTimeout(resolve, 1));
@@ -799,7 +796,7 @@ export class PerformanceBenchmarks extends EventEmitter {
 
     return {
       name,
-      category: name.split(':')[0],
+      category: name.split(':')[0] ?? 'unknown',
       type: 'performance',
       startTime: start,
       endTime: end,
@@ -852,7 +849,7 @@ export class PerformanceBenchmarks extends EventEmitter {
 
     return {
       name,
-      category: name.split(':')[0],
+      category: name.split(':')[0] ?? 'unknown',
       type: 'concurrent',
       startTime: start,
       endTime: end,
@@ -874,15 +871,17 @@ export class PerformanceBenchmarks extends EventEmitter {
   }
 
   private calculatePercentile(values: number[], percentile: number): number {
+    if (values.length === 0) return 0;
     const sorted = [...values].sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;
-    return sorted[Math.max(0, index)];
+    const value = sorted[Math.max(0, index)];
+    return value ?? 0;
   }
 
   private createSkippedResult(name: string, reason: string): BenchmarkResult {
     return {
       name,
-      category: name.split(':')[0],
+      category: name.split(':')[0] ?? 'unknown',
       type: 'skipped',
       startTime: new Date(),
       endTime: new Date(),

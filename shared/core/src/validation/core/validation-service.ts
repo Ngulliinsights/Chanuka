@@ -6,11 +6,11 @@
  */
 
 import * as crypto from 'crypto';
-import { logger } from '../../observability/logging/logger';
+// import { logger } from '../observability/logging'; // Unused import
 import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
   ValidationService,
-  ValidationSchema,
+  // ValidationSchema,
   ValidationOptions,
   ValidationContext,
   ValidationResult,
@@ -22,18 +22,18 @@ import {
   PreprocessingConfig,
   SanitizationRules,
   PreprocessingRules,
-  ValidationHealthStatus,
-  IValidationService,
-  IValidationResult,
-  IBatchValidationResult,
-  IValidationOptions,
-  IValidationContext,
-  IValidationServiceConfig,
-  IValidationMetrics,
-  ICachedValidationResult,
-  ISchemaRegistration,
-  IPreprocessingConfig,
-  ICachingConfig,
+  // ValidationHealthStatus,
+  // IValidationService,
+  // IValidationResult,
+  // IBatchValidationResult,
+  // IValidationOptions,
+  // IValidationContext,
+  // IValidationServiceConfig,
+  // IValidationMetrics,
+  // ICachedValidationResult,
+  // ISchemaRegistration,
+  // IPreprocessingConfig,
+  // ICachingConfig,
 } from './interfaces';
 
 /**
@@ -506,7 +506,7 @@ export abstract class CoreValidationService implements ValidationService {
   protected updateMetrics(
     type: 'success' | 'failure' | 'cacheHit' | 'cacheMiss',
     startTime?: number,
-    context?: ValidationContext,
+    _context?: ValidationContext,
     error?: ValidationError
   ): void {
     if (!this.config.metrics?.enabled) {

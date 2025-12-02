@@ -17,9 +17,11 @@ export function isServiceWorkerSupported(): boolean {
 export async function registerServiceWorker(
   config: ServiceWorkerConfig = {},
 ): Promise<ServiceWorkerRegistration | null> {
-  // Skip service worker registration in development
-  if (import.meta.env.DEV) {
-    logger.info('Skipping service worker registration in development mode', {
+  // Skip service worker registration in development or if explicitly disabled
+  if (import.meta.env.DEV || 
+      import.meta.env.VITE_DISABLE_SERVICE_WORKER === 'true' ||
+      import.meta.env.VITE_ENABLE_SERVICE_WORKER === 'false') {
+    logger.info('Skipping service worker registration (development mode or disabled)', {
       component: 'ServiceWorker',
     });
     return null;

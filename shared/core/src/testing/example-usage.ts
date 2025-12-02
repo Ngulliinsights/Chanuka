@@ -46,9 +46,9 @@ export async function runCompletePerformanceTest() {
   const rateLimiterWrapper = {
     check: async (key: string, options: any) => {
       return rateLimiter.check(key, {
-        limit: options.max || options.limit || 100,
+        max: options.max || options.limit || 100,
         windowMs: options.windowMs || 60000,
-        algorithm: 'fixed-window' as const,
+        // algorithm: 'fixed-window' as const,
         message: options.message
       });
     },
@@ -287,7 +287,7 @@ export async function runCustomScenario() {
 
   if (memoryStressResult.success && memoryStressResult.memorySnapshots) {
     const snapshots = memoryStressResult.memorySnapshots;
-    const initialMemory = snapshots[0].heapUsed;
+    const initialMemory = snapshots[0]?.heapUsed || 0;
     const peakMemory = Math.max(...snapshots.map(s => s.heapUsed));
     
     console.log(`🧠 Memory stress test results:`);

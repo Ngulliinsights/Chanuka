@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 import { schemaValidationService } from '@server/core/validation/schema-validation-service.ts';
 
 /**

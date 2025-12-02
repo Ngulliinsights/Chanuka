@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { join, dirname, basename } from 'path';
 import { createHash } from 'crypto';
 import { CleanupPlan, CleanupError } from './orchestrator';
-import { logger } from '../../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 export interface BackupSystemConfig {
   enabled: boolean;

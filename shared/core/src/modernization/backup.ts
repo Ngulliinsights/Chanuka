@@ -9,7 +9,7 @@ import type {
   RetentionPolicy,
   VerificationConfig,
 } from './types';
-import { BackupStrategy, BackupStatus, BackupError, BackupScope } from '/types';
+import { BackupStrategy, BackupStatus, BackupError, BackupScope } from '../types';
 
 // Lightweight logger interface used by the BackupManager. Keep intentionally small to reduce runtime
 // coupling on a specific logging implementation.

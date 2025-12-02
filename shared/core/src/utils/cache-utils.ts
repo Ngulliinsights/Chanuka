@@ -5,9 +5,9 @@
  * into the shared core system.
  */
 
-import { logger } from '@shared/observability/logging';
-import { CacheAdapter } from '@shared/caching/core/interfaces';
-import { MemoryAdapter } from '@shared/caching/adapters/memory-adapter';
+import { logger } from '../observability/logging';
+// import { CacheAdapter } from '../caching/core/interfaces'; // Unused import
+import { MemoryAdapter } from '../caching/adapters/memory-adapter';
 
 // Cache metrics for monitoring
 export interface CacheMetrics {
@@ -47,7 +47,7 @@ const cacheMetrics: CacheMetrics = {
 export const cache = Object.assign(
   (options: Partial<CacheOptions> = {}) => {
     return (
-      target: any,
+      _target: any,
       propertyKey: string | symbol,
       descriptor: TypedPropertyDescriptor<any>,
     ) => {

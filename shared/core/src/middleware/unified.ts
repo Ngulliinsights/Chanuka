@@ -307,7 +307,7 @@ export class UnifiedMiddleware {
         res.json({
           status: 'healthy',
           timestamp: new Date().toISOString(),
-          metrics: this.config.health.enableMetrics ? this.metrics : undefined
+          metrics: this.config.health?.enableMetrics ? this.metrics : undefined
         });
       });
     }

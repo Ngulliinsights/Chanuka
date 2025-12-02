@@ -6,8 +6,8 @@ import { Badge } from '../ui/badge';
 import { 
   ExpertBadge, 
   ExpertBadgeGroup,
-  CredibilityScoring,
   CredibilityIndicator,
+  CredibilityBreakdown,
   ExpertProfileCard,
   CommunityValidation,
   ValidationSummary,

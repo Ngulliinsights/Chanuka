@@ -14,7 +14,7 @@ import { ThemeProvider } from '@client/contexts/ThemeContext';
 import { SimpleErrorBoundary } from './error-handling/SimpleErrorBoundary';
 import { initializeStore } from '@client/store';
 // import { loadingStateUtils } from '@shared/shared/design-system/components/loading-states';
-// import { errorStateUtils } from '@shared/shared/design-system/components/error-states';
+// import { errorStateUtils } from '@client/shared/design-system/components/error-states';
 import { CommunityUIProvider } from '@client/store/slices/communitySlice';
 
 // =============================================================================
@@ -241,11 +241,14 @@ function ReduxStoreProvider({ children }: { children: React.ReactNode }): React.
     if (!storeData || !storeData.persistor) return;
 
     const persistor = storeData.persistor as any;
+    let isSubscribed = true;
 
     try {
       // If persistor already bootstrapped, flip immediately
       if (persistor.getState && persistor.getState().bootstrapped) {
-        setBootstrapped(true);
+        if (mountedRef.current && isSubscribed) {
+          setBootstrapped(true);
+        }
         return;
       }
 
@@ -253,16 +256,22 @@ function ReduxStoreProvider({ children }: { children: React.ReactNode }): React.
       const unsubscribe = persistor.subscribe(() => {
         try {
           if (persistor.getState && persistor.getState().bootstrapped) {
-            setBootstrapped(true);
+            // Atomic check to prevent race condition with unmounting
+            if (mountedRef.current && isSubscribed) {
+              setBootstrapped(true);
+            }
             if (typeof unsubscribe === 'function') unsubscribe();
           }
         } catch (e) {
-          setBootstrapped(true);
+          if (mountedRef.current && isSubscribed) {
+            setBootstrapped(true);
+          }
         }
       });
 
       // Cleanup subscription on unmount
       return () => {
+        isSubscribed = false;
         try {
           if (typeof unsubscribe === 'function') unsubscribe();
         } catch (e) {
@@ -277,11 +286,13 @@ function ReduxStoreProvider({ children }: { children: React.ReactNode }): React.
   // Error state: display user-friendly error with retry option
   if (error) {
     console.log('[ReduxStoreProvider] Rendering error state');
-    const errorConfig = errorStateUtils.createErrorBoundary({
-      title: 'Store Initialization Error',
-      description: 'Failed to initialize the application store. Please refresh the page.',
-      onRetry: () => window.location.reload(),
-    });
+    const errorConfig = {
+      children: {
+        title: { text: 'Store Initialization Error' },
+        description: { text: 'Failed to initialize the application store. Please refresh the page.' },
+        actions: { children: [{ onClick: () => window.location.reload() }] }
+      }
+    };
 
     return (
       <div className="chanuka-error-boundary contrast-aaa">

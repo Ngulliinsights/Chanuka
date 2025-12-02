@@ -6,7 +6,7 @@
  */
 
 import type { Result, Maybe } from '../../primitives';
-import type { Bill, NewBill } from '@/schema/foundation';
+import type { Bill, NewBill } from '../../../../schema/foundation';
 
 export interface IBillRepository {
   /**

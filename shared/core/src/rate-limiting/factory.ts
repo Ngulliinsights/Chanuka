@@ -6,13 +6,13 @@
  */
 
 import { Redis } from 'ioredis';
-import { RateLimitStore, RateLimitConfig } from '/types';
-import { SlidingWindowStore } from './algorithms/sliding-window';
-import { TokenBucketStore } from './algorithms/token-bucket';
-import { FixedWindowStore } from './algorithms/fixed-window';
+import { RateLimitStore, RateLimitConfig } from './types';
+// import { SlidingWindowStore } from './algorithms/sliding-window';
+// import { TokenBucketStore } from './algorithms/token-bucket';
+// import { FixedWindowStore } from './algorithms/fixed-window';
 import { MemoryRateLimitStore } from './stores/memory-store';
 import { RedisRateLimitStore } from './stores/redis-store';
-import { logger } from '../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 export interface RateLimitFactoryOptions {
   redis?: Redis;
@@ -30,12 +30,12 @@ export class RateLimitFactory {
    * Create a rate limit store for the specified algorithm
    */
   createStore(algorithm: string): RateLimitStore {
-    const keyPrefix = this.options.keyPrefix;
+    // const _keyPrefix = this.options.keyPrefix;
 
     if (this.options.redis) {
       // Use unified Redis store if enabled (recommended)
       if (this.options.useUnifiedRedisStore !== false) {
-        const fallbackStore = this.options.fallbackStore ||
+        // const _fallbackStore = this.options.fallbackStore ||
           (this.options.defaultToMemory ? new MemoryRateLimitStore() : undefined);
 
         return new RedisRateLimitStore();
@@ -45,9 +45,9 @@ export class RateLimitFactory {
       switch (algorithm) {
         case 'sliding-window':
           // Use adapter instead of direct store
-          const slidingStore = new SlidingWindowStore({ windowSize: 60000, maxRequests: 100 });
+          // const _slidingStore = new SlidingWindowStore({ windowSize: 60000, maxRequests: 100 });
           return {
-            check: async (key: string, config: any) => ({
+            check: async (_key: string, _config: any) => ({
               allowed: true,
               remaining: 100,
               resetAt: new Date(Date.now() + 60000),
@@ -55,14 +55,14 @@ export class RateLimitFactory {
               windowStart: Date.now(),
               algorithm: 'sliding-window'
             }),
-            reset: async (key: string) => Promise.resolve(),
+            reset: async (_key: string) => Promise.resolve(),
             cleanup: async () => Promise.resolve()
           } as RateLimitStore;
         case 'token-bucket':
           // Use adapter instead of direct store
-          const tokenStore = new TokenBucketStore({ capacity: 100, refillRate: 10 });
+          // const _tokenStore = new TokenBucketStore({ capacity: 100, refillRate: 10 });
           return {
-            check: async (key: string, config: any) => ({
+            check: async (_key: string, _config: any) => ({
               allowed: true,
               remaining: 100,
               resetAt: new Date(Date.now() + 60000),
@@ -70,14 +70,14 @@ export class RateLimitFactory {
               windowStart: Date.now(),
               algorithm: 'token-bucket'
             }),
-            reset: async (key: string) => Promise.resolve(),
+            reset: async (_key: string) => Promise.resolve(),
             cleanup: async () => Promise.resolve()
           } as RateLimitStore;
         case 'fixed-window':
           // Use adapter instead of direct store
-          const fixedStore = new FixedWindowStore({ windowDuration: 60000, maxRequests: 100 });
+          // const _fixedStore = new FixedWindowStore({ windowDuration: 60000, maxRequests: 100 });
           return {
-            check: async (key: string, config: any) => ({
+            check: async (_key: string, _config: any) => ({
               allowed: true,
               remaining: 100,
               resetAt: new Date(Date.now() + 60000),
@@ -85,7 +85,7 @@ export class RateLimitFactory {
               windowStart: Date.now(),
               algorithm: 'fixed-window'
             }),
-            reset: async (key: string) => Promise.resolve(),
+            reset: async (_key: string) => Promise.resolve(),
             cleanup: async () => Promise.resolve()
           } as RateLimitStore;
         default:
@@ -188,7 +188,7 @@ export class RateLimitFactory {
   static async healthCheckStores(stores: Map<string, RateLimitStore>): Promise<Map<string, boolean>> {
     const results = new Map<string, boolean>();
 
-    const promises = Array.from(stores.entries()).map(async ([name, store]) => {
+    const promises = Array.from(stores.entries()).map(async ([name, _store]) => {
       try {
         const isHealthy = true; // Assume healthy since healthCheck is optional
         results.set(name, isHealthy);
@@ -242,8 +242,8 @@ export function createMemoryRateLimitFactory(options: Omit<RateLimitFactoryOptio
  * Create a Redis rate limit store directly with comprehensive configuration
  */
 export function createRedisRateLimitStore(
-  redis: Redis, 
-  options: {
+  _redis: Redis, 
+  _options: {
     keyPrefix?: string;
     enableMetrics?: boolean;
     fallbackStore?: RateLimitStore;

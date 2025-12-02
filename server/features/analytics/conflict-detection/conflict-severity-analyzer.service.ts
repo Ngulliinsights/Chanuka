@@ -5,7 +5,7 @@
  * and assessing confidence in conflict detection results.
  */
 
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import {
   ConflictAnalysis,
   FinancialConflict,

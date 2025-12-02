@@ -11,7 +11,7 @@ export type Brand<T, Brand> = T & { readonly __brand: Brand };
 /**
  * Create a branded type constructor
  */
-export function brand<T, B extends string>(value: T, brand: B): Brand<T, B> {
+export function brand<T, B extends string>(value: T, _brand: B): Brand<T, B> {
   return value as Brand<T, B>;
 }
 

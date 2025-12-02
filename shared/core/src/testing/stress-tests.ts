@@ -1,6 +1,6 @@
 import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
-import { LoadTester } from './load-tester';
+// import { LoadTester } from './load-tester'; // Unused import
 import type { CacheService } from '../caching/core/interfaces';
 import type { RateLimitStore } from '../rate-limiting/types';
 import { UnifiedLogger } from '../observability/logging/logger';
@@ -10,11 +10,8 @@ import { UnifiedLogger } from '../observability/logging/logger';
  * Tests system behavior under extreme load conditions
  */
 export class StressTests extends EventEmitter {
-  private loadTester: LoadTester;
-
   constructor(private config: StressTestConfig = {}) {
     super();
-    this.loadTester = new LoadTester();
   }
 
   /**
@@ -90,7 +87,7 @@ export class StressTests extends EventEmitter {
       for (const { size, count, phase } of phases) {
         const phaseStart = performance.now();
         const data = 'x'.repeat(size);
-        const keys: string[] = [];
+
 
         // Store objects
         const promises = [];
@@ -236,7 +233,7 @@ export class StressTests extends EventEmitter {
         this.emit('stress:cache:concurrency:level', {
           concurrency,
           duration: levelEnd - levelStart,
-          operationsPerSecond: results[results.length - 1].operationsPerSecond
+          operationsPerSecond: results[results.length - 1]?.operationsPerSecond ?? 0
         });
       }
 
@@ -282,7 +279,7 @@ export class StressTests extends EventEmitter {
 
       for (const pattern of floodPatterns) {
         const patternStart = performance.now();
-        const { requests, concurrency, duration } = pattern;
+        const { requests, concurrency } = pattern;
 
         const requestsPerWorker = Math.floor(requests / concurrency);
         const workers = Array(concurrency).fill(null).map(async (_, workerId) => {
@@ -334,8 +331,8 @@ export class StressTests extends EventEmitter {
 
         this.emit('stress:rate-limit:flood:pattern', {
           pattern: pattern.name,
-          blockRate: results[results.length - 1].blockRate,
-          requestsPerSecond: results[results.length - 1].requestsPerSecond
+          blockRate: results[results.length - 1]?.blockRate ?? 0,
+          requestsPerSecond: results[results.length - 1]?.requestsPerSecond ?? 0
         });
       }
 
@@ -515,7 +512,7 @@ export class StressTests extends EventEmitter {
         this.emit('stress:logging:volume:test', {
           test: test.name,
           logsWritten,
-          actualLogsPerSecond: results[results.length - 1].actualLogsPerSecond
+          actualLogsPerSecond: results[results.length - 1]?.actualLogsPerSecond ?? 0
         });
       }
 
@@ -599,7 +596,7 @@ export class StressTests extends EventEmitter {
 
         this.emit('stress:logging:concurrency:level', {
           concurrency,
-          logsPerSecond: results[results.length - 1].operationsPerSecond
+          logsPerSecond: results[results.length - 1]?.operationsPerSecond ?? 0
         });
       }
 

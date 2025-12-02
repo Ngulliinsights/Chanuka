@@ -1,10 +1,10 @@
 /**
  * Loading Spinner Component
- * Reusable loading spinner with consistent styling
+ * Unified loading spinner with consistent styling using Lucide icon
  */
 
-import React from 'react';
 import { cn } from '@client/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface LoadingSpinnerProps {
   className?: string;
@@ -15,22 +15,18 @@ export function LoadingSpinner({ className, size = 'md' }: LoadingSpinnerProps) 
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',
-    lg: 'h-12 w-12'
+    lg: 'h-12 w-12',
   };
 
   return (
-    <div
-      className={cn(
-        'animate-spin rounded-full border-2 border-gray-300 border-t-blue-600',
-        sizeClasses[size],
-        className
-      )}
+    <Loader2 
+      className={cn('animate-spin text-primary', sizeClasses[size], className)}
       role="status"
       aria-label="Loading"
-    >
-      <span className="sr-only">Loading...</span>
-    </div>
+    />
   );
 }
 
+// Export as Spinner for backward compatibility
+export const Spinner = LoadingSpinner;
 export default LoadingSpinner;

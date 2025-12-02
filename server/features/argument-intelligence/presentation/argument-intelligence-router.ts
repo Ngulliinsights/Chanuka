@@ -4,7 +4,7 @@
 // Complete REST API for argument intelligence operations
 
 import { Router } from 'express';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { ArgumentProcessor } from '@shared/application/argument-processor.js';
 import { StructureExtractorService } from '@shared/application/structure-extractor.js';
 import { ClusteringService } from '@shared/application/clustering-service.js';
@@ -16,7 +16,7 @@ import { argumentIntelligenceService } from '@shared/application/argument-intell
 import { SentenceClassifier } from '@shared/infrastructure/nlp/sentence-classifier.js';
 import { EntityExtractor } from '@shared/infrastructure/nlp/entity-extractor.js';
 import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator.js';
-import { db  } from '@shared/core/index.js';
+import { db  } from '@shared/core';
 
 export const router = Router();
 

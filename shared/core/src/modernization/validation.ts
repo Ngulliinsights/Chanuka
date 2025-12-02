@@ -129,7 +129,7 @@ export class ValidationFramework extends EventEmitter {
   public stopContinuousValidation(): void {
     if (this.continuousValidation) {
       clearInterval(this.continuousValidation);
-      this.continuousValidation = undefined;
+      this.continuousValidation = undefined as any;
       this.logger.info('Continuous validation stopped', {});
     }
   }
@@ -171,7 +171,7 @@ export class ValidationFramework extends EventEmitter {
             name: this.getValidationName(validationType),
             type: validationType,
             status: ValidationStatus.FAILED,
-            message: `Validation check failed: ${error.message}`,
+            message: `Validation check failed: ${(error as Error).message}`,
             duration: 0
           };
 
@@ -217,7 +217,7 @@ export class ValidationFramework extends EventEmitter {
     } catch (error) {
       const validationError = error instanceof ValidationError
         ? error
-        : new ValidationError(`Validation failed: ${error.message}`, ValidationType.FUNCTIONALITY);
+        : new ValidationError(`Validation failed: ${(error as Error).message}`, ValidationType.FUNCTIONALITY);
 
       this.emit('validation:error', validationError);
       throw validationError;
@@ -284,7 +284,7 @@ export class ValidationFramework extends EventEmitter {
         name: checkName,
         type,
         status: ValidationStatus.FAILED,
-        message: `Check failed: ${error.message}`,
+        message: `Check failed: ${(error as Error).message}`,
         duration
       };
     }
@@ -307,7 +307,7 @@ export class ValidationFramework extends EventEmitter {
           syntaxErrors.push(file);
         }
       } catch (error) {
-        syntaxErrors.push(`${file}: ${error.message}`);
+        syntaxErrors.push(`${file}: ${(error as Error).message}`);
       }
     }
 
@@ -438,8 +438,8 @@ export class ValidationFramework extends EventEmitter {
     } catch (error) {
       return {
         status: ValidationStatus.FAILED,
-        message: `Build validation failed: ${error.message}`,
-        details: { error: error.message }
+        message: `Build validation failed: ${(error as Error).message}`,
+        details: { error: (error as Error).message }
       };
     }
   }
@@ -624,7 +624,7 @@ export class ValidationFramework extends EventEmitter {
     const imports: string[] = [];
     let match;
     while ((match = importRegex.exec(content)) !== null) {
-      imports.push(match[1]);
+      imports.push(match[1]!);
     }
     return imports;
   }

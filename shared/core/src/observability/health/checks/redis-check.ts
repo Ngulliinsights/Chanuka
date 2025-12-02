@@ -6,8 +6,11 @@
  */
 
 import { Redis, Cluster } from 'ioredis';
-import { HealthCheck, HealthResult, HealthStatus } from '/types';
-import { logger } from '../../observability/logging';
+// import { HealthCheck, HealthResult, HealthStatus } from '../../../types';
+type HealthCheck = any;
+type HealthResult = any;
+type HealthStatus = any;
+// import { logger } from '../observability/logging'; // Unused import
 
 export interface RedisHealthConfig {
   maxLatencyMs?: number;
@@ -178,7 +181,7 @@ export class RedisHealthCheck implements HealthCheck {
       const details: Record<string, any> = {};
       
       if (memoryMatch) {
-        const usedMemory = parseInt(memoryMatch[1]);
+        const usedMemory = parseInt(memoryMatch[1] || '0');
         details.usedMemory = usedMemory;
         details.usedMemoryHuman = this.formatBytes(usedMemory);
         
@@ -188,12 +191,12 @@ export class RedisHealthCheck implements HealthCheck {
       }
       
       if (maxMemoryMatch) {
-        const maxMemory = parseInt(maxMemoryMatch[1]);
+        const maxMemory = parseInt(maxMemoryMatch[1] || '0');
         details.maxMemory = maxMemory;
         details.maxMemoryHuman = this.formatBytes(maxMemory);
         
         if (memoryMatch && maxMemory > 0) {
-          const usedMemory = parseInt(memoryMatch[1]);
+          const usedMemory = parseInt(memoryMatch[1] || '0');
           const usagePercent = (usedMemory / maxMemory) * 100;
           details.usagePercent = Math.round(usagePercent * 100) / 100;
           

@@ -13,6 +13,8 @@ export interface RateLimitResult {
   remaining: number;
   resetAt: Date;
   retryAfter?: number | undefined;
+  windowStart?: number;
+  algorithm?: string;
 }
 
 export interface RateLimitStore {

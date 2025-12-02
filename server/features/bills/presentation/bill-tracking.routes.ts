@@ -5,7 +5,7 @@ import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@
 // Correct import path for the new service location
 import { billTrackingService } from '@shared/application/bill-tracking.service.js';
 import { z } from 'zod';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 const router = Router();
 

@@ -6,9 +6,9 @@
  * connection management across the platform.
  */
 
-import { DatabaseOrchestrator } from '@shared/database/core/database-orchestrator';
-import { DatabaseConfigManager } from '@shared/database/core/unified-config';
-import { logger, LoggerChild } from '@shared/core/src/observability/logging';
+import { DatabaseOrchestrator } from '../core/database-orchestrator';
+import { DatabaseConfigManager } from '../core/unified-config';
+import { logger, LoggerChild } from '../../core/src/observability/logging';
 
 // ============================================================================
 // Types and Interfaces
@@ -45,11 +45,11 @@ export interface ScriptContext {
 
 export class DatabaseScriptLogger {
   private logger: LoggerChild;
-  private scriptName: string;
+  private _scriptName: string = '';
   private verbose: boolean;
 
   constructor(scriptName: string, verbose = false) {
-    this.scriptName = scriptName;
+    this._scriptName = scriptName;
     this.verbose = verbose;
     this.logger = logger.child({ scriptName });
   }

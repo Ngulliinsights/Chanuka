@@ -22,10 +22,10 @@ import { router as billsRouter } from '@server/features/bills/presentation/bills
 import { router as sponsorsRouter } from '@server/features/bills/sponsors.ts';
 import { router as profileRouter } from '@server/features/users/application/profile.ts';
 import { router as adminRouter } from '@server/features/admin/admin.ts';
-import { database as db, users } from '@shared/database/connection.js';
+import { database as db, users } from '@shared/database';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('Authentication Flow Validation Tests', () => {
   let app: express.Application;

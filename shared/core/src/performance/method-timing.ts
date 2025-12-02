@@ -90,7 +90,7 @@ export class MethodTimingService extends EventEmitter {
       enabled: true,
       samplingRate: 1.0, // Sample all by default
       excludeMethods: [],
-      includeMethods: undefined,
+      includeMethods: [],
       slowMethodThreshold: 1000, // 1 second
       logSlowMethods: true,
       collectStats: true,
@@ -276,14 +276,14 @@ export class MethodTimingService extends EventEmitter {
     if (values.length === 0) return 0;
     const mid = Math.floor(values.length / 2);
     return values.length % 2 === 0
-      ? (values[mid - 1] + values[mid]) / 2
-      : values[mid];
+      ? ((values[mid - 1] || 0) + (values[mid] || 0)) / 2
+      : (values[mid] || 0);
   }
 
   private calculatePercentile(values: number[], percentile: number): number {
     if (values.length === 0) return 0;
     const index = Math.ceil((percentile / 100) * values.length) - 1;
-    return values[Math.max(0, Math.min(index, values.length - 1))];
+    return values[Math.max(0, Math.min(index, values.length - 1))] || 0;
   }
 
   private logSlowMethod(data: MethodTimingData): void {
@@ -346,12 +346,12 @@ class ActiveTimingHandle implements TimingHandle {
 
     this.service.recordTiming({
       methodName: this.methodName,
-      className: this.className,
+      className: this.className || '',
       duration,
       startTime: this.startTime,
       endTime,
       success,
-      error,
+      error: error || '',
       metadata: { ...this.initialMetadata, ...metadata },
     });
   }
@@ -371,7 +371,7 @@ class NoOpTimingHandle implements TimingHandle {
  */
 export function timed(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
   const originalMethod = descriptor.value;
-  const methodName = `${target.constructor.name}.${propertyKey}`;
+  // const _methodName = `${target.constructor.name}.${propertyKey}`;
 
   descriptor.value = function (...args: any[]) {
     const timingService = getGlobalMethodTimingService();

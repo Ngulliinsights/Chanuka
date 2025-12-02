@@ -13,7 +13,7 @@ import { featureFlagsService } from './feature-flags.service.js';
 import { abTestingService } from './ab-testing.service.js';
 import { errorAdapter } from '@shared/errors/error-adapter.js';
 import { errorHandler } from '@shared/errors/error-standardization.js';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import * as Boom from '@hapi/boom';
 import { Result, ok, err } from 'neverthrow';
 

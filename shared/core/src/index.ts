@@ -58,7 +58,8 @@ export * from './rate-limiting';
 export * from './performance';
 
 // Types - selective to avoid conflicts
-export type { Result } from './primitives/types/result';
+export type { Result, Maybe } from './primitives/types';
+export { Ok, Err, ok, err, some, none } from './primitives/types';
 
 // Re-export commonly used types
 export type { BaseError } from './observability/error-management/errors/base-error';

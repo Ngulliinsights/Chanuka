@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { join, extname, basename } from 'path';
-import { logger } from '../../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 import {
   AnalysisResult,
   AnalysisType,

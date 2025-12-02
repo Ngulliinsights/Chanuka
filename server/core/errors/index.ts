@@ -6,7 +6,7 @@ export {
   NotFoundError,
   UnauthorizedError,
   ForbiddenError
-} from '@shared/core/index.js';
+} from '@shared/core';
 export * from '@server/utils/errors.js';
 
 // Re-export server-specific error handling

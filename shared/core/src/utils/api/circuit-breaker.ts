@@ -96,7 +96,7 @@ export class CircuitBreaker {
   /**
    * Handle failed execution
    */
-  private onFailure(error: Error): void {
+  private onFailure(_error: Error): void {
     this.totalFailures++;
     this.failures++;
     this.lastFailureTime = Date.now();
@@ -158,8 +158,8 @@ export class CircuitBreaker {
       state: this.state,
       failures: this.failures,
       successes: this.successes,
-      lastFailureTime: this.lastFailureTime,
-      lastSuccessTime: this.lastSuccessTime,
+      ...(this.lastFailureTime !== undefined && { lastFailureTime: this.lastFailureTime }),
+      ...(this.lastSuccessTime !== undefined && { lastSuccessTime: this.lastSuccessTime }),
       totalRequests: this.totalRequests,
       totalFailures: this.totalFailures,
       totalSuccesses: this.totalSuccesses,

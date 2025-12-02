@@ -207,7 +207,7 @@ export interface TelemetryCollector {
 
 export class TelemetryError extends BaseError {
   constructor(message: string, cause?: Error) {
-    super(message, { statusCode: 500, code: 'TELEMETRY_ERROR', cause, isOperational: false });
+    super(message, { statusCode: 500, code: 'TELEMETRY_ERROR', cause: cause || new Error('Unknown cause'), isOperational: false });
   }
 }
 
@@ -234,7 +234,7 @@ export class UnifiedTelemetryExporter implements TelemetryExporter, TelemetryCol
 
   constructor(config: TelemetryConfig, correlationManager?: CorrelationManager) {
     this.config = this.validateConfig(config);
-    this.correlationManager = correlationManager;
+    this.correlationManager = correlationManager || null as any;
 
     if (this.config.batching.enabled) {
       this.startFlushTimer();
@@ -252,15 +252,15 @@ export class UnifiedTelemetryExporter implements TelemetryExporter, TelemetryCol
     const telemetryData: TelemetryData = {
       id: this.generateId(),
       timestamp: new Date(),
-      correlationId: this.getCorrelationId(),
-      traceId: context?.traceId,
-      spanId: context?.spanId as string | undefined,
+      correlationId: this.getCorrelationId() || '',
+      traceId: context?.traceId || '',
+      spanId: context?.spanId as string || '',
       type: 'log',
       data: {
         level,
         message,
-        context,
-        metadata
+        context: context || {},
+        metadata: metadata || {}
       },
       metadata: this.extractMetadata(context)
     };
@@ -280,7 +280,7 @@ export class UnifiedTelemetryExporter implements TelemetryExporter, TelemetryCol
       const telemetryData: TelemetryData = {
         id: this.generateId(),
         timestamp: value.timestamp,
-        correlationId: this.getCorrelationId(),
+        correlationId: this.getCorrelationId() || '',
         type: 'metric',
         data: {
           name: metric.name,
@@ -306,19 +306,19 @@ export class UnifiedTelemetryExporter implements TelemetryExporter, TelemetryCol
     const telemetryData: TelemetryData = {
       id: this.generateId(),
       timestamp: span.startTime,
-      correlationId: this.getCorrelationId(),
+      correlationId: this.getCorrelationId() || '',
       traceId: span.traceId,
       spanId: span.spanId,
       type: 'trace',
       data: {
         spanId: span.spanId,
         traceId: span.traceId,
-        parentSpanId: span.parentSpanId,
+        parentSpanId: span.parentSpanId || '',
         name: span.name,
         kind: span.kind,
         startTime: span.startTime,
-        endTime: span.endTime,
-        duration: span.duration,
+        endTime: span.endTime || new Date(),
+        duration: span.duration || 0,
         status: span.status,
         attributes: span.attributes,
         events: span.events
@@ -375,7 +375,7 @@ export class UnifiedTelemetryExporter implements TelemetryExporter, TelemetryCol
 
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
-      this.flushTimer = undefined;
+      this.flushTimer = null as any;
     }
 
     return this.flush();
@@ -703,10 +703,10 @@ export class TelemetryIntegration {
    * Integrate with observability components
    */
   integrate(logger?: Logger, metrics?: MetricsCollector, tracer?: Tracer): void {
-    this.logger = logger;
-    this.metrics = metrics;
-    this.tracer = tracer;
-    this.spanContextType = tracer ? 'tracing' : undefined;
+    this.logger = logger || null as any;
+    this.metrics = metrics || null as any;
+    this.tracer = tracer || null as any;
+    this.spanContextType = tracer ? 'tracing' : 'interface';
 
     this.setupLoggerIntegration();
     this.setupMetricsIntegration();
@@ -753,7 +753,7 @@ export class TelemetryIntegration {
         this.exporter.collectLog(level, message, context, metadata);
 
         // Call original method
-        originalMethods[level](message, context, metadata);
+        originalMethods[level](message, context as any, metadata);
       };
     });
   }

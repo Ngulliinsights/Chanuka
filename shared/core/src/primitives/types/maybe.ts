@@ -39,14 +39,14 @@ export class Some<T> {
   /**
    * Get the value with a default if it's None
    */
-  unwrapOr(defaultValue: T): T {
+  unwrapOr(_defaultValue: T): T {
     return this.value;
   }
 
   /**
    * Get the value or throw with a custom message
    */
-  expect(message: string): T {
+  expect(_message: string): T {
     return this.value;
   }
 
@@ -67,7 +67,7 @@ export class Some<T> {
   /**
    * Handle both Some and None cases
    */
-  match<U>(onSome: (value: T) => U, onNone: () => U): U {
+  match<U>(onSome: (value: T) => U, _onNone: () => U): U {
     return onSome(this.value);
   }
 
@@ -123,28 +123,28 @@ export class None {
   /**
    * Transform the value (no-op for None)
    */
-  map<U>(fn: (value: never) => U): Maybe<U> {
+  map<U>(_fn: (value: never) => U): Maybe<U> {
     return none;
   }
 
   /**
    * Chain operations that return Maybe values (no-op for None)
    */
-  andThen<U>(fn: (value: never) => Maybe<U>): Maybe<U> {
+  andThen<U>(_fn: (value: never) => Maybe<U>): Maybe<U> {
     return none;
   }
 
   /**
    * Handle both Some and None cases
    */
-  match<U>(onSome: (value: never) => U, onNone: () => U): U {
+  match<U>(_onSome: (value: never) => U, onNone: () => U): U {
     return onNone();
   }
 
   /**
    * Filter the value (no-op for None)
    */
-  filter(predicate: (value: never) => boolean): Maybe<never> {
+  filter(_predicate: (value: never) => boolean): Maybe<never> {
     return none;
   }
 }

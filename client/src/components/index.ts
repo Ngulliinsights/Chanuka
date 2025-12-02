@@ -34,5 +34,5 @@ export { default as BillTracking } from './bills/bill-tracking';
 export { ImplementationWorkarounds } from './bills/implementation-workarounds';
 
 // Notifications Components
-export { default as NotificationCenter } from './notifications/notification-center';
+export { NotificationCenter } from './notifications/NotificationCenter';
 export { NotificationPreferences } from './notifications/notification-preferences';

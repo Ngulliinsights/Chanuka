@@ -487,7 +487,7 @@ Time: ${new Date(violation.timestamp).toISOString()}`;
   /**
    * Send email alert
    */
-  private async sendEmailAlert(message: string, violation: BudgetViolation): Promise<void> {
+  private async sendEmailAlert(_message: string, violation: BudgetViolation): Promise<void> {
     // Implementation would depend on email service (SendGrid, AWS SES, etc.)
     logger.info('Email alert would be sent', {
       component: 'performance-monitoring',

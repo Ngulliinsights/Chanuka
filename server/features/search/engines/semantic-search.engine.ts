@@ -5,8 +5,8 @@
 // Combines semantic search with traditional search for optimal results
 
 import { database } from '@shared/database';
-import { bills, sponsors } from '@shared/schema/foundation';
-import { comments } from '@shared/schema/citizen_participation';
+import { bills, sponsors } from '@shared/schema';
+import { comments } from '@shared/schema';
 import { content_embeddings, search_queries, SearchQuery, QueryType } from '@shared/schema/search_system';
 import { embeddingService } from './embedding-service';
 import { eq, or, sql, desc } from 'drizzle-orm';

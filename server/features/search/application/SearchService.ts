@@ -6,7 +6,7 @@ import { SearchValidator } from '@shared/domain/SearchValidator';
 import { queryIntentService } from '@shared/domain/QueryIntentService';
 import { typoCorrectionService } from '@shared/domain/TypoCorrectionService';
 import { dualEngineOrchestrator } from '@shared/engines/dual-engine-orchestrator';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 import type { Request, Response } from 'express';
 import type {
   SearchQuery,

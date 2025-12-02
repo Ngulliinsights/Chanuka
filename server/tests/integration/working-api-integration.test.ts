@@ -21,10 +21,10 @@ import { router as billsRouter } from '@server/features/bills/presentation/bills
 import { router as sponsorsRouter } from '@server/features/bills/sponsors';
 import { router as authRouter } from '@/components/auth';
 import { router as healthRouter } from '@server/infrastructure/monitoring/health';
-import { database as db, users, bills, sponsors } from '@shared/database/connection.js';
+import { database as db, users, bills, sponsors } from '@shared/database';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('Working API Integration Tests', () => {
   let app: express.Application;

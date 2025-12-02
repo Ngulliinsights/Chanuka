@@ -22,7 +22,7 @@ import {
 } from '../ai-middleware';
 import { getDefaultCache } from '../../cache';
 import { MemoryStore } from '../../rate-limiting/stores/memory-store';
-import { logger } from '@shared/core/src/observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 // Mock dependencies
 vi.mock('../../cache');

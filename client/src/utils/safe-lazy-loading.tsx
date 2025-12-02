@@ -656,10 +656,10 @@ export const DynamicFeatureImports = {
   AnalysisSection: () => import("@client/components/analysis/section"),
 
   // Bill tracking components
-  BillCard: () => import("@client/components/bills/bill-card"),
-  BillList: () => import("@client/components/bills/bill-list"),
-  BillTracking: () => import("@client/components/bills/bill-tracking"),
-  BillImplementation: () => import("@client/components/bills/implementation-workarounds"),
+  BillCard: () => import("@client/features/bills/ui/bill-card"),
+  BillList: () => import("@client/features/bills/ui/bill-list"),
+  BillTracking: () => import("@client/features/bills/ui/bill-tracking"),
+  BillImplementation: () => import("@client/features/bills/ui/implementation-workarounds"),
 
   // Chart and visualization libraries (if used)
   Charts: () => import("recharts"),

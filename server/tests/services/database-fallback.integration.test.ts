@@ -4,7 +4,7 @@ import { cleanup } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { demoDataService } from '@server/infrastructure/demo-data.js';
 import { DatabaseFallbackService } from '@server/infrastructure/database/database-fallback.js';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 // Mock database connection with proper typing
 const mockDatabase = {

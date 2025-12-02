@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -16,8 +16,8 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { CleanupOrchestrator, FileCategory } from '../orchestrator';
-import { AnalysisType, FindingType } from '@shared/core/src/types';
-import { logger } from '@shared/core/src/observability/logging';
+import { AnalysisType, FindingType } from '../../types';
+import { logger } from '../../observability/logging';
 
 describe('CleanupOrchestrator', () => {
   let tempDir: string;

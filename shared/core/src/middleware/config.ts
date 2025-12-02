@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { logger } from '../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 const middlewareFeatureSchema = z.object({
   enabled: z.boolean().default(true),

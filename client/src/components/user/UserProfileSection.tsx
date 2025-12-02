@@ -4,7 +4,7 @@
  * Preserves strengths from profile.tsx
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Switch } from '../ui/switch';

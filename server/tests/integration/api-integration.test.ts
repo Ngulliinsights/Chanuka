@@ -26,8 +26,8 @@ import { router as notificationsRouter } from '@server/infrastructure/notificati
 import realTimeTrackingRouter from '@server/features/bills/real-time-tracking.ts';
 import engagementAnalyticsRouter from '@server/features/analytics/engagement-analytics.ts';
 import { router as healthRouter } from '@server/infrastructure/monitoring/health.js';
-import { database as db, withTransaction } from '@shared/database/connection.js';
-import { logger  } from '@shared/core/src/index.js';
+import { database as db, withTransaction } from '@shared/database';
+import { logger  } from '@shared/core';
 
 describe('Comprehensive API Integration Tests', () => {
   let app: express.Application;

@@ -6,12 +6,12 @@
  */
 
 import React from 'react';
-import { UserDashboard } from '@client/components/dashboard/UserDashboard';
+import { UserDashboard } from '@client/components/shared/dashboard';
 import { logger } from '@client/utils/logger';
 
 export default function Dashboard() {
   React.useEffect(() => {
-    logger.info('Dashboard page loaded', { 
+    logger.info('Dashboard page loaded', {
       component: 'Dashboard',
       timestamp: new Date().toISOString()
     });
@@ -19,7 +19,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <UserDashboard />
+      <UserDashboard variant="full-page" />
     </div>
   );
 }

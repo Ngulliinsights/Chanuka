@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 import { ApiValidationError, ApiError, ApiSuccess } from './api-response.js';
-import { logger   } from '@shared/core/index.js';
-import { AuthenticatedRequest } from '@shared/middleware/auth.js';
+import { logger } from './shared-core-fallback.js';
+import { AuthenticatedRequest } from './missing-modules-fallback.js';
 
 /**
  * Options for configuring the controller wrapper
@@ -76,7 +76,7 @@ export function controllerWrapper<
           validatedBody = options.bodySchema.parse(req.body);
         } catch (error) {
           if (error instanceof ZodError) {
-            return res.status(400).json({
+            res.status(400).json({
               success: false,
               error: { message: 'Validation failed', errors: error.errors, statusCode: 400 },
               metadata: {
@@ -86,6 +86,7 @@ export function controllerWrapper<
                 executionTime: Date.now() - startTime
               }
             });
+            return;
           }
           throw error;
         }
@@ -98,7 +99,7 @@ export function controllerWrapper<
           validatedQuery = options.querySchema.parse(req.query);
         } catch (error) {
           if (error instanceof ZodError) {
-            return res.status(400).json({
+            res.status(400).json({
               success: false,
               error: { message: 'Validation failed', errors: error.errors, statusCode: 400 },
               metadata: {
@@ -108,6 +109,7 @@ export function controllerWrapper<
                 executionTime: Date.now() - startTime
               }
             });
+            return;
           }
           throw error;
         }
@@ -120,7 +122,7 @@ export function controllerWrapper<
           validatedParams = options.paramsSchema.parse(req.params);
         } catch (error) {
           if (error instanceof ZodError) {
-            return res.status(400).json({
+            res.status(400).json({
               success: false,
               error: { message: 'Validation failed', errors: error.errors, statusCode: 400 },
               metadata: {
@@ -130,6 +132,7 @@ export function controllerWrapper<
                 executionTime: Date.now() - startTime
               }
             });
+            return;
           }
           throw error;
         }
@@ -146,7 +149,7 @@ export function controllerWrapper<
       const result = await handler(input, req, res);
 
       // Return successful response
-      return res.status(200).json({
+      res.status(200).json({
         success: true,
         data: result,
         metadata: {
@@ -156,6 +159,7 @@ export function controllerWrapper<
           executionTime: Date.now() - startTime
         }
       });
+            return;
 
     } catch (error) {
       // Log the error with context
@@ -169,7 +173,7 @@ export function controllerWrapper<
       });
 
       // Return error response
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
         error: { message: error instanceof Error ? error.message : 'Internal server error', statusCode: 500 },
         metadata: {
@@ -179,6 +183,7 @@ export function controllerWrapper<
           executionTime: Date.now() - startTime
         }
       });
+            return;
     }
   };
 }

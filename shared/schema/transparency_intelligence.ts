@@ -5,7 +5,7 @@
 
 import {
   pgTable, uuid, varchar, integer, decimal, boolean, timestamp, jsonb, text, date,
-  index, check
+  index
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { bills, sponsors, users } from './foundation';

@@ -5,12 +5,12 @@
  * and data structures, enabling consistent test patterns regardless of underlying schema.
  */
 
-import type { Result, Maybe, UserId, Timestamp } from '../primitives';
+import type { Result, Timestamp } from '../primitives';
 
 // Define missing branded types for now
 export type BillId = string & { readonly __brand: 'BillId' };
 export type SessionId = string & { readonly __brand: 'SessionId' };
-import type { DatabaseEntity, TestDataConfig, DatabaseOperationResult } from './test-data-factory';
+import type { DatabaseEntity, DatabaseOperationResult } from './test-data-factory';
 
 /**
  * Test assertion configuration

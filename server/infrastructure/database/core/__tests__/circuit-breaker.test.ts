@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { jest } from '@jest/globals';
-import { CircuitBreaker  } from '@shared/core/src/index.js';
+import { CircuitBreaker } from '@shared/core';
 
 describe('CircuitBreaker', () => {
   let circuitBreaker: CircuitBreaker;

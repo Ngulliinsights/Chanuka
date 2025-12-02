@@ -6,7 +6,7 @@ import {
   HealthReport,
   HealthOrchestratorOptions,
   HealthMetrics,
-  RetryPolicy,
+  // RetryPolicy,
   DEFAULT_CONFIG,
   healthOrchestratorOptionsSchema,
 } from './types';

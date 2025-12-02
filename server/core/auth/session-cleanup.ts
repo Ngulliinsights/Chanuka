@@ -1,5 +1,5 @@
 import { authService } from './auth-service.js';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 export class SessionCleanupService {
   private cleanupInterval: NodeJS.Timeout | null = null;

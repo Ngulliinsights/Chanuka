@@ -80,7 +80,7 @@ export class RealTimeErrorMonitor extends EventEmitter implements ErrorMonitor {
 
     if (this.aggregationTimer) {
       clearInterval(this.aggregationTimer);
-      this.aggregationTimer = undefined;
+      this.aggregationTimer = undefined as any;
     }
 
     logger.info('Error monitor stopped', { component: 'ErrorMonitor' });
@@ -269,7 +269,7 @@ export class RealTimeErrorMonitor extends EventEmitter implements ErrorMonitor {
     return {
       errorCount: 0,
       errorRate: 0,
-      lastError: undefined,
+      lastError: undefined as any,
       errorsByType: {},
       errorsBySeverity: {
         [ErrorSeverity.LOW]: 0,
@@ -288,7 +288,7 @@ export class RealTimeErrorMonitor extends EventEmitter implements ErrorMonitor {
     this.metrics.errorsByType[error.code] = (this.metrics.errorsByType[error.code] || 0) + 1;
 
     // Update by severity
-    this.metrics.errorsBySeverity[error.metadata.severity]++;
+    (this.metrics.errorsBySeverity as any)[error.metadata?.severity || 'low']++;
 
     // Calculate error rate (errors per minute over last 5 minutes)
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -367,7 +367,7 @@ export class RealTimeErrorMonitor extends EventEmitter implements ErrorMonitor {
       ).length;
 
       data.push({
-        date: periodStart.toISOString().split('T')[0], // YYYY-MM-DD format
+        date: periodStart.toISOString().split('T')[0]!, // YYYY-MM-DD format
         count
       });
     }

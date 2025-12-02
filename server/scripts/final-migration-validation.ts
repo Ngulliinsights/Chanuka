@@ -8,7 +8,7 @@
  */
 
 import { logger } from '@shared/core/observability/logging';
-import { database as db } from '@shared/database/connection.js';
+import { database as db } from '@shared/database';
 import { webSocketService } from '@shared/infrastructure/websocket.js';
 import { BatchingService } from '@shared/infrastructure/batching-service.js';
 

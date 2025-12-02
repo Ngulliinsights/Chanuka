@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { RateLimitStore, RateLimitOptions, RateLimitHeaders } from '/types';
+import { RateLimitStore, RateLimitOptions, RateLimitHeaders } from './types';
 
 export class RateLimitMiddleware {
   private store: RateLimitStore;
@@ -37,7 +37,7 @@ export class RateLimitMiddleware {
     };
   }
 
-  private getKey(req: Request, options: RateLimitOptions): string {
+  private getKey(req: Request, _options: RateLimitOptions): string {
     // Default to IP-based limiting
     return req.ip || req.connection.remoteAddress || 'unknown';
   }

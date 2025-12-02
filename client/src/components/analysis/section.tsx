@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Button } from '../ui/button';
 import { ErrorBoundary } from '../error-handling/ErrorBoundary';
-import { LoadingSpinner } from '../ui/spinner';
+import { LoadingSpinner } from '../ui/loading-spinner';
 import { Suspense } from 'react';
 import { logger } from '@client/utils/logger';
 

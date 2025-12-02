@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
 import { 
   FileText, 
   Users, 
@@ -13,7 +13,28 @@ import {
   Clock,
   TrendingUp
 } from 'lucide-react';
-import { CivicAction, RightsCard } from '@client/types';
+
+// Define types locally
+interface CivicAction {
+  id: string;
+  type: 'foi' | 'petition' | 'complaint' | 'public_participation';
+  title: string;
+  description: string;
+  estimatedTime: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  successRate?: number;
+  localContacts: any[];
+}
+
+interface RightsCard {
+  id: string;
+  scenario: string;
+  title: string;
+  description: string;
+  steps: any[];
+  contacts: any[];
+  lastUpdated: Date;
+}
 
 interface CivicActionToolboxProps {
   billId: string;

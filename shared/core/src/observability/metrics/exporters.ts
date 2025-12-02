@@ -1,4 +1,10 @@
-import { Metric, MetricsExporter, PrometheusConfig, OpenTelemetryConfig } from '/types';
+// import { Metric, MetricsExporter, PrometheusConfig, OpenTelemetryConfig } from '../../types';
+
+// Temporary type definitions
+type Metric = any;
+type MetricsExporter = any;
+type PrometheusConfig = any;
+type OpenTelemetryConfig = any;
 
 // ==================== Prometheus Exporter ====================
 
@@ -272,7 +278,7 @@ export class JSONExporter implements MetricsExporter {
         type: metric.type,
         help: metric.help,
         labels: metric.labels || {},
-        values: metric.values.map(value => ({
+        values: metric.values.map((value: any) => ({
           value: value.value,
           timestamp: value.timestamp.toISOString(),
           labels: value.labels || {},

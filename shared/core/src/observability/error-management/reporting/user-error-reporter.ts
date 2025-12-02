@@ -45,7 +45,7 @@ export class UserErrorReporter {
       enableTechnicalDetails: config.enableTechnicalDetails ?? false,
       maxReportsPerUser: config.maxReportsPerUser ?? 10,
       reportRetentionDays: config.reportRetentionDays ?? 30,
-      feedbackStorage: config.feedbackStorage
+      feedbackStorage: config.feedbackStorage as any
     };
   }
 
@@ -65,11 +65,11 @@ export class UserErrorReporter {
     const report: UserErrorReport = {
       errorId,
       userMessage,
-      technicalDetails,
+      technicalDetails: technicalDetails || '',
       recoveryOptions,
       timestamp: new Date(),
-      user_id: context.user_id,
-      session_id: context.session_id
+      user_id: context.user_id as any,
+      session_id: context.session_id as any
      };
 
     // Store the report
@@ -104,9 +104,9 @@ export class UserErrorReporter {
     }
 
     const userFeedback: UserFeedback = {
-      rating: feedback.rating,
-      comment: feedback.comment,
-      contactInfo: feedback.contactInfo,
+      rating: feedback.rating || 0,
+      comment: feedback.comment || '',
+      contactInfo: feedback.contactInfo || '',
       timestamp: new Date()
     };
 
@@ -247,10 +247,10 @@ export class UserErrorReporter {
   exportReports(): ErrorReportSubmission[] { return Array.from(this.reports.values()).map(report => ({
       errorId: report.errorId,
       userMessage: report.userMessage,
-      technicalDetails: report.technicalDetails,
+      technicalDetails: report.technicalDetails || '',
       recoveryOptions: report.recoveryOptions || [],
-      user_id: report.user_id,
-      session_id: report.session_id
+      user_id: report.user_id as any,
+      session_id: report.session_id as any
      }));
   }
 

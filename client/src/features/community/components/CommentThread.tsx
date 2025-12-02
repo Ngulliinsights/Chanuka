@@ -5,15 +5,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ThumbsUp, ThumbsDown, Reply, MoreVertical, Edit, Trash } from 'lucide-react';
-import { useComments } from '@client/hooks/useCommunity';
-import type { Comment, CreateCommentRequest } from '@client/types';
+import { useComments } from '../hooks/useCommunity';
+import type { Comment, CreateCommentRequest } from '../../../types/discussion';
 
-interface CommentThreadProps { bill_id?: string;
+interface CommentThreadProps {
+  bill_id?: string;
   comments: Comment[];
   onCommentUpdate?: () => void;
- }
+}
 
-export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentThreadProps) {
+export function CommentThread({ bill_id, comments, onCommentUpdate }: CommentThreadProps) {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
@@ -21,13 +22,14 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
 
   const { createComment, updateComment, voteOnComment, deleteComment } = useComments(bill_id);
 
-  const handleReply = async (parent_id: string) => { if (!replyContent.trim()) return;
+  const handleReply = async (parent_id: string) => {
+    if (!replyContent.trim()) return;
 
     const request: CreateCommentRequest = {
       content: replyContent,
       bill_id,
       parent_id,
-     };
+    };
 
     try {
       await createComment.mutateAsync(request);
@@ -45,7 +47,7 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
     try {
       await updateComment.mutateAsync({
         comment_id,
-        request: { content: editContent }
+        request: { content: editContent },
       });
       setEditContent('');
       setEditingComment(null);
@@ -80,15 +82,16 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
     const isEditing = editingComment === comment.id;
 
     return (
-      <div key={comment.id} className={`${depth > 0 ? 'ml-8 border-l-2 border-gray-200 pl-4' : ''} mb-4`}>
+      <div
+        key={comment.id}
+        className={`${depth > 0 ? 'ml-8 border-l-2 border-gray-200 pl-4' : ''} mb-4`}
+      >
         <Card className="bg-gray-50">
           <CardContent className="pt-4">
             <div className="flex items-start space-x-3">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={comment.authorAvatar} alt={comment.authorName} />
-                <AvatarFallback>
-                  {comment.authorName.charAt(0).toUpperCase()}
-                </AvatarFallback>
+                <AvatarFallback>{comment.authorName.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
 
               <div className="flex-1">
@@ -98,7 +101,9 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
                     {new Date(comment.created_at).toLocaleDateString()}
                   </span>
                   {comment.isEdited && (
-                    <Badge variant="outline" className="text-xs">Edited</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      Edited
+                    </Badge>
                   )}
                 </div>
 
@@ -106,7 +111,7 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
                   <div className="space-y-2">
                     <Textarea
                       value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
+                      onChange={e => setEditContent(e.target.value)}
                       placeholder="Edit your comment..."
                       rows={3}
                     />
@@ -137,7 +142,7 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
                 {/* Attachments */}
                 {comment.attachments && comment.attachments.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {comment.attachments.map((attachment) => (
+                    {comment.attachments.map(attachment => (
                       <Badge key={attachment.id} variant="secondary" className="text-xs">
                         📎 {attachment.filename}
                       </Badge>
@@ -152,7 +157,9 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleVote(comment.id, comment.userVote === 'up' ? null : 'up')}
+                        onClick={() =>
+                          handleVote(comment.id, comment.userVote === 'up' ? null : 'up')
+                        }
                         className={`h-6 px-2 ${comment.userVote === 'up' ? 'text-green-600' : ''}`}
                       >
                         <ThumbsUp className="h-3 w-3 mr-1" />
@@ -161,7 +168,9 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleVote(comment.id, comment.userVote === 'down' ? null : 'down')}
+                        onClick={() =>
+                          handleVote(comment.id, comment.userVote === 'down' ? null : 'down')
+                        }
                         className={`h-6 px-2 ${comment.userVote === 'down' ? 'text-red-600' : ''}`}
                       >
                         <ThumbsDown className="h-3 w-3 mr-1" />
@@ -210,7 +219,7 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
                   <div className="mt-3 space-y-2">
                     <Textarea
                       value={replyContent}
-                      onChange={(e) => setReplyContent(e.target.value)}
+                      onChange={e => setReplyContent(e.target.value)}
                       placeholder="Write a reply..."
                       rows={3}
                     />
@@ -246,10 +255,5 @@ export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentTh
     );
   };
 
-  return (
-    <div className="space-y-4">
-      {comments.map(comment => renderComment(comment))}
-    </div>
-  );
+  return <div className="space-y-4">{comments.map(comment => renderComment(comment))}</div>;
 }
-

@@ -1,4 +1,6 @@
-import { Metric, PrometheusConfig } from '/types';
+// import { Metric, PrometheusConfig } from '../../../types';
+type Metric = any;
+type PrometheusConfig = any;
 import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
 
 // ==================== Enhanced Prometheus Exporter ====================

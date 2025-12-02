@@ -1,4 +1,4 @@
-import type { User } from '@shared/schema/foundation';
+import type { User } from '@shared/schema';
 import { database as db } from '@shared/database';
 import { logger } from '@/shared/core';
 

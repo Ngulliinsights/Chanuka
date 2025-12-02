@@ -22,16 +22,20 @@ vi.mock('../../components/user/UserProfileSection', () => ({
   ),
 }));
 
-vi.mock('../../components/user/UserDashboardSection', () => ({
-  default: ({ user }: any) => (
+vi.mock('../../components/shared/dashboard', () => ({
+  UserDashboard: ({ variant }: any) => (
     <div data-testid="user-dashboard-section">
-      Dashboard for {user?.name || 'Unknown User'}
+      Dashboard ({variant} variant)
     </div>
   ),
 }));
 
-vi.mock('../../components/user/PrivacySettingsSection', () => ({
-  default: () => <div data-testid="privacy-settings-section">Privacy Settings</div>,
+vi.mock('../../components/shared/privacy/PrivacyManager', () => ({
+  PrivacyManager: ({ mode }: any) => (
+    <div data-testid="privacy-settings-section">
+      Privacy Manager ({mode} mode)
+    </div>
+  ),
 }));
 
 vi.mock('../../components/user/AccessibilitySettingsSection', () => ({

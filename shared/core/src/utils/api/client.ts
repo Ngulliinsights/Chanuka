@@ -5,9 +5,9 @@
  * including circuit breakers, retries, caching, and rate limiting.
  */
 
-import { logger } from '../../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 import { InterceptorManager, createDefaultInterceptors } from './interceptors';
-import { CircuitBreaker, CircuitBreakerRegistry, DEFAULT_CIRCUIT_CONFIGS } from './circuit-breaker';
+import { CircuitBreakerRegistry, DEFAULT_CIRCUIT_CONFIGS } from './circuit-breaker';
 
 export interface ApiClientConfig {
     baseURL?: string;
@@ -208,7 +208,7 @@ export class ApiClient {
 
         } catch (error) {
             this.stats.failedRequests++;
-            const duration = Date.now() - startTime;
+            // const duration = Date.now() - startTime;
 
             // Apply error interceptors
             const request = { url: this.buildUrl(url), method: options.method || 'GET', headers: {} };
@@ -268,7 +268,7 @@ export class ApiClient {
             clearTimeout(timeoutId);
 
             const responseData = await this.parseResponse(response);
-            const duration = Date.now() - Date.now(); // This should be passed from caller
+            // const duration = Date.now() - Date.now(); // This should be passed from caller
 
             return {
                 status: response.status,

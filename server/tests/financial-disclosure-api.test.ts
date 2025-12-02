@@ -18,7 +18,7 @@ import express from 'express';
 import { createFinancialDisclosureRouter } from '@server/features/analytics/financial-disclosure/index.ts';
 import { FinancialDisclosureMonitoringService } from '@server/features/analytics/financial-disclosure/monitoring.ts';
 import { financialDisclosureAnalyticsService } from '@server/features/analytics/services/financial-disclosure.service.ts';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 // Create mock monitoring service for tests
 const mockDependencies = {

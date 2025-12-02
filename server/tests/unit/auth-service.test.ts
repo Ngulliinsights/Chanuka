@@ -4,7 +4,7 @@ import { AuthService, registerSchema, loginSchema } from '@server/core/auth/auth
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 // Mock dependencies with proper typing
 vi.mock('bcryptjs');

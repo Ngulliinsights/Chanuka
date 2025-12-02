@@ -2,7 +2,7 @@ import { Bill } from '@shared/entities/bill';
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@shared/events/bill-events';
 import { NotificationChannelService } from '@server/infrastructure/notifications/notification-channels';
 // UserRepository interface removed - using direct service calls
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 /**
  * Handles notification workflows for bill events

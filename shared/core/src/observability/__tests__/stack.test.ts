@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));

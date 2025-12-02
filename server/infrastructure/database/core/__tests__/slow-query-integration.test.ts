@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { QueryExecutor } from '../query-executor';
 import { getMonitoringService, resetMonitoringService } from '../../../monitoring/monitoring';
 import { connectionManager } from '../connection-manager';
-import { logger  } from '@shared/core/src/index.js';
+import { logger } from '@shared/core';
 
 // Mock the connection manager with explicit typing for better type safety
 vi.mock('../connection-manager', () => ({

@@ -1,38 +1,35 @@
-import { QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import React, { Suspense, useEffect, useMemo } from 'react';
-import { lazy } from 'react';
 
 // Core Providers and Layout
 import AppProviders from '@client/components/AppProviders';
-import SimpleAppLayout from '@client/components/layout/SimpleAppLayout';
 import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
-
+import SimpleAppLayout from '@client/components/layout/SimpleAppLayout';
 // UI Components
 // AccessibilitySettingsPanel is now integrated into UserAccountPage
-import { OfflineStatus } from '@client/components/offline/offline-manager';
+import { LazyPageWrapper } from '@client/components/LazyPageWrapper';
 import { LoadingStateManager } from '@client/components/loading/LoadingStates';
+import { OfflineStatus } from '@client/components/offline/offline-manager';
+import { CookieConsentBanner } from '@client/components/privacy';
 import { Toaster } from '@client/components/ui/toaster';
-
 // Hooks
 import { useLoadingOperation } from '@client/core/loading/hooks';
+import { createNavigationProvider } from '@client/core/navigation/context';
+import { useWebVitals } from '@client/features/analytics/hooks';
 import { useAuth } from '@client/features/users/hooks';
 import { useMediaQuery } from '@client/hooks/use-mobile';
-import { useWebVitals } from '@client/features/analytics/hooks';
-
 // Utils
 import { logger } from '@client/utils/logger';
 import { SafeLazyPages, SafeLazySponsorshipPages } from '@client/utils/safe-lazy-loading';
-import { SimpleLazyPages, LazyPageWrapper } from '@client/utils/simple-lazy-pages';
+import { SimpleLazyPages } from '@client/utils/simple-lazy-pages';
+import { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { lazy } from 'react';
+import React, { Suspense, useEffect, useMemo } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 // Core Systems
-import { createNavigationProvider } from '@client/core/navigation/context';
-import { CookieConsentBanner } from '@client/components/privacy';
 
 // Test Pages (lazy loaded only when needed)
 const DesignSystemTestPage = lazy(() => import('@client/pages/design-system-test'));
-const TestStylingPage = lazy(() => import('@client/pages/test-styling'));
 
 // =============================================================================
 // CONFIGURATION - Centralized configuration for easy maintenance
@@ -102,38 +99,26 @@ const getQueryClient = (): QueryClient => {
  * to users when pages take longer than expected to load.
  */
 function PageLoader() {
-  try {
-    const { error, isTimeout } = useLoadingOperation('app-page-loading', {
-      timeout: CONFIG.loading.pageTimeout,
-      connectionAware: CONFIG.loading.connectionAware,
-      showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
-    });
+  const { error, isTimeout } = useLoadingOperation('app-page-loading', {
+    timeout: CONFIG.loading.pageTimeout,
+    connectionAware: CONFIG.loading.connectionAware,
+    showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
+  });
 
-    const currentState = isTimeout ? 'timeout' : 'loading';
-    const loadingMessage = error?.message || 'Loading page...';
+  const currentState = isTimeout ? 'timeout' : 'loading';
+  const loadingMessage = error?.message || 'Loading page...';
 
-    return (
-      <LoadingStateManager
-        type="page"
-        state={currentState}
-        message={loadingMessage}
-        error={error ?? undefined}
-        timeout={CONFIG.loading.pageTimeout}
-        className="min-h-screen"
-        showDetails={IS_DEV}
-      />
-    );
-  } catch (error) {
-    // Fallback loading state if hooks fail
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  return (
+    <LoadingStateManager
+      type="page"
+      state={currentState}
+      message={loadingMessage}
+      error={error ?? undefined}
+      timeout={CONFIG.loading.pageTimeout}
+      className="min-h-screen"
+      showDetails={IS_DEV}
+    />
+  );
 }
 
 // =============================================================================
@@ -234,6 +219,15 @@ const ROUTES = [
     element: <SafeLazyPages.ExpertVerification />,
     id: 'expert-verification',
   },
+  {
+    path: '/civic-education',
+    element: (
+      <LazyPageWrapper>
+        <SimpleLazyPages.CivicEducation />
+      </LazyPageWrapper>
+    ),
+    id: 'civic-education',
+  },
 
   // User Management Routes
   { 
@@ -297,11 +291,6 @@ const ROUTES = [
       element: <DesignSystemTestPage />,
       id: 'design-system-test',
     },
-    {
-      path: '/test-styling',
-      element: <TestStylingPage />,
-      id: 'test-styling',
-    },
   ] : []),
 
   // 404 Catch-all - must be last
@@ -328,11 +317,11 @@ function WebVitalsMonitor() {
       if (IS_DEV) {
         // In development, log to console for immediate feedback
         logger.info('Core Web Vitals collected', undefined, metrics as Record<string, unknown>);
-      } else if (typeof (window as any).gtag !== 'undefined') {
+      } else if (typeof (window as unknown as { gtag?: unknown }).gtag !== 'undefined') {
         // In production, send to Google Analytics for tracking trends
         Object.entries(metrics).forEach(([name, value]) => {
           if (value !== undefined) {
-            (window as any).gtag('event', 'web_vitals', {
+            (window as unknown as { gtag: (event: string, action: string, params: Record<string, unknown>) => void }).gtag('event', 'web_vitals', {
               event_category: 'Web Vitals',
               event_label: name.toUpperCase(),
               value: Math.round(value),

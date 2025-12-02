@@ -18,10 +18,10 @@ import request from 'supertest';
 import express from 'express';
 import { authService } from '@server/core/auth/auth-service';
 import { getEmailService } from '../infrastructure/notifications/email-service';
-import { database as db, user as users, session as sessions, passwordReset as passwordResets } from '@shared/database/connection.js';
+import { database as db, user as users, session as sessions, passwordReset as passwordResets } from '@shared/database';
 import { eq } from 'drizzle-orm';
 import { router as authRouter } from '@server/core/auth/auth.ts';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 // Create test app
 const app = express();

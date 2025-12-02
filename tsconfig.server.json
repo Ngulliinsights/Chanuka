@@ -80,7 +80,7 @@
         "./shared/*"
       ],
       "@shared/core": [
-        "./shared/core/src/index.ts"
+        "./shared/core/src"
       ],
       "@shared/core/*": [
         "./shared/core/src/*"
@@ -116,6 +116,8 @@
     "server/**/*.d.ts",
     "server/types/**/*",
     "shared/schema.ts",
+    "shared/schema/**/*",
+    "shared/core/src/**/*",
     "shared/database/**/*",
     "db/**/*"
   ],
@@ -126,8 +128,6 @@
     "dist",
     "server/tests",
     "**/*.test.ts",
-    "**/*.spec.ts",
-    "shared/core/**",
-    "shared/core/src/**"
+    "**/*.spec.ts"
   ]
 }

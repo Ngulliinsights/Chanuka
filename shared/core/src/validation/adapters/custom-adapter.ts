@@ -6,7 +6,7 @@
 
 import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
-  ISchemaAdapter,
+  // ISchemaAdapter,
   IValidationResult,
   IValidationService,
   IBatchValidationResult,
@@ -309,7 +309,7 @@ export class CustomValidationService extends CoreValidationService implements IV
     };
   }
 
-  validateSync<T>(schema: ValidationSchema, data: unknown, options?: ValidationOptions): T {
+  validateSync<T>(schema: ValidationSchema, data: unknown, _options?: ValidationOptions): T {
     const result = schema.validate(data);
     if (result.success) {
       return result.data as T;

@@ -22,99 +22,355 @@
  */
 
 import { globalApiClient } from './client';
-import { logger } from '@client/utils/logger';
+import { logger } from '../../utils/logger';
 import { globalErrorHandler } from './errors';
 
 // ============================================================================
 // Type Re-exports and Definitions
 // ============================================================================
 
-// Import all community types from the consolidated location
-import type {
-  ActivityItem,
-  TrendingTopic,
-  CommunityStats,
-  LocalImpactMetrics,
-  Comment,
-  DiscussionThread,
-  CommentFormData,
-  CommentReport,
-  ModerationAction,
-  ModerationViolationType,
-  ExpertInsight,
-  Attachment,
-  Mention,
-  ThreadParticipant,
-  SocialShare,
-  Contributor,
-  CreateCommentRequest,
-  CreateThreadRequest,
-  UpdateCommentRequest,
-  VoteRequest,
-  ShareRequest,
-  CommentsResponse,
-  ThreadsResponse,
-  CommentEvent,
-  ThreadEvent,
-  UserEvent,
-  CommentValidation,
-  ModerationFlag,
-  ModerationStats,
-  CommunityGuidelines,
-  UserModerationHistory,
-  CommentUpdateEvent,
-  ModerationEvent,
-  TypingIndicator,
-  CommentQualityMetrics,
-  QualityThresholds,
-  ModerationAppeal,
-  CommentSortOption,
-  CommentFilterOption
-} from '@client/types/community';
+// Import available types from community
+import type { VoteRequest } from '../../types/community';
 
-export type {
-  ActivityItem,
-  TrendingTopic,
-  CommunityStats,
-  LocalImpactMetrics,
-  Comment,
-  DiscussionThread,
-  CommentFormData,
-  CommentReport,
-  ModerationAction,
-  ModerationViolationType,
-  ExpertInsight,
-  Attachment,
-  Mention,
-  ThreadParticipant,
-  SocialShare,
-  Contributor,
-  CreateCommentRequest,
-  CreateThreadRequest,
-  UpdateCommentRequest,
-  VoteRequest,
-  ShareRequest,
-  CommentsResponse,
-  ThreadsResponse,
-  CommentEvent,
-  ThreadEvent,
-  UserEvent,
-  CommentValidation,
-  ModerationFlag,
-  ModerationStats,
-  CommunityGuidelines,
-  UserModerationHistory,
-  CommentUpdateEvent,
-  ModerationEvent,
-  TypingIndicator,
-  CommentQualityMetrics,
-  QualityThresholds,
-  ModerationAppeal,
-  CommentSortOption,
-  CommentFilterOption
-} from '@client/types/community';
+// Define all community types locally since they're not available in the types directory
+export interface ActivityItem {
+  id: string;
+  type: 'comment' | 'vote' | 'expert_insight' | 'bill_update';
+  userId: string;
+  billId?: number;
+  timestamp: string;
+  metadata?: any;
+}
 
-export type { Expert } from '@client/types/expert';
+export interface TrendingTopic {
+  id: string;
+  title: string;
+  count: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
+export interface CommunityStats {
+  totalComments: number;
+  totalUsers: number;
+  activeUsers: number;
+  engagementRate: number;
+}
+
+export interface LocalImpactMetrics {
+  state?: string;
+  district?: string;
+  county?: string;
+  impactScore: number;
+  affectedPopulation: number;
+}
+
+export interface Comment {
+  id: string;
+  billId: number;
+  parentId?: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  upvotes: number;
+  downvotes: number;
+  userVote?: 'up' | 'down' | null;
+  replies: Comment[];
+  replyCount: number;
+  depth: number;
+  status: 'active' | 'hidden' | 'removed' | 'under_review';
+  qualityScore: number;
+  isHighQuality: boolean;
+  isExpertComment: boolean;
+}
+
+export interface DiscussionThread {
+  id: number;
+  billId: number;
+  title?: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  comments: Comment[];
+  totalComments: number;
+  participantCount: number;
+  isLocked: boolean;
+  engagementScore: number;
+  qualityScore: number;
+  lastActivity: string;
+}
+
+export interface CommentFormData {
+  content: string;
+  parentId?: string;
+  billId: number;
+}
+
+export interface CommentReport {
+  id: number;
+  commentId: string;
+  reporterId: string;
+  violationType: ModerationViolationType;
+  reason: string;
+  description?: string;
+  createdAt: string;
+  status: 'pending' | 'under_review' | 'resolved' | 'dismissed';
+}
+
+export interface ModerationAction {
+  id: number;
+  commentId: string;
+  moderatorId: string;
+  action: 'hide' | 'remove' | 'restore' | 'warn' | 'ban_user';
+  reason: string;
+  createdAt: string;
+}
+
+export type ModerationViolationType = 
+  | 'spam'
+  | 'harassment'
+  | 'misinformation'
+  | 'off_topic'
+  | 'inappropriate_language'
+  | 'personal_attack'
+  | 'duplicate_content'
+  | 'copyright_violation'
+  | 'other';
+
+export interface ExpertInsight {
+  id: string;
+  billId: number;
+  expertId: string;
+  title: string;
+  content: string;
+  summary: string;
+  createdAt: string;
+  updatedAt: string;
+  status: 'draft' | 'published' | 'archived';
+}
+
+export interface Attachment {
+  id: string;
+  url: string;
+  type: 'image' | 'document' | 'link';
+  name: string;
+}
+
+export interface Mention {
+  userId: string;
+  userName: string;
+  position: number;
+}
+
+export interface ThreadParticipant {
+  userId: string;
+  userName: string;
+  joinedAt: string;
+  lastActive: string;
+}
+
+export interface SocialShare {
+  id: string;
+  platform: string;
+  url: string;
+  createdAt: string;
+}
+
+export interface Contributor {
+  id: string;
+  name: string;
+  avatar?: string;
+  contributionCount: number;
+  reputation: number;
+}
+
+export interface CreateCommentRequest {
+  billId: number;
+  content: string;
+  parentId?: string;
+  mentions?: string[];
+  attachments?: string[];
+}
+
+export interface CreateThreadRequest {
+  billId: number;
+  title: string;
+  description?: string;
+}
+
+export interface UpdateCommentRequest {
+  content: string;
+}
+
+export interface ShareRequest {
+  platform: string;
+  url: string;
+  title: string;
+  description?: string;
+}
+
+export interface CommentsResponse {
+  comments: Comment[];
+  total: number;
+  page: number;
+  hasMore: boolean;
+}
+
+export interface ThreadsResponse {
+  threads: DiscussionThread[];
+  total: number;
+  page: number;
+}
+
+export interface CommentEvent {
+  type: 'comment_added' | 'comment_updated' | 'comment_removed' | 'comment_voted';
+  commentId: string;
+  comment?: Comment;
+  userId?: string;
+  timestamp: string;
+}
+
+export interface ThreadEvent {
+  type: 'thread_created' | 'thread_updated' | 'thread_locked';
+  threadId: string;
+  thread?: DiscussionThread;
+  userId?: string;
+  timestamp: string;
+}
+
+export interface UserEvent {
+  type: 'user_joined' | 'user_left' | 'user_typing';
+  userId: string;
+  userName: string;
+  timestamp: string;
+}
+
+export interface CommentValidation {
+  isValid: boolean;
+  errors: {
+    content?: string;
+    length?: string;
+    quality?: string;
+  };
+  warnings: {
+    similarContent?: string;
+    tone?: string;
+  };
+}
+
+export interface ModerationFlag {
+  id: number;
+  commentId: string;
+  reporterId: string;
+  type: ModerationViolationType;
+  reason: string;
+  createdAt: string;
+  status: 'pending' | 'reviewed' | 'dismissed' | 'upheld';
+}
+
+export interface ModerationStats {
+  totalReports: number;
+  pendingReports: number;
+  resolvedReports: number;
+  averageResolutionTime: number;
+}
+
+export interface CommunityGuidelines {
+  id: number;
+  title: string;
+  description: string;
+  rules: Array<{
+    id: number;
+    title: string;
+    description: string;
+    examples: string[];
+    consequences: string[];
+  }>;
+  lastUpdated: string;
+}
+
+export interface UserModerationHistory {
+  userId: string;
+  warnings: number;
+  violations: number;
+  bans: number;
+  reputation: number;
+  lastViolation?: string;
+  status: 'good_standing' | 'warned' | 'restricted' | 'banned';
+}
+
+export interface CommentUpdateEvent {
+  type: 'comment_added' | 'comment_updated' | 'comment_removed' | 'comment_voted';
+  billId: number;
+  commentId: string;
+  comment?: Comment;
+  userId?: string;
+  timestamp: string;
+}
+
+export interface ModerationEvent {
+  type: 'comment_reported' | 'comment_moderated' | 'user_warned' | 'user_banned';
+  commentId?: string;
+  userId?: string;
+  moderatorId?: string;
+  action?: string;
+  reason?: string;
+  timestamp: string;
+}
+
+export interface TypingIndicator {
+  userId: string;
+  userName: string;
+  billId: number;
+  parentId?: string;
+  timestamp: string;
+}
+
+export interface CommentQualityMetrics {
+  length: number;
+  readabilityScore: number;
+  sentimentScore: number;
+  hasLinks: boolean;
+  hasCitations: boolean;
+  engagementRatio: number;
+  responseRate: number;
+}
+
+export interface QualityThresholds {
+  minLength: number;
+  maxLength: number;
+  minReadabilityScore: number;
+  minSentimentScore: number;
+  spamKeywords: string[];
+  requiredElements?: string[];
+}
+
+export interface ModerationAppeal {
+  id: number;
+  commentId: string;
+  userId: string;
+  moderationActionId: string;
+  reason: string;
+  description: string;
+  evidence?: string[];
+  createdAt: string;
+  status: 'pending' | 'under_review' | 'approved' | 'denied';
+}
+
+export type CommentSortOption = 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
+export type CommentFilterOption = 'all' | 'expert_only' | 'high_quality' | 'recent';
+
+export interface Expert {
+  id: string;
+  name: string;
+  expertise: string[];
+  verified: boolean;
+}
+
+// Re-export VoteRequest from the types directory
+export type { VoteRequest };
 
 /**
  * Comprehensive options for retrieving and filtering comments.
@@ -1027,6 +1283,234 @@ export class CommunityApiService {
         error
       });
       throw await this.handleError(error, 'getLocalImpactMetrics', { location });
+    }
+  }
+
+  // ==========================================================================
+  // Thread Management
+  // ==========================================================================
+
+  /**
+   * Creates a new discussion thread for a bill.
+   *
+   * @param data - Thread creation data
+   * @returns Created thread object
+   */
+  async createThread(data: { billId: number; title: string; description?: string }): Promise<DiscussionThread> {
+    try {
+      const response = await globalApiClient.post<DiscussionThread>(
+        `${this.baseUrl}/community/threads`,
+        {
+          bill_id: data.billId,
+          title: data.title,
+          description: data.description
+        },
+        {
+          timeout: this.defaultTimeout,
+          skipCache: true
+        }
+      );
+
+      logger.info('Thread created successfully', {
+        component: 'CommunityApiService',
+        billId: data.billId,
+        threadId: response.data.id
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to create thread', {
+        component: 'CommunityApiService',
+        billId: data.billId,
+        error
+      });
+      throw await this.handleError(error, 'createThread', { billId: data.billId });
+    }
+  }
+
+  /**
+   * Updates an existing discussion thread.
+   *
+   * @param threadId - ID of the thread to update
+   * @param updates - Thread update data
+   * @returns Updated thread object
+   */
+  async updateThread(threadId: string, updates: { title?: string; description?: string }): Promise<DiscussionThread> {
+    try {
+      const response = await globalApiClient.put<DiscussionThread>(
+        `${this.baseUrl}/community/threads/${threadId}`,
+        updates,
+        {
+          timeout: this.defaultTimeout,
+          skipCache: true
+        }
+      );
+
+      logger.info('Thread updated successfully', {
+        component: 'CommunityApiService',
+        threadId
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to update thread', {
+        component: 'CommunityApiService',
+        threadId,
+        error
+      });
+      throw await this.handleError(error, 'updateThread', { threadId });
+    }
+  }
+
+  /**
+   * Deletes a discussion thread.
+   *
+   * @param threadId - ID of the thread to delete
+   */
+  async deleteThread(threadId: string): Promise<void> {
+    try {
+      await globalApiClient.delete(
+        `${this.baseUrl}/community/threads/${threadId}`,
+        {
+          timeout: this.defaultTimeout,
+          skipCache: true
+        }
+      );
+
+      logger.info('Thread deleted successfully', {
+        component: 'CommunityApiService',
+        threadId
+      });
+    } catch (error) {
+      logger.error('Failed to delete thread', {
+        component: 'CommunityApiService',
+        threadId,
+        error
+      });
+      throw await this.handleError(error, 'deleteThread', { threadId });
+    }
+  }
+
+  /**
+   * Retrieves a specific thread by ID.
+   *
+   * @param threadId - ID of the thread to retrieve
+   * @returns Thread object with metadata
+   */
+  async getThread(threadId: string): Promise<DiscussionThread | null> {
+    try {
+      const response = await globalApiClient.get<DiscussionThread>(
+        `${this.baseUrl}/community/threads/${threadId}`,
+        {
+          timeout: this.defaultTimeout,
+          cacheTTL: this.discussionCacheTTL
+        }
+      );
+
+      logger.info('Thread loaded', {
+        component: 'CommunityApiService',
+        threadId
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to fetch thread', {
+        component: 'CommunityApiService',
+        threadId,
+        error
+      });
+      // Return null instead of throwing for graceful degradation
+      return null;
+    }
+  }
+
+  /**
+   * Retrieves all threads for a bill.
+   *
+   * @param billId - ID of the bill
+   * @returns Array of thread objects
+   */
+  async getBillThreads(billId: number): Promise<DiscussionThread[]> {
+    try {
+      const response = await globalApiClient.get<DiscussionThread[]>(
+        `${this.baseUrl}/community/threads?bill_id=${billId}`,
+        {
+          timeout: this.defaultTimeout,
+          cacheTTL: this.discussionCacheTTL
+        }
+      );
+
+      logger.info('Bill threads loaded', {
+        component: 'CommunityApiService',
+        billId,
+        count: response.data.length
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to fetch bill threads', {
+        component: 'CommunityApiService',
+        billId,
+        error
+      });
+      throw await this.handleError(error, 'getBillThreads', { billId });
+    }
+  }
+
+  // ==========================================================================
+  // Search and Discovery
+  // ==========================================================================
+
+  /**
+   * Searches community content (comments, threads, insights).
+   *
+   * @param query - Search query string
+   * @param options - Search filtering options
+   * @returns Array of search results
+   */
+  async searchCommunity(query: string, options: {
+    contentTypes?: Array<'comment' | 'thread' | 'insight'>;
+    billId?: number;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<any[]> {
+    try {
+      const params = new URLSearchParams({
+        q: query,
+        limit: (options.limit || 20).toString(),
+        offset: (options.offset || 0).toString()
+      });
+
+      if (options.contentTypes?.length) {
+        options.contentTypes.forEach(type => params.append('types', type));
+      }
+
+      if (options.billId) {
+        params.append('bill_id', options.billId.toString());
+      }
+
+      const response = await globalApiClient.get<any[]>(
+        `${this.baseUrl}/community/search?${params.toString()}`,
+        {
+          timeout: this.defaultTimeout,
+          cacheTTL: 2 * 60 * 1000 // 2 minutes cache for search results
+        }
+      );
+
+      logger.info('Community search completed', {
+        component: 'CommunityApiService',
+        query,
+        resultCount: response.data.length
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to search community', {
+        component: 'CommunityApiService',
+        query,
+        error
+      });
+      throw await this.handleError(error, 'searchCommunity', { query });
     }
   }
 

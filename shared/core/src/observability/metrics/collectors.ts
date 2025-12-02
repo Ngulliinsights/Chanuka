@@ -105,8 +105,8 @@ export class AtomicGauge implements Gauge {
         const existingIndex = this.findValueIndex(combinedLabels);
 
         if (existingIndex >= 0) {
-          this.values[existingIndex].value = value;
-          this.values[existingIndex].timestamp = new Date();
+          this.values[existingIndex]!.value = value;
+          this.values[existingIndex]!.timestamp = new Date();
         } else {
           this.values.push({
             value,
@@ -375,7 +375,7 @@ export class AggregatingSummary implements Summary {
     for (const quantile of this.quantiles) {
       const index = Math.ceil(sorted.length * quantile) - 1;
       const idx = Math.max(0, Math.min(index, sorted.length - 1));
-      result[quantile.toString()] = sorted[idx];
+      result[quantile.toString()] = sorted[idx] || 0;
     }
 
     return result;

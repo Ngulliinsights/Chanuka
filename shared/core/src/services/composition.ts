@@ -16,10 +16,10 @@
  * - Support for both synchronous and asynchronous composition
  */
 
-import { Result, ok, err, isOk, isErr } from '../primitives/types/result';
+import { Result, err, isOk } from '../primitives/types/result';
 import { BaseError, BaseErrorOptions } from '../observability/error-management';
 import { logger, MetricsCollector, Tracer, CorrelationManager } from '../observability';
-import { retry, timeout, delay } from '/utils/async-utils';
+import { timeout, delay } from '../utils/async-utils';
 import { MiddlewareServices } from '../middleware/factory';
 
 // ==================== Core Composition Types ====================
@@ -279,8 +279,8 @@ export class CircuitBreaker {
       state: this.state,
       failures: this.failures,
       successes: this.successes,
-      lastFailureTime: this.lastFailureTime,
-      lastSuccessTime: this.lastSuccessTime,
+      lastFailureTime: this.lastFailureTime || new Date(0),
+      lastSuccessTime: this.lastSuccessTime || new Date(0),
       consecutiveFailures: this.consecutiveFailures,
       consecutiveSuccesses: this.consecutiveSuccesses
     };
@@ -472,7 +472,7 @@ export class SingleFlight<T = any> {
    * Perform the actual operation
    */
   private async performOperation(
-    key: string,
+    _key: string,
     operation: () => Promise<Result<T, BaseError>>,
     operationName: string
   ): Promise<Result<T, BaseError>> {

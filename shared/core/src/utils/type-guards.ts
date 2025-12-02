@@ -8,7 +8,7 @@
  * into a unified, framework-agnostic interface.
  */
 
-import { logger } from '../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 // ==================== Type Definitions ====================
 
@@ -168,7 +168,7 @@ export class TypeGuards {
     for (const [field, validator] of Object.entries(schema)) {
       if (field in obj) {
         try {
-          if (!validator(obj[field])) {
+          if (!validator((obj as any)[field])) {
             errors.push(`Field '${field}' failed validation`);
           }
         } catch (error) {
@@ -190,11 +190,16 @@ export class TypeGuards {
       }
     }
 
-    return {
+    const result: TypeValidationResult<T> = {
       isValid: errors.length === 0,
-      value: errors.length === 0 ? obj as T : undefined,
       errors
     };
+    
+    if (errors.length === 0) {
+      result.value = obj as T;
+    }
+    
+    return result;
   }
 
   // ==================== Array Type Guards ====================

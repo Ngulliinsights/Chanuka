@@ -14,9 +14,9 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, jest } from '@jest/globals';
-import { database as db, withTransaction, bill as bills, user as users, comments as comments, bill_engagement, sponsor as sponsors, bill_sponsorship as bill_sponsorships } from '@shared/database/connection.js';
+import { database as db, withTransaction, bill as bills, user as users, comments as comments, bill_engagement, sponsor as sponsors, bill_sponsorship as bill_sponsorships } from '@shared/database';
 import { eq, and } from 'drizzle-orm';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('Database Transaction Integrity Tests', () => {
   let testUserId: string;

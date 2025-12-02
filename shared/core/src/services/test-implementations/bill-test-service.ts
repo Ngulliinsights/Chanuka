@@ -6,9 +6,9 @@
  * for bills using the injected repository.
  */
 
-import { ok, err, some, none } from '../../primitives';
+import { err } from '../../primitives';
 import type { Result, Maybe } from '../../primitives';
-import type { Bill, NewBill } from '@/schema/foundation';
+import type { Bill, NewBill } from '../../../../schema/foundation';
 import type { IBillRepository } from '../../repositories/interfaces/bill-repository.interface';
 import type { IBillService } from '../interfaces/bill-service.interface';
 
@@ -80,7 +80,7 @@ export class BillTestService implements IBillService {
     }
   ): Promise<Result<Bill[], Error>> {
     try {
-      if (!sponsorId?.trim()) {
+      if (!sponsor_id?.trim()) {
         return err(new Error('Sponsor ID is required'));
       }
 
@@ -93,7 +93,7 @@ export class BillTestService implements IBillService {
         return err(new Error('Offset must be non-negative'));
       }
 
-      return await this.billRepository.findBySponsorId(sponsorId, options);
+      return await this.billRepository.findBySponsorId(sponsor_id, options);
     } catch (error) {
       return err(error instanceof Error ? error : new Error('Failed to find bills by sponsor ID'));
     }

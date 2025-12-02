@@ -42,6 +42,7 @@ The docs module contains comprehensive documentation for the Chanuka platform, i
   - **`philosophical_connections_analysis.md`** - Philosophical analysis
   - **`philosophical_threshold_poems.md`** - Creative philosophical content
   - **`README.md`** - Chanuka documentation overview
+  - **`Scriptural Distributed Leadership.md`** - Biblical foundations for distributed leadership model
   - **`sponsorbyreal.html`** - Real sponsorship data
   - **`strategic_additions_poems.md`** - Strategic content
   - **`strategic-ui-features-analysis.md`** - UI feature analysis

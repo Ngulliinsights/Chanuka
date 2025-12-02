@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useCallback, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary } from '../error-handling/ErrorBoundary';
 import { LoadingStateManager } from '../loading/LoadingStates';
 import { ProtectedRoute, AdminRoute, ModeratorRoute, VerifiedUserRoute } from './ProtectedRoute';
 import { logger } from '@client/utils/logger';
@@ -51,7 +51,7 @@ const PrivacyPage = createLazyComponent(() => import('@client/pages/legal/privac
 const CookiePolicyPage = createLazyComponent(() => import('@client/pages/legal/cookie-policy'), 'Cookie Policy');
 // Consolidated user account page
 const UserProfile = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Account');
-const UserDashboard = createLazyComponent(() => import('@client/pages/dashboard'), 'User Dashboard');
+const UserDashboard = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Dashboard');
 const AdminDashboard = createLazyComponent(() => import('@client/pages/admin'), 'Admin Dashboard');
 const NotFoundPage = createLazyComponent(() => import('@client/pages/not-found'), 'Not Found');
 

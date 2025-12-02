@@ -19,7 +19,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -32,8 +32,8 @@ import {
   AICacheOptions,
   AICacheEntry
 } from '../ai-cache';
-import { CacheService } from '@shared/core/src/types';
-import { logger } from '@shared/core/src/observability/logging';
+import { CacheService } from '../../types';
+// import { logger } from '../observability/logging'; // Unused import
 
 describe('AI Cache', () => {
   let mockBaseCache: CacheService;

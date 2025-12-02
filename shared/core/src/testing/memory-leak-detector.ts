@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as path from 'path';
+// import * as path from 'path'; // Unused import
 import { EventEmitter } from 'events';
 import { performance } from 'perf_hooks';
 
@@ -63,7 +63,7 @@ export class MemoryLeakDetector extends EventEmitter {
 
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
-      this.monitoringInterval = undefined;
+      delete this.monitoringInterval;
     }
 
     const report = this.generateLeakReport();
@@ -120,6 +120,8 @@ export class MemoryLeakDetector extends EventEmitter {
 
     // Check for memory pressure
     const latestSnapshot = recentSnapshots[recentSnapshots.length - 1];
+    if (!latestSnapshot) return;
+    
     const memoryPressure = latestSnapshot.heapUsed / latestSnapshot.heapSizeLimit;
 
     if (memoryPressure > this.leakThresholds.memoryPressureThreshold) {
@@ -143,7 +145,9 @@ export class MemoryLeakDetector extends EventEmitter {
     const growthRate = this.calculateGrowthRate(heapUsage, timestamps);
 
     // Calculate retained size increase
-    const retainedIncrease = heapUsage[heapUsage.length - 1] - heapUsage[0];
+    const firstUsage = heapUsage[0];
+    const lastUsage = heapUsage[heapUsage.length - 1];
+    const retainedIncrease = (lastUsage && firstUsage) ? lastUsage - firstUsage : 0;
 
     // Check for sawtooth pattern (frequent GC)
     const sawtoothPattern = this.detectSawtoothPattern(heapUsage);
@@ -172,7 +176,7 @@ export class MemoryLeakDetector extends EventEmitter {
       retainedIncrease,
       sawtoothPattern,
       fragmentation,
-      timeWindow: timestamps[timestamps.length - 1] - timestamps[0],
+      timeWindow: (timestamps[timestamps.length - 1] ?? 0) - (timestamps[0] ?? 0),
       snapshotCount: snapshots.length
     };
   }
@@ -183,10 +187,17 @@ export class MemoryLeakDetector extends EventEmitter {
   private calculateGrowthRate(values: number[], timestamps: number[]): number {
     if (values.length < 2) return 0;
 
-    const timeSpan = (timestamps[timestamps.length - 1] - timestamps[0]) / (1000 * 60); // minutes
-    const valueIncrease = values[values.length - 1] - values[0];
+    const firstTimestamp = timestamps[0];
+    const lastTimestamp = timestamps[timestamps.length - 1];
+    const firstValue = values[0];
+    const lastValue = values[values.length - 1];
+    
+    if (!firstTimestamp || !lastTimestamp || !firstValue || !lastValue) return 0;
+    
+    const timeSpan = (lastTimestamp - firstTimestamp) / (1000 * 60); // minutes
+    const valueIncrease = lastValue - firstValue;
 
-    return valueIncrease / values[0] / timeSpan; // growth per minute
+    return valueIncrease / firstValue / timeSpan; // growth per minute
   }
 
   /**
@@ -199,11 +210,17 @@ export class MemoryLeakDetector extends EventEmitter {
     let valleys = 0;
 
     for (let i = 1; i < heapUsage.length - 1; i++) {
-      if (heapUsage[i] > heapUsage[i - 1] && heapUsage[i] > heapUsage[i + 1]) {
-        peaks++;
-      }
-      if (heapUsage[i] < heapUsage[i - 1] && heapUsage[i] < heapUsage[i + 1]) {
-        valleys++;
+      const current = heapUsage[i];
+      const prev = heapUsage[i - 1];
+      const next = heapUsage[i + 1];
+      
+      if (current && prev && next) {
+        if (current > prev && current > next) {
+          peaks++;
+        }
+        if (current < prev && current < next) {
+          valleys++;
+        }
       }
     }
 
@@ -270,7 +287,7 @@ export class MemoryLeakDetector extends EventEmitter {
     return {
       timestamp: new Date(),
       monitoringDuration: this.memorySnapshots.length > 0 ?
-        this.memorySnapshots[this.memorySnapshots.length - 1].timestamp - this.memorySnapshots[0].timestamp : 0,
+        (this.memorySnapshots[this.memorySnapshots.length - 1]?.timestamp ?? 0) - (this.memorySnapshots[0]?.timestamp ?? 0) : 0,
       leakDetected: analysis.leakDetected,
       severity: analysis.severity,
       analysis,
@@ -293,7 +310,6 @@ export class MemoryLeakDetector extends EventEmitter {
   private setupGCTracking(): void {
     if (typeof global !== 'undefined' && global.gc) {
       // Track GC events if available
-      let lastGCStart = 0;
 
       // This is a simplified GC tracking - in practice, you'd use performance hooks
       const originalGC = global.gc;

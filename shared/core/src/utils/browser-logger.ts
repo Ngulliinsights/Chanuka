@@ -257,9 +257,9 @@ export class BrowserLogger implements LoggerChild {
       this.buffer.push({
         level,
         message,
-        context,
-        metadata,
-        timestamp: new Date(),
+        ...(context !== undefined && { context }),
+        ...(metadata !== undefined && { metadata }),
+        timestamp: new Date()
       });
 
       // Prevent buffer from growing too large
@@ -407,7 +407,7 @@ export class BrowserLogger implements LoggerChild {
    */
   private processErrorMetadata(
     messageOrError: string | Error | unknown,
-    context?: LogContext,
+    _context?: LogContext,
     metadataOrError?: Record<string, unknown> | unknown
   ): Record<string, unknown> | undefined {
     let error: unknown;
@@ -661,7 +661,7 @@ export function createBrowserLoggerWithLegacyFallback(
   const defaultConfig: UnifiedLoggerConfig = {
     environment,
     featureFlags: getDefaultFeatureFlags(environment),
-    legacyLogger,
+    ...(legacyLogger && { legacyLogger }),
     ...customConfig,
   };
 

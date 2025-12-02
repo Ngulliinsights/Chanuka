@@ -157,16 +157,13 @@ export class MemoryAwareSocketService extends EventEmitter {
   }
 
   /**
-   * Register a new WebSocket connection for monitoring.
+   * Register a new WebSocket connection for monitoring with atomic shutdown protection.
    * This adds the connection to our tracking system and initializes its message buffer.
    */
   registerConnection(connectionId: string, user_id: string, priority: number = 1): void {
+    // Atomic check for shutdown state
     if (this.isShuttingDown) {
-      logger.warn('Cannot register connection during shutdown', {
-        component: 'MemoryAwareSocketService',
-        connectionId
-      });
-      return;
+      throw new Error('Cannot register connection: service is shutting down');
     }
 
     const connectionInfo: ConnectionInfo = {
@@ -179,8 +176,17 @@ export class MemoryAwareSocketService extends EventEmitter {
       created_at: Date.now()
     };
 
+    // Atomic registration with double-check
     this.connections.set(connectionId, connectionInfo);
     this.messageBuffers.set(connectionId, []);
+
+    // Double-check shutdown state after registration to prevent race
+    if (this.isShuttingDown) {
+      // Rollback registration if shutdown started during registration
+      this.connections.delete(connectionId);
+      this.messageBuffers.delete(connectionId);
+      throw new Error('Service shutdown during connection registration');
+    }
 
     logger.debug('Connection registered', {
       component: 'MemoryAwareSocketService',
@@ -417,17 +423,18 @@ export class MemoryAwareSocketService extends EventEmitter {
   }
 
   /**
-   * Shutdown the service gracefully.
+   * Shutdown the service gracefully with atomic state management.
    * Stops monitoring, cleans up resources, and shuts down dependencies.
    */
   async shutdown(): Promise<void> {
+    // Atomic shutdown flag to prevent new registrations
     this.isShuttingDown = true;
 
     logger.info('Shutting down MemoryAwareSocketService', {
       component: 'MemoryAwareSocketService'
     });
 
-    // Stop monitoring interval
+    // Stop monitoring interval immediately to prevent new optimizations
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = null;
@@ -439,20 +446,34 @@ export class MemoryAwareSocketService extends EventEmitter {
       this.gcTimer = null;
     }
 
-    // Wait for any ongoing optimization to complete
+    // Wait for any ongoing optimization to complete with timeout
     let waitCount = 0;
     while (this.isOptimizing && waitCount < 50) {
       await this.delay(100);
       waitCount++;
     }
 
-    // Clean up all connections and buffers
-    for (const connectionId of this.connections.keys()) {
+    if (this.isOptimizing) {
+      logger.warn('Shutdown proceeding with optimization still in progress', {
+        component: 'MemoryAwareSocketService'
+      });
+    }
+
+    // Clean up all connections and buffers atomically
+    const connectionIds = Array.from(this.connections.keys());
+    for (const connectionId of connectionIds) {
       this.unregisterConnection(connectionId);
     }
 
     // Shutdown batching service
-    await this.batchingService.shutdown();
+    try {
+      await this.batchingService.shutdown();
+    } catch (error) {
+      logger.error('Error shutting down batching service', {
+        component: 'MemoryAwareSocketService',
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
 
     // Remove all listeners to prevent memory leaks
     this.removeAllListeners();

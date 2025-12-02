@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { database as db } from '@shared/database';
 import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@shared/schema';
 import { eq, and, or } from 'drizzle-orm';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 // Data source configuration
 interface DataSourceConfig {

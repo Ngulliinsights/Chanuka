@@ -6,7 +6,7 @@
 
 import Boom from '@hapi/boom';
 import { Result, ok, err } from 'neverthrow';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { 
   ErrorCategory, 
   ErrorSeverity, 

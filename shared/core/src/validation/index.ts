@@ -4,6 +4,12 @@
  * Unified validation framework with adapter pattern, schema caching, and comprehensive error handling
  */
 
+// ===== UNIFIED INTERFACES =====
+export type { IValidationService } from './ivalidation-service';
+export { ValidationServiceWrapper } from './validation-service-wrapper';
+export { ValidationServiceRegistry } from './ivalidation-service';
+export { createValidationServiceWrapper } from './validation-service-wrapper';
+
 // ===== CORE INTERFACES =====
 export * from './core';
 

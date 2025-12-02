@@ -1,4 +1,6 @@
-import { Metric, MetricsExporter } from '/types';
+// import { Metric, MetricsExporter } from '../../../types';
+type Metric = any;
+type MetricsExporter = any;
 import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
 import * as dgram from 'dgram';
 import * as net from 'net';
@@ -240,7 +242,7 @@ export class EnhancedStatsDExporter {
     try {
       if (this.flushTimer) {
         clearInterval(this.flushTimer);
-        this.flushTimer = undefined;
+        this.flushTimer = undefined as any;
       }
 
       // Final flush
@@ -256,7 +258,7 @@ export class EnhancedStatsDExporter {
         } else {
           (this.client as net.Socket).end();
         }
-        this.client = undefined;
+        this.client = undefined as any;
       }
 
       return new Ok(undefined);

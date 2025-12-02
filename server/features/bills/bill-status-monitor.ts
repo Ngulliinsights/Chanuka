@@ -4,7 +4,7 @@ import { webSocketService } from '@server/infrastructure/websocket.js';
 import { cacheService } from '@server/infrastructure/cache/cache-service.js';
 import * as schema from '@shared/schema';
 import { Bill } from '@shared/schema';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { notificationOrchestratorService, NotificationRequest } from '@server/infrastructure/notifications/notification-orchestrator.js';
 
 // --- Cache Configuration ---

@@ -15,8 +15,8 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from
 import { performance } from 'perf_hooks';
 import { billService, BillService } from '../application/bill-service';
 import { databaseService } from '../../../infrastructure/database/database-service';
-import { bills, sponsors } from '@shared/schema/foundation';
-import { bill_engagement } from '@shared/schema/citizen_participation';
+import { bills, sponsors } from '@shared/schema';
+import { bill_engagement } from '@shared/schema';
 import { eq, sql } from 'drizzle-orm';
 
 interface PerformanceResult {

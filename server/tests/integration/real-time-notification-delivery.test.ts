@@ -35,10 +35,10 @@ import { router as billTrackingRouter } from '@server/features/bills/bill-tracki
 // Mock realTimeTrackingRouter
 const realTimeTrackingRouter = express.Router();
 import { router as authRouter } from '@server/core/auth/auth.ts';
-import { database as db, users, bills, notifications, bill_engagement } from '@shared/database/connection.js';
+import { database as db, users, bills, notifications, bill_engagement } from '@shared/database';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('Real-Time Notification Delivery Tests', () => {
   let app: express.Application;

@@ -1,34 +1,63 @@
-o/* Chanuka Design System - CSS Custom Properties */
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Chanuka Design System - CSS Custom Properties */
 
 :root {
-  /* Use unified design tokens - these map to the new system */
-  --background: var(--color-background);
-  --foreground: var(--color-foreground);
+  /* Base design tokens - primary source of truth */
+  --color-background: 210 20% 98%;
+  --color-foreground: 0 0% 10%;
 
   /* Card components */
-  --card: var(--color-background);
-  --card-foreground: var(--color-foreground);
-  --popover: var(--color-background);
-  --popover-foreground: var(--color-foreground);
+  --color-card: var(--color-background);
+  --color-card-foreground: var(--color-foreground);
+  --color-popover: var(--color-background);
+  --color-popover-foreground: var(--color-foreground);
 
   /* Brand colors */
+  --color-primary: 213 94% 23%;
+  --color-primary-foreground: 0 0% 100%;
+  --color-secondary: 196 100% 18%;
+  --color-secondary-foreground: 0 0% 100%;
+
+  /* Utility colors */
+  --color-muted: 210 20% 95%;
+  --color-muted-foreground: 215 16% 25%;
+  --color-accent: 28 94% 25%;
+  --color-accent-foreground: 0 0% 100%;
+
+  /* Semantic colors */
+  --color-success: 142 71% 25%;
+  --color-warning: 43 96% 25%;
+  --color-error: 0 84% 35%;
+  --color-info: 213 94% 25%;
+
+  /* Form elements */
+  --color-border: 214 32% 91%;
+  --color-input: var(--color-border);
+  --ring: var(--color-accent);
+
+  /* Legacy compatibility - maps to new system */
+  --background: var(--color-background);
+  --foreground: var(--color-foreground);
+  --card: var(--color-card);
+  --card-foreground: var(--color-card-foreground);
+  --popover: var(--color-background);
+  --popover-foreground: var(--color-foreground);
   --primary: var(--color-primary);
   --primary-foreground: var(--color-primary-foreground);
   --secondary: var(--color-secondary);
   --secondary-foreground: var(--color-secondary-foreground);
-
-  /* Utility colors */
   --muted: var(--color-muted);
   --muted-foreground: var(--color-muted-foreground);
   --accent: var(--color-accent);
   --accent-foreground: var(--color-accent-foreground);
   --destructive: var(--color-error);
   --destructive-foreground: var(--color-primary-foreground);
-
-  /* Form elements */
   --border: var(--color-border);
   --input: var(--color-border);
-  --ring: var(--color-accent);
 
   /* Chanuka-specific civic engagement colors */
   --civic-urgent: 0 84% 60%;
@@ -93,12 +122,51 @@ o/* Chanuka Design System - CSS Custom Properties */
   --leading-loose: 2;
 
   /* Spacing Scale */
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
-  --space-2xl: 3rem;
+  --space-0: 0;
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+
+  /* Legacy spacing aliases for compatibility */
+  --space-xs: var(--space-1);
+  --space-sm: var(--space-2);
+  --space-md: var(--space-4);
+  --space-lg: var(--space-6);
+  --space-xl: var(--space-8);
+  --space-2xl: var(--space-12);
+
+  /* Typography Scale - unified */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  /* Radius Scale */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Animation */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
 
   /* Touch Target Standards */
   --touch-target-min: 44px;
@@ -109,33 +177,57 @@ o/* Chanuka Design System - CSS Custom Properties */
 
 .dark {
   /* Dark mode base colors */
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
+  --color-background: 222.2 84% 4.9%;
+  --color-foreground: 210 40% 98%;
 
   /* Dark mode card components */
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
+  --color-card: var(--color-background);
+  --color-card-foreground: var(--color-foreground);
+  --color-popover: var(--color-background);
+  --color-popover-foreground: var(--color-foreground);
 
   /* Dark mode brand colors */
-  --primary: 217.2 91.2% 59.8%;
-  --primary-foreground: 222.2 84% 4.9%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
+  --color-primary: 217.2 91.2% 75.8%;
+  --color-primary-foreground: 222.2 84% 4.9%;
+  --color-secondary: 217.2 32.6% 17.5%;
+  --color-secondary-foreground: 210 40% 98%;
 
   /* Dark mode utility colors */
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
+  --color-muted: 217.2 32.6% 17.5%;
+  --color-muted-foreground: 215 20.2% 75.1%;
+  --color-accent: 217.2 32.6% 17.5%;
+  --color-accent-foreground: 210 40% 98%;
+
+  /* Dark mode semantic colors */
+  --color-success: 142 76% 46%;
+  --color-warning: 43 96% 66%;
+  --color-error: 0 62.8% 30.6%;
+  --color-info: 217 91% 70%;
 
   /* Dark mode form elements */
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
+  --color-border: 217.2 32.6% 17.5%;
+  --color-input: var(--color-border);
   --ring: 224.3 76.3% 94.1%;
+
+  /* Legacy compatibility - updated for dark mode */
+  --background: var(--color-background);
+  --foreground: var(--color-foreground);
+  --card: var(--color-card);
+  --card-foreground: var(--color-card-foreground);
+  --popover: var(--color-background);
+  --popover-foreground: var(--color-foreground);
+  --primary: var(--color-primary);
+  --primary-foreground: var(--color-primary-foreground);
+  --secondary: var(--color-secondary);
+  --secondary-foreground: var(--color-secondary-foreground);
+  --muted: var(--color-muted);
+  --muted-foreground: var(--color-muted-foreground);
+  --accent: var(--color-accent);
+  --accent-foreground: var(--color-accent-foreground);
+  --destructive: var(--color-error);
+  --destructive-foreground: 0 0% 100%;
+  --border: var(--color-border);
+  --input: var(--color-border);
 
   /* Dark mode civic colors (adjusted for contrast) */
   --civic-urgent: 0 84% 70%;
@@ -191,7 +283,7 @@ o/* Chanuka Design System - CSS Custom Properties */
     --border: 0 0% 0%;
     --ring: 0 0% 0%;
   }
-  
+
   .dark {
     --border: 0 0% 100%;
     --ring: 0 0% 100%;
@@ -207,86 +299,16 @@ o/* Chanuka Design System - CSS Custom Properties */
 /* Ensure minimum touch target size on mobile */
 @media (max-width: 767px) {
   button,
-  [role="button"],
-  input[type="button"],
-  input[type="submit"],
-  input[type="reset"],
+  [role='button'],
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'],
   a {
     min-height: var(--touch-target-min);
     min-width: var(--touch-target-min);
   }
 }
 
-/* Chanuka Component Classes */
-
-@layer components {
-  /* Card Components */
-  .chanuka-card {
-    @apply bg-card text-card-foreground rounded-lg border border-border shadow-sm;
-  }
-
-  .chanuka-card:hover {
-    @apply shadow-md border-primary/20;
-  }
-
-  /* Button Components */
-  .chanuka-btn {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors;
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
-    @apply disabled:pointer-events-none disabled:opacity-50;
-  }
-
-  .chanuka-btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90;
-  }
-
-  .chanuka-btn-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
-  }
-
-  .chanuka-btn-outline {
-    @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
-  }
-
-  /* Status Badge Components */
-  .chanuka-status-badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
-    @apply transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
-  }
-
-  /* Status-specific badge styles */
-  .status-badge {
-    @apply chanuka-status-badge;
-  }
-
-  .status-indicator {
-    @apply chanuka-status-badge;
-  }
-
-  /* Risk level indicators */
-  .risk-low {
-    @apply bg-green-100 text-green-800 border border-green-200;
-  }
-
-  .risk-medium {
-    @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
-  }
-
-  .risk-high {
-    @apply bg-red-100 text-red-800 border border-red-200;
-  }
-}
-
-/* Enhanced card styles */
-@layer components {
-  .card-enhanced {
-    @apply bg-card text-card-foreground rounded-lg border border-border shadow-sm transition-all duration-200;
-  }
-
-  .card-hover:hover {
-    @apply shadow-lg transform translate-y-[-2px];
-  }
-}
 
 /* Scrollbar styles for virtual scrolling */
 .scrollbar-thin {
@@ -435,7 +457,7 @@ o/* Chanuka Design System - CSS Custom Properties */
   }
 
   .chanuka-skeleton::after {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -611,13 +633,21 @@ o/* Chanuka Design System - CSS Custom Properties */
 
 /* Animations */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Radix Collapsible Animations */
@@ -733,20 +763,54 @@ o/* Chanuka Design System - CSS Custom Properties */
     --focus-ring-width: 3px;
     --border-width: 2px;
   }
-  
+
   .chanuka-btn,
   .chanuka-card,
   .chanuka-error {
     border-width: 2px;
   }
-  
+
   .chanuka-spinner {
     border-width: 3px;
   }
-  
+
   *:focus-visible {
     outline: 3px solid hsl(var(--ring));
     outline-offset: 2px;
+  }
+}
+
+/* Civic Engagement Component Classes */
+@layer components {
+  /* Civic Status Badges using civic engagement colors */
+  .civic-badge-urgent {
+    background-color: hsl(var(--civic-urgent));
+    color: white;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .civic-badge-constitutional {
+    background-color: hsl(var(--civic-constitutional));
+    color: white;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .civic-badge-expert {
+    background-color: hsl(var(--civic-expert));
+    color: white;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .civic-badge-community {
+    background-color: hsl(var(--civic-community));
+    color: white;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .civic-badge-transparency {
+    background-color: hsl(var(--civic-transparency));
+    color: white;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
 }
 

@@ -3,7 +3,7 @@
 // ============================================================================
 // Service that identifies which constitutional provisions are relevant to a bill
 
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { ConstitutionalProvision } from '@shared/schema/index.js';
 import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository.js';
 

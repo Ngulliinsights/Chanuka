@@ -10,7 +10,7 @@
  */
 
 import { Pool, PoolClient, PoolConfig } from 'pg';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 
 export interface ConnectionPoolConfig extends PoolConfig {
   // Pool sizing

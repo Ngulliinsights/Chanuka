@@ -1,91 +1,267 @@
-import express from 'express'
-import cors from 'cors'
+#!/usr/bin/env node
 
-const app = express()
-app.use(cors({ origin: '*', credentials: true }))
-app.use(express.json())
+/**
+ * Simple Server - Minimal working server for development
+ * This bypasses the complex shared module dependencies
+ */
 
-app.get('/api', (_req, res) => {
-  res.json({ message: 'Chanuka API (simple)', version: '1.0.0', endpoints: { externalApi: '/external-api', bills: '/bills' } })
-})
+import express from 'express';
+import cors from 'cors';
+import { createServer } from 'http';
 
-app.get('/api/service-status', (_req, res) => {
-  res.json({ status: 'online', timestamp: new Date().toISOString(), uptime: process.uptime(), version: '1.0.0' })
-})
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.get('/external-api/analytics', (req, res) => {
-  const source = typeof req.query.source === 'string' ? req.query.source : undefined
-  const timeWindow = req.query.timeWindow ? Number(req.query.timeWindow) : undefined
-  const isFallback = req.query.fallback === 'true'
+// Basic middleware
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:4200'],
+  credentials: true
+}));
 
-  const sources = source ? [{ source, requestCount: 10, successRate: 0.98, averageResponseTime: 120, totalCost: 1.5, cacheHitRate: 0.75 }] : [
-    { source: 'parliament-ca', requestCount: 120, successRate: 0.97, averageResponseTime: 110, totalCost: 12.3, cacheHitRate: 0.70 },
-    { source: 'senate-us', requestCount: 90, successRate: 0.96, averageResponseTime: 130, totalCost: 9.1, cacheHitRate: 0.68 }
-  ]
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-  const effectiveSources = source && source === 'non-existent-source' ? [] : sources
+// Basic logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.path}`);
+  next();
+});
 
-  const data = {
-    sources: effectiveSources,
-    totalRequests: effectiveSources.reduce((a, b) => a + b.requestCount, 0),
-    totalCost: effectiveSources.reduce((a, b) => a + b.totalCost, 0),
-    averageResponseTime: effectiveSources.length ? Math.round(effectiveSources.reduce((a, b) => a + b.averageResponseTime, 0) / effectiveSources.length) : 0,
-    overallSuccessRate: effectiveSources.length ? Math.round((effectiveSources.reduce((a, b) => a + b.successRate, 0) / effectiveSources.length) * 100) / 100 : 0,
-    cacheHitRate: effectiveSources.length ? Math.round((effectiveSources.reduce((a, b) => a + b.cacheHitRate, 0) / effectiveSources.length) * 100) / 100 : 0,
-    topPerformingSources: sources.slice(0, 1),
-    costBreakdown: sources.map(s => ({ source: s.source, cost: s.totalCost })),
-    timeWindow: timeWindow,
-    isFallback,
-    fallbackReason: isFallback ? 'external source unavailable' : undefined
-  }
+// Health check endpoints
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    message: 'Simple server is running'
+  });
+});
 
-  res.setHeader('Cache-Control', 'public, max-age=60')
-  res.json({ success: true, data })
-})
+app.get('/api/frontend-health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    serving_mode: 'development',
+    message: 'Frontend health check passed'
+  });
+});
 
-app.get('/external-api/health', (req, res) => {
-  const detailed = req.query.detailed === 'true'
-  const services = [
-    {
-      name: 'parliament-ca', status: 'healthy', responseTime: 110, last_checked: new Date().toISOString(),
-      endpoint: detailed ? 'https://api.parliament.ca' : undefined,
-      errorCount: detailed ? 0 : undefined,
-      successRate: detailed ? 0.98 : undefined
+app.get('/api/service-status', (req, res) => {
+  res.json({
+    status: 'online',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '1.0.0'
+  });
+});
+
+// Mock API endpoints for development
+app.get('/api/bills', (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      {
+        id: '1',
+        title: 'Sample Bill 1',
+        bill_number: 'B001-2024',
+        status: 'introduced',
+        summary: 'This is a sample bill for development purposes',
+        introduced_date: '2024-01-15',
+        sponsor: 'John Doe'
+      },
+      {
+        id: '2',
+        title: 'Sample Bill 2',
+        bill_number: 'B002-2024',
+        status: 'committee',
+        summary: 'Another sample bill for testing',
+        introduced_date: '2024-01-20',
+        sponsor: 'Jane Smith'
+      }
+    ],
+    metadata: {
+      total: 2,
+      page: 1,
+      limit: 10
     }
-  ]
-  res.json({ success: true, data: { sources: ['parliament-ca', 'senate-us'], timestamp: new Date().toISOString(), overallStatus: 'healthy', services } })
-})
+  });
+});
 
-app.post('/external-api/cache/invalidate', (_req, res) => {
-  res.json({ success: true, data: { invalidated: true } })
-})
+app.get('/api/bills/:id', (req, res) => {
+  const { id } = req.params;
+  res.json({
+    success: true,
+    data: {
+      id,
+      title: `Sample Bill ${id}`,
+      bill_number: `B00${id}-2024`,
+      status: 'introduced',
+      summary: `This is sample bill ${id} for development purposes`,
+      content: `Full content of bill ${id} would go here...`,
+      introduced_date: '2024-01-15',
+      sponsor: 'John Doe',
+      tags: ['sample', 'development'],
+      votes: {
+        for: 0,
+        against: 0,
+        abstain: 0
+      }
+    }
+  });
+});
 
-app.get('/external-api/config/cache', (_req, res) => {
-  res.json({ success: true, data: { ttl: 300 } })
-})
+app.get('/api/sponsors', (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      {
+        id: '1',
+        name: 'John Doe',
+        role: 'MP',
+        party: 'Sample Party',
+        constituency: 'Sample Constituency',
+        email: 'john.doe@example.com'
+      },
+      {
+        id: '2',
+        name: 'Jane Smith',
+        role: 'Senator',
+        party: 'Another Party',
+        constituency: 'Another Constituency',
+        email: 'jane.smith@example.com'
+      }
+    ],
+    metadata: {
+      total: 2,
+      page: 1,
+      limit: 10
+    }
+  });
+});
 
-app.get('/external-api/metrics/performance', (_req, res) => {
-  res.json({ success: true, data: { averageResponseTime: 120, requestCount: 1000, errorRate: 0.02, throughput: 50 } })
-})
+app.get('/api/users/profile', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      id: 'dev-user',
+      name: 'Development User',
+      email: 'dev@example.com',
+      role: 'citizen',
+      preferences: {
+        notifications: true,
+        email_updates: false
+      }
+    }
+  });
+});
 
-app.get('/external-api/metrics/cost', (_req, res) => {
-  res.json({ success: true, data: { totalCost: 21.4, costBySource: [{ source: 'parliament-ca', cost: 12.3 }], projectedMonthlyCost: 87.6 } })
-})
+// Mock authentication endpoints
+app.post('/api/auth/login', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      token: 'dev-token-' + Date.now(),
+      user: {
+        id: 'dev-user',
+        name: 'Development User',
+        email: req.body.email || 'dev@example.com',
+        role: 'citizen'
+      }
+    },
+    message: 'Login successful (development mode)'
+  });
+});
 
-app.get('/external-api/test-failure', (_req, res) => {
-  res.status(503).json({ success: false, error: 'External API unavailable' })
-})
+app.post('/api/auth/logout', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Logout successful'
+  });
+});
 
-app.get('/external-api/slow-endpoint', (_req, res) => {
-  res.json({ success: true, data: { message: 'ok' } })
-})
+// Mock search endpoint
+app.get('/api/search', (req, res) => {
+  const { q } = req.query;
+  res.json({
+    success: true,
+    data: {
+      bills: [
+        {
+          id: '1',
+          title: `Sample Bill matching "${q}"`,
+          bill_number: 'B001-2024',
+          status: 'introduced',
+          summary: `This bill matches your search for "${q}"`
+        }
+      ],
+      sponsors: [
+        {
+          id: '1',
+          name: 'John Doe',
+          role: 'MP',
+          party: 'Sample Party'
+        }
+      ]
+    },
+    metadata: {
+      query: q,
+      total_results: 2
+    }
+  });
+});
 
-app.get('/bills', (req, res) => {
-  const limit = req.query.limit ? Number(req.query.limit) : 5
-  const bills = Array.from({ length: limit }).map((_, i) => ({ id: i + 1, title: `Bill ${i + 1}` }))
-  res.json({ success: true, data: bills })
-})
+// Catch-all for API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: {
+      message: `API endpoint ${req.path} not found`,
+      statusCode: 404
+    },
+    timestamp: new Date().toISOString()
+  });
+});
 
-const PORT = Number(process.env.PORT || 4200)
-app.listen(PORT, '::', () => {})
+// Error handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Server error:', err);
+  res.status(500).json({
+    success: false,
+    error: {
+      message: 'Internal server error',
+      statusCode: 500
+    },
+    timestamp: new Date().toISOString()
+  });
+});
 
+// Create HTTP server
+const server = createServer(app);
+
+// Graceful shutdown
+const gracefulShutdown = (signal: string) => {
+  console.log(`\n${signal} received. Starting graceful shutdown...`);
+  server.close(() => {
+    console.log('Server closed successfully');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Start server
+server.listen(PORT, () => {
+  console.log(`🚀 Simple server running on http://localhost:${PORT}`);
+  console.log(`📋 API endpoints available:`);
+  console.log(`   GET  /api/health`);
+  console.log(`   GET  /api/bills`);
+  console.log(`   GET  /api/bills/:id`);
+  console.log(`   GET  /api/sponsors`);
+  console.log(`   GET  /api/search?q=term`);
+  console.log(`   POST /api/auth/login`);
+  console.log(`\n💡 This is a development server with mock data`);
+});
+
+export { app, server };

@@ -116,16 +116,18 @@ export class RateLimitMetricsCollector {
       }
 
       const stats = algorithmStats[event.algorithm];
-      stats.total++;
-      
-      if (!event.allowed) {
-        stats.blocked++;
+      if (stats) {
+        stats.total++;
+        
+        if (!event.allowed) {
+          stats.blocked++;
+        }
+        
+        // Update average response time
+        stats.avgResponseTime = (
+          (stats.avgResponseTime * (stats.total - 1)) + event.processingTime
+        ) / stats.total;
       }
-      
-      // Update average response time
-      stats.avgResponseTime = (
-        (stats.avgResponseTime * (stats.total - 1)) + event.processingTime
-      ) / stats.total;
     }
 
     // Count recent errors
@@ -236,8 +238,8 @@ export class RateLimitMetricsCollector {
       .map(([pathMethod, stats]) => {
         const [method, path] = pathMethod.split(' ', 2);
         return {
-          path,
-          method,
+          path: path || 'unknown',
+          method: method || 'unknown',
           totalRequests: stats.total,
           blockedRequests: stats.blocked,
           blockRate: stats.total > 0 ? stats.blocked / stats.total : 0,

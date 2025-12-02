@@ -9,7 +9,7 @@
  */
 
 import { Pool, PoolClient } from 'pg';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 
 export interface IndexAnalysis {
   indexName: string;

@@ -75,10 +75,10 @@ export function sanitizeHtml(input: string, options: SanitizationOptions = {}): 
   if (options.allowedAttributes) {
     sanitized = sanitized.replace(
       /<([^>]+)>/g,
-      (match, tagContent) => {
+      (_match, tagContent) => {
         return tagContent.replace(
           /(\w+)=["']([^"']*)["']/g,
-          (attrMatch, attrName, attrValue) => {
+          (attrMatch: string, attrName: string, attrValue: string) => {
             const allowedAttrs = options.allowedAttributes?.[attrName.toLowerCase()];
             if (allowedAttrs && allowedAttrs.includes(attrValue)) {
               return attrMatch;
@@ -447,7 +447,7 @@ export function generateRateLimitKey(identifier: string, action: string): string
 export function shouldRateLimit(
   attempts: number,
   maxAttempts: number,
-  windowMs: number
+  _windowMs: number
 ): boolean {
   return attempts >= maxAttempts;
 }

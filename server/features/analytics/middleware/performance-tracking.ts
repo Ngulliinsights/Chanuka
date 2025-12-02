@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { performanceMonitor } from '@shared/core/performance/index.js';
 import { analyticsConfig } from '@shared/config/analytics.config.js';
 import { AuthenticatedRequest } from '../../../middleware/auth.js';

@@ -14,13 +14,13 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
 
 import { z } from 'zod';
-import { logger } from '@shared/core/src/observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 import {
   emailSchema,
   passwordSchema,

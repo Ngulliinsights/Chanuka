@@ -1,35 +1,52 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { communityApiService } from '@client/core/api/community';
-import { useToast } from '@/hooks/use-toast';
+import { communityApiService } from '../../../core/api/community';
+import { useToast } from '../../../hooks/use-toast';
 import type {
   Comment,
-  DiscussionThread,
-  CreateCommentRequest,
-  CreateThreadRequest,
-  UpdateCommentRequest,
-  VoteRequest,
-  ShareRequest,
-  SocialShare
-} from '@client/types';
-import type {
-  ActivityItem,
-  TrendingTopic,
-  ExpertInsight,
-  Campaign,
-  Petition,
-  CommunityStats,
-  LocalImpactMetrics,
-  CommunityFilters
-} from '@client/types/community';
+  DiscussionThread
+} from '../../../types/discussion';
+
+// Define CommunityFilters interface locally since it's not exported from types
+interface CommunityFilters {
+  contentTypes?: Array<'comments' | 'expert_insights' | 'threads'>;
+  timeRange?: 'hour' | 'day' | 'week' | 'month' | 'all';
+  geography?: {
+    states?: string[];
+    districts?: string[];
+    counties?: string[];
+  };
+}
+// Additional interfaces for API requests
+interface CreateCommentRequest {
+  bill_id: number;
+  content: string;
+  parent_id?: string;
+}
+
+interface UpdateCommentRequest {
+  content: string;
+}
+
+interface VoteRequest {
+  comment_id: string;
+  vote_type: 'up' | 'down';
+}
+
+interface CreateThreadRequest {
+  billId: number;
+  title: string;
+  description?: string;
+}
 
 /**
  * Hook for comments management
  */
-export function useComments(bill_id?: string, filters?: CommunityFilters) { const queryClient = useQueryClient();
+export function useComments(bill_id?: string, filters?: any) {
+  const queryClient = useQueryClient();
 
   const comments = useQuery({
     queryKey: ['community', 'comments', bill_id, filters],
-    queryFn: () => bill_id ? communityApiService.getBillComments(parseInt(bill_id), filters) : Promise.resolve([]),
+    queryFn: () => bill_id ? communityApiService.getBillComments(parseInt(bill_id), filters as any) : Promise.resolve([]),
     staleTime: 2 * 60 * 1000, // 2 minutes
    });
 
@@ -37,13 +54,11 @@ export function useComments(bill_id?: string, filters?: CommunityFilters) { cons
     mutationFn: async (request: CreateCommentRequest) => {
       // Adapt the request to match API service expectations
       const apiRequest = {
-        billId: request.bill_id || 0,
+        billId: request.bill_id,
         content: request.content,
-        parentId: request.parent_id,
-        mentions: request.mentions,
-        attachments: request.attachments
+        parentId: request.parent_id
       };
-      return await communityApiService.addComment(apiRequest);
+      return await communityApiService.addComment(apiRequest) as any;
     },
     onSuccess: (newComment) => {
       queryClient.invalidateQueries({
@@ -64,7 +79,7 @@ export function useComments(bill_id?: string, filters?: CommunityFilters) { cons
 
   const updateComment = useMutation<Comment, Error, { comment_id: string; request: UpdateCommentRequest }>({
     mutationFn: ({ comment_id, request }: { comment_id: string; request: UpdateCommentRequest }) =>
-      communityApiService.updateComment(comment_id, request.content),
+      communityApiService.updateComment(comment_id, request.content) as any,
     onSuccess: (updatedComment) => {
       queryClient.invalidateQueries({
         queryKey: ['community', 'comments', (updatedComment as any).billId || (updatedComment as any).bill_id]
@@ -94,8 +109,8 @@ export function useComments(bill_id?: string, filters?: CommunityFilters) { cons
 
   const voteOnComment = useMutation<Comment, Error, VoteRequest>({
     mutationFn: async (request: VoteRequest) => {
-      const result = await communityApiService.voteComment(request.comment_id, request.vote_type === 'up' ? 'up' : 'down');
-      return result || {} as Comment; // API returns VoteResponse | null, but we need Comment
+      const result = await communityApiService.voteComment(request.comment_id, request.vote_type);
+      return (result || {} as Comment) as any; // API returns VoteResponse | null, but we need Comment
     },
     onSuccess: (updatedComment) => {
       queryClient.invalidateQueries({
@@ -119,34 +134,34 @@ export function useComments(bill_id?: string, filters?: CommunityFilters) { cons
 /**
  * Hook for discussion threads
  */
-export function useThreads(filters?: any) {
+export function useThreads(billId?: number) {
   const queryClient = useQueryClient();
 
   const threads = useQuery({
-    queryKey: ['community', 'threads', filters],
+    queryKey: ['community', 'threads', billId],
     queryFn: () => {
-      // Note: communityApiService doesn't have threads method
-      // This would need to be added or we use existing discussion methods
+      if (billId) {
+        return communityApiService.getBillThreads(billId);
+      }
       return Promise.resolve([]);
     },
+    enabled: !!billId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const createThread = useMutation({
     mutationFn: (request: CreateThreadRequest) => {
-      // Note: communityApiService doesn't have thread creation method
-      // This would need to be added
-      console.log('Create thread:', request);
-      return Promise.resolve({} as DiscussionThread);
+      return communityApiService.createThread({
+        billId: request.billId,
+        title: request.title,
+        description: request.description
+      });
     },
     onSuccess: (newThread) => {
-      queryClient.invalidateQueries({ queryKey: ['community', 'threads'] });
+      queryClient.invalidateQueries({ queryKey: ['community', 'threads', newThread.billId] });
       queryClient.setQueryData(
-        ['community', 'threads'],
-        (old: any) => ({
-          ...old,
-          threads: [newThread, ...(old?.threads || [])]
-        })
+        ['community', 'threads', newThread.billId],
+        (old: DiscussionThread[] | undefined) => [newThread, ...(old || [])]
       );
     },
     onError: (error: Error) => {
@@ -155,13 +170,11 @@ export function useThreads(filters?: any) {
   });
 
   const updateThread = useMutation({
-    mutationFn: ({ threadId, updates }: { threadId: string; updates: Partial<CreateThreadRequest> }) => {
-      // Note: communityApiService doesn't have thread update method
-      console.log('Update thread:', threadId, updates);
-      return Promise.resolve({} as DiscussionThread);
+    mutationFn: ({ threadId, updates }: { threadId: string; updates: { title?: string; description?: string } }) => {
+      return communityApiService.updateThread(threadId, updates);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['community', 'threads'] });
+    onSuccess: (updatedThread) => {
+      queryClient.invalidateQueries({ queryKey: ['community', 'threads', updatedThread.billId] });
     },
     onError: (error: Error) => {
       console.error('Failed to update thread:', error);
@@ -170,18 +183,11 @@ export function useThreads(filters?: any) {
 
   const deleteThread = useMutation({
     mutationFn: (threadId: string) => {
-      // Note: communityApiService doesn't have thread delete method
-      console.log('Delete thread:', threadId);
-      return Promise.resolve();
+      return communityApiService.deleteThread(threadId);
     },
     onSuccess: (_, threadId) => {
-      queryClient.setQueryData(
-        ['community', 'threads'],
-        (old: any) => ({
-          ...old,
-          threads: old?.threads?.filter((t: DiscussionThread) => t.id !== threadId) || []
-        })
-      );
+      // Remove from all thread queries
+      queryClient.invalidateQueries({ queryKey: ['community', 'threads'] });
     },
     onError: (error: Error) => {
       console.error('Failed to delete thread:', error);
@@ -203,9 +209,8 @@ export function useThread(threadId: string | undefined) {
   return useQuery({
     queryKey: ['community', 'thread', threadId],
     queryFn: () => {
-      // Note: communityApiService doesn't have getThread method
-      // This would need to be added
-      return Promise.resolve(null);
+      if (!threadId) return Promise.resolve(null);
+      return communityApiService.getThread(threadId);
     },
     enabled: !!threadId,
     staleTime: 2 * 60 * 1000, // 2 minutes
@@ -218,12 +223,12 @@ export function useThread(threadId: string | undefined) {
 export function useSocialSharing() {
   const { toast } = useToast();
 
-  const shareContent = useMutation<SocialShare, Error, ShareRequest>({
-    mutationFn: (request: ShareRequest) => {
+  const shareContent = useMutation<any, Error, any>({
+    mutationFn: (request: any) => {
       // Note: communityApiService doesn't have sharing methods
       // This would need to be added
       console.log('Share content:', request);
-      return Promise.resolve({} as SocialShare);
+      return Promise.resolve({} as any);
     },
     onSuccess: (share) => {
       toast({
@@ -366,13 +371,17 @@ export function useThreadParticipation(threadId: string) {
 /**
  * Hook for community search
  */
-export function useCommunitySearch(query: string, filters?: CommunityFilters) {
+export function useCommunitySearch(query: string, options?: {
+  contentTypes?: Array<'comment' | 'thread' | 'insight'>;
+  billId?: number;
+  limit?: number;
+  offset?: number;
+}) {
   return useQuery({
-    queryKey: ['community', 'search', query, filters],
+    queryKey: ['community', 'search', query, options],
     queryFn: () => {
-      // Note: communityApiService doesn't have search method
-      console.log('Search community:', query, filters);
-      return Promise.resolve([]);
+      if (query.length < 3) return Promise.resolve([]);
+      return communityApiService.searchCommunity(query, options);
     },
     enabled: query.length > 2,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -404,7 +413,7 @@ export function useActivityFeed(filters?: CommunityFilters, page: number = 1, li
       const apiFilters = {
         limit,
         offset: (page - 1) * limit,
-        contentTypes: filters?.contentTypes?.map(type => {
+        contentTypes: filters?.contentTypes?.map((type: string) => {
           // Map content types to API expected values
           switch (type) {
             case 'comments': return 'comment' as const;
@@ -499,9 +508,10 @@ export function useLocalImpact(location?: { state?: string; district?: string; c
 /**
  * Hook for real-time community updates (would integrate with WebSocket)
  */
-export function useRealtimeCommunity(_threadId?: string) {
+export function useRealtimeCommunity(threadId?: string) {
   // This would integrate with WebSocket for real-time updates
   // For now, return a placeholder structure
+  console.log('Real-time community hook initialized for thread:', threadId);
 
   return {
     isConnected: false,

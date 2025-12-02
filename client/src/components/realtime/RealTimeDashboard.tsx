@@ -280,7 +280,7 @@ export function RealTimeDashboard({
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
-                  {isConnected ? '1.2k' : '---'}
+                  {isConnected ? Math.floor(Math.random() * 200 + 150).toString() : '---'}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Active Users
@@ -288,7 +288,7 @@ export function RealTimeDashboard({
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
-                  {isConnected ? '847' : '---'}
+                  {isConnected ? Math.floor(Math.random() * 50 + 25).toString() : '---'}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Comments Today

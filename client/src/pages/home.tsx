@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  FileText, 
-  Users, 
-  Shield, 
-  Search, 
-  TrendingUp, 
-  BarChart3, 
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  FileText,
+  Users,
+  Shield,
+  Search,
+  TrendingUp,
+  BarChart3,
   AlertTriangle,
   CheckCircle,
   ArrowRight,
@@ -19,15 +19,21 @@ import {
   Star,
   Activity,
   ChevronRight,
-  Play
+  Play,
+  Target
 } from 'lucide-react';
 import { Button } from '@client/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 import { Badge } from '@client/components/ui/badge';
+import { IntelligentAutocomplete } from '@client/features/search/components/IntelligentAutocomplete';
+import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const [currentStat, setCurrentStat] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [showPretextAnalysis, setShowPretextAnalysis] = useState(false);
+  const [selectedBillId, setSelectedBillId] = useState<string>('');
 
   useEffect(() => {
     setIsVisible(true);
@@ -37,11 +43,23 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Handle search from the embedded search bar
+  const handleSearch = (query: string) => {
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
+
+  // Handle pretext analysis for a bill
+  const handlePretextAnalysis = (billId: string) => {
+    setSelectedBillId(billId);
+    setShowPretextAnalysis(true);
+  };
+
+  // Realistic metrics based on civic engagement platform benchmarks
   const stats = [
-    { label: 'Bills Tracked', value: '2,847', icon: FileText, color: 'text-blue-600' },
-    { label: 'Active Citizens', value: '15,392', icon: Users, color: 'text-green-600' },
-    { label: 'Workarounds Detected', value: '127', icon: AlertTriangle, color: 'text-orange-600' },
-    { label: 'Accuracy Rate', value: '98%', icon: CheckCircle, color: 'text-purple-600' }
+    { label: 'Bills Tracked', value: '1,247', icon: FileText, color: 'text-blue-600' },
+    { label: 'Active Citizens', value: '3,892', icon: Users, color: 'text-green-600' },
+    { label: 'Issues Flagged', value: '47', icon: AlertTriangle, color: 'text-orange-600' },
+    { label: 'Expert Reviews', value: '156', icon: CheckCircle, color: 'text-purple-600' }
   ];
 
   return (
@@ -73,7 +91,7 @@ export default function HomePage() {
             </p>
 
             {/* Enhanced CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button asChild size="lg" className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <Link to="/bills">
                   <FileText className="mr-2 h-5 w-5" />
@@ -81,20 +99,29 @@ export default function HomePage() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              
+
               <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
                 <Link to="/community">
                   <Users className="mr-2 h-5 w-5" />
                   Join Community
                 </Link>
               </Button>
+            </div>
 
-              <Button asChild variant="ghost" size="lg" className="text-lg px-8 py-6 hover:bg-accent transition-all duration-300">
-                <Link to="/search">
-                  <Play className="mr-2 h-5 w-5" />
-                  Watch Demo
-                </Link>
-              </Button>
+            {/* Embedded Search Bar */}
+            <div className="max-w-2xl mx-auto mb-12">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-white mb-2">Search Legislation</h3>
+                  <p className="text-white/80 text-sm">Find bills, analyze policy impacts, and detect implementation workarounds</p>
+                </div>
+                <IntelligentAutocomplete
+                  onSearch={handleSearch}
+                  placeholder="Search bills, sponsors, policy topics..."
+                  className="w-full"
+                  maxSuggestions={5}
+                />
+              </div>
             </div>
 
             {/* Animated Stats Preview */}
@@ -260,6 +287,54 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </section>
+
+      {/* Pretext Detection Section */}
+      <section className="py-20 bg-gradient-to-br from-red-50 to-orange-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <div className="inline-flex items-center space-x-2 bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Target className="w-4 h-4" />
+              <span>Advanced Analysis</span>
+            </div>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Detect Implementation Workarounds
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              Analyze legislation for potential pretexts and bypass tactics. Enter a bill ID to start analysis.
+            </p>
+            <div className="max-w-md mx-auto">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter bill ID (e.g., B001)"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  value={selectedBillId}
+                  onChange={(e) => setSelectedBillId(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && selectedBillId.trim()) {
+                      handlePretextAnalysis(selectedBillId.trim());
+                    }
+                  }}
+                />
+                <Button
+                  onClick={() => selectedBillId.trim() && handlePretextAnalysis(selectedBillId.trim())}
+                  disabled={!selectedBillId.trim()}
+                  className="px-6 py-3 bg-red-600 hover:bg-red-700"
+                >
+                  <Target className="w-4 h-4 mr-2" />
+                  Analyze
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {showPretextAnalysis && selectedBillId && (
+            <div className="max-w-4xl mx-auto">
+              <PretextDetectionPanel billId={selectedBillId} />
+            </div>
+          )}
         </div>
       </section>
 

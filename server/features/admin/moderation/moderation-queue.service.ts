@@ -12,7 +12,7 @@ import { bill,
   sponsor 
  } from '@shared/shared/schema';
 import { eq, count, desc, sql, and, gte, SQL } from 'drizzle-orm';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { ContentModerationFilters, ModerationItem, PaginationInfo } from './types.js';
 import { contentAnalysisService } from './content-analysis.service.js';
 

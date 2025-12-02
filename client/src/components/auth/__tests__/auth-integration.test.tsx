@@ -18,7 +18,7 @@ import {
   TestSuiteHelper
 } from '../../../shared/testing/test-utilities';
 
-import { LoginForm } from '../ui/LoginForm';
+import { LoginForm } from '../../shared/auth/forms';
 import { RegisterForm } from '../ui/RegisterForm';
 import { AuthError, AuthValidationError } from '@client/errors';
 

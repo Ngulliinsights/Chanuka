@@ -7,7 +7,7 @@ import { authenticateToken, requireRole } from '@server/middleware/auth.js';
 //import { billService } from '@shared/bills/application/bill-service.js';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 import { ApiSuccess, ApiError, ApiForbidden } from '@shared/core/utils/api-utils';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 // Security Services
 import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder.js';
@@ -15,7 +15,7 @@ import { inputValidationService, commonSchemas } from '@server/infrastructure/se
 
 // Database & Schema Imports
 import { database as db } from '@shared/database';
-import { users, bills } from '@shared/schema/foundation';
+import { users, bills } from '@shared/schema';
 
 // --- Constants and Types ---
 

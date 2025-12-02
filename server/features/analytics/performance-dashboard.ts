@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { performanceMonitor   } from '@shared/core/index.js';
-import { logger   } from '@shared/core/index.js';
+import { performanceMonitor   } from '@shared/core';
+import { logger   } from '@shared/core';
 import { errorTracker } from '@server/core/errors/error-tracker.ts';
 
 export const router = Router();

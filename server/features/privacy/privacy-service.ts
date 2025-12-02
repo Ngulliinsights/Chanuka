@@ -16,7 +16,7 @@ import {
   system_audit_log
 } from "@shared/schema";
 import { auditLogger } from '@server/infrastructure/monitoring/index.js';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 export interface UserDataExport {
   user: {

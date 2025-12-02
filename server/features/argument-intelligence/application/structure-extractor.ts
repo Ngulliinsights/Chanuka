@@ -3,7 +3,7 @@
 // ============================================================================
 // Extracts argumentative structure from informal citizen comments
 
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { SentenceClassifier } from '@shared/infrastructure/nlp/sentence-classifier.js';
 import { EntityExtractor } from '@shared/infrastructure/nlp/entity-extractor.js';
 import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator.js';

@@ -35,7 +35,6 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { cn } from '@client/lib/utils';
-import { useCommunityStore } from '@client/store/slices/communitySlice';
 import { CommunityFilters as CommunityFiltersType } from '@client/types/community';
 
 interface CommunityFiltersProps {
@@ -44,8 +43,22 @@ interface CommunityFiltersProps {
 }
 
 export function CommunityFilters({ onClose, className }: CommunityFiltersProps) {
-  const { filters, setFilters, resetToDefaults } = useCommunityStore();
-  const [localFilters, setLocalFilters] = useState<CommunityFiltersType>(filters);
+  // Mock default filters - delinked from backend
+  const defaultFilters: CommunityFiltersType = {
+    contentTypes: ['comments', 'discussions', 'expert_insights', 'campaigns', 'petitions'],
+    policyAreas: [],
+    timeRange: 'week',
+    geography: {
+      states: [],
+      districts: [],
+      counties: []
+    },
+    expertLevel: ['official', 'domain', 'identity', 'community'],
+    sortBy: 'trending',
+    showLocalOnly: false
+  };
+
+  const [localFilters, setLocalFilters] = useState<CommunityFiltersType>(defaultFilters);
 
   // Mock data for policy areas - in real app, this would come from API
   const availablePolicyAreas = [
@@ -151,23 +164,14 @@ export function CommunityFilters({ onClose, className }: CommunityFiltersProps) 
   };
 
   const handleApplyFilters = () => {
-    setFilters(localFilters);
+    // Mock: Apply filters (no backend call)
+    console.log('Mock: Applying filters', localFilters);
     onClose?.();
   };
 
   const handleResetFilters = () => {
-    // Reset UI filters to defaults in the global store, then reflect defaults locally
-    resetToDefaults();
-    setLocalFilters(prev => ({
-      ...prev,
-      contentTypes: ['comments','discussions','expert_insights','campaigns','petitions'],
-      policyAreas: [],
-      timeRange: 'week',
-      geography: { states: [], districts: [], counties: [] },
-      expertLevel: ['official','domain','identity','community'],
-      sortBy: 'trending',
-      showLocalOnly: false
-    } as CommunityFiltersType));
+    // Mock: Reset filters to defaults
+    setLocalFilters(defaultFilters);
   };
 
   const getActiveFilterCount = () => {

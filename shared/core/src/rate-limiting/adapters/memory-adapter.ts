@@ -3,7 +3,7 @@
  * Adapts the existing MemoryRateLimitStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '/core/interfaces';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 import { MemoryRateLimitStore } from '../stores/memory-store';
 
 export class MemoryAdapter implements RateLimitStore {
@@ -12,16 +12,15 @@ export class MemoryAdapter implements RateLimitStore {
   async check(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
     const result = await this.store.check(key, {
       windowMs: config.windowMs,
-      max: config.limit,
-      message: config.message,
-      testMax: config.testMax,
-      devMax: config.devMax
+      max: config.max,
+      ...(config.message && { message: config.message })
+      // testMax and devMax not in RateLimitOptions interface
     });
 
     // Add missing properties to match RateLimitResult interface
     return {
       ...result,
-      totalHits: 0, // Not tracked in memory store
+      // totalHits: 0, // Not tracked in memory store - totalHits not in RateLimitResult interface
       windowStart: Date.now() - config.windowMs,
       algorithm: 'fixed-window'
     };

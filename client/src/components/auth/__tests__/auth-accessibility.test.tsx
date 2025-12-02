@@ -13,9 +13,9 @@ import {
   renderWithProviders, 
   AccessibilityTestHelper,
   FormTestHelper
-} from '@shared/testing/test-utilities';
+} from '../../../shared/testing/test-utilities';
 
-import { LoginForm } from '../ui/LoginForm';
+import { LoginForm } from '../../shared/auth/forms';
 import { RegisterForm } from '../ui/RegisterForm';
 import { AuthInput } from '../ui/AuthInput';
 import { AuthButton } from '../ui/AuthButton';

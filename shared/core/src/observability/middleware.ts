@@ -7,7 +7,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { Result, ok, err } from '../primitives/types';
+// import { Result, ok, err } from '../../primitives/types/result'; // Unused import
 import { BaseError } from './error-management';
 import {
   Logger,
@@ -55,7 +55,7 @@ export class MiddlewareError extends BaseError {
     super(message, {
       statusCode: 500,
       code: 'MIDDLEWARE_ERROR',
-      cause,
+      cause: cause || undefined,
       isOperational: false,
       domain: 'SYSTEM' as any
     });
@@ -153,7 +153,7 @@ export function createRequestLoggingMiddleware(
   const { enableLogging = true, logLevel = 'info', skipPaths = [] } = config;
 
   if (!enableLogging || !logger) {
-    return (req: Request, res: Response, next: NextFunction) => next();
+    return (_req: Request, _res: Response, next: NextFunction) => next();
   }
 
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -166,15 +166,16 @@ export function createRequestLoggingMiddleware(
     }
 
     // Log incoming request
-    const requestContext: LogContext = { component: 'http',
+    const requestContext: LogContext = { 
+      component: 'http',
       operation: 'request',
-      correlationId: correlationContext?.correlationId,
-      traceId: correlationContext?.traceId,
-      requestId: correlationContext?.requestId,
-      user_id: correlationContext?.user_id,
-      session_id: correlationContext?.session_id,
-      statusCode: undefined,
-      duration: undefined,
+      correlationId: correlationContext?.correlationId || '',
+      traceId: correlationContext?.traceId || '',
+      requestId: correlationContext?.requestId || '',
+      user_id: correlationContext?.user_id || '',
+      session_id: correlationContext?.session_id || '',
+      statusCode: 0,
+      duration: 0,
       tags: ['http', 'request']
      };
 
@@ -189,7 +190,7 @@ export function createRequestLoggingMiddleware(
 
     // Override res.end to log response
     const originalEnd = res.end;
-    const originalWrite = res.write;
+    const _originalWrite = res.write;
     let responseFinished = false;
 
     res.end = function(chunk?: any, encoding?: BufferEncoding | (() => void), callback?: () => void): Response {
@@ -243,7 +244,7 @@ export function createPerformanceMonitoringMiddleware(
   const { enableMetrics = true, metricsPrefix = 'http', skipMetricsPaths = [] } = config;
 
   if (!enableMetrics || !metrics) {
-    return (req: Request, res: Response, next: NextFunction) => next();
+    return (_req: Request, _res: Response, next: NextFunction) => next();
   }
 
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -326,19 +327,21 @@ export function createErrorTrackingMiddleware(
   const { enableErrorTracking = true } = config;
 
   if (!enableErrorTracking || !logger) {
-    return (err: Error, req: Request, res: Response, next: NextFunction) => next(err);
+    return (err: Error, _req: Request, _res: Response, next: NextFunction) => next(err);
   }
 
-  return (err: Error, req: Request, res: Response, next: NextFunction): void => { const correlationContext = (req as any).correlationContext as CorrelationContext | undefined;
+  return (err: Error, req: Request, _res: Response, next: NextFunction): void => { const correlationContext = (req as any).correlationContext as CorrelationContext | undefined;
 
     const errorContext: LogContext = {
       component: 'http',
       operation: 'error',
-      correlationId: correlationContext?.correlationId,
-      traceId: correlationContext?.traceId,
-      requestId: correlationContext?.requestId,
-      user_id: correlationContext?.user_id,
-      session_id: correlationContext?.session_id,
+      correlationId: correlationContext?.correlationId || '',
+      traceId: correlationContext?.traceId || '',
+      requestId: correlationContext?.requestId || '',
+      user_id: correlationContext?.user_id || '',
+      session_id: correlationContext?.session_id || '',
+      statusCode: 500,
+      duration: 0,
       errorCode: err instanceof BaseError ? err.code : 'UNKNOWN_ERROR',
       tags: ['http', 'error']
      };

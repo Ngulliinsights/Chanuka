@@ -15,14 +15,14 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
 
 import { HealthChecker } from '../observability/health-checker';
-import type { HealthCheck, HealthResult } from '@shared/core/src/types';
-import { logger } from '@shared/core/src/observability/logging';
+import type { HealthCheck, HealthResult } from '../../types';
+// import { logger } from '../observability/logging'; // Unused import
 
 describe('HealthChecker', () => {
   let healthChecker: HealthChecker;

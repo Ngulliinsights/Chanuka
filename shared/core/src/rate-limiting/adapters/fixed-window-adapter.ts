@@ -3,7 +3,7 @@
  * Adapts the existing FixedWindowStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '/core/interfaces';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 import { FixedWindow } from '../algorithms/fixed-window';
 
 export class FixedWindowAdapter implements RateLimitStore {
@@ -25,7 +25,7 @@ export class FixedWindowAdapter implements RateLimitStore {
       allowed: result.value,
       remaining: remainingResult.value,
       resetAt: new Date(Date.now() + config.windowMs),
-      totalHits: config.limit - remainingResult.value,
+      // totalHits: config.max - remainingResult.value, // totalHits not in RateLimitResult interface
       windowStart: Date.now(),
       algorithm: 'fixed-window'
     };

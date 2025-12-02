@@ -6,7 +6,7 @@
 import { AdvocacyEventPublisher, CoalitionOpportunityIdentifiedEvent, CoalitionFormedEvent } from '@shared/domain/events/advocacy-events.js';
 import { CoalitionOpportunity } from '@server/types/index.ts';
 import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors.js';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 export interface CoalitionProposal {
   id: string;

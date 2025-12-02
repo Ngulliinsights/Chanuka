@@ -1,11 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Clock, Star, TrendingUp } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '@client/hooks/useSearch';
-import type { SearchSuggestion } from '@client/types';
+import { Input } from '../../../components/ui/input';
+import { Button } from '../../../components/ui/button';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Badge } from '../../../components/ui/badge';
+import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '../hooks/useSearch';
+
+// Define SearchSuggestion type locally
+interface SearchSuggestion {
+  text: string;
+  type: string;
+}
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -150,7 +155,7 @@ export function SearchBar({
                   <TrendingUp className="h-3 w-3 mr-1" />
                   Suggestions
                 </div>
-                {suggestions.map((suggestion, index) => (
+                {suggestions.map((suggestion: any, index: number) => (
                   <button
                     key={`suggestion-${index}`}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm hover:bg-accent flex items-center ${
@@ -172,7 +177,7 @@ export function SearchBar({
             {liveResults?.results && liveResults.results.length > 0 && (
               <div className="p-2">
                 <div className="text-xs font-medium text-muted-foreground mb-2">Results</div>
-                {liveResults.results.slice(0, 3).map((result, index) => {
+                {liveResults.results.slice(0, 3).map((result: any, index: number) => {
                   const actualIndex = (suggestions?.length || 0) + index;
                   return (
                     <button
@@ -207,7 +212,7 @@ export function SearchBar({
                   <Clock className="h-3 w-3 mr-1" />
                   Recent Searches
                 </div>
-                {history.data.slice(0, 3).map((item, index) => {
+                {history.data.slice(0, 3).map((item: any, index: number) => {
                   const actualIndex = (suggestions?.length || 0) + (liveResults?.results?.length || 0) + index;
                   return (
                     <button

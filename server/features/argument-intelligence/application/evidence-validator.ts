@@ -3,7 +3,7 @@
 // ============================================================================
 // Validates evidence claims and assesses their credibility
 
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 export interface EvidenceValidationResult {
   evidenceId: string;

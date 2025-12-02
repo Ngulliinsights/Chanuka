@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
-import { Result, Ok, Err } from '../../primitives/types';
-import { BaseError } from '../error-management';
+// Removed unused import
+// Removed unused import
 import {
   Span as ISpan,
   SpanContext,
@@ -44,19 +44,19 @@ export class Span implements ISpan {
     this._startTime = startTime || new Date();
     this._resource = resource || {
       attributes: {},
-      schemaUrl: undefined,
+      schemaUrl: '',
     };
     this._instrumentationScope = instrumentationScope || {
       name: 'unknown',
-      version: undefined,
+      version: '',
       attributes: {},
-      schemaUrl: undefined,
+      schemaUrl: '',
     };
 
     this._context = {
       traceId,
       spanId,
-      parentSpanId,
+      parentSpanId: parentSpanId || '',
       name,
       kind,
       startTime: this._startTime,
@@ -79,10 +79,10 @@ export class Span implements ISpan {
   context(): SpanContext {
     return {
       ...this._context,
-      endTime: this._endTime,
-      duration: this._duration,
+      endTime: this._endTime || new Date(),
+      duration: this._duration || 0,
       status: this._status,
-      statusMessage: this._statusMessage,
+      statusMessage: this._statusMessage || '',
       attributes: { ...this._attributes },
       events: [...this._events],
       links: [...this._links],

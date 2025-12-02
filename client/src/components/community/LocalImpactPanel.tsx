@@ -29,7 +29,6 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { cn } from '@client/lib/utils';
-import { useCommunityStore } from '@client/store/slices/communitySlice';
 import { LocalImpactMetrics } from '@client/types/community';
 
 interface LocalImpactPanelProps {
@@ -50,18 +49,12 @@ interface Representative {
 }
 
 export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) {
-   const { localImpact, setLocalImpact, updateLocalImpact } = useCommunityStore();
-   const [selectedState, setSelectedState] = useState(localImpact?.data?.state || '');
-   const [selectedDistrict, setSelectedDistrict] = useState(localImpact?.data?.district || '');
-   const [selectedCounty, setSelectedCounty] = useState(localImpact?.data?.county || '');
-   const impact: LocalImpactMetrics = localImpact?.data ?? ({} as LocalImpactMetrics);
-   const [loading, setLoading] = useState(false);
-   const [representatives, setRepresentatives] = useState<Representative[]>([]);
-
-   // Memoize the setLocalImpact function to prevent useEffect dependency issues
-   const memoizedSetLocalImpact = useCallback((metrics: LocalImpactMetrics) => {
-     setLocalImpact(metrics);
-   }, [setLocalImpact]);
+    const [selectedState, setSelectedState] = useState('');
+    const [selectedDistrict, setSelectedDistrict] = useState('');
+    const [selectedCounty, setSelectedCounty] = useState('');
+    const [impact, setImpact] = useState<LocalImpactMetrics | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [representatives, setRepresentatives] = useState<Representative[]>([]);
 
    // Memoize location data to prevent unnecessary effect runs
    const locationData = useMemo(() => ({
@@ -165,22 +158,19 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
       setLoading(true);
       // Simulate API call
       const timeoutId = setTimeout(() => {
-        memoizedSetLocalImpact(mockLocalImpactData);
+        setImpact(mockLocalImpactData);
         setRepresentatives(mockRepresentatives);
         setLoading(false);
       }, 1000);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [locationData, memoizedSetLocalImpact]);
+  }, [locationData]);
 
   const handleLocationUpdate = useCallback(() => {
-    updateLocalImpact({
-      state: selectedState,
-      district: selectedDistrict,
-      county: selectedCounty
-    });
-  }, [selectedState, selectedDistrict, selectedCounty, updateLocalImpact]);
+    // Mock: Update local impact data
+    console.log('Mock: Updating local impact for', { selectedState, selectedDistrict, selectedCounty });
+  }, [selectedState, selectedDistrict, selectedCounty]);
 
   const getPartyColor = (party: string) => {
     switch (party.toLowerCase()) {
@@ -276,7 +266,7 @@ export function LocalImpactPanel({ onClose, className }: LocalImpactPanelProps) 
         </div>
 
         {/* Local Impact Metrics */}
-        {localImpact && !loading && (
+        {impact && !loading && (
           <>
             <div className="space-y-4">
                     <h4 className="font-medium text-sm flex items-center gap-2">

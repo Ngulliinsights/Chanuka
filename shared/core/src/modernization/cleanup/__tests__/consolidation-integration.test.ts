@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -18,7 +18,7 @@ import { join } from 'path';
 import { CleanupOrchestrator } from '../orchestrator';
 import { CleanupExecutor } from '../executor';
 import { BackupSystem } from '../backup-system';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '../../observability/logging';
 
 describe('File Consolidation and Removal Integration', () => {
   const testDir = join(__dirname, 'test-workspace');

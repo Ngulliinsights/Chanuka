@@ -247,13 +247,17 @@ export function unflattenObject(obj: Record<string, any>): any {
 
     for (let i = 0; i < keys.length - 1; i++) {
       const k = keys[i];
+      if (!k) continue;
       if (!(k in current)) {
         current[k] = {};
       }
       current = current[k];
     }
 
-    current[keys[keys.length - 1]] = value;
+    const lastKey = keys[keys.length - 1];
+    if (lastKey) {
+      current[lastKey] = value;
+    }
   }
 
   return result;

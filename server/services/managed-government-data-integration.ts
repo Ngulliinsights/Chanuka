@@ -1,7 +1,7 @@
-import { GovernmentDataIntegrationService } from '@shared/infrastructure/external-data/government-data-integration.js';
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@shared/infrastructure/external-data/external-api-manager.js';
+// Import fallback implementations for missing shared modules
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../utils/missing-modules-fallback.js';
 import { ExternalAPIErrorHandler } from './external-api-error-handler.js';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 import { z } from 'zod';
 
 /**
@@ -10,12 +10,11 @@ import { z } from 'zod';
  * comprehensive API management capabilities including rate limiting,
  * health monitoring, caching, and usage analytics.
  */
-export class ManagedGovernmentDataIntegrationService extends GovernmentDataIntegrationService {
+export class ManagedGovernmentDataIntegrationService {
   private apiManager: ExternalAPIManagementService;
   private errorHandler: ExternalAPIErrorHandler;
 
   constructor() {
-    super();
     this.apiManager = new ExternalAPIManagementService();
     this.errorHandler = new ExternalAPIErrorHandler();
     this.setupEventListeners();
@@ -73,7 +72,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Enhanced bill fetching with full API management
    */
-  override async fetchBillsFromSource(sourceName: string, options: {
+  async fetchBillsFromSource(sourceName: string, options: {
     limit?: number;
     offset?: number;
     since?: Date;
@@ -103,7 +102,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Enhanced sponsor fetching with full API management
    */
-  override async fetchSponsorsFromSource(sourceName: string, options: {
+  async fetchSponsorsFromSource(sourceName: string, options: {
     limit?: number;
     offset?: number;
     since?: Date;
@@ -132,7 +131,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Enhanced integration with comprehensive monitoring and analytics
    */
-  override async integrateBills(options: {
+  async integrateBills(options: {
     sources?: string[];
     since?: Date;
     dryRun?: boolean;
@@ -199,7 +198,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Enhanced sponsor integration with API management
    */
-  override async integrateSponsors(options: {
+  async integrateSponsors(options: {
     sources?: string[];
     since?: Date;
     dryRun?: boolean;
@@ -264,8 +263,8 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   /**
    * Get comprehensive integration status with API management metrics
    */
-  override async getIntegrationStatus(): Promise<any> {
-    const baseStatus = await super.getIntegrationStatus();
+  async getIntegrationStatus(): Promise<any> {
+    // Get base status from API manager instead of super class
     const apiAnalytics = this.apiManager.getAPIAnalytics();
     const healthStatuses = this.apiManager.getHealthStatus();
     const cacheStats = this.apiManager.getCacheStatistics();
@@ -895,6 +894,106 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
     const normalizedEmail = email.toLowerCase().trim();
 
     return emailRegex.test(normalizedEmail) ? normalizedEmail : null;
+  }
+
+  /**
+   * Parse bills data from API response
+   */
+  private parseBillsData(data: any, sourceName: string): any {
+    try {
+      let transformedData;
+      
+      // Apply appropriate transformation based on source
+      switch (sourceName) {
+        case 'parliament-ca':
+          transformedData = ManagedGovernmentDataIntegrationService.transformParliamentData(data);
+          break;
+        case 'senate-ke':
+          transformedData = ManagedGovernmentDataIntegrationService.transformSenateKenyaData(data);
+          break;
+        case 'county-assemblies':
+          transformedData = ManagedGovernmentDataIntegrationService.transformCountyAssembliesData(data);
+          break;
+        default:
+          transformedData = data; // Use data as-is for unknown sources
+      }
+
+      // Validate the transformed data
+      const validation = ManagedGovernmentDataIntegrationService.validateTransformedData(transformedData, 'bills');
+      
+      if (!validation.valid) {
+        logger.warn(`Data validation failed for ${sourceName}`, {
+          errors: validation.errors,
+          invalidRecords: validation.invalidRecords.length
+        });
+      }
+
+      return {
+        success: true,
+        data: validation.validRecords,
+        source: sourceName,
+        totalRecords: validation.validRecords.length,
+        invalidRecords: validation.invalidRecords.length,
+        errors: validation.errors
+      };
+    } catch (error) {
+      logger.error(`Error parsing bills data from ${sourceName}`, { error });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown parsing error',
+        source: sourceName
+      };
+    }
+  }
+
+  /**
+   * Parse sponsors data from API response
+   */
+  private parseSponsorsData(data: any, sourceName: string): any {
+    try {
+      let transformedData;
+      
+      // Apply appropriate transformation based on source
+      switch (sourceName) {
+        case 'parliament-ca':
+          transformedData = ManagedGovernmentDataIntegrationService.transformParliamentData(data);
+          break;
+        case 'senate-ke':
+          transformedData = ManagedGovernmentDataIntegrationService.transformSenateKenyaData(data);
+          break;
+        case 'county-assemblies':
+          transformedData = ManagedGovernmentDataIntegrationService.transformCountyAssembliesData(data);
+          break;
+        default:
+          transformedData = data; // Use data as-is for unknown sources
+      }
+
+      // Validate the transformed data
+      const validation = ManagedGovernmentDataIntegrationService.validateTransformedData(transformedData, 'sponsors');
+      
+      if (!validation.valid) {
+        logger.warn(`Data validation failed for ${sourceName}`, {
+          errors: validation.errors,
+          invalidRecords: validation.invalidRecords.length
+        });
+      }
+
+      return {
+        success: true,
+        data: validation.validRecords,
+        source: sourceName,
+        totalRecords: validation.validRecords.length,
+        invalidRecords: validation.invalidRecords.length,
+        errors: validation.errors
+      };
+    } catch (error) {
+      logger.error(`Error parsing sponsors data from ${sourceName}`, { error });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown parsing error',
+        source: sourceName
+      };
+    }
   }
 }
 

@@ -1,22 +1,22 @@
 import { AsyncLocalStorage } from 'async_hooks';
-import { Result, Ok, Err } from '../../primitives/types';
+// Removed unused import
 import { BaseError } from '../error-management';
 import {
   TraceContext,
   TextMapPropagator,
-  Baggage,
+  // Baggage, // Unused
   TRACE_HEADER_W3C,
   TRACE_HEADER_JAEGER,
   TRACE_HEADER_B3,
 } from './types';
-import { Span } from './span';
+// Removed unused import
 
 /**
  * Context propagation error
  */
 export class ContextPropagationError extends BaseError {
   constructor(message: string, cause?: Error) {
-    super(message, { statusCode: 500, code: 'CONTEXT_PROPAGATION_ERROR', cause, isOperational: false });
+    super(message, { statusCode: 500, code: 'CONTEXT_PROPAGATION_ERROR', cause: cause || new Error('Unknown cause'), isOperational: false });
   }
 }
 
@@ -150,16 +150,16 @@ export class JaegerPropagator implements TextMapPropagator {
     const traceId = parts[0];
     const spanId = parts[1];
     const parentSpanId = parts[2] !== '0' ? parts[2] : undefined;
-    const sampled = (parseInt(parts[3], 10) & 1) === 1;
+    const sampled = (parseInt(parts[3] || '0', 10) & 1) === 1;
 
     if (!traceId || !spanId) return undefined;
 
     return {
       traceId,
       spanId,
-      parentSpanId,
+      parentSpanId: parentSpanId || '',
       sampled,
-      flags: parseInt(parts[3], 10),
+      flags: parseInt(parts[3] || '0', 10),
     };
   }
 }
@@ -200,7 +200,7 @@ export class B3Propagator implements TextMapPropagator {
 export class BaggagePropagator implements TextMapPropagator {
   private readonly baggageHeader = 'baggage';
 
-  inject(context: TraceContext, carrier: any): void {
+  inject(_context: TraceContext, _carrier: any): void {
     // Baggage injection would be implemented here if baggage was part of TraceContext
     // For now, this is a no-op as baggage is handled separately
   }
@@ -254,7 +254,7 @@ export class CompositePropagator implements TextMapPropagator {
 
   inject(context: TraceContext, carrier: any): void {
     // Use W3C as the primary format for injection
-    this.propagators[0].inject(context, carrier);
+    this.propagators[0]?.inject(context, carrier);
   }
 
   extract(carrier: any): TraceContext | undefined {

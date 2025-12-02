@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 // Dynamic import to avoid circular dependencies
 let performanceMonitoring: any = null;

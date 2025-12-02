@@ -6,7 +6,7 @@ import {
 } from '@shared/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 import { BaseStorage } from '@/infrastructure/database/base/BaseStorage';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 // Constants for cache configuration
 const CACHE_PREFIX = 'progress:';

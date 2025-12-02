@@ -5,7 +5,7 @@
 import { CampaignEntity, Campaign, NewCampaign } from '@shared/entities/campaign.js';
 // Repository interfaces removed - using direct service calls
 import { CampaignMetrics, CoalitionOpportunity } from '@server/types/index.ts';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 export class CampaignDomainService {
   constructor(

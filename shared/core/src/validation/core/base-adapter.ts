@@ -20,7 +20,7 @@ import {
   ValidationEventEmitter,
   SanitizationRules,
   PreprocessingRules,
-  SchemaRegistry,
+  // SchemaRegistry,
   SchemaRegistration
 } from './interfaces.js';
 
@@ -69,7 +69,7 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
       name,
       schema,
       version: schema.version || '1.0.0',
-      description: schema.description,
+      description: schema.description || '',
       tags: schema.tags || [],
       created_at: new Date(),
       updated_at: new Date()
@@ -304,7 +304,7 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
   }
 
   // Event system
-  emit(event_type: ValidationEventType, data: Omit<ValidationEvent, 'type' | 'timestamp'>): boolean {
+  override emit(event_type: ValidationEventType, data: Omit<ValidationEvent, 'type' | 'timestamp'>): boolean {
     const event: ValidationEvent = {
       type: event_type,
       timestamp: Date.now(),
@@ -324,14 +324,14 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
   protected updateMetrics(operation: 'success' | 'error' | 'cache_hit' | 'cache_miss', latency?: number): void {
     if (!this.config.enableMetrics) return;
 
-    this.metrics.validations++;
+    this.metrics.totalValidations++;
     
     switch (operation) {
       case 'success':
-        this.metrics.successes++;
+        this.metrics.successfulValidations++;
         break;
       case 'error':
-        this.metrics.failures++;
+        this.metrics.failedValidations++;
         break;
       case 'cache_hit':
         this.metrics.cacheHits++;
@@ -341,22 +341,10 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
         break;
     }
 
-    // Update rates
-    this.metrics.successRate = this.metrics.validations > 0 
-      ? this.metrics.successes / this.metrics.validations 
-      : 0;
-    
-    this.metrics.cacheHitRate = (this.metrics.cacheHits + this.metrics.cacheMisses) > 0
-      ? this.metrics.cacheHits / (this.metrics.cacheHits + this.metrics.cacheMisses)
-      : 0;
-
     // Update latency
     if (latency !== undefined) {
-      this.metrics.avgLatency = (this.metrics.avgLatency + latency) / 2;
+      this.metrics.avgValidationTime = (this.metrics.avgValidationTime + latency) / 2;
     }
-
-    // Update schema count
-    this.metrics.schemasRegistered = this.schemaRegistry.size;
   }
 
   protected async measureLatency<T>(operation: () => Promise<T>): Promise<T> {
@@ -423,15 +411,15 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
 
   private initializeMetrics(): ValidationMetrics {
     return {
-      validations: 0,
-      successes: 0,
-      failures: 0,
-      successRate: 0,
-      avgLatency: 0,
+      totalValidations: 0,
+      successfulValidations: 0,
+      failedValidations: 0,
       cacheHits: 0,
       cacheMisses: 0,
-      cacheHitRate: 0,
-      schemasRegistered: 0
+      avgValidationTime: 0,
+      schemaUsageCount: {},
+      errorsByField: {},
+      errorsByCode: {}
     };
   }
 
@@ -445,7 +433,7 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
           this.cache.delete(key);
         }
       }
-    }, timeout / 2); // Clean up every half timeout period
+    }, (this.config.cacheTimeout || 300000) / 2); // Clean up every half timeout period
   }
 }
 

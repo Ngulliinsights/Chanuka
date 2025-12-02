@@ -4,10 +4,16 @@
  * A comprehensive caching system with multiple adapters and advanced features
  */
 
+// Unified caching service interface and implementation
+export type { ICachingService } from './icaching-service';
+export { CachingService } from './caching-service';
+export { CachingServiceRegistry } from './icaching-service';
+export { createCachingService } from './caching-service';
+
 // Core interfaces and types
-export type { 
-  CacheAdapter, 
-  CacheMetrics, 
+export type {
+  CacheAdapter,
+  CacheMetrics,
   CacheHealthStatus,
   CacheOptions,
   CacheEvent,
@@ -20,6 +26,14 @@ export type {
   EvictionPolicy,
   PromotionStrategy
 } from './types';
+
+// Unified cache config types
+export type {
+  CacheConfig as UnifiedCacheConfig,
+  CacheMetrics as UnifiedCacheMetrics,
+  HealthStatus,
+  CacheOperationOptions
+} from './interfaces';
 
 // Base adapter
 export { BaseCacheAdapter } from './core/base-adapter';

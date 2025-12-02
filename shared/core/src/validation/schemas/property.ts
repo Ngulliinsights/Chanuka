@@ -5,14 +5,14 @@
  */
 
 import { z } from 'zod';
-import { logger } from '../../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 import {
   coordinateSchema,
   addressSchema,
   moneySchema,
   urlSchema,
-  fileUploadSchema,
-  paginationSchema,
+  // fileUploadSchema,
+  // paginationSchema,
   uuidSchema
 } from './common';
 

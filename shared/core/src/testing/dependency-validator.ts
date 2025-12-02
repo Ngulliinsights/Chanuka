@@ -8,8 +8,8 @@ import { EventEmitter } from 'events';
  */
 export class DependencyValidator extends EventEmitter {
   private dependencyGraph: Map<string, Set<string>> = new Map();
-  private layerDefinitions: Map<string, LayerDefinition> = new Map();
-  private validationResults: any[] = [];
+  // private layerDefinitions: Map<string, LayerDefinition> = new Map(); // Unused variable
+  // private validationResults: any[] = []; // Unused variable
 
   constructor(private config: DependencyValidationConfig = {}) {
     super();
@@ -102,11 +102,15 @@ export class DependencyValidator extends EventEmitter {
 
       let match;
       while ((match = importRegex.exec(content)) !== null) {
-        dependencies.add(this.resolveImportPath(match[1], filePath));
+        if (match[1]) {
+          dependencies.add(this.resolveImportPath(match[1], filePath));
+        }
       }
 
       while ((match = dynamicImportRegex.exec(content)) !== null) {
-        dependencies.add(this.resolveImportPath(match[1], filePath));
+        if (match[1]) {
+          dependencies.add(this.resolveImportPath(match[1], filePath));
+        }
       }
     } catch (error) {
       this.emit('dependency:extraction:error', { file: filePath, error });
@@ -428,7 +432,7 @@ export class DependencyValidator extends EventEmitter {
 
   private async isDependencyUsed(dep: string): Promise<boolean> {
     // Simple check - look for imports in source files
-    for (const [file, dependencies] of Array.from(this.dependencyGraph.entries())) {
+    for (const [, dependencies] of Array.from(this.dependencyGraph.entries())) {
       for (const fileDep of Array.from(dependencies)) {
         if (fileDep.includes(dep)) {
           return true;

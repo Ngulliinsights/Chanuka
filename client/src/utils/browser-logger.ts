@@ -43,6 +43,29 @@ export interface BrowserError {
   recoverable: boolean;
 }
 
+export class BrowserError extends Error {
+  public readonly id: string;
+  public readonly severity: ErrorSeverity;
+  public readonly domain: ErrorDomain;
+  public readonly timestamp: Date;
+  public readonly context?: Record<string, unknown>;
+  public readonly recoverable: boolean;
+
+  constructor(
+    message: string,
+    options: Partial<BrowserError> = {}
+  ) {
+    super(message);
+    this.name = 'BrowserError';
+    this.id = options.id || `err_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    this.severity = options.severity || ErrorSeverity.MEDIUM;
+    this.domain = options.domain || ErrorDomain.COMPONENT;
+    this.timestamp = options.timestamp || new Date();
+    this.context = options.context;
+    this.recoverable = options.recoverable ?? true;
+  }
+}
+
 export interface Logger {
   debug: (message: string, context?: LogContext, meta?: Record<string, unknown>) => void;
   info: (message: string, context?: LogContext, meta?: Record<string, unknown>) => void;

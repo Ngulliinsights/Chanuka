@@ -39,14 +39,14 @@ export class Ok<T, E = Error> {
   /**
    * Get the value with a default if it's an error
    */
-  unwrapOr(defaultValue: T): T {
+  unwrapOr(_defaultValue: T): T {
     return this.value;
   }
 
   /**
    * Get the value or throw with a custom message
    */
-  expect(message: string): T {
+  expect(_message: string): T {
     return this.value;
   }
 
@@ -60,7 +60,7 @@ export class Ok<T, E = Error> {
   /**
    * Transform the error (no-op for Ok)
    */
-  mapErr<F>(fn: (error: E) => F): Result<T, F> {
+  mapErr<F>(_fn: (error: E) => F): Result<T, F> {
     return new Ok<T, F>(this.value);
   }
 
@@ -74,7 +74,7 @@ export class Ok<T, E = Error> {
   /**
    * Handle both Ok and Err cases
    */
-  match<U>(onOk: (value: T) => U, onErr: (error: E) => U): U {
+  match<U>(onOk: (value: T) => U, _onErr: (error: E) => U): U {
     return onOk(this.value);
   }
 }
@@ -128,7 +128,7 @@ export class Err<T = unknown, E = Error> {
   /**
    * Transform the value (no-op for Err)
    */
-  map<U>(fn: (value: T) => U): Result<U, E> {
+  map<U>(_fn: (value: T) => U): Result<U, E> {
     return new Err<U, E>(this.error);
   }
 
@@ -142,14 +142,14 @@ export class Err<T = unknown, E = Error> {
   /**
    * Chain operations that return Results (no-op for Err)
    */
-  andThen<U>(fn: (value: T) => Result<U, E>): Result<U, E> {
+  andThen<U>(_fn: (value: T) => Result<U, E>): Result<U, E> {
     return new Err<U, E>(this.error);
   }
 
   /**
    * Handle both Ok and Err cases
    */
-  match<U>(onOk: (value: T) => U, onErr: (error: E) => U): U {
+  match<U>(_onOk: (value: T) => U, onErr: (error: E) => U): U {
     return onErr(this.error);
   }
 }

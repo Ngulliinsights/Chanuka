@@ -1,8 +1,8 @@
 import { eq, and, desc, sql, count, inArray } from 'drizzle-orm';
 import { database as db } from '@shared/database';
 import { notifications } from '@shared/schema';
-import { alert_preferences, user_contact_methods } from '@shared/schema/citizen_participation';
-import { logger } from '@shared/core/index.js';
+import { alert_preferences, user_contact_methods } from '@shared/schema';
+import { logger } from '@shared/core';
 
 // Types for notification operations
 export interface CreateNotificationData {

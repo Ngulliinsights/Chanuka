@@ -14,7 +14,7 @@ import { ApiSuccess,
   ApiValidationError,
   ApiResponseWrapper
  } from '@shared/core/utils/api-utils.js';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 export const router = Router();
 

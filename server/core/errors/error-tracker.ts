@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 // TODO: Fix imports when shared/core modules are available
 // Stub types for compilation
 class ErrorTrackingIntegrationManager {

@@ -15,10 +15,10 @@ import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { 
-  MessageSquare, 
-  Heart, 
-  Share2, 
+import {
+  MessageSquare,
+  Heart,
+  Share2,
   ExternalLink,
   Clock,
   MapPin,
@@ -27,13 +27,11 @@ import {
   FileText,
   Megaphone,
   PenTool,
-  Bookmark,
-  MoreHorizontal
+  Bookmark
 } from 'lucide-react';
 import { cn } from '@client/lib/utils';
 import { ActivityItem } from '@client/types/community';
 import { ExpertBadge } from '../verification/ExpertBadge';
-import { useCommunityStore } from '@client/store/slices/communitySlice';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ActivityFeedProps {
@@ -52,8 +50,6 @@ const ActivityFeedComponent = ({
   className
 }: ActivityFeedProps) => {
    const [expandedItems, setExpandedItems] = useState<Set<string>>(() => new Set());
-
-   const communityStore = useCommunityStore();
 
   const getActivityIcon = (type: ActivityItem['type']) => {
     switch (type) {
@@ -360,7 +356,7 @@ const ActivityFeedComponent = ({
                         asChild
                         className="text-xs h-auto p-1"
                       >
-                        <a href={`/bills/${activity.billId}`}>
+                        <a href={`/bills/${activity.billId}`} title={`View bill: ${activity.billTitle || activity.title}`}>
                           <ExternalLink className="h-4 w-4" />
                         </a>
                       </Button>

@@ -637,13 +637,6 @@ export class BrowserAdapter extends BaseCacheAdapter {
     }
   }
 
-  // Override base class methods
-  protected override getMemoryUsage(): number {
-    // For browser storage, we can't easily track memory usage
-    // Return an estimate based on number of entries
-    return this.metrics.keyCount * 1024; // Rough estimate: 1KB per entry
-  }
-
   // Helper methods that call base class methods
   private validateKey(key: string): void {
     if (!key || typeof key !== 'string') {
@@ -673,6 +666,13 @@ export class BrowserAdapter extends BaseCacheAdapter {
 
   private recordDelete(_key: string): void {
     this.updateMetrics('delete');
+  }
+
+  // Override base class methods
+  protected override getMemoryUsage(): number {
+    // For browser storage, we can't easily track memory usage
+    // Return an estimate based on number of entries
+    return this.metrics.keyCount * 1024; // Rough estimate: 1KB per entry
   }
 }
 

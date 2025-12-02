@@ -4,7 +4,7 @@ import type { Pool as PoolType } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
 import { createHash } from 'crypto';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 export interface MigrationRecord {
   id: number;

@@ -1,5 +1,5 @@
 // services/passwordReset.ts
-import { database as db } from '@shared/database/connection.js';
+import { database as db } from '@shared/database';
 // Import specific tables and functions needed from the consolidated schema
 import { users } from '@shared/schema';
 import { ValidationError } from '@shared/core/observability/error-management/errors/specialized-errors.js';

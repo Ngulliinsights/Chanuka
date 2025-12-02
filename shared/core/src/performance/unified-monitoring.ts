@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { PerformanceMonitoringService, PerformanceMetric, BudgetViolation, PerformanceReport } from './monitoring';
+import { PerformanceMonitoringService, PerformanceMetric, BudgetViolation } from './monitoring';
 import { MethodTimingService, MethodTimingData, MethodTimingStats } from './method-timing';
 import { logger } from '../observability/logging';
 
@@ -122,7 +122,7 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
   private methodTimingService: MethodTimingService;
   private metrics: UnifiedPerformanceMetric[] = [];
   private environmentReports: Map<string, EnvironmentPerformanceReport> = new Map();
-  private syncTimer?: NodeJS.Timeout;
+  private syncTimer?: NodeJS.Timeout | null;
 
   constructor(config?: Partial<UnifiedMonitoringConfig>) {
     super();
@@ -173,7 +173,7 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
 
     if (this.syncTimer) {
       clearInterval(this.syncTimer);
-      this.syncTimer = undefined;
+      this.syncTimer = null;
     }
 
     logger.info('Unified performance monitoring stopped', {
@@ -193,7 +193,7 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
       source: 'client',
       environment: this.config.environment,
       instanceId: this.config.instanceId,
-      session_id,
+      session_id: session_id || '',
     };
 
     this.metrics.push(unifiedMetric);
@@ -302,16 +302,16 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
     // Find best and worst environments
     const healthScores = Object.entries(resourceUtilization);
     const bestEnvironment = healthScores.reduce((best, [env, score]) =>
-      score > (resourceUtilization[best] || 0) ? env : best, healthScores[0][0]
+      score > (resourceUtilization[best!] || 0) ? env : best, healthScores[0]![0]
     );
     const worstEnvironment = healthScores.reduce((worst, [env, score]) =>
-      score < (resourceUtilization[worst] || 100) ? env : worst, healthScores[0][0]
+      score < (resourceUtilization[worst!] || 100) ? env : worst, healthScores[0]![0]
     );
 
     // Calculate performance gaps
     const gaps: Record<string, number> = {};
     environments.forEach(env => {
-      gaps[env] = resourceUtilization[bestEnvironment] - resourceUtilization[env];
+      gaps[env] = (resourceUtilization[bestEnvironment!] || 0) - (resourceUtilization[env] || 0);
     });
 
     const recommendations = this.generateCrossEnvironmentRecommendations(
@@ -354,8 +354,8 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
    * Calculate overall health score
    */
   private calculateHealthScore(
-    clientMetrics: UnifiedPerformanceMetric[],
-    serverMetrics: UnifiedPerformanceMetric[],
+    _clientMetrics: UnifiedPerformanceMetric[],
+    _serverMetrics: UnifiedPerformanceMetric[],
     violations: BudgetViolation[]
   ): number {
     let score = 100;
@@ -365,7 +365,7 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
     score -= violations.filter(v => v.severity === 'warning').length * 5;
 
     // Penalize for slow server response times
-    const avgServerResponse = serverMetrics
+    const avgServerResponse = _serverMetrics
       .filter(m => m.name.includes('response') || m.name.includes('duration'))
       .reduce((sum, m, _, arr) => sum + m.value / arr.length, 0);
 
@@ -374,7 +374,7 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
     }
 
     // Penalize for high error rates
-    const errorRate = this.calculateErrorRate(serverMetrics);
+    const errorRate = this.calculateErrorRate(_serverMetrics);
     if (errorRate > this.config.alertThresholds.errorRateThreshold) {
       score -= 20;
     }
@@ -387,7 +387,7 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
    */
   private generateInsights(
     clientMetrics: UnifiedPerformanceMetric[],
-    serverMetrics: UnifiedPerformanceMetric[],
+    _serverMetrics: UnifiedPerformanceMetric[],
     methodStats: MethodTimingStats[]
   ): PerformanceInsight[] {
     const insights: PerformanceInsight[] = [];
@@ -482,11 +482,11 @@ export class UnifiedPerformanceMonitoringService extends EventEmitter {
     bestEnvironment: string,
     worstEnvironment: string,
     gaps: Record<string, number>,
-    reports: EnvironmentPerformanceReport[]
+    _reports: EnvironmentPerformanceReport[]
   ): string[] {
     const recommendations: string[] = [];
 
-    if (gaps[worstEnvironment] > 20) {
+    if ((gaps[worstEnvironment!] || 0) > 20) {
       recommendations.push(
         `Investigate performance issues in ${worstEnvironment} environment`,
         `Apply successful optimizations from ${bestEnvironment} to ${worstEnvironment}`,

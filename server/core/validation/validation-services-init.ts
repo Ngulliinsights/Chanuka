@@ -14,7 +14,7 @@
 
 import type { Pool as PoolType } from 'pg';
 import { getDbInstance } from '@server/infrastructure/database/index.js';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 
 // Import service classes
 import { ValidationMetricsCollector } from './validation-metrics.js';

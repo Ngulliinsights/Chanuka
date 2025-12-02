@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -16,9 +16,9 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { StressTests } from '../testing/stress-tests';
 import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
-import { Logger } from '@shared/core/src/observability/logging';
+import { Logger } from '../observability/logging';
 import type { StressTestComponents, StressTestConfig } from '../testing/stress-tests';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '../observability/logging';
 
 describe('Core Utilities Stress Tests', () => {
   let stressTests: StressTests;

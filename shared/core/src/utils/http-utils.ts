@@ -8,7 +8,7 @@
  * and other sources into a unified, framework-agnostic interface.
  */
 
-import { logger } from '../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 // ==================== Type Definitions ====================
 
@@ -100,7 +100,7 @@ export const HTTP_STATUS = {
  */
 export function createSuccessResponse<T>(
   data: T,
-  statusCode: number = HTTP_STATUS.OK,
+  _statusCode: number = HTTP_STATUS.OK,
   meta?: ApiResponse['meta']
 ): ApiResponse<T> {
   return {
@@ -119,7 +119,7 @@ export function createSuccessResponse<T>(
  */
 export function createErrorResponse(
   message: string,
-  statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR,
+  _statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR,
   code?: string,
   details?: any
 ): ApiResponse {

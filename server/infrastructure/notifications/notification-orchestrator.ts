@@ -5,7 +5,7 @@ import { smartNotificationFilterService, type FilterCriteria, type FilterResult 
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
 import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '@server/features/users/domain/user-preferences.ts';
 import { CombinedBillTrackingPreferences } from './types.js';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 /**
  * Unified Notification Orchestrator Service

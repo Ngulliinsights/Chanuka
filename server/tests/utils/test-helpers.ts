@@ -1,6 +1,6 @@
 import database from '@shared/database';
-import { users, bills, sponsors } from '@shared/schema/foundation';
-import { notifications, comments, bill_engagement } from '@shared/schema/citizen_participation';
+import { users, bills, sponsors } from '@shared/schema';
+import { notifications, comments, bill_engagement } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';

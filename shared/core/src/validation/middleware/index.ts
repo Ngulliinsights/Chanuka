@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 import { ValidationError } from '../types';
 import { validationService } from '../validation-service';
-import { logger } from '../../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 /**
  * Request validation configuration
@@ -257,7 +257,7 @@ export class ValidationMiddleware {
  * Method decorator for validation (for use with class-based controllers)
  */
 export function validate(options: ValidationDecoratorOptions) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
@@ -293,7 +293,7 @@ export function validate(options: ValidationDecoratorOptions) {
 /**
  * Class decorator for automatic validation of all methods
  */
-export function validateClass(defaultOptions?: any) {
+export function validateClass(_defaultOptions?: any) {
   return function <T extends { new (...args: any[]): {} }>(constructor: T) {
     return class extends constructor {
       constructor(...args: any[]) {

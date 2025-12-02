@@ -20,7 +20,7 @@ import { databaseFallbackService } from '@server/infrastructure/database/databas
 import { demoDataService } from '@server/infrastructure/demo-data.js';
 import request from 'supertest';
 import { app } from '../../index.js';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('Database Fallback Integration Tests', () => {
   beforeEach(() => {

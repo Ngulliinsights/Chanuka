@@ -1,6 +1,5 @@
 import { Result, ok, err } from '../../primitives/types/result';
-import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions } from '/types';
-import { RateLimitResult } from '/core/interfaces';
+import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions, RateLimitResult } from '../types';
 import Redis from 'ioredis';
 
 export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
@@ -60,7 +59,7 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
 
   async increment(key: string, field: string, amount: number = 1): Promise<Result<number>> {
     try {
-      const redisKey = `ratelimit:${key}`;
+      // const _redisKey = `ratelimit:${key}`;
 
       // Get current data
       const currentData = await this.get(key);
@@ -116,7 +115,7 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
  // RateLimitStore interface methods
  async check(key: string, options: RateLimitOptions): Promise<RateLimitResult> {
    const now = Date.now();
-   const redisKey = `ratelimit:${key}`;
+   // const _redisKey = `ratelimit:${key}`;
 
    try {
      const data = await this.get(key);
@@ -134,15 +133,12 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
        return {
          allowed: true,
          remaining: newData.tokens,
-         resetAt: new Date(newData.resetTime),
-         totalHits: 1,
-         windowStart: now,
-         algorithm: 'fixed-window'
+         resetAt: new Date(newData.resetTime)
        };
      }
 
      const currentData = data.value;
-     const totalHits = options.max - currentData.tokens + 1;
+     // const _totalHits = options.max - currentData.tokens + 1;
 
      if (currentData.tokens > 0) {
        currentData.tokens--;
@@ -151,10 +147,7 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
        return {
          allowed: true,
          remaining: currentData.tokens,
-         resetAt: new Date(currentData.resetTime),
-         totalHits: totalHits,
-         windowStart: currentData.lastRefill,
-         algorithm: 'fixed-window'
+         resetAt: new Date(currentData.resetTime)
        };
      }
 
@@ -162,20 +155,14 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
        allowed: false,
        remaining: 0,
        resetAt: new Date(currentData.resetTime),
-       retryAfter: Math.ceil((currentData.resetTime - now) / 1000),
-       totalHits: totalHits,
-       windowStart: currentData.lastRefill,
-       algorithm: 'fixed-window'
+       retryAfter: Math.ceil((currentData.resetTime - now) / 1000)
      };
    } catch (error) {
      // Fallback to allow on Redis errors
      return {
        allowed: true,
        remaining: Math.max(0, options.max - 1),
-       resetAt: new Date(now + options.windowMs),
-       totalHits: 1,
-       windowStart: now,
-       algorithm: 'fixed-window'
+       resetAt: new Date(now + options.windowMs)
      };
    }
  }
@@ -191,7 +178,7 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
      if (keys.length === 0) return;
 
      const pipeline = this.redis.pipeline();
-     const now = Date.now();
+     // const _now = Date.now();
 
      for (const key of keys) {
        // Check if the key has expired by getting its TTL

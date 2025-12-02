@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { logger } from '../../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 /**
  * Email validation with comprehensive security checks

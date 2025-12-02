@@ -522,8 +522,7 @@ import {
     BrowserError,
     logger as baseBrowserLogger
 } from './browser-logger';
-import { setCSPHeader } from './meta-tag-manager';
-import { getCSPConfig } from './csp-headers';
+import { getCSPConfig, setCSPHeader } from './csp-headers';
 import { initializeCSPReporting } from './csp-headers';
 
 // Re-export for backward compatibility

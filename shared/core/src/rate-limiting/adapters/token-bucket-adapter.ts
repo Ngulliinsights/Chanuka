@@ -3,23 +3,23 @@
  * Adapts the existing TokenBucketStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '/core/interfaces';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 import { TokenBucketStore } from '../algorithms/token-bucket';
 
 export class TokenBucketAdapter implements RateLimitStore {
   constructor(private store: TokenBucketStore) {}
 
-  async check(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
+  async check(_key: string, config: RateLimitConfig): Promise<RateLimitResult> {
     // TokenBucketStore doesn't have a check method that matches our interface
     // We need to implement the logic here
     const now = Date.now();
-    const state = { tokens: config.limit, lastRefill: now }; // Simplified state
+    const state = { tokens: config.max, lastRefill: now }; // Simplified state
 
     // Refill tokens based on elapsed time (assuming 1 token per second for simplicity)
     const elapsed = now - state.lastRefill;
-    const refillRate = config.limit / (config.windowMs / 1000); // tokens per millisecond
+    const refillRate = config.max / (config.windowMs / 1000); // tokens per millisecond
     const tokensToAdd = Math.floor(elapsed * refillRate);
-    state.tokens = Math.min(config.limit, state.tokens + tokensToAdd);
+    state.tokens = Math.min(config.max, state.tokens + tokensToAdd);
     state.lastRefill = now;
 
     // Check if request can be fulfilled
@@ -29,7 +29,7 @@ export class TokenBucketAdapter implements RateLimitStore {
         allowed: true,
         remaining: state.tokens,
         resetAt: new Date(now + config.windowMs),
-        totalHits: config.limit - state.tokens,
+        // totalHits: config.max - state.tokens, // totalHits not in RateLimitResult interface
         windowStart: now - config.windowMs,
         algorithm: 'token-bucket'
       };
@@ -40,7 +40,7 @@ export class TokenBucketAdapter implements RateLimitStore {
       remaining: 0,
       resetAt: new Date(now + config.windowMs),
       retryAfter: Math.ceil(config.windowMs / 1000),
-      totalHits: config.limit,
+      // totalHits: config.max, // totalHits not in RateLimitResult interface
       windowStart: now - config.windowMs,
       algorithm: 'token-bucket'
     };

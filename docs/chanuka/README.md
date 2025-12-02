@@ -10,6 +10,7 @@ This directory contains comprehensive documentation for the Chanuka civic engage
 - [Missing Strategic Features Analysis](./missing-strategic-features-analysis.md) - Gap analysis and implementation priorities
 
 ### Implementation Guides
+- [Platform Consolidation Implementation Tasks](./%23%20Chanuka%20Platform%20Consolidation%20Impleme.md) - Detailed consolidation implementation tasks and phases
 - [API Strategy Document](./api_strategy_doc.md) - Multi-API strategy and implementation guidance
 - [Automation Strategy](./chanuka_automation_strategy.md) - Platform automation approach
 - [Design Specification](./chanuka_design.txt) - Detailed UI/UX design specifications
@@ -22,6 +23,7 @@ This directory contains comprehensive documentation for the Chanuka civic engage
 ### Branding & Communication
 - [Complete Slogans](./chanuka_complete_slogans.md) - Platform slogans and messaging
 - [Philosophical Connections](./philosophical_connections_analysis.md) - Philosophical foundation analysis
+- [Scriptural Distributed Leadership](./Scriptural%20Distributed%20Leadership.md) - Biblical foundations for distributed leadership model
 - [Strategic Additions Poems](./strategic_additions_poems.md) - Creative content for platform
 
 ### Prototypes & Mockups

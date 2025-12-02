@@ -185,7 +185,7 @@ export function asyncHandler(fn: (req: Request, res: Response, next: NextFunctio
 /**
  * 404 Not Found handler
  */
-export function notFoundHandler(req: Request, res: Response, next: NextFunction) {
+export function notFoundHandler(req: Request, _res: Response, next: NextFunction) {
   const error = new BaseError(`Route ${req.path} not found`, {
     statusCode: 404,
     code: 'ROUTE_NOT_FOUND',

@@ -11,7 +11,7 @@
 
 import { Pool, PoolClient } from 'pg';
 import { EventEmitter } from 'events';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 
 export interface DatabaseMetrics {
   timestamp: Date;

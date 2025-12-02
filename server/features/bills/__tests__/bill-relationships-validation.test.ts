@@ -15,8 +15,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import { billService } from '../application/bill-service';
 import { databaseService } from '../../../infrastructure/database/database-service';
-import { bills, sponsors } from '@shared/schema/foundation';
-import { bill_engagement, comments } from '@shared/schema/citizen_participation';
+import { bills, sponsors } from '@shared/schema';
+import { bill_engagement, comments } from '@shared/schema';
 import { eq, sql, and } from 'drizzle-orm';
 
 describe('Bill Relationships Validation', () => {

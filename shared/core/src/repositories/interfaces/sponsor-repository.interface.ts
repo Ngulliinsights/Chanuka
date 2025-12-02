@@ -6,7 +6,7 @@
  */
 
 import type { Result, Maybe } from '../../primitives';
-import type { Sponsor, NewSponsor } from '@/schema/foundation';
+import type { Sponsor, NewSponsor } from '../../../../schema/foundation';
 
 export interface ISponsorRepository {
   /**

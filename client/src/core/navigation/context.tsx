@@ -48,43 +48,66 @@ export function createNavigationProvider(
       dispatch(setMounted(true));
     }, [dispatch]);
 
-    // Update mobile state when media query changes
+    // Coordinated state updates to prevent race conditions
     useEffect(() => {
-      if (state.isMobile !== isMobileQuery) {
-        dispatch(setMobile(isMobileQuery));
-        if (isMobileQuery) {
-          dispatch(setSidebarCollapsed(true));
-        }
-      }
-    }, [isMobileQuery, state.isMobile, dispatch]);
+      let hasUpdates = false;
+      const updates: Array<() => void> = [];
 
-    // Sync navigation state with authentication changes
-    useEffect(() => {
+      // Check mobile state
+      if (state.isMobile !== isMobileQuery) {
+        updates.push(() => {
+          dispatch(setMobile(isMobileQuery));
+          if (isMobileQuery) {
+            dispatch(setSidebarCollapsed(true));
+          }
+        });
+        hasUpdates = true;
+      }
+
+      // Check user role
       const newUserRole = isAuthenticated && user?.role
         ? (user.role as UserRole)
         : 'public';
 
       if (state.user_role !== newUserRole) {
-        dispatch(setUserRole(newUserRole));
+        updates.push(() => dispatch(setUserRole(newUserRole)));
+        hasUpdates = true;
       }
 
+      // Check authentication state
       if (!isAuthenticated && state.user_role !== 'public') {
-        dispatch(clearPersistedState());
+        updates.push(() => dispatch(clearPersistedState()));
+        hasUpdates = true;
       }
-    }, [user, isAuthenticated, state.user_role, dispatch]);
 
-    // Update navigation on location change
-    useEffect(() => {
+      // Check current path
       const currentPath = location.pathname;
       if (state.currentPath !== currentPath) {
-        dispatch(setCurrentPath(currentPath));
-        dispatch(setCurrentSection(determineNavigationSection(currentPath)) as any);
-        // Cast breadcrumb/related-pages results to any to avoid cross-module type incompatibilities
-        dispatch(updateBreadcrumbs(generateBreadcrumbs(currentPath) as any));
-        dispatch(updateRelatedPages(calculateRelatedPages(currentPath, state.user_role) as any));
-        dispatch(addToRecentPages({ path: currentPath, title: document.title || currentPath }));
+        updates.push(() => {
+          dispatch(setCurrentPath(currentPath));
+          dispatch(setCurrentSection(determineNavigationSection(currentPath)) as any);
+          dispatch(updateBreadcrumbs(generateBreadcrumbs(currentPath) as any));
+          dispatch(updateRelatedPages(calculateRelatedPages(currentPath, state.user_role) as any));
+          dispatch(addToRecentPages({ path: currentPath, title: document.title || currentPath }));
+        });
+        hasUpdates = true;
       }
-    }, [location.pathname, state.currentPath, state.user_role, dispatch]);
+
+      // Apply all updates atomically in a single batch
+      if (hasUpdates) {
+        // Execute all updates in sequence to maintain consistency
+        updates.forEach(update => update());
+      }
+    }, [
+      state.isMobile, 
+      isMobileQuery, 
+      state.user_role, 
+      isAuthenticated, 
+      user?.role, 
+      state.currentPath, 
+      location.pathname, 
+      dispatch
+    ]);
 
     // Navigation actions
     const navigateTo = useCallback((path: string) => {

@@ -17,7 +17,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from
 import request from 'supertest';
 import { app } from '../../index';
 import { databaseService } from '@server/infrastructure/database/database-service.js';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('API Endpoints Integration Tests', () => {
   let server: any;

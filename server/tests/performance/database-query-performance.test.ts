@@ -14,9 +14,9 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { database as db, bill as bills, bill_engagement, comments as comments, sponsor as sponsors } from '@shared/database/connection.js';
+import { database as db, bill as bills, bill_engagement, comments as comments, sponsor as sponsors } from '@shared/database';
 import { eq, sql, desc } from 'drizzle-orm';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('Database Query Performance Tests', () => {
   // Performance thresholds remain conservative but realistic

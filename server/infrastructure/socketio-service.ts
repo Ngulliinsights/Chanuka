@@ -10,10 +10,11 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { Server } from 'http';
 import * as jwt from 'jsonwebtoken';
 import Redis from 'ioredis';
-import { database as db } from '@shared/database/connection.js';
-import { User, users } from '@shared/schema/foundation';
+import { database as db } from '@shared/database';
+import { User, users } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '@shared/core/observability/logging';
+import { Mutex } from 'async-mutex';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -79,6 +80,11 @@ export class SocketIOService {
   private clients: Map<string, Set<AuthenticatedSocket>> = new Map();
   private billSubscriptions: Map<number, Set<string>> = new Map();
   private userSubscriptionIndex: Map<string, Set<number>> = new Map();
+  
+  // Race condition protection
+  private connectionMutexes: Map<string, Mutex> = new Map();
+  private subscriptionMutex: Mutex = new Mutex();
+  private shutdownState = { value: false };
 
   // Statistics tracking (maintaining compatibility)
   private connectionStats = {
@@ -459,48 +465,74 @@ export class SocketIOService {
       activeConnections: this.connectionStats.activeConnections
     });
     
-    this.cleanupSocket(socket);
+    // Use async cleanup to handle race conditions properly
+    this.cleanupSocket(socket).catch(error => {
+      logger.error('Error during socket cleanup', {
+        component: 'SocketIOService',
+        connectionId: socket.connectionId,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    });
   }
 
   /**
-   * Clean up socket resources
+   * Clean up socket resources with race condition protection
    */
-  private cleanupSocket(socket: AuthenticatedSocket): void {
+  private async cleanupSocket(socket: AuthenticatedSocket): Promise<void> {
     const user_id = socket.user_id;
     if (!user_id) return;
 
-    // Remove from clients map
-    const userSockets = this.clients.get(user_id);
-    if (userSockets) {
-      userSockets.delete(socket);
-      if (userSockets.size === 0) {
-        this.clients.delete(user_id);
+    // Get or create mutex for this user to prevent concurrent cleanup
+    const mutex = this.getOrCreateConnectionMutex(user_id);
+    
+    await mutex.runExclusive(async () => {
+      // Remove from clients map atomically
+      const userSockets = this.clients.get(user_id);
+      if (userSockets) {
+        userSockets.delete(socket);
+        if (userSockets.size === 0) {
+          this.clients.delete(user_id);
+          // Clean up the mutex when no more connections for this user
+          this.connectionMutexes.delete(user_id);
+        }
       }
-    }
 
-    // Clean up subscriptions
-    if (socket.subscriptions) {
-      for (const bill_id of Array.from(socket.subscriptions)) {
-        const subscribers = this.billSubscriptions.get(bill_id);
-        if (subscribers) {
-          subscribers.delete(user_id);
-          if (subscribers.size === 0) {
-            this.billSubscriptions.delete(bill_id);
+      // Clean up subscriptions atomically
+      if (socket.subscriptions) {
+        for (const bill_id of Array.from(socket.subscriptions)) {
+          const subscribers = this.billSubscriptions.get(bill_id);
+          if (subscribers) {
+            subscribers.delete(user_id);
+            if (subscribers.size === 0) {
+              this.billSubscriptions.delete(bill_id);
+            }
+          }
+        }
+
+        // Clean up user subscription index
+        const userSubs = this.userSubscriptionIndex.get(user_id);
+        if (userSubs && socket.subscriptions.size > 0) {
+          for (const bill_id of Array.from(socket.subscriptions)) {
+            userSubs.delete(bill_id);
+          }
+          if (userSubs.size === 0) {
+            this.userSubscriptionIndex.delete(user_id);
           }
         }
       }
+    });
+  }
 
-      // Clean up user subscription index
-      const userSubs = this.userSubscriptionIndex.get(user_id);
-      if (userSubs && socket.subscriptions.size > 0) {
-        for (const bill_id of Array.from(socket.subscriptions)) {
-          userSubs.delete(bill_id);
-        }
-        if (userSubs.size === 0) {
-          this.userSubscriptionIndex.delete(user_id);
-        }
-      }
+  /**
+   * Get or create a connection mutex for a specific user
+   */
+  private getOrCreateConnectionMutex(user_id: string): Mutex {
+    let mutex = this.connectionMutexes.get(user_id);
+    if (!mutex) {
+      mutex = new Mutex();
+      this.connectionMutexes.set(user_id, mutex);
     }
+    return mutex;
   }
 
   // ==========================================================================
@@ -543,7 +575,7 @@ export class SocketIOService {
   }
 
   /**
-   * Handle bill subscription
+   * Handle bill subscription with race condition protection
    */
   private async handleSubscribe(socket: AuthenticatedSocket, message: SocketMessage): Promise<void> {
     const { bill_id } = message.data || {};
@@ -558,23 +590,26 @@ export class SocketIOService {
       return;
     }
 
-    // Add to bill subscriptions
-    if (!this.billSubscriptions.has(bill_id)) {
-      this.billSubscriptions.set(bill_id, new Set());
-    }
-    this.billSubscriptions.get(bill_id)!.add(user_id);
+    // Use subscription mutex to prevent race conditions
+    await this.subscriptionMutex.runExclusive(async () => {
+      // Add to bill subscriptions atomically
+      if (!this.billSubscriptions.has(bill_id)) {
+        this.billSubscriptions.set(bill_id, new Set());
+      }
+      this.billSubscriptions.get(bill_id)!.add(user_id);
 
-    // Add to user subscription index
-    if (!this.userSubscriptionIndex.has(user_id)) {
-      this.userSubscriptionIndex.set(user_id, new Set());
-    }
-    this.userSubscriptionIndex.get(user_id)!.add(bill_id);
+      // Add to user subscription index atomically
+      if (!this.userSubscriptionIndex.has(user_id)) {
+        this.userSubscriptionIndex.set(user_id, new Set());
+      }
+      this.userSubscriptionIndex.get(user_id)!.add(bill_id);
 
-    // Add to socket subscriptions
-    socket.subscriptions!.add(bill_id);
+      // Add to socket subscriptions
+      socket.subscriptions!.add(bill_id);
 
-    // Join Socket.IO room for efficient broadcasting
-    socket.join(`bill:${bill_id}`);
+      // Join Socket.IO room for efficient broadcasting
+      socket.join(`bill:${bill_id}`);
+    });
 
     socket.emit('subscription_confirmed', {
       type: 'subscription_confirmed',
@@ -589,7 +624,7 @@ export class SocketIOService {
   }
 
   /**
-   * Handle bill unsubscription
+   * Handle bill unsubscription with race condition protection
    */
   private async handleUnsubscribe(socket: AuthenticatedSocket, message: SocketMessage): Promise<void> {
     const { bill_id } = message.data || {};
@@ -604,29 +639,32 @@ export class SocketIOService {
       return;
     }
 
-    // Remove from bill subscriptions
-    const subscribers = this.billSubscriptions.get(bill_id);
-    if (subscribers) {
-      subscribers.delete(user_id);
-      if (subscribers.size === 0) {
-        this.billSubscriptions.delete(bill_id);
+    // Use subscription mutex to prevent race conditions
+    await this.subscriptionMutex.runExclusive(async () => {
+      // Remove from bill subscriptions atomically
+      const subscribers = this.billSubscriptions.get(bill_id);
+      if (subscribers) {
+        subscribers.delete(user_id);
+        if (subscribers.size === 0) {
+          this.billSubscriptions.delete(bill_id);
+        }
       }
-    }
 
-    // Remove from user subscription index
-    const userSubs = this.userSubscriptionIndex.get(user_id);
-    if (userSubs) {
-      userSubs.delete(bill_id);
-      if (userSubs.size === 0) {
-        this.userSubscriptionIndex.delete(user_id);
+      // Remove from user subscription index atomically
+      const userSubs = this.userSubscriptionIndex.get(user_id);
+      if (userSubs) {
+        userSubs.delete(bill_id);
+        if (userSubs.size === 0) {
+          this.userSubscriptionIndex.delete(user_id);
+        }
       }
-    }
 
-    // Remove from socket subscriptions
-    socket.subscriptions!.delete(bill_id);
+      // Remove from socket subscriptions
+      socket.subscriptions!.delete(bill_id);
 
-    // Leave Socket.IO room
-    socket.leave(`bill:${bill_id}`);
+      // Leave Socket.IO room
+      socket.leave(`bill:${bill_id}`);
+    });
 
     socket.emit('unsubscription_confirmed', {
       type: 'unsubscription_confirmed',

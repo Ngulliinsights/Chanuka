@@ -5,9 +5,25 @@
  * or progressive loading with proper session management and cancellation.
  */
 
-import { logger } from '@/utils/logger';
-import { streamSearch, cancelSearch } from '@/core/api/search';
-import type { SearchResult, SearchQuery } from '@client/types';
+import { logger } from '../../../utils/logger';
+import { streamSearch, cancelSearch } from '../../../core/api/search';
+
+// Define types locally
+interface SearchResult {
+  id: string;
+  title: string;
+  type: string;
+  content: string;
+  score: number;
+}
+
+interface SearchQuery {
+  q: string;
+  type?: string;
+  limit?: number;
+  offset?: number;
+  filters?: Record<string, any>;
+}
 
 export interface StreamingSearchOptions {
   onResult?: (result: SearchResult) => void;

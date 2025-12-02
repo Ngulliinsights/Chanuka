@@ -1668,21 +1668,21 @@
     },
     {
       "type": "inline-style",
-      "file": "src\\main-simple.tsx",
+      "file": "src\\main.tsx",
       "line": 8,
       "message": "Inline styles found. Use design system classes instead.",
       "suggestion": "Move styles to CSS classes using design tokens"
     },
     {
       "type": "inline-style",
-      "file": "src\\main-simple.tsx",
+      "file": "src\\main.tsx",
       "line": 18,
       "message": "Inline styles found. Use design system classes instead.",
       "suggestion": "Move styles to CSS classes using design tokens"
     },
     {
       "type": "inline-style",
-      "file": "src\\main-simple.tsx",
+      "file": "src\\main.tsx",
       "line": 21,
       "message": "Inline styles found. Use design system classes instead.",
       "suggestion": "Move styles to CSS classes using design tokens"
@@ -7191,7 +7191,7 @@
     },
     {
       "type": "design-token-check",
-      "file": "src\\main-simple.tsx",
+      "file": "src\\main.tsx",
       "message": "File does not use design system tokens (may be acceptable for utility files)"
     },
     {

@@ -65,7 +65,7 @@ export class MiddlewareFactory {
   }
 
   createCompositeMiddleware() {
-    const middlewares = [];
+    const middlewares: any[] = [];
     
     if (this.config.enableLogging) {
       middlewares.push(this.createLoggingMiddleware());

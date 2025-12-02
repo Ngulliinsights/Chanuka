@@ -6,10 +6,10 @@
  */
 
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
 import {
   Save,
   Share2,
@@ -24,9 +24,9 @@ import {
   ChevronUp,
   Search
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import type { SearchResult, SearchHighlight } from '@client/types';
+import { cn } from '../../../lib/utils';
+import { useToast } from '../../../hooks/use-toast';
+import type { SearchResult, SearchHighlight } from '../../../features/search/types';
 
 interface SearchResultCardProps {
   result: SearchResult;

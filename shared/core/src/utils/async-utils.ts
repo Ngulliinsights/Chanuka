@@ -8,7 +8,7 @@
  * and other sources into a unified, framework-agnostic interface.
  */
 
-import { logger } from '@shared/observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 // ==================== Type Definitions ====================
 
@@ -241,7 +241,7 @@ export class Mutex {
  */
 export class Semaphore {
   private permits: number;
-  private readonly maxPermits: number;
+  // private readonly _maxPermits: number;
   private waiting: Array<() => void> = [];
 
   constructor(permits: number) {
@@ -249,7 +249,7 @@ export class Semaphore {
       throw new Error('Semaphore permits must be a positive integer');
     }
     this.permits = permits;
-    this.maxPermits = permits;
+    // this._maxPermits = permits;
   }
 
   /**
@@ -364,7 +364,7 @@ export const cacheMutex = new Mutex();
  */
 export class CircuitBreaker {
   private failures = 0;
-  private successes = 0;
+  // private _successes = 0;
   private consecutiveSuccesses = 0;
   private lastFailureTime = 0;
   private lastStateChange = Date.now();
@@ -514,7 +514,7 @@ export class CircuitBreaker {
    */
   reset(): void {
     this.failures = 0;
-    this.successes = 0;
+    // this._successes = 0;
     this.consecutiveSuccesses = 0;
     this.lastFailureTime = 0;
     this.totalExecutions = 0;

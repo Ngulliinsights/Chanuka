@@ -58,5 +58,27 @@ export {
 // Usage examples
 export { examples } from './examples/circuit-breaker-usage';
 
+// Authentication API service
+export {
+  AuthApiService,
+  createAuthApiService,
+  authApiService,
+  type LoginCredentials,
+  type RegisterData,
+  type AuthUser,
+  type UserPreferences,
+  type AuthTokens
+} from './auth';
+
+// Analytics API service
+export {
+  AnalyticsApiService,
+  createAnalyticsApiService,
+  analyticsApiService
+} from './analytics';
+
+// Global API client
+export { globalApiClient } from './client';
+
 // Re-export BaseError for convenience
 export { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';

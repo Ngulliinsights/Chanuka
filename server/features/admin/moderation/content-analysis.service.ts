@@ -5,7 +5,7 @@
  * spam detection, and content quality assessment.
  */
 
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { ContentAnalysisResult } from './types.js';
 
 export class ContentAnalysisService {

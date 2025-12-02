@@ -250,7 +250,7 @@ async function validateAIRequest(req: Request): Promise<{
 
   return {
     valid: errors.length === 0,
-    errors: errors.length > 0 ? errors : undefined
+    errors: errors.length > 0 ? errors : undefined as any
   };
 }
 

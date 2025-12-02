@@ -34,8 +34,8 @@ export class CounterMetric implements Counter {
     const existingIndex = this.findValueIndex(combinedLabels);
 
     if (existingIndex >= 0) {
-      this.values[existingIndex].value += value;
-      this.values[existingIndex].timestamp = new Date();
+      this.values[existingIndex]!.value += value;
+      this.values[existingIndex]!.timestamp = new Date();
     } else {
       this.values.push({
         value,
@@ -76,8 +76,8 @@ export class GaugeMetric implements Gauge {
     const existingIndex = this.findValueIndex(combinedLabels);
 
     if (existingIndex >= 0) {
-      this.values[existingIndex].value = value;
-      this.values[existingIndex].timestamp = new Date();
+      this.values[existingIndex]!.value = value;
+      this.values[existingIndex]!.timestamp = new Date();
     } else {
       this.values.push({
         value,
@@ -92,8 +92,8 @@ export class GaugeMetric implements Gauge {
     const existingIndex = this.findValueIndex(combinedLabels);
 
     if (existingIndex >= 0) {
-      this.values[existingIndex].value += value;
-      this.values[existingIndex].timestamp = new Date();
+      this.values[existingIndex]!.value += value;
+      this.values[existingIndex]!.timestamp = new Date();
     } else {
       this.values.push({
         value,
@@ -173,8 +173,8 @@ export class HistogramMetric implements Histogram {
     // Update metric value
     const existingIndex = this.findValueIndex(combinedLabels);
     if (existingIndex >= 0) {
-      this.values[existingIndex].value = this.counts[labelKey];
-      this.values[existingIndex].timestamp = new Date();
+      this.values[existingIndex]!.value = this.counts[labelKey];
+      this.values[existingIndex]!.timestamp = new Date();
     } else {
       this.values.push({
         value: this.counts[labelKey],
@@ -248,8 +248,8 @@ export class SummaryMetric implements Summary {
     // Update metric value
     const existingIndex = this.findValueIndex(combinedLabels);
     if (existingIndex >= 0) {
-      this.values[existingIndex].value = this.counts[labelKey];
-      this.values[existingIndex].timestamp = new Date();
+      this.values[existingIndex]!.value = this.counts[labelKey];
+      this.values[existingIndex]!.timestamp = new Date();
     } else {
       this.values.push({
         value: this.counts[labelKey],
@@ -286,7 +286,7 @@ export class SummaryMetric implements Summary {
     for (const quantile of this.quantiles) {
       const index = Math.ceil(sorted.length * quantile) - 1;
       const idx = Math.max(0, Math.min(index, sorted.length - 1));
-      result[quantile.toString()] = sorted[idx];
+      result[quantile.toString()] = sorted[idx] || 0;
     }
 
     return result;
@@ -336,8 +336,8 @@ export class InMemoryMetricsRegistry implements MetricsRegistry {
       help: metric.help,
       type: metric.type,
       values: metric.values,
-      labels: metric.labels,
-    }));
+      labels: metric.labels || {},
+    })) as any;
   }
 }
 

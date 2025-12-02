@@ -159,10 +159,8 @@ export function setCSPHeader(policy: string | CSPDirectives): void {
       .join(';');
     
     if (filteredPolicy.trim()) {
-      const metaTag = document.createElement('meta');
-      metaTag.httpEquiv = 'Content-Security-Policy';
-      metaTag.content = filteredPolicy;
-      document.head.appendChild(metaTag);
+      // Use the meta tag manager to prevent duplicates
+      setCSPHeaderSafe(filteredPolicy);
     }
     
     // Log info about filtered directives (not a warning)

@@ -10,8 +10,8 @@
       "@server/*": ["./*"],
       "@shared": ["../shared"],
       "@shared/*": ["../shared/*"],
-      "@shared/core": ["../shared/core"],
-      "@shared/core/*": ["../shared/core/*"],
+      "@shared/core": ["../shared/core/src"],
+      "@shared/core/*": ["../shared/core/src/*"],
       "@shared/database": ["../shared/database"],
       "@shared/database/*": ["../shared/database/*"],
       "@shared/schema": ["../shared/schema"],
@@ -35,8 +35,7 @@
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.spec.ts",
-    "../shared/**/*"
+    "**/*.spec.ts"
   ]
 }
 

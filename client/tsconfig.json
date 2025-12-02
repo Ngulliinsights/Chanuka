@@ -35,15 +35,15 @@
     "forceConsistentCasingInFileNames": true,
 
     // Project Structure
-    "baseUrl": ".",
+    "baseUrl": "./src",
     // Silence TypeScript 7.0 deprecation warnings for `baseUrl` until migration
     "ignoreDeprecations": "5.0",
 
     // Path Mappings
     "paths": {
-      "@/*": ["src/*"],
-      "@client": ["src"],
-      "@client/*": ["src/*"],
+      "@/*": ["./*"],
+      "@client": ["."],
+      "@client/*": ["./*"],
       "@shared": ["../shared"],
       "@shared/*": ["../shared/*"],
       "@shared/core": ["../shared/core"],

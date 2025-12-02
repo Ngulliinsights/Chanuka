@@ -6,7 +6,7 @@
 
 import {
   pgTable, text, integer, timestamp, jsonb, uuid, varchar,
-  index, unique, decimal, boolean, date
+  index, unique, decimal, date
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
@@ -135,7 +135,7 @@ export const search_analytics = pgTable("search_analytics", {
 // RELATIONSHIPS
 // ============================================================================
 
-export const contentEmbeddingsRelations = relations(content_embeddings, ({ one }) => ({
+export const contentEmbeddingsRelations = relations(content_embeddings, ({ }) => ({
   // Note: Dynamic relations to bills, sponsors, comments based on content_type
   // Relations are handled at the application level due to polymorphic nature
 }));

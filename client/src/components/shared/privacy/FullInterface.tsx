@@ -1,0 +1,308 @@
+/**
+ * Full Privacy Interface Component
+ * Comprehensive interface with all privacy controls (tabs for visibility, data, notifications, cookies, rights)
+ */
+
+import React, { useState, useCallback, Suspense } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Alert, AlertDescription } from '../../ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
+import { Badge } from '../../ui/badge';
+import {
+  Shield,
+  Eye,
+  Database,
+  Bell,
+  AlertTriangle,
+  Info
+} from 'lucide-react';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { ConsentModal } from '../../auth/ConsentModal';
+import {
+  PrivacySettings,
+  DataExportRequest,
+  DataDeletionRequest,
+  ConsentRecord
+} from '@client/types/auth';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { logger } from '@client/utils/logger';
+const VisibilityControls = React.lazy(() => import('./controls/VisibilityControls').then(module => ({ default: module.VisibilityControls })));
+const DataUsageControls = React.lazy(() => import('./controls/DataUsageControls').then(module => ({ default: module.DataUsageControls })));
+const ConsentControls = React.lazy(() => import('./controls/ConsentControls').then(module => ({ default: module.ConsentControls })));
+
+interface FullInterfaceProps {
+  settings: PrivacySettings | null;
+  onSettingsChange: (settings: PrivacySettings) => void;
+  className?: string;
+}
+
+export const FullInterface = React.memo<FullInterfaceProps>(function FullInterface({
+  settings,
+  onSettingsChange,
+  className = ''
+}) {
+  const auth = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [consentType, setConsentType] = useState<ConsentRecord['consent_type']>('analytics');
+  const [exportRequests, setExportRequests] = useState<DataExportRequest[]>([]);
+  const [deletionRequests, setDeletionRequests] = useState<DataDeletionRequest[]>([]);
+
+  const handleSettingChange = useCallback(async (key: keyof PrivacySettings, value: any) => {
+    if (!settings) return;
+
+    const newSettings = { ...settings, [key]: value };
+    onSettingsChange(newSettings);
+
+    try {
+      const result = await auth.updatePrivacySettings({ [key]: value });
+      if (!result.success) {
+        // Revert on failure to maintain UI consistency
+        onSettingsChange(settings);
+        logger.error('Failed to update privacy setting:', { component: 'FullInterface' }, result.error);
+      }
+    } catch (error) {
+      // Revert on error to prevent UI from showing incorrect state
+      onSettingsChange(settings);
+      logger.error('Privacy setting update failed:', { component: 'FullInterface' }, error);
+    }
+  }, [settings, onSettingsChange, auth]);
+
+  const handleNotificationChange = useCallback(async (key: keyof PrivacySettings['notification_preferences'], value: boolean) => {
+    if (!settings) return;
+
+    const newNotificationPrefs = {
+      ...settings.notification_preferences,
+      [key]: value,
+    };
+
+    await handleSettingChange('notification_preferences', newNotificationPrefs);
+  }, [settings, handleSettingChange]);
+
+  const requestDataExport = useCallback(async (format: 'json' | 'csv' | 'xml') => {
+    setLoading(true);
+    try {
+      const exportRequest = await auth.requestDataExport(format, [
+        'profile',
+        'activity',
+        'analytics',
+        'communications'
+      ]);
+
+      setExportRequests(prev => [...prev, exportRequest]);
+    } catch (error) {
+      logger.error('Data export request failed:', { component: 'FullInterface' }, error);
+    } finally {
+      setLoading(false);
+    }
+  }, [auth]);
+
+  const requestDataDeletion = useCallback(async () => {
+    setLoading(true);
+    try {
+      const deletionRequest = await auth.requestDataDeletion('30days', [
+        'profile',
+        'activity',
+        'analytics',
+        'communications'
+      ]);
+
+      setDeletionRequests(prev => [...prev, deletionRequest]);
+    } catch (error) {
+      logger.error('Data deletion request failed:', { component: 'FullInterface' }, error);
+    } finally {
+      setLoading(false);
+    }
+  }, [auth]);
+
+  const openConsentModal = useCallback((type: ConsentRecord['consent_type']) => {
+    setConsentType(type);
+    setShowConsentModal(true);
+  }, []);
+
+  const handleConsentChange = useCallback((type: ConsentRecord['consent_type'], granted: boolean) => {
+    switch (type) {
+      case 'analytics':
+        handleSettingChange('analytics_consent', granted);
+        break;
+      case 'marketing':
+        handleSettingChange('marketing_consent', granted);
+        break;
+      case 'data_sharing':
+        handleSettingChange('data_sharing_consent', granted);
+        break;
+      case 'location':
+        handleSettingChange('location_tracking', granted);
+        break;
+    }
+  }, [handleSettingChange]);
+
+  // Show login prompt if user is not authenticated
+  if (!auth.user || !settings) {
+    return (
+      <Alert>
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          Please log in to manage your privacy settings.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  const cookieCategories = privacyCompliance.getCookieCategories();
+
+  // Loading component for lazy loaded tabs
+  const TabLoadingFallback = () => (
+    <Card>
+      <CardContent className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <span className="ml-2">Loading...</span>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className={`space-y-6 ${className}`}>
+      {/* Privacy Overview Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Privacy & Data Protection
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              We are committed to protecting your privacy and giving you control over your data.
+              These settings help you manage how your information is collected, used, and shared.
+              <a
+                href="/privacy-policy"
+                className="ml-1 text-blue-600 hover:underline inline-flex items-center"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Read our Privacy Policy
+                <svg className="h-3 w-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+
+      {/* Privacy Settings Tabs */}
+      <Tabs defaultValue="visibility" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="visibility">Visibility</TabsTrigger>
+          <TabsTrigger value="data">Data Usage</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="cookies">Cookies</TabsTrigger>
+          <TabsTrigger value="rights">Your Rights</TabsTrigger>
+        </TabsList>
+
+        {/* Profile Visibility Tab */}
+        <TabsContent value="visibility">
+          <Suspense fallback={<TabLoadingFallback />}>
+            <VisibilityControls
+              settings={settings}
+              onSettingChange={handleSettingChange}
+            />
+          </Suspense>
+        </TabsContent>
+
+        {/* Data Usage Tab */}
+        <TabsContent value="data">
+          <Suspense fallback={<TabLoadingFallback />}>
+            <DataUsageControls
+              settings={settings}
+              onSettingChange={handleSettingChange}
+              onConsentChange={handleConsentChange}
+              onOpenConsentModal={openConsentModal}
+            />
+          </Suspense>
+        </TabsContent>
+
+        {/* Notifications Tab */}
+        <TabsContent value="notifications">
+          <Suspense fallback={<TabLoadingFallback />}>
+            <ConsentControls
+              settings={settings}
+              onNotificationChange={handleNotificationChange}
+              onRequestDataExport={requestDataExport}
+              onRequestDataDeletion={requestDataDeletion}
+              loading={loading}
+            />
+          </Suspense>
+        </TabsContent>
+
+        {/* Cookies Tab */}
+        <TabsContent value="cookies">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Cookie Preferences
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {cookieCategories.map((category) => (
+                <div key={category.id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium">{category.name}</h4>
+                      {category.required && (
+                        <Badge variant="secondary">Required</Badge>
+                      )}
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={category.required || true}
+                      disabled={category.required}
+                      aria-label={`${category.name} cookie toggle`}
+                      className="rounded"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">{category.description}</p>
+                  <div className="flex flex-wrap gap-1">
+                    {category.cookies.map((cookie) => (
+                      <Badge key={cookie} variant="outline" className="text-xs">
+                        {cookie}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Your Rights Tab */}
+        <TabsContent value="rights">
+          <ConsentControls
+            settings={settings}
+            onNotificationChange={handleNotificationChange}
+            onRequestDataExport={requestDataExport}
+            onRequestDataDeletion={requestDataDeletion}
+            loading={loading}
+          />
+        </TabsContent>
+      </Tabs>
+
+      {/* Consent Modal */}
+      <ConsentModal
+        isOpen={showConsentModal}
+        onClose={() => setShowConsentModal(false)}
+        consentType={consentType}
+        onConsent={(granted) => {
+          handleConsentChange(consentType, granted);
+          setShowConsentModal(false);
+        }}
+      />
+    </div>
+  );
+});

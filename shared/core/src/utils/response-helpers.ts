@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { ErrorDomain } from '../observability/error-management';
-import { logger } from '../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 interface ErrorResponse {
   statusCode: number;

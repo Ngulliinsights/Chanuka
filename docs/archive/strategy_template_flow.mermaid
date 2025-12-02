@@ -1,0 +1,23 @@
+graph TD
+    A[Phase 1: Conceptual Validation] --> B{Concept<br/>Valid?}
+    B -->|Yes| C[Phase 2: Strategic Architecture]
+    B -->|No| Z[Stop or Reconceptualize]
+    C --> D{Strategy<br/>Sound?}
+    D -->|Yes| E[Phase 3: Operational Design]
+    D -->|No| Z
+    E --> F{Operations<br/>Ready?}
+    F -->|Yes| G[Phase 4: Pilot Execution]
+    F -->|No| E
+    G --> H{Pilot<br/>Success?}
+    H -->|Yes| I[Phase 5: Scaled Execution]
+    H -->|Refine| E
+    H -->|No| Z
+    I --> J[Continuous Improvement]
+    J --> K[Exit/Value Realization]
+    
+    style A fill:#e1f5ff
+    style C fill:#e1f5ff
+    style E fill:#ffe1f5
+    style G fill:#fff5e1
+    style I fill:#e1ffe1
+    style Z fill:#ffe1e1

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { MiddlewareProvider } from '/types';
-import { Services } from '/types/services';
-import { logger } from '../../observability/logging';
+import { MiddlewareProvider } from '../../types';
+import { Services } from '../../types/services';
+// import { logger } from '../observability/logging'; // Unused import
 
 export class AuthMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'auth';

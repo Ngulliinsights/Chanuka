@@ -4,16 +4,12 @@
  * Manages saved searches with email alert configuration and execution.
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Search,
   Star,
-  Mail,
   Play,
-  Edit,
   Trash2,
-  Plus,
-  Settings,
   Bell,
   BellOff
 } from 'lucide-react';
@@ -22,15 +18,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useSavedSearches } from '../hooks/useSearch';
 import { intelligentSearch } from '../services/intelligent-search';
 import { format } from 'date-fns';
-import type { SavedSearch } from '@client/types';
+import type { SavedSearch } from '../types';
 
 interface SavedSearchesProps {
   onExecuteSearch?: (search: SavedSearch) => void;
@@ -104,7 +99,7 @@ export function SavedSearches({
     try {
       await intelligentSearch.saveSearchWithAlerts({
         name: selectedSearch.name,
-        query: selectedSearch.query,
+        query: selectedSearch.query as any,
         emailAlerts: alertConfig,
         isPublic: selectedSearch.is_public
       });
@@ -171,7 +166,7 @@ export function SavedSearches({
           </div>
         ) : (
           <div className="space-y-4">
-            {searches.map((search) => (
+            {searches.map((search: SavedSearch) => (
               <Card key={search.id} className="border-l-4 border-l-primary/20">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">

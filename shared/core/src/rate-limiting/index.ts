@@ -37,35 +37,35 @@ export function createMemoryStore() {
 }
 
 // Type-safe rate limiter factory function
-export function createRateLimiter(store?: any): {
+export function createRateLimiter(_store?: any): {
   check: (key: string) => Promise<{ allowed: boolean; remaining: number; resetAt: Date }>;
   reset: (key: string) => Promise<void>;
 } {
-  const rateLimitStore = store || createMemoryStore();
+  // const _rateLimitStore = store || createMemoryStore();
   return {
-    check: async (key: string) => ({ 
+    check: async (_key: string) => ({ 
       allowed: true, 
       remaining: 100, 
       resetAt: new Date(Date.now() + 15 * 60 * 1000) 
     }),
-    reset: async (key: string) => {
+    reset: async (_key: string) => {
       // Reset implementation would go here
     }
   };
 }
 
-export function createAIRateLimiter(store?: any): {
+export function createAIRateLimiter(_store?: any): {
   check: (key: string, cost?: number) => Promise<{ allowed: boolean; remaining: number; resetAt: Date }>;
   reset: (key: string) => Promise<void>;
 } {
-  const rateLimitStore = store || createMemoryStore();
+  // const _rateLimitStore = store || createMemoryStore();
   return {
-    check: async (key: string, cost: number = 1) => ({ 
+    check: async (_key: string, _cost: number = 1) => ({ 
       allowed: true, 
       remaining: 100, 
       resetAt: new Date(Date.now() + 15 * 60 * 1000) 
     }),
-    reset: async (key: string) => {
+    reset: async (_key: string) => {
       // Reset implementation would go here
     }
   };

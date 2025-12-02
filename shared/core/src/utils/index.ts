@@ -63,7 +63,7 @@ export * from './formatting';
 export * from './images/image-utils';
 
 // Form testing utilities (only in test environment)
-export * as FormTesting from '@shared/testing/form/form-testing-utils';
+export * as FormTesting from '../testing/form/form-testing-utils';
 
 // ==================== Backward Compatibility ====================
 

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api';
 import { notificationService } from "./notification-service";
 import { authenticateToken as requireAuth } from '@server/middleware/auth';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 
 export const router: Router = Router();
 

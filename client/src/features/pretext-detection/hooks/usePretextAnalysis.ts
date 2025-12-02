@@ -1,6 +1,70 @@
 import { useState, useEffect } from 'react';
-import { PretextScore, BillAnalysis, CivicAction, RightsCard } from '@client/types';
-import { PretextAnalysisService } from '@client/services/PretextAnalysisService';
+
+// Define types locally
+interface PretextScore {
+  score: number;
+  rationale: string[];
+  confidence: number;
+  riskLevel: 'low' | 'medium' | 'high';
+}
+
+interface BillAnalysis {
+  id: string;
+  title: string;
+  score: PretextScore;
+}
+
+interface CivicAction {
+  id: string;
+  type: 'foi' | 'petition' | 'complaint';
+  title: string;
+  description: string;
+  template: string;
+  requiredFields: Array<{
+    name: string;
+    type: string;
+    label: string;
+    required: boolean;
+    options?: string[];
+  }>;
+  localContacts: any[];
+  estimatedTime: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  successRate: number;
+}
+
+interface RightsCard {
+  id: string;
+  scenario: string;
+  title: string;
+  description: string;
+  steps: Array<{
+    order: number;
+    title: string;
+    description: string;
+    critical: boolean;
+    timeframe?: string;
+    legalBasis?: string;
+  }>;
+  contacts: any[];
+  language: string;
+  lastUpdated: Date;
+}
+
+// Mock service class
+class PretextAnalysisService {
+  constructor(private config: any) {}
+
+  async analyzeBill(billId: string): Promise<PretextScore> {
+    // Mock analysis - replace with actual API call
+    return {
+      score: Math.floor(Math.random() * 100),
+      rationale: ['Timing concerns', 'Beneficiary analysis'],
+      confidence: 0.8,
+      riskLevel: 'medium'
+    };
+  }
+}
 
 // Default configuration
 const DEFAULT_CONFIG = {

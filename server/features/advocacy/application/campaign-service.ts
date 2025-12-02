@@ -7,7 +7,7 @@ import { Campaign, NewCampaign } from '@shared/domain/entities/campaign.js';
 import { CampaignDomainService } from '@shared/domain/services/campaign-domain-service.js';
 import { CampaignFilters, PaginationOptions, CampaignMetrics } from '@server/types/index.ts';
 import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors.js';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 export class CampaignService {
   constructor(

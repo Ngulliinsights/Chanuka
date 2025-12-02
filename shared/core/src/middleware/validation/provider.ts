@@ -1,7 +1,7 @@
-import { MiddlewareProvider } from '/types';
-import { ValidationService } from '/services/validation';
+// import { MiddlewareProvider } from '../../types';
+import { CoreValidationService as ValidationService } from '../../validation/core/validation-service';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 export class ValidationMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'validation';

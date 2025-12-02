@@ -7,15 +7,36 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Clock, TrendingUp, FileText, Star, ArrowRight } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Input } from '../../../components/ui/input';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Badge } from '../../../components/ui/badge';
+import { Button } from '../../../components/ui/button';
+import { Separator } from '../../../components/ui/separator';
 import { intelligentSearch } from '../services/intelligent-search';
-import { useDebounce } from '@/hooks/useDebounce';
-import { logger } from '@/utils/logger';
-import type { SearchSuggestion, AutocompleteResult } from '@client/types';
+import { useDebounce } from '../../../hooks/useDebounce';
+import { logger } from '../../../utils/logger';
+
+// Define types locally
+interface SearchSuggestion {
+  term: string;
+  type: 'recent' | 'popular' | 'bill_title' | 'completion';
+  frequency?: number;
+  score?: number;
+  id?: string;
+  metadata?: any;
+}
+
+interface AutocompleteResult {
+  suggestions: SearchSuggestion[];
+  facets: {
+    categories: string[];
+    sponsors: string[];
+    tags: string[];
+    statuses: string[];
+  };
+  query: string;
+  totalSuggestions: number;
+}
 
 interface IntelligentAutocompleteProps {
   onSearch: (query: string) => void;

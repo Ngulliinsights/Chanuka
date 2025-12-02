@@ -3,13 +3,14 @@
  * Tests for the consolidated privacy settings management
  */
 
+import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import PrivacySettingsSection from '@client/PrivacySettingsSection';
-import { MockUserFactory } from '@client/test-utils';
+import { FullInterface as PrivacySettingsSection } from '../../shared/privacy';
+import { MockUserFactory } from '../../../shared/testing/test-utilities';
 
 // Mock the services
 const mockPrivacyService = {
@@ -55,6 +56,8 @@ describe('PrivacySettingsSection', () => {
     email: 'john@example.com',
   });
 
+  const mockOnSettingsChange = vi.fn();
+
   const mockPrivacySettings = {
     dataSharing: {
       analytics: true,
@@ -95,7 +98,7 @@ describe('PrivacySettingsSection', () => {
     it('displays current privacy settings', async () => {
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         expect(screen.getByRole('checkbox', { name: /analytics data sharing/i })).toBeChecked();
@@ -107,7 +110,7 @@ describe('PrivacySettingsSection', () => {
     it('organizes settings into logical sections', async () => {
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         expect(screen.getByRole('heading', { name: /data sharing/i })).toBeInTheDocument();
@@ -124,7 +127,7 @@ describe('PrivacySettingsSection', () => {
 
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       expect(screen.getByTestId('privacy-settings-loading')).toBeInTheDocument();
     });
@@ -140,7 +143,7 @@ describe('PrivacySettingsSection', () => {
         data: { ...mockPrivacySettings, dataSharing: { ...mockPrivacySettings.dataSharing, marketing: true } },
       });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const marketingCheckbox = screen.getByRole('checkbox', { name: /marketing data sharing/i });
@@ -167,7 +170,7 @@ describe('PrivacySettingsSection', () => {
         data: mockPrivacySettings,
       });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const profileVisibility = screen.getByRole('combobox', { name: /profile visibility/i });
@@ -191,7 +194,7 @@ describe('PrivacySettingsSection', () => {
       
       mockPrivacyService.updatePrivacySettings.mockRejectedValue(new Error('Update failed'));
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const marketingCheckbox = screen.getByRole('checkbox', { name: /marketing data sharing/i });
@@ -218,7 +221,7 @@ describe('PrivacySettingsSection', () => {
         data: mockPrivacySettings,
       });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const marketingCheckbox = screen.getByRole('checkbox', { name: /marketing data sharing/i });
@@ -247,7 +250,7 @@ describe('PrivacySettingsSection', () => {
         data: { downloadUrl: 'https://example.com/export.zip' },
       });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       const exportButton = screen.getByRole('button', { name: /export my data/i });
       await user.click(exportButton);
@@ -267,7 +270,7 @@ describe('PrivacySettingsSection', () => {
         success: true,
       });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       const deleteButton = screen.getByRole('button', { name: /delete my data/i });
       await user.click(deleteButton);
@@ -292,7 +295,7 @@ describe('PrivacySettingsSection', () => {
         data: { requestId: 'req-123' },
       });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       const requestButton = screen.getByRole('button', { name: /submit data request/i });
       await user.click(requestButton);
@@ -324,7 +327,7 @@ describe('PrivacySettingsSection', () => {
         },
       });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       const reportTab = screen.getByRole('tab', { name: /data usage report/i });
       await userEvent.setup().click(reportTab);
@@ -342,7 +345,7 @@ describe('PrivacySettingsSection', () => {
     it('displays cookie preferences', async () => {
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         expect(screen.getByRole('checkbox', { name: /essential cookies/i })).toBeChecked();
@@ -356,7 +359,7 @@ describe('PrivacySettingsSection', () => {
       const user = userEvent.setup();
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const essentialCookies = screen.getByRole('checkbox', { name: /essential cookies/i });
@@ -368,7 +371,7 @@ describe('PrivacySettingsSection', () => {
       const user = userEvent.setup();
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const infoButton = screen.getByRole('button', { name: /cookie info/i });
@@ -387,7 +390,7 @@ describe('PrivacySettingsSection', () => {
       const user = userEvent.setup();
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       // Should start with settings tab
       expect(screen.getByRole('tab', { name: /settings/i })).toHaveAttribute('aria-selected', 'true');
@@ -409,7 +412,7 @@ describe('PrivacySettingsSection', () => {
         data: mockPrivacySettings,
       });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       // Switch to cookies tab
       const cookiesTab = screen.getByRole('tab', { name: /cookies/i });
@@ -428,7 +431,7 @@ describe('PrivacySettingsSection', () => {
     it('has proper form labels and descriptions', async () => {
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const checkboxes = screen.getAllByRole('checkbox');
@@ -441,7 +444,7 @@ describe('PrivacySettingsSection', () => {
     it('provides clear explanations for privacy options', async () => {
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         expect(screen.getByText(/analytics data helps us improve/i)).toBeInTheDocument();
@@ -453,7 +456,7 @@ describe('PrivacySettingsSection', () => {
       const user = userEvent.setup();
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const firstCheckbox = screen.getByRole('checkbox', { name: /analytics data sharing/i });
@@ -471,7 +474,7 @@ describe('PrivacySettingsSection', () => {
     it('has proper heading hierarchy', async () => {
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const mainHeading = screen.getByRole('heading', { level: 2, name: /privacy settings/i });
@@ -489,7 +492,7 @@ describe('PrivacySettingsSection', () => {
 
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         expect(screen.getByText(/failed to load privacy settings/i)).toBeInTheDocument();
@@ -503,7 +506,7 @@ describe('PrivacySettingsSection', () => {
 
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         const retryButton = screen.getByRole('button', { name: /retry/i });
@@ -524,7 +527,7 @@ describe('PrivacySettingsSection', () => {
     it('displays privacy policy links', () => {
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       expect(screen.getByRole('link', { name: /privacy policy/i })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /terms of service/i })).toBeInTheDocument();
@@ -533,7 +536,7 @@ describe('PrivacySettingsSection', () => {
     it('shows consent timestamps', async () => {
       const TestWrapper = createTestWrapper();
       
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       await waitFor(() => {
         expect(screen.getByText(/consent given on/i)).toBeInTheDocument();
@@ -546,7 +549,7 @@ describe('PrivacySettingsSection', () => {
       
       mockGDPRService.revokeConsent.mockResolvedValue({ success: true });
 
-      render(<PrivacySettingsSection user={mockUser} />, { wrapper: TestWrapper });
+      render(<PrivacySettingsSection settings={mockPrivacySettings} onSettingsChange={mockOnSettingsChange} />, { wrapper: TestWrapper });
 
       const revokeButton = screen.getByRole('button', { name: /withdraw consent/i });
       await user.click(revokeButton);

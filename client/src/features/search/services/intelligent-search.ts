@@ -13,17 +13,58 @@
  */
 
 import Fuse, { type IFuseOptions } from 'fuse.js';
-import { searchApiClient } from '@client/core/api/search';
-import { logger } from '@/utils/logger';
-import type {
-  SearchResult,
-  SearchSuggestion,
-  AutocompleteResult,
-  SavedSearch,
-  SearchAnalytics,
-  SearchHighlight,
-  SearchQuery
-} from '@client/types';
+import { searchApiClient } from '../../../core/api/search';
+import { logger } from '../../../utils/logger';
+import type { SearchResult, SearchMetadata } from '../types';
+
+interface SearchSuggestion {
+  term: string;
+  type: string;
+  frequency?: number;
+  score?: number;
+  id?: string;
+  metadata?: any;
+}
+
+interface AutocompleteResult {
+  suggestions: SearchSuggestion[];
+  facets: {
+    categories: string[];
+    sponsors: string[];
+    tags: string[];
+    statuses: string[];
+  };
+  query: string;
+  totalSuggestions: number;
+}
+
+interface SavedSearch {
+  id: string;
+  name: string;
+  query: any;
+  createdAt: string;
+}
+
+interface SearchAnalytics {
+  totalSearches: number;
+  popularQueries: string[];
+  avgResponseTime: number;
+}
+
+interface SearchHighlight {
+  field: string;
+  snippet: string;
+  positions: Array<{ start: number; end: number }>;
+}
+
+interface SearchQuery {
+  q: string;
+  type?: 'bills' | 'users' | 'comments' | 'all';
+  sort?: 'relevance' | 'date' | 'popularity';
+  limit?: number;
+  offset?: number;
+  filters?: Record<string, any>;
+}
 
 // ============================================================================
 // Type Definitions

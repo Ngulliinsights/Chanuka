@@ -6,7 +6,7 @@
 
 import {
   pgTable, text, integer, timestamp, jsonb, numeric, uuid, varchar,
-  index, uniqueIndex, boolean, date, check
+  index, uniqueIndex, boolean, date
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
@@ -857,7 +857,7 @@ export const billImpactMetricsRelations = relations(bill_impact_metrics, ({ one 
   }),
 }));
 
-export const countyEngagementStatsRelations = relations(county_engagement_stats, ({ one }) => ({
+export const countyEngagementStatsRelations = relations(county_engagement_stats, ({ }) => ({
   // Note: kenyanCountyEnum is an enum, not a table, so this relation is conceptual
   // The actual constraint is enforced by the enum type
 }));
@@ -869,7 +869,7 @@ export const userEngagementSummaryRelations = relations(user_engagement_summary,
   }),
 }));
 
-export const contentPerformanceRelations = relations(content_performance, ({ one }) => ({
+export const contentPerformanceRelations = relations(content_performance, ({ }) => ({
   // Polymorphic relationship - content_id can reference different tables
   // based on content_type. Implement specific relations in application code.
 }));

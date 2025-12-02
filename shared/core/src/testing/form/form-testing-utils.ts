@@ -31,7 +31,7 @@ export interface FormTestConfig {
 }
 
 export class FormTestingUtils {
-  static async fillField(field: FormField, value: string | number) {
+  static async fillField(_field: FormField, _value: string | number) {
     // Implementation would be environment specific (DOM, React Testing Library, etc.)
     throw new Error('fillField must be implemented by a testing framework adapter');
   }
@@ -44,19 +44,19 @@ export class FormTestingUtils {
     }
   }
 
-  static async testFormSubmission(fields: FormField[], config: FormTestConfig) {
-    await this.fillForm(fields);
+  static async testFormSubmission(_fields: FormField[], _config: FormTestConfig) {
+    await this.fillForm(_fields);
     // Implementation for form submission testing
     throw new Error('testFormSubmission must be implemented by a testing framework adapter');
   }
 
-  static async testFieldValidation(field: FormField, invalidValue: any, expectedError: string) {
-    await this.fillField(field, invalidValue);
+  static async testFieldValidation(_field: FormField, _invalidValue: any, _expectedError: string) {
+    await this.fillField(_field, _invalidValue);
     // Implementation for validation testing
     throw new Error('testFieldValidation must be implemented by a testing framework adapter');
   }
 
-  static async testFormAccessibility(fields: FormField[]) {
+  static async testFormAccessibility(_fields: FormField[]) {
     // Implementation for accessibility testing
     throw new Error('testFormAccessibility must be implemented by a testing framework adapter');
   }

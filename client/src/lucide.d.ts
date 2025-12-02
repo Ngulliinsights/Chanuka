@@ -49,5 +49,6 @@ declare module 'lucide-react' {
   export const Play: LucideIcon;
   export const BellOff: LucideIcon;
   export const ArrowRight: LucideIcon;
+  export const Video: LucideIcon;
   // Add more icons as needed
 }

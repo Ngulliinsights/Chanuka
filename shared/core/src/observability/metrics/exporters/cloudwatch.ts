@@ -1,4 +1,5 @@
-import { Metric } from '/types';
+// import { Metric } from '../../../types';
+type Metric = any;
 import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
 
 // ==================== CloudWatch Configuration ====================
@@ -38,10 +39,10 @@ export class EnhancedCloudWatchExporter {
       retryAttempts: config.retryAttempts || 3,
       retryDelay: config.retryDelay || 1000,
       bufferSize: config.bufferSize || 1000,
-      accessKeyId: config.accessKeyId || process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: config.secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY,
-      sessionToken: config.sessionToken || process.env.AWS_SESSION_TOKEN,
-      endpoint: config.endpoint,
+      accessKeyId: config.accessKeyId || process.env.AWS_ACCESS_KEY_ID || '',
+      secretAccessKey: config.secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY || '',
+      sessionToken: config.sessionToken || process.env.AWS_SESSION_TOKEN || '',
+      endpoint: config.endpoint || '',
       storageResolution: config.storageResolution || 60, // 1 minute resolution
     };
 
@@ -271,7 +272,7 @@ export class EnhancedCloudWatchExporter {
     try {
       if (this.flushTimer) {
         clearInterval(this.flushTimer);
-        this.flushTimer = undefined;
+        this.flushTimer = undefined as any;
       }
 
       // Final flush

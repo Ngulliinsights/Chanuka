@@ -14,25 +14,31 @@ import {
   MessageSquare,
   Share2,
   Bookmark,
-  Filter,
-  SortAsc,
-  SortDesc,
-  Grid,
-  List,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  LayoutGrid,
+  LayoutList,
   Download,
   MoreHorizontal
 } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
-import type { SearchResult, SearchResponse } from '@client/types';
-import type { CombinedSearchResult } from '@client/services/intelligent-search';
+import type { SearchResult } from '../types';
+import type { CombinedSearchResult } from '../services/intelligent-search';
+
+// Type definition for search highlights
+interface SearchHighlight {
+  field: string;
+  text: string;
+  score?: number;
+}
 
 interface SearchResultsProps {
   results: CombinedSearchResult | null;
@@ -63,47 +69,52 @@ export function SearchResults({
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
-  // Sort and filter results
+  // Sort and filter results based on user preferences
   const processedResults = useMemo(() => {
     if (!results?.results) return [];
 
     let filtered = results.results;
 
-    // Filter by type if selected
+    // Apply type filtering if any types are selected
     if (selectedTypes.length > 0) {
       filtered = filtered.filter(result => selectedTypes.includes(result.type));
     }
 
-    // Sort results
+    // Sort the filtered results according to the selected criteria
     const sorted = [...filtered].sort((a, b) => {
       let comparison = 0;
 
       switch (sortBy) {
         case 'relevance':
+          // Higher relevance scores should appear first
           comparison = a.relevanceScore - b.relevanceScore;
           break;
         case 'date':
+          // Compare timestamps to sort by date
           const dateA = new Date(a.metadata.created_at || 0).getTime();
           const dateB = new Date(b.metadata.created_at || 0).getTime();
           comparison = dateA - dateB;
           break;
         case 'title':
+          // Alphabetical sorting by title
           comparison = a.title.localeCompare(b.title);
           break;
         case 'engagement':
+          // Calculate total engagement as views plus comments
           const engagementA = (a.metadata.view_count || 0) + (a.metadata.comment_count || 0);
           const engagementB = (b.metadata.view_count || 0) + (b.metadata.comment_count || 0);
           comparison = engagementA - engagementB;
           break;
       }
 
+      // Reverse comparison for descending order
       return sortOrder === 'desc' ? -comparison : comparison;
     });
 
     return sorted;
   }, [results, sortBy, sortOrder, selectedTypes]);
 
-  // Get available result types for filtering
+  // Extract unique result types and count occurrences for the filter dropdown
   const availableTypes = useMemo(() => {
     if (!results?.results) return [];
     
@@ -115,27 +126,45 @@ export function SearchResults({
     }));
   }, [results]);
 
-  // Highlight search terms in text
-  const highlightText = (text: string, highlights: string[] = []): React.ReactNode => {
-    if (!highlights.length) return text;
+  // Helper function to extract highlight terms from SearchHighlight objects
+  const extractHighlightTerms = (highlights: SearchHighlight[] | string[]): string[] => {
+    if (!highlights || highlights.length === 0) return [];
+    
+    // Check if highlights are objects or strings
+    if (typeof highlights[0] === 'string') {
+      return highlights as string[];
+    }
+    
+    // Extract text from SearchHighlight objects
+    return (highlights as SearchHighlight[]).map(h => h.text);
+  };
+
+  // Highlight matching search terms within text content
+  const highlightText = (text: string, highlights: SearchHighlight[] | string[] = []): React.ReactNode => {
+    const terms = extractHighlightTerms(highlights);
+    
+    if (!terms.length) return text;
 
     let highlightedText = text;
-    highlights.forEach(highlight => {
+    
+    // Replace each search term with a marked version for visual emphasis
+    terms.forEach(highlight => {
+      // Escape special regex characters to handle terms like "C++" safely
       const regex = new RegExp(`(${highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      highlightedText = highlightedText.replace(regex, '<mark>$1</mark>');
+      highlightedText = highlightedText.replace(regex, '<mark class="bg-yellow-200 px-0.5">$1</mark>');
     });
 
     return <span dangerouslySetInnerHTML={{ __html: highlightedText }} />;
   };
 
-  // Get relevance score color
+  // Determine the color coding for relevance scores
   const getRelevanceColor = (score: number): string => {
     if (score >= 80) return 'text-green-600';
     if (score >= 60) return 'text-yellow-600';
     return 'text-red-600';
   };
 
-  // Get result type icon
+  // Map result types to appropriate emoji icons
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'bill':
@@ -149,7 +178,7 @@ export function SearchResults({
     }
   };
 
-  // Render loading skeleton
+  // Render skeleton loaders while data is being fetched
   const renderSkeleton = () => (
     <div className="space-y-4">
       {Array.from({ length: 5 }).map((_, index) => (
@@ -175,8 +204,8 @@ export function SearchResults({
     </div>
   );
 
-  // Render single result
-  const renderResult = (result: SearchResult, index: number) => (
+  // Render an individual search result card
+  const renderResult = (result: SearchResult) => (
     <Card
       key={`${result.type}-${result.id}`}
       className="hover:shadow-md transition-shadow cursor-pointer"
@@ -184,7 +213,7 @@ export function SearchResults({
     >
       <CardContent className="p-4">
         <div className="space-y-3">
-          {/* Header with type, relevance, and actions */}
+          {/* Header row with type badge, relevance score, and action menu */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-lg">{getTypeIcon(result.type)}</span>
@@ -199,6 +228,7 @@ export function SearchResults({
               </div>
             </div>
 
+            {/* Dropdown menu for save and share actions */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm">
@@ -228,17 +258,17 @@ export function SearchResults({
             </DropdownMenu>
           </div>
 
-          {/* Title */}
+          {/* Result title with search term highlighting */}
           <h3 className="font-semibold text-lg leading-tight">
             {highlightText(result.title, result.highlights)}
           </h3>
 
-          {/* Content/Excerpt */}
+          {/* Content excerpt with search term highlighting */}
           <p className="text-muted-foreground text-sm leading-relaxed">
             {highlightText(result.excerpt || result.content, result.highlights)}
           </p>
 
-          {/* Metadata */}
+          {/* Metadata row showing date, views, comments, and status */}
           <div className="flex items-center space-x-4 text-xs text-muted-foreground">
             {result.metadata.created_at && (
               <div className="flex items-center space-x-1">
@@ -247,14 +277,14 @@ export function SearchResults({
               </div>
             )}
             
-            {result.metadata.view_count && (
+            {result.metadata.view_count !== undefined && (
               <div className="flex items-center space-x-1">
                 <Eye className="h-3 w-3" />
                 <span>{result.metadata.view_count.toLocaleString()} views</span>
               </div>
             )}
             
-            {result.metadata.comment_count && (
+            {result.metadata.comment_count !== undefined && (
               <div className="flex items-center space-x-1">
                 <MessageSquare className="h-3 w-3" />
                 <span>{result.metadata.comment_count} comments</span>
@@ -268,7 +298,7 @@ export function SearchResults({
             )}
           </div>
 
-          {/* Tags */}
+          {/* Tag badges if available */}
           {result.metadata.tags && result.metadata.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {result.metadata.tags.slice(0, 3).map((tag: string, tagIndex: number) => (
@@ -284,7 +314,7 @@ export function SearchResults({
             </div>
           )}
 
-          {/* Relevance Progress Bar */}
+          {/* Visual relevance score indicator */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">Relevance</span>
@@ -299,6 +329,7 @@ export function SearchResults({
     </Card>
   );
 
+  // Show loading state with skeleton placeholders
   if (isLoading) {
     return (
       <div className={className}>
@@ -307,6 +338,7 @@ export function SearchResults({
     );
   }
 
+  // Show error message if search failed
   if (error) {
     return (
       <Card className={className}>
@@ -318,6 +350,7 @@ export function SearchResults({
     );
   }
 
+  // Show empty state when no results are found
   if (!results || processedResults.length === 0) {
     return (
       <Card className={className}>
@@ -334,7 +367,7 @@ export function SearchResults({
 
   return (
     <div className={className}>
-      {/* Results Header */}
+      {/* Results header with count, timing, and controls */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
           <h2 className="text-lg font-semibold">
@@ -344,7 +377,7 @@ export function SearchResults({
             {results.searchTime}ms
           </Badge>
           
-          {/* Engine Performance */}
+          {/* Show search engine performance metrics if multiple engines were used */}
           {results.engines.length > 1 && (
             <div className="flex items-center space-x-2">
               {results.engines.map(engine => (
@@ -356,8 +389,9 @@ export function SearchResults({
           )}
         </div>
 
+        {/* Control panel for filtering, sorting, and viewing options */}
         <div className="flex items-center space-x-2">
-          {/* Type Filter */}
+          {/* Type filter dropdown - only shown when multiple types exist */}
           {availableTypes.length > 1 && (
             <Select
               value={selectedTypes.join(',')}
@@ -377,7 +411,7 @@ export function SearchResults({
             </Select>
           )}
 
-          {/* Sort Options */}
+          {/* Sort criteria selector */}
           <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
             <SelectTrigger className="w-32">
               <SelectValue />
@@ -390,15 +424,16 @@ export function SearchResults({
             </SelectContent>
           </Select>
 
+          {/* Sort direction toggle button */}
           <Button
             variant="outline"
             size="sm"
             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
           >
-            {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+            {sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
           </Button>
 
-          {/* View Mode */}
+          {/* View mode toggle between list and grid layouts */}
           <div className="flex border rounded-md">
             <Button
               variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -406,7 +441,7 @@ export function SearchResults({
               onClick={() => setViewMode('list')}
               className="rounded-r-none"
             >
-              <List className="h-4 w-4" />
+              <LayoutList className="h-4 w-4" />
             </Button>
             <Button
               variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -414,11 +449,11 @@ export function SearchResults({
               onClick={() => setViewMode('grid')}
               className="rounded-l-none"
             >
-              <Grid className="h-4 w-4" />
+              <LayoutGrid className="h-4 w-4" />
             </Button>
           </div>
 
-          {/* Export */}
+          {/* Export functionality dropdown */}
           {onExportResults && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -440,7 +475,7 @@ export function SearchResults({
         </div>
       </div>
 
-      {/* Search Suggestions */}
+      {/* Search suggestions section - helps users refine their search */}
       {results.suggestions.length > 0 && (
         <Card className="mb-6">
           <CardContent className="p-4">
@@ -456,12 +491,10 @@ export function SearchResults({
         </Card>
       )}
 
-      {/* Results List */}
+      {/* Results display area - adapts layout based on view mode */}
       <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
-        {processedResults.map((result, index) => renderResult(result, index))}
+        {processedResults.map((result) => renderResult(result))}
       </div>
-
-      {/* Load More / Pagination could go here */}
     </div>
   );
 }

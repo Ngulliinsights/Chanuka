@@ -3,8 +3,8 @@
 // ============================================================================
 // Comprehensive performance monitoring, optimization, and alerting
 
-import { logger } from '@shared/core/index.js';
-import { cache } from '@shared/core/index.js';
+import { logger } from '@shared/core';
+import { cache } from '@shared/core';
 
 export interface PerformanceMetric {
   id: string;

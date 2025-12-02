@@ -17,7 +17,7 @@ import { describe, it, expect } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import coverageRouter from '@server/features/coverage/coverage-routes';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('Coverage Integration Tests', () => {
   let app: express.Application;

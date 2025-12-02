@@ -29,7 +29,7 @@ import { createServer } from 'http';
 import path from 'path';
 import fs from 'fs';
 import { setupVite } from '../../vite.js';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('Frontend Serving Integration Tests', () => {
   let app: express.Application;

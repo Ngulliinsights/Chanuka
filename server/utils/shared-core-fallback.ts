@@ -4,7 +4,7 @@
  */
 
 // Import logger from shared/core
-export { logger } from '@shared/core/src/index.js';
+export { logger } from '@shared/core';
 
 // Performance monitoring fallback
 export class Performance {

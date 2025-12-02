@@ -6,7 +6,7 @@
 
 import { z } from 'zod';
 import { emailSchema, passwordSchema, strongPasswordSchema, phoneSchema, nameSchema } from './common';
-import { logger } from '../../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 import { isAgeBetween } from '../helpers';
 /**

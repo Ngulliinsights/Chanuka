@@ -1,4 +1,4 @@
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 // Replace with actual import/client for your ML service
 // import { MlApiClient } from 'some-ml-client';
 

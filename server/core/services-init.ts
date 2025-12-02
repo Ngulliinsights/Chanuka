@@ -12,7 +12,7 @@
  */
 
 import type { Pool as PoolType } from 'pg';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 import { getDbInstance } from '@shared/infrastructure/database/index.js';
 
 // Import initialization modules

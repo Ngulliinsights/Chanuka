@@ -56,12 +56,31 @@ export default function BillDetail() {
       try {
         setLoading(true);
         
-        // Mock bill data - in production, this would be an API call
+        // Demo bill data - using realistic legislative examples for investor presentation
+        const demoBills = {
+          '1': {
+            id: 1,
+            billNumber: 'HB-2024-001',
+            title: 'Digital Privacy Protection and Data Rights Act',
+            summary: 'A comprehensive bill to protect digital privacy rights, regulate data collection and processing by technology companies, and establish a framework for individual data ownership and control. This legislation aims to give citizens greater control over their personal information while promoting innovation in the digital economy.',
+          },
+          '2': {
+            id: 2,
+            billNumber: 'SB-2024-042',
+            title: 'Climate Action and Renewable Energy Transition Act',
+            summary: 'Establishes a comprehensive framework for transitioning to renewable energy sources, reducing carbon emissions by 50% by 2030, and creating green jobs. Includes provisions for carbon pricing, renewable energy incentives, and just transition support for affected communities.',
+          },
+          '3': {
+            id: 3,
+            billNumber: 'HB-2024-078',
+            title: 'Healthcare Access and Affordability Enhancement Act',
+            summary: 'Expands healthcare access through public option programs, reduces prescription drug costs through Medicare negotiation, and strengthens community health centers. Aims to reduce healthcare costs by 25% while improving access for underserved populations.',
+          }
+        };
+        
+        const selectedBill = demoBills[id as keyof typeof demoBills] || demoBills['1'];
         const mockBill: Bill = {
-          id: parseInt(id),
-          billNumber: `HB-2024-${id.padStart(3, '0')}`,
-          title: 'Digital Privacy Protection and Data Rights Act',
-          summary: 'A comprehensive bill to protect digital privacy rights, regulate data collection and processing by technology companies, and establish a framework for individual data ownership and control. This legislation aims to give citizens greater control over their personal information while promoting innovation in the digital economy.',
+          ...selectedBill,
           status: BillStatus.INTRODUCED,
           urgencyLevel: UrgencyLevel.HIGH,
           introducedDate: '2024-01-15T00:00:00Z',

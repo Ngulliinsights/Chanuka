@@ -11,7 +11,7 @@ import {
   useRef,
   useCallback,
 } from 'react';
-import { logger } from '@client/utils/logger';
+import { logger } from '../../../utils/logger';
 import {
   User,
   RegisterData,
@@ -24,11 +24,11 @@ import {
   DataExportRequest,
   DataDeletionRequest,
 } from '../types/auth';
-import { LoginCredentials } from '@client/core/api/auth';
-import { sessionManager } from '@client/utils/session-manager';
-import { authApiService as authService } from '@client/core/api';
-import { useAppDispatch, useAppSelector } from '@client/store/hooks';
-import * as authActions from '@client/store/slices/authSlice';
+import { LoginCredentials } from '../../../core/api/auth';
+import { sessionManager } from '../../../utils/session-manager';
+import { authApiService as authService } from '../../../core/api';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import * as authActions from '../../../store/slices/authSlice';
 
 /**
  * Comprehensive authentication context interface.

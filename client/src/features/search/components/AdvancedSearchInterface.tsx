@@ -19,22 +19,41 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { intelligentSearch } from '@client/services/intelligent-search';
-import { useToast } from '@/hooks/use-toast';
-import type { DualSearchRequest } from '@client/services/intelligent-search';
-import type { SearchFilters, AdvancedSearchOptions } from '@client/types';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Badge } from '../../../components/ui/badge';
+import { Switch } from '../../../components/ui/switch';
+import { Textarea } from '../../../components/ui/textarea';
+import { Separator } from '../../../components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../components/ui/collapsible';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog';
+import { intelligentSearch } from '../services/intelligent-search';
+import { useToast } from '../../../hooks/use-toast';
+import type { DualSearchRequest } from '../services/intelligent-search';
+
+// Define types locally
+interface SearchFilters {
+  billStatus?: string[];
+  categories?: string[];
+  sponsors?: string[];
+  tags?: string[];
+  dateRange?: {
+    start: string;
+    end: string;
+  };
+}
+
+interface AdvancedSearchOptions {
+  exactPhrase?: boolean;
+  excludeWords?: string[];
+  fuzzyMatching?: boolean;
+  proximity?: number;
+  dateBoost?: 'recent' | 'none';
+}
 
 interface SearchField {
   id: string;

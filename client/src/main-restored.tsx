@@ -1,7 +1,7 @@
-import { createRoot } from "react-dom/client";
-import React from "react";
-import App from "./App";
-import "./index.css";
+import { createRoot } from 'react-dom/client';
+import React from 'react';
+import App from './App';
+import './index.css';
 
 // Import essential utilities but skip complex initialization
 import { logger } from '@client/utils/logger';
@@ -9,8 +9,12 @@ import { logger } from '@client/utils/logger';
 // Simple polyfill setup
 (function ensureProcessEnv() {
   try {
-    const mode = (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.MODE) ||
-      (typeof (import.meta as any).env?.VITE_NODE_ENV !== 'undefined' && (import.meta as any).env.VITE_NODE_ENV) ||
+    const mode =
+      (typeof import.meta !== 'undefined' &&
+        (import.meta as any).env &&
+        (import.meta as any).env.MODE) ||
+      (typeof (import.meta as any).env?.VITE_NODE_ENV !== 'undefined' &&
+        (import.meta as any).env.VITE_NODE_ENV) ||
       'development';
 
     if (typeof (globalThis as any).process === 'undefined') {
@@ -29,20 +33,27 @@ import { logger } from '@client/utils/logger';
 })();
 
 // Suppress browser extension errors
-window.addEventListener('error', (event) => {
+window.addEventListener('error', event => {
   if (event.message && event.message.includes('chrome-extension://')) {
     event.preventDefault();
     return false;
   }
-  if (event.message && event.message.includes('message channel closed before a response was received')) {
+  if (
+    event.message &&
+    event.message.includes('message channel closed before a response was received')
+  ) {
     event.preventDefault();
     return false;
   }
 });
 
-window.addEventListener('unhandledrejection', (event) => {
-  if (event.reason && typeof event.reason === 'object' && 
-      event.reason.message && event.reason.message.includes('message channel closed before a response was received')) {
+window.addEventListener('unhandledrejection', event => {
+  if (
+    event.reason &&
+    typeof event.reason === 'object' &&
+    event.reason.message &&
+    event.reason.message.includes('message channel closed before a response was received')
+  ) {
     event.preventDefault();
     return false;
   }
@@ -50,7 +61,7 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Simple loading state
 function showLoadingState(message: string) {
-  const rootElement = document.getElementById("root");
+  const rootElement = document.getElementById('root');
   if (!rootElement) return;
 
   rootElement.innerHTML = `
@@ -73,7 +84,7 @@ function showLoadingState(message: string) {
 async function initializeApp() {
   try {
     showLoadingState('Initializing application...');
-    
+
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
       await new Promise(resolve => {
@@ -82,9 +93,9 @@ async function initializeApp() {
     }
 
     showLoadingState('Setting up React application...');
-    
+
     // Get root element
-    const rootElement = document.getElementById("root");
+    const rootElement = document.getElementById('root');
     if (!rootElement) {
       throw new Error('Root element not found');
     }
@@ -92,14 +103,13 @@ async function initializeApp() {
     // Create React root and render
     const root = createRoot(rootElement);
     root.render(<App />);
-    
+
     logger.info('✅ Chanuka Platform initialized successfully', { component: 'Main' });
 
     // Initialize background services after render (non-blocking)
     setTimeout(() => {
       initializeBackgroundServices();
     }, 1000);
-
   } catch (error) {
     console.error('❌ Failed to initialize app:', error);
     showErrorState(error as Error);
@@ -142,7 +152,7 @@ async function initializeBackgroundServices() {
 
 // Error state display
 function showErrorState(error: Error) {
-  const rootElement = document.getElementById("root");
+  const rootElement = document.getElementById('root');
   if (!rootElement) return;
 
   rootElement.innerHTML = `

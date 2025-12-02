@@ -4,13 +4,13 @@
 
 import * as DOMPurify from 'dompurify';
 import * as sqlTemplate from 'sql-template-tag';
-import { logger } from '../observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 /**
  * Sanitize HTML content to prevent XSS
  */
 export function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html);
+  return (DOMPurify as any).sanitize(html);
 }
 
 /**

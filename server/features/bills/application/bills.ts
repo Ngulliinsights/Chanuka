@@ -6,11 +6,12 @@ import { NotificationChannelService } from '@/infrastructure/notifications/notif
 import { DomainEventPublisher } from '@shared/domain/events/bill-events';
 import { DatabaseService } from '@/infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
-import { Result, Ok, Err  } from '@shared/core/index.js';
+import { Result, Ok, Err } from '@shared/core';
 import { BillServiceError } from '@shared/domain/errors/bill-errors';
 import { eq, and, sql } from 'drizzle-orm';
-import { bills } from '@shared/schema/foundation';
+import { bills } from '@shared/schema';
 import { databaseService } from '@/infrastructure/database/database-service';
+import type { IBillRepository } from '../../domain/interfaces/bill-repository.interface';
 
 /**
  * Application service for bill operations
@@ -22,7 +23,8 @@ export class BillsApplicationService {
     private readonly userService: UserService,
     private readonly notificationChannelService: NotificationChannelService,
     private readonly domainEventPublisher: DomainEventPublisher,
-    private readonly databaseService: DatabaseService
+    private readonly databaseService: DatabaseService,
+    private readonly billRepository?: IBillRepository
   ) { }
 
   private get db() {
@@ -251,13 +253,23 @@ export class BillsApplicationService {
    */
   async getBillById(bill_id: string): Promise<Result<any | null, BillServiceError>> {
     try {
-      const [bill] = await this.db
-        .select()
-        .from(bills)
-        .where(eq(bills.id, bill_id))
-        .limit(1);
+      if (this.billRepository) {
+        // Use repository pattern
+        const result = await this.billRepository.findById(bill_id);
+        if (result.isErr()) {
+          return new Err(new BillServiceError('BILL_NOT_FOUND', result.error.message));
+        }
+        return new Ok(result.value);
+      } else {
+        // Fallback to direct database access
+        const [bill] = await this.db
+          .select()
+          .from(bills)
+          .where(eq(bills.id, bill_id))
+          .limit(1);
 
-      return new Ok(bill || null);
+        return new Ok(bill || null);
+      }
 
     } catch (error) {
       return new Err(new BillServiceError('BILL_NOT_FOUND', error instanceof Error ? error.message : 'Bill not found'));
@@ -274,28 +286,58 @@ export class BillsApplicationService {
     offset?: number;
   }): Promise<Result<any[], BillServiceError>> {
     try {
-      const conditions: any[] = [];
+      if (this.billRepository) {
+        // Use repository pattern
+        let result: Result<any[], Error>;
 
-      if (params.status) {
-        conditions.push(eq(bills.status, params.status));
+        if (params.status) {
+          result = await this.billRepository.findByStatus(params.status, {
+            limit: params.limit,
+            offset: params.offset
+          });
+        } else if (params.sponsor_id) {
+          result = await this.billRepository.findBySponsorId(params.sponsor_id, {
+            limit: params.limit,
+            offset: params.offset
+          });
+        } else {
+          // For now, get all bills - in a real implementation you'd have a findAll method
+          result = await this.billRepository.findByStatus('introduced', {
+            limit: params.limit || 50,
+            offset: params.offset || 0
+          });
+        }
+
+        if (result.isErr()) {
+          return new Err(new BillServiceError('BILLS_FETCH_FAILED', result.error.message));
+        }
+
+        return new Ok(result.value);
+      } else {
+        // Fallback to direct database access
+        const conditions: any[] = [];
+
+        if (params.status) {
+          conditions.push(eq(bills.status, params.status));
+        }
+
+        if (params.sponsor_id) {
+          conditions.push(eq(bills.sponsor_id, params.sponsor_id));
+        }
+
+        let query = this.db.select().from(bills);
+
+        if (conditions.length > 0) {
+          query = query.where(and(...conditions)) as any;
+        }
+
+        const result = await query
+          .limit(params.limit || 20)
+          .offset(params.offset || 0)
+          .orderBy(sql`${bills.updated_at} DESC`);
+
+        return new Ok(result);
       }
-
-      if (params.sponsor_id) {
-        conditions.push(eq(bills.sponsor_id, params.sponsor_id));
-      }
-
-      let query = this.db.select().from(bills);
-
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as any;
-      }
-
-      const result = await query
-        .limit(params.limit || 20)
-        .offset(params.offset || 0)
-        .orderBy(sql`${bills.updated_at} DESC`);
-
-      return new Ok(result);
 
     } catch (error) {
       return new Err(new BillServiceError('BILLS_FETCH_FAILED', error instanceof Error ? error.message : 'Failed to fetch bills'));

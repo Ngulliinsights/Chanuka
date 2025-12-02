@@ -4,7 +4,7 @@
 import { readDatabase } from '@shared/database';
 import { sponsors, sponsorTransparency } from "@shared/foundation";
 import { eq, desc, and, sql, count } from "drizzle-orm";
-import { cache, logger, DatabaseError  } from '@shared/core/index.js';
+import { cache, logger, DatabaseError  } from '@shared/core';
 import { FinancialDisclosureConfig } from '@shared/config';
 import { disclosureProcessingService } from './disclosure-processing.service';
 import type {

@@ -7,7 +7,7 @@ import type {
   UpdateProfileData,
   UpdatePreferencesData,
   VerificationRequest
-} from '@client/types';
+} from '../../../types';
 
 /**
  * Hook for user authentication operations

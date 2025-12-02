@@ -1,4 +1,4 @@
-import { useNavigation } from '@client/context';
+import { useNavigation } from '../context';
 import { useKeyboardFocus } from '@/hooks/use-keyboard-focus';
 import { logger } from '@/utils/logger';
 

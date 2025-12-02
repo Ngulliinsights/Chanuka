@@ -11,7 +11,7 @@ import {
   getSearchMetrics,
 } from '@shared/application/SearchService';
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 const router = Router();
 

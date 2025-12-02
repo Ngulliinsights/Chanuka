@@ -3,7 +3,7 @@
 // ============================================================================
 // Provides consistent error handling patterns across all services
 
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 export enum ErrorCategory {
   VALIDATION = 'validation',

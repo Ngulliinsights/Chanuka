@@ -14,6 +14,7 @@ import {
   Home,
   Palette,
   Menu,
+  BookOpen,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -32,6 +33,7 @@ export default function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     { name: 'Bills', href: '/bills', icon: FileText },
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
     { name: 'Community', href: '/community', icon: Users },
+    { name: 'Civic Education', href: '/civic-education', icon: BookOpen },
     { name: 'Search', href: '/search', icon: Search },
     { name: 'Test Styling', href: '/test-styling', icon: Palette },
   ];
@@ -233,6 +235,7 @@ export default function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
                   { name: 'Bills Tracker', href: '/bills' },
                   { name: 'Dashboard', href: '/dashboard' },
                   { name: 'Community', href: '/community' },
+                  { name: 'Civic Education', href: '/civic-education' },
                   { name: 'Search', href: '/search' },
                   { name: 'Analytics', href: '/analytics' },
                 ].map(item => (

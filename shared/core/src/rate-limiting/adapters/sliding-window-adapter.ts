@@ -3,13 +3,13 @@
  * Adapts the existing SlidingWindowStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '/core/interfaces';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 import { SlidingWindowStore } from '../algorithms/sliding-window';
 
 export class SlidingWindowAdapter implements RateLimitStore {
   constructor(private store: SlidingWindowStore) {}
 
-  async check(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
+  async check(_key: string, config: RateLimitConfig): Promise<RateLimitResult> {
     // SlidingWindowStore doesn't have a check method that matches our interface
     // We need to implement the logic here
     const now = Date.now();
@@ -19,13 +19,13 @@ export class SlidingWindowAdapter implements RateLimitStore {
     let timestamps: number[] = [];
 
     // Check if adding this request would exceed the limit
-    if (timestamps.length >= config.limit) {
+    if (timestamps.length >= config.max) {
       return {
         allowed: false,
         remaining: 0,
         resetAt: new Date(now + config.windowMs),
         retryAfter: Math.ceil(config.windowMs / 1000),
-        totalHits: timestamps.length,
+        // totalHits: timestamps.length, // totalHits not in RateLimitResult interface
         windowStart,
         algorithm: 'sliding-window'
       };
@@ -36,9 +36,9 @@ export class SlidingWindowAdapter implements RateLimitStore {
 
     return {
       allowed: true,
-      remaining: config.limit - timestamps.length,
+      remaining: config.max - timestamps.length,
       resetAt: new Date(now + config.windowMs),
-      totalHits: timestamps.length,
+      // totalHits: timestamps.length, // totalHits not in RateLimitResult interface
       windowStart,
       algorithm: 'sliding-window'
     };

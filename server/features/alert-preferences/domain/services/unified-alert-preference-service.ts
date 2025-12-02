@@ -6,7 +6,7 @@ import { user_profileservice } from '@/users/domain/user-profile';
 import { cacheService } from '@/infrastructure/cache';
 import * as schema from '@shared/schema';
 import { z } from 'zod';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 // ============================================================================
 // TYPE DEFINITIONS

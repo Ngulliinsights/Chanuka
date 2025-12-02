@@ -1,5 +1,4 @@
 import type { Request } from 'express';
-import { logger } from '@shared/observability/logging';
 
 // User interface
 export interface User {

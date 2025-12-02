@@ -80,7 +80,7 @@ import { privacySchedulerService } from '@server/features/privacy/privacy-schedu
 import { schemaValidationService } from '@server/core/validation/schema-validation-service';
 
 // Unified utilities
-import { logger, Performance, ApiResponse } from '@shared/core/index.js';
+import { logger, Performance, ApiResponse } from '@shared/core';
 
 // Type definitions for better error handling
 interface AppError extends Error {

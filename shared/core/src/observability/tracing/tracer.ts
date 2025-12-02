@@ -1,5 +1,5 @@
-import { randomBytes } from 'crypto';
-import { Result, Ok, Err } from '../../primitives/types';
+// Removed unused import
+// Removed unused import
 import { BaseError } from '../error-management';
 import {
   Tracer as ITracer,
@@ -10,20 +10,20 @@ import {
   SamplingRule,
   TraceExporter,
   BatchSpanProcessor,
-  TracingConfig,
+  // TracingConfig, // Unused
   DEFAULT_CONFIG,
   Resource,
   InstrumentationScope,
 } from './types';
 import { Span, createSpan, generateSpanId, generateTraceId } from './span';
-import { TraceContextManager, traceContextManager, withTraceContext, withTraceContextAsync } from './context';
+import { traceContextManager, withTraceContext, withTraceContextAsync } from './context';
 
 /**
  * Tracer implementation error
  */
 export class TracerError extends BaseError {
   constructor(message: string, cause?: Error) {
-    super(message, { statusCode: 500, code: 'TRACER_ERROR', cause, isOperational: false });
+    super(message, { statusCode: 500, code: 'TRACER_ERROR', cause: cause || new Error('Unknown cause'), isOperational: false });
   }
 }
 
@@ -38,7 +38,7 @@ export class ProbabilisticSampler {
   }
 
   shouldSample(
-    traceId: string,
+    _traceId: string,
     name: string,
     kind?: string,
     attributes?: Record<string, string | number | boolean>
@@ -138,10 +138,10 @@ export class BatchSpanProcessorImpl implements BatchSpanProcessor {
   private spans: Span[] = [];
   private exporter: TraceExporter;
   private maxBatchSize: number;
-  private maxQueueSize: number;
+  private _maxQueueSize: number = 1000;
   private exportTimeout: number;
   private scheduledDelay: number;
-  private timer?: NodeJS.Timeout;
+  private timer?: NodeJS.Timeout | null;
   private exporting = false;
 
   constructor(
@@ -155,12 +155,12 @@ export class BatchSpanProcessorImpl implements BatchSpanProcessor {
   ) {
     this.exporter = exporter;
     this.maxBatchSize = options.maxBatchSize || DEFAULT_CONFIG.MAX_BATCH_SIZE;
-    this.maxQueueSize = options.maxQueueSize || DEFAULT_CONFIG.MAX_QUEUE_SIZE;
+    this._maxQueueSize = options.maxQueueSize || DEFAULT_CONFIG.MAX_QUEUE_SIZE;
     this.exportTimeout = options.exportTimeout || DEFAULT_CONFIG.EXPORT_TIMEOUT_MS;
     this.scheduledDelay = options.scheduledDelay || DEFAULT_CONFIG.SCHEDULED_DELAY_MS;
   }
 
-  onStart(span: ISpan): void {
+  onStart(_span: ISpan): void {
     // Optional: implement span start hooks
   }
 
@@ -181,7 +181,7 @@ export class BatchSpanProcessorImpl implements BatchSpanProcessor {
   async forceFlush(): Promise<void> {
     if (this.timer) {
       clearTimeout(this.timer);
-      this.timer = undefined;
+      this.timer = null;
     }
 
     if (this.spans.length > 0) {
@@ -192,7 +192,7 @@ export class BatchSpanProcessorImpl implements BatchSpanProcessor {
   async shutdown(): Promise<void> {
     if (this.timer) {
       clearTimeout(this.timer);
-      this.timer = undefined;
+      this.timer = null;
     }
 
     if (this.spans.length > 0) {
@@ -202,7 +202,7 @@ export class BatchSpanProcessorImpl implements BatchSpanProcessor {
 
   private scheduleExport(): void {
     this.timer = setTimeout(() => {
-      this.timer = undefined;
+      this.timer = null;
       this.exportSpans();
     }, this.scheduledDelay);
   }
@@ -296,13 +296,13 @@ export class Tracer implements ITracer {
       spanId,
       name,
       {
-        kind: options.kind,
+        kind: options.kind || 'internal',
         parentSpanId: parentContext.spanId,
-        startTime: options.startTime,
+        startTime: options.startTime || new Date(),
         resource: this.resource,
         instrumentationScope: this.instrumentationScope,
-        attributes: options.attributes,
-        links: options.links,
+        attributes: options.attributes || {},
+        links: options.links || [],
       }
     );
 
@@ -351,7 +351,10 @@ export class Tracer implements ITracer {
         parentSpanId: context.parentSpanId,
         sampled: true,
       };
-      traceContextManager.setCurrentContext(traceContext);
+      traceContextManager.setCurrentContext({
+        ...traceContext,
+        parentSpanId: traceContext.parentSpanId || ''
+      });
     }
   }
 
@@ -385,7 +388,10 @@ export class Tracer implements ITracer {
       sampled: true,
     };
 
-    return withTraceContext(traceContext, () => {
+    return withTraceContext({
+      ...traceContext,
+      parentSpanId: traceContext.parentSpanId || ''
+    }, () => {
       this.setCurrentSpan(span);
       return fn();
     });
@@ -407,7 +413,10 @@ export class Tracer implements ITracer {
       sampled: true,
     };
 
-    return withTraceContextAsync(traceContext, async () => {
+    return withTraceContextAsync({
+      ...traceContext,
+      parentSpanId: traceContext.parentSpanId || ''
+    }, async () => {
       this.setCurrentSpan(span);
       return await fn();
     });
@@ -502,7 +511,7 @@ export class Tracer implements ITracer {
   /**
    * Wrap span with context management
    */
-  private withSpanContext(span: Span, traceContext: any): Span {
+  private withSpanContext(span: Span, _traceContext: any): Span {
     // Create a proxy that automatically manages context
     const proxy = new Proxy(span, {
       get: (target, prop) => {

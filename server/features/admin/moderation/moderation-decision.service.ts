@@ -11,7 +11,7 @@ import { comments,
   users
  } from '@shared/shared/schema';
 import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { 
   ModerationItem, 
   ModerationActionRecord, 

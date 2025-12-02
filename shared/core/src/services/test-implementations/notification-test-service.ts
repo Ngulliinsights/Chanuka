@@ -57,7 +57,7 @@ export class NotificationTestService implements INotificationService {
   async sendNotification(request: NotificationRequest): Promise<Result<NotificationResult, Error>> {
     try {
       // Business logic validation
-      if (!request.userId?.trim()) {
+      if (!request.user_id?.trim()) {
         return err(new Error('User ID is required'));
       }
 
@@ -70,7 +70,7 @@ export class NotificationTestService implements INotificationService {
       }
 
       // Get user preferences
-      const preferences = this.userPreferences.get(request.userId);
+      const preferences = this.userPreferences.get(request.user_id);
       if (!preferences) {
         return err(new Error(`User preferences not found for user: ${request.user_id}`));
       }
@@ -148,11 +148,11 @@ export class NotificationTestService implements INotificationService {
     categories: string[];
   }, Error>> {
     try {
-      if (!userId?.trim()) {
+      if (!user_id?.trim()) {
         return err(new Error('User ID is required'));
       }
 
-      const preferences = this.userPreferences.get(userId);
+      const preferences = this.userPreferences.get(user_id);
       if (!preferences) {
         return err(new Error(`User preferences not found for user: ${user_id}`));
       }
@@ -173,11 +173,11 @@ export class NotificationTestService implements INotificationService {
     }
   ): Promise<Result<void, Error>> {
     try {
-      if (!userId?.trim()) {
+      if (!user_id?.trim()) {
         return err(new Error('User ID is required'));
       }
 
-      const existingPreferences = this.userPreferences.get(userId);
+      const existingPreferences = this.userPreferences.get(user_id);
       if (!existingPreferences) {
         return err(new Error(`User preferences not found for user: ${user_id}`));
       }
@@ -201,7 +201,7 @@ export class NotificationTestService implements INotificationService {
         ...preferences
       };
 
-      this.userPreferences.set(userId, updatedPreferences);
+      this.userPreferences.set(user_id, updatedPreferences);
 
       return ok(undefined);
     } catch (error) {
@@ -281,7 +281,7 @@ export class NotificationTestService implements INotificationService {
     frequency: 'immediate' | 'daily' | 'weekly';
     categories: string[];
   }): void {
-    this.userPreferences.set(userId, preferences);
+    this.userPreferences.set(user_id, preferences);
   }
 }
 

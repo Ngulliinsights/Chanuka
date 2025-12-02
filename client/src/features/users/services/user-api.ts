@@ -1,25 +1,109 @@
-import { globalApiClient } from '@/core/api/client';
-import { logger } from '@client/utils/logger';
-import type {
-  User,
-  UserProfile,
-  UserPreferences,
-  LoginCredentials,
-  RegisterData,
-  UpdateProfileData,
-  UpdatePreferencesData,
-  VerificationRequest,
-  AuthResponse,
-  ProfileResponse,
-  VerificationResponse,
-  VerificationStatus,
-  SavedBillsFilters,
-  SavedBillsResponse,
-  EngagementHistoryFilters,
-  EngagementHistoryResponse,
-  EngagementAction,
-  DashboardData
-} from '@client/types';
+import { globalApiClient } from '../../../core/api/client';
+import { logger } from '../../../utils/logger';
+
+// Define types locally since they're not available in the types directory
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  avatar?: string;
+}
+
+interface UserProfile extends User {
+  bio?: string;
+  location?: string;
+  preferences?: UserPreferences;
+}
+
+interface UserPreferences {
+  theme: 'light' | 'dark';
+  notifications: boolean;
+  privacy: 'public' | 'private';
+}
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface RegisterData {
+  email: string;
+  password: string;
+  name: string;
+}
+
+interface UpdateProfileData {
+  name?: string;
+  bio?: string;
+  location?: string;
+}
+
+interface UpdatePreferencesData {
+  theme?: 'light' | 'dark';
+  notifications?: boolean;
+  privacy?: 'public' | 'private';
+}
+
+interface VerificationRequest {
+  type: 'email' | 'phone';
+  value: string;
+}
+
+interface AuthResponse {
+  user: User;
+  token: string;
+  expiresAt: string;
+}
+
+interface ProfileResponse {
+  user: UserProfile;
+}
+
+interface VerificationResponse {
+  success: boolean;
+  message: string;
+}
+
+interface VerificationStatus {
+  email: boolean;
+  phone: boolean;
+}
+
+interface SavedBillsFilters {
+  page?: number;
+  limit?: number;
+  category?: string;
+}
+
+interface SavedBillsResponse {
+  bills: any[];
+  total: number;
+  page: number;
+}
+
+interface EngagementHistoryFilters {
+  page?: number;
+  limit?: number;
+  type?: string;
+}
+
+interface EngagementHistoryResponse {
+  activities: any[];
+  total: number;
+  page: number;
+}
+
+interface EngagementAction {
+  type: string;
+  billId: number;
+  timestamp: string;
+}
+
+interface DashboardData {
+  savedBills: number;
+  trackedBills: number;
+  recentActivity: any[];
+}
 
 /**
  * Users API service - handles all user-related API calls

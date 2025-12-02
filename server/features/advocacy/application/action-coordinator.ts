@@ -6,7 +6,7 @@ import { ActionItem, NewActionItem, ActionItemEntity } from '@shared/domain/enti
 // Repository interfaces removed - using direct service calls
 import { ActionFilters, PaginationOptions, ActionTemplate } from '@server/types/index.ts';
 import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors.js';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 
 export class ActionCoordinator {
   constructor(

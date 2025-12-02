@@ -7,14 +7,16 @@
 
 import { ok, err, some, none } from '../../primitives';
 import type { Result, Maybe } from '../../primitives';
-import type { Sponsor, NewSponsor } from '@/schema/foundation';
+import type { Sponsor, NewSponsor } from '../../../../schema/foundation';
 import type { ISponsorRepository } from '../interfaces/sponsor-repository.interface';
 import type { ITestDataFactory } from '../../testing/test-data-factory';
 
 export class SponsorTestRepository implements ISponsorRepository {
   private sponsors = new Map<string, Sponsor>();
 
-  constructor(private readonly testDataFactory: ITestDataFactory) {}
+  constructor(private readonly _testDataFactory: ITestDataFactory) {
+    // Factory will be used for test data generation
+  }
 
   async create(sponsor: NewSponsor): Promise<Result<Sponsor, Error>> {
     try {
@@ -295,7 +297,7 @@ export class SponsorTestRepository implements ISponsorRepository {
       const updatedSponsor: Sponsor = {
         ...existingSponsor,
         voting_record: metrics.voting_record ?? existingSponsor.voting_record,
-        attendance_rate: metrics.attendance_rate ?? existingSponsor.attendance_rate,
+        attendance_rate: typeof metrics.attendance_rate === 'string' ? metrics.attendance_rate : existingSponsor.attendance_rate,
         last_disclosure_date: metrics.last_disclosure_date ? metrics.last_disclosure_date.toISOString() : existingSponsor.last_disclosure_date,
         updated_at: new Date(),
       };

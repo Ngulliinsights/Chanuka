@@ -1,10 +1,13 @@
-// Bills feature barrel exports
-export * from './types';
-export * from './services/bill-api';
-export * from './hooks/useBills';
-export * from './hooks';
-export * from './components/BillCard';
-export * from './components/BillList';
+// Bills feature barrel exports - Feature-Sliced Design
+
+// Model layer
+export * from './model';
+
+// UI layer
+export * from './ui';
+
+// API layer
+export * from './api';
 
 
 

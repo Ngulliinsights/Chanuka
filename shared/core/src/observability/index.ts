@@ -1,6 +1,12 @@
 // Observability - Single Source of Truth
 // This module consolidates all logging, health, middleware, and error management
 
+// Unified observability stack interface and implementation
+export type { IObservabilityStack } from './iobservability-stack';
+export { ObservabilityStackService } from './observability-stack-service';
+export { ObservabilityStackRegistry } from './iobservability-stack';
+export { createObservabilityStackService } from './observability-stack-service';
+
 // Core observability
 export * from './interfaces';
 export * from './middleware';

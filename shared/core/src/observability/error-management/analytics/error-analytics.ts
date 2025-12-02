@@ -7,7 +7,7 @@
 
 import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error.js';
 import { ErrorAnalytics, ErrorDashboardData } from '../types.js';
-import { logger } from '../../logging/index.js';
+// import { logger } from '../observability/logging'; // Unused import
 
 export interface ErrorAnalyticsConfig {
   analysisWindow: number; // in milliseconds
@@ -131,7 +131,7 @@ export class ErrorAnalyticsEngine {
 
     return {
       summary,
-      recentErrors,
+      recentErrors: recentErrors as any,
       errorTrends: analytics.errorTrends,
       topIssues,
       recoveryStats
@@ -288,7 +288,7 @@ export class ErrorAnalyticsEngine {
       ).length;
 
       trends.push({
-        date: dayStart.toISOString().split('T')[0],
+        date: dayStart.toISOString().split('T')[0]!,
         count
       });
     }

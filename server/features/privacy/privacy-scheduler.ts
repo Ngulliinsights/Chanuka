@@ -1,7 +1,7 @@
 import * as cron from 'node-cron';
 import { privacyService } from './privacy-service.js';
 import { auditLogger } from '@server/infrastructure/monitoring/index.js';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 class PrivacySchedulerService {
   private cleanupJob: cron.ScheduledTask | null = null;

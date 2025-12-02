@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { LoadingSpinner } from '../ui/spinner';
+import { LoadingSpinner } from '../ui/loading-spinner';
 import { useBills } from '@client/features/bills/hooks/useBills';
 import { logger } from '@client/utils/logger';
 

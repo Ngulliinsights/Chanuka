@@ -3,8 +3,9 @@ import * as pg from 'pg';
 const { Pool } = pg;
 import { errorTracker } from '@server/core/errors/error-tracker.ts';
 import { config } from '../../config/index.js';
-import { logger  } from '@shared/core/index.js';
-import { users, bills, sponsors, User, Bill, Sponsor, comments, notifications, bill_engagement, bill_tracking_preferences } from '@shared/schema/index.js';
+import { logger } from '@shared/core';
+import { users, bills, sponsors, User, Bill, Sponsor, comments, notifications, bill_engagement, bill_tracking_preferences } from '@shared/schema';
+import { databaseLogger } from '../logging/database-logger';
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
@@ -317,6 +318,51 @@ export class DatabaseService {
   }
 
   /**
+   * Enhanced health check with connection pool metrics and performance monitoring
+   */
+  async getDetailedHealthStatus(): Promise<HealthCheckResult & {
+    poolMetrics: {
+      totalCount: number;
+      idleCount: number;
+      waitingCount: number;
+      averageResponseTime: number;
+    };
+    performanceMetrics: {
+      slowQueries: number;
+      averageQueryTime: number;
+      connectionEfficiency: number;
+    };
+  }> {
+    const basicHealth = await this.performHealthCheck();
+    const poolStats = this.pool ? {
+      totalCount: this.pool.totalCount,
+      idleCount: this.pool.idleCount,
+      waitingCount: this.pool.waitingCount,
+      averageResponseTime: 0 // Would need to track this separately
+    } : {
+      totalCount: 0,
+      idleCount: 0,
+      waitingCount: 0,
+      averageResponseTime: 0
+    };
+
+    // Calculate connection efficiency (lower waiting count is better)
+    const connectionEfficiency = poolStats.totalCount > 0
+      ? Math.max(0, 1 - (poolStats.waitingCount / poolStats.totalCount))
+      : 1;
+
+    return {
+      ...basicHealth,
+      poolMetrics: poolStats,
+      performanceMetrics: {
+        slowQueries: 0, // Would need to integrate with performance monitor
+        averageQueryTime: 0, // Would need to track this
+        connectionEfficiency
+      }
+    };
+  }
+
+  /**
    * Determines if health check should be skipped due to circuit breaker
    */
   private shouldSkipHealthCheck(): boolean {
@@ -546,12 +592,19 @@ export class DatabaseService {
 
     // Fast-fail if circuit breaker is open
     if (this.circuitBreakerState === 'open') {
+      logger.warn(`⚠️ Database unavailable for ${context}, using fallback data`, { component: 'Chanuka' });
       return this.createFallbackResult(fallbackData, timestamp, 0, new Error('Circuit breaker is open'));
     }
 
     // Use fallback if disconnected (unless in half-open state for testing)
     if (!this.isConnected && this.circuitBreakerState !== 'half-open') {
-      logger.warn(`⚠️ Database unavailable for ${context}, using fallback data`, { component: 'Chanuka' });
+      logger.warn(`⚠️ Database unavailable for ${context}, using fallback data`, {
+        component: 'database',
+        operation: 'fallback',
+        context,
+        circuitBreakerState: this.circuitBreakerState,
+        connectionStatus: this.isConnected
+      });
       return this.createFallbackResult(fallbackData, timestamp, Date.now() - startTime, new Error('Database connection unavailable'));
     }
 
@@ -559,7 +612,8 @@ export class DatabaseService {
       const data = await operation();
       const executionTime = Date.now() - startTime;
 
-      this.logSlowOperation(context, executionTime);
+      // Enhanced logging with performance metrics
+      this.logOperationSuccess(context, executionTime, data);
 
       return {
         data,
@@ -600,6 +654,31 @@ export class DatabaseService {
   }
 
   /**
+   * Logs successful operations with performance metrics
+   */
+  private logOperationSuccess<T>(context: string, executionTime: number, data: T): void {
+    const isSlow = executionTime > SLOW_QUERY_THRESHOLD;
+
+    // Log performance metrics for all operations
+    logger.info(`Database operation completed: ${context}`, {
+      component: 'database',
+      operation: 'success',
+      context,
+      executionTime,
+      slowQuery: isSlow,
+      recordCount: Array.isArray(data) ? data.length : (data ? 1 : 0),
+      tags: isSlow ? ['slow-operation'] : undefined
+    });
+
+    // Log detailed performance analysis for slow queries
+    if (isSlow) {
+      databaseLogger.logQueryPerformance('database_service', context, executionTime, {
+        recordCount: Array.isArray(data) ? data.length : (data ? 1 : 0)
+      });
+    }
+  }
+
+  /**
    * Handles operation failures with appropriate error tracking
    */
   private handleOperationFailure<T>(
@@ -633,6 +712,12 @@ export class DatabaseService {
     retryOnSerializationFailure: boolean = true
   ): Promise<DatabaseResult<T>> {
     if (!this.isConnected) {
+      logger.error(`Database unavailable for transaction: ${context}`, {
+        component: 'database',
+        operation: 'transaction',
+        context,
+        connectionStatus: this.isConnected
+      });
       throw new Error(`Database unavailable for transaction: ${context}`);
     }
 
@@ -641,11 +726,36 @@ export class DatabaseService {
     const timestamp = new Date();
     const startTime = Date.now();
     const maxSerializationRetries = 3;
+    let lastError: Error | null = null;
+
+    logger.debug(`Starting database transaction: ${context}`, {
+      component: 'database',
+      operation: 'transaction_start',
+      context,
+      maxRetries: maxSerializationRetries
+    });
 
     for (let attempts = 0; attempts < maxSerializationRetries; attempts++) {
       try {
         const result = await this.executeTransaction(callback);
         const executionTime = Date.now() - startTime;
+
+        // Log successful transaction
+        logger.info(`Database transaction completed: ${context}`, {
+          component: 'database',
+          operation: 'transaction_success',
+          context,
+          executionTime,
+          attempts: attempts + 1,
+          slowQuery: executionTime > SLOW_QUERY_THRESHOLD
+        });
+
+        // Log performance metrics for slow transactions
+        if (executionTime > SLOW_QUERY_THRESHOLD) {
+          databaseLogger.logQueryPerformance('transaction', context, executionTime, {
+            recordCount: 1 // Transaction affects data, but we don't know exact count
+          });
+        }
 
         return {
           data: result,
@@ -654,17 +764,49 @@ export class DatabaseService {
           executionTime
         };
       } catch (error) {
+        lastError = error as Error;
+
         if (this.shouldRetryTransaction(error as any, retryOnSerializationFailure, attempts, maxSerializationRetries)) {
+          logger.warn(`Transaction serialization failure, retrying: ${context}`, {
+            component: 'database',
+            operation: 'transaction_retry',
+            context,
+            attempt: attempts + 1,
+            maxRetries: maxSerializationRetries,
+            error: (error as Error).message
+          });
+
           await this.delayBeforeRetry(attempts);
           continue;
         }
+
+        // Log final transaction failure
+        logger.error(`Database transaction failed: ${context}`, {
+          component: 'database',
+          operation: 'transaction_failure',
+          context,
+          attempts: attempts + 1,
+          executionTime: Date.now() - startTime,
+          error: (error as Error).message,
+          stack: (error as Error).stack
+        });
 
         this.handleTransactionError(error as Error, context);
         throw error;
       }
     }
 
-    throw new Error(`Transaction failed after ${maxSerializationRetries} attempts`);
+    // This should never be reached, but just in case
+    const finalError = new Error(`Transaction failed after ${maxSerializationRetries} attempts`);
+    logger.error(`Transaction exhausted all retries: ${context}`, {
+      component: 'database',
+      operation: 'transaction_exhausted',
+      context,
+      maxRetries: maxSerializationRetries,
+      lastError: lastError?.message
+    });
+
+    throw finalError;
   }
 
   /**

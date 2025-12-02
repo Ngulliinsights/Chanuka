@@ -18,7 +18,7 @@ import { MigrationService } from '../infrastructure/database/migration-service.j
 import { DataIntegrityValidationService } from '@server/core/validation/data-validation-service.ts';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 // Mock pool for testing
 const mockPool = {

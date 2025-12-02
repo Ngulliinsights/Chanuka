@@ -85,7 +85,7 @@ export const createAuthInterceptor = (options: {
 }): RequestInterceptor => ({
   name: 'auth',
   priority: 100, // High priority
-  intercept: async (request, context) => {
+  intercept: async (request, _context) => {
     const headers = { ...request.headers };
 
     switch (options.type) {
@@ -296,7 +296,7 @@ export const createRetryInterceptor = (options: {
   return {
     name: 'retry',
     priority: 200,
-    intercept: async (error, request, context) => {
+    intercept: async (error, _request, context) => {
       const shouldRetry =
         context.attempt < maxRetries &&
         (retryableStatusCodes.includes(error.status || 0) ||
@@ -372,7 +372,7 @@ export const createCacheInterceptor = (options: {
     response: {
       name: 'cache-response',
       priority: 75,
-      intercept: async (response, request, context) => {
+      intercept: async (response, request, _context) => {
         if (cacheableMethods.includes(request.method) &&
             cacheableStatusCodes.includes(response.status)) {
           const cacheKey = keyGenerator(request);

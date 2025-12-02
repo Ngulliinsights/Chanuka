@@ -9,7 +9,7 @@ import { performanceMonitor } from '@server/infrastructure/monitoring/performanc
 import { errorHandler } from '@server/infrastructure/errors/error-standardization.js';
 import { TestDataManager } from '@server/utils/test-helpers.ts';
 import { databaseService } from '@server/infrastructure/database/database-service.js';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 
 describe('Comprehensive Integration Tests', () => {
   let testDataManager: TestDataManager;
@@ -347,7 +347,7 @@ describe('Comprehensive Integration Tests', () => {
 
   describe('Cache Integration', () => {
     it('should handle caching across services', async () => {
-      const { cache } = await import('@shared/core/index.js');
+      const { cache } = await import('@shared/core');
 
       // Test cache operations
       const testKey = 'integration-test-key';

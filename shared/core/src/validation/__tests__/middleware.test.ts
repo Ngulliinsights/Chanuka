@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { ValidationError } from '@shared/core/src/observability/error-management/errors/specialized-errors';
+import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
   validateRequest,
   ValidationMiddleware,

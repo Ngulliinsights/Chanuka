@@ -958,15 +958,15 @@
    - Inline styles found. Use design system classes instead.
    - Suggestion: Move styles to CSS classes using design tokens
 
-238. **src\main-simple.tsx:8**
+238. **src\main.tsx:8**
    - Inline styles found. Use design system classes instead.
    - Suggestion: Move styles to CSS classes using design tokens
 
-239. **src\main-simple.tsx:18**
+239. **src\main.tsx:18**
    - Inline styles found. Use design system classes instead.
    - Suggestion: Move styles to CSS classes using design tokens
 
-240. **src\main-simple.tsx:21**
+240. **src\main.tsx:21**
    - Inline styles found. Use design system classes instead.
    - Suggestion: Move styles to CSS classes using design tokens
 

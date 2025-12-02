@@ -5,7 +5,7 @@
 import { readDatabase } from '@shared/database';
 import { sponsors } from "@shared/foundation";
 import { eq, desc } from "drizzle-orm";
-import { cache, logger, DatabaseError  } from '@shared/core/index.js';
+import { cache, logger, DatabaseError  } from '@shared/core';
 import { FinancialDisclosureConfig } from './config';
 
 // Import decomposed services

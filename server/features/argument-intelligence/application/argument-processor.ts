@@ -3,7 +3,7 @@
 // ============================================================================
 // Main orchestration service for processing citizen comments into structured arguments
 
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { StructureExtractorService } from './structure-extractor.js';
 import { ClusteringService } from './clustering-service.js';
 import { EvidenceValidatorService } from './evidence-validator.js';

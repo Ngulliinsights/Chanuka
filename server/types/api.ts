@@ -35,8 +35,7 @@ export type {
 } from './common.js';
 
 // Import analysis types from domain features
-export type { BillAnalysis } from '@shared/features/bills/types/analysis.js';
-export type { SponsorshipAnalysis } from '@shared/features/sponsors/types/analysis.js';
+export type { BillAnalysis, SponsorshipAnalysis } from '../utils/missing-modules-fallback.js';
 
 // Legacy types for backward compatibility
 

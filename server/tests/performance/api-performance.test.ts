@@ -24,7 +24,7 @@ import { router as sponsorsRouter } from '@server/features/bills/sponsors.ts';
 import { createFinancialDisclosureRouter } from '@server/features/analytics/financial-disclosure/index.ts';
 import { router as authRouter } from '@server/core/auth/auth.ts';
 import { PerformanceMetrics, performanceMonitor } from '@/utils/test-helpers.js';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('API Performance Tests', () => {
   let app: express.Application;

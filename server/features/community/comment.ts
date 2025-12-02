@@ -1,9 +1,9 @@
 
 import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { database as db } from '@shared/database';
-import { comments } from '@shared/schema/citizen_participation';
-import { users, user_profiles } from '@shared/schema/foundation';
-import { bills } from '@shared/schema/foundation';
+import { comments } from '@shared/schema';
+import { users, user_profiles } from '@shared/schema';
+import { bills } from '@shared/schema';
 import { eq, and, desc, asc, sql, count, isNull, or, inArray } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache/cache-service';
 import { cacheKeys } from '@shared/core/caching/key-generator';

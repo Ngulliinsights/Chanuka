@@ -7,7 +7,7 @@ export {
 } from '@shared/core';
 
 // Legacy compatibility wrappers
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 // Performance monitoring using shared observability
 export const performanceMonitor = {

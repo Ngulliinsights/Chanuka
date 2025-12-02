@@ -365,7 +365,7 @@ export function validateBudgetConfig(config: PerformanceBudgetConfig): { valid: 
   const errors: string[] = [];
 
   // Validate Core Web Vitals budgets
-  Object.entries(config.coreWebVitals).forEach(([key, budget]) => {
+  Object.entries(config.coreWebVitals).forEach(([_key, budget]) => {
     if (budget.threshold <= 0) {
       errors.push(`${budget.name}: threshold must be positive`);
     }
@@ -375,14 +375,14 @@ export function validateBudgetConfig(config: PerformanceBudgetConfig): { valid: 
   });
 
   // Validate bundle size budgets
-  Object.entries(config.bundleSize).forEach(([key, budget]) => {
+  Object.entries(config.bundleSize).forEach(([_key, budget]) => {
     if (budget.threshold <= 0) {
       errors.push(`${budget.name}: threshold must be positive`);
     }
   });
 
   // Validate styling budgets
-  Object.entries(config.styling).forEach(([key, budget]) => {
+  Object.entries(config.styling).forEach(([_key, budget]) => {
     if (budget.threshold <= 0) {
       errors.push(`${budget.name}: threshold must be positive`);
     }

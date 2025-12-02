@@ -21,15 +21,15 @@ export interface TokenBucketConfig {
  * only if there are sufficient tokens available.
  */
 export class TokenBucket implements RateLimitAlgorithm {
-  private tokens: number;
-  private lastRefill: number;
+  // private _tokens: number;
+  // private _lastRefill: number;
 
   constructor(
     private readonly config: TokenBucketConfig,
     private readonly store: Map<string, { tokens: number; lastRefill: number }> = new Map()
   ) {
-    this.tokens = config.initialTokens ?? config.capacity;
-    this.lastRefill = Date.now();
+    // this._tokens = config.initialTokens ?? config.capacity;
+    // this._lastRefill = Date.now();
   }
 
   /**

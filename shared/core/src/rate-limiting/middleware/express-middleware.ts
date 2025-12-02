@@ -4,10 +4,10 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { Result, ok, err } from '../../primitives/types/result';
+// import { Result, ok, err } from '../../primitives/types/result'; // Unused import
 import { logger } from '../../observability/logging/logger';
 import { getMetricsCollector } from '../metrics';
-import { IRateLimitStore, RateLimitOptions, RateLimitResult, RateLimitHeaders } from '/types';
+import { IRateLimitStore, RateLimitOptions, RateLimitResult } from '../types';
 
 export interface ExpressRateLimitOptions extends RateLimitOptions {
   store: IRateLimitStore;
@@ -54,7 +54,7 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
       // For now, implement a simple check using the store's get/set operations
       // This should be replaced with a proper check method when available
       const now = Date.now();
-      const windowStart = now - config.windowMs;
+      // const _windowStart = now - config.windowMs;
 
       // Get current data
       const getResult = await store.get(key);
@@ -133,8 +133,8 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
         algorithm: 'express-middleware', // Could be enhanced to track actual algorithm
         remaining: result.remaining,
         processingTime,
-        ip: req.ip,
-        user_agent: req.get('User-Agent'),
+        ip: req.ip || 'unknown',
+        user_agent: req.get('User-Agent') || 'unknown',
         path: req.path,
         method: req.method
       });
@@ -173,7 +173,7 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
       next();
     } catch (error) {
       // Record error metrics
-      const processingTime = Date.now() - startTime;
+      // const _processingTime = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown rate limiting error';
       metrics.recordError(errorMessage);
 
@@ -203,7 +203,7 @@ function defaultKeyGenerator(req: Request): string { // More sophisticated key g
 }
 
 function shouldSkipRequest(
-  req: Request,
+  _req: Request,
   res: Response,
   skipSuccessfulRequests: boolean,
   skipFailedRequests: boolean

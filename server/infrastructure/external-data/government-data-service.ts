@@ -8,7 +8,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { circuitBreakerRequest, retryWithCircuitBreaker } from '@server/middleware/circuit-breaker-middleware';
 import { EventEmitter } from 'events';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 import { httpUtils } from '@shared/core/utils/http-utils';
 import {
   DataSource,

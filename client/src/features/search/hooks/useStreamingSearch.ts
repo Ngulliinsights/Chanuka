@@ -8,9 +8,22 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { streamingSearchService } from '../services/streaming-search';
-import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/utils/logger';
-import type { SearchResult, SearchQuery } from '@client/types';
+import { useToast } from '../../../hooks/use-toast';
+import { logger } from '../../../utils/logger';
+
+// Define types locally
+interface SearchResult {
+  id: string;
+  title: string;
+  type: string;
+  content: string;
+  score: number;
+}
+
+interface SearchQuery {
+  q: string;
+  filters?: Record<string, any>;
+}
 import type {
   StreamingSearchOptions,
   StreamingSearchSession,

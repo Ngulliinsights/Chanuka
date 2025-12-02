@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "ts-node -r tsconfig-paths/register index.ts",
+    "dev": "tsx simple-server.ts",
+    "dev:full": "tsx index.ts",
     "build": "echo 'Server build skipped - using development mode'",
     "start": "tsx index.ts",
     "test": "vitest run",

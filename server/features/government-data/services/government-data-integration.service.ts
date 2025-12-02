@@ -3,8 +3,8 @@
 // ============================================================================
 // Handles data scarcity and API limitations with multiple fallback mechanisms
 
-import { logger  } from '@shared/core/index.js';
-import { cache  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
+import { cache  } from '@shared/core';
 import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { bills, sponsors } from '@shared/schema';
 import { eq, and, sql, desc, isNull } from 'drizzle-orm';

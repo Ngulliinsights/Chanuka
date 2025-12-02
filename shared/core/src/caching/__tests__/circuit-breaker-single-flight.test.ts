@@ -14,15 +14,15 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
 
 import { SingleFlightCache } from '../single-flight-cache';
 import { MemoryAdapter } from '../adapters/memory-adapter';
-import type { CacheService } from '@shared/core/src/types';
-import { logger } from '@shared/core/src/observability/logging';
+import type { CacheService } from '../../types';
+// import { logger } from '../observability/logging'; // Unused import
 
 describe('Circuit Breaker and Single Flight Cache', () => {
   let mockAdapter: CacheService;

@@ -8,15 +8,33 @@
 import { useState, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { intelligentSearch } from '../services/intelligent-search';
-import { useDebounce } from '@client/hooks/useDebounce';
-import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/utils/logger';
+import { useDebounce } from '../../../hooks/useDebounce';
+import { useToast } from '../../../hooks/use-toast';
+import { logger } from '../../../utils/logger';
 import type { 
   DualSearchRequest, 
   CombinedSearchResult,
   SearchEngineResult 
 } from '../services/intelligent-search';
-import type { AutocompleteResult, SearchSuggestion } from '@client/types';
+
+// Define types locally
+interface AutocompleteResult {
+  suggestions: SearchSuggestion[];
+  facets: {
+    categories: string[];
+    sponsors: string[];
+    tags: string[];
+    statuses: string[];
+  };
+  query: string;
+  totalSuggestions: number;
+}
+
+interface SearchSuggestion {
+  text: string;
+  type: string;
+  count?: number;
+}
 
 interface UseIntelligentSearchOptions {
   debounceMs?: number;

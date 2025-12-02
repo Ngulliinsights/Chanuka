@@ -7,7 +7,7 @@ import { EventEmitter } from 'events';
  * Provides detailed coverage metrics, trends, and recommendations
  */
 export class CoverageReporter extends EventEmitter {
-  private coverageData: CoverageData[] = [];
+  // private coverageData: CoverageData[] = []; // Unused variable
   private baselineCoverage: CoverageBaseline | null = null;
   private coverageHistory: CoverageHistoryEntry[] = [];
 

@@ -1,4 +1,4 @@
-import { execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { EventEmitter } from 'events';
@@ -415,11 +415,9 @@ export class CICDRunner extends EventEmitter {
 
   private createMockComponents() {
     // This would create actual service instances in a real implementation
+    // With exactOptionalPropertyTypes: true, we can't assign undefined to optional properties
     return {
-      cache: undefined, // Mock cache service
-      rateLimiter: undefined, // Mock rate limiter
-      logger: undefined, // Mock logger
-      validator: undefined // Mock validator
+      // Return empty object - optional properties will be undefined by default
     };
   }
 
@@ -485,7 +483,7 @@ export class CICDRunner extends EventEmitter {
   private parseAuditOutput(output: string): number {
     // Simplified audit output parsing
     const match = output.match(/found (\d+) vulnerabilities/);
-    return match ? parseInt(match[1]) : 0;
+    return match && match[1] ? parseInt(match[1]) : 0;
   }
 
   private generatePipelineSummary(results: PipelineStageResult[]): PipelineSummary {

@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
 import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
-import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType } from '/types';
+import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType } from '../../types';
 import { BackupSystem, BackupSystemConfig } from './backup-system';
 import { logger } from '../../observability/logging';
 
@@ -58,7 +58,7 @@ export class CleanupExecutor {
       if (this.config.validateBeforeExecution) {
         const validation = await this.validatePreExecution(plan);
         if (validation.status === ValidationStatus.FAILED) {
-          throw new Error(`Pre-execution validation failed: ${validation.summary.criticalIssues.join(', ')}`);
+          throw new Error(`Pre-execution validation failed: ${(validation as any).summary?.criticalIssues?.join(', ') || 'Unknown issues'}`);
         }
       }
 
@@ -419,7 +419,7 @@ export class CleanupExecutor {
 
     // Read the most recent file
     try {
-      const content = await fs.readFile(join(this.rootPath, mostRecentFile), 'utf-8');
+      const content = await fs.readFile(join(this.rootPath, mostRecentFile!), 'utf-8');
       processedSources.push(...sources); // Mark all as processed for removal
       return content;
     } catch (error) {
@@ -612,7 +612,7 @@ exit 0
     const warnings = checks.filter(c => c.status === ValidationStatus.WARNING).length;
 
     return {
-      id: `validation-pre-${Date.now()}`,
+      // id: `validation-pre-${Date.now()}`,
       timestamp: new Date(),
       scope: 'pre_execution' as any,
       status: failed > 0 ? ValidationStatus.FAILED : 
@@ -696,7 +696,7 @@ exit 0
     const warnings = checks.filter(c => c.status === ValidationStatus.WARNING).length;
 
     return {
-      id: `validation-post-${Date.now()}`,
+      // id: `validation-post-${Date.now()}`,
       timestamp: new Date(),
       scope: 'post_execution' as any,
       status: failed > 0 ? ValidationStatus.FAILED : 

@@ -63,7 +63,7 @@ export class UnifiedApiResponse {
     return {
       success: true,
       data,
-      message,
+      ...(message !== undefined && { message }),
       metadata: {
         timestamp: new Date().toISOString(),
         ...metadata
@@ -82,7 +82,7 @@ export class UnifiedApiResponse {
       error: {
         code,
         message,
-        details,
+        ...(details !== undefined && { details }),
         ...(process.env.NODE_ENV === 'development' && { stack: new Error().stack })
       },
       message,
@@ -132,7 +132,7 @@ export class UnifiedApiResponse {
 
   static createMetadata(
     startTime: number,
-    operation: string,
+    _operation: string,
     additionalMetadata?: Partial<ResponseMetadata>
   ): Partial<ResponseMetadata> {
     const duration = Date.now() - startTime;
@@ -222,7 +222,7 @@ export function ApiError(
 export function ApiUnauthorized(
   res: Response,
   message: string = 'Authentication required',
-  metadata?: Partial<ResponseMetadata>
+  _metadata?: Partial<ResponseMetadata>
 ): void {
   const response = UnifiedApiResponse.unauthorized(message);
   sendApiResponse(res, response, 401);
@@ -231,7 +231,7 @@ export function ApiUnauthorized(
 export function ApiForbidden(
   res: Response,
   message: string = 'Insufficient permissions',
-  metadata?: Partial<ResponseMetadata>
+  _metadata?: Partial<ResponseMetadata>
 ): void {
   const response = UnifiedApiResponse.forbidden(message);
   sendApiResponse(res, response, 403);
@@ -241,7 +241,7 @@ export function ApiNotFound(
   res: Response,
   resource: string = 'Resource',
   message?: string,
-  metadata?: Partial<ResponseMetadata>
+  _metadata?: Partial<ResponseMetadata>
 ): void {
   const response = UnifiedApiResponse.notFound(resource, message);
   sendApiResponse(res, response, 404);
@@ -250,7 +250,7 @@ export function ApiNotFound(
 export function ApiValidationError(
   res: Response,
   errors: Array<{ field: string; message: string }> | { field: string; message: string },
-  metadata?: Partial<ResponseMetadata>
+  _metadata?: Partial<ResponseMetadata>
 ): void {
   const errorArray = Array.isArray(errors) ? errors : [errors];
   const response = UnifiedApiResponse.validation(errorArray, 'Validation failed');

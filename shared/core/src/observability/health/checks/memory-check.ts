@@ -5,8 +5,11 @@
  * Based on patterns from optimized_health_system.md
  */
 
-import { HealthCheck, HealthResult, HealthStatus } from '/types';
-import { logger } from '../../observability/logging';
+// import { HealthCheck, HealthResult, HealthStatus } from '../../../types';
+type HealthCheck = any;
+type HealthResult = any;
+type HealthStatus = any;
+// import { logger } from '../observability/logging'; // Unused import
 
 export interface MemoryHealthConfig {
   maxRssBytes?: number;

@@ -8,7 +8,7 @@
  */
 
 import { AsyncLocalStorage } from 'async_hooks';
-import { Result, ok, err } from '../primitives/types';
+// import { Result, ok, err } from '../../primitives/types/result'; // Unused import
 import { BaseError } from './error-management';
 import { CorrelationContext, CorrelationManager } from './interfaces';
 
@@ -24,7 +24,7 @@ export const SESSION_HEADER = 'x-session-id';
 
 export class CorrelationError extends BaseError {
   constructor(message: string, cause?: Error) {
-    super(message, { statusCode: 500, code: 'CORRELATION_ERROR', cause, isOperational: false });
+    super(message, { statusCode: 500, code: 'CORRELATION_ERROR', cause: cause as any, isOperational: false });
   }
 }
 

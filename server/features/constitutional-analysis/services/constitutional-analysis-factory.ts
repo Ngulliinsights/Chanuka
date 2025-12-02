@@ -3,7 +3,7 @@
 // ============================================================================
 // Factory for creating and configuring constitutional analysis services
 
-import { db  } from '@shared/core/index.js';
+import { db  } from '@shared/core';
 import { ConstitutionalAnalyzer } from '@shared/application/constitutional-analyzer.js';
 import { ProvisionMatcherService } from '@shared/application/provision-matcher.js';
 import { PrecedentFinderService } from '@shared/application/precedent-finder.js';

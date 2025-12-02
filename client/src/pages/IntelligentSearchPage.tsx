@@ -1,6 +1,6 @@
 /**
  * Intelligent Search Page
- * 
+ *
  * Comprehensive search interface that combines all search components
  * and provides a complete search experience with dual-engine capabilities.
  */
@@ -26,7 +26,19 @@ import { intelligentSearch } from '@/features/search/services/intelligent-search
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/utils/logger';
 import type { DualSearchRequest } from '@/features/search/services/intelligent-search';
-import type { SearchResult, SavedSearch, SearchFilters as SearchFiltersType } from '@/features/search/types';
+import type {
+  SearchResult as ApiSearchResult,
+  SavedSearch,
+  SearchFilters as SearchFiltersType,
+} from '@/features/search/types';
+
+// This type represents what SearchResultCard expects
+// It's a subset of the API SearchResult with only the types it can handle
+type DisplayableSearchResult = ApiSearchResult & {
+  type: 'bill' | 'comment' | 'sponsor';
+  excerpt: string;
+  relevanceScore: number;
+};
 
 export function IntelligentSearchPage() {
   const [activeTab, setActiveTab] = useState('search');
@@ -37,7 +49,7 @@ export function IntelligentSearchPage() {
   const [showAnalytics, setShowAnalytics] = useState(false);
 
   const { toast } = useToast();
-  
+
   // Main search functionality
   const {
     results,
@@ -47,60 +59,99 @@ export function IntelligentSearchPage() {
     clearResults,
     searchTime,
     enginePerformance,
-    hasSearched
+    hasSearched,
   } = useIntelligentSearch({
     debounceMs: 300,
-    enableAutoSearch: false
+    enableAutoSearch: false,
   });
 
   // Streaming search functionality
   const streamingSearch = useStreamingSearch({
     autoStart: false,
-    onResult: (result) => {
+    onResult: result => {
       logger.info('Streaming search result received', { resultId: result.id, type: result.type });
     },
-    onProgress: (progress) => {
+    onProgress: progress => {
       logger.debug('Streaming search progress', { progress });
     },
     onComplete: (results, totalCount) => {
       logger.info('Streaming search completed', { resultCount: results.length, totalCount });
     },
-    onError: (error) => {
-      logger.error('Streaming search error', { error: error.message });
+    onError: err => {
+      logger.error('Streaming search error', { error: err.message });
       toast({
-        title: "Search Error",
-        description: error.message,
-        variant: "destructive"
+        title: 'Search Error',
+        description: err.message,
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   // Additional data
   const { data: popularSearches } = usePopularSearches(5);
   const { history } = useSearchHistory();
 
+  /**
+   * Type guard to check if a search result can be displayed by SearchResultCard.
+   * This filters out result types that aren't supported by the card component.
+   */
+  const isDisplayableResult = (result: ApiSearchResult): result is DisplayableSearchResult => {
+    return result.type === 'bill' || result.type === 'comment' || result.type === 'sponsor';
+  };
+
+  /**
+   * Converts API search results to a format compatible with SearchResultCard.
+   * This ensures all required properties exist and have the correct types.
+   */
+  const normalizeResult = (result: ApiSearchResult): DisplayableSearchResult | null => {
+    // First check if this is a displayable type
+    if (!isDisplayableResult(result)) {
+      logger.debug('Filtering out non-displayable result type', { type: result.type, id: result.id });
+      return null;
+    }
+
+    // Now we know result.type is compatible, so we can safely cast
+    // after adding the required properties
+    return {
+      ...result,
+      type: result.type as 'bill' | 'comment' | 'sponsor',
+      excerpt: result.excerpt ?? '',
+      relevanceScore: result.relevanceScore ?? 0,
+    };
+  };
+
+  /**
+   * Filters and normalizes a list of search results to only include
+   * those that can be displayed by SearchResultCard.
+   */
+  const getDisplayableResults = (results: ApiSearchResult[]): DisplayableSearchResult[] => {
+    return results
+      .map(normalizeResult)
+      .filter((result): result is DisplayableSearchResult => result !== null);
+  };
+
   // Handle simple search from autocomplete
   const handleSimpleSearch = async (query: string) => {
     if (!query.trim()) return;
 
     setSearchQuery(query);
-    
+
     const searchRequest: DualSearchRequest = {
       q: query,
       type: 'all',
       enableFuzzy: true,
       combineResults: true,
       maxResults: 50,
-      highlightMatches: true
+      highlightMatches: true,
     };
 
     try {
       await search(searchRequest);
       setActiveTab('results');
-    } catch (error) {
+    } catch (err) {
       logger.error('Simple search failed', {
         query,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
   };
@@ -108,22 +159,24 @@ export function IntelligentSearchPage() {
   // Handle advanced search
   const handleAdvancedSearch = async (request: DualSearchRequest) => {
     setSearchQuery(request.q);
-    
+
     try {
       await search(request);
       setActiveTab('results');
       setShowAdvanced(false);
-    } catch (error) {
+    } catch (err) {
       logger.error('Advanced search failed', {
         query: request.q,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
   };
 
-  // Handle result click
-  const handleResultClick = (result: SearchResult) => {
-    // Navigate to the specific result based on type
+  /**
+   * Handle result click - navigates to the appropriate page based on result type.
+   * This function is synchronous to match SearchResultCard's expected signature.
+   */
+  const handleResultClick = (result: ApiSearchResult) => {
     switch (result.type) {
       case 'bill':
         window.location.href = `/bills/${result.id}`;
@@ -137,53 +190,68 @@ export function IntelligentSearchPage() {
         }
         break;
       default:
-        logger.warn('Unknown result type', { type: result.type, id: result.id });
+        // Handle other types or log
+        logger.warn('Unhandled result type for navigation', { type: result.type, id: result.id });
     }
   };
 
-  // Handle save result
-  const handleSaveResult = async (result: SearchResult) => {
-    try {
-      // This would typically save to user's bookmarks or favorites
-      toast({
-        title: "Result Saved",
-        description: `"${result.title}" has been saved to your bookmarks.`
-      });
-    } catch (error) {
-      toast({
-        title: "Save Failed",
-        description: "Failed to save result.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Handle share result
-  const handleShareResult = async (result: SearchResult) => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: result.title,
-          text: result.excerpt || result.content,
-          url: window.location.origin + `/bills/${result.id}`
-        });
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(
-          `${result.title}\n${window.location.origin}/bills/${result.id}`
-        );
+  /**
+   * Handle save result - bookmarks a search result for the user.
+   * Made synchronous by handling the async operation internally.
+   */
+  const handleSaveResult = (result: ApiSearchResult) => {
+    // Execute the save operation asynchronously without blocking the return
+    Promise.resolve()
+      .then(() => {
+        // In a real implementation, this would call an API to save the bookmark
         toast({
-          title: "Link Copied",
-          description: "Result link has been copied to clipboard."
+          title: 'Result Saved',
+          description: `"${result.title}" has been saved to your bookmarks.`,
+        });
+      })
+      .catch(() => {
+        toast({
+          title: 'Save Failed',
+          description: 'Failed to save result.',
+          variant: 'destructive',
+        });
+      });
+  };
+
+  /**
+   * Handle share result - shares a search result via the Web Share API or clipboard.
+   * Made synchronous by handling the async operation internally.
+   */
+  const handleShareResult = (result: ApiSearchResult) => {
+    // Execute the share operation asynchronously without blocking the return
+    const shareContent = async () => {
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: result.title,
+            text: result.excerpt || result.content,
+            url: window.location.origin + `/bills/${result.id}`,
+          });
+        } else {
+          // Fallback to clipboard for browsers without Web Share API
+          await navigator.clipboard.writeText(
+            `${result.title}\n${window.location.origin}/bills/${result.id}`
+          );
+          toast({
+            title: 'Link Copied',
+            description: 'Result link has been copied to clipboard.',
+          });
+        }
+      } catch {
+        toast({
+          title: 'Share Failed',
+          description: 'Failed to share result.',
+          variant: 'destructive',
         });
       }
-    } catch (error) {
-      toast({
-        title: "Share Failed",
-        description: "Failed to share result.",
-        variant: "destructive"
-      });
-    }
+    };
+
+    shareContent();
   };
 
   // Handle export results
@@ -199,7 +267,7 @@ export function IntelligentSearchPage() {
         relevanceScore: result.relevanceScore,
         createdAt: result.metadata.created_at,
         status: result.metadata.status,
-        category: result.metadata.category
+        category: result.metadata.category,
       }));
 
       let content: string;
@@ -208,9 +276,11 @@ export function IntelligentSearchPage() {
 
       if (format === 'csv') {
         const headers = Object.keys(data[0] || {}).join(',');
-        const rows = data.map(row => Object.values(row).map(val => 
-          typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val
-        ).join(','));
+        const rows = data.map(row =>
+          Object.values(row)
+            .map(val => (typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val))
+            .join(',')
+        );
         content = [headers, ...rows].join('\n');
         mimeType = 'text/csv';
         filename = `search-results-${Date.now()}.csv`;
@@ -231,14 +301,14 @@ export function IntelligentSearchPage() {
       URL.revokeObjectURL(url);
 
       toast({
-        title: "Export Successful",
-        description: `Results exported as ${format.toUpperCase()}.`
+        title: 'Export Successful',
+        description: `Results exported as ${format.toUpperCase()}.`,
       });
-    } catch (error) {
+    } catch {
       toast({
-        title: "Export Failed",
-        description: "Failed to export results.",
-        variant: "destructive"
+        title: 'Export Failed',
+        description: 'Failed to export results.',
+        variant: 'destructive',
       });
     }
   };
@@ -249,9 +319,9 @@ export function IntelligentSearchPage() {
       ...savedSearch.query,
       enableFuzzy: true,
       combineResults: true,
-      highlightMatches: true
+      highlightMatches: true,
     };
-    
+
     handleAdvancedSearch(request);
   };
 
@@ -262,21 +332,21 @@ export function IntelligentSearchPage() {
         name: config.name,
         query: {
           q: searchQuery,
-          ...config.searchSettings
+          ...config.searchSettings,
         },
         emailAlerts: config.emailAlerts,
-        isPublic: config.isPublic || false
+        isPublic: config.isPublic || false,
       });
 
       toast({
-        title: "Search Configuration Saved",
-        description: `"${config.name}" has been saved successfully.`
+        title: 'Search Configuration Saved',
+        description: `"${config.name}" has been saved successfully.`,
       });
-    } catch (error) {
+    } catch {
       toast({
-        title: "Save Failed",
-        description: "Failed to save search configuration.",
-        variant: "destructive"
+        title: 'Save Failed',
+        description: 'Failed to save search configuration.',
+        variant: 'destructive',
       });
     }
   };
@@ -286,24 +356,34 @@ export function IntelligentSearchPage() {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <SearchAnalyticsDashboard
-          onExport={(format) => {
-            // Handle export
+          onExport={format => {
             toast({
-              title: "Export Started",
-              description: `Exporting analytics as ${format.toUpperCase()}.`
+              title: 'Export Started',
+              description: `Exporting analytics as ${format.toUpperCase()}.`,
             });
           }}
           onRefresh={() => {
-            // Handle refresh
             toast({
-              title: "Refreshing",
-              description: "Analytics data is being refreshed."
+              title: 'Refreshing',
+              description: 'Analytics data is being refreshed.',
             });
           }}
         />
       </div>
     );
   }
+
+  // Get the displayable results from regular search
+  // Note: Streaming results have incompatible type structure, using regular search results for now
+  if (results?.results) {
+    logger.debug('Using regular search results', {
+      resultCount: results.results.length,
+      firstResultKeys: Object.keys(results.results[0] || {}),
+      firstResultType: results.results[0]?.type,
+    });
+  }
+
+  const displayResults = getDisplayableResults(results?.results || []);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -312,17 +392,17 @@ export function IntelligentSearchPage() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center space-x-3">
-                <Target className="h-8 w-8 text-primary" />
-                <span>Intelligent Search</span>
-              </h1>
+              <Target className="h-8 w-8 text-primary" />
+              <span>Intelligent Search</span>
+            </h1>
             <p className="text-muted-foreground mt-2">
               Advanced dual-engine search with AI-powered suggestions and real-time results
             </p>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <Button
-              variant={showAdvanced ? "default" : "outline"}
+              variant={showAdvanced ? 'default' : 'outline'}
               onClick={() => setShowAdvanced(!showAdvanced)}
             >
               <Settings className="h-4 w-4 mr-2" />
@@ -330,7 +410,7 @@ export function IntelligentSearchPage() {
             </Button>
 
             <Button
-              variant={useStreaming ? "default" : "outline"}
+              variant={useStreaming ? 'default' : 'outline'}
               onClick={() => setUseStreaming(!useStreaming)}
               size="sm"
             >
@@ -339,7 +419,7 @@ export function IntelligentSearchPage() {
             </Button>
 
             <Button
-              variant={showAnalytics ? "default" : "outline"}
+              variant={showAnalytics ? 'default' : 'outline'}
               onClick={() => setShowAnalytics(!showAnalytics)}
               size="sm"
             >
@@ -381,6 +461,7 @@ export function IntelligentSearchPage() {
               onCancel={streamingSearch.cancelSearch}
             />
           )}
+
           {/* Simple Search */}
           {!showAdvanced && (
             <Card>
@@ -406,7 +487,7 @@ export function IntelligentSearchPage() {
           )}
 
           {/* Search Results */}
-          {(hasSearched || isLoading || streamingSearch.results.length > 0) && (
+          {(hasSearched || isLoading || displayResults.length > 0) && (
             <div className="space-y-4">
               {/* Results Header with Filters */}
               <div className="flex items-center justify-between">
@@ -431,16 +512,12 @@ export function IntelligentSearchPage() {
                 </div>
 
                 {/* Compact Filters */}
-                <SearchFilters
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  compact={true}
-                />
+                <SearchFilters filters={filters} onFiltersChange={setFilters} compact={true} />
               </div>
 
               {/* Results Grid */}
               <div className="space-y-4">
-                {(streamingSearch.results.length > 0 ? streamingSearch.results : results?.results || []).map((result, index) => (
+                {displayResults.map((result, index) => (
                   <SearchResultCard
                     key={`${result.type}-${result.id}-${index}`}
                     result={result}
@@ -454,7 +531,7 @@ export function IntelligentSearchPage() {
               </div>
 
               {/* Loading State */}
-              {isLoading && streamingSearch.results.length === 0 && (
+              {isLoading && displayResults.length === 0 && (
                 <div className="flex items-center justify-center py-8">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -467,6 +544,13 @@ export function IntelligentSearchPage() {
               {error && (
                 <div className="text-center py-8">
                   <p className="text-destructive">{error.message}</p>
+                </div>
+              )}
+
+              {/* No Results State */}
+              {!isLoading && hasSearched && displayResults.length === 0 && !error && (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No results found. Try adjusting your search terms.</p>
                 </div>
               )}
             </div>
@@ -515,12 +599,12 @@ export function IntelligentSearchPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Filters */}
-          {(hasSearched || streamingSearch.results.length > 0) && (
+          {(hasSearched || displayResults.length > 0) && (
             <SearchFilters
               filters={filters}
               onFiltersChange={setFilters}
-              availableCategories={[]} // Would be populated from API
-              availableStatuses={[]} // Would be populated from API
+              availableCategories={[]}
+              availableStatuses={[]}
             />
           )}
 
@@ -537,9 +621,7 @@ export function IntelligentSearchPage() {
             </TabsList>
 
             <TabsContent value="saved" className="mt-4">
-              <SavedSearches
-                onExecuteSearch={handleExecuteSavedSearch}
-              />
+              <SavedSearches onExecuteSearch={handleExecuteSavedSearch} />
             </TabsContent>
 
             <TabsContent value="history" className="mt-4">
@@ -570,9 +652,7 @@ export function IntelligentSearchPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-muted-foreground text-sm">
-                      No recent searches
-                    </p>
+                    <p className="text-muted-foreground text-sm">No recent searches</p>
                   )}
                 </CardContent>
               </Card>

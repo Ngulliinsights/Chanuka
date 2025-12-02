@@ -1,5 +1,5 @@
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../rate-limiting/types';
-import { logger } from '../../observability/logging';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
+// import { logger } from '../observability/logging'; // Unused import
 
 /**
  * Modern rate limiting service implementation that uses the new RateLimitStore interface
@@ -50,7 +50,7 @@ export class RateLimitingService {
    * Check if the rate limit store is healthy
    */
   async healthCheck(): Promise<boolean> {
-    return await this.store.healthCheck?.() ?? true;
+    return await (this.store as any).healthCheck?.() ?? true;
   }
 }
 

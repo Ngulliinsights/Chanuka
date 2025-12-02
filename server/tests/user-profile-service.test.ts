@@ -17,7 +17,7 @@ import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { database as db, user as users, user_profiles as user_profiles, user_interest as user_interests, bill_engagement, notification as notifications, bill as bills } from '@shared/database/connection';
 import { user_profileservice } from '@server/features/users/domain/user-profile.ts';
 import { eq } from 'drizzle-orm';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 describe('User Profile Service', () => {
   let testUserId: string;

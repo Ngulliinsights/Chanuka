@@ -28,9 +28,9 @@ import jwt from 'jsonwebtoken';
 import { webSocketService } from '../infrastructure/websocket.js';
 import { billStatusMonitorService } from '@server/features/bills/bill-status-monitor.ts';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
-import { database as db, user as users, bill as bills, bill_engagement } from '@shared/database/connection.js';
+import { database as db, user as users, bill as bills, bill_engagement } from '@shared/database';
 import { eq } from 'drizzle-orm';
-import { logger  } from '@shared/core/src/index.js';
+import { logger  } from '@shared/core';
 
 // Mock billStatusMonitor
 const billStatusMonitor = {

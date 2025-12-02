@@ -19,7 +19,7 @@ import {
   ConfigObserver,
   LogLevel
 } from './types';
-import { logger } from '@client/utils/logger';
+import { logger } from '../../utils/logger';
 
 // ============================================================================
 // Configuration Service Implementation

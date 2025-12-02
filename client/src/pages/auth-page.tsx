@@ -1,6 +1,6 @@
 /**
  * Comprehensive Authentication Page
- * 
+ *
  * Complete authentication flow with login, registration, password reset,
  * and OAuth integration. Includes proper error handling, accessibility,
  * and security features.
@@ -9,20 +9,40 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, CheckCircle, ArrowLeft, Shield, Mail } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/components/ui/card';
 import { Button } from '@client/components/ui/button';
 import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { LoginForm } from '@client/components/auth/LoginForm';
+import { LoginForm } from '@client/components/shared/auth/forms';
 import { RegisterForm } from '@client/components/auth/ui/RegisterForm';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { logger } from '@client/utils/logger';
 
-type AuthMode = 'login' | 'register' | 'forgot-password' | 'reset-password' | 'verify-email' | 'oauth-callback';
+type AuthMode =
+  | 'login'
+  | 'register'
+  | 'forgot-password'
+  | 'reset-password'
+  | 'verify-email'
+  | 'oauth-callback';
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, isAuthenticated, verifyEmail, resetPassword, requestPasswordReset, loginWithOAuth, register } = useAuth();
+  const {
+    user,
+    isAuthenticated,
+    verifyEmail,
+    resetPassword,
+    requestPasswordReset,
+    loginWithOAuth,
+    register,
+  } = useAuth();
 
   // Determine initial mode from URL parameters
   const getInitialMode = (): AuthMode => {
@@ -121,11 +141,14 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const result = await requestPasswordReset(email, `${window.location.origin}/auth?mode=reset-password`);
+      const result = await requestPasswordReset(
+        email,
+        `${window.location.origin}/auth?mode=reset-password`
+      );
       if (result.success) {
-        setMessage({ 
-          type: 'success', 
-          text: 'Password reset instructions have been sent to your email address.' 
+        setMessage({
+          type: 'success',
+          text: 'Password reset instructions have been sent to your email address.',
         });
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to send reset email' });
@@ -159,9 +182,9 @@ export default function AuthPage() {
     try {
       const result = await resetPassword(resetToken, newPassword, confirmPassword);
       if (result.success) {
-        setMessage({ 
-          type: 'success', 
-          text: 'Password reset successfully! You can now sign in with your new password.' 
+        setMessage({
+          type: 'success',
+          text: 'Password reset successfully! You can now sign in with your new password.',
         });
         setMode('login');
       } else {
@@ -189,7 +212,7 @@ export default function AuthPage() {
       'forgot-password': 'Reset Your Password',
       'reset-password': 'Set New Password',
       'verify-email': 'Verify Your Email',
-      'oauth-callback': 'Completing Sign In...'
+      'oauth-callback': 'Completing Sign In...',
     };
 
     const descriptions = {
@@ -198,7 +221,7 @@ export default function AuthPage() {
       'forgot-password': 'Enter your email to receive reset instructions',
       'reset-password': 'Choose a strong new password for your account',
       'verify-email': 'Verifying your email address...',
-      'oauth-callback': 'Please wait while we complete your authentication...'
+      'oauth-callback': 'Please wait while we complete your authentication...',
     };
 
     return (
@@ -206,12 +229,8 @@ export default function AuthPage() {
         <div className="flex items-center justify-center mb-4">
           <Shield className="h-12 w-12 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {titles[mode]}
-        </h1>
-        <p className="text-gray-600">
-          {descriptions[mode]}
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{titles[mode]}</h1>
+        <p className="text-gray-600">{descriptions[mode]}</p>
       </div>
     );
   };
@@ -243,7 +262,9 @@ export default function AuthPage() {
             <div className="text-center space-y-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
               <p className="text-muted-foreground">
-                {mode === 'verify-email' ? 'Verifying your email...' : 'Completing authentication...'}
+                {mode === 'verify-email'
+                  ? 'Verifying your email...'
+                  : 'Completing authentication...'}
               </p>
             </div>
           </CardContent>
@@ -255,6 +276,7 @@ export default function AuthPage() {
       case 'login':
         return (
           <LoginForm
+            variant="security"
             onSuccess={handleAuthSuccess}
             onSwitchToRegister={() => {
               setMode('register');
@@ -270,7 +292,12 @@ export default function AuthPage() {
       case 'register':
         return (
           <RegisterForm
-            onSubmit={async (data) => {
+            onSubmit={async (data: {
+              email: string;
+              password: string;
+              first_name: string;
+              last_name: string;
+            }) => {
               setLoading(true);
               try {
                 // call central register API via useAuth
@@ -283,7 +310,12 @@ export default function AuthPage() {
 
                 if (result.success) {
                   // on successful registration navigate/notify
-                  setMessage({ type: 'success', text: result.requiresVerification ? 'Account created! Please check your email to verify your account.' : 'Account created successfully! Redirecting...' });
+                  setMessage({
+                    type: 'success',
+                    text: result.requiresVerification
+                      ? 'Account created! Please check your email to verify your account.'
+                      : 'Account created successfully! Redirecting...',
+                  });
                   // short delay to show message then redirect
                   setTimeout(() => handleAuthSuccess(), 800);
                 }
@@ -297,7 +329,7 @@ export default function AuthPage() {
                 setLoading(false);
               }
             }}
-            onError={(err) => setMessage({ type: 'error', text: err })}
+            onError={(err: string) => setMessage({ type: 'error', text: err })}
           />
         );
 
@@ -323,7 +355,7 @@ export default function AuthPage() {
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="Enter your email address"
                     required
@@ -343,9 +375,7 @@ export default function AuthPage() {
           <Card className="w-full max-w-md mx-auto">
             <CardHeader>
               <CardTitle>Set New Password</CardTitle>
-              <CardDescription>
-                Choose a strong password for your account.
-              </CardDescription>
+              <CardDescription>Choose a strong password for your account.</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handlePasswordReset} className="space-y-4">
@@ -357,7 +387,7 @@ export default function AuthPage() {
                     id="new-password"
                     type="password"
                     value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    onChange={e => setNewPassword(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="Enter new password"
                     required
@@ -373,7 +403,7 @@ export default function AuthPage() {
                     id="confirm-password"
                     type="password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={e => setConfirmPassword(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="Confirm new password"
                     required
@@ -398,12 +428,9 @@ export default function AuthPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {renderHeader()}
-        
+
         {message && (
-          <Alert 
-            variant={message.type === 'error' ? 'destructive' : 'default'} 
-            className="mb-6"
-          >
+          <Alert variant={message.type === 'error' ? 'destructive' : 'default'} className="mb-6">
             {message.type === 'error' ? (
               <AlertTriangle className="h-4 w-4" />
             ) : (
@@ -433,4 +460,3 @@ export default function AuthPage() {
     </div>
   );
 }
-

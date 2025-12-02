@@ -10,8 +10,8 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
 import { Server as HttpServer } from 'http';
 import { logger } from '@shared/core/observability/logging';
-import { database as db } from '@shared/database/connection.js';
-import { users } from '@shared/schema/foundation.js';
+import { database as db } from '@shared/database';
+import { users } from '@shared/schema.js';
 import { eq } from 'drizzle-orm';
 import * as jwt from 'jsonwebtoken';
 

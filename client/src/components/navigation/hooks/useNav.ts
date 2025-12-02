@@ -1,8 +1,8 @@
 import { useAuth } from '@/features/users/hooks';
 import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
-import { DEFAULT_NAVIGATION_MAP } from '@client/constants';
+import { DEFAULT_NAVIGATION_MAP } from '../constants';
 import { canViewItem } from '../core/roleGuard';
-import type { NavigationSection } from '@client/types';
+import type { NavigationSection } from '@client/types/navigation';
 
 export const useNav = (section?: NavigationSection) => {
   const { user } = useAuth();

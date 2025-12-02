@@ -5,7 +5,7 @@
  */
 
 import type { UnifiedApiClient } from './types';
-import { logger } from '@client/utils/logger';
+import { logger } from '../../utils/logger';
 
 // ============================================================================
 // Core Authentication Types

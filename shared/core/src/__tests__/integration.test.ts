@@ -8,21 +8,21 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
 
 import { MiddlewareConfig } from '../middleware/config';
-import { MiddlewareFactory } from '@shared/core/src/middleware/factory';
-// import { Logger } from '@shared/core/src/observability/logging'; // Using logger instance instead
+import { MiddlewareFactory } from '../middleware/factory';
+// import { Logger } from '../observability/logging'; // Using logger instance instead
 import { CacheInterface } from '../caching/core/interfaces';
 import { ValidationAdapter } from '../validation/core/interfaces';
-import { RateLimitStore } from '@shared/core/src/types';
+import { RateLimitStore } from '../types';
 import { HealthOrchestrator } from '../observability/health/health-orchestrator';
 import express from 'express';
 import request from 'supertest';
-import { logger } from '@shared/core/src/observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 describe('Core Utilities Integration Tests', () => {
   let app: express.Application;

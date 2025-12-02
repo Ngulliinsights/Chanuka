@@ -1,537 +1,505 @@
-/* Design Tokens - Must come first */
-@import './styles/design-tokens.css';
-
-/* Tailwind CSS - Base layer */
-@tailwind base;
-
-/* Design System Imports */
+/* Import Chanuka Design System */
 @import './styles/chanuka-design-system.css';
-@import './styles/base/base.css';
-@import './styles/themes/dark.css';
-@import './shared/design-system/responsive.css';
-
-/* Component Styles */
-@import './styles/components/buttons.css';
-@import './styles/components/forms.css';
-@import './styles/components/layout.css';
-@import './styles/components/ui.css';
-@import './styles/components/progressive-disclosure.css';
-
-/* Responsive Styles */
-@import './styles/responsive/mobile.css';
-@import './styles/responsive/tablet.css';
-@import './styles/responsive/desktop.css';
-@import './styles/responsive/special.css';
-
-/* Utilities */
-@import './styles/utilities/animations.css';
-@import './styles/utilities/accessibility.css';
-@import './styles/accessibility.css';
-@import './styles/fallbacks.css';
-
-/* Tailwind Components and Utilities - After custom styles */
-@tailwind components;
-@tailwind utilities;
-
-  .chanuka-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--space-md) var(--space-xl);
-    gap: var(--space-lg);
-  }
-
-  .chanuka-logo {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: inherit;
-    text-decoration: none;
-    transition: opacity var(--timing-fast) var(--easing-out);
-  }
-
-  .chanuka-logo:hover {
-    opacity: 0.9;
-    text-decoration: none;
-  }
-
-  .chanuka-logo-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    background-color: hsl(var(--primary-foreground));
-    color: hsl(var(--primary));
-    border-radius: var(--radius-full);
-    font-weight: 700;
-    font-size: 0.875rem;
-  }
-
-  /* Card Component - Enhanced with better spacing and hover effects */
-  .chanuka-card {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    transition: all var(--timing-base) var(--easing-out);
-  }
-
-  .chanuka-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    border-color: hsl(var(--border) / 0.8);
-  }
-
-  .chanuka-card-header {
-    padding: var(--space-lg);
-    background-color: hsl(var(--muted));
-    border-bottom: 1px solid hsl(var(--border));
-  }
-
-  .chanuka-card-content {
-    padding: var(--space-lg);
-  }
-
-  .chanuka-card-footer {
-    padding: var(--space-md) var(--space-lg);
-    background-color: hsl(var(--muted));
-    border-top: 1px solid hsl(var(--border));
-  }
-
-  /* Button System - Comprehensive and accessible */
-  .chanuka-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.25;
-    text-align: center;
-    text-decoration: none;
-    white-space: nowrap;
-    border: 1px solid transparent;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--timing-fast) var(--easing-out);
-    -webkit-user-select: none;
-    user-select: none;
-  }
-
-  .chanuka-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-
-  /* Button size variants */
-  .chanuka-btn-sm {
-    padding: var(--space-xs) var(--space-sm);
-    font-size: 0.75rem;
-  }
-
-  .chanuka-btn-lg {
-    padding: var(--space-md) var(--space-lg);
-    font-size: 1rem;
-  }
-
-  /* Button style variants */
-  .chanuka-btn-primary {
-    background-color: hsl(var(--accent));
-    border-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
-  }
-
-  .chanuka-btn-primary:hover:not(:disabled) {
-    background-color: hsl(var(--accent) / 0.9);
-    border-color: hsl(var(--accent) / 0.9);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .chanuka-btn-secondary {
-    background-color: hsl(var(--secondary));
-    border-color: hsl(var(--secondary));
-    color: hsl(var(--secondary-foreground));
-  }
-
-  .chanuka-btn-secondary:hover:not(:disabled) {
-    background-color: hsl(var(--primary-dark));
-    border-color: hsl(var(--primary-dark));
-  }
-
-  .chanuka-btn-outline {
-    background-color: transparent;
-    border-color: hsl(var(--border));
-    color: hsl(var(--muted-foreground));
-  }
-
-  .chanuka-btn-outline:hover:not(:disabled) {
-    background-color: hsl(var(--accent));
-    border-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
-  }
-
-  .chanuka-btn-ghost {
-    background-color: transparent;
-    border-color: transparent;
-    color: hsl(var(--muted-foreground));
-  }
-
-  .chanuka-btn-ghost:hover:not(:disabled) {
-    background-color: hsl(var(--muted));
-    color: hsl(var(--foreground));
-  }
-
-  /* Form Controls - Improved accessibility and consistency */
-  .chanuka-input,
-  .chanuka-select,
-  .chanuka-textarea {
-    width: 100%;
-    padding: var(--space-sm) var(--space-md);
-    font-family: inherit;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: hsl(var(--foreground));
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius-md);
-    transition: all var(--timing-fast) var(--easing-out);
-  }
-
-  .chanuka-input:focus,
-  .chanuka-select:focus,
-  .chanuka-textarea:focus {
-    outline: none;
-    border-color: hsl(var(--ring));
-    box-shadow: var(--shadow-focus);
-  }
-
-  .chanuka-input::placeholder,
-  .chanuka-textarea::placeholder {
-    color: hsl(var(--muted-foreground));
-  }
-
-  .chanuka-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right var(--space-sm) center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-    cursor: pointer;
-  }
-
-  /* Tab System - Enhanced with better state management */
-  .chanuka-tabs {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-
-  .chanuka-tab-list {
-    display: flex;
-    background-color: hsl(var(--muted));
-    border-bottom: 1px solid hsl(var(--border));
-  }
-
-  .chanuka-tab {
-    flex: 1;
-    padding: var(--space-md) var(--space-lg);
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-align: center;
-    background-color: transparent;
-    border: none;
-    border-bottom: 3px solid transparent;
-    color: hsl(var(--muted-foreground));
-    cursor: pointer;
-    transition: all var(--timing-fast) var(--easing-out);
-  }
-
-  .chanuka-tab:hover:not(.active) {
-    background-color: hsl(var(--muted) / 0.8);
-    color: hsl(var(--foreground));
-  }
-
-  .chanuka-tab.active {
-    background-color: hsl(var(--accent));
-    border-bottom-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
-  }
-
-  .chanuka-tab-content {
-    padding: var(--space-lg);
-  }
-
-  /* Status Indicators - Improved semantic design */
-  .chanuka-status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--space-xs) var(--space-sm);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: hsl(var(--primary-foreground));
-    border-radius: var(--radius-full);
-  }
-
-  .chanuka-status-success {
-    background-color: hsl(var(--success));
-  }
-  .chanuka-status-warning {
-    background-color: hsl(var(--warning));
-    color: hsl(var(--foreground));
-  }
-  .chanuka-status-error {
-    background-color: hsl(var(--danger));
-  }
-  .chanuka-status-info {
-    background-color: hsl(var(--info));
-  }
-
-  .chanuka-status-urgent {
-    background-color: hsl(var(--danger));
-    animation: pulse 2s infinite;
-  }
-
-  /* Progress Indicators */
-  .chanuka-progress {
-    width: 100%;
-    height: 0.5rem;
-    background-color: hsl(var(--muted));
-    border-radius: var(--radius-full);
-    overflow: hidden;
-  }
-
-  .chanuka-progress-bar {
-    height: 100%;
-    background-color: hsl(var(--accent));
-    border-radius: var(--radius-full);
-    transition: width var(--timing-slow) var(--easing-out);
-  }
-
-  /* Timeline Component */
-  .chanuka-timeline {
-    position: relative;
-    padding-left: var(--space-xl);
-    margin: var(--space-xl) 0;
-  }
-
-  .chanuka-timeline::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0.5rem;
-    height: 100%;
-    width: 2px;
-    background-color: hsl(var(--border));
-  }
-
-  .chanuka-timeline-item {
-    position: relative;
-    margin-bottom: var(--space-lg);
-    padding-bottom: var(--space-lg);
-  }
-
-  .chanuka-timeline-marker {
-    position: absolute;
-    left: -var(--space-xl);
-    top: var(--space-xs);
-    width: 1rem;
-    height: 1rem;
-    background-color: hsl(var(--card));
-    border: 2px solid hsl(var(--border));
-    border-radius: var(--radius-full);
-    z-index: 1;
-  }
-
-  .chanuka-timeline-marker.active {
-    background-color: hsl(var(--success));
-    border-color: hsl(var(--success));
-  }
-
-  .chanuka-timeline-marker.current {
-    background-color: hsl(var(--accent));
-    border-color: hsl(var(--accent));
-    box-shadow: 0 0 0 4px rgba(243, 138, 31, 0.15);
-  }
-
-  /* Filter and Search Components */
-  .chanuka-filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
-  }
-
-  .chanuka-search-box {
-    position: relative;
-    flex: 1;
-    max-width: 24rem;
-  }
-
-  .chanuka-search-box input {
-    padding-left: 2.5rem;
-  }
-
-  .chanuka-search-icon {
-    position: absolute;
-    left: var(--space-md);
-    top: 50%;
-    transform: translateY(-50%);
-    color: hsl(var(--muted-foreground));
-    pointer-events: none;
-  }
-
-  /* Breadcrumb Navigation */
-  .chanuka-breadcrumb {
-    display: flex;
-    align-items: center;
-    padding: var(--space-md);
-    font-size: 0.875rem;
-    background-color: hsl(var(--muted));
-    border-bottom: 1px solid hsl(var(--border));
-  }
-
-  .chanuka-breadcrumb a {
-    color: hsl(var(--primary));
-    text-decoration: none;
-    transition: color var(--timing-fast) var(--easing-out);
-  }
-
-  .chanuka-breadcrumb a:hover {
-    color: hsl(var(--accent));
-  }
-
-  .chanuka-breadcrumb .separator {
-    margin: 0 var(--space-sm);
-    color: hsl(var(--muted-foreground));
-  }
-
-  .chanuka-breadcrumb .current {
-    color: hsl(var(--foreground));
-    font-weight: 500;
-  }
-
-  /* Layout System - Responsive design improvements */
-  .chanuka-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--space-md);
-  }
-
-  .chanuka-grid {
-    display: grid;
-    gap: var(--space-lg);
-  }
-
-  .chanuka-grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-  .chanuka-grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .chanuka-grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .chanuka-grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  /* Utility Classes */
-  .chanuka-fade-in {
-    animation: fadeIn var(--timing-slow) var(--easing-out);
-  }
-
-  .chanuka-slide-up {
-    animation: slideUp var(--timing-slow) var(--easing-out);
-  }
-
-  /* Enhanced Navigation Components */
-  .chanuka-sidebar {
-    background-color: hsl(var(--sidebar-background));
-    border-right: 1px solid hsl(var(--sidebar-border));
-    transition: all var(--timing-base) var(--easing-in-out);
-  }
-
-  .chanuka-sidebar-collapsed {
-    width: 4rem;
-    min-width: 4rem;
-  }
-
-  .chanuka-sidebar-expanded {
-    width: 16rem;
-    min-width: 16rem;
-  }
-
-  .chanuka-nav-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
-    color: hsl(var(--sidebar-foreground) / 0.7);
-    text-decoration: none;
-    border-radius: var(--radius-md);
-    transition: all var(--timing-fast) var(--easing-out);
-    position: relative;
-  }
-
-  .chanuka-nav-item:hover {
-    background-color: hsl(var(--muted));
-    color: hsl(var(--sidebar-foreground));
-  }
-
-  .chanuka-nav-item.active {
-    background-color: hsl(var(--sidebar-accent));
-    color: hsl(var(--sidebar-accent-foreground));
-  }
-
-  .chanuka-nav-tooltip {
-    position: absolute;
-    left: calc(100% + var(--space-sm));
-    top: 50%;
-    transform: translateY(-50%);
-    padding: var(--space-xs) var(--space-sm);
-    background-color: hsl(var(--foreground));
-    color: hsl(var(--background));
-    font-size: 0.75rem;
-    white-space: nowrap;
-    border-radius: var(--radius-sm);
-    opacity: 0;
-    visibility: hidden;
-    transition: all var(--timing-fast) var(--easing-out);
-    z-index: 100;
-    pointer-events: none;
-  }
-
-  .chanuka-nav-tooltip::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: -4px;
-    transform: translateY(-50%) rotate(45deg);
-    width: 8px;
-    height: 8px;
-    background-color: hsl(var(--foreground));
-  }
-
-  .chanuka-nav-item:hover .chanuka-nav-tooltip {
-    opacity: 1;
-    visibility: visible;
-  }
+
+.chanuka-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-md) var(--space-xl);
+  gap: var(--space-lg);
+}
+
+.chanuka-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--timing-fast) var(--easing-out);
+}
+
+.chanuka-logo:hover {
+  opacity: 0.9;
+  text-decoration: none;
+}
+
+.chanuka-logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background-color: hsl(var(--primary-foreground));
+  color: hsl(var(--primary));
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* Card Component - Enhanced with better spacing and hover effects */
+.chanuka-card {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all var(--timing-base) var(--easing-out);
+}
+
+.chanuka-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: hsl(var(--border) / 0.8);
+}
+
+.chanuka-card-header {
+  padding: var(--space-lg);
+  background-color: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.chanuka-card-content {
+  padding: var(--space-lg);
+}
+
+.chanuka-card-footer {
+  padding: var(--space-md) var(--space-lg);
+  background-color: hsl(var(--muted));
+  border-top: 1px solid hsl(var(--border));
+}
+
+/* Button System - Comprehensive and accessible */
+.chanuka-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--timing-fast) var(--easing-out);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.chanuka-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Button size variants */
+.chanuka-btn-sm {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+}
+
+.chanuka-btn-lg {
+  padding: var(--space-md) var(--space-lg);
+  font-size: 1rem;
+}
+
+/* Button style variants */
+.chanuka-btn-primary {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+.chanuka-btn-primary:hover:not(:disabled) {
+  background-color: hsl(var(--accent) / 0.9);
+  border-color: hsl(var(--accent) / 0.9);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.chanuka-btn-secondary {
+  background-color: hsl(var(--secondary));
+  border-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+}
+
+.chanuka-btn-secondary:hover:not(:disabled) {
+  background-color: hsl(var(--primary-dark));
+  border-color: hsl(var(--primary-dark));
+}
+
+.chanuka-btn-outline {
+  background-color: transparent;
+  border-color: hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+}
+
+.chanuka-btn-outline:hover:not(:disabled) {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+.chanuka-btn-ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: hsl(var(--muted-foreground));
+}
+
+.chanuka-btn-ghost:hover:not(:disabled) {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
+/* Form Controls - Improved accessibility and consistency */
+.chanuka-input,
+.chanuka-select,
+.chanuka-textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  transition: all var(--timing-fast) var(--easing-out);
+}
+
+.chanuka-input:focus,
+.chanuka-select:focus,
+.chanuka-textarea:focus {
+  outline: none;
+  border-color: hsl(var(--ring));
+  box-shadow: var(--shadow-focus);
+}
+
+.chanuka-input::placeholder,
+.chanuka-textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.chanuka-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right var(--space-sm) center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+/* Tab System - Enhanced with better state management */
+.chanuka-tabs {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.chanuka-tab-list {
+  display: flex;
+  background-color: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.chanuka-tab {
+  flex: 1;
+  padding: var(--space-md) var(--space-lg);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  transition: all var(--timing-fast) var(--easing-out);
+}
+
+.chanuka-tab:hover:not(.active) {
+  background-color: hsl(var(--muted) / 0.8);
+  color: hsl(var(--foreground));
+}
+
+.chanuka-tab.active {
+  background-color: hsl(var(--accent));
+  border-bottom-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+.chanuka-tab-content {
+  padding: var(--space-lg);
+}
+
+/* Status Indicators - Improved semantic design */
+.chanuka-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: hsl(var(--primary-foreground));
+  border-radius: var(--radius-full);
+}
+
+.chanuka-status-success {
+  background-color: hsl(var(--success));
+}
+.chanuka-status-warning {
+  background-color: hsl(var(--warning));
+  color: hsl(var(--foreground));
+}
+.chanuka-status-error {
+  background-color: hsl(var(--danger));
+}
+.chanuka-status-info {
+  background-color: hsl(var(--info));
+}
+
+.chanuka-status-urgent {
+  background-color: hsl(var(--danger));
+  animation: pulse 2s infinite;
+}
+
+/* Progress Indicators */
+.chanuka-progress {
+  width: 100%;
+  height: 0.5rem;
+  background-color: hsl(var(--muted));
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.chanuka-progress-bar {
+  height: 100%;
+  background-color: hsl(var(--accent));
+  border-radius: var(--radius-full);
+  transition: width var(--timing-slow) var(--easing-out);
+}
+
+/* Timeline Component */
+.chanuka-timeline {
+  position: relative;
+  padding-left: var(--space-xl);
+  margin: var(--space-xl) 0;
+}
+
+.chanuka-timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0.5rem;
+  height: 100%;
+  width: 2px;
+  background-color: hsl(var(--border));
+}
+
+.chanuka-timeline-item {
+  position: relative;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-lg);
+}
+
+.chanuka-timeline-marker {
+  position: absolute;
+  left: -var(--space-xl);
+  top: var(--space-xs);
+  width: 1rem;
+  height: 1rem;
+  background-color: hsl(var(--card));
+  border: 2px solid hsl(var(--border));
+  border-radius: var(--radius-full);
+  z-index: 1;
+}
+
+.chanuka-timeline-marker.active {
+  background-color: hsl(var(--success));
+  border-color: hsl(var(--success));
+}
+
+.chanuka-timeline-marker.current {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--accent));
+  box-shadow: 0 0 0 4px rgba(243, 138, 31, 0.15);
+}
+
+/* Filter and Search Components */
+.chanuka-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.chanuka-search-box {
+  position: relative;
+  flex: 1;
+  max-width: 24rem;
+}
+
+.chanuka-search-box input {
+  padding-left: 2.5rem;
+}
+
+.chanuka-search-icon {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+}
+
+/* Breadcrumb Navigation */
+.chanuka-breadcrumb {
+  display: flex;
+  align-items: center;
+  padding: var(--space-md);
+  font-size: 0.875rem;
+  background-color: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.chanuka-breadcrumb a {
+  color: hsl(var(--primary));
+  text-decoration: none;
+  transition: color var(--timing-fast) var(--easing-out);
+}
+
+.chanuka-breadcrumb a:hover {
+  color: hsl(var(--accent));
+}
+
+.chanuka-breadcrumb .separator {
+  margin: 0 var(--space-sm);
+  color: hsl(var(--muted-foreground));
+}
+
+.chanuka-breadcrumb .current {
+  color: hsl(var(--foreground));
+  font-weight: 500;
+}
+
+/* Layout System - Responsive design improvements */
+.chanuka-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.chanuka-grid {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.chanuka-grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+.chanuka-grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.chanuka-grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.chanuka-grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Utility Classes */
+.chanuka-fade-in {
+  animation: fadeIn var(--timing-slow) var(--easing-out);
+}
+
+.chanuka-slide-up {
+  animation: slideUp var(--timing-slow) var(--easing-out);
+}
+
+/* Enhanced Navigation Components */
+.chanuka-sidebar {
+  background-color: hsl(var(--sidebar-background));
+  border-right: 1px solid hsl(var(--sidebar-border));
+  transition: all var(--timing-base) var(--easing-in-out);
+}
+
+.chanuka-sidebar-collapsed {
+  width: 4rem;
+  min-width: 4rem;
+}
+
+.chanuka-sidebar-expanded {
+  width: 16rem;
+  min-width: 16rem;
+}
+
+.chanuka-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: hsl(var(--sidebar-foreground) / 0.7);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: all var(--timing-fast) var(--easing-out);
+  position: relative;
+}
+
+.chanuka-nav-item:hover {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--sidebar-foreground));
+}
+
+.chanuka-nav-item.active {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-accent-foreground));
+}
+
+.chanuka-nav-tooltip {
+  position: absolute;
+  left: calc(100% + var(--space-sm));
+  top: 50%;
+  transform: translateY(-50%);
+  padding: var(--space-xs) var(--space-sm);
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--background));
+  font-size: 0.75rem;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--timing-fast) var(--easing-out);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.chanuka-nav-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background-color: hsl(var(--foreground));
+}
+
+.chanuka-nav-item:hover .chanuka-nav-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
 
 /* Enhanced Responsive Design - Mobile-first approach with better breakpoints */
 
@@ -743,16 +711,6 @@
 }
 
 /* Animation Definitions */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(var(--space-sm));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 @keyframes slideUp {
   from {
@@ -870,7 +828,8 @@
   will-change: width, transform;
   transform: translateZ(0); /* Force GPU layer */
   backface-visibility: hidden;
-  transition: width var(--timing-base) var(--easing-in-out),
+  transition:
+    width var(--timing-base) var(--easing-in-out),
     transform var(--timing-base) var(--easing-in-out);
 }
 
@@ -879,7 +838,8 @@
   will-change: margin-left, padding;
   transform: translateZ(0); /* Force GPU layer */
   backface-visibility: hidden;
-  transition: margin-left var(--timing-base) var(--easing-in-out),
+  transition:
+    margin-left var(--timing-base) var(--easing-in-out),
     padding var(--timing-base) var(--easing-in-out);
 }
 
@@ -900,14 +860,16 @@
 .chanuka-mobile-nav-enter-active {
   transform: translateY(0);
   opacity: 1;
-  transition: transform var(--timing-base) var(--easing-out),
+  transition:
+    transform var(--timing-base) var(--easing-out),
     opacity var(--timing-base) var(--easing-out);
 }
 
 .chanuka-mobile-nav-exit-active {
   transform: translateY(-100%);
   opacity: 0;
-  transition: transform var(--timing-base) var(--easing-in),
+  transition:
+    transform var(--timing-base) var(--easing-in),
     opacity var(--timing-base) var(--easing-in);
 }
 
@@ -934,7 +896,7 @@
   /* Enhanced touch targets */
   .chanuka-btn,
   button,
-  [role="button"] {
+  [role='button'] {
     min-height: 44px;
     min-width: 44px;
     touch-action: manipulation;
@@ -1084,14 +1046,16 @@
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  transition:
+    opacity 0.2s ease-in-out,
+    visibility 0.2s ease-in-out;
   z-index: 1000;
   pointer-events: none;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .chanuka-nav-tooltip-enhanced::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   left: -4px;
@@ -1114,7 +1078,7 @@
 }
 
 .chanuka-nav-loading::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1163,7 +1127,7 @@
     color: ButtonText;
   }
 
-  .chanuka-nav-item[aria-current="page"] {
+  .chanuka-nav-item[aria-current='page'] {
     background-color: Highlight;
     color: HighlightText;
     border-color: HighlightText;
@@ -1235,20 +1199,6 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-}
-
-.line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
 }
 
 /* Mobile-optimized touch interactions */
@@ -1378,10 +1328,10 @@
 
 /* Improved mobile form controls */
 @media (max-width: 640px) {
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="search"],
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='search'],
   textarea,
   select {
     font-size: 16px; /* Prevent zoom on iOS */
@@ -1453,7 +1403,12 @@
 
 /* Mobile-specific loading states */
 .mobile-skeleton {
-  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%);
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted) / 0.5) 50%,
+    hsl(var(--muted)) 75%
+  );
   background-size: 200% 100%;
   animation: mobileSkeletonLoading 1.5s infinite;
 }
@@ -1498,7 +1453,7 @@
   .mobile-only {
     display: none;
   }
-  
+
   .desktop-only {
     display: block;
   }
@@ -1584,7 +1539,7 @@
     background: ButtonFace;
     color: ButtonText;
   }
-  
+
   .mobile-high-contrast:focus {
     outline: 3px solid Highlight;
     outline-offset: 2px;
@@ -1596,7 +1551,7 @@
   .mobile-print-hidden {
     display: none !important;
   }
-  
+
   .mobile-print-visible {
     display: block !important;
   }

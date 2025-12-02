@@ -10,7 +10,7 @@
 // - Dual-engine integration capabilities
 
 import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 import { databaseService } from '@/infrastructure/database/database-service';
 import { searchSyntaxParser, ParsedQuery } from '@server/utils/search-syntax-parser';
 

@@ -3,7 +3,7 @@ import { authenticateToken, AuthenticatedRequest } from '../../../middleware/aut
 import { user_profileservice } from '@shared/domain/user-profile.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api-utils';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 export const router = Router();
 

@@ -10,7 +10,7 @@ import { ConfigManager } from '../index';
 import { z } from 'zod';
 import fs from 'fs';
 import path from 'path';
-import { logger } from '@shared/core/src/observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 // Mock file system operations
 vi.mock('fs');

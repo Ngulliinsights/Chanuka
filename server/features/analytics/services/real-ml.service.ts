@@ -2,7 +2,7 @@
 // import * as tf from '@tensorflow/tfjs-node';
 import * as natural from 'natural';
 import * as compromise from 'compromise';
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import type {
     AnalysisResult,

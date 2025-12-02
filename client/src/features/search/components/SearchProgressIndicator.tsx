@@ -6,10 +6,10 @@
  */
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Progress } from '../../../components/ui/progress';
+import { Badge } from '../../../components/ui/badge';
 import {
   Loader2,
   X,
@@ -20,8 +20,16 @@ import {
   Search,
   Target
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { SearchProgress } from '@client/services/streaming-search';
+import { cn } from '../../../lib/utils';
+
+// Define SearchProgress type locally
+interface SearchProgress {
+  loaded: number;
+  total: number;
+  percentage: number;
+  currentEngine: string;
+  searchTime: number;
+}
 
 interface SearchProgressIndicatorProps {
   progress: SearchProgress;

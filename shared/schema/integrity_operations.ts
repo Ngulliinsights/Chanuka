@@ -5,7 +5,7 @@
 
 import {
   pgTable, text, integer, timestamp, jsonb, numeric, uuid, varchar,
-  index, uniqueIndex, smallint, boolean, date
+  index, uniqueIndex, smallint, boolean
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";

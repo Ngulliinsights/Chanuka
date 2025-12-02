@@ -7,8 +7,8 @@ import { DomainEventPublisher } from '@shared/events/bill-events';
 import { databaseService } from '@/infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
 import { eq, and, sql, count, desc } from 'drizzle-orm';
-import { bills, bill_engagement, sponsors, users } from '@shared/schema/foundation';
-import { bill_votes, bill_trackers } from '@shared/schema/citizen_participation';
+import { bills, bill_engagement, sponsors, users } from '@shared/schema';
+import { bill_votes, bill_trackers } from '@shared/schema';
 
 /**
  * Business rules and validation logic for bill operations

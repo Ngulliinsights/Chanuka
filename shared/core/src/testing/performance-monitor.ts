@@ -1,8 +1,6 @@
-import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
 import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { logger } from '../observability/logging';
 
 /**
  * Performance monitoring and reporting utility
@@ -73,7 +71,7 @@ export class PerformanceMonitor extends EventEmitter {
     const metric: PerformanceMetric = {
       timestamp: Date.now(),
       value,
-      metadata
+      ...(metadata !== undefined && { metadata })
     };
 
     this.metrics.get(metricName)!.push(metric);
@@ -205,7 +203,7 @@ export class PerformanceMonitor extends EventEmitter {
       metricReports.push({
         metricName,
         stats,
-        baseline: baseline || undefined,
+        ...(baseline && { baseline }),
         dataPoints: this.getMetrics(metricName, timeRangeMs).length
       });
     }
@@ -305,7 +303,7 @@ export class PerformanceMonitor extends EventEmitter {
           trend: stats.trend,
           status: this.getMetricStatus(metricName, stats.mean),
           sparkline: recentMetrics.slice(-50).map(m => ({ x: m.timestamp, y: m.value })),
-          baseline: baseline?.baseline.expectedValue,
+          ...(baseline?.baseline.expectedValue !== undefined && { baseline: baseline.baseline.expectedValue }),
           isRegression: baseline?.isRegression || false
         });
       }
@@ -329,8 +327,10 @@ export class PerformanceMonitor extends EventEmitter {
 
   // Private helper methods
   private calculatePercentile(sortedValues: number[], percentile: number): number {
+    if (sortedValues.length === 0) return 0;
     const index = Math.ceil((percentile / 100) * sortedValues.length) - 1;
-    return sortedValues[Math.max(0, index)];
+    const value = sortedValues[Math.max(0, index)];
+    return value ?? 0;
   }
 
   private calculateStandardDeviation(values: number[]): number {
@@ -453,7 +453,7 @@ export class PerformanceMonitor extends EventEmitter {
     });
   }
 
-  private getRecentAlerts(timeRangeMs: number): PerformanceAlert[] {
+  private getRecentAlerts(_timeRangeMs: number): PerformanceAlert[] {
     // This would typically be stored separately
     // For now, return empty array
     return [];

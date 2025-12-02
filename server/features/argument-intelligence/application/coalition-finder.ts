@@ -3,7 +3,7 @@
 // ============================================================================
 // Identifies potential coalitions based on shared concerns and compatible positions
 
-import { logger  } from '@shared/core/index.js';
+import { logger  } from '@shared/core';
 import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator.js';
 
 export interface CoalitionMatch {

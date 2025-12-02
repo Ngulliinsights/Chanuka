@@ -16,7 +16,7 @@ import { EventEmitter } from 'events';
 // import { Redis } from 'ioredis';
 import { ExternalAPIErrorHandler, ErrorSeverity } from '@server/services/external-api-error-handler';
 import { APICostMonitoringService } from '@server/services/api-cost-monitoring';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 
 // ============================================================================
 // Core Types and Interfaces

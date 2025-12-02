@@ -266,7 +266,7 @@ export class AIDeduplicationMiddleware {
     return {
       pendingRequests: this.pendingRequests.size,
       pendingKeys: Array.from(this.pendingRequests.keys()),
-      cacheSize: undefined // Would need cache adapter support
+      cacheSize: undefined as any // Would need cache adapter support
     };
   }
 

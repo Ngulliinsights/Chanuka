@@ -299,12 +299,12 @@ export class ProgressTracker extends EventEmitter {
   public stop(): void {
     if (this.updateTimer) {
       clearInterval(this.updateTimer);
-      this.updateTimer = undefined;
+      this.updateTimer = undefined as any;
     }
 
     if (this.resourceMonitor) {
       clearInterval(this.resourceMonitor);
-      this.resourceMonitor = undefined;
+      this.resourceMonitor = undefined as any;
     }
 
     this.logger.info('Progress tracking stopped', {});
@@ -392,7 +392,7 @@ export class ProgressTracker extends EventEmitter {
     // Calculate duration since last progress update
     // This is simplified - in reality, we'd track individual step start times
     return this.stepDurations.length > 0 
-      ? Date.now() / 1000 - this.stepDurations[this.stepDurations.length - 1]
+      ? Date.now() / 1000 - (this.stepDurations[this.stepDurations.length - 1] || 0)
       : 0;
   }
 

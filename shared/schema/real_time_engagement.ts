@@ -5,7 +5,7 @@
 
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, uuid, varchar,
-  index, uniqueIndex, decimal, unique
+  index, decimal, unique
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users } from './foundation';

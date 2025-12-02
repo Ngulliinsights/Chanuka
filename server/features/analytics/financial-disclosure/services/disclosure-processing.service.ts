@@ -6,7 +6,7 @@ import {
 } from "@shared/foundation";
 import { eq, desc, and, sql, count } from "drizzle-orm";
 import { readDatabase } from '@shared/database';
-import { cache, logger, NotFoundError, DatabaseError  } from '@shared/core/index.js';
+import { cache, logger, NotFoundError, DatabaseError  } from '@shared/core';
 import { FinancialDisclosureConfig } from '@shared/config';
 import type {
   FinancialDisclosure,

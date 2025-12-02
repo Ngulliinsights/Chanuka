@@ -5,7 +5,7 @@ import { billComprehensiveAnalysisService } from '@shared/application/bill-compr
 import { analysisService } from '@shared/application/analysis-service-direct.js';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js'; // Use if auth needed
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api';
-import { logger   } from '@shared/core/index.js';
+import { logger   } from '@shared/core';
 import { z } from 'zod';
 
 const router = Router();

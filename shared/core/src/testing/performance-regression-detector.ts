@@ -12,13 +12,14 @@ export class PerformanceRegressionDetector extends EventEmitter {
   private historicalData: PerformanceHistoryEntry[] = [];
   private regressionThresholds: RegressionThresholds;
 
-  constructor(private config: RegressionDetectorConfig = {}) {
+  constructor(private _config: RegressionDetectorConfig = {}) {
     super();
+    // Config will be used for regression detection settings
     this.regressionThresholds = {
-      operationsPerSecond: config.thresholds?.operationsPerSecond ?? -0.1, // 10% degradation
-      averageTimeMs: config.thresholds?.averageTimeMs ?? 0.1, // 10% increase
-      memoryUsage: config.thresholds?.memoryUsage ?? 0.2, // 20% increase
-      errorRate: config.thresholds?.errorRate ?? 0.05 // 5% increase
+      operationsPerSecond: _config.thresholds?.operationsPerSecond ?? -0.1, // 10% degradation
+      averageTimeMs: _config.thresholds?.averageTimeMs ?? 0.1, // 10% increase
+      memoryUsage: _config.thresholds?.memoryUsage ?? 0.2, // 20% increase
+      errorRate: _config.thresholds?.errorRate ?? 0.05 // 5% increase
     };
 
     this.loadHistoricalData();
@@ -151,7 +152,7 @@ export class PerformanceRegressionDetector extends EventEmitter {
           };
         }
 
-        trends[result.name].dataPoints.push({
+        trends[result.name]?.dataPoints.push({
           timestamp: entry.timestamp,
           operationsPerSecond: result.operationsPerSecond,
           averageTimeMs: result.averageTimeMs || 0,
@@ -267,7 +268,7 @@ export class PerformanceRegressionDetector extends EventEmitter {
 
       result.push({
         name: name,
-        category: group[0].category,
+        category: group[0]?.category ?? 'unknown',
         operationsPerSecond: avgOps,
         averageTimeMs: avgTime,
         minTimeMs: Math.min(...group.map(b => b.minTimeMs)),
@@ -392,8 +393,8 @@ export class PerformanceRegressionDetector extends EventEmitter {
     try {
       const baselinesFile = path.join(process.cwd(), 'performance-baselines.json');
       const data = Array.from(this.baselineMetrics.entries()).map(([name, baseline]) => ({
-        name,
-        ...baseline
+        ...baseline,
+        name
       }));
       fs.writeFileSync(baselinesFile, JSON.stringify(data, null, 2));
     } catch (error) {

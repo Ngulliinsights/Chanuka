@@ -78,11 +78,27 @@ export type {
   ModernizationConfig,
   ValidationScope,
   ValidationCheck,
-  ValidationStatus,
-  ValidationType,
   BackupResult,
   ProgressState,
-  ValidationResult as ModernizationValidationResult
+  ValidationResult as ModernizationValidationResult,
+  AnalysisResult,
+  Finding,
+  Recommendation
+} from '../modernization/types';
+
+export {
+  ValidationStatus,
+  ValidationType,
+  AnalysisType,
+  FindingType,
+  FindingSeverity,
+  RecommendedAction,
+  TaskPriority,
+  BackupStrategy,
+  BackupStatus,
+  BackupScope,
+  AnalysisError,
+  BackupError
 } from '../modernization/types';
 
 // Observability types (excluding conflicting ones already aliased above)

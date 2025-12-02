@@ -378,7 +378,7 @@ export async function resetDatabaseForTesting(): Promise<void> {
     throw new Error('Cannot reset database in production environment');
   }
   
-  const orchestrator = getDatabaseOrchestrator();
+  // const orchestrator = getDatabaseOrchestrator();
   
   // Implementation would depend on your specific reset requirements
   // This is a placeholder for the actual reset logic

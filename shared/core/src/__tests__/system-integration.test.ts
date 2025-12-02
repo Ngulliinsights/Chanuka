@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -16,12 +16,12 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { LoadTester } from '../testing/load-tester';
 import { HealthChecker } from '../observability/health/health-checker';
 import { SlidingWindowStore } from '../rate-limiting/algorithms/sliding-window';
-import { MiddlewareFactory } from '@shared/core/src/middleware/factory';
+import { MiddlewareFactory } from '../middleware/factory';
 import express from 'express';
 import request from 'supertest';
 import Redis from 'ioredis';
 import { Logger } from '../observability/logging';
-import { logger } from '@shared/core/src/observability/logging';
+// import { logger } from '../observability/logging'; // Unused import
 
 describe('Core System Integration Tests', () => {
   let app: express.Application;

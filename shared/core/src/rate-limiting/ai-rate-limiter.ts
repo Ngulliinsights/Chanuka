@@ -1,7 +1,7 @@
 /**
  * AI Rate Limiter - specialized rate limiter for AI/ML operations
  */
-import { RateLimitStore, AIRateLimitOptions, RateLimitResult } from '/types';
+import { RateLimitStore, AIRateLimitOptions, RateLimitResult } from './types';
 
 export class AIRateLimiter {
   constructor(
@@ -17,7 +17,7 @@ export class AIRateLimiter {
     return this.store.check(key, {
       windowMs: this.options.windowMs,
       max: Math.floor(this.options.maxCostPerWindow / cost),
-      message: this.options.message
+      ...(this.options.message && { message: this.options.message })
     });
   }
 

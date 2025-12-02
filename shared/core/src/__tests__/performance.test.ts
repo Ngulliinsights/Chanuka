@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -16,10 +16,10 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { PerformanceBenchmarks } from '../testing/performance-benchmarks';
 import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
-import { Logger } from '@shared/core/src/observability/logging';
+import { Logger } from '../observability/logging';
 import { ValidationService } from '../validation/validation-service';
 import type { BenchmarkComponents, BenchmarkConfig } from '../testing/performance-benchmarks';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '../observability/logging';
 
 describe('Core Utilities Performance Benchmarks', () => {
   let benchmarks: PerformanceBenchmarks;

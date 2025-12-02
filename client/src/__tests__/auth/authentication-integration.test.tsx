@@ -3,6 +3,7 @@
  * Comprehensive tests for the enhanced authentication system
  */
 
+import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,7 +12,7 @@ import { BrowserRouter } from 'react-router-dom';
 import AuthPage from '@client/pages/auth-page';
 import { AuthProvider } from '@client/hooks/useAuth';
 import { SecurityDashboard } from '@client/components/auth/SecurityDashboard';
-import { PrivacyControls } from '@client/components/auth/PrivacyControls';
+import { PrivacyManager } from '@client/components/shared/privacy/PrivacyManager';
 import { TwoFactorSetup } from '@client/components/auth/TwoFactorSetup';
 import { PasswordStrengthIndicator } from '@client/components/auth/PasswordStrengthIndicator';
 import { SocialLogin } from '@client/components/auth/SocialLogin';
@@ -388,99 +389,55 @@ describe('Authentication Integration', () => {
     });
   });
 
-  describe('PrivacyControls', () => {
-    const mockUser = {
-      id: 'test-user',
-      email: 'test@example.com',
-      name: 'Test User',
-      username: 'testuser',
-      first_name: 'Test',
-      last_name: 'User',
-      role: 'citizen',
-      verification_status: 'verified',
-      is_active: true,
-      created_at: new Date().toISOString(),
-      reputation: 100,
-      expertise: 'general',
-      two_factor_enabled: false,
-      last_login: new Date().toISOString(),
-      login_count: 5,
-      account_locked: false,
-      locked_until: null,
-      password_changed_at: new Date().toISOString(),
-      privacy_settings: {
-        profile_visibility: 'public' as const,
-        email_visibility: 'private' as const,
-        activity_tracking: true,
-        analytics_consent: false,
-        marketing_consent: false,
-        data_sharing_consent: false,
-        location_tracking: false,
-        personalized_content: true,
-        third_party_integrations: false,
-        notification_preferences: {
-          email_notifications: true,
-          push_notifications: false,
-          sms_notifications: false,
-          bill_updates: true,
-          comment_replies: true,
-          expert_insights: true,
-          security_alerts: true,
-          privacy_updates: true,
-        },
-      },
-      consent_given: [],
-      data_retention_preference: {
-        retention_period: '2years' as const,
-        auto_delete_inactive: false,
-        export_before_delete: true,
+  describe('PrivacyManager', () => {
+    const mockSettings = {
+      profile_visibility: 'public' as const,
+      email_visibility: 'private' as const,
+      activity_tracking: true,
+      analytics_consent: false,
+      marketing_consent: false,
+      data_sharing_consent: false,
+      location_tracking: false,
+      personalized_content: true,
+      third_party_integrations: false,
+      notification_preferences: {
+        email_notifications: true,
+        push_notifications: false,
+        sms_notifications: false,
+        bill_updates: true,
+        comment_replies: true,
+        expert_insights: true,
+        security_alerts: true,
+        privacy_updates: true,
       },
     };
 
-    it('should show privacy controls overview', () => {
-      // Mock the auth context
-      vi.doMock('../../hooks/useAuth', () => ({
-        useAuth: () => ({
-          user: mockUser,
-          isAuthenticated: true,
-          updatePrivacySettings: vi.fn(() => Promise.resolve({ success: true })),
-          requestDataExport: vi.fn(),
-          requestDataDeletion: vi.fn(),
-        }),
-      }));
-
+    it('should show privacy manager in compact mode', () => {
       render(
         <TestWrapper>
-          <PrivacyControls />
+          <PrivacyManager
+            mode="compact"
+            settings={mockSettings}
+            onSettingsChange={vi.fn()}
+          />
+        </TestWrapper>
+      );
+
+      expect(screen.getByText('Privacy Settings')).toBeInTheDocument();
+    });
+
+    it('should show privacy manager in full mode', () => {
+      render(
+        <TestWrapper>
+          <PrivacyManager
+            mode="full"
+            settings={mockSettings}
+            onSettingsChange={vi.fn()}
+          />
         </TestWrapper>
       );
 
       expect(screen.getByText('Privacy & Data Protection')).toBeInTheDocument();
-      expect(screen.getByText(/We are committed to protecting your privacy/)).toBeInTheDocument();
-    });
-
-    it('should show privacy tabs', () => {
-      vi.doMock('../../hooks/useAuth', () => ({
-        useAuth: () => ({
-          user: mockUser,
-          isAuthenticated: true,
-          updatePrivacySettings: vi.fn(() => Promise.resolve({ success: true })),
-          requestDataExport: vi.fn(),
-          requestDataDeletion: vi.fn(),
-        }),
-      }));
-
-      render(
-        <TestWrapper>
-          <PrivacyControls />
-        </TestWrapper>
-      );
-
-      expect(screen.getByText('Visibility')).toBeInTheDocument();
-      expect(screen.getByText('Data Usage')).toBeInTheDocument();
-      expect(screen.getByText('Notifications')).toBeInTheDocument();
-      expect(screen.getByText('Cookies')).toBeInTheDocument();
-      expect(screen.getByText('Your Rights')).toBeInTheDocument();
     });
   });
 

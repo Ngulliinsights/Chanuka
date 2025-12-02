@@ -17,7 +17,7 @@ import { readdir, stat, unlink } from 'fs/promises';
 import { join, dirname } from 'path';
 import { createGzip, createGunzip } from 'zlib';
 import { pipeline } from 'stream/promises';
-import { logger } from '@shared/core/index.js';
+import { logger } from '@shared/core';
 
 const execAsync = promisify(exec);
 
