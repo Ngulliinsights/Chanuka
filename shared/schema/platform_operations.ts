@@ -4,19 +4,15 @@
 // Analytics, metrics, and platform performance tracking with enhanced 
 // integrity, performance, and observability features
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, timestamp, jsonb, numeric, uuid, varchar,
   index, uniqueIndex, boolean, date
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
-import {
-  kenyanCountyEnum
-  } from "./enum";
-
-import { bills, users } from "./foundation";
 import { comments } from "./citizen_participation";
+import { kenyanCountyEnum } from "./enum";
+import { bills, users } from "./foundation";
 
 // ============================================================================
 // DATA SOURCES - Track where legislative data comes from
@@ -857,7 +853,7 @@ export const billImpactMetricsRelations = relations(bill_impact_metrics, ({ one 
   }),
 }));
 
-export const countyEngagementStatsRelations = relations(county_engagement_stats, ({ }) => ({
+export const countyEngagementStatsRelations = relations(county_engagement_stats, () => ({
   // Note: kenyanCountyEnum is an enum, not a table, so this relation is conceptual
   // The actual constraint is enforced by the enum type
 }));
@@ -869,7 +865,7 @@ export const userEngagementSummaryRelations = relations(user_engagement_summary,
   }),
 }));
 
-export const contentPerformanceRelations = relations(content_performance, ({ }) => ({
+export const contentPerformanceRelations = relations(content_performance, () => ({
   // Polymorphic relationship - content_id can reference different tables
   // based on content_type. Implement specific relations in application code.
 }));

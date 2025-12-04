@@ -10,8 +10,9 @@
  * - Navigation timing metrics
  */
 
-import { logger } from './logger';
 import type { Metric } from 'web-vitals';
+
+import { logger } from './logger';
 
 // Configuration interface for RUM service initialization
 interface RUMConfig {

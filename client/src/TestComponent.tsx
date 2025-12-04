@@ -1,6 +1,7 @@
 
 
 import { useEffect } from 'react';
+
 import { logger } from '@client/utils/logger';
 
 export default function TestComponent() {

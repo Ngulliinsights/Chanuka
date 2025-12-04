@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-import { CleanupOrchestrator } from './orchestrator';
-import { CleanupExecutor } from './executor';
 import { logger } from '../../observability/logging';
+
+import { CleanupExecutor } from './executor';
+import { CleanupOrchestrator } from './orchestrator';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -11,9 +12,9 @@ async function main() {
 
   const orchestrator = new CleanupOrchestrator(rootPath);
 
-  try {
-    switch (command) {
-      case 'analyze':
+    try {
+      switch (command) {
+      case 'analyze': {
         logger.info('🔍 Analyzing root directory...', { component: 'Chanuka' });
         const analysis = await orchestrator.analyzeRootDirectory();
         
@@ -38,8 +39,9 @@ async function main() {
           logger.info('', { component: 'Chanuka' });
         });
         break;
+      }
 
-      case 'plan':
+      case 'plan': {
         logger.info('📋 Creating cleanup plan...', { component: 'Chanuka' });
         const planAnalysis = await orchestrator.analyzeRootDirectory();
         const plan = await orchestrator.createCleanupPlan(planAnalysis);
@@ -77,8 +79,9 @@ async function main() {
           console.log(`  ${icon} ${check.description}`);
         });
         break;
+      }
 
-      case 'execute':
+      case 'execute': {
         const dryRun = args.includes('--dry-run');
         const skipBackup = args.includes('--no-backup');
         
@@ -119,6 +122,7 @@ async function main() {
           });
         }
         break;
+      }
 
       default:
         logger.info('🧹 Cleanup CLI Tool', { component: 'Chanuka' });

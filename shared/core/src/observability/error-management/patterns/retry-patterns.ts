@@ -5,8 +5,8 @@
  * with exponential backoff, jitter, and circuit breaker integration.
  */
 
-import { BaseError, ErrorSeverity } from '../errors/base-error.js';
 import { logger } from '../../logging/index.js';
+import { BaseError } from '../errors/base-error.js';
 
 export interface RetryOptions {
   maxAttempts?: number;
@@ -126,7 +126,7 @@ export class ExponentialBackoffRetry {
 
     // HTTP status codes that are retryable
     if ('statusCode' in error) {
-      const statusCode = (error as any).statusCode;
+      const statusCode = (error as Error & { statusCode: number }).statusCode;
       return statusCode >= 500 || statusCode === 429 || statusCode === 408;
     }
 
@@ -252,11 +252,11 @@ export function createRetryStrategy(type: 'exponential' | 'linear' | 'immediate'
  * Decorator for automatic retry on method calls
  */
 export function retry(options: RetryOptions = {}) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: unknown, _propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const retryStrategy = new ExponentialBackoffRetry(options);
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       return retryStrategy.execute(() => originalMethod.apply(this, args));
     };
 

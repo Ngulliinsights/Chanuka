@@ -7,6 +7,8 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
+import { useWebSocket } from '@client/hooks/use-websocket';
 import {
   fetchOverviewMetrics,
   fetchTrendData,
@@ -29,7 +31,6 @@ import {
   selectIsRealTimeEnabled,
   selectConnectionStatus,
 } from '@client/store/slices/errorAnalyticsSlice';
-import { useWebSocket } from '@client/hooks/use-websocket';
 
 interface UseErrorAnalyticsOptions {
   enableRealTime?: boolean;

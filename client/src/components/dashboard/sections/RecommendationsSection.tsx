@@ -4,11 +4,6 @@
  * Displays ML-powered bill recommendations with relevance scoring and reasoning.
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Badge } from '../../ui/badge';
-import { Progress } from '../../ui/progress';
 import { 
   Lightbulb, 
   Plus, 
@@ -22,8 +17,16 @@ import {
   RefreshCw,
   Info
 } from 'lucide-react';
-import { BillRecommendation } from '@client/types/user-dashboard';
+import React from 'react';
+
 import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
+import { BillRecommendation } from '@client/types/user-dashboard';
+
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Progress } from '../../ui/progress';
+
 
 interface RecommendationsSectionProps {
   recommendations: BillRecommendation[];

@@ -5,6 +5,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { logger } from '@client/utils/logger';
+
 import { 
   notificationService, 
   Notification, 
@@ -12,7 +15,6 @@ import {
   NotificationCategory,
   NotificationType 
 } from '../services/notification-service';
-import { logger } from '@client/utils/logger';
 
 /**
  * Main notification hook - provides access to notifications and core functionality

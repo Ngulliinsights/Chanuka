@@ -6,15 +6,19 @@ import React, {
   ErrorInfo,
   useMemo,
 } from "react";
-import { useUnifiedNavigation } from "@client/core/navigation/hooks/use-unified-navigation";
-import { useNavigationPerformance } from "@client/core/navigation/hooks/use-navigation-performance";
-import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from "@client/core/navigation/hooks/use-navigation-accessibility";
+
 import { DesktopSidebar } from '@client/components/navigation';
-import MobileNavigation from "./mobile-navigation";
+import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from "@client/core/navigation/hooks/use-navigation-accessibility";
+import { useNavigationPerformance } from "@client/core/navigation/hooks/use-navigation-performance";
+import { useUnifiedNavigation } from "@client/core/navigation/hooks/use-unified-navigation";
+
 import {
   SkipLink,
   useAccessibility,
 } from "../accessibility/accessibility-manager";
+
+import MobileNavigation from "./mobile-navigation";
+
 import {
   AppLayoutProps,
   LayoutConfig,

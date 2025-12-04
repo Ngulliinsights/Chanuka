@@ -3,14 +3,16 @@
  * Base component that consolidates functionality from both existing LoginForm components
  */
 
-import React, { useState, useEffect } from 'react';
+import { rateLimiter } from '@client/utils/security-monitoring';
 import { Eye, EyeOff, Shield, AlertTriangle, CheckCircle, Mail } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { LoginCredentials } from '@client/types/auth';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../ui/card';
 import { Checkbox } from '../../../ui/checkbox';
 import { Label } from '../../../ui/label';
-import { useAuth } from '@client/features/users/hooks/useAuth';
-import { LoginCredentials } from '@client/types/auth';
-import { rateLimiter } from '@client/utils/security-monitoring';
 import { useLoginForm } from '../hooks/useLoginForm';
 import { AuthInput, AuthAlert, SubmitButton } from '../ui';
 

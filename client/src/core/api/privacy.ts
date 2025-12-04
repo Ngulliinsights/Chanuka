@@ -15,8 +15,9 @@
  * @module PrivacyAnalyticsApiService
  */
 
-import { globalApiClient } from './client';
 import { logger } from '@client/utils/logger';
+
+import { globalApiClient } from './client';
 import { ErrorCode, ErrorFactory } from './errors';
 
 // ============================================================================

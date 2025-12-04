@@ -7,8 +7,9 @@
 
 import fs from 'fs';
 import path from 'path';
-import { glob } from 'glob';
 import { gzipSync } from 'zlib';
+
+import { glob } from 'glob';
 
 interface PerformanceMetrics {
   bundleSize: {

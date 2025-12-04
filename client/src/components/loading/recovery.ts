@@ -3,8 +3,9 @@
  * Following navigation component patterns for recovery handling
  */
 
-import { LoadingError, LoadingTimeoutError, LoadingNetworkError, isRetryableError } from './errors';
 import { LoadingConfig, ConnectionType } from '@client/types';
+
+import { LoadingError, LoadingTimeoutError, LoadingNetworkError, isRetryableError } from './errors';
 
 export interface RecoveryContext {
   operationId: string;

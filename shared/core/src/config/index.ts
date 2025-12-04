@@ -647,6 +647,9 @@ export * from './types';
 export * from './schema';
 export { configSchema, defaultFeatures };
 
+// Export utilities configuration provider
+export * from './utilities';
+
 // Export default instance for convenience
 export default configManager;
 

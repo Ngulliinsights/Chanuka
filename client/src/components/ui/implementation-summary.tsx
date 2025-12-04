@@ -3,11 +3,12 @@
  * Shows the complete status of shadcn/ui and Radix UI implementation
  */
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
-import { Badge } from './badge';
-import { Progress } from './progress';
 import { CheckCircle, Shield, Package2, Palette, Code2, Zap } from 'lucide-react';
+import React from 'react';
+
+import { Badge } from './badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
+import { Progress } from './progress';
 
 interface ComponentStatus {
   name: string;

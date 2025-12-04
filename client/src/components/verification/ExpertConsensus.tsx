@@ -1,9 +1,3 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { 
   Users, 
   TrendingUp, 
@@ -17,8 +11,17 @@ import {
   Info,
   Zap
 } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { ExpertConsensus as ExpertConsensusType } from '@client/types/expert';
+
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+
 
 interface ExpertConsensusProps {
   consensus: ExpertConsensusType;

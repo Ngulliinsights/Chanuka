@@ -2,6 +2,7 @@
 // Based on the consolidated API client design specifications
 
 import { ApiService } from '@client/types';
+
 import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
 
 // Service Registry Pattern Implementation

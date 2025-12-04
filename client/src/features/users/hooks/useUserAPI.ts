@@ -7,19 +7,20 @@
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
+
 import { userService as userBackendService } from '../../../services/userService';
-import { useAuthStore } from '../../../store/slices/authSlice';
-import { useUserDashboardStore } from '../../../store/slices/userDashboardSlice';
-import { logger } from '../../../utils/logger';
 import type {
   UserProfile,
   NotificationPreferences,
 } from '../../../services/userService';
+import { useAuthStore } from '../../../store/slices/authSlice';
+import { useUserDashboardStore } from '../../../store/slices/userDashboardSlice';
 import type {
   PrivacyControls,
   DataExportRequest,
   DashboardPreferences
 } from '../../../types/user-dashboard';
+import { logger } from '../../../utils/logger';
 
 // Query Keys - These create consistent cache keys for React Query
 export const userQueryKeys = {

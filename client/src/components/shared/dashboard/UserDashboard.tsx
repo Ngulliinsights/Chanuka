@@ -1,15 +1,4 @@
-import React from 'react';
-import { useDashboardData } from './useDashboardData';
-import { StatsSection } from './sections/StatsSection';
-import { ActivitySection } from './sections/ActivitySection';
-import { BillsSection } from './sections/BillsSection';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@client/components/ui/avatar';
-import { Progress } from '@client/components/ui/progress';
-import { Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 import {
   Settings,
   Download,
@@ -22,7 +11,22 @@ import {
   Award,
   Star
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@client/components/ui/avatar';
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Progress } from '@client/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+
+import { ActivitySection } from './sections/ActivitySection';
+import { BillsSection } from './sections/BillsSection';
+import { StatsSection } from './sections/StatsSection';
+import { useDashboardData } from './useDashboardData';
+
+
 
 export type DashboardVariant = 'full-page' | 'section';
 

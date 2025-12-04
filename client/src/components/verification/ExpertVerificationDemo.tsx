@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+import { 
+  Expert, 
+  CredibilityMetrics, 
+  CommunityValidation as CommunityValidationType,
+  VerificationWorkflow as VerificationWorkflowType,
+  ExpertConsensus as ExpertConsensusType
+} from '@client/types/expert';
+
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
 import { 
   ExpertBadge, 
   ExpertBadgeGroup,
@@ -15,13 +25,7 @@ import {
   ExpertConsensus,
   ConsensusIndicator
 } from './index';
-import { 
-  Expert, 
-  CredibilityMetrics, 
-  CommunityValidation as CommunityValidationType,
-  VerificationWorkflow as VerificationWorkflowType,
-  ExpertConsensus as ExpertConsensusType
-} from '@client/types/expert';
+
 
 /**
  * ExpertVerificationDemo - Comprehensive demo of the expert verification system

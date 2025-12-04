@@ -1,8 +1,3 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Badge } from '@client/components/ui/badge';
-import { Progress } from '@client/components/ui/progress';
-import { Button } from '@client/components/ui/button';
 import {
   CheckCircle,
   Clock,
@@ -14,6 +9,12 @@ import {
   Layers,
   RefreshCw
 } from 'lucide-react';
+import React from 'react';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Progress } from '@client/components/ui/progress';
 
 interface MigrationPhase {
   id: string;

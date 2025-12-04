@@ -4,6 +4,12 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { 
+  clientRateLimiter, 
+  RateLimitConfigs, 
+  RateLimitResult 
+} from '../security/rate-limiter';
 import { 
   securityService, 
   SecurityStatus, 
@@ -13,11 +19,6 @@ import {
   SecurityThreat, 
   vulnerabilityScanner 
 } from '../security/vulnerability-scanner';
-import { 
-  clientRateLimiter, 
-  RateLimitConfigs, 
-  RateLimitResult 
-} from '../security/rate-limiter';
 
 export interface UseSecurityOptions {
   enableThreatMonitoring?: boolean;

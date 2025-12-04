@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import AuthenticatedAPI from '@client/utils/authenticated-api';
+
+import { AuthenticatedAPI } from '@client/utils/api';
 
 /**
  * A wrapper around React Query's useMutation that provides a simplified API for common mutations.

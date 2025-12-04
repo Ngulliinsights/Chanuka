@@ -1,7 +1,3 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
 import { 
   ThumbsUp, 
   ThumbsDown, 
@@ -13,8 +9,15 @@ import {
   BookOpen,
   Clock
 } from 'lucide-react';
-import { ExpertBadge } from '../verification/ExpertBadge';
+import React, { useState } from 'react';
+
 import { Expert } from '@client/types/expert';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { ExpertBadge } from '../verification/ExpertBadge';
+
 
 interface ExpertAnalysisData {
   id: string;

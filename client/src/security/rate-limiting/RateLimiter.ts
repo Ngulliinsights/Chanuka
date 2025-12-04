@@ -5,6 +5,7 @@
  */
 
 import type { RateLimitConfig, SecurityEvent } from '@client/types/security-types';
+
 import { securityConfig } from '../config/security-config';
 import { SecurityMonitor } from '../monitoring/SecurityMonitor';
 

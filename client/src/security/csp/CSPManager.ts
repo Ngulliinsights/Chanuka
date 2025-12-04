@@ -5,6 +5,7 @@
  */
 
 import type { CSPDirectives, SecurityEvent } from '@client/types/security-types';
+
 import { securityConfig } from '../config/security-config';
 import { SecurityMonitor } from '../monitoring/SecurityMonitor';
 
@@ -57,7 +58,7 @@ export class CSPManager {
           cspParts.push(directive.replace(/([A-Z])/g, '-$1').toLowerCase());
         }
       } else if (Array.isArray(values) && values.length > 0) {
-        let directiveValues = values.map(value => 
+        const directiveValues = values.map(value => 
           value === "'nonce-{NONCE}'" ? `'nonce-${this.nonce}'` : value
         );
         cspParts.push(`${directive.replace(/([A-Z])/g, '-$1').toLowerCase()} ${directiveValues.join(' ')}`);

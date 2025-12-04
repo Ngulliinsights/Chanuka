@@ -5,7 +5,6 @@
  * See `use-safe-query.ts` and `use-safe-mutation.ts` for the new, consolidated API.
  */
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   ApiResponse,
   UnifiedError,
@@ -15,6 +14,7 @@ import {
   ErrorDomain,
   ErrorSeverity
 } from '@client/index';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 export interface UseApiOptions extends Omit<RequestOptions, 'method'> {
   enabled?: boolean;

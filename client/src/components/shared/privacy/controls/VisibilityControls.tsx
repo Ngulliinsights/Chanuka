@@ -3,12 +3,14 @@
  * Profile and data visibility settings
  */
 
+import { Eye } from 'lucide-react';
 import React from 'react';
+
+import { PrivacySettings } from '@client/types/auth';
+
 import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
 import { Label } from '../../../ui/label';
 import { Switch } from '../../../ui/switch';
-import { Eye } from 'lucide-react';
-import { PrivacySettings } from '@client/types/auth';
 
 interface VisibilityControlsProps {
   settings: PrivacySettings;

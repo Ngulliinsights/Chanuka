@@ -86,7 +86,7 @@ export class ComponentTemplateGenerator {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
     
-    let exports = [`export * from './types';`];
+    const exports = [`export * from './types';`];
     
     if (this.config.hasValidation) {
       exports.push(`export * from './validation';`);

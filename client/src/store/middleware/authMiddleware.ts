@@ -3,19 +3,37 @@
  * Handles authentication state changes, token refresh, and security monitoring
  */
 
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, Dispatch } from '@reduxjs/toolkit';
+
 import { authApiService as authService } from '@client/core/api';
-import { tokenManager } from '@client/utils/tokenManager';
-import { setCurrentSession, recordActivity } from '../slices/sessionSlice';
-import { securityMonitor } from '@client/utils/security-monitoring';
-import { rbacManager } from '@client/utils/rbac';
 import { logger } from '@client/utils/logger';
+import { rbacManager } from '@client/utils/rbac';
+import { securityMonitor } from '@client/utils/security';
+import { tokenManager } from '@client/utils/storage';
+
 import { logout, clearError } from '../slices/authSlice';
+import { setCurrentSession, recordActivity } from '../slices/sessionSlice';
 
 interface AuthMiddlewareConfig {
   enableAutoRefresh: boolean;
   enableSecurityMonitoring: boolean;
   refreshThreshold: number; // minutes before expiry to refresh
+}
+
+interface LoginFulfilledPayload {
+  user?: { id: string };
+  sessionExpiry?: string;
+  requires2FA?: boolean;
+  sessionId?: string;
+  method?: string;
+}
+
+interface LoginRejectedPayload {
+  message?: string;
+}
+
+interface UserUpdatePayload {
+  id?: string;
 }
 
 const DEFAULT_CONFIG: AuthMiddlewareConfig = {
@@ -39,11 +57,11 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
     if (typeof action === 'object' && action !== null && 'type' in action && typeof action.type === 'string') {
       switch (action.type) {
         case 'auth/login/fulfilled':
-          handleLoginSuccess((action as any).payload, finalConfig, store.dispatch);
+          handleLoginSuccess((action as any).payload as LoginFulfilledPayload, finalConfig, store.dispatch);
           break;
 
         case 'auth/login/rejected':
-          handleLoginFailure((action as any).error, finalConfig);
+          handleLoginFailure((action as any).error as LoginRejectedPayload, finalConfig);
           break;
 
         case 'auth/logout/fulfilled':
@@ -51,7 +69,7 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
           break;
 
         case 'auth/setUser':
-          handleUserUpdate((action as any).payload, finalConfig);
+          handleUserUpdate((action as any).payload as UserUpdatePayload, finalConfig);
           break;
 
         // Monitor for actions that require authentication
@@ -84,7 +102,7 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
 /**
  * Handle successful login
  */
-function handleLoginSuccess(payload: any, config: AuthMiddlewareConfig, dispatch: any): void {
+function handleLoginSuccess(payload: LoginFulfilledPayload, config: AuthMiddlewareConfig, dispatch: Dispatch): void {
   try {
     logger.info('Login successful', {
       component: 'AuthMiddleware',
@@ -131,7 +149,7 @@ function handleLoginSuccess(payload: any, config: AuthMiddlewareConfig, dispatch
 /**
  * Handle login failure
  */
-function handleLoginFailure(error: any, _config: AuthMiddlewareConfig): void {
+function handleLoginFailure(error: LoginRejectedPayload, _config: AuthMiddlewareConfig): void {
   try {
     logger.warn('Login failed', {
       component: 'AuthMiddleware',
@@ -159,7 +177,7 @@ function handleLoginFailure(error: any, _config: AuthMiddlewareConfig): void {
 /**
  * Handle successful logout
  */
-function handleLogoutSuccess(_config: AuthMiddlewareConfig, dispatch: any): void {
+function handleLogoutSuccess(_config: AuthMiddlewareConfig, dispatch: Dispatch): void {
   try {
     logger.info('Logout successful', { component: 'AuthMiddleware' });
 
@@ -183,7 +201,7 @@ function handleLogoutSuccess(_config: AuthMiddlewareConfig, dispatch: any): void
 /**
  * Handle user data updates
  */
-function handleUserUpdate(user: any, _config: AuthMiddlewareConfig): void {
+function handleUserUpdate(user: UserUpdatePayload, _config: AuthMiddlewareConfig): void {
   try {
     logger.debug('User data updated', {
       component: 'AuthMiddleware',
@@ -204,7 +222,7 @@ function handleUserUpdate(user: any, _config: AuthMiddlewareConfig): void {
  * Check if token needs refresh
  */
 function checkTokenRefresh(
-  store: any,
+  store: { dispatch: Dispatch },
   config: AuthMiddlewareConfig,
   refreshPromise: Promise<void> | null,
   setRefreshPromise: (promise: Promise<void> | null) => void
@@ -230,7 +248,7 @@ function checkTokenRefresh(
 /**
  * Perform token refresh
  */
-async function performTokenRefresh(store: any): Promise<void> {
+async function performTokenRefresh(store: { dispatch: Dispatch }): Promise<void> {
   try {
     logger.debug('Attempting token refresh', { component: 'AuthMiddleware' });
 
@@ -241,7 +259,7 @@ async function performTokenRefresh(store: any): Promise<void> {
       const jwtTokens = {
         accessToken: authTokens.accessToken,
         refreshToken: authTokens.refreshToken,
-        expiresAt: Date.now() + (authTokens.expiresIn * 1000),
+        expiresAt: new Date(Date.now() + (authTokens.expiresIn * 1000)),
         tokenType: authTokens.tokenType
       };
 

@@ -1,10 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Progress } from '../ui/progress';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { useWebVitals, usePerformanceBudget } from '@client/hooks/use-web-vitals';
+import type { WebVitalsMetrics } from '@client/hooks/use-web-vitals';
 import {
   Activity,
   TrendingUp,
@@ -17,9 +12,18 @@ import {
   Download,
   Settings
 } from 'lucide-react';
-import { useWebVitals, usePerformanceBudget } from '@client/hooks/use-web-vitals';
+import React, { useState, useEffect } from 'react';
+
 import { performanceMonitoring } from '@client/services/performance-monitoring';
-import type { WebVitalsMetrics } from '@client/hooks/use-web-vitals';
+
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+
 
 interface PerformanceViolation {
   metric: string;

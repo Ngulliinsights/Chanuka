@@ -3,9 +3,10 @@
  * Manages login form state, validation, and submission
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { useAuth } from '@client/features/users/hooks/useAuth';
 import { validatePassword } from '@client/utils/password-validation';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
+import { useAuth } from '@client/features/users/hooks/useAuth';
 import { validateEmail } from '@client/utils/input-validation';
 import { logger } from '@client/utils/logger';
 

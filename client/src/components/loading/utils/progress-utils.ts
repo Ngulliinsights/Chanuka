@@ -4,6 +4,7 @@
  */
 
 import { LoadingProgress, LoadingStage } from '@client/types';
+
 import { validateLoadingProgress } from '@client/validation';
 
 /**

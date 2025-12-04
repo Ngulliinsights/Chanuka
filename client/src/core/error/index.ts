@@ -73,6 +73,8 @@ export {
 // Integration with Existing Unified Error Handler
 // ============================================================================
 
+import { useCallback } from 'react';
+
 import { coreErrorHandler } from './handler';
 import { registerDefaultRecoveryStrategies } from './recovery';
 
@@ -163,7 +165,6 @@ export function handleError(errorData: Partial<import('@client/types').AppError>
 // React Hooks for Error Management
 // ============================================================================
 
-import { useCallback } from 'react';
 
 /**
  * Hook for error handling in React components

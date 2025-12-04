@@ -7,9 +7,10 @@
  * Requirements: 9.1, 9.5
  */
 
-import React from 'react';
-import { cn } from '@client/lib/utils';
 import { useResponsive, type ResponsiveValue } from '@client/responsive';
+import React from 'react';
+
+import { cn } from '@client/lib/utils';
 
 export interface ResponsiveGridProps {
   children: React.ReactNode;

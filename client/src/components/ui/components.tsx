@@ -4,15 +4,17 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Tabs } from './tabs';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
-import { Avatar, AvatarFallback, AvatarImage } from './avatar';
-import { Progress } from './progress';
-import { Badge } from './badge';
+
 import { cn } from '@client/lib/utils';
 import { logger } from '@client/utils/logger';
+
+import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import { Badge } from './badge';
 import { UIComponentError } from './errors';
+import { Progress } from './progress';
 import { attemptUIRecovery } from './recovery';
+import { Tabs } from './tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 
 // Enhanced Tabs with analytics and state management
 interface EnhancedTabsProps {

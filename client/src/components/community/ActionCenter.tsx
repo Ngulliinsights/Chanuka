@@ -9,11 +9,7 @@
  * - Compact and full view modes
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { formatDistanceToNow, format } from 'date-fns';
 import {
   Megaphone,
   PenTool,
@@ -25,10 +21,19 @@ import {
   Clock,
   Share2,
 } from 'lucide-react';
+
 import { cn } from '@client/lib/utils';
-import { Campaign, Petition } from '@client/types/community';
 import { useCommunityStore } from '@client/store/slices/communitySlice';
-import { formatDistanceToNow, format } from 'date-fns';
+import { Campaign, Petition } from '@client/types/community';
+
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+
+
+
 
 interface ActionCenterProps {
   campaigns: Campaign[];

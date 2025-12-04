@@ -10,11 +10,7 @@
  * - Mobile-optimized layout
  */
 
-import { useState, useCallback, memo } from 'react';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { formatDistanceToNow } from 'date-fns';
 import {
   MessageSquare,
   Heart,
@@ -29,10 +25,17 @@ import {
   PenTool,
   Bookmark
 } from 'lucide-react';
+import { useState, useCallback, memo } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { ActivityItem } from '@client/types/community';
+
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
 import { ExpertBadge } from '../verification/ExpertBadge';
-import { formatDistanceToNow } from 'date-fns';
+
 
 interface ActivityFeedProps {
   activities: ActivityItem[];
@@ -179,7 +182,7 @@ const ActivityFeedComponent = ({
         ))}
       </div>
     );
-  };
+  }
 
   if (activities.length === 0) {
     return (
@@ -197,7 +200,7 @@ const ActivityFeedComponent = ({
         </CardContent>
       </Card>
     );
-  };
+  }
 
   return (
     <div className={cn('space-y-4', className)}>

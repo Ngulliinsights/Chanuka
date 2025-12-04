@@ -3,15 +3,19 @@
  * Protects routes based on authentication status and user permissions
  */
 
+import { useAuth } from '@client/hooks/useAuth';
+import { Shield, Lock, AlertTriangle, ArrowLeft } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@client/hooks/useAuth';
+
+import { logger } from '@client/utils/logger';
 import { rbacManager, usePermission, useMinimumRole } from '@client/utils/rbac';
-import { LoadingSpinner } from '../ui/loading-spinner';
+
 import { Alert, AlertDescription } from '../ui/alert';
 import { Button } from '../ui/button';
-import { Shield, Lock, AlertTriangle, ArrowLeft } from 'lucide-react';
-import { logger } from '@client/utils/logger';
+import { LoadingSpinner } from '../ui/loading-spinner';
+
+
 
 interface AuthGuardProps {
   children: React.ReactNode;

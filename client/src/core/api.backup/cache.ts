@@ -2,6 +2,7 @@
 // Based on the consolidated API client design specifications
 
 import { CacheConfig, CacheEntry } from '@client/types';
+
 import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
 
 // Persistent Cache Adapters
@@ -322,7 +323,7 @@ export class UnifiedCacheManager {
   async get<T>(key: string): Promise<T | null> {
     try {
       // Try memory cache first
-      let entry = this.memoryCache.get(key);
+      const entry = this.memoryCache.get(key);
       if (entry && !this.isExpired(entry)) {
         entry.accessCount++;
         entry.lastAccessed = Date.now();
@@ -443,7 +444,7 @@ export class UnifiedCacheManager {
 
   getStats(): { memorySize: number; persistentSize: number; hitRate: number } {
     const memorySize = this.memoryCache.size;
-    let persistentSize = 0;
+    const persistentSize = 0;
 
     // This is a simplified stats calculation
     // In a real implementation, you'd track more detailed metrics

@@ -1,8 +1,9 @@
+import React from 'react';
 import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { createRoot } from 'react-dom/client';
 import '@testing-library/jest-dom';
-import { logger } from '@client/utils/logger';
+import { logger } from '@/utils/logger';
 
 // Mock modules that are imported in main.tsx
 vi.mock('../../utils/serviceWorker', () => ({
@@ -16,23 +17,17 @@ vi.mock('../../utils/asset-loading', () => ({
   setupAssetPreloading: vi.fn()
 }));
 
-vi.mock('../../utils/mobile-error-handler', () => ({
+vi.mock('../../utils/mobile', () => ({
   getMobileErrorHandler: vi.fn().mockReturnValue({
     initialize: vi.fn(),
     handleError: vi.fn()
   })
 }));
 
-vi.mock('../../utils/polyfills', () => ({
-  loadPolyfills: vi.fn().mockResolvedValue(undefined)
-}));
-
-vi.mock('../../utils/browser-compatibility', () => ({
+vi.mock('../../utils/browser', () => ({
+  loadPolyfills: vi.fn().mockResolvedValue(undefined),
   isBrowserSupported: vi.fn().mockReturnValue(true),
-  getBrowserWarnings: vi.fn().mockReturnValue([])
-}));
-
-vi.mock('../../utils/browser-compatibility-manager', () => ({
+  getBrowserWarnings: vi.fn().mockReturnValue([]),
   initializeBrowserCompatibility: vi.fn().mockResolvedValue({
     browserInfo: { name: 'Chrome', version: '91.0' },
     isSupported: true,
@@ -47,7 +42,7 @@ vi.mock('../../utils/performance-optimizer', () => ({
   }
 }));
 
-vi.mock('../../utils/performanceMonitoring', () => ({
+vi.mock('../../utils/performance-monitor', () => ({
   performanceMonitor: {
     measureRouteChange: vi.fn().mockReturnValue(() => {})
   }
@@ -61,8 +56,8 @@ vi.mock('../../utils/development-error-recovery', () => ({
   }
 }));
 
-vi.mock('../../utils/development-debug', () => ({
-  default: {
+vi.mock('../../utils/dev-tools', () => ({
+  DevelopmentDebugger: {
     getInstance: vi.fn().mockReturnValue({
       initialize: vi.fn()
     })
@@ -107,12 +102,15 @@ describe('React Application Initialization Integration Tests', () => {
     container = document.createElement('div');
     container.id = 'root';
     document.body.appendChild(container);
-    
+
     // Clear all mocks
     vi.clearAllMocks();
-    
+
     // Reset DOM state
-    document.readyState = 'complete';
+    Object.defineProperty(document, 'readyState', {
+      writable: true,
+      value: 'complete'
+    });
   });
 
   afterEach(() => {
@@ -140,7 +138,7 @@ describe('React Application Initialization Integration Tests', () => {
         }
       });
 
-      document.addEventListener = mockAddEventListener;
+      (document.addEventListener as any) = mockAddEventListener;
 
       // Import and start initialization (this would normally be done in main.tsx)
       const initPromise = new Promise<void>((resolve) => {
@@ -427,7 +425,7 @@ describe('React Application Initialization Integration Tests', () => {
 
   describe('Browser Compatibility and Polyfills', () => {
     test('should initialize browser compatibility manager', async () => {
-      const { initializeBrowserCompatibility } = await import('@client/utils/browser-compatibility-manager');
+      const { initializeBrowserCompatibility } = await import('@client/utils/browser');
       
       const compatibilityStatus = await initializeBrowserCompatibility({
         autoLoadPolyfills: true,
@@ -460,7 +458,7 @@ describe('React Application Initialization Integration Tests', () => {
 
     test('should handle browser compatibility warnings', async () => {
       // Mock browser compatibility with warnings
-      vi.mocked(await import('@client/utils/browser-compatibility-manager')).initializeBrowserCompatibility
+      vi.mocked(await import('@client/utils/browser')).initializeBrowserCompatibility
         .mockResolvedValueOnce({
           browserInfo: { name: 'IE', version: '11.0' },
           isSupported: false,
@@ -468,7 +466,7 @@ describe('React Application Initialization Integration Tests', () => {
           warnings: ['Browser version is outdated', 'Some features may not work']
         });
 
-      const { initializeBrowserCompatibility } = await import('@client/utils/browser-compatibility-manager');
+      const { initializeBrowserCompatibility } = await import('@client/utils/browser');
       
       const compatibilityStatus = await initializeBrowserCompatibility({
         autoLoadPolyfills: true,
@@ -507,10 +505,10 @@ describe('React Application Initialization Integration Tests', () => {
     });
 
     test('should initialize performance monitoring', async () => {
-      const { performanceMonitor } = await import('@client/utils/performanceMonitoring');
-      
+      const { performanceMonitor } = await import('../../utils/performance-monitor');
+
       const measureRouteChange = performanceMonitor.measureRouteChange('initial-load');
-      
+
       expect(performanceMonitor.measureRouteChange).toHaveBeenCalledWith('initial-load');
       expect(typeof measureRouteChange).toBe('function');
     });
@@ -564,7 +562,7 @@ describe('React Application Initialization Integration Tests', () => {
       const originalNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
 
-      const { DevelopmentErrorRecovery } = await import('@client/utils/development-error-recovery');
+      const { DevelopmentErrorRecovery } = await import('../../utils/development-error-recovery');
       
       const instance = DevelopmentErrorRecovery.getInstance();
       
@@ -578,7 +576,7 @@ describe('React Application Initialization Integration Tests', () => {
       const originalNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
 
-      const DevelopmentDebugger = (await import('@client/utils/development-debug')).default;
+      const DevelopmentDebugger = (await import('../../utils/development-debug')).default;
       
       const instance = DevelopmentDebugger.getInstance();
       

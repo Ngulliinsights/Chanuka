@@ -3,9 +3,11 @@
  * Following navigation component patterns for UI components
  */
 
-import React from 'react';
 import { Loader2 } from 'lucide-react';
+import React from 'react';
+
 import { cn } from '@/lib/utils';
+
 import { Button } from '../../../ui/button';
 
 export interface AuthButtonProps {

@@ -1,12 +1,14 @@
+import { ThumbsUp, ThumbsDown, Reply, MoreVertical, Edit, Trash } from 'lucide-react';
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ThumbsUp, ThumbsDown, Reply, MoreVertical, Edit, Trash } from 'lucide-react';
-import { useComments } from '../hooks/useCommunity';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+
 import type { Comment, CreateCommentRequest } from '../../../types/discussion';
+import { useComments } from '../hooks/useCommunity';
 
 interface CommentThreadProps {
   bill_id?: string;

@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+
 import { UserDashboard } from '@client/components/shared/dashboard';
 import { logger } from '@client/utils/logger';
 

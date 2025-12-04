@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Button } from '../../../components/ui/button';
-import { Alert, AlertDescription } from '../../../components/ui/alert';
 import { Loader2, Shield, AlertTriangle } from 'lucide-react';
-import { PretextWatchCard } from './PretextWatchCard';
-import { CivicActionToolbox } from './CivicActionToolbox';
+import React, { useState } from 'react';
+
+import { Alert, AlertDescription } from '../../../components/ui/alert';
+import { Button } from '../../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { usePretextAnalysis } from '../hooks/usePretextAnalysis';
+
+import { CivicActionToolbox } from './CivicActionToolbox';
+import { PretextWatchCard } from './PretextWatchCard';
+
 
 // Define types locally
 interface CivicAction {

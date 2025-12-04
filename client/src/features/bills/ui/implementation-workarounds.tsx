@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Textarea } from '../ui/textarea';
 import { AlertTriangle, Eye, CheckCircle, X, Clock, FileText, Users, Calendar, ArrowLeft, Shield, Building, Settings } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@client/components/ui/dialog';
+import { Textarea } from '@client/components/ui/textarea';
 import { logger } from '@client/utils/logger';
 
 // Enhanced interface to support multiple workaround types in Kenyan context

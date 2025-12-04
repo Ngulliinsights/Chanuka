@@ -1,8 +1,8 @@
 // Consolidated WebSocket Service for Unified API Client Architecture
 // Based on the consolidated API client design specifications
 
-import { WebSocketConfig, Subscription, ConnectionState } from './types';
 import { globalErrorHandler } from './errors';
+import { WebSocketConfig, Subscription, ConnectionState } from './types';
 
 // WebSocketEvents interface imported from types.ts
 

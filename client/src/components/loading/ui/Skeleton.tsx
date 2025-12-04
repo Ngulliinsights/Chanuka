@@ -1,6 +1,7 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
 import { SkeletonProps } from '@client/types';
+import React from 'react';
+
+import { cn } from '@/lib/utils';
 
 export const Skeleton: React.FC<SkeletonProps> = ({
   className,

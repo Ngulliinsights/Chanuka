@@ -7,6 +7,7 @@
 
 import * as React from 'react';
 import { useEffect, useRef, useCallback } from 'react';
+
 import { logger } from '@client/utils/logger';
 
 interface UseRenderTrackerOptions {

@@ -1,15 +1,17 @@
-import React, { ReactElement } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, RenderOptions } from '@testing-library/react';
+import React, { ReactElement } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { LoadingProvider } from '@client/core/loading/context';
-import { createNavigationProvider } from '@client/core/navigation/context';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth, AuthProvider } from '@client/features/users/hooks/useAuth';
-import { useMediaQuery } from '@client/hooks/use-mobile';
+import { vi } from 'vitest';
+
 import { AccessibilityProvider } from '@client/components/accessibility/accessibility-manager';
 import { OfflineProvider } from '@client/components/offline/offline-manager';
-import { vi } from 'vitest';
+import { LoadingProvider } from '@client/core/loading/context';
+import { createNavigationProvider } from '@client/core/navigation/context';
+import { useAuth, AuthProvider } from '@client/features/users/hooks/useAuth';
+import { useMediaQuery } from '@client/hooks/use-mobile';
+
 
 // =============================================================================
 // TYPES

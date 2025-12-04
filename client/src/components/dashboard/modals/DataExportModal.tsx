@@ -4,25 +4,6 @@
  * Allows users to export their personal data for GDPR compliance.
  */
 
-import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '../../ui/dialog';
-import { Button } from '../../ui/button';
-import { Label } from '../../ui/label';
-import { Checkbox } from '../../ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
-import { Input } from '../../ui/input';
 import { 
   Download, 
   FileText, 
@@ -33,7 +14,29 @@ import {
   Loader2,
   Info
 } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { DataExportRequest } from '@client/types/user-dashboard';
+
+import { Button } from '../../ui/button';
+import { Checkbox } from '../../ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '../../ui/dialog';
+import { Input } from '../../ui/input';
+import { Label } from '../../ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../ui/select';
+
 
 interface DataExportModalProps {
   open: boolean;

@@ -1,7 +1,9 @@
-import React from 'react';
-import { Badge } from '../ui/badge';
 import { Calendar, Clock, Users, Eye, Bookmark, MessageCircle, Share2 } from 'lucide-react';
+import React from 'react';
+
 import { Bill } from '@/core/api/types';
+
+import { Badge } from '../ui/badge';
 
 interface BillHeaderProps {
   bill: Bill;

@@ -1,5 +1,5 @@
-import { Building, FileText, Users, Shield, Search, User, Settings, BarChart3 } from 'lucide-react';
 import type { NavigationItem, NavigationSection } from '@client/types';
+import { Building, FileText, Users, Shield, Search, User, Settings, BarChart3 } from 'lucide-react';
 
 export const SECTION_TITLES: Record<NavigationSection, string> = {
   legislative: 'Legislative Data',

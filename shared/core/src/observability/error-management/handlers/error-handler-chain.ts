@@ -5,9 +5,9 @@
  * for recovery, logging, and circuit breaker integration.
  */
 
+import { logger } from '../../logging/index.js';
 import { BaseError, ErrorSeverity } from '../errors/base-error.js';
 import { CircuitBreaker } from '../patterns/circuit-breaker.js';
-import { logger } from '../../logging/index.js';
 
 export interface ErrorHandler {
   readonly priority: number;
@@ -207,7 +207,7 @@ export class LoggingHandler implements ErrorHandler {
   readonly priority = 10;
   readonly name = 'logging';
 
-  canHandle(error: BaseError): boolean {
+  canHandle(_error: BaseError): boolean {
     return true; // Can handle all errors
   }
 

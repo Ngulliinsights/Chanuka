@@ -2,8 +2,8 @@
  * Password utility hooks for auth components
  */
 
-import React from 'react';
 import { AuthConfig } from '@client/types';
+import React from 'react';
 
 // Simple password strength calculation
 function calculatePasswordStrength(password: string) {

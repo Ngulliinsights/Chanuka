@@ -3,6 +3,7 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
+import { ErrorSeverity } from '@client/core/error';
 import { 
   BaseError, 
   NetworkError,
@@ -18,7 +19,6 @@ import {
   TooManyRequestsError
 } from '@client/utils/logger';
 
-import { ErrorSeverity } from '@client/core/error';
 
 export function normalizeError(
   error: any,

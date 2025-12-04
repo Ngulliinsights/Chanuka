@@ -13,15 +13,19 @@
  * - Smooth animations and transitions
  */
 
+import { useAuth } from '@client/hooks/useAuth';
+import { X, Menu, Home, FileText, Users, Search, User, Settings, LogOut } from 'lucide-react';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Menu, Home, FileText, Users, Search, User, Settings, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+
 import { cn } from '@client/lib/utils';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
+
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { useAuth } from '@client/hooks/useAuth';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+
+
 import { SwipeGestures } from './SwipeGestures';
 
 interface NavigationItem {

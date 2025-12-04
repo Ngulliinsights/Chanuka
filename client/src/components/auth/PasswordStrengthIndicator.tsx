@@ -3,11 +3,13 @@
  * Visual feedback for password strength and requirements
  */
 
-import React from 'react';
-import { Progress } from '../ui/progress';
-import { Badge } from '../ui/badge';
-import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { validatePassword, PASSWORD_STRENGTH_CONFIG } from '@client/utils/password-validation';
+import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import React from 'react';
+
+
+import { Badge } from '../ui/badge';
+import { Progress } from '../ui/progress';
 
 interface PasswordStrengthIndicatorProps {
   password: string;

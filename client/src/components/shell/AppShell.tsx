@@ -1,17 +1,21 @@
 import React, { Suspense, useEffect, useState, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter } from 'react-router-dom';
-import { Toaster } from '../ui/toaster';
-import { ThemeProvider } from '../../contexts/ThemeContext';
-import { AccessibilityProvider } from '../accessibility/accessibility-manager';
-import { OfflineProvider } from '../offline/offline-manager';
-import { LoadingStateManager } from '../loading/LoadingStates';
-import { GlobalLoadingIndicator } from '../loading/GlobalLoadingIndicator';
-import { SkipLinks } from './SkipLinks';
-import { NavigationBar } from './NavigationBar';
-import { AppRouter } from './AppRouter';
+
 import { AuthProvider } from '@client/features/users/hooks/useAuth';
 import { logger } from '@client/utils/logger';
+
+import { ThemeProvider } from '../../contexts/ThemeContext';
+import { AccessibilityProvider } from '../accessibility/accessibility-manager';
+import { GlobalLoadingIndicator } from '../loading/GlobalLoadingIndicator';
+import { LoadingStateManager } from '../loading/LoadingStates';
+import { OfflineProvider } from '../offline/offline-manager';
+import { Toaster } from '../ui/toaster';
+
+import { AppRouter } from './AppRouter';
+import { NavigationBar } from './NavigationBar';
+import { SkipLinks } from './SkipLinks';
+
 
 interface AppShellProps {
   children?: React.ReactNode;

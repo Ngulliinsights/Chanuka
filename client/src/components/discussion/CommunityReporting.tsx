@@ -1,4 +1,3 @@
-import React, { useState, useCallback } from 'react';
 import { 
   Flag, 
   AlertTriangle, 
@@ -9,8 +8,13 @@ import {
   X,
   Send
 } from 'lucide-react';
-import { Button } from '../ui/button';
+import React, { useState, useCallback } from 'react';
+
+import { cn } from '@client/lib/utils';
+import { ModerationViolationType, CommentReport } from '@client/types/community';
+
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { 
   Dialog,
   DialogContent,
@@ -18,8 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog';
-import { cn } from '@client/lib/utils';
-import { ModerationViolationType, CommentReport } from '@client/types/community';
+
 
 interface CommunityReportingProps {
   commentId: string;

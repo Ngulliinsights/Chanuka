@@ -1,0 +1,17 @@
+/* Mobile Navigation Enhancements Styles */
+
+/* Pull to refresh indicator styles */
+.pull-indicator {
+  height: var(--pull-distance, 0px);
+  opacity: var(--indicator-opacity, 0);
+}
+
+/* Spinner rotation for pull to refresh */
+.spinner:not(.animate-spin) {
+  transform: rotate(var(--spinner-rotation, 0deg));
+}
+
+/* Content translation during pull to refresh */
+.content-container {
+  transform: translateY(var(--content-translate, 0px));
+}

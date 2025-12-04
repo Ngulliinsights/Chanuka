@@ -1,10 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Progress } from '@client/components/ui/progress';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import { 
   Database, 
   Server, 
@@ -21,6 +14,14 @@ import {
   Trash2,
   Settings
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Progress } from '@client/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 
 interface DatabaseStats {
   totalRecords: number;

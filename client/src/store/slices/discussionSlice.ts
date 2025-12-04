@@ -3,10 +3,12 @@
  * Manages discussion threads, comments, real-time updates, and moderation
  */
 
+import type { RootState } from '@client/index';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
-import { mockDataService } from '@client/services/mockDataService';
+
 import { communityBackendService } from '@client/services/community-backend-service';
+import { mockDataService } from '@client/services/mockDataService';
 import {
   DiscussionThread,
   Comment,
@@ -18,7 +20,6 @@ import {
   ModerationViolationType
 } from '@client/types/community';
 import { logger } from '@client/utils/logger';
-import type { RootState } from '@client/index';
 
 // State interface with clear organization
 interface DiscussionState {

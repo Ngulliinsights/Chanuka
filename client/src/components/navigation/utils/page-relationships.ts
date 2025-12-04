@@ -1,7 +1,9 @@
 import type { NavigationItem, UserRole, RelatedPage } from '@client/types';
-import { findNavigationItemByPath } from './navigation-utils';
-import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@client/validation';
+
 import { NavigationValidationError } from '@client/errors';
+import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@client/validation';
+
+import { findNavigationItemByPath } from './navigation-utils';
 
 // Define page relationships based on the configuration
 const PAGE_RELATIONSHIPS: Record<string, Record<string, { type: 'parent' | 'child' | 'sibling' | 'related'; weight: number; context: string }>> = {

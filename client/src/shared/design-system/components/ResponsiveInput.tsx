@@ -15,9 +15,11 @@
  * Requirements: 9.1 (Responsive Design), 9.5 (Accessibility)
  */
 
-import React, { useCallback, useMemo } from 'react';
-import { cn } from '@client/lib/utils';
 import { useResponsive } from '@client/responsive';
+import React, { useCallback, useMemo } from 'react';
+
+import { cn } from '@client/lib/utils';
+
 import { inputUtils } from './input';
 
 /**

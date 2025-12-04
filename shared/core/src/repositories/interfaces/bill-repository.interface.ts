@@ -5,8 +5,8 @@
  * direct schema usage while maintaining the same functionality.
  */
 
-import type { Result, Maybe } from '../../primitives';
 import type { Bill, NewBill } from '../../../../schema/foundation';
+import type { Result, Maybe } from '../../primitives';
 
 export interface IBillRepository {
   /**

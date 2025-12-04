@@ -3,13 +3,16 @@
  * Analytics, marketing, data sharing consents
  */
 
+import { Database, Info } from 'lucide-react';
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
+
+import { PrivacySettings, ConsentRecord } from '@client/types/auth';
+
 import { Button } from '../../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
 import { Label } from '../../../ui/label';
 import { Switch } from '../../../ui/switch';
-import { Database, Info } from 'lucide-react';
-import { PrivacySettings, ConsentRecord } from '@client/types/auth';
+
 
 interface DataUsageControlsProps {
   settings: PrivacySettings;

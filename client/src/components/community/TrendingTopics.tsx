@@ -9,11 +9,7 @@
  * - Compact and full view modes
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
+import { formatDistanceToNow } from 'date-fns';
 import {
   TrendingUp,
   TrendingDown,
@@ -27,9 +23,17 @@ import {
   Zap,
   Activity
 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { TrendingTopic } from '@client/types/community';
-import { formatDistanceToNow } from 'date-fns';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+
+
 
 interface TrendingTopicsProps {
   topics: TrendingTopic[];

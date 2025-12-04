@@ -10,14 +10,7 @@
  * - Feed customization
  */
 
-import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Avatar, AvatarFallback } from '../ui/avatar';
 import { ThumbsUp } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import {
   Activity,
   TrendingUp,
@@ -27,14 +20,26 @@ import {
   RefreshCw,
   MessageSquare,
 } from 'lucide-react';
-import { cn } from '@client/lib/utils';
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
+
 import { useMediaQuery } from '@client/hooks/useMediaQuery';
+import { cn } from '@client/lib/utils';
+
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+
+
 import ActivityFeed from './ActivityFeed';
-import { TrendingTopics } from './TrendingTopics';
-import { CommunityFilters } from './CommunityFilters';
-import { LocalImpactPanel } from './LocalImpactPanel';
-import CommunityStats from './CommunityStats';
 import { CommunityErrorBoundary } from './CommunityErrorBoundary';
+import { CommunityFilters } from './CommunityFilters';
+import CommunityStats from './CommunityStats';
+import { LocalImpactPanel } from './LocalImpactPanel';
+import { TrendingTopics } from './TrendingTopics';
 
 // Expert Insights Component
 const ExpertInsights = ({ insights, compact }: { insights: any[]; compact?: boolean }) => {

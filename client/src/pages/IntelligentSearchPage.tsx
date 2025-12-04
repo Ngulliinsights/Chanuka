@@ -5,32 +5,33 @@
  * and provides a complete search experience with dual-engine capabilities.
  */
 
-import { useState } from 'react';
 import { Settings, Save, TrendingUp, Target, Clock, BarChart3 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
-import { IntelligentAutocomplete } from '@/features/search/components/IntelligentAutocomplete';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdvancedSearchInterface } from '@/features/search/components/AdvancedSearchInterface';
+import { IntelligentAutocomplete } from '@/features/search/components/IntelligentAutocomplete';
 import { SavedSearches } from '@/features/search/components/SavedSearches';
-import { SearchTips } from '@/features/search/components/SearchTips';
+import { SearchAnalyticsDashboard } from '@/features/search/components/SearchAnalyticsDashboard';
+import { SearchFilters } from '@/features/search/components/SearchFilters';
 import { SearchProgressIndicator } from '@/features/search/components/SearchProgressIndicator';
 import { SearchResultCard } from '@/features/search/components/SearchResultCard';
-import { SearchFilters } from '@/features/search/components/SearchFilters';
-import { SearchAnalyticsDashboard } from '@/features/search/components/SearchAnalyticsDashboard';
+import { SearchTips } from '@/features/search/components/SearchTips';
 import { useIntelligentSearch } from '@/features/search/hooks/useIntelligentSearch';
-import { useStreamingSearch } from '@/features/search/hooks/useStreamingSearch';
 import { usePopularSearches, useSearchHistory } from '@/features/search/hooks/useSearch';
+import { useStreamingSearch } from '@/features/search/hooks/useStreamingSearch';
 import { intelligentSearch } from '@/features/search/services/intelligent-search';
-import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/utils/logger';
 import type { DualSearchRequest } from '@/features/search/services/intelligent-search';
 import type {
   SearchResult as ApiSearchResult,
   SavedSearch,
   SearchFilters as SearchFiltersType,
 } from '@/features/search/types';
+import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/utils/logger';
 
 // This type represents what SearchResultCard expects
 // It's a subset of the API SearchResult with only the types it can handle

@@ -5,8 +5,8 @@
  * the unified error handling system for the entire application.
  */
 
-import { errorHandler, ErrorDomain } from './unified-error-handler';
 import { initializeForEnvironment, getErrorSystemStatus, resetErrorSystem } from './error-system-initialization';
+import { errorHandler, ErrorDomain } from './errors';
 
 /**
  * Initialize the unified error handling system
@@ -53,6 +53,11 @@ export async function initializeErrorHandling(config?: {
     // Add custom recovery strategies
     setupCustomRecoveryStrategies();
 
+    // Setup analytics if enabled
+    if (config?.enableAnalytics || process.env.REACT_APP_ENABLE_ERROR_ANALYTICS === 'true') {
+      setupErrorAnalytics();
+    }
+
     // Log system status
     const status = getErrorSystemStatus();
     console.log('✅ Advanced error handling system initialized', {
@@ -60,8 +65,11 @@ export async function initializeErrorHandling(config?: {
       timestamp: new Date().toISOString(),
     });
     
-  } catch (error) {
-    console.error('❌ Failed to initialize advanced error handling:', error);
+  } catch (error: unknown) {
+    const safe = (e: unknown) => {
+      try { return typeof e === 'string' ? e : JSON.stringify(e); } catch { return String(e); }
+    };
+    console.error('❌ Failed to initialize advanced error handling:', safe(error));
     
     // Fallback to basic error handling
     const fallbackConfig = {
@@ -91,13 +99,21 @@ function setupCustomRecoveryStrategies() {
     id: 'api-retry-with-backoff',
     name: 'API Retry with Exponential Backoff',
     description: 'Retry API calls with exponential backoff for transient failures',
-    canRecover: (error) =>
-      error.type === ErrorDomain.NETWORK &&
-      error.details?.status >= 500 &&
-      error.details?.status < 600 &&
-      (error.retryCount || 0) < 3,
-    recover: async (error) => {
-      const retryCount = (error.retryCount || 0) + 1;
+    canRecover: (error: unknown) => {
+      const details = (error as { details?: unknown }).details as Record<string, unknown> | undefined;
+      const status = typeof details?.status === 'number' ? (details!.status as number) : undefined;
+      const type = (error as { type?: unknown }).type as unknown;
+      const retryCount = (error as { retryCount?: unknown }).retryCount as number | undefined;
+      return (
+        type === ErrorDomain.NETWORK &&
+        typeof status === 'number' &&
+        status >= 500 &&
+        status < 600 &&
+        (retryCount || 0) < 3
+      );
+    },
+    recover: async (error: unknown) => {
+      const retryCount = ((error as { retryCount?: unknown }).retryCount as number | undefined) || 0 + 1;
       const delayMs = Math.min(1000 * Math.pow(2, retryCount), 10000);
 
       console.log(`Retrying API call (attempt ${retryCount}) after ${delayMs}ms delay`);
@@ -116,9 +132,13 @@ function setupCustomRecoveryStrategies() {
     id: 'storage-quota-recovery',
     name: 'Storage Quota Recovery',
     description: 'Clear old data when storage quota is exceeded',
-    canRecover: (error) =>
-      error.message?.toLowerCase().includes('quota') ||
-      error.message?.toLowerCase().includes('storage'),
+    canRecover: (error: unknown) => {
+      const msg = (error as { message?: unknown }).message as string | undefined;
+      return !!(msg && msg.toLowerCase && (
+        msg.toLowerCase().includes('quota') ||
+        msg.toLowerCase().includes('storage')
+      ));
+    },
     recover: async () => {
       try {
         // Clear old cache entries
@@ -134,8 +154,11 @@ function setupCustomRecoveryStrategies() {
 
         console.log(`Cleared ${keysToRemove.length} cache entries to free storage space`);
         return true;
-      } catch (recoveryError) {
-        console.error('Failed to clear storage:', recoveryError);
+      } catch (recoveryError: unknown) {
+        const safe = (e: unknown) => {
+          try { return typeof e === 'string' ? e : JSON.stringify(e); } catch { return String(e); }
+        };
+        console.error('Failed to clear storage:', safe(recoveryError));
         return false;
       }
     },
@@ -173,8 +196,11 @@ function setupErrorAnalytics() {
           severity: appError.severity,
           component: appError.context?.component,
         });
-      } catch (analyticsError) {
-        console.warn('Failed to track error analytics:', analyticsError);
+      } catch (analyticsError: unknown) {
+        const safe = (e: unknown) => {
+          try { return typeof e === 'string' ? e : JSON.stringify(e); } catch { return String(e); }
+        };
+        console.warn('Failed to track error analytics:', safe(analyticsError));
       }
     }
   });
@@ -192,7 +218,17 @@ export function getErrorStats() {
  */
 export function cleanupOldErrors() {
   const oneHourAgo = 60 * 60 * 1000;
-  const removedCount = errorHandler.clearErrorsOlderThan(oneHourAgo);
+  // Prefer built-in method if available, otherwise clear all as fallback
+  let removedCount = 0;
+  const maybe = errorHandler as unknown as Record<string, unknown>;
+  if (typeof maybe.clearErrorsOlderThan === 'function') {
+    removedCount = (errorHandler as unknown as { clearErrorsOlderThan: (age: number) => number }).clearErrorsOlderThan(oneHourAgo);
+  } else {
+    // Fallback: clear all stored errors
+    errorHandler.clearErrors();
+    removedCount = 0; // Unknown in fallback
+  }
+
   console.log(`🧹 Cleaned up ${removedCount} old errors`);
   return removedCount;
 }
@@ -212,4 +248,4 @@ export {
   createAuthError,
   createPermissionError,
   createServerError,
-} from './unified-error-handler';
+} from './errors';

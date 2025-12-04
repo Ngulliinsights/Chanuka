@@ -3,8 +3,9 @@
  * Unified loading spinner with consistent styling using Lucide icon
  */
 
-import { cn } from '@client/lib/utils';
 import { Loader2 } from 'lucide-react';
+
+import { cn } from '@client/lib/utils';
 
 interface LoadingSpinnerProps {
   className?: string;

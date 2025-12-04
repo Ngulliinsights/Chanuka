@@ -3,8 +3,8 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
-import { BaseError, ErrorDomain } from '@client/utils/logger';
 import type { AppError } from '@client/core/error';
+import { BaseError, ErrorDomain } from '@client/utils/logger';
 
 export function getContextualMessage(error: BaseError, errorType?: string, context?: string): string {
   if (errorType === 'chunk') {

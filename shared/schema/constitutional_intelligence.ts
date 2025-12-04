@@ -4,12 +4,11 @@
 // Constitutional analysis, legal precedents, and expert review infrastructure
 // This schema enables the platform's core value proposition of constitutional analysis
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique, date, smallint
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
 import { bills, users } from "./foundation";
 
@@ -63,6 +62,7 @@ export const constitutional_provisions = pgTable("constitutional_provisions", {
 // CONSTITUTIONAL ANALYSES - AI + Expert Analysis of Bills
 // ============================================================================
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const constitutional_analyses: any = pgTable("constitutional_analyses", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
@@ -98,12 +98,12 @@ export const constitutional_analyses: any = pgTable("constitutional_analyses", {
   billCurrentAnalysisIdx: index("idx_constitutional_analyses_bill_current")
     .on(table.bill_id, table.superseded_by)
     .where(sql`${table.superseded_by} IS NULL`),
-  
+
   // Expert review queue
   expertReviewQueueIdx: index("idx_constitutional_analyses_expert_review")
     .on(table.requires_expert_review, table.expert_reviewed, table.created_at)
     .where(sql`${table.requires_expert_review} = true AND ${table.expert_reviewed} = false`),
-  
+
   // Constitutional alignment queries
   alignmentIdx: index("idx_constitutional_analyses_alignment")
     .on(table.constitutional_alignment, table.confidence_score),

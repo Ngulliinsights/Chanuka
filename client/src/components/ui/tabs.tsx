@@ -3,8 +3,9 @@
  * Accessible tab navigation component
  */
 
-import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
+import * as React from "react"
+
 import { cn } from "@client/utils/cn"
 
 const Tabs = TabsPrimitive.Root

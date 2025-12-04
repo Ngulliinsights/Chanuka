@@ -1,7 +1,3 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
 import { 
   AlertTriangle, 
   CheckCircle, 
@@ -14,7 +10,14 @@ import {
   Users,
   ExternalLink
 } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { ConstitutionalFlag, SeverityLevel } from '@client/types/constitutional';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+
 
 interface ConstitutionalFlagCardProps {
   flag: ConstitutionalFlag;

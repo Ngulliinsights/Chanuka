@@ -47,6 +47,8 @@ export {
 export * from './utils/api-utils';
 export * from './utils/cache-utils';
 export * from './utils/correlation-id';
+export * from './utils/anonymity-service';
+export * from './utils/common-utils';
 
 // Services
 export * from './services';

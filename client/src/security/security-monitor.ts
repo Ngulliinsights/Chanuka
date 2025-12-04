@@ -3,8 +3,9 @@
  * Centralized security event monitoring and alerting system
  */
 
-import { logger } from '@client/utils/logger';
 import { SecurityEvent, SecurityAlert, SecurityMetrics, SecuritySeverity } from '@client/types';
+
+import { logger } from '@client/utils/logger';
 
 export interface SecurityMonitorConfig {
   enabled: boolean;

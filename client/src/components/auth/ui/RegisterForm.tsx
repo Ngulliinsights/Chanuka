@@ -3,14 +3,18 @@
  * Following navigation component patterns for form components
  */
 
-import React, { useState } from 'react';
-import { Mail, Eye, User, Shield, FileText } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { RegisterFormProps, RegisterFormData } from '@client/types';
+import { Mail, Eye, User, Shield, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { cn } from '@/lib/utils';
+
+
 import { useRegisterForm } from '../hooks/useRegisterForm';
-import { AuthInput } from './AuthInput';
-import { SubmitButton } from './AuthButton';
+
 import { AuthAlert } from './AuthAlert';
+import { SubmitButton } from './AuthButton';
+import { AuthInput } from './AuthInput';
 import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({

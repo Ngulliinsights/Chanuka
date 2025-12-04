@@ -212,7 +212,7 @@ describe('Browser Compatibility Detection', () => {
 
   describe('Compatibility Testing', () => {
     it('should run compatibility tests successfully', async () => {
-      const { runBrowserCompatibilityTests } = await import('@client/utils/browser-compatibility-tests');
+      const { runBrowserCompatibilityTests } = await import('../../utils/browser-compatibility-tests');
       
       const results = await runBrowserCompatibilityTests();
       
@@ -237,10 +237,10 @@ describe('Browser Compatibility Detection', () => {
       delete (window as any).Promise;
       delete (window as any).fetch;
       
-      const { runBrowserCompatibilityTests } = await import('@client/utils/browser-compatibility-tests');
-      
+      const { runBrowserCompatibilityTests } = await import('../../utils/browser-compatibility-tests');
+
       const results = await runBrowserCompatibilityTests();
-      
+
       expect(results.criticalIssues.length).toBeGreaterThan(0);
       expect(results.overallScore).toBeLessThan(100);
       
@@ -252,10 +252,10 @@ describe('Browser Compatibility Detection', () => {
     it('should generate appropriate recommendations', async () => {
       mockUserAgent('Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'); // IE 11
       
-      const { runBrowserCompatibilityTests } = await import('@client/utils/browser-compatibility-tests');
-      
+      const { runBrowserCompatibilityTests } = await import('../../utils/browser-compatibility-tests');
+
       const results = await runBrowserCompatibilityTests();
-      
+
       expect(results.recommendations.length).toBeGreaterThan(0);
       expect(results.recommendations.some(rec => 
         rec.toLowerCase().includes('update') || rec.toLowerCase().includes('browser')

@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText,
   Users,
@@ -22,11 +20,14 @@ import {
   Play,
   Target
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { Badge } from '@client/components/ui/badge';
 import { Button } from '@client/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Badge } from '@client/components/ui/badge';
-import { IntelligentAutocomplete } from '@client/features/search/components/IntelligentAutocomplete';
 import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
+import { IntelligentAutocomplete } from '@client/features/search/components/IntelligentAutocomplete';
 
 export default function HomePage() {
   const navigate = useNavigate();

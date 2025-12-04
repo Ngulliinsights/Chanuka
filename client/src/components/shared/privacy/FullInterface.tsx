@@ -3,11 +3,6 @@
  * Comprehensive interface with all privacy controls (tabs for visibility, data, notifications, cookies, rights)
  */
 
-import React, { useState, useCallback, Suspense } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Alert, AlertDescription } from '../../ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
-import { Badge } from '../../ui/badge';
 import {
   Shield,
   Eye,
@@ -16,16 +11,23 @@ import {
   AlertTriangle,
   Info
 } from 'lucide-react';
+import React, { useState, useCallback, Suspense } from 'react';
+
 import { useAuth } from '@client/features/users/hooks/useAuth';
-import { ConsentModal } from '../../auth/ConsentModal';
 import {
   PrivacySettings,
   DataExportRequest,
   DataDeletionRequest,
   ConsentRecord
 } from '@client/types/auth';
-import { privacyCompliance } from '@client/utils/privacy-compliance';
 import { logger } from '@client/utils/logger';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+
+import { ConsentModal } from '../../auth/ConsentModal';
+import { Alert, AlertDescription } from '../../ui/alert';
+import { Badge } from '../../ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
 const VisibilityControls = React.lazy(() => import('./controls/VisibilityControls').then(module => ({ default: module.VisibilityControls })));
 const DataUsageControls = React.lazy(() => import('./controls/DataUsageControls').then(module => ({ default: module.DataUsageControls })));
 const ConsentControls = React.lazy(() => import('./controls/ConsentControls').then(module => ({ default: module.ConsentControls })));

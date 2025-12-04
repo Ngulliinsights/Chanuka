@@ -3,12 +3,13 @@
  * Coordinates all security components and provides unified security management
  */
 
+import { SecurityEvent } from '@client/types';
+
 import { cspNonceManager } from './csp-nonce';
-import { inputSanitizer } from './input-sanitizer';
 import { csrfProtection, setupCSRFInterceptor } from './csrf-protection';
+import { inputSanitizer } from './input-sanitizer';
 import { clientRateLimiter, RateLimitConfigs } from './rate-limiter';
 import { vulnerabilityScanner, SecurityThreat } from './vulnerability-scanner';
-import { SecurityEvent } from '@client/types';
 
 export interface SecurityConfig {
   enableCSP: boolean;

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { useOffline } from './offline-manager';
 
 interface OfflineModalProps {

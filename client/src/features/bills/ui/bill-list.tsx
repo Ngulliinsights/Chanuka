@@ -1,12 +1,14 @@
+import { Loader2, AlertCircle, Filter } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Link } from 'wouter';
-import { Button } from '../ui/button';
-import { BillCard } from './bill-card';
-import { Loader2, AlertCircle, Filter } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Badge } from '../ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@client/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/components/ui/dropdown-menu';
 import { logger } from '@client/utils/logger';
+
+import { BillCard } from './bill-card';
 
 interface Bill {
   id: number;

@@ -6,6 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
+
 import { logger } from '../observability/logging';
 
 export interface MethodTimingData {
@@ -24,7 +25,7 @@ export interface MethodTimingData {
   /** Error details if failed */
   error?: string;
   /** Additional metadata */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   /** Environment */
   environment: string;
   /** Server instance identifier */
@@ -103,7 +104,7 @@ export class MethodTimingService extends EventEmitter {
   /**
    * Start timing a method execution
    */
-  startTiming(methodName: string, className?: string, metadata?: Record<string, any>): TimingHandle {
+  startTiming(methodName: string, className?: string, metadata?: Record<string, unknown>): TimingHandle {
     if (!this.config.enabled) {
       return new NoOpTimingHandle();
     }
@@ -323,7 +324,7 @@ export class MethodTimingService extends EventEmitter {
  * Timing handle for active timing
  */
 export interface TimingHandle {
-  end(success?: boolean, error?: string, metadata?: Record<string, any>): void;
+  end(success?: boolean, error?: string, metadata?: Record<string, unknown>): void;
 }
 
 /**
@@ -335,11 +336,11 @@ class ActiveTimingHandle implements TimingHandle {
     private className: string | undefined,
     private startTime: number,
     private startTimePrecise: bigint,
-    private initialMetadata: Record<string, any> | undefined,
+    private initialMetadata: Record<string, unknown> | undefined,
     private service: MethodTimingService
   ) {}
 
-  end(success: boolean = true, error?: string, metadata?: Record<string, any>): void {
+  end(success: boolean = true, error?: string, metadata?: Record<string, unknown>): void {
     const endTime = Date.now();
     const endTimePrecise = process.hrtime.bigint();
     const duration = Number(endTimePrecise - this.startTimePrecise) / 1_000_000; // Convert to milliseconds
@@ -369,31 +370,33 @@ class NoOpTimingHandle implements TimingHandle {
 /**
  * Decorator for automatic method timing
  */
-export function timed(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
-  const originalMethod = descriptor.value;
-  // const _methodName = `${target.constructor.name}.${propertyKey}`;
+export function timed(target: object, propertyKey: string, descriptor: PropertyDescriptor): void {
+  const originalMethod = descriptor.value as (...args: unknown[]) => unknown;
 
-  descriptor.value = function (...args: any[]) {
+  descriptor.value = function (...args: unknown[]) {
     const timingService = getGlobalMethodTimingService();
-    const handle = timingService.startTiming(propertyKey, target.constructor.name);
+    const ctor = (target as { constructor?: { name?: string } })?.constructor;
+    const className = ctor?.name || undefined;
+    const handle = timingService.startTiming(propertyKey, className);
 
     try {
       const result = originalMethod.apply(this, args);
       if (result instanceof Promise) {
         return result
-          .then((res) => {
+          .then((res: unknown) => {
             handle.end(true);
             return res;
           })
-          .catch((err) => {
-            handle.end(false, err.message);
+          .catch((err: unknown) => {
+            const msg = err instanceof Error ? err.message : String(err);
+            handle.end(false, msg);
             throw err;
           });
       } else {
         handle.end(true);
         return result;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       handle.end(false, error instanceof Error ? error.message : String(error));
       throw error;
     }
@@ -407,7 +410,7 @@ export function timeMethod<T>(
   methodName: string,
   className: string | undefined,
   fn: () => T | Promise<T>,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): T | Promise<T> {
   const timingService = getGlobalMethodTimingService();
   const handle = timingService.startTiming(methodName, className, metadata);
@@ -416,19 +419,20 @@ export function timeMethod<T>(
     const result = fn();
     if (result instanceof Promise) {
       return result
-        .then((res) => {
+        .then((res: unknown) => {
           handle.end(true);
-          return res;
+          return res as T;
         })
-        .catch((err) => {
-          handle.end(false, err.message);
+        .catch((err: unknown) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          handle.end(false, msg);
           throw err;
         });
     } else {
       handle.end(true);
       return result;
     }
-  } catch (error) {
+  } catch (error: unknown) {
     handle.end(false, error instanceof Error ? error.message : String(error));
     throw error;
   }

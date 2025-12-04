@@ -6,9 +6,10 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../errors/base-error.js';
-import { ErrorHandlerChain } from '../handlers/error-handler-chain.js';
+
 import { logger } from '../../logging/index.js';
+import { BaseError, BaseErrorOptions, ErrorDomain, ErrorSeverity } from '../errors/base-error.js';
+import { ErrorHandlerChain } from '../handlers/error-handler-chain.js';
 
 export interface ErrorMiddlewareOptions {
   includeStackTrace?: boolean;
@@ -46,17 +47,26 @@ export function createErrorMiddleware(options: ErrorMiddlewareOptions = {}) {
     const correlationId = req.headers[correlationIdHeader] as string;
     if (correlationId && !baseError.metadata.correlationId) {
       // Create new error with correlation ID
-      baseError = new BaseError(baseError.message, {
-        ...baseError,
+      const baseOptionsMutable: Record<string, unknown> = {
+        statusCode: baseError.statusCode,
+        code: baseError.code,
+        domain: baseError.metadata.domain,
+        severity: baseError.metadata.severity,
+        details: baseError.details ?? {},
         correlationId,
-        context: {
-          ...baseError.metadata.context,
+        context: Object.assign({}, baseError.metadata.context ?? {}, {
           requestPath: req.path,
           requestMethod: req.method,
           user_agent: req.headers['user-agent'],
           ip: req.ip
-        }
-      });
+        })
+      };
+
+      if (baseError.cause) {
+        baseOptionsMutable.cause = baseError.cause;
+      }
+
+      baseError = new BaseError(baseError.message, baseOptionsMutable as BaseErrorOptions);
     }
 
     // Process through error handler chain
@@ -83,12 +93,23 @@ export function createErrorMiddleware(options: ErrorMiddlewareOptions = {}) {
     }
 
     // Prepare response
-    const response: any = {
+    type ErrorPayload = {
+      message: string;
+      code: string;
+      details?: Record<string, unknown>;
+      correlationId?: string;
+      timestamp: string;
+      id?: string;
+      stack?: string;
+      [key: string]: unknown;
+    };
+
+    const response: { error: ErrorPayload } = {
       error: {
         message: baseError.getUserMessage(),
         code: baseError.code,
-        ...(baseError.details && { details: baseError.details }),
-        ...(correlationId && { correlationId }),
+        ...(baseError.details ? { details: baseError.details } : {}),
+        ...(correlationId ? { correlationId } : {}),
         timestamp: new Date().toISOString()
       }
     };
@@ -176,7 +197,7 @@ function convertToBaseError(error: Error, req: Request): BaseError {
 /**
  * Async error wrapper for Express routes
  */
-export function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) {
+export function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };

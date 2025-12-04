@@ -3,10 +3,12 @@
  * Following navigation component testing patterns for consistency
  */
 
+import { ValidationState } from '@client/types';
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import { ReactElement, ReactNode } from 'react';
 import { vi } from 'vitest';
 import { z } from 'zod';
+
 import {
   UIError,
   UIValidationError,
@@ -14,7 +16,6 @@ import {
   UIFormError,
   UIComponentError
 } from '@client/errors';
-import { ValidationState } from '@client/types';
 
 /**
  * Test wrapper component for providing context

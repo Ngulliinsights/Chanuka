@@ -4,7 +4,7 @@
  * Manages saved searches with email alert configuration and execution.
  */
 
-import { useState } from 'react';
+import { format } from 'date-fns';
 import {
   Search,
   Star,
@@ -13,18 +13,20 @@ import {
   Bell,
   BellOff
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+
 import { useSavedSearches } from '../hooks/useSearch';
 import { intelligentSearch } from '../services/intelligent-search';
-import { format } from 'date-fns';
 import type { SavedSearch } from '../types';
 
 interface SavedSearchesProps {

@@ -39,6 +39,7 @@ import {
   useRef,
   ReactNode
 } from 'react';
+
 import type {
   ActivityItem,
   TrendingTopic,

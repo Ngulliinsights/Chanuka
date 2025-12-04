@@ -1,4 +1,6 @@
+import { LoadingOperation } from '@client/types';
 import { useState, useCallback, useRef } from 'react';
+
 import { 
   LoadingError, 
   isRetryableError, 
@@ -6,7 +8,6 @@ import {
   LoadingTimeoutError,
   LoadingNetworkError 
 } from '@client/errors';
-import { LoadingOperation } from '@client/types';
 
 export interface LoadingRecoveryState {
   canRecover: boolean;

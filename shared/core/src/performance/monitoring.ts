@@ -6,8 +6,9 @@
  */
 
 import { EventEmitter } from 'events';
-import { PerformanceBudget, PerformanceBudgetConfig, getPerformanceBudgets, validateBudgetConfig } from './budgets';
+
 import { logger } from '../observability/logging';
+import { PerformanceBudget, PerformanceBudgetConfig, getPerformanceBudgets, validateBudgetConfig } from './budgets';
 
 export interface PerformanceMetric {
   /** Metric name */
@@ -19,7 +20,7 @@ export interface PerformanceMetric {
   /** Timestamp when metric was recorded */
   timestamp: number;
   /** Additional metadata */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface BudgetViolation {
@@ -34,7 +35,7 @@ export interface BudgetViolation {
   /** Timestamp of violation */
   timestamp: number;
   /** Additional context */
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export interface PerformanceReport {
@@ -146,7 +147,7 @@ export class PerformanceMonitoringService extends EventEmitter {
   /**
    * Record Core Web Vitals metric
    */
-  recordWebVital(name: string, value: number, metadata?: Record<string, any>): void {
+  recordWebVital(name: string, value: number, metadata?: Record<string, unknown>): void {
     this.recordMetric({
       name,
       value,
@@ -161,7 +162,7 @@ export class PerformanceMonitoringService extends EventEmitter {
   /**
    * Record bundle size metric
    */
-  recordBundleMetric(name: string, sizeInBytes: number, metadata?: Record<string, any>): void {
+  recordBundleMetric(name: string, sizeInBytes: number, metadata?: Record<string, unknown>): void {
     this.recordMetric({
       name,
       value: sizeInBytes / 1024, // Convert to KB
@@ -181,14 +182,14 @@ export class PerformanceMonitoringService extends EventEmitter {
     violationsFound: number;
     warningsFound: number;
     filesScanned: number;
-  }, metadata?: Record<string, any>): void {
+  }, metadata?: Record<string, unknown>): void {
     // Record violations as a metric
     this.recordMetric({
       name: 'design-system-violations',
       value: auditResults.violationsFound,
       unit: 'count',
       metadata: {
-        ...metadata,
+        ...(metadata as Record<string, unknown>),
         audit: true,
         type: 'violations',
         warnings: auditResults.warningsFound,
@@ -202,7 +203,7 @@ export class PerformanceMonitoringService extends EventEmitter {
       value: auditResults.warningsFound,
       unit: 'count',
       metadata: {
-        ...metadata,
+        ...(metadata as Record<string, unknown>),
         audit: true,
         type: 'warnings',
         violations: auditResults.violationsFound,
@@ -216,7 +217,7 @@ export class PerformanceMonitoringService extends EventEmitter {
       value: auditResults.filesScanned,
       unit: 'files',
       metadata: {
-        ...metadata,
+        ...(metadata as Record<string, unknown>),
         audit: true,
         type: 'coverage',
         violations: auditResults.violationsFound,

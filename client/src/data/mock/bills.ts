@@ -6,6 +6,7 @@
  */
 
 import { faker } from '@faker-js/faker';
+
 import { Bill as ReadonlyBill, BillStatus, UrgencyLevel, ComplexityLevel, ConstitutionalFlag, Severity } from '@client/core/api/types';
 
 interface BillsStats {

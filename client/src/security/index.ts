@@ -4,12 +4,13 @@
  */
 
 import { logger } from '@client/utils/logger';
+
 import { CSPManager } from './csp-manager';
 import { CSRFProtection } from './csrf-protection';
 import { InputSanitizer } from './input-sanitizer';
 import { RateLimiter } from './rate-limiter';
-import { VulnerabilityScanner } from './vulnerability-scanner';
 import { SecurityMonitor } from './security-monitor';
+import { VulnerabilityScanner } from './vulnerability-scanner';
 
 export interface SecurityConfig {
   enableCSP: boolean;

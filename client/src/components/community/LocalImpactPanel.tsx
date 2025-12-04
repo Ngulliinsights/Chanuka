@@ -9,13 +9,6 @@
  * - Community engagement statistics
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import {
   MapPin,
   X,
@@ -28,8 +21,18 @@ import {
   Building,
   BarChart3,
 } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { LocalImpactMetrics } from '@client/types/community';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
 
 interface LocalImpactPanelProps {
   onClose?: () => void;

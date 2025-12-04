@@ -3,8 +3,9 @@
  * Prevents abuse by limiting API requests and user actions
  */
 
-import { logger } from '@client/utils/logger';
 import { SecurityEvent, RateLimitInfo } from '@client/types';
+
+import { logger } from '@client/utils/logger';
 
 export interface RateLimiterConfig {
   enabled: boolean;

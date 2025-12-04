@@ -7,14 +7,12 @@
  */
 
 import { Component, ReactNode, ErrorInfo } from 'react';
-import { logger } from '@client/utils/logger';
-import { startTrace, finishTrace } from '@client/utils/tracing';
-import { getBrowserInfo } from '@client/utils/browser-compatibility';
-import { performanceMonitor } from '@client/utils/performance-monitor';
 
-// Import unified error system from shared/core
-import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
-import { errorHandler } from '@client/utils/unified-error-handler';
+import { getBrowserInfo } from '@/utils/browser';
+import { BaseError, ErrorDomain, ErrorSeverity, errorHandler } from '@/utils/errors';
+import { logger } from '@/utils/logger';
+import { runtimePerformanceMonitor } from '@/utils/performance-monitor';
+import { startTrace, finishTrace } from '@/utils/tracing';
 
 /**
  * Represents a recovery option for error handling
@@ -159,7 +157,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               component: 'ErrorBoundary',
               timestamp: new Date().toISOString(),
               browserInfo: getBrowserInfo(),
-              performanceMetrics: performanceMonitor.getMetrics(),
+              performanceMetrics: runtimePerformanceMonitor.getMetrics(),
             },
           });
 
@@ -257,7 +255,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       recoverySuccessful: false,
       userFeedbackProvided: false,
       browserInfo: getBrowserInfo(),
-      performanceMetrics: performanceMonitor.getMetrics(),
+      performanceMetrics: runtimePerformanceMonitor.getMetrics(),
       context: this.props.context,
     };
 
@@ -270,7 +268,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       componentStack: errorInfo.componentStack,
       context: this.props.context,
       browserInfo: getBrowserInfo(),
-      performanceMetrics: performanceMonitor.getMetrics(),
+      performanceMetrics: runtimePerformanceMonitor.getMetrics(),
       recoveryAttempts: this.recoveryAttempts,
       hasRecoveryOptions: true,
     });
@@ -340,7 +338,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       });
     }
 
-    if (error.metadata?.domain === ErrorDomain.CACHE) {
+    if (error.metadata?.domain === ErrorDomain.SYSTEM) {
       options.push({
         id: 'clear_cache',
         label: 'Clear Cache',
@@ -753,7 +751,7 @@ function EnhancedErrorFallback(props: ErrorFallbackProps & { showTechnicalDetail
                 <button
                   onClick={() => {
                     const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-                    const comment = (textarea as any)._comment || '';
+                    const comment = textarea?.value || '';
                     onFeedback({ comment: comment || undefined });
                   }}
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"

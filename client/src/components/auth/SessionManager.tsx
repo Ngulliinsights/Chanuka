@@ -5,9 +5,10 @@
  * Integrates with the authentication backend service for secure session handling.
  */
 
-import React, { useEffect, useCallback } from 'react';
-import { useAuthStore } from '@client/store/slices/authSlice';
 import { authService } from '@client/services/authService';
+import React, { useEffect, useCallback } from 'react';
+
+import { useAuthStore } from '@client/store/slices/authSlice';
 import { logger } from '@client/utils/logger';
 
 interface SessionManagerProps {

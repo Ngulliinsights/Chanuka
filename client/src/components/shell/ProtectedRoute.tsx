@@ -1,11 +1,13 @@
+import { Shield, Lock, UserX, AlertTriangle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+
 import { useAuth } from '@client/features/users/hooks/useAuth';
+import { logger } from '@client/utils/logger';
+
 import { LoadingStateManager } from '../loading/LoadingStates';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Button } from '../ui/button';
-import { Shield, Lock, UserX, AlertTriangle } from 'lucide-react';
-import { logger } from '@client/utils/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

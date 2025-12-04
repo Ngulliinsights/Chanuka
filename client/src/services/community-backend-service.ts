@@ -8,6 +8,9 @@
 
 import { communityApiService } from '@client/core/api/community';
 import { UnifiedWebSocketManager } from '@client/core/api/websocket';
+import { Expert } from '@client/types/expert';
+import { logger } from '@client/utils/logger';
+
 import {
   ActivityItem,
   TrendingTopic,
@@ -22,8 +25,6 @@ import {
   CommentReport,
   ModerationViolationType
 } from '../types/discussion';
-import { Expert } from '@client/types/expert';
-import { logger } from '@client/utils/logger';
 
 interface ApiResponse<T> {
   success: boolean;

@@ -5,10 +5,12 @@
  * real-time updates, and user preferences.
  */
 
-import { BillUpdate, BillUpdateData, BillTrackingPreferences, EngagementMetrics } from '@client/types/api';
-import { billsApiService } from '@client/core/api/bills';
-import { logger } from '@client/utils/logger';
 import { Bill } from '@shared/schema/foundation';
+
+import { billsApiService } from '@client/core/api/bills';
+import { BillUpdate, BillUpdateData, BillTrackingPreferences, EngagementMetrics } from '@client/types/api';
+import { logger } from '@client/utils/logger';
+
 
 export class BillTrackingService {
   private preferences: BillTrackingPreferences = {

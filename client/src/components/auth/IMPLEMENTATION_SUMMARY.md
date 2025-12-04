@@ -6,7 +6,7 @@ Task 28 has been successfully completed, implementing a comprehensive authentica
 ## ✅ Completed Components
 
 ### 1. JWT Token Management with Refresh Token Rotation
-- **File**: `client/src/utils/tokenManager.ts`
+- **File**: `client/src/utils/secure-token-manager.ts`
 - **Features**:
   - Secure token storage with encryption
   - Automatic token refresh with deduplication

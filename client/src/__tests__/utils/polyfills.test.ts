@@ -5,11 +5,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { loadPolyfills, loadFetchPolyfill, loadPromisePolyfill, getPolyfillStatus } from '@client/utils/polyfills';
+import { loadPolyfills, loadFetchPolyfill, loadPromisePolyfill, getPolyfillStatus } from '@client/utils/browser';
 import { logger } from '@client/utils/logger';
 
 // Mock feature detector
-vi.mock('../../utils/browser-compatibility', () => ({
+vi.mock('../../utils/browser', () => ({
   featureDetector: {
     detectFetchSupport: vi.fn(() => false),
     detectPromiseSupport: vi.fn(() => false),

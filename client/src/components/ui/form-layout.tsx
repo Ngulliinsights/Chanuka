@@ -3,9 +3,11 @@
  * Provides structured layout components for complex forms
  */
 
-import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { cn } from '@client/lib/utils';
+
 import { Button } from './button';
 import { Card, CardContent } from './card';
 

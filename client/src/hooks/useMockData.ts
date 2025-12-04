@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { mockDataService, dataLoaders, RealTimeEvent } from '@client/services/mockDataService';
 import { logger } from '@client/utils/logger';
 

@@ -5,7 +5,7 @@
  * and WebSocket event handling. Ensures proper cleanup and prevents memory leaks.
  */
 
-type EventListener = (...args: any[]) => void;
+type EventListener = (...args: unknown[]) => void;
 
 class EventBus {
   private listeners: Map<string, Set<EventListener>> = new Map();
@@ -40,7 +40,7 @@ class EventBus {
    * @param event - Event name
    * @param args - Arguments to pass to listeners
    */
-  emit(event: string, ...args: any[]): void {
+  emit(event: string, ...args: unknown[]): void {
     const eventListeners = this.listeners.get(event);
     if (eventListeners) {
       eventListeners.forEach(listener => {

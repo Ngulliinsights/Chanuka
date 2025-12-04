@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import { cn } from '@client/lib/utils';
 import { AlertCircle, Eye } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+
+import { cn } from '@client/lib/utils';
 
 export interface ImageFallbackProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'onError' | 'onLoad'> {
   fallbackSrc?: string;

@@ -3,14 +3,6 @@
  * Displays expert verification system and analysis
  */
 
-import { useState } from 'react';
-import { ExpertVerificationDemo } from '@client/components/verification/ExpertVerificationDemo';
-import { VerificationWorkflow } from '@client/components/verification/VerificationWorkflow';
-import { ExpertBadge, ExpertBadgeGroup } from '@client/components/verification/ExpertBadge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import {
   Shield,
   Users,
@@ -21,6 +13,15 @@ import {
   FileText,
   Eye
 } from 'lucide-react';
+import { useState } from 'react';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { ExpertBadge, ExpertBadgeGroup } from '@client/components/verification/ExpertBadge';
+import { ExpertVerificationDemo } from '@client/components/verification/ExpertVerificationDemo';
+import { VerificationWorkflow } from '@client/components/verification/VerificationWorkflow';
 
 export default function ExpertVerification() {
   const [activeTab, setActiveTab] = useState('overview');

@@ -6,6 +6,7 @@
  */
 
 import { faker } from '@faker-js/faker';
+
 import {
   ActivityItem,
   TrendingTopic,
@@ -15,6 +16,8 @@ import {
   CommunityStats,
   LocalImpactMetrics
 } from '@client/types/community';
+
+import { mockExperts, mockOfficialExperts } from './experts';
 import {
   generateId,
   generateDateInRange,
@@ -25,7 +28,6 @@ import {
   generateCommentContent,
   weightedRandom
 } from './generators';
-import { mockExperts, mockOfficialExperts } from './experts';
 import { mockUsers } from './users';
 
 // Seed faker for consistent data

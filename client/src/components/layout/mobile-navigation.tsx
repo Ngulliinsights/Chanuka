@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { BarChart3, X, Building, FileText, Search, User, Settings, ArrowLeft, Bell } from 'lucide-react';
 import React, {
   useState,
   ReactNode,
@@ -6,28 +8,25 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { BarChart3, X, Building, FileText, Search, User, Settings, ArrowLeft, Bell } from 'lucide-react';
-import { cn } from "@client/lib/utils";
-import {
-  MobileTouchHandler,
-  MobileTouchUtils,
-} from '@client/utils/mobile-touch-handler';
-import { Sheet, SheetContent } from "../ui/sheet";
-import { Badge } from "../ui/badge";
-import { Separator } from "../ui/separator";
-import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "react-router-dom";
-import NavigationPreferencesDialog from "../navigation/navigation-preferences-dialog";
-import QuickAccessNav from "../navigation/quick-access-nav";
+
+import { cn } from "@client/lib/utils";
+
+import {
+  MobileTabBar,
+  SwipeableHeader,
+} from "../mobile/mobile-navigation-enhancements";
 import {
   ResponsiveLayoutProvider,
   useResponsiveLayoutContext,
   TouchButton,
 } from "../mobile/responsive-layout-manager";
-import {
-  MobileTabBar,
-  SwipeableHeader,
-} from "../mobile/mobile-navigation-enhancements";
+import NavigationPreferencesDialog from "../navigation/navigation-preferences-dialog";
+import QuickAccessNav from "../navigation/quick-access-nav";
+import { Badge } from "../ui/badge";
+import { Separator } from "../ui/separator";
+import { Sheet, SheetContent } from "../ui/sheet";
+
 import {
   MobileNavigationProps,
   NavigationItem as LayoutNavigationItem,
@@ -37,7 +36,10 @@ import {
   safeValidateNavigationItem,
 } from "./index";
 
-// Core type definitions for better type safety throughout the component
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
 interface User {
   id: string;
   name: string;
@@ -65,7 +67,114 @@ interface MobileNavigationContentProps {
   enableSwipeGestures: boolean;
 }
 
-// Pre-defined navigation items to prevent recreation on every render
+interface SwipeGesture {
+  direction: "left" | "right" | "up" | "down";
+  distance: number;
+  velocity: number;
+}
+
+// ============================================================================
+// TOUCH GESTURE HANDLER
+// ============================================================================
+
+/**
+ * SimpleTouchHandler manages swipe gestures on mobile devices.
+ * It tracks touch start and end positions to calculate swipe direction and distance.
+ */
+class SimpleTouchHandler {
+  private element: HTMLElement;
+  private startX: number = 0;
+  private startY: number = 0;
+  private startTime: number = 0;
+  private threshold: number;
+  public onSwipe?: (gesture: SwipeGesture) => void;
+
+  constructor(element: HTMLElement, options: { threshold: number; preventScroll: boolean }) {
+    this.element = element;
+    this.threshold = options.threshold;
+    this.handleTouchStart = this.handleTouchStart.bind(this);
+    this.handleTouchEnd = this.handleTouchEnd.bind(this);
+    
+    this.element.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+    this.element.addEventListener('touchend', this.handleTouchEnd, { passive: true });
+  }
+
+  private handleTouchStart(e: TouchEvent): void {
+    this.startX = e.touches[0].clientX;
+    this.startY = e.touches[0].clientY;
+    this.startTime = Date.now();
+  }
+
+  private handleTouchEnd(e: TouchEvent): void {
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const deltaX = endX - this.startX;
+    const deltaY = endY - this.startY;
+    const deltaTime = Date.now() - this.startTime;
+
+    // Only trigger swipe if horizontal movement exceeds vertical movement
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > this.threshold) {
+      const direction = deltaX > 0 ? "right" : "left";
+      const velocity = Math.abs(deltaX) / Math.max(deltaTime, 1);
+      
+      this.onSwipe?.({
+        direction,
+        distance: Math.abs(deltaX),
+        velocity,
+      });
+    }
+  }
+
+  public destroy(): void {
+    this.element.removeEventListener('touchstart', this.handleTouchStart);
+    this.element.removeEventListener('touchend', this.handleTouchEnd);
+  }
+}
+
+// ============================================================================
+// TOUCH UTILITIES
+// ============================================================================
+
+/**
+ * TouchUtils provides helper functions for touch interactions.
+ * These utilities improve the mobile user experience by handling common touch scenarios.
+ */
+const TouchUtils = {
+  /**
+   * Detects if the current device supports touch input.
+   */
+  isTouchDevice: (): boolean => {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  },
+  
+  /**
+   * Prevents accidental zooming when users double-tap on elements.
+   * This is important for buttons and interactive elements on mobile devices.
+   */
+  preventZoomOnDoubleTap: (element: HTMLElement): (() => void) => {
+    let lastTouchEnd = 0;
+    
+    const handler = (e: TouchEvent): void => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    };
+    
+    element.addEventListener('touchend', handler);
+    return () => element.removeEventListener('touchend', handler);
+  }
+};
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/**
+ * Pre-defined navigation items prevent unnecessary re-renders.
+ * These items represent the main sections of the application.
+ */
 const NAVIGATION_ITEMS: LayoutNavigationItem[] = [
   {
     id: "home",
@@ -93,6 +202,17 @@ const NAVIGATION_ITEMS: LayoutNavigationItem[] = [
   },
 ];
 
+// Transition duration matches CSS animation timing
+const TRANSITION_DURATION = 300;
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * MobileNavigation is the main wrapper component that manages state and handles errors.
+ * It supports both controlled and uncontrolled modes, allowing flexible integration.
+ */
 const MobileNavigation: React.FC<MobileNavigationProps> = ({
   isOpen: controlledIsOpen,
   onClose,
@@ -101,18 +221,20 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   onLogout,
   className,
   enableSwipeGestures = true,
-  enableTouchOptimization = true,
 }) => {
-  // Internal state management for when component is used in uncontrolled mode
+  // State management for uncontrolled mode
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [navigationError, setNavigationError] = useState<LayoutError | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const transitionTimeoutRef = useRef(null);
 
-  // Determine whether to use controlled or uncontrolled open state
+  // Use controlled state if provided, otherwise use internal state
   const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
   
-  // Stable function for managing state changes with transition handling to prevent rapid toggling
+  /**
+   * Manages state changes with transition locking to prevent rapid toggling.
+   * This ensures smooth animations and prevents UI glitches.
+   */
   const setIsOpen = useCallback((open: boolean) => {
     if (isTransitioning) return;
     
@@ -124,16 +246,19 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
       setInternalIsOpen(open);
     }
     
-    // Clear transition lock after animation completes (300ms matches CSS transition)
     if (transitionTimeoutRef.current) {
       clearTimeout(transitionTimeoutRef.current);
     }
+    
     transitionTimeoutRef.current = setTimeout(() => {
       setIsTransitioning(false);
-    }, 300);
+    }, TRANSITION_DURATION);
   }, [controlledIsOpen, onClose, isTransitioning]);
 
-  // Validate all navigation items on mount and when they change
+  /**
+   * Validates all navigation items on mount to catch configuration errors early.
+   * This helps developers identify issues during development rather than in production.
+   */
   useEffect(() => {
     for (const item of navigationItems) {
       const validation = safeValidateNavigationItem(item);
@@ -150,7 +275,10 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     }
   }, [navigationItems]);
 
-  // Function to recover from errors and reset component state
+  /**
+   * Recovers from errors by resetting all state.
+   * This provides a clean slate if something goes wrong.
+   */
   const recoverFromError = useCallback(() => {
     setNavigationError(null);
     setIsTransitioning(false);
@@ -160,7 +288,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     setIsOpen(false);
   }, [setIsOpen]);
 
-  // Clean up transition timeout when component unmounts
+  // Clean up timeouts on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
       if (transitionTimeoutRef.current) {
@@ -169,7 +297,10 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     };
   }, []);
 
-  // Memoized user fetch function to avoid unnecessary API calls
+  /**
+   * Fetches user data from the API if not provided as a prop.
+   * Uses memoization to prevent unnecessary API calls.
+   */
   const fetchUser = useCallback(async (): Promise<User | null> => {
     if (user) return user;
 
@@ -199,7 +330,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     }
   }, [user]);
 
-  // Query for user data with caching and retry logic
+  // Query with caching and retry logic for better reliability
   const { data: fetchedUser } = useQuery({
     queryKey: ["auth", "user"],
     queryFn: fetchUser,
@@ -210,7 +341,10 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
   const currentUser = user || fetchedUser;
 
-  // Memoized logout handler to ensure stable function reference
+  /**
+   * Handles logout by clearing authentication and redirecting.
+   * Wrapped in useCallback for stable reference across renders.
+   */
   const handleLogout = useCallback(() => {
     try {
       onLogout?.();
@@ -227,7 +361,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     }
   }, [onLogout]);
 
-  // Render error state with recovery option if navigation encounters an error
+  // Render error state with recovery option
   if (navigationError) {
     return (
       <div className={cn("bg-red-50 border-b border-red-200 p-4", className)}>
@@ -242,7 +376,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
           </div>
           <button
             onClick={recoverFromError}
-            className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+            className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
             type="button"
           >
             Recover
@@ -252,7 +386,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     );
   }
 
-  // Wrap content in error boundary with try-catch
+  // Wrap in try-catch for runtime error handling
   try {
     return (
       <ResponsiveLayoutProvider>
@@ -276,6 +410,14 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   }
 };
 
+// ============================================================================
+// CONTENT COMPONENT
+// ============================================================================
+
+/**
+ * MobileNavigationContent renders the actual navigation UI.
+ * This separation keeps the main component focused on state management.
+ */
 const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
   isOpen,
   onClose,
@@ -287,28 +429,33 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
   const { touchOptimized } = useResponsiveLayoutContext();
   const [isContentTransitioning, setIsContentTransitioning] = useState(false);
 
-  const headerRef = useRef<HTMLDivElement>(null);
-  const bottomNavRef = useRef<HTMLDivElement>(null);
-  const contentTransitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const headerRef = useRef(null);
+  const bottomNavRef = useRef(null);
+  const contentTransitionTimeoutRef = useRef(null);
 
-  // Stable close handler with transition management
+  /**
+   * Handles sheet close with transition management.
+   * Prevents multiple rapid close attempts during animation.
+   */
   const handleSheetClose = useCallback(() => {
     if (isContentTransitioning) return;
     
     setIsContentTransitioning(true);
-    if (onClose) {
-      onClose();
-    }
+    onClose?.();
     
     if (contentTransitionTimeoutRef.current) {
       clearTimeout(contentTransitionTimeoutRef.current);
     }
+    
     contentTransitionTimeoutRef.current = setTimeout(() => {
       setIsContentTransitioning(false);
-    }, 300);
+    }, TRANSITION_DURATION);
   }, [onClose, isContentTransitioning]);
 
-  // Stable logout handler
+  /**
+   * Handles logout with error handling.
+   * Ensures clean state even if logout fails.
+   */
   const handleLogout = useCallback(() => {
     try {
       onLogout?.();
@@ -319,7 +466,10 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
     }
   }, [onLogout]);
 
-  // Check if a given path matches the current route
+  /**
+   * Checks if a path matches the current route.
+   * Handles both exact matches and prefix matches.
+   */
   const isActivePath = useCallback(
     (path: string): boolean => {
       if (path === "/") {
@@ -330,18 +480,19 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
     [location.pathname]
   );
 
-  // Set up touch optimizations for better mobile UX
+  /**
+   * Sets up touch optimizations to improve mobile UX.
+   * Prevents double-tap zoom on interactive elements.
+   */
   useEffect(() => {
-    if (!MobileTouchUtils.isTouchDevice()) return;
+    if (!TouchUtils.isTouchDevice()) return;
 
-    const elements = [headerRef.current, bottomNavRef.current].filter(Boolean);
+    const elements = [headerRef.current, bottomNavRef.current].filter(Boolean) as HTMLElement[];
     const cleanupFunctions: (() => void)[] = [];
 
     elements.forEach((element) => {
-      if (element) {
-        const cleanup = MobileTouchUtils.preventZoomOnDoubleTap(element);
-        cleanupFunctions.push(cleanup);
-      }
+      const cleanup = TouchUtils.preventZoomOnDoubleTap(element);
+      cleanupFunctions.push(cleanup);
     });
 
     return () => {
@@ -349,19 +500,22 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
     };
   }, []);
 
-  // Handle swipe gestures for closing the navigation drawer
+  /**
+   * Sets up swipe gesture handling for closing the drawer.
+   * Only active when touch optimization and swipe gestures are enabled.
+   */
   useEffect(() => {
     if (!headerRef.current || !touchOptimized || !enableSwipeGestures) return;
 
-    const touchHandler = new MobileTouchHandler(headerRef.current, {
+    const touchHandler = new SimpleTouchHandler(headerRef.current, {
       threshold: 50,
       preventScroll: false,
     });
 
-    touchHandler.onSwipe = (swipe) => {
+    touchHandler.onSwipe = (swipe: SwipeGesture) => {
       if (isContentTransitioning) return;
       
-      // Only handle left swipe to close when drawer is open
+      // Close drawer on left swipe when open
       if (swipe.direction === "left" && isOpen) {
         handleSheetClose();
       }
@@ -381,43 +535,46 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
     };
   }, []);
 
-  // Bottom navigation items for the tab bar
+  /**
+   * Bottom navigation items for the tab bar.
+   * Memoized to prevent recreation on every render.
+   */
   const bottomNavigationItems = useMemo(
-    () => [
-      {
-        id: "home",
-        label: "Home",
-        href: "/",
-        icon: <Building className="h-5 w-5" />,
-      },
-      {
-        id: "bills",
-        label: "Bills",
-        href: "/bills",
-        icon: <FileText className="h-5 w-5" />,
-      },
-      {
-        id: "search",
-        label: "Search",
-        href: "/search",
-        icon: <Search className="h-5 w-5" />,
-      },
-      {
-        id: "dashboard",
-        label: "Dashboard",
-        href: "/dashboard",
-        icon: <User className="h-5 w-5" />,
-      },
-    ],
+    () => NAVIGATION_ITEMS.map(item => ({
+      id: item.id,
+      label: item.label,
+      href: item.href,
+      icon: item.icon,
+    })),
     []
   );
 
-  // Navigation items for the bottom navigation bar
-  const bottomNavItems = useMemo(() => NAVIGATION_ITEMS.slice(0, 4), []);
+  /**
+   * Generates class names for navigation links based on active state.
+   * Separated into a function for better readability.
+   */
+  const getNavLinkClassName = useCallback((href: string, isAdmin = false) => {
+    const isActive = isActivePath(href);
+    const baseClasses = "flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors";
+    const touchClasses = touchOptimized ? "min-h-[44px]" : "";
+    
+    let activeClasses: string;
+    if (isAdmin) {
+      activeClasses = isActive
+        ? "bg-red-50 text-red-700 border border-red-200"
+        : "text-gray-700 hover:bg-gray-50 active:bg-gray-100";
+    } else {
+      activeClasses = isActive
+        ? "bg-blue-50 text-blue-700 border border-blue-200"
+        : "text-gray-700 hover:bg-gray-50 active:bg-gray-100";
+    }
+    
+    return `${baseClasses} ${touchClasses} ${activeClasses}`;
+  }, [isActivePath, touchOptimized]);
 
   return (
     <>
-      {/* Swipeable header for mobile with actions */}
+      {/* Swipeable header for mobile navigation */}
       <SwipeableHeader
         title="Navigation"
         leftAction={{
@@ -454,11 +611,11 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
         }}
       />
 
-      {/* Side navigation drawer with all navigation options */}
+      {/* Side drawer navigation with all options */}
       <Sheet open={isOpen} onOpenChange={(open) => !open && onClose?.()}>
         <SheetContent side="left" className="w-80">
           <div className="flex flex-col h-full">
-            {/* Header with branding and close button */}
+            {/* Header with branding */}
             <div className="flex items-center justify-between pb-4">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -478,7 +635,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
 
             <Separator className="mb-4" />
 
-            {/* User profile section when logged in */}
+            {/* User profile section */}
             {user && (
               <div className="mb-6">
                 <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
@@ -498,7 +655,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
               </div>
             )}
 
-            {/* Quick access navigation shortcuts */}
+            {/* Quick access navigation */}
             <div className="mb-4">
               <QuickAccessNav showTitle={false} maxItems={3} />
             </div>
@@ -507,47 +664,32 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
 
             {/* Main navigation links */}
             <nav className="flex-1 space-y-2">
-              {NAVIGATION_ITEMS.map((item) => {
-                const isActive = isActivePath(item.href);
-                const linkClassName = `flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                  touchOptimized ? "min-h-[44px]" : ""
-                } ${
-                  isActive
-                    ? "bg-blue-50 text-blue-700 border border-blue-200"
-                    : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
-                }`;
+              {NAVIGATION_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={handleSheetClose}
+                  className={getNavLinkClassName(item.href)}
+                  aria-label={`Navigate to ${item.label}`}
+                >
+                  {item.icon}
+                  <span className="font-medium">{item.label}</span>
+                  {item.badge && item.badge > 0 && (
+                    <Badge variant="destructive" className="ml-auto">
+                      {item.badge > 99 ? "99+" : item.badge}
+                    </Badge>
+                  )}
+                </Link>
+              ))}
 
-                return (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    onClick={handleSheetClose}
-                    className={linkClassName}
-                    aria-label={`Navigate to ${item.label}`}
-                  >
-                    {item.icon}
-                    <span className="font-medium">{item.label}</span>
-                    {item.badge && item.badge > 0 && (
-                      <Badge variant="destructive" className="ml-auto">
-                        {item.badge > 99 ? "99+" : item.badge}
-                      </Badge>
-                    )}
-                  </Link>
-                );
-              })}
-
-              {/* Admin-only section */}
+              {/* Admin section */}
               {user?.role === "admin" && (
                 <>
                   <Separator className="my-4" />
                   <Link
                     to="/admin"
                     onClick={handleSheetClose}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                      isActivePath("/admin")
-                        ? "bg-red-50 text-red-700 border border-red-200"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
+                    className={getNavLinkClassName("/admin", true)}
                     aria-label="Navigate to Admin"
                   >
                     <Settings className="h-5 w-5" />
@@ -557,7 +699,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
               )}
             </nav>
 
-            {/* Footer with account and settings options */}
+            {/* Footer with account options */}
             <div className="pt-4 border-t space-y-2">
               {user && (
                 <Link
@@ -598,22 +740,22 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
         </SheetContent>
       </Sheet>
 
-      {/* Bottom tab bar for quick navigation */}
+      {/* Bottom tab bar */}
       <MobileTabBar
         items={bottomNavigationItems}
         maxVisible={4}
-        onItemClick={(item) => {
+        onItemClick={(item: { href: string }) => {
           window.location.href = item.href;
         }}
       />
 
-      {/* Fixed bottom navigation bar for mobile devices */}
+      {/* Fixed bottom navigation bar */}
       <div
         ref={bottomNavRef}
         className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50 pb-[max(8px,env(safe-area-inset-bottom))] pl-[max(16px,env(safe-area-inset-left))] pr-[max(16px,env(safe-area-inset-right))]"
       >
         <div className="flex items-center justify-around">
-          {bottomNavItems.map((item) => {
+          {NAVIGATION_ITEMS.map((item) => {
             const isActive = isActivePath(item.href);
             const linkClassName = `flex flex-col items-center space-y-1 p-2 rounded-lg transition-colors ${
               touchOptimized ? "min-w-[44px] min-h-[44px]" : ""

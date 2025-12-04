@@ -3,10 +3,8 @@
  * Enhanced OAuth integration with Google and GitHub
  */
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
+import { useAuth } from '@client/hooks/useAuth';
+import { authService, OAuthProvider } from '@client/services/authService';
 import { 
   Github, 
   Mail, 
@@ -17,9 +15,14 @@ import {
   ExternalLink,
   Loader2
 } from 'lucide-react';
-import { authService, OAuthProvider } from '@client/services/authService';
-import { useAuth } from '@client/hooks/useAuth';
+import React, { useState, useEffect } from 'react';
+
 import { logger } from '@client/utils/logger';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+
 
 interface OAuthLoginProps {
   onSuccess?: (data: any) => void;

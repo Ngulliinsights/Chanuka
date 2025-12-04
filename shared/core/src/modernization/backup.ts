@@ -1,7 +1,11 @@
+import * as crypto from 'crypto';
 import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import * as crypto from 'crypto';
+
+// Parent imports (types from parent dir)
+import { BackupStrategy, BackupStatus, BackupError, BackupScope } from '../types';
+
 // Use type-only imports for modernization types to avoid runtime import errors
 import type {
   BackupPlan,
@@ -9,7 +13,6 @@ import type {
   RetentionPolicy,
   VerificationConfig,
 } from './types';
-import { BackupStrategy, BackupStatus, BackupError, BackupScope } from '../types';
 
 // Lightweight logger interface used by the BackupManager. Keep intentionally small to reduce runtime
 // coupling on a specific logging implementation.

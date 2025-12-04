@@ -6,11 +6,7 @@
  * and gamification elements.
  */
 
-import { useEffect, useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { useWebSocket } from '@client/hooks/useWebSocket';
 import {
   Activity,
   Users,
@@ -22,15 +18,25 @@ import {
   FileText,
   Star
 } from 'lucide-react';
-import { cn } from '@client/lib/utils';
-import { useWebSocket } from '@client/hooks/useWebSocket';
+import { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+
+import { cn } from '@client/lib/utils';
 import { RootState } from '@client/store';
-import { EngagementMetricsChart } from './EngagementMetricsChart';
+
+import { Badge } from '../ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+
+
+
 import { CivicScoreCard } from './CivicScoreCard';
+import { ContributionRankings } from './ContributionRankings';
+import { EngagementMetricsChart } from './EngagementMetricsChart';
 import { SentimentTracker } from './SentimentTracker';
 import { TemporalAnalytics } from './TemporalAnalytics';
-import { ContributionRankings } from './ContributionRankings';
 
 interface EngagementAnalyticsDashboardProps {
   className?: string;

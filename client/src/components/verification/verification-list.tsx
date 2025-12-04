@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { LoadingSpinner } from '../ui/loading-spinner';
-import { useBills } from '@client/features/bills/hooks/useBills';
+
+import { useBills } from '@client/features/bills/model/hooks/useBills';
 import { logger } from '@client/utils/logger';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { LoadingSpinner } from '../ui/loading-spinner';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 interface VerificationItem { id: number;
   bill_id: number;

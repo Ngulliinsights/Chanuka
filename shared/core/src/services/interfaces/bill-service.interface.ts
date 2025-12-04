@@ -5,8 +5,8 @@
  * direct repository usage while maintaining the same functionality.
  */
 
-import type { Result, Maybe } from '../../primitives';
 import type { Bill, NewBill } from '../../../../schema/foundation';
+import type { Result, Maybe } from '../../primitives';
 // import type { IBillRepository } from '../../repositories/interfaces/bill-repository.interface';
 
 export interface IBillService {

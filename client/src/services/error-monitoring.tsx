@@ -6,8 +6,8 @@
  */
 
 import * as Sentry from '@sentry/browser';
-import { BrowserTracing } from '@sentry/tracing';
 import { Replay } from '@sentry/replay';
+import { BrowserTracing } from '@sentry/tracing';
 import React from 'react';
 
 interface ErrorContext {

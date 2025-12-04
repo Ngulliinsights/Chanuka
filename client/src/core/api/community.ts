@@ -21,8 +21,10 @@
  * never prevent users from accessing core legislative information.
  */
 
-import { globalApiClient } from './client';
+import type { VoteRequest } from '../../types/community';
 import { logger } from '../../utils/logger';
+
+import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
 
 // ============================================================================
@@ -30,7 +32,6 @@ import { globalErrorHandler } from './errors';
 // ============================================================================
 
 // Import available types from community
-import type { VoteRequest } from '../../types/community';
 
 // Define all community types locally since they're not available in the types directory
 export interface ActivityItem {

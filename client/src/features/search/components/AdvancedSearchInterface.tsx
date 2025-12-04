@@ -5,7 +5,6 @@
  * capabilities for power users and detailed search requirements.
  */
 
-import React, { useState, useEffect } from 'react';
 import {
   Search,
   Plus,
@@ -19,20 +18,22 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../components/ui/collapsible';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Badge } from '../../../components/ui/badge';
+import { Separator } from '../../../components/ui/separator';
 import { Switch } from '../../../components/ui/switch';
 import { Textarea } from '../../../components/ui/textarea';
-import { Separator } from '../../../components/ui/separator';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog';
-import { intelligentSearch } from '../services/intelligent-search';
 import { useToast } from '../../../hooks/use-toast';
+import { intelligentSearch } from '../services/intelligent-search';
 import type { DualSearchRequest } from '../services/intelligent-search';
 
 // Define types locally

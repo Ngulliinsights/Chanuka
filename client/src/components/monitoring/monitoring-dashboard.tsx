@@ -1,12 +1,14 @@
+import { Activity, AlertTriangle, CheckCircle, Database, Server, TrendingUp, TrendingDown, Clock, Users, AlertCircle, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
+
 import { logger } from '@client/utils/logger';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Progress } from '../ui/progress';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { Activity, AlertTriangle, CheckCircle, Database, Server, TrendingUp, TrendingDown, Clock, Users, AlertCircle, RefreshCw } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 interface SystemHealth {
   status: 'healthy' | 'degraded' | 'unhealthy';

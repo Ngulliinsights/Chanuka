@@ -1,9 +1,18 @@
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
-import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
-import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType } from '../../types';
-import { BackupSystem, BackupSystemConfig } from './backup-system';
+
 import { logger } from '../../observability/logging';
+import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType, ValidationScope } from '../types';
+
+import { BackupSystem } from './backup-system';
+import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
+
+interface ScriptMergeOperation {
+  targetScript: string;
+  scripts: string[];
+  functionality: string[];
+  conflicts: string[];
+}
 
 export interface CleanupExecutorConfig {
   dryRun: boolean;
@@ -58,7 +67,7 @@ export class CleanupExecutor {
       if (this.config.validateBeforeExecution) {
         const validation = await this.validatePreExecution(plan);
         if (validation.status === ValidationStatus.FAILED) {
-          throw new Error(`Pre-execution validation failed: ${(validation as any).summary?.criticalIssues?.join(', ') || 'Unknown issues'}`);
+          throw new Error(`Pre-execution validation failed: ${validation.summary?.criticalIssues?.join(', ') || 'Unknown issues'}`);
         }
       }
 
@@ -255,7 +264,7 @@ export class CleanupExecutor {
   /**
    * Execute script merging operations
    */
-  async executeScriptMerges(operations: any[], result: CleanupResult): Promise<void> {
+  async executeScriptMerges(operations: ScriptMergeOperation[], result: CleanupResult): Promise<void> {
     for (const operation of operations) {
       try {
         const targetPath = join(this.rootPath, operation.targetScript);
@@ -451,12 +460,12 @@ ${processedSources.map(s => `- ${s}`).join('\n')}
   /**
    * Generate header for merged scripts
    */
-  private generateScriptHeader(operation: any): string {
+  private generateScriptHeader(operation: ScriptMergeOperation): string {
     return `#!/bin/bash
 
 # Consolidated Script: ${operation.targetScript}
 # Generated: ${new Date().toISOString()}
-# 
+#
 # This script consolidates the following functionality:
 ${operation.functionality.map((f: string) => `# - ${f}`).join('\n')}
 #
@@ -495,7 +504,7 @@ log_info "Starting consolidated script execution..."
   /**
    * Generate footer for merged scripts
    */
-  private generateScriptFooter(operation: any): string {
+  private generateScriptFooter(_operation: ScriptMergeOperation): string {
     return `
 
 # Script execution completed
@@ -507,7 +516,7 @@ exit 0
   /**
    * Clean script content by removing headers and common boilerplate
    */
-  private cleanScriptContent(content: string, scriptPath: string): string {
+  private cleanScriptContent(content: string, _scriptPath: string): string {
     const lines = content.split('\n');
     const cleanedLines: string[] = [];
     let skipShebang = true;
@@ -612,11 +621,11 @@ exit 0
     const warnings = checks.filter(c => c.status === ValidationStatus.WARNING).length;
 
     return {
-      // id: `validation-pre-${Date.now()}`,
+      id: `validation-pre-${Date.now()}`,
       timestamp: new Date(),
-      scope: 'pre_execution' as any,
-      status: failed > 0 ? ValidationStatus.FAILED : 
-              warnings > 0 ? ValidationStatus.WARNING : ValidationStatus.PASSED,
+      scope: ValidationScope.PRE_EXECUTION,
+      status: failed > 0 ? ValidationStatus.FAILED :
+             warnings > 0 ? ValidationStatus.WARNING : ValidationStatus.PASSED,
       checks,
       summary: {
         totalChecks: checks.length,
@@ -624,7 +633,7 @@ exit 0
         failed,
         warnings,
         skipped: 0,
-        overallStatus: failed > 0 ? ValidationStatus.FAILED : 
+        overallStatus: failed > 0 ? ValidationStatus.FAILED :
                       warnings > 0 ? ValidationStatus.WARNING : ValidationStatus.PASSED,
         criticalIssues: checks
           .filter(c => c.status === ValidationStatus.FAILED)
@@ -696,11 +705,11 @@ exit 0
     const warnings = checks.filter(c => c.status === ValidationStatus.WARNING).length;
 
     return {
-      // id: `validation-post-${Date.now()}`,
+      id: `validation-post-${Date.now()}`,
       timestamp: new Date(),
-      scope: 'post_execution' as any,
-      status: failed > 0 ? ValidationStatus.FAILED : 
-              warnings > 0 ? ValidationStatus.WARNING : ValidationStatus.PASSED,
+      scope: ValidationScope.POST_EXECUTION,
+      status: failed > 0 ? ValidationStatus.FAILED :
+             warnings > 0 ? ValidationStatus.WARNING : ValidationStatus.PASSED,
       checks,
       summary: {
         totalChecks: checks.length,
@@ -708,7 +717,7 @@ exit 0
         failed,
         warnings,
         skipped: 0,
-        overallStatus: failed > 0 ? ValidationStatus.FAILED : 
+        overallStatus: failed > 0 ? ValidationStatus.FAILED :
                       warnings > 0 ? ValidationStatus.WARNING : ValidationStatus.PASSED,
         criticalIssues: checks
           .filter(c => c.status === ValidationStatus.FAILED)
@@ -717,12 +726,9 @@ exit 0
     };
   }
 
-  private async checkForImportReferences(filePath: string): Promise<boolean> {
+  private async checkForImportReferences(_filePath: string): Promise<boolean> {
     try {
       // This is a basic implementation - in a real scenario, you'd want more sophisticated analysis
-      const fileName = filePath.replace(/\.(ts|js)$/, '');
-      const searchPattern = new RegExp(`from ['"].*${fileName}['"]|import.*['"].*${fileName}['"]`);
-      
       // Search in common source directories
       const searchDirs = ['src', 'api', 'server', 'core/src'];
       

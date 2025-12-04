@@ -5,12 +5,6 @@
  * historical patterns, and implementation workarounds into a comprehensive analysis.
  */
 
-import { useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Alert, AlertDescription } from '../ui/alert';
 import {
   Network,
   DollarSign,
@@ -21,15 +15,23 @@ import {
   Download,
   Share2
 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+
+import { Bill } from '@/core/api/types';
+import { ConflictAnalysis, NetworkNode, NetworkLink } from '@client/types/conflict-of-interest';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 import { ConflictNetworkVisualization } from './ConflictNetworkVisualization';
 import { FinancialExposureTracker } from './FinancialExposureTracker';
-import { TransparencyScoring } from './TransparencyScoring';
 import { HistoricalPatternAnalysis } from './HistoricalPatternAnalysis';
 import { ImplementationWorkaroundsTracker } from './ImplementationWorkaroundsTracker';
+import { TransparencyScoring } from './TransparencyScoring';
 
-import { ConflictAnalysis, NetworkNode, NetworkLink } from '@client/types/conflict-of-interest';
-import { Bill } from '@/core/api/types';
 
 interface ConflictOfInterestAnalysisProps {
   bill: Bill;

@@ -1,6 +1,9 @@
 // Main API Client with HTTP Methods, Retry Logic, and Caching
 // Based on the consolidated API client design specifications
 
+import { globalCache, CacheKeyGenerator } from './cache';
+import { globalConfig } from './config';
+import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
 import {
   ApiRequest,
   ApiResponse,
@@ -8,9 +11,6 @@ import {
   ClientConfig,
   UnifiedApiClient
 } from './types';
-import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
-import { globalCache, CacheKeyGenerator } from './cache';
-import { globalConfig } from './config';
 
 // Request Interceptor Interface
 interface RequestInterceptor {

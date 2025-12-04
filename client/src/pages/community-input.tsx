@@ -1,13 +1,3 @@
-import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Textarea } from '@client/components/ui/textarea';
-import { Input } from '@client/components/ui/input';
-import { Badge } from '@client/components/ui/badge';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import AppLayout from '@client/components/layout/app-layout';
-import CommunityHub from '@client/components/community/CommunityHub';
 import { 
   MessageSquare, 
   BarChart3, 
@@ -20,6 +10,17 @@ import {
   ThumbsUp,
   MessageCircle
 } from 'lucide-react';
+import { useState } from 'react';
+
+import CommunityHub from '@client/components/community/CommunityHub';
+import AppLayout from '@client/components/layout/app-layout';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Input } from '@client/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { Textarea } from '@client/components/ui/textarea';
 
 interface Announcement {
   id: string;

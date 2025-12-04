@@ -3,10 +3,12 @@
  * Following navigation component patterns for hook implementation
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
 import { LoadingState, LoadingType, LoadingPriority } from '@client/types';
-import { LoadingError } from '@client/errors';
 import { debounce } from '@client/utils/loading-utils';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
+import { LoadingError } from '@client/errors';
+
 
 export interface LoadingStateOptions {
   initialState?: LoadingState;

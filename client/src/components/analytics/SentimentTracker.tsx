@@ -5,11 +5,7 @@
  * sentiment analysis, and trend visualization.
  */
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Button } from '../ui/button';
+import { useWebSocket } from '@client/hooks/useWebSocket';
 import {
   Heart,
   ThumbsUp,
@@ -22,9 +18,17 @@ import {
   MessageSquare,
   AlertTriangle
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { useCommunityStore } from '@client/store/slices/communitySlice';
-import { useWebSocket } from '@client/hooks/useWebSocket';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+
+
 
 interface SentimentData {
   positive: number;

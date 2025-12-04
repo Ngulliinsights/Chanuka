@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useUserDashboardSelectors, useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
+
 import { useAuthStore } from '@client/store/slices/authSlice';
+import { useUserDashboardSelectors, useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
 import { logger } from '@client/utils/logger';
 
 export interface UseDashboardDataOptions {

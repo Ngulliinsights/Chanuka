@@ -1,8 +1,3 @@
-import React, { useState, useCallback } from 'react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Textarea } from '../ui/textarea';
 import { 
   ThumbsUp, 
   ThumbsDown, 
@@ -14,8 +9,16 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { CommunityValidation as CommunityValidationType } from '@client/types/expert';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Textarea } from '../ui/textarea';
+
 
 interface CommunityValidationProps {
   validation: CommunityValidationType;

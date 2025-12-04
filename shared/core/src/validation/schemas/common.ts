@@ -67,7 +67,7 @@ export const passwordSchema = z
     { message: 'Password must contain at least one number' }
   )
   .refine(
-    (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+    (password) => /[^A-Za-z0-9]/.test(password),
     { message: 'Password must contain at least one special character' }
   )
   .refine(
@@ -96,7 +96,7 @@ export const strongPasswordSchema = z
     { message: 'Password must contain at least one number' }
   )
   .refine(
-    (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+    (password) => /[^A-Za-z0-9]/.test(password),
     { message: 'Password must contain at least one special character' }
   )
   .refine(
@@ -303,7 +303,7 @@ export const nameSchema = z
   .min(1, 'Name is required')
   .max(100, 'Name is too long')
   .regex(
-    /^[a-zA-Z\s\-'\.]+$/,
+    /^[a-zA-Z\s'.-]+$/,
     'Name can only contain letters, spaces, hyphens, apostrophes, and periods'
   )
   .transform((name) => {
@@ -526,7 +526,7 @@ export const createArraySchema = <T extends z.ZodTypeAny>(
   const { minItems = 0, maxItems = 100, unique = false, sorted = false } = options;
   
   // Start with base array schema
-  let baseSchema = z.array(schema).min(minItems).max(maxItems);
+  const baseSchema = z.array(schema).min(minItems).max(maxItems);
   let arraySchema: z.ZodType<z.infer<typeof baseSchema>> = baseSchema;
   
   // Apply uniqueness validation if requested

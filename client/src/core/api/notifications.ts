@@ -12,8 +12,9 @@
  * @module api/notifications
  */
 
-import { globalApiClient } from './client';
 import { logger } from '@client/utils/logger';
+
+import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
 
 // ============================================================================

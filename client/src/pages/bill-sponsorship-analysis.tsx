@@ -1,13 +1,3 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { ImplementationWorkarounds } from '@client/components/bills/implementation-workarounds';
-import {
-  useBillSponsorshipAnalysis as useSponsorshipAnalysis
-} from '../features/bills/hooks/useBills';
 import {
   TrendingUp,
   DollarSign,
@@ -20,6 +10,18 @@ import {
   Shield,
   ExternalLink
 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { ImplementationWorkarounds } from '@client/features/bills/ui/implementation-workarounds';
+
+import {
+  useBillSponsorshipAnalysis as useSponsorshipAnalysis
+} from '../features/bills/model/hooks/useBills';
 
 export default function BillSponsorshipAnalysis() {
   const { id } = useParams();

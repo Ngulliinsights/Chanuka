@@ -4,7 +4,7 @@
  */
 
 // Export services
-export { authService } from './AuthService';
+export { authService } from './auth-service';
 export { userService } from './userService';
 export { mockDataService } from './mockDataService';
 export { api } from './api';
@@ -56,9 +56,9 @@ export interface RealTimeMetrics {
   activeIncidents: number;
   systemHealth: 'healthy' | 'warning' | 'critical';
   lastUpdated: string;
-  liveStream: any[];
+  liveStream: unknown[];
   currentErrorRate: number;
-  activeAlerts: any[];
+  activeAlerts: Record<string, unknown>[];
 }
 
 // Mock error analytics repository
@@ -115,10 +115,10 @@ export const communityRepository = {
   async getDiscussions() {
     return [];
   },
-  async createDiscussion(data: any) {
+  async createDiscussion(data: Record<string, unknown>) {
     return { id: Date.now().toString(), ...data };
   },
-  async updateDiscussion(id: string, data: any) {
+  async updateDiscussion(id: string, data: Record<string, unknown>) {
     return { id, ...data };
   },
   async deleteDiscussion() {

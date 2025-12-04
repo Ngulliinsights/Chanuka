@@ -6,7 +6,6 @@
  * example of how community data flows through the system.
  */
 
-import React, { useEffect, useState, useRef } from 'react';
 import {
   useCommunityWebSocket,
   useDiscussionUpdates,
@@ -15,9 +14,11 @@ import {
   useCommunityNotifications,
   useCommunityBackend
 } from '@client/features/community/hooks/useCommunityWebSocket';
+import React, { useEffect, useState, useRef } from 'react';
+
 import { useActivityFeed, useTrendingTopics, useExpertInsights, useCommunityStats } from '@client/features/community/hooks/useCommunity';
-import { useCommunityUI } from '@client/store/slices/communitySlice';
 import { useSafeEffect } from '@client/hooks/useSafeEffect';
+import { useCommunityUI } from '@client/store/slices/communitySlice';
 import { logger } from '@client/utils/logger';
 
 interface CommunityDataIntegrationProps {

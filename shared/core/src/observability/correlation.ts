@@ -8,7 +8,7 @@
  */
 
 import { AsyncLocalStorage } from 'async_hooks';
-// import { Result, ok, err } from '../../primitives/types/result'; // Unused import
+
 import { BaseError } from './error-management';
 import { CorrelationContext, CorrelationManager } from './interfaces';
 
@@ -24,7 +24,7 @@ export const SESSION_HEADER = 'x-session-id';
 
 export class CorrelationError extends BaseError {
   constructor(message: string, cause?: Error) {
-    super(message, { statusCode: 500, code: 'CORRELATION_ERROR', cause: cause as any, isOperational: false });
+    super(message, { statusCode: 500, code: 'CORRELATION_ERROR', ...(cause && { cause }), isOperational: false });
   }
 }
 
@@ -138,12 +138,12 @@ export class AsyncCorrelationManager implements CorrelationManager {
 
     const fullContext: CorrelationContext = {
       correlationId,
-      traceId,
-      requestId,
-      spanId: context.spanId,
-      user_id: context.user_id,
-      session_id: context.session_id,
-      metadata: { ...context.metadata  }
+      ...(traceId && { traceId }),
+      ...(requestId && { requestId }),
+      ...(context.spanId && { spanId: context.spanId }),
+      ...(context.user_id && { user_id: context.user_id }),
+      ...(context.session_id && { session_id: context.session_id }),
+      ...(context.metadata && { metadata: { ...context.metadata } })
     };
 
     return fullContext;
@@ -268,7 +268,7 @@ export class AsyncCorrelationManager implements CorrelationManager {
  * Express.js middleware for automatic correlation ID injection
  */
 export function createCorrelationMiddleware(correlationManager: CorrelationManager) {
-  return (req: any, res: any, next: () => void) => {
+  return (req: Record<string, any>, res: Record<string, any>, next: () => void) => {
     try {
       // Extract correlation context from request headers
       const context = correlationManager.startRequestFromHeaders?.(req.headers) ?? correlationManager.startRequest();
@@ -303,9 +303,9 @@ export function createCorrelationMiddleware(correlationManager: CorrelationManag
  */
 export interface CorrelationMiddleware {
   /**
-   * Apply correlation middleware to a request handler
-   */
-  apply(handler: Function): Function;
+    * Apply correlation middleware to a request handler
+    */
+  apply(handler: (...args: any[]) => any): (...args: any[]) => any;
 }
 
 /**
@@ -313,10 +313,10 @@ export interface CorrelationMiddleware {
  */
 export function createFrameworkAgnosticMiddleware(correlationManager: CorrelationManager): CorrelationMiddleware {
   return {
-    apply: (handler: Function) => {
-      return (...args: any[]) => {
+    apply: (handler: (...args: any[]) => any) => {
+      return (...args: unknown[]) => {
         // Assume first arg is request-like object with headers
-        const req = args[0];
+        const req = args[0] as Record<string, any>;
         if (req && typeof req === 'object' && req.headers) {
           const context = correlationManager.startRequestFromHeaders?.(req.headers) ?? correlationManager.startRequest();
           return correlationManager.withContext(context, () => {

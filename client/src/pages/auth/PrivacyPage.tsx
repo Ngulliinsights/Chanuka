@@ -3,10 +3,11 @@
  * Privacy controls and data management interface
  */
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
 import { Shield, Eye, AlertTriangle } from 'lucide-react';
+import React from 'react';
+
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 
 export default function PrivacyPage() {
   return (

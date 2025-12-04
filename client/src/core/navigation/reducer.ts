@@ -4,6 +4,7 @@
  */
 
 import { NavigationState, NavigationAction, RecentPage } from '@client/types';
+
 import { NavigationStatePersistence } from './persistence';
 
 export function navigationReducer(state: NavigationState, action: NavigationAction): NavigationState {

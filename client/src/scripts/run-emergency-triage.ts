@@ -7,9 +7,10 @@
  * to identify the worst offending components causing race conditions.
  */
 
+import { fileURLToPath } from 'url';
+
 import { emergencyTriage, type TriageReport, type CircuitBreakerConfig } from '@client/utils/emergency-triage';
 import { logger } from '@client/utils/logger';
-import { fileURLToPath } from 'url';
 
 interface TriageConfig {
   duration: number; // milliseconds

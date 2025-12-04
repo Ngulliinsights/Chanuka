@@ -3,9 +3,10 @@
  * Combines shadcn/ui with Chanuka design system
  */
 
-import { forwardRef, ButtonHTMLAttributes } from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import { forwardRef, ButtonHTMLAttributes } from "react"
+
 import { cn } from '@client/lib/utils'
 
 const buttonVariants = cva(

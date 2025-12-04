@@ -5,15 +5,7 @@
  * date ranges, categories, and other search criteria.
  */
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Button } from '../../../components/ui/button';
-import { Badge } from '../../../components/ui/badge';
-import { Checkbox } from '../../../components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
-import { Calendar } from '../../../components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/popover';
-import { Separator } from '../../../components/ui/separator';
+import { format } from 'date-fns';
 import {
   Filter,
   X,
@@ -25,8 +17,18 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Badge } from '../../../components/ui/badge';
+import { Button } from '../../../components/ui/button';
+import { Calendar } from '../../../components/ui/calendar';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Checkbox } from '../../../components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+import { Separator } from '../../../components/ui/separator';
 import { cn } from '../../../lib/utils';
-import { format } from 'date-fns';
+
 
 // Define SearchFilters type locally
 interface SearchFiltersType {

@@ -1,12 +1,14 @@
-import { forwardRef, HTMLAttributes, ThHTMLAttributes, TdHTMLAttributes, useState, useCallback, useEffect } from "react"
+import { TableValidationProps, ValidationError } from '@client/types';
 import { AlertCircle, RefreshCw } from "lucide-react"
+import { forwardRef, HTMLAttributes, ThHTMLAttributes, TdHTMLAttributes, useState, useCallback, useEffect } from "react"
 
 import { cn } from '@client/lib/utils'
 import { logger } from '@client/utils/logger';
-import { TableValidationProps, ValidationError } from '@client/types';
-import { validateTableData } from './validation';
+
+
 import { UITableError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
+import { validateTableData } from './validation';
 
 const Table = forwardRef<
   HTMLTableElement,

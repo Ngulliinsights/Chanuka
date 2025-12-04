@@ -6,35 +6,36 @@
  * features, structured data, and responsive design.
  */
 
+import { useBill } from '@client/features/bills/hooks/useBills';
+import { ArrowLeft, AlertTriangle, Loader2, Star, Share2, MessageSquare, Users, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle, Loader2, Star, Share2, MessageSquare, Users, FileText } from 'lucide-react';
-import { UnifiedButton, UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '@client/components/ui/unified-components';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
+
 
 // Bill Detail Components
+import BillAnalysisTab from '@client/components/bill-detail/BillAnalysisTab';
+import BillCommunityTab from '@client/components/bill-detail/BillCommunityTab';
+import BillFullTextTab from '@client/components/bill-detail/BillFullTextTab';
 import { BillHeader } from '@client/components/bill-detail/BillHeader';
 import BillOverviewTab from '@client/components/bill-detail/BillOverviewTab';
-import BillAnalysisTab from '@client/components/bill-detail/BillAnalysisTab';
-import BillFullTextTab from '@client/components/bill-detail/BillFullTextTab';
-import BillSponsorsTab from '@client/components/bill-detail/BillSponsorsTab';
-import BillCommunityTab from '@client/components/bill-detail/BillCommunityTab';
 import BillRelatedTab from '@client/components/bill-detail/BillRelatedTab';
-import { QuickActionsBar } from '@client/components/bill-detail/QuickActionsBar';
+import BillSponsorsTab from '@client/components/bill-detail/BillSponsorsTab';
 import { CivicActionGuidance } from '@client/components/bill-detail/CivicActionGuidance';
 import { ConstitutionalAnalysisPanel } from '@client/components/bill-detail/ConstitutionalAnalysisPanel';
 import { ExpertAnalysisCard } from '@client/components/bill-detail/ExpertAnalysisCard';
-import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
+import { QuickActionsBar } from '@client/components/bill-detail/QuickActionsBar';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { UnifiedButton, UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '@client/components/ui/unified-components';
+import type { Bill } from '@client/core/api/types';
 
 // Hooks and Services
-import { useAuth } from '@client/features/users/hooks/useAuth';
-import { useBill } from '@client/features/bills/hooks/useBills';
-import { logger } from '@client/utils/logger';
 
 // Types
-import type { Bill } from '@client/core/api/types';
 import { BillStatus, UrgencyLevel, ComplexityLevel } from '@client/core/api/types';
+import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { logger } from '@client/utils/logger';
 
 export default function BillDetail() {
   const { id } = useParams<{ id: string }>();

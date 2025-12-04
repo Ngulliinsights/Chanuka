@@ -1,14 +1,19 @@
+import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 'lucide-react';
 import React, { useState } from 'react';
+
+import { Bill } from '@/core/api/types';
+
+import { EducationalFramework } from '../education/EducationalFramework';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 'lucide-react';
 import { UnifiedAccordionGroup, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '../ui/unified-components';
-import { Bill } from '@/core/api/types';
+
+
+import { CivicActionGuidance } from './CivicActionGuidance';
 import { ConstitutionalAnalysisPanel } from './ConstitutionalAnalysisPanel';
 import { ConstitutionalFlagCard } from './ConstitutionalFlagCard';
 import { ExpertAnalysisCard } from './ExpertAnalysisCard';
-import { CivicActionGuidance } from './CivicActionGuidance';
-import { EducationalFramework } from '../education/EducationalFramework';
+
 
 interface BillAnalysisTabProps {
   bill: Bill;

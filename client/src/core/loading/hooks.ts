@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+
 import { useLoading } from './context';
 import { LoadingOptions, LoadingResult, ProgressiveLoadingResult, TimeoutAwareLoadingResult, LoadingHookOptions, LoadingState, ProgressiveStage, LoadingError, LoadingTimeoutError } from './types';
 

@@ -89,7 +89,7 @@ export interface BackupConfig {
     type: 'aws-s3' | 'gcp-storage' | 'azure-blob';
     bucket: string;
     region: string;
-    credentials: any;
+    credentials: Record<string, unknown>;
   };
 }
 

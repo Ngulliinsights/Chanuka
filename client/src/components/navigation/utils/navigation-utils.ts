@@ -1,7 +1,8 @@
 import type { NavigationItem, UserRole } from '@client/types';
+
 import { DEFAULT_NAVIGATION_MAP } from '@client/constants';
-import { validateNavigationPath } from '@client/validation';
 import { InvalidNavigationPathError } from '@client/errors';
+import { validateNavigationPath } from '@client/validation';
 
 /**
  * Finds a navigation item by its path

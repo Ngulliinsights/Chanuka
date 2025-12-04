@@ -8,11 +8,13 @@
  * - Graceful degradation for partial failures
  */
 
-import React, { Component, ReactNode } from 'react';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import React, { Component, ReactNode } from 'react';
+
 import { cn } from '@client/lib/utils';
+
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
 
 interface CommunityErrorBoundaryProps {
   children: ReactNode;

@@ -1,10 +1,12 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Users, DollarSign, Eye } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
+import React from 'react';
+
 import { Bill } from '@/core/api/types';
+
 import { ConflictOfInterestAnalysis } from '../conflict-of-interest/ConflictOfInterestAnalysis';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 interface BillSponsorsTabProps {
   bill: Bill;

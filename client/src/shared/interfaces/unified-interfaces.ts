@@ -5,8 +5,8 @@
  * for consolidating overlapping functionalities across the client architecture.
  */
 
-import { z } from 'zod';
 import { ReactNode, ComponentType } from 'react';
+import { z } from 'zod';
 
 // ============================================================================
 // CORE SHARED TYPES

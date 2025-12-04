@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
+
+import { useProgressiveLoading, useTimeoutAwareOperation, usePageLoading, useComponentLoading } from '@client/core/loading';
+import { useLoading } from '@client/core/loading';
+import { logger } from '@client/utils/logger';
+
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
 import { 
   LoadingStateManager,
   PageLoader,
   ComponentLoader,
   ConnectionAwareLoader,
 } from './LoadingStates';
-import { useProgressiveLoading, useTimeoutAwareOperation, usePageLoading, useComponentLoading } from '@client/core/loading';
-import { useLoading } from '@client/core/loading';
-import { logger } from '@client/utils/logger';
 
 export const LoadingDemo: React.FC = () => {
   const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>('idle');

@@ -5,7 +5,7 @@
  * to maintain application performance during error storms.
  */
 
-import { AppError, ErrorDomain, ErrorSeverity } from './unified-error-handler';
+import { AppError, ErrorDomain, ErrorSeverity } from './errors';
 
 // Rate limiting configuration
 export interface RateLimitConfig {
@@ -16,6 +16,25 @@ export interface RateLimitConfig {
   keyGenerator?: (error: AppError) => string;
   onLimitReached?: (error: AppError, resetTime: number) => void;
   skipIf?: (error: AppError) => boolean;
+}
+
+interface RateLimitInfo {
+  limited: boolean;
+  count: number;
+  limit: number;
+  resetTime: number;
+  retryAfter: number;
+}
+
+interface LimiterStats {
+  totalKeys: number;
+  limitedKeys: number;
+  topErrorSources: Array<{
+    key: string;
+    count: number;
+    limited: boolean;
+    errorRate: number;
+  }>;
 }
 
 // Rate limit entry
@@ -237,7 +256,7 @@ export class ErrorRateLimiterManager {
       maxErrors: 10,
       keyGenerator: (error) => `network:${error.context?.url || 'unknown'}`,
       skipIf: (error) => error.type !== ErrorDomain.NETWORK,
-      onLimitReached: (error, resetTime) => {
+      onLimitReached: (_error, resetTime) => {
         console.warn(`Network error rate limit reached. Backing off until ${new Date(resetTime)}`);
         // Could trigger circuit breaker here
       },
@@ -249,7 +268,7 @@ export class ErrorRateLimiterManager {
       maxErrors: 3,
       keyGenerator: (error) => `critical:${error.context?.component || 'unknown'}`,
       skipIf: (error) => error.severity !== ErrorSeverity.CRITICAL,
-      onLimitReached: (error, resetTime) => {
+      onLimitReached: (_error, _resetTime) => {
         console.error(`Critical error rate limit reached! System may be unstable.`);
         // Could trigger emergency protocols here
       },
@@ -260,8 +279,8 @@ export class ErrorRateLimiterManager {
       windowMs: 120000, // 2 minutes
       maxErrors: 20,
       keyGenerator: (error) => `user:${error.context?.userId || 'anonymous'}`,
-      onLimitReached: (error, resetTime) => {
-        console.warn(`User error rate limit reached for ${error.context?.userId}`);
+      onLimitReached: (_error, _resetTime) => {
+        console.warn(`User error rate limit reached for ${_error.context?.userId}`);
       },
     }));
   }
@@ -302,13 +321,13 @@ export class ErrorRateLimiterManager {
     return result;
   }
 
-  getRateLimitInfo(error: AppError, limiterName?: string): Record<string, any> {
+  getRateLimitInfo(error: AppError, limiterName?: string): RateLimitInfo | Record<string, RateLimitInfo> {
     if (limiterName) {
       const limiter = this.limiters.get(limiterName);
       return limiter ? limiter.getRateLimitInfo(error) : {};
     }
 
-    const info: Record<string, any> = {};
+    const info: Record<string, RateLimitInfo> = {};
     for (const [name, limiter] of this.limiters.entries()) {
       info[name] = limiter.getRateLimitInfo(error);
     }
@@ -320,14 +339,14 @@ export class ErrorRateLimiterManager {
     activeLimiters: number;
     totalLimitedKeys: number;
     overallErrorRate: number;
-    limiterStats: Record<string, any>;
+    limiterStats: Record<string, LimiterStats>;
   } {
     const stats = {
       totalLimiters: this.limiters.size,
       activeLimiters: 0,
       totalLimitedKeys: 0,
       overallErrorRate: 0,
-      limiterStats: {} as Record<string, any>,
+      limiterStats: {} as Record<string, LimiterStats>,
     };
 
     let totalErrors = 0;
@@ -392,7 +411,7 @@ export function useErrorRateLimit() {
 // Utility functions
 export function createRateLimitedErrorHandler(
   originalHandler: (error: AppError) => void,
-  limiterName?: string
+  _limiterName?: string
 ): (error: AppError) => void {
   return (error: AppError) => {
     const limitResult = errorRateLimiter.shouldLimit(error);

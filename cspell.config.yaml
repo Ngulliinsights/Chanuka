@@ -9,6 +9,7 @@ language: en
 words:
   - upvotes
   - TTFB # Time To First Byte
+  - ttfb
   - downvotes
   - Chanuka
   - chanuka
@@ -30,6 +31,7 @@ words:
   - unsub
   - prefs
   - mbps
+  - Mbps
   - levelchange
   - chargingchange
   - unsubscription
@@ -92,3 +94,5 @@ words:
   - ukuzaji
   - développement
   - croissance
+  - ccpa
+  - CCPA

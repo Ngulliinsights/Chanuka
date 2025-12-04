@@ -1,9 +1,18 @@
 import { LazyExoticComponent, ComponentType, useMemo } from 'react';
 
+// Navigator Connection API interface
+interface NavigatorConnection extends EventTarget {
+  effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
+  downlink: number;
+  rtt: number;
+  saveData: boolean;
+  type: 'bluetooth' | 'cellular' | 'ethernet' | 'none' | 'wifi' | 'wimax' | 'other' | 'unknown';
+}
+
 // Route preloading configuration
 export interface RoutePreloadConfig {
   path: string;
-  component: LazyExoticComponent<ComponentType<any>>;
+  component: LazyExoticComponent<ComponentType<unknown>> | null;
   priority: 'high' | 'medium' | 'low';
   preloadConditions?: {
     onHover?: boolean;
@@ -17,31 +26,31 @@ export interface RoutePreloadConfig {
 export const CRITICAL_ROUTES: RoutePreloadConfig[] = [
   {
     path: '/',
-    component: null as any,
+    component: null,
     priority: 'high',
     preloadConditions: { immediate: true }
   },
   {
     path: '/bills',
-    component: null as any,
+    component: null,
     priority: 'high',
     preloadConditions: { onHover: true, onIdle: true }
   },
   {
     path: '/dashboard',
-    component: null as any,
+    component: null,
     priority: 'medium',
     preloadConditions: { onHover: true }
   },
   {
     path: '/community',
-    component: null as any,
+    component: null,
     priority: 'medium',
     preloadConditions: { onIdle: true }
   },
   {
     path: '/search',
-    component: null as any,
+    component: null,
     priority: 'low',
     preloadConditions: { onHover: true }
   }
@@ -50,8 +59,8 @@ export const CRITICAL_ROUTES: RoutePreloadConfig[] = [
 // Preloader class for managing route preloading
 export class RoutePreloader {
   private preloadedRoutes = new Set<string>();
-  private preloadPromises = new Map<string, Promise<any>>();
-  private idleCallback?: number;
+  private preloadPromises = new Map<string, Promise<void>>();
+  private idleCallback?: number | NodeJS.Timeout;
   private eventListeners: Array<{ event: string; handler: EventListener }> = [];
   private isDestroyed = false;
 
@@ -65,7 +74,7 @@ export class RoutePreloader {
       if ('requestIdleCallback' in window) {
         return requestIdleCallback(callback, { timeout: 5000 });
       } else {
-        return setTimeout(callback, 100) as any;
+        return setTimeout(callback, 100);
       }
     };
 
@@ -78,9 +87,9 @@ export class RoutePreloader {
       if (this.isDestroyed) return;
       if (this.idleCallback) {
         if ('cancelIdleCallback' in window) {
-          cancelIdleCallback(this.idleCallback);
+          cancelIdleCallback(this.idleCallback as number);
         } else {
-          clearTimeout(this.idleCallback);
+          clearTimeout(this.idleCallback as NodeJS.Timeout);
         }
         this.idleCallback = undefined;
       }
@@ -105,7 +114,7 @@ export class RoutePreloader {
 
   // Preload a specific component
   async preloadComponent(
-    component: LazyExoticComponent<ComponentType<any>>,
+    component: LazyExoticComponent<ComponentType<unknown>>,
     routePath: string
   ): Promise<void> {
     // Early exit if destroyed
@@ -141,25 +150,26 @@ export class RoutePreloader {
   }
 
   private async performPreload(
-    component: LazyExoticComponent<ComponentType<any>>
+    component: LazyExoticComponent<ComponentType<unknown>>
   ): Promise<void> {
     // Use the component's preload method if available (Vite, webpack 5)
-    if (typeof (component as any).preload === 'function') {
-      await (component as any).preload();
+    const comp = component as unknown as { preload?: () => Promise<void>; _payload?: unknown };
+    if (typeof comp.preload === 'function') {
+      await comp.preload();
       return;
     }
 
     // Fallback: Access the internal _payload to trigger preloading
     // Note: This uses React internals and may break in future versions
-    const payload = (component as any)._payload;
-    
+    const payload = comp._payload as unknown as { _result?: unknown; _init?: (p: unknown) => Promise<void>; _payload?: unknown };
+
     if (payload && typeof payload._result === 'undefined') {
-      await payload._init(payload._payload);
+      await payload._init!(payload._payload);
     }
   }
 
   // Preload routes when hovering over links
-  preloadOnHover(component: LazyExoticComponent<ComponentType<any>>, routePath: string) {
+  preloadOnHover(component: LazyExoticComponent<ComponentType<unknown>>, routePath: string) {
     return (element: HTMLElement) => {
       // Check if already destroyed
       if (this.isDestroyed) {
@@ -180,7 +190,7 @@ export class RoutePreloader {
   }
 
   // Preload routes when they become visible
-  preloadOnVisible(component: LazyExoticComponent<ComponentType<any>>, routePath: string) {
+  preloadOnVisible(component: LazyExoticComponent<ComponentType<unknown>>, routePath: string) {
     return (element: HTMLElement) => {
       // Check if already destroyed
       if (this.isDestroyed) {
@@ -260,9 +270,9 @@ export class RoutePreloader {
     // Clear idle callback
     if (this.idleCallback) {
       if ('cancelIdleCallback' in window) {
-        cancelIdleCallback(this.idleCallback);
+        cancelIdleCallback(this.idleCallback as number);
       } else {
-        clearTimeout(this.idleCallback);
+        clearTimeout(this.idleCallback as NodeJS.Timeout);
       }
       this.idleCallback = undefined;
     }
@@ -285,11 +295,11 @@ export const routePreloader = new RoutePreloader();
 // Uses useMemo to prevent creating new function references on each render
 export function useRoutePreloader() {
   return useMemo(() => ({
-    preloadRoute: (component: LazyExoticComponent<ComponentType<any>>, path: string) => 
+    preloadRoute: (component: LazyExoticComponent<ComponentType<unknown>>, path: string) =>
       routePreloader.preloadComponent(component, path),
-    preloadOnHover: (component: LazyExoticComponent<ComponentType<any>>, path: string) =>
+    preloadOnHover: (component: LazyExoticComponent<ComponentType<unknown>>, path: string) =>
       routePreloader.preloadOnHover(component, path),
-    preloadOnVisible: (component: LazyExoticComponent<ComponentType<any>>, path: string) =>
+    preloadOnVisible: (component: LazyExoticComponent<ComponentType<unknown>>, path: string) =>
       routePreloader.preloadOnVisible(component, path),
     getPreloadStatus: (path: string) => routePreloader.getPreloadStatus(path),
   }), []); // Empty dependency array since we're using the global instance
@@ -324,20 +334,20 @@ export class ConnectionAwarePreloader extends RoutePreloader {
     this.destroy = () => {
       window.removeEventListener('online', onlineHandler);
       window.removeEventListener('offline', offlineHandler);
-      
+
       // Remove connection change listener if it exists
       if (this.connectionHandler && 'connection' in navigator) {
-        const connection = (navigator as any).connection;
+        const connection = (navigator as Navigator & { connection: NavigatorConnection }).connection;
         connection.removeEventListener('change', this.connectionHandler);
       }
-      
+
       originalDestroy();
     };
 
     // Monitor connection type if available
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
-      
+      const connection = (navigator as Navigator & { connection: NavigatorConnection }).connection;
+
       const updateConnectionType = () => {
         const effectiveType = connection.effectiveType;
         this.connectionType = effectiveType === '4g' ? 'fast' : 'slow';
@@ -351,7 +361,7 @@ export class ConnectionAwarePreloader extends RoutePreloader {
 
   // Override preload to consider connection
   override async preloadComponent(
-    component: LazyExoticComponent<ComponentType<any>>,
+    component: LazyExoticComponent<ComponentType<unknown>>,
     routePath: string
   ): Promise<void> {
     // Skip preloading if offline
@@ -375,7 +385,7 @@ export const connectionAwarePreloader = new ConnectionAwarePreloader();
 // Utility function to setup preloading for navigation links
 export function setupLinkPreloading(
   linkElement: HTMLElement,
-  component: LazyExoticComponent<ComponentType<any>>,
+  component: LazyExoticComponent<ComponentType<unknown>>,
   routePath: string,
   options: {
     onHover?: boolean;

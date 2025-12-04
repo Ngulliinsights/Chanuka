@@ -10,8 +10,9 @@
  * smooth user experience even when backend services face issues.
  */
 
-import { globalApiClient } from './client';
 import { logger } from '@client/utils/logger';
+
+import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
 
 // ============================================================================

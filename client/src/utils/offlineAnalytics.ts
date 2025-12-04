@@ -3,15 +3,15 @@
  * Tracks offline usage patterns and reports errors for offline-first applications
  */
 
+import { backgroundSyncManager } from './backgroundSyncManager';
 import { logger } from './logger';
 import { offlineDataManager } from './offlineDataManager';
-import { backgroundSyncManager } from './backgroundSyncManager';
 
 export interface OfflineEvent {
   id: string;
   type: 'page_view' | 'user_action' | 'api_error' | 'sync_error' | 'connection_change' | 'cache_hit' | 'cache_miss' | 'performance_metric' | 'visibility_change';
   timestamp: number;
-  data: any;
+  data: Record<string, unknown>;
   userAgent: string;
   url: string;
   session_id: string;
@@ -58,8 +58,8 @@ class OfflineAnalyticsManager {
 
     try {
       // Load any pending analytics from offline storage
-      const storedEvents = await offlineDataManager.getOfflineAnalytics();
-      if (storedEvents.length > 0) {
+      const storedEvents = (await offlineDataManager.getOfflineAnalytics()) as OfflineEvent[];
+      if (storedEvents && storedEvents.length > 0) {
         this.events = storedEvents;
         logger.info('Loaded stored analytics events', { component: 'OfflineAnalytics', count: storedEvents.length });
       }
@@ -72,7 +72,7 @@ class OfflineAnalyticsManager {
   }
 
   // Event tracking
-  async trackEvent(type: OfflineEvent['type'], data: any = {}): Promise<void> {
+  async trackEvent(type: OfflineEvent['type'], data: Record<string, unknown> = {}): Promise<void> {
     if (!this.isInitialized) await this.initialize();
 
     const event: OfflineEvent = {
@@ -105,23 +105,25 @@ class OfflineAnalyticsManager {
     await this.trackEvent('page_view', { page });
   }
 
-  async trackUserAction(action: string, details?: any): Promise<void> {
+  async trackUserAction(action: string, details?: Record<string, unknown>): Promise<void> {
     await this.trackEvent('user_action', { action, details });
   }
 
-  async trackApiError(endpoint: string, error: any): Promise<void> {
+  async trackApiError(endpoint: string, error: unknown): Promise<void> {
+    const e = error as { message?: string; status?: number; retryCount?: number };
     await this.trackEvent('api_error', {
       endpoint,
-      error: error.message,
-      status: error.status,
-      retryCount: error.retryCount,
+      error: e.message ?? 'unknown',
+      status: e.status,
+      retryCount: e.retryCount,
     });
   }
 
-  async trackSyncError(actionId: string, error: any): Promise<void> {
+  async trackSyncError(actionId: string, error: unknown): Promise<void> {
+    const e = error as { message?: string };
     await this.trackEvent('sync_error', {
       actionId,
-      error: error.message,
+      error: e.message ?? 'unknown',
       timestamp: Date.now(),
     });
   }
@@ -177,12 +179,14 @@ class OfflineAnalyticsManager {
   private analyzeUserJourney(events: OfflineEvent[]) {
     const pageViews = events
       .filter(e => e.type === 'page_view')
-      .map(e => e.data.page)
+      .map(e => (e.data.page as string | undefined))
+      .filter((page): page is string => typeof page === 'string')
       .filter((page, index, arr) => arr.indexOf(page) === index); // Unique
 
     const actions = events
       .filter(e => e.type === 'user_action')
-      .map(e => e.data.action)
+      .map(e => (e.data.action as string | undefined))
+      .filter((action): action is string => typeof action === 'string')
       .filter((action, index, arr) => arr.indexOf(action) === index); // Unique
 
     const offlinePeriods = this.calculateOfflinePeriods(events);
@@ -200,9 +204,11 @@ class OfflineAnalyticsManager {
     let lastOfflineStart: number | null = null;
 
     for (const event of connectionChanges) {
-      if (!event.data.isOnline && lastOfflineStart === null) {
+      const d = event.data as Record<string, unknown>;
+      const isOnline = typeof d.isOnline === 'boolean' ? (d.isOnline as boolean) : true;
+      if (!isOnline && lastOfflineStart === null) {
         lastOfflineStart = event.timestamp;
-      } else if (event.data.isOnline && lastOfflineStart !== null) {
+      } else if (isOnline && lastOfflineStart !== null) {
         totalOfflineTime += event.timestamp - lastOfflineStart;
         lastOfflineStart = null;
       }
@@ -221,7 +227,7 @@ class OfflineAnalyticsManager {
     const errorReport = {
       message: error.message,
       stack: error.stack,
-      context,
+      context: context as Record<string, unknown> | undefined,
       timestamp: Date.now(),
       session_id: this.session_id,
       userAgent: navigator.userAgent,
@@ -250,7 +256,7 @@ class OfflineAnalyticsManager {
   }
 
   // Performance tracking
-  async trackPerformance(metric: string, value: number, context?: any): Promise<void> {
+  async trackPerformance(metric: string, value: number, context?: Record<string, unknown>): Promise<void> {
     await this.trackEvent('performance_metric', {
       metric,
       value,
@@ -285,7 +291,7 @@ class OfflineAnalyticsManager {
 
   private getConnectionType(): string {
     if (typeof navigator !== 'undefined' && 'connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as Navigator & { connection?: { effectiveType?: string } }).connection;
       return connection?.effectiveType || 'unknown';
     }
     return 'unknown';

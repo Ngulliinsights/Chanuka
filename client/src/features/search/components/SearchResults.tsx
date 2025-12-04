@@ -5,7 +5,7 @@
  * and advanced result management features.
  */
 
-import React, { useState, useMemo } from 'react';
+import { format } from 'date-fns';
 import {
   Search,
   Star,
@@ -22,16 +22,19 @@ import {
   Download,
   MoreHorizontal
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState, useMemo } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
-import type { SearchResult } from '../types';
+
+
 import type { CombinedSearchResult } from '../services/intelligent-search';
+import type { SearchResult } from '../types';
 
 // Type definition for search highlights
 interface SearchHighlight {

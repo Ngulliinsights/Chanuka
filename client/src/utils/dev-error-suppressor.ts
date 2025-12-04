@@ -18,8 +18,6 @@ class DevErrorSuppressor {
   }
   
   private static setupErrorFiltering() {
-    const originalError = window.addEventListener;
-    
     window.addEventListener('error', (event) => {
       if (this.shouldSuppressError(event)) {
         event.preventDefault();
@@ -41,11 +39,15 @@ class DevErrorSuppressor {
     // Override fetch to suppress development resource errors
     const originalFetch = window.fetch;
     
-    window.fetch = async (...args) => {
+    window.fetch = async (...args: unknown[]) => {
       try {
-        return await originalFetch(...args);
-      } catch (error) {
-        const url = typeof args[0] === 'string' ? args[0] : args[0]?.url || 'unknown';
+        return await originalFetch(...(args as [RequestInfo, RequestInit?]));
+      } catch (error: unknown) {
+        const first = args[0] as unknown;
+        let url = 'unknown';
+        if (typeof first === 'string') url = first;
+        else if ((first as Request).url) url = (first as Request).url;
+        else if ((first as URL).href) url = (first as URL).href;
         
         // Suppress errors for development resources
         if (this.isDevelopmentResource(url)) {
@@ -61,15 +63,15 @@ class DevErrorSuppressor {
   private static setupConsoleFiltering() {
     const originalError = console.error;
     
-    console.error = (...args) => {
-      const message = args.join(' ');
+    console.error = (...args: unknown[]) => {
+      const message = args.map(a => String(a)).join(' ');
       
       if (this.shouldSuppressConsoleError(message)) {
         console.debug('[Dev] Suppressed console.error:', message);
         return;
       }
       
-      originalError.apply(console, args);
+      (originalError as (...data: unknown[]) => void).apply(console, args as unknown[]);
     };
   }
   

@@ -6,11 +6,11 @@
  */
 
 import '@testing-library/jest-dom/vitest';
-import { expect, afterEach, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
 import * as React from 'react';
+import { expect, afterEach, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 
 // Ensure React is available globally
 global.React = React;

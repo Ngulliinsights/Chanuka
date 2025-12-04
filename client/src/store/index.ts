@@ -7,7 +7,6 @@
  */
 
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-
 import { isPlainObject } from '@reduxjs/toolkit';
 
 // Custom serialization check that allows ISO date strings
@@ -27,13 +26,18 @@ import storage from 'redux-persist/lib/storage';
 import { logger } from '@client/utils/logger';
 
 // Import slices - auth and session slices are lazy loaded
-import navigationSlice from './slices/navigationSlice';
-import uiSlice from './slices/uiSlice';
-import realTimeSlice from './slices/realTimeSlice';
-import errorAnalyticsSlice from './slices/errorAnalyticsSlice';
-import loadingSlice from './slices/loadingSlice';
-import errorHandlingSlice from './slices/errorHandlingSlice';
+import { apiMiddleware } from './middleware/apiMiddleware';
+import { authMiddleware } from './middleware/authMiddleware';
+import { errorHandlingMiddleware } from './middleware/errorHandlingMiddleware';
+import { navigationPersistenceMiddleware } from './middleware/navigationPersistenceMiddleware';
+import { webSocketMiddleware } from './middleware/webSocketMiddleware';
 import discussionSlice from './slices/discussionSlice';
+import errorAnalyticsSlice from './slices/errorAnalyticsSlice';
+import errorHandlingSlice from './slices/errorHandlingSlice';
+import loadingSlice from './slices/loadingSlice';
+import navigationSlice from './slices/navigationSlice';
+import realTimeSlice from './slices/realTimeSlice';
+import uiSlice from './slices/uiSlice';
 import userDashboardSlice from './slices/userDashboardSlice';
 
 // Lazy load auth and session slices
@@ -41,11 +45,6 @@ const authSlicePromise = import('./slices/authSlice');
 const sessionSlicePromise = import('./slices/sessionSlice');
 
 // Import middleware
-import { apiMiddleware } from './middleware/apiMiddleware';
-import { webSocketMiddleware } from './middleware/webSocketMiddleware';
-import { errorHandlingMiddleware } from './middleware/errorHandlingMiddleware';
-import { authMiddleware } from './middleware/authMiddleware';
-import { navigationPersistenceMiddleware } from './middleware/navigationPersistenceMiddleware';
 
 // Create a safe storage wrapper that handles localStorage failures
 const createSafeStorage = () => {

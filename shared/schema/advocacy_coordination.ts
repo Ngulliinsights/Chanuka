@@ -4,15 +4,14 @@
 // Campaign management, collective action, and civil society coordination
 // This schema transforms individual engagement into organized advocacy
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique, date, smallint, check
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
-import { bills, users } from "./foundation";
 import { kenyanCountyEnum } from "./enum";
+import { bills, users } from "./foundation";
 
 // ============================================================================
 // CAMPAIGNS - Organized advocacy efforts around bills

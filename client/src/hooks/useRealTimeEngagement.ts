@@ -6,8 +6,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useWebSocket } from './useWebSocket';
+
 import { logger } from '@client/utils/logger';
+
 import {
   LiveEngagementMetrics,
   PersonalEngagementScore,
@@ -18,6 +19,8 @@ import {
   RealTimeEngagementUpdate,
   EngagementAnalyticsConfig
 } from '../types/engagement-analytics';
+
+import { useWebSocket } from './useWebSocket';
 
 interface RealTimeEngagementData {
   liveMetrics: LiveEngagementMetrics;

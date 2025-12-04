@@ -3,11 +3,12 @@
  * Following navigation component patterns for utility UI components
  */
 
-import React from 'react';
-import { cn } from '@/lib/utils';
 import { AuthConfig } from '@client/types';
-import { usePasswordStrength } from '@client/hooks/usePasswordUtils';
+import React from 'react';
+
+import { cn } from '@/lib/utils';
 import { PASSWORD_STRENGTH_LEVELS, PASSWORD_STRENGTH_LABELS, PASSWORD_STRENGTH_COLORS } from '@client/constants';
+import { usePasswordStrength } from '@client/hooks/usePasswordUtils';
 
 export interface PasswordStrengthIndicatorProps {
   password: string;

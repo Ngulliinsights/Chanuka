@@ -6,10 +6,10 @@
  * Manages WebSocket connections, subscriptions, and dispatches actions to Redux store.
  */
 
-import { Middleware } from '@reduxjs/toolkit';
-import { logger } from '@client/utils/logger';
-import { UnifiedWebSocketManager, globalWebSocketPool } from '@client/core/api/websocket';
+import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
+
 import { ConnectionState } from '@client/core/api/types';
+import { UnifiedWebSocketManager, globalWebSocketPool } from '@client/core/api/websocket';
 import {
   CivicWebSocketMessage,
   CivicWebSocketState,
@@ -17,6 +17,8 @@ import {
   PollingFallbackConfig,
   RealTimeHandlers
 } from '@client/types/realtime';
+import { logger } from '@client/utils/logger';
+
 import {
   updateConnectionState,
   addBillUpdate,
@@ -40,7 +42,7 @@ class PollingFallbackManager {
   private config: PollingFallbackConfig;
   private pollingTimers: Map<string, NodeJS.Timeout> = new Map();
   private handlers: RealTimeHandlers = {};
-  private dispatch: any = null;
+  private dispatch: Dispatch<AnyAction> | null = null;
   private subscriptions: {
     bills: number[];
     notifications: boolean;
@@ -50,7 +52,7 @@ class PollingFallbackManager {
     this.config = config;
   }
 
-  setDispatch(dispatch: any) {
+  setDispatch(dispatch: Dispatch<AnyAction>) {
     this.dispatch = dispatch;
   }
 
@@ -165,7 +167,7 @@ class WebSocketMiddlewareAdapter {
   private wsManager: UnifiedWebSocketManager;
   private pollingFallback: PollingFallbackManager;
   private config: WebSocketConfig;
-  private dispatch: any = null;
+  private dispatch: Dispatch<AnyAction> | null = null;
   private handlers: RealTimeHandlers = {};
   private subscriptionIds: Map<string, string> = new Map(); // Maps local keys to WS subscription IDs
 
@@ -176,7 +178,7 @@ class WebSocketMiddlewareAdapter {
     this.setupEventListeners();
   }
 
-  setDispatch(dispatch: any) {
+  setDispatch(dispatch: Dispatch<AnyAction>) {
     this.dispatch = dispatch;
     this.pollingFallback.setDispatch(dispatch);
   }
@@ -213,7 +215,7 @@ class WebSocketMiddlewareAdapter {
 
     // Handle different subscription types
     switch (subscription.type) {
-      case 'bill':
+      case 'bill': {
         const billId = Number(subscription.id);
         const subscriptionId = this.wsManager.subscribeToBill(billId);
         this.subscriptionIds.set(key, subscriptionId);
@@ -227,13 +229,14 @@ class WebSocketMiddlewareAdapter {
           notifications: this.subscriptionIds.has('user_notifications:user')
         });
         break;
+      }
 
-      case 'user_notifications':
+      case 'user_notifications': {
         // For notifications, subscribe to general message events
-        const notifSubscriptionId = this.wsManager.subscribe('notifications', (message) => {
+        const notificationSubscriptionId = this.wsManager.subscribe('notifications', (message) => {
           this.handleNotification(message);
         });
-        this.subscriptionIds.set(key, notifSubscriptionId);
+        this.subscriptionIds.set(key, notificationSubscriptionId);
 
         this.pollingFallback.updateSubscriptions({
           bills: Array.from(this.subscriptionIds.entries())
@@ -242,14 +245,16 @@ class WebSocketMiddlewareAdapter {
           notifications: true
         });
         break;
+      }
 
-      default:
+      default: {
         // For other types, use general subscription
         const generalSubscriptionId = this.wsManager.subscribe(subscription.type, (message) => {
           this.handleMessage(message);
         });
         this.subscriptionIds.set(key, generalSubscriptionId);
         break;
+      }
     }
   }
 
@@ -310,7 +315,8 @@ class WebSocketMiddlewareAdapter {
     });
   }
 
-  private handleMessage(message: any) {
+  private handleMessage(message: unknown) {
+    const msg = message as any;
     try {
       // Map UnifiedWebSocketManager messages to CivicWebSocketMessage format
       const civicMessage: CivicWebSocketMessage = this.mapToCivicMessage(message);
@@ -367,30 +373,32 @@ class WebSocketMiddlewareAdapter {
       logger.error('Failed to handle WebSocket message', {
         component: 'WebSocketMiddleware',
         error: error instanceof Error ? error.message : String(error),
-        message
+        message: msg
       });
     }
   }
 
-  private handleNotification(message: any) {
+  private handleNotification(message: unknown) {
     // Handle notification messages
-    if (message.type === 'notification' && message.notification) {
-      this.handlers.onNotification?.(message.notification);
-      this.dispatch?.(addNotification(message.notification));
+    const msg = message as any;
+    if (msg.type === 'notification' && msg.notification) {
+      this.handlers.onNotification?.(msg.notification);
+      this.dispatch?.(addNotification(msg.notification));
     }
   }
 
-  private mapToCivicMessage(message: any): CivicWebSocketMessage {
+  private mapToCivicMessage(message: unknown): CivicWebSocketMessage {
     // Map UnifiedWebSocketManager message format to CivicWebSocketMessage
+    const msg = message as any;
     return {
-      type: message.type,
-      update: message.update,
-      community_update: message.community_update,
-      engagement_metrics: message.engagement_metrics,
-      expert_activity: message.expert_activity,
-      notification: message.notification,
-      message: message.message,
-      timestamp: message.timestamp || new Date().toISOString()
+      type: msg.type,
+      update: msg.update,
+      community_update: msg.community_update,
+      engagement_metrics: msg.engagement_metrics,
+      expert_activity: msg.expert_activity,
+      notification: msg.notification,
+      message: msg.message,
+      timestamp: msg.timestamp || new Date().toISOString()
     };
   }
 
@@ -455,26 +463,26 @@ const wsConfig: WebSocketConfig = {
 const wsAdapter = new WebSocketMiddlewareAdapter(wsConfig);
 
 // WebSocket middleware
-export const webSocketMiddleware: Middleware = (store) => (next) => (action: any) => {
-  const { dispatch } = store;
-  wsAdapter.setDispatch(dispatch);
+export const webSocketMiddleware: Middleware = (store) => (next) => (action: unknown) => {
+  wsAdapter.setDispatch(store.dispatch);
 
   // Handle WebSocket-related actions
-  if (action.type === 'realTime/connect') {
-    wsAdapter.connect().catch((error: any) => {
+  const reduxAction = action as AnyAction;
+  if (reduxAction.type === 'realTime/connect') {
+    wsAdapter.connect().catch((error: Error) => {
       logger.error('Failed to connect WebSocket', {
         component: 'WebSocketMiddleware',
         error: error instanceof Error ? error.message : String(error)
       });
     });
-  } else if (action.type === 'realTime/disconnect') {
+  } else if (reduxAction.type === 'realTime/disconnect') {
     wsAdapter.disconnect();
-  } else if (action.type === 'realTime/subscribe') {
-    wsAdapter.subscribe(action.payload);
-  } else if (action.type === 'realTime/unsubscribe') {
-    wsAdapter.unsubscribe(action.payload);
-  } else if (action.type === 'realTime/setHandlers') {
-    wsAdapter.setHandlers(action.payload);
+  } else if (reduxAction.type === 'realTime/subscribe') {
+    wsAdapter.subscribe(reduxAction.payload);
+  } else if (reduxAction.type === 'realTime/unsubscribe') {
+    wsAdapter.unsubscribe(reduxAction.payload);
+  } else if (reduxAction.type === 'realTime/setHandlers') {
+    wsAdapter.setHandlers(reduxAction.payload);
   }
 
   return next(action);

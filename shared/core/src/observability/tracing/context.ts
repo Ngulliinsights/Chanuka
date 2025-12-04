@@ -1,6 +1,8 @@
 import { AsyncLocalStorage } from 'async_hooks';
+
 // Removed unused import
 import { BaseError } from '../error-management';
+
 import {
   TraceContext,
   TextMapPropagator,
@@ -83,7 +85,7 @@ export class TraceContextManager {
   /**
    * Extract trace context from carrier
    */
-  extract(carrier: any, format: string = 'w3c'): TraceContext | undefined {
+  extract(carrier: Record<string, unknown>, format: string = 'w3c'): TraceContext | undefined {
     const propagator = TracePropagatorFactory.create(format);
     return propagator.extract(carrier);
   }
@@ -91,7 +93,7 @@ export class TraceContextManager {
   /**
    * Inject trace context into carrier
    */
-  inject(context: TraceContext, carrier: any, format: string = 'w3c'): void {
+  inject(context: TraceContext, carrier: Record<string, unknown>, format: string = 'w3c'): void {
     const propagator = TracePropagatorFactory.create(format);
     propagator.inject(context, carrier);
   }
@@ -101,12 +103,12 @@ export class TraceContextManager {
  * W3C Trace Context propagator
  */
 export class W3CTracePropagator implements TextMapPropagator {
-  inject(context: TraceContext, carrier: any): void {
+  inject(context: TraceContext, carrier: Record<string, unknown>): void {
     const sampled = context.sampled ? '01' : '00';
     carrier[TRACE_HEADER_W3C] = `00-${context.traceId}-${context.spanId}-${sampled}`;
   }
 
-  extract(carrier: any): TraceContext | undefined {
+  extract(carrier: Record<string, unknown>): TraceContext | undefined {
     const header = carrier[TRACE_HEADER_W3C];
     if (!header || typeof header !== 'string') return undefined;
 
@@ -133,13 +135,13 @@ export class W3CTracePropagator implements TextMapPropagator {
  * Jaeger propagator
  */
 export class JaegerPropagator implements TextMapPropagator {
-  inject(context: TraceContext, carrier: any): void {
+  inject(context: TraceContext, carrier: Record<string, unknown>): void {
     const parentSpanId = context.parentSpanId || '0';
     const flags = context.sampled ? '1' : '0';
     carrier[TRACE_HEADER_JAEGER] = `${context.traceId}:${context.spanId}:${parentSpanId}:${flags}`;
   }
 
-  extract(carrier: any): TraceContext | undefined {
+  extract(carrier: Record<string, unknown>): TraceContext | undefined {
     const header = carrier[TRACE_HEADER_JAEGER];
     if (!header || typeof header !== 'string') return undefined;
 
@@ -168,7 +170,7 @@ export class JaegerPropagator implements TextMapPropagator {
  * B3 propagator
  */
 export class B3Propagator implements TextMapPropagator {
-  inject(context: TraceContext, carrier: any): void {
+  inject(context: TraceContext, carrier: Record<string, unknown>): void {
     carrier[TRACE_HEADER_B3] = context.traceId;
     carrier['x-b3-spanid'] = context.spanId;
     carrier['x-b3-sampled'] = context.sampled ? '1' : '0';
@@ -177,19 +179,22 @@ export class B3Propagator implements TextMapPropagator {
     }
   }
 
-  extract(carrier: any): TraceContext | undefined {
+  extract(carrier: Record<string, unknown>): TraceContext | undefined {
     const traceId = carrier[TRACE_HEADER_B3];
     const spanId = carrier['x-b3-spanid'];
     const sampled = carrier['x-b3-sampled'];
     const parentSpanId = carrier['x-b3-parentspanid'];
 
-    if (!traceId || !spanId) return undefined;
+    if (typeof traceId !== 'string' || typeof spanId !== 'string') return undefined;
+
+    const sampledBool = typeof sampled === 'string' && sampled === '1';
 
     return {
       traceId,
       spanId,
-      parentSpanId: parentSpanId || undefined,
-      sampled: sampled === '1',
+      ...(typeof parentSpanId === 'string' ? { parentSpanId } : {}),
+      sampled: sampledBool,
+      flags: sampledBool ? 1 : 0,
     };
   }
 }
@@ -200,12 +205,12 @@ export class B3Propagator implements TextMapPropagator {
 export class BaggagePropagator implements TextMapPropagator {
   private readonly baggageHeader = 'baggage';
 
-  inject(_context: TraceContext, _carrier: any): void {
+  inject(_context: TraceContext, _carrier: Record<string, unknown>): void {
     // Baggage injection would be implemented here if baggage was part of TraceContext
     // For now, this is a no-op as baggage is handled separately
   }
 
-  extract(carrier: any): TraceContext | undefined {
+  extract(carrier: Record<string, unknown>): TraceContext | undefined {
     const baggageHeader = carrier[this.baggageHeader];
     if (!baggageHeader || typeof baggageHeader !== 'string') return undefined;
 
@@ -252,12 +257,12 @@ export class CompositePropagator implements TextMapPropagator {
     this.propagators = formats.map(format => TracePropagatorFactory.create(format));
   }
 
-  inject(context: TraceContext, carrier: any): void {
+  inject(context: TraceContext, carrier: Record<string, unknown>): void {
     // Use W3C as the primary format for injection
     this.propagators[0]?.inject(context, carrier);
   }
 
-  extract(carrier: any): TraceContext | undefined {
+  extract(carrier: Record<string, unknown>): TraceContext | undefined {
     // Try each propagator in order
     for (const propagator of this.propagators) {
       const context = propagator.extract(carrier);
@@ -298,14 +303,14 @@ export async function withTraceContextAsync<T>(context: TraceContext, fn: () => 
 /**
  * Extract trace context from headers
  */
-export function extractTraceContext(carrier: any, format?: string): TraceContext | undefined {
+export function extractTraceContext(carrier: Record<string, unknown>, format?: string): TraceContext | undefined {
   return traceContextManager.extract(carrier, format);
 }
 
 /**
  * Inject trace context into headers
  */
-export function injectTraceContext(context: TraceContext, carrier: any, format?: string): void {
+export function injectTraceContext(context: TraceContext, carrier: Record<string, unknown>, format?: string): void {
   return traceContextManager.inject(context, carrier, format);
 }
 

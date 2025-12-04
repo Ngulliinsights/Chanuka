@@ -3,16 +3,19 @@
  * Provides comprehensive testing for mobile functionality
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
 import { Smartphone, Monitor, Network, Gauge, RotateCcw, User, AlertTriangle, CheckCircle, X } from 'lucide-react';
-import { MobileTouchUtils } from '@client/utils/mobile-touch-handler';
-import { useResponsiveLayout } from '@client/utils/responsive-layout';
-import { useMobileErrorHandler } from '@client/utils/mobile-error-handler';
+import React, { useState, useEffect, useRef } from 'react';
+
 import { logger } from '@client/utils/logger';
+import { MobileTouchUtils, useResponsiveLayout, useMobileErrorHandler } from '@client/utils/mobile';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Separator } from '../ui/separator';
+
+
+
 
 interface TestResult {
   name: string;

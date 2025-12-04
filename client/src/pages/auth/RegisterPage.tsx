@@ -3,14 +3,15 @@
  * User registration with privacy controls and OAuth integration
  */
 
+import { Shield, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
+
 import { SocialLogin } from '@client/components/auth/SocialLogin';
 import { RegisterForm } from '@client/components/auth/ui/RegisterForm';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 import { useAuth } from '@client/features/users/hooks/useAuth';
-import { Shield, AlertTriangle } from 'lucide-react';
 import { logger } from '@client/utils/logger';
 
 export default function RegisterPage() {

@@ -5,12 +5,15 @@
  * and real-time updates.
  */
 
-import React, { useState, useEffect } from 'react';
 import { Bell, Filter, Settings, Archive, Trash2, CheckCheck, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { LoadingSpinner } from '@client/core/loading/components/LoadingSpinner';
 import { useNotifications, useNotificationHistory } from '@client/hooks/useNotifications';
 import { NotificationCategory, NotificationType } from '@client/services/notification-service';
-import { Button } from '../ui/button';
+
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -19,9 +22,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel
 } from '../ui/dropdown-menu';
+
 import { NotificationItem } from './NotificationItem';
 import { NotificationPreferences } from './NotificationPreferences';
-import { LoadingSpinner } from '@client/core/loading/components/LoadingSpinner';
+
 
 interface NotificationCenterProps {
   className?: string;

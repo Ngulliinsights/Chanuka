@@ -4,21 +4,9 @@
  */
 
 import React, { useState, useCallback } from 'react';
+
 import { Button } from './button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
-import { 
-  FormSection, 
-  FormStepIndicator, 
-  FormFieldGroup, 
-  FormValidationSummary,
-  FormSuccessIndicator,
-  FormHelpText 
-} from './form-layout';
-import {
-  EnhancedFormInput,
-  EnhancedFormTextarea,
-  EnhancedFormSelect
-} from './form-field';
 import {
   AccessibleFieldset,
   ScreenReaderAnnouncement,
@@ -27,6 +15,19 @@ import {
   AccessibleErrorSummary,
   FormSkipLink
 } from './form-accessibility';
+import {
+  EnhancedFormInput,
+  EnhancedFormTextarea,
+  EnhancedFormSelect
+} from './form-field';
+import { 
+  FormSection, 
+  FormStepIndicator, 
+  FormFieldGroup, 
+  FormValidationSummary,
+  FormSuccessIndicator,
+  FormHelpText 
+} from './form-layout';
 
 interface FormData {
   // Personal Information

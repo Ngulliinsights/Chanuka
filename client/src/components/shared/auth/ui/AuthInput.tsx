@@ -3,12 +3,14 @@
  * Following navigation component patterns for UI components
  */
 
-import React from 'react';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import React from 'react';
+
 import { cn } from '@/lib/utils';
+import { usePasswordVisibility } from '@client/hooks/usePasswordUtils';
+
 import { Input } from '../../../ui/input';
 import { Label } from '../../../ui/label';
-import { usePasswordVisibility } from '@client/hooks/usePasswordUtils';
 
 export interface AuthInputProps {
   name: string;

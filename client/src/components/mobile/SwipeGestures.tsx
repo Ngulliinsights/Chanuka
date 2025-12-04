@@ -13,6 +13,7 @@
  */
 
 import React, { useRef, useCallback, useEffect } from 'react';
+
 import { cn } from '@client/lib/utils';
 
 export type SwipeDirection = 'left' | 'right' | 'up' | 'down';

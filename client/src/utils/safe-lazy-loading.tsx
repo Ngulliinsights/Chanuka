@@ -6,17 +6,19 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import { logger } from "./logger";
+
 import {
   PageLoader,
 } from "../components/loading/LoadingStates";
+
+import { logger } from "./logger";
 import { routePreloader } from "./route-preloading";
 
 /**
  * Component loading state management with proper cleanup
  * Tracks in-flight loads to prevent duplicate concurrent requests
  */
-const componentLoadingState = new Map<string, Promise<any>>();
+const componentLoadingState = new Map<string, Promise<unknown>>();
 const loadedComponents = new Set<string>();
 
 /**
@@ -38,6 +40,7 @@ function cleanupLoadingState(componentId: string, delay: number = 50): void {
  * 3. Added validation before marking as loaded
  * 4. Improved error context for debugging
  */
+/* eslint-disable react-refresh/only-export-components */
 export function retryLazyComponentLoad<P extends object>(
   importFn: () => Promise<{ default: ComponentType<P> }>,
   componentId: string,
@@ -47,7 +50,7 @@ export function retryLazyComponentLoad<P extends object>(
 ): () => Promise<{ default: ComponentType<P> }> {
   return async () => {
     // Check if this component is already being loaded
-    const existingLoad = componentLoadingState.get(componentId);
+    const existingLoad = componentLoadingState.get(componentId) as Promise<{ default: ComponentType<P> }> | undefined;
     if (existingLoad) {
       return existingLoad;
     }
@@ -119,7 +122,7 @@ export function retryLazyComponentLoad<P extends object>(
           maxRetries + 1
         } attempts. Last error: ${lastError.message}`
       );
-      (enhancedError as any).cause = lastError;
+      (enhancedError as Error & { cause: Error }).cause = lastError;
 
       logger.error(`Component load failure: ${componentId}`, { error: enhancedError });
       throw enhancedError;
@@ -148,8 +151,8 @@ export function retryLazyComponentLoad<P extends object>(
  */
 const createStableErrorFallback = (
   componentName: string
-): ComponentType<any> => {
-  const StableFallback: ComponentType<any> = () => (
+): ComponentType<Record<string, never>> => {
+  const StableFallback: ComponentType<Record<string, never>> = () => (
     <div className="p-4 text-center">
       <p className="text-red-600">Failed to load {componentName}</p>
       <button
@@ -171,7 +174,7 @@ const createStableErrorFallback = (
 /**
  * Cache for stable fallback components to prevent recreation
  */
-const fallbackComponentCache = new Map<string, ComponentType<any>>();
+const fallbackComponentCache = new Map<string, ComponentType<Record<string, never>>>();
 
 /**
  * Safe lazy component creation with optimized error handling
@@ -211,7 +214,7 @@ function createSafeLazyComponent<P extends object>(
         fallbackComponentCache.set(componentName, StableFallback);
       }
 
-      return { default: StableFallback };
+      return { default: StableFallback as ComponentType<P> };
     }
   });
 }
@@ -252,7 +255,7 @@ function cleanupPreloadRegistry(): void {
  * 3. Prevents duplicate registrations properly
  * 4. Uses queueMicrotask for more efficient scheduling
  */
-export function createSafeLazyPage<P extends object = {}>(
+export function createSafeLazyPage<P extends Record<string, never> = Record<string, never>>(
   path: string,
   _exportName: string,
   options: {
@@ -264,8 +267,6 @@ export function createSafeLazyPage<P extends object = {}>(
 ): LazyExoticComponent<ComponentType<P>> {
   const {
     enablePreloading = true,
-    preloadPriority: _preloadPriority = "medium",
-    connectionAware: _connectionAware = true,
     displayName,
   } = options;
 
@@ -344,7 +345,7 @@ export function createSafeLazyPage<P extends object = {}>(
         return import("@client/pages/comments");
       case "@/pages/not-found":
         return import("@client/pages/not-found");
-      default:
+      default: {
         // Try to resolve the path by removing @/ and adding ../
         const relativePath = path.replace('@/', '../');
         console.warn(`Unknown page path: ${path}, attempting to load from ${relativePath}`);
@@ -352,6 +353,7 @@ export function createSafeLazyPage<P extends object = {}>(
           console.error(`Failed to load page from ${relativePath}:`, error);
           return Promise.reject(new Error(`Unknown page path: ${path}`));
         });
+      }
     }
   }) as () => Promise<{
     default: ComponentType<P>;
@@ -379,7 +381,7 @@ export function createSafeLazyPage<P extends object = {}>(
         if (!entry || entry.promise) return;
 
         const preloadPromise = routePreloader
-          .preloadComponent(component, `/${componentName.toLowerCase()}`)
+          .preloadComponent(component as LazyExoticComponent<ComponentType<unknown>>, `/${componentName.toLowerCase()}`)
           .catch((error) => {
             // Reset registration on failure to allow retry
             preloadRegistry.delete(preloadKey);
@@ -421,14 +423,14 @@ export function createSafeLazyPage<P extends object = {}>(
  * 1. Enhanced validation and error messages
  * 2. Better TypeScript type safety
  */
-export function createNamedExportLazy<P extends object = {}>(
+export function createNamedExportLazy<P extends Record<string, never> = Record<string, never>>(
   path: string,
   exportName: string,
   componentName: string
 ): LazyExoticComponent<ComponentType<P>> {
   const moduleImport = (() =>
-    import(/* @vite-ignore */ path as any)) as () => Promise<
-    Record<string, any>
+    import(/* @vite-ignore */ path)) as () => Promise<
+    Record<string, unknown>
   >;
 
   const typedImport = async (): Promise<{ default: ComponentType<P> }> => {
@@ -699,7 +701,7 @@ export const SafeLazySponsorshipPages = {
 /**
  * Enhanced retryable lazy component with configurable options
  */
-export function createRetryableLazyComponent<P extends object = {}>(
+export function createRetryableLazyComponent<P extends Record<string, never> = Record<string, never>>(
   importFn: () => Promise<{ default: ComponentType<P> }>,
   componentName: string,
   options: {
@@ -733,7 +735,7 @@ export function createLazyComponentBatch<T extends Record<string, string>>(
     initialDelay?: number;
     backoffFactor?: number;
   } = {}
-): Record<keyof T, LazyExoticComponent<ComponentType<{}>>> {
+): Record<keyof T, LazyExoticComponent<ComponentType<Record<string, never>>>> {
   const { enableRetry = false, ...retryOptions } = options;
 
   return Object.entries(importMap).reduce(
@@ -747,7 +749,7 @@ export function createLazyComponentBatch<T extends Record<string, string>>(
       batch[componentName as keyof T] = lazyComponent;
       return batch;
     },
-    {} as Record<keyof T, LazyExoticComponent<ComponentType<{}>>>
+    {} as Record<keyof T, LazyExoticComponent<ComponentType<Record<string, never>>>>
   );
 }
 
@@ -763,19 +765,19 @@ export function preloadLazyComponent<P extends object>(
 ): Promise<{ default: ComponentType<P> }> {
   try {
     // Check for standard preload method (Vite, webpack 5)
-    if (typeof (lazyComponent as any).preload === "function") {
-      return (lazyComponent as any).preload();
+    if (typeof (lazyComponent as { preload?: () => Promise<unknown> }).preload === "function") {
+      return (lazyComponent as { preload?: () => Promise<unknown> }).preload!() as Promise<{ default: ComponentType<P> }>;
     }
 
     // Fallback to React internals
-    const payload = (lazyComponent as any)._payload;
+    const payload = (lazyComponent as { _payload?: unknown })._payload;
 
-    if (payload && typeof payload._result === "undefined") {
-      return payload._init(payload._payload);
+    if (payload && typeof (payload as { _result?: unknown })._result === "undefined") {
+      return (payload as { _init: (p: unknown) => Promise<unknown> })._init(payload) as Promise<{ default: ComponentType<P> }>;
     }
 
     // Component already loaded
-    return Promise.resolve({ default: lazyComponent as any });
+    return Promise.resolve({ default: lazyComponent as unknown as ComponentType<P> });
   } catch (error) {
     return Promise.reject(
       new Error("Failed to preload component: " + (error as Error).message)
@@ -793,7 +795,7 @@ export function preloadLazyComponent<P extends object>(
  * 4. Prevents race conditions with mounted flag
  */
 export function usePreloadComponents(
-  components: LazyExoticComponent<ComponentType<any>>[],
+  components: LazyExoticComponent<ComponentType<Record<string, never>>>[],
   preloadCondition: boolean = true
 ): void {
   // Track if we've already preloaded this set of components
@@ -804,7 +806,7 @@ export function usePreloadComponents(
   // Create a stable identifier for the component list
   // This prevents re-execution when the array reference changes
   const componentIdentifier = useRef(
-    components.map((c) => (c as any).$$typeof || Math.random()).join("-")
+    components.map((c) => (c as unknown as { $$typeof?: symbol }).$$typeof?.toString() || Math.random()).join("-")
   );
 
   useEffect(() => {
@@ -828,7 +830,7 @@ export function usePreloadComponents(
 
     // Create new identifier for current component list
     const newIdentifier = components
-      .map((c) => (c as any).$$typeof || Math.random())
+      .map((c) => (c as unknown as { $$typeof?: symbol }).$$typeof?.toString() || Math.random())
       .join("-");
 
     // If component list hasn't changed, skip
@@ -866,7 +868,7 @@ export function usePreloadComponents(
         abortControllerRef.current.abort();
       }
     };
-  }, [preloadCondition]); // Only depend on preloadCondition, not components array
+  }, [preloadCondition, components]); // Include components to satisfy exhaustive-deps
 }
 
 /**

@@ -1,11 +1,3 @@
-import React from 'react';
-import { useDashboardData } from '../useDashboardData';
-import { StatsSection } from '../sections/StatsSection';
-import { ActivitySection } from '../sections/ActivitySection';
-import { BillsSection } from '../sections/BillsSection';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import {
   Settings,
   Download,
@@ -13,6 +5,16 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React from 'react';
+
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+
+import { ActivitySection } from '../sections/ActivitySection';
+import { BillsSection } from '../sections/BillsSection';
+import { StatsSection } from '../sections/StatsSection';
+import { useDashboardData } from '../useDashboardData';
 
 interface FullPageDashboardProps {
   className?: string;

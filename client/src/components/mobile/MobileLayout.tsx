@@ -14,15 +14,19 @@
  * - Safe area support for devices with notches
  */
 
+import { Menu, Filter, ArrowUp } from 'lucide-react';
 import React, { useState, useCallback, useEffect } from 'react';
+
 import { useMediaQuery } from '@client/hooks/use-mobile';
 import { cn } from '@client/lib/utils';
-import { MobileNavigationDrawer, useMobileNavigationDrawer } from './MobileNavigationDrawer';
+
+import { Button } from '../ui/button';
+
 import { MobileBottomSheet, useBottomSheet } from './MobileBottomSheet';
+import { MobileNavigationDrawer, useMobileNavigationDrawer } from './MobileNavigationDrawer';
 import { PullToRefresh } from './PullToRefresh';
 import { SwipeGestures } from './SwipeGestures';
-import { Button } from '../ui/button';
-import { Menu, Filter, ArrowUp } from 'lucide-react';
+
 
 interface MobileLayoutProps {
   children: React.ReactNode;

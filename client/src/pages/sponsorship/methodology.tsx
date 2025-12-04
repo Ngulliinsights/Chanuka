@@ -1,11 +1,4 @@
 
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Progress } from '@client/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { logger } from '@client/utils/logger';
 import {
   ArrowLeft,
   Search, 
@@ -21,6 +14,14 @@ import {
   Cpu,
   AlertTriangle
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Progress } from '@client/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { logger } from '@client/utils/logger';
 
 interface MethodologyProps { bill_id?: string;
  }

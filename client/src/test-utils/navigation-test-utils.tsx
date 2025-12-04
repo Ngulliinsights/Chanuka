@@ -4,8 +4,8 @@
  * Utilities for testing navigation and routing functionality
  */
 
-import React from 'react';
 import { render, RenderOptions } from '@testing-library/react';
+import React from 'react';
 import { vi } from 'vitest';
 
 // Mock navigation service

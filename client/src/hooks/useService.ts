@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
+
 import { globalServiceLocator } from '@client/core/api/registry';
 import { ApiService } from '@client/core/api/types';
 import { logger } from '@client/utils/logger';

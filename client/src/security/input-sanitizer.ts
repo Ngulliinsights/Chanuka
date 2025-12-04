@@ -3,9 +3,10 @@
  * Comprehensive XSS prevention and input validation
  */
 
-import DOMPurify from 'dompurify';
-import { logger } from '@client/utils/logger';
 import { SecurityEvent } from '@client/types';
+import DOMPurify from 'dompurify';
+
+import { logger } from '@client/utils/logger';
 
 // Type definitions for DOMPurify hook data
 interface DOMPurifyHookData {

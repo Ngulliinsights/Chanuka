@@ -5,7 +5,7 @@
  * for use in the routing system.
  */
 
-import { BillsDashboard } from '@client/features/bills/ui/bills-dashboard';
+import { BillsDashboard } from '@client/features/bills';
 
 export default function BillsDashboardPage() {
   return <BillsDashboard />;

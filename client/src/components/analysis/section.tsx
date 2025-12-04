@@ -1,9 +1,13 @@
 import { ReactNode } from 'react';
-import { Button } from '../ui/button';
-import { ErrorBoundary } from '../error-handling/ErrorBoundary';
-import { LoadingSpinner } from '../ui/loading-spinner';
 import { Suspense } from 'react';
+
 import { logger } from '@client/utils/logger';
+
+import { ErrorBoundary } from '../error-handling/ErrorBoundary';
+import { Button } from '../ui/button';
+import { LoadingSpinner } from '../ui/loading-spinner';
+
+
 
 export interface SectionProps {
   title: string;

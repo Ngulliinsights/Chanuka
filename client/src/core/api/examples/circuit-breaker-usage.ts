@@ -5,15 +5,16 @@
  * for robust API communication with automatic retry and monitoring.
  */
 
+import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+
 import { apiClients, createCircuitBreakerClient } from '../circuit-breaker-client';
-import { retryOperation, createRetryHandler } from '../retry-handler';
 import { 
   circuitBreakerMonitor, 
   getServiceHealth, 
   getErrorCorrelations,
   recordError 
 } from '../circuit-breaker-monitor';
-import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+import { retryOperation, createRetryHandler } from '../retry-handler';
 
 // ============================================================================
 // Basic Usage Examples

@@ -1,9 +1,12 @@
 import React, { Suspense, lazy, useCallback, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+
+import { logger } from '@client/utils/logger';
+
 import { ErrorBoundary } from '../error-handling/ErrorBoundary';
 import { LoadingStateManager } from '../loading/LoadingStates';
+
 import { ProtectedRoute, AdminRoute, ModeratorRoute, VerifiedUserRoute } from './ProtectedRoute';
-import { logger } from '@client/utils/logger';
 
 // Enhanced lazy loading with retry mechanism
 const createLazyComponent = (importFn: () => Promise<any>, componentName: string) => {

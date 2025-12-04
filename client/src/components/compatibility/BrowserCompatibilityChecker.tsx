@@ -7,9 +7,10 @@ declare const window: Window & typeof globalThis;
  * messages and fallbacks for unsupported browsers.
  */
 
-import React, { useEffect, useState } from 'react';
-import { getBrowserInfo, isBrowserSupported, BrowserInfo } from '@client/utils/browser-compatibility';
 import { loadPolyfills, getPolyfillStatus } from '@client/utils/polyfills';
+import React, { useEffect, useState } from 'react';
+
+import { getBrowserInfo, isBrowserSupported, BrowserInfo } from '@client/utils/browser';
 import { logger } from '@client/utils/logger';
 
 interface BrowserCompatibilityCheckerProps {

@@ -1,7 +1,9 @@
 import React from 'react';
+
+import { ErrorSeverity } from '@client/core/error';
+
 import { ErrorFallbackProps } from './ErrorBoundary';
 import { SharedErrorDisplay, ErrorDisplayConfig } from './utils/shared-error-display';
-import { ErrorSeverity } from '@client/core/error';
 
 /**
  * Consolidated Error Fallback Component

@@ -11,14 +11,6 @@
  * - Local impact toggle
  */
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Checkbox } from '../ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Label } from '../ui/label';
-import { Separator } from '../ui/separator';
 import { 
   Filter, 
   X, 
@@ -34,8 +26,19 @@ import {
   Calendar,
   RotateCcw
 } from 'lucide-react';
+import { useState } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { CommunityFilters as CommunityFiltersType } from '@client/types/community';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Separator } from '../ui/separator';
+
 
 interface CommunityFiltersProps {
   onClose?: () => void;

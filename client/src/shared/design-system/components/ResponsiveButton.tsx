@@ -7,9 +7,11 @@
  * Requirements: 9.1, 9.5
  */
 
-import React from 'react';
-import { cn } from '@client/lib/utils';
 import { useResponsive } from '@client/responsive';
+import React from 'react';
+
+import { cn } from '@client/lib/utils';
+
 import { buttonUtils } from './button';
 
 export interface ResponsiveButtonProps {

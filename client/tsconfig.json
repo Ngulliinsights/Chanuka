@@ -37,7 +37,7 @@
     // Project Structure
     "baseUrl": "./src",
     // Silence TypeScript 7.0 deprecation warnings for `baseUrl` until migration
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
 
     // Path Mappings
     "paths": {
@@ -46,14 +46,14 @@
       "@client/*": ["./*"],
       "@shared": ["../shared"],
       "@shared/*": ["../shared/*"],
-      "@shared/core": ["../shared/core"],
-      "@shared/core/*": ["../shared/core/*"],
+      "@shared/core": ["../shared/core/src"],
+      "@shared/core/*": ["../shared/core/src/*"],
       "@shared/database": ["../shared/database"],
       "@shared/database/*": ["../shared/database/*"],
       "@shared/schema": ["../shared/schema"],
       "@shared/schema/*": ["../shared/schema/*"],
-      "@shared/utils": ["../shared/utils"],
-      "@shared/utils/*": ["../shared/utils/*"],
+      "@shared/utils": ["../shared/core/src/utils"],
+      "@shared/utils/*": ["../shared/core/src/utils/*"],
       "@server": ["../server"],
       "@server/*": ["../server/*"],
       "@tests": ["../tests"],
@@ -64,7 +64,7 @@
     "types": ["vite/client", "vitest/globals", "node"]
   },
 
-  "include": ["src/**/*", "src/types/shims-shared.d.ts"],
+  "include": ["src/**/*", "src/types/shims-shared.d.ts", "src/__tests__/integration/react-initialization.test.tsx"],
 
   "exclude": [
     "node_modules",
@@ -73,6 +73,9 @@
     "**/*.test.tsx",
     "**/*.spec.ts",
     "**/*.spec.tsx",
-    "**/__tests__/**"
+    "src/__tests__/**/*.test.ts",
+    "src/__tests__/**/*.test.tsx",
+    "src/__tests__/**/*.spec.ts",
+    "src/__tests__/**/*.spec.tsx"
   ]
 }

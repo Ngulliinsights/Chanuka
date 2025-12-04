@@ -3,10 +3,10 @@
  * Consistent button styling and behavior patterns
  */
 
-import { colorTokens } from '../tokens/colors';
-import { spacingTokens } from '../tokens/spacing';
 import { borderTokens } from '../tokens/borders';
+import { colorTokens } from '../tokens/colors';
 import { shadowTokens } from '../tokens/shadows';
+import { spacingTokens } from '../tokens/spacing';
 
 export const buttonDesignStandards = {
   // Base button styles

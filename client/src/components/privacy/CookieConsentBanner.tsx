@@ -3,12 +3,6 @@
  * GDPR-compliant cookie consent management with granular controls
  */
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { Switch } from '../ui/switch';
-import { Label } from '../ui/label';
-import { Badge } from '../ui/badge';
 import { 
   Cookie, 
   Settings, 
@@ -19,8 +13,17 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { privacyCompliance } from '@client/utils/privacy-compliance';
+import React, { useState, useEffect } from 'react';
+
 import { logger } from '@client/utils/logger';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Label } from '../ui/label';
+import { Switch } from '../ui/switch';
+
 
 interface CookieCategory {
   id: string;

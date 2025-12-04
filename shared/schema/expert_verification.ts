@@ -3,8 +3,9 @@
 // ============================================================================
 // Expert credentials, verification, and credibility scoring system
 
-import { pgTable, uuid, varchar, integer, decimal, timestamp, jsonb, text, index, unique } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { pgTable, uuid, varchar, integer, decimal, timestamp, jsonb, text, index, unique } from 'drizzle-orm/pg-core';
+
 import { users } from './foundation';
 
 // ============================================================================

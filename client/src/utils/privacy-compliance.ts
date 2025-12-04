@@ -4,6 +4,7 @@
  */
 
 import { ConsentRecord, DataExportRequest, DataDeletionRequest, PrivacySettings } from '@client/types/auth';
+
 import { logger } from './logger';
 
 interface ConsentVersion {

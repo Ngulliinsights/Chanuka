@@ -4,15 +4,14 @@
 // Offline engagement, community facilitation, and multi-modal access
 // This schema ensures the platform serves all Kenyans, not just the digitally connected
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique, date, check
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
-import { bills, users } from "./foundation";
 import { kenyanCountyEnum } from "./enum";
+import { bills, users } from "./foundation";
 
 // ============================================================================
 // AMBASSADORS - Community facilitators for offline engagement

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userApi } from '../services/user-api';
+
 import { useToast } from '../../../hooks/use-toast';
 import type {
   LoginCredentials,
@@ -8,6 +8,7 @@ import type {
   UpdatePreferencesData,
   VerificationRequest
 } from '../../../types';
+import { userApi } from '../services/user-api';
 
 /**
  * Hook for user authentication operations

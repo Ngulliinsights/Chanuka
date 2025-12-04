@@ -1,6 +1,3 @@
-import React from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
-import { Badge } from '../ui/badge';
 import { 
   HelpCircle, 
   Info, 
@@ -12,6 +9,10 @@ import {
   CheckCircle,
   ExternalLink
 } from 'lucide-react';
+import React from 'react';
+
+import { Badge } from '../ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface EducationalTooltipProps {
   term: string;

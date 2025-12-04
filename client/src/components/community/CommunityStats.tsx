@@ -9,9 +9,6 @@
  * - Performance-optimized with memoization and efficient rendering
  */
 
-import { useEffect, useMemo, memo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
   Users,
   MessageSquare,
@@ -22,6 +19,10 @@ import {
   Clock,
   Activity
 } from 'lucide-react';
+import { useEffect, useMemo, memo } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 // Type definitions for better type safety and clarity

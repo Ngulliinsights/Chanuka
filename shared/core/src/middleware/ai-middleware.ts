@@ -8,12 +8,13 @@
  * - Security validation
  */
 
-import { Request, Response, NextFunction } from 'express';
 import { performance } from 'perf_hooks';
+
+import { Request, Response, NextFunction } from 'express';
+
 import { getDefaultCache } from '../cache';
-import { RateLimitMiddleware } from '../rate-limiting/middleware';
-import { RateLimitStore } from '../rate-limiting/types';
 import { logger } from '../observability/logging';
+import { RateLimitStore } from '../rate-limiting/types';
 
 export interface AIRequest extends Request { aiContext?: {
     service: string;
@@ -47,15 +48,16 @@ export interface AIMiddlewareOptions {
 export function aiRequestMiddleware(options: AIMiddlewareOptions) { return async (req: AIRequest, res: Response, next: NextFunction) => {
     const startTime = performance.now();
     const requestId = generateRequestId();
-    
+    const userId = (req as { user?: { id: string } }).user?.id;
+
     // Initialize AI context
     req.aiContext = {
       service: options.service,
       operation: req.path.split('/').pop() || 'unknown',
       startTime,
       requestId,
-      user_id: (req as any).user?.id,
-      cached: false
+      cached: false,
+      ...(userId && { user_id: userId })
      };
 
     // Security validation
@@ -82,6 +84,7 @@ export function aiRequestMiddleware(options: AIMiddlewareOptions) { return async
      });
 
     next();
+    return;
   };
 }
 
@@ -94,13 +97,13 @@ export function aiResponseMiddleware(options: AIMiddlewareOptions) {
     const originalJson = res.json;
 
     // Override send method
-    res.send = function(data: any) {
+    res.send = function(data: unknown) {
       logAIResponse(req, res, data, options);
       return originalSend.call(this, data);
     };
 
     // Override json method
-    res.json = function(data: any) {
+    res.json = function(data: unknown) {
       logAIResponse(req, res, data, options);
       return originalJson.call(this, data);
     };
@@ -114,7 +117,7 @@ export function aiResponseMiddleware(options: AIMiddlewareOptions) {
  */
 export function aiCachingMiddleware(options: AIMiddlewareOptions) {
   if (!options.enableCaching) {
-    return (req: Request, res: Response, next: NextFunction) => next();
+    return (_req: Request, _res: Response, next: NextFunction) => next();
   }
 
   return async (req: AIRequest, res: Response, next: NextFunction) => {
@@ -145,7 +148,7 @@ export function aiCachingMiddleware(options: AIMiddlewareOptions) {
 
       // Cache miss - continue to AI service
       const originalJson = res.json;
-      res.json = function(data: any) {
+      res.json = function(data: unknown) {
         // Cache successful responses
         if (res.statusCode >= 200 && res.statusCode < 300) {
           const ttl = options.cacheTtl || 300; // 5 minutes default
@@ -153,7 +156,7 @@ export function aiCachingMiddleware(options: AIMiddlewareOptions) {
             console.warn('Failed to cache AI response:', err);
           });
         }
-        
+
         return originalJson.call(this, data);
       };
 
@@ -161,7 +164,11 @@ export function aiCachingMiddleware(options: AIMiddlewareOptions) {
     } catch (error) {
       console.warn('AI caching error, proceeding without cache:', error);
       next();
+      return;
     }
+
+    next();
+    return;
   };
 }
 
@@ -170,17 +177,11 @@ export function aiCachingMiddleware(options: AIMiddlewareOptions) {
  */
 export function aiRateLimitMiddleware(options: AIMiddlewareOptions) {
   if (!options.enableRateLimit || !options.rateLimitStore) {
-    return (req: Request, res: Response, next: NextFunction) => next();
+    return (_req: Request, _res: Response, next: NextFunction) => next();
   }
 
-  const config = options.rateLimitConfig || {
-    limit: 100,
-    windowMs: 60000, // 1 minute
-    algorithm: 'sliding-window' as const
-  };
-
   // TODO: Fix RateLimitMiddleware usage
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (_req: Request, _res: Response, next: NextFunction) => {
     // Placeholder rate limiting logic
     next();
   };
@@ -212,7 +213,7 @@ function generateCacheKey(req: Request, service: string): string {
   return `ai:${service}:${operation}:${bodyHash}:${queryHash}`;
 }
 
-function hashObject(obj: any): string {
+function hashObject(obj: Record<string, unknown>): string {
   const str = JSON.stringify(obj, Object.keys(obj).sort());
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -248,16 +249,13 @@ async function validateAIRequest(req: Request): Promise<{
     errors.push('User-Agent header is required');
   }
 
-  return {
-    valid: errors.length === 0,
-    errors: errors.length > 0 ? errors : undefined as any
-  };
+  return errors.length === 0 ? { valid: true } : { valid: false, errors };
 }
 
 function logAIResponse(
   req: AIRequest,
   res: Response,
-  data: any,
+  data: unknown,
   options: AIMiddlewareOptions
 ): void {
   if (!req.aiContext) return;

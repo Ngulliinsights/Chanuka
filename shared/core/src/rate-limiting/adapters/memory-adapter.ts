@@ -3,8 +3,8 @@
  * Adapts the existing MemoryRateLimitStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 import { MemoryRateLimitStore } from '../stores/memory-store';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 
 export class MemoryAdapter implements RateLimitStore {
   constructor(private store: MemoryRateLimitStore) {}

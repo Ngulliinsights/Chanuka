@@ -71,8 +71,8 @@ export interface Tracer {
   startSpan(name: string, options?: SpanOptions): Span;
   getCurrentSpan(): Span | undefined;
   setCurrentSpan(span: Span): void;
-  extract(carrier: any, format: string): TraceContext | undefined;
-  inject(spanContext: TraceContext, carrier: any, format: string): void;
+  extract(carrier: Record<string, unknown>, format: string): TraceContext | undefined;
+  inject(spanContext: TraceContext, carrier: Record<string, unknown>, format: string): void;
 }
 
 export interface Span {
@@ -179,8 +179,8 @@ export interface BatchProcessorConfig {
 // ==================== Context Propagation Types ====================
 
 export interface TextMapPropagator {
-  inject(context: TraceContext, carrier: any): void;
-  extract(carrier: any): TraceContext | undefined;
+  inject(context: TraceContext, carrier: Record<string, unknown>): void;
+  extract(carrier: Record<string, unknown>): TraceContext | undefined;
 }
 
 export interface Baggage {

@@ -5,12 +5,11 @@
 // Optimized for performance, data integrity, and scalability
 // PostgreSQL 15+ features utilized for maximum efficiency
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique, date, smallint, check
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
 // Only import enums actually used in this foundation schema
 // Other enums (verificationStatusEnum, moderationStatusEnum, commentVoteTypeEnum, 

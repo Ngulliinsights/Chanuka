@@ -8,9 +8,18 @@
 import { logger } from '@client/utils/logger';
 
 // Import all mock data
+import {
+  mockLiveEngagementMetrics,
+  mockPersonalEngagementScore,
+  mockCommunitysentimentAnalysis,
+  mockExpertVerificationMetrics,
+  mockEngagementStatistics,
+  mockTemporalAnalyticsData,
+  mockUserEngagementProfile,
+  mockCivicEngagementGoals,
+  mockEngagementNotifications
+} from './analytics';
 import { mockBills, mockBillsStats } from './bills';
-import { mockUsers, mockExpertUsers, mockModeratorUsers, mockCurrentUser } from './users';
-import { mockExperts, mockOfficialExperts, mockExpertCredibilityMetrics } from './experts';
 import { 
   mockActivityItems, 
   mockTrendingTopics, 
@@ -27,18 +36,9 @@ import {
   mockModerationActions,
   mockTypingIndicators 
 } from './discussions';
-import {
-  mockLiveEngagementMetrics,
-  mockPersonalEngagementScore,
-  mockCommunitysentimentAnalysis,
-  mockExpertVerificationMetrics,
-  mockEngagementStatistics,
-  mockTemporalAnalyticsData,
-  mockUserEngagementProfile,
-  mockCivicEngagementGoals,
-  mockEngagementNotifications
-} from './analytics';
+import { mockExperts, mockOfficialExperts, mockExpertCredibilityMetrics } from './experts';
 import { mockRealTimeEvents, mockConnectionStatus } from './realtime';
+import { mockUsers, mockExpertUsers, mockModeratorUsers, mockCurrentUser } from './users';
 
 /**
  * Cache configuration

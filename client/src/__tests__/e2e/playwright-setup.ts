@@ -4,6 +4,7 @@
  */
 
 import { test as base, expect, Page, BrowserContext } from '@playwright/test';
+
 import { MockDataFactory } from '@client/test-utils/comprehensive-test-setup';
 
 // Extend base test with custom fixtures

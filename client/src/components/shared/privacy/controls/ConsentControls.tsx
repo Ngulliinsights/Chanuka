@@ -3,13 +3,6 @@
  * GDPR consent management and notification preferences
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
-import { Button } from '../../../ui/button';
-import { Label } from '../../../ui/label';
-import { Switch } from '../../../ui/switch';
-import { Alert, AlertDescription } from '../../../ui/alert';
-import { Badge } from '../../../ui/badge';
 import {
   Bell,
   Download,
@@ -17,7 +10,17 @@ import {
   AlertTriangle,
   Info
 } from 'lucide-react';
+import React from 'react';
+
 import { PrivacySettings } from '@client/types/auth';
+
+import { Alert, AlertDescription } from '../../../ui/alert';
+import { Badge } from '../../../ui/badge';
+import { Button } from '../../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
+import { Label } from '../../../ui/label';
+import { Switch } from '../../../ui/switch';
+
 
 interface ConsentControlsProps {
   settings: PrivacySettings;

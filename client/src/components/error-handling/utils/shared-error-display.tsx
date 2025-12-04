@@ -1,5 +1,6 @@
-import React from 'react';
 import { AlertTriangle, RefreshCw, Building } from 'lucide-react';
+import React from 'react';
+
 import { Button } from '../../ui/button';
 
 /**

@@ -6,8 +6,9 @@
  * with the existing unified error handler.
  */
 
+import { errorHandler as unifiedErrorHandler } from '@client/utils/errors';
+
 import { ErrorDomain, ErrorSeverity } from './constants';
-import { errorHandler as unifiedErrorHandler } from '@client/utils/unified-error-handler';
 import {
   AppError,
   ErrorContext,

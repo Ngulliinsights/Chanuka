@@ -3,11 +3,7 @@
  * Handles OAuth authentication callbacks from providers like Google and GitHub
  */
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Button } from '../ui/button';
+import { authService } from '@client/services/authService';
 import { 
   CheckCircle, 
   AlertTriangle, 
@@ -15,9 +11,15 @@ import {
   ArrowLeft,
   Shield
 } from 'lucide-react';
-import { authService } from '@client/services/authService';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { logger } from '@client/utils/logger';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 interface CallbackState {
   status: 'loading' | 'success' | 'error';

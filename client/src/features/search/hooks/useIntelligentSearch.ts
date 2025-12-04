@@ -5,12 +5,13 @@
  * with caching, error handling, and performance optimization.
  */
 
-import { useState, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { intelligentSearch } from '../services/intelligent-search';
-import { useDebounce } from '../../../hooks/useDebounce';
+import { useState, useCallback, useRef } from 'react';
+
 import { useToast } from '../../../hooks/use-toast';
+import { useDebounce } from '../../../hooks/useDebounce';
 import { logger } from '../../../utils/logger';
+import { intelligentSearch } from '../services/intelligent-search';
 import type { 
   DualSearchRequest, 
   CombinedSearchResult,

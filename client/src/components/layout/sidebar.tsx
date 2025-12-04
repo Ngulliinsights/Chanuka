@@ -1,8 +1,11 @@
+import { Building, BarChart3, FileText, Users, Search, Settings, HelpCircle, MessageSquare, Shield, TrendingUp, User } from 'lucide-react';
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
 import { cn } from '@client/lib/utils';
+
 import { Logo } from '../ui/logo';
-import { Building, BarChart3, FileText, Users, Search, Settings, HelpCircle, MessageSquare, Shield, TrendingUp, User } from 'lucide-react';
+
 import { 
   SidebarProps, 
   NavigationItem, 

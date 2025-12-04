@@ -7,8 +7,9 @@
  */
 
 import { useEffect, useCallback, useState, useRef } from 'react';
+
+import { useComments } from '..';
 import { communityWebSocketManager } from '../../../services/CommunityWebSocketManager';
-import { eventBus } from '../../../utils/EventBus';
 import {
   Comment,
   DiscussionThread,
@@ -18,7 +19,7 @@ import {
   ModerationEvent,
   TypingIndicator
 } from '../../../types/discussion';
-import { useComments } from '..';
+import { eventBus } from '../../../utils/EventBus';
 
 interface UseDiscussionOptions {
   billId: number;
