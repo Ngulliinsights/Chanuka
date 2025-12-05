@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/
 import { ImplementationWorkarounds } from '@client/components/bills/implementation-workarounds';
 import {
   useBillSponsorshipAnalysis as useSponsorshipAnalysis
-} from '../features/bills/hooks/useBills';
+} from '../features/bills/model/hooks/useBills';
 import {
   TrendingUp,
   DollarSign,

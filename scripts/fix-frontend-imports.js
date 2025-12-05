@@ -35,14 +35,7 @@ const IMPORT_MAPPINGS = {
   '@/utils/apiCache': './utils/apiCache',
   '@/utils/connectionAwareLoading': './utils/connectionAwareLoading',
   '@/utils/mobile-touch-handler': './utils/mobile-touch-handler',
-  '@/utils/navigation/active-state': './utils/navigation/active-state',
-  
-  // Navigation utils
-  '@/utils/navigation/state-persistence': './utils/navigation/state-persistence',
-  '@/utils/navigation/section-detector': './utils/navigation/section-detector',
-  '@/utils/navigation/related-pages-calculator': './utils/navigation/related-pages-calculator',
-  '@/utils/navigation/page-relationship-utils': './utils/navigation/page-relationship-utils',
-  '@/utils/navigation/breadcrumb-generator': './utils/navigation/breadcrumb-generator',
+
   
   // Types
   '@/types/navigation': './types/navigation',

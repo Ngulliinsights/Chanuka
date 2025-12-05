@@ -7,7 +7,7 @@ import {
   determineCurrentSection,
   getPageTitle,
   isValidNavigationPath,
-} from '@/utils/navigation-utils';
+} from '@client/components/navigation/utils/navigation-utils';
 import { InvalidNavigationPathError } from '@client/errors';
 
 describe('navigation-utils', () => {

@@ -4,7 +4,7 @@ import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { NavigationProvider, useNavigation } from '@client/NavigationContext';
 import { useNavigation } from '@client/core/navigation/context';
-import { NavigationStatePersistence } from '@client/utils/navigation/state-persistence';
+import { NavigationStatePersistence } from '@client/core/navigation/persistence';
 // Note: AuthProvider moved to components/auth
 import { logger } from '@client/utils/logger';
 
@@ -19,19 +19,10 @@ vi.mock('@/hooks/useAuth', () => ({
 }));
 
 // Mock navigation utilities
-vi.mock('@/utils/navigation/breadcrumb-generator', () => ({
+vi.mock('@client/core/navigation/utils', () => ({
   generateBreadcrumbs: vi.fn(() => []),
-}));
-
-vi.mock('@/utils/navigation/related-pages-calculator', () => ({
   calculateRelatedPages: vi.fn(() => []),
-}));
-
-vi.mock('@/utils/navigation/section-detector', () => ({
   determineNavigationSection: vi.fn(() => 'legislative'),
-}));
-
-vi.mock('@/utils/navigation/active-state', () => ({
   isNavigationPathActive: vi.fn(() => false),
 }));
 
@@ -339,7 +330,7 @@ describe('Navigation State Persistence and Consistency', () => {
 
     it('should handle missing navigation utilities gracefully', () => {
       // Mock utilities to throw errors
-      const { generateBreadcrumbs } = require('@/utils/navigation/breadcrumb-generator');
+      const { generateBreadcrumbs } = require('@client/core/navigation/utils');
       vi.mocked(generateBreadcrumbs).mockImplementation(() => {
         throw new Error('Breadcrumb error');
       });
