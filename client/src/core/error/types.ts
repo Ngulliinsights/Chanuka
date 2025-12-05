@@ -2,40 +2,59 @@
  * Unified Error Types for Client-Side Cross-Cutting Concerns
  *
  * This module defines the core error types and interfaces used across
- * all client-side error handling, aligned with the unified error management
- * system from shared/core but adapted for client-side React usage.
+ * all client-side error handling, migrated from utils/errors.ts with
+ * enhanced modular architecture.
  */
 
 import { ErrorDomain, ErrorSeverity } from './constants';
 
 // ============================================================================
-// Core Error Types
+// Core Error Types (Enhanced from utils/errors.ts)
 // ============================================================================
 
 /**
- * Error context information for client-side errors
+ * Contextual information that helps with debugging and error correlation.
+ * This data travels with the error through the entire handling pipeline.
  */
 export interface ErrorContext {
-  component?: string;
-  action?: string;
-  userId?: string;
-  sessionId?: string;
-  url?: string;
-  userAgent?: string;
-  route?: string;
-  timestamp?: number;
-  [key: string]: any;
+  component?: string;      // Component where error originated
+  operation?: string;      // Operation being performed
+  userId?: string;         // User context
+  sessionId?: string;      // Session identifier
+  requestId?: string;      // Request tracking ID
+  url?: string;           // Current URL
+  userAgent?: string;     // Browser information
+  retryCount?: number;    // Number of retry attempts
+  route?: string;         // Current route
+  timestamp?: number;     // Error timestamp
+  [key: string]: unknown; // Additional custom context
 }
 
 /**
- * Core error interface for client-side error handling
+ * Complete metadata package for error tracking and analysis
+ */
+export interface ErrorMetadata {
+  domain: ErrorDomain;
+  severity: ErrorSeverity;
+  timestamp: Date;
+  context?: ErrorContext;
+  retryable: boolean;
+  recoverable: boolean;
+  correlationId?: string;
+  cause?: Error | unknown;
+  code: string;
+}
+
+/**
+ * Application error representation used throughout the error handling system
+ * Enhanced with metadata and correlation capabilities from utils/errors.ts
  */
 export interface AppError {
   id: string;
   type: ErrorDomain;
   severity: ErrorSeverity;
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
   timestamp: number;
   context?: ErrorContext;
   recoverable: boolean;
@@ -45,6 +64,8 @@ export interface AppError {
   recoveryStrategy?: string;
   stack?: string;
   cause?: Error;
+  metadata?: ErrorMetadata;
+  correlationId?: string;
 }
 
 /**
@@ -133,6 +154,54 @@ export interface RecoveryResult {
   action: RecoveryAction;
   message?: string;
   nextAction?: RecoveryAction;
+}
+
+// ============================================================================
+// Analytics and Reporting Interfaces (from utils/errors.ts)
+// ============================================================================
+
+/**
+ * Interface for error analytics providers (e.g., Sentry, DataDog)
+ */
+export interface ErrorAnalyticsProvider {
+  name: string;
+  track: (error: AppError) => Promise<void>;
+  isEnabled: () => boolean;
+}
+
+/**
+ * Interface for error reporting services
+ */
+export interface ErrorReporter {
+  report(error: AppError): Promise<void>;
+}
+
+/**
+ * Interface for error transformation logic
+ */
+export interface ErrorTransformer {
+  transform(error: AppError): AppError;
+}
+
+/**
+ * Callback function type for error event listeners
+ */
+export type ErrorListener = (error: AppError) => void;
+
+// ============================================================================
+// Navigation Error Types (from utils/errors.ts)
+// ============================================================================
+
+/**
+ * Navigation-specific error types for handling routing and navigation failures
+ */
+export enum NavigationErrorType {
+  NAVIGATION_ERROR = 'NAVIGATION_ERROR',
+  NAVIGATION_ITEM_NOT_FOUND = 'NAVIGATION_ITEM_NOT_FOUND',
+  INVALID_NAVIGATION_PATH = 'INVALID_NAVIGATION_PATH',
+  NAVIGATION_ACCESS_DENIED = 'NAVIGATION_ACCESS_DENIED',
+  NAVIGATION_VALIDATION_ERROR = 'NAVIGATION_VALIDATION_ERROR',
+  NAVIGATION_CONFIGURATION_ERROR = 'NAVIGATION_CONFIGURATION_ERROR'
 }
 
 // ============================================================================

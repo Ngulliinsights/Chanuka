@@ -12,6 +12,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator
+} from '@/components/ui/command';
 import { AdvancedSearchInterface } from '@/features/search/components/AdvancedSearchInterface';
 import { IntelligentAutocomplete } from '@/features/search/components/IntelligentAutocomplete';
 import { SavedSearches } from '@/features/search/components/SavedSearches';
@@ -48,6 +59,7 @@ export function IntelligentSearchPage() {
   const [useStreaming, setUseStreaming] = useState(true);
   const [filters, setFilters] = useState<SearchFiltersType>({});
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
 
   const { toast } = useToast();
 
@@ -386,8 +398,93 @@ export function IntelligentSearchPage() {
 
   const displayResults = getDisplayableResults(results?.results || []);
 
+  // Add keyboard shortcut for command palette
+  React.useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setShowCommandPalette(open => !open);
+      }
+    };
+
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <>
+      {/* Command Palette */}
+      <CommandDialog open={showCommandPalette} onOpenChange={setShowCommandPalette}>
+        <CommandInput placeholder="Type a command or search..." />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          
+          <CommandGroup heading="Quick Actions">
+            <CommandItem onSelect={() => {
+              setShowAdvanced(true);
+              setShowCommandPalette(false);
+            }}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Open Advanced Search</span>
+              <CommandShortcut>⌘A</CommandShortcut>
+            </CommandItem>
+            <CommandItem onSelect={() => {
+              setShowAnalytics(true);
+              setShowCommandPalette(false);
+            }}>
+              <BarChart3 className="mr-2 h-4 w-4" />
+              <span>View Analytics</span>
+              <CommandShortcut>⌘B</CommandShortcut>
+            </CommandItem>
+            <CommandItem onSelect={() => {
+              clearResults();
+              setShowCommandPalette(false);
+            }}>
+              <Target className="mr-2 h-4 w-4" />
+              <span>Clear Results</span>
+              <CommandShortcut>⌘R</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          <CommandGroup heading="Popular Searches">
+            {popularSearches?.slice(0, 5).map((search: any, index: number) => (
+              <CommandItem
+                key={index}
+                onSelect={() => {
+                  handleSimpleSearch(search.query);
+                  setShowCommandPalette(false);
+                }}
+              >
+                <TrendingUp className="mr-2 h-4 w-4" />
+                <span>{search.query}</span>
+                <CommandShortcut>{search.count} searches</CommandShortcut>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          <CommandGroup heading="Recent Searches">
+            {history.data?.slice(0, 5).map((item: any, index: number) => (
+              <CommandItem
+                key={index}
+                onSelect={() => {
+                  handleSimpleSearch(item.query);
+                  setShowCommandPalette(false);
+                }}
+              >
+                <Clock className="mr-2 h-4 w-4" />
+                <span>{item.query}</span>
+                <CommandShortcut>{item.resultCount} results</CommandShortcut>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -426,6 +523,16 @@ export function IntelligentSearchPage() {
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Analytics
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => setShowCommandPalette(true)}
+              size="sm"
+            >
+              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <span className="text-xs">⌘</span>K
+              </kbd>
             </Button>
 
             {hasSearched && (
@@ -662,6 +769,7 @@ export function IntelligentSearchPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

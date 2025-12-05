@@ -1,64 +1,32 @@
 /**
  * Privacy Analytics API Service
  * 
- * This service handles all privacy-focused analytics communication with the backend.
- * It provides a clean interface for tracking user events while respecting consent
- * preferences and data protection requirements (GDPR, CCPA compliance).
- * 
- * Key Features:
- * - Event batching for efficient network usage
- * - User consent management with versioning
- * - Data export for transparency (user data portability)
- * - Right to be forgotten implementation
- * - Anonymization support
- * 
- * @module PrivacyAnalyticsApiService
+ * Handles server communication for privacy-compliant analytics
+ * Implements GDPR/CCPA data protection requirements
  */
 
-import { logger } from '@client/utils/logger';
-
-import { globalApiClient } from './client';
-import { ErrorCode, ErrorFactory } from './errors';
+import { logger } from '@/utils/logger';
 
 // ============================================================================
-// Type Definitions
+// TYPES
 // ============================================================================
 
-/**
- * Represents a single analytics event with privacy controls
- */
-export interface AnalyticsEvent {
-  readonly id: string;
-  readonly type: string;
-  readonly category: string;
-  readonly action: string;
-  readonly label?: string;
-  readonly value?: number;
-  readonly timestamp: string;
-  readonly sessionId: string;
-  readonly userId?: string;
-  readonly anonymized: boolean;
-  readonly consentGiven: boolean;
-  readonly metadata?: Readonly<Record<string, unknown>>;
+interface AnalyticsEvent {
+  id: string;
+  type: 'track' | 'page_view' | 'engagement' | 'performance' | 'error';
+  category: string;
+  action: string;
+  label?: string;
+  value?: number;
+  timestamp: string;
+  sessionId: string;
+  userId?: string;
+  anonymized: boolean;
+  consentGiven: boolean;
+  metadata?: Record<string, unknown>;
 }
 
-/**
- * Configuration for the analytics system
- */
-export interface AnalyticsConfig {
-  enabledCategories: string[];
-  anonymizeData: boolean;
-  respectDoNotTrack: boolean;
-  consentRequired: boolean;
-  retentionDays: number;
-  batchSize: number;
-  flushInterval: number;
-}
-
-/**
- * User consent preferences with versioning for compliance tracking
- */
-export interface UserConsent {
+interface UserConsent {
   analytics: boolean;
   performance: boolean;
   functional: boolean;
@@ -66,10 +34,7 @@ export interface UserConsent {
   version: string;
 }
 
-/**
- * Aggregated metrics about the analytics system
- */
-export interface AnalyticsMetrics {
+interface AnalyticsMetrics {
   totalEvents: number;
   anonymizedEvents: number;
   consentedEvents: number;
@@ -78,547 +43,236 @@ export interface AnalyticsMetrics {
   lastFlush: string;
 }
 
-/**
- * Response structure for data export requests
- */
-export interface DataExportResponse {
+interface ExportResponse {
   events: AnalyticsEvent[];
   summary: AnalyticsMetrics;
   consent: UserConsent | null;
 }
 
-/**
- * Response structure for data deletion requests
- */
-export interface DataDeletionResponse {
+interface DeleteResponse {
   eventsDeleted: number;
   success: boolean;
 }
 
 // ============================================================================
-// Privacy Analytics API Service
+// API SERVICE
 // ============================================================================
 
-/**
- * Service class that encapsulates all privacy analytics API operations.
- * This class follows the single responsibility principle by focusing solely
- * on API communication, while business logic remains in higher-level services.
- */
-export class PrivacyAnalyticsApiService {
-  private readonly baseUrl: string;
+class PrivacyAnalyticsApiService {
+  private baseUrl: string;
+  private timeout: number;
 
-  /**
-   * Creates a new Privacy Analytics API Service instance
-   * @param baseUrl - Base URL for API endpoints (defaults to '/api')
-   */
-  constructor(baseUrl: string = '/api') {
-    this.baseUrl = baseUrl;
+  constructor() {
+    this.baseUrl = process.env.VITE_API_BASE_URL || '/api';
+    this.timeout = 10000; // 10 seconds
   }
 
-  // ==========================================================================
-  // Event Management
-  // ==========================================================================
-
   /**
-   * Sends a batch of analytics events to the backend.
-   * 
-   * This method is designed for batch processing to reduce network overhead.
-   * Events are validated on the backend, and any validation errors will be
-   * thrown as exceptions.
-   * 
-   * @param events - Array of analytics events to send
-   * @throws {UnifiedError} When the network request fails or validation errors occur
-   * 
-   * @example
-   * ```typescript
-   * await service.sendEvents([
-   *   { id: '1', type: 'pageview', category: 'navigation', ... },
-   *   { id: '2', type: 'click', category: 'interaction', ... }
-   * ]);
-   * ```
+   * Sends analytics events to the server
    */
   async sendEvents(events: AnalyticsEvent[]): Promise<void> {
-    if (!events || events.length === 0) {
-      logger.warn('Attempted to send empty events array', {
-        component: 'PrivacyAnalyticsApi'
-      });
-      return;
-    }
-
     try {
-      await globalApiClient.post(
-        `${this.baseUrl}/analytics/events`,
-        { events },
-        { skipCache: true }
-      );
+      const response = await this.fetchWithTimeout('/analytics/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ events }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to send events: ${response.status} ${response.statusText}`);
+      }
 
       logger.debug('Analytics events sent successfully', {
-        component: 'PrivacyAnalyticsApi',
-        eventCount: events.length
+        component: 'PrivacyAnalyticsApiService',
+        eventCount: events.length,
       });
     } catch (error) {
       logger.error('Failed to send analytics events', {
-        component: 'PrivacyAnalyticsApi',
+        component: 'PrivacyAnalyticsApiService',
+        error: error instanceof Error ? error.message : 'Unknown error',
         eventCount: events.length,
-        error
       });
-
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to send analytics events to the server',
-        { eventCount: events.length, originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'sendEvents' }
-      );
-    }
-  }
-
-  // ==========================================================================
-  // Data Export & Privacy Rights
-  // ==========================================================================
-
-  /**
-   * Exports all analytics data for a specific user.
-   * 
-   * This implements the "right to data portability" under GDPR. Users can
-   * request a complete export of their analytics data in a machine-readable format.
-   * 
-   * @param userId - The unique identifier of the user
-   * @returns Promise resolving to the complete data export
-   * @throws {UnifiedError} When the user is not found or access is denied
-   * 
-   * @example
-   * ```typescript
-   * const export = await service.exportUserData('user_123');
-   * console.log(`Total events: ${export.summary.totalEvents}`);
-   * ```
-   */
-  async exportUserData(userId: string): Promise<DataExportResponse> {
-    if (!userId?.trim()) {
-      throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
-        'User ID is required for data export',
-        { userId },
-        { component: 'PrivacyAnalyticsApi', operation: 'exportUserData' }
-      );
-    }
-
-    try {
-      const response = await globalApiClient.get<DataExportResponse>(
-        `${this.baseUrl}/analytics/export/${encodeURIComponent(userId)}`
-      );
-
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to export user analytics data', {
-        component: 'PrivacyAnalyticsApi',
-        userId,
-        error
-      });
-
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to export user analytics data',
-        { userId, originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'exportUserData' }
-      );
+      throw error;
     }
   }
 
   /**
-   * Deletes all analytics data for a specific user.
-   * 
-   * This implements the "right to be forgotten" under GDPR. Once data is deleted,
-   * it cannot be recovered. This operation is irreversible.
-   * 
-   * @param userId - The unique identifier of the user
-   * @returns Promise resolving to deletion confirmation with count
-   * @throws {UnifiedError} When deletion fails or user is not found
-   * 
-   * @example
-   * ```typescript
-   * const result = await service.deleteUserData('user_123');
-   * console.log(`Deleted ${result.eventsDeleted} events`);
-   * ```
-   */
-  async deleteUserData(userId: string): Promise<DataDeletionResponse> {
-    if (!userId?.trim()) {
-      throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
-        'User ID is required for data deletion',
-        { userId },
-        { component: 'PrivacyAnalyticsApi', operation: 'deleteUserData' }
-      );
-    }
-
-    try {
-      const response = await globalApiClient.delete<DataDeletionResponse>(
-        `${this.baseUrl}/analytics/user/${encodeURIComponent(userId)}`,
-        { skipCache: true }
-      );
-
-      logger.info('User analytics data deleted', {
-        component: 'PrivacyAnalyticsApi',
-        userId,
-        eventsDeleted: response.data.eventsDeleted
-      });
-
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to delete user analytics data', {
-        component: 'PrivacyAnalyticsApi',
-        userId,
-        error
-      });
-
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to delete user analytics data',
-        { userId, originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'deleteUserData' }
-      );
-    }
-  }
-
-  // ==========================================================================
-  // Configuration Management
-  // ==========================================================================
-
-  /**
-   * Retrieves the current analytics configuration.
-   * 
-   * Configuration includes settings like enabled categories, anonymization rules,
-   * data retention policies, and batch processing parameters.
-   * 
-   * @returns Promise resolving to the current configuration
-   * @throws {UnifiedError} When configuration cannot be retrieved
-   */
-  async getConfig(): Promise<AnalyticsConfig> {
-    try {
-      const response = await globalApiClient.get<AnalyticsConfig>(
-        `${this.baseUrl}/analytics/config`
-      );
-
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to get analytics config', {
-        component: 'PrivacyAnalyticsApi',
-        error
-      });
-
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to retrieve analytics configuration',
-        { originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'getConfig' }
-      );
-    }
-  }
-
-  /**
-   * Updates the analytics configuration.
-   * 
-   * Only administrators should have access to this endpoint. Partial updates
-   * are supported - you only need to provide the fields you want to change.
-   * 
-   * @param config - Partial configuration object with fields to update
-   * @returns Promise resolving to the updated complete configuration
-   * @throws {UnifiedError} When update fails or validation errors occur
-   * 
-   * @example
-   * ```typescript
-   * const updated = await service.updateConfig({
-   *   retentionDays: 90,
-   *   batchSize: 50
-   * });
-   * ```
-   */
-  async updateConfig(config: Partial<AnalyticsConfig>): Promise<AnalyticsConfig> {
-    if (!config || Object.keys(config).length === 0) {
-      throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
-        'Configuration update requires at least one field',
-        { config },
-        { component: 'PrivacyAnalyticsApi', operation: 'updateConfig' }
-      );
-    }
-
-    try {
-      const response = await globalApiClient.put<AnalyticsConfig>(
-        `${this.baseUrl}/analytics/config`,
-        config,
-        { skipCache: true }
-      );
-
-      logger.info('Analytics config updated', {
-        component: 'PrivacyAnalyticsApi',
-        updatedFields: Object.keys(config)
-      });
-
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to update analytics config', {
-        component: 'PrivacyAnalyticsApi',
-        error
-      });
-
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to update analytics configuration',
-        { config, originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'updateConfig' }
-      );
-    }
-  }
-
-  // ==========================================================================
-  // Consent Management
-  // ==========================================================================
-
-  /**
-   * Retrieves the current consent preferences for a user.
-   * 
-   * Returns null if the user hasn't provided consent yet. Consent includes
-   * version tracking to handle changes in privacy policies over time.
-   * 
-   * @param userId - The unique identifier of the user
-   * @returns Promise resolving to consent object or null if not set
-   * @throws {UnifiedError} When retrieval fails
+   * Gets user consent settings
    */
   async getUserConsent(userId: string): Promise<UserConsent | null> {
-    if (!userId?.trim()) {
-      throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
-        'User ID is required to retrieve consent',
-        { userId },
-        { component: 'PrivacyAnalyticsApi', operation: 'getUserConsent' }
-      );
-    }
-
     try {
-      const response = await globalApiClient.get<UserConsent | null>(
-        `${this.baseUrl}/analytics/consent/${encodeURIComponent(userId)}`
-      );
-
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to get user consent', {
-        component: 'PrivacyAnalyticsApi',
-        userId,
-        error
-      });
-
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to retrieve user consent preferences',
-        { userId, originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'getUserConsent' }
-      );
-    }
-  }
-
-  /**
-   * Updates a user's consent preferences.
-   * 
-   * Partial updates are supported. The timestamp is automatically updated
-   * by the backend to track when consent was last modified.
-   * 
-   * @param userId - The unique identifier of the user
-   * @param consent - Partial consent object with preferences to update
-   * @returns Promise resolving to the updated complete consent object
-   * @throws {UnifiedError} When update fails or validation errors occur
-   * 
-   * @example
-   * ```typescript
-   * const consent = await service.updateUserConsent('user_123', {
-   *   analytics: true,
-   *   performance: false
-   * });
-   * ```
-   */
-  async updateUserConsent(
-    userId: string,
-    consent: Partial<UserConsent>
-  ): Promise<UserConsent> {
-    if (!userId?.trim()) {
-      throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
-        'User ID is required to update consent',
-        { userId },
-        { component: 'PrivacyAnalyticsApi', operation: 'updateUserConsent' }
-      );
-    }
-
-    if (!consent || Object.keys(consent).length === 0) {
-      throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
-        'Consent update requires at least one preference',
-        { userId, consent },
-        { component: 'PrivacyAnalyticsApi', operation: 'updateUserConsent' }
-      );
-    }
-
-    try {
-      const response = await globalApiClient.put<UserConsent>(
-        `${this.baseUrl}/analytics/consent/${encodeURIComponent(userId)}`,
-        consent,
-        { skipCache: true }
-      );
-
-      logger.info('User consent updated', {
-        component: 'PrivacyAnalyticsApi',
-        userId,
-        updatedPreferences: Object.keys(consent)
-      });
-
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to update user consent', {
-        component: 'PrivacyAnalyticsApi',
-        userId,
-        error
-      });
-
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to update user consent preferences',
-        { userId, consent, originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'updateUserConsent' }
-      );
-    }
-  }
-
-  /**
-   * Withdraws all user consent and deletes associated data.
-   * 
-   * This is a destructive operation that both revokes consent and deletes
-   * all analytics data. This cannot be undone. Use with caution.
-   * 
-   * @param userId - The unique identifier of the user
-   * @throws {UnifiedError} When withdrawal fails
-   * 
-   * @example
-   * ```typescript
-   * await service.withdrawConsent('user_123');
-   * // User data is now deleted and consent is withdrawn
-   * ```
-   */
-  async withdrawConsent(userId: string): Promise<void> {
-    if (!userId?.trim()) {
-      throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
-        'User ID is required to withdraw consent',
-        { userId },
-        { component: 'PrivacyAnalyticsApi', operation: 'withdrawConsent' }
-      );
-    }
-
-    try {
-      await globalApiClient.post(
-        `${this.baseUrl}/analytics/consent/${encodeURIComponent(userId)}/withdraw`,
-        {},
-        { skipCache: true }
-      );
-
-      logger.info('User consent withdrawn and data deleted', {
-        component: 'PrivacyAnalyticsApi',
-        userId
-      });
-    } catch (error) {
-      logger.error('Failed to withdraw user consent', {
-        component: 'PrivacyAnalyticsApi',
-        userId,
-        error
-      });
-
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to withdraw user consent and delete data',
-        { userId, originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'withdrawConsent' }
-      );
-    }
-  }
-
-  // ==========================================================================
-  // Metrics & Reporting
-  // ==========================================================================
-
-  /**
-   * Retrieves aggregated analytics metrics.
-   * 
-   * Optionally filter metrics by date range. Without a date range, returns
-   * all-time metrics. Useful for dashboard displays and compliance reporting.
-   * 
-   * @param dateRange - Optional date range filter
-   * @returns Promise resolving to aggregated metrics
-   * @throws {UnifiedError} When retrieval fails
-   * 
-   * @example
-   * ```typescript
-   * const metrics = await service.getMetrics({
-   *   start: '2024-01-01',
-   *   end: '2024-01-31'
-   * });
-   * ```
-   */
-  async getMetrics(dateRange?: {
-    start: string;
-    end: string;
-  }): Promise<AnalyticsMetrics> {
-    try {
-      const params = new URLSearchParams();
+      const response = await this.fetchWithTimeout(`/analytics/consent/${encodeURIComponent(userId)}`);
       
-      if (dateRange) {
-        if (!dateRange.start || !dateRange.end) {
-          throw ErrorFactory.createValidationError(
-            ErrorCode.VALIDATION_INVALID_INPUT,
-            'Date range must include both start and end dates',
-            { dateRange },
-            { component: 'PrivacyAnalyticsApi', operation: 'getMetrics' }
-          );
-        }
-        params.append('start', dateRange.start);
-        params.append('end', dateRange.end);
+      if (response.status === 404) {
+        return null; // No consent record found
       }
 
-      const queryString = params.toString();
-      const url = queryString 
-        ? `${this.baseUrl}/analytics/metrics?${queryString}`
-        : `${this.baseUrl}/analytics/metrics`;
+      if (!response.ok) {
+        throw new Error(`Failed to get consent: ${response.status} ${response.statusText}`);
+      }
 
-      const response = await globalApiClient.get<AnalyticsMetrics>(url);
-
-      return response.data;
+      const consent = await response.json();
+      return consent;
     } catch (error) {
-      logger.error('Failed to get analytics metrics', {
-        component: 'PrivacyAnalyticsApi',
-        dateRange,
-        error
+      logger.error('Failed to get user consent', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Updates user consent settings
+   */
+  async updateUserConsent(userId: string, consent: UserConsent): Promise<UserConsent> {
+    try {
+      const response = await this.fetchWithTimeout(`/analytics/consent/${encodeURIComponent(userId)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(consent),
       });
 
-      throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
-        'Failed to retrieve analytics metrics',
-        { dateRange, originalError: error },
-        { component: 'PrivacyAnalyticsApi', operation: 'getMetrics' }
-      );
+      if (!response.ok) {
+        throw new Error(`Failed to update consent: ${response.status} ${response.statusText}`);
+      }
+
+      const updatedConsent = await response.json();
+      
+      logger.info('User consent updated', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+        consent: updatedConsent,
+      });
+
+      return updatedConsent;
+    } catch (error) {
+      logger.error('Failed to update user consent', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Withdraws all user consent and triggers data deletion
+   */
+  async withdrawConsent(userId: string): Promise<void> {
+    try {
+      const response = await this.fetchWithTimeout(`/analytics/consent/${encodeURIComponent(userId)}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to withdraw consent: ${response.status} ${response.statusText}`);
+      }
+
+      logger.info('User consent withdrawn', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+      });
+    } catch (error) {
+      logger.error('Failed to withdraw consent', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Exports all user data for GDPR compliance
+   */
+  async exportUserData(userId: string): Promise<ExportResponse> {
+    try {
+      const response = await this.fetchWithTimeout(`/analytics/export/${encodeURIComponent(userId)}`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to export data: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      logger.info('User data exported', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+        eventCount: data.events?.length || 0,
+      });
+
+      return data;
+    } catch (error) {
+      logger.error('Failed to export user data', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Deletes all user data for GDPR compliance
+   */
+  async deleteUserData(userId: string): Promise<DeleteResponse> {
+    try {
+      const response = await this.fetchWithTimeout(`/analytics/data/${encodeURIComponent(userId)}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete data: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      logger.info('User data deleted', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+        eventsDeleted: result.eventsDeleted,
+      });
+
+      return result;
+    } catch (error) {
+      logger.error('Failed to delete user data', {
+        component: 'PrivacyAnalyticsApiService',
+        userId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch with timeout support
+   */
+  private async fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}${url}`, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error(`Request timeout after ${this.timeout}ms`);
+      }
+      throw error;
     }
   }
 }
 
-// ============================================================================
-// Global Instance
-// ============================================================================
-
-/**
- * Global singleton instance of the Privacy Analytics API Service.
- * Use this instance throughout your application for consistent behavior.
- * 
- * @example
- * ```typescript
- * import { privacyAnalyticsApiService } from './api/privacy';
- * 
- * await privacyAnalyticsApiService.sendEvents(events);
- * ```
- */
+// Export singleton instance
 export const privacyAnalyticsApiService = new PrivacyAnalyticsApiService();

@@ -12,7 +12,7 @@
  */
 
 // Import error types from our local error system to avoid circular dependencies
-import { ErrorSeverity, ErrorDomain, BaseError } from './errors';
+import { ErrorSeverity, ErrorDomain, BaseError } from '../core/error';
 
 // Re-export error types for backward compatibility
 export { ErrorSeverity, ErrorDomain, BaseError };

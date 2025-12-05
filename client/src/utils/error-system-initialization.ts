@@ -7,8 +7,8 @@
 
 import { smartRecoveryEngine } from './advanced-error-recovery';
 import { errorRateLimiter } from './error-rate-limiter';
-import { errorAnalytics, setupSentry, setupDataDog, setupCustomAnalytics } from './errors';
-import { errorHandler } from './errors';
+import { ErrorAnalyticsService } from '../core/error';
+import { coreErrorHandler as errorHandler } from '../core/error';
 
 // Configuration interfaces
 export interface ErrorSystemConfig {

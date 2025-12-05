@@ -6,7 +6,7 @@
  */
 
 import { initializeForEnvironment, getErrorSystemStatus, resetErrorSystem } from './error-system-initialization';
-import { errorHandler, ErrorDomain } from './errors';
+import { coreErrorHandler as errorHandler, ErrorDomain } from '../core/error';
 
 /**
  * Initialize the unified error handling system

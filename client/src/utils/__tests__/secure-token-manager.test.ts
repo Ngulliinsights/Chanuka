@@ -69,7 +69,7 @@ vi.mock('../error-system', () => ({
 import { tokenManager } from '../storage';
 import { secureStorage } from '../storage';
 import { logger } from '../logger';
-import { createError, safeAsync, ErrorDomain, ErrorSeverity } from '../errors';
+import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../../core/error';
 
 // Mock fetch globally
 const mockFetch = vi.fn();

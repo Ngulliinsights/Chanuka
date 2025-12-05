@@ -1,0 +1,140 @@
+/**
+ * Authenticated API Client Module
+ * 
+ * Extends the base API client with authentication capabilities including
+ * automatic token injection, token refresh, and authentication error handling.
+ */
+
+import { BaseApiClient, ApiClientConfig, ApiRequest } from './base-client';
+import { AuthenticationInterceptor, TokenRefreshInterceptor, DEFAULT_AUTH_CONFIG, AuthConfig } from './authentication';
+import { logger } from '../../utils/logger';
+
+/**
+ * Configuration for authenticated API client
+ */
+export interface AuthenticatedApiClientConfig extends ApiClientConfig {
+  auth?: AuthConfig;
+}
+
+/**
+ * Authenticated API Client class
+ */
+export class AuthenticatedApiClient extends BaseApiClient {
+  private authConfig: AuthConfig;
+  private authInterceptor: AuthenticationInterceptor;
+  private tokenRefreshInterceptor: TokenRefreshInterceptor;
+
+  constructor(config: Partial<AuthenticatedApiClientConfig> = {}) {
+    super(config);
+    
+    this.authConfig = {
+      ...DEFAULT_AUTH_CONFIG,
+      ...config.auth,
+      tokenRefreshEndpoint: config.auth?.tokenRefreshEndpoint || `${this.config.baseURL}/auth/refresh`
+    };
+
+    this.setupAuthInterceptors();
+  }
+
+  /**
+   * Sets up authentication interceptors
+   */
+  private setupAuthInterceptors(): void {
+    // Create interceptors
+    this.authInterceptor = new AuthenticationInterceptor();
+    this.tokenRefreshInterceptor = new TokenRefreshInterceptor(this.authConfig);
+
+    // Add request interceptor for token injection
+    this.addRequestInterceptor(this.authInterceptor.intercept.bind(this.authInterceptor));
+
+    // Add error interceptor for token refresh
+    this.addErrorInterceptor(this.tokenRefreshInterceptor.intercept.bind(this.tokenRefreshInterceptor));
+
+    logger.debug('Authentication interceptors configured', {
+      component: 'AuthenticatedApiClient',
+      tokenRefreshEndpoint: this.authConfig.tokenRefreshEndpoint
+    });
+  }
+
+  /**
+   * Updates authentication configuration
+   */
+  updateAuthConfig(config: Partial<AuthConfig>): void {
+    this.authConfig = { ...this.authConfig, ...config };
+    
+    // Update token refresh interceptor with new config
+    this.tokenRefreshInterceptor = new TokenRefreshInterceptor(this.authConfig);
+    
+    logger.info('Authentication configuration updated', {
+      component: 'AuthenticatedApiClient',
+      config: this.authConfig
+    });
+  }
+
+  /**
+   * Gets current authentication configuration
+   */
+  getAuthConfig(): Readonly<AuthConfig> {
+    return { ...this.authConfig };
+  }
+
+  /**
+   * Makes an authenticated request (convenience method)
+   */
+  async authenticatedRequest<T = unknown>(request: ApiRequest) {
+    return this.request<T>(request);
+  }
+
+  /**
+   * Authenticated GET request
+   */
+  async secureGet<T = unknown>(
+    url: string, 
+    headers?: Record<string, string>
+  ) {
+    return this.get<T>(url, headers);
+  }
+
+  /**
+   * Authenticated POST request
+   */
+  async securePost<T = unknown>(
+    url: string, 
+    body?: any, 
+    headers?: Record<string, string>
+  ) {
+    return this.post<T>(url, body, headers);
+  }
+
+  /**
+   * Authenticated PUT request
+   */
+  async securePut<T = unknown>(
+    url: string, 
+    body?: any, 
+    headers?: Record<string, string>
+  ) {
+    return this.put<T>(url, body, headers);
+  }
+
+  /**
+   * Authenticated DELETE request
+   */
+  async secureDelete<T = unknown>(
+    url: string, 
+    headers?: Record<string, string>
+  ) {
+    return this.delete<T>(url, headers);
+  }
+
+  /**
+   * Authenticated PATCH request
+   */
+  async securePatch<T = unknown>(
+    url: string, 
+    body?: any, 
+    headers?: Record<string, string>
+  ) {
+    return this.patch<T>(url, body, headers);
+  }
+}

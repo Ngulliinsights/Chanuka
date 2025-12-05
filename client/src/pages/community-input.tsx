@@ -13,6 +13,13 @@ import {
 import { useState } from 'react';
 
 import CommunityHub from '@client/components/community/CommunityHub';
+import { ActivityFeed } from '@client/components/community/ActivityFeed';
+import { TrendingTopics } from '@client/components/community/TrendingTopics';
+import { ExpertInsights } from '@client/components/community/ExpertInsights';
+import { ActionCenter } from '@client/components/community/ActionCenter';
+import { CommunityFilters } from '@client/components/community/CommunityFilters';
+import { LocalImpactPanel } from '@client/components/community/LocalImpactPanel';
+import { CommunityStats } from '@client/components/community/CommunityStats';
 import AppLayout from '@client/components/layout/app-layout';
 import { Alert, AlertDescription } from '@client/components/ui/alert';
 import { Badge } from '@client/components/ui/badge';
@@ -392,14 +399,43 @@ export default function CommunityInput() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Community Hub Tab - Fully integrated with real API */}
+          {/* Community Hub Tab - Enhanced with advanced components */}
           <TabsContent value="community" className="mt-0">
-            <CommunityHub />
+            <div className="space-y-6">
+              {/* Community Stats Overview */}
+              <CommunityStats />
+              
+              {/* Main Community Hub with Filters */}
+              <div className="grid gap-6 lg:grid-cols-4">
+                <div className="lg:col-span-3 space-y-6">
+                  <CommunityHub />
+                  <ActivityFeed />
+                </div>
+                <div className="space-y-6">
+                  <CommunityFilters />
+                  <TrendingTopics />
+                  <ExpertInsights />
+                  <LocalImpactPanel />
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
-          {/* Discussions Tab - Uses the same CommunityHub component */}
+          {/* Discussions Tab - Enhanced with activity feed and expert insights */}
           <TabsContent value="discussions" className="mt-0">
-            <CommunityHub />
+            <div className="space-y-6">
+              <div className="grid gap-6 lg:grid-cols-3">
+                <div className="lg:col-span-2 space-y-6">
+                  <CommunityHub />
+                  <ActivityFeed />
+                </div>
+                <div className="space-y-6">
+                  <ActionCenter />
+                  <ExpertInsights />
+                  <TrendingTopics />
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Announcements Tab - Official platform updates */}

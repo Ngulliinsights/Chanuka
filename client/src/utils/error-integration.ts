@@ -1,7 +1,7 @@
 import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
 import { ErrorFallback } from '@client/components/error-handling/ErrorFallback';
 
-import { errorHandler, ErrorDomain, ErrorSeverity } from './errors';
+import { coreErrorHandler, ErrorDomain, ErrorSeverity } from '../core/error';
 // Note: ErrorModal and ErrorToast may need to be implemented in error-handling directory
 // import { ErrorModal, useErrorModal } from '@client/components/error-handling/ErrorModal';
 // import { ErrorToast, useErrorToast } from '@client/components/error-handling/ErrorToast';
@@ -116,8 +116,8 @@ export function createStandardError(
 }
 
 // Re-export commonly used types and utilities for convenience
-export type { AppError, ErrorType, ErrorSeverity } from './errors';
-export { errorHandler, errorReporting, reportCustomError } from './errors';
+export type { AppError, ErrorSeverity } from '../core/error';
+export { coreErrorHandler as errorHandler } from '../core/error';
 
 // Export available error UI components
 export {

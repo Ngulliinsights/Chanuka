@@ -1,8 +1,9 @@
-import type { NavigationItem, UserRole } from '@client/types';
 
-import { DEFAULT_NAVIGATION_MAP } from '@client/constants';
-import { InvalidNavigationPathError } from '@client/errors';
+import { InvalidNavigationPathError } from '@/core/error';
 import { validateNavigationPath } from '@client/validation';
+
+import { DEFAULT_NAVIGATION_MAP } from '../constants';
+import type { NavigationItem, UserRole } from '../types';
 
 /**
  * Finds a navigation item by its path
@@ -51,7 +52,7 @@ export const getNavigationItemsBySection = (section: NavigationItem['section']):
  */
 export const getAccessibleNavigationItems = (
   user_role: UserRole,
-  user: any | null
+  user: unknown | null
 ): NavigationItem[] => {
   if (!user_role) {
     return [];

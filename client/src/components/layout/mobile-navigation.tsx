@@ -24,8 +24,15 @@ import {
 import NavigationPreferencesDialog from "../navigation/navigation-preferences-dialog";
 import QuickAccessNav from "../navigation/quick-access-nav";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
-import { Sheet, SheetContent } from "../ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
+import { TouchTarget } from "@client/shared/design-system/components/TouchTarget";
+import { ResponsiveButton } from "@client/shared/design-system/components/ResponsiveButton";
+import { ResponsiveContainer } from "@client/shared/design-system/components/ResponsiveContainer";
+import { navigationUtils } from "@client/utils/navigation";
 
 import {
   MobileNavigationProps,

@@ -1,34 +1,91 @@
 /**
- * Circuit Breaker API Module
+ * Core API Module - Modular API System
  * 
- * Exports all circuit breaker functionality for easy importing
- * throughout the application.
+ * This module provides comprehensive API functionality including:
+ * - Base HTTP client with retry logic and caching
+ * - Authentication with automatic token refresh
+ * - Safe API wrapper for error handling
+ * - Request deduplication and batching
+ * - Circuit breaker and monitoring
  */
 
-// Core circuit breaker client
+// Core API clients
 export {
-  CircuitBreakerClient,
-  createCircuitBreakerClient,
-  apiClients,
-  type CircuitBreakerClientConfig,
-  type RequestConfig,
-  type ApiResponse
-} from './circuit-breaker-client';
+  BaseApiClient,
+  DEFAULT_API_CONFIG,
+  type ApiRequest,
+  type ApiResponse,
+  type ApiClientConfig,
+  type RequestInterceptor,
+  type ResponseInterceptor,
+  type ErrorInterceptor,
+  type ApiError,
+  type HttpMethod,
+  type RequestBody
+} from './base-client';
 
-// Retry handler
+export {
+  AuthenticatedApiClient,
+  type AuthenticatedApiClientConfig
+} from './authenticated-client';
+
+export {
+  SafeApiClient,
+  type SafeApiResult
+} from './safe-client';
+
+// Authentication
+export {
+  AuthenticationInterceptor,
+  TokenRefreshInterceptor,
+  createAuthInterceptors,
+  shouldRefreshToken,
+  proactiveTokenRefresh,
+  DEFAULT_AUTH_CONFIG,
+  type AuthConfig
+} from './authentication';
+
+// Retry logic
 export {
   RetryHandler,
-  createRetryHandler,
   retryOperation,
-  retryHandlers,
+  safeRetryOperation,
+  createHttpRetryHandler,
+  createServiceRetryHandler,
   DEFAULT_RETRY_CONFIG,
   SERVICE_RETRY_CONFIGS,
   type RetryConfig,
   type RetryContext,
   type RetryResult
+} from './retry';
+
+// Cache management
+export {
+  ApiCacheManager,
+  CacheKeyGenerator,
+  globalCache,
+  DEFAULT_CACHE_CONFIG,
+  type CacheEntry,
+  type CacheConfig,
+  type CacheStats,
+  type InvalidationOptions
+} from './cache-manager';
+
+// Legacy circuit breaker exports (for backward compatibility)
+export {
+  CircuitBreakerClient,
+  createCircuitBreakerClient,
+  apiClients,
+  type CircuitBreakerClientConfig,
+  type RequestConfig
+} from './circuit-breaker-client';
+
+export {
+  RetryHandler as LegacyRetryHandler,
+  createRetryHandler,
+  retryHandlers
 } from './retry-handler';
 
-// Circuit breaker monitoring
 export {
   CircuitBreakerMonitor,
   circuitBreakerMonitor,
@@ -42,23 +99,7 @@ export {
   type ErrorCorrelation
 } from './circuit-breaker-monitor';
 
-// Interceptors (for advanced usage)
-export {
-  processRequestInterceptors,
-  processResponseInterceptors,
-  circuitBreakerInterceptor,
-  circuitBreakerResponseInterceptor,
-  getCircuitBreakerStats,
-  addRequestInterceptor,
-  addResponseInterceptor,
-  removeRequestInterceptor,
-  removeResponseInterceptor
-} from './interceptors';
-
-// Usage examples
-export { examples } from './examples/circuit-breaker-usage';
-
-// Authentication API service
+// Service APIs
 export {
   AuthApiService,
   createAuthApiService,
@@ -70,15 +111,17 @@ export {
   type AuthTokens
 } from './auth';
 
-// Analytics API service
 export {
   AnalyticsApiService,
   createAnalyticsApiService,
   analyticsApiService
 } from './analytics';
 
-// Global API client
+// Global clients
 export { globalApiClient } from './client';
 
-// Re-export BaseError for convenience
-export { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+// Types
+export * from './types';
+
+// Re-export error types for convenience
+export { ErrorDomain, ErrorSeverity } from '../error';

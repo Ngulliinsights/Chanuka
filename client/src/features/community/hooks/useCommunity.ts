@@ -5,7 +5,7 @@ import { useToast } from '../../../hooks/use-toast';
 import type {
   Comment,
   DiscussionThread
-} from '../../../types/discussion';
+} from '../../../types/community';
 
 // Define CommunityFilters interface locally since it's not exported from types
 interface CommunityFilters {
@@ -59,7 +59,7 @@ export function useComments(bill_id?: string, filters?: any) {
         content: request.content,
         parentId: request.parent_id
       };
-      return await communityApiService.addComment(apiRequest) as any;
+      return await communityApiService.addComment(apiRequest);
     },
     onSuccess: (newComment) => {
       queryClient.invalidateQueries({
@@ -80,7 +80,7 @@ export function useComments(bill_id?: string, filters?: any) {
 
   const updateComment = useMutation<Comment, Error, { comment_id: string; request: UpdateCommentRequest }>({
     mutationFn: ({ comment_id, request }: { comment_id: string; request: UpdateCommentRequest }) =>
-      communityApiService.updateComment(comment_id, request.content) as any,
+      communityApiService.updateComment(comment_id, request.content),
     onSuccess: (updatedComment) => {
       queryClient.invalidateQueries({
         queryKey: ['community', 'comments', (updatedComment as any).billId || (updatedComment as any).bill_id]
@@ -108,10 +108,10 @@ export function useComments(bill_id?: string, filters?: any) {
     },
   });
 
-  const voteOnComment = useMutation<Comment, Error, VoteRequest>({
+  const voteOnComment = useMutation<any, Error, VoteRequest>({
     mutationFn: async (request: VoteRequest) => {
       const result = await communityApiService.voteComment(request.comment_id, request.vote_type);
-      return (result || {} as Comment) as any; // API returns VoteResponse | null, but we need Comment
+      return result; // API returns VoteResponse | null
     },
     onSuccess: (updatedComment) => {
       queryClient.invalidateQueries({

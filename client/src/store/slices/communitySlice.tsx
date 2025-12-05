@@ -47,10 +47,20 @@ import type {
   Campaign,
   Petition,
   CommunityStats,
-  CommunityFilters,
-  LocalImpactMetrics,
-  TrendingAlgorithmConfig
+  LocalImpactMetrics
 } from '@client/types/community';
+
+// Define missing interfaces locally
+interface CommunityFilters {
+  tags?: string[];
+  authors?: string[];
+  dateRange?: { start?: string; end?: string };
+}
+
+interface TrendingAlgorithmConfig {
+  windowDays?: number;
+  minScore?: number;
+}
 
 // ============================================================================
 // Type Definitions
@@ -103,148 +113,10 @@ interface RealTimeUpdate {
 // API Client with Error Handling
 // ============================================================================
 
-class CommunityApiClient {
-  private baseUrl: string;
-  private abortControllers: Map<string, AbortController>;
-  
-  constructor(baseUrl: string = '/api/community') {
-    this.baseUrl = baseUrl;
-    // Track abort controllers to enable request cancellation
-    this.abortControllers = new Map();
-  }
+// Import the existing API service instead of creating a new one
+import { communityApiService } from '../../core/api/community';
 
-  /**
-   * Creates a unique key for abort controller tracking
-   */
-  private getRequestKey(endpoint: string, options?: RequestInit): string {
-    return `${endpoint}-${JSON.stringify(options?.body || '')}`;
-  }
-
-  /**
-   * Cancels an in-flight request if it exists
-   */
-  public cancelRequest(endpoint: string, options?: RequestInit): void {
-    const key = this.getRequestKey(endpoint, options);
-    const controller = this.abortControllers.get(key);
-    if (controller) {
-      controller.abort();
-      this.abortControllers.delete(key);
-    }
-  }
-
-  private async request<T>(
-    endpoint: string, 
-    options?: RequestInit
-  ): Promise<T> {
-    const requestKey = this.getRequestKey(endpoint, options);
-    
-    // Cancel any existing request with the same key
-    this.cancelRequest(endpoint, options);
-    
-    // Create new abort controller for this request
-    const abortController = new AbortController();
-    this.abortControllers.set(requestKey, abortController);
-
-    try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options?.headers,
-        },
-        signal: abortController.signal,
-      });
-
-      // Clean up abort controller after request completes
-      this.abortControllers.delete(requestKey);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw {
-          message: errorData.message || `HTTP ${response.status}: ${response.statusText}`,
-          code: errorData.code,
-          statusCode: response.status,
-          details: errorData
-        } as ApiError;
-      }
-
-      return response.json();
-    } catch (error) {
-      // Clean up on error
-      this.abortControllers.delete(requestKey);
-      
-      // Don't throw on aborted requests - they're intentional
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        throw {
-          message: 'Request cancelled',
-          code: 'REQUEST_CANCELLED',
-          statusCode: 499
-        } as ApiError;
-      }
-      
-      // Rethrow ApiError as-is, wrap other errors
-      if (isApiError(error)) {
-        throw error;
-      }
-      
-      throw {
-        message: error instanceof Error ? error.message : 'Network request failed',
-        code: 'NETWORK_ERROR'
-      } as ApiError;
-    }
-  }
-
-  async fetchActivityFeed(
-    filters: CommunityFilters,
-    page: number,
-    limit: number
-  ): Promise<ActivityItem[]> {
-    return this.request('/activity', {
-      method: 'POST',
-      body: JSON.stringify({ filters, page, limit })
-    });
-  }
-
-  async fetchTrendingTopics(): Promise<TrendingTopic[]> {
-    return this.request('/trending');
-  }
-
-  async fetchExpertInsights(filters: CommunityFilters): Promise<ExpertInsight[]> {
-    return this.request('/insights', {
-      method: 'POST',
-      body: JSON.stringify(filters)
-    });
-  }
-
-  async fetchCampaigns(): Promise<Campaign[]> {
-    return this.request('/campaigns');
-  }
-
-  async fetchPetitions(): Promise<Petition[]> {
-    return this.request('/petitions');
-  }
-
-  async fetchStats(): Promise<CommunityStats> {
-    return this.request('/stats');
-  }
-
-  async fetchLocalImpact(): Promise<LocalImpactMetrics> {
-    return this.request('/local-impact');
-  }
-
-  /**
-   * Cleanup method to abort all pending requests and clear the abort controllers map
-   */
-  cleanup(): void {
-    for (const controller of this.abortControllers.values()) {
-      controller.abort();
-    }
-    this.abortControllers.clear();
-  }
-}
-
-// Singleton instance for the entire app
-const communityApi = new CommunityApiClient();
+// Use the existing API service
 
 // ============================================================================
 // Query Keys Factory - Type-safe cache management

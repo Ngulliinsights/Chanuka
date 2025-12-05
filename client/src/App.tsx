@@ -42,6 +42,7 @@ import { SafeLazyPages, SafeLazySponsorshipPages } from '@client/utils/safe-lazy
 import { LazyPages, preloadHighPriorityRoutes } from '@client/utils/simple-lazy-pages';
 
 import { IntegrationProvider, IntegrationStatus } from './components/integration/IntegrationProvider';
+import { IntegrationTest } from './components/integration/IntegrationTest';
 
 // Development-only pages
 const DesignSystemTestPage = lazy(() => import('@client/pages/design-system-test'));
@@ -232,6 +233,23 @@ const ROUTES = [
     id: 'database-manager',
   },
 
+  // Analytics & Monitoring
+  {
+    path: '/performance',
+    element: <SafeLazyPages.PerformanceDashboard />,
+    id: 'performance-dashboard',
+  },
+  {
+    path: '/analytics',
+    element: <SafeLazyPages.AnalyticsDashboard />,
+    id: 'analytics-dashboard',
+  },
+  {
+    path: '/privacy-center',
+    element: <SafeLazyPages.PrivacyCenter />,
+    id: 'privacy-center',
+  },
+
   // Development Tools (only in dev mode)
   ...(IS_DEV
     ? [
@@ -239,6 +257,11 @@ const ROUTES = [
           path: '/design-system-test',
           element: <DesignSystemTestPage />,
           id: 'design-system-test',
+        },
+        {
+          path: '/integration-status',
+          element: <SafeLazyPages.IntegrationStatus />,
+          id: 'integration-status',
         },
       ]
     : []),
@@ -526,7 +549,10 @@ export default function App() {
 
                   {/* Development tools (only in dev mode) */}
                   {IS_DEV && CONFIG.dev.enableDevTools && (
-                    <ReactQueryDevtools initialIsOpen={false} />
+                    <>
+                      <ReactQueryDevtools initialIsOpen={false} />
+                      <IntegrationTest />
+                    </>
                   )}
                 </NavigationWrapper>
               </AppInitializer>

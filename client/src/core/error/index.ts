@@ -1,8 +1,8 @@
 /**
  * Core Error Management Module
  *
- * Unified exports for the client-side error handling system.
- * Provides a clean API for error management across the application.
+ * Comprehensive error handling system with full feature parity from utils/errors.ts
+ * but with enhanced modular architecture for better maintainability.
  */
 
 // ============================================================================
@@ -20,6 +20,11 @@ export type {
   ErrorBoundaryProps,
   ErrorFallbackProps,
   RecoveryResult,
+  ErrorMetadata,
+  ErrorAnalyticsProvider,
+  ErrorReporter,
+  ErrorTransformer,
+  NavigationErrorType,
 } from './types';
 
 export {
@@ -29,7 +34,26 @@ export {
 } from './constants';
 
 // ============================================================================
-// Core Error Handler
+// Error Classes
+// ============================================================================
+
+export {
+  BaseError,
+  ValidationError,
+  NetworkError,
+  UnauthorizedError,
+  NotFoundError,
+  CacheError,
+  NavigationError,
+  NavigationItemNotFoundError,
+  InvalidNavigationPathError,
+  NavigationAccessDeniedError,
+  NavigationValidationError,
+  NavigationConfigurationError,
+} from './classes';
+
+// ============================================================================
+// Core Services
 // ============================================================================
 
 export { coreErrorHandler } from './handler';
@@ -38,6 +62,11 @@ export {
   createValidationError,
   createAuthError,
 } from './handler';
+
+export { ErrorAnalyticsService } from './analytics';
+export { ErrorReportingService } from './reporting';
+export { ErrorRateLimiter } from './rate-limiter';
+export { ErrorFactory } from './factory';
 
 // ============================================================================
 // Error Boundary Components

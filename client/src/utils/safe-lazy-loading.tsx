@@ -598,6 +598,30 @@ export const SafeLazyPages = {
     enablePreloading: false,
     displayName: "CookiePolicy",
   }),
+
+  // Analytics & Monitoring Pages
+  PerformanceDashboard: createSafeLazyPage("@/pages/performance-dashboard", "default", {
+    preloadPriority: "medium",
+    enablePreloading: true,
+    displayName: "PerformanceDashboard",
+  }),
+  AnalyticsDashboard: createSafeLazyPage("@/pages/analytics-dashboard", "default", {
+    preloadPriority: "medium",
+    enablePreloading: true,
+    displayName: "AnalyticsDashboard",
+  }),
+  PrivacyCenter: createSafeLazyPage("@/pages/privacy-center", "default", {
+    preloadPriority: "medium",
+    enablePreloading: true,
+    displayName: "PrivacyCenter",
+  }),
+
+  // Development Pages
+  IntegrationStatus: createSafeLazyPage("@/pages/integration-status", "default", {
+    preloadPriority: "low",
+    enablePreloading: false,
+    displayName: "IntegrationStatus",
+  }),
   DataRetention: createSafeLazyPage("@/pages/data-retention", "default", {
     preloadPriority: "low",
     enablePreloading: false,

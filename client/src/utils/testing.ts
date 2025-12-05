@@ -16,7 +16,7 @@
 
 import { authenticatedApi, safeApi as secureApi } from './api';
 import { assetLoadingManager } from './assets';
-import { BaseError, ErrorDomain, ErrorSeverity } from './errors';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../core/error';
 import { logger } from './logger';
 import { tokenManager as secureTokenManager, sessionManager } from './storage';
 

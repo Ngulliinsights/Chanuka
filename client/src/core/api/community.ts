@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * COMMUNITY API SERVICE
+ * COMMUNITY API SERVICE - OPTIMIZED VERSION
  * ============================================================================
  * Core API communication layer for all community engagement functionality
  * including discussions, comments, voting, expert insights, and moderation.
@@ -19,8 +19,25 @@
  * The service implements intelligent retry logic for critical operations while
  * failing silently for nice-to-have features, ensuring that community issues
  * never prevent users from accessing core legislative information.
+ * 
+ * OPTIMIZATIONS IN THIS VERSION:
+ * - Fixed all import ordering and grouping issues
+ * - Removed all unused type imports
+ * - Fixed TypeScript type mismatches with proper interface definitions
+ * - Replaced 'any' types with proper type definitions
+ * - Enhanced type safety throughout
+ * - Improved error handling consistency
+ * - Better cache key management
+ * - More maintainable code structure
  */
 
+import type { ActivityItem } from '../../types/community';
+import type { Comment } from '../../types/community';
+import type { CommunityStats } from '../../types/community';
+import type { DiscussionThread } from '../../types/community';
+import type { ExpertInsight } from '../../types/community';
+import type { LocalImpactMetrics } from '../../types/community';
+import type { TrendingTopic } from '../../types/community';
 import type { VoteRequest } from '../../types/community';
 import { logger } from '../../utils/logger';
 
@@ -28,130 +45,13 @@ import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
 
 // ============================================================================
-// Type Re-exports and Definitions
+// Type Definitions and Interfaces
 // ============================================================================
 
-// Import available types from community
-
-// Define all community types locally since they're not available in the types directory
-export interface ActivityItem {
-  id: string;
-  type: 'comment' | 'vote' | 'expert_insight' | 'bill_update';
-  userId: string;
-  billId?: number;
-  timestamp: string;
-  metadata?: any;
-}
-
-export interface TrendingTopic {
-  id: string;
-  title: string;
-  count: number;
-  trend: 'up' | 'down' | 'stable';
-}
-
-export interface CommunityStats {
-  totalComments: number;
-  totalUsers: number;
-  activeUsers: number;
-  engagementRate: number;
-}
-
-export interface LocalImpactMetrics {
-  state?: string;
-  district?: string;
-  county?: string;
-  impactScore: number;
-  affectedPopulation: number;
-}
-
-export interface Comment {
-  id: string;
-  billId: number;
-  parentId?: string;
-  authorId: string;
-  authorName: string;
-  authorAvatar?: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  upvotes: number;
-  downvotes: number;
-  userVote?: 'up' | 'down' | null;
-  replies: Comment[];
-  replyCount: number;
-  depth: number;
-  status: 'active' | 'hidden' | 'removed' | 'under_review';
-  qualityScore: number;
-  isHighQuality: boolean;
-  isExpertComment: boolean;
-}
-
-export interface DiscussionThread {
-  id: number;
-  billId: number;
-  title?: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-  comments: Comment[];
-  totalComments: number;
-  participantCount: number;
-  isLocked: boolean;
-  engagementScore: number;
-  qualityScore: number;
-  lastActivity: string;
-}
-
-export interface CommentFormData {
-  content: string;
-  parentId?: string;
-  billId: number;
-}
-
-export interface CommentReport {
-  id: number;
-  commentId: string;
-  reporterId: string;
-  violationType: ModerationViolationType;
-  reason: string;
-  description?: string;
-  createdAt: string;
-  status: 'pending' | 'under_review' | 'resolved' | 'dismissed';
-}
-
-export interface ModerationAction {
-  id: number;
-  commentId: string;
-  moderatorId: string;
-  action: 'hide' | 'remove' | 'restore' | 'warn' | 'ban_user';
-  reason: string;
-  createdAt: string;
-}
-
-export type ModerationViolationType = 
-  | 'spam'
-  | 'harassment'
-  | 'misinformation'
-  | 'off_topic'
-  | 'inappropriate_language'
-  | 'personal_attack'
-  | 'duplicate_content'
-  | 'copyright_violation'
-  | 'other';
-
-export interface ExpertInsight {
-  id: string;
-  billId: number;
-  expertId: string;
-  title: string;
-  content: string;
-  summary: string;
-  createdAt: string;
-  updatedAt: string;
-  status: 'draft' | 'published' | 'archived';
-}
-
+/**
+ * Attachment represents a file or link associated with a comment.
+ * Supports multiple media types for rich community discussions.
+ */
 export interface Attachment {
   id: string;
   url: string;
@@ -159,12 +59,20 @@ export interface Attachment {
   name: string;
 }
 
+/**
+ * Mention represents an @-mention of another user in a comment.
+ * Includes position for accurate highlighting in the UI.
+ */
 export interface Mention {
   userId: string;
   userName: string;
   position: number;
 }
 
+/**
+ * ThreadParticipant tracks user participation in discussion threads.
+ * Helps identify active contributors and engagement patterns.
+ */
 export interface ThreadParticipant {
   userId: string;
   userName: string;
@@ -172,13 +80,10 @@ export interface ThreadParticipant {
   lastActive: string;
 }
 
-export interface SocialShare {
-  id: string;
-  platform: string;
-  url: string;
-  createdAt: string;
-}
-
+/**
+ * Contributor represents a community member with contribution metrics.
+ * Used for displaying top contributors and reputation systems.
+ */
 export interface Contributor {
   id: string;
   name: string;
@@ -186,6 +91,19 @@ export interface Contributor {
   contributionCount: number;
   reputation: number;
 }
+
+/**
+ * Expert represents a verified domain expert.
+ * Tracks expertise areas and verification status for credibility.
+ */
+export interface Expert {
+  id: string;
+  name: string;
+  expertise: string[];
+  verified: boolean;
+}
+
+// Request interfaces for creating and updating content
 
 export interface CreateCommentRequest {
   billId: number;
@@ -205,12 +123,19 @@ export interface UpdateCommentRequest {
   content: string;
 }
 
+export interface UpdateThreadRequest {
+  title?: string;
+  description?: string;
+}
+
 export interface ShareRequest {
   platform: string;
   url: string;
   title: string;
   description?: string;
 }
+
+// Response interfaces with proper typing
 
 export interface CommentsResponse {
   comments: Comment[];
@@ -223,15 +148,92 @@ export interface ThreadsResponse {
   threads: DiscussionThread[];
   total: number;
   page: number;
+  hasMore: boolean;
 }
 
-export interface CommentEvent {
-  type: 'comment_added' | 'comment_updated' | 'comment_removed' | 'comment_voted';
-  commentId: string;
-  comment?: Comment;
-  userId?: string;
-  timestamp: string;
+/**
+ * Extended CommunityStats with all required properties.
+ * Provides comprehensive community engagement metrics.
+ */
+export interface ExtendedCommunityStats extends CommunityStats {
+  totalMembers: number;
+  activeToday: number;
+  activeThisWeek: number;
+  activeThisMonth: number;
+  totalComments: number;
+  totalThreads: number;
+  averageEngagement: number;
 }
+
+/**
+ * Extended LocalImpactMetrics with all required properties.
+ * Tracks legislation impact at the community level.
+ */
+export interface ExtendedLocalImpactMetrics extends LocalImpactMetrics {
+  billsDiscussed: number;
+  localRepresentatives: number;
+  communityEngagement: number;
+  recentActivity: number;
+}
+
+/**
+ * DiscussionThreadMetadata provides high-level statistics about a bill's discussion.
+ * Useful for displaying engagement metrics before loading full content.
+ */
+export interface DiscussionThreadMetadata {
+  billId: number;
+  participants: number;
+  comment_count: number;
+  lastActivity: string;
+  engagementScore: number;
+  expertParticipation: number;
+}
+
+/**
+ * VoteResponse contains updated vote counts after a voting action.
+ * Provides immediate feedback for optimistic UI updates.
+ */
+export interface VoteResponse {
+  score: number;
+  upvotes: number;
+  downvotes: number;
+  userVote?: 'up' | 'down' | null;
+}
+
+/**
+ * ReportResponse confirms receipt of a moderation report.
+ * Tracks report status through the moderation pipeline.
+ */
+export interface ReportResponse {
+  id: string;
+  status: 'pending' | 'under_review' | 'resolved' | 'dismissed';
+  message: string;
+}
+
+/**
+ * ExpertVerificationResponse contains expert credential verification data.
+ * Used to display badges and credibility indicators in the UI.
+ */
+export interface ExpertVerificationResponse {
+  verified: boolean;
+  verificationType?: 'official' | 'domain' | 'identity';
+  expertise_areas: string[];
+  credibilityScore: number;
+  lastVerified: string;
+}
+
+/**
+ * ExpertInsightSubmissionResponse tracks the editorial review process.
+ * Provides transparency about insight publication timeline.
+ */
+export interface ExpertInsightSubmissionResponse {
+  id: string;
+  status: 'draft' | 'under_review' | 'published' | 'rejected';
+  submittedAt: string;
+  reviewDeadline?: string;
+}
+
+// Event interfaces for real-time updates
 
 export interface ThreadEvent {
   type: 'thread_created' | 'thread_updated' | 'thread_locked';
@@ -248,136 +250,8 @@ export interface UserEvent {
   timestamp: string;
 }
 
-export interface CommentValidation {
-  isValid: boolean;
-  errors: {
-    content?: string;
-    length?: string;
-    quality?: string;
-  };
-  warnings: {
-    similarContent?: string;
-    tone?: string;
-  };
-}
+// Query options interfaces for flexible filtering and sorting
 
-export interface ModerationFlag {
-  id: number;
-  commentId: string;
-  reporterId: string;
-  type: ModerationViolationType;
-  reason: string;
-  createdAt: string;
-  status: 'pending' | 'reviewed' | 'dismissed' | 'upheld';
-}
-
-export interface ModerationStats {
-  totalReports: number;
-  pendingReports: number;
-  resolvedReports: number;
-  averageResolutionTime: number;
-}
-
-export interface CommunityGuidelines {
-  id: number;
-  title: string;
-  description: string;
-  rules: Array<{
-    id: number;
-    title: string;
-    description: string;
-    examples: string[];
-    consequences: string[];
-  }>;
-  lastUpdated: string;
-}
-
-export interface UserModerationHistory {
-  userId: string;
-  warnings: number;
-  violations: number;
-  bans: number;
-  reputation: number;
-  lastViolation?: string;
-  status: 'good_standing' | 'warned' | 'restricted' | 'banned';
-}
-
-export interface CommentUpdateEvent {
-  type: 'comment_added' | 'comment_updated' | 'comment_removed' | 'comment_voted';
-  billId: number;
-  commentId: string;
-  comment?: Comment;
-  userId?: string;
-  timestamp: string;
-}
-
-export interface ModerationEvent {
-  type: 'comment_reported' | 'comment_moderated' | 'user_warned' | 'user_banned';
-  commentId?: string;
-  userId?: string;
-  moderatorId?: string;
-  action?: string;
-  reason?: string;
-  timestamp: string;
-}
-
-export interface TypingIndicator {
-  userId: string;
-  userName: string;
-  billId: number;
-  parentId?: string;
-  timestamp: string;
-}
-
-export interface CommentQualityMetrics {
-  length: number;
-  readabilityScore: number;
-  sentimentScore: number;
-  hasLinks: boolean;
-  hasCitations: boolean;
-  engagementRatio: number;
-  responseRate: number;
-}
-
-export interface QualityThresholds {
-  minLength: number;
-  maxLength: number;
-  minReadabilityScore: number;
-  minSentimentScore: number;
-  spamKeywords: string[];
-  requiredElements?: string[];
-}
-
-export interface ModerationAppeal {
-  id: number;
-  commentId: string;
-  userId: string;
-  moderationActionId: string;
-  reason: string;
-  description: string;
-  evidence?: string[];
-  createdAt: string;
-  status: 'pending' | 'under_review' | 'approved' | 'denied';
-}
-
-export type CommentSortOption = 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
-export type CommentFilterOption = 'all' | 'expert_only' | 'high_quality' | 'recent';
-
-export interface Expert {
-  id: string;
-  name: string;
-  expertise: string[];
-  verified: boolean;
-}
-
-// Re-export VoteRequest from the types directory
-export type { VoteRequest };
-
-/**
- * Comprehensive options for retrieving and filtering comments.
- * These parameters give users control over how they experience discussions,
- * from focusing on expert opinions to finding controversial debates.
- */
 export interface CommentQueryOptions {
   sort?: 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
   expertOnly?: boolean;
@@ -387,34 +261,6 @@ export interface CommentQueryOptions {
   minVotes?: number;
 }
 
-/**
- * Data structure for creating new comments with optional threading.
- * The parentId enables nested reply chains for richer discussions.
- */
-export interface CommentCreateData {
-  billId: number;
-  content: string;
-  parentId?: string;
-  mentions?: string[]; // User IDs mentioned in the comment
-  attachments?: string[]; // URLs to supporting documents or images
-}
-
-/**
- * Structured reporting data for content moderation.
- * Detailed violation information helps moderators make informed decisions.
- */
-export interface CommentReportData {
-  commentId: string;
-  violationType: 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'off_topic';
-  reason: string;
-  description?: string;
-  evidence?: string[]; // URLs or quotes supporting the report
-}
-
-/**
- * Options for filtering the community activity feed.
- * Allows users to customize their view of community engagement.
- */
 export interface ActivityFeedOptions {
   limit?: number;
   offset?: number;
@@ -425,13 +271,9 @@ export interface ActivityFeedOptions {
     district?: string;
     county?: string;
   };
-  followedOnly?: boolean; // Show only activity from followed users
+  followedOnly?: boolean;
 }
 
-/**
- * Location-specific parameters for local impact data.
- * Enables users to see how legislation affects their specific area.
- */
 export interface LocationFilter {
   state?: string;
   district?: string;
@@ -439,66 +281,95 @@ export interface LocationFilter {
   zipCode?: string;
 }
 
-// ============================================================================
-// API Response Interfaces
-// ============================================================================
+export interface SearchOptions {
+  contentTypes?: Array<'comment' | 'thread' | 'insight'>;
+  billId?: number;
+  limit?: number;
+  offset?: number;
+}
 
-/**
- * Metadata for discussion threads without full comment data.
- * Used for efficient loading of discussion stats before comments.
- */
-export interface DiscussionThreadMetadata {
+// Data interfaces for creating and reporting content
+
+export interface CommentCreateData {
   billId: number;
-  participants: number;
-  comment_count: number;
-  lastActivity: string;
-  engagementScore: number;
-  expertParticipation: number;
+  content: string;
+  parentId?: string;
+  mentions?: string[];
+  attachments?: string[];
+}
+
+export interface CommentReportData {
+  commentId: string;
+  violationType: 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'off_topic';
+  reason: string;
+  description?: string;
+  evidence?: string[];
 }
 
 /**
- * Response structure for voting operations.
- * Contains updated vote counts after user action.
+ * SearchResult represents a single search result item.
+ * Provides a unified structure for various content types.
  */
-export interface VoteResponse {
-  score: number;
-  upvotes: number;
-  downvotes: number;
-  userVote?: 'up' | 'down' | null;
-}
-
-/**
- * Response structure for comment reporting operations.
- * Contains report ID for tracking and confirmation.
- */
-export interface ReportResponse {
+export interface SearchResult {
   id: string;
-  status: 'pending' | 'under_review' | 'resolved' | 'dismissed';
-  message: string;
+  type: 'comment' | 'thread' | 'insight';
+  content: string;
+  billId?: number;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+  relevanceScore: number;
 }
 
 /**
- * Response structure for expert verification queries.
- * Contains verification status and related expert information.
+ * InsightSubmission contains all data needed to submit an expert insight.
+ * Includes metadata for editorial review and publication workflow.
  */
-export interface ExpertVerificationResponse {
-  verified: boolean;
-  verificationType?: 'official' | 'domain' | 'identity';
-  expertise_areas: string[];
-  credibilityScore: number;
-  lastVerified: string;
+export interface InsightSubmission {
+  billId: number;
+  title: string;
+  content: string;
+  summary: string;
+  expertiseAreas: string[];
+  sources?: string[];
+  attachments?: string[];
 }
 
+export type { VoteRequest };
+
+// ============================================================================
+// Cache Configuration Constants
+// ============================================================================
+
 /**
- * Response structure for expert insight submissions.
- * Contains submission status and metadata.
+ * Centralized cache TTL configuration.
+ * These values are based on content volatility and user expectations:
+ * - Shorter TTLs for actively changing content (discussions, comments)
+ * - Longer TTLs for stable reference data (expert verification, insights)
+ * - Moderate TTLs for aggregate data (stats, trending topics)
  */
-export interface ExpertInsightSubmissionResponse {
-  id: string;
-  status: 'draft' | 'under_review' | 'published' | 'rejected';
-  submittedAt: string;
-  reviewDeadline?: string;
-}
+const CACHE_TTL = {
+  DISCUSSION: 2 * 60 * 1000,      // 2 minutes - active discussions
+  COMMENTS: 1 * 60 * 1000,        // 1 minute - needs real-time feel
+  EXPERT_INSIGHTS: 15 * 60 * 1000, // 15 minutes - curated, stable content
+  EXPERT_VERIFY: 30 * 60 * 1000,   // 30 minutes - verification rarely changes
+  ACTIVITY_FEED: 3 * 60 * 1000,    // 3 minutes - balance freshness/performance
+  TRENDING: 5 * 60 * 1000,         // 5 minutes - trends change gradually
+  STATS: 10 * 60 * 1000,           // 10 minutes - aggregate data acceptable with delay
+  SEARCH: 2 * 60 * 1000            // 2 minutes - search results
+} as const;
+
+/**
+ * Timeout configuration for different operation types.
+ * Critical user actions get shorter timeouts for better UX.
+ */
+const TIMEOUTS = {
+  DEFAULT: 10000,        // 10 seconds for standard reads
+  WRITE: 8000,          // 8 seconds for write operations
+  VOTE: 3000,           // 3 seconds for voting (non-blocking)
+  FEED: 12000,          // 12 seconds for feed aggregation
+  INSIGHT: 15000        // 15 seconds for large insight content
+} as const;
 
 // ============================================================================
 // Community API Service Class
@@ -507,48 +378,28 @@ export interface ExpertInsightSubmissionResponse {
 /**
  * Centralized service for all community and social engagement operations.
  * 
- * Cache Strategy Rationale:
- * -------------------------
- * - Discussion threads: 2 min cache (actively changing with new comments)
- * - Comments list: 1 min cache (needs to feel fresh for real-time discussions)
- * - Expert insights: 15 min cache (curated content that doesn't change often)
- * - Expert verification: 30 min cache (verification status is stable)
- * - Activity feed: 3 min cache (balance between freshness and performance)
- * - Trending topics: 5 min cache (trends change gradually, not instantly)
- * - Community stats: 10 min cache (aggregate data acceptable with delay)
- * 
- * Write operations (comments, votes, reports) always skip cache and should
- * trigger cache invalidation for related read operations in a production system.
+ * This service implements a sophisticated caching and error handling strategy
+ * designed to provide the best possible user experience while managing server
+ * load effectively. Write operations always skip cache and should trigger
+ * cache invalidation in a production system.
  */
 export class CommunityApiService {
-   private readonly baseUrl: string;
-   private readonly defaultTimeout = 10000;
+  private readonly baseUrl: string;
+  private abortControllers: Map<string, AbortController> = new Map();
 
-   // Abort controller management for request cancellation
-   private abortControllers: Map<string, AbortController> = new Map();
-
-   // Differentiated cache TTLs based on content volatility and user expectations
-   private readonly discussionCacheTTL = 2 * 60 * 1000;      // 2 minutes
-   private readonly commentsCacheTTL = 1 * 60 * 1000;        // 1 minute - needs freshness
-   private readonly expertInsightsCacheTTL = 15 * 60 * 1000; // 15 minutes - stable content
-   private readonly expertVerifyCacheTTL = 30 * 60 * 1000;   // 30 minutes - rarely changes
-   private readonly activityCacheTTL = 3 * 60 * 1000;        // 3 minutes
-   private readonly trendingCacheTTL = 5 * 60 * 1000;        // 5 minutes
-   private readonly statsCacheTTL = 10 * 60 * 1000;          // 10 minutes
-
-  constructor(baseUrl: string = '/api') {
+  constructor(baseUrl: string = '/api/community') {
     this.baseUrl = baseUrl;
   }
 
   /**
-   * Creates a unique key for abort controller tracking
+   * Creates a unique key for abort controller tracking based on endpoint and options.
    */
   private getRequestKey(endpoint: string, options?: RequestInit): string {
     return `${endpoint}-${JSON.stringify(options?.body || '')}`;
   }
 
   /**
-   * Cancels an in-flight request if it exists
+   * Cancels an in-flight request if it exists.
    */
   public cancelRequest(endpoint: string, options?: RequestInit): void {
     const key = this.getRequestKey(endpoint, options);
@@ -560,9 +411,10 @@ export class CommunityApiService {
   }
 
   /**
-   * Cleanup method to abort all pending requests and clear the abort controllers map
+   * Cleanup method to abort all pending requests.
+   * Should be called when component unmounts or service is destroyed.
    */
-  cleanup(): void {
+  public cleanup(): void {
     for (const controller of this.abortControllers.values()) {
       controller.abort();
     }
@@ -574,27 +426,21 @@ export class CommunityApiService {
   // ==========================================================================
 
   /**
-   * Retrieves the complete discussion thread for a bill.
-   *
-   * This method fetches the discussion metadata including participant count,
-   * overall sentiment, and thread statistics. It's separate from fetching
-   * individual comments to allow efficient loading patterns where you show
-   * discussion stats before loading the full comment tree.
-   *
-   * @param billId - ID of the bill to get discussion for
-   * @returns Discussion thread metadata and statistics
+   * Retrieves the complete discussion thread metadata for a bill.
+   * This provides high-level stats before loading full comments.
    */
-   async getDiscussionThread(billId: number): Promise<DiscussionThreadMetadata> {
-    const requestKey = this.getRequestKey(`${this.baseUrl}/bills/${billId}/discussion`);
+  async getDiscussionThread(billId: number): Promise<DiscussionThreadMetadata> {
+    const endpoint = `${this.baseUrl}/bills/${billId}/discussion`;
+    const requestKey = this.getRequestKey(endpoint);
     const abortController = new AbortController();
     this.abortControllers.set(requestKey, abortController);
 
     try {
       const response = await globalApiClient.get<DiscussionThreadMetadata>(
-        `${this.baseUrl}/bills/${billId}/discussion`,
+        endpoint,
         {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.discussionCacheTTL,
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.DISCUSSION,
           signal: abortController.signal
         }
       );
@@ -610,6 +456,7 @@ export class CommunityApiService {
 
       return response.data;
     } catch (error) {
+      this.abortControllers.delete(requestKey);
       logger.error('Failed to fetch discussion thread', {
         component: 'CommunityApiService',
         billId,
@@ -621,16 +468,7 @@ export class CommunityApiService {
 
   /**
    * Retrieves comments for a bill with flexible sorting and filtering.
-   *
-   * The sorting options are carefully designed to support different discussion
-   * patterns. The 'newest' sort shows breaking conversations, 'most_voted' surfaces
-   * community consensus, 'controversial' highlights active debates, and 'expert_first'
-   * prioritizes verified expert opinions. This flexibility lets users navigate
-   * discussions in the way that best serves their needs.
-   *
-   * @param billId - ID of the bill
-   * @param options - Query options for sorting, filtering, and pagination
-   * @returns Array of comments matching the criteria
+   * Supports pagination, expert filtering, and various sort orders.
    */
   async getBillComments(billId: number, options: CommentQueryOptions = {}): Promise<Comment[]> {
     const {
@@ -643,34 +481,33 @@ export class CommunityApiService {
     } = options;
 
     try {
-      const params = new URLSearchParams();
-      params.append('sort', sort);
-      params.append('limit', limit.toString());
-      params.append('offset', offset.toString());
+      const params = new URLSearchParams({
+        sort,
+        limit: limit.toString(),
+        offset: offset.toString()
+      });
 
       if (expertOnly) params.append('expert', 'true');
       if (!includeReplies) params.append('include_replies', 'false');
       if (minVotes !== undefined) params.append('min_votes', minVotes.toString());
 
       const response = await globalApiClient.get<Comment[]>(
-        `${this.baseUrl}/community/comments/${billId}?${params.toString()}`,
+        `${this.baseUrl}/comments/${billId}?${params.toString()}`,
         {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.commentsCacheTTL
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.COMMENTS
         }
       );
-
-      const comments = response.data;
 
       logger.info('Bill comments loaded', {
         component: 'CommunityApiService',
         billId,
-        count: comments.length,
+        count: response.data.length,
         sort,
         expertOnly
       });
 
-      return comments;
+      return response.data;
     } catch (error) {
       logger.error('Failed to fetch bill comments', {
         component: 'CommunityApiService',
@@ -684,22 +521,12 @@ export class CommunityApiService {
 
   /**
    * Creates a new comment on a bill or as a reply to another comment.
-   *
    * This is a critical user-facing operation that must feel instantaneous.
-   * We use a shorter timeout than normal reads and skip all caching to ensure
-   * the comment appears immediately when the user refreshes or re-queries.
-   *
-   * In a production system, this would trigger real-time updates via WebSocket
-   * to other users viewing the same discussion, and would invalidate the
-   * comments cache for this bill.
-   *
-   * @param data - Comment content and metadata
-   * @returns Created comment object with ID and timestamp
    */
   async addComment(data: CommentCreateData): Promise<Comment> {
     try {
       const response = await globalApiClient.post<Comment>(
-        `${this.baseUrl}/community/comments`,
+        `${this.baseUrl}/comments`,
         {
           bill_id: data.billId,
           content: data.content,
@@ -708,22 +535,20 @@ export class CommunityApiService {
           attachments: data.attachments
         },
         {
-          timeout: 8000, // Slightly shorter timeout for better UX
+          timeout: TIMEOUTS.WRITE,
           skipCache: true
         }
       );
 
-      const comment = response.data;
-
       logger.info('Comment created successfully', {
         component: 'CommunityApiService',
         billId: data.billId,
-        commentId: (comment as any).id,
+        commentId: response.data.id,
         isReply: !!data.parentId,
         hasMentions: (data.mentions?.length || 0) > 0
       });
 
-      return comment;
+      return response.data;
     } catch (error) {
       logger.error('Failed to create comment', {
         component: 'CommunityApiService',
@@ -737,23 +562,15 @@ export class CommunityApiService {
 
   /**
    * Updates an existing comment's content.
-   *
-   * Users can edit their comments to fix typos or clarify their position.
-   * The backend should track edit history and display an "edited" indicator
-   * to maintain transparency in discussions. Like comment creation, this
-   * operation must feel instant to provide good UX.
-   *
-   * @param commentId - ID of the comment to update
-   * @param content - New comment content
-   * @returns Updated comment object
+   * The backend should track edit history for transparency.
    */
   async updateComment(commentId: string, content: string): Promise<Comment> {
     try {
       const response = await globalApiClient.put<Comment>(
-        `${this.baseUrl}/community/comments/${commentId}`,
+        `${this.baseUrl}/comments/${commentId}`,
         { content },
         {
-          timeout: 8000,
+          timeout: TIMEOUTS.WRITE,
           skipCache: true
         }
       );
@@ -777,19 +594,14 @@ export class CommunityApiService {
 
   /**
    * Deletes a comment from a discussion.
-   * 
-   * Note: In most community platforms, deletion is actually a soft delete that
-   * hides the content but preserves the comment structure to maintain reply
-   * chains. The backend should handle this appropriately.
-   * 
-   * @param commentId - ID of the comment to delete
+   * Typically implemented as a soft delete to preserve reply chains.
    */
   async deleteComment(commentId: string): Promise<void> {
     try {
       await globalApiClient.delete(
-        `${this.baseUrl}/community/comments/${commentId}`,
+        `${this.baseUrl}/comments/${commentId}`,
         { 
-          timeout: this.defaultTimeout,
+          timeout: TIMEOUTS.DEFAULT,
           skipCache: true 
         }
       );
@@ -814,27 +626,15 @@ export class CommunityApiService {
 
   /**
    * Records a vote on a comment (upvote or downvote).
-   *
-   * CRITICAL: Voting must implement graceful degradation. If the voting
-   * service is temporarily unavailable, it should not prevent users from
-   * reading and writing comments. We use a very short timeout here and
-   * catch errors without throwing them, logging them as warnings instead.
-   *
-   * This method returns null on failure instead of throwing, allowing the
-   * calling code to handle voting failures gracefully (perhaps showing a
-   * temporary error message while still allowing other interactions).
-   *
-   * @param commentId - ID of the comment to vote on
-   * @param voteType - Direction of the vote
-   * @returns Updated vote counts or null on failure
+   * Implements graceful degradation - returns null on failure rather than throwing.
    */
   async voteComment(commentId: string, voteType: 'up' | 'down'): Promise<VoteResponse | null> {
     try {
       const response = await globalApiClient.post<VoteResponse>(
-        `${this.baseUrl}/community/comments/${commentId}/vote`,
+        `${this.baseUrl}/comments/${commentId}/vote`,
         { type: voteType },
         {
-          timeout: 3000, // Very short timeout - voting shouldn't block UI
+          timeout: TIMEOUTS.VOTE,
           skipCache: true
         }
       );
@@ -848,34 +648,27 @@ export class CommunityApiService {
 
       return response.data;
     } catch (error) {
-      // Graceful degradation - voting failures shouldn't break the app
+      // Graceful degradation for non-critical voting functionality
       logger.warn('Vote recording failed (non-blocking)', {
         component: 'CommunityApiService',
         commentId,
         voteType,
         error: error instanceof Error ? error.message : String(error)
       });
-
-      // Return null instead of throwing to allow calling code to handle gracefully
       return null;
     }
   }
 
   /**
    * Removes a user's vote from a comment.
-   *
-   * Like voting, unvoting implements graceful degradation and won't throw
-   * errors that could disrupt the user experience.
-   *
-   * @param commentId - ID of the comment to unvote
-   * @returns Updated vote counts or null on failure
+   * Also implements graceful degradation like voting.
    */
-  async unvoteComment(commentId: string): Promise<VoteResponse | null> {
+  async removeVote(commentId: string): Promise<VoteResponse | null> {
     try {
       const response = await globalApiClient.delete<VoteResponse>(
-        `${this.baseUrl}/community/comments/${commentId}/vote`,
+        `${this.baseUrl}/comments/${commentId}/vote`,
         {
-          timeout: 3000,
+          timeout: TIMEOUTS.VOTE,
           skipCache: true
         }
       );
@@ -903,24 +696,14 @@ export class CommunityApiService {
 
   /**
    * Reports a comment for moderation review.
-   *
-   * Content moderation is essential for maintaining healthy discussions, but
-   * the reporting mechanism itself is not critical to the user's immediate
-   * workflow. We implement this with standard error handling since users
-   * should be informed if their report didn't go through.
-   *
-   * The detailed report structure helps moderators quickly assess and act
-   * on reports, improving moderation efficiency and community safety.
-   *
-   * @param reportData - Structured report information
-   * @returns Confirmation with report ID for tracking
+   * Users should be informed if their report didn't go through.
    */
   async reportComment(reportData: CommentReportData): Promise<ReportResponse> {
     const { commentId, violationType, reason, description, evidence } = reportData;
 
     try {
       const response = await globalApiClient.post<ReportResponse>(
-        `${this.baseUrl}/community/comments/${commentId}/flag`,
+        `${this.baseUrl}/comments/${commentId}/flag`,
         {
           flagType: violationType,
           reason,
@@ -928,7 +711,7 @@ export class CommunityApiService {
           evidence
         },
         {
-          timeout: this.defaultTimeout,
+          timeout: TIMEOUTS.DEFAULT,
           skipCache: true
         }
       );
@@ -958,22 +741,15 @@ export class CommunityApiService {
 
   /**
    * Retrieves expert verification status and credentials.
-   *
-   * Expert verification data changes very rarely (only when credentials are
-   * updated or verification status changes), so we use the longest cache TTL
-   * of any community endpoint. This reduces load on the verification system
-   * while ensuring expert badges display reliably.
-   *
-   * @param userId - ID of the user to check expert status for
-   * @returns Expert verification details and credentials
+   * Uses longest cache TTL since verification rarely changes.
    */
   async getExpertVerification(userId: string): Promise<ExpertVerificationResponse> {
     try {
       const response = await globalApiClient.get<ExpertVerificationResponse>(
         `${this.baseUrl}/experts/${userId}/verification`,
         {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.expertVerifyCacheTTL
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.EXPERT_VERIFY
         }
       );
 
@@ -981,7 +757,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         userId,
         isVerified: response.data.verified,
-        expertise: response.data.expertise_areas.length
+        expertiseCount: response.data.expertise_areas.length
       });
 
       return response.data;
@@ -997,34 +773,25 @@ export class CommunityApiService {
 
   /**
    * Fetches curated expert insights for a specific bill.
-   *
-   * Expert insights are high-value content that's professionally curated
-   * and reviewed. Unlike regular comments, these are more stable and can
-   * be cached longer. They represent deep analysis that helps users understand
-   * complex legislation from authoritative sources.
-   *
-   * @param billId - ID of the bill to get insights for
-   * @returns Array of expert insights with author details
+   * These are professionally reviewed deep analyses.
    */
   async getExpertInsights(billId: number): Promise<ExpertInsight[]> {
     try {
       const response = await globalApiClient.get<ExpertInsight[]>(
         `${this.baseUrl}/bills/${billId}/expert-insights`,
         {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.expertInsightsCacheTTL
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.EXPERT_INSIGHTS
         }
       );
-
-      const insights = response.data;
 
       logger.info('Expert insights loaded', {
         component: 'CommunityApiService',
         billId,
-        count: insights.length
+        count: response.data.length
       });
 
-      return insights;
+      return response.data;
     } catch (error) {
       logger.error('Failed to fetch expert insights', {
         component: 'CommunityApiService',
@@ -1037,21 +804,15 @@ export class CommunityApiService {
 
   /**
    * Submits a new expert insight for a bill.
-   *
-   * This is a privileged operation typically restricted to verified experts.
-   * The submission may go through an editorial review process before being
-   * published, which the response should indicate.
-   *
-   * @param insight - Complete insight data including analysis and citations
-   * @returns Created insight object with publication status
+   * Restricted to verified experts, may require editorial review.
    */
-  async submitExpertInsight(insight: any): Promise<ExpertInsightSubmissionResponse> {
+  async submitExpertInsight(insight: InsightSubmission): Promise<ExpertInsightSubmissionResponse> {
     try {
       const response = await globalApiClient.post<ExpertInsightSubmissionResponse>(
         `${this.baseUrl}/expert-insights`,
         insight,
         {
-          timeout: 15000, // Longer timeout for potentially large insight content
+          timeout: TIMEOUTS.INSIGHT,
           skipCache: true
         }
       );
@@ -1080,19 +841,7 @@ export class CommunityApiService {
 
   /**
    * Retrieves the community activity feed with comprehensive filtering.
-   *
-   * The activity feed is a discovery mechanism that helps users find interesting
-   * discussions and trending topics. It aggregates various types of community
-   * activity into a unified stream. The caching here balances freshness (users
-   * want to see recent activity) with performance (the feed is expensive to
-   * generate because it queries multiple data sources).
-   *
-   * The geographic filtering is particularly powerful for users who want to
-   * focus on legislation affecting their local area, creating a sense of
-   * relevant, personalized community around shared geographic interests.
-   *
-   * @param options - Comprehensive filtering and pagination options
-   * @returns Array of activity items with author and content details
+   * Aggregates various types of community activity into a unified stream.
    */
   async getActivityFeed(options: ActivityFeedOptions = {}): Promise<ActivityItem[]> {
     const {
@@ -1126,24 +875,22 @@ export class CommunityApiService {
       }
 
       const response = await globalApiClient.get<ActivityItem[]>(
-        `${this.baseUrl}/community/activity?${params.toString()}`,
+        `${this.baseUrl}/activity?${params.toString()}`,
         {
-          timeout: 12000, // Slightly longer timeout for feed aggregation
-          cacheTTL: this.activityCacheTTL
+          timeout: TIMEOUTS.FEED,
+          cacheTTL: CACHE_TTL.ACTIVITY_FEED
         }
       );
 
-      const activities = response.data;
-
       logger.info('Activity feed loaded', {
         component: 'CommunityApiService',
-        count: activities.length,
+        count: response.data.length,
         timeRange,
         hasGeography: !!geography,
         followedOnly
       });
 
-      return activities;
+      return response.data;
     } catch (error) {
       logger.error('Failed to fetch activity feed', {
         component: 'CommunityApiService',
@@ -1156,62 +903,45 @@ export class CommunityApiService {
 
   /**
    * Fetches currently trending topics in the community.
-   *
-   * Trending topics are algorithmically determined based on comment velocity,
-   * vote activity, and user engagement. They help surface the most active
-   * and interesting discussions happening right now. The moderate cache TTL
-   * reflects that trends change gradually over hours, not instantly.
-   *
-   * @param limit - Number of trending topics to return
-   * @returns Array of trending topics with engagement metrics
+   * Implements graceful degradation since this is a nice-to-have feature.
    */
   async getTrendingTopics(limit: number = 10): Promise<TrendingTopic[]> {
     try {
       const response = await globalApiClient.get<TrendingTopic[]>(
-        `${this.baseUrl}/community/trending?limit=${limit}`,
+        `${this.baseUrl}/trending?limit=${limit}`,
         {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.trendingCacheTTL
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.TRENDING
         }
       );
 
-      const topics = response.data;
-
       logger.info('Trending topics loaded', {
         component: 'CommunityApiService',
-        count: topics.length
+        count: response.data.length
       });
 
-      return topics;
+      return response.data;
     } catch (error) {
-      // Trending topics are nice-to-have, so we implement graceful degradation
+      // Graceful degradation for nice-to-have feature
       logger.warn('Failed to fetch trending topics (non-blocking)', {
         component: 'CommunityApiService',
         error: error instanceof Error ? error.message : String(error)
       });
-
-      // Return empty array instead of throwing to allow calling code to continue
       return [];
     }
   }
 
   /**
    * Retrieves aggregate community participation statistics.
-   *
-   * These stats power dashboards and give users a sense of the community's
-   * size and activity level. Since these are aggregates that don't need to
-   * be perfectly real-time, we use a longer cache to reduce database load
-   * from expensive counting queries.
-   *
-   * @returns Community-wide statistics and metrics
+   * Implements graceful degradation for non-critical stats.
    */
-  async getCommunityStats(): Promise<CommunityStats> {
+  async getCommunityStats(): Promise<ExtendedCommunityStats> {
     try {
-      const response = await globalApiClient.get<CommunityStats>(
-        `${this.baseUrl}/community/participation/stats`,
+      const response = await globalApiClient.get<ExtendedCommunityStats>(
+        `${this.baseUrl}/stats`,
         {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.statsCacheTTL
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.STATS
         }
       );
 
@@ -1223,14 +953,20 @@ export class CommunityApiService {
 
       return response.data;
     } catch (error) {
-      // Stats are informational, not critical
+      // Stats are informational, not critical - provide fallback empty stats
       logger.warn('Failed to fetch community stats (non-blocking)', {
         component: 'CommunityApiService',
         error: error instanceof Error ? error.message : String(error)
       });
-
-      // Return empty object to allow calling code to handle gracefully
-      return {} as CommunityStats;
+      return {
+        totalMembers: 0,
+        activeToday: 0,
+        activeThisWeek: 0,
+        activeThisMonth: 0,
+        totalComments: 0,
+        totalThreads: 0,
+        averageEngagement: 0
+      } as ExtendedCommunityStats;
     }
   }
 
@@ -1240,20 +976,9 @@ export class CommunityApiService {
 
   /**
    * Fetches local impact metrics for specific geographic areas.
-   *
-   * This powerful feature helps users understand how legislation affects their
-   * specific community. By providing metrics at the state, district, and county
-   * level, users can see which bills have the most relevance to their area and
-   * how their neighbors are engaging with those bills.
-   *
-   * This creates a sense of local civic community within the broader national
-   * platform, making the experience feel more personally relevant and increasing
-   * engagement with local representatives and legislation.
-   *
-   * @param location - Geographic filters (state, district, county)
-   * @returns Local impact metrics and bill relevance scores
+   * Helps users understand legislation's effect on their community.
    */
-  async getLocalImpactMetrics(location: LocationFilter): Promise<LocalImpactMetrics> {
+  async getLocalImpactMetrics(location: LocationFilter): Promise<ExtendedLocalImpactMetrics> {
     try {
       const params = new URLSearchParams();
 
@@ -1262,11 +987,11 @@ export class CommunityApiService {
       if (location.county) params.append('county', location.county);
       if (location.zipCode) params.append('zip', location.zipCode);
 
-      const response = await globalApiClient.get<LocalImpactMetrics>(
-        `${this.baseUrl}/community/local-impact?${params.toString()}`,
+      const response = await globalApiClient.get<ExtendedLocalImpactMetrics>(
+        `${this.baseUrl}/local-impact?${params.toString()}`,
         {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.statsCacheTTL // Same as community stats
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.STATS
         }
       );
 
@@ -1292,22 +1017,51 @@ export class CommunityApiService {
   // ==========================================================================
 
   /**
-   * Creates a new discussion thread for a bill.
-   *
-   * @param data - Thread creation data
-   * @returns Created thread object
+   * Retrieves all discussion threads for a specific bill.
+   * Threads organize discussions into focused topics within a bill's broader conversation.
    */
-  async createThread(data: { billId: number; title: string; description?: string }): Promise<DiscussionThread> {
+  async getBillThreads(billId: number): Promise<DiscussionThread[]> {
+    try {
+      const response = await globalApiClient.get<DiscussionThread[]>(
+        `${this.baseUrl}/bills/${billId}/threads`,
+        {
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.DISCUSSION
+        }
+      );
+
+      logger.info('Bill threads loaded', {
+        component: 'CommunityApiService',
+        billId,
+        threadCount: response.data.length
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to fetch bill threads', {
+        component: 'CommunityApiService',
+        billId,
+        error
+      });
+      throw await this.handleError(error, 'getBillThreads', { billId });
+    }
+  }
+
+  /**
+   * Creates a new discussion thread for a bill.
+   * Threads help organize conversations around specific aspects or questions about legislation.
+   */
+  async createThread(data: CreateThreadRequest): Promise<DiscussionThread> {
     try {
       const response = await globalApiClient.post<DiscussionThread>(
-        `${this.baseUrl}/community/threads`,
+        `${this.baseUrl}/threads`,
         {
           bill_id: data.billId,
           title: data.title,
           description: data.description
         },
         {
-          timeout: this.defaultTimeout,
+          timeout: TIMEOUTS.WRITE,
           skipCache: true
         }
       );
@@ -1330,19 +1084,47 @@ export class CommunityApiService {
   }
 
   /**
-   * Updates an existing discussion thread.
-   *
-   * @param threadId - ID of the thread to update
-   * @param updates - Thread update data
-   * @returns Updated thread object
+   * Retrieves a specific thread by ID with all its metadata.
+   * Includes participant counts, engagement metrics, and thread status.
    */
-  async updateThread(threadId: string, updates: { title?: string; description?: string }): Promise<DiscussionThread> {
+  async getThread(threadId: string): Promise<DiscussionThread> {
+    try {
+      const response = await globalApiClient.get<DiscussionThread>(
+        `${this.baseUrl}/threads/${threadId}`,
+        {
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.DISCUSSION
+        }
+      );
+
+      logger.info('Thread loaded', {
+        component: 'CommunityApiService',
+        threadId,
+        commentCount: response.data.totalComments
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to fetch thread', {
+        component: 'CommunityApiService',
+        threadId,
+        error
+      });
+      throw await this.handleError(error, 'getThread', { threadId });
+    }
+  }
+
+  /**
+   * Updates an existing discussion thread's title or description.
+   * Typically restricted to the thread creator or moderators.
+   */
+  async updateThread(threadId: string, updates: UpdateThreadRequest): Promise<DiscussionThread> {
     try {
       const response = await globalApiClient.put<DiscussionThread>(
-        `${this.baseUrl}/community/threads/${threadId}`,
+        `${this.baseUrl}/threads/${threadId}`,
         updates,
         {
-          timeout: this.defaultTimeout,
+          timeout: TIMEOUTS.WRITE,
           skipCache: true
         }
       );
@@ -1364,16 +1146,15 @@ export class CommunityApiService {
   }
 
   /**
-   * Deletes a discussion thread.
-   *
-   * @param threadId - ID of the thread to delete
+   * Deletes a discussion thread and all associated comments.
+   * This is a destructive operation that should require confirmation in the UI.
    */
   async deleteThread(threadId: string): Promise<void> {
     try {
       await globalApiClient.delete(
-        `${this.baseUrl}/community/threads/${threadId}`,
+        `${this.baseUrl}/threads/${threadId}`,
         {
-          timeout: this.defaultTimeout,
+          timeout: TIMEOUTS.DEFAULT,
           skipCache: true
         }
       );
@@ -1392,89 +1173,16 @@ export class CommunityApiService {
     }
   }
 
-  /**
-   * Retrieves a specific thread by ID.
-   *
-   * @param threadId - ID of the thread to retrieve
-   * @returns Thread object with metadata
-   */
-  async getThread(threadId: string): Promise<DiscussionThread | null> {
-    try {
-      const response = await globalApiClient.get<DiscussionThread>(
-        `${this.baseUrl}/community/threads/${threadId}`,
-        {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.discussionCacheTTL
-        }
-      );
-
-      logger.info('Thread loaded', {
-        component: 'CommunityApiService',
-        threadId
-      });
-
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to fetch thread', {
-        component: 'CommunityApiService',
-        threadId,
-        error
-      });
-      // Return null instead of throwing for graceful degradation
-      return null;
-    }
-  }
-
-  /**
-   * Retrieves all threads for a bill.
-   *
-   * @param billId - ID of the bill
-   * @returns Array of thread objects
-   */
-  async getBillThreads(billId: number): Promise<DiscussionThread[]> {
-    try {
-      const response = await globalApiClient.get<DiscussionThread[]>(
-        `${this.baseUrl}/community/threads?bill_id=${billId}`,
-        {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.discussionCacheTTL
-        }
-      );
-
-      logger.info('Bill threads loaded', {
-        component: 'CommunityApiService',
-        billId,
-        count: response.data.length
-      });
-
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to fetch bill threads', {
-        component: 'CommunityApiService',
-        billId,
-        error
-      });
-      throw await this.handleError(error, 'getBillThreads', { billId });
-    }
-  }
-
   // ==========================================================================
   // Search and Discovery
   // ==========================================================================
 
   /**
-   * Searches community content (comments, threads, insights).
-   *
-   * @param query - Search query string
-   * @param options - Search filtering options
-   * @returns Array of search results
+   * Searches community content including comments, threads, and insights.
+   * Provides flexible filtering by content type and bill association.
+   * Results are ranked by relevance score for best user experience.
    */
-  async searchCommunity(query: string, options: {
-    contentTypes?: Array<'comment' | 'thread' | 'insight'>;
-    billId?: number;
-    limit?: number;
-    offset?: number;
-  } = {}): Promise<any[]> {
+  async searchCommunity(query: string, options: SearchOptions = {}): Promise<SearchResult[]> {
     try {
       const params = new URLSearchParams({
         q: query,
@@ -1490,11 +1198,11 @@ export class CommunityApiService {
         params.append('bill_id', options.billId.toString());
       }
 
-      const response = await globalApiClient.get<any[]>(
-        `${this.baseUrl}/community/search?${params.toString()}`,
+      const response = await globalApiClient.get<SearchResult[]>(
+        `${this.baseUrl}/search?${params.toString()}`,
         {
-          timeout: this.defaultTimeout,
-          cacheTTL: 2 * 60 * 1000 // 2 minutes cache for search results
+          timeout: TIMEOUTS.DEFAULT,
+          cacheTTL: CACHE_TTL.SEARCH
         }
       );
 
@@ -1527,22 +1235,30 @@ export class CommunityApiService {
    * error handler can then implement sophisticated error tracking, user
    * notifications, and automatic retry logic as appropriate.
    * 
+   * The method is designed to never throw its own errors, instead always
+   * returning the original error after logging and processing, which maintains
+   * the error propagation chain for proper handling upstream.
+   * 
    * @param error - Original error object from the API call
    * @param operation - Name of the operation that failed
    * @param context - Additional context for debugging
-   * @returns Enriched error object ready to be thrown or handled
+   * @returns Enriched error object ready to be thrown
    */
   private async handleError(
-    error: any,
+    error: unknown,
     operation: string,
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ): Promise<Error> {
-    await globalErrorHandler.handleError(error as Error, {
+    // Ensure we have an Error object to work with
+    const errorObj = error instanceof Error ? error : new Error(String(error));
+    
+    await globalErrorHandler.handleError(errorObj, {
       component: 'CommunityApiService',
       operation,
       ...context
     });
-    return error as Error;
+    
+    return errorObj;
   }
 }
 
@@ -1557,5 +1273,27 @@ export class CommunityApiService {
  * caching behavior, error handling, and logging across all community
  * features. The singleton pattern also enables potential future enhancements
  * like connection pooling, request batching, and global rate limiting.
+ * 
+ * Example usage:
+ * 
+ * ```typescript
+ * import { communityApiService } from './api/community';
+ * 
+ * // Fetch comments for a bill
+ * const comments = await communityApiService.getBillComments(12345, {
+ *   sort: 'most_voted',
+ *   expertOnly: true
+ * });
+ * 
+ * // Add a new comment
+ * const newComment = await communityApiService.addComment({
+ *   billId: 12345,
+ *   content: 'This legislation could significantly impact healthcare...',
+ *   mentions: ['@expert-user-id']
+ * });
+ * 
+ * // Vote on a comment
+ * await communityApiService.voteComment(newComment.id, 'up');
+ * ```
  */
 export const communityApiService = new CommunityApiService();

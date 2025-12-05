@@ -16,7 +16,7 @@
  * @module api-utils
  */
 
-import { createError, ErrorDomain, ErrorSeverity } from './errors';
+import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../core/error';
 import { logger } from './logger';
 import { tokenManager } from './storage';
 
@@ -248,8 +248,7 @@ export class ApiClient {
             await interceptor(error);
           }
 
-          throw createError(
-            'API_ERROR',
+          throw ErrorFactory.createNetworkError(
             error.message,
             {
               statusCode: error.statusCode,
@@ -303,8 +302,7 @@ export class ApiClient {
         await interceptor(lastError);
       }
       
-      throw createError(
-        'API_REQUEST_FAILED',
+      throw ErrorFactory.createNetworkError(
         lastError.message,
         {
           statusCode: lastError.statusCode,
@@ -320,8 +318,7 @@ export class ApiClient {
     }
 
     // This should never happen, but TypeScript needs the guarantee
-    throw createError(
-      'API_REQUEST_FAILED',
+    throw ErrorFactory.createNetworkError(
       'Request failed with unknown error',
       {
         domain: 'API' as ErrorDomain,
