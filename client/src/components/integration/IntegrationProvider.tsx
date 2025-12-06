@@ -11,7 +11,7 @@ import { logger } from '@/utils/logger';
 // Import the orphaned modules we're integrating
 import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@/utils/security';
 import { PrivacyAnalyticsService } from '@/services/privacyAnalyticsService';
-import { DeviceDetector, TouchHandler } from '@/utils/mobile';
+import { DeviceDetector, TouchHandler } from '@/core/mobile';
 
 // ============================================================================
 // TYPES & INTERFACES

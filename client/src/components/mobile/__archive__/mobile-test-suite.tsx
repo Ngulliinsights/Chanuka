@@ -12,7 +12,7 @@ import { Smartphone, Monitor, Network, Gauge, RotateCcw, User, AlertTriangle, Ch
 import React, { useState, useEffect, useRef } from 'react';
 
 import { logger } from '@client/utils/logger';
-import { MobileTouchUtils, useResponsiveLayout, useMobileErrorHandler } from '@client/utils/mobile';
+import { MobileTouchUtils, useResponsiveLayout, useMobileErrorHandler } from '@/core/mobile';
 
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
