@@ -123,4 +123,4 @@ Thumbs.db
 # Playwright
 test-results/
 playwright-report/
-playwright/.cache/
+playwright/.cache/client/src/components/Sidebar.tsx
