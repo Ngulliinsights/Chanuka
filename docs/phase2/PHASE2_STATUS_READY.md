@@ -84,17 +84,17 @@ git commit -m "Phase 2: Colocate test files to standardized structure"
 ## 📚 Key Documentation
 
 ### For Executing Phase 2
-1. **`PHASE2_QUICK_START.md`** ← Start here! (3-step guide)
-2. **`PHASE2_EXECUTION_PLAN.md`** ← Full execution details
-3. **`PHASE2_DETAILED_STRATEGY.md`** ← Complete strategy
+1. **`docs/phase2/PHASE2_QUICK_START.md`** ← Start here! (3-step guide)
+2. **`docs/phase2/PHASE2_EXECUTION_PLAN.md`** ← Full execution details
+3. **`docs/phase2/PHASE2_DETAILED_STRATEGY.md`** ← Complete strategy
 
 ### For Understanding
-4. **`TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md`** ← Project overview
-5. **`TESTING_IMPLEMENTATION_SUMMARY.md`** ← Architecture
+4. **`docs/testing/TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md`** ← Project overview
+5. **`docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md`** ← Architecture
 6. **`test-utils/README.md`** ← Setup files reference
 
 ### Complete Index
-7. **`TESTING_DOCUMENTATION_INDEX.md`** ← All docs in one place
+7. **`docs/testing/TESTING_DOCUMENTATION_INDEX.md`** ← All docs in one place
 
 ---
 
@@ -256,7 +256,7 @@ git log --oneline | head   # Verify
 
 ## ✅ Checklist: Are You Ready?
 
-- [ ] Read `PHASE2_QUICK_START.md` (5 min)
+- [ ] Read `docs/phase2/PHASE2_QUICK_START.md` (5 min)
 - [ ] Understand the before/after structure
 - [ ] Have access to terminal
 - [ ] Git is configured and working
@@ -300,10 +300,10 @@ git log --oneline | head   # Verify
 → `test-utils/README.md` (sections 1-3)
 
 **Learn test patterns**:
-→ `TESTING_QUICK_START.md` (patterns section)
+→ `docs/testing/TESTING_QUICK_START.md` (patterns section)
 
 **Understand architecture**:
-→ `TESTING_ARCHITECTURE_DIAGRAM.md` (visuals)
+→ `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` (visuals)
 
 **See examples**:
 → `test-utils/setup/client.ts` (code examples)
@@ -338,19 +338,19 @@ git log --oneline | head   # Verify
 ## 💬 Need Help?
 
 ### Quick Questions
-→ See `TESTING_QUICK_START.md` → FAQ section
+→ See `docs/testing/TESTING_QUICK_START.md` → FAQ section
 
 ### Execution Issues
-→ See `PHASE2_EXECUTION_PLAN.md` → Risk Mitigation section
+→ See `docs/phase2/PHASE2_EXECUTION_PLAN.md` → Risk Mitigation section
 
 ### Import Path Problems
-→ See `PHASE2_EXECUTION_PLAN.md` → Import Path Updates section
+→ See `docs/phase2/PHASE2_EXECUTION_PLAN.md` → Import Path Updates section
 
 ### Troubleshooting
 → See `test-utils/README.md` → Troubleshooting section
 
 ### Complete Overview
-→ See `TESTING_DOCUMENTATION_INDEX.md` (all docs)
+→ See `docs/testing/TESTING_DOCUMENTATION_INDEX.md` (all docs)
 
 ---
 

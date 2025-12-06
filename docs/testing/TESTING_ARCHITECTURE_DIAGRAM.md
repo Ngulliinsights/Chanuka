@@ -201,9 +201,9 @@ PROJECT ROOT
 │       ├── login.spec.ts ............ E2E tests
 │       └── bills-workflow.spec.ts ... (Playwright format)
 │
-├── TESTING_IMPLEMENTATION_SUMMARY.md
-├── TESTING_CONSOLIDATION_PHASE1.md
-└── TESTING_MIGRATION_CHECKLIST.md
+├── docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md
+├── docs/testing/TESTING_CONSOLIDATION_PHASE1.md
+└── docs/testing/TESTING_MIGRATION_CHECKLIST.md
 ```
 
 ---

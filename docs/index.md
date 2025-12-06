@@ -81,9 +81,9 @@ This comprehensive documentation index provides a complete catalog of all Chanuk
 
 | Document | Description | Status |
 |----------|-------------|--------|
-| [CRITICAL_FIXES_ROADMAP.md](../CRITICAL_FIXES_ROADMAP.md) | Critical fixes and roadmap | Current |
-| [TEST_STATUS_SUMMARY.md](../TEST_STATUS_SUMMARY.md) | Testing status and summaries | Current |
-| [RACE_CONDITION_FIXES_SUMMARY.md](../RACE_CONDITION_FIXES_SUMMARY.md) | Race condition fixes documentation | Current |
+| [docs/analysis/CRITICAL_FIXES_ROADMAP.md](../docs/analysis/CRITICAL_FIXES_ROADMAP.md) | Critical fixes and roadmap | Current |
+| [docs/testing/TEST_STATUS_SUMMARY.md](../docs/testing/TEST_STATUS_SUMMARY.md) | Testing status and summaries | Current |
+| [docs/analysis/RACE_CONDITION_FIXES_SUMMARY.md](../docs/analysis/RACE_CONDITION_FIXES_SUMMARY.md) | Race condition fixes documentation | Current |
 
 ### Technical Infrastructure
 
@@ -144,8 +144,8 @@ This comprehensive documentation index provides a complete catalog of all Chanuk
 
 **Project Managers:**
 - [README.md](README.md)
-- [CRITICAL_FIXES_ROADMAP.md](../CRITICAL_FIXES_ROADMAP.md)
-- [TEST_STATUS_SUMMARY.md](../TEST_STATUS_SUMMARY.md)
+- [docs/analysis/CRITICAL_FIXES_ROADMAP.md](../docs/analysis/CRITICAL_FIXES_ROADMAP.md)
+- [docs/testing/TEST_STATUS_SUMMARY.md](../docs/testing/TEST_STATUS_SUMMARY.md)
 
 **Stakeholders:**
 - [README.md](README.md)
@@ -158,7 +158,7 @@ This comprehensive documentation index provides a complete catalog of all Chanuk
 **Design:** chanuka_design_specifications.md, ui-design-plan.md
 **Implementation:** chanuka_implementation_guide.md, setup.md
 **Operations:** infrastructure-guide.md, deployment-module.md
-**Quality:** documentation-standards.md, TEST_STATUS_SUMMARY.md
+**Quality:** documentation-standards.md, docs/testing/TEST_STATUS_SUMMARY.md
 
 ## Maintenance
 

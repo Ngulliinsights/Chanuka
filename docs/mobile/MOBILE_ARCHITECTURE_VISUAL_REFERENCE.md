@@ -390,5 +390,5 @@ Timeline:           Complete     Phase 2 Ready
 - `__archive__/ARCHIVE_README.md` - Legacy files
 
 **Tracking:**
-- `MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md` - Progress tracker
-- `MOBILE_REFACTORING_SETUP_SUMMARY.md` - Project summary
+- `docs/mobile/MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md` - Progress tracker
+- `docs/mobile/MOBILE_REFACTORING_SETUP_SUMMARY.md` - Project summary

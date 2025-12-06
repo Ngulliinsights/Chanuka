@@ -5,8 +5,8 @@ Maximum depth: 7 levels
 ```
 .
 CHANGELOG.md
-CHANUKA_CLIENT_COMPREHENSIVE_ANALYSIS.md
-CHANUKA_CLIENT_DEEP_DIVE_ANALYSIS.md
+docs/chanuka/CHANUKA_CLIENT_COMPREHENSIVE_ANALYSIS.md
+docs/chanuka/CHANUKA_CLIENT_DEEP_DIVE_ANALYSIS.md
 clear-sw.html
 client/
 ├── index.html
@@ -1506,7 +1506,7 @@ client/
 ├── vitest.integration.config.ts
 ├── vitest.performance.config.ts
 components.json
-CRITICAL_FIXES_ROADMAP.md
+docs/analysis/CRITICAL_FIXES_ROADMAP.md
 cspell.config.yaml
 deployment/
 ├── cdn-config.js
@@ -1517,11 +1517,11 @@ deployment/
 ├── monitoring-dashboards.js
 ├── pipeline-config.yml
 ├── README.md
-DESIGN_SYSTEM_INTEGRATION_COMPLETE.md
-DESIGN_SYSTEM_INTEGRATION_GAP_ANALYSIS.md
-DESIGN_SYSTEM_PHASE_2_COMPLETE.md
-discussion_community_integration_analysis.md
-DISCUSSION_COMMUNITY_INTEGRATION_ANALYSIS_VALIDATED.md
+docs/design-system/DESIGN_SYSTEM_INTEGRATION_COMPLETE.md
+docs/design-system/DESIGN_SYSTEM_INTEGRATION_GAP_ANALYSIS.md
+docs/design-system/DESIGN_SYSTEM_PHASE_2_COMPLETE.md
+docs/analysis/discussion_community_integration_analysis.md
+docs/analysis/DISCUSSION_COMMUNITY_INTEGRATION_ANALYSIS_VALIDATED.md
 docker-compose.yml
 Dockerfile
 Dockerfile.client
@@ -1681,16 +1681,16 @@ logs/
 ├── logger_errors.txt
 ├── logger_files.txt
 ├── logger_files_clean.txt
-NAVIGATION_CONSISTENCY_ANALYSIS_REPORT.md
-NAVIGATION_CONSISTENCY_PHASE2_COMPLETE.md
-NAVIGATION_UTILITIES_CONSOLIDATION_COMPLETE.md
-NAVIGATION_UTILITIES_REDUNDANCY_ANALYSIS.md
+docs/navigation/NAVIGATION_CONSISTENCY_ANALYSIS_REPORT.md
+docs/navigation/NAVIGATION_CONSISTENCY_PHASE2_COMPLETE.md
+docs/navigation/NAVIGATION_UTILITIES_CONSOLIDATION_COMPLETE.md
+docs/navigation/NAVIGATION_UTILITIES_REDUNDANCY_ANALYSIS.md
 nginx.conf
 nx.json
 package.json
 performance-baselines.json
 performance-budget-report.json
-performance-budget-report.md
+docs/analysis/performance-budget-report.md
 performance-budgets.json
 playwright.config.ts
 playwright-report/
@@ -1698,8 +1698,8 @@ playwright-report/
 pnpm-lock.yaml
 pnpm-workspace.yaml
 postcss.config.js
-RACE_CONDITION_FIXES_SUMMARY.md
-race-condition-analysis-report.md
+docs/analysis/RACE_CONDITION_FIXES_SUMMARY.md
+docs/analysis/race-condition-analysis-report.md
 README.md
 run_codebase_stats.bat
 runtime-dependency-check.js
@@ -3308,7 +3308,7 @@ shared/
 ├── vitest.config.ts
 start-dev.js
 tailwind.config.js
-TEST_STATUS_SUMMARY.md
+docs/testing/TEST_STATUS_SUMMARY.md
 test-connection.html
 test-imports.ts
 test-results/
@@ -3366,8 +3366,8 @@ tsconfig.json
 tsconfig.server.json
 tsconfig.server.tsbuildinfo
 tsconfig.tsbuildinfo
-UTILITY_CONSOLIDATION_PLAN.md
-utils-usage-report.md
+docs/analysis/UTILITY_CONSOLIDATION_PLAN.md
+docs/analysis/utils-usage-report.md
 validation_output.txt
 VERSION
 vitest.config.ts

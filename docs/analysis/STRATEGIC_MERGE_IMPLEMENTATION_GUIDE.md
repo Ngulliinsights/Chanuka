@@ -310,13 +310,13 @@ To:
 
 **Documentation** (8 files, 2,800+ lines):
 1. `test-utils/README.md` (487 lines) - Setup guide
-2. `TESTING_IMPLEMENTATION_SUMMARY.md` (405 lines) - Architecture
-3. `TESTING_ARCHITECTURE_DIAGRAM.md` (415 lines) - Visual layout
-4. `TESTING_QUICK_START.md` (300 lines) - Getting started
-5. `TESTING_MIGRATION_CHECKLIST.md` (314 lines) - Deployment
-6. `PHASE2_QUICK_START.md` (164 lines) - Phase 2 execution
-7. `PHASE2_EXECUTION_PLAN.md` (295 lines) - Detailed steps
-8. `TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md` (395 lines) - Progress tracking
+2. `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md` (405 lines) - Architecture
+3. `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` (415 lines) - Visual layout
+4. `docs/testing/TESTING_QUICK_START.md` (300 lines) - Getting started
+5. `docs/testing/TESTING_MIGRATION_CHECKLIST.md` (314 lines) - Deployment
+6. `docs/phase2/PHASE2_QUICK_START.md` (164 lines) - Phase 2 execution
+7. `docs/phase2/PHASE2_EXECUTION_PLAN.md` (295 lines) - Detailed steps
+8. `docs/testing/TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md` (395 lines) - Progress tracking
 
 **Value Proposition**:
 - Unified test infrastructure
@@ -496,7 +496,7 @@ SimpleTool/
 │
 ├── TESTING_*.md                 (Main's documentation)
 ├── PHASE2_*.md
-├── BRANCH_COMPARISON_DEEP_ANALYSIS.md
+├── docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md
 └── ...
 ```
 

@@ -1,24 +1,29 @@
 /**
- * Testing Utilities - Consolidated Module
+ * System Validation Module - Validators for architecture and migrations
  * 
- * This module consolidates all testing-related functionality into a single,
- * well-organized system. It validates imports, migrations, architecture, and
- * provides helpful testing utilities for development.
- * 
- * Key responsibilities:
+ * This module consolidates system-level validation functionality:
  * - Import validation: Ensures all critical modules are available
  * - Migration validation: Verifies security, error handling, and compatibility
  * - Architecture validation: Checks service registration and design patterns
- * - Test helpers: Provides utilities for simulating errors and managing test state
  * 
- * Replaces: test-imports.ts, validate-migration.ts, validateArchitecture.ts
+ * Migrated from: client/src/utils/testing.ts
+ * Usage: Import for CI/CD validation scripts, pre-deployment checks, or manual validation
+ * 
+ * Examples:
+ *   // Check if migration is complete
+ *   const validator = new MigrationValidator();
+ *   const results = await validator.runValidation();
+ *   
+ *   // Validate architecture design patterns
+ *   const archResult = await ArchitectureValidator.validate();
+ *   if (!archResult.isValid) {
+ *     console.error('Architecture issues found:', archResult.errors);
+ *   }
  */
 
-import { authenticatedApi, safeApi as secureApi } from './api';
-import { assetLoadingManager } from './assets';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../core/error';
-import { logger } from './logger';
-import { tokenManager as secureTokenManager, sessionManager } from './storage';
+// Note: These validators are designed to work with the application's logger,
+// but they can be used in Node.js contexts (e.g., CI/CD) where these modules
+// might not be available. Error handling is built in for graceful degradation.
 
 // ============================================================================
 // TYPES
@@ -28,7 +33,7 @@ import { tokenManager as secureTokenManager, sessionManager } from './storage';
  * Represents the result of a single validation test.
  * Each test checks one specific aspect of the system.
  */
-interface ValidationResult {
+export interface ValidationResult {
   category: string;    // Grouping category (e.g., "Security", "Imports")
   test: string;        // Specific test name
   passed: boolean;     // Whether the test passed
@@ -39,7 +44,7 @@ interface ValidationResult {
  * Results from comprehensive architecture validation.
  * Includes overall validity, specific issues, and a numeric score.
  */
-interface ArchitectureValidationResult {
+export interface ArchitectureValidationResult {
   isValid: boolean;      // True if no critical errors found
   errors: string[];      // Critical issues that must be fixed
   warnings: string[];    // Non-critical issues to be aware of
@@ -50,11 +55,27 @@ interface ArchitectureValidationResult {
  * Summary statistics for a collection of validation results.
  * Useful for quickly understanding test outcomes.
  */
-interface ValidationSummary {
+export interface ValidationSummary {
   passed: number;        // Number of tests that passed
   total: number;         // Total number of tests run
   passRate: number;      // Percentage of tests that passed
   results: ValidationResult[];  // All individual test results
+}
+
+// Safe logger helper - uses console if logger unavailable
+function safeLog(type: 'info' | 'error' | 'warn', message: string, meta?: unknown) {
+  try {
+    const logger = require('../../../client/src/utils/logger').logger;
+    if (logger && typeof logger[type] === 'function') {
+      logger[type](message, meta);
+      return;
+    }
+  } catch (e) {
+    // Logger not available, fall through to console
+  }
+  
+  const consoleMethod = type === 'info' ? 'log' : type;
+  console[consoleMethod as 'log' | 'error' | 'warn'](message, meta);
 }
 
 // ============================================================================
@@ -75,7 +96,8 @@ export class ImportValidator {
 
     // Test logger import - critical for debugging and monitoring
     try {
-      if (typeof logger.info === 'function') {
+      const { logger } = require('../../../client/src/utils/logger');
+      if (typeof logger?.info === 'function') {
         results.push({
           category: 'Imports',
           test: 'Logger import',
@@ -101,7 +123,8 @@ export class ImportValidator {
 
     // Test token manager import - critical for authentication
     try {
-      if (typeof secureTokenManager.isTokenValid === 'function') {
+      const { tokenManager } = require('../../../client/src/utils/storage');
+      if (typeof tokenManager?.isTokenValid === 'function') {
         results.push({
           category: 'Imports',
           test: 'Token manager import',
@@ -127,7 +150,8 @@ export class ImportValidator {
 
     // Test session manager import - critical for user sessions
     try {
-      if (typeof sessionManager.isSessionValid === 'function') {
+      const { sessionManager } = require('../../../client/src/utils/storage');
+      if (typeof sessionManager?.isSessionValid === 'function') {
         results.push({
           category: 'Imports',
           test: 'Session manager import',
@@ -174,9 +198,9 @@ export class MigrationValidator {
     this.results.push({ category, test, passed, message });
 
     if (passed) {
-      logger.info(`✅ ${category}: ${test}`, { component: 'MigrationValidator' });
+      safeLog('info', `✅ ${category}: ${test}`, { component: 'MigrationValidator' });
     } else {
-      logger.error(`❌ ${category}: ${test} - ${message}`, { component: 'MigrationValidator' });
+      safeLog('error', `❌ ${category}: ${test} - ${message}`, { component: 'MigrationValidator' });
     }
   }
 
@@ -189,9 +213,11 @@ export class MigrationValidator {
 
     // Test 1: Ensure no localStorage token access (security anti-pattern)
     try {
-      const hasLocalStorageTokens = localStorage.getItem('token') !== null ||
+      const hasLocalStorageTokens = typeof localStorage !== 'undefined' && (
+        localStorage.getItem('token') !== null ||
         localStorage.getItem('auth_token') !== null ||
-        localStorage.getItem('access_token') !== null;
+        localStorage.getItem('access_token') !== null
+      );
 
       this.addResult(
         category,
@@ -205,8 +231,11 @@ export class MigrationValidator {
 
     // Test 2: Verify secure API exists and is functional
     try {
-      const hasSecureApi = typeof authenticatedApi.get === 'function' &&
-        typeof secureApi.safeGet === 'function';
+      const { authenticatedApi } = require('../../../client/src/utils/api');
+      const { safeApi: secureApi } = require('../../../client/src/utils/api');
+
+      const hasSecureApi = typeof authenticatedApi?.get === 'function' &&
+        typeof secureApi?.safeGet === 'function';
 
       this.addResult(
         category,
@@ -220,8 +249,9 @@ export class MigrationValidator {
 
     // Test 3: Verify secure token manager with proper methods
     try {
-      const hasSecureTokenManager = typeof secureTokenManager.isTokenValid === 'function' &&
-        typeof secureTokenManager.getAccessToken === 'function';
+      const { tokenManager } = require('../../../client/src/utils/storage');
+      const hasSecureTokenManager = typeof tokenManager?.isTokenValid === 'function' &&
+        typeof tokenManager?.getAccessToken === 'function';
 
       this.addResult(
         category,
@@ -243,10 +273,10 @@ export class MigrationValidator {
 
     // Test 1: Verify unified error handler singleton
     try {
-      const { UnifiedErrorHandler } = await import('./errors');
-      const errorHandler = UnifiedErrorHandler.getInstance();
-      const hasErrorHandler = typeof errorHandler.handleError === 'function' &&
-        typeof errorHandler.getRecentErrors === 'function';
+      const { UnifiedErrorHandler } = require('../../../client/src/core/error');
+      const errorHandler = UnifiedErrorHandler?.getInstance?.();
+      const hasErrorHandler = typeof errorHandler?.handleError === 'function' &&
+        typeof errorHandler?.getRecentErrors === 'function';
 
       this.addResult(
         category,
@@ -260,6 +290,8 @@ export class MigrationValidator {
 
     // Test 2: Verify error classes work correctly
     try {
+      const { BaseError, ErrorDomain, ErrorSeverity } = require('../../../client/src/core/error');
+
       const testError = new BaseError('Test error', {
         domain: ErrorDomain.SYSTEM,
         severity: ErrorSeverity.LOW
@@ -288,8 +320,9 @@ export class MigrationValidator {
 
     // Test 1: Verify asset loading manager with required methods
     try {
-      const hasAssetManager = typeof assetLoadingManager.loadAsset === 'function' &&
-        typeof assetLoadingManager.getLoadingStats === 'function';
+      const { assetLoadingManager } = require('../../../client/src/utils/assets');
+      const hasAssetManager = typeof assetLoadingManager?.loadAsset === 'function' &&
+        typeof assetLoadingManager?.getLoadingStats === 'function';
 
       this.addResult(
         category,
@@ -303,8 +336,9 @@ export class MigrationValidator {
 
     // Test 2: Verify asset loader functionality (duplicate check serves as redundancy)
     try {
-      const hasAssetLoader = typeof assetLoadingManager.loadAsset === 'function' &&
-        typeof assetLoadingManager.getLoadingStats === 'function';
+      const { assetLoadingManager } = require('../../../client/src/utils/assets');
+      const hasAssetLoader = typeof assetLoadingManager?.loadAsset === 'function' &&
+        typeof assetLoadingManager?.getLoadingStats === 'function';
 
       this.addResult(
         category,
@@ -326,10 +360,11 @@ export class MigrationValidator {
 
     // Test 1: Verify all required logger methods exist
     try {
-      const hasLoggerMethods = typeof logger.debug === 'function' &&
-        typeof logger.info === 'function' &&
-        typeof logger.warn === 'function' &&
-        typeof logger.error === 'function';
+      const { logger } = require('../../../client/src/utils/logger');
+      const hasLoggerMethods = typeof logger?.debug === 'function' &&
+        typeof logger?.info === 'function' &&
+        typeof logger?.warn === 'function' &&
+        typeof logger?.error === 'function';
 
       this.addResult(
         category,
@@ -343,7 +378,8 @@ export class MigrationValidator {
 
     // Test 2: Test logger actually works by attempting to log
     try {
-      logger.info('Migration validation test', { component: 'MigrationValidator' });
+      const { logger } = require('../../../client/src/utils/logger');
+      logger?.info('Migration validation test', { component: 'MigrationValidator' });
 
       this.addResult(
         category,
@@ -365,8 +401,11 @@ export class MigrationValidator {
 
     // Test 1: Verify API compatibility with both old and new patterns
     try {
-      const apiCompatible = typeof authenticatedApi.get === 'function' &&
-        typeof secureApi.safeGet === 'function';
+      const { authenticatedApi } = require('../../../client/src/utils/api');
+      const { safeApi: secureApi } = require('../../../client/src/utils/api');
+
+      const apiCompatible = typeof authenticatedApi?.get === 'function' &&
+        typeof secureApi?.safeGet === 'function';
 
       this.addResult(
         category,
@@ -380,6 +419,8 @@ export class MigrationValidator {
 
     // Test 2: Verify error handling compatibility
     try {
+      const { BaseError, ErrorDomain, ErrorSeverity } = require('../../../client/src/core/error');
+
       const errorCompatible = typeof BaseError === 'function' &&
         typeof ErrorDomain === 'object' &&
         typeof ErrorSeverity === 'object';
@@ -400,7 +441,7 @@ export class MigrationValidator {
    * This is the main entry point for migration validation.
    */
   async runValidation(): Promise<ValidationResult[]> {
-    logger.info('Starting migration validation...', { component: 'MigrationValidator' });
+    safeLog('info', 'Starting migration validation...', { component: 'MigrationValidator' });
 
     // Run all validation categories
     this.validateSecurity();
@@ -414,7 +455,8 @@ export class MigrationValidator {
     const total = this.results.length;
     const passRate = (passed / total) * 100;
 
-    logger.info(
+    safeLog(
+      'info',
       `Migration validation complete: ${passed}/${total} tests passed (${passRate.toFixed(1)}%)`,
       { component: 'MigrationValidator', passed, total, passRate }
     );
@@ -474,7 +516,7 @@ export class ArchitectureValidator {
 
       const isValid = errors.length === 0;
 
-      logger.info('Architecture validation completed', {
+      safeLog('info', 'Architecture validation completed', {
         component: 'ArchitectureValidator',
         isValid,
         score,
@@ -489,7 +531,7 @@ export class ArchitectureValidator {
         score: Math.max(0, score) // Ensure score doesn't go below 0
       };
     } catch (error) {
-      logger.error('Architecture validation failed', {
+      safeLog('error', 'Architecture validation failed', {
         component: 'ArchitectureValidator',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
@@ -524,10 +566,10 @@ export class ArchitectureValidator {
 
     try {
       // Dynamically import the service locator to avoid circular dependencies
-      const { globalServiceLocator } = await import('../core/api/registry');
+      const { globalServiceLocator } = require('../../../client/src/core/api/registry');
 
       for (const serviceName of requiredServices) {
-        if (!globalServiceLocator.hasService(serviceName)) {
+        if (!globalServiceLocator?.hasService?.(serviceName)) {
           errors.push(`Required service '${serviceName}' is not registered`);
           penalty += 20; // Major issue - missing service
         } else {
@@ -566,7 +608,13 @@ export class ArchitectureValidator {
 
     try {
       // Check if standardized types are available
-      const apiTypes = await import('../types/api').catch(() => null);
+      const apiTypes = await Promise.resolve().then(() => {
+        try {
+          return require('../../../client/src/types/api');
+        } catch {
+          return null;
+        }
+      });
 
       const requiredTypes = [
         'BillUpdate',
@@ -651,151 +699,3 @@ export class ArchitectureValidator {
     return report;
   }
 }
-
-// ============================================================================
-// TEST HELPERS
-// ============================================================================
-
-/**
- * Provides utilities for testing error handling, managing test state,
- * and getting information about the test environment.
- */
-export class TestHelpers {
-  /**
-   * Simulates different types of errors for testing error handling.
-   * Useful for verifying error boundaries and recovery mechanisms work.
-   */
-  static simulateError(type: 'javascript' | 'promise' | 'network' | 'resource'): void {
-    logger.info(`🧪 Simulating ${type} error for testing`, { component: 'TestHelpers' });
-
-    switch (type) {
-      case 'javascript':
-        // Synchronous error - tests error boundaries
-        throw new Error('Simulated JavaScript error for testing');
-
-      case 'promise':
-        // Asynchronous error - tests unhandled rejection handling
-        Promise.reject(new Error('Simulated promise rejection for testing'));
-        break;
-
-      case 'resource': {
-        // Resource loading error - tests asset loading error handling
-        const script = document.createElement('script');
-        script.src = '/non-existent-script.js';
-        document.head.appendChild(script);
-        break;
-      }
-
-      case 'network':
-        // Network error - tests API error handling
-        fetch('/non-existent-endpoint').catch(() => {
-          logger.info('Simulated network error completed', { component: 'TestHelpers' });
-        });
-        break;
-    }
-  }
-
-  /**
-   * Clears all caches and storage for a clean test state.
-   * Useful for ensuring tests start from a known state.
-   */
-  static async clearAllCaches(): Promise<void> {
-    // Clear browser caches
-    if ('caches' in window) {
-      const names = await caches.keys();
-      await Promise.all(names.map(name => caches.delete(name)));
-    }
-
-    // Clear storage (with error handling for restricted contexts)
-    try {
-      localStorage.clear();
-      sessionStorage.clear();
-    } catch (e) {
-      logger.warn('Failed to clear storage (may be in restricted context)', {
-        component: 'TestHelpers',
-        error: e
-      });
-    }
-  }
-
-  /**
-   * Gets comprehensive information about the test environment.
-   * Useful for debugging environment-specific issues.
-   */
-  static getTestEnvironment(): Record<string, unknown> {
-    return {
-      userAgent: navigator.userAgent,
-      platform: navigator.platform,
-      language: navigator.language,
-      cookieEnabled: navigator.cookieEnabled,
-      onLine: navigator.onLine,
-      viewport: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      },
-      screen: {
-        width: screen.width,
-        height: screen.height,
-        colorDepth: screen.colorDepth,
-      },
-    };
-  }
-}
-
-// ============================================================================
-// AUTO-VALIDATION IN DEVELOPMENT
-// ============================================================================
-
-export const migrationValidator = new MigrationValidator();
-
-/**
- * Auto-run validation in development mode after a short delay.
- * This catches issues early in the development cycle.
- */
-if (process.env.NODE_ENV === 'development') {
-  setTimeout(() => {
-    migrationValidator.runValidation().catch(error => {
-      console.error('Migration validation failed:', error);
-    });
-  }, 1000); // Wait 1 second to allow modules to initialize
-}
-
-// ============================================================================
-// DEVELOPMENT HELPERS
-// ============================================================================
-
-/**
- * Convenience function to run architecture validation in development.
- * Displays results in the console with clear visual indicators.
- */
-export const validateArchitectureInDev = async (): Promise<void> => {
-  if (process.env.NODE_ENV === 'development') {
-    try {
-      const result = await ArchitectureValidator.validate();
-
-      if (!result.isValid) {
-        console.group('🏗️ Architecture Validation Issues');
-        result.errors.forEach(error => console.error('❌', error));
-        result.warnings.forEach(warning => console.warn('⚠️', warning));
-        console.groupEnd();
-      } else {
-        console.log('✅ Architecture validation passed');
-      }
-    } catch (error) {
-      console.error('Architecture validation failed:', error);
-    }
-  }
-};
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export default {
-  ImportValidator,
-  MigrationValidator,
-  ArchitectureValidator,
-  TestHelpers,
-  migrationValidator,
-  validateArchitectureInDev,
-};

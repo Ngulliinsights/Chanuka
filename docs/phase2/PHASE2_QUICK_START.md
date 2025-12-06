@@ -9,8 +9,8 @@
 ## What's Ready
 
 - `phase2-migration-commands.sh` (1175 lines) - Automated migration script
-- `PHASE2_EXECUTION_PLAN.md` - Detailed execution guide
-- `PHASE2_DETAILED_STRATEGY.md` - Complete strategy documentation
+- `docs/phase2/PHASE2_EXECUTION_PLAN.md` - Detailed execution guide
+- `docs/phase2/PHASE2_DETAILED_STRATEGY.md` - Complete strategy documentation
 - Build issues resolved (mobile/index.ts created)
 
 ## Execute Phase 2 Now (3 Simple Steps)
@@ -132,9 +132,9 @@ cat phase2-import-validation.log | grep ERROR
 
 ## Key Resources
 
-- **Main Guide**: `PHASE2_EXECUTION_PLAN.md`
-- **Details**: `PHASE2_DETAILED_STRATEGY.md`
-- **Overview**: `TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md`
+- **Main Guide**: `docs/phase2/PHASE2_EXECUTION_PLAN.md`
+- **Details**: `docs/phase2/PHASE2_DETAILED_STRATEGY.md`
+- **Overview**: `docs/testing/TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md`
 - **Setup Reference**: `test-utils/README.md`
 
 ## Success Metrics

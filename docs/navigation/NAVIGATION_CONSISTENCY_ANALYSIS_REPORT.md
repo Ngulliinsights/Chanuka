@@ -20,9 +20,9 @@ This comprehensive report synthesizes findings from multiple analyses of the Cha
 
 This report synthesizes findings from:
 
-1. **DESIGN_SYSTEM_INTEGRATION_GAP_ANALYSIS.md** - Design system integration gaps
-2. **CHANUKA_CLIENT_COMPREHENSIVE_ANALYSIS.md** - Overall codebase architecture analysis
-3. **CHANUKA_CLIENT_DEEP_DIVE_ANALYSIS.md** - Detailed implementation analysis
+1. **docs/design-system/DESIGN_SYSTEM_INTEGRATION_GAP_ANALYSIS.md** - Design system integration gaps
+2. **docs/chanuka/CHANUKA_CLIENT_COMPREHENSIVE_ANALYSIS.md** - Overall codebase architecture analysis
+3. **docs/chanuka/CHANUKA_CLIENT_DEEP_DIVE_ANALYSIS.md** - Detailed implementation analysis
 4. **Navigation Test Suite** - 13+ navigation-specific test files
 5. **Orphan File Analysis** - Utility and component organization assessment
 
@@ -380,9 +380,9 @@ The Chanuka platform's navigation system demonstrates functional completeness wi
 
 ### Appendix A: Files Analyzed
 
-- DESIGN_SYSTEM_INTEGRATION_GAP_ANALYSIS.md
-- CHANUKA_CLIENT_COMPREHENSIVE_ANALYSIS.md
-- CHANUKA_CLIENT_DEEP_DIVE_ANALYSIS.md
+- docs/design-system/DESIGN_SYSTEM_INTEGRATION_GAP_ANALYSIS.md
+- docs/chanuka/CHANUKA_CLIENT_COMPREHENSIVE_ANALYSIS.md
+- docs/chanuka/CHANUKA_CLIENT_DEEP_DIVE_ANALYSIS.md
 - Navigation test suite (13+ files)
 - Orphan file analysis reports
 

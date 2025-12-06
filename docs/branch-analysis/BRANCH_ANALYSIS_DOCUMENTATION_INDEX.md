@@ -15,7 +15,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 ## 🎯 Quick Navigation by Role
 
 ### For Project Managers / Decision Makers
-**Start here**: `EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`
+**Start here**: `docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`
 - High-level overview (5-10 min read)
 - Cost-benefit analysis
 - Risk assessment
@@ -24,7 +24,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 - **Action**: Answer 5 critical questions, confirm recommendation
 
 ### For Architects / Tech Leads
-**Start here**: `BRANCH_COMPARISON_DEEP_ANALYSIS.md`
+**Start here**: `docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md`
 - Detailed strength comparison
 - Architecture analysis
 - Commit-by-commit breakdown
@@ -33,7 +33,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 - **Action**: Review modular structure decisions, validate approach
 
 ### For Developers Executing the Merge
-**Start here**: `STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md`
+**Start here**: `docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md`
 - Step-by-step execution instructions
 - Conflict resolution strategy
 - Validation procedures
@@ -42,7 +42,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 - **Action**: Follow procedures exactly, report blockers
 
 ### For Team Leads / Coordinators
-**Start here**: `BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md`
+**Start here**: `docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md`
 - Side-by-side capability matrix
 - Implementation timeline
 - Team communication guide
@@ -50,7 +50,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 - **Action**: Plan team resources and timeline
 
 ### For Quick Reference
-**Start here**: `QUICK_REFERENCE_BRANCH_COMPARISON.md`
+**Start here**: `docs/branch-analysis/QUICK_REFERENCE_BRANCH_COMPARISON.md`
 - One-page summaries
 - Decision checklist
 - Command reference
@@ -61,7 +61,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 
 ## 📖 Complete Document Descriptions
 
-### Document 1: EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
+### Document 1: docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
 
 **Length**: ~3,000 words | **Read Time**: 10-15 minutes
 
@@ -92,7 +92,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 
 ---
 
-### Document 2: BRANCH_COMPARISON_DEEP_ANALYSIS.md
+### Document 2: docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md
 
 **Length**: ~5,500 words | **Read Time**: 20-30 minutes
 
@@ -121,7 +121,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 
 ---
 
-### Document 3: STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md
+### Document 3: docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md
 
 **Length**: ~6,000 words | **Read Time**: 25-35 minutes
 
@@ -151,7 +151,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 
 ---
 
-### Document 4: BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md
+### Document 4: docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md
 
 **Length**: ~7,000 words | **Read Time**: 30-40 minutes
 
@@ -180,7 +180,7 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 
 ---
 
-### Document 5: QUICK_REFERENCE_BRANCH_COMPARISON.md
+### Document 5: docs/branch-analysis/QUICK_REFERENCE_BRANCH_COMPARISON.md
 
 **Length**: ~2,500 words | **Read Time**: 8-12 minutes
 
@@ -238,11 +238,11 @@ This comprehensive analysis includes **5 detailed documents** plus this index. T
 
 ```
 START HERE (Choose your role)
-├─ Project Managers → EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
-├─ Architects → BRANCH_COMPARISON_DEEP_ANALYSIS.md
-├─ Developers → STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md
-├─ Coordinators → BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md
-├─ Quick Lookup → QUICK_REFERENCE_BRANCH_COMPARISON.md
+├─ Project Managers → docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
+├─ Architects → docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md
+├─ Developers → docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md
+├─ Coordinators → docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md
+├─ Quick Lookup → docs/branch-analysis/QUICK_REFERENCE_BRANCH_COMPARISON.md
 └─ Visual Summary → BRANCH_ANALYSIS_SUMMARY.txt
 
 ALL DOCUMENTS REACH SAME CONCLUSION:
@@ -283,27 +283,27 @@ Payoff: Maximum
 ### For First-Time Readers (30 minutes)
 1. This index document (5 min)
 2. `BRANCH_ANALYSIS_SUMMARY.txt` (5 min) - visual overview
-3. `QUICK_REFERENCE_BRANCH_COMPARISON.md` (8 min) - key facts
-4. `EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md` (12 min) - decision framework
+3. `docs/branch-analysis/QUICK_REFERENCE_BRANCH_COMPARISON.md` (8 min) - key facts
+4. `docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md` (12 min) - decision framework
 
 ### For Decision Makers (45 minutes)
-1. `EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md` (15 min) - understand recommendation
-2. `BRANCH_COMPARISON_DEEP_ANALYSIS.md` (20 min) - validate recommendation
-3. `BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md` (10 min) - decision framework
+1. `docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md` (15 min) - understand recommendation
+2. `docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md` (20 min) - validate recommendation
+3. `docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md` (10 min) - decision framework
 
 ### For Implementers (2 hours)
-1. `STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md` (35 min) - understand procedure
-2. `BRANCH_COMPARISON_DEEP_ANALYSIS.md` (25 min) - understand context
-3. `BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md` (20 min) - understand commits
-4. `QUICK_REFERENCE_BRANCH_COMPARISON.md` (20 min) - bookmark for reference
-5. `STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md` (20 min) - re-read procedures before executing
+1. `docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md` (35 min) - understand procedure
+2. `docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md` (25 min) - understand context
+3. `docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md` (20 min) - understand commits
+4. `docs/branch-analysis/QUICK_REFERENCE_BRANCH_COMPARISON.md` (20 min) - bookmark for reference
+5. `docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md` (20 min) - re-read procedures before executing
 
 ---
 
 ## 🎬 Using These Documents in Meetings
 
 ### Executive Briefing (15 minutes)
-**Use**: `EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`
+**Use**: `docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`
 - Section: "Quick Comparison" (3 min)
 - Section: "Key Statistics" (2 min)
 - Section: "Strategic Recommendation" (5 min)
@@ -311,21 +311,21 @@ Payoff: Maximum
 - Decision: Approve timeline and approach
 
 ### Architecture Review (30 minutes)
-**Use**: `BRANCH_COMPARISON_DEEP_ANALYSIS.md`
+**Use**: `docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md`
 - Section: "Strategic Positioning" (8 min)
 - Section: "Archive's Strengths" (10 min)
 - Section: "Main's Strengths" (8 min)
 - Discussion: Validate approach (4 min)
 
 ### Team Planning (45 minutes)
-**Use**: `BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md`
+**Use**: `docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md`
 - Section: "Phased Adoption Timeline" (15 min)
 - Section: "Effort & Resource Planning" (10 min)
 - Section: "Success Metrics" (10 min)
 - Planning: Assign roles, set deadlines (10 min)
 
 ### Execution Kickoff (30 minutes)
-**Use**: `STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md`
+**Use**: `docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md`
 - Section: "Step 1: Prepare Environment" (10 min)
 - Section: "Conflict Resolution Strategy" (10 min)
 - Section: "Validation Procedures" (10 min)
@@ -399,14 +399,14 @@ Wiki Structure:
 3. ✅ Schedule decision meeting
 
 ### In Decision Meeting
-1. Review `EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md` sections 1-3
+1. Review `docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md` sections 1-3
 2. Answer 5 critical questions (in Executive Summary)
 3. Confirm recommendation: **Hybrid Rebase (Archive-First)**
 4. Approve timeline: **2-3 weeks**
 5. Assign implementation team
 
 ### After Approval
-1. Team reads `STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md`
+1. Team reads `docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md`
 2. Create safety backups (git branches)
 3. Execute rebase following documented procedure
 4. Run validation suite
@@ -417,22 +417,22 @@ Wiki Structure:
 ## 📞 Using This Analysis
 
 ### Question: "Should we merge these branches?"
-**Answer**: Yes, using the Hybrid Rebase approach (see `EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`)
+**Answer**: Yes, using the Hybrid Rebase approach (see `docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`)
 
 ### Question: "Which branch is better?"
-**Answer**: Archive has better architecture, Main has better testing. Combined is best (see `BRANCH_COMPARISON_DEEP_ANALYSIS.md`)
+**Answer**: Archive has better architecture, Main has better testing. Combined is best (see `docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md`)
 
 ### Question: "How do we do the merge?"
-**Answer**: Follow exact steps in `STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md` with conflict resolution strategy
+**Answer**: Follow exact steps in `docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md` with conflict resolution strategy
 
 ### Question: "What's the timeline?"
-**Answer**: 2-3 weeks for execution, with specific breakdown in `BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md`
+**Answer**: 2-3 weeks for execution, with specific breakdown in `docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md`
 
 ### Question: "What are the risks?"
 **Answer**: Medium-level risks with documented mitigation in all documents
 
 ### Question: "What will we gain?"
-**Answer**: 1,169,986 LOC of clean, modular, well-tested codebase (see `EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`)
+**Answer**: 1,169,986 LOC of clean, modular, well-tested codebase (see `docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`)
 
 ---
 
@@ -450,13 +450,13 @@ Wiki Structure:
 ## 📚 Complete File List
 
 ```
-1. EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
-2. BRANCH_COMPARISON_DEEP_ANALYSIS.md
-3. STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md
-4. BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md
-5. QUICK_REFERENCE_BRANCH_COMPARISON.md
+1. docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
+2. docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md
+3. docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md
+4. docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md
+5. docs/branch-analysis/QUICK_REFERENCE_BRANCH_COMPARISON.md
 6. BRANCH_ANALYSIS_SUMMARY.txt
-7. BRANCH_ANALYSIS_DOCUMENTATION_INDEX.md (this file)
+7. docs/branch-analysis/BRANCH_ANALYSIS_DOCUMENTATION_INDEX.md (this file)
 ```
 
 **Total**: 7 comprehensive documents  
@@ -481,10 +481,10 @@ All recommendations are:
 ---
 
 **Questions?** Refer to the appropriate document:
-- Strategic questions → `EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`
-- Technical questions → `BRANCH_COMPARISON_DEEP_ANALYSIS.md`
-- Implementation questions → `STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md`
-- Decision questions → `BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md`
-- Quick reference → `QUICK_REFERENCE_BRANCH_COMPARISON.md`
+- Strategic questions → `docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md`
+- Technical questions → `docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md`
+- Implementation questions → `docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md`
+- Decision questions → `docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md`
+- Quick reference → `docs/branch-analysis/QUICK_REFERENCE_BRANCH_COMPARISON.md`
 
 **Let's make SimpleTool the best it can be!** 🎉

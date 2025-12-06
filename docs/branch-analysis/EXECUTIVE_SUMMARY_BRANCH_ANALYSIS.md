@@ -104,10 +104,10 @@ client/src/core/
 
 ✅ **Documentation Quality** (2,800+ LOC)
 - `test-utils/README.md` (487 lines)
-- `TESTING_IMPLEMENTATION_SUMMARY.md` (405 lines)
-- `TESTING_ARCHITECTURE_DIAGRAM.md` (415 lines)
-- `TESTING_QUICK_START.md` (300 lines)
-- `TESTING_MIGRATION_CHECKLIST.md` (314 lines)
+- `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md` (405 lines)
+- `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` (415 lines)
+- `docs/testing/TESTING_QUICK_START.md` (300 lines)
+- `docs/testing/TESTING_MIGRATION_CHECKLIST.md` (314 lines)
 - Phase-based roadmap with clear milestones
 
 ✅ **Ready to Deploy**
@@ -404,19 +404,19 @@ Before proceeding, confirm:
 
 This analysis includes three comprehensive documents:
 
-1. **BRANCH_COMPARISON_DEEP_ANALYSIS.md** (Primary Analysis)
+1. **docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md** (Primary Analysis)
    - Detailed strength comparison
    - Commit-by-commit breakdown
    - File-level differences
    - Future roadmap
 
-2. **STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md** (How-To Guide)
+2. **docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md** (How-To Guide)
    - Step-by-step execution
    - Conflict resolution strategy
    - Validation procedures
    - Post-merge checklist
 
-3. **BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md** (Decision Framework)
+3. **docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md** (Decision Framework)
    - Side-by-side capability matrix
    - Use-case recommendations
    - Timeline options

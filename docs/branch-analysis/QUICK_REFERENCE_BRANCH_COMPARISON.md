@@ -304,22 +304,22 @@ git push origin main --force-with-lease
 
 For full details, see:
 
-1. **EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md**
+1. **docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md**
    - High-level overview
    - Decision recommendations
    - Cost-benefit analysis
 
-2. **BRANCH_COMPARISON_DEEP_ANALYSIS.md**
+2. **docs/branch-analysis/BRANCH_COMPARISON_DEEP_ANALYSIS.md**
    - Detailed comparison
    - Commit breakdown
    - Strategic positioning
 
-3. **STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md**
+3. **docs/analysis/STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md**
    - Step-by-step instructions
    - Conflict resolution strategy
    - Validation procedures
 
-4. **BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md**
+4. **docs/branch-analysis/BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md**
    - Side-by-side matrix
    - Use-case recommendations
    - Timeline options
@@ -345,7 +345,7 @@ For full details, see:
 
 ## 🚀 Next Steps
 
-1. Read EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
+1. Read docs/branch-analysis/EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
 2. Discuss with team
 3. Answer 5 critical questions
 4. Confirm recommendation

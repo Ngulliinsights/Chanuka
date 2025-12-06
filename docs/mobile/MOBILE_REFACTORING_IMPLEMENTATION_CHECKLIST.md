@@ -41,7 +41,7 @@ This checklist tracks the mobile component refactoring from chaos to a clean, sc
 - [x] Create `README_NEW_STRUCTURE.md` (comprehensive architecture guide)
 - [x] Create `ARCHIVE_README.md` (legacy file inventory)
 - [x] Create `MOBILE_DEVELOPMENT_GUIDE.md` (developer reference)
-- [x] Create `MOBILE_REFACTORING_SETUP_SUMMARY.md` (this project summary)
+- [x] Create `docs/mobile/MOBILE_REFACTORING_SETUP_SUMMARY.md` (this project summary)
 
 **Deliverable:** Foundation for organized mobile architecture ready for component migration
 
@@ -253,8 +253,8 @@ This checklist tracks the mobile component refactoring from chaos to a clean, sc
 ✅ client/src/components/mobile/README_NEW_STRUCTURE.md
 ✅ client/src/components/mobile/__archive__/ARCHIVE_README.md
 ✅ docs/MOBILE_DEVELOPMENT_GUIDE.md
-✅ MOBILE_REFACTORING_SETUP_SUMMARY.md
-✅ This checklist (MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md)
+✅ docs/mobile/MOBILE_REFACTORING_SETUP_SUMMARY.md
+✅ This checklist (docs/mobile/MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md)
 ```
 
 ### To Move in Phase 2

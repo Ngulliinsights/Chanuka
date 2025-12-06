@@ -42,10 +42,10 @@ This document summarizes the complete status of the testing infrastructure conso
 
 **Created Comprehensive Documentation**:
 - `test-utils/README.md` (450 lines) - Setup files guide
-- `TESTING_IMPLEMENTATION_SUMMARY.md` (400 lines) - Overview + rationale
-- `TESTING_ARCHITECTURE_DIAGRAM.md` (350 lines) - Visual structure
-- `TESTING_QUICK_START.md` (200 lines) - Getting started guide
-- `TESTING_MIGRATION_CHECKLIST.md` (350 lines) - Step-by-step checklist
+- `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md` (400 lines) - Overview + rationale
+- `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` (350 lines) - Visual structure
+- `docs/testing/TESTING_QUICK_START.md` (200 lines) - Getting started guide
+- `docs/testing/TESTING_MIGRATION_CHECKLIST.md` (350 lines) - Step-by-step checklist
 
 ### Key Achievements
 
@@ -254,15 +254,15 @@ Week 5:
 - `test-utils/setup/shared.ts` - Shared library tests
 - `test-utils/setup/e2e.ts` - E2E automation
 - `test-utils/README.md` - Comprehensive guide
-- `TESTING_IMPLEMENTATION_SUMMARY.md` - Overview
-- `TESTING_ARCHITECTURE_DIAGRAM.md` - Visual guide
-- `TESTING_QUICK_START.md` - Getting started
-- `TESTING_MIGRATION_CHECKLIST.md` - Migration steps
+- `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md` - Overview
+- `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` - Visual guide
+- `docs/testing/TESTING_QUICK_START.md` - Getting started
+- `docs/testing/TESTING_MIGRATION_CHECKLIST.md` - Migration steps
 
 ### Phase 2 Generated Assets 🔄
 - `phase2-migration-commands.sh` - Automated migration script (1176 lines)
-- `PHASE2_DETAILED_STRATEGY.md` - Comprehensive strategy guide
-- `PHASE2_EXECUTION_PLAN.md` - Step-by-step execution guide
+- `docs/phase2/PHASE2_DETAILED_STRATEGY.md` - Comprehensive strategy guide
+- `docs/phase2/PHASE2_EXECUTION_PLAN.md` - Step-by-step execution guide
 - `scripts/analyze-phase2.sh` - Test file analysis
 - `scripts/phase2-migration-generator.sh` - Script generator
 
@@ -307,8 +307,8 @@ Week 5:
 ### Action Items (Prioritized)
 
 **Today**:
-1. ✅ Review Phase 2 Execution Plan (`PHASE2_EXECUTION_PLAN.md`)
-2. ✅ Review Phase 2 Detailed Strategy (`PHASE2_DETAILED_STRATEGY.md`)
+1. ✅ Review Phase 2 Execution Plan (`docs/phase2/PHASE2_EXECUTION_PLAN.md`)
+2. ✅ Review Phase 2 Detailed Strategy (`docs/phase2/PHASE2_DETAILED_STRATEGY.md`)
 3. ⏳ Decide: Ready to execute Phase 2?
 
 **When Ready** (Phase 2 Deployment):
@@ -387,9 +387,9 @@ The testing infrastructure consolidation project is on track. Phase 1 (Configura
 ## Questions or Issues?
 
 Refer to:
-- `PHASE2_EXECUTION_PLAN.md` - How to execute Phase 2
-- `PHASE2_DETAILED_STRATEGY.md` - Detailed strategy and rationale
+- `docs/phase2/PHASE2_EXECUTION_PLAN.md` - How to execute Phase 2
+- `docs/phase2/PHASE2_DETAILED_STRATEGY.md` - Detailed strategy and rationale
 - `test-utils/README.md` - Understanding Phase 1 setup
-- `TESTING_QUICK_START.md` - Quick reference guide
+- `docs/testing/TESTING_QUICK_START.md` - Quick reference guide
 
 All resources are available in the workspace root or test-utils directory.

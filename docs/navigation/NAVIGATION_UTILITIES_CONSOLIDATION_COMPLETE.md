@@ -214,9 +214,9 @@ const {
 - ✅ `client/src/components/navigation/ui/DesktopSidebar.tsx` - Updated to use consolidated utilities
 
 ### **Created**
-- ✅ `NAVIGATION_UTILITIES_REDUNDANCY_ANALYSIS.md` - Comprehensive redundancy analysis
+- ✅ `docs/navigation/NAVIGATION_UTILITIES_REDUNDANCY_ANALYSIS.md` - Comprehensive redundancy analysis
 - ✅ `client/src/components/navigation/utils/MIGRATION_TO_CONSOLIDATED_UTILITIES.md` - Migration guide
-- ✅ `NAVIGATION_UTILITIES_CONSOLIDATION_COMPLETE.md` - This completion report
+- ✅ `docs/navigation/NAVIGATION_UTILITIES_CONSOLIDATION_COMPLETE.md` - This completion report
 
 ### **Deprecated (for future removal)**
 - 📅 `client/src/components/navigation/utils/navigation-utils.ts` - Functions consolidated into primary utilities

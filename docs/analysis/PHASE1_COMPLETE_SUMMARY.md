@@ -51,9 +51,9 @@ client/src/types/mobile.ts        (unified types)
 ### 4. Documentation (4 comprehensive guides)
 1. **`README_NEW_STRUCTURE.md`** - Architecture reference
 2. **`MOBILE_DEVELOPMENT_GUIDE.md`** - Developer patterns & usage
-3. **`MOBILE_REFACTORING_SETUP_SUMMARY.md`** - Project overview
-4. **`MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md`** - Phase tracker
-5. **`MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md`** - Diagrams & trees
+3. **`docs/mobile/MOBILE_REFACTORING_SETUP_SUMMARY.md`** - Project overview
+4. **`docs/mobile/MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md`** - Phase tracker
+5. **`docs/mobile/MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md`** - Diagrams & trees
 6. **`__archive__/ARCHIVE_README.md`** - Legacy file inventory
 
 ---
@@ -140,7 +140,7 @@ All the foundation is laid for Phase 2 component migration:
 ### For Different Audiences
 
 **👨‍💼 Project Managers / Stakeholders**
-→ Read: `MOBILE_REFACTORING_SETUP_SUMMARY.md`
+→ Read: `docs/mobile/MOBILE_REFACTORING_SETUP_SUMMARY.md`
 - What was done: ✅
 - What's next: Phase 2-5
 - Timeline & metrics
@@ -161,14 +161,14 @@ All the foundation is laid for Phase 2 component migration:
 - Export structure
 
 **📋 Project Managers / Trackers**
-→ Read: `MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md`
+→ Read: `docs/mobile/MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md`
 - Phase-by-phase breakdown
 - All actionable items
 - Progress tracking
 - Success metrics
 
 **📊 Visual Learners**
-→ Read: `MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md`
+→ Read: `docs/mobile/MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md`
 - Directory trees
 - Data flow diagrams
 - Component hierarchy
@@ -181,7 +181,7 @@ All the foundation is laid for Phase 2 component migration:
 ### 1. Review the Architecture (15 min)
 ```bash
 # Read in this order:
-1. MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md (diagrams)
+1. docs/mobile/MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md (diagrams)
 2. README_NEW_STRUCTURE.md (detailed guide)
 3. MOBILE_DEVELOPMENT_GUIDE.md (patterns)
 ```
@@ -252,7 +252,7 @@ npm run lint                  # Check imports
 ## 📞 Next Steps
 
 ### For Project Managers
-1. **Review** `MOBILE_REFACTORING_SETUP_SUMMARY.md`
+1. **Review** `docs/mobile/MOBILE_REFACTORING_SETUP_SUMMARY.md`
 2. **Check** the detailed checklist
 3. **Plan** Phase 2 timeline (suggest 1-2 weeks)
 4. **Assign** developers to component groups
@@ -309,10 +309,10 @@ After Phase 2 is complete, you'll have:
 - `types/mobile.ts` (with comments)
 
 **For project progress:**
-- `MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md`
+- `docs/mobile/MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md`
 
 **For visual reference:**
-- `MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md`
+- `docs/mobile/MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md`
 
 **For archived files:**
 - `__archive__/ARCHIVE_README.md`
@@ -339,11 +339,11 @@ Phase 2 is mostly mechanical work:
 
 | Document | Purpose | Read Time |
 |----------|---------|-----------|
-| `MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md` | Diagrams & visual guide | 10 min |
+| `docs/mobile/MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md` | Diagrams & visual guide | 10 min |
 | `README_NEW_STRUCTURE.md` | Detailed architecture | 25 min |
 | `MOBILE_DEVELOPMENT_GUIDE.md` | Developer patterns | 20 min |
-| `MOBILE_REFACTORING_SETUP_SUMMARY.md` | Project overview | 15 min |
-| `MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md` | Phase tracker | 30 min |
+| `docs/mobile/MOBILE_REFACTORING_SETUP_SUMMARY.md` | Project overview | 15 min |
+| `docs/mobile/MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md` | Phase tracker | 30 min |
 
 **Total reading time:** ~100 minutes for complete understanding
 
@@ -367,7 +367,7 @@ A: Document in Phase 2 checklist, update during migration
 A: Only for complex touch interactions; otherwise make responsive
 
 **Q: How do I stay on track?**
-A: Use `MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md`
+A: Use `docs/mobile/MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md`
 
 ---
 

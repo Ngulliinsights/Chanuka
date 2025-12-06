@@ -70,17 +70,17 @@ Read these to understand the setup:
    - Global utilities reference
    - Troubleshooting
 
-2. **`TESTING_IMPLEMENTATION_SUMMARY.md`**
+2. **`docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md`**
    - What was accomplished
    - Benefits achieved
    - Architecture overview
 
-3. **`TESTING_MIGRATION_CHECKLIST.md`**
+3. **`docs/testing/TESTING_MIGRATION_CHECKLIST.md`**
    - Deployment steps
    - Validation checklist
    - Timeline for Phases 2-4
 
-4. **`TESTING_ARCHITECTURE_DIAGRAM.md`**
+4. **`docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md`**
    - Visual diagrams
    - System flow
    - Configuration relationships
@@ -194,9 +194,9 @@ describe('BillCard', () => {
 
 ### For Infrastructure Team
 
-1. Read `TESTING_IMPLEMENTATION_SUMMARY.md` (15 min)
-2. Read `TESTING_ARCHITECTURE_DIAGRAM.md` (10 min)
-3. Follow `TESTING_MIGRATION_CHECKLIST.md` (30 min deployment)
+1. Read `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md` (15 min)
+2. Read `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` (10 min)
+3. Follow `docs/testing/TESTING_MIGRATION_CHECKLIST.md` (30 min deployment)
 4. Validate with team (1 hour)
 5. ✅ Deployed!
 
@@ -276,9 +276,9 @@ Before declaring success:
 |-------|----------------|
 | **How to write tests** | `test-utils/README.md` |
 | **Global utilities** | `test-utils/setup/*.ts` |
-| **Architecture** | `TESTING_ARCHITECTURE_DIAGRAM.md` |
-| **Deployment** | `TESTING_MIGRATION_CHECKLIST.md` |
-| **Overview** | `TESTING_IMPLEMENTATION_SUMMARY.md` |
+| **Architecture** | `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` |
+| **Deployment** | `docs/testing/TESTING_MIGRATION_CHECKLIST.md` |
+| **Overview** | `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md` |
 
 ---
 

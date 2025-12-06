@@ -242,13 +242,13 @@ test-utils/setup/
 
 **Documentation** (Phase 1 & 2 Complete):
 - `test-utils/README.md` (487 lines)
-- `TESTING_IMPLEMENTATION_SUMMARY.md` (405 lines)
-- `TESTING_ARCHITECTURE_DIAGRAM.md` (415 lines)
-- `TESTING_QUICK_START.md` (300 lines)
-- `TESTING_MIGRATION_CHECKLIST.md` (314 lines)
-- `PHASE2_QUICK_START.md` (164 lines)
-- `PHASE2_EXECUTION_PLAN.md` (295 lines)
-- `TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md` (395 lines)
+- `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md` (405 lines)
+- `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` (415 lines)
+- `docs/testing/TESTING_QUICK_START.md` (300 lines)
+- `docs/testing/TESTING_MIGRATION_CHECKLIST.md` (314 lines)
+- `docs/phase2/PHASE2_QUICK_START.md` (164 lines)
+- `docs/phase2/PHASE2_EXECUTION_PLAN.md` (295 lines)
+- `docs/testing/TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md` (395 lines)
 
 #### 2. **Vitest Workspace Unification** ⭐⭐⭐⭐
 **Main Has**:

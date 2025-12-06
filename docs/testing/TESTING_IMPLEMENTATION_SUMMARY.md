@@ -30,8 +30,8 @@ Successfully consolidated the fragmented testing infrastructure across the monor
 
 ### Documentation
 - ✅ `/test-utils/README.md` - 300+ line comprehensive guide
-- ✅ `/TESTING_CONSOLIDATION_PHASE1.md` - Phase summary
-- ✅ `/TESTING_MIGRATION_CHECKLIST.md` - Implementation roadmap
+- ✅ `/docs/testing/TESTING_CONSOLIDATION_PHASE1.md` - Phase summary
+- ✅ `/docs/testing/TESTING_MIGRATION_CHECKLIST.md` - Implementation roadmap
 
 ---
 
@@ -79,8 +79,8 @@ test-utils/
 ### Documentation
 ```
 test-utils/README.md                    (450+ lines)
-TESTING_CONSOLIDATION_PHASE1.md         (400+ lines)
-TESTING_MIGRATION_CHECKLIST.md          (350+ lines)
+docs/testing/TESTING_CONSOLIDATION_PHASE1.md         (400+ lines)
+docs/testing/TESTING_MIGRATION_CHECKLIST.md          (350+ lines)
 ```
 
 ---
@@ -287,8 +287,8 @@ pnpm test --reporter=verbose
 
 ### For Setup & Configuration
 - ✅ `/test-utils/README.md` - Complete guide
-- ✅ `/TESTING_CONSOLIDATION_PHASE1.md` - Technical details
-- ✅ `/TESTING_MIGRATION_CHECKLIST.md` - Deployment steps
+- ✅ `/docs/testing/TESTING_CONSOLIDATION_PHASE1.md` - Technical details
+- ✅ `/docs/testing/TESTING_MIGRATION_CHECKLIST.md` - Deployment steps
 
 ### For Teams & Developers
 - ✅ Quick reference in README
@@ -375,11 +375,11 @@ For team members implementing Phases 2-4:
 
 ### During Validation
 - Review `/test-utils/README.md` for setup details
-- Check `/TESTING_MIGRATION_CHECKLIST.md` for step-by-step deployment
+- Check `/docs/testing/TESTING_MIGRATION_CHECKLIST.md` for step-by-step deployment
 - Refer to individual setup files for environment-specific details
 
 ### For Phases 2-4
-- Follow `/TESTING_MIGRATION_CHECKLIST.md`
+- Follow `/docs/testing/TESTING_MIGRATION_CHECKLIST.md`
 - Reference existing test patterns
 - Use documentation in each setup file
 

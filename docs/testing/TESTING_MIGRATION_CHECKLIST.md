@@ -34,7 +34,7 @@
 
 - [x] Created documentation
   - [x] `/test-utils/README.md` - Setup guide
-  - [x] `/TESTING_CONSOLIDATION_PHASE1.md` - Phase 1 summary
+  - [x] `/docs/testing/TESTING_CONSOLIDATION_PHASE1.md` - Phase 1 summary
   - [x] This checklist
 
 ### 🔄 Next: Validation & Activation

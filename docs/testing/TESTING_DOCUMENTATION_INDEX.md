@@ -14,19 +14,19 @@ This project consolidates the scattered testing infrastructure in SimpleTool mon
 ## 📖 Quick Navigation
 
 ### 🚀 Start Here (First Time)
-- **`PHASE2_QUICK_START.md`** - 3-step guide to execute Phase 2 immediately
+- **`docs/phase2/PHASE2_QUICK_START.md`** - 3-step guide to execute Phase 2 immediately
 
 ### 📊 Project Status
-- **`TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md`** - Complete progress overview + timeline
-- **`PHASE2_EXECUTION_PLAN.md`** - Detailed execution steps + risk mitigation
-- **`PHASE2_DETAILED_STRATEGY.md`** - Comprehensive strategy with rationale
+- **`docs/testing/TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md`** - Complete progress overview + timeline
+- **`docs/phase2/PHASE2_EXECUTION_PLAN.md`** - Detailed execution steps + risk mitigation
+- **`docs/phase2/PHASE2_DETAILED_STRATEGY.md`** - Comprehensive strategy with rationale
 
 ### 🛠️ Implementation Details
 - **`test-utils/README.md`** - Phase 1 setup files guide + usage examples
-- **`TESTING_IMPLEMENTATION_SUMMARY.md`** - Architecture overview
-- **`TESTING_ARCHITECTURE_DIAGRAM.md`** - Visual test structure
-- **`TESTING_QUICK_START.md`** - How to use the new test utilities
-- **`TESTING_MIGRATION_CHECKLIST.md`** - Step-by-step Phase 1 deployment
+- **`docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md`** - Architecture overview
+- **`docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md`** - Visual test structure
+- **`docs/testing/TESTING_QUICK_START.md`** - How to use the new test utilities
+- **`docs/testing/TESTING_MIGRATION_CHECKLIST.md`** - Step-by-step Phase 1 deployment
 
 ### 🔧 Automated Tools
 - **`phase2-migration-commands.sh`** - Automated test file migration (1175 lines)
@@ -69,25 +69,25 @@ test-utils/README.md
 ├── Import examples
 └── Troubleshooting
 
-TESTING_IMPLEMENTATION_SUMMARY.md
+docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md
 ├── Architecture overview
 ├── Configuration explained
 ├── Migration impact
 └── Success criteria
 
-TESTING_ARCHITECTURE_DIAGRAM.md
+docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md
 ├── Visual test structure
 ├── Environment setup
 ├── File relationships
 └── Data flow diagrams
 
-TESTING_QUICK_START.md
+docs/testing/TESTING_QUICK_START.md
 ├── Getting started guide
 ├── Common test patterns
 ├── Setup utilities usage
 └── FAQ
 
-TESTING_MIGRATION_CHECKLIST.md
+docs/testing/TESTING_MIGRATION_CHECKLIST.md
 ├── Phase 1 deployment steps
 ├── Activation checklist
 ├── Verification steps
@@ -127,21 +127,21 @@ Ready to execute:
 
 #### Documentation (Phase 2)
 ```
-PHASE2_EXECUTION_PLAN.md
+docs/phase2/PHASE2_EXECUTION_PLAN.md
 ├── Step-by-step execution guide
 ├── Expected timeline
 ├── Risk mitigation strategies
 ├── Rollback procedures
 └── Success criteria
 
-PHASE2_DETAILED_STRATEGY.md
+docs/phase2/PHASE2_DETAILED_STRATEGY.md
 ├── Current state analysis
 ├── Stage-by-stage breakdown
 ├── Implementation timeline
 ├── Import path update guide
 ├── Risk assessment
 
-PHASE2_QUICK_START.md
+docs/phase2/PHASE2_QUICK_START.md
 ├── 3-step quick guide
 ├── Expected output
 ├── Troubleshooting
@@ -156,7 +156,7 @@ scripts/analyze-phase2.sh
 scripts/phase2-migration-generator.sh
 └── Generates the migration commands
 
-TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md
+docs/testing/TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md
 └── Complete project progress + timeline
 ```
 
@@ -165,26 +165,26 @@ TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md
 ## 🎯 How to Use This Documentation
 
 ### For Quick Execution
-1. Read: `PHASE2_QUICK_START.md` (5 min)
+1. Read: `docs/phase2/PHASE2_QUICK_START.md` (5 min)
 2. Execute: `bash phase2-migration-commands.sh`
 3. Validate: `pnpm test`
 4. Done!
 
 ### For Understanding the Architecture
-1. Read: `TESTING_IMPLEMENTATION_SUMMARY.md` (Overview)
-2. Read: `TESTING_ARCHITECTURE_DIAGRAM.md` (Visual)
+1. Read: `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md` (Overview)
+2. Read: `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` (Visual)
 3. Read: `test-utils/README.md` (Details)
-4. Reference: `TESTING_QUICK_START.md` (Examples)
+4. Reference: `docs/testing/TESTING_QUICK_START.md` (Examples)
 
 ### For Deployment/Execution
-1. Review: `PHASE2_EXECUTION_PLAN.md` (Full guide)
-2. Reference: `PHASE2_DETAILED_STRATEGY.md` (Details)
-3. Follow: `TESTING_MIGRATION_CHECKLIST.md` (Checklist)
+1. Review: `docs/phase2/PHASE2_EXECUTION_PLAN.md` (Full guide)
+2. Reference: `docs/phase2/PHASE2_DETAILED_STRATEGY.md` (Details)
+3. Follow: `docs/testing/TESTING_MIGRATION_CHECKLIST.md` (Checklist)
 4. Execute: `phase2-migration-commands.sh`
 
 ### For Troubleshooting
-1. Check: `PHASE2_EXECUTION_PLAN.md` → Risk Mitigation section
-2. Reference: `TESTING_QUICK_START.md` → FAQ
+1. Check: `docs/phase2/PHASE2_EXECUTION_PLAN.md` → Risk Mitigation section
+2. Reference: `docs/testing/TESTING_QUICK_START.md` → FAQ
 3. Review: `test-utils/README.md` → Troubleshooting
 4. Debug: `phase2-migration.log` (from execution)
 
@@ -195,14 +195,14 @@ TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md
 ### In Workspace Root
 ```
 vitest.workspace.unified.ts                          (Phase 1 config)
-PHASE2_QUICK_START.md                                (Start here!)
-PHASE2_EXECUTION_PLAN.md                             (How to execute)
-PHASE2_DETAILED_STRATEGY.md                          (Why & how)
-TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md            (Progress)
-TESTING_IMPLEMENTATION_SUMMARY.md                    (Architecture)
-TESTING_ARCHITECTURE_DIAGRAM.md                      (Visuals)
-TESTING_QUICK_START.md                               (Usage guide)
-TESTING_MIGRATION_CHECKLIST.md                       (Deployment)
+docs/phase2/PHASE2_QUICK_START.md                                (Start here!)
+docs/phase2/PHASE2_EXECUTION_PLAN.md                             (How to execute)
+docs/phase2/PHASE2_DETAILED_STRATEGY.md                          (Why & how)
+docs/testing/TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md            (Progress)
+docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md                    (Architecture)
+docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md                      (Visuals)
+docs/testing/TESTING_QUICK_START.md                               (Usage guide)
+docs/testing/TESTING_MIGRATION_CHECKLIST.md                       (Deployment)
 phase2-migration-commands.sh                         (Automation!)
 ```
 
@@ -298,18 +298,18 @@ phase2-import-validation.log                         (Import fixes)
 → `test-utils/README.md` → "Setup Files Reference" section
 
 **For Test Patterns**:
-→ `TESTING_QUICK_START.md` → "Common Test Patterns" section
+→ `docs/testing/TESTING_QUICK_START.md` → "Common Test Patterns" section
 
 **For Architecture Overview**:
-→ `TESTING_ARCHITECTURE_DIAGRAM.md` → Full diagrams
+→ `docs/testing/TESTING_ARCHITECTURE_DIAGRAM.md` → Full diagrams
 
 ### Practical Examples
 
 **How to write a unit test**:
-→ `TESTING_QUICK_START.md` → "Example: Component Unit Test"
+→ `docs/testing/TESTING_QUICK_START.md` → "Example: Component Unit Test"
 
 **How to write an integration test**:
-→ `TESTING_QUICK_START.md` → "Example: Integration Test"
+→ `docs/testing/TESTING_QUICK_START.md` → "Example: Integration Test"
 
 **How to write an a11y test**:
 → `test-utils/setup/client-a11y.ts` → Code examples
@@ -318,7 +318,7 @@ phase2-import-validation.log                         (Import fixes)
 
 ## ✅ Checklist: Phase 2 Execution
 
-- [ ] Read `PHASE2_QUICK_START.md`
+- [ ] Read `docs/phase2/PHASE2_QUICK_START.md`
 - [ ] Create backup branch: `git checkout -b phase2-migration`
 - [ ] Run migration: `bash phase2-migration-commands.sh`
 - [ ] Validate imports: `pnpm run validate:imports`
@@ -342,7 +342,7 @@ phase2-import-validation.log                         (Import fixes)
 **Import errors after migration**?
 → Run: `pnpm run validate:imports`
 → Update paths in affected test files
-→ Reference: `PHASE2_EXECUTION_PLAN.md` → "Import Path Updates" section
+→ Reference: `docs/phase2/PHASE2_EXECUTION_PLAN.md` → "Import Path Updates" section
 
 **Tests not running**?
 → Verify Vitest config recognizes new patterns
@@ -357,9 +357,9 @@ phase2-import-validation.log                         (Import fixes)
 
 ## 📞 Support
 
-**For execution issues**: See `PHASE2_EXECUTION_PLAN.md` → "Risk Mitigation" section
-**For understanding**: See `TESTING_QUICK_START.md` → "FAQ" section
-**For detailed info**: See `PHASE2_DETAILED_STRATEGY.md`
+**For execution issues**: See `docs/phase2/PHASE2_EXECUTION_PLAN.md` → "Risk Mitigation" section
+**For understanding**: See `docs/testing/TESTING_QUICK_START.md` → "FAQ" section
+**For detailed info**: See `docs/phase2/PHASE2_DETAILED_STRATEGY.md`
 **For setup details**: See `test-utils/README.md` → "Troubleshooting" section
 
 ---
@@ -372,7 +372,7 @@ phase2-import-validation.log                         (Import fixes)
 **Risk Level**: Low (automated, git rollback available)
 **Benefit**: Standardized test structure for all 475 tests
 
-**Start Now**: Read `PHASE2_QUICK_START.md` → Run `bash phase2-migration-commands.sh` → Done!
+**Start Now**: Read `docs/phase2/PHASE2_QUICK_START.md` → Run `bash phase2-migration-commands.sh` → Done!
 
 ---
 

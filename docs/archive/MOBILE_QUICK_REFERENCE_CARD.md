@@ -229,9 +229,9 @@ A: Probably not - use responsive CSS first!
 | Overall architecture | `README_NEW_STRUCTURE.md` |
 | How to use components | `MOBILE_DEVELOPMENT_GUIDE.md` |
 | Code patterns & examples | `MOBILE_DEVELOPMENT_GUIDE.md` |
-| Phase progress | `MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md` |
-| Visual diagrams | `MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md` |
-| Project summary | `PHASE1_COMPLETE_SUMMARY.md` |
+| Phase progress | `docs/mobile/MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md` |
+| Visual diagrams | `docs/mobile/MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md` |
+| Project summary | `docs/analysis/PHASE1_COMPLETE_SUMMARY.md` |
 | Legacy files | `__archive__/ARCHIVE_README.md` |
 
 ---

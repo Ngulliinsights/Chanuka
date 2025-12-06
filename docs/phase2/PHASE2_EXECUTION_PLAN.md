@@ -95,7 +95,7 @@ find client/src -type d -name "__tests__" -o -type d -name "__tests__/__archive_
 
 # Update documentation
 # - Update README with new test structure
-# - Update testing guidelines in TESTING_QUICK_START.md
+# - Update testing guidelines in docs/testing/TESTING_QUICK_START.md
 # - Add examples of new test location pattern
 ```
 
@@ -250,7 +250,7 @@ pnpm test
 
 **Today**:
 1. Review this execution plan
-2. Review Phase 2 detailed strategy: `PHASE2_DETAILED_STRATEGY.md`
+2. Review Phase 2 detailed strategy: `docs/phase2/PHASE2_DETAILED_STRATEGY.md`
 3. Verify migration script: `cat phase2-migration-commands.sh | head -100`
 4. Create backup branch: `git checkout -b phase2-implementation`
 
@@ -287,8 +287,8 @@ pnpm test
 
 - Migration script: `phase2-migration-commands.sh` (1176 lines, fully generated)
 - Migration log: `phase2-migration.log` (will be created during execution)
-- Detailed strategy: `PHASE2_DETAILED_STRATEGY.md`
-- Phase 1 docs: `test-utils/README.md`, `TESTING_IMPLEMENTATION_SUMMARY.md`
+- Detailed strategy: `docs/phase2/PHASE2_DETAILED_STRATEGY.md`
+- Phase 1 docs: `test-utils/README.md`, `docs/testing/TESTING_IMPLEMENTATION_SUMMARY.md`
 
 ---
 
