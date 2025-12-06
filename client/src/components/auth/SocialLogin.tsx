@@ -3,10 +3,7 @@
  * Privacy-focused social authentication options with OAuth integration
  */
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
+import { authService, OAuthProvider } from '@client/services/authService';
 import { 
   Github, 
   Mail, 
@@ -17,9 +14,14 @@ import {
   ExternalLink,
   Loader2
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { SocialLoginProvider } from '@client/types/auth';
-import { authService, OAuthProvider } from '@client/services/authService';
 import { logger } from '@client/utils/logger';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 
 interface SocialLoginProps {
   onSuccess?: (data: any) => void;

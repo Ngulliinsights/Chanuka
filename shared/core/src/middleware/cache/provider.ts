@@ -1,19 +1,27 @@
 import { MiddlewareProvider } from '../types';
 import { CacheService } from '../../caching/core/interfaces';
 import { Request, Response, NextFunction } from 'express';
+
+import { CacheService } from '../../caching/core/interfaces';
 import { logger } from '../../observability/logging';
+import { MiddlewareProvider } from '../../types';
+
+interface CacheOptions {
+  ttl: number;
+  key: string;
+}
 
 export class CacheMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'cache';
 
   constructor(private readonly cacheService: CacheService) {}
 
-  validate(options: Record<string, any>): boolean {
+  validate(options: CacheOptions): boolean {
     const { ttl, key } = options;
     return typeof ttl === 'number' && typeof key === 'string';
   }
 
-  create(options: Record<string, any>) {
+  create(options: CacheOptions) {
     const { ttl, key } = options;
     
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -30,7 +38,7 @@ export class CacheMiddlewareProvider implements MiddlewareProvider {
         const originalJson = res.json.bind(res);
         
         // Override json method to cache response
-        res.json = (body: any) => {
+        res.json = (body: unknown) => {
           this.cacheService.set(cacheKey, body, ttl).catch(err => {
             logger.error('Cache set error:', { component: 'Chanuka' }, err);
           });

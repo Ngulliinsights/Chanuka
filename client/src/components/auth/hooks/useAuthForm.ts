@@ -3,13 +3,17 @@
  * Handles form state, validation, and submission for login/register forms
  */
 
+import { UseAuthFormOptions, UseAuthFormReturn, FormData, FormFieldName } from '@client/types';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useAuth } from '../../../features/users/hooks/useAuth';
-import { validatePassword } from '@/utils/password-validation';
+
+import { LoginCredentials, RegisterData } from '@/types/auth';
 import { validateEmail } from '@/utils/input-validation';
 import { logger } from '@/utils/logger';
-import { LoginCredentials, RegisterData } from '@/types/auth';
-import { UseAuthFormOptions, UseAuthFormReturn, FormData, FormFieldName } from '@client/types';
+
+import { useAuth } from '../../../features/users/hooks/useAuth';
+
+import { validatePassword } from '@/utils/password-validation';
+
 
 const initialFormData: FormData = {
   email: '',

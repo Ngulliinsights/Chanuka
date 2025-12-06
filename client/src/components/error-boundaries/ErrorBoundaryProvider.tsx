@@ -6,8 +6,10 @@
  */
 
 import React, { ReactNode } from 'react';
-import { ErrorBoundary, ErrorSeverity, ErrorDomain } from './ErrorBoundary';
+
 import { logger } from '../../utils/browser-logger';
+
+import { ErrorBoundary, ErrorSeverity, ErrorDomain } from './ErrorBoundary';
 
 interface ErrorBoundaryProviderProps {
   children: ReactNode;

@@ -1,7 +1,3 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
 import { 
   Users, 
   Phone, 
@@ -16,7 +12,14 @@ import {
   AlertCircle,
   Info
 } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { CivicActionStep, ActionType, DifficultyLevel, ImpactLevel } from '@client/types/constitutional';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+
 
 interface CivicActionGuidanceProps {
   billId: string;

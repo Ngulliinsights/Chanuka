@@ -3,11 +3,12 @@
 // ============================================================================
 // Financial transparency, conflict detection, and influence network tracking
 
+import { sql, relations } from 'drizzle-orm';
 import {
   pgTable, uuid, varchar, integer, decimal, boolean, timestamp, jsonb, text, date,
   index
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+
 import { bills, sponsors, users } from './foundation';
 
 // ============================================================================

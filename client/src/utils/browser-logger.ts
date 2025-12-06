@@ -32,7 +32,7 @@ export interface LogContext {
   [key: string]: unknown;
 }
 
-export interface BrowserError {
+export interface BrowserErrorInfo {
   id: string;
   message: string;
   severity: ErrorSeverity;
@@ -53,7 +53,7 @@ export class BrowserError extends Error {
 
   constructor(
     message: string,
-    options: Partial<BrowserError> = {}
+    options: Partial<BrowserErrorInfo> = {}
   ) {
     super(message);
     this.name = 'BrowserError';
@@ -79,18 +79,9 @@ export interface Logger {
  */
 function createBrowserError(
   message: string,
-  options: Partial<BrowserError> = {}
+  options: Partial<BrowserErrorInfo> = {}
 ): BrowserError {
-  return {
-    id: `err_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
-    message,
-    severity: options.severity || ErrorSeverity.MEDIUM,
-    domain: options.domain || ErrorDomain.COMPONENT,
-    timestamp: new Date(),
-    context: options.context,
-    stack: options.stack,
-    recoverable: options.recoverable ?? true
-  };
+  return new BrowserError(message, options);
 }
 
 /**
@@ -191,31 +182,35 @@ function createBrowserLogger(): Logger {
 
     error: (message: string, context?: LogContext, error?: Error | unknown) => {
       const contextStr = formatContext(context);
-      
+
       // Create structured error information
-      let errorInfo: any = null;
+      let errorInfo: unknown = null;
       if (error instanceof Error) {
         errorInfo = {
           name: error.name,
           message: error.message,
-          stack: error.stack
-        };
+          stack: error.stack,
+        } as Record<string, unknown>;
       } else if (error) {
-        errorInfo = error;
+        errorInfo = error as Record<string, unknown>;
       }
-      
+
       console.error(`[ERROR] ${message}`, contextStr, errorInfo);
-      
+
       // Send to error tracking service if available
-      if (typeof window !== 'undefined' && (window as any).Sentry) {
-        (window as any).Sentry.captureException(error || new Error(message), {
-          contexts: {
-            logger: {
-              message,
-              context: context || {}
-            }
-          }
-        });
+      if (typeof window !== 'undefined') {
+        const w = window as unknown as { Sentry?: { captureException?: (err: unknown, opts?: unknown) => void } };
+        const maybeSentry = w?.Sentry;
+        if (maybeSentry && typeof maybeSentry.captureException === 'function') {
+          maybeSentry.captureException(error || new Error(message), {
+            contexts: {
+              logger: {
+                message,
+                context: context || {},
+              },
+            },
+          });
+        }
       }
     },
 
@@ -234,9 +229,13 @@ export const ErrorRecovery = {
    */
   recoverFromChunkError: (): void => {
     // Clear module cache if available
-    if ('webpackChunkName' in window) {
-      delete (window as any).webpackChunkName;
-    }
+      if (typeof window !== 'undefined') {
+        const w = window as unknown as Record<string, unknown>;
+        if (Object.prototype.hasOwnProperty.call(w, 'webpackChunkName')) {
+          // remove potentially injected webpack variable
+          Reflect.deleteProperty(w, 'webpackChunkName');
+        }
+      }
     
     // Reload the page to fetch fresh chunks
     window.location.reload();

@@ -1,10 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Progress } from '../ui/progress';
 import { 
   AlertTriangle, 
   TrendingUp, 
@@ -17,7 +10,16 @@ import {
   Eye,
   RefreshCw
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { logger } from '@client/utils/logger';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 interface ConflictData {
   conflicts: ConflictDetectionResult[];

@@ -3,23 +3,27 @@
  * Simplified interface for settings pages
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Switch } from '../../ui/switch';
-import { Label } from '../../ui/label';
-import { Alert, AlertDescription } from '../../ui/alert';
 import {
   Shield,
   Settings,
   AlertTriangle,
   Info
 } from 'lucide-react';
+import React from 'react';
+
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { PrivacySettings } from '@client/types/auth';
-import { VisibilityControls } from './controls/VisibilityControls';
-import { DataUsageControls } from './controls/DataUsageControls';
+
+import { Alert, AlertDescription } from '../../ui/alert';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Label } from '../../ui/label';
+import { Switch } from '../../ui/switch';
+
+
 import { ConsentControls } from './controls/ConsentControls';
+import { DataUsageControls } from './controls/DataUsageControls';
+import { VisibilityControls } from './controls/VisibilityControls';
 
 interface CompactInterfaceProps {
   settings: PrivacySettings | null;

@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
+
 import { useSafeQuery } from './use-safe-query';
 
 export interface PretextAnalysisResult {

@@ -1,14 +1,13 @@
-import React from 'react';
-import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
-import { cn } from '@client/lib/utils';
-import { useAssetLoading, LoadingProgress } from '@client/utils/asset-loading';
-import { logger } from '@client/utils/logger';
+import { useLoadingRecovery } from '@client/hooks/useLoadingRecovery';
 import { AssetLoadingIndicatorProps as TypesAssetLoadingIndicatorProps } from '@client/types';
-import { 
-  validateLoadingProgress, 
-  safeValidateLoadingProgress,
-  isValidProgressPercentage 
-} from './validation';
+import { useAssetLoading, LoadingProgress } from '@client/utils/asset-loading';
+import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import React from 'react';
+
+import { cn } from '@client/lib/utils';
+import { logger } from '@client/utils/logger';
+
+
 import { 
   LoadingError, 
   LoadingAssetError, 
@@ -16,7 +15,12 @@ import {
   getErrorDisplayMessage,
   getErrorRecoveryStrategy 
 } from './errors';
-import { useLoadingRecovery } from '@client/hooks/useLoadingRecovery';
+import { 
+  validateLoadingProgress, 
+  safeValidateLoadingProgress,
+  isValidProgressPercentage 
+} from './validation';
+
 
 export interface AssetLoadingIndicatorProps {
   className?: string;

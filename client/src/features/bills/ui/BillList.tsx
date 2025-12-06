@@ -10,6 +10,8 @@ import { cn } from '@client/lib/utils';
 import { logger } from '@client/utils/logger';
 import type { Bill, BillsQueryParams } from '@client/features/bills/model/types';
 
+import { BillCard } from './BillCard';
+
 interface BillListProps {
   bills: Bill[];
   isLoading: boolean;

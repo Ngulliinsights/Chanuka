@@ -1,10 +1,12 @@
+import { Calendar, Users, FileText, AlertTriangle } from 'lucide-react';
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+
+import { Bill } from '@/core/api/types';
+
+import { EducationalTooltip } from '../education/EducationalTooltip';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { Calendar, Users, FileText, AlertTriangle } from 'lucide-react';
-import { Bill } from '@/core/api/types';
-import { EducationalTooltip } from '../education/EducationalTooltip';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 interface BillOverviewTabProps {
   bill: Bill;

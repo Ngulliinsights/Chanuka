@@ -11,9 +11,9 @@
  * ✓ Added proper ARIA attributes and error/helper text associations
  */
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Eye, EyeOff, Search, X, ChevronDown } from "lucide-react";
-import { useResponsiveLayoutContext } from "./responsive-layout-manager";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+
 import {
   validateEmail,
   validatePassword,
@@ -22,6 +22,9 @@ import {
   sanitizeInput,
   ValidationResult
 } from '@client/utils/input-validation';
+
+import { useResponsiveLayoutContext } from "./responsive-layout-manager";
+
 
 interface MobileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;

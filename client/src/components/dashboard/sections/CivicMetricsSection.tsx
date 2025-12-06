@@ -4,11 +4,7 @@
  * Displays personal civic engagement scoring, achievements, and impact comparisons.
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Badge } from '../../ui/badge';
-import { Progress } from '../../ui/progress';
+import { format } from 'date-fns';
 import { 
   TrendingUp, 
   Award, 
@@ -22,8 +18,16 @@ import {
   Info,
   Calendar
 } from 'lucide-react';
+import React from 'react';
+
 import { CivicImpactMetrics } from '@client/types/user-dashboard';
-import { format } from 'date-fns';
+
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Progress } from '../../ui/progress';
+
+
 
 interface CivicMetricsSectionProps {
   metrics: CivicImpactMetrics | undefined;

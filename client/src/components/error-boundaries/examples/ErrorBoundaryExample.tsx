@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from 'react';
+
 import { ErrorBoundary, withErrorBoundary, useErrorHandler } from '../ErrorBoundary';
 
 /**

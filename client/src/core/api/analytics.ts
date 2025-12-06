@@ -4,9 +4,6 @@
  * Provides type-safe, consistent interface for all analytics operations
  */
 
-import type { UnifiedApiClient } from './types';
-import { logger } from '@client/utils/logger';
-import { globalErrorHandler } from './errors';
 import type {
   BillAnalytics,
   AnalyticsFilters,
@@ -17,6 +14,11 @@ import type {
   AnalyticsResponse,
   UserActivity
 } from '@client/features/analytics/types';
+import { logger } from '@client/utils/logger';
+
+import { globalErrorHandler } from './errors';
+import type { UnifiedApiClient } from './types';
+
 
 /**
  * Centralized service for all analytics-related API operations.

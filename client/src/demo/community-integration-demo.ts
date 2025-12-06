@@ -7,6 +7,7 @@
  */
 
 import { communityWebSocketMiddleware } from '@client/services/community-websocket-middleware';
+
 import { communityBackendService } from '@client/services/community-backend-service';
 import { notificationService } from '@client/services/notification-service';
 import { logger } from '@client/utils/logger';

@@ -5,17 +5,20 @@
  * frequency, quiet hours, and push notification settings.
  */
 
-import React, { useState, useEffect } from 'react';
 import { X, Bell, Mail, Smartphone, Clock, Test } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { LoadingSpinner } from '@client/core/loading/components/LoadingSpinner';
+import { NotificationCategory } from '@client/services/notification-service';
+
 import { 
   useNotificationPreferences, 
   usePushNotifications, 
   useEmailNotifications 
 } from '../../hooks/useNotifications';
-import { NotificationCategory } from '@client/services/notification-service';
-import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { Switch } from '../ui/switch';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { 
   Select, 
@@ -24,8 +27,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '../ui/select';
-import { Input } from '../ui/input';
-import { LoadingSpinner } from '@client/core/loading/components/LoadingSpinner';
+import { Switch } from '../ui/switch';
+
 
 interface NotificationPreferencesProps {
   isOpen: boolean;

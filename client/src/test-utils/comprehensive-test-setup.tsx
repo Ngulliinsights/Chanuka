@@ -4,11 +4,11 @@
  */
 
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, RenderOptions, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ReactElement, ReactNode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, expect } from 'vitest';
 
 // =============================================================================

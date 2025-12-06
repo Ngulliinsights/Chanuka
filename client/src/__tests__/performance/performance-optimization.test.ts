@@ -19,7 +19,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { performanceOptimizer } from '@client/utils/performance-optimizer';
+import { performanceOptimizer } from '@client/utils/performance';
 import { logger } from '@client/utils/logger';
 
 // Mock performance APIs

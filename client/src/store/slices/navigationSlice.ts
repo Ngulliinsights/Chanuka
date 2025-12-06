@@ -7,6 +7,7 @@
  */
 
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+
 import {
   NavigationState,
   BreadcrumbItem,

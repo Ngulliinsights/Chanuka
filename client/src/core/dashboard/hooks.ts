@@ -2,9 +2,10 @@
  * Dashboard Hooks - Consolidated dashboard hook functionality
  */
 
-import { useCallback } from 'react';
-import { useDashboard } from './context';
 import { WidgetConfig, WidgetType, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from '@client/types';
+import { useCallback } from 'react';
+
+import { useDashboard } from './context';
 
 /**
  * Main dashboard hook - provides all dashboard functionality

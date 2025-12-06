@@ -4,12 +4,11 @@
 // Argument extraction, synthesis, and evidence tracking for citizen input
 // This schema transforms scattered comments into structured legislative input
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique, date, smallint
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
 import { bills, users } from "./foundation";
 // import { comments } from "./citizen_participation"; // Unused import

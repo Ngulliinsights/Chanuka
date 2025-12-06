@@ -5,8 +5,9 @@
  * and real-time simulation throughout the application.
  */
 
-import { logger } from '@client/utils/logger';
 import { DiscussionThread } from '@client/types/discussion';
+import { logger } from '@client/utils/logger';
+
 import {
   dataLoaders,
   initializeEssentialData,

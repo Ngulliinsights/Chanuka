@@ -5,13 +5,10 @@
  * as an interactive network graph with accessibility fallbacks.
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Network, Table, Eye, EyeOff, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+
 import { 
   NetworkData, 
   NetworkNode, 
@@ -19,6 +16,13 @@ import {
   ConflictVisualizationProps,
   AccessibilityFallbackData 
 } from '@client/types/conflict-of-interest';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+
 
 interface ConflictNetworkVisualizationProps extends ConflictVisualizationProps {
   showAccessibilityFallback?: boolean;

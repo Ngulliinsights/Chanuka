@@ -495,6 +495,7 @@ export const rbacManager = new RBACManager();
 // ============================================================================
 
 import { useState, useEffect } from 'react';
+
 import { useAuth } from '@client/features/users/hooks/useAuth';
 
 /**

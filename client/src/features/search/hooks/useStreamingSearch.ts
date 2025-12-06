@@ -5,11 +5,12 @@
  * progress tracking, and session management.
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { streamingSearchService } from '../services/streaming-search';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
 import { useToast } from '../../../hooks/use-toast';
 import { logger } from '../../../utils/logger';
+import { streamingSearchService } from '../services/streaming-search';
 
 // Define types locally
 interface SearchResult {

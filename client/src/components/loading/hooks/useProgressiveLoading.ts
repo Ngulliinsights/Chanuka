@@ -3,12 +3,14 @@
  * Following navigation component patterns for hook implementation
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
 import { LoadingStage, LoadingState } from '@client/types';
-import { LoadingError, LoadingStageError } from '@client/errors';
-import { validateLoadingStage } from '@client/validation';
 import { calculateStageProgress, ProgressTracker } from '@client/utils/progress-utils';
 import { createTimeoutManager } from '@client/utils/timeout-utils';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
+import { LoadingError, LoadingStageError } from '@client/errors';
+import { validateLoadingStage } from '@client/validation';
+
 
 export interface UseProgressiveLoadingOptions {
   stages: LoadingStage[];

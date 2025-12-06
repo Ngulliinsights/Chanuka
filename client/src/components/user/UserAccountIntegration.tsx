@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { 
   useUserDashboard,
@@ -20,11 +21,12 @@ import {
   useTrackEngagement,
   useRecordActivity
 } from '@client/features/users/hooks/useUserAPI';
-import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
 import { notificationService } from '@client/services/notification-service';
+import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
 import { logger } from '@client/utils/logger';
-import { LoadingSpinner } from '../ui/loading-spinner';
+
 import { ErrorMessage } from '../ui/error-message';
+import { LoadingSpinner } from '../ui/loading-spinner';
 
 interface UserAccountIntegrationProps {
   children: React.ReactNode;

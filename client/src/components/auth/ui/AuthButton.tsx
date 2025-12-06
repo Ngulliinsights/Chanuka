@@ -3,11 +3,14 @@
  * Following navigation component patterns for UI components
  */
 
-import React from 'react';
-import { Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '../../ui/button';
 import { AuthButtonProps } from '@client/types';
+import { Loader2 } from 'lucide-react';
+import React from 'react';
+
+import { cn } from '@/lib/utils';
+
+import { Button } from '../../ui/button';
+
 
 export const AuthButton: React.FC<AuthButtonProps> = ({
   type = 'button',

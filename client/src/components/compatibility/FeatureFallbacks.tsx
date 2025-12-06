@@ -6,7 +6,8 @@
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { featureDetector } from '@client/utils/browser-compatibility';
+
+import { featureDetector } from '@client/utils/browser';
 import { logger } from '@client/utils/logger';
 
 // Intersection Observer fallback hook

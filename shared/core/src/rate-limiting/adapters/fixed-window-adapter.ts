@@ -3,8 +3,8 @@
  * Adapts the existing FixedWindowStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 import { FixedWindow } from '../algorithms/fixed-window';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 
 export class FixedWindowAdapter implements RateLimitStore {
   constructor(private store: FixedWindow) {}
@@ -48,7 +48,7 @@ export class FixedWindowAdapter implements RateLimitStore {
 /**
  * Factory function to create a fixed window adapter
  */
-export function createFixedWindowAdapter(config: any): FixedWindowAdapter {
+export function createFixedWindowAdapter(config: unknown): FixedWindowAdapter {
   const store = new FixedWindow(config);
   return new FixedWindowAdapter(store);
 }

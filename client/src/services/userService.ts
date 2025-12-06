@@ -14,8 +14,8 @@
 
 // Remove repository interfaces - using services directly
 import { globalConfig } from '@client/core/api/config';
-import { logger } from '@client/utils/logger';
 import { EngagementHistoryFilters } from '@client/core/api/user';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Type Definitions (Consolidated from all user services)
@@ -637,6 +637,7 @@ class UserService {
 // ============================================================================
 
 import { authService } from './AuthService';
+
 import { userApi } from '@client/features/users/services/user-api';
 
 export const userService = new UserService(authService, userApi);

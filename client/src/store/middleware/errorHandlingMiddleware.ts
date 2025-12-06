@@ -5,6 +5,7 @@
  */
 
 import { Middleware } from '@reduxjs/toolkit';
+
 import { logger } from '@client/utils/logger';
 
 export const errorHandlingMiddleware: Middleware = (store) => (next) => (action) => {

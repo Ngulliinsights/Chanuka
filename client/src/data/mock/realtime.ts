@@ -6,10 +6,11 @@
  */
 
 import { faker } from '@faker-js/faker';
-import { generateId, generateDateInRange, weightedRandom } from './generators';
+
 import { mockBills } from './bills';
-import { mockUsers } from './users';
 import { mockExperts, mockOfficialExperts } from './experts';
+import { generateId, generateDateInRange, weightedRandom } from './generators';
+import { mockUsers } from './users';
 
 // Seed faker for consistent data
 faker.seed(12345);

@@ -6,6 +6,7 @@
  */
 
 import { Middleware } from '@reduxjs/toolkit';
+
 import { NavigationState } from '@client/types/navigation';
 import { logger } from '@client/utils/logger';
 

@@ -6,7 +6,9 @@
  */
 
 import { faker } from '@faker-js/faker';
+
 import { User, PrivacySettings, SecurityEvent, ConsentRecord } from '@client/types/auth';
+
 import { generateId, generateDateInRange, generateLocation } from './generators';
 
 // Seed faker for consistent data

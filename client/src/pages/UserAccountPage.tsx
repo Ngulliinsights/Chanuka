@@ -3,20 +3,21 @@
  * Consolidates profile management, dashboard, privacy, and accessibility settings
  */
 
-import { useState } from 'react';
-import { useAuth } from '@client/features/users/hooks/useAuth';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Card, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
 import { Shield, User, BarChart3, Eye } from 'lucide-react';
+import { useState } from 'react';
+
 import AppLayout from '@client/components/layout/app-layout';
 
 // Import consolidated components
-import { UserProfileSection } from '@client/components/user/UserProfileSection';
 import { UserDashboard } from '@client/components/shared/dashboard';
 import { PrivacyManager } from '@client/components/shared/privacy/PrivacyManager';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Card, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import { AccessibilitySettingsSection } from '@client/components/user/AccessibilitySettingsSection';
 import { UserAccountIntegration } from '@client/components/user/UserAccountIntegration';
+import { UserProfileSection } from '@client/components/user/UserProfileSection';
+import { useAuth } from '@client/features/users/hooks/useAuth';
 
 export default function UserAccountPage() {
   const { user, isAuthenticated } = useAuth();

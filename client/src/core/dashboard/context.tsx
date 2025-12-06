@@ -3,10 +3,13 @@
  * Best practices: Widget-based architecture, data management, permissions
  */
 
-import React, { createContext, useContext, useReducer, useCallback, useEffect, useMemo } from 'react';
 import { DashboardState, DashboardAction, DashboardConfig, WidgetConfig, DashboardLayout, DashboardSettings } from '@client/types';
-import { dashboardReducer } from './reducer';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, useMemo } from 'react';
+
 import { logger } from '@client/utils/logger';
+
+import { dashboardReducer } from './reducer';
+
 
 const initialState: DashboardState = {
   config: null,

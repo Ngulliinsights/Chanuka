@@ -4,7 +4,25 @@
  */
 
 export type NavigationSection = 'legislative' | 'community' | 'tools' | 'user' | 'admin';
-export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
+export type UserRole = 'admin' | 'expert' | 'user' | 'public';
+
+/**
+ * Navigation item interface
+ */
+export interface NavigationItem {
+  id: string;
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }> | string;
+  section: NavigationSection;
+  description?: string;
+  badge?: number;
+  allowedRoles?: UserRole[];
+  requiresAuth?: boolean;
+  adminOnly?: boolean;
+  condition?: (role: UserRole, user: any) => boolean;
+  priority?: number;
+}
 
 export interface BreadcrumbItem {
   label: string;
@@ -32,12 +50,13 @@ export interface RecentPage {
 }
 
 export interface NavigationPreferences {
-  defaultLandingPage: string;
+  sidebarCollapsed: boolean;
+  recentPages: string[];
   favoritePages: string[];
-  recentlyVisited: RecentPage[];
-  compactMode: boolean;
-  showBreadcrumbs: boolean;
-  autoExpand: boolean;
+  defaultLandingPage?: string;
+  compactMode?: boolean;
+  showBreadcrumbs?: boolean;
+  autoExpand?: boolean;
 }
 
 export interface NavigationState {
@@ -60,30 +79,8 @@ export interface NavigationState {
   preferences: NavigationPreferences;
 }
 
-// Action types for reducer
-export type NavigationAction =
-  | { type: 'SET_CURRENT_PATH'; payload: string }
-  | { type: 'SET_BREADCRUMBS'; payload: BreadcrumbItem[] }
-  | { type: 'SET_RELATED_PAGES'; payload: RelatedPage[] }
-  | { type: 'SET_CURRENT_SECTION'; payload: NavigationSection }
-  | { type: 'TOGGLE_SIDEBAR' }
-  | { type: 'TOGGLE_MOBILE_MENU' }
-  | { type: 'SET_MOBILE'; payload: boolean }
-  | { type: 'SET_MOUNTED'; payload: boolean }
-  | { type: 'SET_SIDEBAR_COLLAPSED'; payload: boolean }
-  | { type: 'SET_USER_ROLE'; payload: UserRole }
-  | { type: 'UPDATE_PREFERENCES'; payload: Partial<NavigationPreferences> }
-  | { type: 'LOAD_PERSISTED_STATE'; payload: Partial<NavigationState> }
-  | { type: 'RESET_USER_SPECIFIC_STATE' }
-  | { type: 'SYNC_AUTH_STATE'; payload: { user: any; isAuthenticated: boolean } }
-  | { type: 'BATCH_NAVIGATION_UPDATE'; payload: { 
-      currentPath: string; 
-      section: NavigationSection; 
-      breadcrumbs: BreadcrumbItem[]; 
-      relatedPages: RelatedPage[]; 
-      recentPage: { path: string; title: string };
-      closeMobileMenu: boolean;
-    } };
+// Legacy action types removed - navigation now uses Redux Toolkit actions exclusively
+// All navigation actions are handled through Redux Toolkit slice actions
 
 export interface NavigationContextValue extends NavigationState {
   // Navigation actions
@@ -99,5 +96,18 @@ export interface NavigationContextValue extends NavigationState {
   toggleMobileMenu: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   is_active: (path: string) => boolean;
+}
+
+/**
+ * Navigation analytics event
+ */
+export interface NavigationAnalyticsEvent {
+  event: 'page_view' | 'navigation_click' | 'search' | 'command_palette';
+  path?: string;
+  query?: string;
+  source?: string;
+  timestamp: string;
+  userAgent?: string;
+  referrer?: string;
 }
 

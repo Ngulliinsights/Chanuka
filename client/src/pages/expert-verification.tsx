@@ -3,14 +3,6 @@
  * Displays expert verification system and analysis
  */
 
-import { useState } from 'react';
-import { ExpertVerificationDemo } from '@client/components/verification/ExpertVerificationDemo';
-import { VerificationWorkflow } from '@client/components/verification/VerificationWorkflow';
-import { ExpertBadge, ExpertBadgeGroup } from '@client/components/verification/ExpertBadge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import {
   Shield,
   Users,
@@ -21,6 +13,19 @@ import {
   FileText,
   Eye
 } from 'lucide-react';
+import { useState } from 'react';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { ExpertBadge, ExpertBadgeGroup } from '@client/components/verification/ExpertBadge';
+import { ExpertVerificationDemo } from '@client/components/verification/ExpertVerificationDemo';
+import { VerificationWorkflow } from '@client/components/verification/VerificationWorkflow';
+import { CredibilityIndicator, CredibilityBreakdown } from '@client/components/verification/CredibilityScoring';
+import { ExpertProfileCard } from '@client/components/verification/ExpertProfileCard';
+import { CommunityValidation, ValidationSummary } from '@client/components/verification/CommunityValidation';
+import { ExpertConsensus, ConsensusIndicator } from '@client/components/verification/ExpertConsensus';
 
 export default function ExpertVerification() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -236,70 +241,98 @@ export default function ExpertVerification() {
         </TabsContent>
 
         <TabsContent value="experts" className="space-y-6">
+          <div className="grid gap-6">
+            {featuredExperts.map((expert) => (
+              <ExpertProfileCard
+                key={expert.id}
+                expert={{
+                  id: expert.id.toString(),
+                  name: expert.name,
+                  title: expert.title,
+                  institution: expert.institution,
+                  credentials: [
+                    {
+                      id: '1',
+                      type: 'degree',
+                      title: 'PhD in Constitutional Law',
+                      institution: expert.institution,
+                      year: 2010,
+                      verified: true
+                    }
+                  ],
+                  affiliations: [
+                    {
+                      id: '1',
+                      type: expert.affiliationType,
+                      organization: expert.institution,
+                      role: expert.title,
+                      startDate: '2015-01-01',
+                      verified: true
+                    }
+                  ],
+                  specializations: expert.specializations,
+                  verificationType: expert.verificationType,
+                  credibilityScore: expert.credibilityScore,
+                  contributions: [],
+                  bio: `Experienced ${expert.title.toLowerCase()} with extensive background in ${expert.specializations.join(' and ')}.`,
+                  contactInfo: {
+                    email: `${expert.name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
+                    website: `https://example.com/experts/${expert.id}`
+                  },
+                  verificationDate: new Date().toISOString(),
+                  lastActive: new Date().toISOString()
+                }}
+                showFullProfile={false}
+                onViewProfile={() => window.open(`/experts/${expert.id}`, '_blank')}
+                onViewContributions={() => window.open(`/experts/${expert.id}/analyses`, '_blank')}
+              />
+            ))}
+          </div>
+
+          {/* Expert Consensus Example */}
           <Card>
             <CardHeader>
-              <CardTitle>Featured Experts</CardTitle>
-              <CardDescription>Top-rated experts contributing to legislative analysis</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Expert Consensus Analysis
+              </CardTitle>
+              <CardDescription>
+                How experts reach consensus on legislative analysis
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-6">
-                {featuredExperts.map((expert) => (
-                  <div key={expert.id} className="flex items-center justify-between p-6 bg-gray-50 rounded-lg">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Users className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{expert.name}</h3>
-                          <ExpertBadgeGroup
-                            verificationType={expert.verificationType}
-                            credibilityScore={expert.credibilityScore}
-                            specializations={expert.specializations}
-                            affiliationType={expert.affiliationType}
-                            size="sm"
-                            maxSpecializations={2}
-                          />
-                        </div>
-                        <p className="text-gray-600 mb-1">{expert.title}</p>
-                        <p className="text-sm text-gray-500">{expert.institution}</p>
-                        <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
-                          <span className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-yellow-500" />
-                            {expert.credibilityScore}% Credibility
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <FileText className="w-4 h-4" />
-                            {expert.recentAnalyses} Recent Analyses
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          // Navigate to expert profile page
-                          window.open(`/experts/${expert.id}`, '_blank');
-                        }}
-                      >
-                        <Eye className="w-4 h-4 mr-1" />
-                        View Profile
-                      </Button>
-                      <Button 
-                        size="sm"
-                        onClick={() => {
-                          // Navigate to expert's analyses
-                          window.open(`/experts/${expert.id}/analyses`, '_blank');
-                        }}
-                      >
-                        View Analyses
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ExpertConsensus
+                consensus={{
+                  id: 'consensus-123',
+                  billId: 'bill-456',
+                  topic: 'Constitutional Compliance of Healthcare Bill 2024',
+                  totalExperts: 12,
+                  participatingExperts: 9,
+                  agreementLevel: 78,
+                  positions: [
+                    {
+                      stance: 'support',
+                      count: 7,
+                      percentage: 78,
+                      reasoning: 'Aligns with constitutional healthcare provisions'
+                    },
+                    {
+                      stance: 'oppose',
+                      count: 2,
+                      percentage: 22,
+                      reasoning: 'Potential conflicts with existing legislation'
+                    }
+                  ],
+                  keyPoints: [
+                    'Constitutional compliance verified',
+                    'Budget allocation concerns raised',
+                    'Implementation timeline feasible'
+                  ],
+                  lastUpdated: new Date().toISOString()
+                }}
+                showDetails={true}
+                onViewDetails={() => console.log('View consensus details')}
+              />
             </CardContent>
           </Card>
         </TabsContent>

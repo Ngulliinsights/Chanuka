@@ -11,10 +11,10 @@ import { AuthRepository, UserRepository } from '../mocks/services';
 import { authApiService } from '@client/core/api/auth';
 import { userApiService } from '@client/core/api/user';
 import { globalApiClient } from '@client/core/api/client';
-import { securityMonitor } from '@client/utils/security-monitoring';
+import { securityMonitor } from '@client/utils/security';
 import { privacyCompliance } from '@client/utils/privacy-compliance';
-import { validatePassword } from '@client/utils/password-validation';
-import { tokenManager } from '@client/utils/tokenManager';
+import { validatePassword } from '@client/utils/security';
+import { tokenManager } from '@client/utils/storage';
 import { rbacManager } from '@client/utils/rbac';
 
 // Mock all dependencies
@@ -125,7 +125,7 @@ vi.mock('../../core/api/client', () => ({
   },
 }));
 
-vi.mock('../../utils/tokenManager', () => ({
+vi.mock('../../utils/secure-token-manager', () => ({
   tokenManager: {
     storeTokens: vi.fn(),
     getTokens: vi.fn(() => ({

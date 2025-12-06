@@ -4,26 +4,6 @@
  * Allows users to customize their dashboard layout and preferences.
  */
 
-import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '../../ui/dialog';
-import { Button } from '../../ui/button';
-import { Label } from '../../ui/label';
-import { Switch } from '../../ui/switch';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
-import { Input } from '../../ui/input';
-import { Checkbox } from '../../ui/checkbox';
 import { 
   Settings, 
   Layout, 
@@ -35,7 +15,30 @@ import {
   Maximize,
   RefreshCw
 } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { DashboardPreferences } from '@client/types/user-dashboard';
+
+import { Button } from '../../ui/button';
+import { Checkbox } from '../../ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '../../ui/dialog';
+import { Input } from '../../ui/input';
+import { Label } from '../../ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../ui/select';
+import { Switch } from '../../ui/switch';
+
 
 interface DashboardPreferencesModalProps {
   open: boolean;

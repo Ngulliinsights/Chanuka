@@ -1,10 +1,3 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Progress } from '@client/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import {
   ArrowLeft,
   Network,
@@ -17,6 +10,14 @@ import {
   Share2,
   Target
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Progress } from '@client/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import { logger } from '@client/utils/logger';
 
 interface FinancialNetworkProps { bill_id?: string;

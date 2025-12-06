@@ -3,9 +3,9 @@
  * Centralizes all monitoring services for the Chanuka Client
  */
 
-import SentryMonitoring from './sentry-config';
-import PerformanceMonitoring from './performance-monitoring';
 import ErrorMonitoring from './error-monitoring';
+import PerformanceMonitoring from './performance-monitoring';
+import SentryMonitoring from './sentry-config';
 
 interface MonitoringConfig {
   environment: string;

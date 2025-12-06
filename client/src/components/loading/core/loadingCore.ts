@@ -4,9 +4,10 @@
  */
 
 import { LoadingOperation, LoadingConfig, LoadingStats } from '@client/types';
+
+import { DEFAULT_LOADING_CONFIG } from '@client/constants';
 import { LoadingError } from '@client/errors';
 import { validateLoadingOperation } from '@client/validation';
-import { DEFAULT_LOADING_CONFIG } from '@client/constants';
 
 export class LoadingCore {
   private operations: Map<string, LoadingOperation> = new Map();

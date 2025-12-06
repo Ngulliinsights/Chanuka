@@ -3,14 +3,15 @@
  * Password reset request page
  */
 
+import { Shield, ArrowLeft, Loader2, AlertTriangle, CheckCircle, Mail } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+
+import { Alert, AlertDescription } from '@client/components/ui/alert';
 import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 import { Input } from '@client/components/ui/input';
 import { Label } from '@client/components/ui/label';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Shield, ArrowLeft, Loader2, AlertTriangle, CheckCircle, Mail } from 'lucide-react';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 
 export default function ForgotPasswordPage() {

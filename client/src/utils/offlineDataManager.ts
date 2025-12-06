@@ -10,7 +10,7 @@ export interface OfflineAction {
   type: string;
   endpoint: string;
   method: string;
-  data?: any;
+  data?: unknown;
   timestamp: number;
   retryCount: number;
   maxRetries: number;
@@ -19,7 +19,7 @@ export interface OfflineAction {
 
 export interface CachedData {
   key: string;
-  data: any;
+  data: unknown;
   timestamp: number;
   ttl: number;
   version: string;
@@ -38,7 +38,7 @@ class OfflineDataManager {
   private readonly actionsStore = 'offline-actions';
   private readonly cacheStore = 'offline-cache';
   private readonly analyticsStore = 'offline-analytics';
-  private pendingRequests = new Map<string, Promise<any>>();
+  private pendingRequests = new Map<string, Promise<unknown>>();
 
   async init(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -183,7 +183,7 @@ class OfflineDataManager {
   }
 
   // Offline Cache Management
-  async setOfflineData(key: string, data: any, ttl: number = 24 * 60 * 60 * 1000): Promise<void> {
+  async setOfflineData(key: string, data: unknown, ttl: number = 24 * 60 * 60 * 1000): Promise<void> {
     if (!this.db) await this.init();
 
     const cachedData: CachedData = {
@@ -211,7 +211,7 @@ class OfflineDataManager {
     });
   }
 
-  async getOfflineData<T = any>(key: string): Promise<T | null> {
+  async getOfflineData<T = unknown>(key: string): Promise<T | null> {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
@@ -222,7 +222,7 @@ class OfflineDataManager {
       request.onsuccess = () => {
         const cached = request.result as CachedData | undefined;
         if (cached && Date.now() - cached.timestamp < cached.ttl) {
-          resolve(cached.data);
+          resolve(cached.data as T);
         } else {
           if (cached) {
             // Remove expired data
@@ -239,7 +239,7 @@ class OfflineDataManager {
     });
   }
 
-  async getOfflineDataWithFallback<T = any>(
+  async getOfflineDataWithFallback<T = unknown>(
     key: string,
     fetchFn: () => Promise<T>,
     fallbackData?: T
@@ -248,14 +248,14 @@ class OfflineDataManager {
     const existingRequest = this.pendingRequests.get(key);
     if (existingRequest) {
       logger.debug('Deduplicating request for key', { component: 'OfflineDataManager', key });
-      return existingRequest;
+      return existingRequest as Promise<T>;
     }
 
     // Create the request promise
-    const requestPromise = this.performGetOfflineDataWithFallback(key, fetchFn, fallbackData);
+    const requestPromise: Promise<T> = this.performGetOfflineDataWithFallback(key, fetchFn, fallbackData);
 
-    // Store it in pending requests
-    this.pendingRequests.set(key, requestPromise);
+    // Store it in pending requests (typed as unknown internally)
+    this.pendingRequests.set(key, requestPromise as Promise<unknown>);
 
     try {
       const result = await requestPromise;
@@ -266,7 +266,7 @@ class OfflineDataManager {
     }
   }
 
-  private async performGetOfflineDataWithFallback<T = any>(
+  private async performGetOfflineDataWithFallback<T = unknown>(
     key: string,
     fetchFn: () => Promise<T>,
     fallbackData?: T
@@ -296,10 +296,10 @@ class OfflineDataManager {
   }
 
   // Analytics and Error Reporting
-  async logOfflineEvent(type: string, data: any): Promise<void> {
+  async logOfflineEvent(type: string, data: unknown): Promise<void> {
     if (!this.db) await this.init();
 
-    const event = {
+    const event: { type: string; data: unknown; timestamp: number; userAgent: string; url: string } = {
       type,
       data,
       timestamp: Date.now(),
@@ -317,7 +317,7 @@ class OfflineDataManager {
     });
   }
 
-  async getOfflineAnalytics(): Promise<any[]> {
+  async getOfflineAnalytics(): Promise<unknown[]> {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {

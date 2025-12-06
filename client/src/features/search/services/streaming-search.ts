@@ -5,8 +5,8 @@
  * or progressive loading with proper session management and cancellation.
  */
 
-import { logger } from '../../../utils/logger';
 import { streamSearch, cancelSearch } from '../../../core/api/search';
+import { logger } from '../../../utils/logger';
 
 // Define types locally
 interface SearchResult {

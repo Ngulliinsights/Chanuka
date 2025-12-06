@@ -7,9 +7,11 @@
  */
 
 import { Component, ReactNode, ErrorInfo } from 'react';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../../../../shared/core';
-import { logger } from '@client/utils/logger';
+
 import { getCircuitBreakerStats } from '@client/core/api/interceptors';
+import { logger } from '@client/utils/logger';
+
+import { BaseError, ErrorDomain, ErrorSeverity } from '../../../../shared/core';
 
 export interface UnifiedErrorBoundaryProps {
   children: ReactNode;

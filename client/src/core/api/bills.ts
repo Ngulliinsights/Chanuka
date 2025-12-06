@@ -6,10 +6,12 @@
  * caching strategies, and comprehensive logging.
  */
 
-import { globalApiClient } from './client';
-import { logger } from '@client/utils/logger';
-import { globalErrorHandler } from './errors';
 import { mockBills, mockBillsStats } from '@client/data/mock/bills';
+import { logger } from '@client/utils/logger';
+
+import { globalApiClient } from './client';
+import { globalErrorHandler } from './errors';
+
 
 // Type definitions for bills API
 export interface BillsSearchParams {

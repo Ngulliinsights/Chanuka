@@ -5,11 +5,8 @@
  * financial interests and organizational connections.
  */
 
-import React, { useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { TrendingUp, Vote, Calendar, AlertTriangle, BarChart3 } from 'lucide-react';
+import React, { useMemo } from 'react';
 import { 
   LineChart, 
   Line, 
@@ -25,7 +22,14 @@ import {
   Area,
   AreaChart
 } from 'recharts';
+
 import { VotingPattern, ConflictAnalysis } from '@client/types/conflict-of-interest';
+
+import { Badge } from '../ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+
 
 interface HistoricalPatternAnalysisProps {
   conflictAnalysis: ConflictAnalysis;

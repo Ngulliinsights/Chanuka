@@ -5,6 +5,7 @@
  */
 
 import type { SecurityEvent } from '@client/types/security-types';
+
 import { securityConfig } from '../config/security-config';
 import { SecurityMonitor } from '../monitoring/SecurityMonitor';
 
@@ -127,7 +128,7 @@ export class InputSanitizer {
       const allowedAttrs = allowedAttributes[tag] || allowedAttributes['*'] || [];
       
       // Simple attribute filtering
-      let filteredTag = match.replace(/\s+([a-zA-Z-]+)\s*=\s*["'][^"']*["']/g, (attrMatch, attrName) => {
+      const filteredTag = match.replace(/\s+([a-zA-Z-]+)\s*=\s*["'][^"']*["']/g, (attrMatch, attrName) => {
         return allowedAttrs.includes(attrName.toLowerCase()) ? attrMatch : '';
       });
 
@@ -168,7 +169,7 @@ export class InputSanitizer {
     }
 
     // HTML encode special characters
-    let sanitized = input
+    const sanitized = input
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
@@ -218,7 +219,7 @@ export class InputSanitizer {
     }
 
     // Remove dangerous CSS properties and values
-    let sanitized = css
+    const sanitized = css
       .replace(/expression\s*\(/gi, '') // IE expression()
       .replace(/javascript:/gi, '')
       .replace(/vbscript:/gi, '')

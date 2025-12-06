@@ -3,11 +3,6 @@
  * GDPR-compliant consent collection with detailed information
  */
 
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
 import { 
   Info, 
   Shield, 
@@ -18,7 +13,15 @@ import {
   Cookie,
   ExternalLink
 } from 'lucide-react';
+import React from 'react';
+
 import { ConsentRecord } from '@client/types/auth';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
+
 
 interface ConsentModalProps {
   isOpen: boolean;

@@ -1,9 +1,5 @@
+import { AlertTriangle, CheckCircle, X, TrendingUp, TrendingDown } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Progress } from '../ui/progress';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { 
   BarChart, 
   Bar, 
@@ -18,7 +14,13 @@ import {
   LineChart,
   Line
 } from 'recharts';
-import { AlertTriangle, CheckCircle, X, TrendingUp, TrendingDown } from 'lucide-react';
+
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
 
 interface CoverageReport {
   lines: { total: number; covered: number; percentage: number };

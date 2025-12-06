@@ -1,7 +1,3 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
 import {
   Scale,
   AlertTriangle,
@@ -14,8 +10,15 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import { useState } from 'react';
+
 import { Bill } from '@/core/api/types';
 import { ConstitutionalAnalysisData, SeverityLevel } from '@client/types/constitutional';
+
+import { Badge } from '../ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+
 
 interface ConstitutionalAnalysisPanelProps {
   bill: Bill;

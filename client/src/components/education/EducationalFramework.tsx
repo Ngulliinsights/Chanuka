@@ -1,7 +1,3 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Button } from '../ui/button';
 import { 
   BookOpen, 
   Scale, 
@@ -12,13 +8,20 @@ import {
   HelpCircle,
   ExternalLink
 } from 'lucide-react';
+import { useState } from 'react';
 
-import { PlainLanguageSummary } from './PlainLanguageSummary';
-import { ConstitutionalContext } from './ConstitutionalContext';
-import { HistoricalPrecedents } from './HistoricalPrecedents';
-import { ProcessEducation } from './ProcessEducation';
-import { EducationalTooltip } from './EducationalTooltip';
 import { Bill } from '@/core/api/types';
+
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+import { ConstitutionalContext } from './ConstitutionalContext';
+import { EducationalTooltip } from './EducationalTooltip';
+import { HistoricalPrecedents } from './HistoricalPrecedents';
+import { PlainLanguageSummary } from './PlainLanguageSummary';
+import { ProcessEducation } from './ProcessEducation';
+
 
 interface EducationalFrameworkProps {
   bill: Bill;

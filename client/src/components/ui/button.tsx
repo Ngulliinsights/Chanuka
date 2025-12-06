@@ -1,244 +1,51 @@
-import { forwardRef, ButtonHTMLAttributes, useState, useCallback } from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import { Loader2, AlertCircle, CheckCircle } from "lucide-react"
+/**
+ * Button Component
+ *
+ * Reusable button component with variants and sizes
+ */
 
-import { cn } from '@client/lib/utils'
-import { logger } from '@client/utils/logger';
-import { ButtonStateSchema, ButtonVariantSchema, ButtonSizeSchema } from './validation';
-import { UIComponentError } from './errors';
-import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
+import { cva, type VariantProps } from 'class-variance-authority';
+import React from 'react';
 
-// Define types locally
-type ButtonState = {
-  loading?: boolean;
-  error?: boolean;
-  success?: boolean;
-};
-
-export interface EnhancedButtonProps
-  extends ButtonProps {
-  state?: ButtonState;
-  loadingText?: string;
-  errorText?: string;
-  successText?: string;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
-}
+import { cn } from '@client/lib/utils';
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        default: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500',
+        ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-blue-500',
+        destructive: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        sm: 'px-3 py-1.5 text-sm',
+        md: 'px-4 py-2 text-base',
+        lg: 'px-6 py-3 text-lg',
       },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default",
+      variant: 'default',
+      size: 'md',
     },
   }
-)
+);
 
-export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
+interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+  children: React.ReactNode;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size }), "btn-enhanced", className)}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
-Button.displayName = "Button"
+export const Button: React.FC<ButtonProps> = ({ variant, size, className, children, ...props }) => {
+  return (
+    <button className={cn(buttonVariants({ variant, size }), className)} {...props}>
+      {children}
+    </button>
+  );
+};
 
-const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
-  ({ 
-    className, 
-    variant = "default", 
-    size = "default", 
-    asChild = false,
-    state,
-    loadingText = "Loading...",
-    errorText = "Error occurred",
-    successText = "Success!",
-    onClick,
-    children,
-    disabled,
-    ...props 
-  }, ref) => {
-    const [internalState, setInternalState] = useState<ButtonState>({});
-    const [retryCount, setRetryCount] = useState(0);
-
-    const currentState = state || internalState;
-    const isLoading = currentState.loading;
-    const hasError = currentState.error;
-    const hasSuccess = currentState.success;
-    const isDisabled = disabled || isLoading;
-
-    const handleValidationError = useCallback(async (error: UIComponentError) => {
-      try {
-        const recoveryResult = await attemptUIRecovery('enhanced-button', error, retryCount);
-
-        if (recoveryResult.success) {
-          setRetryCount(0);
-          setInternalState({ error: false });
-        } else {
-          setRetryCount(prev => prev + 1);
-          const suggestions = getUIRecoverySuggestions(error);
-          logger.warn('Button recovery failed', { suggestions });
-        }
-      } catch (recoveryError) {
-        logger.error('Button recovery error', undefined, recoveryError);
-      }
-    }, [retryCount]);
-
-    const handleClick = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
-      if (isDisabled) return;
-
-      try {
-        // Validate button state
-        if (state) {
-          const validationResult = ButtonStateSchema.safeParse(state);
-          if (!validationResult.success) {
-            const error = new UIComponentError('enhanced-button', 'click', 'Invalid button state');
-            await handleValidationError(error);
-            return;
-          }
-        }
-
-        // Validate variant and size
-        const variantResult = ButtonVariantSchema.safeParse(variant);
-        const sizeResult = ButtonSizeSchema.safeParse(size);
-        
-        if (!variantResult.success || !sizeResult.success) {
-          const error = new UIComponentError('enhanced-button', 'click', 'Invalid button configuration');
-          await handleValidationError(error);
-          return;
-        }
-
-        // Set loading state if not externally controlled
-        if (!state) {
-          setInternalState({ loading: true });
-        }
-
-        await onClick?.(event);
-
-        // Set success state if not externally controlled
-        if (!state) {
-          setInternalState({ success: true });
-          setTimeout(() => setInternalState({}), 2000);
-        }
-
-      } catch (error) {
-        logger.error('Button click error', undefined, error);
-
-        if (!state) {
-          setInternalState({ error: true });
-          setTimeout(() => setInternalState({}), 3000);
-        }
-
-        const componentError = new UIComponentError('enhanced-button', 'click', error instanceof Error ? error.message : 'Unknown error');
-        await handleValidationError(componentError);
-      }
-    }, [isDisabled, state, variant, size, onClick, handleValidationError]);
-
-    const getButtonContent = () => {
-      if (isLoading) {
-        return (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            {loadingText}
-          </>
-        );
-      }
-      
-      if (hasError) {
-        return (
-          <>
-            <AlertCircle className="h-4 w-4" />
-            {errorText}
-          </>
-        );
-      }
-      
-      if (hasSuccess) {
-        return (
-          <>
-            <CheckCircle className="h-4 w-4" />
-            {successText}
-          </>
-        );
-      }
-      
-      return children;
-    };
-
-    const getButtonVariant = () => {
-      if (hasError) return "destructive";
-      if (hasSuccess) return "default";
-      return variant;
-    };
-
-    const Comp = asChild ? Slot : "button";
-    
-    return (
-      <Comp
-        className={cn(
-          buttonVariants({ 
-            variant: getButtonVariant(), 
-            size, 
-            className 
-          }),
-          isLoading && "cursor-not-allowed",
-          hasError && "animate-pulse",
-          hasSuccess && "animate-pulse"
-        )}
-        ref={ref}
-        disabled={isDisabled}
-        onClick={handleClick}
-        aria-busy={isLoading}
-        aria-describedby={hasError ? `${props.id}-error` : undefined}
-        {...props}
-      >
-        {getButtonContent()}
-        
-        {hasError && props.id && (
-          <span 
-            id={`${props.id}-error`} 
-            className="sr-only"
-            role="alert"
-          >
-            {errorText}
-          </span>
-        )}
-      </Comp>
-    );
-  }
-);
-EnhancedButton.displayName = "EnhancedButton";
-
-export { Button, buttonVariants, EnhancedButton }
-
+export { buttonVariants };
+export default Button;

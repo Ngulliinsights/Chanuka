@@ -1,8 +1,9 @@
 // ============================================================================
 // ANALYSIS SCHEMA - Drizzle table for analysis records
 // ============================================================================
-import { pgTable, integer, numeric, text, jsonb, boolean, timestamp, uuid as uuidType, varchar } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { pgTable, integer, numeric, text, jsonb, boolean, timestamp, uuid as uuidType, varchar } from "drizzle-orm/pg-core";
+
 import { bills, users } from "./foundation";
 
 export const analysis = pgTable("analysis", {

@@ -5,16 +5,17 @@
  * bill title suggestions, and real-time search results.
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Clock, TrendingUp, FileText, Star, ArrowRight } from 'lucide-react';
-import { Input } from '../../../components/ui/input';
-import { Card, CardContent } from '../../../components/ui/card';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Input } from '../../../components/ui/input';
 import { Separator } from '../../../components/ui/separator';
-import { intelligentSearch } from '../services/intelligent-search';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { logger } from '../../../utils/logger';
+import { intelligentSearch } from '../services/intelligent-search';
 
 // Define types locally
 interface SearchSuggestion {

@@ -4,7 +4,6 @@
  * A tabs component for organizing content
  */
 
-import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 import { cn } from "@client/lib/utils"
 

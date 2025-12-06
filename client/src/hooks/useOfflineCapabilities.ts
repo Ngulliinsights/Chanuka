@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { offlineDataManager } from '@client/utils/offlineDataManager';
-import { cacheInvalidation } from '@client/utils/cacheInvalidation';
-import { addNetworkStatusListener, isOnline } from '@client/utils/serviceWorker';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { backgroundSyncManager } from '@client/utils/backgroundSyncManager';
-import { offlineAnalytics } from '@client/utils/offlineAnalytics';
+import { cacheInvalidation } from '@client/utils/cacheInvalidation';
 import { logger } from '@client/utils/logger';
+import { offlineAnalytics } from '@client/utils/offlineAnalytics';
+import { offlineDataManager } from '@client/utils/offlineDataManager';
+import { addNetworkStatusListener, isOnline } from '@client/utils/serviceWorker';
 
 export interface OfflineState {
   isOnline: boolean;

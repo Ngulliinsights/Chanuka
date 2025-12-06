@@ -4,13 +4,15 @@
  * Preserves strengths from profile.tsx
  */
 
+import { Shield, User, Settings, Lock } from 'lucide-react';
 import { useState } from 'react';
+
 import { useAuth } from '@client/features/users/hooks/useAuth';
+
+import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Switch } from '../ui/switch';
-import { Button } from '../ui/button';
 import { ThemeToggle } from '../ui/theme-toggle';
-import { Shield, User, Settings, Lock } from 'lucide-react';
 
 // Session Display Component
 function SessionDisplay() {

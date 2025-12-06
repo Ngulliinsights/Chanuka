@@ -3,21 +3,19 @@
 // ============================================================================
 // Content moderation, verification, and platform integrity infrastructure
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, timestamp, jsonb, numeric, uuid, varchar,
   index, uniqueIndex, smallint, boolean
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
+import { comments } from "./citizen_participation";
 import {
   moderationStatusEnum,
   verificationStatusEnum,
   severityEnum
 } from "./enum";
-
 import { users } from "./foundation";
-import { comments } from "./citizen_participation";
 
 // ============================================================================
 // CONTENT REPORTS - User reports of problematic content

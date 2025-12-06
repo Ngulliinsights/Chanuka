@@ -3,10 +3,11 @@
  * Handles dashboard settings and preferences
  */
 
-import { useState, useCallback, useEffect } from 'react';
 import type { DashboardConfig, DashboardSection } from '@client/types';
-import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/validation';
+import { useState, useCallback, useEffect } from 'react';
+
 import { DashboardConfigurationError } from '@client/errors';
+import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/validation';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds

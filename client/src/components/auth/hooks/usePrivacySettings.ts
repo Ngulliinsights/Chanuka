@@ -4,9 +4,10 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+
 import { PrivacySettings } from '@client/types/auth';
-import { privacyCompliance } from '@client/utils/privacy-compliance';
 import { logger } from '@client/utils/logger';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
 
 export interface UsePrivacySettingsOptions {
   initialSettings?: Partial<PrivacySettings>;

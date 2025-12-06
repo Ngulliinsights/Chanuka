@@ -6,14 +6,19 @@
   "main": "./index.ts",
   "exports": {
     ".": "./index.ts",
-    "./core": "./core/index.ts",
+    "./core": "./core/src/index.ts",
     "./schema": "./schema/index.ts",
     "./database": "./database/index.ts",
-    "./utils": "./utils/index.ts"
+    "./platform": "./platform/index.ts"
   },
   "scripts": {
     "build": "tsc --project tsconfig.json",
-    "type-check": "tsc --noEmit --project tsconfig.json"
+    "type-check": "tsc --noEmit --project tsconfig.json",
+    "lint": "eslint . --ext .ts,.js --fix",
+    "lint:check": "eslint . --ext .ts,.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
   }
 }
 

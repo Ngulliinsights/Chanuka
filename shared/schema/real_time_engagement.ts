@@ -3,11 +3,10 @@
 // ============================================================================
 // Live engagement tracking, gamification, and real-time analytics
 
-import {
-  pgTable, text, integer, boolean, timestamp, jsonb, uuid, varchar,
-  index, decimal, unique
-} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { pgTable, text, integer, boolean, timestamp, jsonb, uuid, varchar,
+  index, decimal, unique } from 'drizzle-orm/pg-core';
+
 import { users } from './foundation';
 
 // ============================================================================

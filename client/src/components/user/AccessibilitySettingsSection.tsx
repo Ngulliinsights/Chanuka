@@ -4,11 +4,12 @@
  * Preserves strengths from accessibility-settings-panel.tsx
  */
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Switch } from '../ui/switch';
 import { Settings, Eye, Activity, Volume2, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Switch } from '../ui/switch';
 
 // Type definitions
 type FontSize = 'small' | 'medium' | 'large' | 'extra-large';

@@ -4,9 +4,10 @@
  */
 
 import { globalApiClient } from '@client/core/api/client';
-import { logger } from '@client/utils/logger';
 import { globalErrorHandler } from '@client/core/api/errors';
 import { mockBills, mockBillsStats } from '@client/data/mock/bills';
+import { logger } from '@client/utils/logger';
+
 import type { Bill, Sponsor, BillsQueryParams } from '../model/types';
 
 // API-specific types

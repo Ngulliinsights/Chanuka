@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { NavigationValidationError, InvalidNavigationPathError } from './errors';
 
 /**

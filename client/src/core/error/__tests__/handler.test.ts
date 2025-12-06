@@ -10,7 +10,7 @@ import { coreErrorHandler } from '@client/handler';
 import { AppError } from '@client/types';
 
 // Mock the unified error handler
-vi.mock('../../../utils/unified-error-handler', () => ({
+vi.mock('../../../utils/errors', () => ({
   errorHandler: {
     handleError: vi.fn(),
     getErrorStats: vi.fn(() => ({

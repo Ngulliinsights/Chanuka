@@ -3,12 +3,14 @@
  * Provides advanced form inputs with validation, help text, and accessibility features
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Eye, EyeOff, AlertCircle, CheckCircle, HelpCircle } from 'lucide-react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+
 import { cn } from '@client/lib/utils';
+
+import { Button } from './button';
 import { Input } from './input';
 import { Label } from './label';
-import { Button } from './button';
 
 interface BaseFieldProps {
   id?: string;

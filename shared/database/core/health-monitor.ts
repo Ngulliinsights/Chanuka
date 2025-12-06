@@ -8,6 +8,7 @@
  */
 
 import { logger } from '../../core/src/observability/logging';
+
 import { UnifiedConnectionManager } from './connection-manager.js';
 
 // ============================================================================
@@ -20,7 +21,7 @@ export interface HealthCheckResult {
   latencyMs?: number;
   error?: string;
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface HealthMetrics {
@@ -56,7 +57,7 @@ export interface Alert {
   timestamp: Date;
   resolved: boolean;
   resolvedAt?: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface HealthMonitorConfig {
@@ -320,7 +321,7 @@ export class UnifiedHealthMonitor {
     }
   }
 
-  private evaluatePoolHealth(poolStatus: any): 'healthy' | 'degraded' | 'unhealthy' {
+  private evaluatePoolHealth(poolStatus: ReturnType<UnifiedConnectionManager['getPoolStatus']>): 'healthy' | 'degraded' | 'unhealthy' {
     const { metrics } = poolStatus;
     
     // Check if we have too many waiting clients

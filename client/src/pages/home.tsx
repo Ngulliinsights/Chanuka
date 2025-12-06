@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText,
   Users,
@@ -24,10 +22,16 @@ import {
   Lightbulb,
   Heart
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { Badge } from '@client/components/ui/badge';
 import { Button } from '@client/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Badge } from '@client/components/ui/badge';
-import { IntelligentAutocomplete } from '@client/features/search/components/IntelligentAutocomplete';
+import { ResponsiveButton } from '@client/shared/design-system/components/ResponsiveButton';
+import { ResponsiveContainer } from '@client/shared/design-system/components/ResponsiveContainer';
+import { ResponsiveGrid } from '@client/shared/design-system/components/ResponsiveGrid';
+import { TouchTarget } from '@client/shared/design-system/components/TouchTarget';
 import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
 import { TouchOptimizedCard } from '@/components/mobile/__archive__/MobileOptimizedLayout';
 import { useAppStore } from '@client/store/unified-state-manager';

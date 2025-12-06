@@ -1,4 +1,8 @@
 import React from "react";
+
+import { useNavigationPreferences } from "@/core/navigation/hooks";
+
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,10 +10,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
-import { useNavigationPreferences } from "@/core/navigation/hooks";
+import { Switch } from "../ui/switch";
+
 
 interface NavigationPreferencesDialogProps {
   trigger: React.ReactNode;

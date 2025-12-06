@@ -1,10 +1,17 @@
+import { Search, Bell, User, Settings } from 'lucide-react';
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Bell, User, Settings } from 'lucide-react';
+
+import { useNavigation } from '@client/core/navigation/context';
+import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useMediaQuery } from '@client/hooks/use-mobile';
+import { cn } from '@client/lib/utils';
+import { logger } from '@client/utils/logger';
+
 import { Menu as MenuIcon, LogOut as LogOutIcon, Home as HomeIcon } from '../icons/SimpleIcons';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +20,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Badge } from '../ui/badge';
-import { useAuth } from '@client/features/users/hooks/useAuth';
-import { useNavigation } from '@client/core/navigation/context';
-import { useMediaQuery } from '@client/hooks/use-mobile';
-import { cn } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
+import { Input } from '../ui/input';
+
 
 interface NavigationBarProps {
   className?: string;

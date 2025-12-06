@@ -6,6 +6,7 @@
  */
 
 import { faker } from '@faker-js/faker';
+
 import {
   LiveEngagementMetrics,
   PersonalEngagementScore,
@@ -20,6 +21,8 @@ import {
   CommunityImpactMetrics,
   EngagementTrend
 } from '@client/types/engagement-analytics';
+
+import { mockExperts, mockOfficialExperts } from './experts';
 import {
   generateId,
   generateDateInRange,
@@ -28,7 +31,6 @@ import {
   weightedRandom
 } from './generators';
 import { mockUsers } from './users';
-import { mockExperts, mockOfficialExperts } from './experts';
 
 // Seed faker for consistent data
 faker.seed(12345);

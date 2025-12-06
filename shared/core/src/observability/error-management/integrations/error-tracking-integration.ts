@@ -5,9 +5,9 @@
  * like Sentry, Rollbar, Bugsnag, and others.
  */
 
+import { logger } from '../../logging/index.js';
 import { BaseError } from '../errors/base-error.js';
 import { ErrorContext, ErrorTrackingIntegration } from '../types.js';
-import { logger } from '../../logging/index.js';
 
 export interface IntegrationConfig {
   dsn?: string;
@@ -21,7 +21,7 @@ export interface IntegrationConfig {
     email?: string;
     username?: string;
   };
-  customData?: Record<string, any>;
+  customData?: Record<string, unknown>;
 }
 
 export abstract class BaseErrorTrackingIntegration implements ErrorTrackingIntegration {
@@ -34,8 +34,9 @@ export abstract class BaseErrorTrackingIntegration implements ErrorTrackingInteg
 
   abstract get name(): string;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async initialize(config: Record<string, any>): Promise<void> {
-    this.config = { ...this.config, ...config };
+    this.config = { ...this.config, ...(config as Partial<IntegrationConfig>) };
     await this.doInitialize();
     this.initialized = true;
 
@@ -61,12 +62,12 @@ export abstract class BaseErrorTrackingIntegration implements ErrorTrackingInteg
         component: 'ErrorTrackingIntegration',
         integration: this.name,
         errorId: error.errorId,
-        trackingError
+        trackingError: formatError(trackingError)
       });
     }
   }
 
-  async getAnalytics(): Promise<any> {
+  async getAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
     if (!this.initialized) {
       throw new Error(`Integration not initialized: ${this.name}`);
     }
@@ -88,8 +89,13 @@ export abstract class BaseErrorTrackingIntegration implements ErrorTrackingInteg
 
   protected abstract doInitialize(): Promise<void>;
   protected abstract doTrackError(error: BaseError, context?: ErrorContext): Promise<void>;
-  protected abstract doGetAnalytics(): Promise<any>;
+  protected abstract doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics>;
   protected abstract doShutdown(): Promise<void>;
+}
+
+function formatError(err: unknown): unknown {
+  if (err instanceof Error) return { message: err.message, stack: err.stack };
+  return err;
 }
 
 /**
@@ -160,13 +166,16 @@ export class SentryIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doGetAnalytics(): Promise<any> {
+  protected async doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
     // In a real implementation, this would fetch analytics from Sentry API
     return {
       totalErrors: 0,
-      resolvedErrors: 0,
-      unresolvedErrors: 0,
-      topIssues: []
+      errorRate: 0,
+      errorDistribution: {} as Record<string, number>,
+      errorTrends: { daily: [], weekly: [], monthly: [] },
+      topErrorTypes: [],
+      recoverySuccessRate: 0,
+      userImpact: { affectedUsers: 0, sessionsWithErrors: 0, errorPerSession: 0 }
     };
   }
 
@@ -222,11 +231,15 @@ export class RollbarIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doGetAnalytics(): Promise<any> {
+  protected async doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
     return {
-      totalItems: 0,
-      occurrences: 0,
-      topActiveItems: []
+      totalErrors: 0,
+      errorRate: 0,
+      errorDistribution: {} as Record<string, number>,
+      errorTrends: { daily: [], weekly: [], monthly: [] },
+      topErrorTypes: [],
+      recoverySuccessRate: 0,
+      userImpact: { affectedUsers: 0, sessionsWithErrors: 0, errorPerSession: 0 }
     };
   }
 
@@ -293,11 +306,15 @@ export class BugsnagIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doGetAnalytics(): Promise<any> {
+  protected async doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
     return {
       totalErrors: 0,
-      uniqueErrors: 0,
-      topErrors: []
+      errorRate: 0,
+      errorDistribution: {} as Record<string, number>,
+      errorTrends: { daily: [], weekly: [], monthly: [] },
+      topErrorTypes: [],
+      recoverySuccessRate: 0,
+      userImpact: { affectedUsers: 0, sessionsWithErrors: 0, errorPerSession: 0 }
     };
   }
 
@@ -350,10 +367,15 @@ export class ConsoleIntegration extends BaseErrorTrackingIntegration {
     console.groupEnd();
   }
 
-  protected async doGetAnalytics(): Promise<any> {
+  protected async doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
     return {
-      message: 'Console integration does not provide analytics',
-      integration: this.name
+      totalErrors: 0,
+      errorRate: 0,
+      errorDistribution: {} as Record<string, number>,
+      errorTrends: { daily: [], weekly: [], monthly: [] },
+      topErrorTypes: [],
+      recoverySuccessRate: 0,
+      userImpact: { affectedUsers: 0, sessionsWithErrors: 0, errorPerSession: 0 }
     };
   }
 
@@ -400,11 +422,11 @@ export class ErrorTrackingIntegrationManager {
     const promises = Array.from(this.integrations.values()).map(async (integration) => {
       try {
         await integration.initialize({});
-      } catch (error) {
+      } catch (err: unknown) {
         logger.error(`Failed to initialize integration: ${integration.name}`, {
           component: 'ErrorTrackingIntegrationManager',
           integration: integration.name,
-          error
+          error: formatError(err)
         });
       }
     });
@@ -416,12 +438,13 @@ export class ErrorTrackingIntegrationManager {
     const promises = Array.from(this.integrations.values()).map(async (integration) => {
       try {
         await integration.trackError(error, context);
-      } catch (error) {
+      } catch (err: unknown) {
+        const originalErrorId = err instanceof BaseError ? err.errorId : undefined;
         logger.error(`Failed to track error with integration: ${integration.name}`, {
           component: 'ErrorTrackingIntegrationManager',
           integration: integration.name,
-          originalErrorId: error.errorId,
-          trackingError: error
+          originalErrorId,
+          trackingError: formatError(err)
         });
       }
     });
@@ -433,11 +456,11 @@ export class ErrorTrackingIntegrationManager {
     const promises = Array.from(this.integrations.values()).map(async (integration) => {
       try {
         await integration.shutdown();
-      } catch (error) {
+      } catch (err: unknown) {
         logger.error(`Failed to shutdown integration: ${integration.name}`, {
           component: 'ErrorTrackingIntegrationManager',
           integration: integration.name,
-          error
+          error: formatError(err)
         });
       }
     });

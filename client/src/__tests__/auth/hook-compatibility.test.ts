@@ -162,7 +162,7 @@ vi.mock('../../core/api/client', () => ({
   },
 }));
 
-vi.mock('../../utils/tokenManager', () => ({
+vi.mock('../../utils/secure-token-manager', () => ({
   tokenManager: {
     storeTokens: vi.fn(),
     getTokens: vi.fn(() => null),

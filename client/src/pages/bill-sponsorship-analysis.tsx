@@ -10,6 +10,18 @@ import {
   TrendingUp,
   Users
 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { ImplementationWorkarounds } from '@client/features/bills/ui/implementation-workarounds';
+
+import {
+  useBillSponsorshipAnalysis as useSponsorshipAnalysis
+} from '../features/bills/model/hooks/useBills';
 
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';

@@ -14,18 +14,60 @@ export class AuthMiddlewareProvider implements MiddlewareProvider {
 
   create(_options: Record<string, any>) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      // Add auth middleware logic
       try {
-        // Example: Check auth token
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-          return res.status(401).json({ error: 'No authorization token provided' });
+        // Skip authentication for certain paths
+        if (skipPaths.some(path => req.path.startsWith(path))) {
+          return next();
         }
-        
-        // Add token validation logic here
+
+        // Extract token from Authorization header
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+          if (requireAuth) {
+            return res.status(401).json({ 
+              error: 'Authentication required',
+              code: 'AUTH_REQUIRED'
+            });
+          }
+          return next();
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+          return res.status(401).json({ 
+            error: 'Invalid token format',
+            code: 'INVALID_TOKEN_FORMAT'
+          });
+        }
+
+        // TODO: Implement proper JWT validation
+        // For now, we'll do basic validation
+        if (token === 'invalid' || token.length < 10) {
+          return res.status(401).json({ 
+            error: 'Invalid or expired token',
+            code: 'INVALID_TOKEN'
+          });
+        }
+
+        // Mock user data - replace with actual JWT decode
+        const user = {
+          id: 'user_123',
+          email: 'user@example.com',
+          role: 'citizen',
+          anonymityLevel: 'public'
+        };
+
+        // Attach user to request
+        (req as any).user = user;
+        (req as any).token = token;
+
         next();
       } catch (error) {
-        next(error);
+        console.error('Authentication error:', error);
+        res.status(500).json({ 
+          error: 'Authentication service error',
+          code: 'AUTH_SERVICE_ERROR'
+        });
       }
     };
   }

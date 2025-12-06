@@ -1,8 +1,3 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Progress } from '../ui/progress';
 import { 
   ArrowRight, 
   Clock, 
@@ -20,6 +15,12 @@ import {
   ExternalLink,
   BookOpen
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
 
 interface LegislativeStep {
   id: string;

@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import React, { useState, useEffect, useCallback } from 'react';
-import { safeApi, useSafeApi } from '../utils/safe-api';
+import { safeApi, useSafeApi } from '../utils/api';
 
 // Mock fetch for testing
 const mockFetch = vi.fn();

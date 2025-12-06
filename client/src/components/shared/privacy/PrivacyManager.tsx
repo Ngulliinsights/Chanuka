@@ -4,10 +4,12 @@
  */
 
 import React from 'react';
+
+import { PrivacySettings } from '@client/types/auth';
+
+import { CompactInterface } from './CompactInterface';
 import { FullInterface } from './FullInterface';
 import { ModalInterface } from './ModalInterface';
-import { CompactInterface } from './CompactInterface';
-import { PrivacySettings } from '@client/types/auth';
 
 export type PrivacyMode = 'full' | 'modal' | 'compact';
 

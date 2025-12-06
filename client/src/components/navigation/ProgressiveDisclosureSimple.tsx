@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
 import { ChevronDown, ChevronRight, Clock, MapPin, Menu, CheckCircle, Circle, ArrowRight, BookOpen, Target } from 'lucide-react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 // Enhanced types for progressive disclosure
 interface SimpleSection {

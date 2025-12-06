@@ -5,9 +5,9 @@
  * for recovery, logging, and circuit breaker integration.
  */
 
+import { logger } from '../../logging/index.js';
 import { BaseError, ErrorSeverity } from '../errors/base-error.js';
 import { CircuitBreaker } from '../patterns/circuit-breaker.js';
-import { logger } from '../../logging/index.js';
 
 export interface ErrorHandler {
   readonly priority: number;

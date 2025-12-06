@@ -3,12 +3,7 @@
  * Account security monitoring and management
  */
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { useAuth } from '@client/hooks/useAuth';
 import { 
   Shield, 
   Smartphone, 
@@ -24,10 +19,19 @@ import {
   Trash2,
   RefreshCw
 } from 'lucide-react';
-import { useAuth } from '@client/hooks/useAuth';
-import { TwoFactorSetup } from './TwoFactorSetup';
+import React, { useState, useEffect } from 'react';
+
 import { SecurityEvent, SuspiciousActivityAlert, SessionInfo } from '@client/types/auth';
 import { logger } from '@client/utils/logger';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+import { TwoFactorSetup } from './TwoFactorSetup';
+
 
 interface SecurityDashboardProps {
   className?: string;

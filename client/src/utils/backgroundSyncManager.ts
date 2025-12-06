@@ -10,7 +10,7 @@ export interface OfflineAction {
   type: string;
   endpoint: string;
   method: string;
-  data?: any;
+  data?: unknown;
   priority: 'low' | 'medium' | 'high';
   maxRetries: number;
 }
@@ -30,9 +30,14 @@ class BackgroundSyncManager {
 
     try {
       // Register for background sync if supported
-      if ('serviceWorker' in navigator && 'sync' in (window as any).ServiceWorkerRegistration.prototype) {
-        const registration = await navigator.serviceWorker.ready;
-        await (registration as any).sync.register('background-sync');
+      if ('serviceWorker' in navigator && typeof ServiceWorkerRegistration !== 'undefined') {
+        const registration = (await navigator.serviceWorker.ready) as ServiceWorkerRegistration & {
+          sync?: { register: (tag: string) => Promise<void> };
+        };
+
+        if (registration.sync && typeof registration.sync.register === 'function') {
+          await registration.sync.register('background-sync');
+        }
         logger.info('Background sync registered', { component: 'BackgroundSyncManager' });
       }
 
@@ -61,7 +66,14 @@ class BackgroundSyncManager {
       const response = await sendMessageToServiceWorker({
         type: 'GET_SYNC_STATUS',
       });
-      return response.status;
+      // guard and coerce response shape safely
+      const res = response as unknown;
+      if (res && typeof res === 'object' && 'status' in (res as Record<string, unknown>)) {
+        return (res as { status: SyncStatus }).status as SyncStatus;
+      }
+
+      // fallback empty status
+      return { queueLength: 0, lastSyncTime: null, pendingActions: [] };
     } catch (error) {
       logger.error('Failed to get sync status', { component: 'BackgroundSyncManager', error });
       throw error;
@@ -105,7 +117,7 @@ class BackgroundSyncManager {
   async queueApiRequest(
     method: string,
     endpoint: string,
-    data?: any,
+    data?: unknown,
     priority: 'low' | 'medium' | 'high' = 'medium'
   ): Promise<void> {
     const action: OfflineAction = {
@@ -120,7 +132,7 @@ class BackgroundSyncManager {
     await this.addOfflineAction(action);
   }
 
-  async queueBillComment(bill_id: number, comment: any): Promise<void> { await this.queueApiRequest(
+  async queueBillComment(bill_id: number, comment: unknown): Promise<void> { await this.queueApiRequest(
       'POST',
       `/api/bills/${bill_id }/comments`,
       comment,
@@ -128,7 +140,7 @@ class BackgroundSyncManager {
     );
   }
 
-  async queueUserPreferences(preferences: any): Promise<void> {
+  async queueUserPreferences(preferences: unknown): Promise<void> {
     await this.queueApiRequest(
       'PUT',
       '/api/users/preferences',
@@ -137,7 +149,7 @@ class BackgroundSyncManager {
     );
   }
 
-  async queueEngagement(bill_id: number, engagement: any): Promise<void> { await this.queueApiRequest(
+  async queueEngagement(bill_id: number, engagement: unknown): Promise<void> { await this.queueApiRequest(
       'POST',
       `/api/bills/${bill_id }/engagement`,
       engagement,

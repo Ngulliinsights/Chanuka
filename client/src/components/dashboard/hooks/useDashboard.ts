@@ -3,8 +3,6 @@
  * Following navigation component hook patterns
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useBills } from '@/features/bills/hooks/useBills';
 import type { 
   DashboardData, 
   DashboardConfig, 
@@ -12,12 +10,8 @@ import type {
   ActionItem,
   TrackedTopic 
 } from '@client/types';
-import { 
-  validateDashboardData, 
-  validateActionItem, 
-  validateTrackedTopic,
-  safeValidateDashboardConfig 
-} from '@client/validation';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { 
   DashboardError, 
   DashboardDataFetchError, 
@@ -25,6 +19,14 @@ import {
   DashboardTopicError 
 } from '@client/errors';
 import { getRecoveryStrategy, executeRecovery } from '@client/recovery';
+import { 
+  validateDashboardData, 
+  validateActionItem, 
+  validateTrackedTopic,
+  safeValidateDashboardConfig 
+} from '@client/validation';
+
+import { useBills } from '@/features/bills/hooks/useBills';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds

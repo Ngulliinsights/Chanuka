@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { logger } from '../observability/logging';
+
 import {
   ProgressState,
   ProgressMetrics,
@@ -16,7 +17,7 @@ export interface ProgressTrackerOptions {
     persistState: boolean;
     notifications: boolean;
   };
-  logger: any;
+  logger: typeof logger;
 }
 
 export class ProgressTracker extends EventEmitter {
@@ -26,8 +27,8 @@ export class ProgressTracker extends EventEmitter {
   private taskProgress: Map<string, number> = new Map();
   private phaseStartTimes: Map<ModernizationPhase, Date> = new Map();
   private stepDurations: number[] = [];
-  private updateTimer?: NodeJS.Timeout;
-  private resourceMonitor?: NodeJS.Timeout;
+  private updateTimer: NodeJS.Timeout | undefined = undefined;
+  private resourceMonitor: NodeJS.Timeout | undefined = undefined;
 
   constructor(options: ProgressTrackerOptions) {
     super();
@@ -62,9 +63,9 @@ export class ProgressTracker extends EventEmitter {
       stepsCompleted: 0,
       totalSteps,
       startTime: now,
-      estimatedCompletion: estimatedDuration 
+      estimatedCompletion: estimatedDuration
         ? new Date(now.getTime() + estimatedDuration * 1000)
-        : undefined,
+        : new Date(now.getTime()),
       metrics: this.initializeMetrics()
     };
 
@@ -299,12 +300,12 @@ export class ProgressTracker extends EventEmitter {
   public stop(): void {
     if (this.updateTimer) {
       clearInterval(this.updateTimer);
-      this.updateTimer = undefined as any;
+      this.updateTimer = undefined;
     }
 
     if (this.resourceMonitor) {
       clearInterval(this.resourceMonitor);
-      this.resourceMonitor = undefined as any;
+      this.resourceMonitor = undefined;
     }
 
     this.logger.info('Progress tracking stopped', {});
@@ -423,7 +424,8 @@ export class ProgressTracker extends EventEmitter {
         {
           taskId: state.taskId,
           status,
-          progress: state.overallProgress
+          progress: state.overallProgress,
+          stepDurations: this.stepDurations
         }
       );
 

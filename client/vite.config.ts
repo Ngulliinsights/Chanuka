@@ -173,15 +173,26 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         '@chanuka/shared': path.resolve(rootDir, '../shared'),
         '@shared': path.resolve(rootDir, '../shared'),
         '@shared/*': path.resolve(rootDir, '../shared/*'),
-        '@shared/core': path.resolve(rootDir, '../shared/core'),
-        '@shared/core/*': path.resolve(rootDir, '../shared/core/*'),
-        '@shared/database': path.resolve(rootDir, '../shared/database'),
-        '@shared/database/*': path.resolve(rootDir, '../shared/database/*'),
+        
+        // Client-safe shared module paths
+        '@shared/core/utils': path.resolve(rootDir, '../shared/core/src/utils'),
+        '@shared/core': path.resolve(rootDir, '../shared/core/src'),
         '@shared/schema': path.resolve(rootDir, '../shared/schema'),
-        '@shared/schema/*': path.resolve(rootDir, '../shared/schema/*'),
-        '@shared/utils': path.resolve(rootDir, '../shared/utils'),
-        '@shared/utils/*': path.resolve(rootDir, '../shared/utils/*'),
-      },
+        '@shared/platform': path.resolve(rootDir, '../shared/platform'),
+        '@shared/i18n': path.resolve(rootDir, '../shared/i18n'),
+        
+        // Exclude server-only modules (redirect to stubs)
+        '@shared/database': path.resolve(rootDir, './src/stubs/database-stub.ts'),
+        '@shared/core/middleware': path.resolve(rootDir, './src/stubs/middleware-stub.ts'),
+        
+        // Security fixes - redirect to secure implementations
+        '@client/utils/authenticated-api': path.resolve(rootDir, './src/utils/secure-authenticated-api.ts'),
+        '@client/utils/secure-token-manager': path.resolve(rootDir, './src/utils/secure-token-manager.ts'),
+        
+        // Logger consolidation - redirect all logger imports to unified implementation
+                '@client/utils/logger': path.resolve(rootDir, './src/utils/logger.ts'),
+                '@client/utils/logger-simple': path.resolve(rootDir, './src/utils/logger.ts'),
+              },
       // Extension resolution order affects lookup speed
       // More common extensions first means fewer failed lookups
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],

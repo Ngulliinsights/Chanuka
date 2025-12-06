@@ -10,6 +10,7 @@
  */
 
 import { Pool, PoolClient, PoolConfig } from 'pg';
+
 import { logger } from '../../core/src/index';
 
 // ============================================================================
@@ -40,7 +41,7 @@ export interface TransactionOptions {
  */
 export interface DatabaseTransaction {
   /** Execute a query within the transaction */
-  query<T = any>(sql: string, params?: any[]): Promise<T>;
+  query<T = unknown>(sql: string, params?: unknown[]): Promise<T>;
   /** Commit the transaction */
   commit(): Promise<void>;
   /** Rollback the transaction */
@@ -398,7 +399,7 @@ export class UnifiedConnectionManager {
   /**
    * Execute a query with automatic connection management and routing.
    */
-  public async query(text: string, params?: any[], useReadReplica = true): Promise<any> {
+  public async query(text: string, params?: unknown[], useReadReplica = true): Promise<unknown> {
     const startTime = Date.now();
     let client: PoolClient;
 
@@ -533,7 +534,7 @@ export class UnifiedConnectionManager {
     }
 
     return {
-      async query<T = any>(sql: string, params?: any[]): Promise<T> {
+      async query<T = unknown>(sql: string, params?: unknown[]): Promise<T> {
         if (!isActive) {
           throw new Error('Transaction is no longer active');
         }
@@ -586,7 +587,7 @@ export class UnifiedConnectionManager {
       '57014', // Query canceled
     ]);
 
-    if ('code' in error && transientCodes.has((error as any).code)) {
+    if (error && typeof error === 'object' && 'code' in error && typeof error.code === 'string' && transientCodes.has(error.code)) {
       return true;
     }
 

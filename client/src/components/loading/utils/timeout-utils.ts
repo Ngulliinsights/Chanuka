@@ -4,6 +4,7 @@
  */
 
 import { LoadingOperation } from '@client/types';
+
 import { LOADING_TIMEOUTS } from '@client/constants';
 
 export interface TimeoutConfig {

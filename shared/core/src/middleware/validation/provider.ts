@@ -1,6 +1,15 @@
 import { MiddlewareProvider } from '../types';
 import { CoreValidationService as ValidationService } from '../../validation/core/validation-service';
 import { Request, Response, NextFunction } from 'express';
+
+import { MiddlewareProvider } from '../../types';
+import { ValidationSchema } from '../../validation/core/interfaces';
+import { CoreValidationService as ValidationService } from '../../validation/core/validation-service';
+
+interface ValidationMiddlewareOptions {
+  schema: ValidationSchema;
+  target: 'body' | 'query' | 'params';
+}
 // import { logger } from '../observability/logging'; // Unused import
 
 export class ValidationMiddlewareProvider implements MiddlewareProvider {
@@ -8,20 +17,20 @@ export class ValidationMiddlewareProvider implements MiddlewareProvider {
 
   constructor(private readonly validator: ValidationService) {}
 
-  validate(options: Record<string, any>): boolean {
+  validate(options: ValidationMiddlewareOptions): boolean {
     const { schema, target } = options;
     return schema && ['body', 'query', 'params'].includes(target);
   }
 
-  create(options: Record<string, any>) {
+  create(options: ValidationMiddlewareOptions) {
     const { schema, target } = options;
-    
-    return (req: Request, res: Response, next: NextFunction): void => {
+
+    return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const dataToValidate = req[target as keyof Request];
-        const result = this.validator.validate(schema, dataToValidate);
-        
-        if (!result.valid) {
+        const result = await this.validator.validateSafe(schema, dataToValidate);
+
+        if (!result.success) {
           res.status(400).json({
             error: 'Validation failed',
             details: result.errors

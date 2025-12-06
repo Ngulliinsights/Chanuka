@@ -3,12 +3,6 @@
  * Comprehensive performance monitoring and optimization control panel
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { 
   Activity, 
   Zap, 
@@ -23,12 +17,20 @@ import {
   Download,
   RefreshCw
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 
+import { assetOptimizer, type AssetMetrics } from '@client/utils/assets';
 import { bundleAnalyzer, type BundleMetrics, type OptimizationRecommendation } from '@client/utils/bundle-analyzer';
-import { assetOptimizer, type AssetMetrics } from '@client/utils/asset-optimization';
-import { webVitalsMonitor, type WebVitalsMetric, type WebVitalsReport } from '@client/utils/web-vitals-monitor';
-import { realtimeOptimizer, type ConnectionMetrics } from '@client/utils/realtime-optimizer';
 import { logger } from '@client/utils/logger';
+import { webVitalsMonitor, type WebVitalsMetric, type WebVitalsReport } from '@client/utils/performance';
+import { realtimeOptimizer, type ConnectionMetrics } from '@client/utils/realtime-optimizer';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
 
 interface PerformanceOptimizationDashboardProps {
   className?: string;

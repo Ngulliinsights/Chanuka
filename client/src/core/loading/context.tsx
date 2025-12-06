@@ -5,10 +5,12 @@
  */
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef, useMemo } from 'react';
-import { LoadingStateData, LoadingAction, LoadingOperation, LoadingOptions, LoadingPriority, LoadingType, LoadingContextValue, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats, LoadingError, LoadingTimeoutError, LoadingRetryError, LoadingConnectionError } from './types';
-import { loadingReducer } from './reducer';
-import { logger } from '@client/utils/logger';
+
 import { useErrorAnalytics } from '@client/features/analytics/hooks/useErrorAnalytics';
+import { logger } from '@client/utils/logger';
+
+import { loadingReducer } from './reducer';
+import { LoadingStateData, LoadingAction, LoadingOperation, LoadingOptions, LoadingPriority, LoadingType, LoadingContextValue, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats, LoadingError, LoadingTimeoutError, LoadingRetryError, LoadingConnectionError } from './types';
 
 const initialState: LoadingStateData = {
   operations: {},

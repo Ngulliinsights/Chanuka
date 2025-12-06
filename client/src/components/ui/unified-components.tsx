@@ -3,12 +3,13 @@
  * Consolidates shadcn/ui with Chanuka design system
  */
 
-import { forwardRef, ButtonHTMLAttributes, HTMLAttributes, InputHTMLAttributes } from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import * as TabsPrimitive from "@radix-ui/react-tabs"
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
+import { Slot } from "@radix-ui/react-slot"
+import * as TabsPrimitive from "@radix-ui/react-tabs"
+import { cva, type VariantProps } from "class-variance-authority"
 import { ChevronDown, Loader2 } from "lucide-react"
+import { forwardRef, ButtonHTMLAttributes, HTMLAttributes, InputHTMLAttributes } from "react"
+
 import { cn } from '@client/lib/utils'
 
 // =============================================================================

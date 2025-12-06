@@ -1,15 +1,16 @@
+import { useQuery } from '@tanstack/react-query';
+import { Users, FileText, MessageSquare as MessageCircle, Shield, Settings, Database, Activity } from 'lucide-react';
 import { useState } from 'react';
-import { Users, FileText, MessageSquare as MessageCircle, TrendingUp, Shield, Settings, Database, Activity, Monitor } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+
+import { authenticatedApi } from '@client/utils/api';
+import { logger } from '@client/utils/logger';
+
+import { MonitoringDashboard } from '../monitoring/monitoring-dashboard';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Progress } from '../ui/progress';
-import { useQuery } from '@tanstack/react-query';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { MonitoringDashboard } from '../monitoring/monitoring-dashboard';
-import AuthenticatedAPI from '@client/utils/authenticated-api';
-import { logger } from '@client/utils/logger';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {
@@ -56,18 +57,10 @@ interface SystemHealth {
 const useAdminStats = () => {
   return useQuery<AdminStats>({
     queryKey: ['admin', 'stats'],
-    queryFn: async ({ signal }) => {
-      const result = await AuthenticatedAPI.adminGet<AdminStats>('/api/admin/dashboard/stats', {
-        signal, // Add AbortController support for race condition prevention
-        timeout: 15000, // 15 second timeout
-        retries: 2 // Retry failed requests
-      });
+    queryFn: async () => {
+      const response = await authenticatedApi.get<AdminStats>('/api/admin/dashboard/stats');
 
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      return result.data!;
+      return response.data;
     },
     refetchInterval: 30000, // Refresh every 30 seconds
     staleTime: 25000, // Consider data stale after 25 seconds
@@ -80,18 +73,10 @@ const useAdminStats = () => {
 const useSystemHealth = () => {
   return useQuery<SystemHealth>({
     queryKey: ['admin', 'health'],
-    queryFn: async ({ signal }) => {
-      const result = await AuthenticatedAPI.adminGet<SystemHealth>('/api/admin/health', {
-        signal, // Add AbortController support for race condition prevention
-        timeout: 10000, // 10 second timeout
-        retries: 1 // Retry once for health checks
-      });
+    queryFn: async () => {
+      const response = await authenticatedApi.get<SystemHealth>('/api/admin/health');
 
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      return result.data!;
+      return response.data;
     },
     refetchInterval: 10000, // Refresh every 10 seconds
     staleTime: 8000, // Consider data stale after 8 seconds
@@ -107,8 +92,7 @@ const AdminDashboard = () => {
   const { data: stats, isLoading, error: statsError } = useAdminStats();
   const { data: systemHealth, error: healthError } = useSystemHealth();
 
-  // Enhanced color palette for better visual distinction
-  const CHART_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+
 
   // Utility function with better time formatting
   const formatUptime = (seconds: number): string => {
@@ -273,49 +257,51 @@ const AdminDashboard = () => {
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* User Roles Distribution with fixed TypeScript types */}
+            {/* User Roles Distribution */}
             <Card>
               <CardHeader>
                 <CardTitle>User Roles Distribution</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={stats?.users.byRole ?? []}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ role, count }: UserRoleData) => `${role}: ${count}`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="count"
-                    >
-                      {(stats?.users.byRole ?? []).map((entry: UserRoleData, index: number) => (
-                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number, name: string) => [value, name]} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="space-y-3">
+                  {(stats?.users.byRole ?? []).map((role) => {
+                    const total = stats?.users.total ?? 1;
+                    const percentage = Math.round((role.count / total) * 100);
+                    return (
+                      <div key={role.role} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="capitalize">{role.role}</span>
+                          <span>{role.count} ({percentage}%)</span>
+                        </div>
+                        <Progress value={percentage} className="h-2" />
+                      </div>
+                    );
+                  })}
+                </div>
               </CardContent>
             </Card>
 
-            {/* Bill Status Distribution with enhanced styling */}
+            {/* Bill Status Distribution */}
             <Card>
               <CardHeader>
                 <CardTitle>Bill Status Distribution</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={stats?.bills.byStatus ?? []}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="status" />
-                    <YAxis />
-                    <Tooltip formatter={(value: number, name: string) => [value, name]} />
-                    <Bar dataKey="count" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="space-y-3">
+                  {(stats?.bills.byStatus ?? []).map((status) => {
+                    const maxCount = Math.max(...(stats?.bills.byStatus ?? []).map(s => s.count));
+                    const percentage = maxCount > 0 ? Math.round((status.count / maxCount) * 100) : 0;
+                    return (
+                      <div key={status.status} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="capitalize">{status.status.replace('_', ' ')}</span>
+                          <span>{status.count}</span>
+                        </div>
+                        <Progress value={percentage} className="h-2" />
+                      </div>
+                    );
+                  })}
+                </div>
               </CardContent>
             </Card>
           </div>

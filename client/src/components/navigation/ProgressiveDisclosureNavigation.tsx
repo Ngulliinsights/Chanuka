@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, ChevronRight, Clock, MapPin, ArrowRight, Menu } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+
 import { cn } from '@client/lib/utils';
-import { Progress } from '../ui/progress';
+
 import { Button } from '../ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { Progress } from '../ui/progress';
 
 // Types for progressive disclosure navigation
 export interface NavigationSection {

@@ -6,6 +6,7 @@
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+
 import { logger } from '@client/utils/logger';
 
 // Error classification types

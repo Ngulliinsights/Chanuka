@@ -130,6 +130,291 @@ export const configSchema = z.object({
     enablePreprocessing: z.coerce.boolean().default(true),
     strictMode: z.coerce.boolean().default(true),
   }),
+
+  // Utilities configuration - centralized settings for all utility modules
+  utilities: z.object({
+    // API utilities configuration
+    api: z.object({
+      timeout: z.coerce.number().min(1000).max(300000).default(10000), // 10 seconds
+      retries: z.coerce.number().min(0).max(10).default(3),
+      retryDelay: z.coerce.number().min(100).max(30000).default(1000), // 1 second
+      circuitBreaker: z.object({
+        enabled: z.coerce.boolean().default(true),
+        threshold: z.coerce.number().min(1).max(20).default(5),
+        timeout: z.coerce.number().min(1000).max(300000).default(60000), // 1 minute
+        resetTimeout: z.coerce.number().min(1000).max(300000).default(30000), // 30 seconds
+      }),
+      batch: z.object({
+        maxConcurrent: z.coerce.number().min(1).max(20).default(5),
+        maxBatchSize: z.coerce.number().min(1).max(100).default(10),
+      }),
+    }),
+
+    // Asset loading configuration
+    assets: z.object({
+      critical: z.object({
+        maxRetries: z.coerce.number().min(0).max(10).default(3),
+        retryDelay: z.coerce.number().min(100).max(10000).default(1000),
+        timeout: z.coerce.number().min(1000).max(60000).default(10000),
+        priority: z.enum(['high', 'medium', 'low']).default('high'),
+        connectionAware: z.coerce.boolean().default(true),
+      }),
+      script: z.object({
+        maxRetries: z.coerce.number().min(0).max(10).default(2),
+        retryDelay: z.coerce.number().min(100).max(10000).default(1500),
+        timeout: z.coerce.number().min(1000).max(60000).default(15000),
+        priority: z.enum(['high', 'medium', 'low']).default('medium'),
+        connectionAware: z.coerce.boolean().default(true),
+      }),
+      style: z.object({
+        maxRetries: z.coerce.number().min(0).max(10).default(2),
+        retryDelay: z.coerce.number().min(100).max(10000).default(1000),
+        timeout: z.coerce.number().min(1000).max(60000).default(8000),
+        priority: z.enum(['high', 'medium', 'low']).default('high'),
+        connectionAware: z.coerce.boolean().default(false),
+      }),
+      image: z.object({
+        maxRetries: z.coerce.number().min(0).max(10).default(1),
+        retryDelay: z.coerce.number().min(100).max(10000).default(2000),
+        timeout: z.coerce.number().min(1000).max(60000).default(12000),
+        priority: z.enum(['high', 'medium', 'low']).default('low'),
+        connectionAware: z.coerce.boolean().default(true),
+      }),
+      font: z.object({
+        maxRetries: z.coerce.number().min(0).max(10).default(2),
+        retryDelay: z.coerce.number().min(100).max(10000).default(1000),
+        timeout: z.coerce.number().min(1000).max(60000).default(8000),
+        priority: z.enum(['high', 'medium', 'low']).default('medium'),
+        connectionAware: z.coerce.boolean().default(true),
+      }),
+      connection: z.object({
+        slowThreshold: z.coerce.number().min(0.1).max(10).default(1.5), // Mbps
+        fastThreshold: z.coerce.number().min(1).max(100).default(5), // Mbps
+        slowRetryMultiplier: z.coerce.number().min(1).max(5).default(1.5),
+        slowTimeoutMultiplier: z.coerce.number().min(1).max(3).default(1.5),
+      }),
+      performance: z.object({
+        slowLoadThreshold: z.coerce.number().min(1000).max(30000).default(3000), // 3 seconds
+        cacheExpiryMs: z.coerce.number().min(30000).max(86400000).default(1800000), // 30 minutes
+        preloadOnInteraction: z.coerce.boolean().default(true),
+      }),
+    }),
+
+    // Token management configuration
+    tokens: z.object({
+      metadataKey: z.string().default('chanuka_token_metadata'),
+      userDataKey: z.string().default('chanuka_user_data'),
+      refreshBufferMinutes: z.coerce.number().min(1).max(60).default(5),
+      maxRefreshRetries: z.coerce.number().min(1).max(10).default(3),
+      refreshRetryDelay: z.coerce.number().min(100).max(10000).default(1000),
+      tokenValidationInterval: z.coerce.number().min(1000).max(60000).default(30000), // 30 seconds
+      enableSilentRefresh: z.coerce.boolean().default(true),
+      enableAutoCleanup: z.coerce.boolean().default(true),
+    }),
+
+    // Error handling and recovery configuration
+    errors: z.object({
+      recovery: z.object({
+        enabled: z.coerce.boolean().default(true),
+        maxRecoveryAttempts: z.coerce.number().min(1).max(10).default(3),
+        recoveryTimeout: z.coerce.number().min(1000).max(60000).default(10000),
+      }),
+      strategies: z.object({
+        networkRetry: z.object({
+          enabled: z.coerce.boolean().default(true),
+          maxRetries: z.coerce.number().min(1).max(10).default(3),
+          baseDelay: z.coerce.number().min(100).max(5000).default(1000),
+          maxDelay: z.coerce.number().min(1000).max(30000).default(10000),
+          backoffMultiplier: z.coerce.number().min(1).max(3).default(2),
+        }),
+        authRefresh: z.object({
+          enabled: z.coerce.boolean().default(true),
+          maxRetries: z.coerce.number().min(1).max(5).default(2),
+          retryDelay: z.coerce.number().min(100).max(5000).default(500),
+        }),
+        cacheClear: z.object({
+          enabled: z.coerce.boolean().default(true),
+          clearLocalStorage: z.coerce.boolean().default(true),
+          clearSessionStorage: z.coerce.boolean().default(true),
+        }),
+      }),
+      logging: z.object({
+        includeContext: z.coerce.boolean().default(true),
+        includeStack: z.coerce.boolean().default(process.env.NODE_ENV !== 'production'),
+        maxContextDepth: z.coerce.number().min(1).max(10).default(3),
+        enableMetrics: z.coerce.boolean().default(true),
+      }),
+    }),
+
+    // Performance monitoring configuration
+    performance: z.object({
+      renderTracker: z.object({
+        enabled: z.coerce.boolean().default(true),
+        sampleRate: z.coerce.number().min(0).max(1).default(0.1),
+        maxTrackedComponents: z.coerce.number().min(10).max(1000).default(100),
+        slowRenderThreshold: z.coerce.number().min(10).max(1000).default(16), // 16ms
+        enableMemoryTracking: z.coerce.boolean().default(true),
+      }),
+      assetTracker: z.object({
+        enabled: z.coerce.boolean().default(true),
+        trackLoadTimes: z.coerce.boolean().default(true),
+        trackCacheHits: z.coerce.boolean().default(true),
+        slowAssetThreshold: z.coerce.number().min(1000).max(30000).default(3000),
+      }),
+    }),
+
+    // Storage and caching configuration
+    storage: z.object({
+      secureStorage: z.object({
+        prefix: z.string().default('chanuka_secure_'),
+        enableEncryption: z.coerce.boolean().default(false),
+        encryptionKey: z.string().optional(),
+        maxItems: z.coerce.number().min(10).max(1000).default(100),
+        ttlMs: z.coerce.number().min(60000).max(86400000).default(3600000), // 1 hour
+      }),
+      cache: z.object({
+        enableFallback: z.coerce.boolean().default(true),
+        maxFallbackSize: z.coerce.number().min(1).max(100).default(10), // MB
+        enableCompression: z.coerce.boolean().default(true),
+        compressionThreshold: z.coerce.number().min(100).max(10000).default(1024), // 1KB
+      }),
+    }),
+  }).default({
+    api: {
+      timeout: 10000,
+      retries: 3,
+      retryDelay: 1000,
+      circuitBreaker: {
+        enabled: true,
+        threshold: 5,
+        timeout: 60000,
+        resetTimeout: 30000,
+      },
+      batch: {
+        maxConcurrent: 5,
+        maxBatchSize: 10,
+      },
+    },
+    assets: {
+      critical: {
+        maxRetries: 3,
+        retryDelay: 1000,
+        timeout: 10000,
+        priority: 'high',
+        connectionAware: true,
+      },
+      script: {
+        maxRetries: 2,
+        retryDelay: 1500,
+        timeout: 15000,
+        priority: 'medium',
+        connectionAware: true,
+      },
+      style: {
+        maxRetries: 2,
+        retryDelay: 1000,
+        timeout: 8000,
+        priority: 'high',
+        connectionAware: false,
+      },
+      image: {
+        maxRetries: 1,
+        retryDelay: 2000,
+        timeout: 12000,
+        priority: 'low',
+        connectionAware: true,
+      },
+      font: {
+        maxRetries: 2,
+        retryDelay: 1000,
+        timeout: 8000,
+        priority: 'medium',
+        connectionAware: true,
+      },
+      connection: {
+        slowThreshold: 1.5,
+        fastThreshold: 5,
+        slowRetryMultiplier: 1.5,
+        slowTimeoutMultiplier: 1.5,
+      },
+      performance: {
+        slowLoadThreshold: 3000,
+        cacheExpiryMs: 1800000,
+        preloadOnInteraction: true,
+      },
+    },
+    tokens: {
+      metadataKey: 'chanuka_token_metadata',
+      userDataKey: 'chanuka_user_data',
+      refreshBufferMinutes: 5,
+      maxRefreshRetries: 3,
+      refreshRetryDelay: 1000,
+      tokenValidationInterval: 30000,
+      enableSilentRefresh: true,
+      enableAutoCleanup: true,
+    },
+    errors: {
+      recovery: {
+        enabled: true,
+        maxRecoveryAttempts: 3,
+        recoveryTimeout: 10000,
+      },
+      strategies: {
+        networkRetry: {
+          enabled: true,
+          maxRetries: 3,
+          baseDelay: 1000,
+          maxDelay: 10000,
+          backoffMultiplier: 2,
+        },
+        authRefresh: {
+          enabled: true,
+          maxRetries: 2,
+          retryDelay: 500,
+        },
+        cacheClear: {
+          enabled: true,
+          clearLocalStorage: true,
+          clearSessionStorage: true,
+        },
+      },
+      logging: {
+        includeContext: true,
+        includeStack: process.env.NODE_ENV !== 'production',
+        maxContextDepth: 3,
+        enableMetrics: true,
+      },
+    },
+    performance: {
+      renderTracker: {
+        enabled: true,
+        sampleRate: 0.1,
+        maxTrackedComponents: 100,
+        slowRenderThreshold: 16,
+        enableMemoryTracking: true,
+      },
+      assetTracker: {
+        enabled: true,
+        trackLoadTimes: true,
+        trackCacheHits: true,
+        slowAssetThreshold: 3000,
+      },
+    },
+    storage: {
+      secureStorage: {
+        prefix: 'chanuka_secure_',
+        enableEncryption: false,
+        maxItems: 100,
+        ttlMs: 3600000,
+      },
+      cache: {
+        enableFallback: true,
+        maxFallbackSize: 10,
+        enableCompression: true,
+        compressionThreshold: 1024,
+      },
+    },
+  }),
 });
 
 // Type inference for better TypeScript support
@@ -177,6 +462,46 @@ export const envMapping = {
   // Monitoring settings
   'ENABLE_HEALTH_CHECK': 'monitoring.enableHealthCheck',
   'HEALTH_CHECK_PATH': 'monitoring.healthCheckPath',
+
+  // Utilities - API settings
+  'UTILITIES_API_TIMEOUT': 'utilities.api.timeout',
+  'UTILITIES_API_RETRIES': 'utilities.api.retries',
+  'UTILITIES_API_RETRY_DELAY': 'utilities.api.retryDelay',
+  'UTILITIES_API_CIRCUIT_BREAKER_ENABLED': 'utilities.api.circuitBreaker.enabled',
+  'UTILITIES_API_CIRCUIT_BREAKER_THRESHOLD': 'utilities.api.circuitBreaker.threshold',
+  'UTILITIES_API_CIRCUIT_BREAKER_TIMEOUT': 'utilities.api.circuitBreaker.timeout',
+
+  // Utilities - Asset loading settings
+  'UTILITIES_ASSETS_CRITICAL_MAX_RETRIES': 'utilities.assets.critical.maxRetries',
+  'UTILITIES_ASSETS_CRITICAL_TIMEOUT': 'utilities.assets.critical.timeout',
+  'UTILITIES_ASSETS_SCRIPT_MAX_RETRIES': 'utilities.assets.script.maxRetries',
+  'UTILITIES_ASSETS_SCRIPT_TIMEOUT': 'utilities.assets.script.timeout',
+  'UTILITIES_ASSETS_IMAGE_MAX_RETRIES': 'utilities.assets.image.maxRetries',
+  'UTILITIES_ASSETS_IMAGE_TIMEOUT': 'utilities.assets.image.timeout',
+  'UTILITIES_ASSETS_CONNECTION_SLOW_THRESHOLD': 'utilities.assets.connection.slowThreshold',
+  'UTILITIES_ASSETS_CONNECTION_FAST_THRESHOLD': 'utilities.assets.connection.fastThreshold',
+
+  // Utilities - Token management settings
+  'UTILITIES_TOKENS_METADATA_KEY': 'utilities.tokens.metadataKey',
+  'UTILITIES_TOKENS_REFRESH_BUFFER_MINUTES': 'utilities.tokens.refreshBufferMinutes',
+  'UTILITIES_TOKENS_MAX_REFRESH_RETRIES': 'utilities.tokens.maxRefreshRetries',
+  'UTILITIES_TOKENS_ENABLE_SILENT_REFRESH': 'utilities.tokens.enableSilentRefresh',
+
+  // Utilities - Error handling settings
+  'UTILITIES_ERRORS_RECOVERY_ENABLED': 'utilities.errors.recovery.enabled',
+  'UTILITIES_ERRORS_RECOVERY_MAX_ATTEMPTS': 'utilities.errors.recovery.maxRecoveryAttempts',
+  'UTILITIES_ERRORS_STRATEGIES_NETWORK_RETRY_ENABLED': 'utilities.errors.strategies.networkRetry.enabled',
+  'UTILITIES_ERRORS_STRATEGIES_AUTH_REFRESH_ENABLED': 'utilities.errors.strategies.authRefresh.enabled',
+
+  // Utilities - Performance settings
+  'UTILITIES_PERFORMANCE_RENDER_TRACKER_ENABLED': 'utilities.performance.renderTracker.enabled',
+  'UTILITIES_PERFORMANCE_RENDER_TRACKER_SAMPLE_RATE': 'utilities.performance.renderTracker.sampleRate',
+  'UTILITIES_PERFORMANCE_ASSET_TRACKER_ENABLED': 'utilities.performance.assetTracker.enabled',
+
+  // Utilities - Storage settings
+  'UTILITIES_STORAGE_SECURE_STORAGE_PREFIX': 'utilities.storage.secureStorage.prefix',
+  'UTILITIES_STORAGE_SECURE_STORAGE_ENABLE_ENCRYPTION': 'utilities.storage.secureStorage.enableEncryption',
+  'UTILITIES_STORAGE_CACHE_ENABLE_FALLBACK': 'utilities.storage.cache.enableFallback',
 } as const;
 
 // Default feature flags

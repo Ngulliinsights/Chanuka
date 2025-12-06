@@ -5,15 +5,19 @@
  * and detailed scoring breakdowns.
  */
 
-import React, { useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Button } from '../ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { Eye, Info, ChevronDown, ChevronUp, Shield, AlertCircle, CheckCircle } from 'lucide-react';
+import React, { useMemo } from 'react';
 import { RadialBarChart, RadialBar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+
 import { TransparencyScore, ConflictAnalysis } from '@client/types/conflict-of-interest';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { Progress } from '../ui/progress';
+
+
 
 interface TransparencyScoringProps {
   conflictAnalysis: ConflictAnalysis;

@@ -3,8 +3,8 @@
  * Accessible skeleton screens for better perceived performance
  */
 
-import React from 'react';
 import { LoadingComponentProps } from '@client/types';
+import React from 'react';
 
 export interface LoadingSkeletonProps extends LoadingComponentProps {
   variant?: 'default' | 'pulse' | 'wave';

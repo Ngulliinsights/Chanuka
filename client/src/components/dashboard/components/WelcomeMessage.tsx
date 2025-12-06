@@ -4,10 +4,7 @@
  * Displays personalized welcome message with quick stats and tips.
  */
 
-import React from 'react';
-import { Card, CardContent } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Badge } from '../../ui/badge';
+import { formatDistanceToNow } from 'date-fns';
 import { 
   X, 
   Sparkles, 
@@ -17,9 +14,15 @@ import {
   Award,
   Calendar
 } from 'lucide-react';
+import React from 'react';
+
 import { User } from '@client/store/slices/authSlice';
 import { UserDashboardData } from '@client/types/user-dashboard';
-import { formatDistanceToNow } from 'date-fns';
+
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
+import { Card, CardContent } from '../../ui/card';
+
 
 interface WelcomeMessageProps {
   user: User;

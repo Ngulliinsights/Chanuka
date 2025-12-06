@@ -1,6 +1,6 @@
+import { CaptureConsole } from '@sentry/integrations';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
-import { CaptureConsole } from '@sentry/integrations';
 
 interface SentryConfig {
   dsn: string;

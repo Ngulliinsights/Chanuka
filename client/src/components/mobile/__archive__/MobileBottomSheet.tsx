@@ -12,9 +12,10 @@
  * - Accessibility compliance
  */
 
+import { X, GripHorizontal } from 'lucide-react';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, GripHorizontal } from 'lucide-react';
+
 import { cn } from '@client/lib/utils';
 import { Button } from '../../ui/button';
 

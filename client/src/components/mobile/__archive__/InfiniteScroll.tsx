@@ -12,8 +12,9 @@
  * - Performance optimizations for large lists
  */
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { Button } from '../../ui/button';
 

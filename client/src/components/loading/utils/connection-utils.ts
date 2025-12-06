@@ -4,6 +4,7 @@
  */
 
 import { ConnectionType } from '@client/types';
+
 import { CONNECTION_THRESHOLDS } from '@client/constants';
 
 export interface ConnectionInfo {

@@ -5,6 +5,7 @@
  */
 
 import type { CSRFToken, SecurityEvent } from '@client/types/security-types';
+
 import { securityConfig } from '../config/security-config';
 import { SecurityMonitor } from '../monitoring/SecurityMonitor';
 

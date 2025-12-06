@@ -3,8 +3,8 @@
  * Adapts the existing SlidingWindowStore to the unified RateLimitStore interface
  */
 
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 import { SlidingWindowStore } from '../algorithms/sliding-window';
+import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
 
 export class SlidingWindowAdapter implements RateLimitStore {
   constructor(private store: SlidingWindowStore) {}
@@ -16,7 +16,7 @@ export class SlidingWindowAdapter implements RateLimitStore {
     const windowStart = now - config.windowMs;
 
     // Get or initialize request timestamps for this key
-    let timestamps: number[] = [];
+    const timestamps: number[] = [];
 
     // Check if adding this request would exceed the limit
     if (timestamps.length >= config.max) {
@@ -63,7 +63,7 @@ export class SlidingWindowAdapter implements RateLimitStore {
 /**
  * Factory function to create a sliding window adapter
  */
-export function createSlidingWindowAdapter(redis: any): SlidingWindowAdapter {
+export function createSlidingWindowAdapter(redis: unknown): SlidingWindowAdapter {
   const store = new SlidingWindowStore(redis);
   return new SlidingWindowAdapter(store);
 }

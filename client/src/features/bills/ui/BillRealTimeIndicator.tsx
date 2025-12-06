@@ -6,9 +6,22 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useBillRealTime } from '@client/hooks/useWebSocket';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
+// import { useBillRealTime } from '@client/hooks/useWebSocket'; // TODO: Implement useWebSocket hook
+
+// Mock implementation for now
+const useBillRealTime = (billId: string) => ({
+  isConnected: false,
+  billUpdates: [],
+  engagementMetrics: {
+    views: 0,
+    comments: 0,
+    shares: 0,
+    activeUsers: 0
+  }
+});
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+
 import { 
   Activity, 
   MessageSquare, 
@@ -18,6 +31,7 @@ import {
   Clock,
   Eye
 } from 'lucide-react';
+
 import { cn } from '@client/lib/utils';
 import { BillRealTimeUpdate, EngagementMetricsUpdate } from '@client/types/realtime';
 

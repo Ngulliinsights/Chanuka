@@ -1,9 +1,3 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Separator } from '../ui/separator';
 import { 
   User, 
   MapPin, 
@@ -16,11 +10,21 @@ import {
   Award,
   Clock
 } from 'lucide-react';
-import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/SimpleIcons';
+import React, { useState } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { Expert, ExpertCredential, ExpertAffiliation } from '@client/types/expert';
-import { ExpertBadge } from './ExpertBadge';
+
+import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/SimpleIcons';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Separator } from '../ui/separator';
+
+
 import { CredibilityIndicator } from './CredibilityScoring';
+import { ExpertBadge } from './ExpertBadge';
 
 interface ExpertProfileCardProps {
   expert: Expert;

@@ -1,11 +1,3 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Textarea } from '@client/components/ui/textarea';
-import { Badge } from '@client/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@client/components/ui/avatar';
-import { Separator } from '@client/components/ui/separator';
 import {
   ArrowLeft,
   MessageSquare,
@@ -17,7 +9,16 @@ import {
   Filter,
   ChevronDown
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@client/components/ui/avatar';
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/components/ui/select';
+import { Separator } from '@client/components/ui/separator';
+import { Textarea } from '@client/components/ui/textarea';
 
 interface Comment {
   id: string;

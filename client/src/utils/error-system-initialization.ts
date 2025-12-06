@@ -5,10 +5,10 @@
  * error handling system including analytics, recovery, and monitoring.
  */
 
-import { errorHandler } from './unified-error-handler';
-import { errorAnalytics, setupSentry, setupDataDog, setupCustomAnalytics } from './error-analytics';
 import { smartRecoveryEngine } from './advanced-error-recovery';
 import { errorRateLimiter } from './error-rate-limiter';
+import { ErrorAnalyticsService } from '../core/error';
+import { coreErrorHandler as errorHandler } from '../core/error';
 
 // Configuration interfaces
 export interface ErrorSystemConfig {
@@ -202,15 +202,18 @@ function mergeConfig(
   const result = { ...defaultConfig };
 
   // Merge top-level properties
-  Object.keys(userConfig).forEach(key => {
-    const userValue = (userConfig as any)[key];
+  (Object.keys(userConfig) as Array<keyof ErrorSystemConfig>).forEach(key => {
+    const userValue = userConfig[key];
     if (userValue !== undefined) {
       if (typeof userValue === 'object' && userValue !== null && !Array.isArray(userValue)) {
         // Deep merge objects
-        (result as any)[key] = { ...(result as any)[key], ...userValue };
+        (result as Record<keyof ErrorSystemConfig, unknown>)[key] = {
+          ...(result as Record<keyof ErrorSystemConfig, unknown>)[key] as Record<string, unknown>,
+          ...userValue as Record<string, unknown>
+        };
       } else {
         // Direct assignment for primitives and arrays
-        (result as any)[key] = userValue;
+        (result as Record<keyof ErrorSystemConfig, unknown>)[key] = userValue;
       }
     }
   });
@@ -235,7 +238,7 @@ export function getErrorSystemStatus(): {
     analytics: errorAnalytics?.getStats()?.enabled || false,
     recovery: !!smartRecoveryEngine,
     rateLimiting: !!errorRateLimiter,
-    providers: errorAnalytics?.getStats()?.providers?.map(p => p.displayName) || [],
+    providers: errorAnalytics?.getStats()?.providers?.map(p => p.name) || [],
   };
 }
 

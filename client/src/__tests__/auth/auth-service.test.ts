@@ -102,7 +102,7 @@ vi.mock('../../core/api/client', () => ({
   },
 }));
 
-vi.mock('../../utils/tokenManager', () => ({
+vi.mock('../../utils/secure-token-manager', () => ({
   tokenManager: {
     storeTokens: vi.fn(),
     getTokens: vi.fn(() => null),
@@ -131,8 +131,7 @@ import { privacyCompliance } from '@client/utils/privacy-compliance';
 import { validatePassword } from '@client/utils/password-validation';
 import { authApiService } from '@client/core/api/auth';
 import { globalApiClient } from '@client/core/api/client';
-import { tokenManager } from '@client/utils/tokenManager';
-import { sessionManager } from '@client/utils/session-manager';
+import { tokenManager, sessionManager } from '@client/utils/storage';
 import { rbacManager } from '@client/utils/rbac';
 import { logger } from '@client/utils/logger';
 

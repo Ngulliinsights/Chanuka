@@ -487,12 +487,18 @@ importers:
       fuse.js:
         specifier: ^7.1.0
         version: 7.1.0
+      immer:
+        specifier: ^10.0.3
+        version: 10.2.0
       isomorphic-dompurify:
         specifier: ^2.26.0
         version: 2.31.0(bufferutil@4.0.9)
       lucide-react:
         specifier: ^0.453.0
         version: 0.453.0(react@18.3.1)
+      prop-types:
+        specifier: ^15.8.1
+        version: 15.8.1
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -544,6 +550,9 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.25.76
+      zustand:
+        specifier: ^4.4.7
+        version: 4.5.7(@types/react@18.3.26)(immer@10.2.0)(react@18.3.1)
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.10.0
@@ -578,6 +587,9 @@ importers:
       '@types/node':
         specifier: ^20.19.4
         version: 20.19.24
+      '@types/prop-types':
+        specifier: ^15.7.15
+        version: 15.7.15
       '@types/puppeteer':
         specifier: ^7.0.4
         version: 7.0.4(bufferutil@4.0.9)(typescript@5.6.3)
@@ -19374,3 +19386,24 @@ packages:
 
   /zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
+  /zustand@4.5.7(@types/react@18.3.26)(immer@10.2.0)(react@18.3.1):
+    resolution: {integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      '@types/react': '>=16.8'
+      immer: '>=9.0.6'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      '@types/react': 18.3.26
+      immer: 10.2.0
+      react: 18.3.1
+      use-sync-external-store: 1.6.0(react@18.3.1)
+    dev: false

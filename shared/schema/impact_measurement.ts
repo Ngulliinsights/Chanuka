@@ -4,16 +4,15 @@
 // Platform effectiveness, equity analysis, and outcome tracking
 // This schema measures whether the platform is actually improving democratic participation
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, date, smallint, real
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
+import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
 import { campaigns } from "./advocacy_coordination";
-import { kenyanCountyEnum } from "./enum";
 
 // ============================================================================
 // PARTICIPATION COHORTS - Track user groups for equity analysis

@@ -6,6 +6,7 @@
  */
 
 import { faker } from '@faker-js/faker';
+
 import {
   DiscussionThread,
   Comment,
@@ -14,6 +15,8 @@ import {
   ModerationFlag,
   TypingIndicator
 } from '@client/types/community';
+
+import { mockExperts, mockOfficialExperts } from './experts';
 import {
   generateId,
   generateDateInRange,
@@ -23,7 +26,6 @@ import {
   weightedRandom
 } from './generators';
 import { mockUsers } from './users';
-import { mockExperts, mockOfficialExperts } from './experts';
 
 // Seed faker for consistent data
 faker.seed(12345);

@@ -13,13 +13,14 @@
  * while maintaining system integrity.
  */
 
+import { logger } from '../../utils/logger';
+
 import {
   ServiceConfig,
   ConfigValidator,
   ConfigObserver,
   LogLevel
 } from './types';
-import { logger } from '../../utils/logger';
 
 // ============================================================================
 // Configuration Service Implementation

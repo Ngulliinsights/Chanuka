@@ -5,8 +5,9 @@
  * Provides a clean abstraction over Redux store operations.
  */
 
-import { useQueryClient } from '@tanstack/react-query';
 import { Bill } from '@shared/schema/foundation';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { BillUpdate, WebSocketNotification } from '@client/types/api';
 import { logger } from '@client/utils/logger';
 

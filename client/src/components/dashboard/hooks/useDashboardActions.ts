@@ -3,10 +3,11 @@
  * Specialized hook for action items functionality
  */
 
-import { useState, useCallback } from 'react';
 import type { ActionItem, ActionPriority } from '@client/types';
-import { validateActionItem } from '@client/validation';
+import { useState, useCallback } from 'react';
+
 import { DashboardActionError } from '@client/errors';
+import { validateActionItem } from '@client/validation';
 
 export interface UseDashboardActionsResult {
   actions: ActionItem[];

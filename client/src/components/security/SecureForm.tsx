@@ -3,15 +3,17 @@
  * Example component demonstrating security features usage
  */
 
+import { Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
+
 import { useSecureForm, useSecurity, ValidationSchemas } from '@client/hooks/useSecurity';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
+
 import { Alert, AlertDescription } from '../ui/alert';
 import { Badge } from '../ui/badge';
-import { Shield, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 interface UserFormValues {
   email: string;

@@ -4,7 +4,6 @@
  * Individual notification display with actions and metadata
  */
 
-import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { 
   MessageCircle, 
@@ -17,9 +16,12 @@ import {
   Trash2,
   Check
 } from 'lucide-react';
+import React from 'react';
+
 import { Notification, NotificationType } from '@client/services/notification-service';
-import { Button } from '../ui/button';
+
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 
 interface NotificationItemProps {

@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { cn } from '@client/lib/utils';
 import { AlertCircle, FileText, RefreshCw } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+
+import { cn } from '@client/lib/utils';
 
 export interface ScriptFallbackProps {
   src: string;

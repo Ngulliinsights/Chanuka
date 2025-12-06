@@ -5,12 +5,6 @@
  * bill provisions and their relationship to financial interests.
  */
 
-import React, { useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { 
   AlertTriangle, 
   CheckCircle, 
@@ -21,6 +15,7 @@ import {
   Calendar,
   Target
 } from 'lucide-react';
+import React, { useMemo } from 'react';
 import { 
   BarChart, 
   Bar, 
@@ -35,7 +30,16 @@ import {
   Pie,
   Cell
 } from 'recharts';
+
 import { ImplementationWorkaround, ConflictAnalysis } from '@client/types/conflict-of-interest';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+
 
 interface ImplementationWorkaroundsTrackerProps {
   conflictAnalysis: ConflictAnalysis;

@@ -12,8 +12,9 @@
  * - Performance optimized for mobile devices
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { BarChart3, PieChart, TrendingUp, Info, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Button } from '../../ui/button';

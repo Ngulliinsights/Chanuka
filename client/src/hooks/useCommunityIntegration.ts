@@ -6,8 +6,10 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { communityApiService } from '@client/core/api/community';
 import { useActivityFeed as storeActivityFeed, useTrendingTopics as storeTrendingTopics, useExpertInsights as storeExpertInsights, useCommunityStats as storeCommunityStats } from '@client/store/slices/communitySlice';
+
 import { useToast } from './use-toast';
 
 /**

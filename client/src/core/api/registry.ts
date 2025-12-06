@@ -15,8 +15,10 @@
  */
 
 import { ApiService } from '@client/types';
-import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
+
 import { logger } from '@client/utils/logger';
+
+import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
 
 // ============================================================================
 // Type Definitions

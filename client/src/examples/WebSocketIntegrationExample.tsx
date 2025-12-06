@@ -5,12 +5,6 @@
  * with bill tracking and community engagement.
  */
 
-import React, { useEffect, useState } from 'react';
-import { useWebSocket } from '@client/hooks/use-websocket';
-import { useNotifications } from '@client/hooks/useNotifications';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
 import { 
   Activity, 
   Bell, 
@@ -20,6 +14,13 @@ import {
   Wifi,
   WifiOff
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { useWebSocket } from '@client/hooks/use-websocket';
+import { useNotifications } from '@client/hooks/useNotifications';
 
 /**
  * Example 1: Basic WebSocket Connection

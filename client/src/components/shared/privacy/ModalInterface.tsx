@@ -4,6 +4,9 @@
  */
 
 import React from 'react';
+
+import { PrivacySettings } from '@client/types/auth';
+
 import {
   Dialog,
   DialogContent,
@@ -11,8 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
+
 import { FullInterface } from './FullInterface';
-import { PrivacySettings } from '@client/types/auth';
 
 interface ModalInterfaceProps {
   open: boolean;

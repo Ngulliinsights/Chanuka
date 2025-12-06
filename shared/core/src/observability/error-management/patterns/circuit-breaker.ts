@@ -14,21 +14,21 @@
 // implementation below provides the small subset of functionality we need
 // (on/addListener, once, off/removeListener, emit, removeAllListeners).
 class EventEmitter {
-  private listeners: Map<string, Function[]> = new Map();
+  private listeners: Map<string, ((...args: unknown[]) => void)[]> = new Map();
 
-  on(event: string, listener: Function): this {
+  on(event: string, listener: (...args: unknown[]) => void): this {
     const arr = this.listeners.get(event) ?? [];
     arr.push(listener);
     this.listeners.set(event, arr);
     return this;
   }
 
-  addListener(event: string, listener: Function): this {
+  addListener(event: string, listener: (...args: unknown[]) => void): this {
     return this.on(event, listener);
   }
 
-  once(event: string, listener: Function): this {
-    const wrapper = (...args: any[]) => {
+  once(event: string, listener: (...args: unknown[]) => void): this {
+    const wrapper = (...args: unknown[]) => {
       this.removeListener(event, wrapper);
       try {
         listener(...args);
@@ -45,17 +45,17 @@ class EventEmitter {
     return this.on(event, wrapper);
   }
 
-  removeListener(event: string, listener: Function): this {
+  removeListener(event: string, listener: (...args: unknown[]) => void): this {
     const arr = this.listeners.get(event);
     if (!arr) return this;
-    const idx = arr.indexOf(listener as Function);
+    const idx = arr.indexOf(listener as (...args: unknown[]) => void);
     if (idx >= 0) arr.splice(idx, 1);
     if (arr.length === 0) this.listeners.delete(event);
     else this.listeners.set(event, arr);
     return this;
   }
 
-  off(event: string, listener: Function): this {
+  off(event: string, listener: (...args: unknown[]) => void): this {
     return this.removeListener(event, listener);
   }
 
@@ -65,7 +65,7 @@ class EventEmitter {
     return this;
   }
 
-  emit(event: string, ...args: any[]): boolean {
+  emit(event: string, ...args: unknown[]): boolean {
     const arr = this.listeners.get(event);
     if (!arr || arr.length === 0) return false;
     // slice to avoid mutation during iteration
@@ -84,8 +84,8 @@ class EventEmitter {
     return true;
   }
 }
-import { BaseError, ErrorDomain, ErrorSeverity } from '../errors/base-error.js';
 import { logger } from '../../logging/index.js';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../errors/base-error.js';
 
 export interface CircuitBreakerMetrics {
   failures: number;

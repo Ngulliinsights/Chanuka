@@ -3,8 +3,8 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
-import { BaseError, ErrorSeverity, ErrorDomain } from '@client/utils/logger';
 import type { AppError } from '@client/core/error';
+import { BaseError, ErrorSeverity, ErrorDomain } from '@client/utils/logger';
 import { logger } from '@client/utils/logger';
 
 export interface RecoveryStrategy {

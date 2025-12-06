@@ -5,9 +5,9 @@
  * with the error correlation system for comprehensive observability.
  */
 
+import { getCircuitBreakerStats } from '@client/core/api/interceptors';
 import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
 import { logger } from '@client/utils/logger';
-import { getCircuitBreakerStats } from '@client/core/api/interceptors';
 
 export interface CircuitBreakerEvent {
   serviceName: string;

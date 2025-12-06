@@ -1,10 +1,13 @@
-import { useAuth } from '@/features/users/hooks';
+import type { RelatedPage, UserRole } from '@client/types';
+
 import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
-import { getPageRelationships, generateBreadcrumbRelationships } from '../utils/page-relationships';
-import { validateNavigationPath, validateUserRole, validateUseRelatedPagesOptions } from '@client/validation';
+import { useAuth } from '@/features/users/hooks';
 import { NavigationValidationError } from '@client/errors';
 import { getRecoverySuggestions } from '@client/recovery';
-import type { RelatedPage, UserRole } from '@client/types';
+import { validateNavigationPath, validateUserRole, validateUseRelatedPagesOptions } from '@client/validation';
+
+import { getPageRelationships, generateBreadcrumbRelationships } from '../utils/page-relationships';
+
 
 export interface UseRelatedPagesResult {
   relatedPages: RelatedPage[];

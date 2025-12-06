@@ -6,6 +6,7 @@
  */
 
 import { faker } from '@faker-js/faker';
+
 import {
   Expert,
   ExpertCredential,
@@ -15,6 +16,7 @@ import {
   CredibilityMetrics,
   CommunityValidation
 } from '@client/types/expert';
+
 import {
   generateId,
   generateDateInRange,

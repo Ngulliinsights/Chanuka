@@ -13,7 +13,7 @@ export interface NotificationChannel {
   /** Whether the channel is enabled */
   enabled: boolean;
   /** Channel-specific configuration */
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 export interface NotificationRequest {
@@ -26,7 +26,7 @@ export interface NotificationRequest {
   /** Notification message */
   message: string;
   /** Additional data payload */
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   /** Priority level */
   priority?: 'low' | 'normal' | 'high' | 'urgent';
   /** Channels to send through */

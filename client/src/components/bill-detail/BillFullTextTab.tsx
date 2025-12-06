@@ -1,9 +1,12 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { FileText, Download, Search } from 'lucide-react';
-import { Button } from '../ui/button';
-import { UnifiedAccordionGroup } from '../ui/unified-components';
+import React from 'react';
+
 import { Bill } from '@/core/api/types';
+
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { UnifiedAccordionGroup } from '../ui/unified-components';
+
 
 interface BillFullTextTabProps {
   bill: Bill;

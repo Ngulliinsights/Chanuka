@@ -3,13 +3,15 @@
  * Manages registration form state, validation, and submission with integrated privacy settings
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { useAuth } from '@client/features/users/hooks/useAuth';
 import { validatePassword } from '@client/utils/password-validation';
-import { validateEmail } from '@client/utils/input-validation';
-import { privacyCompliance } from '@client/utils/privacy-compliance';
-import { logger } from '@client/utils/logger';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
+import { useAuth } from '@client/features/users/hooks/useAuth';
 import { PrivacySettings, PasswordRequirements } from '@client/types/auth';
+import { validateEmail } from '@client/utils/input-validation';
+import { logger } from '@client/utils/logger';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+
 import { usePrivacySettings } from './usePrivacySettings';
 
 // Custom RegisterData interface for this hook that includes privacy settings

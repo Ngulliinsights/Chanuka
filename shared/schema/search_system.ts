@@ -4,12 +4,11 @@
 // Foundation for vector-based semantic search with AI embeddings
 // Supports hybrid ranking combining semantic and traditional search
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, timestamp, jsonb, uuid, varchar,
   index, unique, decimal, date
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
 import { users } from "./foundation";
 
@@ -135,7 +134,7 @@ export const search_analytics = pgTable("search_analytics", {
 // RELATIONSHIPS
 // ============================================================================
 
-export const contentEmbeddingsRelations = relations(content_embeddings, ({ }) => ({
+export const contentEmbeddingsRelations = relations(content_embeddings, () => ({
   // Note: Dynamic relations to bills, sponsors, comments based on content_type
   // Relations are handled at the application level due to polymorphic nature
 }));
@@ -147,7 +146,7 @@ export const searchQueriesRelations = relations(search_queries, ({ one }) => ({
   }),
 }));
 
-export const searchAnalyticsRelations = relations(search_analytics, ({}) => ({
+export const searchAnalyticsRelations = relations(search_analytics, () => ({
   // Analytics table is primarily for reporting, no outbound relations needed
 }));
 

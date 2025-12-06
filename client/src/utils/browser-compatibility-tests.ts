@@ -5,7 +5,7 @@
  * and cross-browser issues detection.
  */
 
-import { getBrowserInfo, featureDetector } from './browser-compatibility';
+import { getBrowserInfo, featureDetector } from './browser';
 import { logger } from './logger';
 
 export interface CompatibilityTestResult {

@@ -6,9 +6,10 @@
  */
 
 import { billsApiService, BillsSearchParams, PaginatedBillsResponse } from '@client/core/api/bills';
-import { billsDataCache } from './billsDataCache';
 import { Bill } from '@client/core/api/types';
 import { logger } from '@client/utils/logger';
+
+import { billsDataCache } from './billsDataCache';
 
 // ============================================================================
 // Type Definitions

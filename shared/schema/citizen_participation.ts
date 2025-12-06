@@ -4,12 +4,11 @@
 // Public-facing interaction layer for citizen engagement in legislative processes
 // This schema handles user sessions, comments, voting, tracking, and notifications
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
 import {
   kenyanCountyEnum,
@@ -77,7 +76,7 @@ export const sessions = pgTable("sessions", {
 // COMMENTS - Threaded citizen feedback on bills with moderation
 // ============================================================================
 
-export const comments: any = pgTable("comments", {
+export const comments = pgTable("comments", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),

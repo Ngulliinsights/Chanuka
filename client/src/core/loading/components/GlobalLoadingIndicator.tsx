@@ -3,10 +3,11 @@
  * Shows loading state for the entire application
  */
 
-import React from 'react';
 import { useLoading } from '@client/context';
-import { LoadingSpinner } from './LoadingSpinner';
+import React from 'react';
+
 import { LoadingProgress } from './LoadingProgress';
+import { LoadingSpinner } from './LoadingSpinner';
 
 export interface GlobalLoadingIndicatorProps {
   className?: string;

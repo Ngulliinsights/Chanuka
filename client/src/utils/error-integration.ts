@@ -1,7 +1,7 @@
-import { errorHandler } from './unified-error-handler';
-import { initializeErrorReporting } from './error-reporting';
 import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
 import { ErrorFallback } from '@client/components/error-handling/ErrorFallback';
+
+import { coreErrorHandler, ErrorDomain, ErrorSeverity } from '../core/error';
 // Note: ErrorModal and ErrorToast may need to be implemented in error-handling directory
 // import { ErrorModal, useErrorModal } from '@client/components/error-handling/ErrorModal';
 // import { ErrorToast, useErrorToast } from '@client/components/error-handling/ErrorToast';
@@ -43,11 +43,6 @@ export function initializeErrorHandling(config: ErrorIntegrationConfig = {}): vo
   // Configure the unified error handler with merged settings
   errorHandler.configure(finalConfig);
 
-  // Initialize error reporting if enabled - this sets up external error tracking
-  if (finalConfig.enableReporting) {
-    initializeErrorReporting();
-  }
-
   console.log('Error handling system initialized', {
     config: finalConfig,
     timestamp: new Date().toISOString(),
@@ -62,8 +57,8 @@ export function initializeErrorHandling(config: ErrorIntegrationConfig = {}): vo
  * convenient functions for showing error modals and toasts.
  */
 export function useErrorHandling() {
-  const errorModal = useErrorModal();
-  const errorToast = useErrorToast();
+  // const errorModal = useErrorModal();
+  // const errorToast = useErrorToast();
 
   return {
     // Error handler methods - these allow you to manually handle errors
@@ -79,39 +74,39 @@ export function useErrorHandling() {
     // UI components - React components you can use in your JSX
     ErrorBoundary,
     ErrorFallback,
-    ErrorModal,
-    ErrorToast,
+    // ErrorModal,
+    // ErrorToast,
 
     // Modal controls - for programmatic control of error modals
-    errorModal,
+    // errorModal,
 
     // Toast controls - for programmatic control of error toasts
-    errorToast,
+    // errorToast,
 
     // Convenience methods - shortcuts for common operations
-    showErrorModal: errorModal.showError,
-    hideErrorModal: errorModal.hideError,
-    showErrorToast: errorToast.showError,
-    showSuccessToast: errorToast.showSuccess,
+    // showErrorModal: errorModal.showError,
+    // hideErrorModal: errorModal.hideError,
+    // showErrorToast: errorToast.showError,
+    // showSuccessToast: errorToast.showSuccess,
   };
 }
 
 /**
  * Utility function to create standardized error objects
- * 
+ *
  * This function provides a consistent way to create and handle errors throughout
  * your application. It ensures that all errors have the same structure and are
  * properly processed by the error handler.
  */
 export function createStandardError(
-  type: string,
+  type: ErrorDomain,
   message: string,
-  details?: any,
-  context?: Record<string, any>
+  details?: Record<string, unknown>,
+  context?: Record<string, unknown>
 ) {
   return errorHandler.handleError({
-    type: type as any,
-    severity: 'medium' as any,
+    type,
+    severity: ErrorSeverity.MEDIUM,
     message,
     details,
     context,
@@ -121,16 +116,15 @@ export function createStandardError(
 }
 
 // Re-export commonly used types and utilities for convenience
-export type { AppError, ErrorType, ErrorSeverity } from './unified-error-handler';
-export { errorHandler } from './unified-error-handler';
-export { errorReporting, reportCustomError } from './error-reporting';
+export type { AppError, ErrorSeverity } from '../core/error';
+export { coreErrorHandler as errorHandler } from '../core/error';
 
 // Export available error UI components
 export {
   ErrorBoundary,
   ErrorFallback,
-  ErrorModal,
-  useErrorModal,
-  ErrorToast,
-  useErrorToast,
+  // ErrorModal,
+  // useErrorModal,
+  // ErrorToast,
+  // useErrorToast,
 };

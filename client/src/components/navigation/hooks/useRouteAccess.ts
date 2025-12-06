@@ -1,10 +1,13 @@
-import { useAuth } from '@/features/users/hooks';
+import type { AccessDenialReason, UserRole } from '@client/types';
+
 import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
-import { checkRouteAccess } from '../utils/route-access';
-import { validateNavigationPath, validateUserRole } from '@client/validation';
+import { useAuth } from '@/features/users/hooks';
 import { NavigationValidationError, NavigationAccessDeniedError } from '@client/errors';
 import { getRecoverySuggestions, createRecoveryContext } from '@client/recovery';
-import type { AccessDenialReason, UserRole } from '@client/types';
+import { validateNavigationPath, validateUserRole } from '@client/validation';
+
+import { checkRouteAccess } from '../utils/route-access';
+
 
 export interface UseRouteAccessResult {
   canAccess: boolean;

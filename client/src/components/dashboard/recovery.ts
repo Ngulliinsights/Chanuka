@@ -3,8 +3,9 @@
  * Following navigation component recovery patterns
  */
 
-import { DashboardError, DashboardErrorType } from './errors';
 import type { DashboardData, DashboardConfig } from '@client/types';
+
+import { DashboardError, DashboardErrorType } from './errors';
 
 export interface RecoveryStrategy {
   canRecover: boolean;

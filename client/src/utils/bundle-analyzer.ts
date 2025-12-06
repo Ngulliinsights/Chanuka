@@ -290,7 +290,12 @@ class BundleAnalyzer {
     try {
       observer.observe({ entryTypes: ['resource'] });
     } catch (error) {
-      logger.warn('Failed to setup chunk loading monitor', { component: 'BundleAnalyzer' }, error);
+      const meta: Record<string, unknown> =
+        typeof error === 'object' && error !== null
+          ? (error as Record<string, unknown>)
+          : { error: String(error) };
+
+      logger.warn('Failed to setup chunk loading monitor', { component: 'BundleAnalyzer' }, meta);
     }
   }
 

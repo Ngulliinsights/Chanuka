@@ -7,8 +7,9 @@
 
 import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
 import { logger } from '@client/utils/logger';
-import { RetryHandler, createRetryHandler, RetryConfig } from './retry-handler';
+
 import { processRequestInterceptors, processResponseInterceptors } from './interceptors';
+import { RetryHandler, createRetryHandler, RetryConfig } from './retry-handler';
 
 export interface CircuitBreakerClientConfig {
   serviceName: string;

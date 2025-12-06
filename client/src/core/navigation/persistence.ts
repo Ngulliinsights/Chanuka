@@ -2,7 +2,7 @@
  * Navigation State Persistence - Handles localStorage operations
  */
 
-import { NavigationState, RecentPage } from '@client/types';
+import { NavigationState, RecentPage } from './types';
 
 export class NavigationStatePersistence {
   private static STORAGE_KEY = 'navigation-state';

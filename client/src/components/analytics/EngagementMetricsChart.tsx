@@ -5,11 +5,6 @@
  * user activity patterns, and real-time metrics visualization.
  */
 
-import React, { useEffect, useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import {
   BarChart3,
   LineChart,
@@ -22,7 +17,15 @@ import {
   Calendar,
   Clock
 } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+
 import { cn } from '@client/lib/utils';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
 
 interface LiveMetrics {
   activeUsers: number;

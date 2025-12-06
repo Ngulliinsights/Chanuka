@@ -22,246 +22,82 @@ interface BillsStats {
 }
 
 interface StatsOverviewProps {
-  stats: BillsStats;
-  className?: string;
-}
-
-interface StatCardProps {
-  title: string;
-  value: number | string;
-  icon: React.ReactNode;
-  description?: string;
-  trend?: {
-    value: number;
-    isPositive: boolean;
+  stats: {
+    totalBills: number;
+    urgentCount: number;
+    constitutionalFlags: number;
+    trendingCount: number;
+    lastUpdated: string;
   };
-  color: 'primary' | 'urgent' | 'constitutional' | 'trending';
   className?: string;
 }
 
-const colorClasses = {
-  primary: {
-    icon: 'text-[hsl(var(--primary))]',
-    bg: 'bg-[hsl(var(--primary))]/10',
-    border: 'border-[hsl(var(--primary))]/20',
-  },
-  urgent: {
-    icon: 'text-[hsl(var(--civic-urgent))]',
-    bg: 'bg-[hsl(var(--civic-urgent))]/10',
-    border: 'border-[hsl(var(--civic-urgent))]/20',
-  },
-  constitutional: {
-    icon: 'text-[hsl(var(--civic-constitutional))]',
-    bg: 'bg-[hsl(var(--civic-constitutional))]/10',
-    border: 'border-[hsl(var(--civic-constitutional))]/20',
-  },
-  trending: {
-    icon: 'text-[hsl(var(--civic-community))]',
-    bg: 'bg-[hsl(var(--civic-community))]/10',
-    border: 'border-[hsl(var(--civic-community))]/20',
-  },
-};
+export const StatsOverview: React.FC<StatsOverviewProps> = ({ stats, className }) => {
+  const statItems = [
+    {
+      label: 'Total Bills',
+      value: ClientSharedAdapter.formatting.number(stats.totalBills),
+      icon: FileText,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+    },
+    {
+      label: 'Urgent Bills',
+      value: ClientSharedAdapter.formatting.number(stats.urgentCount),
+      icon: AlertTriangle,
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+    },
+    {
+      label: 'Constitutional Issues',
+      value: ClientSharedAdapter.formatting.number(stats.constitutionalFlags),
+      icon: Shield,
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-50',
+    },
+    {
+      label: 'Trending',
+      value: ClientSharedAdapter.formatting.number(stats.trendingCount),
+      icon: TrendingUp,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+    },
+  ];
 
-function StatCard({ title, value, icon, description, trend, color, className }: StatCardProps) {
-  const colors = colorClasses[color];
-  
   return (
-    <Card className={cn("chanuka-card transition-all duration-200 hover:shadow-md", className)}>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-bold">{value}</p>
-              {trend && (
-                <Badge 
-                  variant="secondary" 
-                  className={cn(
-                    "text-xs",
-                    trend.isPositive ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100"
-                  )}
-                >
-                  {trend.isPositive ? '+' : ''}{trend.value}%
-                </Badge>
-              )}
-            </div>
-            {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
-            )}
-          </div>
-          
-          <div className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-lg",
-            colors.bg,
-            colors.border,
-            "border"
-          )}>
-            <div className={colors.icon}>
-              {icon}
-            </div>
-          </div>
+    <div className={className}>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        {statItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Card key={item.label} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <div className={`p-2 rounded-lg ${item.bgColor} mr-3`}>
+                    <Icon className={`h-5 w-5 ${item.color}`} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900">{item.value}</p>
+                    <p className="text-sm text-gray-600">{item.label}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      
+      <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center">
+          <Clock className="h-4 w-4 mr-1" />
+          Last updated: {ClientSharedAdapter.formatting.relativeTime(stats.lastUpdated)}
         </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-export function StatsOverview({ stats, className }: StatsOverviewProps) {
-  const formatLastUpdated = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 1) {
-      return 'Just now';
-    } else if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
-    } else if (diffInMinutes < 1440) {
-      const hours = Math.floor(diffInMinutes / 60);
-      return `${hours}h ago`;
-    } else {
-      const days = Math.floor(diffInMinutes / 1440);
-      return `${days}d ago`;
-    }
-  };
-
-  return (
-    <div className={cn("space-y-4", className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Legislative Overview</h2>
-          <p className="text-muted-foreground">
-            Real-time statistics and trends
-          </p>
+          Data refreshes every 5 minutes
         </div>
-        
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Activity className="h-4 w-4" />
-          <span>Updated {formatLastUpdated(stats.lastUpdated)}</span>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Bills"
-          value={stats.totalBills.toLocaleString()}
-          icon={<FileText className="h-6 w-6" />}
-          description="Active legislation"
-          color="primary"
-        />
-        
-        <StatCard
-          title="Urgent Bills"
-          value={stats.urgentCount}
-          icon={<AlertTriangle className="h-6 w-6" />}
-          description="High & critical priority"
-          color="urgent"
-          trend={{
-            value: 12,
-            isPositive: false
-          }}
-        />
-        
-        <StatCard
-          title="Constitutional Issues"
-          value={stats.constitutionalFlags}
-          icon={<Flag className="h-6 w-6" />}
-          description="Bills with constitutional concerns"
-          color="constitutional"
-        />
-        
-        <StatCard
-          title="Trending"
-          value={stats.trendingCount}
-          icon={<TrendingUp className="h-6 w-6" />}
-          description="High engagement bills"
-          color="trending"
-          trend={{
-            value: 8,
-            isPositive: true
-          }}
-        />
-      </div>
-
-      {/* Additional Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="chanuka-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Bills introduced today</span>
-                <span className="font-medium">3</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Status changes</span>
-                <span className="font-medium">7</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">New comments</span>
-                <span className="font-medium">24</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="chanuka-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              Community Engagement
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Active users</span>
-                <span className="font-medium">1,247</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Expert contributions</span>
-                <span className="font-medium">18</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Bills saved</span>
-                <span className="font-medium">156</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="chanuka-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              Top Categories
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Healthcare</span>
-                <Badge variant="secondary" className="text-xs">23</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Education</span>
-                <Badge variant="secondary" className="text-xs">18</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Environment</span>
-                <Badge variant="secondary" className="text-xs">15</Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
-}
+};
+
+export default StatsOverview;

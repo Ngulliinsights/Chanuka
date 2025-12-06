@@ -1,9 +1,3 @@
-import { useState, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Textarea } from '../ui/textarea';
-import { Avatar, AvatarFallback } from '../ui/avatar';
 import {
   CheckCircle,
   Circle,
@@ -15,8 +9,17 @@ import {
   FileText,
   RotateCcw
 } from 'lucide-react';
+import { useState, useCallback } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { VerificationWorkflow as VerificationWorkflowType, VerificationStatus } from '@client/types/expert';
+
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Textarea } from '../ui/textarea';
+
 
 interface VerificationWorkflowProps {
   workflow: VerificationWorkflowType;

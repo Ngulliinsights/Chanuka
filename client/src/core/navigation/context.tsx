@@ -5,6 +5,7 @@
 
 import React, { createContext, useContext, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+
 import { RootState } from '@client/store';
 import {
   setCurrentPath,
@@ -21,6 +22,7 @@ import {
   addToRecentPages,
   clearPersistedState,
 } from '@client/store/slices/navigationSlice';
+
 import { NavigationContextValue, UserRole, BreadcrumbItem, RelatedPage } from './types';
 import { generateBreadcrumbs, calculateRelatedPages, determineNavigationSection, isNavigationPathActive } from './utils';
 // navigationPersistenceUtils intentionally unused here

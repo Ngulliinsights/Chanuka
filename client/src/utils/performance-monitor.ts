@@ -1,405 +1,593 @@
 /**
- * Enhanced Performance Monitor Utility
- * Comprehensive performance monitoring with optimization integration
+ * Runtime Performance Monitor
+ *
+ * Core service for monitoring performance metrics in production.
+ * Tracks Core Web Vitals, checks budgets, detects regressions, and sends alerts.
  */
 
+import { performanceApiService } from '../core/api/performance';
+
 import { logger } from './logger';
-import { bundleAnalyzer } from './bundle-analyzer';
-import { assetOptimizer } from './asset-optimization';
-import { webVitalsMonitor } from './web-vitals-monitor';
-import { realtimeOptimizer } from './realtime-optimizer';
+import { performanceAlerts, performanceBudgetChecker } from './performance';
+
+interface CoreWebVitals {
+  lcp?: number;
+  fid?: number;
+  cls?: number;
+  fcp?: number;
+  ttfb?: number;
+}
 
 interface PerformanceMetrics {
-    loadTime: number;
-    renderTime: number;
-    navigationTime: number;
-    resourceLoadTime: number;
-    memoryUsage?: number;
-    bundleSize?: number;
-    optimizedAssets?: number;
-    webVitalsScore?: number;
-    [key: string]: unknown;
+  coreWebVitals: CoreWebVitals;
+  memoryUsage?: number;
+  renderTime?: number;
+  bundleSize?: number;
+  customMetrics?: Record<string, number>;
 }
 
-interface PerformanceConfig {
-    enableBundleAnalysis: boolean;
-    enableAssetOptimization: boolean;
-    enableWebVitalsMonitoring: boolean;
-    enableRealtimeOptimization: boolean;
-    reportingInterval: number;
-    performanceBudgets: {
-        loadTime: number;
-        bundleSize: number;
-        memoryUsage: number;
-    };
+interface DeviceInfo {
+  userAgent: string;
+  platform: string;
+  language: string;
+  cookieEnabled: boolean;
+  onLine: boolean;
+  hardwareConcurrency: number;
+  deviceMemory?: number;
+  screen: {
+    width: number;
+    height: number;
+    colorDepth: number;
+  };
 }
 
-class PerformanceMonitor {
-    private static instance: PerformanceMonitor;
-    private metrics: PerformanceMetrics = {
-        loadTime: 0,
-        renderTime: 0,
-        navigationTime: 0,
-        resourceLoadTime: 0
-    };
-    private observers: PerformanceObserver[] = [];
-    private isMonitoring = false;
-    private config: PerformanceConfig;
-    private reportingTimer: NodeJS.Timeout | null = null;
-
-    private constructor() {
-        this.config = {
-            enableBundleAnalysis: true,
-            enableAssetOptimization: true,
-            enableWebVitalsMonitoring: true,
-            enableRealtimeOptimization: true,
-            reportingInterval: 30000, // 30 seconds
-            performanceBudgets: {
-                loadTime: 3000, // 3 seconds
-                bundleSize: 2 * 1024 * 1024, // 2MB
-                memoryUsage: process.env.NODE_ENV === 'development' ? 200 * 1024 * 1024 : 100 * 1024 * 1024 // 200MB in dev, 100MB in prod
-            }
-        };
-    }
-
-    public static getInstance(): PerformanceMonitor {
-        if (!PerformanceMonitor.instance) {
-            PerformanceMonitor.instance = new PerformanceMonitor();
-        }
-        return PerformanceMonitor.instance;
-    }
-
-    public async startMonitoring(): Promise<void> {
-        if (this.isMonitoring) return;
-
-        this.isMonitoring = true;
-        logger.info('Starting enhanced performance monitoring...', { component: 'PerformanceMonitor' });
-
-        // Initialize core monitoring
-        this.setupPerformanceObservers();
-        this.collectInitialMetrics();
-
-        // Initialize optimization services
-        await this.initializeOptimizationServices();
-
-        // Start periodic reporting
-        this.startPeriodicReporting();
-    }
-
-    /**
-     * Initialize all optimization services
-     */
-    private async initializeOptimizationServices(): Promise<void> {
-        try {
-            if (this.config.enableWebVitalsMonitoring) {
-                await webVitalsMonitor.startMonitoring();
-                logger.info('Web Vitals monitoring initialized', { component: 'PerformanceMonitor' });
-            }
-
-            if (this.config.enableBundleAnalysis) {
-                bundleAnalyzer.monitorChunkLoading();
-                logger.info('Bundle analysis monitoring initialized', { component: 'PerformanceMonitor' });
-            }
-
-            if (this.config.enableAssetOptimization) {
-                assetOptimizer.optimizeExistingImages();
-                logger.info('Asset optimization initialized', { component: 'PerformanceMonitor' });
-            }
-
-            // Real-time optimization will be initialized when WebSocket connects
-            logger.info('All optimization services initialized', { component: 'PerformanceMonitor' });
-        } catch (error) {
-            logger.error('Failed to initialize optimization services', { component: 'PerformanceMonitor' }, error);
-        }
-    }
-
-    private setupPerformanceObservers(): void {
-        if (!('PerformanceObserver' in window)) {
-            logger.warn('PerformanceObserver not supported', { component: 'PerformanceMonitor' });
-            return;
-        }
-
-        try {
-            // Monitor navigation timing
-            const navObserver = new PerformanceObserver((list) => {
-                const entries = list.getEntries();
-                entries.forEach((entry) => {
-                    if (entry.entryType === 'navigation') {
-                        this.metrics.navigationTime = entry.duration;
-                        this.checkPerformanceBudgets();
-                    }
-                });
-            });
-            navObserver.observe({ entryTypes: ['navigation'] });
-            this.observers.push(navObserver);
-
-            // Monitor resource loading
-            const resourceObserver = new PerformanceObserver((list) => {
-                const entries = list.getEntries();
-                entries.forEach((entry) => {
-                    if (entry.entryType === 'resource') {
-                        this.metrics.resourceLoadTime = entry.duration;
-                    }
-                });
-            });
-            resourceObserver.observe({ entryTypes: ['resource'] });
-            this.observers.push(resourceObserver);
-
-            // Monitor memory usage if available
-            if ('memory' in performance) {
-                const memoryObserver = setInterval(() => {
-                    const memory = (performance as any).memory;
-                    if (memory) {
-                        this.metrics.memoryUsage = memory.usedJSHeapSize;
-                        this.checkMemoryUsage();
-                    }
-                }, 5000); // Check every 5 seconds
-
-                // Store interval ID for cleanup
-                (this as any).memoryInterval = memoryObserver;
-            }
-
-        } catch (error) {
-            logger.error('Failed to setup performance observers', { component: 'PerformanceMonitor' }, error);
-        }
-    }
-    private collectInitialMetrics(): void {
-        if (!window.performance) {
-            logger.warn('Performance API not available', { component: 'PerformanceMonitor' });
-            return;
-        }
-
-        try {
-            // Use modern Navigation Timing API instead of deprecated timing
-            const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-            if (navigationEntries.length > 0) {
-                const navigation = navigationEntries[0];
-                if (navigation) {
-                    this.metrics.loadTime = navigation.loadEventEnd - navigation.fetchStart;
-                    this.metrics.renderTime = navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart;
-                    this.metrics.navigationTime = navigation.duration;
-                }
-            } else {
-                // Fallback to deprecated API if modern one isn't available
-                if (window.performance.timing) {
-                    const timing = window.performance.timing;
-                    this.metrics.loadTime = timing.loadEventEnd - timing.navigationStart;
-                    this.metrics.renderTime = timing.domContentLoadedEventEnd - timing.domContentLoadedEventStart;
-                }
-            }
-
-            // Collect memory usage if available
-            if ('memory' in window.performance) {
-                const memory = (window.performance as any).memory;
-                this.metrics.memoryUsage = memory.usedJSHeapSize;
-            }
-
-            logger.info('Initial performance metrics collected', { component: 'PerformanceMonitor' }, this.metrics);
-        } catch (error) {
-            logger.error('Failed to collect performance metrics', { component: 'PerformanceMonitor' }, error);
-        }
-    }
-
-    public getMetrics(): PerformanceMetrics {
-        return { ...this.metrics };
-    }
-
-    public measureFunction<T>(name: string, fn: () => T): T {
-        const start = performance.now();
-        try {
-            const result = fn();
-            const end = performance.now();
-            logger.debug(`Function ${name} took ${(end - start).toFixed(2)}ms`, { component: 'PerformanceMonitor' });
-            return result;
-        } catch (error) {
-            const end = performance.now();
-            logger.debug(`Function ${name} took ${(end - start).toFixed(2)}ms`, { component: 'PerformanceMonitor' });
-            throw error;
-        }
-    }
-
-    public measureAsyncFunction<T>(name: string, fn: () => Promise<T>): Promise<T> {
-        const start = performance.now();
-        return fn().then((result) => {
-            const end = performance.now();
-            logger.debug(`Async function ${name} took ${(end - start).toFixed(2)}ms`, { component: 'PerformanceMonitor' });
-            return result;
-        }).catch((error) => {
-            const end = performance.now();
-            logger.debug(`Async function ${name} took ${(end - start).toFixed(2)}ms`, { component: 'PerformanceMonitor' });
-            throw error;
-        });
-    }
-
-    /**
-     * Check performance budgets and alert if exceeded
-     */
-    private checkPerformanceBudgets(): void {
-        const budgets = this.config.performanceBudgets;
-
-        if (this.metrics.loadTime > budgets.loadTime) {
-            logger.warn(`Load time budget exceeded: ${this.metrics.loadTime}ms > ${budgets.loadTime}ms`, {
-                component: 'PerformanceMonitor'
-            });
-        }
-
-        if (this.metrics.bundleSize && this.metrics.bundleSize > budgets.bundleSize) {
-            logger.warn(`Bundle size budget exceeded: ${this.metrics.bundleSize} > ${budgets.bundleSize}`, {
-                component: 'PerformanceMonitor'
-            });
-        }
-    }
-
-    /**
-     * Check memory usage and warn if high
-     */
-    private checkMemoryUsage(): void {
-        if (this.metrics.memoryUsage && this.metrics.memoryUsage > this.config.performanceBudgets.memoryUsage) {
-            logger.warn(`High memory usage detected: ${Math.round(this.metrics.memoryUsage / 1024 / 1024)}MB`, {
-                component: 'PerformanceMonitor'
-            });
-        }
-    }
-
-    /**
-     * Start periodic performance reporting
-     */
-    private startPeriodicReporting(): void {
-        if (this.reportingTimer) {
-            clearInterval(this.reportingTimer);
-        }
-
-        this.reportingTimer = setInterval(async () => {
-            await this.generatePerformanceReport();
-        }, this.config.reportingInterval);
-    }
-
-    /**
-     * Generate comprehensive performance report
-     */
-    private async generatePerformanceReport(): Promise<void> {
-        try {
-            // Collect metrics from all optimization services
-            const bundleMetrics = bundleAnalyzer.getMetrics();
-            const assetMetrics = assetOptimizer.getMetrics();
-            const webVitalsMetrics = webVitalsMonitor.getMetrics();
-            const _connectionMetrics = realtimeOptimizer.getMetrics();
-
-            // Update combined metrics
-            if (bundleMetrics) {
-                this.metrics.bundleSize = bundleMetrics.totalSize;
-            }
-
-            if (assetMetrics) {
-                this.metrics.optimizedAssets = assetMetrics.optimizedAssets;
-            }
-
-            if (webVitalsMetrics.size > 0) {
-                // Calculate Web Vitals score
-                const vitalsArray = Array.from(webVitalsMetrics.values());
-                const goodMetrics = vitalsArray.filter(m => m.rating === 'good').length;
-                this.metrics.webVitalsScore = Math.round((goodMetrics / vitalsArray.length) * 100);
-            }
-
-            logger.debug('Performance report generated', {
-                component: 'PerformanceMonitor',
-                metrics: this.metrics
-            });
-
-        } catch (error) {
-            logger.error('Failed to generate performance report', { component: 'PerformanceMonitor' }, error);
-        }
-    }
-
-    /**
-     * Initialize real-time optimization for WebSocket
-     */
-    public initializeRealtimeOptimization(websocket: WebSocket): void {
-        if (this.config.enableRealtimeOptimization) {
-            realtimeOptimizer.startOptimization(websocket);
-            logger.info('Real-time optimization started for WebSocket', { component: 'PerformanceMonitor' });
-        }
-    }
-
-    /**
-     * Update performance configuration
-     */
-    public updateConfig(newConfig: Partial<PerformanceConfig>): void {
-        this.config = { ...this.config, ...newConfig };
-        
-        // Restart reporting if interval changed
-        if (newConfig.reportingInterval) {
-            this.startPeriodicReporting();
-        }
-
-        logger.info('Performance monitor config updated', { component: 'PerformanceMonitor', config: this.config });
-    }
-
-    /**
-     * Get current configuration
-     */
-    public getConfig(): PerformanceConfig {
-        return { ...this.config };
-    }
-
-    /**
-     * Get comprehensive metrics including optimization data
-     */
-    public async getComprehensiveMetrics(): Promise<{
-        core: PerformanceMetrics;
-        bundle: any;
-        assets: any;
-        webVitals: any;
-        connection: any;
-    }> {
-        return {
-            core: this.getMetrics(),
-            bundle: bundleAnalyzer.getMetrics(),
-            assets: assetOptimizer.getMetrics(),
-            webVitals: Array.from(webVitalsMonitor.getMetrics().entries()),
-            connection: realtimeOptimizer.getMetrics()
-        };
-    }
-
-    public stopMonitoring(): void {
-        this.isMonitoring = false;
-        
-        // Stop core observers
-        this.observers.forEach(observer => observer.disconnect());
-        this.observers = [];
-
-        // Stop memory monitoring
-        if ((this as any).memoryInterval) {
-            clearInterval((this as any).memoryInterval);
-        }
-
-        // Stop reporting
-        if (this.reportingTimer) {
-            clearInterval(this.reportingTimer);
-            this.reportingTimer = null;
-        }
-
-        // Stop optimization services
-        webVitalsMonitor.stopMonitoring();
-        realtimeOptimizer.stopOptimization();
-
-        logger.info('Performance monitoring stopped', { component: 'PerformanceMonitor' });
-    }
+interface NetworkInfo {
+  effectiveType?: string;
+  downlink?: number;
+  rtt?: number;
+  saveData?: boolean;
 }
 
-// Export singleton instance
-export const performanceMonitor = PerformanceMonitor.getInstance();
+interface SessionInfo {
+  sessionId: string;
+  userId?: string;
+  startTime: number;
+  pageViews: number;
+  interactions: number;
+  errors: number;
+  deviceInfo: DeviceInfo;
+  networkInfo: NetworkInfo;
+}
 
-// Export initialization function
-export async function initPerformanceMonitoring(): Promise<void> {
+/**
+ * Runtime Performance Monitor Class
+ */
+export class RuntimePerformanceMonitor {
+  private observers: PerformanceObserver[] = [];
+  private metrics: PerformanceMetrics = {
+    coreWebVitals: {}
+  };
+  private sessionInfo: SessionInfo;
+  private isInitialized = false;
+  private bundleSizeTrackingEnabled = false;
+  private memoryCheckInterval?: NodeJS.Timeout;
+
+  constructor() {
+    this.sessionInfo = this.createSessionInfo();
+    this.initialize();
+  }
+
+  /**
+   * Initialize performance monitoring
+   */
+  private async initialize(): Promise<void> {
+    if (this.isInitialized) return;
+
     try {
-        await performanceMonitor.startMonitoring();
-        logger.info('Enhanced performance monitoring initialized', { component: 'PerformanceMonitor' });
+      // Start Core Web Vitals monitoring
+      this.startCoreWebVitalsMonitoring();
+
+      // Start memory monitoring
+      this.startMemoryMonitoring();
+
+      // Start bundle size tracking if enabled
+      if (this.bundleSizeTrackingEnabled) {
+        this.startBundleSizeTracking();
+      }
+
+      // Track page visibility changes
+      this.trackPageVisibility();
+
+      // Track user interactions
+      this.trackUserInteractions();
+
+      this.isInitialized = true;
+
+      logger.debug('Runtime performance monitoring initialized', {
+        sessionId: this.sessionInfo.sessionId,
+        budgetsConfigured: performanceBudgetChecker.getBudgets().length > 0
+      });
     } catch (error) {
-        logger.error('Failed to initialize performance monitoring', { component: 'PerformanceMonitor' }, error);
+      logger.error('Failed to initialize performance monitoring', { error });
     }
+  }
+
+  /**
+   * Start monitoring Core Web Vitals
+   */
+  private startCoreWebVitalsMonitoring(): void {
+    // LCP (Largest Contentful Paint)
+    if ('PerformanceObserver' in window) {
+      try {
+        const lcpObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
+          this.metrics.coreWebVitals.lcp = lastEntry.startTime;
+          this.checkBudgetAndAlert();
+        });
+        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+        this.observers.push(lcpObserver);
+      } catch (error) {
+        logger.warn('LCP monitoring not supported', { error });
+      }
+
+      // CLS (Cumulative Layout Shift)
+      try {
+        let clsValue = 0;
+        const clsObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            const layoutShiftEntry = entry as PerformanceEntry & { hadRecentInput?: boolean; value: number };
+            if (!layoutShiftEntry.hadRecentInput) {
+              clsValue += layoutShiftEntry.value;
+            }
+          }
+          this.metrics.coreWebVitals.cls = clsValue;
+          this.checkBudgetAndAlert();
+        });
+        clsObserver.observe({ entryTypes: ['layout-shift'] });
+        this.observers.push(clsObserver);
+      } catch (error) {
+        logger.warn('CLS monitoring not supported', { error });
+      }
+
+      // FCP (First Contentful Paint)
+      try {
+        const fcpObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (entry.name === 'first-contentful-paint') {
+              this.metrics.coreWebVitals.fcp = entry.startTime;
+              this.checkBudgetAndAlert();
+            }
+          }
+        });
+        fcpObserver.observe({ entryTypes: ['paint'] });
+        this.observers.push(fcpObserver);
+      } catch (error) {
+        logger.warn('FCP monitoring not supported', { error });
+      }
+    }
+
+    // FID (First Input Delay) - requires user interaction
+    if ('PerformanceEventTiming' in window) {
+      try {
+        const fidObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (entry.name === 'first-input') {
+              const eventTimingEntry = entry as PerformanceEntry & { processingStart: number };
+              this.metrics.coreWebVitals.fid = eventTimingEntry.processingStart - entry.startTime;
+              this.checkBudgetAndAlert();
+            }
+          }
+        });
+        fidObserver.observe({ entryTypes: ['first-input'] });
+        this.observers.push(fidObserver);
+      } catch (error) {
+        logger.warn('FID monitoring not supported', { error });
+      }
+    }
+
+    // TTFB (Time to First Byte) - from navigation timing
+    if ('performance' in window && 'timing' in performance) {
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navigation) {
+        this.metrics.coreWebVitals.ttfb = navigation.responseStart - navigation.requestStart;
+        this.checkBudgetAndAlert();
+      }
+    }
+  }
+
+  /**
+   * Start memory usage monitoring
+   */
+  private startMemoryMonitoring(): void {
+    // Monitor memory usage periodically
+    this.memoryCheckInterval = setInterval(() => {
+      if ('memory' in performance) {
+        const memory = (performance as Performance & { memory: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+        this.metrics.memoryUsage = memory.usedJSHeapSize;
+
+        // Check for memory issues
+        const memoryLimit = memory.jsHeapSizeLimit;
+        const memoryUsagePercent = (memory.usedJSHeapSize / memoryLimit) * 100;
+
+        if (memoryUsagePercent > 80) {
+          logger.warn('High memory usage detected', {
+            used: memory.usedJSHeapSize,
+            limit: memoryLimit,
+            percentage: memoryUsagePercent
+          });
+        }
+      }
+    }, 30000); // Check every 30 seconds
+  }
+
+  /**
+   * Start bundle size tracking
+   */
+  private startBundleSizeTracking(): void {
+    // Track bundle size changes by monitoring resource loading
+    if ('PerformanceObserver' in window) {
+      try {
+        const resourceObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries() as PerformanceResourceTiming[];
+          let totalBundleSize = 0;
+
+          entries.forEach(entry => {
+            // Look for JavaScript bundles
+            if (entry.name.includes('.js') && !entry.name.includes('external')) {
+              totalBundleSize += entry.transferSize || 0;
+            }
+          });
+
+          if (totalBundleSize > 0) {
+            this.metrics.bundleSize = totalBundleSize;
+            this.checkBudgetAndAlert();
+          }
+        });
+
+        resourceObserver.observe({ entryTypes: ['resource'] });
+        this.observers.push(resourceObserver);
+      } catch (error) {
+        logger.warn('Bundle size tracking not supported', { error });
+      }
+    }
+  }
+
+  /**
+   * Track page visibility changes
+   */
+  private trackPageVisibility(): void {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        // Page is hidden, pause intensive monitoring
+        logger.debug('Page hidden, pausing performance monitoring');
+      } else {
+        // Page is visible again, resume monitoring
+        logger.debug('Page visible, resuming performance monitoring');
+        this.checkBudgetAndAlert();
+      }
+    });
+  }
+
+  /**
+   * Track user interactions for FID and engagement metrics
+   */
+  private trackUserInteractions(): void {
+    let interactionCount = 0;
+    const interactionHandler = () => {
+      interactionCount++;
+      this.sessionInfo.interactions = interactionCount;
+    };
+
+    // Track various interaction events
+    const events = ['click', 'keydown', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      document.addEventListener(event, interactionHandler, { passive: true });
+    });
+  }
+
+  /**
+   * Check budget and send alerts if violations detected
+   */
+  private async checkBudgetAndAlert(): Promise<void> {
+    try {
+      // Check each metric individually since checkBudgets doesn't exist
+      const metricsToCheck = [
+        { name: 'LCP', value: this.metrics.coreWebVitals.lcp },
+        { name: 'FID', value: this.metrics.coreWebVitals.fid },
+        { name: 'CLS', value: this.metrics.coreWebVitals.cls },
+        { name: 'FCP', value: this.metrics.coreWebVitals.fcp },
+        { name: 'TTFB', value: this.metrics.coreWebVitals.ttfb },
+        { name: 'memory-usage', value: this.metrics.memoryUsage },
+        { name: 'bundle-size', value: this.metrics.bundleSize }
+      ].filter(metric => metric.value !== undefined);
+
+      const violations: Array<{ metric: string; actual: number; limit: number; severity: string; description: string }> = [];
+      const warnings: Array<{ metric: string; actual: number; limit: number; description: string }> = [];
+
+      for (const metric of metricsToCheck) {
+        const budgetResult = performanceBudgetChecker.checkBudget({
+          name: metric.name,
+          value: metric.value!,
+          timestamp: new Date(),
+          category: 'loading'
+        });
+
+        if (budgetResult.status === 'fail') {
+          violations.push({
+            metric: metric.name,
+            actual: metric.value!,
+            limit: budgetResult.budget?.budget || 0,
+            severity: 'error',
+            description: budgetResult.message
+          });
+        } else if (budgetResult.status === 'warning') {
+          warnings.push({
+            metric: metric.name,
+            actual: metric.value!,
+            limit: budgetResult.budget?.warning || 0,
+            description: budgetResult.message
+          });
+        }
+      }
+
+      // Send alerts for violations
+      if (violations.length > 0) {
+        for (const violation of violations) {
+          performanceAlerts.createAlert({
+            id: `budget_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+            type: 'budget-exceeded',
+            severity: violation.severity === 'error' ? 'high' : 'medium',
+            message: `${violation.metric} Budget Violation: ${violation.description}`,
+            metric: violation.metric,
+            value: violation.actual,
+            threshold: violation.limit,
+            timestamp: new Date()
+          });
+        }
+      }
+
+      // Send alerts for warnings  
+      if (warnings.length > 0) {
+        for (const warning of warnings) {
+          performanceAlerts.createAlert({
+            id: `warning_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+            type: 'slow-metric',
+            severity: 'medium',
+            message: `${warning.metric} Budget Warning: ${warning.description}`,
+            metric: warning.metric,
+            value: warning.actual,
+            threshold: warning.limit,
+            timestamp: new Date()
+          });
+        }
+      }
+
+      // Note: Regression detection would need to be implemented separately
+      // as it requires historical data storage and comparison logic
+
+      // Send metrics to backend
+      await this.reportMetricsToBackend();
+
+    } catch (error) {
+      logger.error('Failed to check budgets and send alerts', { error });
+    }
+  }
+
+  /**
+   * Report metrics to backend API
+   */
+  private async reportMetricsToBackend(): Promise<void> {
+    try {
+      await performanceApiService.reportMetrics({
+        sessionId: this.sessionInfo.sessionId,
+        session: this.sessionInfo,
+        metrics: this.convertToApiMetrics(),
+        customMetrics: Object.entries(this.metrics.customMetrics || {}).map(([name, value]) => ({
+          name,
+          value,
+          unit: 'number',
+          timestamp: Date.now()
+        })),
+        resourceTimings: this.getResourceTimings(),
+        timestamp: Date.now(),
+        url: window.location.href,
+        userAgent: navigator.userAgent
+      });
+    } catch (error) {
+      logger.error('Failed to report metrics to backend', { error });
+    }
+  }
+
+  /**
+   * Convert internal metrics to API format
+   */
+  private convertToApiMetrics() {
+    const metrics: Array<{ name: string; value: number; rating: 'good' | 'needs-improvement' | 'poor'; timestamp: number; id: string }> = [];
+
+    if (this.metrics.coreWebVitals.lcp !== undefined) {
+      metrics.push({
+        name: 'LCP',
+        value: this.metrics.coreWebVitals.lcp,
+        rating: this.getRating('lcp', this.metrics.coreWebVitals.lcp),
+        timestamp: Date.now(),
+        id: crypto.randomUUID()
+      });
+    }
+
+    if (this.metrics.coreWebVitals.fid !== undefined) {
+      metrics.push({
+        name: 'FID',
+        value: this.metrics.coreWebVitals.fid,
+        rating: this.getRating('fid', this.metrics.coreWebVitals.fid),
+        timestamp: Date.now(),
+        id: crypto.randomUUID()
+      });
+    }
+
+    if (this.metrics.coreWebVitals.cls !== undefined) {
+      metrics.push({
+        name: 'CLS',
+        value: this.metrics.coreWebVitals.cls,
+        rating: this.getRating('cls', this.metrics.coreWebVitals.cls),
+        timestamp: Date.now(),
+        id: crypto.randomUUID()
+      });
+    }
+
+    return metrics;
+  }
+
+  /**
+   * Get performance rating for a metric
+   */
+  private getRating(metric: string, value: number): 'good' | 'needs-improvement' | 'poor' {
+    const budget = performanceBudgetChecker.getBudget(metric);
+    if (!budget) return 'good';
+
+    if (value <= budget.warning) return 'good';
+    if (value <= budget.budget) return 'needs-improvement';
+    return 'poor';
+  }
+
+  /**
+   * Get resource timings for API report
+   */
+  private getResourceTimings() {
+    if (!('performance' in window) || !performance.getEntriesByType) {
+      return [];
+    }
+
+    const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+    return resources.slice(0, 50).map(resource => ({
+      name: resource.name,
+      duration: resource.duration,
+      size: resource.transferSize || 0,
+      type: resource.initiatorType || 'unknown',
+      cached: resource.transferSize === 0,
+      protocol: resource.nextHopProtocol || undefined
+    }));
+  }
+
+  /**
+   * Create session information
+   */
+  private createSessionInfo(): SessionInfo {
+    return {
+      sessionId: `sess_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      userId: undefined, // Would be set from auth context
+      startTime: Date.now(),
+      pageViews: 1,
+      interactions: 0,
+      errors: 0,
+      deviceInfo: {
+        userAgent: navigator.userAgent,
+        platform: (navigator as any).userAgentData?.platform || 'unknown',
+        language: navigator.language,
+        cookieEnabled: navigator.cookieEnabled,
+        onLine: navigator.onLine,
+        hardwareConcurrency: navigator.hardwareConcurrency || 0,
+        deviceMemory: (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
+        screen: {
+          width: screen.width,
+          height: screen.height,
+          colorDepth: screen.colorDepth
+        }
+      },
+      networkInfo: {
+        effectiveType: (navigator as Navigator & { connection?: { effectiveType?: string; downlink?: number; rtt?: number; saveData?: boolean } }).connection?.effectiveType,
+        downlink: (navigator as Navigator & { connection?: { effectiveType?: string; downlink?: number; rtt?: number; saveData?: boolean } }).connection?.downlink,
+        rtt: (navigator as Navigator & { connection?: { effectiveType?: string; downlink?: number; rtt?: number; saveData?: boolean } }).connection?.rtt,
+        saveData: (navigator as Navigator & { connection?: { effectiveType?: string; downlink?: number; rtt?: number; saveData?: boolean } }).connection?.saveData
+      }
+    };
+  }
+
+  /**
+   * Add custom metric for monitoring
+   */
+  addCustomMetric(name: string, value: number): void {
+    if (!this.metrics.customMetrics) {
+      this.metrics.customMetrics = {};
+    }
+    this.metrics.customMetrics[name] = value;
+    this.checkBudgetAndAlert();
+  }
+
+  /**
+   * Get current metrics
+   */
+  getMetrics(): PerformanceMetrics {
+    return { ...this.metrics };
+  }
+
+  /**
+   * Get session information
+   */
+  getSessionInfo(): SessionInfo {
+    return { ...this.sessionInfo };
+  }
+
+  /**
+   * Enable bundle size tracking
+   */
+  enableBundleSizeTracking(): void {
+    this.bundleSizeTrackingEnabled = true;
+    if (this.isInitialized) {
+      this.startBundleSizeTracking();
+    }
+  }
+
+  /**
+   * Measure route change performance
+   * @param route The route being changed to
+   * @returns Cleanup function to stop measurement
+   */
+  measureRouteChange(route: string): () => void {
+    const startTime = performance.now();
+
+    // Add custom metric for route change start
+    this.addCustomMetric(`route_change_start_${route}`, startTime);
+
+    // Return cleanup function
+    return () => {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+
+      // Add custom metrics for route change completion
+      this.addCustomMetric(`route_change_end_${route}`, endTime);
+      this.addCustomMetric(`route_change_duration_${route}`, duration);
+    };
+  }
+
+  /**
+   * Cleanup monitoring
+   */
+  destroy(): void {
+    // Disconnect all observers
+    this.observers.forEach(observer => {
+      try {
+        observer.disconnect();
+      } catch (error) {
+        logger.warn('Failed to disconnect observer', { error });
+      }
+    });
+    this.observers = [];
+
+    // Clear intervals
+    if (this.memoryCheckInterval) {
+      clearInterval(this.memoryCheckInterval);
+    }
+
+    this.isInitialized = false;
+    logger.debug('Performance monitoring destroyed');
+  }
 }
 
-// Export for debugging
-export { PerformanceMonitor };
-export type { PerformanceMetrics, PerformanceConfig };
+// Global instance
+export const runtimePerformanceMonitor = new RuntimePerformanceMonitor();
+
+// Legacy API compatibility
+export const performanceMonitor = {
+  measureRouteChange: (route: string) => runtimePerformanceMonitor.measureRouteChange(route)
+};

@@ -1,7 +1,9 @@
 import type { NavigationItem, UserRole, AccessDenialReason } from '@client/types';
-import { findNavigationItemByPath } from './navigation-utils';
-import { validateNavigationPath, validateUserRole } from '@client/validation';
+
 import { NavigationAccessDeniedError, InvalidNavigationPathError } from '@client/errors';
+import { validateNavigationPath, validateUserRole } from '@client/validation';
+
+import { findNavigationItemByPath } from './navigation-utils';
 
 /**
  * Checks if a user can access a specific route

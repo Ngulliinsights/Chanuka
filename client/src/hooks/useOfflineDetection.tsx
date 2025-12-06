@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { logger } from '@client/utils/logger';
 
 export interface ConnectionQuality {

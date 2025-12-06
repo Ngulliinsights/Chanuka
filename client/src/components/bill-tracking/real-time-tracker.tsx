@@ -1,10 +1,14 @@
+import { Bell, Network, Settings, Clock, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
 import { useWebSocket } from "@client/hooks/use-websocket";
 import { BillTrackingPreferences } from "@client/types/api";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
+import { logger } from '@client/utils/logger';
+
 import { Badge } from "../ui/badge";
-import { Switch } from "../ui/switch";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
   Select,
   SelectContent,
@@ -12,9 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Bell, Network, Settings, Clock, AlertCircle } from 'lucide-react';
-import { toast } from "sonner";
-import { logger } from '@client/utils/logger';
+import { Switch } from "../ui/switch";
+
 
 interface RealTimeBillTrackerProps {
   billId?: number;

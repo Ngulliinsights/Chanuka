@@ -4,12 +4,11 @@
 // Legislative procedures, bill readings, amendments, and committee processes
 // This schema tracks the formal parliamentary workflow required by Kenya's Constitution
 
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, uuid, varchar,
   index, unique, date, smallint, check
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
 
 import { bills, sponsors, committees, parliamentary_sessions } from "./foundation";
 

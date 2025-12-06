@@ -3,6 +3,8 @@
  * Extended validation helpers beyond the core validation schemas
  */
 
+import { AUTH_VALIDATION_RULES, AUTH_ERROR_MESSAGES } from '@client/constants';
+import { AuthValidationError } from '@client/errors';
 import { 
   validateEmail, 
   validatePassword, 
@@ -10,8 +12,6 @@ import {
   safeValidateEmail,
   safeValidatePassword 
 } from '@client/validation';
-import { AuthValidationError } from '@client/errors';
-import { AUTH_VALIDATION_RULES, AUTH_ERROR_MESSAGES } from '@client/constants';
 
 /**
  * Password strength checker

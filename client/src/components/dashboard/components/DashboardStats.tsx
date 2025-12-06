@@ -4,9 +4,7 @@
  * Displays key statistics and metrics overview for the user dashboard.
  */
 
-import React from 'react';
-import { Card, CardContent } from '../../ui/card';
-import { Badge } from '../../ui/badge';
+import { formatDistanceToNow } from 'date-fns';
 import { 
   BookOpen, 
   MessageSquare, 
@@ -17,8 +15,13 @@ import {
   Users,
   Target
 } from 'lucide-react';
+import React from 'react';
+
 import { UserDashboardData, CivicImpactMetrics } from '@client/types/user-dashboard';
-import { formatDistanceToNow } from 'date-fns';
+
+import { Badge } from '../../ui/badge';
+import { Card, CardContent } from '../../ui/card';
+
 
 interface DashboardStatsProps {
   stats: UserDashboardData['stats'] | undefined;

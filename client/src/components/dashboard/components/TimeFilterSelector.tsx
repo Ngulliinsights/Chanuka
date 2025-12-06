@@ -4,7 +4,11 @@
  * Allows users to filter dashboard data by time periods.
  */
 
+import { Calendar, Clock } from 'lucide-react';
 import React from 'react';
+
+import { TemporalFilter } from '@client/types/user-dashboard';
+
 import { Button } from '../../ui/button';
 import { 
   Select,
@@ -13,8 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../ui/select';
-import { Calendar, Clock } from 'lucide-react';
-import { TemporalFilter } from '@client/types/user-dashboard';
 
 interface TimeFilterSelectorProps {
   value: TemporalFilter;

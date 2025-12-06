@@ -2,12 +2,14 @@
  * Core Error Handler Service
  *
  * Centralized error handling service for client-side applications.
- * Provides unified error processing, recovery strategies, and integration
- * with the existing unified error handler.
+ * Provides unified error processing, recovery strategies, analytics, and reporting.
+ * Migrated from utils/errors.ts with enhanced modular architecture.
  */
 
+import { ErrorAnalyticsService } from './analytics';
 import { ErrorDomain, ErrorSeverity } from './constants';
-import { errorHandler as unifiedErrorHandler } from '@client/utils/unified-error-handler';
+import { ErrorRateLimiter } from './rate-limiter';
+import { ErrorReportingService } from './reporting';
 import {
   AppError,
   ErrorContext,
@@ -28,6 +30,12 @@ class CoreErrorHandler {
   private config: Required<ErrorHandlerConfig>;
   private recoveryStrategies: Map<string, ErrorRecoveryStrategy> = new Map();
   private errorListeners: Set<ErrorListener> = new Set();
+  private errors = new Map<string, AppError>();
+  private notificationTimeout: NodeJS.Timeout | null = null;
+  private pendingNotifications: AppError[] = [];
+  private rateLimiter: ErrorRateLimiter;
+  private analytics: ErrorAnalyticsService;
+  private reporting: ErrorReportingService;
   private isInitialized = false;
 
   private constructor() {
@@ -39,6 +47,10 @@ class CoreErrorHandler {
       logErrors: true,
       enableAnalytics: false,
     };
+
+    this.rateLimiter = new ErrorRateLimiter(60000, 50);
+    this.analytics = ErrorAnalyticsService.getInstance();
+    this.reporting = ErrorReportingService.getInstance();
   }
 
   static getInstance(): CoreErrorHandler {
@@ -60,11 +72,16 @@ class CoreErrorHandler {
     this.config = { ...this.config, ...config };
     this.setupDefaultRecoveryStrategies();
     this.setupGlobalErrorHandlers();
+
+    // Configure analytics and reporting
+    this.analytics.configure({ enabled: this.config.enableAnalytics });
+    this.reporting.configure({ enabled: true });
+
     this.isInitialized = true;
   }
 
   /**
-   * Handle an error with unified processing
+   * Handle an error with comprehensive processing including analytics and reporting
    */
   handleError(errorData: Partial<AppError>): AppError {
     // Create standardized error object
@@ -85,40 +102,52 @@ class CoreErrorHandler {
       ...errorData,
     };
 
-    // Delegate to unified error handler for core processing and advanced features
-    const unifiedError = unifiedErrorHandler.handleError({
-      type: error.type,
-      severity: error.severity,
-      message: error.message,
-      details: error.details,
-      context: error.context,
-      recoverable: error.recoverable,
-      retryable: error.retryable,
+    // Check rate limiting
+    const rateLimitResult = this.rateLimiter.shouldLimit(error);
+    if (rateLimitResult.limited) {
+      console.warn(`Error rate limited for ${error.type}:${error.context?.component}`, {
+        retryAfter: rateLimitResult.retryAfter,
+        errorId: error.id,
+      });
+      return error;
+    }
+
+    // Store error for retrieval
+    this.errors.set(error.id, error);
+
+    // Maintain error limit
+    if (this.errors.size > this.config.maxErrors) {
+      const oldestKey = this.errors.keys().next().value;
+      this.errors.delete(oldestKey);
+    }
+
+    // Log error if enabled
+    if (this.config.logErrors) {
+      this.logError(error);
+    }
+
+    // Track analytics
+    if (this.config.enableAnalytics) {
+      this.analytics.track(error).catch(analyticsError => {
+        console.error('Analytics tracking failed:', analyticsError);
+      });
+    }
+
+    // Report error
+    this.reporting.reportError(error).catch(reportingError => {
+      console.error('Error reporting failed:', reportingError);
     });
 
-    // Merge unified error data with our error object
-    Object.assign(error, unifiedError);
-
-    // Add core-specific enhancements
-    error.context = {
-      ...error.context,
-      coreHandlerVersion: '1.0.0',
-      integratedWithUnified: true,
-    };
-
-    // Notify local listeners (core-specific listeners)
+    // Notify listeners
     this.notifyListeners(error);
 
-    // Attempt recovery using core recovery strategies
+    // Debounced notifications
+    this.scheduleNotification(error);
+
+    // Attempt recovery
     if (this.config.enableRecovery && error.recoverable) {
       this.attemptRecovery(error).catch(recoveryError => {
-        console.error('Core recovery attempt failed:', recoveryError);
-        // Fallback to unified error handler recovery if available
-        if (unifiedErrorHandler.attemptRecovery) {
-          unifiedErrorHandler.attemptRecovery(error).catch(unifiedRecoveryError => {
-            console.error('Unified recovery attempt also failed:', unifiedRecoveryError);
-          });
-        }
+        console.error('Recovery attempt failed:', recoveryError);
       });
     }
 
@@ -207,7 +236,7 @@ class CoreErrorHandler {
       canRecover: (error) =>
         error.severity === ErrorSeverity.CRITICAL &&
         error.recoverable,
-      recover: async (error) => {
+      recover: async (_error) => {
         try {
           // Clear caches
           if ('caches' in window) {
@@ -243,7 +272,7 @@ class CoreErrorHandler {
       canRecover: (error) =>
         error.severity >= ErrorSeverity.HIGH &&
         error.recoverable,
-      recover: async (error) => {
+      recover: async (_error) => {
         setTimeout(() => window.location.reload(), 1000);
         return true;
       },
@@ -363,57 +392,156 @@ class CoreErrorHandler {
   }
 
   /**
-   * Get error statistics (delegates to unified handler for comprehensive stats)
+   * Log error with appropriate severity level
+   */
+  private logError(error: AppError): void {
+    const logData = {
+      errorId: error.id,
+      type: error.type,
+      severity: error.severity,
+      context: error.context,
+      details: error.details,
+    };
+
+    switch (error.severity) {
+      case ErrorSeverity.CRITICAL:
+      case ErrorSeverity.HIGH:
+        console.error(error.message, logData);
+        break;
+      case ErrorSeverity.MEDIUM:
+        console.warn(error.message, logData);
+        break;
+      case ErrorSeverity.LOW:
+        console.info(error.message, logData);
+        break;
+    }
+  }
+
+  /**
+   * Schedule debounced error notifications
+   */
+  private scheduleNotification(error: AppError): void {
+    this.pendingNotifications.push(error);
+
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+
+    this.notificationTimeout = setTimeout(() => {
+      this.emitErrorEvents();
+      this.pendingNotifications = [];
+      this.notificationTimeout = null;
+    }, this.config.notificationDebounceMs);
+  }
+
+  /**
+   * Emit error events for UI components
+   */
+  private emitErrorEvents(): void {
+    if (typeof window !== 'undefined' && this.pendingNotifications.length > 0) {
+      window.dispatchEvent(new CustomEvent('coreErrors', {
+        detail: this.pendingNotifications
+      }));
+    }
+  }
+
+  /**
+   * Get comprehensive error statistics
    */
   getErrorStats(): ErrorStats {
-    return unifiedErrorHandler.getErrorStats();
+    const errors = Array.from(this.errors.values());
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000;
+    const oneDay = 24 * oneHour;
+    const oneWeek = 7 * oneDay;
+
+    const byType = {} as Record<ErrorDomain, number>;
+    const bySeverity = {} as Record<ErrorSeverity, number>;
+    let recovered = 0;
+    let retryable = 0;
+
+    // Initialize counters
+    Object.values(ErrorDomain).forEach(domain => {
+      byType[domain] = 0;
+    });
+    Object.values(ErrorSeverity).forEach(severity => {
+      bySeverity[severity] = 0;
+    });
+
+    errors.forEach(error => {
+      byType[error.type]++;
+      bySeverity[error.severity]++;
+      if (error.recovered) recovered++;
+      if (error.retryable) retryable++;
+    });
+
+    return {
+      total: errors.length,
+      byType,
+      bySeverity,
+      recent: {
+        lastHour: errors.filter(e => now - e.timestamp < oneHour).length,
+        last24Hours: errors.filter(e => now - e.timestamp < oneDay).length,
+        last7Days: errors.filter(e => now - e.timestamp < oneWeek).length,
+      },
+      recovered,
+      retryable,
+    };
   }
 
   /**
-   * Get recent errors from unified handler
+   * Get recent errors
    */
-  getRecentErrors(limit = 10): any[] {
-    return unifiedErrorHandler.getRecentErrors?.(limit) || [];
+  getRecentErrors(limit = 10): AppError[] {
+    return Array.from(this.errors.values())
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, limit);
   }
 
   /**
-   * Get errors by type from unified handler
+   * Get errors by type
    */
-  getErrorsByType(type: ErrorDomain, limit = 10): any[] {
-    return unifiedErrorHandler.getErrorsByType?.(type, limit) || [];
+  getErrorsByType(type: ErrorDomain, limit = 10): AppError[] {
+    return Array.from(this.errors.values())
+      .filter(error => error.type === type)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, limit);
   }
 
   /**
-   * Get errors by severity from unified handler
+   * Get errors by severity
    */
-  getErrorsBySeverity(severity: ErrorSeverity, limit = 10): any[] {
-    return unifiedErrorHandler.getErrorsBySeverity?.(severity, limit) || [];
+  getErrorsBySeverity(severity: ErrorSeverity, limit = 10): AppError[] {
+    return Array.from(this.errors.values())
+      .filter(error => error.severity === severity)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, limit);
   }
 
   /**
-   * Clear errors (delegates to unified handler)
+   * Clear all stored errors
    */
   clearErrors(): void {
-    unifiedErrorHandler.clearErrors?.();
+    this.errors.clear();
   }
 
   /**
-   * Add recovery strategy to unified handler if supported
+   * Destroy the handler and clean up resources
    */
-  addUnifiedRecoveryStrategy(strategy: any): void {
-    if (unifiedErrorHandler.addRecoveryStrategy) {
-      unifiedErrorHandler.addRecoveryStrategy(strategy);
-    }
-  }
+  destroy(): void {
+    this.rateLimiter.destroy();
+    this.reporting.destroy();
 
-  /**
-   * Remove recovery strategy from unified handler if supported
-   */
-  removeUnifiedRecoveryStrategy(strategyId: string): boolean {
-    if (unifiedErrorHandler.removeRecoveryStrategy) {
-      return unifiedErrorHandler.removeRecoveryStrategy(strategyId);
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+      this.notificationTimeout = null;
     }
-    return false;
+
+    this.errors.clear();
+    this.recoveryStrategies.clear();
+    this.errorListeners.clear();
+    this.pendingNotifications = [];
+    this.isInitialized = false;
   }
 
   /**
@@ -455,7 +583,7 @@ export const coreErrorHandler = CoreErrorHandler.getInstance();
  */
 export function createNetworkError(
   message: string,
-  details?: any,
+  details?: Record<string, unknown>,
   context?: Partial<ErrorContext>
 ): AppError {
   return coreErrorHandler.handleError({
@@ -474,7 +602,7 @@ export function createNetworkError(
  */
 export function createValidationError(
   message: string,
-  details?: any,
+  details?: Record<string, unknown>,
   context?: Partial<ErrorContext>
 ): AppError {
   return coreErrorHandler.handleError({
@@ -493,7 +621,7 @@ export function createValidationError(
  */
 export function createAuthError(
   message: string,
-  details?: any,
+  details?: Record<string, unknown>,
   context?: Partial<ErrorContext>
 ): AppError {
   return coreErrorHandler.handleError({

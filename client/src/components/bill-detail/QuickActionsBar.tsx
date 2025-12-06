@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { Button } from '../ui/button';
 import { Share2, Bell, ExternalLink, Bookmark, MessageCircle, BookmarkCheck } from 'lucide-react';
+import { useState } from 'react';
+
 import { Bill } from '@/core/api/types';
+
+import { Button } from '../ui/button';
 
 interface QuickActionsBarProps {
   bill: Bill;

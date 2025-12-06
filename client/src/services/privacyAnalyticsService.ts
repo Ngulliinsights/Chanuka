@@ -3,9 +3,9 @@
  * GDPR/CCPA compliant analytics with consent management and data protection
  */
 
+import { privacyAnalyticsApiService } from '@/core/api/privacy';
 import { logger } from '@/utils/logger';
 import { privacyUtils, privacyCompliance } from '@/utils/privacy-compliance';
-import { privacyAnalyticsApiService } from '@/core/api/privacy';
 
 // ============================================================================
 // Types & Interfaces

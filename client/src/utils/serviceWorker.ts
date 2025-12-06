@@ -1,5 +1,6 @@
 // Service Worker registration and management utilities
 import { navigationService } from '@client/services/navigation';
+
 import { logger } from './logger';
 
 export interface ServiceWorkerConfig {

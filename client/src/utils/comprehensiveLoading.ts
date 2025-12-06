@@ -149,6 +149,16 @@ export function getAdjustedTimeout(
   }
 }
 
+// Normalize arbitrary connection descriptors to our canonical set
+export function normalizeConnectionType(value?: string): 'fast' | 'slow' | 'offline' | 'unknown' {
+  if (!value) return 'unknown';
+  const v = value.toLowerCase();
+  if (v === 'slow' || v === '2g' || v === 'slow-2g') return 'slow';
+  if (v === 'offline') return 'offline';
+  if (v === '3g' || v === '4g' || v === 'fast') return 'fast';
+  return 'unknown';
+}
+
 // Retry delay calculation with jitter for exponential backoff
 export function calculateRetryDelay(
   retryCount: number,
@@ -216,7 +226,7 @@ export interface LoadingAnalysis {
 export function analyzeLoadingPerformance(
   operations: LoadingOperation[],
   completedOperations: Array<LoadingOperation & { completedAt: number; success: boolean }>,
-  connectionInfo: any
+  connectionInfo?: { connectionType?: string; isOnline?: boolean }
 ): LoadingAnalysis {
   const now = Date.now();
   
@@ -376,11 +386,12 @@ export class LoadingScenarioBuilder {
 export function createOperationFromScenario(
   scenario: LoadingScenario,
   instanceId: string,
-  connectionInfo?: any
+  connectionInfo?: { connectionType?: string; isOnline?: boolean }
 ): Omit<LoadingOperation, 'startTime' | 'retryCount'> {
-  const adjustedTimeout = connectionInfo 
-    ? getAdjustedTimeout(scenario.defaultTimeout, connectionInfo.connectionType)
-    : scenario.defaultTimeout;
+  const adjustedTimeout = getAdjustedTimeout(
+    scenario.defaultTimeout,
+    normalizeConnectionType(connectionInfo?.connectionType)
+  );
   
   // Extract the first stage ID if stages exist, otherwise use undefined
   const stageId = scenario.stages?.[0]?.id ?? undefined;
@@ -396,6 +407,9 @@ export function createOperationFromScenario(
     maxRetries: scenario.maxRetries,
     connectionAware: scenario.connectionAware,
     stage: stageId,
+    // include retry policy details expected by LoadingOperation shape
+    retryStrategy: scenario.retryStrategy,
+    retryDelay: calculateRetryDelay(0, scenario.retryStrategy),
   };
 }
 
@@ -467,7 +481,7 @@ export const globalLoadingMonitor = new LoadingPerformanceMonitor();
 // Utility functions for common loading patterns
 export const LoadingUtils = {
   // Create a page loading operation with proper scenario lookup
-  createPageLoading: (pageId: string, connectionInfo?: any) => {
+  createPageLoading: (pageId: string, connectionInfo?: { connectionType?: string; isOnline?: boolean }) => {
     const scenario = LOADING_SCENARIOS.PAGE_INITIAL;
     if (!scenario) {
       throw new Error('PAGE_INITIAL scenario not found');
@@ -476,7 +490,7 @@ export const LoadingUtils = {
   },
   
   // Create an API loading operation with proper scenario lookup
-  createApiLoading: (apiId: string, connectionInfo?: any) => {
+  createApiLoading: (apiId: string, connectionInfo?: { connectionType?: string; isOnline?: boolean }) => {
     const scenario = LOADING_SCENARIOS.API_REQUEST;
     if (!scenario) {
       throw new Error('API_REQUEST scenario not found');
@@ -485,7 +499,7 @@ export const LoadingUtils = {
   },
   
   // Create a component loading operation with proper scenario lookup
-  createComponentLoading: (componentId: string, connectionInfo?: any) => {
+  createComponentLoading: (componentId: string, connectionInfo?: { connectionType?: string; isOnline?: boolean }) => {
     const scenario = LOADING_SCENARIOS.COMPONENT_LAZY;
     if (!scenario) {
       throw new Error('COMPONENT_LAZY scenario not found');

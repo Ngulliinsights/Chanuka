@@ -3,7 +3,7 @@
  * Centralized configuration management for different environments
  */
 
-import { logger } from './logger';
+// Note: Avoiding logger import to prevent circular dependency
 
 interface EnvironmentConfig {
   apiUrl: string;
@@ -34,39 +34,54 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
   const isDevelopment = process.env.NODE_ENV === 'development';
   const isProduction = process.env.NODE_ENV === 'production';
   
+  // Helper function to safely access environment variables
+  const getEnv = (key: string, defaultValue = ''): string => {
+    if (typeof window !== 'undefined' && (window as any).ENV) {
+      return (window as any).ENV[key] || defaultValue;
+    }
+    // Fallback for build-time environment variables
+    try {
+      return (import.meta as any).env?.[key] || defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  };
+
   const config = {
-    apiUrl: import.meta.env.VITE_API_URL || (isDevelopment ? 'http://localhost:3000' : ''),
-    wsUrl: import.meta.env.VITE_WS_URL || (isDevelopment ? 'ws://localhost:3000' : ''),
+    apiUrl: getEnv('VITE_API_URL') || (isDevelopment ? 'http://localhost:3000' : ''),
+    wsUrl: getEnv('VITE_WS_URL') || (isDevelopment ? 'ws://localhost:3000' : ''),
     environment: isProduction ? 'production' : isDevelopment ? 'development' : 'staging',
-    enableAnalytics: import.meta.env.VITE_ENABLE_ANALYTICS === 'true',
-    enableSecurityMonitoring: import.meta.env.VITE_ENABLE_SECURITY_MONITORING !== 'false',
-    logLevel: (import.meta.env.VITE_LOG_LEVEL as any) || (isDevelopment ? 'debug' : 'info'),
+    enableAnalytics: getEnv('VITE_ENABLE_ANALYTICS') === 'true',
+    enableSecurityMonitoring: getEnv('VITE_ENABLE_SECURITY_MONITORING') !== 'false',
+    logLevel: (getEnv('VITE_LOG_LEVEL') || (isDevelopment ? 'debug' : 'info')) as 'debug' | 'info' | 'warn' | 'error',
     oauth: {
       google: {
-        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-        enabled: !!import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        clientId: getEnv('VITE_GOOGLE_CLIENT_ID'),
+        enabled: !!getEnv('VITE_GOOGLE_CLIENT_ID'),
       },
       github: {
-        clientId: import.meta.env.VITE_GITHUB_CLIENT_ID || '',
-        enabled: !!import.meta.env.VITE_GITHUB_CLIENT_ID,
+        clientId: getEnv('VITE_GITHUB_CLIENT_ID'),
+        enabled: !!getEnv('VITE_GITHUB_CLIENT_ID'),
       },
     },
     security: {
-      enableCSP: import.meta.env.VITE_ENABLE_CSP !== 'false',
-      enableHSTS: import.meta.env.VITE_ENABLE_HSTS !== 'false',
-      sessionTimeout: parseInt(import.meta.env.VITE_SESSION_TIMEOUT || '1800000', 10), // 30 minutes
-      maxLoginAttempts: parseInt(import.meta.env.VITE_MAX_LOGIN_ATTEMPTS || '5', 10),
+      enableCSP: getEnv('VITE_ENABLE_CSP') !== 'false',
+      enableHSTS: getEnv('VITE_ENABLE_HSTS') !== 'false',
+      sessionTimeout: parseInt(getEnv('VITE_SESSION_TIMEOUT', '1800000'), 10), // 30 minutes
+      maxLoginAttempts: parseInt(getEnv('VITE_MAX_LOGIN_ATTEMPTS', '5'), 10),
     },
   } as const;
 
-  logger.info('Environment configuration loaded', { 
-    component: 'EnvConfig',
-    environment: config.environment,
-    oauthEnabled: {
-      google: config.oauth.google.enabled,
-      github: config.oauth.github.enabled
-    }
-  });
+  // Environment configuration loaded successfully
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Environment configuration loaded', { 
+      environment: config.environment,
+      oauthEnabled: {
+        google: config.oauth.google.enabled,
+        github: config.oauth.github.enabled
+      }
+    });
+  }
   
   return config;
 };

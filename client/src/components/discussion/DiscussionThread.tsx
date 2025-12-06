@@ -1,4 +1,3 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { 
   MessageSquare, 
   Users, 
@@ -9,17 +8,8 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
-import { CommentItem } from './CommentItem';
-import { CommentForm } from './CommentForm';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { 
   DiscussionThread as DiscussionThreadType, 
@@ -29,6 +19,20 @@ import {
   CommentFilterOption,
   ModerationViolationType
 } from '@client/types/community';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+
+import { CommentForm } from './CommentForm';
+import { CommentItem } from './CommentItem';
+
 
 interface DiscussionThreadProps {
   thread: DiscussionThreadType;

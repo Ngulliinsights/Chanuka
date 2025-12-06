@@ -43,20 +43,25 @@ import type { BillsQueryParams } from '../model/types';
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface FilterPanelProps {
-  className?: string;
+  filters: {
+    status?: string;
+    urgency?: string;
+    policyArea?: string;
+  };
+  onFiltersChange: (filters: any) => void;
   isMobile?: boolean;
-  resultCount?: number;
-  totalCount?: number;
-  filters: BillsQueryParams;
-  onFiltersChange: (filters: BillsQueryParams) => void;
+  resultCount: number;
+  totalCount: number;
 }
 
-interface FilterOption {
-  value: string;
-  label: string;
-  count?: number;
-  description?: string;
-}
+export const FilterPanel: React.FC<FilterPanelProps> = ({
+  filters,
+  onFiltersChange,
+  isMobile = false,
+  resultCount,
+  totalCount,
+}) => {
+  const [isOpen, setIsOpen] = useState(!isMobile);
 
 // interface FilterSection {
 //   key: keyof BillsFilter;
@@ -621,34 +626,36 @@ export function FilterPanel({
   // Mobile bottom sheet interface
   if (isMobile) {
     return (
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild>
-          <Button variant="outline" className="chanuka-btn">
+      <div className="mb-4">
+        <Button
+          variant="outline"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full justify-between"
+        >
+          <span className="flex items-center">
             <Filter className="h-4 w-4 mr-2" />
-            Filters
-            {activeFilterCount > 0 && (
-              <Badge variant="secondary" className="ml-2 h-5 w-5 p-0 text-xs">
-                {activeFilterCount}
-              </Badge>
-            )}
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="bottom" className="h-[80vh] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Filter Bills
-            </SheetTitle>
-          </SheetHeader>
-          <div className="mt-6">
-            <FilterContent />
-          </div>
-        </SheetContent>
-      </Sheet>
+            Filters {hasActiveFilters && `(${Object.values(filters).filter(Boolean).length})`}
+          </span>
+        </Button>
+        
+        {isOpen && (
+          <Card className="mt-2">
+            <CardContent className="p-4">
+              <FilterContent
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onClearFilters={clearFilters}
+                hasActiveFilters={hasActiveFilters}
+                resultCount={resultCount}
+                totalCount={totalCount}
+              />
+            </CardContent>
+          </Card>
+        )}
+      </div>
     );
   }
 
-  // Desktop sidebar interface
   return (
     <Card className={cn('chanuka-card', className)}>
       <CardHeader className="pb-4">

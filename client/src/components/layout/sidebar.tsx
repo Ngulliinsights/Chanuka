@@ -1,8 +1,11 @@
+import { Building, BarChart3, FileText, Users, Search, Settings, HelpCircle, MessageSquare, Shield, TrendingUp, User, Activity, PieChart, Lock } from 'lucide-react';
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
 import { cn } from '@client/lib/utils';
+
 import { Logo } from '../ui/logo';
-import { Building, BarChart3, FileText, Users, Search, Settings, HelpCircle, MessageSquare, Shield, TrendingUp, User } from 'lucide-react';
+
 import { 
   SidebarProps, 
   NavigationItem, 
@@ -20,6 +23,13 @@ const DEFAULT_NAVIGATION: NavigationItem[] = [
   { id: 'community', label: 'Community', href: '/community', icon: <Users className="h-4 w-4" /> },
   { id: 'verification', label: 'Expert Verification', href: '/expert-verification', icon: <Shield className="h-4 w-4" /> },
   { id: 'sponsorship', label: 'Sponsorship Analysis', href: '/bill-sponsorship-analysis', icon: <TrendingUp className="h-4 w-4" /> },
+  
+  // Analytics & Monitoring
+  { id: 'analytics', label: 'Analytics', href: '/analytics', icon: <PieChart className="h-4 w-4" /> },
+  { id: 'performance', label: 'Performance', href: '/performance', icon: <Activity className="h-4 w-4" /> },
+  { id: 'privacy-center', label: 'Privacy Center', href: '/privacy-center', icon: <Lock className="h-4 w-4" /> },
+  
+  // User Management
   { id: 'user-dashboard', label: 'My Dashboard', href: '/account', icon: <User className="h-4 w-4" />, requiresAuth: true },
   { id: 'profile', label: 'Profile', href: '/profile', icon: <User className="h-4 w-4" />, requiresAuth: true },
   { id: 'privacy-settings', label: 'Privacy Settings', href: '/privacy-settings', icon: <Settings className="h-4 w-4" />, requiresAuth: true },

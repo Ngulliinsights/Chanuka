@@ -28,8 +28,7 @@ export {
 
 // Re-export auth services
 export { authService } from '@client/services/authService';
-export { tokenManager } from '@client/utils/tokenManager';
-export { sessionManager } from '@client/utils/session-manager';
+export { tokenManager, sessionManager } from '@client/utils/storage';
 
 // Re-export auth types
 export type { 

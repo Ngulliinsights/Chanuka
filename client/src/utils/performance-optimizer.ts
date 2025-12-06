@@ -10,6 +10,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useMemo, useState } from 'react'
+
 import { logger } from './logger'
 
 // Performance budgets representing ideal thresholds for various metrics
@@ -138,20 +139,21 @@ class PerformanceOptimizer {
     if (!('PerformanceObserver' in window)) return
 
     try {
-      const longTaskObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
+      const longTaskObserver = new PerformanceObserver((list: PerformanceObserverEntryList) => {
+        for (const entry of list.getEntries() as PerformanceEntry[]) {
+          const e = entry as PerformanceEntry & { duration?: number; name?: string; startTime?: number };
           // Only report tasks that exceed our threshold to reduce noise
-          if (entry.duration > PERFORMANCE_BUDGETS.LONG_TASK_THRESHOLD) {
+          if (e.duration && e.duration > PERFORMANCE_BUDGETS.LONG_TASK_THRESHOLD) {
             logger.warn('Long task detected - this blocks user interactions', {
               component: 'PerformanceOptimizer',
-              duration: `${entry.duration.toFixed(2)}ms`,
-              name: entry.name,
-              startTime: `${entry.startTime.toFixed(2)}ms`,
+              duration: `${e.duration.toFixed(2)}ms`,
+              name: e.name,
+              startTime: `${(e.startTime ?? 0).toFixed(2)}ms`,
             })
             
             this.suggestOptimizations('long-task', {
-              duration: entry.duration,
-              name: entry.name,
+              duration: e.duration,
+              name: e.name,
             })
           }
         }
@@ -207,7 +209,8 @@ class PerformanceOptimizer {
    */
   private monitorMemoryUsage() {
     // Check if the memory API is available (Chrome-only feature)
-    const hasMemoryAPI = 'memory' in performance && (performance as any).memory
+    const perfWithMemory = performance as unknown as { memory?: { usedJSHeapSize?: number } }
+    const hasMemoryAPI = typeof perfWithMemory.memory === 'object' && perfWithMemory.memory !== null
 
     if (!hasMemoryAPI) {
       logger.debug('Memory monitoring not available (Chrome-only feature)', {
@@ -215,11 +218,10 @@ class PerformanceOptimizer {
       })
       return
     }
-
     const memoryCheckInterval = window.setInterval(() => {
       try {
-        const memory = (performance as any).memory
-        const currentUsage = memory.usedJSHeapSize
+        const memory = perfWithMemory.memory
+        const currentUsage = memory?.usedJSHeapSize ?? 0
         const timestamp = Date.now()
         
         this.memoryUsage.push({ timestamp, usage: currentUsage })
@@ -368,7 +370,7 @@ class PerformanceOptimizer {
   /**
    * Generate contextual optimization suggestions based on detected issues
    */
-  private suggestOptimizations(type: string, data: any) {
+  private suggestOptimizations(type: string, data: unknown) {
     const suggestions = this.getOptimizationSuggestions(type, data)
     
     if (suggestions.length > 0) {
@@ -384,20 +386,28 @@ class PerformanceOptimizer {
    * Get specific optimization suggestions based on the performance issue type
    * These suggestions are actionable and prioritized by impact
    */
-  private getOptimizationSuggestions(type: string, data: any): string[] {
+  private getOptimizationSuggestions(type: string, data: unknown): string[] {
     const suggestions: string[] = []
     
+    const d = data as {
+      duration?: number;
+      name?: string;
+      url?: string;
+      componentName?: string;
+      averageRenderTime?: number;
+    }
+
     switch (type) {
       case 'long-task':
         suggestions.push('Break down large operations into smaller chunks using requestIdleCallback')
         suggestions.push('Implement virtual scrolling for lists with many items')
         suggestions.push('Defer non-critical JavaScript execution')
         
-        if (data.duration > 100) {
+        if (d.duration && d.duration > 100) {
           suggestions.push('Move heavy computations to a Web Worker to free the main thread')
         }
         
-        if (data.name?.includes('script')) {
+        if (d.name?.includes('script')) {
           suggestions.push('Consider code splitting to reduce initial JavaScript execution')
         }
         break
@@ -415,13 +425,13 @@ class PerformanceOptimizer {
         suggestions.push('Add timeout handling for network requests')
         suggestions.push('Consider request deduplication for identical concurrent requests')
         
-        if (data.url.includes('/api/')) {
+        if (d.url && d.url.includes('/api/')) {
           suggestions.push('Optimize API response payload size')
           suggestions.push('Implement pagination for large data sets')
           suggestions.push('Consider using GraphQL to request only needed fields')
         }
         
-        if (data.duration > 10000) {
+        if (d.duration && d.duration > 10000) {
           suggestions.push('Add loading indicators to improve perceived performance')
         }
         break

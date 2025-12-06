@@ -1,6 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { MessageCircle, Users, TrendingUp, Award } from 'lucide-react';
+
 import { Bill } from '@/core/api/types';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 interface BillCommunityTabProps {
   bill: Bill;

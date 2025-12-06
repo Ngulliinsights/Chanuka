@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+
 import { logger } from './logger';
 
 export interface ComponentError {
@@ -74,18 +75,18 @@ class EmergencyTriageTool {
     this.renderCounts.clear();
     this.lastRenderTime.clear();
 
-    logger.info('🚨 Emergency triage monitoring started');
+    logger.info('🚨 Emergency triage monitoring started', {});
 
     // Intercept console.error
-    console.error = (...args: any[]) => {
+    console.error = (...args: unknown[]) => {
       this.captureError('error', args);
-      this.originalConsoleError(...args);
+      (this.originalConsoleError as (...data: unknown[]) => void)(...args);
     };
 
     // Intercept console.warn
-    console.warn = (...args: any[]) => {
+    console.warn = (...args: unknown[]) => {
       this.captureError('warn', args);
-      this.originalConsoleWarn(...args);
+      (this.originalConsoleWarn as (...data: unknown[]) => void)(...args);
     };
 
     // Monitor React DevTools if available
@@ -111,7 +112,7 @@ class EmergencyTriageTool {
     console.warn = this.originalConsoleWarn;
 
     const report = this.generateReport(endTime);
-    logger.info('🚨 Emergency triage monitoring stopped', report);
+    logger.info('🚨 Emergency triage monitoring stopped', { report } as Record<string, unknown>);
 
     return report;
   }
@@ -119,10 +120,12 @@ class EmergencyTriageTool {
   /**
    * Capture and analyze console errors
    */
-  private captureError(level: 'error' | 'warn', args: any[]): void {
-    const message = args.map(arg => 
-      typeof arg === 'string' ? arg : JSON.stringify(arg)
-    ).join(' ');
+  private captureError(level: 'error' | 'warn', args: unknown[]): void {
+    const message = args
+      .map(arg => (typeof arg === 'string' ? arg : (() => {
+        try { return JSON.stringify(arg); } catch { return String(arg); }
+      })()))
+      .join(' ');
 
     const componentError = this.analyzeError(message, level);
     if (componentError) {
@@ -325,7 +328,7 @@ class EmergencyTriageTool {
       };
 
       this.errors.push(error);
-      logger.error('🚨 INFINITE RENDER DETECTED:', componentName, renderCount + 1);
+      logger.error('🚨 INFINITE RENDER DETECTED', { component: componentName, count: renderCount + 1 } as Record<string, unknown>);
     }
   }
 
@@ -334,14 +337,14 @@ class EmergencyTriageTool {
    */
   private setupReactDevToolsMonitoring(): void {
     // Check if React DevTools is available
-    if (typeof window !== 'undefined' && (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__) {
-      const hook = (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__;
-      
+    if (typeof window !== 'undefined' && (window as unknown as Record<string, unknown>).__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+      const hook = (window as unknown as Record<string, any>).__REACT_DEVTOOLS_GLOBAL_HOOK__;
+
       // Monitor fiber commits for render tracking
-      if (hook.onCommitFiberRoot) {
-        const originalOnCommit = hook.onCommitFiberRoot;
-        hook.onCommitFiberRoot = (id: any, root: any, ...args: any[]) => {
-          this.trackFiberCommit(root);
+      if (typeof hook.onCommitFiberRoot === 'function') {
+        const originalOnCommit = hook.onCommitFiberRoot as (...args: unknown[]) => unknown;
+        hook.onCommitFiberRoot = (id: unknown, root: unknown, ...args: unknown[]) => {
+          try { this.trackFiberCommit(root); } catch (_) { /* ignore */ }
           return originalOnCommit(id, root, ...args);
         };
       }
@@ -351,13 +354,15 @@ class EmergencyTriageTool {
   /**
    * Track fiber commits for render analysis
    */
-  private trackFiberCommit(root: any): void {
-    if (!root || !root.current) return;
+  private trackFiberCommit(root: unknown): void {
+    if (!root) return;
 
     try {
-      const fiber = root.current;
+      const maybeRoot = root as { current?: unknown };
+      if (!maybeRoot.current) return;
+      const fiber = maybeRoot.current;
       this.traverseFiber(fiber);
-    } catch (error) {
+    } catch (_error) {
       // Silently ignore DevTools errors
     }
   }
@@ -365,19 +370,22 @@ class EmergencyTriageTool {
   /**
    * Traverse fiber tree to track component renders
    */
-  private traverseFiber(fiber: any): void {
-    if (!fiber) return;
+  private traverseFiber(fiber: unknown): void {
+    if (!fiber || typeof fiber !== 'object') return;
 
-    if (fiber.type && typeof fiber.type === 'function') {
-      const componentName = fiber.type.displayName || fiber.type.name || 'Anonymous';
-      this.trackRender(componentName);
+    const f = fiber as Record<string, unknown>;
+    const type = f.type;
+    if (typeof type === 'function') {
+      const maybeType = type as any;
+      const componentName = maybeType.displayName || maybeType.name || 'Anonymous';
+      this.trackRender(String(componentName));
     }
 
     // Traverse children
-    let child = fiber.child;
+    let child = f.child as unknown;
     while (child) {
       this.traverseFiber(child);
-      child = child.sibling;
+      child = (child as any).sibling as unknown;
     }
   }
 
@@ -392,14 +400,15 @@ class EmergencyTriageTool {
       try {
         const observer = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (entry.duration > 50) { // Tasks longer than 50ms
+            const duration = (entry as PerformanceEntry & { duration?: number }).duration ?? 0;
+            if (duration > 50) { // Tasks longer than 50ms
               const error: ComponentError = {
                 component: 'PerformanceMonitor',
                 errorType: 'unknown',
-                message: `Long task detected: ${entry.duration}ms`,
+                message: `Long task detected: ${duration}ms`,
                 timestamp: Date.now(),
                 frequency: 1,
-                severity: entry.duration > 100 ? 'high' : 'medium'
+                severity: duration > 100 ? 'high' : 'medium'
               };
               this.errors.push(error);
             }
@@ -407,7 +416,7 @@ class EmergencyTriageTool {
         });
 
         observer.observe({ entryTypes: ['longtask'] });
-      } catch (error) {
+      } catch (_error) {
         // PerformanceObserver not supported
       }
     }
@@ -421,7 +430,7 @@ class EmergencyTriageTool {
     if (!breaker || !breaker.enabled) return;
 
     if (error.frequency >= breaker.errorThreshold) {
-      logger.error('🔥 CIRCUIT BREAKER TRIGGERED:', error.component);
+      logger.error('🔥 CIRCUIT BREAKER TRIGGERED', { component: error.component } as Record<string, unknown>);
       this.triggerCircuitBreaker(error.component);
     }
   }
@@ -431,7 +440,7 @@ class EmergencyTriageTool {
    */
   private triggerCircuitBreaker(componentName: string): void {
     // This would disable the component in a real implementation
-    logger.error(`Circuit breaker activated for ${componentName}`);
+    logger.error('Circuit breaker activated', { component: componentName } as Record<string, unknown>);
     
     // Emit custom event for component to handle
     if (typeof window !== 'undefined') {
@@ -446,7 +455,7 @@ class EmergencyTriageTool {
    */
   configureCircuitBreaker(config: CircuitBreakerConfig): void {
     this.circuitBreakers.set(config.component, config);
-    logger.info('Circuit breaker configured:', config.component);
+    logger.info('Circuit breaker configured', { component: config.component } as Record<string, unknown>);
   }
 
   /**

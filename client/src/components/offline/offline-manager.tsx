@@ -3,6 +3,7 @@
  * Handles offline functionality, data synchronization, and network status
  */
 
+import { Network, Database, RefreshCw } from 'lucide-react';
 import React, { 
   createContext, 
   useContext, 
@@ -11,7 +12,7 @@ import React, {
   useCallback, 
   useRef 
 } from 'react';
-import { Network, Database, RefreshCw } from 'lucide-react';
+
 import { logger } from '@client/utils/logger';
 
 interface OfflineData {

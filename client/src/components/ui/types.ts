@@ -3,8 +3,8 @@
  * Following navigation component patterns for consistency
  */
 
-import { z } from 'zod';
 import { ReactNode, ComponentProps, HTMLAttributes } from 'react';
+import { z } from 'zod';
 
 // Base UI component props interface
 export interface BaseUIProps {

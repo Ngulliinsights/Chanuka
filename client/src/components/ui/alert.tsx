@@ -3,8 +3,9 @@
  * Alert component for displaying important messages
  */
 
-import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react"
+
 import { cn } from "@client/utils/cn"
 
 const alertVariants = cva(

@@ -3,14 +3,6 @@
  * Handles TOTP setup with QR code and backup codes
  */
 
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
 import { 
   Shield, 
   QrCode, 
@@ -23,9 +15,20 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { TwoFactorSetup as TwoFactorSetupType } from '@client/types/auth';
 import { logger } from '@client/utils/logger';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+
 
 interface TwoFactorSetupProps {
   isOpen: boolean;

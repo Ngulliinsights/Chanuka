@@ -5,11 +5,6 @@
  * using the integrated WebSocket client with polling fallback.
  */
 
-import React, { useEffect, useState } from 'react';
-import { useWebSocket } from '@client/hooks/use-websocket';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { 
   Bell, 
   Activity, 
@@ -20,7 +15,14 @@ import {
   WifiOff,
   AlertCircle
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+
+import { useWebSocket } from '@client/hooks/use-websocket';
 import { cn } from '@client/lib/utils';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 interface RealTimeDashboardProps {
   className?: string;

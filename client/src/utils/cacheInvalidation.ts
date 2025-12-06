@@ -15,7 +15,7 @@ export interface CacheInvalidationConfig {
 
 export interface CacheEntry {
   key: string;
-  data: any;
+  data: unknown;
   timestamp: number;
   ttl: number;
   version: string;
@@ -58,7 +58,7 @@ class CacheInvalidationManager {
   }
 
   // Core cache operations
-  async set(key: string, data: any, options: {
+  async set(key: string, data: unknown, options: {
     ttl?: number;
     tags?: string[];
     dependencies?: string[];
@@ -88,7 +88,7 @@ class CacheInvalidationManager {
     logger.debug('Cache entry set', { component: 'CacheInvalidationManager', key, tags: entry.tags });
   }
 
-  async get<T = any>(key: string): Promise<T | null> {
+  async get<T = unknown>(key: string): Promise<T | null> {
     const entry = this.cache.get(key);
 
     if (!entry) {
@@ -119,7 +119,7 @@ class CacheInvalidationManager {
     }
 
     this.logAccess(key);
-    return entry.data;
+    return entry.data as T;
   }
 
   async invalidate(key: string): Promise<void> {
@@ -242,7 +242,7 @@ class CacheInvalidationManager {
   }
 
   // Cache warming
-  async warmCache(keys: string[], fetchFn: (key: string) => Promise<any>): Promise<void> {
+  async warmCache(keys: string[], fetchFn: (key: string) => Promise<unknown>): Promise<void> {
     const promises = keys.map(async (key) => {
       try {
         const data = await fetchFn(key);
@@ -332,7 +332,7 @@ class CacheInvalidationManager {
     };
   }
 
-  private estimateSize(obj: any): number {
+  private estimateSize(obj: unknown): number {
     // Rough estimation of object size in bytes
     try {
       return JSON.stringify(obj).length * 2; // UTF-16

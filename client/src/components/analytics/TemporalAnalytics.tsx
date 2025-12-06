@@ -5,11 +5,6 @@
  * activity pattern recognition, and predictive insights.
  */
 
-import React, { useMemo, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import {
   Clock,
   Calendar,
@@ -24,7 +19,15 @@ import {
   Moon,
   Coffee
 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+
 import { cn } from '@client/lib/utils';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
 
 interface ActivityData {
   timestamp: string;

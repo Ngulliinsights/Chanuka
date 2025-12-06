@@ -7,10 +7,10 @@
 
 // Temporarily disable complex logging to avoid circular dependencies
 const logger = {
-  error: (msg: string, meta?: any) => console.error(msg, meta),
-  warn: (msg: string, meta?: any) => console.warn(msg, meta),
-  info: (msg: string, meta?: any) => console.info(msg, meta),
-  debug: (msg: string, meta?: any) => console.debug(msg, meta)
+  error: (msg: string, meta?: Record<string, unknown>) => console.error(msg, meta),
+  warn: (msg: string, meta?: Record<string, unknown>) => console.warn(msg, meta),
+  info: (msg: string, meta?: Record<string, unknown>) => console.info(msg, meta),
+  debug: (msg: string, meta?: Record<string, unknown>) => console.debug(msg, meta)
 };
 
 // Error domains for categorization
@@ -54,7 +54,7 @@ export interface ErrorMetadata {
   readonly domain: ErrorDomain;
   readonly severity: ErrorSeverity;
   readonly source: string;
-  readonly context: Readonly<Record<string, any>> | undefined;
+  readonly context: Readonly<Record<string, unknown>> | undefined;
   readonly retryable: boolean;
   readonly recoveryStrategies: ReadonlyArray<RecoveryStrategy>;
   attemptCount: number;
@@ -91,7 +91,7 @@ export class BaseError extends Error {
   public readonly errorId: string;
   public readonly statusCode: number;
   public readonly code: string;
-  public readonly details: Record<string, any> | undefined;
+  public readonly details: Record<string, unknown> | undefined;
   public readonly isOperational: boolean;
   public readonly metadata: ErrorMetadata;
   public override readonly cause?: Error | undefined;
@@ -242,7 +242,7 @@ export class BaseError extends Error {
   /**
    * Enhanced serialization
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       error: {
         id: this.errorId,
@@ -260,7 +260,7 @@ export class BaseError extends Error {
           ...(this.metadata.context && { context: this.metadata.context }),
           retryable: this.metadata.retryable,
           recoveryStrategies: this.metadata.recoveryStrategies.map(
-            ({ action, ...rest }) => rest
+            ({ action: _action, ...rest }) => rest
           ),
           attemptCount: this.metadata.attemptCount,
           ...(this.metadata.lastAttempt && {
@@ -283,14 +283,14 @@ export class BaseError extends Error {
   /**
    * Creates a sanitized version safe for logging
    */
-  toSafeLog(): Record<string, any> {
-    const json = this.toJSON();
-    
+  toSafeLog(): Record<string, unknown> {
+    const json = this.toJSON() as Record<string, any>;
+
     // Remove potentially sensitive context data
     if (json.error.metadata.context) {
       delete json.error.metadata.context;
     }
-    
+
     return json;
   }
 

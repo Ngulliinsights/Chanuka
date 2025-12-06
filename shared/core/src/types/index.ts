@@ -68,7 +68,8 @@ export type {
   DetailedMetrics,
   CacheService,
   ValidationService,
-  HealthChecker
+  HealthChecker,
+  MiddlewareProvider
 } from '../middleware/types';
 
 // Modernization types (excluding conflicting ValidationError already aliased)

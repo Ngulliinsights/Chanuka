@@ -6,8 +6,8 @@
  */
 
 import { UnifiedWebSocketManager } from '@client/core/api/websocket';
-import { billTrackingService } from './billTrackingService';
-import { stateManagementService } from './stateManagementService';
+import { logger } from '@client/utils/logger';
+
 import { 
   WebSocketSubscription, 
   BillUpdate, 
@@ -16,7 +16,9 @@ import {
   ConnectionState,
   RealTimeHandlers 
 } from '../types/api';
-import { logger } from '@client/utils/logger';
+
+import { billTrackingService } from './billTrackingService';
+import { stateManagementService } from './stateManagementService';
 
 export class WebSocketService {
   private wsManager: UnifiedWebSocketManager;

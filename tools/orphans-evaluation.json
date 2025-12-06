@@ -1,0 +1,444 @@
+{
+  "evaluations": [
+    {
+      "file": "client/src/utils/safe-lazy-loading.tsx",
+      "loc": 887,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "retryLazyComponentLoad",
+        "createSafeLazyPage",
+        "createNamedExportLazy",
+        "SafeLazyWrapperProps",
+        "SafeLazyWrapper",
+        "SafeLazyPages",
+        "DynamicFeatureImports",
+        "SafeLazySponsorshipPages",
+        "createRetryableLazyComponent",
+        "createLazyComponentBatch",
+        "preloadLazyComponent",
+        "usePreloadComponents",
+        "clearAllCaches"
+      ],
+      "tests": [
+        "client\\src\\utils\\__tests__\\safe-lazy-loading.test.tsx"
+      ],
+      "todos": [],
+      "score": 15,
+      "category": "Refactor & Integrate Later"
+    },
+    {
+      "file": "client/src/utils/mobile.ts",
+      "loc": 1715,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "TouchEvent",
+        "DeviceInfo",
+        "ResponsiveBreakpoints",
+        "MobileErrorContext",
+        "TouchConfig",
+        "DeviceDetector",
+        "TouchHandler",
+        "ResponsiveUtils",
+        "MobileErrorHandler",
+        "MobilePerformanceOptimizer",
+        "deviceDetector",
+        "touchHandler",
+        "responsiveUtils",
+        "mobileErrorHandler",
+        "mobilePerformanceOptimizer",
+        "isMobileDevice",
+        "isTabletDevice",
+        "hasTouch",
+        "getCurrentScreenSize",
+        "getDeviceOrientation",
+        "isIOSDevice",
+        "isAndroidDevice",
+        "getDeviceInfo",
+        "addTouchGesture",
+        "removeTouchGesture",
+        "createResponsiveStyles",
+        "isBreakpointActive",
+        "isBreakpointUp",
+        "isBreakpointDown",
+        "getResponsiveValue",
+        "onDeviceChange",
+        "onBreakpointChange",
+        "getCurrentFPS",
+        "isPerformanceDegraded",
+        "optimizeForMobile",
+        "initializeMobileUtils",
+        "destroyMobileUtils"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 12,
+      "category": "Keep/Archive"
+    },
+    {
+      "file": "client/src/utils/security.ts",
+      "loc": 1615,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "CSPDirectives",
+        "SecurityEvent",
+        "SuspiciousActivityAlert",
+        "ValidationRule",
+        "PasswordStrength",
+        "InputValidatorConfig",
+        "PasswordValidatorConfig",
+        "SecurityMonitorConfig",
+        "generateId",
+        "CSPManager",
+        "DOMSanitizer",
+        "InputValidator",
+        "PasswordValidator",
+        "SecurityMonitor",
+        "cspManager",
+        "domSanitizer",
+        "inputValidator",
+        "passwordValidator",
+        "securityMonitor",
+        "generateCSPHeader",
+        "sanitizeHTML",
+        "sanitizeText",
+        "sanitizeURL",
+        "validateInput",
+        "sanitizeInput",
+        "validatePassword",
+        "logSecurityEvent"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 12,
+      "category": "Keep/Archive"
+    },
+    {
+      "file": "client/src/components/mobile/mobile-optimized-forms.tsx",
+      "loc": 777,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "MobileInput",
+        "MobilePasswordInput",
+        "MobileSearchInput",
+        "MobileSelect",
+        "MobileTextarea",
+        "MobileForm"
+      ],
+      "tests": [
+        "client\\src\\components\\mobile\\__tests__\\mobile-optimized-forms.test.tsx"
+      ],
+      "todos": [],
+      "score": 12,
+      "category": "Keep/Archive"
+    },
+    {
+      "file": "client/src/services/privacyAnalyticsService.ts",
+      "loc": 1353,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "privacyAnalyticsService",
+        "analyticsUtils",
+        "useAnalytics",
+        "withAnalytics",
+        "trackMethod",
+        "privacyAnalyticsService",
+        "export",
+        "PrivacyAnalyticsService"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 11,
+      "category": "Keep/Archive"
+    },
+    {
+      "file": "client/src/core/api/websocket.ts",
+      "loc": 1211,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "BillsWebSocketConfig",
+        "BillStatusUpdate",
+        "BillEngagementUpdate",
+        "BillAmendmentUpdate",
+        "BillVotingUpdate",
+        "BillRealTimeUpdate",
+        "UnifiedWebSocketManager",
+        "WebSocketConnectionPool",
+        "globalWebSocketPool"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 11,
+      "category": "Keep/Archive"
+    },
+    {
+      "file": "client/src/core/api/bills.ts",
+      "loc": 831,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "BillsSearchParams",
+        "PaginatedBillsResponse",
+        "BillEngagementData",
+        "BillComment",
+        "BillsStats",
+        "BillsApiService",
+        "billsApiService",
+        "SystemHealth",
+        "SystemStats",
+        "SystemActivity",
+        "SystemSchema",
+        "SystemEnvironment",
+        "SystemApiService",
+        "systemApiService"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 11,
+      "category": "Keep/Archive"
+    },
+    {
+      "file": "client/src/store/slices/communitySlice.tsx",
+      "loc": 1143,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "communityKeys",
+        "CommunityUIProvider",
+        "useActivityFeed",
+        "useTrendingTopics",
+        "useExpertInsights",
+        "useCampaigns",
+        "usePetitions",
+        "useCommunityStats",
+        "useLocalImpact",
+        "useCommunityData",
+        "useCommunityRealTimeUpdates",
+        "createCommunityQueryClient",
+        "useCommunitySelectors",
+        "useCommunityStore",
+        "export",
+        "useCommunityUI",
+        "communityApi",
+        "as",
+        "api"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 10,
+      "category": "Keep/Archive"
+    },
+    {
+      "file": "client/src/core/api/notifications.ts",
+      "loc": 891,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "NotificationPriority",
+        "BulkAction",
+        "VapidKeyResponse",
+        "PushSubscriptionPayload",
+        "GetNotificationsOptions",
+        "SendNotificationPayload",
+        "NotificationStats",
+        "BulkOperationResult",
+        "NotificationApiService",
+        "notificationApiService"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 9,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/core/api/user.ts",
+      "loc": 771,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "SavedBillsFilters",
+        "SavedBillsResponse",
+        "EngagementHistoryFilters",
+        "EngagementHistoryResponse",
+        "EngagementAction",
+        "DashboardData",
+        "UserApiService",
+        "userApiService"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 9,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "loc": 763,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "export",
+        "Sidebar",
+        "SidebarContent",
+        "SidebarFooter",
+        "SidebarGroup",
+        "SidebarGroupAction",
+        "SidebarGroupContent",
+        "SidebarGroupLabel",
+        "SidebarHeader",
+        "SidebarInput",
+        "SidebarInset",
+        "SidebarMenu",
+        "SidebarMenuAction",
+        "SidebarMenuBadge",
+        "SidebarMenuButton",
+        "SidebarMenuItem",
+        "SidebarMenuSkeleton",
+        "SidebarMenuSub",
+        "SidebarMenuSubButton",
+        "SidebarMenuSubItem",
+        "SidebarProvider",
+        "SidebarRail",
+        "SidebarSeparator",
+        "SidebarTrigger",
+        "useSidebar"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 9,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/utils/dev-tools.ts",
+      "loc": 857,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "isDevelopment",
+        "isProduction",
+        "devConfig",
+        "DevServerCheck",
+        "DevelopmentDebugger",
+        "applyDevelopmentOverrides"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 8,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/utils/performance-optimizer.ts",
+      "loc": 829,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "BundleMetrics",
+        "CacheMetrics",
+        "OptimizationRecommendations",
+        "usePerformanceTracking",
+        "useOptimizedCallback",
+        "useMemoryOptimizedState",
+        "lazyWithPreload",
+        "usePerformanceOptimization",
+        "performanceOptimizer"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 8,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/utils/testing.ts",
+      "loc": 801,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "ImportValidator",
+        "MigrationValidator",
+        "ArchitectureValidator",
+        "TestHelpers",
+        "migrationValidator",
+        "validateArchitectureInDev"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 8,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/services/auth-service.ts",
+      "loc": 943,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "AuthService",
+        "authServiceInstance",
+        "export",
+        "authService"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 7,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/services/community-backend-service.ts",
+      "loc": 911,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "communityBackendService",
+        "export",
+        "CommunityBackendService"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 7,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/services/performance-monitoring.ts",
+      "loc": 827,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "performanceMonitoring",
+        "usePerformanceMonitoring",
+        "performanceUtils",
+        "performanceMonitoring"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 7,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/services/bills-data-cache.ts",
+      "loc": 780,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "CacheEntry",
+        "CacheConfig",
+        "CacheStats",
+        "OfflineQueueItem",
+        "billsDataCache"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 7,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/utils/rum-integration.ts",
+      "loc": 858,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "rumService",
+        "rumService"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 6,
+      "category": "Delete"
+    },
+    {
+      "file": "client/src/components/privacy/GDPRComplianceManager.tsx",
+      "loc": 762,
+      "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
+      "exports": [
+        "function"
+      ],
+      "tests": [],
+      "todos": [],
+      "score": 5,
+      "category": "Delete"
+    }
+  ]
+}

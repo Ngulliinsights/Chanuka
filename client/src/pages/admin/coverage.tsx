@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { CoverageDashboard } from '@client/components/coverage/coverage-dashboard';
 import { logger } from '@client/utils/logger';
 

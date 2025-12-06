@@ -1,11 +1,3 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Avatar, AvatarFallback } from '@client/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Progress } from '@client/components/ui/progress';
 import {
   ArrowLeft,
   Users,
@@ -20,6 +12,15 @@ import {
   TrendingUp,
   AlertTriangle
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+import { Avatar, AvatarFallback } from '@client/components/ui/avatar';
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Progress } from '@client/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import { logger } from '@client/utils/logger';
 
 interface CosponsorProps { bill_id?: string;

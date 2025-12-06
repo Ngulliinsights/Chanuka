@@ -1,11 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { Input } from '../ui/input';
-import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { 
   MessageSquare, 
   ChevronUp as ChevronUp, 
@@ -20,6 +12,17 @@ import {
   TrendingUp, 
   Filter 
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { logger } from '@client/utils/logger';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card } from '../ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Separator } from '../ui/separator';
+import { Textarea } from '../ui/textarea';
 // Using a simple date formatting function instead of date-fns
 const formatDistanceToNow = (date: Date) => {
   const now = new Date();
@@ -35,7 +38,7 @@ const formatDistanceToNow = (date: Date) => {
   return date.toLocaleDateString();
 };
 import { useBillAnalysis } from '@client/features/bills/hooks/useBills';
-import { logger } from '@client/utils/logger';
+
 
 interface Comment { id: string;
   user_id: number;

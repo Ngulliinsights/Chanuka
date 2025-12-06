@@ -5,65 +5,76 @@
  * providing a comprehensive set of domain-specific error types.
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from './base-error';
+import { BaseError, ErrorDomain, ErrorSeverity, BaseErrorOptions } from './base-error';
+
+export interface ValidationErrorItem {
+  field?: string;
+  code: string;
+  message: string;
+  value?: unknown;
+}
 
 /**
  * Validation Error - for input validation failures
  * Implements unified validation error interface for compatibility
  */
 export class ValidationError extends BaseError {
-  public readonly errors: Array<{
-    field?: string;
-    code: string;
-    message: string;
-    value?: unknown;
-  }>;
+  public readonly errors: ValidationErrorItem[];
 
   // Unified interface properties for compatibility
   public readonly field?: string;
 
-  constructor(messageOrZodError: string | any, errors?: any[], details?: Record<string, any>) {
+  constructor(
+    messageOrZodError: string | { issues?: unknown[] },
+    errors?: ValidationErrorItem[],
+    details?: Record<string, unknown>
+  ) {
     let message: string;
-    let validationErrors: Array<{
-      field?: string;
-      code: string;
-      message: string;
-      value?: unknown;
-    }>;
+    let validationErrors: ValidationErrorItem[];
 
-    // Handle ZodError input
-    if (typeof messageOrZodError === 'object' && messageOrZodError?.issues) {
+    // Handle ZodError-like input
+    if (
+      typeof messageOrZodError === 'object' &&
+      messageOrZodError !== null &&
+      Array.isArray(messageOrZodError.issues)
+    ) {
       message = 'Validation failed';
-      validationErrors = messageOrZodError.issues.map((issue: any) => ({
-        field: issue.path?.join('.') || '',
-        code: issue.code || 'invalid',
-        message: issue.message || 'Invalid value',
-        value: issue.received
-      }));
+      validationErrors = (messageOrZodError.issues as unknown[]).map((issue) => {
+        const issueObj = issue as Record<string, unknown>;
+        const path = Array.isArray(issueObj.path) ? (issueObj.path as unknown[]).map(String) : undefined;
+        return {
+          field: path ? path.join('.') : undefined,
+          code: typeof issueObj.code === 'string' ? issueObj.code : 'invalid',
+          message: typeof issueObj.message === 'string' ? issueObj.message : 'Invalid value',
+          value: issueObj.received
+        } as ValidationErrorItem;
+      });
     } else {
       // Handle string message + errors array
-      message = messageOrZodError;
+      message = String(messageOrZodError);
       validationErrors = errors || [];
     }
 
-    super(message, {
+    const opts: BaseErrorOptions = {
       statusCode: 400,
       code: 'VALIDATION_ERROR',
       details: {
         errors: validationErrors,
-        ...details
+        ...(details ?? {})
       },
       isOperational: true,
       domain: ErrorDomain.VALIDATION,
       severity: ErrorSeverity.LOW,
-    });
+    };
 
-  this.errors = validationErrors;
+    super(message, opts);
 
-  // Set unified interface properties for compatibility
-  if (validationErrors.length === 1 && validationErrors[0]?.field !== undefined) {
-    this.field = validationErrors[0].field;
-  }
+    this.errors = validationErrors;
+
+    // Set unified interface properties for compatibility
+    if (validationErrors.length === 1 && validationErrors[0]?.field !== undefined) {
+      this.field = validationErrors[0].field;
+    }
   }
 }
 
@@ -71,7 +82,7 @@ export class ValidationError extends BaseError {
  * Not Found Error - for missing resources
  */
 export class NotFoundError extends BaseError {
-  constructor(resource: string, identifier?: string, details?: Record<string, any>) {
+  constructor(resource: string, identifier?: string, details?: Record<string, unknown>) {
     const message = identifier 
       ? `${resource} with id '${identifier}' not found` 
       : `${resource} not found`;
@@ -95,17 +106,21 @@ export class NotFoundError extends BaseError {
  * Unauthorized Error - for authentication failures
  */
 export class UnauthorizedError extends BaseError {
-  constructor(message: string = 'Authentication required', details?: Record<string, any>) {
-    const options: any = {
+  constructor(message: string = 'Authentication required', details?: Record<string, unknown>) {
+    const options: BaseErrorOptions = details !== undefined ? {
+      statusCode: 401,
+      code: 'UNAUTHORIZED',
+      isOperational: true,
+      domain: ErrorDomain.AUTHENTICATION,
+      severity: ErrorSeverity.MEDIUM,
+      details
+    } : {
       statusCode: 401,
       code: 'UNAUTHORIZED',
       isOperational: true,
       domain: ErrorDomain.AUTHENTICATION,
       severity: ErrorSeverity.MEDIUM,
     };
-    if (details !== undefined) {
-      options.details = details;
-    }
     super(message, options);
   }
 }
@@ -117,7 +132,7 @@ export class ForbiddenError extends BaseError {
   constructor(
     message: string = 'Insufficient permissions', 
     requiredPermissions?: string[], 
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message, {
       statusCode: 403,
@@ -140,7 +155,7 @@ export class ConflictError extends BaseError {
   constructor(
     message: string, 
     conflictingResource?: string, 
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message, {
       statusCode: 409,
@@ -163,7 +178,7 @@ export class TooManyRequestsError extends BaseError {
   constructor(
     message: string = 'Too many requests', 
     retryAfter?: number, 
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message, {
       statusCode: 429,
@@ -187,7 +202,7 @@ export class ServiceUnavailableError extends BaseError {
   constructor(
     message: string = 'Service temporarily unavailable', 
     retryAfter?: number, 
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message, {
       statusCode: 503,
@@ -208,7 +223,7 @@ export class ServiceUnavailableError extends BaseError {
  * Database Error - for database-related issues
  */
 export class DatabaseError extends BaseError {
-  constructor(message: string, operation?: string, details?: Record<string, any>) {
+  constructor(message: string, operation?: string, details?: Record<string, unknown>) {
     super(message, {
       statusCode: 500,
       code: 'DATABASE_ERROR',
@@ -232,7 +247,7 @@ export class ExternalServiceError extends BaseError {
     message: string, 
     service?: string, 
     statusCode?: number, 
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message, {
       statusCode: statusCode || 502,
@@ -254,8 +269,16 @@ export class ExternalServiceError extends BaseError {
  * Network Error - for network-related issues
  */
 export class NetworkError extends BaseError {
-  constructor(message: string, details?: Record<string, any>) {
-    const options: any = {
+  constructor(message: string, details?: Record<string, unknown>) {
+    const options: BaseErrorOptions = details !== undefined ? {
+      statusCode: 503,
+      code: 'NETWORK_ERROR',
+      isOperational: true,
+      domain: ErrorDomain.NETWORK,
+      severity: ErrorSeverity.HIGH,
+      retryable: true,
+      details
+    } : {
       statusCode: 503,
       code: 'NETWORK_ERROR',
       isOperational: true,
@@ -263,9 +286,6 @@ export class NetworkError extends BaseError {
       severity: ErrorSeverity.HIGH,
       retryable: true,
     };
-    if (details !== undefined) {
-      options.details = details;
-    }
     super(message, options);
   }
 }
@@ -274,7 +294,7 @@ export class NetworkError extends BaseError {
  * Cache Error - for caching-related issues
  */
 export class CacheError extends BaseError {
-  constructor(message: string, operation?: string, details?: Record<string, any>) {
+  constructor(message: string, operation?: string, details?: Record<string, unknown>) {
     super(message, {
       statusCode: 500,
       code: 'CACHE_ERROR',
@@ -298,20 +318,18 @@ export class LegacyError extends BaseError {
     message: string,
     statusCode: number = 500,
     code?: string,
-    details?: any,
+    details?: Record<string, unknown>,
     isOperational: boolean = true
   ) {
-    const options: any = {
+    const options: BaseErrorOptions = {
       statusCode,
       code: code || 'APP_ERROR',
       isOperational,
       domain: ErrorDomain.SYSTEM,
       severity: statusCode >= 500 ? ErrorSeverity.HIGH : ErrorSeverity.MEDIUM,
     };
-    if (details !== undefined) {
-      options.details = details;
-    }
-    super(message, options);
+    const finalOptions: BaseErrorOptions = details !== undefined ? { ...options, details } : options;
+    super(message, finalOptions);
   }
 }
 

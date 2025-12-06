@@ -7,9 +7,18 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@client/hooks/use-toast';
+import { Star, Bell, Eye, Share2, MessageSquare, TrendingUp, Calendar, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Label } from '@client/components/ui/label';
+import { Separator } from '@client/components/ui/separator';
+import { Switch } from '@client/components/ui/switch';
 import { useSafeQuery } from '@client/hooks/use-safe-query';
-import AuthenticatedAPI from '@client/utils/authenticated-api';
+import { useToast } from '@client/hooks/use-toast';
+import { AuthenticatedAPI } from '@client/utils/api';
 import { logger } from '@client/utils/logger';
 
 interface Bill {

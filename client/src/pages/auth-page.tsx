@@ -6,9 +6,14 @@
  * and security features.
  */
 
+import { AlertTriangle, CheckCircle, ArrowLeft, Shield, Mail } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AlertTriangle, CheckCircle, ArrowLeft, Shield, Mail } from 'lucide-react';
+
+import { RegisterForm } from '@client/components/auth/ui/RegisterForm';
+import { LoginForm } from '@client/components/shared/auth/forms';
+import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { Button } from '@client/components/ui/button';
 import {
   Card,
   CardContent,
@@ -16,10 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { LoginForm } from '@client/components/shared/auth/forms';
-import { RegisterForm } from '@client/components/auth/ui/RegisterForm';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { logger } from '@client/utils/logger';
 

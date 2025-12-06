@@ -1,9 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
+import { Settings, CheckCircle, Clock, HelpCircle, TrendingUp, Database, FileText, Shield, Server } from 'lucide-react';
+
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
-import { Settings, CheckCircle, Clock, HelpCircle, TrendingUp, Database, FileText, Shield, Server } from 'lucide-react';
+
 
 interface EnvironmentSetupProps {
   environment?: any;

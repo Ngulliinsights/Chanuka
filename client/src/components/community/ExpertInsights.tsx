@@ -9,12 +9,7 @@
  * - Compact and full view modes
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Progress } from '../ui/progress';
+import { formatDistanceToNow } from 'date-fns';
 import { 
   ThumbsUp, 
   ThumbsDown, 
@@ -30,10 +25,18 @@ import {
   FileText,
   Link as LinkIcon
 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { cn } from '@client/lib/utils';
 import { ExpertInsight } from '@client/types/community';
+
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
 import { ExpertBadge } from '../verification/ExpertBadge';
-import { formatDistanceToNow } from 'date-fns';
+
 
 interface ExpertInsightsProps {
   insights: ExpertInsight[];

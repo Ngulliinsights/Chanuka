@@ -1,10 +1,15 @@
+import { UserRole } from '@clien/types/navigation';
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  Users, 
+  Clock, 
+  Target, 
+  AlertTriangle,
+  Download,
+  RefreshCw
+} from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { 
   BarChart, 
   Bar, 
@@ -21,20 +26,20 @@ import {
   FunnelChart,
   Funnel
 } from 'recharts';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  Clock, 
-  Target, 
-  AlertTriangle,
-  Download,
-  RefreshCw
-} from 'lucide-react';
-import { useJourneyAnalytics } from '@/hooks/use-journey-tracker';
+
 import { JourneyAnalytics, JourneyOptimization, PathAnalytics, DropOffPoint, ConversionFunnel } from '@client/services/UserJourneyTracker';
-import { UserRole } from '@clien/types/navigation';
 import { logger } from '@client/utils/logger';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+
+import { useJourneyAnalytics } from '@/hooks/use-journey-tracker';
+
 
 interface JourneyAnalyticsDashboardProps {
   className?: string;

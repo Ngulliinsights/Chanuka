@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+
 import { UserDashboard } from '@client/components/shared/dashboard';
 import { SmartDashboard } from '@client/components/enhanced-user-flows/SmartDashboard';
 import { RealTimeDashboard } from '@client/components/realtime/RealTimeDashboard';

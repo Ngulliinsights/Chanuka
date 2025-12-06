@@ -1,12 +1,13 @@
-import React from 'react';
-import { Card, CardContent } from '@client/components/ui/card';
-import { Badge } from '@client/components/ui/badge';
 import {
   Bookmark,
   TrendingUp,
   MessageSquare,
   Award
 } from 'lucide-react';
+import React from 'react';
+
+import { Badge } from '@client/components/ui/badge';
+import { Card, CardContent } from '@client/components/ui/card';
 import { UserDashboardData } from '@client/types/user-dashboard';
 
 interface StatsSectionProps {

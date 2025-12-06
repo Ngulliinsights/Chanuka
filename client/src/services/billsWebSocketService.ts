@@ -14,8 +14,9 @@
  * This file will be removed in a future version.
  */
 
-import { globalWebSocketPool } from '@client/core/api/websocket';
 import { useQueryClient } from '@tanstack/react-query';
+
+import { globalWebSocketPool } from '@client/core/api/websocket';
 import { logger } from '@client/utils/logger';
 
 // ============================================================================

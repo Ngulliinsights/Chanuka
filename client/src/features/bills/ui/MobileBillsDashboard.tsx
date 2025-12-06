@@ -13,8 +13,6 @@
  * - Responsive data visualizations
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   FileText,
   Search,
@@ -27,29 +25,49 @@ import {
   Share2,
   MessageCircle
 } from 'lucide-react';
-import {
-  MobileLayout,
-  MobileContainer,
-  MobileSection,
-  MobileGrid,
-  useBottomSheet,
-  InfiniteScroll,
-  useInfiniteScroll,
-  MobileTabSelector,
-  useMobileTabs,
-  MobileMetricCard,
-  MobileBarChart,
-  type MobileTab,
-  type ChartData
-} from '@client/mobile';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+// TODO: Implement mobile components
+// import {
+//   MobileLayout,
+//   MobileContainer,
+//   MobileSection,
+//   MobileGrid,
+//   useBottomSheet,
+//   InfiniteScroll,
+//   useInfiniteScroll,
+//   MobileTabSelector,
+//   useMobileTabs,
+//   MobileMetricCard,
+//   MobileBarChart,
+//   type MobileTab,
+//   type ChartData
+// } from '@client/mobile';
+
+// Simple fallback components
+const MobileLayout = ({ children }: { children: React.ReactNode }) => <div className="mobile-layout">{children}</div>;
+const MobileContainer = ({ children }: { children: React.ReactNode }) => <div className="mobile-container">{children}</div>;
+const MobileSection = ({ children }: { children: React.ReactNode }) => <div className="mobile-section">{children}</div>;
+const MobileGrid = ({ children }: { children: React.ReactNode }) => <div className="mobile-grid">{children}</div>;
+const useBottomSheet = () => ({ isOpen: false, open: () => {}, close: () => {} });
+const InfiniteScroll = ({ children, onLoadMore }: { children: React.ReactNode; onLoadMore: () => void }) => <div>{children}</div>;
+const useInfiniteScroll = () => ({ hasNextPage: false, fetchNextPage: () => {}, isFetchingNextPage: false });
+const MobileTabSelector = ({ tabs, activeTab, onTabChange }: any) => <div>Tab Selector</div>;
+const useMobileTabs = (tabs: any[]) => ({ activeTab: tabs[0]?.id || '', setActiveTab: () => {} });
+const MobileMetricCard = ({ title, value }: { title: string; value: string | number }) => <div>{title}: {value}</div>;
+const MobileBarChart = ({ data }: { data: any }) => <div>Bar Chart</div>;
+
+type MobileTab = { id: string; label: string; };
+type ChartData = any;
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Input } from '@client/components/ui/input';
+import { Bill, BillStatus, UrgencyLevel, ComplexityLevel } from '@client/core/api/types';
 import { cn } from '@client/lib/utils';
+
 // Using mock data for now - can be replaced with useBills hook when needed
 // import { useBills } from '@client/features/bills/hooks/useBills';
-import { Bill, BillStatus, UrgencyLevel, ComplexityLevel } from '@client/core/api/types';
 import { Heart } from 'lucide-react';
 
 

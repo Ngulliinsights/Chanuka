@@ -1,7 +1,8 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Button } from '../ui/button';
+
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 
 interface QuickAccessItem {

@@ -5,14 +5,19 @@
  * This component can be used as a reference or directly in bill detail pages.
  */
 
-import React, { useState } from 'react';
-import { MessageSquare, Users, AlertCircle } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Alert, AlertDescription } from '../ui/alert';
-import { DiscussionThread } from './DiscussionThread';
 import { useDiscussion } from '@client/hooks/useDiscussion';
+import { MessageSquare, Users, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { cn } from '@client/lib/utils';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+
+import { DiscussionThread } from './DiscussionThread';
+
+
 
 interface DiscussionIntegrationProps {
   billId: number;

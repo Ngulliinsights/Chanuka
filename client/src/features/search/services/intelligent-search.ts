@@ -13,6 +13,7 @@
  */
 
 import Fuse, { type IFuseOptions } from 'fuse.js';
+
 import { searchApiClient } from '../../../core/api/search';
 import { logger } from '../../../utils/logger';
 import type { SearchResult, SearchMetadata } from '../types';

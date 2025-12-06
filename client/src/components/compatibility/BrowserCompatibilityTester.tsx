@@ -6,8 +6,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { runBrowserCompatibilityTests, CompatibilityTestSuite } from '@client/utils/browser-compatibility-tests';
+
+import { runBrowserCompatibilityTests, CompatibilityTestSuite } from '@/utils/browser';
 import { logger } from '@client/utils/logger';
+
 
 interface BrowserCompatibilityTesterProps {
   onTestComplete?: (results: CompatibilityTestSuite) => void;

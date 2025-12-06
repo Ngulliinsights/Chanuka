@@ -6,6 +6,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import {
   CivicWebSocketState,
   BillRealTimeUpdate,

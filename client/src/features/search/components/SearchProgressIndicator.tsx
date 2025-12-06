@@ -5,11 +5,6 @@
  * engine performance metrics, and cancellation controls.
  */
 
-import React from 'react';
-import { Card, CardContent } from '../../../components/ui/card';
-import { Button } from '../../../components/ui/button';
-import { Progress } from '../../../components/ui/progress';
-import { Badge } from '../../../components/ui/badge';
 import {
   Loader2,
   X,
@@ -20,6 +15,12 @@ import {
   Search,
   Target
 } from 'lucide-react';
+import React from 'react';
+
+import { Badge } from '../../../components/ui/badge';
+import { Button } from '../../../components/ui/button';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Progress } from '../../../components/ui/progress';
 import { cn } from '../../../lib/utils';
 
 // Define SearchProgress type locally

@@ -3,12 +3,6 @@
  * Transparent reporting of how user data is collected, used, and shared
  */
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import {
   Database,
   BarChart3,
@@ -21,12 +15,21 @@ import {
   Trash,
   RefreshCw
 } from 'lucide-react';
-import { Globe } from '../icons/SimpleIcons';
+import { useState, useEffect } from 'react';
+
+import { useAuth } from '@client/features/users/hooks';
 import { dataRetentionService, retentionUtils } from '@client/services/dataRetentionService';
 import { privacyAnalyticsService } from '@client/services/privacyAnalyticsService';
-import { privacyCompliance } from '@client/utils/privacy-compliance';
-import { useAuth } from '@client/features/users/hooks';
 import { logger } from '@client/utils/logger';
+import { privacyCompliance } from '@client/utils/privacy-compliance';
+
+import { Globe } from '../icons/SimpleIcons';
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
 
 interface DataUsageStats {
   totalDataPoints: number;

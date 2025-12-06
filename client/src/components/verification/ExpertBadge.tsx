@@ -1,9 +1,11 @@
-import { UnifiedBadge } from '../ui/unified-components';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { Shield, Award, CheckCircle, User, Star, Building } from 'lucide-react';
-import { GraduationCap } from '../icons/SimpleIcons';
+
 import { cn } from '@client/lib/utils';
 import { ExpertVerificationType } from '@client/types/expert';
+
+import { GraduationCap } from '../icons/SimpleIcons';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { UnifiedBadge } from '../ui/unified-components';
 
 interface ExpertBadgeProps {
   verificationType: ExpertVerificationType;

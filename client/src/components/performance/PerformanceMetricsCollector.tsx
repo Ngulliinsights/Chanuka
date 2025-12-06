@@ -5,13 +5,14 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
+
 import {
   performanceOptimizer,
   usePerformanceOptimization,
   BundleMetrics,
   CacheMetrics,
   OptimizationRecommendations,
-} from '@client/utils/performance-optimizer';
+} from '@client/utils/performance';
 
 interface PerformanceMetricsProps {
   showDetails?: boolean;

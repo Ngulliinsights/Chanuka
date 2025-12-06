@@ -1,9 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Alert, AlertDescription } from '../ui/alert';
 import { 
   Network, 
   ZoomIn, 
@@ -13,6 +7,13 @@ import {
   Info,
   AlertTriangle
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface ConflictNode {
   id: string;
@@ -147,8 +148,8 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({ bil
     });
 
     // Simple clustering for sponsors and organizations
-    let sponsorX = width * 0.2;
-    let orgX = width * 0.8;
+    const sponsorX = width * 0.2;
+    const orgX = width * 0.8;
     let yOffset = 0;
 
     nodes.forEach((node) => {

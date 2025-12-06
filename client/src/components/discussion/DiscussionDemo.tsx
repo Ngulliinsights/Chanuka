@@ -5,13 +5,18 @@
  * the discussion system into a bill detail page.
  */
 
-import React, { useState } from 'react';
-import { MessageSquare, Users, Settings } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { DiscussionIntegration } from './DiscussionIntegration';
 import { useDiscussion } from '@client/hooks/useDiscussion';
+import { MessageSquare, Users, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { cn } from '@client/lib/utils';
+
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+
+import { DiscussionIntegration } from './DiscussionIntegration';
+
+
 
 interface DiscussionDemoProps {
   className?: string;

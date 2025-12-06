@@ -10,7 +10,8 @@
 
 import { useQuery, useQueries, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { useRef, useCallback, useEffect, useMemo } from 'react';
-import AuthenticatedAPI, { APIResponse } from '@client/utils/authenticated-api';
+
+import { AuthenticatedAPI, APIResponse } from '@client/utils/api';
 import { logger } from '@client/utils/logger';
 
 export interface SafeQueryOptions<T> extends Omit<UseQueryOptions<T>, 'queryFn'> {

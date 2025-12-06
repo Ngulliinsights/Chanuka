@@ -1,8 +1,9 @@
-import { globalApiClient as api } from './index';
 import type {
   SearchRequest,
   SaveSearchRequest
 } from '@client/features/search/types';
+
+import { globalApiClient as api } from './index';
 
 /**
  * Search API Client - Core API wrapper for search endpoints

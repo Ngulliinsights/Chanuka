@@ -5,14 +5,6 @@
  * and integration examples for development and testing.
  */
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Alert, AlertDescription } from '../ui/alert';
-import { RealTimeEngagementDashboard } from './real-time-engagement-dashboard';
-import { generateMockEngagementData } from '@client/hooks/useRealTimeEngagement';
 import { 
   Play, 
   Pause, 
@@ -24,7 +16,19 @@ import {
   TrendingUp,
   Award
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { generateMockEngagementData } from '@client/hooks/useRealTimeEngagement';
 import { cn } from '@client/lib/utils';
+
+import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
+import { RealTimeEngagementDashboard } from './real-time-engagement-dashboard';
+
 
 interface RealTimeEngagementDemoProps {
   className?: string;

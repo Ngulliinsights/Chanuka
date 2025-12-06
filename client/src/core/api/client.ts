@@ -9,8 +9,7 @@ import {
   UnifiedApiClient
 } from './types';
 import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
-import { globalCache, CacheKeyGenerator } from './cache';
-import { globalConfig } from './config';
+
 import { logger } from '../../utils/logger';
 // Note: validationService import removed as it's not available
 
@@ -199,7 +198,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       }
 
       // Build and prepare the request
-      let request = await this.buildRequest(method, endpoint, data, options, requestId);
+      const request = await this.buildRequest(method, endpoint, data, options, requestId);
 
       // Execute request with circuit breaker and retry logic
       const response = await this.executeRequestWithResilience<T>(
@@ -887,4 +886,6 @@ globalApiClient.addResponseInterceptor(new LoggingResponseInterceptor());
 
 // Initialize auth service with the API client to break circular dependency
 import { createAuthApiService } from './auth';
+import { globalCache, CacheKeyGenerator } from './cache';
+import { globalConfig } from './config';
 export const authApiService = createAuthApiService(globalApiClient);

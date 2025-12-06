@@ -1,8 +1,10 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
 import { Shield, Eye, Clock, Users, Network } from 'lucide-react';
+import React from 'react';
+
 import { logger } from '@client/utils/logger';
+
+import { Badge } from '../ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 export function PrivacyPolicy() {
   return (

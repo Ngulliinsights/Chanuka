@@ -1,13 +1,14 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import {
   Bookmark,
   TrendingUp
 } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import { Badge } from '@client/components/ui/badge';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 import { TrackedBill, BillRecommendation } from '@client/types/user-dashboard';
 
 interface BillsSectionProps {

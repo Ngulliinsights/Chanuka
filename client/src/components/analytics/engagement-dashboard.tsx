@@ -1,22 +1,18 @@
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Eye,
+  MessageSquare,
+  Share2,
+  Activity,
+  AlertTriangle,
+  Download,
+  Filter,
+  Calendar,
+  BarChart3,
+} from "lucide-react";
 import React, { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Button } from "../ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { Badge } from "../ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Alert, AlertDescription } from "../ui/alert";
 import {
   BarChart,
   Bar,
@@ -33,21 +29,29 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import {
-  TrendingUp,
-  TrendingDown,
-  Users,
-  Eye,
-  MessageSquare,
-  Share2,
-  Activity,
-  AlertTriangle,
-  Download,
-  Filter,
-  Calendar,
-  BarChart3,
-} from "lucide-react";
+
 import { logger } from '@client/utils/logger';
+
+import { Alert, AlertDescription } from "../ui/alert";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+
+
 
 interface EngagementMetrics {
   totalViews: number;

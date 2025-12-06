@@ -8,9 +8,11 @@
  * - Implement single-flight pattern for AI requests
  */
 
-import { Request, Response, NextFunction } from 'express';
-import { getDefaultCache } from '../cache';
 import { performance } from 'perf_hooks';
+
+import { Request, Response, NextFunction } from 'express';
+
+import { getDefaultCache } from '../cache';
 import { logger } from '../observability/logging';
 
 export interface DeduplicationOptions {
@@ -18,12 +20,12 @@ export interface DeduplicationOptions {
   ttl?: number; // Time to live for deduplication cache
   keyGenerator?: (req: Request) => string;
   skipCondition?: (req: Request) => boolean;
-  onDuplicate?: (req: Request, res: Response, originalResult: any) => void;
+  onDuplicate?: (req: Request) => void;
   enableMetrics?: boolean;
 }
 
 interface PendingRequest {
-  promise: Promise<any>;
+  promise: Promise<unknown>;
   startTime: number;
   requestCount: number;
   requestIds: string[];
@@ -68,9 +70,9 @@ export class AIDeduplicationMiddleware {
         const cachedResult = await this.cache.get(deduplicationKey);
         if (cachedResult) {
           this.recordMetrics('cache_hit', deduplicationKey);
-          this.options.onDuplicate(req, res, cachedResult);
+          this.options.onDuplicate(req);
           return res.json({
-            ...cachedResult,
+            ...(cachedResult as Record<string, unknown>),
             _deduplicated: true,
             _source: 'cache'
           });
@@ -95,9 +97,9 @@ export class AIDeduplicationMiddleware {
           try {
             // Wait for the original request to complete
             const result = await pendingRequest.promise;
-            this.options.onDuplicate(req, res, result);
+            this.options.onDuplicate(req);
             return res.json({
-              ...result,
+              ...(result as Record<string, unknown>),
               _deduplicated: true,
               _source: 'pending',
               _requestId: requestId
@@ -109,7 +111,7 @@ export class AIDeduplicationMiddleware {
         }
 
         // No cached result and no pending request - create new pending request
-        const pendingPromise = this.createPendingRequest(req, res, next, deduplicationKey, requestId);
+        const pendingPromise = this.createPendingRequest(res, next, deduplicationKey);
         
         this.pendingRequests.set(deduplicationKey, {
           promise: pendingPromise,
@@ -148,7 +150,7 @@ export class AIDeduplicationMiddleware {
       let _responseData: any = null;
       let responseSent = false;
 
-      res.json = function(data: any) {
+      res.json = function(data: unknown) {
         if (!responseSent) {
           _responseData = data;
           responseSent = true;
@@ -169,7 +171,7 @@ export class AIDeduplicationMiddleware {
         return originalJson.call(this, data);
       };
 
-      res.send = function(data: any) {
+      res.send = function(data: unknown) {
         if (!responseSent) {
           _responseData = data;
           responseSent = true;
@@ -203,11 +205,11 @@ export class AIDeduplicationMiddleware {
     const path = req.path;
     const query = JSON.stringify(req.query, Object.keys(req.query).sort());
     const body = req.body ? JSON.stringify(req.body, Object.keys(req.body).sort()) : '';
-    const user_id = (req as any).user?.id || 'anonymous';
+    const user_id = (req as { user?: { id: string } }).user?.id || 'anonymous';
 
     // Create a hash of the request content
     const content = `${method }:${path}:${query}:${body}:${ user_id }`;
-    return `ai_dedup:${this.hashString(content)}`;
+    return `ai_deduplication:${this.hashString(content)}`;
   }
 
   /**
@@ -216,7 +218,7 @@ export class AIDeduplicationMiddleware {
   private defaultOnDuplicate = (req: Request, _res: Response, originalResult: any): void => {
     logger.info('AI Request Served from Deduplication', { component: 'Chanuka' }, { path: req.path,
       method: req.method,
-      user_id: (req as any).user?.id,
+      user_id: (req as { user?: { id: string } }).user?.id,
       ip: req.ip
      });
   }
@@ -261,12 +263,12 @@ export class AIDeduplicationMiddleware {
   getStats(): {
     pendingRequests: number;
     pendingKeys: string[];
-    cacheSize?: number;
+    cacheSize?: number | undefined;
   } {
     return {
       pendingRequests: this.pendingRequests.size,
       pendingKeys: Array.from(this.pendingRequests.keys()),
-      cacheSize: undefined as any // Would need cache adapter support
+      cacheSize: undefined // Would need cache adapter support
     };
   }
 
@@ -327,11 +329,11 @@ export function createServiceDeduplicationMiddleware(
       const operation = req.path.split('/').pop() || 'unknown';
       const query = JSON.stringify(req.query, Object.keys(req.query).sort());
       const body = req.body ? JSON.stringify(req.body, Object.keys(req.body).sort()) : '';
-      const user_id = (req as any).user?.id || 'anonymous';
+      const user_id = (req as { user?: { id: string } }).user?.id || 'anonymous';
 
       const content = `${service }:${operation}:${query}:${body}:${ user_id }`;
       const hash = hashString(content);
-      return `ai_dedup:${service}:${hash}`;
+      return `ai_deduplication:${service}:${hash}`;
     }
   });
 }

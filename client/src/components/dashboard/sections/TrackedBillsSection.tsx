@@ -4,10 +4,7 @@
  * Displays user's tracked bills with status updates and engagement metrics.
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Badge } from '../../ui/badge';
+import { formatDistanceToNow } from 'date-fns';
 import { 
   BookOpen, 
   Bell, 
@@ -20,9 +17,16 @@ import {
   Clock,
   TrendingUp
 } from 'lucide-react';
-import { TrackedBill } from '@client/types/user-dashboard';
+import React from 'react';
+
 import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
-import { formatDistanceToNow } from 'date-fns';
+import { TrackedBill } from '@client/types/user-dashboard';
+
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+
+
 
 interface TrackedBillsSectionProps {
   bills: TrackedBill[];

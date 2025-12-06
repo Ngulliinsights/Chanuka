@@ -1,4 +1,5 @@
 import { ProgressiveDisclosureNavigation } from './ProgressiveDisclosureNavigation';
+
 import type { NavigationSection, ReadingPath } from '@/core/navigation/hooks/useProgressiveDisclosure';
 
 // Demo component to test Progressive Disclosure Navigation

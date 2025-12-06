@@ -1,4 +1,3 @@
-import React, { useState, useCallback, useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { 
   ChevronUp, 
@@ -11,8 +10,13 @@ import {
   Shield,
   AlertTriangle
 } from 'lucide-react';
-import { Button } from '../ui/button';
+import React, { useState, useCallback, useMemo } from 'react';
+
+import { cn } from '@client/lib/utils';
+import { Comment, ModerationViolationType } from '@client/types/community';
+
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -21,8 +25,7 @@ import {
   DropdownMenuSeparator
 } from '../ui/dropdown-menu';
 import { ExpertBadge } from '../verification/ExpertBadge';
-import { cn } from '@client/lib/utils';
-import { Comment, ModerationViolationType } from '@client/types/community';
+
 
 interface CommentItemProps {
   comment: Comment;

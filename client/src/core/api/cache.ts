@@ -26,8 +26,8 @@
  * @module UnifiedCaching
  */
 
-import { CacheConfig, CacheEntry } from './types';
 import { globalErrorHandler } from './errors';
+import { CacheConfig, CacheEntry } from './types';
 
 // ============================================================================
 // Persistent Storage Adapters
@@ -522,7 +522,7 @@ export class UnifiedCacheManager {
   async get<T>(key: string): Promise<T | null> {
     try {
       // Check memory cache first (fastest path)
-      let entry = this.memoryCache.get(key);
+      const entry = this.memoryCache.get(key);
       
       if (entry && !this.isExpired(entry)) {
         // Update access tracking for LRU eviction

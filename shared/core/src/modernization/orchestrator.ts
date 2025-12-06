@@ -1,5 +1,11 @@
 import { EventEmitter } from 'events';
 import { UnifiedLogger } from '../observability/logging';
+
+import { AnalysisEngine } from './analysis';
+import { BackupManager } from './backup';
+import { ProgressTracker } from './progress';
+import { ValidationFramework } from './validation';
+
 import { 
   ModernizationTask,
   ModernizationPhase,
@@ -12,10 +18,6 @@ import {
   BackupResult,
   AnalysisResult
 } from './types';
-import { AnalysisEngine } from './analysis';
-import { BackupManager } from './backup';
-import { ProgressTracker } from './progress';
-import { ValidationFramework } from './validation';
 // Lightweight logger interface matching project's meta-first logging usage
 type LoggerLike = {
   info: (meta: unknown, message?: string) => void;
@@ -91,7 +93,7 @@ export class ModernizationOrchestrator extends EventEmitter {
         persistState: this.config.progress.persistState,
         notifications: this.config.progress.notifications
       },
-      logger: this.logger as any
+      logger: this.logger as unknown as UnifiedLogger
     });
 
     this.validationFramework = new ValidationFramework({
@@ -103,8 +105,7 @@ export class ModernizationOrchestrator extends EventEmitter {
         failFast: this.config.validation.failFast,
         types: this.config.validation.types
       },
-      logger: this.logger as any,
-      workingDirectory: this.workingDirectory
+      logger: this.logger as unknown as UnifiedLogger
     });
     
     this.setupEventHandlers();

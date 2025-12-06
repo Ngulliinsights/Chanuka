@@ -3,10 +3,11 @@
  * Specialized hook for tracked topics functionality
  */
 
-import { useState, useCallback } from 'react';
 import type { TrackedTopic, TopicCategory } from '@client/types';
-import { validateTrackedTopic } from '@client/validation';
+import { useState, useCallback } from 'react';
+
 import { DashboardTopicError } from '@client/errors';
+import { validateTrackedTopic } from '@client/validation';
 
 export interface UseDashboardTopicsResult {
   topics: TrackedTopic[];
