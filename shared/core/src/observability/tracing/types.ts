@@ -17,14 +17,14 @@ export interface TraceContext {
 export interface SpanContext {
   traceId: string;
   spanId: string;
-  parentSpanId?: string;
+  parentSpanId?: string | undefined;
   name: string;
   kind: SpanKind;
   startTime: Date;
-  endTime?: Date;
-  duration?: number;
+  endTime?: Date | undefined;
+  duration?: number | undefined;
   status: SpanStatus;
-  statusMessage?: string;
+  statusMessage?: string | undefined;
   attributes: Record<string, string | number | boolean>;
   events: SpanEvent[];
   links: SpanLink[];

@@ -1,39 +1,49 @@
 /**
  * Error Message Component
- * Reusable error display with retry functionality
+ * 
+ * A component for displaying error messages with retry functionality
  */
 
-import React from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import { Button } from './button';
-import { Alert, AlertDescription } from './alert';
+import * as React from "react"
 
-interface ErrorMessageProps {
-  message: string;
-  onRetry?: () => void;
-  className?: string;
+import { AlertCircle, RefreshCw } from "lucide-react"
+
+import { cn } from "@client/lib/utils"
+
+import { Button } from "./button"
+import { Card, CardContent } from "./card"
+
+interface ErrorMessageProps extends React.HTMLAttributes<HTMLDivElement> {
+  message: string
+  onRetry?: () => void
+  showRetry?: boolean
 }
 
-export function ErrorMessage({ message, onRetry, className }: ErrorMessageProps) {
-  return (
-    <Alert className={className} variant="destructive">
-      <AlertCircle className="h-4 w-4" />
-      <AlertDescription className="flex items-center justify-between">
-        <span>{message}</span>
-        {onRetry && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRetry}
-            className="ml-4"
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Retry
-          </Button>
-        )}
-      </AlertDescription>
-    </Alert>
-  );
-}
+const ErrorMessage = React.forwardRef<HTMLDivElement, ErrorMessageProps>(
+  ({ className, message, onRetry, showRetry = true, ...props }, ref) => {
+    return (
+      <Card ref={ref} className={cn("border-red-200 bg-red-50", className)} {...props}>
+        <CardContent className="flex items-center justify-center p-6">
+          <div className="text-center space-y-4">
+            <div className="flex justify-center">
+              <AlertCircle className="h-12 w-12 text-red-500" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-red-900 mb-2">Something went wrong</h3>
+              <p className="text-red-700">{message}</p>
+            </div>
+            {showRetry && onRetry && (
+              <Button onClick={onRetry} variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Again
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+)
+ErrorMessage.displayName = "ErrorMessage"
 
-export default ErrorMessage;
+export { ErrorMessage }

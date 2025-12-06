@@ -18,10 +18,12 @@ import {
   HealthStatus,
   CacheOperationOptions
 } from './interfaces';
-import {
+/*
+import { // Unused import
   CacheService,
   CacheAdapterConfig
 } from './core/interfaces';
+*/
 import { createCacheService } from './factory';
 
 /**

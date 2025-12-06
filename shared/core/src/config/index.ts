@@ -6,9 +6,10 @@
  */
 
 import { EventEmitter } from 'events';
-import * as chokidar from 'chokidar';
+// import * as chokidar from 'chokidar';
+// Unused import
 import { config as dotenvConfig } from 'dotenv';
-import { existsSync, readFileSync, watchFile } from 'fs';
+import { existsSync, watchFile } from 'fs';
 import { resolve } from 'path';
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
 // import { logger } from '../observability/logging'; // Unused import
@@ -35,7 +36,7 @@ export class ConfigManager extends EventEmitter {
     watchingFiles: [],
     dependencyStatus: {},
   };
-  private validationCache = new Map<string, boolean>();
+  private _validationCache = new Map<string, boolean>();
   private hotReloadConfig: HotReloadConfig = {
     enabled: false,
     debounceMs: 1000,
@@ -55,10 +56,10 @@ export class ConfigManager extends EventEmitter {
     try {
       // Load environment variables with cascading priority
       this.loadEnvironmentFiles();
-      
+
       // Parse and validate configuration
       const parsed = configSchema.safeParse(this.buildConfigFromEnv());
-      
+
       if (!parsed.success) {
         const errors = parsed.error.errors.map(err => ({
           path: err.path.join('.'),
@@ -66,30 +67,30 @@ export class ConfigManager extends EventEmitter {
           code: err.code,
           received: 'received' in err ? err.received : undefined,
         }));
-        
+
         const errorMessage = `Configuration validation failed: ${errors.map(e => `${e.path}: ${e.message}`).join(', ')}`;
         const error = new Error(errorMessage) as any;
         error.validationErrors = errors;
-        
+
         this.emit('config:error', error);
-        
+
         if (this.options.failFast !== false) {
           throw error;
         }
       }
-      
+
       const previousConfig = this._config;
       this._config = parsed.success ? parsed.data : this.getDefaultConfig();
-      
+
       // Update state
       this._state.loaded = true;
       this._state.valid = parsed.success;
       this._state.lastLoaded = new Date();
       this._state.lastValidated = new Date();
-      
+
       // Emit events
       this.emit('config:loaded', this._config);
-      
+
       if (previousConfig) {
         const changes = this.detectChanges(previousConfig, this._config);
         if (changes.length > 0) {
@@ -101,17 +102,17 @@ export class ConfigManager extends EventEmitter {
           });
         }
       }
-      
+
       // Validate runtime dependencies if enabled
       if (this.options.validateDependencies !== false) {
         await this.validateRuntimeDependencies();
       }
-      
+
       // Set up hot reloading in development
       if (this._config.app.environment === 'development' && this.options.enableHotReload !== false) {
         this.setupHotReload();
       }
-      
+
       return this._config;
     } catch (error) {
       this.emit('config:error', error);
@@ -153,27 +154,27 @@ export class ConfigManager extends EventEmitter {
     if (!feature.enabled) {
       return { enabled: false, reason: 'disabled' };
     }
-    
+
     // Check if user is specifically enabled
     if (context?.user_id && feature.enabledForUsers.includes(context.user_id)) {
       const result = { enabled: true, reason: 'user_targeting' as const, rolloutPercentage: 100 };
       this.emit('feature:evaluated', featureName, result, context);
       return result;
     }
-    
+
     // Check rollout percentage
     if (feature.rolloutPercentage < 100) {
       const hash = this.hashString(`${featureName}-${context?.user_id || context?.session_id || 'anonymous'}`);
       const enabled = (hash % 100) < feature.rolloutPercentage;
-      const result = { 
-        enabled, 
-        reason: 'rollout' as const, 
-        rolloutPercentage: feature.rolloutPercentage 
+      const result = {
+        enabled,
+        reason: 'rollout' as const,
+        rolloutPercentage: feature.rolloutPercentage
       };
       this.emit('feature:evaluated', featureName, result, context);
       return result;
     }
-    
+
     const result = { enabled: true, reason: 'enabled' as const, rolloutPercentage: 100 };
     this.emit('feature:evaluated', featureName, result, context);
     return result;
@@ -189,7 +190,7 @@ export class ConfigManager extends EventEmitter {
 
     const merged = this.deepMerge(this._config, overrides);
     const parsed = configSchema.safeParse(merged);
-    
+
     if (!parsed.success) {
       const errors = parsed.error.errors.map(err => ({
         path: err.path.join('.'),
@@ -198,10 +199,10 @@ export class ConfigManager extends EventEmitter {
       }));
       throw new Error(`Configuration update failed: ${errors.map(e => `${e.path}: ${e.message}`).join(', ')}`);
     }
-    
+
     const previousConfig = this._config;
     this._config = parsed.data;
-    
+
     const changes = this.detectChanges(previousConfig, this._config);
     this.emit('config:changed', {
       previous: previousConfig,
@@ -256,7 +257,7 @@ export class ConfigManager extends EventEmitter {
       `.env.${env}`,
       '.env.local',
     ];
-    
+
     return envFiles.filter(file => {
       const fullPath = resolve(process.cwd(), file);
       return existsSync(fullPath);
@@ -268,7 +269,7 @@ export class ConfigManager extends EventEmitter {
    */
   private loadEnvironmentFiles(): void {
     const envFiles = this.getEnvFilePath();
-    
+
     for (const file of envFiles) {
       try {
         const result = dotenvConfig({ path: file });
@@ -286,7 +287,7 @@ export class ConfigManager extends EventEmitter {
    */
   private buildConfigFromEnv(): Record<string, any> {
     const config: Record<string, any> = {};
-    
+
     // Apply environment variable mappings
     for (const [envVar, configPath] of Object.entries(envMapping)) {
       const value = process.env[envVar];
@@ -294,7 +295,7 @@ export class ConfigManager extends EventEmitter {
         this.setNestedValue(config, configPath, value);
       }
     }
-    
+
     // Add any additional environment variables that follow naming conventions
     for (const [key, value] of Object.entries(process.env)) {
       if (value !== undefined && !envMapping[key as keyof typeof envMapping]) {
@@ -305,7 +306,7 @@ export class ConfigManager extends EventEmitter {
         }
       }
     }
-    
+
     return config;
   }
 
@@ -316,12 +317,12 @@ export class ConfigManager extends EventEmitter {
     // Convert common patterns like CACHE_REDIS_URL to cache.redisUrl
     const parts = envVar.toLowerCase().split('_');
     if (parts.length < 2) return null;
-    
+
     // Convert to camelCase
-    const camelCased = parts.map((part, index) => 
+    const _camelCased = parts.map((part, index) =>
       index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)
     ).join('');
-    
+
     // Map to known config sections
     const sectionMappings: Record<string, string> = {
       cache: 'cache',
@@ -336,17 +337,17 @@ export class ConfigManager extends EventEmitter {
       monitoring: 'monitoring',
       validation: 'validation',
     };
-    
+
     const firstPart = parts[0];
     if (!firstPart) return null;
-    
+
     const section = sectionMappings[firstPart];
     if (!section) return null;
-    
-    const property = parts.slice(1).map((part, index) => 
+
+    const property = parts.slice(1).map((part, index) =>
       index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)
     ).join('');
-    
+
     return `${section}.${property}`;
   }
 
@@ -356,7 +357,7 @@ export class ConfigManager extends EventEmitter {
   private setNestedValue(obj: Record<string, any>, path: string, value: any): void {
     const keys = path.split('.');
     let current = obj;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
       if (!key) continue;
@@ -365,7 +366,7 @@ export class ConfigManager extends EventEmitter {
       }
       current = current[key];
     }
-    
+
     const lastKey = keys[keys.length - 1];
     if (lastKey) {
       current[lastKey] = value;
@@ -385,27 +386,27 @@ export class ConfigManager extends EventEmitter {
   private async validateRuntimeDependencies(): Promise<void> {
     const config = this._config!;
     const validations: Promise<DependencyValidationResult>[] = [];
-    
+
     // Validate Redis connection if using Redis
     if (config.cache.provider === 'redis' || config.rateLimit.provider === 'redis') {
       validations.push(this.validateRedisConnection(config.cache.redisUrl));
     }
-    
+
     // Validate database connection
     validations.push(this.validateDatabaseConnection(config.database.url));
-    
+
     // Validate Sentry DSN if configured
     if (config.errors.reportToSentry && config.errors.sentryDsn) {
       validations.push(this.validateSentryDsn(config.errors.sentryDsn));
     }
-    
+
     const results = await Promise.allSettled(validations);
-    
+
     for (const result of results) {
       if (result.status === 'fulfilled') {
         this._state.dependencyStatus[result.value.dependency] = result.value;
         this.emit('dependency:validated', result.value);
-        
+
         if (result.value.status === 'unhealthy') {
           console.warn(`Dependency validation warning: ${result.value.dependency} - ${result.value.message}`);
         }
@@ -481,15 +482,15 @@ export class ConfigManager extends EventEmitter {
    */
   private setupHotReload(): void {
     if (this.hotReloadConfig.enabled) return;
-    
+
     const envFiles = this.getEnvFilePath();
-    
+
     for (const file of envFiles) {
       if (!this._state.watchingFiles.includes(file)) {
         this._state.watchingFiles.push(file);
-        
+
         let debounceTimer: NodeJS.Timeout;
-        
+
         watchFile(file, () => {
           clearTimeout(debounceTimer);
           debounceTimer = setTimeout(async () => {
@@ -503,7 +504,7 @@ export class ConfigManager extends EventEmitter {
         });
       }
     }
-    
+
     this.hotReloadConfig.enabled = true;
   }
 
@@ -512,15 +513,15 @@ export class ConfigManager extends EventEmitter {
    */
   private detectChanges(previous: AppConfig, current: AppConfig): ConfigChange[] {
     const changes: ConfigChange[] = [];
-    
+
     const compareObjects = (prev: any, curr: any, path: string = '') => {
       const allKeys = new Set([...Object.keys(prev || {}), ...Object.keys(curr || {})]);
-      
+
       for (const key of Array.from(allKeys)) {
         const currentPath = path ? `${path}.${key}` : key;
         const prevValue = prev?.[key];
         const currValue = curr?.[key];
-        
+
         if (prevValue === undefined && currValue !== undefined) {
           changes.push({
             path: currentPath,
@@ -547,7 +548,7 @@ export class ConfigManager extends EventEmitter {
         }
       }
     };
-    
+
     compareObjects(previous, current);
     return changes;
   }
@@ -557,7 +558,7 @@ export class ConfigManager extends EventEmitter {
    */
   private addConfigurationWarnings(result: ConfigValidationResult): void {
     const config = this._config!;
-    
+
     // Warn about development settings in production
     if (config.app.environment === 'production') {
       if (config.log.pretty) {
@@ -567,7 +568,7 @@ export class ConfigManager extends EventEmitter {
           suggestion: 'Consider disabling pretty logging for better performance',
         });
       }
-      
+
       if (config.errors.includeStack) {
         result.warnings.push({
           path: 'errors.includeStack',
@@ -576,7 +577,7 @@ export class ConfigManager extends EventEmitter {
         });
       }
     }
-    
+
     // Warn about weak security settings
     if (config.security.bcryptRounds < 12) {
       result.warnings.push({
@@ -585,7 +586,7 @@ export class ConfigManager extends EventEmitter {
         suggestion: 'Consider increasing BCrypt rounds for better security',
       });
     }
-    
+
     // Warn about cache configuration
     if (config.cache.provider === 'memory' && config.app.environment === 'production') {
       result.warnings.push({
@@ -614,7 +615,7 @@ export class ConfigManager extends EventEmitter {
    */
   private deepMerge(target: any, source: any): any {
     const result = { ...target };
-    
+
     for (const key in source) {
       if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
         result[key] = this.deepMerge(target[key] || {}, source[key]);
@@ -622,7 +623,7 @@ export class ConfigManager extends EventEmitter {
         result[key] = source[key];
       }
     }
-    
+
     return result;
   }
 

@@ -135,22 +135,22 @@ export class AIDeduplicationMiddleware {
    * Create a pending request that will be shared among duplicate requests
    */
   private createPendingRequest(
-    req: Request,
+    _req: Request,
     res: Response,
     next: NextFunction,
     deduplicationKey: string,
-    requestId: string
+    _requestId: string
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       // Override response methods to capture the result
       const originalJson = res.json;
       const originalSend = res.send;
-      let responseData: any = null;
+      let _responseData: any = null;
       let responseSent = false;
 
       res.json = function(data: any) {
         if (!responseSent) {
-          responseData = data;
+          _responseData = data;
           responseSent = true;
           
           // Cache the result for future requests
@@ -171,7 +171,7 @@ export class AIDeduplicationMiddleware {
 
       res.send = function(data: any) {
         if (!responseSent) {
-          responseData = data;
+          _responseData = data;
           responseSent = true;
           resolve(data);
         }
@@ -213,7 +213,7 @@ export class AIDeduplicationMiddleware {
   /**
    * Default duplicate handler
    */
-  private defaultOnDuplicate = (req: Request, res: Response, originalResult: any): void => {
+  private defaultOnDuplicate = (req: Request, _res: Response, originalResult: any): void => {
     logger.info('AI Request Served from Deduplication', { component: 'Chanuka' }, { path: req.path,
       method: req.method,
       user_id: (req as any).user?.id,

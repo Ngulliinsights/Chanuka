@@ -150,3 +150,7 @@ export function LazyLoadPlaceholder() {
   );
 }
 
+export const LoadingStates = {
+  PageLoading: PageLoader,
+};
+

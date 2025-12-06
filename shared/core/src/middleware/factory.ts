@@ -29,7 +29,7 @@ export class MiddlewareFactory {
   ) {}
 
   createLoggingMiddleware() {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, _res: Response, next: NextFunction) => {
       if (this.config.enableLogging && this.services.logger) {
         this.services.logger.info(`${req.method} ${req.path}`);
       }
@@ -38,7 +38,7 @@ export class MiddlewareFactory {
   }
 
   createMetricsMiddleware() {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (_req: Request, res: Response, next: NextFunction) => {
       if (this.config.enableMetrics && this.services.metrics) {
         const start = Date.now();
         res.on('finish', () => {
@@ -51,14 +51,14 @@ export class MiddlewareFactory {
   }
 
   createCachingMiddleware() {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (_req: Request, res: Response, next: NextFunction) => {
       // Basic caching middleware implementation
       next();
     };
   }
 
   createRateLimitMiddleware() {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (_req: Request, res: Response, next: NextFunction) => {
       // Basic rate limiting middleware implementation
       next();
     };

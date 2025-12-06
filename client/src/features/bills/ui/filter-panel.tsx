@@ -1,6 +1,6 @@
 /**
  * Advanced Multi-Dimensional Filtering System
- * 
+ *
  * Provides comprehensive filtering capabilities for bills with:
  * - Desktop sidebar and mobile bottom sheet interfaces
  * - Multi-dimensional filtering (bill type, policy areas, sponsors, urgency, controversy, constitutional flags)
@@ -10,8 +10,6 @@
  * - Controversy level filtering and strategic importance categorization
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import {
   Filter,
   X,
@@ -21,18 +19,28 @@ import {
   Flag,
   Tag,
   Settings,
-  RotateCcw
+  RotateCcw,
 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Label } from '../ui/label';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
-import { Separator } from '../ui/separator';
-import { Checkbox } from '../ui/checkbox';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
 import { cn } from '@client/lib/utils';
-import type { BillsQueryParams } from '@client/features/bills/types';
+
+import { Badge } from '../../../components/ui/badge';
+import { Button } from '../../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Checkbox } from '../../../components/ui/checkbox';
+import { Label } from '../../../components/ui/label';
+import { Separator } from '../../../components/ui/separator';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '../../../components/ui/sheet';
+import type { BillsQueryParams } from '../model/types';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface FilterPanelProps {
   className?: string;
@@ -88,8 +96,16 @@ const URGENCY_LEVELS: FilterOption[] = [
 ];
 
 const CONTROVERSY_LEVELS: FilterOption[] = [
-  { value: 'high', label: 'High Controversy', description: 'Significant public debate and opposition' },
-  { value: 'medium', label: 'Medium Controversy', description: 'Some public debate and mixed opinions' },
+  {
+    value: 'high',
+    label: 'High Controversy',
+    description: 'Significant public debate and opposition',
+  },
+  {
+    value: 'medium',
+    label: 'Medium Controversy',
+    description: 'Some public debate and mixed opinions',
+  },
   { value: 'low', label: 'Low Controversy', description: 'Minimal public debate or opposition' },
 ];
 
@@ -102,27 +118,42 @@ const STATUS_OPTIONS: FilterOption[] = [
   { value: 'vetoed', label: 'Vetoed' },
 ];
 
-export function FilterPanel({ className, isMobile = false, resultCount = 0, totalCount = 0, filters, onFiltersChange }: FilterPanelProps) {
+export function FilterPanel({
+  className,
+  isMobile = false,
+  resultCount = 0,
+  totalCount = 0,
+  filters,
+  onFiltersChange,
+}: FilterPanelProps) {
   // Safe defaults for optional filter properties
-  const safeFilters = {
-    status: filters.status || [],
-    urgency: filters.urgency || [],
-    policyAreas: filters.policyAreas || [],
-    sponsors: filters.sponsors || [],
-    constitutionalFlags: filters.constitutionalFlags || false,
-    controversyLevels: filters.controversyLevels || [],
-    dateRange: filters.dateRange || { start: undefined, end: undefined },
-  };
+  const safeFilters = useMemo(
+    () => ({
+      status: filters.status || [],
+      urgency: filters.urgency || [],
+      policyAreas: filters.policyAreas || [],
+      sponsors: filters.sponsors || [],
+      constitutionalFlags: filters.constitutionalFlags || false,
+      controversyLevels: filters.controversyLevels || [],
+      dateRange: filters.dateRange || { start: undefined, end: undefined },
+    }),
+    [filters]
+  );
 
-  const handleSetFilters = React.useCallback((newFilters: BillsQueryParams) => {
-    onFiltersChange(newFilters);
-  }, [onFiltersChange]);
+  const handleSetFilters = React.useCallback(
+    (newFilters: BillsQueryParams) => {
+      onFiltersChange(newFilters);
+    },
+    [onFiltersChange]
+  );
 
   const clearFilters = React.useCallback(() => {
     onFiltersChange({});
   }, [onFiltersChange]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['status', 'urgency']));
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(['status', 'urgency'])
+  );
   const [isOpen, setIsOpen] = useState(false);
 
   // Sync filters with URL parameters (only on mount and URL changes)
@@ -176,7 +207,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
         onFiltersChange(urlFilters as BillsQueryParams);
       }
     }
-  }, [searchParams]); // Remove handleSetFilters and filters from dependencies
+  }, [searchParams, filters, onFiltersChange]);
 
   // Update URL when filters change (debounced to prevent loops)
   useEffect(() => {
@@ -224,7 +255,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
     }, 100); // Debounce by 100ms
 
     return () => clearTimeout(timeoutId);
-  }, [safeFilters]); // Remove setSearchParams from dependencies
+  }, [safeFilters, searchParams, setSearchParams]);
 
   // Calculate active filter count
   const activeFilterCount = useMemo(() => {
@@ -235,7 +266,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
     count += safeFilters.sponsors.length;
     count += safeFilters.constitutionalFlags ? 1 : 0;
     count += safeFilters.controversyLevels.length;
-    count += (safeFilters.dateRange.start || safeFilters.dateRange.end) ? 1 : 0;
+    count += safeFilters.dateRange.start || safeFilters.dateRange.end ? 1 : 0;
     return count;
   }, [safeFilters]);
 
@@ -244,46 +275,49 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
     const chips: Array<{ key: string; label: string; onRemove: () => void }> = [];
 
     // Status chips
-    safeFilters.status.forEach(status => {
+    safeFilters.status.forEach((status: string) => {
       const option = STATUS_OPTIONS.find(opt => opt.value === status);
       if (option) {
         chips.push({
           key: `status-${status}`,
           label: option.label,
-          onRemove: () => handleSetFilters({
-            ...safeFilters,
-            status: safeFilters.status.filter(s => s !== status)
-          })
+          onRemove: () =>
+            handleSetFilters({
+              ...safeFilters,
+              status: safeFilters.status.filter((s: string) => s !== status),
+            }),
         });
       }
     });
 
     // Urgency chips
-    safeFilters.urgency.forEach(urgency => {
+    safeFilters.urgency.forEach((urgency: string) => {
       const option = URGENCY_LEVELS.find(opt => opt.value === urgency);
       if (option) {
         chips.push({
           key: `urgency-${urgency}`,
           label: `${option.label} Priority`,
-          onRemove: () => handleSetFilters({
-            ...safeFilters,
-            urgency: safeFilters.urgency.filter(u => u !== urgency)
-          })
+          onRemove: () =>
+            handleSetFilters({
+              ...safeFilters,
+              urgency: safeFilters.urgency.filter((u: string) => u !== urgency),
+            }),
         });
       }
     });
 
     // Policy area chips
-    safeFilters.policyAreas.forEach(area => {
+    safeFilters.policyAreas.forEach((area: string) => {
       const option = POLICY_AREAS.find(opt => opt.value === area);
       if (option) {
         chips.push({
           key: `policy-${area}`,
           label: option.label,
-          onRemove: () => handleSetFilters({
-            ...safeFilters,
-            policyAreas: safeFilters.policyAreas.filter(p => p !== area)
-          })
+          onRemove: () =>
+            handleSetFilters({
+              ...safeFilters,
+              policyAreas: safeFilters.policyAreas.filter((p: string) => p !== area),
+            }),
         });
       }
     });
@@ -293,42 +327,49 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
       chips.push({
         key: 'constitutional-flags',
         label: 'Constitutional Issues',
-        onRemove: () => handleSetFilters({ ...safeFilters, constitutionalFlags: false })
+        onRemove: () => handleSetFilters({ ...safeFilters, constitutionalFlags: false }),
       });
     }
 
     // Controversy level chips
-    safeFilters.controversyLevels.forEach(level => {
+    safeFilters.controversyLevels.forEach((level: string) => {
       const option = CONTROVERSY_LEVELS.find(opt => opt.value === level);
       if (option) {
         chips.push({
           key: `controversy-${level}`,
           label: option.label,
-          onRemove: () => handleSetFilters({
-            ...safeFilters,
-            controversyLevels: safeFilters.controversyLevels.filter(c => c !== level)
-          })
+          onRemove: () =>
+            handleSetFilters({
+              ...safeFilters,
+              controversyLevels: safeFilters.controversyLevels.filter((c: string) => c !== level),
+            }),
         });
       }
     });
 
     // Date range chip
     if (safeFilters.dateRange.start || safeFilters.dateRange.end) {
-      const startDate = safeFilters.dateRange.start ? new Date(safeFilters.dateRange.start).toLocaleDateString() : '';
-      const endDate = safeFilters.dateRange.end ? new Date(safeFilters.dateRange.end).toLocaleDateString() : '';
-      const dateLabel = startDate && endDate
-        ? `${startDate} - ${endDate}`
-        : startDate
-        ? `From ${startDate}`
-        : `Until ${endDate}`;
+      const startDate = safeFilters.dateRange.start
+        ? new Date(safeFilters.dateRange.start).toLocaleDateString()
+        : '';
+      const endDate = safeFilters.dateRange.end
+        ? new Date(safeFilters.dateRange.end).toLocaleDateString()
+        : '';
+      const dateLabel =
+        startDate && endDate
+          ? `${startDate} - ${endDate}`
+          : startDate
+            ? `From ${startDate}`
+            : `Until ${endDate}`;
 
       chips.push({
         key: 'date-range',
         label: dateLabel,
-        onRemove: () => handleSetFilters({
-          ...safeFilters,
-          dateRange: { start: undefined, end: undefined }
-        })
+        onRemove: () =>
+          handleSetFilters({
+            ...safeFilters,
+            dateRange: { start: undefined, end: undefined },
+          }),
       });
     }
 
@@ -355,17 +396,17 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
     const currentArray = safeFilters[filterKey];
     const newArray = checked
       ? [...currentArray, value]
-      : currentArray.filter(item => item !== value);
+      : currentArray.filter((item: string) => item !== value);
 
     handleSetFilters({ ...safeFilters, [filterKey]: newArray });
   };
 
-  const FilterSection = ({ 
-    title, 
-    icon: Icon, 
-    children, 
-    sectionKey, 
-    collapsible = true 
+  const FilterSection = ({
+    title,
+    icon: Icon,
+    children,
+    sectionKey,
+    collapsible = true,
   }: {
     title: string;
     icon: React.ComponentType<{ className?: string }>;
@@ -374,34 +415,26 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
     collapsible?: boolean;
   }) => {
     const isExpanded = expandedSections.has(sectionKey);
-    
+
     return (
       <div className="space-y-3">
-        <div 
-          className={cn(
-            "flex items-center justify-between",
-            collapsible && "cursor-pointer"
-          )}
+        <div
+          className={cn('flex items-center justify-between', collapsible && 'cursor-pointer')}
           onClick={collapsible ? () => toggleSection(sectionKey) : undefined}
         >
           <div className="flex items-center gap-2">
             <Icon className="h-4 w-4 text-muted-foreground" />
             <Label className="text-sm font-medium">{title}</Label>
           </div>
-          {collapsible && (
-            isExpanded ? (
+          {collapsible &&
+            (isExpanded ? (
               <ChevronUp className="h-4 w-4 text-muted-foreground" />
             ) : (
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            )
-          )}
+            ))}
         </div>
-        
-        {(!collapsible || isExpanded) && (
-          <div className="space-y-2 pl-6">
-            {children}
-          </div>
-        )}
+
+        {(!collapsible || isExpanded) && <div className="space-y-2 pl-6">{children}</div>}
       </div>
     );
   };
@@ -411,19 +444,12 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          {resultCount === totalCount ? (
-            `Showing all ${totalCount} bills`
-          ) : (
-            `Showing ${resultCount} of ${totalCount} bills`
-          )}
+          {resultCount === totalCount
+            ? `Showing all ${totalCount} bills`
+            : `Showing ${resultCount} of ${totalCount} bills`}
         </div>
         {activeFilterCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearFilters}
-            className="text-xs"
-          >
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
             <RotateCcw className="h-3 w-3 mr-1" />
             Clear All ({activeFilterCount})
           </Button>
@@ -467,11 +493,11 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
               <Checkbox
                 id={`status-${option.value}`}
                 checked={safeFilters.status.includes(option.value)}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: boolean) =>
                   handleArrayFilterChange('status', option.value, checked as boolean)
                 }
               />
-              <Label 
+              <Label
                 htmlFor={`status-${option.value}`}
                 className="text-sm font-normal cursor-pointer"
               >
@@ -492,12 +518,12 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
               <Checkbox
                 id={`urgency-${option.value}`}
                 checked={safeFilters.urgency.includes(option.value)}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: boolean) =>
                   handleArrayFilterChange('urgency', option.value, checked as boolean)
                 }
               />
               <div className="flex-1">
-                <Label 
+                <Label
                   htmlFor={`urgency-${option.value}`}
                   className="text-sm font-normal cursor-pointer"
                 >
@@ -522,11 +548,11 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
               <Checkbox
                 id={`policy-${option.value}`}
                 checked={safeFilters.policyAreas.includes(option.value)}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: boolean) =>
                   handleArrayFilterChange('policyAreas', option.value, checked as boolean)
                 }
               />
-              <Label 
+              <Label
                 htmlFor={`policy-${option.value}`}
                 className="text-sm font-normal cursor-pointer"
               >
@@ -540,19 +566,21 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
       <Separator />
 
       {/* Constitutional Flags Filter */}
-      <FilterSection title="Constitutional Issues" icon={Flag} sectionKey="constitutional" collapsible={false}>
+      <FilterSection
+        title="Constitutional Issues"
+        icon={Flag}
+        sectionKey="constitutional"
+        collapsible={false}
+      >
         <div className="flex items-center space-x-2">
           <Checkbox
             id="constitutional-flags"
             checked={safeFilters.constitutionalFlags}
-            onCheckedChange={(checked) =>
+            onCheckedChange={(checked: boolean) =>
               handleSetFilters({ ...safeFilters, constitutionalFlags: checked as boolean })
             }
           />
-          <Label 
-            htmlFor="constitutional-flags"
-            className="text-sm font-normal cursor-pointer"
-          >
+          <Label htmlFor="constitutional-flags" className="text-sm font-normal cursor-pointer">
             Show only bills with constitutional concerns
           </Label>
         </div>
@@ -568,12 +596,12 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
               <Checkbox
                 id={`controversy-${option.value}`}
                 checked={safeFilters.controversyLevels.includes(option.value)}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: boolean) =>
                   handleArrayFilterChange('controversyLevels', option.value, checked as boolean)
                 }
               />
               <div className="flex-1">
-                <Label 
+                <Label
                   htmlFor={`controversy-${option.value}`}
                   className="text-sm font-normal cursor-pointer"
                 >
@@ -622,7 +650,7 @@ export function FilterPanel({ className, isMobile = false, resultCount = 0, tota
 
   // Desktop sidebar interface
   return (
-    <Card className={cn("chanuka-card", className)}>
+    <Card className={cn('chanuka-card', className)}>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Settings className="h-5 w-5" />

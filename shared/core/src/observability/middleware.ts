@@ -382,7 +382,7 @@ export function createRequestTimeoutMiddleware(
 ): (req: Request, res: Response, next: NextFunction) => void {
   const { requestTimeout = 30000 } = config; // 30 seconds default
 
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (_req: Request, res: Response, next: NextFunction): void => {
     const timeout = setTimeout(() => {
       if (!res.headersSent) {
         res.status(408).json({

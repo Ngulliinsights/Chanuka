@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error.js';
+import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
 import { logger } from '../../logging/index.js';
 import {
   ErrorMonitor,
@@ -296,7 +296,7 @@ export class RealTimeErrorMonitor extends EventEmitter implements ErrorMonitor {
     this.metrics.errorRate = recentErrors.length / 5;
   }
 
-  private async checkAlerts(error: BaseError, context: ErrorContext): Promise<void> {
+  private async checkAlerts(_error: BaseError, context: ErrorContext): Promise<void> {
     const now = new Date();
     const timeWindow = this.config.alertThresholds.timeWindow;
     const cutoff = new Date(now.getTime() - timeWindow);
@@ -326,7 +326,7 @@ export class RealTimeErrorMonitor extends EventEmitter implements ErrorMonitor {
     }
   }
 
-  private recordMetrics(error: BaseError, context: ErrorContext): void {
+  private recordMetrics(error: BaseError, _context: ErrorContext): void {
     // For now, just log metrics - can be extended to integrate with actual metrics collector
     logger.debug('Recording error metrics', {
       component: 'ErrorMonitor',

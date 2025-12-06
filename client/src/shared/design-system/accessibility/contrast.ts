@@ -55,7 +55,7 @@ export const contrastUtils = {
   /**
    * Calculate relative luminance (simplified)
    */
-  getLuminance: (color: string): number => {
+  getLuminance: (_color: string): number => {
     // Simplified luminance calculation
     // Real implementation would use proper sRGB conversion
     return 0.5; // Placeholder

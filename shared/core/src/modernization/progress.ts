@@ -4,7 +4,7 @@ import {
   ProgressState,
   ProgressMetrics,
   ResourceUsage,
-  PerformanceMetrics,
+  _PerformanceMetrics,
   ModernizationPhase,
   TaskStatus
 } from './types';
@@ -410,7 +410,7 @@ export class ProgressTracker extends EventEmitter {
   private async persistState(state: ProgressState, status: TaskStatus): Promise<void> {
     try {
       // In a real implementation, this would save to a file or database
-      const persistedData = {
+      const _persistedData = {
         state,
         status,
         timestamp: new Date().toISOString(),

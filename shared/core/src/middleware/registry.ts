@@ -23,7 +23,7 @@ export class MiddlewareRegistry {
 }
 
 export const applyMiddleware = (middleware: any) => {
-  return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+  return (_target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {

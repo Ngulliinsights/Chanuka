@@ -11,7 +11,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { performance } from 'perf_hooks';
 import { getDefaultCache } from '../cache';
-import { RateLimitMiddleware } from '../rate-limiting/middleware';
+// import { RateLimitMiddleware } from '../rate-limiting/middleware'; // Unused import
 import { RateLimitStore } from '../rate-limiting/types';
 import { logger } from '../observability/logging';
 
@@ -114,7 +114,7 @@ export function aiResponseMiddleware(options: AIMiddlewareOptions) {
  */
 export function aiCachingMiddleware(options: AIMiddlewareOptions) {
   if (!options.enableCaching) {
-    return (req: Request, res: Response, next: NextFunction) => next();
+    return (_req: Request, res: Response, next: NextFunction) => next();
   }
 
   return async (req: AIRequest, res: Response, next: NextFunction) => {
@@ -170,17 +170,17 @@ export function aiCachingMiddleware(options: AIMiddlewareOptions) {
  */
 export function aiRateLimitMiddleware(options: AIMiddlewareOptions) {
   if (!options.enableRateLimit || !options.rateLimitStore) {
-    return (req: Request, res: Response, next: NextFunction) => next();
+    return (_req: Request, res: Response, next: NextFunction) => next();
   }
 
-  const config = options.rateLimitConfig || {
+  const _config = options.rateLimitConfig || {
     limit: 100,
     windowMs: 60000, // 1 minute
     algorithm: 'sliding-window' as const
   };
 
   // TODO: Fix RateLimitMiddleware usage
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (_req: Request, res: Response, next: NextFunction) => {
     // Placeholder rate limiting logic
     next();
   };

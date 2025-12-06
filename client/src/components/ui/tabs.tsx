@@ -1,11 +1,12 @@
 /**
  * Tabs Component
- * Accessible tab navigation component
+ * 
+ * A tabs component for organizing content
  */
 
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
-import { cn } from "@client/utils/cn"
+import { cn } from "@client/lib/utils"
 
 const Tabs = TabsPrimitive.Root
 

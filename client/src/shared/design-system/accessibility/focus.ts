@@ -69,7 +69,7 @@ export const focusUtils = {
   /**
    * Check if focus is visible (for :focus-visible polyfill)
    */
-  isFocusVisible: (element: HTMLElement): boolean => {
+  isFocusVisible: (_element: HTMLElement): boolean => {
     // Simplified check - real implementation would check user interaction method
     return document.body.classList.contains('keyboard-navigation');
   },

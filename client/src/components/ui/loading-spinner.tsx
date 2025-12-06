@@ -1,32 +1,36 @@
 /**
  * Loading Spinner Component
- * Unified loading spinner with consistent styling using Lucide icon
+ * 
+ * A simple loading spinner component
  */
 
-import { cn } from '@client/lib/utils';
-import { Loader2 } from 'lucide-react';
+import * as React from "react"
+import { Loader2 } from "lucide-react"
+import { cn } from "@client/lib/utils"
 
-interface LoadingSpinnerProps {
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
+interface LoadingSpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
+  size?: "sm" | "md" | "lg"
 }
 
-export function LoadingSpinner({ className, size = 'md' }: LoadingSpinnerProps) {
-  const sizeClasses = {
-    sm: 'h-4 w-4',
-    md: 'h-8 w-8',
-    lg: 'h-12 w-12',
-  };
+const LoadingSpinner = React.forwardRef<HTMLDivElement, LoadingSpinnerProps>(
+  ({ className, size = "md", ...props }, ref) => {
+    const sizeClasses = {
+      sm: "h-4 w-4",
+      md: "h-6 w-6", 
+      lg: "h-8 w-8"
+    }
 
-  return (
-    <Loader2 
-      className={cn('animate-spin text-primary', sizeClasses[size], className)}
-      role="status"
-      aria-label="Loading"
-    />
-  );
-}
+    return (
+      <div
+        ref={ref}
+        className={cn("flex items-center justify-center", className)}
+        {...props}
+      >
+        <Loader2 className={cn("animate-spin", sizeClasses[size])} />
+      </div>
+    )
+  }
+)
+LoadingSpinner.displayName = "LoadingSpinner"
 
-// Export as Spinner for backward compatibility
-export const Spinner = LoadingSpinner;
-export default LoadingSpinner;
+export { LoadingSpinner }

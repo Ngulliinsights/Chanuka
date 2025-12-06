@@ -4,10 +4,10 @@
  * Optimized for performance, accessibility, and developer experience
  */
 
-import { colorTokens } from '../tokens/colors';
-import { spacingTokens } from '../tokens/spacing';
 import { animationTokens } from '../tokens/animations';
 import { borderTokens } from '../tokens/borders';
+import { colorTokens } from '../tokens/colors';
+import { spacingTokens } from '../tokens/spacing';
 
 // Type definitions for better type safety and developer experience
 export type LoadingSpinnerSize = 'small' | 'medium' | 'large' | 'xlarge';

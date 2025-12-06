@@ -5,7 +5,7 @@
  * to help improve system reliability and user experience.
  */
 
-import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error.js';
+import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
 import { ErrorAnalytics, ErrorDashboardData } from '../types.js';
 // import { logger } from '../observability/logging'; // Unused import
 
@@ -416,7 +416,7 @@ export class ErrorAnalyticsEngine {
     return [];
   }
 
-  private calculateTrendForError(errorType: string): 'increasing' | 'decreasing' | 'stable' {
+  private calculateTrendForError(_errorType: string): 'increasing' | 'decreasing' | 'stable' {
     // Simplified trend calculation
     return 'stable';
   }

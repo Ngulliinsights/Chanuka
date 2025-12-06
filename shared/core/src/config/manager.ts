@@ -8,10 +8,10 @@
 import { EventEmitter } from 'events';
 import * as chokidar from 'chokidar';
 import * as dotenvExpand from 'dotenv-expand';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
 import { resolve } from 'path';
+import { Result, err, ok } from '../primitives/types/result';
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
-import { Result, Ok, Err, ok, err } from '../primitives/types/result';
 import { BaseError, ErrorDomain, ErrorSeverity } from '../observability/error-management';
 import { ObservabilityStack } from '../observability/stack';
 import type {
@@ -22,7 +22,6 @@ import type {
   FeatureFlagResult,
   ConfigValidationResult,
   DependencyValidationResult,
-  ConfigManagerEvents,
   ConfigManagerState,
   HotReloadConfig,
 } from './types';
@@ -67,14 +66,13 @@ export class ConfigurationManager extends EventEmitter {
     watchingFiles: [],
     dependencyStatus: {},
   };
-  private validationCache = new Map<string, boolean>();
   private hotReloadConfig: HotReloadConfig = {
     enabled: false,
     debounceMs: 1000,
     watchPaths: ['.env', '.env.local'],
     excludePatterns: ['node_modules/**', 'dist/**'],
   };
-  private observability?: ObservabilityStack;
+  private observability?: ObservabilityStack | undefined;
   private encryptionKey?: string;
   private encryptedValues = new Set<string>();
 
@@ -133,10 +131,10 @@ export class ConfigurationManager extends EventEmitter {
 
       // Detect and emit configuration changes
       if (previousConfig) {
-        const changes = this.detectChanges(previousConfig, this._config);
+        const changes = this.detectChanges(previousConfig!, this._config);
         if (changes.length > 0) {
           const changeEvent: ConfigChangeEvent = {
-            previous: previousConfig,
+            previous: previousConfig!,
             current: this._config,
             changes,
             timestamp: new Date(),
@@ -158,7 +156,7 @@ export class ConfigurationManager extends EventEmitter {
       }
 
       // Set up hot reloading in development
-      if (this._config.app.environment === 'development' && this.options.enableHotReload !== false) {
+      if (this._config && this._config.app.environment === 'development' && this.options.enableHotReload !== false) {
         this.setupHotReload();
       }
 
@@ -416,7 +414,6 @@ export class ConfigurationManager extends EventEmitter {
     this.removeAllListeners();
     this._state.watchingFiles = [];
     this.hotReloadConfig.enabled = false;
-    this.validationCache.clear();
     this.encryptedValues.clear();
 
     this.observability?.getLogger()?.info('Configuration manager destroyed');
@@ -453,7 +450,7 @@ export class ConfigurationManager extends EventEmitter {
     });
 
     // Track feature flag evaluations
-    this.on('feature:evaluated', (flag, result, context) => {
+    this.on('feature:evaluated', (flag, result, _context) => {
       metrics.counter('feature.flag.evaluated', 1, {
         flag,
         enabled: String(result.enabled),
@@ -558,9 +555,6 @@ export class ConfigurationManager extends EventEmitter {
     const parts = envVar.toLowerCase().split('_');
     if (parts.length < 2) return null;
 
-    const camelCased = parts.map((part, index) =>
-      index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)
-    ).join('');
 
     const sectionMappings: Record<string, string> = {
       cache: 'cache',

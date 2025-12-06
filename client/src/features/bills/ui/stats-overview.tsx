@@ -1,6 +1,3 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
 import { 
   FileText, 
   AlertTriangle, 
@@ -10,6 +7,10 @@ import {
   Users,
   Activity
 } from 'lucide-react';
+import React from 'react';
+
+import { Badge } from '@client/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
 import { cn } from '@client/lib/utils';
 // Define BillsStats locally as per migration instructions
 interface BillsStats {

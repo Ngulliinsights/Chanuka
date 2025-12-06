@@ -1,17 +1,27 @@
-import React, { Suspense } from 'react';
+import { Suspense, ReactElement } from 'react';
 
-// Simple loading component
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-  </div>
-);
+import { LoadingStates } from '@client/components/loading/LoadingStates';
 
-// Wrapper component with error boundary
-export const LazyPageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Suspense fallback={<PageLoader />}>
-    {children}
-  </Suspense>
-);
+interface LazyPageWrapperProps {
+  children: React.ComponentType;
+  fallback?: ReactElement;
+}
 
-export default LazyPageWrapper;
+/**
+ * Wrapper component that properly handles lazy-loaded React components
+ * by wrapping them in a Suspense boundary with a fallback UI.
+ * 
+ * This solves the TypeScript error where LazyExoticComponent cannot be
+ * directly assigned to ReactNode in React Router's Route element prop.
+ */
+export function LazyPageWrapper({
+  children,
+  fallback = <LoadingStates.PageLoading />
+}: LazyPageWrapperProps) {
+  const Component = children;
+  return (
+    <Suspense fallback={fallback}>
+      <Component />
+    </Suspense>
+  );
+}

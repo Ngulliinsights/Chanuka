@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Star, Bell, Eye, Share2, MessageSquare, TrendingUp, Calendar, User } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Switch } from '../ui/switch';
-import { Label } from '../ui/label';
-import { Separator } from '../ui/separator';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@client/hooks/use-toast';
 import { useSafeQuery } from '@client/hooks/use-safe-query';

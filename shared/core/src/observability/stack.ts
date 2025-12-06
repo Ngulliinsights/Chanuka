@@ -6,7 +6,8 @@
  * manages correlation ID propagation using AsyncLocalStorage.
  */
 
-import { AsyncLocalStorage } from 'async_hooks';
+// import { AsyncLocalStorage } from 'async_hooks';
+ // Unused import
 import { Result, Ok, Err } from '../primitives/types';
 import { BaseError } from './error-management';
 import {
@@ -22,7 +23,7 @@ import {
   TracingConfig,
   HealthConfig
 } from './interfaces';
-import { TelemetryIntegration, TelemetryConfig, createTelemetryIntegration, createDefaultTelemetryConfig } from './telemetry';
+import { TelemetryIntegration, createTelemetryIntegration, createDefaultTelemetryConfig } from './telemetry';
 import { AsyncCorrelationManager } from './correlation';
 
 // ==================== Correlation Manager Implementation ====================
@@ -45,7 +46,7 @@ export class ObservabilityInitializationError extends ObservabilityError {
 }
 
 export class ObservabilityConfigurationError extends ObservabilityError {
-  constructor(message: string, config?: unknown) {
+  constructor(message: string, _config?: unknown) {
     super(`Observability configuration error: ${message}`, undefined);
   }
 }
@@ -320,15 +321,15 @@ export class ObservabilityStack {
   // ==================== Private Factory Methods ====================
   // These would be replaced with actual implementations in the real system
 
-  private createMetricsCollector(config: MetricsConfig): MetricsCollector {
+  private createMetricsCollector(_config: MetricsConfig): MetricsCollector {
     // Import enhanced metrics collectors
     const {
-      createAtomicCounter,
-      createAtomicGauge,
-      createAggregatingHistogram,
-      createAggregatingSummary,
+      _createAtomicCounter,
+      _createAtomicGauge,
+      _createAggregatingHistogram,
+      _createAggregatingSummary,
       createRegistry,
-      defaultRegistry
+      _defaultRegistry
     } = require('../metrics');
 
     // Create a registry for this stack instance
@@ -415,12 +416,12 @@ export class ObservabilityStack {
       fatal: noop,
       critical: noop,
       child: () => this.createLogger(config),
-      withContext: <T>(context: any, fn: () => T) => fn(),
-      withContextAsync: async <T>(context: any, fn: () => Promise<T>) => fn()
+      withContext: <T>(_context: any, fn: () => T) => fn(),
+      withContextAsync: async <T>(_context: any, fn: () => Promise<T>) => fn()
     };
   }
 
-  private createHealthChecker(config: HealthConfig): HealthChecker {
+  private createHealthChecker(_config: HealthConfig): HealthChecker {
     // Placeholder implementation - would be replaced with real health checker
     return {
       registerCheck: () => new Ok(undefined),

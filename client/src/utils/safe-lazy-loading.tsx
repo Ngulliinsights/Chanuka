@@ -647,7 +647,7 @@ export const DynamicFeatureImports = {
   ArchitecturePlanning: () => import("@client/components/architecture-planning"),
 
   // Complex form components
-  MobileOptimizedForms: () => import("@client/components/mobile/mobile-optimized-forms"),
+  MobileOptimizedForms: () => import("@/components/mobile/__archive__/mobile-optimized-forms"),
 
   // Large analysis components
   AnalysisComponents: () => import("@client/components/analysis/comments"),
@@ -656,8 +656,8 @@ export const DynamicFeatureImports = {
   AnalysisSection: () => import("@client/components/analysis/section"),
 
   // Bill tracking components
-  BillCard: () => import("@client/features/bills/ui/bill-card"),
-  BillList: () => import("@client/features/bills/ui/bill-list"),
+  BillCard: () => import("@client/features/bills/ui/BillCard"),
+  BillList: () => import("@client/features/bills/ui/BillList"),
   BillTracking: () => import("@client/features/bills/ui/bill-tracking"),
   BillImplementation: () => import("@client/features/bills/ui/implementation-workarounds"),
 

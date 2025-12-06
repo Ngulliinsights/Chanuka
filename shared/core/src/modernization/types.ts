@@ -189,7 +189,7 @@ export interface ProgressState {
   stepsCompleted: number;
   totalSteps: number;
   startTime: Date;
-  estimatedCompletion?: Date;
+  estimatedCompletion?: Date | undefined;
   metrics: ProgressMetrics;
 }
 

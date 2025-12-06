@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { MiddlewareProvider } from '../../types';
+import { MiddlewareProvider } from '../types';
 import { Services } from '../../types/services';
 // import { logger } from '../observability/logging'; // Unused import
 
@@ -8,11 +8,11 @@ export class AuthMiddlewareProvider implements MiddlewareProvider {
 
   constructor(private readonly services: Services) {}
 
-  validate(options: Record<string, any>): boolean {
+  validate(_options: Record<string, any>): boolean {
     return true; // Add validation logic
   }
 
-  create(options: Record<string, any>) {
+  create(_options: Record<string, any>) {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Add auth middleware logic
       try {

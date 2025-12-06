@@ -1,6 +1,7 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 import { AlertTriangle, Shield, FileText } from 'lucide-react';
+import React from 'react';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 
 export const ImplementationWorkarounds: React.FC<{ bill_id: string }> = ({ bill_id }) => {
   return (

@@ -1,8 +1,16 @@
 import { promises as fs } from 'fs';
-import { join, dirname, basename } from 'path';
+import { join, dirname } from 'path';
 import { createHash } from 'crypto';
-import { CleanupPlan, CleanupError } from './orchestrator';
+// import { CleanupError } from './orchestrator'; // Unused import
 // import { logger } from '../observability/logging'; // Unused import
+
+interface CleanupPlan {
+  id: string;
+  filesToRemove: { path: string }[];
+  filesToMove: { source: string; destination: string }[];
+  filesToConsolidate: { sources: string[]; destination: string }[];
+  scriptsToMerge: { scripts: string[]; destination: string }[];
+}
 
 export interface BackupSystemConfig {
   enabled: boolean;

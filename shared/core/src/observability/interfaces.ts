@@ -318,18 +318,16 @@ export interface HealthChecker {
   getCheckConfig(name: string): Result<HealthCheck, BaseError>;
 }
 
-// ==================== Correlation Context Interface ====================
-
 /**
  * Correlation context for request tracing
  */
 export interface CorrelationContext { correlationId: string;
-  traceId?: string;
-  spanId?: string;
-  user_id?: string;
-  session_id?: string;
-  requestId?: string;
-  metadata?: Record<string, unknown>;
+  traceId?: string | undefined;
+  spanId?: string | undefined;
+  user_id?: string | undefined;
+  session_id?: string | undefined;
+  requestId?: string | undefined;
+  metadata?: Record<string, unknown> | undefined;
  }
 
 /**

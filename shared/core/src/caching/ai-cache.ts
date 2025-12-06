@@ -10,10 +10,12 @@
  */
 
 // CacheHealthStatus is not used in this file
-import { CacheService } from './types';
-import { cacheFactory } from './simple-factory';
 import { performance } from 'perf_hooks';
-import { logger } from '../../../core';
+
+import { logger } from '../../../core/src/index';
+
+import { cacheFactory } from './simple-factory';
+import { CacheService } from './types';
 
 export interface AICacheOptions {
   baseCache?: CacheService;

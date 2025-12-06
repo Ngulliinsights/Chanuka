@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import {
   FileText,
   BarChart3,
@@ -16,8 +14,12 @@ import {
   Menu,
   BookOpen,
 } from 'lucide-react';
-import { Button } from '../ui/button';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
+
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 
 interface SimpleAppLayoutProps {
   children: React.ReactNode;

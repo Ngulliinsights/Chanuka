@@ -1,8 +1,10 @@
 import { promises as fs } from 'fs';
+import { BackupSystem } from './backup-system';
 import { join, dirname } from 'path';
 import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
 import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType } from '../../types';
-import { BackupSystem, BackupSystemConfig } from './backup-system';
+// import { BackupSystem, BackupSystemConfig } from './backup-system';
+ // Unused import
 import { logger } from '../../observability/logging';
 
 export interface CleanupExecutorConfig {
@@ -495,7 +497,7 @@ log_info "Starting consolidated script execution..."
   /**
    * Generate footer for merged scripts
    */
-  private generateScriptFooter(operation: any): string {
+  private generateScriptFooter(_operation: any): string {
     return `
 
 # Script execution completed
@@ -507,7 +509,7 @@ exit 0
   /**
    * Clean script content by removing headers and common boilerplate
    */
-  private cleanScriptContent(content: string, scriptPath: string): string {
+  private cleanScriptContent(content: string, _scriptPath: string): string {
     const lines = content.split('\n');
     const cleanedLines: string[] = [];
     let skipShebang = true;
@@ -721,7 +723,7 @@ exit 0
     try {
       // This is a basic implementation - in a real scenario, you'd want more sophisticated analysis
       const fileName = filePath.replace(/\.(ts|js)$/, '');
-      const searchPattern = new RegExp(`from ['"].*${fileName}['"]|import.*['"].*${fileName}['"]`);
+      const _searchPattern = new RegExp(`from ['"].*${fileName}['"]|import.*['"].*${fileName}['"]`);
       
       // Search in common source directories
       const searchDirs = ['src', 'api', 'server', 'core/src'];

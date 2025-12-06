@@ -11,7 +11,7 @@ import { executeQuery } from './pool.js';
 import { initializeDatabaseSafety, shutdownDatabaseSafety } from './init.js';
 import { bills as userTable } from '../schema/foundation';
 // import { eq } from 'drizzle-orm'; // Unused import
-import { logger } from '../core/index';
+import { logger } from '../core';
 import { users } from '../schema/foundation';
 
 /**

@@ -5,7 +5,7 @@
  * with exponential backoff, jitter, and circuit breaker integration.
  */
 
-import { BaseError, ErrorSeverity } from '../errors/base-error.js';
+import { BaseError, ErrorSeverity } from '../errors/base-error';
 import { logger } from '../../logging/index.js';
 
 export interface RetryOptions {
@@ -252,7 +252,7 @@ export function createRetryStrategy(type: 'exponential' | 'linear' | 'immediate'
  * Decorator for automatic retry on method calls
  */
 export function retry(options: RetryOptions = {}) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const retryStrategy = new ExponentialBackoffRetry(options);
 

@@ -1,15 +1,17 @@
 import React, { useMemo, useCallback } from 'react';
 import { Grid as FixedSizeGrid } from 'react-virtualized';
-import { BillCard } from './bill-card';
-import { Bill } from '@/core/api/types';
+
+import { Bill } from '@client/features/bills/model/types';
 import { cn } from '@client/lib/utils';
+
+import { BillCard } from './BillCard';
 
 interface VirtualBillGridProps {
   bills: Bill[];
-  onSave?: (billId: number) => void;
-  onShare?: (billId: number) => void;
-  onComment?: (billId: number) => void;
-  savedBills?: Set<number>;
+  onSave?: (billId: string) => void;
+  onShare?: (billId: string) => void;
+  onComment?: (billId: string) => void;
+  savedBills?: Set<string>;
   className?: string;
   height?: number;
 }
@@ -21,24 +23,10 @@ interface GridItemProps {
   data: {
     bills: Bill[];
     columnsPerRow: number;
-    onSave?: (billId: number) => void;
-    onShare?: (billId: number) => void;
-    onComment?: (billId: number) => void;
-    savedBills?: Set<number>;
-  };
-}
-
-interface GridItemProps {
-  columnIndex: number;
-  rowIndex: number;
-  style: React.CSSProperties;
-  data: {
-    bills: Bill[];
-    columnsPerRow: number;
-    onSave?: (billId: number) => void;
-    onShare?: (billId: number) => void;
-    onComment?: (billId: number) => void;
-    savedBills?: Set<number>;
+    onSave?: (billId: string) => void;
+    onShare?: (billId: string) => void;
+    onComment?: (billId: string) => void;
+    savedBills?: Set<string>;
   };
 }
 
@@ -59,6 +47,7 @@ const GridItem = ({ columnIndex, rowIndex, style, data }: GridItemProps) => {
         onShare={onShare}
         onComment={onComment}
         isSaved={savedBills?.has(bill.id)}
+        viewMode="grid"
       />
     </div>
   );
@@ -196,6 +185,7 @@ export function BillGrid({
           onShare={onShare}
           onComment={onComment}
           isSaved={savedBills.has(bill.id)}
+          viewMode={viewMode}
         />
       ))}
     </div>

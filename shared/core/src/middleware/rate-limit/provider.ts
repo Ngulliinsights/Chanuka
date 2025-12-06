@@ -1,4 +1,4 @@
-import { MiddlewareProvider } from '../../types';
+import { MiddlewareProvider } from '../types';
 import { RateLimitStore } from '../../rate-limiting/types';
 import { Request, Response, NextFunction } from 'express';
 // import { logger } from '../observability/logging'; // Unused import

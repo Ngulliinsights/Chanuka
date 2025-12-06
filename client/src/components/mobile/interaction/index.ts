@@ -1,0 +1,19 @@
+/**
+ * Mobile Interaction Components - Touch & Gesture Based
+ * 
+ * Components that handle user touch interactions, gestures, and scroll behaviors.
+ * These components provide mobile-specific UX patterns.
+ * 
+ * @module components/mobile/interaction
+ */
+
+// Gesture interaction components
+export { PullToRefresh, usePullToRefresh } from './PullToRefresh';
+export { SwipeGestures, useSwipeGestures } from './SwipeGestures';
+export type { SwipeDirection, SwipeGestureData } from './SwipeGestures';
+
+// Scroll interaction components
+export { InfiniteScroll, useInfiniteScroll } from './InfiniteScroll';
+
+// Modal interaction components
+export { MobileBottomSheet, useBottomSheet } from './MobileBottomSheet';

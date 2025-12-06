@@ -23,11 +23,11 @@ import {
   ResponsiveLayoutProvider,
   useResponsiveLayoutContext,
   TouchButton,
-} from "../mobile/responsive-layout-manager";
+} from "../mobile/__archive__/responsive-layout-manager";
 import {
   MobileTabBar,
   SwipeableHeader,
-} from "../mobile/mobile-navigation-enhancements";
+} from "../mobile/__archive__/mobile-navigation-enhancements";
 import {
   MobileNavigationProps,
   NavigationItem as LayoutNavigationItem,

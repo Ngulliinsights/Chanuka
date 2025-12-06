@@ -5,7 +5,7 @@
  * based on error patterns, context, and historical success rates.
  */
 
-import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error.js';
+import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
 import { ErrorRecoveryEngine, RecoverySuggestion } from '../types.js';
 import { logger } from '../../logging/index.js';
 

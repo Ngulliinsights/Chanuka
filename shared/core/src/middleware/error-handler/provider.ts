@@ -1,11 +1,11 @@
-import { MiddlewareProvider } from '../../types';
+import { MiddlewareProvider } from '../types';
 import { Request, Response, NextFunction } from 'express';
 import { createErrorMiddleware } from '../../observability/error-management/middleware/express-error-middleware.js';
 
 export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'errorHandler';
 
-  validate(options: Record<string, any>): boolean {
+  validate(_options: Record<string, any>): boolean {
     return true;
   }
 

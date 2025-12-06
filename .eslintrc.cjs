@@ -4,102 +4,115 @@ module.exports = {
     node: true,
     es2022: true,
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-  ],
-  parser: '@typescript-eslint/parser',
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2022,
-    sourceType: 'module',
-    project: ['./tsconfig.json', './client/tsconfig.json', './server/tsconfig.json', './shared/tsconfig.json'],
+    sourceType: "module",
+    project: [
+      "./tsconfig.json",
+      "./client/tsconfig.json",
+      "./server/tsconfig.json",
+      "./shared/tsconfig.json",
+    ],
   },
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ["@typescript-eslint", "import"],
   settings: {
-    'import/resolver': {
+    "import/resolver": {
       node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
       },
     },
   },
   rules: {
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/no-explicit-any': 'warn',
-    'import/no-unresolved': 'off', // Temporarily disabled due to resolver issues
-    'import/order': [
-      'error',
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "import/no-unresolved": "off", // Temporarily disabled due to resolver issues
+    "import/order": [
+      "error",
       {
         groups: [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index',
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
         ],
-        'newlines-between': 'always',
+        "newlines-between": "always",
         alphabetize: {
-          order: 'asc',
+          order: "asc",
           caseInsensitive: true,
         },
       },
     ],
     // Module Boundary Enforcement Rules
-    'no-restricted-imports': [
-      'error',
+    "no-restricted-imports": [
+      "error",
       {
         paths: [
           // Client cannot import server modules
           {
-            name: '@server',
-            message: 'Client modules cannot import server modules. Use API calls instead.',
+            name: "@server",
+            message:
+              "Client modules cannot import server modules. Use API calls instead.",
           },
           {
-            name: 'server',
-            message: 'Client modules cannot import server modules. Use API calls instead.',
+            name: "server",
+            message:
+              "Client modules cannot import server modules. Use API calls instead.",
           },
           // Server cannot import client modules
           {
-            name: '@client',
-            message: 'Server modules cannot import client modules. Use shared types/interfaces.',
+            name: "@client",
+            message:
+              "Server modules cannot import client modules. Use shared types/interfaces.",
           },
           {
-            name: 'client',
-            message: 'Server modules cannot import client modules. Use shared types/interfaces.',
+            name: "client",
+            message:
+              "Server modules cannot import client modules. Use shared types/interfaces.",
           },
           // Shared cannot import client or server modules
           {
-            name: '@client',
-            message: 'Shared modules cannot import client modules. Keep shared modules pure.',
+            name: "@client",
+            message:
+              "Shared modules cannot import client modules. Keep shared modules pure.",
           },
           {
-            name: 'client',
-            message: 'Shared modules cannot import client modules. Keep shared modules pure.',
+            name: "client",
+            message:
+              "Shared modules cannot import client modules. Keep shared modules pure.",
           },
           {
-            name: '@server',
-            message: 'Shared modules cannot import server modules. Keep shared modules pure.',
+            name: "@server",
+            message:
+              "Shared modules cannot import server modules. Keep shared modules pure.",
           },
           {
-            name: 'server',
-            message: 'Shared modules cannot import server modules. Keep shared modules pure.',
+            name: "server",
+            message:
+              "Shared modules cannot import server modules. Keep shared modules pure.",
           },
         ],
         patterns: [
           // Prevent client from importing server files
           {
-            group: ['**/server/**'],
-            message: 'Client modules cannot import server files. Use API calls instead.',
+            group: ["**/server/**"],
+            message:
+              "Client modules cannot import server files. Use API calls instead.",
           },
           // Prevent server from importing client files
           {
-            group: ['**/client/**'],
-            message: 'Server modules cannot import client files. Use shared types/interfaces.',
+            group: ["**/client/**"],
+            message:
+              "Server modules cannot import client files. Use shared types/interfaces.",
           },
           // Prevent shared from importing client or server files
           {
-            group: ['**/client/**', '**/server/**'],
-            message: 'Shared modules cannot import client or server files. Keep shared modules pure.',
+            group: ["**/client/**", "**/server/**"],
+            message:
+              "Shared modules cannot import client or server files. Keep shared modules pure.",
           },
         ],
       },
@@ -107,54 +120,57 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['client/**/*'],
+      files: ["client/**/*"],
       extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended',
-        'plugin:react/recommended',
-        'plugin:react-hooks/recommended',
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
       ],
-      plugins: ['react', 'react-hooks', 'react-refresh', 'import'],
+      plugins: ["react", "react-hooks", "react-refresh", "import"],
       settings: {
         react: {
-          version: 'detect',
+          version: "detect",
         },
-        'import/resolver': {
+        "import/resolver": {
           typescript: {
             alwaysTryTypes: true,
-            project: './client/tsconfig.json',
+            project: "./client/tsconfig.json",
           },
         },
       },
       rules: {
-        'react/react-in-jsx-scope': 'off', // Not needed with React 17+
-        '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-        '@typescript-eslint/no-explicit-any': 'warn',
-        'import/no-unresolved': 'off', // Temporarily disabled due to resolver issues
-        'react-refresh/only-export-components': [
-          'warn',
+        "react/react-in-jsx-scope": "off", // Not needed with React 17+
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { argsIgnorePattern: "^_" },
+        ],
+        "@typescript-eslint/no-explicit-any": "warn",
+        "import/no-unresolved": "off", // Temporarily disabled due to resolver issues
+        "react-refresh/only-export-components": [
+          "warn",
           { allowConstantExport: true },
         ],
       },
     },
     {
-      files: ['server/**/*'],
+      files: ["server/**/*"],
       settings: {
-        'import/resolver': {
+        "import/resolver": {
           typescript: {
             alwaysTryTypes: true,
-            project: './server/tsconfig.json',
+            project: "./server/tsconfig.json",
           },
         },
       },
     },
     {
-      files: ['shared/**/*'],
+      files: ["client/src/shared/**/*"],
       settings: {
-        'import/resolver': {
+        "import/resolver": {
           typescript: {
             alwaysTryTypes: true,
-            project: './shared/tsconfig.json',
+            project: "./client/tsconfig.json",
           },
         },
       },

@@ -9,7 +9,7 @@ import { Request, Response, NextFunction, Application } from 'express';
 import { performance } from 'perf_hooks';
 
 // Import core utilities
-import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting';
+// import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting'; // Unused import
 import { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
 import { setupGlobalErrorHandlers } from '../observability/error-management';
 // Removed - module deleted by design during development
@@ -95,7 +95,7 @@ export interface MiddlewareMetrics {
 export class UnifiedMiddleware {
   private config: UnifiedMiddlewareConfig;
   private logger: typeof logger;
-  private validationService: ValidationService;
+  private _validationService: ValidationService;
   private cache: any;
   private metrics: MiddlewareMetrics;
 
@@ -212,7 +212,7 @@ export class UnifiedMiddleware {
    */
   private createRateLimitMiddleware() {
     // TODO: Implement proper rate limiting
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (_req: Request, res: Response, next: NextFunction) => {
       // Placeholder rate limiting logic
       this.updateMetrics('rateLimitHits', 0);
       next();
@@ -261,7 +261,7 @@ export class UnifiedMiddleware {
   /**
    * Validation middleware
    */
-  private validationMiddleware(req: Request, res: Response, next: NextFunction): void {
+  private validationMiddleware(_req: Request, res: Response, next: NextFunction): void {
     // This is a placeholder - actual validation would be route-specific
     // In practice, this would be configured per route with specific schemas
     next();
@@ -303,7 +303,7 @@ export class UnifiedMiddleware {
     if (this.config.health?.enabled) {
       const endpoint = this.config.health.endpoint || '/health';
       // TODO: Implement createHealthEndpoints
-      app.get(endpoint, (req: Request, res: Response) => {
+      app.get(endpoint, (_req: Request, res: Response) => {
         res.json({
           status: 'healthy',
           timestamp: new Date().toISOString(),

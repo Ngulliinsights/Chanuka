@@ -9,7 +9,8 @@ import {
   MetricType,
 } from './types';
 import { Result, Ok, Err } from '../../primitives/types/result';
-import { AsyncCorrelationManager } from '../correlation.js';
+// import { AsyncCorrelationManager } from '../correlation.js';
+ // Unused import
 
 // ==================== Enhanced Metric Implementations ====================
 
@@ -65,7 +66,7 @@ export class AtomicCounter implements Counter {
   }
 
   get(labels: Record<string, string> = {}): number {
-    const combinedLabels = { ...this.labels, ...labels };
+    const _combinedLabels = { ...this.labels, ...labels };
     return this._value;
   }
 
@@ -152,7 +153,7 @@ export class AtomicGauge implements Gauge {
     return this.increment(-value, labels);
   }
 
-  get(labels: Record<string, string> = {}): number {
+  get(_labels: Record<string, string> = {}): number {
     return this._value;
   }
 

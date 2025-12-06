@@ -3,9 +3,9 @@
  * Consistent hover, focus, active, and disabled states for all components
  */
 
+import { animationTokens } from '../tokens/animations';
 import { colorTokens } from '../tokens/colors';
 import { shadowTokens } from '../tokens/shadows';
-import { animationTokens } from '../tokens/animations';
 
 export const interactiveStates = {
   // Base interactive state patterns

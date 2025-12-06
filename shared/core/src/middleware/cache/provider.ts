@@ -1,4 +1,4 @@
-import { MiddlewareProvider } from '../../types';
+import { MiddlewareProvider } from '../types';
 import { CacheService } from '../../caching/core/interfaces';
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../../observability/logging';

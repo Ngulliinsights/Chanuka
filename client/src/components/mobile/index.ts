@@ -1,34 +1,17 @@
 /**
- * Mobile Components Index
+ * Mobile Components - Barrel Export
  * 
- * Exports all mobile-optimized components and utilities for enhanced mobile experience.
+ * This file provides convenient imports for all mobile-optimized components.
+ * Used for responsive/mobile-first UI patterns.
  */
 
-// Core mobile components
-export { MobileBottomSheet, useBottomSheet } from './MobileBottomSheet';
-export { MobileTabSelector, useMobileTabs } from './MobileTabSelector';
-export { PullToRefresh, usePullToRefresh } from './PullToRefresh';
-export { InfiniteScroll, useInfiniteScroll } from './InfiniteScroll';
-export { SwipeGestures, useSwipeGestures } from './SwipeGestures';
-export { MobileNavigationDrawer, useMobileNavigationDrawer } from './MobileNavigationDrawer';
-
-// Data visualization components
-export {
-  MobileBarChart,
-  MobilePieChart,
-  MobileMetricCard,
-  MobileChartCarousel,
-} from './MobileDataVisualization';
+// Main layout wrapper - aliased for compatibility
+export { MobileLayout as MobileOptimizedLayout } from './layout/MobileLayout'
 
 // Layout components
-export {
-  MobileLayout,
-  MobileContainer,
-  MobileSection,
-  MobileGrid,
-} from './MobileLayout';
-
-// Types
-export type { SwipeDirection, SwipeEvent, SwipeGestureOptions } from './SwipeGestures';
-export type { MobileTab } from './MobileTabSelector';
-export type { DataPoint, ChartData } from './MobileDataVisualization';
+export { MobileLayout } from './layout/MobileLayout'
+export { MobileHeader } from './layout/MobileHeader'
+export { BottomNavigationBar } from './layout/BottomNavigationBar'
+export { NavigationDrawer } from './layout/NavigationDrawer'
+export { SafeAreaWrapper } from './layout/SafeAreaWrapper'
+export { AutoHideHeader } from './layout/AutoHideHeader'

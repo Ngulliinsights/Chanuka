@@ -24,7 +24,7 @@ export interface TelemetryData {
   spanId?: string;
   type: 'log' | 'metric' | 'trace';
   data: LogEntry | MetricEntry | TraceEntry;
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, unknown> | undefined;
 }
 
 export interface LogEntry {
@@ -693,7 +693,7 @@ export class TelemetryIntegration {
   private logger?: Logger;
   private metrics?: MetricsCollector;
   private tracer?: Tracer;
-  private spanContextType?: 'interface' | 'tracing';
+  private _spanContextType?: 'interface' | 'tracing';
 
   constructor(config: TelemetryConfig, correlationManager?: CorrelationManager) {
     this.exporter = new UnifiedTelemetryExporter(config, correlationManager);

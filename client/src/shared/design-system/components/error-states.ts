@@ -3,11 +3,11 @@
  * Clear error states with helpful messaging and recovery actions
  */
 
-import { colorTokens } from '../tokens/colors';
-import { spacingTokens } from '../tokens/spacing';
-import { borderTokens } from '../tokens/borders';
-import { shadowTokens } from '../tokens/shadows';
 import { animationTokens } from '../tokens/animations';
+import { borderTokens } from '../tokens/borders';
+import { colorTokens } from '../tokens/colors';
+import { shadowTokens } from '../tokens/shadows';
+import { spacingTokens } from '../tokens/spacing';
 
 export const errorStates = {
   // Base error styles

@@ -1,3 +1,9 @@
+/**
+ * useMediaQuery Hook
+ * 
+ * A hook for responsive design that listens to media query changes
+ */
+
 import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {
@@ -8,12 +14,12 @@ export function useMediaQuery(query: string): boolean {
     
     // Set initial value
     setMatches(media.matches);
-
-    // Create event listener
+    
+    // Create listener function
     const listener = (event: MediaQueryListEvent) => {
       setMatches(event.matches);
     };
-
+    
     // Add listener
     if (media.addEventListener) {
       media.addEventListener('change', listener);
@@ -21,7 +27,7 @@ export function useMediaQuery(query: string): boolean {
       // Fallback for older browsers
       media.addListener(listener);
     }
-
+    
     // Cleanup
     return () => {
       if (media.removeEventListener) {

@@ -1,10 +1,10 @@
 // `pino` is an optional runtime dependency; if not available fall back to console-based logger
-let pino: any = null;
+let _pino: any = null;
 async function initPino() {
   try {
-    pino = await import('pino');
+    _pino = await import('pino');
   } catch (_err) {
-    pino = null;
+    _pino = null;
   }
 }
 initPino();
@@ -15,7 +15,7 @@ let fs: any = null;
 let fsSync: any = null;
 let path: any = null;
 let crypto: any = null;
-let perf_hooks: any = null;
+let _perf_hooks: any = null;
 
 const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
 
@@ -29,7 +29,7 @@ async function initNodeModules() {
       fsSync = fsModule;
       path = await import('path');
       crypto = await import('crypto');
-      perf_hooks = await import('perf_hooks');
+      _perf_hooks = await import('perf_hooks');
     } catch (_err) {
       console.error('Failed to load Node.js modules:', _err);
       // Fallback if modules not available
@@ -59,7 +59,7 @@ if (!AsyncLocalStorage) {
   };
 
   // Browser-compatible fallbacks for other Node.js modules
-  perf_hooks = { performance: globalThis.performance };
+  _perf_hooks = { performance: globalThis.performance };
 }
 
 import {
@@ -71,7 +71,6 @@ import {
   CacheOperationLogData,
   SecurityEventLogData,
   BusinessEventLogData,
-  PerformanceLogData,
   StoredLogEntry,
   LogQueryFilters,
   LogAggregation,
@@ -83,7 +82,6 @@ import {
   DEFAULT_CONFIG,
   SENSITIVE_PATHS,
   LOG_LEVEL_VALUES,
-  logContextSchema,
   loggerOptionsSchema,
 } from './types';
 

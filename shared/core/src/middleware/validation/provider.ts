@@ -1,4 +1,4 @@
-// import { MiddlewareProvider } from '../../types';
+import { MiddlewareProvider } from '../types';
 import { CoreValidationService as ValidationService } from '../../validation/core/validation-service';
 import { Request, Response, NextFunction } from 'express';
 // import { logger } from '../observability/logging'; // Unused import

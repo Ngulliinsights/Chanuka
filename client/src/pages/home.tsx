@@ -20,31 +20,71 @@ import {
   Activity,
   ChevronRight,
   Play,
-  Target
+  Target,
+  Lightbulb,
+  Heart
 } from 'lucide-react';
 import { Button } from '@client/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
 import { Badge } from '@client/components/ui/badge';
 import { IntelligentAutocomplete } from '@client/features/search/components/IntelligentAutocomplete';
 import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
+import { TouchOptimizedCard } from '@/components/mobile/__archive__/MobileOptimizedLayout';
+import { useAppStore } from '@client/store/unified-state-manager';
+import { useMediaQuery } from '@client/hooks/useMediaQuery';
+import { copySystem } from '@client/content/copy-system';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  
+  // Enhanced state management
+  const user = useAppStore(state => state.user.user);
+  const addActivity = useAppStore(state => state.addActivity);
+  
   const [currentStat, setCurrentStat] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [showPretextAnalysis, setShowPretextAnalysis] = useState(false);
   const [selectedBillId, setSelectedBillId] = useState<string>('');
+  const [showPersonalizedFeatures, setShowPersonalizedFeatures] = useState(false);
+  
+  // Get user level for personalized content
+  const userLevel = user?.persona || 'novice';
 
   useEffect(() => {
     setIsVisible(true);
     const interval = setInterval(() => {
       setCurrentStat((prev) => (prev + 1) % 4);
     }, 3000);
+    
+    // Track home page visit
+    addActivity({
+      type: 'page_viewed',
+      metadata: { 
+        page: 'home',
+        userPersona: userLevel,
+        timestamp: new Date().toISOString()
+      }
+    });
+    
+    // Show personalized features for returning users
+    if (user && user.onboardingCompleted) {
+      setShowPersonalizedFeatures(true);
+    }
+    
     return () => clearInterval(interval);
-  }, []);
+  }, [addActivity, userLevel, user]);
 
-  // Handle search from the embedded search bar
+  // Enhanced search with activity tracking
   const handleSearch = (query: string) => {
+    addActivity({
+      type: 'search_initiated',
+      metadata: { 
+        query,
+        source: 'home_page',
+        userPersona: userLevel
+      }
+    });
     navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
@@ -77,35 +117,84 @@ export default function HomePage() {
               <span>Platform Active • Real-time Updates</span>
             </div>
 
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-                Democracy
-              </span>
-              <br />
-              <span className="text-gray-900">in Your Hands</span>
-            </h1>
-            
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-10 leading-relaxed">
-              Track legislation, analyze policy impacts, detect implementation workarounds, and engage with your community. 
-              The Chanuka Platform empowers citizens with transparency tools for modern democracy.
-            </p>
+            {/* Personalized Welcome */}
+            {user && showPersonalizedFeatures ? (
+              <div className="mb-6">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                  Welcome back, {user.name?.split(' ')[0]}!
+                </h1>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6 leading-relaxed">
+                  {userLevel === 'novice' 
+                    ? "Ready to continue exploring how legislation affects your community?"
+                    : userLevel === 'intermediate'
+                    ? "Your civic engagement dashboard is ready with today's key developments."
+                    : "Your professional legislative intelligence briefing is ready."
+                  }
+                </p>
+                <div className="flex items-center justify-center gap-4 mb-8">
+                  <Badge variant="secondary" className="text-sm">
+                    <Heart className="w-4 h-4 mr-1 text-red-500" />
+                    {user.persona} User
+                  </Badge>
+                  <Badge variant="outline" className="text-sm">
+                    <Activity className="w-4 h-4 mr-1" />
+                    Active Citizen
+                  </Badge>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+                  <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+                    Democracy
+                  </span>
+                  <br />
+                  <span className="text-gray-900">in Your Hands</span>
+                </h1>
+                
+                <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-10 leading-relaxed">
+                  {copySystem.platformMission.short}
+                </p>
+              </div>
+            )}
 
-            {/* Enhanced CTA Buttons */}
+            {/* Personalized CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Button asChild size="lg" className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <Link to="/bills">
-                  <FileText className="mr-2 h-5 w-5" />
-                  Explore Bills
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              {user && showPersonalizedFeatures ? (
+                <>
+                  <Button asChild size="lg" className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <Link to="/dashboard">
+                      <BarChart3 className="mr-2 h-5 w-5" />
+                      View Dashboard
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  
+                  <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+                    <Link to="/bills">
+                      <FileText className="mr-2 h-5 w-5" />
+                      {userLevel === 'expert' ? 'Professional Tools' : 'Explore Bills'}
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild size="lg" className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <Link to="/bills">
+                      <FileText className="mr-2 h-5 w-5" />
+                      Explore Bills
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
 
-              <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
-                <Link to="/community">
-                  <Users className="mr-2 h-5 w-5" />
-                  Join Community
-                </Link>
-              </Button>
+                  <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+                    <Link to="/community">
+                      <Users className="mr-2 h-5 w-5" />
+                      Join Community
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Embedded Search Bar */}

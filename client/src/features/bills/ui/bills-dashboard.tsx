@@ -6,21 +6,43 @@
  * Now uses the new Bills API services for data management and real-time updates.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import {
+  Search,
+  RefreshCw,
+  Download,
+  ChevronUp,
+  ChevronDown,
+  LayoutGrid,
+  LayoutList,
+  Lightbulb,
+  Target,
+} from 'lucide-react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+
+import { RealTimeDashboard } from '@client/components/realtime/RealTimeDashboard';
+import { MobileBillCard, TouchOptimizedCard } from '@/components/mobile/__archive__/MobileOptimizedLayout';
+import { Button } from '@client/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Input } from '@client/components/ui/input';
+import { Badge } from '@client/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/components/ui/select';
+import { useBills } from '@client/features/bills/model/hooks/useBills';
+import { BillsQueryParams, Bill } from '@client/features/bills/model/types';
 import { useMediaQuery } from '@client/hooks/useMediaQuery';
-import { useBills } from '@client/features/bills/hooks/useBills';
-import { BillsQueryParams } from '@client/features/bills/types';
-import { FilterPanel } from './filter-panel';
-import { BillGrid } from './virtual-bill-grid';
-import { StatsOverview } from './stats-overview';
-import { RealTimeDashboard } from '../realtime/RealTimeDashboard';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Search, RefreshCw, Download, ChevronUp, ChevronDown, LayoutGrid, LayoutList } from 'lucide-react';
+import { useAppStore, useBillsFilters, useUserPreferences } from '@client/store/unified-state-manager';
+import { copySystem } from '@client/content/copy-system';
 import { cn } from '@client/lib/utils';
 import { logger } from '@client/utils/logger';
+
+import { FilterPanel } from './filter-panel';
+import { StatsOverview } from './stats-overview';
+import { BillGrid } from './virtual-bill-grid';
 
 interface BillsDashboardProps {
   className?: string;
@@ -28,42 +50,46 @@ interface BillsDashboardProps {
 
 export function BillsDashboard({ className }: BillsDashboardProps) {
   const isMobile = useMediaQuery('(max-width: 768px)');
-
+  
+  // Enhanced state management
+  const user = useAppStore(state => state.user.user);
+  const userPreferences = useUserPreferences();
+  const billsFilters = useBillsFilters();
+  const savedBills = useAppStore(state => state.user.savedBills);
+  const addNotification = useAppStore(state => state.addNotification);
+  
   // Local state for search input and view preferences
-  const [searchInput, setSearchInput] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchInput, setSearchInput] = useState(billsFilters.query || '');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(userPreferences.dashboard.layout || 'grid');
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'urgency' | 'engagement'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [showPersonalizedHelp, setShowPersonalizedHelp] = useState(false);
 
-  // Use existing React Query bills hook
+  // Use existing React Query bills hook with unified state
   const [filters, setFilters] = useState<BillsQueryParams>({
+    ...billsFilters,
     page: 1,
-    limit: 12,
+    limit: isMobile ? 8 : 12, // Fewer items on mobile
     sortBy: 'date',
     sortOrder: 'desc',
-    status: [],
-    urgency: [],
-    policyAreas: [],
-    sponsors: [],
-    constitutionalFlags: false,
-    controversyLevels: [],
-    dateRange: { start: undefined, end: undefined },
   });
 
   const onFiltersChange = useCallback((newFilters: BillsQueryParams) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev: BillsQueryParams) => ({ ...prev, ...newFilters }));
+    // Update unified state
+    useAppStore.getState().updateFilters(newFilters);
   }, []);
 
   const { data: billsData, isLoading: loading, error: billsError, refetch } = useBills(filters);
 
   // Enhanced demo data integration for investor presentations
-  const bills = billsData?.bills || [];
+  const bills = useMemo(() => billsData?.bills || [], [billsData?.bills]);
   const stats = billsData?.stats || {
     totalBills: 1247,
     urgentCount: 23,
     constitutionalFlags: 8,
     trendingCount: 15,
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
   };
   const error = billsError?.message || null;
 
@@ -80,8 +106,9 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       const query = searchInput.trim();
-      if (query.length >= 2 || query.length === 0) { // Only search if 2+ chars or empty
-        setFilters(prev => ({
+      if (query.length >= 2 || query.length === 0) {
+        // Only search if 2+ chars or empty
+        setFilters((prev: BillsQueryParams) => ({
           ...prev,
           query,
           page: 1, // Reset to first page on new search
@@ -92,49 +119,80 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  // Handle bill engagement actions
-  const handleSave = useCallback(
-    async (billId: number) => {
-      try {
-        // TODO: Implement with proper engagement mutation hook
-        logger.info('Bill saved', {
-          component: 'BillsDashboard',
-          billId,
+  // Enhanced bill engagement actions with unified state
+  const handleSave = useCallback(async (billId: string) => {
+    try {
+      const isSaved = savedBills.has(billId);
+      
+      if (isSaved) {
+        useAppStore.getState().unsaveBill(billId);
+        addNotification({
+          type: 'info',
+          message: 'Bill removed from your saved list'
         });
-      } catch (error) {
-        logger.error('Failed to save bill', {
-          component: 'BillsDashboard',
-          billId,
-          error: error instanceof Error ? error.message : 'Unknown error',
+      } else {
+        useAppStore.getState().saveBill(billId);
+        addNotification({
+          type: 'success',
+          message: copySystem.confirmations.billShared
         });
       }
-    },
-    []
-  );
+      
+      logger.info('Bill save toggled', {
+        component: 'BillsDashboard',
+        billId,
+        action: isSaved ? 'unsaved' : 'saved',
+        userPersona: user?.persona
+      });
+    } catch (error) {
+      logger.error('Failed to save bill', {
+        component: 'BillsDashboard',
+        billId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
+      addNotification({
+        type: 'error',
+        message: 'Failed to save bill. Please try again.'
+      });
+    }
+  }, [savedBills, addNotification, user?.persona]);
 
   const handleShare = useCallback(
-    async (billId: number) => {
+    async (billId: string) => {
       try {
+        const bill = bills.find((b: Bill) => b.id === billId);
+        if (!bill) return;
+
+        // Track sharing activity
+        useAppStore.getState().addActivity({
+          type: 'bill_shared',
+          metadata: { billId, title: bill.title }
+        });
+
         // Implement actual sharing logic
         if (navigator.share) {
-          const bill = bills.find(b => b.id === billId);
-          if (bill) {
-            await navigator.share({
-              title: bill.title,
-              text: bill.summary,
-              url: `${window.location.origin}/bills/${billId}`,
-            });
-          }
+          await navigator.share({
+            title: bill.title,
+            text: bill.summary,
+            url: `${window.location.origin}/bills/${billId}`,
+          });
         } else {
           // Fallback: copy to clipboard
           const url = `${window.location.origin}/bills/${billId}`;
           await navigator.clipboard.writeText(url);
-          // TODO: Show toast notification
+          
+          addNotification({
+            type: 'success',
+            message: 'Bill link copied to clipboard!'
+          });
         }
 
         logger.info('Bill shared', {
           component: 'BillsDashboard',
           billId,
+          userPersona: user?.persona,
+          shareMethod: navigator.share ? 'native' : 'clipboard'
         });
       } catch (error) {
         logger.error('Failed to share bill', {
@@ -142,12 +200,17 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
           billId,
           error: error instanceof Error ? error.message : 'Unknown error',
         });
+        
+        addNotification({
+          type: 'error',
+          message: 'Failed to share bill. Please try again.'
+        });
       }
     },
-    [bills]
+    [bills, addNotification, user?.persona]
   );
 
-  const handleComment = useCallback((billId: number) => {
+  const handleComment = useCallback((billId: string) => {
     // Navigate to bill detail page with comment section focused
     window.location.href = `/bills/${billId}#comments`;
   }, []);
@@ -169,23 +232,22 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
   const handleExport = useCallback(() => {
     try {
       // Create CSV data from filtered bills
-      const csvData = filteredBills.map((bill: any) => ({
-        'Bill Number': bill.billNumber,
+      const csvData = filteredBills.map((bill: Bill) => ({
+        'Bill Number': bill.id,
         Title: bill.title,
         Status: bill.status,
-        Urgency: bill.urgencyLevel,
-        'Introduced Date': bill.introducedDate,
-        'Policy Areas': bill.policyAreas?.join('; ') || '',
-        'View Count': bill.viewCount || 0,
-        'Comment Count': bill.commentCount || 0,
+        Category: bill.category,
+        'Introduced Date': bill.introduced_date,
+        'View Count': bill.engagementMetrics?.views || 0,
+        'Comment Count': bill.comments?.length || 0,
       }));
 
       // Convert to CSV string
       const headers = Object.keys(csvData[0] || {});
       const csvContent = [
         headers.join(','),
-        ...csvData.map((row: any) =>
-          headers.map(header => `"${row[header as keyof typeof row]}"`).join(',')
+        ...csvData.map((row: Record<string, string | number>) =>
+          headers.map(header => `"${row[header]}"`).join(',')
         ),
       ].join('\n');
 
@@ -218,7 +280,7 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
       setSortBy(sortField);
 
       // Update filters to trigger new query
-      setFilters(prev => ({
+      setFilters((prev: BillsQueryParams) => ({
         ...prev,
         sortBy: sortField,
         sortOrder: sortOrder as 'asc' | 'desc',
@@ -233,13 +295,12 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
     setSortOrder(newSortOrder);
 
     // Update filters to trigger new query
-    setFilters(prev => ({
+    setFilters((prev: BillsQueryParams) => ({
       ...prev,
       sortOrder: newSortOrder as 'asc' | 'desc',
       page: 1, // Reset to first page
     }));
   }, [sortOrder]);
-
 
   const handleClearCache = useCallback(() => {
     // TODO: Implement cache clearing
@@ -266,16 +327,40 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
     );
   }
 
+  // Get personalized copy based on user level
+  const userLevel = user?.persona || 'novice';
+  const billTrackingCopy = copySystem.getCopy('billTracking', {
+    userLevel: userLevel as 'novice' | 'intermediate' | 'expert',
+    pageType: 'feature',
+    emotionalTone: 'empowering',
+    contentComplexity: userLevel === 'expert' ? 'technical' : 'simple'
+  });
+
   return (
     <div className={cn('container mx-auto px-4 py-6', className)}>
-      {/* Header */}
+      {/* Personalized Header */}
       <div className="space-y-4 mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Bills Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{billTrackingCopy.headline}</h1>
             <p className="text-muted-foreground">
-              Discover and track legislative bills with advanced filtering and real-time updates
+              {billTrackingCopy.description}
             </p>
+            
+            {/* Contextual Help for New Users */}
+            {userLevel === 'novice' && !showPersonalizedHelp && (
+              <div className="mt-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPersonalizedHelp(true)}
+                  className="text-blue-600 hover:text-blue-700 p-0 h-auto font-normal"
+                >
+                  <Lightbulb className="w-4 h-4 mr-1" />
+                  New to bill tracking? Get personalized tips
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -305,6 +390,55 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
             </Button>
           </div>
         </div>
+
+        {/* Personalized Help Panel */}
+        {showPersonalizedHelp && userLevel === 'novice' && (
+          <TouchOptimizedCard className="bg-blue-50 border-blue-200">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-blue-800">
+                  <Target className="w-5 h-5" />
+                  Getting Started with Bill Tracking
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPersonalizedHelp(false)}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  ×
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 text-blue-700">
+                <p className="text-sm">
+                  <strong>💡 Pro tip:</strong> Start by searching for topics you care about, like "healthcare" or "education"
+                </p>
+                <p className="text-sm">
+                  <strong>❤️ Save bills</strong> that interest you to get updates when they change
+                </p>
+                <p className="text-sm">
+                  <strong>🔍 Use filters</strong> to find bills by status, urgency, or policy area
+                </p>
+                <div className="pt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setShowPersonalizedHelp(false);
+                      // Focus search input
+                      const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
+                      searchInput?.focus();
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Start Exploring Bills
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </TouchOptimizedCard>
+        )}
 
         {/* Stats Overview */}
         <StatsOverview stats={stats} />
@@ -354,7 +488,9 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
                   <Input
                     placeholder="Search bills by title, number, or content..."
                     value={searchInput}
-                    onChange={e => setSearchInput(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setSearchInput(e.target.value)
+                    }
                     className="pl-10"
                   />
                 </div>
@@ -442,14 +578,29 @@ export function BillsDashboard({ className }: BillsDashboardProps) {
             </Card>
           ) : (
             <div data-infinite-scroll>
-              <BillGrid
-                bills={paginatedBills}
-                onSave={handleSave}
-                onShare={handleShare}
-                onComment={handleComment}
-                savedBills={new Set()} // TODO: Implement saved bills tracking
-                viewMode={viewMode}
-              />
+              {/* Mobile-Optimized Bill Cards */}
+              {isMobile ? (
+                <div className="space-y-4">
+                  {paginatedBills.map((bill: Bill) => (
+                    <MobileBillCard
+                      key={bill.id}
+                      bill={bill}
+                      onSave={handleSave}
+                      onShare={handleShare}
+                      onComment={handleComment}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <BillGrid
+                  bills={paginatedBills}
+                  onSave={handleSave}
+                  onShare={handleShare}
+                  onComment={handleComment}
+                  savedBills={savedBills}
+                  viewMode={viewMode}
+                />
+              )}
 
               {/* Loading indicator for additional data */}
               {isLoadingMore && (

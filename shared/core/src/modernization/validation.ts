@@ -29,7 +29,7 @@ export interface ValidationFrameworkOptions {
 export class ValidationFramework extends EventEmitter {
   private readonly config: ValidationFrameworkOptions['config'];
   private readonly logger: typeof logger;
-  private readonly workingDirectory: string;
+  private readonly _workingDirectory: string;
   private validationHistory: ValidationResult[] = [];
   private continuousValidation?: NodeJS.Timeout;
 
@@ -290,7 +290,7 @@ export class ValidationFramework extends EventEmitter {
     }
   }
 
-  private async validateSyntax(scope: ValidationScope): Promise<{
+  private async validateSyntax(_scope: ValidationScope): Promise<{
     status: ValidationStatus;
     message: string;
     details: Record<string, unknown>;
@@ -330,7 +330,7 @@ export class ValidationFramework extends EventEmitter {
     }
   }
 
-  private async validateImports(scope: ValidationScope): Promise<{
+  private async validateImports(_scope: ValidationScope): Promise<{
     status: ValidationStatus;
     message: string;
     details: Record<string, unknown>;
@@ -373,7 +373,7 @@ export class ValidationFramework extends EventEmitter {
     }
   }
 
-  private async validateTests(scope: ValidationScope): Promise<{
+  private async validateTests(_scope: ValidationScope): Promise<{
     status: ValidationStatus;
     message: string;
     details: Record<string, unknown>;
@@ -413,7 +413,7 @@ export class ValidationFramework extends EventEmitter {
     }
   }
 
-  private async validateBuild(scope: ValidationScope): Promise<{
+  private async validateBuild(_scope: ValidationScope): Promise<{
     status: ValidationStatus;
     message: string;
     details: Record<string, unknown>;
@@ -445,8 +445,8 @@ export class ValidationFramework extends EventEmitter {
   }
 
   private async validateFunctionality(
-    scope: ValidationScope,
-    task?: ModernizationTask
+    _scope: ValidationScope,
+    _task?: ModernizationTask
   ): Promise<{
     status: ValidationStatus;
     message: string;
@@ -492,7 +492,7 @@ export class ValidationFramework extends EventEmitter {
     }
   }
 
-  private async validatePerformance(scope: ValidationScope): Promise<{
+  private async validatePerformance(_scope: ValidationScope): Promise<{
     status: ValidationStatus;
     message: string;
     details: Record<string, unknown>;
@@ -523,7 +523,7 @@ export class ValidationFramework extends EventEmitter {
     }
   }
 
-  private async validateSecurity(scope: ValidationScope): Promise<{
+  private async validateSecurity(_scope: ValidationScope): Promise<{
     status: ValidationStatus;
     message: string;
     details: Record<string, unknown>;
@@ -603,7 +603,7 @@ export class ValidationFramework extends EventEmitter {
   }
 
   // Helper methods (simplified implementations)
-  private async findFiles(patterns: string[]): Promise<string[]> {
+  private async findFiles(_patterns: string[]): Promise<string[]> {
     // Simplified file finding - would use glob in real implementation
     return [];
   }

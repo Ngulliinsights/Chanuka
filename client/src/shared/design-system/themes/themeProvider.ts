@@ -3,10 +3,12 @@
  * Handles theme persistence and CSS variable updates
  */
 
-import { lightTheme } from './light';
+import { validateThemeContrast, generateContrastCSS } from '@client/utils/contrast';
+
 import { darkTheme } from './dark';
 import { highContrastTheme, darkHighContrastTheme } from './high-contrast';
-import { validateThemeContrast, generateContrastCSS } from '@client/utils/contrast';
+import { lightTheme } from './light';
+
 
 export type ThemeName = 'light' | 'dark' | 'high-contrast' | 'dark-high-contrast';
 export type Theme = typeof lightTheme | typeof darkTheme | typeof highContrastTheme | typeof darkHighContrastTheme;

@@ -207,7 +207,7 @@ export class LoggingHandler implements ErrorHandler {
   readonly priority = 10;
   readonly name = 'logging';
 
-  canHandle(error: BaseError): boolean {
+  canHandle(_error: BaseError): boolean {
     return true; // Can handle all errors
   }
 

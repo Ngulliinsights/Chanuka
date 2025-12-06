@@ -65,17 +65,17 @@ export interface ErrorMetadata {
 export interface BaseErrorOptions {
   readonly statusCode?: number;
   readonly code?: string;
-  readonly details?: Record<string, any>;
+  readonly details?: Record<string, any> | undefined;
   readonly isOperational?: boolean;
-  readonly cause?: Error;
+  readonly cause?: Error | undefined;
   readonly domain?: ErrorDomain;
   readonly severity?: ErrorSeverity;
   readonly source?: string;
   readonly correlationId?: string;
   readonly parentErrorId?: string;
-  readonly context?: Record<string, any>;
+  readonly context?: Record<string, any> | undefined;
   readonly retryable?: boolean;
-  readonly recoveryStrategies?: RecoveryStrategy[];
+  readonly recoveryStrategies?: RecoveryStrategy[] | undefined;
 }
 
 /**
