@@ -8,15 +8,22 @@ const __dirname = resolve(fileURLToPath(import.meta.url), '..')
 /**
  * UNIFIED VITEST WORKSPACE CONFIGURATION
  * 
- * This is the single source of truth for all test configuration across the monorepo.
+ * This is the SINGLE SOURCE OF TRUTH for all test configuration across the monorepo.
  * All projects use consistent setup, environments, and conventions.
  * 
  * Key Principles:
- * - One workspace, multiple projects
- * - Consistent setup files for each environment
+ * - One workspace, multiple projects (7 projects)
+ * - Global utilities auto-injected via vitest.setup.ts
  * - Standardized naming conventions (.test.ts, .integration.test.ts, .e2e.test.ts)
- * - Shared test utilities in /test-utils directory
- * - Eliminated duplicate configurations
+ * - Phase 1 test infrastructure in /tests directory
+ * - Eliminated duplicate and redundant configurations
+ * 
+ * Entry Point Flow:
+ * vitest.workspace.ts (this file)
+ *   → Each project references vitest.setup.ts
+ *     → tests/setup/vitest.ts (global utilities - auto-injected)
+ *     → tests/setup/test-environment.ts (mocks)
+ *     → tests/validation/ (validators - optional)
  */
 
 export default defineWorkspace([
@@ -29,7 +36,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./test-utils/setup/client.ts'],
+      setupFiles: ['./vitest.setup.ts'],
       css: true,
       testTimeout: 10000,
       hookTimeout: 5000,
@@ -101,7 +108,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./test-utils/setup/client-integration.ts'],
+      setupFiles: ['./vitest.setup.ts'],
       css: true,
       testTimeout: 30000, // Longer for integration tests
       hookTimeout: 10000,
@@ -162,7 +169,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./test-utils/setup/client-a11y.ts'],
+      setupFiles: ['./vitest.setup.ts'],
       css: true,
       testTimeout: 15000,
       hookTimeout: 5000,
@@ -205,7 +212,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'node',
-      setupFiles: ['./test-utils/setup/server.ts'],
+      setupFiles: ['./vitest.setup.ts'],
       testTimeout: 10000,
       hookTimeout: 5000,
       
@@ -265,7 +272,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'node',
-      setupFiles: ['./test-utils/setup/server-integration.ts'],
+      setupFiles: ['./vitest.setup.ts'],
       testTimeout: 30000, // Longer for DB operations
       hookTimeout: 10000,
       
@@ -303,7 +310,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'node',
-      setupFiles: ['./test-utils/setup/shared.ts'],
+      setupFiles: ['./vitest.setup.ts'],
       testTimeout: 10000,
       hookTimeout: 5000,
       
@@ -349,7 +356,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'node',
-      setupFiles: ['./test-utils/setup/e2e.ts'],
+      setupFiles: ['./vitest.setup.ts'],
       testTimeout: 60000, // E2E can take longer
       hookTimeout: 30000,
       
