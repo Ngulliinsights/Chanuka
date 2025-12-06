@@ -9,7 +9,7 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 
 import { getBrowserInfo } from '@/utils/browser';
-import { BaseError, ErrorDomain, ErrorSeverity, errorHandler } from '@/utils/errors';
+import { BaseError, ErrorDomain, ErrorSeverity, errorHandler } from '@/core/error';
 import { logger } from '@/utils/logger';
 import { runtimePerformanceMonitor } from '@/utils/performance-monitor';
 import { startTrace, finishTrace } from '@/utils/tracing';
