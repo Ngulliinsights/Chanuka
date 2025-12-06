@@ -1,13 +1,438 @@
-# Testing Infrastructure - Unified Configuration
+# ⚠️ ARCHIVED: Testing Infrastructure Moved to `tests/`
 
-This document explains the consolidated testing infrastructure that has been unified across the entire monorepo.
+**This directory is deprecated.** All testing infrastructure has been consolidated into the `tests/` directory following best practices for single source of truth.
 
-## 📋 Quick Reference
+## Where Things Moved
 
-### Running Tests
+| Old Location | New Location | Purpose |
+|---|---|---|
+| `test-utils/setup.ts` | `tests/setup/vitest.ts` | Global test utilities (factories, helpers, patterns) |
+| `test-utils/factories/` | `tests/factories/` | Feature-specific mock factories (planned Phase 2) |
+| `test-utils/helpers/` | `tests/helpers/` | Component testing helpers (planned Phase 3) |
+
+## Current Testing Infrastructure
+
+All testing setup is now centralized in:
+- **`vitest.setup.ts`** (root orchestrator)
+- **`tests/setup/vitest.ts`** (global utilities, factories)
+- **`tests/setup/test-environment.ts`** (Redis, Performance API mocks)
+- **`tests/mocks/`** (shared mocks)
+- **`tests/utils/`** (test helpers)
+- **`tests/factories/`** (future: feature-specific factories)
+
+## How Tests Access Utilities
+
+### Global Utilities (No Imports)
+```typescript
+// Any test file
+describe('Feature', () => {
+  it('works', () => {
+    const user = global.testUtils.createMockUser();
+    // testUtils auto-injected by vitest.setup.ts
+  });
+});
+```
+
+### Feature Factories (When Needed, Phase 2+)
+```typescript
+import { createComplexUserScenario } from '@tests/factories/user-factory';
+// Available when tests/factories/ is populated in Phase 2
+```
+
+## For Developers
+
+- Write tests anywhere in `src/` (collocated with source)
+- Global utilities are automatically available
+- Import feature factories from `@tests/factories/` as needed
+- Mocks are auto-loaded by `vitest.setup.ts`
+
+## For Maintainers
+
+- **Don't** add anything to this directory
+- **Do** update `tests/setup/vitest.ts` for global utilities
+- **Do** create factories in `tests/factories/` as needed
+- **Don't** maintain duplicate test setup
+
+---
+
+**Status**: Consolidated into `tests/` (December 6, 2025)
+**Recommendation**: Delete this directory after confirming all tests work
+
+## Overview
+
+This is a **clean reset** of the testing infrastructure after removing 487 outdated tests that no longer aligned with the project structure. This Phase 1 establishes a modern, maintainable testing foundation.
+
+## Current Status
+
+✅ **Phase 1 Starting**: Fresh infrastructure ready
+- All outdated tests deleted (58,622 LOC removed)
+- Global test utilities setup (no imports needed)
+- Vitest configuration ready
+- Integration strategy designed
+
+## Architecture
+
+### Testing Utils Integration Strategy
+
+The testing utilities are strategically integrated at **3 layers**:
+
+#### Layer 1: Global Utilities (Available Everywhere)
+```typescript
+// test-utils/setup.ts
+global.testUtils = {
+  createMockUser(overrides),
+  createMockBill(overrides),
+  createMockSponsor(overrides),
+  createMockAnalysis(overrides),
+  delay(ms),
+  generateUniqueId(prefix),
+  mockApiError(message, status),
+  testPatterns: { invalidIds, xssPayloads, sqlInjectionPayloads, ... }
+}
+```
+
+**Usage in any test** (no imports required):
+```typescript
+describe('Feature', () => {
+  it('works', () => {
+    const user = global.testUtils.createMockUser({ name: 'John' });
+    // test...
+  });
+});
+```
+
+#### Layer 2: Feature-Specific Utilities (Domain Logic Tests)
+When testing domain logic (services, hooks, business logic):
+```typescript
+// test-utils/factories/
+// - user-factory.ts      (create complex user scenarios)
+// - bill-factory.ts      (bill analysis workflows)
+// - analysis-factory.ts  (multi-step analysis scenarios)
+// - etc.
+```
+
+#### Layer 3: Component Testing Helpers (UI Tests)
+When testing React components:
+```typescript
+// test-utils/component-helpers/
+// - render-with-providers.tsx  (Redux, Router, Contexts)
+// - mock-navigation.ts         (Navigation mocking)
+// - user-interactions.ts       (Common click/type patterns)
+```
+
+### Directory Structure
+
+```
+test-utils/
+├── setup.ts                  ← Loaded automatically by Vitest
+├── factories/                ← Feature-specific mock factories (TODO)
+│   ├── user-factory.ts
+│   ├── bill-factory.ts
+│   ├── analysis-factory.ts
+│   └── sponsor-factory.ts
+├── helpers/                  ← Component testing helpers (TODO)
+│   ├── render-with-providers.tsx
+│   ├── mock-navigation.ts
+│   └── user-interactions.ts
+└── README.md                 ← This file
+```
+
+## How to Write Tests (Phase 1)
+
+### 1. Unit Test - Service/Hook/Utility
+```typescript
+import { describe, it, expect } from 'vitest';
+import { calculateBillImpact } from '@/services/analysis';
+
+describe('calculateBillImpact', () => {
+  it('returns correct impact score', () => {
+    const bill = global.testUtils.createMockBill({
+      title: 'Healthcare Reform'
+    });
+    
+    const impact = calculateBillImpact(bill);
+    expect(impact).toBeGreaterThan(0);
+  });
+
+  it('handles edge cases', () => {
+    const bill = global.testUtils.createMockBill({
+      title: '' // Edge case: empty title
+    });
+    
+    expect(() => calculateBillImpact(bill)).not.toThrow();
+  });
+});
+```
+
+### 2. Component Test (Basic)
+```typescript
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { UserCard } from '@/components/UserCard';
+
+describe('UserCard', () => {
+  it('renders user information', () => {
+    const user = global.testUtils.createMockUser({
+      name: 'Alice',
+      email: 'alice@example.com'
+    });
+    
+    render(<UserCard user={user} />);
+    
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+    expect(screen.getByText('alice@example.com')).toBeInTheDocument();
+  });
+});
+```
+
+### 3. Integration Test (Feature Flow)
+```typescript
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BillDetailsPage } from '@/pages/BillDetailsPage';
+
+describe('BillDetailsPage - User Flow', () => {
+  let bill;
+
+  beforeEach(() => {
+    bill = global.testUtils.createMockBill({
+      billNumber: 'HB-2024',
+      status: 'passed'
+    });
+  });
+
+  it('loads and displays bill analysis', async () => {
+    render(<BillDetailsPage billId={bill.id} />);
+    
+    // Wait for analysis to load
+    await waitFor(() => {
+      expect(screen.getByText(/analysis/i)).toBeInTheDocument();
+    });
+  });
+
+  it('handles errors gracefully', async () => {
+    // Test with error scenario
+    const error = global.testUtils.mockApiError('Failed to load');
+    expect(error.status).toBe(400);
+  });
+});
+```
+
+## Global Test Utilities Reference
+
+### Mock Data Factories
+
+```typescript
+// Create a user (all fields optional)
+global.testUtils.createMockUser({
+  id: 'custom-id',
+  email: 'user@example.com',
+  name: 'Custom Name',
+  role: 'expert',
+  // ... any other User properties
+});
+
+// Create a bill
+global.testUtils.createMockBill({
+  billNumber: 'SB-2024',
+  title: 'Custom Bill',
+  status: 'passed',
+  // ... any other Bill properties
+});
+
+// Create a sponsor
+global.testUtils.createMockSponsor({
+  name: 'Senator Smith',
+  chamber: 'senate',
+  party: 'democrat',
+  // ... any other Sponsor properties
+});
+
+// Create an analysis
+global.testUtils.createMockAnalysis({
+  type: 'financial-impact',
+  summary: 'Custom analysis',
+  // ... any other Analysis properties
+});
+```
+
+### Helper Functions
+
+```typescript
+// Delay test execution (useful for async testing)
+await global.testUtils.delay(1000);
+
+// Generate unique IDs for test isolation
+const userId = global.testUtils.generateUniqueId('user');  // 'user-1234567890-abc123'
+
+// Create mock API errors
+const error = global.testUtils.mockApiError('Not found', 404);
+throw error; // { message: 'Not found', status: 404, statusCode: 404 }
+```
+
+### Test Patterns (For Validation Testing)
+
+```typescript
+// Invalid IDs (for testing error handling)
+global.testUtils.testPatterns.invalidIds
+// → ['', '0', '-1', 'invalid', 'null', 'undefined']
+
+// XSS attack payloads (for security testing)
+global.testUtils.testPatterns.xssPayloads
+// → ['<script>alert("xss")</script>', ...]
+
+// SQL injection payloads (for security testing)
+global.testUtils.testPatterns.sqlInjectionPayloads
+// → ["'; DROP TABLE users; --", ...]
+
+// Boundary values (for edge case testing)
+global.testUtils.testPatterns.edgeCaseBoundaries
+// → [0, -1, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER]
+```
+
+## Running Tests
 
 ```bash
-# Run ALL tests
+# Run all tests
+pnpm test
+
+# Run specific file
+pnpm test BillCard
+
+# Run with coverage
+pnpm test --coverage
+
+# Watch mode (re-run on changes)
+pnpm test --watch
+
+# Run with UI
+pnpm test --ui
+```
+
+## Next Steps (Phase 2-4 Roadmap)
+
+### Phase 2: Feature-Based Organization
+- Create domain-specific factories in `test-utils/factories/`
+- Organize tests by feature (colocate with source)
+- Standardize test naming conventions
+- **Timeline**: 1-2 weeks
+
+### Phase 3: Component Testing Infrastructure
+- Create `render-with-providers` helper
+- Mock navigation, routing, global state
+- Accessibility testing setup
+- **Timeline**: 1 week
+
+### Phase 4: Advanced Testing
+- Performance testing setup
+- E2E test framework (Playwright)
+- Visual regression testing
+- Flaky test detection
+- **Timeline**: 1-2 weeks
+
+## Integration Points (Where Testing Utils Connect)
+
+### 1. **Test File** → **Global Utils**
+```
+*.test.ts ─→ setupFiles: test-utils/setup.ts ─→ global.testUtils
+```
+
+### 2. **Feature Test** → **Feature Factory** (Future)
+```
+features/bills/*.test.ts ─→ test-utils/factories/bill-factory.ts
+```
+
+### 3. **Component Test** → **Component Helpers** (Future)
+```
+components/**/*.test.tsx ─→ test-utils/helpers/render-with-providers.tsx
+```
+
+### 4. **Service Test** → **Mock Data**
+```
+services/**/*.test.ts ─→ global.testUtils.createMock*() ─→ global.testPatterns
+```
+
+## Project Structure (Updated)
+
+```
+SimpleTool/
+├── vitest.config.ts              ← Main test config
+├── test-utils/
+│   ├── setup.ts                  ← Global utilities (auto-loaded)
+│   ├── factories/                ← Feature factories (future)
+│   ├── helpers/                  ← Component helpers (future)
+│   └── README.md
+├── client/src/
+│   ├── components/
+│   │   ├── BillCard.tsx
+│   │   └── BillCard.test.tsx     ← New tests (colocated)
+│   ├── services/
+│   │   ├── billService.ts
+│   │   └── billService.test.ts   ← New tests (colocated)
+│   ├── hooks/
+│   │   ├── useBill.ts
+│   │   └── useBill.test.ts       ← New tests (colocated)
+│   └── ... (other source files)
+├── server/src/
+│   ├── features/
+│   │   ├── bills/
+│   │   │   ├── bill.service.ts
+│   │   │   └── bill.service.test.ts ← New tests (colocated)
+│   └── ... (other source files)
+└── shared/
+    ├── core/src/
+    │   ├── utils/
+    │   │   ├── validators.ts
+    │   │   └── validators.test.ts  ← New tests (colocated)
+```
+
+## Best Practices
+
+1. **Colocation**: Keep test files next to source files
+   - ✅ `BillCard.tsx` + `BillCard.test.tsx`
+   - ❌ Avoid scattered `__tests__/` directories
+
+2. **Naming**: Use clear, descriptive test names
+   - ✅ `it('renders bill title when provided')`
+   - ❌ `it('works')`
+
+3. **Use Global Utils**: No imports needed
+   - ✅ `const user = global.testUtils.createMockUser();`
+   - ❌ `import { createMockUser } from 'test-utils';`
+
+4. **Test Behavior**: Focus on what component does, not how
+   - ✅ `expect(screen.getByText('Submit')).toBeEnabled()`
+   - ❌ `expect(component.state.buttonDisabled).toBe(false)`
+
+5. **Keep Tests Simple**: One assertion = one test
+   - ✅ Multiple `it()` blocks for different scenarios
+   - ❌ Multiple assertions in one test
+
+## Troubleshooting
+
+### "testUtils is not defined"
+→ Make sure `test-utils/setup.ts` is in `setupFiles` in `vitest.config.ts`
+→ Verify file exports `global.testUtils`
+
+### Tests not running
+→ Check filename matches pattern: `*.test.ts` or `*.test.tsx`
+→ Verify path in `include` glob in `vitest.config.ts`
+
+### Import errors in tests
+→ Check path aliases in `vitest.config.ts` resolve section
+→ Verify source files exist at imported paths
+
+## Questions?
+
+See these resources:
+- **Setup Details**: `test-utils/setup.ts` (well-commented)
+- **Vitest Config**: `vitest.config.ts`
+- **Vitest Docs**: https://vitest.dev
+
+---
+
+**Status**: Phase 1 ✅ Complete - Ready for test writing
+**Created**: December 6, 2025
 pnpm test
 
 # Run specific test suites
