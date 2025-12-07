@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
-import { AuthenticatedAPI } from '@client/utils/api';
+import { AuthenticatedApiClient } from '@client/utils/api';
 import { logger } from '@client/utils/logger';
 
 // Define types locally since they're not exported

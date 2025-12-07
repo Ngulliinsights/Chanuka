@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 
 import { logger } from '@client/utils/logger';
 
@@ -18,24 +18,18 @@ export function ErrorRecoveryManager({ children }: ErrorRecoveryManagerProps) {
     retryCount: 0,
   });
 
-  const handleError = useCallback((error: Error) => {
-    logger.error('Error Recovery Manager caught error:', error);
-    setErrorState(prev => ({
-      hasError: true,
-      error,
-      retryCount: prev.retryCount + 1,
-    }));
-  }, []);
-
-  const retry = useCallback(() => {
+  const retry = () => {
     setErrorState({
       hasError: false,
       error: undefined,
       retryCount: 0,
     });
-  }, []);
+  };
 
   if (errorState.hasError) {
+    if (errorState.error) {
+      logger.error('Error Recovery Manager caught error:', {}, errorState.error);
+    }
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8">
         <h1 className="text-2xl font-bold text-red-600 mb-4">Application Error</h1>

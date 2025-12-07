@@ -9,9 +9,8 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 
 import { getCircuitBreakerStats } from '@client/core/api/interceptors';
+import { BaseError, ErrorDomain, ErrorSeverity } from '@client/core/error';
 import { logger } from '@client/utils/logger';
-
-import { BaseError, ErrorDomain, ErrorSeverity } from '../../../../shared/core';
 
 export interface UnifiedErrorBoundaryProps {
   children: ReactNode;
@@ -40,7 +39,7 @@ export interface UnifiedErrorFallbackProps {
   onReload: () => void;
   recoveryAttempted: boolean;
   recoverySuccessful: boolean;
-  circuitBreakerStats: Record<string, any>;
+  circuitBreakerStats: Record<string, unknown>;
 }
 
 /**
@@ -54,8 +53,6 @@ export interface UnifiedErrorFallbackProps {
  * - Error correlation across services
  */
 export class UnifiedErrorBoundary extends Component<UnifiedErrorBoundaryProps, UnifiedErrorBoundaryState> {
-  private recoveryAttempts = 0;
-
   constructor(props: UnifiedErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -81,7 +78,7 @@ export class UnifiedErrorBoundary extends Component<UnifiedErrorBoundaryProps, U
           cause: error,
           context: {
             component: 'UnifiedErrorBoundary',
-            timestamp: new Date().toISOString(),
+            timestamp: Date.now(),
             userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
             url: typeof window !== 'undefined' ? window.location.href : undefined,
           },
@@ -98,119 +95,36 @@ export class UnifiedErrorBoundary extends Component<UnifiedErrorBoundaryProps, U
   }
 
   /**
-   * Enhanced error processing with shared BaseError system
+   * Enhanced error processing with shared error system
    */
-  override async componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  override componentDidCatch(_error: Error, errorInfo: ErrorInfo) {
     const baseError = this.state.error!;
-
-    // Create child error with correlation to maintain error chain
-    const enhancedError = baseError.createChildError(
-      `React component error: ${error.message}`,
-      {
-        domain: ErrorDomain.SYSTEM,
-        severity: ErrorSeverity.HIGH,
-        context: {
-          componentStack: errorInfo.componentStack,
-          errorBoundary: true,
-          isolate: this.props.isolate,
-          context: this.props.context,
-          circuitBreakerStats: getCircuitBreakerStats(),
-        },
-      }
-    );
 
     // Log using shared error system
     logger.error('Unified error boundary caught error', {
       component: 'UnifiedErrorBoundary',
-      errorId: enhancedError.errorId,
-      correlationId: enhancedError.metadata.correlationId,
-      parentErrorId: enhancedError.metadata.parentErrorId,
+      errorId: baseError.errorId,
+      correlationId: baseError.metadata.correlationId,
       componentStack: errorInfo.componentStack,
       context: this.props.context,
       circuitBreakerStats: getCircuitBreakerStats(),
     });
 
-    // Attempt automatic recovery if enabled and error is retryable
-    if (this.props.enableRecovery && enhancedError.shouldRetry(this.props.maxRecoveryAttempts || 3)) {
-      await this.attemptRecovery(enhancedError);
-    }
-
     // Call custom error handler
     if (this.props.onError) {
-      this.props.onError(enhancedError, errorInfo);
+      this.props.onError(baseError, errorInfo);
     }
 
-    // Update state with enhanced error
+    // Update state with error
     this.setState({
-      error: enhancedError,
-      errorId: enhancedError.errorId,
+      error: baseError,
+      errorId: baseError.errorId,
+      recoveryAttempted: true,
+      recoverySuccessful: false,
     });
   }
 
-  /**
-   * Attempt automatic recovery using BaseError recovery strategies
-   */
-  private async attemptRecovery(error: BaseError): Promise<void> {
-    this.recoveryAttempts++;
-    
-    try {
-      logger.info('Attempting automatic error recovery', {
-        component: 'UnifiedErrorBoundary',
-        errorId: error.errorId,
-        correlationId: error.metadata.correlationId,
-        attemptNumber: this.recoveryAttempts,
-      });
-
-      // Use BaseError's built-in recovery mechanism
-      const recoverySuccessful = await error.attemptRecovery();
-
-      this.setState({
-        recoveryAttempted: true,
-        recoverySuccessful,
-        recoveryAttempts: this.recoveryAttempts,
-      });
-
-      if (recoverySuccessful) {
-        // Reset error state on successful recovery
-        this.setState({
-          hasError: false,
-          error: undefined,
-          errorId: undefined,
-        });
-
-        logger.info('Automatic error recovery successful', {
-          component: 'UnifiedErrorBoundary',
-          errorId: error.errorId,
-          correlationId: error.metadata.correlationId,
-          attemptNumber: this.recoveryAttempts,
-        });
-      } else {
-        logger.warn('Automatic error recovery failed', {
-          component: 'UnifiedErrorBoundary',
-          errorId: error.errorId,
-          correlationId: error.metadata.correlationId,
-          attemptNumber: this.recoveryAttempts,
-        });
-      }
-    } catch (recoveryError) {
-      logger.error('Error during recovery attempt', {
-        component: 'UnifiedErrorBoundary',
-        errorId: error.errorId,
-        correlationId: error.metadata.correlationId,
-        attemptNumber: this.recoveryAttempts,
-        recoveryError,
-      });
-
-      this.setState({
-        recoveryAttempted: true,
-        recoverySuccessful: false,
-        recoveryAttempts: this.recoveryAttempts,
-      });
-    }
-  }
-
   private handleRetry = () => {
-    this.recoveryAttempts++;
     this.setState({
       hasError: false,
       error: undefined,
@@ -221,7 +135,6 @@ export class UnifiedErrorBoundary extends Component<UnifiedErrorBoundaryProps, U
 
     logger.info('Manual retry attempted', {
       component: 'UnifiedErrorBoundary',
-      attemptNumber: this.recoveryAttempts,
     });
   };
 
@@ -272,7 +185,10 @@ function UnifiedErrorFallback(props: UnifiedErrorFallbackProps) {
   } = props;
 
   const hasCircuitBreakerIssues = Object.values(circuitBreakerStats).some(
-    (state: any) => state.state === 'open' || state.state === 'half-open'
+    (state: unknown) => {
+      const s = state as { state?: string };
+      return s.state === 'open' || s.state === 'half-open';
+    }
   );
 
   return (
@@ -303,7 +219,7 @@ function UnifiedErrorFallback(props: UnifiedErrorFallbackProps) {
             </div>
             <div className="ml-4">
               <h1 className="text-2xl font-bold text-gray-900">Application Error</h1>
-              <p className="text-gray-600 mt-1">{error.getUserMessage()}</p>
+              <p className="text-gray-600 mt-1">{error.message}</p>
             </div>
           </div>
         </div>
@@ -423,28 +339,6 @@ function UnifiedErrorFallback(props: UnifiedErrorFallbackProps) {
             Reload Page
           </button>
         </div>
-
-        {/* Recovery Strategies */}
-        {error.metadata.recoveryStrategies.length > 0 && (
-          <details className="mt-6 border-t border-gray-200 pt-6">
-            <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus:text-gray-900">
-              Available Recovery Options
-            </summary>
-            <div className="mt-4 space-y-2">
-              {error.metadata.recoveryStrategies.map((strategy, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded-md">
-                  <h4 className="text-sm font-medium text-gray-900">{strategy.name}</h4>
-                  <p className="text-sm text-gray-600 mt-1">{strategy.description}</p>
-                  {strategy.automatic && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
-                      Automatic
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </details>
-        )}
       </div>
     </div>
   );

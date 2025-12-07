@@ -1,13 +1,16 @@
 /**
  * Advanced Multi-Dimensional Filtering System
  *
- * Provides comprehensive filtering capabilities for bills with:
- * - Desktop sidebar and mobile bottom sheet interfaces
- * - Multi-dimensional filtering (bill type, policy areas, sponsors, urgency, controversy, constitutional flags)
- * - Active filter chips with individual removal and "Clear All" functionality
- * - URL synchronization for shareable filtered views
- * - Dynamic result counts showing filter impact
- * - Controversy level filtering and strategic importance categorization
+ * This component provides a comprehensive filtering interface for legislative bills
+ * with intelligent URL synchronization, responsive design, and optimized performance.
+ *
+ * Key Features:
+ * - Responsive sidebar (desktop) and bottom sheet (mobile) layouts
+ * - Multi-dimensional filtering across status, urgency, policy areas, and controversy
+ * - Active filter chips with individual removal capabilities
+ * - URL parameter synchronization for shareable filtered views
+ * - Real-time result count feedback
+ * - Optimized re-render prevention through memoization
  */
 
 import {
@@ -21,7 +24,7 @@ import {
   Settings,
   RotateCcw,
 } from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { cn } from '@client/lib/utils';
@@ -32,53 +35,38 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Checkbox } from '../../../components/ui/checkbox';
 import { Label } from '../../../components/ui/label';
 import { Separator } from '../../../components/ui/separator';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '../../../components/ui/sheet';
 import type { BillsQueryParams } from '../model/types';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+// ============================================================================
+// Type Definitions
+// ============================================================================
+
+interface FilterOption {
+  value: string;
+  label: string;
+  description?: string;
+}
 
 interface FilterPanelProps {
-  filters: {
-    status?: string;
-    urgency?: string;
-    policyArea?: string;
-  };
-  onFiltersChange: (filters: any) => void;
+  filters: BillsQueryParams;
+  onFiltersChange: (filters: BillsQueryParams) => void;
   isMobile?: boolean;
   resultCount: number;
   totalCount: number;
+  className?: string;
 }
 
-export const FilterPanel: React.FC<FilterPanelProps> = ({
-  filters,
-  onFiltersChange,
-  isMobile = false,
-  resultCount,
-  totalCount,
-}) => {
-  const [isOpen, setIsOpen] = useState(!isMobile);
+interface FilterChip {
+  key: string;
+  label: string;
+  onRemove: () => void;
+}
 
-// interface FilterSection {
-//   key: keyof BillsFilter;
-//   title: string;
-//   icon: React.ComponentType<{ className?: string }>;
-//   options: FilterOption[];
-//   type: 'checkbox' | 'select' | 'toggle';
-//   collapsible?: boolean;
-// }
+type ArrayFilterKey = 'status' | 'urgency' | 'policyAreas' | 'sponsors' | 'controversyLevels';
 
-// Filter configuration data
-// const BILL_TYPES: FilterOption[] = [
-//   { value: 'public', label: 'Public Bills', description: 'Bills affecting the general public' },
-//   { value: 'private', label: 'Private Bills', description: 'Bills affecting specific individuals or organizations' },
-//   { value: 'money', label: 'Money Bills', description: 'Bills dealing with taxation or government spending' },
-//   { value: 'constitutional', label: 'Constitutional Bills', description: 'Bills amending the constitution' },
-// ];
+// ============================================================================
+// Filter Configuration Constants
+// ============================================================================
 
 const POLICY_AREAS: FilterOption[] = [
   { value: 'technology', label: 'Technology & Digital' },
@@ -123,89 +111,132 @@ const STATUS_OPTIONS: FilterOption[] = [
   { value: 'vetoed', label: 'Vetoed' },
 ];
 
-export function FilterPanel({
-  className,
-  isMobile = false,
-  resultCount = 0,
-  totalCount = 0,
+// Debounce delay for URL updates to prevent excessive history entries
+const URL_UPDATE_DEBOUNCE_MS = 150;
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+/**
+ * Safely normalizes filter values to ensure they're always arrays.
+ * This prevents type errors when filters are undefined or improperly formatted.
+ */
+const normalizeFilters = (filters: BillsQueryParams) => ({
+  status: Array.isArray(filters.status) ? filters.status : [],
+  urgency: Array.isArray(filters.urgency) ? filters.urgency : [],
+  policyAreas: Array.isArray(filters.policyAreas) ? filters.policyAreas : [],
+  sponsors: Array.isArray(filters.sponsors) ? filters.sponsors : [],
+  constitutionalFlags: filters.constitutionalFlags || false,
+  controversyLevels: Array.isArray(filters.controversyLevels) ? filters.controversyLevels : [],
+  dateRange: filters.dateRange || { start: undefined, end: undefined },
+});
+
+/**
+ * Parses URL search parameters into a structured filter object.
+ * This enables shareable URLs with pre-applied filters.
+ */
+const parseUrlFilters = (searchParams: URLSearchParams): Partial<BillsQueryParams> => {
+  const urlFilters: Partial<BillsQueryParams> = {};
+
+  const statusParam = searchParams.get('status');
+  if (statusParam) urlFilters.status = statusParam.split(',');
+
+  const urgencyParam = searchParams.get('urgency');
+  if (urgencyParam) urlFilters.urgency = urgencyParam.split(',');
+
+  const policyAreasParam = searchParams.get('policyAreas');
+  if (policyAreasParam) urlFilters.policyAreas = policyAreasParam.split(',');
+
+  const sponsorsParam = searchParams.get('sponsors');
+  if (sponsorsParam) urlFilters.sponsors = sponsorsParam.split(',');
+
+  const constitutionalFlagsParam = searchParams.get('constitutionalFlags');
+  if (constitutionalFlagsParam) urlFilters.constitutionalFlags = constitutionalFlagsParam === 'true';
+
+  const controversyParam = searchParams.get('controversyLevels');
+  if (controversyParam) urlFilters.controversyLevels = controversyParam.split(',');
+
+  const dateStartParam = searchParams.get('dateStart');
+  const dateEndParam = searchParams.get('dateEnd');
+  if (dateStartParam || dateEndParam) {
+    urlFilters.dateRange = {
+      start: dateStartParam || undefined,
+      end: dateEndParam || undefined,
+    };
+  }
+
+  return urlFilters;
+};
+
+/**
+ * Serializes filter objects into URL search parameters.
+ * Only includes filters that have active values to keep URLs clean.
+ */
+const serializeFiltersToUrl = (filters: ReturnType<typeof normalizeFilters>): URLSearchParams => {
+  const params = new URLSearchParams();
+
+  if (filters.status.length > 0) params.set('status', filters.status.join(','));
+  if (filters.urgency.length > 0) params.set('urgency', filters.urgency.join(','));
+  if (filters.policyAreas.length > 0) params.set('policyAreas', filters.policyAreas.join(','));
+  if (filters.sponsors.length > 0) params.set('sponsors', filters.sponsors.join(','));
+  if (filters.constitutionalFlags) params.set('constitutionalFlags', 'true');
+  if (filters.controversyLevels.length > 0) params.set('controversyLevels', filters.controversyLevels.join(','));
+  if (filters.dateRange.start) params.set('dateStart', filters.dateRange.start);
+  if (filters.dateRange.end) params.set('dateEnd', filters.dateRange.end);
+
+  return params;
+};
+
+// ============================================================================
+// Main Component
+// ============================================================================
+
+export const FilterPanel: React.FC<FilterPanelProps> = ({
   filters,
   onFiltersChange,
-}: FilterPanelProps) {
-  // Safe defaults for optional filter properties
-  const safeFilters = useMemo(
-    () => ({
-      status: filters.status || [],
-      urgency: filters.urgency || [],
-      policyAreas: filters.policyAreas || [],
-      sponsors: filters.sponsors || [],
-      constitutionalFlags: filters.constitutionalFlags || false,
-      controversyLevels: filters.controversyLevels || [],
-      dateRange: filters.dateRange || { start: undefined, end: undefined },
-    }),
-    [filters]
-  );
-
-  const handleSetFilters = React.useCallback(
-    (newFilters: BillsQueryParams) => {
-      onFiltersChange(newFilters);
-    },
-    [onFiltersChange]
-  );
-
-  const clearFilters = React.useCallback(() => {
-    onFiltersChange({});
-  }, [onFiltersChange]);
+  isMobile = false,
+  resultCount,
+  totalCount,
+  className,
+}) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Track which filter sections are expanded (for better UX on long filter lists)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['status', 'urgency'])
   );
+  
+  // Controls mobile bottom sheet visibility
   const [isOpen, setIsOpen] = useState(false);
 
-  // Sync filters with URL parameters (only on mount and URL changes)
+  // Normalize filters to ensure consistent array types throughout the component
+  const safeFilters = useMemo(() => normalizeFilters(filters), [filters]);
+
+  // Memoized callback to update filters with proper type safety
+  const handleSetFilters = useCallback(
+    (newFilters: Partial<BillsQueryParams>) => {
+      onFiltersChange({ ...filters, ...newFilters } as BillsQueryParams);
+    },
+    [filters, onFiltersChange]
+  );
+
+  // Clear all active filters at once
+  const clearFilters = useCallback(() => {
+    onFiltersChange({} as BillsQueryParams);
+  }, [onFiltersChange]);
+
+  // ============================================================================
+  // URL Synchronization Effect
+  // ============================================================================
+  
+  /**
+   * Syncs URL parameters to filters on component mount and when URL changes.
+   * This allows users to share filtered views via URL.
+   */
   useEffect(() => {
-    const urlFilters: Partial<BillsQueryParams> = {};
+    const urlFilters = parseUrlFilters(searchParams);
 
-    // Parse URL parameters into filters
-    const statusParam = searchParams.get('status');
-    if (statusParam) {
-      urlFilters.status = statusParam.split(',');
-    }
-
-    const urgencyParam = searchParams.get('urgency');
-    if (urgencyParam) {
-      urlFilters.urgency = urgencyParam.split(',');
-    }
-
-    const policyAreasParam = searchParams.get('policyAreas');
-    if (policyAreasParam) {
-      urlFilters.policyAreas = policyAreasParam.split(',');
-    }
-
-    const sponsorsParam = searchParams.get('sponsors');
-    if (sponsorsParam) {
-      urlFilters.sponsors = sponsorsParam.split(',');
-    }
-
-    const constitutionalFlagsParam = searchParams.get('constitutionalFlags');
-    if (constitutionalFlagsParam) {
-      urlFilters.constitutionalFlags = constitutionalFlagsParam === 'true';
-    }
-
-    const controversyParam = searchParams.get('controversyLevels');
-    if (controversyParam) {
-      urlFilters.controversyLevels = controversyParam.split(',');
-    }
-
-    const dateStartParam = searchParams.get('dateStart');
-    const dateEndParam = searchParams.get('dateEnd');
-    if (dateStartParam || dateEndParam) {
-      urlFilters.dateRange = {
-        start: dateStartParam || undefined,
-        end: dateEndParam || undefined,
-      };
-    }
-
-    // Update filters if URL has parameters and they're different from current filters
     if (Object.keys(urlFilters).length > 0) {
       const filtersChanged = JSON.stringify(urlFilters) !== JSON.stringify(filters);
       if (filtersChanged) {
@@ -214,55 +245,32 @@ export function FilterPanel({
     }
   }, [searchParams, filters, onFiltersChange]);
 
-  // Update URL when filters change (debounced to prevent loops)
+  /**
+   * Updates URL when filters change, with debouncing to prevent excessive updates.
+   * Uses replace mode to avoid cluttering browser history.
+   */
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      const newSearchParams = new URLSearchParams();
-
-      if (safeFilters.status.length > 0) {
-        newSearchParams.set('status', safeFilters.status.join(','));
-      }
-
-      if (safeFilters.urgency.length > 0) {
-        newSearchParams.set('urgency', safeFilters.urgency.join(','));
-      }
-
-      if (safeFilters.policyAreas.length > 0) {
-        newSearchParams.set('policyAreas', safeFilters.policyAreas.join(','));
-      }
-
-      if (safeFilters.sponsors.length > 0) {
-        newSearchParams.set('sponsors', safeFilters.sponsors.join(','));
-      }
-
-      if (safeFilters.constitutionalFlags) {
-        newSearchParams.set('constitutionalFlags', 'true');
-      }
-
-      if (safeFilters.controversyLevels.length > 0) {
-        newSearchParams.set('controversyLevels', safeFilters.controversyLevels.join(','));
-      }
-
-      if (safeFilters.dateRange.start) {
-        newSearchParams.set('dateStart', safeFilters.dateRange.start);
-      }
-
-      if (safeFilters.dateRange.end) {
-        newSearchParams.set('dateEnd', safeFilters.dateRange.end);
-      }
-
-      // Only update URL if it's actually different
+      const newSearchParams = serializeFiltersToUrl(safeFilters);
       const currentParams = searchParams.toString();
       const newParams = newSearchParams.toString();
+
       if (currentParams !== newParams) {
         setSearchParams(newSearchParams, { replace: true });
       }
-    }, 100); // Debounce by 100ms
+    }, URL_UPDATE_DEBOUNCE_MS);
 
     return () => clearTimeout(timeoutId);
   }, [safeFilters, searchParams, setSearchParams]);
 
-  // Calculate active filter count
+  // ============================================================================
+  // Computed Values
+  // ============================================================================
+
+  /**
+   * Calculates the total number of active filters for display in badges.
+   * This gives users a quick visual indicator of how many filters are applied.
+   */
   const activeFilterCount = useMemo(() => {
     let count = 0;
     count += safeFilters.status.length;
@@ -275,11 +283,14 @@ export function FilterPanel({
     return count;
   }, [safeFilters]);
 
-  // Generate active filter chips
-  const activeFilterChips = useMemo(() => {
-    const chips: Array<{ key: string; label: string; onRemove: () => void }> = [];
+  /**
+   * Generates removable filter chips for all active filters.
+   * Each chip shows the filter value and includes a remove button.
+   */
+  const activeFilterChips = useMemo((): FilterChip[] => {
+    const chips: FilterChip[] = [];
 
-    // Status chips
+    // Add status filter chips
     safeFilters.status.forEach((status: string) => {
       const option = STATUS_OPTIONS.find(opt => opt.value === status);
       if (option) {
@@ -288,14 +299,13 @@ export function FilterPanel({
           label: option.label,
           onRemove: () =>
             handleSetFilters({
-              ...safeFilters,
               status: safeFilters.status.filter((s: string) => s !== status),
             }),
         });
       }
     });
 
-    // Urgency chips
+    // Add urgency filter chips
     safeFilters.urgency.forEach((urgency: string) => {
       const option = URGENCY_LEVELS.find(opt => opt.value === urgency);
       if (option) {
@@ -304,14 +314,13 @@ export function FilterPanel({
           label: `${option.label} Priority`,
           onRemove: () =>
             handleSetFilters({
-              ...safeFilters,
               urgency: safeFilters.urgency.filter((u: string) => u !== urgency),
             }),
         });
       }
     });
 
-    // Policy area chips
+    // Add policy area filter chips
     safeFilters.policyAreas.forEach((area: string) => {
       const option = POLICY_AREAS.find(opt => opt.value === area);
       if (option) {
@@ -320,23 +329,22 @@ export function FilterPanel({
           label: option.label,
           onRemove: () =>
             handleSetFilters({
-              ...safeFilters,
               policyAreas: safeFilters.policyAreas.filter((p: string) => p !== area),
             }),
         });
       }
     });
 
-    // Constitutional flags chip
+    // Add constitutional flags chip if active
     if (safeFilters.constitutionalFlags) {
       chips.push({
         key: 'constitutional-flags',
         label: 'Constitutional Issues',
-        onRemove: () => handleSetFilters({ ...safeFilters, constitutionalFlags: false }),
+        onRemove: () => handleSetFilters({ constitutionalFlags: false }),
       });
     }
 
-    // Controversy level chips
+    // Add controversy level filter chips
     safeFilters.controversyLevels.forEach((level: string) => {
       const option = CONTROVERSY_LEVELS.find(opt => opt.value === level);
       if (option) {
@@ -345,14 +353,13 @@ export function FilterPanel({
           label: option.label,
           onRemove: () =>
             handleSetFilters({
-              ...safeFilters,
               controversyLevels: safeFilters.controversyLevels.filter((c: string) => c !== level),
             }),
         });
       }
     });
 
-    // Date range chip
+    // Add date range chip if active
     if (safeFilters.dateRange.start || safeFilters.dateRange.end) {
       const startDate = safeFilters.dateRange.start
         ? new Date(safeFilters.dateRange.start).toLocaleDateString()
@@ -372,7 +379,6 @@ export function FilterPanel({
         label: dateLabel,
         onRemove: () =>
           handleSetFilters({
-            ...safeFilters,
             dateRange: { start: undefined, end: undefined },
           }),
       });
@@ -381,7 +387,15 @@ export function FilterPanel({
     return chips;
   }, [safeFilters, handleSetFilters]);
 
-  const toggleSection = (sectionKey: string) => {
+  // ============================================================================
+  // Event Handlers
+  // ============================================================================
+
+  /**
+   * Toggles the expansion state of a filter section.
+   * This improves UX by allowing users to focus on relevant filters.
+   */
+  const toggleSection = useCallback((sectionKey: string) => {
     setExpandedSections(prev => {
       const newSet = new Set(prev);
       if (newSet.has(sectionKey)) {
@@ -391,239 +405,274 @@ export function FilterPanel({
       }
       return newSet;
     });
-  };
+  }, []);
 
-  const handleArrayFilterChange = (
-    filterKey: 'status' | 'urgency' | 'policyAreas' | 'sponsors' | 'controversyLevels',
-    value: string,
-    checked: boolean
-  ) => {
-    const currentArray = safeFilters[filterKey];
-    const newArray = checked
-      ? [...currentArray, value]
-      : currentArray.filter((item: string) => item !== value);
+  /**
+   * Handles checkbox changes for array-based filters.
+   * Adds or removes values from the filter array based on checkbox state.
+   */
+  const handleArrayFilterChange = useCallback(
+    (filterKey: ArrayFilterKey, value: string, checked: boolean) => {
+      const currentArray = safeFilters[filterKey] as string[];
+      const newArray = checked
+        ? [...currentArray, value]
+        : currentArray.filter((item: string) => item !== value);
 
-    handleSetFilters({ ...safeFilters, [filterKey]: newArray });
-  };
-
-  const FilterSection = ({
-    title,
-    icon: Icon,
-    children,
-    sectionKey,
-    collapsible = true,
-  }: {
-    title: string;
-    icon: React.ComponentType<{ className?: string }>;
-    children: React.ReactNode;
-    sectionKey: string;
-    collapsible?: boolean;
-  }) => {
-    const isExpanded = expandedSections.has(sectionKey);
-
-    return (
-      <div className="space-y-3">
-        <div
-          className={cn('flex items-center justify-between', collapsible && 'cursor-pointer')}
-          onClick={collapsible ? () => toggleSection(sectionKey) : undefined}
-        >
-          <div className="flex items-center gap-2">
-            <Icon className="h-4 w-4 text-muted-foreground" />
-            <Label className="text-sm font-medium">{title}</Label>
-          </div>
-          {collapsible &&
-            (isExpanded ? (
-              <ChevronUp className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            ))}
-        </div>
-
-        {(!collapsible || isExpanded) && <div className="space-y-2 pl-6">{children}</div>}
-      </div>
-    );
-  };
-
-  const FilterContent = () => (
-    <div className="space-y-6">
-      {/* Results Summary */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {resultCount === totalCount
-            ? `Showing all ${totalCount} bills`
-            : `Showing ${resultCount} of ${totalCount} bills`}
-        </div>
-        {activeFilterCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
-            <RotateCcw className="h-3 w-3 mr-1" />
-            Clear All ({activeFilterCount})
-          </Button>
-        )}
-      </div>
-
-      {/* Active Filter Chips */}
-      {activeFilterChips.length > 0 && (
-        <div className="space-y-2">
-          <Label className="text-xs font-medium text-muted-foreground">Active Filters</Label>
-          <div className="flex flex-wrap gap-2">
-            {activeFilterChips.map(chip => (
-              <Badge
-                key={chip.key}
-                variant="secondary"
-                className="chanuka-status-badge flex items-center gap-1 text-xs"
-              >
-                {chip.label}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto w-auto p-0 hover:bg-transparent"
-                  onClick={chip.onRemove}
-                  aria-label={`Remove ${chip.label} filter`}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <Separator />
-
-      {/* Bill Status Filter */}
-      <FilterSection title="Bill Status" icon={Flag} sectionKey="status">
-        <div className="space-y-2">
-          {STATUS_OPTIONS.map(option => (
-            <div key={option.value} className="flex items-center space-x-2">
-              <Checkbox
-                id={`status-${option.value}`}
-                checked={safeFilters.status.includes(option.value)}
-                onCheckedChange={(checked: boolean) =>
-                  handleArrayFilterChange('status', option.value, checked as boolean)
-                }
-              />
-              <Label
-                htmlFor={`status-${option.value}`}
-                className="text-sm font-normal cursor-pointer"
-              >
-                {option.label}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </FilterSection>
-
-      <Separator />
-
-      {/* Urgency Level Filter */}
-      <FilterSection title="Urgency Level" icon={AlertTriangle} sectionKey="urgency">
-        <div className="space-y-2">
-          {URGENCY_LEVELS.map(option => (
-            <div key={option.value} className="flex items-center space-x-2">
-              <Checkbox
-                id={`urgency-${option.value}`}
-                checked={safeFilters.urgency.includes(option.value)}
-                onCheckedChange={(checked: boolean) =>
-                  handleArrayFilterChange('urgency', option.value, checked as boolean)
-                }
-              />
-              <div className="flex-1">
-                <Label
-                  htmlFor={`urgency-${option.value}`}
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  {option.label}
-                </Label>
-                {option.description && (
-                  <p className="text-xs text-muted-foreground">{option.description}</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </FilterSection>
-
-      <Separator />
-
-      {/* Policy Areas Filter */}
-      <FilterSection title="Policy Areas" icon={Tag} sectionKey="policyAreas">
-        <div className="space-y-2">
-          {POLICY_AREAS.map(option => (
-            <div key={option.value} className="flex items-center space-x-2">
-              <Checkbox
-                id={`policy-${option.value}`}
-                checked={safeFilters.policyAreas.includes(option.value)}
-                onCheckedChange={(checked: boolean) =>
-                  handleArrayFilterChange('policyAreas', option.value, checked as boolean)
-                }
-              />
-              <Label
-                htmlFor={`policy-${option.value}`}
-                className="text-sm font-normal cursor-pointer"
-              >
-                {option.label}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </FilterSection>
-
-      <Separator />
-
-      {/* Constitutional Flags Filter */}
-      <FilterSection
-        title="Constitutional Issues"
-        icon={Flag}
-        sectionKey="constitutional"
-        collapsible={false}
-      >
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="constitutional-flags"
-            checked={safeFilters.constitutionalFlags}
-            onCheckedChange={(checked: boolean) =>
-              handleSetFilters({ ...safeFilters, constitutionalFlags: checked as boolean })
-            }
-          />
-          <Label htmlFor="constitutional-flags" className="text-sm font-normal cursor-pointer">
-            Show only bills with constitutional concerns
-          </Label>
-        </div>
-      </FilterSection>
-
-      <Separator />
-
-      {/* Controversy Level Filter */}
-      <FilterSection title="Controversy Level" icon={AlertTriangle} sectionKey="controversy">
-        <div className="space-y-2">
-          {CONTROVERSY_LEVELS.map(option => (
-            <div key={option.value} className="flex items-center space-x-2">
-              <Checkbox
-                id={`controversy-${option.value}`}
-                checked={safeFilters.controversyLevels.includes(option.value)}
-                onCheckedChange={(checked: boolean) =>
-                  handleArrayFilterChange('controversyLevels', option.value, checked as boolean)
-                }
-              />
-              <div className="flex-1">
-                <Label
-                  htmlFor={`controversy-${option.value}`}
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  {option.label}
-                </Label>
-                {option.description && (
-                  <p className="text-xs text-muted-foreground">{option.description}</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </FilterSection>
-    </div>
+      handleSetFilters({ [filterKey]: newArray });
+    },
+    [safeFilters, handleSetFilters]
   );
 
-  // Mobile bottom sheet interface
+  // ============================================================================
+  // Reusable Sub-Components
+  // ============================================================================
+
+  /**
+   * Reusable collapsible section component for organizing filter groups.
+   * Provides consistent styling and behavior across all filter sections.
+   */
+  const FilterSection = useCallback(
+    ({
+      title,
+      icon: Icon,
+      children,
+      sectionKey,
+      collapsible = true,
+    }: {
+      title: string;
+      icon: React.ComponentType<{ className?: string }>;
+      children: React.ReactNode;
+      sectionKey: string;
+      collapsible?: boolean;
+    }) => {
+      const isExpanded = expandedSections.has(sectionKey);
+
+      return (
+        <div className="space-y-3">
+          <div
+            className={cn('flex items-center justify-between', collapsible && 'cursor-pointer')}
+            onClick={collapsible ? () => toggleSection(sectionKey) : undefined}
+          >
+            <div className="flex items-center gap-2">
+              <Icon className="h-4 w-4 text-muted-foreground" />
+              <Label className="text-sm font-medium">{title}</Label>
+            </div>
+            {collapsible &&
+              (isExpanded ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              ))}
+          </div>
+
+          {(!collapsible || isExpanded) && <div className="space-y-2 pl-6">{children}</div>}
+        </div>
+      );
+    },
+    [expandedSections, toggleSection]
+  );
+
+  /**
+   * Main filter content component used in both mobile and desktop layouts.
+   * Contains all filter sections and active filter display.
+   */
+  const FilterContent = useCallback(
+    () => (
+      <div className="space-y-6">
+        {/* Results summary showing filter impact */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            {resultCount === totalCount
+              ? `Showing all ${totalCount} bills`
+              : `Showing ${resultCount} of ${totalCount} bills`}
+          </div>
+          {activeFilterCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
+              <RotateCcw className="h-3 w-3 mr-1" />
+              Clear All ({activeFilterCount})
+            </Button>
+          )}
+        </div>
+
+        {/* Active filter chips for quick removal */}
+        {activeFilterChips.length > 0 && (
+          <div className="space-y-2">
+            <Label className="text-xs font-medium text-muted-foreground">Active Filters</Label>
+            <div className="flex flex-wrap gap-2">
+              {activeFilterChips.map(chip => (
+                <Badge
+                  key={chip.key}
+                  variant="secondary"
+                  className="flex items-center gap-1 text-xs"
+                >
+                  {chip.label}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto w-auto p-0 hover:bg-transparent"
+                    onClick={chip.onRemove}
+                    aria-label={`Remove ${chip.label} filter`}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <Separator />
+
+        {/* Bill Status Filter Section */}
+        <FilterSection title="Bill Status" icon={Flag} sectionKey="status">
+          <div className="space-y-2">
+            {STATUS_OPTIONS.map(option => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`status-${option.value}`}
+                  checked={safeFilters.status.includes(option.value)}
+                  onCheckedChange={(checked: boolean) =>
+                    handleArrayFilterChange('status', option.value, checked)
+                  }
+                />
+                <Label
+                  htmlFor={`status-${option.value}`}
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </FilterSection>
+
+        <Separator />
+
+        {/* Urgency Level Filter Section */}
+        <FilterSection title="Urgency Level" icon={AlertTriangle} sectionKey="urgency">
+          <div className="space-y-2">
+            {URGENCY_LEVELS.map(option => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`urgency-${option.value}`}
+                  checked={safeFilters.urgency.includes(option.value)}
+                  onCheckedChange={(checked: boolean) =>
+                    handleArrayFilterChange('urgency', option.value, checked)
+                  }
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor={`urgency-${option.value}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {option.label}
+                  </Label>
+                  {option.description && (
+                    <p className="text-xs text-muted-foreground">{option.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </FilterSection>
+
+        <Separator />
+
+        {/* Policy Areas Filter Section */}
+        <FilterSection title="Policy Areas" icon={Tag} sectionKey="policyAreas">
+          <div className="space-y-2">
+            {POLICY_AREAS.map(option => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`policy-${option.value}`}
+                  checked={safeFilters.policyAreas.includes(option.value)}
+                  onCheckedChange={(checked: boolean) =>
+                    handleArrayFilterChange('policyAreas', option.value, checked)
+                  }
+                />
+                <Label
+                  htmlFor={`policy-${option.value}`}
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </FilterSection>
+
+        <Separator />
+
+        {/* Constitutional Issues Filter Section */}
+        <FilterSection
+          title="Constitutional Issues"
+          icon={Flag}
+          sectionKey="constitutional"
+          collapsible={false}
+        >
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="constitutional-flags"
+              checked={safeFilters.constitutionalFlags}
+              onCheckedChange={(checked: boolean) =>
+                handleSetFilters({ constitutionalFlags: checked })
+              }
+            />
+            <Label htmlFor="constitutional-flags" className="text-sm font-normal cursor-pointer">
+              Show only bills with constitutional concerns
+            </Label>
+          </div>
+        </FilterSection>
+
+        <Separator />
+
+        {/* Controversy Level Filter Section */}
+        <FilterSection title="Controversy Level" icon={AlertTriangle} sectionKey="controversy">
+          <div className="space-y-2">
+            {CONTROVERSY_LEVELS.map(option => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`controversy-${option.value}`}
+                  checked={safeFilters.controversyLevels.includes(option.value)}
+                  onCheckedChange={(checked: boolean) =>
+                    handleArrayFilterChange('controversyLevels', option.value, checked)
+                  }
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor={`controversy-${option.value}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {option.label}
+                  </Label>
+                  {option.description && (
+                    <p className="text-xs text-muted-foreground">{option.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </FilterSection>
+      </div>
+    ),
+    [
+      resultCount,
+      totalCount,
+      activeFilterCount,
+      activeFilterChips,
+      safeFilters,
+      clearFilters,
+      handleArrayFilterChange,
+      handleSetFilters,
+      FilterSection,
+    ]
+  );
+
+  // ============================================================================
+  // Render Logic
+  // ============================================================================
+
+  // Mobile layout with collapsible bottom sheet
   if (isMobile) {
     return (
       <div className="mb-4">
@@ -634,21 +683,15 @@ export function FilterPanel({
         >
           <span className="flex items-center">
             <Filter className="h-4 w-4 mr-2" />
-            Filters {hasActiveFilters && `(${Object.values(filters).filter(Boolean).length})`}
+            Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
           </span>
+          {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
-        
+
         {isOpen && (
           <Card className="mt-2">
             <CardContent className="p-4">
-              <FilterContent
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onClearFilters={clearFilters}
-                hasActiveFilters={hasActiveFilters}
-                resultCount={resultCount}
-                totalCount={totalCount}
-              />
+              <FilterContent />
             </CardContent>
           </Card>
         )}
@@ -656,6 +699,7 @@ export function FilterPanel({
     );
   }
 
+  // Desktop layout with persistent sidebar
   return (
     <Card className={cn('chanuka-card', className)}>
       <CardHeader className="pb-4">
@@ -674,4 +718,4 @@ export function FilterPanel({
       </CardContent>
     </Card>
   );
-}
+};

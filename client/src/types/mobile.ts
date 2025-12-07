@@ -1,9 +1,9 @@
 /**
  * Mobile Type Definitions
- * 
+ *
  * Unified TypeScript types for all mobile components and hooks.
  * Single source of truth for mobile-specific interfaces.
- * 
+ *
  * @module types/mobile
  */
 
@@ -16,25 +16,29 @@ export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
  * Gesture types
  */
 export type GestureType =
-  | 'swipe'
   | 'tap'
-  | 'long-press'
-  | 'pull-to-refresh'
+  | 'double-tap'
+  | 'swipe'
   | 'pinch'
+  | 'long-press'
+  | 'pan'
+  | 'pull-to-refresh'
   | 'rotate';
 
 /**
  * Gesture event data
  */
 export interface GestureEvent {
-  type: GestureType;
-  timestamp: number;
-  target?: EventTarget;
-  direction?: SwipeDirection;
-  velocity?: number;
-  distance?: number;
-  angle?: number;
-  scale?: number;
+  readonly type: GestureType;
+  readonly timestamp: number;
+  readonly target?: EventTarget;
+  readonly coordinates?: Readonly<{ x: number; y: number }>;
+  readonly direction?: SwipeDirection;
+  readonly velocity?: number;
+  readonly distance?: number;
+  readonly duration?: number;
+  readonly angle?: number;
+  readonly scale?: number;
 }
 
 /**
@@ -57,15 +61,25 @@ export interface SwipeGestureData {
 export type SwipeEvent = SwipeGestureData;
 
 /**
- * Touch event configuration
+ * Gesture configuration options
  */
-export interface TouchConfig {
+export interface GestureConfig {
+  // Enable flags
   enableSwipe?: boolean;
   enableLongPress?: boolean;
   enableTap?: boolean;
+  // Thresholds
+  tapThreshold?: number; // Max distance in pixels for tap
+  tapTimeout?: number; // Max duration in ms for tap
+  doubleTapTimeout?: number; // Max time between taps for double-tap
+  longPressDelay?: number; // Duration for long press in ms
+  swipeThreshold?: number; // Min distance for swipe
+  // Callbacks
   onSwipe?: (data: SwipeGestureData) => void;
-  onLongPress?: (e: TouchEvent) => void;
-  onTap?: (e: TouchEvent) => void;
+  onLongPress?: (e: GestureEvent) => void;
+  onTap?: (e: GestureEvent) => void;
+  // Other
+  preventDefaultOnTouch?: boolean;
 }
 
 /**
@@ -89,6 +103,30 @@ export interface SafeAreaInsets {
   bottom: number;
   left: number;
   right: number;
+}
+
+/**
+ * Comprehensive device information for responsive behavior
+ */
+export interface DeviceInfo {
+  readonly isMobile: boolean;
+  readonly isTablet: boolean;
+  readonly isDesktop: boolean;
+  readonly deviceType: 'phone' | 'tablet' | 'desktop';
+  readonly screenSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  readonly orientation: 'portrait' | 'landscape';
+  readonly hasTouch: boolean;
+  readonly pixelRatio: number;
+  readonly viewportWidth: number;
+  readonly viewportHeight: number;
+  readonly screenWidth: number;
+  readonly screenHeight: number;
+  readonly platform: string;
+  readonly vendor: string;
+  readonly isIOS: boolean;
+  readonly isAndroid: boolean;
+  readonly browserEngine: 'webkit' | 'gecko' | 'blink' | 'unknown';
+  readonly safeAreaInsets?: SafeAreaInsets;
 }
 
 /**
@@ -145,6 +183,34 @@ export interface ViewportConfig {
   pixelRatio: number;
   safeArea: SafeAreaInsets;
   orientation: 'portrait' | 'landscape';
+}
+
+/**
+ * Configurable breakpoints for responsive design
+ */
+export interface ResponsiveBreakpoints {
+  xs: number;
+  sm: number;
+  md: number;
+  lg: number;
+  xl: number;
+  '2xl': number;
+}
+
+/**
+ * Mobile-specific error context for better debugging
+ */
+export interface MobileErrorContext {
+  readonly deviceInfo: DeviceInfo;
+  readonly touchSupport: boolean;
+  readonly networkType?: string;
+  readonly connectionSpeed?: string;
+  readonly memoryInfo?: {
+    usedJSHeapSize?: number;
+    totalJSHeapSize?: number;
+    jsHeapSizeLimit?: number;
+  };
+  readonly timestamp: number;
 }
 
 /**

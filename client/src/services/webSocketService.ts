@@ -18,7 +18,6 @@ import {
 } from '../types/api';
 
 import { billTrackingService } from './billTrackingService';
-import { stateManagementService } from './stateManagementService';
 
 export class WebSocketService {
   private wsManager: UnifiedWebSocketManager;
@@ -263,10 +262,7 @@ export class WebSocketService {
         read: false
       };
 
-      // Add to state
-      stateManagementService.addNotification(processedNotification);
-
-      // Notify handlers
+      // Notify handlers - notifications are now handled by React Query hooks in components
       this.handlers.onNotification?.(processedNotification);
 
       logger.debug('Notification processed', {

@@ -636,7 +636,7 @@ class UserService {
 // Export Singleton Instance
 // ============================================================================
 
-import { authService } from './AuthService';
+import { authService } from './auth-service';
 
 import { userApi } from '@client/features/users/services/user-api';
 

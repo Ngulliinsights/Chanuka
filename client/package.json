@@ -104,8 +104,7 @@
     "tailwindcss-animate": "^1.0.7",
     "web-vitals": "^5.1.0",
     "wouter": "^3.3.5",
-    "zod": "^3.23.8",
-    "zustand": "^4.4.7"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

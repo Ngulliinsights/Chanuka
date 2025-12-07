@@ -1,87 +1,193 @@
 /**
- * Card Component
+ * Card Component - UNIFIED & TOKEN-BASED
  * 
- * Simple card component for layout and content organization
+ * ✅ Uses design tokens
+ * ✅ Multiple variants
+ * ✅ Proper spacing structure
+ * ✅ Semantic sections
  */
 
 import React from 'react';
+import { cn } from '@client/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-interface CardProps {
-  className?: string;
-  children: React.ReactNode;
+const cardVariants = cva(
+  [
+    'rounded-[0.5rem]',
+    'transition-all duration-150 ease-out',
+    'overflow-hidden',
+  ].join(' '),
+  {
+    variants: {
+      variant: {
+        default: [
+          'bg-[hsl(var(--color-card))]',
+          'border border-[hsl(var(--color-border))]',
+          'shadow-sm',
+          'hover:shadow-md',
+        ].join(' '),
+
+        elevated: [
+          'bg-[hsl(var(--color-card))]',
+          'shadow-lg',
+          'hover:shadow-xl',
+        ].join(' '),
+
+        outlined: [
+          'bg-[hsl(var(--color-card))]',
+          'border-2 border-[hsl(var(--color-border))]',
+          'shadow-none',
+        ].join(' '),
+
+        ghost: [
+          'bg-transparent',
+          'border-none',
+          'shadow-none',
+        ].join(' '),
+      },
+
+      interactive: {
+        true: 'cursor-pointer hover:scale-[1.02] transform',
+        false: '',
+      },
+    },
+
+    defaultVariants: {
+      variant: 'default',
+      interactive: false,
+    },
+  }
+);
+
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  /**
+   * Card variant style
+   */
+  variant?: VariantProps<typeof cardVariants>['variant'];
 }
 
-interface CardContentProps {
-  className?: string;
-  children: React.ReactNode;
-}
+/**
+ * Card Root
+ */
+const Card = React.forwardRef<
+  HTMLDivElement,
+  CardProps
+>(({ className, variant, interactive, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(cardVariants({ variant, interactive }), className)}
+    {...props}
+  />
+));
+Card.displayName = 'Card';
 
-interface CardHeaderProps {
-  className?: string;
-  children: React.ReactNode;
-}
+/**
+ * Card Header - with semantic spacing using tokens
+ */
+const CardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      'flex flex-col space-y-1.5',
+      'p-6',
+      'border-b border-[hsl(var(--color-border))]',
+      'bg-[hsl(var(--color-muted))]',
+      className
+    )}
+    {...props}
+  />
+));
+CardHeader.displayName = 'CardHeader';
 
-interface CardTitleProps {
-  className?: string;
-  children: React.ReactNode;
-}
+/**
+ * Card Title - proper typography hierarchy
+ */
+const CardTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn(
+      'text-2xl',
+      'font-semibold leading-none tracking-tight',
+      'text-[hsl(var(--color-foreground))]',
+      className
+    )}
+    {...props}
+  />
+));
+CardTitle.displayName = 'CardTitle';
 
-interface CardDescriptionProps {
-  className?: string;
-  children: React.ReactNode;
-}
+/**
+ * Card Description - muted secondary text
+ */
+const CardDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn(
+      'text-sm',
+      'text-[hsl(var(--color-muted-foreground))]',
+      className
+    )}
+    {...props}
+  />
+));
+CardDescription.displayName = 'CardDescription';
 
-interface CardFooterProps {
-  className?: string;
-  children: React.ReactNode;
-}
+/**
+ * Card Content - main content area with proper spacing
+ */
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      'p-6',
+      className
+    )}
+    {...props}
+  />
+));
+CardContent.displayName = 'CardContent';
 
-export const Card: React.FC<CardProps> = ({ className = '', children }) => {
-  return (
-    <div className={`bg-white rounded-lg border border-gray-200 shadow-sm ${className}`}>
-      {children}
-    </div>
-  );
+/**
+ * Card Footer - bottom section with semantic spacing
+ */
+const CardFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      'flex items-center',
+      'p-6',
+      'border-t border-[hsl(var(--color-border))]',
+      'bg-[hsl(var(--color-muted))]',
+      className
+    )}
+    {...props}
+  />
+));
+CardFooter.displayName = 'CardFooter';
+
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  cardVariants,
 };
-
-export const CardContent: React.FC<CardContentProps> = ({ className = '', children }) => {
-  return (
-    <div className={`p-6 ${className}`}>
-      {children}
-    </div>
-  );
-};
-
-export const CardHeader: React.FC<CardHeaderProps> = ({ className = '', children }) => {
-  return (
-    <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>
-      {children}
-    </div>
-  );
-};
-
-export const CardTitle: React.FC<CardTitleProps> = ({ className = '', children }) => {
-  return (
-    <h3 className={`text-2xl font-semibold leading-none tracking-tight ${className}`}>
-      {children}
-    </h3>
-  );
-};
-
-export const CardDescription: React.FC<CardDescriptionProps> = ({ className = '', children }) => {
-  return (
-    <p className={`text-sm text-muted-foreground ${className}`}>
-      {children}
-    </p>
-  );
-};
-
-export const CardFooter: React.FC<CardFooterProps> = ({ className = '', children }) => {
-  return (
-    <div className={`flex items-center p-6 pt-0 ${className}`}>
-      {children}
-    </div>
-  );
-};
-
-export default Card;

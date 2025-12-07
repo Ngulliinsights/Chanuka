@@ -17,7 +17,7 @@ export enum AuthErrorType {
 export class AuthError extends Error {
   public readonly type: AuthErrorType;
   public readonly statusCode: number;
-  public readonly details?: Record<string, any>;
+  public readonly details?: Record<string, unknown>;
   public readonly isOperational: boolean;
   public readonly canRetry: boolean;
 
@@ -25,7 +25,7 @@ export class AuthError extends Error {
     message: string,
     type: AuthErrorType = AuthErrorType.AUTH_ERROR,
     statusCode: number = 400,
-    details?: Record<string, any>,
+    details?: Record<string, unknown>,
     canRetry: boolean = false
   ) {
     super(message);
@@ -44,7 +44,7 @@ export class AuthError extends Error {
 }
 
 export class AuthValidationError extends AuthError {
-  constructor(message: string, field: string, value: any, details?: Record<string, any>) {
+  constructor(message: string, field: string, value: unknown, details?: Record<string, unknown>) {
     super(
       message,
       AuthErrorType.AUTH_VALIDATION_ERROR,
@@ -56,7 +56,7 @@ export class AuthValidationError extends AuthError {
 }
 
 export class AuthCredentialsError extends AuthError {
-  constructor(message: string = 'Invalid credentials', details?: Record<string, any>) {
+  constructor(message: string = 'Invalid credentials', details?: Record<string, unknown>) {
     super(
       message,
       AuthErrorType.AUTH_CREDENTIALS_ERROR,
@@ -68,7 +68,7 @@ export class AuthCredentialsError extends AuthError {
 }
 
 export class AuthRegistrationError extends AuthError {
-  constructor(message: string, reason?: string, details?: Record<string, any>) {
+  constructor(message: string, reason?: string, details?: Record<string, unknown>) {
     super(
       message,
       AuthErrorType.AUTH_REGISTRATION_ERROR,
@@ -80,7 +80,7 @@ export class AuthRegistrationError extends AuthError {
 }
 
 export class AuthNetworkError extends AuthError {
-  constructor(message: string = 'Network error occurred', details?: Record<string, any>) {
+  constructor(message: string = 'Network error occurred', details?: Record<string, unknown>) {
     super(
       message,
       AuthErrorType.AUTH_NETWORK_ERROR,
@@ -95,7 +95,7 @@ export class AuthRateLimitError extends AuthError {
   constructor(
     message: string = 'Too many attempts. Please try again later.',
     retryAfter?: number,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(
       message,
@@ -108,7 +108,7 @@ export class AuthRateLimitError extends AuthError {
 }
 
 export class AuthConfigurationError extends AuthError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(
       message,
       AuthErrorType.AUTH_CONFIGURATION_ERROR,
@@ -120,7 +120,7 @@ export class AuthConfigurationError extends AuthError {
 }
 
 export class AuthSessionError extends AuthError {
-  constructor(message: string = 'Session expired or invalid', details?: Record<string, any>) {
+  constructor(message: string = 'Session expired or invalid', details?: Record<string, unknown>) {
     super(
       message,
       AuthErrorType.AUTH_SESSION_ERROR,
@@ -175,7 +175,7 @@ export function getErrorMessage(error: unknown): string {
   return 'An unexpected error occurred';
 }
 
-export function getErrorDetails(error: unknown): Record<string, any> | undefined {
+export function getErrorDetails(error: unknown): Record<string, unknown> | undefined {
   if (isAuthError(error)) {
     return error.details;
   }

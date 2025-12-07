@@ -9,71 +9,135 @@
  * - Accessibility features
  */
 
-import React, { useEffect, useState } from 'react';
-import { useAppStore, useUserPreferences, useOnlineStatus } from '@client/store/unified-state-manager';
-import { copySystem } from '@client/content/copy-system';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useSelector } from 'react-redux';
+
+import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { logger } from '@client/utils/logger';
-import { useMediaQuery } from '@client/hooks/useMediaQuery';
 
 interface EnhancedUXIntegrationProps {
   children: React.ReactNode;
 }
 
 export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) {
-  const user = useAppStore(state => state.user.user);
-  const preferences = useUserPreferences();
-  const { isOnline, syncStatus } = useOnlineStatus();
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  
+  const { data: user } = useUserProfile();
+  const preferences = useSelector((state: { ui: { preferences: Record<string, unknown> } }) => state.ui.preferences);
+  const isOnline = useSelector((state: { ui: { isOnline: boolean } }) => state.ui.isOnline);
+  const { isMobile } = useDeviceInfo();
+
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize enhanced UX features
-  useEffect(() => {
-    initializeEnhancedUX();
-  }, []);
+  const initializeEnhancedUX = useCallback(async () => {
+    const setupAccessibilityAnnouncements = () => {
+      // Create or get the announcements element
+      let announcements = document.getElementById('accessibility-announcements');
+      if (!announcements) {
+        announcements = document.createElement('div');
+        announcements.id = 'accessibility-announcements';
+        announcements.setAttribute('aria-live', 'polite');
+        announcements.setAttribute('aria-atomic', 'true');
+        announcements.className = 'sr-only';
+        document.body.appendChild(announcements);
+      }
 
-  // Handle online/offline state changes
-  useEffect(() => {
-    if (isOnline && syncStatus === 'idle') {
-      // Process any pending actions when coming back online
-      useAppStore.getState().processPendingActions();
-    }
-  }, [isOnline, syncStatus]);
-
-  // Apply accessibility preferences
-  useEffect(() => {
-    if (preferences.accessibility.reducedMotion) {
-      document.documentElement.style.setProperty('--animation-duration', '0.01ms');
-    }
-    
-    if (preferences.accessibility.highContrast) {
-      document.documentElement.classList.add('high-contrast');
-    } else {
-      document.documentElement.classList.remove('high-contrast');
-    }
-    
-    // Set font size
-    const fontSizeMap = {
-      small: '14px',
-      medium: '16px',
-      large: '18px'
+      // TODO: Listen for state changes that should be announced
+      // This would need to be implemented with Redux subscriptions or React Query
     };
-    document.documentElement.style.setProperty(
-      '--base-font-size', 
-      fontSizeMap[preferences.accessibility.fontSize]
-    );
-  }, [preferences.accessibility]);
 
-  // Apply theme preferences
-  useEffect(() => {
-    const theme = preferences.theme === 'system' 
-      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : preferences.theme;
+    const announceToScreenReader = (message: string) => {
+      const announcements = document.getElementById('accessibility-announcements');
+      if (announcements) {
+        announcements.textContent = message;
+        // Clear after a delay to allow for re-announcements
+        setTimeout(() => {
+          announcements.textContent = '';
+        }, 1000);
+      }
+    };
+
+    const setupKeyboardNavigation = () => {
+      // Enhanced keyboard navigation
+      document.addEventListener('keydown', (event) => {
+        // Skip to main content (Alt + M)
+        if (event.altKey && event.key === 'm') {
+          event.preventDefault();
+          const main = document.querySelector('main');
+          if (main) {
+            main.focus();
+            announceToScreenReader('Skipped to main content');
+          }
+        }
+        
+        // Open search (Alt + S)
+        if (event.altKey && event.key === 's') {
+          event.preventDefault();
+          const searchInput = document.querySelector('input[type="search"], input[placeholder*="search" i]') as HTMLInputElement;
+          if (searchInput) {
+            searchInput.focus();
+            announceToScreenReader('Search focused');
+          }
+        }
+        
+        // Open navigation (Alt + N)
+        if (event.altKey && event.key === 'n') {
+          event.preventDefault();
+          const navButton = document.querySelector('[aria-label*="navigation" i], [aria-label*="menu" i]') as HTMLButtonElement;
+          if (navButton) {
+            navButton.click();
+            announceToScreenReader('Navigation opened');
+          }
+        }
+      });
+    };
+
+    const setupPerformanceMonitoring = () => {
+      // Monitor Core Web Vitals
+      if ('web-vital' in window) {
+        // This would integrate with the existing web vitals monitoring
+        logger.info('Performance monitoring active');
+      }
       
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [preferences.theme]);
+      // Monitor component render times
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.duration > 100) { // Log slow renders
+            logger.warn('Slow component render detected', {
+              name: entry.name,
+              duration: entry.duration,
+              component: 'EnhancedUXIntegration'
+            });
+          }
+        }
+      });
+      
+      observer.observe({ entryTypes: ['measure'] });
+    };
 
-  const initializeEnhancedUX = async () => {
+    const setupErrorRecovery = () => {
+      // Enhanced error recovery with user-friendly messages
+      window.addEventListener('unhandledrejection', (event) => {
+        logger.error('Unhandled promise rejection', { error: event.reason });
+
+        // TODO: Implement notification system with Redux or React Query
+        // For now, just log the error
+      });
+
+      window.addEventListener('error', (event) => {
+        logger.error('Unhandled error', {
+          error: event.error,
+          filename: event.filename,
+          lineno: event.lineno
+        });
+
+        // TODO: Implement notification system with Redux or React Query
+        // Don't show notifications for script loading errors (likely extensions)
+        if (!event.filename?.includes('extension')) {
+          // For now, just log the error
+        }
+      });
+    };
+
     try {
       // Initialize accessibility announcements
       setupAccessibilityAnnouncements();
@@ -93,7 +157,7 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
       
       logger.info('Enhanced UX integration initialized', {
         component: 'EnhancedUXIntegration',
-        userPersona: user?.persona,
+        userId: user?.id,
         isMobile,
         isOnline,
         features: [
@@ -107,134 +171,57 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
     } catch (error) {
       logger.error('Failed to initialize enhanced UX', { error });
     }
-  };
+  }, [user?.id, isMobile, isOnline]);
 
-  const setupAccessibilityAnnouncements = () => {
-    // Create or get the announcements element
-    let announcements = document.getElementById('accessibility-announcements');
-    if (!announcements) {
-      announcements = document.createElement('div');
-      announcements.id = 'accessibility-announcements';
-      announcements.setAttribute('aria-live', 'polite');
-      announcements.setAttribute('aria-atomic', 'true');
-      announcements.className = 'sr-only';
-      document.body.appendChild(announcements);
+  // Initialize enhanced UX features
+  useEffect(() => {
+    initializeEnhancedUX();
+  }, [initializeEnhancedUX]);
+
+  // Handle online/offline state changes
+  useEffect(() => {
+    if (isOnline) {
+      // Process any pending actions when coming back online
+      // TODO: Implement pending actions processing with React Query mutations
     }
+  }, [isOnline]);
 
-    // Listen for state changes that should be announced
-    useAppStore.subscribe(
-      (state) => state.ui.notifications,
-      (notifications) => {
-        const latestNotification = notifications[0];
-        if (latestNotification && !latestNotification.dismissed) {
-          announceToScreenReader(latestNotification.message);
-        }
-      }
+  // Apply accessibility preferences
+  useEffect(() => {
+    const accessibilityPrefs = (preferences as Record<string, unknown>).accessibility as Record<string, unknown>;
+    
+    if (accessibilityPrefs?.reducedMotion) {
+      document.documentElement.style.setProperty('--animation-duration', '0.01ms');
+    }
+    
+    if (accessibilityPrefs?.highContrast) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
+    
+    // Set font size
+    const fontSizeMap = {
+      small: '14px',
+      medium: '16px',
+      large: '18px'
+    };
+    const fontSize = fontSizeMap[(accessibilityPrefs?.fontSize as keyof typeof fontSizeMap) || 'medium'] || fontSizeMap.medium;
+    document.documentElement.style.setProperty(
+      '--base-font-size',
+      fontSize
     );
-  };
+  }, [preferences]);
 
-  const announceToScreenReader = (message: string) => {
-    const announcements = document.getElementById('accessibility-announcements');
-    if (announcements) {
-      announcements.textContent = message;
-      // Clear after a delay to allow for re-announcements
-      setTimeout(() => {
-        announcements.textContent = '';
-      }, 1000);
-    }
-  };
-
-  const setupKeyboardNavigation = () => {
-    // Enhanced keyboard navigation
-    document.addEventListener('keydown', (event) => {
-      // Skip to main content (Alt + M)
-      if (event.altKey && event.key === 'm') {
-        event.preventDefault();
-        const main = document.querySelector('main');
-        if (main) {
-          main.focus();
-          announceToScreenReader('Skipped to main content');
-        }
-      }
+  // Apply theme preferences
+  useEffect(() => {
+    const prefsTheme = (preferences as Record<string, unknown>).theme;
+    const theme = prefsTheme === 'system' 
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : prefsTheme;
       
-      // Open search (Alt + S)
-      if (event.altKey && event.key === 's') {
-        event.preventDefault();
-        const searchInput = document.querySelector('input[type="search"], input[placeholder*="search" i]') as HTMLInputElement;
-        if (searchInput) {
-          searchInput.focus();
-          announceToScreenReader('Search focused');
-        }
-      }
-      
-      // Open navigation (Alt + N)
-      if (event.altKey && event.key === 'n') {
-        event.preventDefault();
-        const navButton = document.querySelector('[aria-label*="navigation" i], [aria-label*="menu" i]') as HTMLButtonElement;
-        if (navButton) {
-          navButton.click();
-          announceToScreenReader('Navigation opened');
-        }
-      }
-    });
-  };
-
-  const setupPerformanceMonitoring = () => {
-    // Monitor Core Web Vitals
-    if ('web-vital' in window) {
-      // This would integrate with the existing web vitals monitoring
-      logger.info('Performance monitoring active');
-    }
-    
-    // Monitor component render times
-    const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry.duration > 100) { // Log slow renders
-          logger.warn('Slow component render detected', {
-            name: entry.name,
-            duration: entry.duration,
-            component: 'EnhancedUXIntegration'
-          });
-        }
-      }
-    });
-    
-    observer.observe({ entryTypes: ['measure'] });
-  };
-
-  const setupErrorRecovery = () => {
-    // Enhanced error recovery with user-friendly messages
-    window.addEventListener('unhandledrejection', (event) => {
-      logger.error('Unhandled promise rejection', { error: event.reason });
-      
-      // Use setTimeout to avoid setState during render
-      setTimeout(() => {
-        useAppStore.getState().addNotification({
-          type: 'error',
-          message: 'Something went wrong, but we\'re working to fix it. Please try refreshing the page.'
-        });
-      }, 0);
-    });
-    
-    window.addEventListener('error', (event) => {
-      logger.error('Unhandled error', { 
-        error: event.error,
-        filename: event.filename,
-        lineno: event.lineno
-      });
-      
-      // Don't show notifications for script loading errors (likely extensions)
-      if (!event.filename?.includes('extension')) {
-        // Use setTimeout to avoid setState during render
-        setTimeout(() => {
-          useAppStore.getState().addNotification({
-            type: 'error',
-            message: 'An unexpected error occurred. Please try refreshing the page.'
-          });
-        }, 0);
-      }
-    });
-  };
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [preferences]);
 
   // Show loading state while initializing
   if (!isInitialized) {

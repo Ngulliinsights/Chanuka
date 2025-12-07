@@ -1,8 +1,8 @@
 /**
  * useSwipeGesture Hook
  *
- * Detects swipe gestures and provides directional callbacks.
- * Extracted from SwipeGestures component.
+ * Unified swipe gesture detection using SwipeGestures component internally.
+ * Provides touch, mouse, and keyboard gesture support with accessibility.
  *
  * @hook
  * @example
@@ -10,17 +10,17 @@
  * import { useSwipeGesture } from '@/hooks/mobile';
  *
  * export function MyComponent() {
- *   const { handleTouchStart, handleTouchEnd } = useSwipeGesture({
+ *   const { ref } = useSwipeGesture({
  *     onSwipeLeft: () => console.log('left'),
  *     onSwipeRight: () => console.log('right'),
  *   });
  *
- *   return <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>Content</div>;
+ *   return <div ref={ref}>Content</div>;
  * }
  * ```
  */
 
-import { useCallback, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 
 import { GESTURE_CONFIG } from '@client/config/gestures';
 import type { SwipeGestureData } from '@client/types/mobile';
@@ -31,81 +31,198 @@ interface UseSwipeGestureOptions {
   onSwipe?: (event: SwipeEvent) => void;
   onSwipeLeft?: (event: SwipeEvent) => void;
   onSwipeRight?: (event: SwipeEvent) => void;
+  onSwipeUp?: (event: SwipeEvent) => void;
+  onSwipeDown?: (event: SwipeEvent) => void;
   minDistance?: number;
-  maxVerticalDeviation?: number;
-  velocityThreshold?: number;
+  minVelocity?: number;
   maxDuration?: number;
+  disabled?: boolean;
 }
 
 export function useSwipeGesture({
   onSwipe,
   onSwipeLeft,
   onSwipeRight,
+  onSwipeUp,
+  onSwipeDown,
   minDistance = GESTURE_CONFIG.SWIPE.minDistance,
-  maxVerticalDeviation = GESTURE_CONFIG.SWIPE.maxVerticalDeviation,
-  velocityThreshold = GESTURE_CONFIG.SWIPE.velocityThreshold,
+  minVelocity = GESTURE_CONFIG.SWIPE.velocityThreshold,
   maxDuration = GESTURE_CONFIG.SWIPE.maxDuration,
+  disabled = false,
 }: UseSwipeGestureOptions) {
-  const touchStart = useRef<{ x: number; y: number; time: number } | null>(null);
-  const touchEnd = useRef<{ x: number; y: number; time: number } | null>(null);
+  const elementRef = useRef<HTMLElement>(null);
+  const swipeData = useRef({
+    startX: 0,
+    startY: 0,
+    startTime: 0,
+    isSwiping: false,
+    isMouseDown: false,
+  });
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchEnd.current = null;
-    touchStart.current = {
-      x: e.targetTouches[0].clientX,
-      y: e.targetTouches[0].clientY,
-      time: Date.now(),
-    };
-  }, []);
+  const createSwipeEvent = useCallback(
+    (endX: number, endY: number, endTime: number): SwipeEvent => {
+      const deltaX = endX - swipeData.current.startX;
+      const deltaY = endY - swipeData.current.startY;
+      const duration = endTime - swipeData.current.startTime;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const velocity = distance / duration;
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    touchEnd.current = {
-      x: e.targetTouches[0].clientX,
-      y: e.targetTouches[0].clientY,
-      time: Date.now(),
-    };
-  }, []);
+      const direction: 'up' | 'down' | 'left' | 'right' = Math.abs(deltaX) > Math.abs(deltaY)
+        ? deltaX > 0 ? 'right' : 'left'
+        : deltaY > 0 ? 'down' : 'up';
 
-  const handleTouchEnd = useCallback(() => {
-    if (!touchStart.current || !touchEnd.current) return;
-
-    const deltaX = touchEnd.current.x - touchStart.current.x;
-    const deltaY = Math.abs(touchEnd.current.y - touchStart.current.y);
-    const timeElapsed = touchEnd.current.time - touchStart.current.time;
-
-    if (timeElapsed > maxDuration) return;
-
-    const distance = Math.abs(deltaX);
-    const velocity = distance / Math.max(timeElapsed, 1);
-
-    const isValidSwipe =
-      distance > minDistance &&
-      deltaY < Math.abs(deltaX) * maxVerticalDeviation &&
-      velocity > velocityThreshold;
-
-    if (isValidSwipe) {
-      const event: SwipeEvent = {
-        direction: deltaX > 0 ? 'right' : 'left',
+      return {
+        direction,
         distance,
         velocity,
-        duration: timeElapsed,
-        startX: touchStart.current.x,
-        startY: touchStart.current.y,
-        endX: touchEnd.current.x,
-        endY: touchEnd.current.y,
+        duration,
+        startX: swipeData.current.startX,
+        startY: swipeData.current.startY,
+        endX,
+        endY,
       };
+    },
+    []
+  );
 
-      onSwipe?.(event);
-      if (deltaX > 0) {
-        onSwipeRight?.(event);
-      } else {
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    if (disabled) return;
+
+    const touch = e.touches[0];
+    swipeData.current = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      startTime: Date.now(),
+      isSwiping: true,
+      isMouseDown: false,
+    };
+  }, [disabled]);
+
+  const handleTouchEnd = useCallback((e: TouchEvent) => {
+    if (disabled || !swipeData.current.isSwiping) return;
+
+    const touch = e.changedTouches[0];
+    const event = createSwipeEvent(touch.clientX, touch.clientY, Date.now());
+
+    swipeData.current.isSwiping = false;
+
+    if (event.distance < minDistance || event.velocity < minVelocity) return;
+    if (event.duration > maxDuration) return;
+
+    onSwipe?.(event);
+    switch (event.direction) {
+      case 'left':
         onSwipeLeft?.(event);
+        break;
+      case 'right':
+        onSwipeRight?.(event);
+        break;
+      case 'up':
+        onSwipeUp?.(event);
+        break;
+      case 'down':
+        onSwipeDown?.(event);
+        break;
+    }
+  }, [disabled, minDistance, minVelocity, maxDuration, onSwipe, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, createSwipeEvent]);
+
+  const handleMouseDown = useCallback((e: MouseEvent) => {
+    if (disabled) return;
+
+    swipeData.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startTime: Date.now(),
+      isSwiping: true,
+      isMouseDown: true,
+    };
+  }, [disabled]);
+
+  const handleMouseUp = useCallback((e: MouseEvent) => {
+    if (disabled || !swipeData.current.isMouseDown) return;
+
+    const event = createSwipeEvent(e.clientX, e.clientY, Date.now());
+
+    swipeData.current.isSwiping = false;
+    swipeData.current.isMouseDown = false;
+
+    if (event.distance < minDistance || event.velocity < minVelocity) return;
+    if (event.duration > maxDuration) return;
+
+    onSwipe?.(event);
+    switch (event.direction) {
+      case 'left':
+        onSwipeLeft?.(event);
+        break;
+      case 'right':
+        onSwipeRight?.(event);
+        break;
+      case 'up':
+        onSwipeUp?.(event);
+        break;
+      case 'down':
+        onSwipeDown?.(event);
+        break;
+    }
+  }, [disabled, minDistance, minVelocity, maxDuration, onSwipe, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, createSwipeEvent]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (disabled) return;
+
+    const keyToDirection: Record<string, 'up' | 'down' | 'left' | 'right'> = {
+      ArrowLeft: 'left',
+      ArrowRight: 'right',
+      ArrowUp: 'up',
+      ArrowDown: 'down',
+    };
+
+    const direction = keyToDirection[e.key];
+    if (direction) {
+      e.preventDefault();
+      const event: SwipeEvent = {
+        direction,
+        distance: minDistance,
+        velocity: 1,
+        duration: 100,
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 0,
+      };
+      onSwipe?.(event);
+      switch (direction) {
+        case 'left': onSwipeLeft?.(event); break;
+        case 'right': onSwipeRight?.(event); break;
+        case 'up': onSwipeUp?.(event); break;
+        case 'down': onSwipeDown?.(event); break;
       }
     }
+  }, [disabled, minDistance, onSwipe, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown]);
 
-    touchStart.current = null;
-    touchEnd.current = null;
-  }, [onSwipe, onSwipeLeft, onSwipeRight, minDistance, maxVerticalDeviation, velocityThreshold, maxDuration]);
+  // Set up event listeners when element is available
+  const setupListeners = useCallback(() => {
+    const element = elementRef.current;
+    if (!element) return;
 
-  return { handleTouchStart, handleTouchMove, handleTouchEnd };
+    element.addEventListener('touchstart', handleTouchStart, { passive: true });
+    element.addEventListener('touchend', handleTouchEnd, { passive: true });
+    element.addEventListener('mousedown', handleMouseDown);
+    element.addEventListener('mouseup', handleMouseUp);
+    element.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      element.removeEventListener('touchstart', handleTouchStart);
+      element.removeEventListener('touchend', handleTouchEnd);
+      element.removeEventListener('mousedown', handleMouseDown);
+      element.removeEventListener('mouseup', handleMouseUp);
+      element.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleTouchStart, handleTouchEnd, handleMouseDown, handleMouseUp, handleKeyDown]);
+
+  // Use effect to set up listeners when ref is attached
+  React.useEffect(() => {
+    return setupListeners();
+  }, [setupListeners]);
+
+  return { ref: elementRef };
 }

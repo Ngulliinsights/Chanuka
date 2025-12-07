@@ -1,7 +1,12 @@
+/**
+ * Theme Toggle Component
+ * Accessible theme switcher with light/dark/system options
+ */
+
 import { Moon, Sun, Monitor } from 'lucide-react';
 import React from 'react';
 
-import { useTheme, Theme } from '../../contexts/ThemeContext';
+import { useTheme, type ThemeContextType } from '@client/shared/design-system/theme/theme-provider';
 
 import { Button } from './button';
 import {
@@ -10,6 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './dropdown-menu';
+
+type Theme = 'light' | 'dark' | 'high-contrast';
 
 interface ThemeToggleProps {
   variant?: 'button' | 'dropdown';
@@ -22,7 +29,7 @@ export function ThemeToggle({
   size = 'default',
   className = ''
 }: ThemeToggleProps) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
 
   const themes: { value: Theme; label: string; icon: React.ReactNode }[] = [
     {
@@ -36,8 +43,8 @@ export function ThemeToggle({
       icon: <Moon className="h-4 w-4" />,
     },
     {
-      value: 'system',
-      label: 'System',
+      value: 'high-contrast',
+      label: 'High Contrast',
       icon: <Monitor className="h-4 w-4" />,
     },
   ];
@@ -47,9 +54,9 @@ export function ThemeToggle({
       <Button
         variant="ghost"
         size={size}
-        onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
+        onClick={() => setTheme(isDark ? 'light' : 'dark')}
         className={`relative ${className}`}
-        aria-label={`Switch to ${resolvedTheme === 'light' ? 'dark' : 'light'} theme`}
+        aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
       >
         <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
         <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -83,7 +90,7 @@ export function ThemeToggle({
             {icon}
             <span>{label}</span>
             {theme === value && (
-              <span className="ml-auto text-xs text-muted-foreground">✓</span>
+              <span className="ml-auto text-xs text-[hsl(var(--color-muted-foreground))]">✓</span>
             )}
           </DropdownMenuItem>
         ))}

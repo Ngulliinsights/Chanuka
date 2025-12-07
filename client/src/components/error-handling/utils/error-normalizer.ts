@@ -7,17 +7,11 @@ import { ErrorSeverity } from '@client/core/error';
 import { 
   BaseError, 
   NetworkError,
-  ExternalServiceError,
-  ServiceUnavailableError,
-  DatabaseError,
   CacheError,
   UnauthorizedError,
-  ForbiddenError,
   NotFoundError,
   ValidationError,
-  ConflictError,
-  TooManyRequestsError
-} from '@client/utils/logger';
+} from '@client/core/error';
 
 
 export function normalizeError(
@@ -48,28 +42,12 @@ export function normalizeError(
       normalizedError = new NetworkError(message);
       break;
 
-    case 'chunk':
-      normalizedError = new ExternalServiceError(message);
-      break;
-
-    case 'timeout':
-      normalizedError = new ServiceUnavailableError(message);
-      break;
-
-    case 'database':
-      normalizedError = new DatabaseError(message);
-      break;
-
     case 'cache':
       normalizedError = new CacheError(message);
       break;
 
     case 'unauthorized':
       normalizedError = new UnauthorizedError(message);
-      break;
-
-    case 'forbidden':
-      normalizedError = new ForbiddenError(message);
       break;
 
     case 'notfound':
@@ -80,21 +58,8 @@ export function normalizeError(
       normalizedError = new ValidationError(message) as BaseError;
       break;
 
-    case 'conflict':
-      normalizedError = new ConflictError(message);
-      break;
-
-    case 'ratelimit':
-      normalizedError = new TooManyRequestsError(message);
-      break;
-
-    case 'memory':
-    case 'security':
-      normalizedError = new BaseError(message, errorType === 'memory' ? 'MEMORY_ERROR' : 'SECURITY_ERROR');
-      break;
-
     default:
-      normalizedError = new BaseError(message, 'UNKNOWN_ERROR');
+      normalizedError = new BaseError(message, errorType || 'UNKNOWN_ERROR');
   }
 
   if (originalStack && !normalizedError.stack) {

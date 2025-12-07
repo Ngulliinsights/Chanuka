@@ -41,8 +41,8 @@ export class UIError extends Error {
   }
 }
 
-// Import ValidationError from client logger where it's defined
-import type { ValidationError } from '@client/utils/logger';
+// Import ValidationError from core error module where it's defined
+import type { ValidationError } from '@client/core/error';
 
 // Re-export for backward compatibility
 export type { ValidationError };

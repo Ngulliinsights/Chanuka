@@ -14,7 +14,7 @@
  * - Decorators for simplified service registration
  */
 
-import { ApiService } from '@client/types';
+import { ApiService } from './types';
 
 import { logger } from '@client/utils/logger';
 
@@ -696,15 +696,13 @@ export const globalServiceLocator = ServiceLocator.getInstance();
 // Register core services - using dynamic imports to avoid circular dependencies
 const registerCoreServices = async () => {
   try {
-    const { StateManagementService } = await import('@client/services/stateManagementService');
     const { BillTrackingService } = await import('@client/services/billTrackingService');
     const { WebSocketService } = await import('@client/services/webSocketService');
 
     // Register services with the global locator
-    globalServiceLocator.registerService('stateManagementService', StateManagementService);
     globalServiceLocator.registerService('billTrackingService', BillTrackingService);
-    globalServiceLocator.registerService('webSocketService', WebSocketService, ['stateManagementService']);
-    
+    globalServiceLocator.registerService('webSocketService', WebSocketService);
+
     logger.info('Core services registered successfully', { component: 'ServiceRegistry' });
   } catch (error) {
     logger.error('Failed to register core services', { component: 'ServiceRegistry', error: error instanceof Error ? error.message : 'Unknown error' });

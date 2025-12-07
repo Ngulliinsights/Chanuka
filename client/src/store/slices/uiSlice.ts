@@ -30,6 +30,9 @@ interface UIState {
     duration: number;
   } | null;
 
+  // Connection status
+  isOnline: boolean;
+
   // Mobile responsiveness
   isMobile: boolean;
   screenSize: 'mobile' | 'tablet' | 'desktop';
@@ -53,6 +56,7 @@ const initialState: UIState = {
   globalLoading: false,
   loadingMessage: null,
   toast: null,
+  isOnline: navigator.onLine,
   isMobile: false,
   screenSize: 'desktop',
   features: {
@@ -126,6 +130,11 @@ const uiSlice = createSlice({
       }
     },
 
+    // Connection status
+    setOnlineStatus: (state, action: PayloadAction<boolean>) => {
+      state.isOnline = action.payload;
+    },
+
     // Feature flags
     toggleFeature: (state, action: PayloadAction<keyof UIState['features']>) => {
       state.features[action.payload] = !state.features[action.payload];
@@ -148,6 +157,7 @@ export const {
   setGlobalLoading,
   showToast,
   hideToast,
+  setOnlineStatus,
   setScreenSize,
   setIsMobile,
   toggleFeature,
@@ -164,6 +174,7 @@ export const selectModalData = (state: { ui: UIState }) => state.ui.modalData;
 export const selectGlobalLoading = (state: { ui: UIState }) => state.ui.globalLoading;
 export const selectLoadingMessage = (state: { ui: UIState }) => state.ui.loadingMessage;
 export const selectToast = (state: { ui: UIState }) => state.ui.toast;
+export const selectIsOnline = (state: { ui: UIState }) => state.ui.isOnline;
 export const selectIsMobile = (state: { ui: UIState }) => state.ui.isMobile;
 export const selectScreenSize = (state: { ui: UIState }) => state.ui.screenSize;
 export const selectFeatures = (state: { ui: UIState }) => state.ui.features;

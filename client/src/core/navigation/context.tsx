@@ -22,8 +22,9 @@ import {
   addToRecentPages,
   clearPersistedState,
 } from '@client/store/slices/navigationSlice';
+import { UserRole } from '@client/types/navigation';
 
-import { NavigationContextValue, UserRole, BreadcrumbItem, RelatedPage } from './types';
+import { NavigationContextValue, BreadcrumbItem, RelatedPage } from './types';
 import { generateBreadcrumbs, calculateRelatedPages, determineNavigationSection, isNavigationPathActive } from './utils';
 // navigationPersistenceUtils intentionally unused here
 
@@ -32,15 +33,15 @@ const NavigationContext = createContext<NavigationContextValue | undefined>(unde
 export function createNavigationProvider(
   useLocation: () => { pathname: string },
   useNavigate: () => (path: string) => void,
-  useAuth: () => { user: any; isAuthenticated: boolean },
-  useMediaQuery: (query: string) => boolean
+  useAuth: () => { user: { role?: UserRole } | null; isAuthenticated: boolean },
+  useDeviceInfo: () => { isMobile: boolean; isTablet: boolean; isDesktop: boolean }
 ) {
   return function NavigationProvider({ children }: { children: React.ReactNode }) {
     const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
     const { user, isAuthenticated } = useAuth();
-    const isMobileQuery = useMediaQuery('(max-width: 767px)');
+    const { isMobile } = useDeviceInfo();
 
     // Select navigation state from Redux store
     const state = useSelector((state: RootState) => state.navigation);
@@ -56,10 +57,10 @@ export function createNavigationProvider(
       const updates: Array<() => void> = [];
 
       // Check mobile state
-      if (state.isMobile !== isMobileQuery) {
+      if (state.isMobile !== isMobile) {
         updates.push(() => {
-          dispatch(setMobile(isMobileQuery));
-          if (isMobileQuery) {
+          dispatch(setMobile(isMobile));
+          if (isMobile) {
             dispatch(setSidebarCollapsed(true));
           }
         });
@@ -87,8 +88,9 @@ export function createNavigationProvider(
       if (state.currentPath !== currentPath) {
         updates.push(() => {
           dispatch(setCurrentPath(currentPath));
-          dispatch(setCurrentSection(determineNavigationSection(currentPath)) as any);
-          dispatch(updateBreadcrumbs(generateBreadcrumbs(currentPath) as any));
+          dispatch(setCurrentSection(determineNavigationSection(currentPath)));
+          dispatch(updateBreadcrumbs(generateBreadcrumbs(currentPath)));
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           dispatch(updateRelatedPages(calculateRelatedPages(currentPath, state.user_role) as any));
           dispatch(addToRecentPages({ path: currentPath, title: document.title || currentPath }));
         });
@@ -101,13 +103,13 @@ export function createNavigationProvider(
         updates.forEach(update => update());
       }
     }, [
-      state.isMobile, 
-      isMobileQuery, 
-      state.user_role, 
-      isAuthenticated, 
-      user?.role, 
-      state.currentPath, 
-      location.pathname, 
+      state.isMobile,
+      isMobile,
+      state.user_role,
+      isAuthenticated,
+      user?.role,
+      state.currentPath,
+      location.pathname,
       dispatch
     ]);
 
@@ -117,10 +119,11 @@ export function createNavigationProvider(
     }, [navigate]);
 
     const updateBreadcrumbsAction = useCallback((breadcrumbs: BreadcrumbItem[]) => {
-      dispatch(updateBreadcrumbs(breadcrumbs as any));
+      dispatch(updateBreadcrumbs(breadcrumbs));
     }, [dispatch]);
 
     const updateRelatedPagesAction = useCallback((pages: RelatedPage[]) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       dispatch(updateRelatedPages(pages as any));
     }, [dispatch]);
 
@@ -128,8 +131,9 @@ export function createNavigationProvider(
       dispatch(setUserRole(role));
     }, [dispatch]);
 
-    const updatePreferencesAction = useCallback((preferences: Partial<any>) => {
-      dispatch(updatePreferences(preferences));
+    const updatePreferencesAction = useCallback((preferences: Partial<{ defaultLandingPage: string; favoritePages: string[]; compactMode: boolean; showBreadcrumbs: boolean; autoExpand: boolean }>) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      dispatch(updatePreferences(preferences as any));
     }, [dispatch]);
 
     const addToRecentPagesAction = useCallback((page: { path: string; title: string }) => {
@@ -154,6 +158,7 @@ export function createNavigationProvider(
 
     // Context value with all functionality - no memoization to avoid dependency issues
     // Use `any` here to bridge type differences between core and shared navigation types.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const contextValue: any = {
       ...state,
       

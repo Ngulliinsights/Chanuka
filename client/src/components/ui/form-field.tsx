@@ -105,11 +105,11 @@ export const EnhancedFormInput: React.FC<EnhancedFormInputProps> = ({
     if (!showValidationIcon || !isTouched) return null;
     
     if (currentError) {
-      return <AlertCircle className="h-4 w-4 text-red-500" />;
+      return <AlertCircle className="h-4 w-4 text-[hsl(var(--color-destructive))]" />;
     }
     
     if (isValid && value) {
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
+      return <CheckCircle className="h-4 w-4 text-[hsl(var(--color-success))]" />;
     }
     
     return null;
@@ -120,11 +120,11 @@ export const EnhancedFormInput: React.FC<EnhancedFormInputProps> = ({
       {label && (
         <Label htmlFor={inputId} className="flex items-center space-x-1">
           <span>{label}</span>
-          {required && <span className="text-red-500">*</span>}
+          {required && <span className="text-[hsl(var(--color-destructive))]">*</span>}
           {helpText && (
             <div className="group relative">
-              <HelpCircle className="h-3 w-3 text-gray-400 cursor-help" />
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              <HelpCircle className="h-3 w-3 text-[hsl(var(--color-muted-foreground))] cursor-help" />
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[hsl(var(--color-foreground))] text-[hsl(var(--color-background))] text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 {helpText}
               </div>
             </div>
@@ -144,8 +144,8 @@ export const EnhancedFormInput: React.FC<EnhancedFormInputProps> = ({
           onChange={handleChange}
           onBlur={handleBlur}
           className={cn(
-            showError && 'border-red-500 focus:border-red-500 focus:ring-red-500',
-            isValid && isTouched && value && 'border-green-500',
+            showError && 'border-[hsl(var(--color-destructive))] focus:border-[hsl(var(--color-destructive))] focus:ring-[hsl(var(--color-destructive))]',
+            isValid && isTouched && value && 'border-[hsl(var(--color-success))]',
             showValidationIcon && 'pr-10'
           )}
           aria-invalid={showError ? 'true' : 'false'}
@@ -164,13 +164,13 @@ export const EnhancedFormInput: React.FC<EnhancedFormInputProps> = ({
       </div>
       
       {showError && (
-        <p id={`${inputId}-error`} className="text-sm text-red-600" role="alert">
+        <p id={`${inputId}-error`} className="text-sm text-[hsl(var(--color-destructive))]" role="alert">
           {currentError}
         </p>
       )}
       
       {helpText && !showError && (
-        <p id={`${inputId}-help`} className="text-sm text-gray-500">
+        <p id={`${inputId}-help`} className="text-sm text-[hsl(var(--color-muted-foreground))]">
           {helpText}
         </p>
       )}
@@ -260,12 +260,12 @@ export const EnhancedFormTextarea: React.FC<EnhancedFormTextareaProps> = ({
       {label && (
         <Label htmlFor={textareaId} className="flex items-center space-x-1">
           <span>{label}</span>
-          {required && <span className="text-red-500">*</span>}
+          {required && <span className="text-[hsl(var(--color-destructive))]\">*</span>}
         </Label>
       )}
       
       {description && (
-        <p className="text-sm text-gray-600">{description}</p>
+        <p className="text-sm text-[hsl(var(--color-muted-foreground))]">{description}</p>
       )}
       
       <div className="relative">
@@ -279,7 +279,7 @@ export const EnhancedFormTextarea: React.FC<EnhancedFormTextareaProps> = ({
           maxLength={maxLength}
           className={cn(
             "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-            showError && 'border-red-500 focus:border-red-500 focus:ring-red-500',
+            showError && 'border-[hsl(var(--color-destructive))] focus:border-[hsl(var(--color-destructive))] focus:ring-[hsl(var(--color-destructive))]',
             autoResize && 'resize-none overflow-hidden'
           )}
           aria-invalid={showError ? 'true' : 'false'}
@@ -294,13 +294,13 @@ export const EnhancedFormTextarea: React.FC<EnhancedFormTextareaProps> = ({
       <div className="flex justify-between items-start">
         <div className="flex-1">
           {showError && (
-            <p id={`${textareaId}-error`} className="text-sm text-red-600" role="alert">
+            <p id={`${textareaId}-error`} className="text-sm text-[hsl(var(--color-destructive))]" role="alert">
               {currentError}
             </p>
           )}
           
           {helpText && !showError && (
-            <p id={`${textareaId}-help`} className="text-sm text-gray-500">
+            <p id={`${textareaId}-help`} className="text-sm text-[hsl(var(--color-muted-foreground))]">
               {helpText}
             </p>
           )}
@@ -308,9 +308,9 @@ export const EnhancedFormTextarea: React.FC<EnhancedFormTextareaProps> = ({
         
         {showCharacterCount && (
           <p className={cn(
-            'text-xs text-gray-500 ml-2',
-            maxLength && characterCount > maxLength * 0.9 && 'text-amber-600',
-            maxLength && characterCount >= maxLength && 'text-red-600'
+            'text-xs text-[hsl(var(--color-muted-foreground))] ml-2',
+            maxLength && characterCount > maxLength * 0.9 && 'text-[hsl(var(--color-warning))]',
+            maxLength && characterCount >= maxLength && 'text-[hsl(var(--color-destructive))]'
           )}>
             {characterCount}{maxLength && `/${maxLength}`}
           </p>
@@ -390,7 +390,7 @@ export const EnhancedFormSelect: React.FC<EnhancedFormSelectProps> = ({
       {label && (
         <Label htmlFor={selectId} className="flex items-center space-x-1">
           <span>{label}</span>
-          {required && <span className="text-red-500">*</span>}
+          {required && <span className="text-[hsl(var(--color-destructive))]">*</span>}
         </Label>
       )}
       
@@ -405,7 +405,7 @@ export const EnhancedFormSelect: React.FC<EnhancedFormSelectProps> = ({
         onBlur={handleBlur}
         className={cn(
           "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          showError && 'border-red-500 focus:border-red-500 focus:ring-red-500'
+          showError && 'border-[hsl(var(--color-destructive))] focus:border-[hsl(var(--color-destructive))] focus:ring-[hsl(var(--color-destructive))]'
         )}
         aria-invalid={showError ? 'true' : 'false'}
         aria-describedby={
@@ -429,13 +429,13 @@ export const EnhancedFormSelect: React.FC<EnhancedFormSelectProps> = ({
       </select>
       
       {showError && (
-        <p id={`${selectId}-error`} className="text-sm text-red-600" role="alert">
+        <p id={`${selectId}-error`} className="text-sm text-[hsl(var(--color-destructive))]" role="alert">
           {currentError}
         </p>
       )}
       
       {helpText && !showError && (
-        <p id={`${selectId}-help`} className="text-sm text-gray-500">
+        <p id={`${selectId}-help`} className="text-sm text-[hsl(var(--color-muted-foreground))]">
           {helpText}
         </p>
       )}

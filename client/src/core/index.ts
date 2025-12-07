@@ -35,11 +35,6 @@ export {
     createValidationError,
     createAuthError,
 
-    // Error boundary components
-    EnhancedErrorBoundary,
-    useErrorBoundary,
-    withErrorBoundary,
-
     // Recovery strategies
     networkRetryStrategy,
     cacheClearStrategy,
@@ -59,6 +54,56 @@ export {
     logError,
     useCoreErrorHandler,
 } from './error';
+
+// ============================================================================
+// Browser Compatibility
+// ============================================================================
+
+export {
+    // Types
+    type BrowserInfo,
+    type FeatureSet,
+    type CompatibilityStatus,
+    type CompatibilityRecommendation,
+    type PolyfillStatus,
+    type FetchOptions,
+    type FetchResponse,
+    type IntersectionObserverEntry,
+    type IntersectionObserverOptions,
+    type StoragePolyfill,
+
+    // Classes
+    FeatureDetector,
+    BrowserDetector,
+    PolyfillManager,
+    BrowserCompatibilityManager,
+
+    // Singleton instances
+    featureDetector,
+    browserDetector,
+    polyfillManager,
+    browserCompatibilityManager,
+
+    // Constants
+    MINIMUM_VERSIONS,
+    CRITICAL_FEATURES,
+    BROWSER_NAME_MAP,
+
+    // Utilities
+    isBrowserEnv,
+    isTestEnv,
+
+    // Convenience functions
+    getBrowserInfo,
+    isBrowserSupported,
+    hasFeature,
+    hasCriticalFeatures,
+    initializeBrowserCompatibility,
+    getBrowserCompatibilityStatus,
+    shouldBlockBrowser,
+    getCompatibilityWarnings,
+    loadPolyfills,
+} from './browser';
 
 // ============================================================================
 // Loading States (Placeholder - to be implemented)

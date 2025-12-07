@@ -1,11 +1,13 @@
 /**
  * Mobile Configuration
- * 
+ *
  * Global configuration for mobile-specific settings including breakpoints,
  * safe areas, and default behaviors.
- * 
+ *
  * @module config/mobile
  */
+
+import { DeviceDetector } from '@/core/mobile';
 
 /**
  * Mobile device breakpoints
@@ -36,12 +38,10 @@ export const DEVICE_TYPES = {
 } as const;
 
 /**
- * Determine device type from viewport width
+ * Determine device type using comprehensive device detection
  */
-export function getDeviceType(width: number): string {
-  if (width < MOBILE_BREAKPOINTS.MD) return DEVICE_TYPES.PHONE;
-  if (width < MOBILE_BREAKPOINTS.XL) return DEVICE_TYPES.TABLET;
-  return DEVICE_TYPES.DESKTOP;
+export function getDeviceType(): string {
+  return DeviceDetector.getInstance().getDeviceInfo().deviceType;
 }
 
 /**
@@ -89,13 +89,10 @@ export const ORIENTATIONS = {
 } as const;
 
 /**
- * Get viewport orientation
+ * Get viewport orientation using device detection
  */
 export function getOrientation(): string {
-  if (typeof window === 'undefined') return ORIENTATIONS.PORTRAIT;
-  return window.innerHeight > window.innerWidth
-    ? ORIENTATIONS.PORTRAIT
-    : ORIENTATIONS.LANDSCAPE;
+  return DeviceDetector.getInstance().getOrientation();
 }
 
 /**

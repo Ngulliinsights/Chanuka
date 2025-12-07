@@ -1,38 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 
-
-const MOBILE_BREAKPOINT = 768
+import { useDeviceInfo } from './mobile/useDeviceInfo'
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = useState<boolean | undefined>(undefined)
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
-
-  const debouncedSetMobile = useCallback((value: boolean) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-    debounceTimerRef.current = setTimeout(() => {
-      setIsMobile(value)
-    }, 100) // 100ms debounce
-  }, [])
-
-  useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      debouncedSetMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    
-    return () => {
-      mql.removeEventListener("change", onChange)
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
-      }
-    }
-  }, [debouncedSetMobile])
-
-  return !!isMobile
+  const { isMobile } = useDeviceInfo()
+  return isMobile
 }
 
 // Enhanced media query hook with SSR support and debouncing

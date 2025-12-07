@@ -409,7 +409,7 @@ export function useActivityFeed(): UseQueryResult<ActivityItem[], ApiError> {
 
    return useQuery({
      queryKey: communityKeys.activity(filters, currentPage),
-     queryFn: () => communityApi.fetchActivityFeed(filters, currentPage, itemsPerPage),
+     queryFn: () => communityApiService.fetchActivityFeed(filters, currentPage, itemsPerPage),
 
      // Enable background refetching only when real-time is enabled and no errors
      refetchInterval: (query) =>
@@ -451,7 +451,7 @@ export function useTrendingTopics(): UseQueryResult<TrendingTopic[], ApiError> {
 
    return useQuery({
      queryKey: communityKeys.trending(),
-     queryFn: communityApi.fetchTrendingTopics,
+     queryFn: communityApiService.fetchTrendingTopics,
 
      refetchInterval: (query) =>
        isRealTimeEnabled && !query.state.error ? REFETCH_INTERVALS.TRENDING : false,
@@ -493,7 +493,7 @@ export function useExpertInsights(): UseQueryResult<ExpertInsight[], ApiError> {
 
    return useQuery({
      queryKey: communityKeys.insights(filters),
-     queryFn: () => communityApi.fetchExpertInsights(filters),
+     queryFn: () => communityApiService.fetchExpertInsights(filters),
 
      refetchInterval: (query) =>
        isRealTimeEnabled && !query.state.error ? REFETCH_INTERVALS.INSIGHTS : false,
@@ -520,7 +520,7 @@ export function useCampaigns(): UseQueryResult<Campaign[], ApiError> {
 
    return useQuery({
      queryKey: communityKeys.campaigns(),
-     queryFn: communityApi.fetchCampaigns,
+     queryFn: communityApiService.fetchCampaigns,
 
      refetchInterval: (query) =>
        isRealTimeEnabled && !query.state.error ? REFETCH_INTERVALS.CAMPAIGNS : false,
@@ -547,7 +547,7 @@ export function usePetitions(): UseQueryResult<Petition[], ApiError> {
 
   return useQuery({
     queryKey: communityKeys.petitions(),
-    queryFn: communityApi.fetchPetitions,
+    queryFn: communityApiService.fetchPetitions,
 
     refetchInterval: (query) =>
       isRealTimeEnabled && !query.state.error ? REFETCH_INTERVALS.PETITIONS : false,
@@ -569,7 +569,7 @@ export function useCommunityStats(): UseQueryResult<CommunityStats, ApiError> {
   
   return useQuery({
     queryKey: communityKeys.stats(),
-    queryFn: communityApi.fetchStats,
+    queryFn: communityApiService.fetchStats,
     
     refetchInterval: (query) =>
       isRealTimeEnabled && !query.state.error ? REFETCH_INTERVALS.STATS : false,
@@ -588,7 +588,7 @@ export function useLocalImpact(): UseQueryResult<LocalImpactMetrics, ApiError> {
   
   return useQuery({
     queryKey: communityKeys.localImpact(),
-    queryFn: communityApi.fetchLocalImpact,
+    queryFn: communityApiService.fetchLocalImpact,
     
     refetchInterval: (query) =>
       isRealTimeEnabled && !query.state.error ? REFETCH_INTERVALS.LOCAL_IMPACT : false,
@@ -912,7 +912,7 @@ export function useCommunityRealTimeUpdates() {
   ) => {
     await queryClient.prefetchQuery({
       queryKey: communityKeys.activity(filters, page),
-      queryFn: () => communityApi.fetchActivityFeed(filters, page, itemsPerPage),
+      queryFn: () => communityApiService.fetchActivityFeed(filters, page, itemsPerPage),
       staleTime: 20000,
     });
   }, [queryClient]);
@@ -1003,7 +1003,7 @@ export function useCommunityStore() {
 
 export {
   useCommunityUI,
-  communityApi as api,
+  communityApiService as api,
 };
 
 export type { 

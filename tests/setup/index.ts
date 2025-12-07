@@ -1,12 +1,17 @@
 /**
- * Test Setup Exports
+ * MAIN TEST SETUP ENTRY POINT
  * 
- * This file orchestrates all test setup and makes it available
- * through a single entry point.
+ * This file coordinates all test setup for the entire workspace.
+ * It's loaded by vitest.workspace.ts and ensures consistent
+ * test environment across all modules.
  */
+
+// Import module-specific setups
+import './modules/client';
+import './modules/server';
+import './modules/shared';
 
 // Vitest setup (global utilities, mocks, configuration)
 export {} from './vitest';
 
-// Future: E2E setup (Playwright configuration)
-// export {} from './e2e';
+export {};

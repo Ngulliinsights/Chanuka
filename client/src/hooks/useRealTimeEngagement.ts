@@ -20,7 +20,7 @@ import {
   EngagementAnalyticsConfig
 } from '../types/engagement-analytics';
 
-import { useWebSocket } from './useWebSocket';
+import { useWebSocket } from './use-websocket';
 
 interface RealTimeEngagementData {
   liveMetrics: LiveEngagementMetrics;

@@ -7,6 +7,7 @@ import React, {
   useMemo,
 } from "react";
 
+import { MobileNavigation } from "@client/components/mobile/MobileNavigation";
 import { DesktopSidebar } from '@client/components/navigation';
 import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from "@client/core/navigation/hooks/use-navigation-accessibility";
 import { useNavigationPerformance } from "@client/core/navigation/hooks/use-navigation-performance";
@@ -16,8 +17,6 @@ import {
   SkipLink,
   useAccessibility,
 } from "../accessibility/accessibility-manager";
-
-import MobileNavigation from "./mobile-navigation";
 
 import {
   AppLayoutProps,

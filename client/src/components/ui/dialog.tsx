@@ -27,7 +27,13 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      [
+        'fixed inset-0 z-50',
+        'bg-black/80',
+        'backdrop-blur-sm',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out',
+        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      ].join(' '),
       className
     )}
     {...props}
@@ -44,13 +50,39 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        [
+          'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg',
+          'translate-x-[-50%] translate-y-[-50%] gap-4',
+          'bg-[hsl(var(--color-card))]',
+          'border border-[hsl(var(--color-border))]',
+          'rounded-lg p-6',
+          'shadow-lg',
+          'duration-200',
+          'data-[state=open]:animate-in data-[state=closed]:animate-out',
+          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+          'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
+          'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
+          'sm:rounded-lg',
+        ].join(' '),
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+      <DialogPrimitive.Close className={cn(
+        [
+          'absolute right-4 top-4',
+          'rounded-sm opacity-70',
+          'ring-offset-[hsl(var(--color-background))]',
+          'transition-opacity hover:opacity-100',
+          'focus:outline-none focus:ring-2',
+          'focus:ring-[hsl(var(--color-primary))] focus:ring-offset-2',
+          'disabled:pointer-events-none',
+          'data-[state=open]:bg-[hsl(var(--color-accent))]',
+          'data-[state=open]:text-[hsl(var(--color-muted-foreground))]',
+        ].join(' ')
+      )}>
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
@@ -94,7 +126,10 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg font-semibold leading-none tracking-tight",
+      [
+        'text-lg font-semibold leading-none tracking-tight',
+        'text-[hsl(var(--color-foreground))]',
+      ].join(' '),
       className
     )}
     {...props}
@@ -108,7 +143,13 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn(
+      [
+        'text-sm',
+        'text-[hsl(var(--color-muted-foreground))]',
+      ].join(' '),
+      className
+    )}
     {...props}
   />
 ))
@@ -244,12 +285,16 @@ const EnhancedDialog = React.forwardRef<
 
         {currentError && (
           <div 
-            className="rounded-md bg-destructive/15 p-3 border border-destructive/20"
+            className={cn(
+              'rounded-md p-3 border',
+              'bg-[hsl(var(--color-destructive))]/15',
+              'border-[hsl(var(--color-destructive))]/20'
+            )}
             role="alert"
           >
             <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-destructive" />
-              <p className="text-sm text-destructive font-medium">
+              <AlertCircle className="h-4 w-4 text-[hsl(var(--color-destructive))]" />
+              <p className="text-sm text-[hsl(var(--color-destructive))] font-medium">
                 {currentError}
               </p>
             </div>
@@ -265,8 +310,21 @@ const EnhancedDialog = React.forwardRef<
               onClick={handleCancel}
               disabled={currentLoading}
               className={cn(
-                "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                "border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                [
+                  'inline-flex items-center justify-center gap-2',
+                  'whitespace-nowrap rounded-md text-sm font-medium',
+                  'border border-[hsl(var(--color-border))]',
+                  'bg-[hsl(var(--color-background))]',
+                  'text-[hsl(var(--color-foreground))]',
+                  'hover:bg-[hsl(var(--color-accent))]',
+                  'hover:text-[hsl(var(--color-accent-foreground))]',
+                  'transition-colors duration-150',
+                  'ring-offset-[hsl(var(--color-background))]',
+                  'focus-visible:outline-none focus-visible:ring-2',
+                  'focus-visible:ring-[hsl(var(--color-primary))] focus-visible:ring-offset-2',
+                  'disabled:pointer-events-none disabled:opacity-50',
+                  'h-10 px-4 py-2',
+                ].join(' ')
               )}
             >
               {cancelText}
@@ -279,8 +337,19 @@ const EnhancedDialog = React.forwardRef<
               onClick={handleConfirm}
               disabled={currentLoading}
               className={cn(
-                "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                "bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                [
+                  'inline-flex items-center justify-center gap-2',
+                  'whitespace-nowrap rounded-md text-sm font-medium',
+                  'bg-[hsl(var(--color-primary))]',
+                  'text-[hsl(var(--color-primary-foreground))]',
+                  'hover:bg-[hsl(var(--color-primary))] hover:opacity-90',
+                  'transition-all duration-150',
+                  'ring-offset-[hsl(var(--color-background))]',
+                  'focus-visible:outline-none focus-visible:ring-2',
+                  'focus-visible:ring-[hsl(var(--color-primary))] focus-visible:ring-offset-2',
+                  'disabled:pointer-events-none disabled:opacity-50',
+                  'h-10 px-4 py-2',
+                ].join(' ')
               )}
             >
               {currentLoading && <Loader2 className="h-4 w-4 animate-spin" />}

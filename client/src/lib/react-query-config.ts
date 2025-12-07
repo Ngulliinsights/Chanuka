@@ -7,7 +7,8 @@
 
 import { QueryClient, DefaultOptions } from '@tanstack/react-query';
 
-import { useAppStore } from '../store/unified-store';
+import { getStore } from '../store';
+import { setOnlineStatus } from '../store/slices/uiSlice';
 
 // ============================================================================
 // QUERY CLIENT CONFIGURATION
@@ -225,20 +226,25 @@ export const cacheUtils = {
 export const configureOfflineSupport = () => {
   // Listen for online/offline events
   const handleOnline = () => {
-    useAppStore.getState().setOnlineStatus(true);
+    // Dispatch Redux action to update online status
+    const store = getStore();
+    store.dispatch(setOnlineStatus(true));
     queryClient.resumePausedMutations();
   };
-  
+
   const handleOffline = () => {
-    useAppStore.getState().setOnlineStatus(false);
+    // Dispatch Redux action to update online status
+    const store = getStore();
+    store.dispatch(setOnlineStatus(false));
   };
-  
+
   window.addEventListener('online', handleOnline);
   window.addEventListener('offline', handleOffline);
-  
+
   // Set initial online status
-  useAppStore.getState().setOnlineStatus(navigator.onLine);
-  
+  const store = getStore();
+  store.dispatch(setOnlineStatus(navigator.onLine));
+
   return () => {
     window.removeEventListener('online', handleOnline);
     window.removeEventListener('offline', handleOffline);
@@ -256,28 +262,18 @@ export const setupGlobalErrorHandler = () => {
   queryClient.setMutationDefaults(['bills', 'create'], {
     onError: (error: any) => {
       console.error('Mutation error:', error);
-      
-      // Add notification for user feedback
-      useAppStore.getState().addNotification({
-        type: 'system',
-        title: 'Error',
-        message: error.message || 'An unexpected error occurred',
-      });
+
+      // Notifications are now handled by React Query hooks in components
+      // Components can use useToast or other notification systems
     },
   });
-  
+
   queryClient.setQueryDefaults(['bills'], {
     onError: (error: any) => {
       console.error('Query error:', error);
-      
-      // Only show notification for non-network errors
-      if (error.name !== 'NetworkError') {
-        useAppStore.getState().addNotification({
-          type: 'system',
-          title: 'Data Loading Error',
-          message: 'Failed to load data. Please try again.',
-        });
-      }
+
+      // Notifications are now handled by React Query hooks in components
+      // Components can use useToast or other notification systems
     },
   });
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { systemApi } from '@client/services/api';
+import { api } from '@client/services/api';
 import { logger } from '@client/utils/logger';
 
 interface HealthStatus {
@@ -30,7 +30,7 @@ export function HealthCheck({
 
   const checkHealth = async () => {
     try {
-      const response = await systemApi.getHealth();
+      const response = await api.get('/system/health');
       setHealth({
         status: (response as any).status || 'healthy',
         message: (response as any).message || 'System is operational',

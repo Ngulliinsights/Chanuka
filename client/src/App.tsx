@@ -3,6 +3,7 @@ import { Suspense, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 // Internal component imports
+import { MobileHeader } from '@/components/mobile/layout';
 import { AppProviders } from '@client/components/AppProviders';
 import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
 import { EnhancedUXIntegration } from '@client/components/integration/EnhancedUXIntegration';
@@ -14,9 +15,6 @@ import { Toaster } from '@client/components/ui/toaster';
 import { UserAccountIntegration } from '@client/components/user/UserAccountIntegration';
 import { useIsMobile } from '@client/hooks/use-mobile';
 import { logger } from '@client/utils/logger';
-
-// Mobile components
-import { BottomNavigationBar, MobileHeader } from '@/components/mobile/index';
 
 function App() {
   const isMobile = useIsMobile();
@@ -60,7 +58,6 @@ function App() {
             </Routes>
           </Suspense>
 
-          {isMobile && <BottomNavigationBar />}
           <Toaster />
         </ErrorBoundary>
       </AppProviders>

@@ -10,14 +10,14 @@ import React from 'react';
 import { UserDashboard } from '@client/components/shared/dashboard';
 import { SmartDashboard } from '@client/components/enhanced-user-flows/SmartDashboard';
 import { RealTimeDashboard } from '@client/components/realtime/RealTimeDashboard';
-import { useAppStore } from '@client/store/unified-state-manager';
-import { useMediaQuery } from '@client/hooks/useMediaQuery';
+import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { logger } from '@client/utils/logger';
 
 export default function Dashboard() {
-  const user = useAppStore(state => state.user.user);
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  
+  const { data: user } = useUserProfile();
+  const { isMobile } = useDeviceInfo();
+
   React.useEffect(() => {
     logger.info('Enhanced Dashboard page loaded', {
       component: 'Dashboard',
@@ -26,15 +26,8 @@ export default function Dashboard() {
       timestamp: new Date().toISOString()
     });
 
-    // Track dashboard view
-    useAppStore.getState().addActivity({
-      type: 'dashboard_viewed',
-      metadata: { 
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        viewport: { width: window.innerWidth, height: window.innerHeight }
-      }
-    });
+    // Activity tracking is now handled by React Query mutations
+    // TODO: Add activity tracking mutation when needed
   }, [user?.persona, isMobile]);
 
   // Use smart dashboard for personalized experience

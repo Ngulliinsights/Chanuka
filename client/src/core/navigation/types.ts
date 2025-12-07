@@ -3,8 +3,8 @@
  * Platform-agnostic types for cross-cutting navigation concerns
  */
 
-export type NavigationSection = 'legislative' | 'community' | 'tools' | 'user' | 'admin';
-export type UserRole = 'admin' | 'expert' | 'user' | 'public';
+export type NavigationSection = 'legislative' | 'community' | 'tools' | 'user' | 'admin' | 'system';
+export type UserRole = 'public' | 'citizen' | 'user' | 'expert' | 'admin' | 'journalist' | 'advocate';
 
 /**
  * Navigation item interface
@@ -27,7 +27,7 @@ export interface NavigationItem {
 export interface BreadcrumbItem {
   label: string;
   path: string;
-  is_active?: boolean;
+  is_active: boolean;
 }
 
 export interface RelatedPage {

@@ -37,15 +37,15 @@ export const FormSection: React.FC<FormSectionProps> = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const getStatusIcon = () => {
-    if (error) return <AlertCircle className="h-4 w-4 text-red-500" />;
-    if (completed) return <CheckCircle className="h-4 w-4 text-green-500" />;
-    return <Clock className="h-4 w-4 text-gray-400" />;
+    if (error) return <AlertCircle className="h-4 w-4 text-[hsl(var(--color-destructive))]" />;
+    if (completed) return <CheckCircle className="h-4 w-4 text-[hsl(var(--color-success))]" />;
+    return <Clock className="h-4 w-4 text-[hsl(var(--color-muted-foreground))]" />;
   };
 
   const getBorderColor = () => {
-    if (error) return 'border-red-200';
-    if (completed) return 'border-green-200';
-    return 'border-gray-200';
+    if (error) return 'border-[hsl(var(--color-destructive-border))]';
+    if (completed) return 'border-[hsl(var(--color-success-border))]';
+    return 'border-[hsl(var(--color-border))]';
   };
 
   return (
@@ -54,7 +54,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
         className={cn(
           'p-4 border-b',
           getBorderColor(),
-          collapsible && 'cursor-pointer hover:bg-gray-50'
+          collapsible && cn('cursor-pointer hover:bg-[hsl(var(--color-muted))]', 'transition-colors duration-150')
         )}
         onClick={collapsible ? () => setIsOpen(!isOpen) : undefined}
       >
@@ -62,17 +62,17 @@ export const FormSection: React.FC<FormSectionProps> = ({
           <div className="flex items-center space-x-3">
             {getStatusIcon()}
             <div>
-              <h3 className="font-medium text-gray-900">
+              <h3 className="font-medium text-[hsl(var(--color-foreground))]">
                 {title}
-                {required && <span className="text-red-500 ml-1">*</span>}
+                {required && <span className="text-[hsl(var(--color-destructive))] ml-1">*</span>}
               </h3>
               {description && (
-                <p className="text-sm text-gray-600 mt-1">{description}</p>
+                <p className="text-sm text-[hsl(var(--color-muted-foreground))] mt-1">{description}</p>
               )}
             </div>
           </div>
           {collapsible && (
-            <div className="text-gray-400">
+            <div className="text-[hsl(var(--color-muted-foreground))]">
               {isOpen ? (
                 <ChevronDown className="h-4 w-4" />
               ) : (
@@ -134,11 +134,11 @@ export const FormStepIndicator: React.FC<FormStepIndicatorProps> = ({
                 <div
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
-                    isCurrent && 'bg-blue-600 text-white',
-                    isPast && step.completed && 'bg-green-600 text-white',
-                    isPast && step.error && 'bg-red-600 text-white',
-                    isPast && !step.completed && !step.error && 'bg-gray-400 text-white',
-                    isFuture && 'bg-gray-200 text-gray-600'
+                    isCurrent && 'bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))]',
+                    isPast && step.completed && 'bg-[hsl(var(--color-success))] text-[hsl(var(--color-success-foreground))]',
+                    isPast && step.error && 'bg-[hsl(var(--color-destructive))] text-[hsl(var(--color-destructive-foreground))]',
+                    isPast && !step.completed && !step.error && 'bg-[hsl(var(--color-muted))] text-[hsl(var(--color-muted-foreground))]',
+                    isFuture && 'bg-[hsl(var(--color-muted))] text-[hsl(var(--color-muted-foreground))]'
                   )}
                 >
                   {isPast && step.completed ? (
@@ -153,15 +153,15 @@ export const FormStepIndicator: React.FC<FormStepIndicatorProps> = ({
                   <p
                     className={cn(
                       'text-sm font-medium',
-                      isCurrent && 'text-blue-600',
-                      isPast && 'text-gray-900',
-                      isFuture && 'text-gray-500'
+                      isCurrent && 'text-[hsl(var(--color-primary))]',
+                      isPast && 'text-[hsl(var(--color-foreground))]',
+                      isFuture && 'text-[hsl(var(--color-muted-foreground))]'
                     )}
                   >
                     {step.title}
                   </p>
                   {step.description && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-1">
                       {step.description}
                     </p>
                   )}
@@ -171,7 +171,7 @@ export const FormStepIndicator: React.FC<FormStepIndicatorProps> = ({
                 <div
                   className={cn(
                     'flex-1 h-px mx-4',
-                    index < currentIndex ? 'bg-green-600' : 'bg-gray-200'
+                    index < currentIndex ? 'bg-[hsl(var(--color-success))]' : 'bg-[hsl(var(--color-border))]'
                   )}
                 />
               )}
@@ -242,13 +242,13 @@ export const FormValidationSummary: React.FC<FormValidationSummaryProps> = ({
   if (errors.length === 0) return null;
 
   return (
-    <Card className={cn('border-red-200 bg-red-50', className)}>
+    <Card className={cn('border-[hsl(var(--color-destructive-border))] bg-[hsl(var(--color-destructive-bg))]', className)}>
       <CardContent className="pt-4">
         <div className="flex items-start space-x-3">
-          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+          <AlertCircle className="h-5 w-5 text-[hsl(var(--color-destructive))] mt-0.5" />
           <div className="flex-1">
-            <h4 className="font-medium text-red-900 mb-2">{title}</h4>
-            <ul className="text-sm text-red-800 space-y-1">
+            <h4 className="font-medium text-[hsl(var(--color-destructive-text))] mb-2">{title}</h4>
+            <ul className="text-sm text-[hsl(var(--color-destructive-text))] space-y-1">
               {errors.map((error, index) => (
                 <li key={index}>
                   {error.section && (
@@ -283,16 +283,16 @@ export const FormSuccessIndicator: React.FC<FormSuccessIndicatorProps> = ({
   className
 }) => {
   return (
-    <Card className={cn('border-green-200 bg-green-50', className)}>
+    <Card className={cn('border-[hsl(var(--color-success-border))] bg-[hsl(var(--color-success-bg))]', className)}>
       <CardContent className="pt-6">
         <div className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-            <CheckCircle className="h-6 w-6 text-green-600" />
+          <div className="mx-auto w-12 h-12 bg-[hsl(var(--color-success-light))] rounded-full flex items-center justify-center">
+            <CheckCircle className="h-6 w-6 text-[hsl(var(--color-success))]" />
           </div>
           <div>
-            <h3 className="text-lg font-medium text-green-900">{message}</h3>
+            <h3 className="text-lg font-medium text-[hsl(var(--color-success-text))]">{message}</h3>
             {details && (
-              <p className="text-sm text-green-700 mt-2">{details}</p>
+              <p className="text-sm text-[hsl(var(--color-success-text))] mt-2">{details}</p>
             )}
           </div>
           {actions && actions.length > 0 && (
@@ -325,7 +325,7 @@ export const FormHelpText: React.FC<FormHelpTextProps> = ({
   className
 }) => {
   return (
-    <div className={cn('text-sm text-gray-600 bg-gray-50 p-3 rounded-md', className)}>
+    <div className={cn('text-sm text-[hsl(var(--color-muted-foreground))] bg-[hsl(var(--color-muted))] p-3 rounded-md', className)}>
       {children}
     </div>
   );

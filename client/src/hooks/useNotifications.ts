@@ -12,9 +12,8 @@ import {
   notificationService, 
   Notification, 
   NotificationPreferences, 
-  NotificationCategory,
   NotificationType 
-} from '../services/notification-service';
+} from '@client/services/notification-service';
 
 /**
  * Main notification hook - provides access to notifications and core functionality

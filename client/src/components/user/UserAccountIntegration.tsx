@@ -25,7 +25,7 @@ import { notificationService } from '@client/services/notification-service';
 import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
 import { logger } from '@client/utils/logger';
 
-import { ErrorMessage } from '../ui/error-message';
+import { ErrorMessage } from '../ui/ErrorMessage';
 import { LoadingSpinner } from '../ui/loading-spinner';
 
 interface UserAccountIntegrationProps {

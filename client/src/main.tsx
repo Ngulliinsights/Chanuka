@@ -455,7 +455,9 @@ async function initializePerformanceMonitoring(config: BackgroundServiceConfig):
   }
 
   try {
-    await import('@/utils/performance-monitor');
+    // Initialize core performance monitoring
+    const { PerformanceMonitor } = await import('@/core/performance');
+    PerformanceMonitor.getInstance();
     logger.info('Performance monitoring active', { component: 'Performance' });
   } catch (error) {
     const normalizedError = normalizeError(error);

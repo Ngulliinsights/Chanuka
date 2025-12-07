@@ -33,22 +33,24 @@ export { useErrorAnalytics } from '../features/analytics/hooks';
 export { useWebVitals } from '../features/analytics/hooks';
 export { useRenderTracker } from '../features/analytics/hooks';
 
-// Bills Hooks (migrated to features/bills/hooks)
-export { 
-  useBills,
-  useBill,
-  useBillComments,
-  useBillSponsors,
-  useBillAnalysis,
-  useBillCategories,
-  useBillStatuses,
-  useAddBillComment,
-  useRecordBillEngagement,
-  useTrackBill
-} from '../features/bills/hooks';
+// Bills Hooks - NOT YET MIGRATED (migration from Zustand to React Query incomplete)
+// TODO: Create features/bills/hooks when API hooks are ready
+// export { 
+//   useBills,
+//   useBill,
+//   useBillComments,
+//   useBillSponsors,
+//   useBillAnalysis,
+//   useBillCategories,
+//   useBillStatuses,
+//   useAddBillComment,
+//   useRecordBillEngagement,
+//   useTrackBill
+// } from '../features/bills/hooks';
 
-// Community Hooks (migrated to features/community/hooks)
-export { useCommunityRealTime, useTypingIndicators, useCommunityAnalytics } from '../features/community/hooks';
+// Community Hooks - NOT YET MIGRATED (migration from Zustand to React Query incomplete)
+// TODO: Create features/community/hooks when API hooks are ready
+// export { useCommunityRealTime, useTypingIndicators, useCommunityAnalytics } from '../features/community/hooks';
 
 // ============================================================================
 // REMAINING HOOKS - Still in hooks directory
@@ -79,7 +81,8 @@ export { useOnboarding } from './use-onboarding';
 export { useSystem } from './use-system';
 
 // Engagement/Notification Hooks
-export { useNotifications } from './useNotifications';
+// TODO: Fix useNotifications import - migration issue
+// export { useNotifications } from './useNotifications';
 export { useRealTimeEngagement } from './useRealTimeEngagement';
 export { useProgressiveDisclosure } from './useProgressiveDisclosure';
 export { useSecurity } from './useSecurity';

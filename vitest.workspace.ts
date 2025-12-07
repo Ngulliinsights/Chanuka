@@ -36,7 +36,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./vitest.setup.ts'],
+      setupFiles: ['./vitest.setup.ts', './tests/setup/modules/client.ts'],
       css: true,
       testTimeout: 10000,
       hookTimeout: 5000,
@@ -108,7 +108,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./vitest.setup.ts'],
+      setupFiles: ['./vitest.setup.ts', './tests/setup/modules/client.ts'],
       css: true,
       testTimeout: 30000, // Longer for integration tests
       hookTimeout: 10000,
@@ -169,7 +169,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./vitest.setup.ts'],
+      setupFiles: ['./vitest.setup.ts', './tests/setup/modules/client.ts'],
       css: true,
       testTimeout: 15000,
       hookTimeout: 5000,
@@ -212,7 +212,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'node',
-      setupFiles: ['./vitest.setup.ts'],
+      setupFiles: ['./vitest.setup.ts', './tests/setup/modules/server.ts'],
       testTimeout: 10000,
       hookTimeout: 5000,
       
@@ -272,7 +272,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'node',
-      setupFiles: ['./vitest.setup.ts'],
+      setupFiles: ['./vitest.setup.ts', './tests/setup/modules/server.ts'],
       testTimeout: 30000, // Longer for DB operations
       hookTimeout: 10000,
       
@@ -310,7 +310,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'node',
-      setupFiles: ['./vitest.setup.ts'],
+      setupFiles: ['./vitest.setup.ts', './tests/setup/modules/shared.ts'],
       testTimeout: 10000,
       hookTimeout: 5000,
       
@@ -356,7 +356,7 @@ export default defineWorkspace([
     test: {
       globals: true,
       environment: 'node',
-      setupFiles: ['./vitest.setup.ts'],
+      setupFiles: ['./vitest.setup.ts', './tests/setup/index.ts'],
       testTimeout: 60000, // E2E can take longer
       hookTimeout: 30000,
       

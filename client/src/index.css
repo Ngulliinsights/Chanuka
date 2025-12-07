@@ -1186,7 +1186,7 @@
 /* Hide scrollbars for mobile components */
 .scrollbar-hide {
   -ms-overflow-style: none;
-  scrollbar-width: none;
+  /* scrollbar-width: Firefox only (not widely supported yet) */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -1345,8 +1345,8 @@
   inset: 0;
   z-index: 50;
   background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
 .mobile-modal {
@@ -1369,8 +1369,8 @@
   justify-content: center;
   height: 60px;
   background: hsl(var(--background) / 0.95);
-  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid hsl(var(--border));
   transition: all 0.3s ease;
 }

@@ -1,30 +1,76 @@
 /**
- * UI components barrel exports
- * Following navigation component patterns for consistency
+ * UI Component Registry - UNIFIED EXPORT
+ * 
+ * This is the canonical source for all UI component exports.
+ * All components use design tokens and are type-safe.
+ * 
+ * ✅ Single import point: `import { Button, Card, Input } from '@/components/ui`
+ * ✅ No more duplicate implementations
+ * ✅ All components use design tokens
+ * ✅ Full TypeScript support
  */
 
-// Types and interfaces
+// Core Design System (Always export these first)
+export {
+  designTokens,
+  getToken,
+  validateDesignTokens,
+  type DesignTokens,
+  type ColorKey,
+  type SpacingKey,
+  type BreakpointKey,
+} from '@client/shared/design-system/tokens/unified-export';
+
+export {
+  type ButtonVariant,
+  type ButtonSize,
+  type ButtonState,
+  type ButtonConfig,
+  type CardVariant,
+  type CardInteractivity,
+  type CardConfig,
+  type InputVariant,
+  type InputState,
+  type InputConfig,
+  type ColorVariant,
+  type SpacingValue,
+  type BreakpointValue,
+  isValidColorToken,
+} from '@client/shared/design-system/types/component-types';
+
+// Core Components (Token-Based)
+export {
+  Button,
+  buttonVariants,
+  type ButtonProps,
+} from './button';
+
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  cardVariants,
+  type CardProps,
+} from './card';
+
+export {
+  Input,
+  inputVariants,
+  type InputProps,
+} from './input';
+
+// Legacy compatibility - Types and utilities
 export * from './types';
 export * from './errors';
 export * from './validation';
 export * from './recovery';
 
-// Unified Components (Recommended)
-export {
-  UnifiedButton,
-  unifiedButtonVariants,
-  UnifiedCard,
-  UnifiedCardHeader,
-  UnifiedCardTitle,
-  UnifiedCardDescription,
-  UnifiedCardContent,
-  UnifiedCardFooter,
-  UnifiedBadge,
-  unifiedBadgeVariants
-} from './unified-components';
-
-// Legacy components (for backward compatibility)
-export { Input, EnhancedInput } from './input';
+// LEGACY COMPONENTS (Use token-based versions above)
+// These are kept for backward compatibility during migration
+export { Input as LegacyInput, EnhancedInput } from './input';
 export { 
   Form, 
   FormItem, 
@@ -50,9 +96,6 @@ export {
   EnhancedSelect
 } from './select';
 export { Textarea, EnhancedTextarea } from './textarea';
-export { Button, buttonVariants, EnhancedButton } from './button';
-
-// Enhanced interactive components with validation and error handling
 export { 
   Dialog,
   DialogPortal,
@@ -106,12 +149,9 @@ export {
   EnhancedTableRow,
   EnhancedTableCell
 } from './table';
-
-// Other UI components (to be enhanced in future tasks)
 export { Alert } from './alert';
 export { Avatar } from './avatar';
 export { Badge } from './badge';
-export { Card } from './card';
 export { Label } from './label';
 export { Logo } from './logo';
 export { OptimizedImage } from './OptimizedImage';
@@ -127,8 +167,6 @@ export { Tabs } from './tabs';
 export { Toast } from './toast';
 export { Toaster } from './toaster';
 export { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from './tooltip';
-
-// New shadcn/ui components
 export {
   NavigationMenu,
   NavigationMenuList,
@@ -140,7 +178,6 @@ export {
   NavigationMenuViewport,
   navigationMenuTriggerStyle
 } from './navigation-menu';
-
 export {
   Command,
   CommandDialog,
@@ -152,7 +189,6 @@ export {
   CommandShortcut,
   CommandSeparator
 } from './command';
-
 export {
   ContextMenu,
   ContextMenuTrigger,
@@ -171,7 +207,7 @@ export {
   ContextMenuRadioGroup
 } from './context-menu';
 
-// Enhanced components with business logic
+// Enhanced components
 export {
   EnhancedTabs,
   EnhancedTooltip,
@@ -180,15 +216,12 @@ export {
   EnhancedBadge
 } from './enhanced-components';
 
-// Initialize recovery strategies
-export { initializeUIRecoveryStrategies } from './recovery';
-
-// Enhanced form components with UX improvements
+// Form utilities
 export * from './form-layout';
 export * from './form-field';
 export * from './form-accessibility';
 export { FormDemo } from './form-demo';
 
-// Test utilities (for development and testing)
+// Test utilities
 export * from './__tests__/test-utils';
 

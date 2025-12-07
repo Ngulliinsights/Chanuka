@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { systemApi } from '@client/services/api';
+import { api } from '@client/services/api';
 import { logger } from '@client/utils/logger';
 
 export function useSystemHealth() {
   return useQuery({
     queryKey: ['system', 'health'],
-    queryFn: () => systemApi.getHealth(),
+    queryFn: () => api.get('/system/health'),
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 }

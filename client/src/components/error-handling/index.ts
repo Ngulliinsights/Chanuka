@@ -7,6 +7,14 @@ export type {
   ErrorBoundaryState
 } from './ErrorBoundary';
 
+// Community Error Boundary - Specialized for community features
+export { default as CommunityErrorBoundary } from './CommunityErrorBoundary';
+export { useIncrementalErrorBoundary, withCommunityErrorBoundary } from './CommunityErrorBoundary';
+export type {
+  CommunityErrorBoundaryProps,
+  CommunityErrorBoundaryState
+} from './CommunityErrorBoundary';
+
 // Error Fallback Components - Specialized fallback UIs
 export {
   ErrorFallback,
@@ -43,21 +51,15 @@ export {
   RecoveryAction 
 } from '@client/core/error/constants';
 
-// Re-export all error classes from logger where they are defined
+// Re-export all error classes from core/error where they are actually defined
 export { 
   BaseError, 
   ValidationError,
   NetworkError,
-  ExternalServiceError,
-  ServiceUnavailableError,
-  DatabaseError,
-  CacheError,
   UnauthorizedError,
-  ForbiddenError,
   NotFoundError,
-  ConflictError,
-  TooManyRequestsError,
-} from '@client/utils/logger';
+  CacheError,
+} from '@client/core/error/classes';
 
 // Export utility functions
 export { createErrorReporter } from './utils/error-reporter';

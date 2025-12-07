@@ -10,9 +10,5 @@
 // Main layout component
 export { MobileLayout } from './MobileLayout';
 
-// Navigation components
-export { BottomNavigationBar } from './BottomNavigationBar';
-export { NavigationDrawer } from './NavigationDrawer';
-
 // Header component
 export { MobileHeader } from './MobileHeader';

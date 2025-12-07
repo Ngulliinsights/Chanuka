@@ -135,7 +135,7 @@ export const ImplementationSummary: React.FC = () => {
       case 'enhanced':
         return <Badge variant="default">Enhanced</Badge>;
       case 'new':
-        return <Badge className="bg-green-600 hover:bg-green-700">New</Badge>;
+        return <Badge className="bg-[hsl(var(--color-success))] hover:bg-[hsl(var(--color-success-dark))]">New</Badge>;
     }
   };
 

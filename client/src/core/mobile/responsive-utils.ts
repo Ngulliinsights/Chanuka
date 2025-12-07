@@ -8,21 +8,33 @@
  */
 
 import { logger } from '@/utils/logger';
-import type { ResponsiveBreakpoints, DeviceInfo } from './types';
+
+import { MOBILE_BREAKPOINTS } from '../../config';
+
+import type { ResponsiveBreakpoints } from './types';
 
 /**
  * Utility class for managing responsive layouts and breakpoints.
  */
 export class ResponsiveUtils {
-  private static instance: ResponsiveUtils;
-  private breakpoints: ResponsiveBreakpoints = {
-    xs: 0,
-    sm: 576,
-    md: 768,
-    lg: 992,
-    xl: 1200
-  };
-  private mediaQueries: Map<string, MediaQueryList> = new Map();
+   private static instance: ResponsiveUtils;
+   private mediaQueries: Map<string, MediaQueryList> = new Map();
+
+   private getBreakpointValue(key: keyof ResponsiveBreakpoints): number {
+     const upperKey = key.toUpperCase() as keyof typeof MOBILE_BREAKPOINTS;
+     return MOBILE_BREAKPOINTS[upperKey];
+   }
+
+   private getBreakpointsMap(): ResponsiveBreakpoints {
+     return {
+       xs: MOBILE_BREAKPOINTS.XS,
+       sm: MOBILE_BREAKPOINTS.SM,
+       md: MOBILE_BREAKPOINTS.MD,
+       lg: MOBILE_BREAKPOINTS.LG,
+       xl: MOBILE_BREAKPOINTS.XL,
+       '2xl': MOBILE_BREAKPOINTS['2XL']
+     };
+   }
 
   private constructor() {
     this.setupMediaQueries();
@@ -41,7 +53,7 @@ export class ResponsiveUtils {
   private setupMediaQueries(): void {
     if (typeof window === 'undefined' || !window.matchMedia) return;
 
-    Object.entries(this.breakpoints).forEach(([name, width]) => {
+    Object.entries(this.getBreakpointsMap()).forEach(([name, width]) => {
       if (width > 0) {
         const mq = window.matchMedia(`(min-width: ${width}px)`);
         this.mediaQueries.set(name, mq);
@@ -49,21 +61,16 @@ export class ResponsiveUtils {
     });
   }
 
-  setBreakpoints(breakpoints: Partial<ResponsiveBreakpoints>): void {
-    this.breakpoints = { ...this.breakpoints, ...breakpoints };
-    this.mediaQueries.clear();
-    this.setupMediaQueries();
-  }
 
   getBreakpoints(): Readonly<ResponsiveBreakpoints> {
-    return { ...this.breakpoints };
+    return { ...this.getBreakpointsMap() };
   }
 
   getCurrentBreakpoint(): keyof ResponsiveBreakpoints {
     if (typeof window === 'undefined') return 'lg';
 
     const width = window.innerWidth;
-    const breakpoints = Object.entries(this.breakpoints)
+    const breakpoints = Object.entries(this.getBreakpointsMap())
       .sort(([, a], [, b]) => b - a);
 
     for (const [name, minWidth] of breakpoints) {
@@ -81,16 +88,16 @@ export class ResponsiveUtils {
 
   isBreakpointUp(breakpoint: keyof ResponsiveBreakpoints): boolean {
     if (typeof window === 'undefined') return true;
-    
+
     const mq = this.mediaQueries.get(breakpoint);
     if (mq) return mq.matches;
-    
-    return window.innerWidth >= this.breakpoints[breakpoint];
+
+    return window.innerWidth >= this.getBreakpointValue(breakpoint);
   }
 
   isBreakpointDown(breakpoint: keyof ResponsiveBreakpoints): boolean {
     if (typeof window === 'undefined') return false;
-    return window.innerWidth < this.breakpoints[breakpoint];
+    return window.innerWidth < this.getBreakpointValue(breakpoint);
   }
 
   /**
@@ -121,7 +128,7 @@ export class ResponsiveUtils {
     styles: Partial<Record<keyof ResponsiveBreakpoints, Record<string, unknown>>>
   ): Record<string, unknown> {
     const currentBreakpoint = this.getCurrentBreakpoint();
-    const breakpointOrder: (keyof ResponsiveBreakpoints)[] = ['xs', 'sm', 'md', 'lg', 'xl'];
+    const breakpointOrder: (keyof ResponsiveBreakpoints)[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
     
     let finalStyles: Record<string, unknown> = {};
 
@@ -139,8 +146,8 @@ export class ResponsiveUtils {
     breakpoint: keyof ResponsiveBreakpoints,
     direction: 'up' | 'down' = 'up'
   ): string {
-    const width = this.breakpoints[breakpoint];
-    return direction === 'up' 
+    const width = this.getBreakpointValue(breakpoint);
+    return direction === 'up'
       ? `@media (min-width: ${width}px)`
       : `@media (max-width: ${width - 1}px)`;
   }
@@ -150,7 +157,7 @@ export class ResponsiveUtils {
    */
   getResponsiveValue<T>(values: Partial<Record<keyof ResponsiveBreakpoints, T>>): T | undefined {
     const currentBp = this.getCurrentBreakpoint();
-    const breakpointOrder: (keyof ResponsiveBreakpoints)[] = ['xs', 'sm', 'md', 'lg', 'xl'];
+    const breakpointOrder: (keyof ResponsiveBreakpoints)[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
     
     let result: T | undefined;
     

@@ -12,9 +12,8 @@ import {
 } from '../security/rate-limiter';
 import { 
   securityService, 
-  SecurityStatus, 
-  ValidationSchemas 
-} from '../security/security-service';
+  SecurityStatus
+} from '@client/security/security-service';
 import { 
   SecurityThreat, 
   vulnerabilityScanner 
@@ -302,6 +301,3 @@ export function useRateLimit(key: string, configName: keyof typeof RateLimitConf
     retryAfter: status?.retryAfter ?? 0
   };
 }
-
-// Export validation schemas for convenience
-export { ValidationSchemas };

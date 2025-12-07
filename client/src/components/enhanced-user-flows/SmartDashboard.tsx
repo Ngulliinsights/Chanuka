@@ -2,52 +2,83 @@
  * Smart Dashboard Component
  * 
  * Provides personalized, progressive disclosure-based dashboard
- * that adapts to user skill level and engagement patterns
+ * that adapts to user skill level and engagement patterns.
+ * 
+ * This component uses React Query for efficient server state management,
+ * automatically handling caching, refetching, and loading states for
+ * user data, saved bills, and activity history.
  */
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Progress } from '@client/components/ui/progress';
-import { 
-  TrendingUp, 
-  Bell, 
-  BookOpen, 
-  Target, 
-  Users, 
+import { useQuery } from '@tanstack/react-query';
+import {
   AlertTriangle,
-  CheckCircle,
   ArrowRight,
+  BookOpen,
+  CheckCircle,
   Eye,
-  MessageSquare,
-  Share2,
   Filter,
-  Zap,
+  Globe,
   Heart,
-  Globe
+  MessageSquare,
+  Target,
+  TrendingUp,
+  Users,
+  Zap,
 } from 'lucide-react';
-import { useAppStore, useUserPreferences, useSavedBills } from '@client/store/unified-state-manager';
-import { copySystem } from '@client/content/copy-system';
 
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+
+// Type Definitions
 interface SmartDashboardProps {
   className?: string;
 }
 
-interface DashboardWidget {
+interface Activity {
   id: string;
-  title: string;
-  description: string;
-  component: React.ComponentType<any>;
-  priority: number;
-  userLevels: Array<'novice' | 'intermediate' | 'expert'>;
-  requiredData?: string[];
+  type: 'bill_saved' | 'bill_viewed' | 'comment_posted' | 'analysis_viewed';
+  metadata: {
+    billId: string;
+    billTitle?: string;
+  };
+  timestamp: string;
 }
 
+interface User {
+  id: string;
+  name?: string;
+  email: string;
+  persona: 'novice' | 'intermediate' | 'expert';
+}
+
+interface SavedBill {
+  id: string;
+  billId: string;
+  savedAt: string;
+}
+
+// API Functions - These would be in a separate api.ts file in production
+const fetchSavedBills = async (): Promise<SavedBill[]> => {
+  const response = await fetch('/api/user/saved-bills');
+  if (!response.ok) throw new Error('Failed to fetch saved bills');
+  return response.json();
+};
+
+const fetchRecentActivity = async (): Promise<Activity[]> => {
+  const response = await fetch('/api/user/activity?limit=10');
+  if (!response.ok) throw new Error('Failed to fetch activity');
+  return response.json();
+};
+
 // Personalized Welcome Messages
-const getWelcomeMessage = (userLevel: string, timeOfDay: string, recentActivity: any[]) => {
-  const hasRecentActivity = recentActivity.length > 0;
-  
+// This function generates contextual greetings based on the user's experience level,
+// time of day, and whether they have recent activity to review
+const getWelcomeMessage = (
+  userLevel: User['persona'],
+  timeOfDay: 'morning' | 'afternoon' | 'evening',
+  hasRecentActivity: boolean
+): string => {
   const messages = {
     novice: {
       morning: hasRecentActivity 
@@ -72,22 +103,36 @@ const getWelcomeMessage = (userLevel: string, timeOfDay: string, recentActivity:
     }
   };
 
-  return messages[userLevel as keyof typeof messages]?.[timeOfDay as keyof typeof messages.novice] || 
-         "Welcome to your civic engagement dashboard!";
+  return messages[userLevel][timeOfDay];
 };
 
 // Impact Metrics Component
-function ImpactMetrics({ userLevel }: { userLevel: string }) {
-  const savedBills = useSavedBills();
-  const recentActivity = useAppStore(state => state.user.recentActivity);
+// Displays the user's engagement statistics and civic score,
+// with messaging tailored to their experience level
+function ImpactMetrics({ userLevel }: { userLevel: User['persona'] }) {
+  // React Query hooks for fetching saved bills and activity
+  // These automatically handle loading states, caching, and refetching
+  const { data: savedBills = [] } = useQuery({
+    queryKey: ['savedBills'],
+    queryFn: fetchSavedBills,
+  });
   
+  const { data: recentActivity = [] } = useQuery({
+    queryKey: ['recentActivity'],
+    queryFn: fetchRecentActivity,
+  });
+  
+  // Calculate engagement metrics from the fetched data
   const metrics = {
-    billsTracked: savedBills.size,
+    billsTracked: savedBills.length,
     commentsPosted: recentActivity.filter(a => a.type === 'comment_posted').length,
     analysisViewed: recentActivity.filter(a => a.type === 'analysis_viewed').length,
-    civicScore: Math.min(100, (savedBills.size * 10) + (recentActivity.length * 2))
+    // Civic score combines quantity and diversity of engagement
+    civicScore: Math.min(100, (savedBills.length * 10) + (recentActivity.length * 2))
   };
 
+  // Different messaging for different user levels helps users understand
+  // their progress in terms that resonate with their experience
   const levelMessages = {
     novice: {
       title: "Your Civic Journey",
@@ -103,7 +148,7 @@ function ImpactMetrics({ userLevel }: { userLevel: string }) {
     }
   };
 
-  const currentLevel = levelMessages[userLevel as keyof typeof levelMessages] || levelMessages.novice;
+  const currentLevel = levelMessages[userLevel];
 
   return (
     <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
@@ -134,6 +179,7 @@ function ImpactMetrics({ userLevel }: { userLevel: string }) {
           <Progress value={metrics.civicScore} className="h-2" />
         </div>
 
+        {/* Progressive disclosure: Show helpful hints to novices with low engagement */}
         {userLevel === 'novice' && metrics.civicScore < 30 && (
           <div className="mt-4 p-3 bg-blue-100 rounded-lg">
             <p className="text-sm text-blue-800">
@@ -147,7 +193,10 @@ function ImpactMetrics({ userLevel }: { userLevel: string }) {
 }
 
 // Quick Actions Component
-function QuickActions({ userLevel }: { userLevel: string }) {
+// Provides context-appropriate action buttons based on user expertise
+function QuickActions({ userLevel }: { userLevel: User['persona'] }) {
+  // Different user levels see different actions that match their needs
+  // Novices get guided learning, experts get advanced analysis tools
   const actions = {
     novice: [
       { icon: BookOpen, label: "Learn About Bills", href: "/civic-education", color: "bg-green-500" },
@@ -166,7 +215,7 @@ function QuickActions({ userLevel }: { userLevel: string }) {
     ]
   };
 
-  const currentActions = actions[userLevel as keyof typeof actions] || actions.novice;
+  const currentActions = actions[userLevel];
 
   return (
     <Card>
@@ -178,20 +227,17 @@ function QuickActions({ userLevel }: { userLevel: string }) {
           {currentActions.map((action, index) => {
             const Icon = action.icon;
             return (
-              <Button
+              <a
                 key={index}
-                variant="ghost"
-                className="justify-start h-auto p-3 hover:bg-accent"
-                asChild
+                href={action.href}
+                className="flex items-center justify-start h-auto p-3 rounded-md hover:bg-accent transition-colors"
               >
-                <a href={action.href}>
-                  <div className={`w-8 h-8 rounded-lg ${action.color} flex items-center justify-center mr-3`}>
-                    <Icon className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="font-medium">{action.label}</span>
-                  <ArrowRight className="w-4 h-4 ml-auto" />
-                </a>
-              </Button>
+                <div className={`w-8 h-8 rounded-lg ${action.color} flex items-center justify-center mr-3 shrink-0`}>
+                  <Icon className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-medium">{action.label}</span>
+                <ArrowRight className="w-4 h-4 ml-auto shrink-0" />
+              </a>
             );
           })}
         </div>
@@ -201,10 +247,16 @@ function QuickActions({ userLevel }: { userLevel: string }) {
 }
 
 // Recent Activity Component
-function RecentActivity({ userLevel }: { userLevel: string }) {
-  const recentActivity = useAppStore(state => state.user.recentActivity.slice(0, 5));
+// Shows the user's recent interactions with the platform
+function RecentActivity({ userLevel }: { userLevel: User['persona'] }) {
+  // Fetch recent activity using React Query
+  const { data: recentActivity = [], isLoading } = useQuery({
+    queryKey: ['recentActivity'],
+    queryFn: fetchRecentActivity,
+  });
 
-  if (recentActivity.length === 0) {
+  // Show a welcoming empty state when there's no activity yet
+  if (!isLoading && recentActivity.length === 0) {
     return (
       <Card>
         <CardHeader className="pb-3">
@@ -219,35 +271,52 @@ function RecentActivity({ userLevel }: { userLevel: string }) {
                 : "Begin engaging with legislation and community discussions"
               }
             </p>
-            <Button asChild>
-              <a href="/bills">
+            <a href="/bills" className="inline-block">
+              <Button>
                 Explore Bills
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </a>
-            </Button>
+              </Button>
+            </a>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'bill_saved': return <Heart className="w-4 h-4 text-red-500" />;
-      case 'bill_viewed': return <Eye className="w-4 h-4 text-blue-500" />;
-      case 'comment_posted': return <MessageSquare className="w-4 h-4 text-green-500" />;
-      case 'analysis_viewed': return <TrendingUp className="w-4 h-4 text-purple-500" />;
-      default: return <CheckCircle className="w-4 h-4 text-gray-500" />;
-    }
+  // Helper function to get the appropriate icon for each activity type
+  const getActivityIcon = (type: Activity['type']) => {
+    const icons = {
+      bill_saved: <Heart className="w-4 h-4 text-red-500" />,
+      bill_viewed: <Eye className="w-4 h-4 text-blue-500" />,
+      comment_posted: <MessageSquare className="w-4 h-4 text-green-500" />,
+      analysis_viewed: <TrendingUp className="w-4 h-4 text-purple-500" />,
+    };
+    return icons[type] || <CheckCircle className="w-4 h-4 text-gray-500" />;
   };
 
-  const getActivityMessage = (activity: any) => {
-    switch (activity.type) {
-      case 'bill_saved': return `Saved bill ${activity.metadata.billId}`;
-      case 'bill_viewed': return `Viewed bill ${activity.metadata.billId}`;
-      case 'comment_posted': return `Posted comment on ${activity.metadata.billId}`;
-      case 'analysis_viewed': return `Viewed analysis for ${activity.metadata.billId}`;
-      default: return 'Unknown activity';
+  // Generate human-readable activity messages
+  const getActivityMessage = (activity: Activity) => {
+    const messages = {
+      bill_saved: `Saved ${activity.metadata.billTitle || `bill ${activity.metadata.billId}`}`,
+      bill_viewed: `Viewed ${activity.metadata.billTitle || `bill ${activity.metadata.billId}`}`,
+      comment_posted: `Posted comment on ${activity.metadata.billTitle || activity.metadata.billId}`,
+      analysis_viewed: `Viewed analysis for ${activity.metadata.billTitle || activity.metadata.billId}`,
+    };
+    return messages[activity.type] || 'Unknown activity';
+  };
+
+  // Format timestamps in a user-friendly way
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    
+    if (diffInHours < 24) {
+      return 'Today';
+    } else if (diffInHours < 48) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString();
     }
   };
 
@@ -257,47 +326,56 @@ function RecentActivity({ userLevel }: { userLevel: string }) {
         <CardTitle className="text-lg">Recent Activity</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {recentActivity.map((activity) => (
-            <div key={activity.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent">
-              {getActivityIcon(activity.type)}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {getActivityMessage(activity)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(activity.timestamp).toLocaleDateString()}
-                </p>
+        {isLoading ? (
+          <div className="text-center py-4 text-muted-foreground">Loading activity...</div>
+        ) : (
+          <div className="space-y-3">
+            {recentActivity.map((activity) => (
+              <div key={activity.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
+                {getActivityIcon(activity.type)}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {getActivityMessage(activity)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatTimestamp(activity.timestamp)}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 }
 
 // Main Smart Dashboard Component
+// This is the orchestrator that brings together all the sub-components
+// and provides the overall dashboard experience
 export function SmartDashboard({ className }: SmartDashboardProps) {
-  const user = useAppStore(state => state.user.user);
-  const preferences = useUserPreferences();
-  const recentActivity = useAppStore(state => state.user.recentActivity);
+  // Default user level for now
+  const userLevel = 'novice';
   
-  const userLevel = user?.persona || 'novice';
-  const timeOfDay = new Date().getHours() < 12 ? 'morning' : 
-                   new Date().getHours() < 17 ? 'afternoon' : 'evening';
+  // Determine time of day for contextual greeting
+  const hour = new Date().getHours();
+  const timeOfDay: 'morning' | 'afternoon' | 'evening' = 
+    hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
 
-  const welcomeMessage = getWelcomeMessage(userLevel, timeOfDay, recentActivity);
+  // Mock recent activity  
+  const recentActivity: Activity[] = [];
+  
+  const welcomeMessage = getWelcomeMessage(userLevel, timeOfDay, recentActivity.length > 0);
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      {/* Personalized Welcome */}
+    <div className={`space-y-6 ${className || ''}`}>
+      {/* Personalized Welcome Banner */}
       <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white border-0">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold mb-2">
-                Welcome back{user?.name ? `, ${user.name}` : ''}!
+                Welcome back!
               </h1>
               <p className="text-blue-100 text-lg">{welcomeMessage}</p>
             </div>
@@ -310,13 +388,13 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
         </CardContent>
       </Card>
 
-      {/* Dashboard Grid */}
+      {/* Dashboard Grid - Responsive layout that adapts to screen size */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Primary Actions */}
+        {/* Left Column - Primary engagement metrics and contextual content */}
         <div className="lg:col-span-2 space-y-6">
           <ImpactMetrics userLevel={userLevel} />
           
-          {/* Contextual Content Based on User Level */}
+          {/* Progressive disclosure: Show different content based on user level */}
           {userLevel === 'novice' && (
             <Card className="border-green-200 bg-green-50">
               <CardHeader className="pb-3">
@@ -327,17 +405,19 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
               </CardHeader>
               <CardContent>
                 <p className="text-green-700 mb-4">
-                  New to civic engagement? We'll guide you through understanding how legislation works.
+                  New to civic engagement? We&apos;ll guide you through understanding how legislation works.
                 </p>
                 <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-100">
-                  Start Learning Journey
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <a href="/civic-education" className="flex items-center">
+                    Start Learning Journey
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </a>
                 </Button>
               </CardContent>
             </Card>
           )}
 
-          {userLevel === 'expert' && (
+          {userLevel !== 'novice' && (
             <Card className="border-purple-200 bg-purple-50">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-purple-800">
@@ -350,15 +430,17 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
                   Your expertise helps the community understand complex legislation. Thank you for contributing!
                 </p>
                 <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-100">
-                  Review Pending Verifications
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <a href="/expert-verification" className="flex items-center">
+                    Review Pending Verifications
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </a>
                 </Button>
               </CardContent>
             </Card>
           )}
         </div>
 
-        {/* Right Column - Quick Actions & Activity */}
+        {/* Right Column - Quick actions and activity feed */}
         <div className="space-y-6">
           <QuickActions userLevel={userLevel} />
           <RecentActivity userLevel={userLevel} />

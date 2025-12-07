@@ -12,3 +12,6 @@ export { useBottomSheet } from './useBottomSheet';
 // Navigation hooks
 export { useMobileNavigation } from './useMobileNavigation';
 export { useMobileTabs } from './useMobileTabs';
+
+// Device hooks
+export { useDeviceInfo } from './useDeviceInfo';

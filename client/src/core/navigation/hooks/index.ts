@@ -1,9 +1,17 @@
 /**
- * Core Navigation Hooks
- * Navigation state management, accessibility, and performance
+ * Navigation Hooks - Re-exported from parent hooks.ts for backward compatibility
+ * 
+ * All hooks are consolidated in ../hooks.ts
+ * This file maintains backward compatibility for imports from ./hooks/
  */
 
-export { useUnifiedNavigation } from './use-unified-navigation';
-export { useNavigationAccessibility, useNavigationKeyboardShortcuts } from './use-navigation-accessibility';
-export { useNavigationPerformance } from './use-navigation-performance';
-export { useNavigationPreferences } from './use-navigation-preferences';
+export {
+  useNavigationSystem,
+  useUnifiedNavigation,
+  useKeyboardNavigation,
+  useBreadcrumbs,
+  useRelatedPages,
+  useNavigationPreferences,
+  useSidebar,
+  useMobileMenu,
+} from '../hooks';

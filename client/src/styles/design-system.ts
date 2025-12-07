@@ -102,6 +102,7 @@ export const MIGRATION_STRATEGY = `
 
 **Before (Custom Only):**
 \`\`\`tsx
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 export const CustomButton = ({ children, variant = 'primary', ...props }) => (

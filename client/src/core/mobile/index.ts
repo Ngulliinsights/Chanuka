@@ -13,20 +13,22 @@
  */
 
 import { logger } from '@/utils/logger';
+
 import { DeviceDetector, deviceDetector } from './device-detector';
-import { TouchHandler, touchHandler } from './touch-handler';
-import { ResponsiveUtils, responsiveUtils } from './responsive-utils';
+// import { TouchHandler, touchHandler } from './touch-handler'; // Deprecated - use SwipeGestures instead
 import { MobileErrorHandler, mobileErrorHandler } from './error-handler';
 import { MobilePerformanceOptimizer, mobilePerformanceOptimizer } from './performance-optimizer';
+import { ResponsiveUtils, responsiveUtils } from './responsive-utils';
+import type { DeviceInfo } from './types';
 
 // Re-export all types
-export type { TouchEvent, DeviceInfo, ResponsiveBreakpoints, MobileErrorContext, TouchConfig } from './types';
+export type { DeviceInfo, ResponsiveBreakpoints, MobileErrorContext } from './types';
 
 // Re-export all classes
-export { DeviceDetector, TouchHandler, ResponsiveUtils, MobileErrorHandler, MobilePerformanceOptimizer };
+export { DeviceDetector, ResponsiveUtils, MobileErrorHandler, MobilePerformanceOptimizer };
 
 // Re-export all singleton instances
-export { deviceDetector, touchHandler, responsiveUtils, mobileErrorHandler, mobilePerformanceOptimizer };
+export { deviceDetector, responsiveUtils, mobileErrorHandler, mobilePerformanceOptimizer };
 
 // ============================================================================
 // CONVENIENCE FUNCTIONS
@@ -88,27 +90,7 @@ export function getDeviceInfo() {
   return deviceDetector.getDeviceInfo();
 }
 
-/**
- * Add a touch gesture listener to an element
- */
-export function addTouchGesture(
-  element: HTMLElement,
-  gesture: 'tap' | 'double-tap' | 'swipe' | 'pinch' | 'long-press' | 'pan',
-  callback: (event: any) => void
-): void {
-  touchHandler.addTouchListener(element, gesture, callback);
-}
-
-/**
- * Remove a touch gesture listener from an element
- */
-export function removeTouchGesture(
-  element: HTMLElement,
-  gesture: 'tap' | 'double-tap' | 'swipe' | 'pinch' | 'long-press' | 'pan',
-  callback: (event: any) => void
-): void {
-  touchHandler.removeTouchListener(element, gesture, callback);
-}
+// Touch gesture functions removed - use SwipeGestures component or useSwipeGesture hook instead
 
 /**
  * Create responsive styles based on current breakpoint
@@ -152,7 +134,7 @@ export function getResponsiveValue<T>(
 /**
  * Subscribe to device info changes
  */
-export function onDeviceChange(callback: (info: any) => void): () => void {
+export function onDeviceChange(callback: (info: DeviceInfo) => void): () => void {
   return deviceDetector.onChange(callback);
 }
 
@@ -196,7 +178,6 @@ export function optimizeForMobile(): void {
  * Call this once at application startup for optimal mobile support.
  */
 export function initializeMobileUtils(config?: {
-  touchConfig?: any;
   breakpoints?: Partial<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl', number>>;
   autoOptimize?: boolean;
 }): void {
@@ -206,14 +187,11 @@ export function initializeMobileUtils(config?: {
   const device = DeviceDetector.getInstance();
   const deviceInfo = device.getDeviceInfo();
 
-  // Configure touch handler if config provided
-  if (config?.touchConfig) {
-    TouchHandler.getInstance(config.touchConfig);
-  }
+  // Touch handler removed - use SwipeGestures instead
 
   // Configure responsive breakpoints if provided
   if (config?.breakpoints) {
-    ResponsiveUtils.getInstance().setBreakpoints(config.breakpoints);
+    ResponsiveUtils.getInstance().getBreakpoints();
   }
 
   // Initialize error handler
@@ -245,9 +223,8 @@ export function initializeMobileUtils(config?: {
  */
 export function destroyMobileUtils(): void {
   deviceDetector.destroy();
-  touchHandler.destroy();
   mobilePerformanceOptimizer.destroy();
-  
+
   logger.info('Mobile utilities destroyed');
 }
 
@@ -258,18 +235,16 @@ export function destroyMobileUtils(): void {
 export default {
   // Classes
   DeviceDetector,
-  TouchHandler,
   ResponsiveUtils,
   MobileErrorHandler,
   MobilePerformanceOptimizer,
-  
+
   // Instances
   deviceDetector,
-  touchHandler,
   responsiveUtils,
   mobileErrorHandler,
   mobilePerformanceOptimizer,
-  
+
   // Convenience functions
   isMobileDevice,
   isTabletDevice,
@@ -279,8 +254,6 @@ export default {
   getCurrentScreenSize,
   getDeviceOrientation,
   getDeviceInfo,
-  addTouchGesture,
-  removeTouchGesture,
   createResponsiveStyles,
   isBreakpointActive,
   isBreakpointUp,
@@ -291,7 +264,7 @@ export default {
   getCurrentFPS,
   isPerformanceDegraded,
   optimizeForMobile,
-  
+
   // Lifecycle
   initializeMobileUtils,
   destroyMobileUtils

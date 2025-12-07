@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText,
   Users,
@@ -8,7 +10,6 @@ import {
   AlertTriangle,
   CheckCircle,
   ArrowRight,
-  Building,
   MessageSquare,
   Eye,
   Zap,
@@ -17,40 +18,82 @@ import {
   Star,
   Activity,
   ChevronRight,
-  Play,
   Target,
-  Lightbulb,
   Heart
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 
 import { Badge } from '@client/components/ui/badge';
 import { Button } from '@client/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { ResponsiveButton } from '@client/shared/design-system/components/ResponsiveButton';
-import { ResponsiveContainer } from '@client/shared/design-system/components/ResponsiveContainer';
-import { ResponsiveGrid } from '@client/shared/design-system/components/ResponsiveGrid';
-import { TouchTarget } from '@client/shared/design-system/components/TouchTarget';
 import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
-import { TouchOptimizedCard } from '@/components/mobile/__archive__/MobileOptimizedLayout';
-import { useAppStore } from '@client/store/unified-state-manager';
-import { useMediaQuery } from '@client/hooks/useMediaQuery';
+import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { copySystem } from '@client/content/copy-system';
+
+// Define types for better type safety
+interface StatItem {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+}
+
+interface SearchInputProps {
+  onSearch: (query: string) => void;
+  placeholder: string;
+  className?: string;
+  maxSuggestions?: number;
+}
+
+// Simple search input component to replace missing IntelligentAutocomplete
+const SearchInput: React.FC<SearchInputProps> = ({ onSearch, placeholder, className = '' }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      onSearch(searchQuery.trim());
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      onSearch(searchQuery.trim());
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className={className}>
+      <div className="relative">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder={placeholder}
+          className="w-full px-6 py-4 pr-12 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-300"
+        />
+        <button
+          type="submit"
+          disabled={!searchQuery.trim()}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+        >
+          <Search className="w-5 h-5" />
+        </button>
+      </div>
+    </form>
+  );
+};
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width: 768px)');
   
-  // Enhanced state management
-  const user = useAppStore(state => state.user.user);
-  const addActivity = useAppStore(state => state.addActivity);
-  
-  const [currentStat, setCurrentStat] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const [showPretextAnalysis, setShowPretextAnalysis] = useState(false);
+  // State management with proper typing
+  const { data: user } = useUserProfile();
+  const [currentStat, setCurrentStat] = useState<number>(0);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [showPretextAnalysis, setShowPretextAnalysis] = useState<boolean>(false);
   const [selectedBillId, setSelectedBillId] = useState<string>('');
-  const [showPersonalizedFeatures, setShowPersonalizedFeatures] = useState(false);
+  const [showPersonalizedFeatures, setShowPersonalizedFeatures] = useState<boolean>(false);
   
   // Get user level for personalized content
   const userLevel = user?.persona || 'novice';
@@ -60,46 +103,39 @@ export default function HomePage() {
     const interval = setInterval(() => {
       setCurrentStat((prev) => (prev + 1) % 4);
     }, 3000);
-    
-    // Track home page visit
-    addActivity({
-      type: 'page_viewed',
-      metadata: { 
-        page: 'home',
-        userPersona: userLevel,
-        timestamp: new Date().toISOString()
-      }
-    });
-    
+
     // Show personalized features for returning users
     if (user && user.onboardingCompleted) {
       setShowPersonalizedFeatures(true);
     }
-    
-    return () => clearInterval(interval);
-  }, [addActivity, userLevel, user]);
 
-  // Enhanced search with activity tracking
-  const handleSearch = (query: string) => {
-    addActivity({
-      type: 'search_initiated',
-      metadata: { 
-        query,
-        source: 'home_page',
-        userPersona: userLevel
-      }
-    });
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Enhanced search handler with proper typing
+  const handleSearch = (query: string): void => {
     navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
   // Handle pretext analysis for a bill
-  const handlePretextAnalysis = (billId: string) => {
+  const handlePretextAnalysis = (billId: string): void => {
     setSelectedBillId(billId);
     setShowPretextAnalysis(true);
   };
 
+  // Handle input change with proper event typing
+  const handleBillIdChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setSelectedBillId(e.target.value);
+  };
+
+  const handleBillIdKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === 'Enter' && selectedBillId.trim()) {
+      handlePretextAnalysis(selectedBillId.trim());
+    }
+  };
+
   // Realistic metrics based on civic engagement platform benchmarks
-  const stats = [
+  const stats: StatItem[] = [
     { label: 'Bills Tracked', value: '1,247', icon: FileText, color: 'text-blue-600' },
     { label: 'Active Citizens', value: '3,892', icon: Users, color: 'text-green-600' },
     { label: 'Issues Flagged', value: '47', icon: AlertTriangle, color: 'text-orange-600' },
@@ -136,13 +172,13 @@ export default function HomePage() {
                   }
                 </p>
                 <div className="flex items-center justify-center gap-4 mb-8">
-                  <Badge variant="secondary" className="text-sm">
-                    <Heart className="w-4 h-4 mr-1 text-red-500" />
-                    {user.persona} User
+                  <Badge variant="secondary" className="text-sm flex items-center gap-1">
+                    <Heart className="w-4 h-4 text-red-500" />
+                    <span>{user.persona} User</span>
                   </Badge>
-                  <Badge variant="outline" className="text-sm">
-                    <Activity className="w-4 h-4 mr-1" />
-                    Active Citizen
+                  <Badge variant="outline" className="text-sm flex items-center gap-1">
+                    <Activity className="w-4 h-4" />
+                    <span>Active Citizen</span>
                   </Badge>
                 </div>
               </div>
@@ -203,12 +239,12 @@ export default function HomePage() {
 
             {/* Embedded Search Bar */}
             <div className="max-w-2xl mx-auto mb-12">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
                 <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-white mb-2">Search Legislation</h3>
-                  <p className="text-white/80 text-sm">Find bills, analyze policy impacts, and detect implementation workarounds</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Search Legislation</h3>
+                  <p className="text-gray-600 text-sm">Find bills, analyze policy impacts, and detect implementation workarounds</p>
                 </div>
-                <IntelligentAutocomplete
+                <SearchInput
                   onSearch={handleSearch}
                   placeholder="Search bills, sponsors, policy topics..."
                   className="w-full"
@@ -404,12 +440,8 @@ export default function HomePage() {
                   placeholder="Enter bill ID (e.g., B001)"
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   value={selectedBillId}
-                  onChange={(e) => setSelectedBillId(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && selectedBillId.trim()) {
-                      handlePretextAnalysis(selectedBillId.trim());
-                    }
-                  }}
+                  onChange={handleBillIdChange}
+                  onKeyPress={handleBillIdKeyPress}
                 />
                 <Button
                   onClick={() => selectedBillId.trim() && handlePretextAnalysis(selectedBillId.trim())}
@@ -646,4 +678,3 @@ export default function HomePage() {
     </div>
   );
 }
-

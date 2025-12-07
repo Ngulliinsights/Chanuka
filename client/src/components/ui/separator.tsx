@@ -1,6 +1,9 @@
 /**
- * Separator Component
- * Visual separator for content sections
+ * Separator Component - UNIFIED & TOKEN-BASED
+ * 
+ * ✅ Uses design tokens
+ * ✅ Horizontal and vertical orientation
+ * ✅ Proper accessibility attributes
  */
 
 import React from 'react';
@@ -16,7 +19,8 @@ export function Separator({ orientation = 'horizontal', className }: SeparatorPr
   return (
     <div
       className={cn(
-        'shrink-0 bg-border',
+        'shrink-0',
+        'bg-[hsl(var(--color-border))]',
         orientation === 'horizontal' ? 'h-[1px] w-full' : 'h-full w-[1px]',
         className
       )}

@@ -8,10 +8,10 @@
 
 import { Component, ReactNode, ErrorInfo } from 'react';
 
+import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@/core/error';
+import { performanceMonitor } from '@/core/performance';
 import { getBrowserInfo } from '@/utils/browser';
-import { BaseError, ErrorDomain, ErrorSeverity, errorHandler } from '@/core/error';
 import { logger } from '@/utils/logger';
-import { runtimePerformanceMonitor } from '@/utils/performance-monitor';
 import { startTrace, finishTrace } from '@/utils/tracing';
 
 /**
@@ -108,8 +108,8 @@ export interface ErrorMetrics {
   recoveryAttempts: number;
   recoverySuccessful: boolean;
   userFeedbackProvided: boolean;
-  browserInfo: any;
-  performanceMetrics: any;
+  browserInfo: unknown;
+  performanceMetrics: unknown;
   context?: string;
 }
 
@@ -155,9 +155,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             cause: error,
             context: {
               component: 'ErrorBoundary',
-              timestamp: new Date().toISOString(),
+              timestamp: Date.now(),
               browserInfo: getBrowserInfo(),
-              performanceMetrics: runtimePerformanceMonitor.getMetrics(),
+              performanceMetrics: performanceMonitor.getPerformanceStats(),
             },
           });
 
@@ -184,7 +184,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     });
 
     // Use unified error handler for comprehensive error processing
-    const appError = errorHandler.handleError({
+    const appError = coreErrorHandler.handleError({
       type: ErrorDomain.SYSTEM,
       severity: ErrorSeverity.HIGH,
       message: error.message,
@@ -240,7 +240,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 height: window.innerHeight,
               }
             : undefined,
-        timestamp: new Date().toISOString(),
+        timestamp: Date.now(),
       },
     });
 
@@ -255,7 +255,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       recoverySuccessful: false,
       userFeedbackProvided: false,
       browserInfo: getBrowserInfo(),
-      performanceMetrics: runtimePerformanceMonitor.getMetrics(),
+      performanceMetrics: performanceMonitor.getPerformanceStats(),
       context: this.props.context,
     };
 
@@ -268,7 +268,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       componentStack: errorInfo.componentStack,
       context: this.props.context,
       browserInfo: getBrowserInfo(),
-      performanceMetrics: runtimePerformanceMonitor.getMetrics(),
+      performanceMetrics: performanceMonitor.getPerformanceStats(),
       recoveryAttempts: this.recoveryAttempts,
       hasRecoveryOptions: true,
     });
@@ -741,10 +741,6 @@ function EnhancedErrorFallback(props: ErrorFallbackProps & { showTechnicalDetail
                     placeholder="Tell us what happened..."
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
                     rows={3}
-                    onChange={e => {
-                      // Store temporarily - would be submitted with rating
-                      (e.target as any)._comment = e.target.value;
-                    }}
                   />
                 </div>
 

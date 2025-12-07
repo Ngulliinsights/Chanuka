@@ -175,5 +175,33 @@ module.exports = {
         },
       },
     },
+    {
+      files: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+      parserOptions: {
+        project: null,
+      },
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "jsx-a11y/no-static-element-interactions": "off",
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/interactive-supports-focus": "off",
+        "jsx-a11y/form-has-associated-label": "off",
+        "jsx-a11y/no-noninteractive-element-to-interactive-role": "off",
+        "jsx-a11y/anchor-is-valid": "off",
+      },
+    },
+    {
+      files: ["**/.eslintrc*.js"],
+      parserOptions: {
+        project: null,
+      },
+    },
+    {
+      files: ["client/src/components/**/*.tsx"],
+      rules: {
+        "stylelint/no-style-component": "off",
+      },
+    },
   ],
 };

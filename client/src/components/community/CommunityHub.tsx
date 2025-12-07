@@ -20,11 +20,12 @@ import {
   RefreshCw,
   MessageSquare,
 } from 'lucide-react';
-import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
-import { useMediaQuery } from '@client/hooks/useMediaQuery';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { cn } from '@client/lib/utils';
 
+import { CommunityErrorBoundary } from '../error-handling/CommunityErrorBoundary';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -32,17 +33,24 @@ import { Card, CardContent } from '../ui/card';
 import { Progress } from '../ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
-
-
 import ActivityFeed from './ActivityFeed';
-import { CommunityErrorBoundary } from './CommunityErrorBoundary';
 import { CommunityFilters } from './CommunityFilters';
 import CommunityStats from './CommunityStats';
 import { LocalImpactPanel } from './LocalImpactPanel';
 import { TrendingTopics } from './TrendingTopics';
 
+interface ExpertInsight {
+  id: number;
+  expert: string;
+  title: string;
+  insight: string;
+  billId: number;
+  timestamp: string;
+  likes: number;
+}
+
 // Expert Insights Component
-const ExpertInsights = ({ insights, compact }: { insights: any[]; compact?: boolean }) => {
+const ExpertInsights = ({ _compact }: { _insights?: ExpertInsight[]; _compact?: boolean }) => {
   const mockInsights = [
     {
       id: 1,
@@ -71,7 +79,7 @@ const ExpertInsights = ({ insights, compact }: { insights: any[]; compact?: bool
         <Badge variant="secondary">{mockInsights.length} insights</Badge>
       </div>
       
-      {mockInsights.slice(0, compact ? 2 : 4).map((insight) => (
+      {mockInsights.slice(0, _compact ? 2 : 4).map((insight) => (
         <Card key={insight.id} className="p-4">
           <div className="flex items-start space-x-3">
             <Avatar className="h-10 w-10">
@@ -98,8 +106,25 @@ const ExpertInsights = ({ insights, compact }: { insights: any[]; compact?: bool
   );
 };
 
+interface CampaignItem {
+  id: number;
+  title: string;
+  description: string;
+  supporters: number;
+  target: number;
+  deadline: string;
+}
+
+interface PetitionItem {
+  id: number;
+  title: string;
+  signatures: number;
+  target: number;
+  daysLeft: number;
+}
+
 // Action Center Component
-const ActionCenter = ({ campaigns, petitions, compact }: { campaigns: any[]; petitions: any[]; compact?: boolean }) => {
+const ActionCenter = ({ compact }: { _campaigns?: CampaignItem[]; _petitions?: PetitionItem[]; compact?: boolean }) => {
   const mockCampaigns = [
     {
       id: 1,
@@ -203,7 +228,7 @@ interface CommunityHubProps {
 }
 
 function CommunityHubComponent({ className }: CommunityHubProps) {
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const { isMobile } = useDeviceInfo();
   const [activeTab, setActiveTab] = useState('feed');
   const [showFilters, setShowFilters] = useState(false);
   const [showLocalImpact, setShowLocalImpact] = useState(false);
@@ -267,6 +292,7 @@ function CommunityHubComponent({ className }: CommunityHubProps) {
       diversity: 72,
       substance: 90,
       trendingScore: 85,
+      score: 85,
       hourlyActivity: [5, 8, 12, 15, 10, 8, 6],
       dailyActivity: [45, 38, 52, 41],
       weeklyActivity: [280, 320, 290],
@@ -292,6 +318,7 @@ function CommunityHubComponent({ className }: CommunityHubProps) {
       diversity: 88,
       substance: 75,
       trendingScore: 65,
+      score: 65,
       hourlyActivity: [3, 5, 8, 10, 6, 4, 2],
       dailyActivity: [32, 28, 35, 30],
       weeklyActivity: [200, 220, 210],
@@ -308,34 +335,40 @@ function CommunityHubComponent({ className }: CommunityHubProps) {
   // Mock expert insights
   const filteredExpertInsights = [
     {
-      id: '1',
-      title: 'Analysis of Constitutional Implications',
-      author: { name: 'Dr. Legal Expert', credentials: 'Constitutional Law Professor' },
-      summary: 'This bill raises important questions about separation of powers...',
-      communityValidation: { validationScore: 95, totalVotes: 120 }
+      id: 1,
+      expert: 'Dr. Legal Expert',
+      title: 'Constitutional Law Professor',
+      insight: 'This bill raises important questions about separation of powers and constitutional implications.',
+      billId: 1,
+      timestamp: '2024-01-20T10:30:00Z',
+      likes: 95
     }
   ];
 
   // Mock campaigns and petitions
   const filteredCampaigns = [
     {
-      id: '1',
+      id: 1,
       title: 'Support Clean Energy Initiative',
       description: 'Join the movement for renewable energy adoption',
       status: 'active',
       supporters: 1250,
-      goal: 2000
+      goal: 2000,
+      target: 2000,
+      deadline: '2024-03-15T00:00:00Z'
     }
   ];
 
   const filteredPetitions = [
     {
-      id: '1',
+      id: 1,
       title: 'Protect Local Parks',
       description: 'Stop the proposed development that threatens our community parks',
       status: 'active',
       signatures: 850,
-      goal: 1000
+      goal: 1000,
+      target: 1000,
+      daysLeft: 12
     }
   ];
 
@@ -503,8 +536,8 @@ function CommunityHubComponent({ className }: CommunityHubProps) {
                 </h3>
                 <CommunityErrorBoundary context="ExpertInsights">
                   <ExpertInsights
-                    insights={filteredExpertInsights.slice(0, 3)}
-                    compact={true}
+                    _insights={filteredExpertInsights.slice(0, 3)}
+                    _compact={true}
                   />
                 </CommunityErrorBoundary>
               </CardContent>
@@ -519,8 +552,8 @@ function CommunityHubComponent({ className }: CommunityHubProps) {
                 </h3>
                 <CommunityErrorBoundary context="ActionCenter">
                   <ActionCenter
-                    campaigns={filteredCampaigns.slice(0, 2)}
-                    petitions={filteredPetitions.slice(0, 2)}
+                    _campaigns={filteredCampaigns.slice(0, 2)}
+                    _petitions={filteredPetitions.slice(0, 2)}
                     compact={true}
                   />
                 </CommunityErrorBoundary>
@@ -572,15 +605,15 @@ function CommunityHubComponent({ className }: CommunityHubProps) {
 
               <TabsContent value="experts" className="mt-4">
                 <CommunityErrorBoundary context="ExpertInsights">
-                  <ExpertInsights insights={filteredExpertInsights} />
+                  <ExpertInsights _insights={filteredExpertInsights} />
                 </CommunityErrorBoundary>
               </TabsContent>
 
               <TabsContent value="action" className="mt-4">
                 <CommunityErrorBoundary context="ActionCenter">
                   <ActionCenter
-                    campaigns={filteredCampaigns}
-                    petitions={filteredPetitions}
+                    _campaigns={filteredCampaigns}
+                    _petitions={filteredPetitions}
                   />
                 </CommunityErrorBoundary>
               </TabsContent>

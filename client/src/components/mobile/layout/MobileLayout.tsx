@@ -3,20 +3,19 @@
  * Composes modular components to provide complete mobile UX shell
  */
 
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 
-import type { NavigationItem } from '../../../config/navigation';
+import type { NavigationItem } from '../../../config';
+import { useDeviceInfo } from '../../../hooks/mobile/useDeviceInfo';
 import { useMobileNavigation } from '../../../hooks/mobile/useMobileNavigation';
 import { useScrollManager } from '../../../hooks/mobile/useScrollManager';
-import { useMediaQuery } from '../../../hooks/useMediaQuery';
 import { cn } from '../../../lib/utils';
 import { OfflineStatusBanner } from '../feedback/OfflineStatusBanner';
 import { PullToRefresh } from '../interaction/PullToRefresh';
 import { ScrollToTopButton } from '../interaction/ScrollToTopButton';
+import { MobileNavigation } from '../MobileNavigation';
 
 import { AutoHideHeader } from './AutoHideHeader';
-import { BottomNavigationBar } from './BottomNavigationBar';
-import { NavigationDrawer } from './NavigationDrawer';
 
 interface MobileLayoutProps {
   children: React.ReactNode;
@@ -26,7 +25,6 @@ interface MobileLayoutProps {
   onRefresh?: () => Promise<void>;
   showScrollToTop?: boolean;
   customNavigationItems?: NavigationItem[];
-  onNavigationClick?: (itemId: string) => void;
 }
 
 export function MobileLayout({
@@ -37,12 +35,10 @@ export function MobileLayout({
   onRefresh,
   showScrollToTop = true,
   customNavigationItems,
-  onNavigationClick,
 }: MobileLayoutProps): JSX.Element {
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  
-  const [activeNavItemId, setActiveNavItemId] = useState<string>();
-  const { isDrawerOpen, openDrawer, closeDrawer } = useMobileNavigation();
+  const { isMobile } = useDeviceInfo();
+
+  const { openDrawer } = useMobileNavigation();
 
   const { headerVisible } = useScrollManager({
     isEnabled: showNavigation && isMobile,
@@ -51,14 +47,6 @@ export function MobileLayout({
     headerToggleThreshold: 10,
   });
 
-  const handleNavigationClick = useCallback(
-    (itemId: string) => {
-      setActiveNavItemId(itemId);
-      onNavigationClick?.(itemId);
-      closeDrawer();
-    },
-    [onNavigationClick, closeDrawer]
-  );
 
   if (!isMobile) {
     return (
@@ -94,20 +82,11 @@ export function MobileLayout({
       )}
 
       {showNavigation && (
-        <>
-          <NavigationDrawer
-            isOpen={isDrawerOpen}
-            onClose={closeDrawer}
-            navigationItems={customNavigationItems}
-            onNavigationClick={handleNavigationClick}
-            activeItemId={activeNavItemId}
-          />
-          <BottomNavigationBar
-            items={customNavigationItems}
-            activeId={activeNavItemId}
-            onNavigate={handleNavigationClick}
-          />
-        </>
+        <MobileNavigation
+          mode="both"
+          items={customNavigationItems}
+          onLogout={() => {}}
+        />
       )}
 
       {showScrollToTop && <ScrollToTopButton />}

@@ -28,6 +28,7 @@
     /* Modules */
     "module": "ES2022",
     "moduleResolution": "bundler",
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],

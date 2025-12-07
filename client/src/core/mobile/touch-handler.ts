@@ -1,13 +1,17 @@
 /**
  * Touch Handler Module
- * 
+ *
+ * @deprecated This module is deprecated in favor of the unified SwipeGestures system.
+ * Use SwipeGestures component or useSwipeGesture hook for touch gesture handling.
+ *
  * Advanced touch gesture recognition system with support for multiple
  * simultaneous gestures and configurable thresholds.
- * 
+ *
  * @module core/mobile/touch-handler
  */
 
 import { logger } from '@/utils/logger';
+
 import type { TouchEvent, TouchConfig } from './types';
 
 /**
@@ -32,13 +36,21 @@ export class TouchHandler {
   }> = new WeakMap();
 
   private constructor(config: TouchConfig = {}) {
+    console.warn('TouchHandler is deprecated. Use SwipeGestures component or useSwipeGesture hook instead.');
+
     this.config = {
+      enableSwipe: config.enableSwipe ?? true,
+      enableLongPress: config.enableLongPress ?? true,
+      enableTap: config.enableTap ?? true,
       tapThreshold: config.tapThreshold || 10,
       tapTimeout: config.tapTimeout || 300,
       doubleTapTimeout: config.doubleTapTimeout || 300,
       longPressDelay: config.longPressDelay || 500,
       swipeThreshold: config.swipeThreshold || 30,
-      preventDefaultOnTouch: config.preventDefaultOnTouch ?? false
+      preventDefaultOnTouch: config.preventDefaultOnTouch ?? false,
+      onSwipe: config.onSwipe || (() => {}),
+      onLongPress: config.onLongPress || (() => {}),
+      onTap: config.onTap || (() => {})
     };
   }
 

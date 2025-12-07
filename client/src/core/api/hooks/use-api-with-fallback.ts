@@ -9,11 +9,11 @@ import {
   ApiResponse,
   UnifiedError,
   RequestOptions,
-  globalApiClient,
   ErrorCode,
   ErrorDomain,
   ErrorSeverity
-} from '@client/index';
+} from '@client/core/api/types';
+import { globalApiClient } from '@client/core/api/client';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 export interface UseApiOptions extends Omit<RequestOptions, 'method'> {

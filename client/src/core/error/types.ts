@@ -183,11 +183,6 @@ export interface ErrorTransformer {
   transform(error: AppError): AppError;
 }
 
-/**
- * Callback function type for error event listeners
- */
-export type ErrorListener = (error: AppError) => void;
-
 // ============================================================================
 // Navigation Error Types (from utils/errors.ts)
 // ============================================================================

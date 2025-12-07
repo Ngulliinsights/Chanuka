@@ -182,8 +182,7 @@ Mobile device configuration:
 ```typescript
 import { MOBILE_BREAKPOINTS, getDeviceType } from '@/config/mobile';
 
-const width = window.innerWidth;
-const device = getDeviceType(width); // 'phone' | 'tablet' | 'desktop'
+const device = getDeviceType(); // 'phone' | 'tablet' | 'desktop'
 
 // Breakpoints:
 // XS: 320px (phones)

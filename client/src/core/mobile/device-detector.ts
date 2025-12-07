@@ -9,6 +9,7 @@
  */
 
 import { logger } from '@/utils/logger';
+
 import type { DeviceInfo } from './types';
 
 /**
@@ -73,7 +74,10 @@ export class DeviceDetector {
       isMobile,
       isTablet,
       isDesktop,
+      deviceType: isMobile ? 'phone' : isTablet ? 'tablet' : 'desktop',
       screenSize: this.calculateScreenSize(width),
+      screenWidth: width,
+      screenHeight: height,
       orientation: width > height ? 'landscape' : 'portrait',
       hasTouch: isTouchDevice,
       pixelRatio: window.devicePixelRatio || 1,
@@ -106,7 +110,10 @@ export class DeviceDetector {
       isMobile: false,
       isTablet: false,
       isDesktop: true,
+      deviceType: 'desktop',
       screenSize: 'lg',
+      screenWidth: 1024,
+      screenHeight: 768,
       orientation: 'landscape',
       hasTouch: false,
       pixelRatio: 1,
