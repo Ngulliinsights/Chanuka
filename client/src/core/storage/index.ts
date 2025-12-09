@@ -17,15 +17,17 @@ export {
   SecureStorage
 } from './secure-storage';
 
-// Session management
+// Session management (re-exported from consolidated auth module)
 export {
-  SessionManager
-} from './session-manager';
+  SessionManager,
+  sessionManager
+} from '../auth/services/session-manager';
 
-// Token management
+// Token management (re-exported from consolidated auth module)
 export {
-  TokenManager
-} from './token-manager';
+  TokenManager,
+  tokenManager
+} from '../auth/services/token-manager';
 
 // Cache storage
 export {
@@ -50,37 +52,40 @@ export {
   type StorageBackend
 } from './types';
 
+// Import classes first
+import { SecureStorage } from './secure-storage';
+import { CacheStorageManager } from './cache-storage';
+// SessionManager and TokenManager are imported above from auth module
+
 // Create singleton instances
 const secureStorage = SecureStorage.getInstance();
-const sessionManager = SessionManager.getInstance();
-const tokenManager = TokenManager.getInstance();
-const cacheManager = CacheStorageManager.getInstance();
+const cacheStorageManager = CacheStorageManager.getInstance();
+// sessionManager and tokenManager are imported from auth module
 
 // Export singleton instances
 export {
   secureStorage,
-  sessionManager,
-  tokenManager,
-  cacheManager
+  cacheStorageManager
+  // sessionManager and tokenManager are re-exported above
 };
 
 // Convenience functions for common operations
 export async function storeSecurely<T>(
   key: string, 
   value: T, 
-  options?: Partial<StorageOptions>
+  options?: Partial<import('./types').StorageOptions>
 ): Promise<void> {
   return secureStorage.setItem(key, value, { encrypt: true, ...options });
 }
 
 export async function retrieveSecurely<T>(
   key: string, 
-  options?: Partial<StorageOptions>
+  options?: Partial<import('./types').StorageOptions>
 ): Promise<T | null> {
   return secureStorage.getItem<T>(key, { encrypt: true, ...options });
 }
 
-export function getCurrentSession(): SessionInfo | null {
+export function getCurrentSession(): import('./types').SessionInfo | null {
   return sessionManager.getCurrentSession();
 }
 
@@ -106,15 +111,15 @@ export async function cacheData<T>(
   ttlMinutes?: number
 ): Promise<void> {
   const ttl = ttlMinutes ? ttlMinutes * 60 * 1000 : undefined;
-  return cacheManager.set(key, data, { ttl });
+  return cacheStorageManager.set(key, data, { ttl });
 }
 
 export async function getCachedData<T>(key: string): Promise<T | null> {
-  return cacheManager.get<T>(key);
+  return cacheStorageManager.get<T>(key);
 }
 
 export async function clearCache(): Promise<void> {
-  return cacheManager.clear();
+  return cacheStorageManager.clear();
 }
 
 export async function clearSession(): Promise<void> {
@@ -127,7 +132,7 @@ export async function clearTokens(): Promise<void> {
 
 export async function clearAllStorage(): Promise<void> {
   await Promise.all([
-    cacheManager.clear(),
+    cacheStorageManager.clear(),
     sessionManager.clearSession(),
     tokenManager.clearTokens(),
     secureStorage.clear()
@@ -138,7 +143,7 @@ export async function clearAllStorage(): Promise<void> {
 export function getStorageStats() {
   return {
     secure: secureStorage.getStats(),
-    cache: cacheManager.getStats(),
+    cache: cacheStorageManager.getStats(),
     session: sessionManager.getSessionStats(),
     tokens: tokenManager.getTokenStats()
   };
@@ -156,7 +161,7 @@ export const storageUtils = {
   secureStorage,
   sessionManager,
   tokenManager,
-  cacheManager,
+  cacheStorageManager,
   
   // Convenience functions
   storeSecurely,

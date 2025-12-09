@@ -2,14 +2,40 @@
  * Unified Error Types for Client-Side Cross-Cutting Concerns
  *
  * This module defines the core error types and interfaces used across
- * all client-side error handling, migrated from utils/errors.ts with
- * enhanced modular architecture.
+ * all client-side error handling, consolidated from multiple sources
+ * with enhanced modular architecture.
  */
 
-import { ErrorDomain, ErrorSeverity } from './constants';
+import { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
 
 // ============================================================================
-// Core Error Types (Enhanced from utils/errors.ts)
+// Recovery Strategy Types
+// ============================================================================
+
+export interface RecoveryStrategy {
+  id: string;
+  type: RecoveryAction;
+  name: string;
+  description: string;
+  automatic: boolean;
+  action?: () => Promise<boolean> | boolean;
+  conditions?: (error: any, context?: any) => boolean;
+  priority?: number;
+  maxRetries?: number;
+  timeout?: number;
+  syncAction?: () => boolean;
+  asyncAction?: () => Promise<boolean>;
+}
+
+export interface RecoveryResult {
+  success: boolean;
+  action: RecoveryAction;
+  message?: string;
+  nextAction?: RecoveryAction;
+}
+
+// ============================================================================
+// Core Error Types (Consolidated from multiple sources)
 // ============================================================================
 
 /**
@@ -46,26 +72,149 @@ export interface ErrorMetadata {
 }
 
 /**
- * Application error representation used throughout the error handling system
- * Enhanced with metadata and correlation capabilities from utils/errors.ts
+ * Unified AppError class consolidating all conflicting AppError interfaces
+ * Enhanced with comprehensive error handling capabilities
  */
-export interface AppError {
-  id: string;
-  type: ErrorDomain;
-  severity: ErrorSeverity;
-  message: string;
-  details?: Record<string, unknown>;
-  timestamp: number;
+export class AppError extends Error {
+  public readonly id: string;
+  public readonly type: ErrorDomain;
+  public readonly severity: ErrorSeverity;
+  public readonly code: string;
+  public readonly statusCode?: number;
+  public readonly timestamp: number;
+  public readonly context?: ErrorContext;
+  public readonly userId?: string;
+  public readonly sessionId?: string;
+  public readonly recoverable: boolean;
+  public readonly retryable: boolean;
+  public readonly recoveryStrategies: RecoveryStrategy[];
+  public readonly retryCount: number;
+  public readonly recovered?: boolean;
+  public readonly recoveryStrategy?: string;
+  public readonly stack?: string;
+  public readonly cause?: Error;
+  public readonly metadata?: ErrorMetadata;
+  public readonly correlationId: string;
+  public readonly details?: Record<string, unknown>;
+
+  constructor(
+    message: string,
+    code: string,
+    domain: ErrorDomain,
+    severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+    options: AppErrorOptions = {}
+  ) {
+    super(message);
+    this.name = 'AppError';
+    this.id = options.correlationId || crypto.randomUUID?.() || Math.random().toString(36);
+    this.code = code;
+    this.type = domain;
+    this.severity = severity;
+    this.timestamp = Date.now();
+    this.statusCode = options.statusCode;
+    this.context = options.context;
+    this.userId = options.userId;
+    this.sessionId = options.sessionId;
+    this.recoverable = options.recoverable ?? false;
+    this.retryable = options.retryable ?? false;
+    this.recoveryStrategies = options.recoveryStrategies ?? [];
+    this.retryCount = options.retryCount ?? 0;
+    this.recovered = options.recovered ?? false;
+    this.recoveryStrategy = options.recoveryStrategy;
+    this.cause = options.cause;
+    this.metadata = options.metadata;
+    this.correlationId = options.correlationId || this.id;
+    this.details = options.details;
+
+    // Maintain proper stack trace
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, AppError);
+    }
+  }
+
+  /**
+   * Serialize error to JSON for logging/reporting
+   */
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      message: this.message,
+      code: this.code,
+      type: this.type,
+      severity: this.severity,
+      statusCode: this.statusCode,
+      timestamp: this.timestamp,
+      context: this.context,
+      userId: this.userId,
+      sessionId: this.sessionId,
+      recoverable: this.recoverable,
+      retryable: this.retryable,
+      recoveryStrategies: this.recoveryStrategies.map(s => ({
+        id: s.id,
+        type: s.type,
+        name: s.name,
+        priority: s.priority
+      })),
+      retryCount: this.retryCount,
+      recovered: this.recovered,
+      recoveryStrategy: this.recoveryStrategy,
+      correlationId: this.correlationId,
+      stack: this.stack,
+      details: this.details,
+    };
+  }
+
+  /**
+   * Check if this error can be recovered
+   */
+  canRecover(): boolean {
+    return this.recoverable && this.recoveryStrategies.length > 0;
+  }
+
+  /**
+   * Get applicable recovery strategies
+   */
+  getRecoveryStrategies(): RecoveryStrategy[] {
+    return this.recoveryStrategies;
+  }
+
+  /**
+   * Create a new error with incremented retry count
+   */
+  withRetry(): AppError {
+    return new AppError(
+      this.message,
+      this.code,
+      this.type,
+      this.severity,
+      {
+        ...this,
+        retryCount: this.retryCount + 1,
+      }
+    );
+  }
+}
+
+// ============================================================================
+// Supporting Interfaces and Types
+// ============================================================================
+
+export interface AppErrorOptions {
+  statusCode?: number;
   context?: ErrorContext;
-  recoverable: boolean;
-  retryable: boolean;
+  userId?: string;
+  sessionId?: string;
+  recoverable?: boolean;
+  retryable?: boolean;
+  recoveryStrategies?: RecoveryStrategy[];
   retryCount?: number;
   recovered?: boolean;
   recoveryStrategy?: string;
-  stack?: string;
   cause?: Error;
   metadata?: ErrorMetadata;
   correlationId?: string;
+  details?: Record<string, unknown>;
 }
 
 /**
@@ -144,17 +293,6 @@ export interface ErrorFallbackProps {
   showTechnicalDetails?: boolean;
 }
 
-import { RecoveryAction } from './constants';
-
-/**
- * Recovery result interface
- */
-export interface RecoveryResult {
-  success: boolean;
-  action: RecoveryAction;
-  message?: string;
-  nextAction?: RecoveryAction;
-}
 
 // ============================================================================
 // Analytics and Reporting Interfaces (from utils/errors.ts)
@@ -203,5 +341,5 @@ export enum NavigationErrorType {
 // Re-export shared error types for convenience
 // ============================================================================
 
-export { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
+export { ErrorDomain, ErrorSeverity } from './constants';
 

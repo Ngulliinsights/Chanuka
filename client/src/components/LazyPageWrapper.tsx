@@ -1,6 +1,6 @@
 import { Suspense, ReactElement } from 'react';
 
-import { LoadingStates } from '@client/components/loading/LoadingStates';
+import { LoadingStates } from '@client/core/loading/components/LoadingStates';
 
 interface LazyPageWrapperProps {
   children: React.ComponentType;

@@ -90,8 +90,8 @@ function resolveAllVars(vars) {
 
 // Main function
 function checkContrast() {
-  const designTokensPath = path.join(__dirname, '../src/styles/design-tokens.css');
-  const chanukaCssPath = path.join(__dirname, '../src/styles/chanuka-design-system.css');
+  const designTokensPath = path.join(__dirname, '../src/shared/design-system/styles/design-tokens.css');
+  const chanukaCssPath = path.join(__dirname, '../src/shared/design-system/styles/chanuka-design-system.css');
 
   const designTokensCss = fs.readFileSync(designTokensPath, 'utf-8');
   const chanukaCss = fs.readFileSync(chanukaCssPath, 'utf-8');

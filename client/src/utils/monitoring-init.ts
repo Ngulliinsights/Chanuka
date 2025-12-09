@@ -9,7 +9,7 @@
  */
 
 import { errorMonitoring } from '@client/services/error-monitoring';
-import { performanceMonitoring } from '@client/services/performance-monitoring';
+import { getPerformanceMonitor } from '@client/core/performance';
 
 interface MonitoringConfig {
   environment: string;

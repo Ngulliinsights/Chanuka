@@ -19,13 +19,16 @@ export { useSafeMutation } from '../core/api/hooks';
 export { useSafeQuery } from '../core/api/hooks';
 
 // Navigation Hooks (migrated to core/navigation/hooks)
-export { useUnifiedNavigation } from '../core/navigation/hooks';
-export { useNavigationAccessibility } from '../core/navigation/hooks';
-export { useNavigationPerformance } from '../core/navigation/hooks';
+export { useUnifiedNavigation, useNavigationSystem } from '../core/navigation/hooks';
+export { useKeyboardNavigation } from '../core/navigation/hooks';
+export { useBreadcrumbs } from '../core/navigation/hooks';
+export { useRelatedPages } from '../core/navigation/hooks';
 export { useNavigationPreferences } from '../core/navigation/hooks';
+export { useSidebar } from '../core/navigation/hooks';
+export { useMobileMenu } from '../core/navigation/hooks';
 
 // Loading Hooks (migrated to core/loading/hooks)
-export { useTimeoutAwareLoading } from '../core/loading/hooks';
+export { useTimeoutAwareLoading as useLoadingOperation } from '../core/loading/hooks';
 
 // Analytics Hooks (migrated to features/analytics/hooks)
 export { useJourneyTracker } from '../features/analytics/hooks';
@@ -78,7 +81,7 @@ export { useErrorRecovery } from './useErrorRecovery';
 // Feature-specific hooks that need feature directories created
 export { useI18n } from './use-i18n';
 export { useOnboarding } from './use-onboarding';
-export { useSystem } from './use-system';
+export { useSystemHealth, useSystemStats, useSystemActivity, useSystemSchema, useSystemEnvironment } from './use-system';
 
 // Engagement/Notification Hooks
 // TODO: Fix useNotifications import - migration issue

@@ -31,7 +31,10 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: 'citizen' | 'expert' | 'official' | 'admin';
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  role: 'citizen' | 'expert' | 'official' | 'admin' | 'moderator';
   verified: boolean;
   twoFactorEnabled: boolean;
   avatar_url?: string;
@@ -39,6 +42,19 @@ export interface AuthUser {
   permissions: string[];
   lastLogin: string;
   createdAt: string;
+  verification_status?: 'pending' | 'verified' | 'rejected';
+  expertise?: string | string[];
+  is_active?: boolean;
+  reputation?: number;
+  two_factor_enabled?: boolean;
+  last_login?: string;
+  login_count?: number;
+  account_locked?: boolean;
+  locked_until?: string | null;
+  password_changed_at?: string;
+  privacy_settings?: PrivacySettings;
+  consent_given?: ConsentRecord[];
+  data_retention_preference?: DataRetentionPreference;
 }
 
 export interface UserPreferences {
@@ -69,14 +85,16 @@ export interface AuthSession {
 // Response & Request Types
 // ============================================================================
 
-export interface AuthResponse<T = any> {
+export interface AuthResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
+  requiresVerification?: boolean;
+  requires2FA?: boolean;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   status: number;
   message?: string;
@@ -144,7 +162,7 @@ export interface PermissionCheckContext {
   user_id: string;
   resource: string;
   action: string;
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
 }
 
 export interface PermissionCheckResult {
@@ -162,7 +180,7 @@ export interface SecurityEvent {
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SuspiciousActivityAlert {
@@ -178,7 +196,79 @@ export interface SecurityIncidentReport {
   type: string;
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
+}
+
+// ============================================================================
+// Privacy & GDPR Types (Missing from API layer)
+// ============================================================================
+
+export interface PrivacySettings {
+  profile_visibility: 'public' | 'registered' | 'private';
+  email_visibility: 'public' | 'registered' | 'private';
+  activity_tracking: boolean;
+  analytics_consent: boolean;
+  marketing_consent: boolean;
+  data_sharing_consent: boolean;
+  location_tracking: boolean;
+  personalized_content: boolean;
+  third_party_integrations: boolean;
+  notification_preferences: NotificationPreferences;
+}
+
+export interface NotificationPreferences {
+  email_notifications: boolean;
+  push_notifications: boolean;
+  sms_notifications: boolean;
+  bill_updates: boolean;
+  comment_replies: boolean;
+  expert_insights: boolean;
+  security_alerts: boolean;
+  privacy_updates: boolean;
+}
+
+export interface ConsentRecord {
+  id: string;
+  consent_type: 'analytics' | 'marketing' | 'data_sharing' | 'cookies' | 'location';
+  granted: boolean;
+  granted_at: string;
+  withdrawn_at: string | null;
+  version: string;
+  ip_address: string;
+  user_agent: string;
+}
+
+export interface DataRetentionPreference {
+  retention_period: '1year' | '2years' | '5years' | 'indefinite';
+  auto_delete_inactive: boolean;
+  export_before_delete: boolean;
+}
+
+export interface PasswordRequirements {
+  min_length: number;
+  require_uppercase: boolean;
+  require_lowercase: boolean;
+  require_numbers: boolean;
+  require_special_chars: boolean;
+  max_age_days: number;
+  prevent_reuse_count: number;
+}
+
+export interface PasswordValidationResult {
+  isValid: boolean;
+  errors: string[];
+  strength: 'weak' | 'fair' | 'good' | 'strong';
+  score: number;
+}
+
+export interface SocialLoginProvider {
+  id: string;
+  name: string;
+  icon: string;
+  privacy_focused: boolean;
+  data_collection_minimal: boolean;
+  supports_oidc: boolean;
+  enabled: boolean;
 }
 
 // ============================================================================
@@ -869,7 +959,7 @@ export class AuthApiService {
    */
   async reportSecurityIncident(incident: SecurityIncidentReport): Promise<AuthResponse> {
     try {
-      const response = await this.apiClient.post<any>(
+      const response = await this.apiClient.post<SecurityIncidentReport>(
         `${this.authEndpoint}/security-incidents`,
         incident,
         { skipCache: true }

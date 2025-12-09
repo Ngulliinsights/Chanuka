@@ -2,13 +2,10 @@ import { Loader2, AlertCircle, Filter } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Link } from 'wouter';
 
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@client/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/components/ui/dropdown-menu';
-import { logger } from '@client/utils/logger';
-
-import { BillCard } from './bill-card';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@client/shared/design-system/primitives/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system/primitives/dropdown-menu';
 
 interface Bill {
   id: number;
@@ -34,7 +31,6 @@ interface BillListProps {
 export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListProps) => {
   const [filter, setFilter] = useState<'active' | 'upcoming' | 'passed'>('active');
   const [page, setPage] = useState(1);
-  const [view, setView] = useState<'card' | 'list'>('list');
   const BILLS_PER_PAGE = 5;
 
   // Memoize filtered bills to prevent unnecessary recalculations on every render
@@ -78,17 +74,19 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
   }
 
   // Memoize status styles to avoid recreating the object on every render
-  const getStatusStyle = useMemo(() => (status: string) => {
-    switch(status.toLowerCase()) {
-      case 'active':
-        return 'bg-green-100 text-green-800 border-green-300';
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'passed':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
-    }
+  const getStatusStyle = useMemo(() => {
+    return (status: string) => {
+      switch(status.toLowerCase()) {
+        case 'active':
+          return 'bg-green-100 text-green-800 border-green-300';
+        case 'upcoming':
+          return 'bg-blue-100 text-blue-800 border-blue-300';
+        case 'passed':
+          return 'bg-purple-100 text-purple-800 border-purple-300';
+        default:
+          return 'bg-gray-100 text-gray-800 border-gray-300';
+      }
+    };
   }, []);
 
   // Helper function to format numbers with proper pluralization
@@ -120,7 +118,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
           {/* Desktop filter buttons with improved accessibility */}
           <div className="hidden md:flex rounded-md shadow-sm" role="group" aria-label="Filter bills by status">
             <Button
-              variant={filter === 'active' ? 'default' : 'outline'}
+              variant={filter === 'active' ? 'primary' : 'outline'}
               size="sm"
               className="rounded-l-md rounded-r-none border-r-0"
               onClick={() => handleFilterChange('active')}
@@ -129,7 +127,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
               Active
             </Button>
             <Button
-              variant={filter === 'upcoming' ? 'default' : 'outline'}
+              variant={filter === 'upcoming' ? 'primary' : 'outline'}
               size="sm"
               className="rounded-none border-r-0"
               onClick={() => handleFilterChange('upcoming')}
@@ -138,7 +136,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
               Upcoming
             </Button>
             <Button
-              variant={filter === 'passed' ? 'default' : 'outline'}
+              variant={filter === 'passed' ? 'primary' : 'outline'}
               size="sm"
               className="rounded-r-md rounded-l-none"
               onClick={() => handleFilterChange('passed')}
@@ -179,14 +177,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
           </div>
         ) : paginatedBills.length > 0 ? (
           <>
-            {view === 'card' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {paginatedBills.map(bill => (
-                  <BillCard key={bill.id} bill={bill} />
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-4">
+            <div className="space-y-4">
                 {paginatedBills.map(bill => (
                   <Link key={bill.id} href={`/bills/${bill.id}`}>
                     <Card className="hover:shadow-md transition-shadow cursor-pointer group">
@@ -244,8 +235,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
                     </Card>
                   </Link>
                 ))}
-              </div>
-            )}
+            </div>
 
             {hasMore && (
               <div className="flex justify-center mt-8">
@@ -267,7 +257,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => handleFilterChange(getAlternativeFilter(filter) as any)}
+              onClick={() => handleFilterChange(getAlternativeFilter(filter) as 'active' | 'upcoming' | 'passed')}
             >
               Show {getAlternativeFilter(filter)} bills instead
             </Button>

@@ -1,5 +1,5 @@
 import { AlertCircle, CheckCircle, Network, RefreshCw, Settings } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { logger } from '@/utils/logger';
 import { useApiConnection } from '@client/core/api/hooks/useApiConnection';

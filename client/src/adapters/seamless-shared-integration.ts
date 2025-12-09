@@ -5,7 +5,8 @@
  * and shared module functionality, reducing friction and improving developer experience.
  */
 
-// Import client utilities for seamless fallback
+// Import unified interfaces
+import { Bill, User } from '../types/core';
 import { envConfig } from '../utils/env-config';
 
 // Simple logger to avoid circular imports
@@ -22,24 +23,6 @@ const logger = {
     console.error(`[ERROR] ${message}`, context);
   }
 };
-
-// Type definitions for shared module compatibility
-export interface User {
-  id: string | number;
-  name?: string;
-  email?: string;
-  avatar?: string;
-}
-
-export interface Bill {
-  id: string | number;
-  title?: string;
-  status?: string;
-  introducedDate?: string;
-  lastUpdated?: string;
-  policyAreas?: string[];
-  constitutionalFlags?: boolean;
-}
 
 export interface Committee {
   id: string | number;
@@ -416,9 +399,9 @@ export class SeamlessSharedIntegration {
         if (bill.status === 'THIRD_READING') score += 90;
         
         // Add time-based urgency
-        if (bill.lastUpdated) {
+        if (bill.lastActionDate) {
           const daysSinceUpdate = Math.floor(
-            (Date.now() - new Date(bill.lastUpdated).getTime()) / (1000 * 60 * 60 * 24)
+            (Date.now() - new Date(bill.lastActionDate).getTime()) / (1000 * 60 * 60 * 24)
           );
           if (daysSinceUpdate < 7) score += 20;
           if (daysSinceUpdate < 3) score += 40;

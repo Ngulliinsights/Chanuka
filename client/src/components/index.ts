@@ -4,24 +4,14 @@
  * Central export point for all client components
  */
 
-// Layout Components
-export { default as Sidebar } from './Sidebar';
-
 // Standalone Components
 export { default as AppProviders } from './AppProviders';
-export { default as ArchitecturePlanning } from './architecture-planning';
-export { default as CheckpointDashboard } from './checkpoint-dashboard';
 export { default as ConnectionStatus } from './connection-status';
 export { default as DatabaseStatus } from './database-status';
-export { default as DecisionMatrix } from './decision-matrix';
-export { default as EnvironmentSetup } from './environment-setup';
 export { ErrorBoundary } from './error-handling/ErrorBoundary';
-export { default as FeatureFlagsPanel } from './feature-flags-panel';
 export { default as MigrationManager } from './MigrationManager';
 export { default as OfflineIndicator } from './OfflineIndicator';
 export { default as OfflineModal } from './OfflineModal';
-export { default as ProjectOverview } from './ProjectOverview';
-export { default as SystemHealth } from './SystemHealth';
 
 // Analytics Components
 export { EngagementDashboard } from './analytics/engagement-dashboard';

@@ -669,9 +669,6 @@ export const SafeLazyPages = {
  * These components are split into separate chunks to reduce initial bundle size
  */
 export const DynamicFeatureImports = {
-  // Heavy analysis components
-  ArchitecturePlanning: () => import("@client/components/architecture-planning"),
-
   // Complex form components
   MobileOptimizedForms: () => import("@/components/mobile/__archive__/mobile-optimized-forms"),
 

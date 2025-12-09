@@ -3,7 +3,7 @@ import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useNavigation } from '@client/core/navigation/context';
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useAuth } from '@client/core/auth';
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { cn } from '@client/lib/utils';
 import { logger } from '@client/utils/logger';

@@ -4,7 +4,7 @@
  * Provides easy access to integrated orphan modules throughout the application
  */
 
-import { useIntegration } from '@/components/integration/IntegrationProvider';
+import { useIntegration } from '@client/shared/ui/integration/IntegrationProvider';
 
 /**
  * Hook to access security services

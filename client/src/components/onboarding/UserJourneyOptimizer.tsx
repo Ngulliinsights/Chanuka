@@ -6,9 +6,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Badge } from '@client/shared/design-system/primitives/badge';
 import { 
   BookOpen, 
   Target, 

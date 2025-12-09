@@ -5,7 +5,6 @@
  * severity levels and external reporting capabilities.
  */
 
-import { logger } from '../../utils/logger';
 import { PerformanceAlert, PerformanceMetric, PerformanceConfig } from './types';
 
 /**
@@ -93,11 +92,6 @@ export class PerformanceAlertsManager {
     // Network thresholds
     this.thresholds.set('request-count', 50);        // Number of requests
     this.thresholds.set('total-size', 2000000);      // 2MB total payload
-
-    logger.info('Default performance thresholds initialized', {
-      component: 'PerformanceAlertsManager',
-      thresholdCount: this.thresholds.size
-    });
   }
 
   /**
@@ -196,7 +190,7 @@ export class PerformanceAlertsManager {
       return 'B'; // Bytes
     }
     if (metricName === 'CLS') {
-      return ''; // Unitless
+      return ''; // Unit-less
     }
     if (metricName.includes('dom')) {
       return ' nodes';
@@ -236,36 +230,17 @@ export class PerformanceAlertsManager {
     );
 
     if (isDuplicate) {
-      logger.debug('Duplicate alert suppressed', {
-        component: 'PerformanceAlertsManager',
-        metric: alert.metric,
-        value: alert.value
-      });
       return;
     }
 
     this.alerts.push(alert);
-    
-    // Log the alert for monitoring and debugging
-    logger.warn('Performance alert created', { 
-      component: 'PerformanceAlertsManager',
-      alert: {
-        id: alert.id,
-        type: alert.type,
-        severity: alert.severity,
-        metric: alert.metric,
-        value: alert.value,
-        threshold: alert.threshold
-      },
-      activeAlertsCount: this.getActiveAlerts().length 
-    });
 
     // Notify listeners
     this.listeners.forEach(listener => {
       try {
         listener(alert);
       } catch (error) {
-        logger.error('Error in alert listener', { error, alert });
+        console.warn('Error in alert listener:', error);
       }
     });
 
@@ -286,10 +261,7 @@ export class PerformanceAlertsManager {
       try {
         await reporter(alert);
       } catch (error) {
-        logger.error('External alert reporting failed', { 
-          error, 
-          alertId: alert.id 
-        });
+        // External reporting failed
       }
     });
 
@@ -315,11 +287,7 @@ export class PerformanceAlertsManager {
 
     const removedCount = initialCount - this.alerts.length;
     if (removedCount > 0) {
-      logger.debug('Old alerts pruned', {
-        component: 'PerformanceAlertsManager',
-        removedCount,
-        remainingCount: this.alerts.length
-      });
+      // Alerts pruned - internal tracking only
     }
   }
 
@@ -373,12 +341,6 @@ export class PerformanceAlertsManager {
       alert.resolved = true;
       alert.resolvedAt = new Date();
       
-      logger.info('Alert resolved', {
-        component: 'PerformanceAlertsManager',
-        alertId,
-        metric: alert.metric
-      });
-      
       return true;
     }
     return false;
@@ -399,11 +361,7 @@ export class PerformanceAlertsManager {
     });
 
     if (resolvedCount > 0) {
-      logger.info('Alerts resolved by metric', {
-        component: 'PerformanceAlertsManager',
-        metric,
-        resolvedCount
-      });
+      // Alerts resolved - internal handling
     }
 
     return resolvedCount;
@@ -414,16 +372,10 @@ export class PerformanceAlertsManager {
    */
   setThreshold(metric: string, threshold: number): void {
     if (threshold <= 0) {
-      logger.error('Invalid threshold value', { metric, threshold });
       throw new Error('Threshold must be greater than zero');
     }
 
     this.thresholds.set(metric, threshold);
-    logger.info('Threshold updated', { 
-      component: 'PerformanceAlertsManager',
-      metric, 
-      threshold 
-    });
   }
 
   /**
@@ -445,11 +397,6 @@ export class PerformanceAlertsManager {
    */
   updateConfig(config: Partial<PerformanceConfig['alerts']>): void {
     this.config = { ...this.config, ...config };
-    
-    logger.info('Performance alerts configuration updated', { 
-      component: 'PerformanceAlertsManager',
-      config: this.config 
-    });
   }
 
   /**
@@ -490,13 +437,7 @@ export class PerformanceAlertsManager {
    * Clears all alerts (useful for testing or reset scenarios)
    */
   clearAlerts(): void {
-    const clearedCount = this.alerts.length;
     this.alerts = [];
-    
-    logger.info('All alerts cleared', {
-      component: 'PerformanceAlertsManager',
-      clearedCount
-    });
   }
 
   /**
@@ -514,7 +455,7 @@ export class PerformanceAlertsManager {
   exportAlerts(): {
     timestamp: Date;
     alerts: PerformanceAlert[];
-    stats: ReturnType<typeof this.getAlertStats>;
+    stats: ReturnType<PerformanceAlertsManager['getAlertStats']>;
     thresholds: Record<string, number>;
   } {
     return {

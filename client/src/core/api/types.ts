@@ -8,6 +8,8 @@
 
 import { ZodSchema } from 'zod';
 
+import { Bill, Comment, User } from '../../types';
+
 // ============================================================================
 // Core API Request/Response Types
 // ============================================================================
@@ -133,30 +135,6 @@ export interface ValidationOptions {
 // Domain Models - Bills and Legislation
 // ============================================================================
 
-/**
- * Represents a legislative bill with complete metadata.
- */
-export interface Bill {
-  readonly id: number;
-  readonly billNumber: string;
-  readonly title: string;
-  readonly summary: string;
-  readonly status: BillStatus;
-  readonly urgencyLevel: UrgencyLevel;
-  readonly introducedDate: string;
-  readonly lastUpdated: string;
-  readonly sponsors: ReadonlyArray<Sponsor>;
-  readonly constitutionalFlags: ReadonlyArray<ConstitutionalFlag>;
-  viewCount: number;
-  saveCount: number;
-  commentCount: number;
-  shareCount: number;
-  readonly policyAreas: ReadonlyArray<string>;
-  readonly complexity: ComplexityLevel;
-  readonly readingTime: number;
-  readonly fullText?: string;
-  readonly amendments?: ReadonlyArray<Amendment>;
-}
 
 export interface Amendment {
   readonly id: number;
@@ -224,41 +202,9 @@ export enum ComplexityLevel {
 // Community and User Models
 // ============================================================================
 
-/**
- * Represents a user comment with threading support.
- */
-export interface Comment {
-  readonly id: string;
-  readonly billId: number;
-  readonly userId: number;
-  readonly content: string;
-  readonly createdAt: string;
-  readonly updatedAt: string;
-  readonly author: User;
-  readonly replies?: ReadonlyArray<Comment>;
-  readonly voteCount: number;
-  readonly userVote?: VoteType;
-  readonly moderated: boolean;
-  readonly moderationReason?: string;
-  readonly isEdited: boolean;
-  readonly isPinned: boolean;
-}
 
 export type VoteType = 'up' | 'down';
 
-export interface User {
-  readonly id: number;
-  readonly username: string;
-  readonly email: string;
-  readonly displayName: string;
-  readonly avatar?: string;
-  readonly verified: boolean;
-  readonly expertStatus: ExpertStatus;
-  readonly reputation: number;
-  readonly joinedAt: string;
-  readonly badges?: ReadonlyArray<Badge>;
-  readonly preferences?: UserPreferences;
-}
 
 export interface Badge {
   readonly id: string;
@@ -450,88 +396,15 @@ export enum EngagementType {
 }
 
 // ============================================================================
-// Error Types
+// Error Types - Consolidated from core/error
 // ============================================================================
 
-export enum ErrorCode {
-  // Network errors
-  NETWORK_TIMEOUT = 'NETWORK_TIMEOUT',
-  NETWORK_DISCONNECTED = 'NETWORK_DISCONNECTED',
-  NETWORK_SERVER_ERROR = 'NETWORK_SERVER_ERROR',
-  NETWORK_REQUEST_FAILED = 'NETWORK_REQUEST_FAILED',
-
-  // Authentication errors
-  AUTH_INVALID_CREDENTIALS = 'AUTH_INVALID_CREDENTIALS',
-  AUTH_TOKEN_EXPIRED = 'AUTH_TOKEN_EXPIRED',
-  AUTH_INSUFFICIENT_PERMISSIONS = 'AUTH_INSUFFICIENT_PERMISSIONS',
-  AUTH_SESSION_INVALID = 'AUTH_SESSION_INVALID',
-
-  // Validation errors
-  VALIDATION_INVALID_INPUT = 'VALIDATION_INVALID_INPUT',
-  VALIDATION_MISSING_REQUIRED = 'VALIDATION_MISSING_REQUIRED',
-  VALIDATION_INVALID_FORMAT = 'VALIDATION_INVALID_FORMAT',
-  VALIDATION_SCHEMA_MISMATCH = 'VALIDATION_SCHEMA_MISMATCH',
-
-  // Business logic errors
-  BUSINESS_ENTITY_NOT_FOUND = 'BUSINESS_ENTITY_NOT_FOUND',
-  BUSINESS_DUPLICATE_ENTITY = 'BUSINESS_DUPLICATE_ENTITY',
-  BUSINESS_INVALID_STATE = 'BUSINESS_INVALID_STATE',
-  BUSINESS_OPERATION_FAILED = 'BUSINESS_OPERATION_FAILED',
-
-  // System errors
-  SYSTEM_UNKNOWN_ERROR = 'SYSTEM_UNKNOWN_ERROR',
-  SYSTEM_SERVICE_UNAVAILABLE = 'SYSTEM_SERVICE_UNAVAILABLE',
-  SYSTEM_RATE_LIMITED = 'SYSTEM_RATE_LIMITED',
-  SYSTEM_CONFIGURATION_ERROR = 'SYSTEM_CONFIGURATION_ERROR'
-}
-
-export enum ErrorDomain {
-  NETWORK = 'network',
-  AUTHENTICATION = 'authentication',
-  AUTHORIZATION = 'authorization',
-  VALIDATION = 'validation',
-  BUSINESS_LOGIC = 'business_logic',
-  SYSTEM = 'system',
-  EXTERNAL_SERVICE = 'external_service',
-  CACHE = 'cache',
-  WEBSOCKET = 'websocket'
-}
-
-export enum ErrorSeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
-}
-
-/**
- * Unified error interface with comprehensive context and recovery information.
- */
-export interface UnifiedError {
-  readonly id: string;
-  readonly code: ErrorCode;
-  readonly domain: ErrorDomain;
-  readonly severity: ErrorSeverity;
-  readonly message: string;
-  readonly details?: Readonly<Record<string, unknown>>;
-  readonly context?: ErrorContext;
-  readonly cause?: UnifiedError;
-  readonly stack?: string;
-  readonly recoverable: boolean;
-  readonly retryable: boolean;
-  readonly reported: boolean;
-  readonly timestamp: string;
-}
-
-export interface ErrorContext {
-  readonly component: string;
-  readonly operation: string;
-  readonly userId?: string;
-  readonly sessionId?: string;
-  readonly requestId?: string;
-  readonly timestamp: string;
-  readonly metadata?: Readonly<Record<string, unknown>>;
-}
+export {
+  ErrorDomain,
+  ErrorSeverity,
+  type AppError as UnifiedError,
+  type ErrorContext
+} from '../../core/error';
 
 // ============================================================================
 // Cache Types
@@ -550,20 +423,20 @@ export type CacheStorage = 'memory' | 'localStorage' | 'indexedDB';
 export type EvictionPolicy = 'lru' | 'lfu' | 'fifo' | 'ttl';
 
 export interface CacheEntry<T = unknown> {
-   data: T;
-   readonly timestamp: number;
-   readonly ttl: number;
-   accessCount: number;
-   lastAccessed: number;
-   metadata: CacheEntryMetadata;
+  data: T;
+  readonly timestamp: number;
+  readonly ttl: number;
+  accessCount: number;
+  lastAccessed: number;
+  metadata: CacheEntryMetadata;
 }
 
 export interface CacheEntryMetadata {
-   readonly size: number;
-   compressed: boolean;
-   encrypted: boolean;
-   readonly tags?: ReadonlyArray<string>;
-   readonly dependencies?: ReadonlyArray<string>;
+  readonly size: number;
+  compressed: boolean;
+  encrypted: boolean;
+  readonly tags?: ReadonlyArray<string>;
+  readonly dependencies?: ReadonlyArray<string>;
 }
 
 // ============================================================================
@@ -643,11 +516,11 @@ export interface WebSocketEvents {
   heartbeat: { sent: boolean; acknowledged: boolean };
 }
 
-export type BillSubscriptionType = 
-  | 'status_change' 
-  | 'new_comment' 
-  | 'amendment' 
-  | 'voting_scheduled' 
+export type BillSubscriptionType =
+  | 'status_change'
+  | 'new_comment'
+  | 'amendment'
+  | 'voting_scheduled'
   | 'sponsor_change';
 
 export interface BillUpdate {

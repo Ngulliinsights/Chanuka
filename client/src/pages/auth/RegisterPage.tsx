@@ -7,10 +7,10 @@ import { Shield, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { SocialLogin } from '@client/components/auth/SocialLogin';
-import { RegisterForm } from '@client/components/auth/ui/RegisterForm';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { SocialLogin } from '@client/features/users/ui/auth/SocialLogin';
+import { RegisterForm } from '@client/features/users/ui/auth/ui/RegisterForm';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { logger } from '@client/utils/logger';
 

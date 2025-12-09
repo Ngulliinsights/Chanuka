@@ -895,30 +895,42 @@ export class EmailServiceFactory {
 // ---------- Global Singleton with Race Condition Protection ----------
 let emailServiceInstance: EmailService | null = null;
 let initializationPromise: Promise<EmailService> | null = null;
+let isInitialized = false;
 
+/**
+ * Gets or creates the email service singleton with proper race condition protection.
+ * Uses promise caching to ensure only one initialization happens even with concurrent calls.
+ */
 export async function getEmailService(): Promise<EmailService> {
-  // Fast path: already initialized
-  if (emailServiceInstance) {
+  // Fast path: already initialized and cached
+  if (isInitialized && emailServiceInstance) {
     return emailServiceInstance;
   }
   
-  // Wait for ongoing initialization
+  // If initialization is already in progress, wait for it to complete
   if (initializationPromise) {
     return initializationPromise;
   }
   
-  // Start new initialization
-  initializationPromise = EmailServiceFactory.createBestAvailable()
-    .then(service => {
+  // Start new initialization with proper error handling
+  initializationPromise = (async () => {
+    try {
+      const service = await EmailServiceFactory.createBestAvailable();
       emailServiceInstance = service;
-      initializationPromise = null;
+      isInitialized = true;
       return service;
-    })
-    .catch(error => {
-      initializationPromise = null;
+    } catch (error) {
+      // Reset state on failure to allow retries
+      isInitialized = false;
+      emailServiceInstance = null;
       logger.error('Failed to initialize email service', { error });
       throw error;
-    });
+    } finally {
+      // Always clear the promise to allow future initialization attempts
+      // only after this one completes (successfully or fails)
+      initializationPromise = null;
+    }
+  })();
   
   return initializationPromise;
 }

@@ -12,13 +12,13 @@ import {
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@client/components/ui/avatar';
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/components/ui/select';
-import { Separator } from '@client/components/ui/separator';
-import { Textarea } from '@client/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system/primitives/avatar';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system/primitives/select';
+import { Separator } from '@client/shared/design-system/primitives/separator';
+import { Textarea } from '@client/shared/design-system/primitives/textarea';
 
 interface Comment {
   id: string;

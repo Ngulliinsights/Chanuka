@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import { api } from '@client/services/api';
+import { globalApiClient } from '@client/core/api/client';
 import { logger } from '@client/utils/logger';
+import api from '@/utils/api';
 
 interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';

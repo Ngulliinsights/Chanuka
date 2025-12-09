@@ -6,8 +6,8 @@
 import { Shield, Lock, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
 
 export default function SecurityPage() {
   return (

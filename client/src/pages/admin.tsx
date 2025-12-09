@@ -24,10 +24,14 @@ import {
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+
+import ConnectionStatus from '@client/shared/ui/status/connection-status';
+import DatabaseStatus from '@client/shared/ui/status/database-status';
+import { useDatabaseStatus } from '@client/shared/hooks/useDatabaseStatus';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -615,6 +619,18 @@ export default function AdminPage() {
           </TabsContent>
 
           <TabsContent value="system" className="space-y-8">
+            {/* Connection Status */}
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Connection Status</h2>
+              <ConnectionStatus showDetails={true} />
+            </div>
+
+            {/* Database Status */}
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Database Status</h2>
+              <DatabaseStatus {...useDatabaseStatus()} />
+            </div>
+
             <Card className="border-0 shadow-lg">
               <CardHeader className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-t-lg">
                 <div className="flex items-center justify-between">

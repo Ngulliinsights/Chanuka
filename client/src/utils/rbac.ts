@@ -3,7 +3,7 @@
  * Comprehensive permission management system
  */
 
-import { User } from '@client/types/auth';
+import { User } from '@client/core/auth';
 // import { authService } from '@client/services/AuthService';
 
 export interface RBACContext {
@@ -496,7 +496,7 @@ export const rbacManager = new RBACManager();
 
 import { useState, useEffect } from 'react';
 
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useAuth } from '@client/core/auth';
 
 /**
  * Hook to check if user has permission

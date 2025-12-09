@@ -13,12 +13,12 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Progress } from '@client/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Progress } from '@client/shared/design-system/primitives/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
 
 interface AnalysisData {
   id: string;

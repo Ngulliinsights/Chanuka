@@ -3,12 +3,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 import { logger } from '@client/utils/logger';
 
-import { Alert, AlertDescription } from '../../../components/ui/alert';
-import { Badge } from '../../../components/ui/badge';
-import { Button } from '../../../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog';
-import { Textarea } from '../../../components/ui/textarea';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/feedback/Alert';
+import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@client/shared/design-system/interactive/Dialog';
+import { Textarea } from '@client/shared/design-system/primitives/textarea';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {
@@ -555,7 +555,7 @@ export function ImplementationWorkarounds({ bill_id }: ImplementationWorkarounds
                     {workaround.verification_status === 'pending' && (
                       <Button
                         size="sm"
-                        variant="default"
+                        variant="primary"
                         onClick={() => handleConfirmWorkaround(workaround.id)}
                       >
                         Confirm Workaround

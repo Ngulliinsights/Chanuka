@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Button } from '@client/components/ui/button';
+import { Button } from '@client/shared/design-system/primitives/button';
 
 export default function NotFound() {
   return (

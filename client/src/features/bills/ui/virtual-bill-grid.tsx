@@ -1,4 +1,4 @@
-import { Bill } from '@client/features/bills/model/types';
+import { Bill } from '../model/types';
 import { cn } from '@client/lib/utils';
 
 import { BillCard } from './BillCard';

@@ -5,9 +5,11 @@
  * automatic token refresh, and authentication interceptors.
  */
 
-import { ApiRequest, ApiResponse, RequestInterceptor, ErrorInterceptor } from './types';
 import { logger } from '../../utils/logger';
-import { tokenManager } from '../../utils/storage';
+import { tokenManager } from '../auth';
+
+import { ErrorInterceptor, ApiError } from './base-client';
+import { ApiRequest } from './types';
 
 /**
  * Authentication configuration for API clients
@@ -22,7 +24,7 @@ export interface AuthConfig {
 /**
  * Authentication interceptor that adds bearer tokens to requests
  */
-export class AuthenticationInterceptor implements RequestInterceptor {
+export class AuthenticationInterceptor {
   async intercept(request: ApiRequest): Promise<ApiRequest> {
     const token = await tokenManager.getAccessToken();
     if (token) {
@@ -41,13 +43,13 @@ export class AuthenticationInterceptor implements RequestInterceptor {
 /**
  * Token refresh interceptor that handles 401 errors by refreshing tokens
  */
-export class TokenRefreshInterceptor implements ErrorInterceptor {
+export class TokenRefreshInterceptor {
   private isRefreshing = false;
   private refreshPromise: Promise<void> | null = null;
 
   constructor(private config: AuthConfig) {}
 
-  async intercept(error: any): Promise<any> {
+  async intercept(error: ApiError): Promise<ApiError> {
     if (error.statusCode === 401) {
       // Prevent multiple simultaneous refresh attempts
       if (this.isRefreshing && this.refreshPromise) {
@@ -81,7 +83,7 @@ export class TokenRefreshInterceptor implements ErrorInterceptor {
   /**
    * Refreshes the authentication token using the refresh token
    */
-  private async refreshAuthToken(refreshToken: string): Promise<void> {
+  public async refreshAuthToken(refreshToken: string): Promise<void> {
     this.isRefreshing = true;
     
     try {
@@ -144,7 +146,7 @@ export async function shouldRefreshToken(thresholdMinutes: number = 5): Promise<
   const token = await tokenManager.getAccessToken();
   if (!token) return false;
 
-  const expiresAt = await tokenManager.getTokenExpiry();
+  const expiresAt = await tokenManager.getTokenExpiration();
   if (!expiresAt) return false;
 
   const now = new Date();
@@ -162,7 +164,7 @@ export async function proactiveTokenRefresh(config: AuthConfig): Promise<void> {
     if (refreshToken) {
       const interceptor = new TokenRefreshInterceptor(config);
       try {
-        await (interceptor as any).refreshAuthToken(refreshToken);
+        await (interceptor as TokenRefreshInterceptor).refreshAuthToken(refreshToken);
       } catch (error) {
         logger.warn('Proactive token refresh failed', { error });
       }

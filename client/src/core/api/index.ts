@@ -99,7 +99,7 @@ export {
   type ErrorCorrelation
 } from './circuit-breaker-monitor';
 
-// Service APIs
+// Service APIs - Auth now comes from consolidated system
 export {
   AuthApiService,
   createAuthApiService,
@@ -109,7 +109,7 @@ export {
   type AuthUser,
   type UserPreferences,
   type AuthTokens
-} from './auth';
+} from '../auth'; // Use consolidated auth system
 
 export {
   AnalyticsApiService,

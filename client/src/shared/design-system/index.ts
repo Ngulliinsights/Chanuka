@@ -1,18 +1,33 @@
 /**
- * Responsive Design System
+ * Design System - UNIFIED EXPORT
+ *
+ * ✅ SINGLE SOURCE OF TRUTH - All components from unified /components/ directory
+ * ✅ TOKEN-BASED - All components use design tokens via CSS custom properties
+ * ✅ TYPE-SAFE - Full TypeScript support with IntelliSense
  * 
- * Main export file for the responsive design system including
- * utilities, components, and configuration.
+ * This is the main entry point for the Chanuka Design System.
+ * Import everything you need from here:
  * 
- * Requirements: 9.1, 9.5
+ * import { Button, Card, Input, Alert } from '@client/shared/design-system';
  */
 
-// Core responsive utilities and configuration
-export * from './responsive';
+// ✅ UNIFIED COMPONENTS - Single source of truth for all UI components
+export * from './feedback';
+export * from './interactive';
+export * from './media';
+export * from './typography';
 
-// Responsive components
-export * from './components';
+// Design Tokens - Colors, spacing, typography tokens
+export * from './tokens';
 
-// CSS imports (for bundlers that support CSS imports)
-import './responsive.css';
+// Theme System - Light/dark mode and theme management
+export * from './themes';
 
+// Utilities - Design system utilities
+export { cn } from './utils/cn';
+
+// Accessibility - A11y utilities and helpers
+export * from './accessibility';
+
+// Styles - CSS files and design tokens
+export * from './styles';

@@ -11,10 +11,10 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Progress } from '@client/components/ui/progress';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Progress } from '@client/shared/design-system/primitives/progress';
 
 interface MigrationPhase {
   id: string;

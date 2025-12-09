@@ -5,9 +5,11 @@
  * automatic token injection, token refresh, and authentication error handling.
  */
 
-import { BaseApiClient, ApiClientConfig, ApiRequest } from './base-client';
-import { AuthenticationInterceptor, TokenRefreshInterceptor, DEFAULT_AUTH_CONFIG, AuthConfig } from './authentication';
 import { logger } from '../../utils/logger';
+import { tokenManager } from '../auth';
+
+import { AuthenticationInterceptor, TokenRefreshInterceptor, DEFAULT_AUTH_CONFIG, AuthConfig } from './authentication';
+import { BaseApiClient, ApiClientConfig, ApiRequest, RequestBody } from './base-client';
 
 /**
  * Configuration for authenticated API client
@@ -21,12 +23,11 @@ export interface AuthenticatedApiClientConfig extends ApiClientConfig {
  */
 export class AuthenticatedApiClient extends BaseApiClient {
   private authConfig: AuthConfig;
-  private authInterceptor: AuthenticationInterceptor;
-  private tokenRefreshInterceptor: TokenRefreshInterceptor;
+  private tokenRefreshInterceptor!: TokenRefreshInterceptor;
 
   constructor(config: Partial<AuthenticatedApiClientConfig> = {}) {
     super(config);
-    
+
     this.authConfig = {
       ...DEFAULT_AUTH_CONFIG,
       ...config.auth,
@@ -41,11 +42,23 @@ export class AuthenticatedApiClient extends BaseApiClient {
    */
   private setupAuthInterceptors(): void {
     // Create interceptors
-    this.authInterceptor = new AuthenticationInterceptor();
+    const authInterceptor = new AuthenticationInterceptor();
     this.tokenRefreshInterceptor = new TokenRefreshInterceptor(this.authConfig);
 
     // Add request interceptor for token injection
-    this.addRequestInterceptor(this.authInterceptor.intercept.bind(this.authInterceptor));
+    this.addRequestInterceptor(async (request) => {
+      const token = await tokenManager.getAccessToken();
+      if (token) {
+        return {
+          ...request,
+          headers: {
+            ...request.headers,
+            'Authorization': `Bearer ${token}`
+          }
+        };
+      }
+      return request;
+    });
 
     // Add error interceptor for token refresh
     this.addErrorInterceptor(this.tokenRefreshInterceptor.intercept.bind(this.tokenRefreshInterceptor));
@@ -61,10 +74,10 @@ export class AuthenticatedApiClient extends BaseApiClient {
    */
   updateAuthConfig(config: Partial<AuthConfig>): void {
     this.authConfig = { ...this.authConfig, ...config };
-    
+
     // Update token refresh interceptor with new config
     this.tokenRefreshInterceptor = new TokenRefreshInterceptor(this.authConfig);
-    
+
     logger.info('Authentication configuration updated', {
       component: 'AuthenticatedApiClient',
       config: this.authConfig
@@ -89,7 +102,7 @@ export class AuthenticatedApiClient extends BaseApiClient {
    * Authenticated GET request
    */
   async secureGet<T = unknown>(
-    url: string, 
+    url: string,
     headers?: Record<string, string>
   ) {
     return this.get<T>(url, headers);
@@ -99,8 +112,8 @@ export class AuthenticatedApiClient extends BaseApiClient {
    * Authenticated POST request
    */
   async securePost<T = unknown>(
-    url: string, 
-    body?: any, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ) {
     return this.post<T>(url, body, headers);
@@ -110,8 +123,8 @@ export class AuthenticatedApiClient extends BaseApiClient {
    * Authenticated PUT request
    */
   async securePut<T = unknown>(
-    url: string, 
-    body?: any, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ) {
     return this.put<T>(url, body, headers);
@@ -121,7 +134,7 @@ export class AuthenticatedApiClient extends BaseApiClient {
    * Authenticated DELETE request
    */
   async secureDelete<T = unknown>(
-    url: string, 
+    url: string,
     headers?: Record<string, string>
   ) {
     return this.delete<T>(url, headers);
@@ -131,8 +144,8 @@ export class AuthenticatedApiClient extends BaseApiClient {
    * Authenticated PATCH request
    */
   async securePatch<T = unknown>(
-    url: string, 
-    body?: any, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ) {
     return this.patch<T>(url, body, headers);

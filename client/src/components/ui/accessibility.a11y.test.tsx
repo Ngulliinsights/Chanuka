@@ -15,11 +15,11 @@ import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
 // Import components
-import { Button } from '@client/components/ui/button';
-import { Input } from '@client/components/ui/input';
-import { Label } from '@client/components/ui/label';
-import { Dialog, DialogTrigger, DialogContent } from '@client/components/ui/dialog';
-import { Card, CardHeader, CardTitle, CardContent } from '@client/components/ui/card';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Input } from '@client/shared/design-system/primitives/input';
+import { Label } from '@client/shared/design-system/primitives/label';
+import { Dialog, DialogTrigger, DialogContent } from '@client/shared/design-system/primitives/dialog';
+import { Card, CardHeader, CardTitle, CardContent } from '@client/shared/design-system/primitives/card';
 
 expect.extend(toHaveNoViolations);
 

@@ -1,18 +1,5 @@
 // Users feature types
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  avatar?: string;
-  isPhoneVerified: boolean;
-  isProfileComplete: boolean;
-  roles: string[];
-  preferences: UserPreferences;
-  verification_status: VerificationStatus;
-  created_at: string;
-  updated_at: string;
-}
+import { User } from '../../types/core';
 
 export interface UserProfile {
   id: string;

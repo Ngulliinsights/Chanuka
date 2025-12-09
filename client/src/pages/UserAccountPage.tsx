@@ -6,17 +6,17 @@
 import { Shield, User, BarChart3, Eye } from 'lucide-react';
 import { useState } from 'react';
 
-import AppLayout from '@client/components/layout/app-layout';
+import AppLayout from '@client/shared/ui/layout/app-layout';
 
 // Import consolidated components
 import { UserDashboard } from '@client/components/shared/dashboard';
 import { PrivacyManager } from '@client/components/shared/privacy/PrivacyManager';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Card, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { AccessibilitySettingsSection } from '@client/components/user/AccessibilitySettingsSection';
-import { UserAccountIntegration } from '@client/components/user/UserAccountIntegration';
-import { UserProfileSection } from '@client/components/user/UserProfileSection';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
+import { Card, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { AccessibilitySettingsSection } from '@client/features/users/ui/profile/AccessibilitySettingsSection';
+import { UserAccountIntegration } from '@client/features/users/ui/profile/UserAccountIntegration';
+import { UserProfileSection } from '@client/features/users/ui/profile/UserProfileSection';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 
 export default function UserAccountPage() {

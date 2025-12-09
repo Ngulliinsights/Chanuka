@@ -5,6 +5,8 @@ Maximum depth: 7 levels
 ```
 .
 BRANCH_ANALYSIS_SUMMARY.txt
+BROWSER_ARCHITECTURE_REFACTORING.md
+BROWSER_COMPATIBILITY_GUIDE.md
 CHANGELOG.md
 clear-sw.html
 client/
@@ -63,7 +65,10 @@ client/
 │   │   ├── seamless-shared-integration.ts
 │   │   ├── secure-storage-adapter.ts
 │   │   ├── shared-module-adapter.ts
+│   ├── app/
 │   ├── App.tsx
+│   │   ├── providers/
+│   │   │   ├── AppProviders.tsx
 │   ├── COMMUNITY_MIGRATION_COMPLETE.md
 │   ├── components/
 │   │   ├── accessibility/
@@ -75,100 +80,19 @@ client/
 │   │   │   ├── section.tsx
 │   │   │   ├── stats.tsx
 │   │   │   ├── timeline.tsx
-│   │   ├── analytics/
-│   │   │   ├── CivicScoreCard.tsx
-│   │   │   ├── ContributionRankings.tsx
-│   │   │   ├── EngagementAnalyticsDashboard.tsx
-│   │   │   ├── engagement-dashboard.tsx
-│   │   │   ├── EngagementMetricsChart.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── JourneyAnalyticsDashboard.tsx
-│   │   │   ├── real-time-engagement-dashboard.tsx
-│   │   │   ├── real-time-engagement-demo.tsx
-│   │   │   ├── SentimentTracker.tsx
-│   │   │   ├── TemporalAnalytics.tsx
 │   │   ├── AppProviders.tsx
-│   │   ├── architecture-planning.tsx
 │   │   ├── asset-loading/
 │   │   │   ├── AssetLoadingProvider.tsx
-│   │   ├── auth/
-│   │   │   ├── AuthGuard.tsx
-│   │   │   ├── AuthRoutes.tsx
-│   │   │   ├── config/
-│   │   │   │   ├── index.ts
-│   │   │   ├── ConsentModal.tsx
-│   │   │   ├── constants.ts
-│   │   │   ├── core/
-│   │   │   │   ├── index.ts
-│   │   │   ├── errors.ts
-│   │   │   ├── hooks/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useAuthForm.ts
-│   │   │   │   ├── useLoginForm.ts
-│   │   │   │   ├── usePasswordUtils.ts
-│   │   │   │   ├── usePrivacySettings.ts
-│   │   │   │   ├── useRegisterForm.ts
-│   │   │   ├── IMPLEMENTATION_SUMMARY.md
-│   │   │   ├── index.ts
-│   │   │   ├── OAuthCallback.tsx
-│   │   │   ├── OAuthLogin.tsx
-│   │   │   ├── PasswordStrengthIndicator.tsx
-│   │   │   ├── recovery.ts
-│   │   │   ├── SecurityDashboard.tsx
-│   │   │   ├── SessionManager.tsx
-│   │   │   ├── SocialLogin.tsx
-│   │   │   ├── TwoFactorSetup.tsx
-│   │   │   ├── types.ts
-│   │   │   ├── ui/
-│   │   │   │   ├── AuthAlert.tsx
-│   │   │   │   ├── AuthButton.tsx
-│   │   │   │   ├── AuthInput.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── PasswordStrengthIndicator.tsx
-│   │   │   │   ├── RegisterForm.tsx
-│   │   │   ├── utils/
-│   │   │   │   ├── auth-validation.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── test-utils.ts
-│   │   │   │   ├── user-utils.ts
-│   │   │   ├── validation.ts
-│   │   ├── bill-detail/
-│   │   │   ├── BillAnalysisTab.tsx
-│   │   │   ├── BillCommunityTab.tsx
-│   │   │   ├── BillFullTextTab.tsx
-│   │   │   ├── BillHeader.tsx
-│   │   │   ├── BillOverviewTab.tsx
-│   │   │   ├── BillRelatedTab.tsx
-│   │   │   ├── BillSponsorsTab.tsx
-│   │   │   ├── CivicActionGuidance.tsx
-│   │   │   ├── ConstitutionalAnalysisPanel.tsx
-│   │   │   ├── ConstitutionalFlagCard.tsx
-│   │   │   ├── ExpertAnalysisCard.tsx
-│   │   │   ├── QuickActionsBar.tsx
-│   │   │   ├── TabSkeleton.tsx
 │   │   ├── bills/
 │   │   │   ├── implementation-workarounds.tsx
 │   │   ├── bill-tracking/
 │   │   │   ├── real-time-tracker.tsx
-│   │   ├── checkpoint-dashboard.tsx
-│   │   ├── community/
-│   │   │   ├── ActionCenter.tsx
-│   │   │   ├── ActivityFeed.tsx
-│   │   │   ├── CommunityDataIntegration.tsx
-│   │   │   ├── CommunityErrorBoundary.tsx
-│   │   │   ├── CommunityFilters.tsx
-│   │   │   ├── CommunityHub.tsx
-│   │   │   ├── CommunityStats.tsx
-│   │   │   ├── ExpertInsights.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── LocalImpactPanel.tsx
-│   │   │   ├── README.md
-│   │   │   ├── TrendingTopics.tsx
 │   │   ├── compatibility/
 │   │   │   ├── BrowserCompatibilityChecker.tsx
 │   │   │   ├── BrowserCompatibilityReport.tsx
 │   │   │   ├── BrowserCompatibilityTester.tsx
 │   │   │   ├── FeatureFallbacks.tsx
+│   │   │   ├── useBrowserStatus.tsx
 │   │   ├── conflict-of-interest/
 │   │   │   ├── ConflictNetworkVisualization.tsx
 │   │   │   ├── ConflictOfInterestAnalysis.tsx
@@ -178,48 +102,7 @@ client/
 │   │   │   ├── index.ts
 │   │   │   ├── TransparencyScoring.tsx
 │   │   ├── connection-status.tsx
-│   │   ├── dashboard/
-│   │   │   ├── action-items.tsx
-│   │   │   ├── activity-summary.tsx
-│   │   │   ├── components/
-│   │   │   │   ├── DashboardStats.tsx
-│   │   │   │   ├── TimeFilterSelector.tsx
-│   │   │   │   ├── WelcomeMessage.tsx
-│   │   │   ├── errors.ts
-│   │   │   ├── hooks/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useDashboard.ts
-│   │   │   │   ├── useDashboardActions.ts
-│   │   │   │   ├── useDashboardConfig.ts
-│   │   │   │   ├── useDashboardTopics.ts
-│   │   │   ├── index.ts
-│   │   │   ├── modals/
-│   │   │   │   ├── DashboardPreferencesModal.tsx
-│   │   │   │   ├── DataExportModal.tsx
-│   │   │   ├── recovery.ts
-│   │   │   ├── sections/
-│   │   │   │   ├── CivicMetricsSection.tsx
-│   │   │   │   ├── EngagementHistorySection.tsx
-│   │   │   │   ├── RecommendationsSection.tsx
-│   │   │   │   ├── TrackedBillsSection.tsx
-│   │   │   ├── tracked-topics.tsx
-│   │   │   ├── types.ts
-│   │   │   ├── utils/
-│   │   │   │   ├── dashboard-config-utils.ts
-│   │   │   │   ├── dashboard-constants.ts
-│   │   │   │   ├── dashboard-formatters.ts
-│   │   │   │   ├── index.ts
-│   │   │   ├── validation.ts
 │   │   ├── database-status.tsx
-│   │   ├── decision-matrix.tsx
-│   │   ├── discussion/
-│   │   │   ├── CommentForm.tsx
-│   │   │   ├── CommentItem.tsx
-│   │   │   ├── CommunityReporting.tsx
-│   │   │   ├── DiscussionDemo.tsx
-│   │   │   ├── DiscussionIntegration.tsx
-│   │   │   ├── DiscussionThread.tsx
-│   │   │   ├── index.ts
 │   │   ├── education/
 │   │   │   ├── ConstitutionalContext.tsx
 │   │   │   ├── EducationalFramework.tsx
@@ -229,13 +112,11 @@ client/
 │   │   │   ├── PlainLanguageSummary.tsx
 │   │   │   ├── ProcessEducation.tsx
 │   │   │   ├── README.md
-│   │   ├── enhanced-user-flows/
-│   │   │   ├── SmartDashboard.tsx
-│   │   ├── environment-setup.tsx
-│   │   ├── error-boundaries/ [DEPRECATED]
-│   │   │   ├── index.ts (redirects to error-handling/)
-│   │   │   ├── README.md (migration guide)
+│   │   ├── error-boundaries/
+│   │   │   ├── index.ts
+│   │   │   ├── README.md
 │   │   ├── error-handling/
+│   │   │   ├── CommunityErrorBoundary.tsx
 │   │   │   ├── ErrorBoundary.tsx
 │   │   │   ├── ErrorFallback.tsx
 │   │   │   ├── ErrorRecoveryManager.tsx
@@ -251,7 +132,8 @@ client/
 │   │   │   │   ├── shared-error-display.tsx
 │   │   ├── examples/
 │   │   │   ├── SeamlessIntegrationExample.tsx
-│   │   ├── feature-flags-panel.tsx
+│   │   ├── hooks/
+│   │   │   ├── useDatabaseStatus.ts
 │   │   ├── icons/
 │   │   │   ├── SimpleIcons.tsx
 │   │   ├── implementation/
@@ -266,8 +148,6 @@ client/
 │   │   │   ├── errors.ts
 │   │   │   ├── index.ts
 │   │   │   ├── MOBILE_NAVIGATION_FIXES.md
-│   │   │   ├── mobile-header.tsx
-│   │   │   ├── mobile-navigation.tsx
 │   │   │   ├── sidebar.tsx
 │   │   │   ├── SimpleAppLayout.tsx
 │   │   │   ├── types.ts
@@ -315,89 +195,6 @@ client/
 │   │   │   │   ├── timeout-utils.ts
 │   │   │   ├── validation.ts
 │   │   ├── MigrationManager.tsx
-│   │   ├── mobile/
-│   │   │   ├── __archive__/
-│   │   │   │   ├── ARCHIVE_README.md
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── InfiniteScroll.tsx
-│   │   │   │   ├── MobileBottomSheet.tsx
-│   │   │   │   ├── MobileDataVisualization.tsx
-│   │   │   │   ├── MobileLayout.tsx
-│   │   │   │   ├── MobileNavigationDrawer.tsx
-│   │   │   │   ├── mobile-navigation-enhancements.tsx
-│   │   │   │   ├── mobile-optimized-forms.tsx
-│   │   │   │   ├── MobileOptimizedLayout.tsx
-│   │   │   │   ├── mobile-performance-optimizations.tsx
-│   │   │   │   ├── MobileTabSelector.tsx
-│   │   │   │   ├── mobile-test-suite.tsx
-│   │   │   │   ├── PullToRefresh.tsx
-│   │   │   │   ├── responsive-layout-manager.tsx
-│   │   │   │   ├── SwipeGestures.tsx
-│   │   │   ├── data-display/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── MobileBillCard.tsx
-│   │   │   │   ├── MobileChartCarousel.tsx
-│   │   │   │   ├── MobileDataVisualization.tsx
-│   │   │   │   ├── MobileTabSelector.tsx
-│   │   │   ├── feedback/
-│   │   │   │   ├── OfflineStatusBanner.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── interaction/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── InfiniteScroll.tsx
-│   │   │   │   ├── MobileBottomSheet.tsx
-│   │   │   │   ├── PullToRefresh.tsx
-│   │   │   │   ├── ScrollToTopButton.tsx
-│   │   │   │   ├── SwipeGestures.tsx
-│   │   │   ├── layout/
-│   │   │   │   ├── AutoHideHeader.tsx
-│   │   │   │   ├── BottomNavigationBar.tsx
-│   │   │   │   ├── full implementation.md
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── MobileHeader.tsx
-│   │   │   │   ├── MobileLayout.tsx
-│   │   │   │   ├── NavigationDrawer.tsx
-│   │   │   │   ├── SafeAreaWrapper.tsx
-│   │   │   ├── mobile-navigation-enhancements.css
-│   │   │   ├── README_NEW_STRUCTURE.md
-│   │   ├── monitoring/
-│   │   │   ├── monitoring-dashboard.tsx
-│   │   ├── navigation/
-│   │   │   ├── analytics/
-│   │   │   │   ├── NavigationAnalytics.tsx
-│   │   │   ├── constants.ts
-│   │   │   ├── core/
-│   │   │   │   ├── roleGuard.ts
-│   │   │   ├── errors.ts
-│   │   │   ├── hooks/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useNav.ts
-│   │   │   │   ├── useOptimizedNavigation.ts
-│   │   │   │   ├── useRelatedPages.ts
-│   │   │   │   ├── useRouteAccess.ts
-│   │   │   ├── index.ts
-│   │   │   ├── navigation-preferences-dialog.tsx
-│   │   │   ├── performance/
-│   │   │   │   ├── NavigationPerformanceDashboard.tsx
-│   │   │   ├── ProgressiveDisclosureDemo.tsx
-│   │   │   ├── ProgressiveDisclosureNavigation.tsx
-│   │   │   ├── ProgressiveDisclosureSimple.tsx
-│   │   │   ├── quick-access-nav.tsx
-│   │   │   ├── recovery.ts
-│   │   │   ├── types.ts
-│   │   │   ├── ui/
-│   │   │   │   ├── DESKTOP_SIDEBAR_FIXES.md
-│   │   │   │   ├── DesktopSidebar.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── NavLink.tsx
-│   │   │   │   ├── NavSection.tsx
-│   │   │   ├── utils/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── MIGRATION_TO_CONSOLIDATED_UTILITIES.md
-│   │   │   │   ├── navigation-utils.ts
-│   │   │   │   ├── page-relationships.ts
-│   │   │   │   ├── route-access.ts
-│   │   │   ├── validation.ts
 │   │   ├── notifications/
 │   │   │   ├── index.ts
 │   │   │   ├── NotificationCenter.tsx
@@ -411,10 +208,6 @@ client/
 │   │   ├── OfflineModal.tsx
 │   │   ├── onboarding/
 │   │   │   ├── UserJourneyOptimizer.tsx
-│   │   ├── performance/
-│   │   │   ├── PerformanceDashboard.tsx
-│   │   │   ├── PerformanceMetricsCollector.tsx
-│   │   │   ├── PerformanceOptimizationDashboard.tsx
 │   │   ├── privacy/
 │   │   │   ├── CookieConsentBanner.tsx
 │   │   │   ├── DataUsageReportDashboard.tsx
@@ -423,13 +216,6 @@ client/
 │   │   │   ├── privacy-dashboard.tsx
 │   │   │   ├── privacy-policy.tsx
 │   │   │   ├── README.md
-│   │   ├── ProjectOverview.tsx
-│   │   ├── realtime/
-│   │   │   ├── index.ts
-│   │   │   ├── RealTimeDashboard.tsx
-│   │   │   ├── RealTimeNotifications.tsx
-│   │   ├── search/
-│   │   │   ├── advanced-search.tsx
 │   │   ├── security/
 │   │   │   ├── SecureForm.tsx
 │   │   │   ├── SecurityDashboard.tsx
@@ -437,20 +223,6 @@ client/
 │   │   ├── settings/
 │   │   │   ├── alert-preferences.tsx
 │   │   ├── shared/
-│   │   │   ├── auth/
-│   │   │   │   ├── forms/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── LoginForm.tsx
-│   │   │   │   │   ├── SecurityLoginForm.tsx
-│   │   │   │   │   ├── StandardLoginForm.tsx
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── useLoginForm.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── AuthAlert.tsx
-│   │   │   │   │   ├── AuthButton.tsx
-│   │   │   │   │   ├── AuthInput.tsx
-│   │   │   │   │   ├── index.ts
 │   │   │   ├── dashboard/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── sections/
@@ -460,7 +232,6 @@ client/
 │   │   │   │   │   ├── StatsSection.tsx
 │   │   │   │   ├── useDashboardData.ts
 │   │   │   │   ├── useMigrationDashboardData.ts
-│   │   │   │   ├── UserDashboard.tsx
 │   │   │   │   ├── variants/
 │   │   │   │   │   ├── FullPageDashboard.tsx
 │   │   │   │   │   ├── SectionDashboard.tsx
@@ -486,87 +257,54 @@ client/
 │   │   │   ├── NavigationBar.tsx
 │   │   │   ├── ProtectedRoute.tsx
 │   │   │   ├── SkipLinks.tsx
-│   │   ├── Sidebar.tsx
 │   │   ├── system/
 │   │   │   ├── HealthCheck.tsx
-│   │   ├── SystemHealth.tsx
 │   │   ├── transparency/
 │   │   │   ├── ConflictAnalysisDashboard.tsx
 │   │   │   ├── ConflictNetworkVisualization.tsx
 │   │   ├── ui/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── design-system.compliance.test.tsx
+│   │   │   │   ├── integration-workflows.integration.test.tsx
+│   │   │   ├── accessibility.a11y.test.tsx
 │   │   │   ├── alert.stories.tsx
-│   │   │   ├── alert.tsx
+│   │   │   ├── alert-badge.test.tsx
 │   │   │   ├── avatar.stories.tsx
-│   │   │   ├── avatar.tsx
+│   │   │   ├── avatar-tabs-progress.test.tsx
 │   │   │   ├── badge.stories.tsx
-│   │   │   ├── badge.tsx
 │   │   │   ├── button.stories.tsx
-│   │   │   ├── button.tsx
-│   │   │   ├── calendar.tsx
+│   │   │   ├── button.test.tsx
 │   │   │   ├── card.stories.tsx
-│   │   │   ├── card.tsx
+│   │   │   ├── card.test.tsx
 │   │   │   ├── checkbox.stories.tsx
-│   │   │   ├── checkbox.tsx
-│   │   │   ├── collapsible.tsx
-│   │   │   ├── command.tsx
+│   │   │   ├── checkbox-switch-tooltip.test.tsx
 │   │   │   ├── components.tsx
-│   │   │   ├── context-menu.tsx
 │   │   │   ├── dialog.stories.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── dropdown-menu.tsx
-│   │   │   ├── ErrorMessage.tsx
+│   │   │   ├── dialog.test.tsx
 │   │   │   ├── errors.ts
-│   │   │   ├── form.tsx
-│   │   │   ├── form-accessibility.tsx
 │   │   │   ├── form-demo.tsx
-│   │   │   ├── form-field.tsx
-│   │   │   ├── form-layout.tsx
 │   │   │   ├── hybrid-components.tsx
 │   │   │   ├── implementation-summary.tsx
 │   │   │   ├── index.ts
 │   │   │   ├── input.stories.tsx
-│   │   │   ├── input.tsx
+│   │   │   ├── input.test.tsx
 │   │   │   ├── label.stories.tsx
-│   │   │   ├── label.tsx
-│   │   │   ├── loading-spinner.tsx
-│   │   │   ├── logo.tsx
+│   │   │   ├── label.test.tsx
 │   │   │   ├── migration-examples.tsx
-│   │   │   ├── navigation-menu.tsx
-│   │   │   ├── OptimizedImage.tsx
-│   │   │   ├── popover.tsx
 │   │   │   ├── progress.stories.tsx
-│   │   │   ├── progress.tsx
 │   │   │   ├── recovery.ts
-│   │   │   ├── scroll-area.tsx
-│   │   │   ├── select.tsx
 │   │   │   ├── separator.tsx
-│   │   │   ├── sheet.tsx
-│   │   │   ├── sidebar.tsx
 │   │   │   ├── simple-button.tsx
 │   │   │   ├── skeleton.tsx
 │   │   │   ├── switch.stories.tsx
-│   │   │   ├── switch.tsx
-│   │   │   ├── table.tsx
 │   │   │   ├── tabs.stories.tsx
-│   │   │   ├── tabs.tsx
 │   │   │   ├── test-components.tsx
-│   │   │   ├── textarea.tsx
-│   │   │   ├── theme-toggle.tsx
-│   │   │   ├── toast.tsx
-│   │   │   ├── toaster.tsx
 │   │   │   ├── tooltip.stories.tsx
-│   │   │   ├── tooltip.tsx
 │   │   │   ├── types.ts
 │   │   │   ├── unified-button.tsx
 │   │   │   ├── unified-components.tsx
 │   │   │   ├── unified-examples.tsx
 │   │   │   ├── validation.ts
-│   │   ├── user/
-│   │   │   ├── AccessibilitySettingsSection.tsx
-│   │   │   ├── UserAccountIntegration.tsx
-│   │   │   ├── UserProfileSection.tsx
 │   │   ├── verification/
 │   │   │   ├── CommunityValidation.tsx
 │   │   │   ├── CredibilityScoring.tsx
@@ -578,11 +316,13 @@ client/
 │   │   │   ├── README.md
 │   │   │   ├── verification-list.tsx
 │   │   │   ├── VerificationWorkflow.tsx
+│   ├── COMPONENTS_CONSOLIDATION_STRATEGY.md
 │   ├── config/
 │   │   ├── api.ts
 │   │   ├── development.ts
 │   │   ├── feature-flags.ts
 │   │   ├── gestures.ts
+│   │   ├── index.ts
 │   │   ├── integration.ts
 │   │   ├── mobile.ts
 │   │   ├── navigation.ts
@@ -593,7 +333,6 @@ client/
 │   │   ├── copy-system.ts
 │   ├── contexts/
 │   │   ├── NavigationContext.tsx
-│   │   ├── ThemeContext.tsx
 │   ├── core/
 │   │   ├── api/
 │   │   │   ├── analytics.ts
@@ -602,14 +341,12 @@ client/
 │   │   │   ├── authentication.ts
 │   │   │   ├── base-client.ts
 │   │   │   ├── bills.ts
-│   │   │   ├── cache.ts
 │   │   │   ├── cache-manager.ts
 │   │   │   ├── circuit-breaker-client.ts
 │   │   │   ├── circuit-breaker-monitor.ts
 │   │   │   ├── client.ts
 │   │   │   ├── community.ts
 │   │   │   ├── config.ts
-│   │   │   ├── errors.ts
 │   │   │   ├── examples/
 │   │   │   │   ├── circuit-breaker-usage.ts
 │   │   │   ├── hooks/
@@ -632,6 +369,47 @@ client/
 │   │   │   ├── types.ts
 │   │   │   ├── user.ts
 │   │   │   ├── websocket.ts
+│   │   ├── auth/
+│   │   │   ├── AUTH_CONSOLIDATION_COMPLETE.md
+│   │   │   ├── config/
+│   │   │   │   ├── auth-config.ts
+│   │   │   │   ├── auth-init.ts
+│   │   │   ├── CONSOLIDATION_COMPLETE.md
+│   │   │   ├── constants/
+│   │   │   │   ├── auth-constants.ts
+│   │   │   ├── errors/
+│   │   │   │   ├── auth-errors.ts
+│   │   │   ├── hooks/
+│   │   │   │   ├── useAuth.ts
+│   │   │   ├── index.ts
+│   │   │   ├── initialization.ts
+│   │   │   ├── MIGRATION.md
+│   │   │   ├── README.md
+│   │   │   ├── scripts/
+│   │   │   │   ├── cleanup-old-auth.ts
+│   │   │   │   ├── init-auth-system.ts
+│   │   │   │   ├── migration-helper.ts
+│   │   │   ├── service.ts
+│   │   │   ├── services/
+│   │   │   │   ├── auth-api-service.ts
+│   │   │   │   ├── session-manager.ts
+│   │   │   │   ├── token-manager.ts
+│   │   │   ├── store/
+│   │   │   │   ├── auth-middleware.ts
+│   │   │   │   ├── auth-slice.ts
+│   │   │   ├── types/
+│   │   │   │   ├── index.ts
+│   │   │   ├── utils/
+│   │   │   │   ├── validation.ts
+│   │   ├── browser/
+│   │   │   ├── browser-detector.ts
+│   │   │   ├── compatibility-manager.ts
+│   │   │   ├── constants.ts
+│   │   │   ├── environment.ts
+│   │   │   ├── feature-detector.ts
+│   │   │   ├── index.ts
+│   │   │   ├── polyfill-manager.ts
+│   │   │   ├── types.ts
 │   │   ├── community/
 │   │   │   ├── hooks/
 │   │   │   │   ├── useRealtime.ts
@@ -644,6 +422,8 @@ client/
 │   │   │   │   ├── websocket-manager.ts
 │   │   │   ├── types/
 │   │   │   │   ├── index.ts
+│   │   ├── CONSOLIDATION_PLAN.md
+│   │   ├── CONSOLIDATION_SUMMARY.md
 │   │   ├── dashboard/
 │   │   │   ├── context.tsx
 │   │   │   ├── hooks.ts
@@ -655,12 +435,25 @@ client/
 │   │   ├── error/
 │   │   │   ├── analytics.ts
 │   │   │   ├── classes.ts
+│   │   │   ├── components/
+│   │   │   │   ├── ErrorBoundary.tsx
+│   │   │   │   ├── ErrorFallback.tsx
+│   │   │   │   ├── example.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── RecoveryUI.tsx
+│   │   │   │   ├── types.ts
 │   │   │   ├── constants.ts
 │   │   │   ├── factory.ts
 │   │   │   ├── handler.ts
 │   │   │   ├── index.ts
+│   │   │   ├── monitoring.tsx
 │   │   │   ├── rate-limiter.ts
 │   │   │   ├── recovery.ts
+│   │   │   ├── reporters/
+│   │   │   │   ├── ApiReporter.ts
+│   │   │   │   ├── CompositeReporter.ts
+│   │   │   │   ├── ConsoleReporter.ts
+│   │   │   │   ├── SentryReporter.ts
 │   │   │   ├── reporting.ts
 │   │   │   ├── types.ts
 │   │   ├── index.ts
@@ -675,7 +468,6 @@ client/
 │   │   │   ├── examples/
 │   │   │   │   ├── README.md
 │   │   │   ├── hooks/
-│   │   │   ├── hooks.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useTimeoutAwareLoading.ts
 │   │   │   ├── index.ts
@@ -730,8 +522,6 @@ client/
 │   │   │   ├── cache-storage.ts
 │   │   │   ├── index.ts
 │   │   │   ├── secure-storage.ts
-│   │   │   ├── session-manager.ts
-│   │   │   ├── token-manager.ts
 │   │   │   ├── types.ts
 │   ├── data/
 │   │   ├── mock/
@@ -747,6 +537,8 @@ client/
 │   │   │   ├── users.ts
 │   ├── demo/
 │   │   ├── community-integration-demo.ts
+│   ├── DESIGN_SYSTEM_APPROACH_RATIONALE.md
+│   ├── DESIGN_SYSTEM_INCONSISTENCY_ANALYSIS.md
 │   ├── DevWrapper.tsx
 │   ├── docs/
 │   │   ├── accessibility-guide.md
@@ -757,8 +549,6 @@ client/
 │   │   ├── WebSocketIntegrationExample.tsx
 │   ├── features/
 │   │   ├── analytics/
-│   │   │   ├── components/
-│   │   │   │   ├── AnalyticsDashboard.tsx
 │   │   │   ├── hooks/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useAnalytics.ts
@@ -768,8 +558,17 @@ client/
 │   │   │   │   ├── use-web-vitals.ts
 │   │   │   ├── index.ts
 │   │   │   ├── services/
+│   │   │   │   ├── analysis.ts
 │   │   │   │   ├── analytics.ts
+│   │   │   │   ├── index.ts
 │   │   │   ├── types.ts
+│   │   │   ├── ui/
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   ├── AnalyticsDashboard.tsx
+│   │   │   │   │   ├── EngagementAnalyticsDashboard.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── metrics/
+│   │   │   │   │   ├── CivicScoreCard.tsx
 │   │   ├── bills/
 │   │   │   ├── api/
 │   │   │   │   ├── index.ts
@@ -780,33 +579,59 @@ client/
 │   │   │   │   │   ├── useBills.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── types.ts
+│   │   │   ├── services/
+│   │   │   │   ├── cache.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── pagination.ts
+│   │   │   │   ├── tracking.ts
 │   │   │   ├── ui/
+│   │   │   │   ├── analysis/
+│   │   │   │   │   ├── BillAnalysis.tsx
+│   │   │   │   │   ├── BillAnalysisTab.tsx
+│   │   │   │   │   ├── ConstitutionalAnalysisPanel.tsx
 │   │   │   │   ├── BillCard.tsx
 │   │   │   │   ├── bill-list.tsx
 │   │   │   │   ├── BillList.tsx
 │   │   │   │   ├── BillRealTimeIndicator.tsx
 │   │   │   │   ├── bills-dashboard.tsx
 │   │   │   │   ├── bill-tracking.tsx
+│   │   │   │   ├── detail/
+│   │   │   │   │   ├── BillCommunityTab.tsx
+│   │   │   │   │   ├── BillFullTextTab.tsx
+│   │   │   │   │   ├── BillHeader.tsx
+│   │   │   │   │   ├── BillOverviewTab.tsx
+│   │   │   │   │   ├── BillSponsorsTab.tsx
 │   │   │   │   ├── filter-panel.tsx
 │   │   │   │   ├── implementation-workarounds.tsx
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── list/
+│   │   │   │   │   ├── BillCard.tsx
 │   │   │   │   ├── MobileBillDetail.tsx
-│   │   │   │   ├── MobileBillsDashboard.tsx
 │   │   │   │   ├── stats-overview.tsx
 │   │   │   │   ├── virtual-bill-grid.tsx
 │   │   ├── community/
-│   │   │   ├── components/
-│   │   │   │   ├── CommentThread.tsx
 │   │   │   ├── hooks/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useCommunity.ts
 │   │   │   │   ├── useDiscussion.ts
 │   │   │   ├── index.ts
+│   │   │   ├── services/
+│   │   │   │   ├── backend.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── ui/
+│   │   │   │   ├── activity/
+│   │   │   │   │   ├── ActivityFeed.tsx
+│   │   │   │   │   ├── CommunityStats.tsx
+│   │   │   │   ├── discussion/
+│   │   │   │   │   ├── CommentForm.tsx
+│   │   │   │   │   ├── CommentItem.tsx
+│   │   │   │   │   ├── DiscussionThread.tsx
+│   │   │   │   ├── expert/
+│   │   │   │   │   ├── ExpertInsights.tsx
+│   │   │   │   ├── hub/
+│   │   │   │   │   ├── CommunityHub.tsx
+│   │   │   │   ├── index.ts
 │   │   ├── pretext-detection/
-│   │   │   ├── components/
-│   │   │   │   ├── CivicActionToolbox.tsx
-│   │   │   │   ├── PretextDetectionPanel.tsx
-│   │   │   │   ├── PretextWatchCard.tsx
 │   │   │   ├── demo.md
 │   │   │   ├── hooks/
 │   │   │   │   ├── usePretextAnalysis.ts
@@ -815,18 +640,11 @@ client/
 │   │   │   ├── services/
 │   │   │   │   ├── PretextAnalysisService.ts
 │   │   │   ├── types.ts
+│   │   │   ├── ui/
+│   │   │   │   ├── CivicActionToolbox.tsx
+│   │   │   │   ├── PretextDetectionPanel.tsx
+│   │   │   │   ├── PretextWatchCard.tsx
 │   │   ├── search/
-│   │   │   ├── components/
-│   │   │   │   ├── AdvancedSearchInterface.tsx
-│   │   │   │   ├── IntelligentAutocomplete.tsx
-│   │   │   │   ├── SavedSearches.tsx
-│   │   │   │   ├── SearchAnalyticsDashboard.tsx
-│   │   │   │   ├── SearchBar.tsx
-│   │   │   │   ├── SearchFilters.tsx
-│   │   │   │   ├── SearchProgressIndicator.tsx
-│   │   │   │   ├── SearchResultCard.tsx
-│   │   │   │   ├── SearchResults.tsx
-│   │   │   │   ├── SearchTips.tsx
 │   │   │   ├── hooks/
 │   │   │   │   ├── useIntelligentSearch.ts
 │   │   │   │   ├── useSearch.ts
@@ -838,6 +656,24 @@ client/
 │   │   │   │   ├── search-api.ts
 │   │   │   │   ├── streaming-search.ts
 │   │   │   ├── types.ts
+│   │   │   ├── ui/
+│   │   │   │   ├── filters/
+│   │   │   │   │   ├── SearchFilters.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── interface/
+│   │   │   │   │   ├── AdvancedSearch.tsx
+│   │   │   │   │   ├── IntelligentAutocomplete.tsx
+│   │   │   │   │   ├── SavedSearches.tsx
+│   │   │   │   │   ├── SearchAnalyticsDashboard.tsx
+│   │   │   │   │   ├── SearchBar.tsx
+│   │   │   │   │   ├── SearchProgressIndicator.tsx
+│   │   │   │   │   ├── SearchTips.tsx
+│   │   │   │   ├── results/
+│   │   │   │   │   ├── SearchResultCard.tsx
+│   │   │   │   │   ├── SearchResults.tsx
+│   │   ├── security/
+│   │   │   ├── ui/
+│   │   │   │   ├── index.ts
 │   │   ├── users/
 │   │   │   ├── hooks/
 │   │   │   │   ├── index.ts
@@ -848,11 +684,32 @@ client/
 │   │   │   ├── services/
 │   │   │   │   ├── user-api.ts
 │   │   │   ├── types.ts
+│   │   │   ├── ui/
+│   │   │   │   ├── auth/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   ├── AuthAlert.tsx
+│   │   │   │   │   │   ├── AuthButton.tsx
+│   │   │   │   │   │   ├── AuthInput.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── useLoginForm.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── profile/
+│   │   │   │   │   ├── UserProfileSection.tsx
+│   ├── FEATURES_CONSISTENCY_ANALYSIS.md
+│   ├── FSD_MIGRATION_STATUS.md
+│   ├── FSD_PHASE2_COMPLETE.md
+│   ├── FSD_PHASE3_COMPLETE.md
+│   ├── FSD_PHASE3_PROGRESS.md
+│   ├── FSD_PHASE4_COMPLETE.md
+│   ├── FSD_PHASE5_COMPLETE.md
+│   ├── FSD_REORGANIZATION_PLAN.md
 │   ├── hooks/
 │   │   ├── index.ts
 │   │   ├── mobile/
 │   │   │   ├── index.ts
 │   │   │   ├── useBottomSheet.ts
+│   │   │   ├── useDeviceInfo.ts
 │   │   │   ├── useInfiniteScroll.ts
 │   │   │   ├── useMobileNavigation.ts
 │   │   │   ├── useMobileTabs.ts
@@ -889,14 +746,74 @@ client/
 │   │   ├── use-system.tsx
 │   │   ├── use-toast.ts
 │   │   ├── use-websocket.ts
+│   ├── IMPLEMENTATION_COMPARISON_ANALYSIS.md
+│   ├── IMPORT_UPDATE_SUMMARY.md
 │   ├── index.css
-│   ├── index-minimal.css
+│   ├── INFRASTRUCTURE_INTEGRATION_SUMMARY.md
+│   ├── LEGACY_MIGRATION_COMPLETE.md
+│   ├── LEGACY_MIGRATION_STRATEGY.md
+│   ├── legacy-archive/
+│   │   ├── ARCHIVE_README.md
+│   │   ├── components/
+│   │   │   ├── analytics/
+│   │   │   │   ├── CivicScoreCard.tsx
+│   │   │   │   ├── ContributionRankings.tsx
+│   │   │   │   ├── EngagementAnalyticsDashboard.tsx
+│   │   │   │   ├── engagement-dashboard.tsx
+│   │   │   │   ├── EngagementMetricsChart.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── JourneyAnalyticsDashboard.tsx
+│   │   │   │   ├── real-time-engagement-dashboard.tsx
+│   │   │   │   ├── real-time-engagement-demo.tsx
+│   │   │   │   ├── SentimentTracker.tsx
+│   │   │   │   ├── TemporalAnalytics.tsx
+│   │   │   ├── bill-detail/
+│   │   │   │   ├── BillAnalysisTab.tsx
+│   │   │   │   ├── BillCommunityTab.tsx
+│   │   │   │   ├── BillFullTextTab.tsx
+│   │   │   │   ├── BillHeader.tsx
+│   │   │   │   ├── BillOverviewTab.tsx
+│   │   │   │   ├── BillRelatedTab.tsx
+│   │   │   │   ├── BillSponsorsTab.tsx
+│   │   │   │   ├── CivicActionGuidance.tsx
+│   │   │   │   ├── ConstitutionalAnalysisPanel.tsx
+│   │   │   │   ├── ConstitutionalFlagCard.tsx
+│   │   │   │   ├── ExpertAnalysisCard.tsx
+│   │   │   │   ├── QuickActionsBar.tsx
+│   │   │   │   ├── TabSkeleton.tsx
+│   │   │   ├── community/
+│   │   │   │   ├── ActionCenter.tsx
+│   │   │   │   ├── ActivityFeed.tsx
+│   │   │   │   ├── CommunityDataIntegration.tsx
+│   │   │   │   ├── CommunityFilters.tsx
+│   │   │   │   ├── CommunityHub.tsx
+│   │   │   │   ├── CommunityStats.tsx
+│   │   │   │   ├── ExpertInsights.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── LocalImpactPanel.tsx
+│   │   │   │   ├── README.md
+│   │   │   │   ├── TrendingTopics.tsx
+│   │   │   ├── discussion/
+│   │   │   │   ├── CommentForm.tsx
+│   │   │   │   ├── CommentItem.tsx
+│   │   │   │   ├── CommunityReporting.tsx
+│   │   │   │   ├── DiscussionDemo.tsx
+│   │   │   │   ├── DiscussionIntegration.tsx
+│   │   │   │   ├── DiscussionThread.tsx
+│   │   │   │   ├── index.ts
+│   │   │   ├── search/
+│   │   │   │   ├── advanced-search.tsx
+│   │   │   ├── user/
+│   │   │   │   ├── AccessibilitySettingsSection.tsx
+│   │   │   │   ├── UserAccountIntegration.tsx
+│   │   │   │   ├── UserProfileSection.tsx
 │   ├── lib/
-│   │   ├── form-builder.ts
+│   │   ├── form-builder.tsx
 │   │   ├── protected-route.tsx
 │   │   ├── queryClient.ts
 │   │   ├── react-query-config.ts
 │   │   ├── utils.ts
+│   │   ├── validation-schemas.test.ts
 │   │   ├── validation-schemas.ts
 │   ├── lucide.d.ts
 │   ├── main.tsx
@@ -961,6 +878,7 @@ client/
 │   │   ├── index.ts
 │   ├── scripts/
 │   │   ├── analyze-bundle.ts
+│   │   ├── fsd-migration.ts
 │   │   ├── migrate-components.ts
 │   │   ├── performance-audit.ts
 │   │   ├── README.md
@@ -992,35 +910,25 @@ client/
 │   │   │   ├── security-types.ts
 │   │   ├── vulnerability-scanner.ts
 │   ├── services/
-│   │   ├── analysis.ts
-│   │   ├── api.ts
-│   │   ├── api-interceptors.ts
-│   │   ├── auth-service.ts
 │   │   ├── auth-service-init.ts
-│   │   ├── bills-data-cache.ts
-│   │   ├── billsPaginationService.ts
-│   │   ├── billsWebSocketService.ts
-│   │   ├── billTrackingService.ts
-│   │   ├── community-backend-service.ts
 │   │   ├── community-websocket-extension.ts
 │   │   ├── CommunityWebSocketManager.ts
 │   │   ├── dataRetentionService.ts
 │   │   ├── errorAnalyticsBridge.ts
-│   │   ├── error-monitoring.tsx
 │   │   ├── index.ts
-│   │   ├── mockDataService.ts
 │   │   ├── mockUserData.ts
 │   │   ├── navigation.ts
 │   │   ├── notification-service.ts
 │   │   ├── notification-system-integration-summary.md
 │   │   ├── PageRelationshipService.ts
-│   │   ├── performance-monitoring.ts
 │   │   ├── privacyAnalyticsService.ts
 │   │   ├── realistic-demo-data.ts
 │   │   ├── UserJourneyTracker.ts
 │   │   ├── userService.ts
 │   │   ├── webSocketService.ts
-│   ├── setupTests.ts
+│   ├── SERVICES_INTEGRATION_COMPLETE.md
+│   ├── SERVICES_INTEGRATION_EXECUTION.md
+│   ├── SERVICES_INTEGRATION_PLAN.md
 │   ├── shared/
 │   │   ├── design-system/
 │   │   │   ├── accessibility/
@@ -1030,39 +938,95 @@ client/
 │   │   │   │   ├── motion.ts
 │   │   │   │   ├── touch.ts
 │   │   │   │   ├── typography.ts
-│   │   │   ├── components/
-│   │   │   │   ├── button.ts
-│   │   │   │   ├── card.ts
-│   │   │   │   ├── design-standards.css
-│   │   │   │   ├── DesignStandardsDemo.css
-│   │   │   │   ├── DesignStandardsDemo.tsx
-│   │   │   │   ├── empty-states.ts
-│   │   │   │   ├── error-states.ts
+│   │   │   ├── feedback/
+│   │   │   │   ├── Alert.tsx
+│   │   │   │   ├── Badge.tsx
+│   │   │   │   ├── ErrorMessage.tsx
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── input.ts
-│   │   │   │   ├── interactive-states.ts
-│   │   │   │   ├── loading-states.ts
-│   │   │   │   ├── ResponsiveButton.tsx
-│   │   │   │   ├── ResponsiveContainer.tsx
-│   │   │   │   ├── ResponsiveGrid.tsx
-│   │   │   │   ├── ResponsiveInput.tsx
-│   │   │   │   ├── ResponsiveStack.tsx
-│   │   │   │   ├── TouchTarget.tsx
-│   │   │   │   ├── typography.ts
+│   │   │   │   ├── LoadingSpinner.tsx
+│   │   │   │   ├── Progress.tsx
+│   │   │   │   ├── separator.tsx
+│   │   │   │   ├── skeleton.tsx
+│   │   │   │   ├── table.tsx
+│   │   │   │   ├── Toast.tsx
+│   │   │   │   ├── Toaster.tsx
+│   │   │   │   ├── Tooltip.tsx
 │   │   │   ├── index.ts
+│   │   │   ├── interactive/
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── Calendar.tsx
+│   │   │   │   ├── card.tsx
+│   │   │   │   ├── checkbox.tsx
+│   │   │   │   ├── Collapsible.tsx
+│   │   │   │   ├── Command.tsx
+│   │   │   │   ├── ContextMenu.tsx
+│   │   │   │   ├── Dialog.tsx
+│   │   │   │   ├── DropdownMenu.tsx
+│   │   │   │   ├── form.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── input.tsx
+│   │   │   │   ├── NavigationMenu.tsx
+│   │   │   │   ├── Popover.tsx
+│   │   │   │   ├── scroll-area.tsx
+│   │   │   │   ├── select.tsx
+│   │   │   │   ├── Sheet.tsx
+│   │   │   │   ├── Sidebar.tsx
+│   │   │   │   ├── switch.tsx
+│   │   │   │   ├── Tabs.tsx
+│   │   │   │   ├── textarea.tsx
+│   │   │   │   ├── ThemeToggle.tsx
 │   │   │   ├── lib/
-│   │   │   │   ├── utils.ts
+│   │   │   ├── media/
+│   │   │   │   ├── Avatar.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── Logo.tsx
+│   │   │   │   ├── OptimizedImage.tsx
 │   │   │   ├── README.md
 │   │   │   ├── responsive.css
 │   │   │   ├── responsive.ts
-│   │   │   ├── theme/
-│   │   │   │   ├── theme-manager.ts
-│   │   │   │   ├── theme-provider.tsx
-│   │   │   │   ├── theme-toggle.tsx
+│   │   │   ├── standards/
+│   │   │   │   ├── button.ts
+│   │   │   │   ├── card.ts
+│   │   │   │   ├── empty-states.ts
+│   │   │   │   ├── error-states.ts
+│   │   │   │   ├── input.ts
+│   │   │   │   ├── interactive-states.ts
+│   │   │   │   ├── loading-states.ts
+│   │   │   │   ├── typography.ts
+│   │   │   ├── styles/
+│   │   │   │   ├── accessibility.css
+│   │   │   │   ├── base/
+│   │   │   │   │   ├── base.css
+│   │   │   │   │   ├── variables.css
+│   │   │   │   ├── chanuka-design-system.css
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── buttons.css
+│   │   │   │   │   ├── forms.css
+│   │   │   │   │   ├── layout.css
+│   │   │   │   │   ├── progressive-disclosure.css
+│   │   │   │   │   ├── ui.css
+│   │   │   │   ├── design-system.ts
+│   │   │   │   ├── design-tokens.css
+│   │   │   │   ├── fallbacks.css
+│   │   │   │   ├── fix-build-errors.css
+│   │   │   │   ├── generated-tokens.css
+│   │   │   │   ├── globals.css
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── MIGRATION_COMPLETE.md
+│   │   │   │   ├── MIGRATION_GUIDE.md
+│   │   │   │   ├── responsive/
+│   │   │   │   │   ├── desktop.css
+│   │   │   │   │   ├── mobile.css
+│   │   │   │   │   ├── special.css
+│   │   │   │   │   ├── tablet.css
+│   │   │   │   ├── STYLE_GUIDE.md
+│   │   │   │   ├── themes/
+│   │   │   │   ├── utilities/
+│   │   │   │   │   ├── accessibility.css
+│   │   │   │   │   ├── animations.css
 │   │   │   ├── themes/
 │   │   │   │   ├── dark.ts
 │   │   │   │   ├── high-contrast.ts
-│   │   │   │   ├── highContrast.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── light.ts
 │   │   │   │   ├── themeProvider.ts
@@ -1074,26 +1038,165 @@ client/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── shadows.ts
 │   │   │   │   ├── spacing.ts
+│   │   │   │   ├── theme.ts
 │   │   │   │   ├── typography.ts
+│   │   │   │   ├── unified.ts
 │   │   │   │   ├── unified-export.ts
 │   │   │   ├── types/
 │   │   │   │   ├── component-types.ts
+│   │   │   ├── typography/
+│   │   │   │   ├── heading.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── Label.tsx
+│   │   │   │   ├── text.tsx
 │   │   │   ├── utils/
-│   │   │   │   ├── classNames.ts
+│   │   │   │   ├── cn.ts
 │   │   │   │   ├── contrast.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── performance.ts
 │   │   │   │   ├── responsive.ts
 │   │   │   │   ├── validation.ts
 │   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── data-retention.ts
+│   │   │   ├── index.ts
+│   │   │   ├── INTEGRATION_COMPLETE.md
 │   │   ├── interfaces/
 │   │   │   ├── unified-interfaces.ts
+│   │   ├── services/
+│   │   │   ├── data-retention.ts
+│   │   │   ├── navigation.ts
 │   │   ├── testing/
 │   │   │   ├── index.ts
-│   │   │   ├── test-utilities.tsx
+│   │   │   ├── mock-data.ts
+│   │   │   ├── mock-users.ts
+│   │   ├── ui/
+│   │   │   ├── dashboard/
+│   │   │   │   ├── action-items.tsx
+│   │   │   │   ├── activity-summary.tsx
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── DashboardStats.tsx
+│   │   │   │   │   ├── TimeFilterSelector.tsx
+│   │   │   │   │   ├── WelcomeMessage.tsx
+│   │   │   │   ├── DashboardFramework.tsx
+│   │   │   │   ├── errors.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── useDashboard.ts
+│   │   │   │   │   ├── useDashboardActions.ts
+│   │   │   │   │   ├── useDashboardConfig.ts
+│   │   │   │   │   ├── useDashboardLayout.ts
+│   │   │   │   │   ├── useDashboardTopics.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── layout/
+│   │   │   │   │   ├── DashboardContent.tsx
+│   │   │   │   │   ├── DashboardFooter.tsx
+│   │   │   │   │   ├── DashboardHeader.tsx
+│   │   │   │   │   ├── DashboardSidebar.tsx
+│   │   │   │   ├── modals/
+│   │   │   │   │   ├── DashboardPreferencesModal.tsx
+│   │   │   │   │   ├── DataExportModal.tsx
+│   │   │   │   ├── MonitoringDashboard.tsx
+│   │   │   │   ├── recovery.ts
+│   │   │   │   ├── sections/
+│   │   │   │   │   ├── CivicMetricsSection.tsx
+│   │   │   │   │   ├── EngagementHistorySection.tsx
+│   │   │   │   │   ├── RecommendationsSection.tsx
+│   │   │   │   │   ├── TrackedBillsSection.tsx
+│   │   │   │   ├── SmartDashboard.tsx
+│   │   │   │   ├── tracked-topics.tsx
+│   │   │   │   ├── types.ts
+│   │   │   │   ├── UserDashboard.tsx
+│   │   │   │   ├── utils/
+│   │   │   │   │   ├── dashboard-config-utils.ts
+│   │   │   │   │   ├── dashboard-constants.ts
+│   │   │   │   │   ├── dashboard-formatters.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   ├── validation.ts
+│   │   │   │   ├── widgets/
+│   │   │   │   │   ├── DashboardGrid.tsx
+│   │   │   │   │   ├── DashboardStack.tsx
+│   │   │   │   │   ├── DashboardTabs.tsx
+│   │   │   │   │   ├── DashboardWidget.tsx
+│   │   │   │   │   ├── widget-types.ts
+│   │   │   ├── index.ts
+│   │   │   ├── layout/
+│   │   │   │   ├── Header.tsx
+│   │   │   │   ├── Layout.tsx
+│   │   │   ├── loading/
+│   │   │   │   ├── LoadingSpinner.tsx
+│   │   │   ├── mobile/
+│   │   │   │   ├── data-display/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── MobileBillCard.tsx
+│   │   │   │   │   ├── MobileChartCarousel.tsx
+│   │   │   │   │   ├── MobileDataVisualization.tsx
+│   │   │   │   │   ├── MobileTabSelector.tsx
+│   │   │   │   ├── fallbacks.tsx
+│   │   │   │   ├── feedback/
+│   │   │   │   │   ├── OfflineStatusBanner.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── interaction/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── InfiniteScroll.tsx
+│   │   │   │   │   ├── MobileBottomSheet.tsx
+│   │   │   │   │   ├── PullToRefresh.tsx
+│   │   │   │   │   ├── ScrollToTopButton.tsx
+│   │   │   │   │   ├── SwipeGestures.tsx
+│   │   │   │   ├── layout/
+│   │   │   │   │   ├── AutoHideHeader.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── MobileHeader.tsx
+│   │   │   │   │   ├── MobileLayout.tsx
+│   │   │   │   │   ├── SafeAreaWrapper.tsx
+│   │   │   │   ├── MobileNavigation.tsx
+│   │   │   │   ├── mobile-navigation-enhancements.css
+│   │   │   │   ├── README_NEW_STRUCTURE.md
+│   │   │   ├── navigation/
+│   │   │   │   ├── analytics/
+│   │   │   │   │   ├── NavigationAnalytics.tsx
+│   │   │   │   ├── constants.ts
+│   │   │   │   ├── core/
+│   │   │   │   │   ├── roleGuard.ts
+│   │   │   │   ├── errors.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── useNav.ts
+│   │   │   │   │   ├── useOptimizedNavigation.ts
+│   │   │   │   │   ├── useRelatedPages.ts
+│   │   │   │   │   ├── useRouteAccess.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── Navigation.tsx
+│   │   │   │   ├── navigation-preferences-dialog.tsx
+│   │   │   │   ├── performance/
+│   │   │   │   │   ├── NavigationPerformanceDashboard.tsx
+│   │   │   │   ├── ProgressiveDisclosureDemo.tsx
+│   │   │   │   ├── ProgressiveDisclosureNavigation.tsx
+│   │   │   │   ├── ProgressiveDisclosureSimple.tsx
+│   │   │   │   ├── quick-access-nav.tsx
+│   │   │   │   ├── recovery.ts
+│   │   │   │   ├── types.ts
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── DESKTOP_SIDEBAR_FIXES.md
+│   │   │   │   │   ├── DesktopSidebar.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── NavLink.tsx
+│   │   │   │   │   ├── NavSection.tsx
+│   │   │   │   ├── utils/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── MIGRATION_TO_CONSOLIDATED_UTILITIES.md
+│   │   │   │   │   ├── navigation-utils.ts
+│   │   │   │   │   ├── page-relationships.ts
+│   │   │   │   │   ├── route-access.ts
+│   │   │   │   ├── validation.ts
+│   │   │   ├── realtime/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── RealTimeDashboard.tsx
+│   │   │   │   ├── RealTimeNotifications.tsx
 │   │   ├── validation/
 │   │   │   ├── base-validation.ts
 │   │   │   ├── index.ts
+│   ├── SHARED_VS_CORE_ANALYSIS.md
 │   ├── store/
 │   │   ├── hooks.ts
 │   │   ├── index.ts
@@ -1118,63 +1221,36 @@ client/
 │   ├── stubs/
 │   │   ├── database-stub.ts
 │   │   ├── middleware-stub.ts
-│   ├── styles/
-│   │   ├── accessibility.css
-│   │   ├── base/
-│   │   │   ├── base.css
-│   │   │   ├── variables.css
-│   │   ├── chanuka-design-system.css
-│   │   ├── components/
-│   │   │   ├── buttons.css
-│   │   │   ├── forms.css
-│   │   │   ├── layout.css
-│   │   │   ├── progressive-disclosure.css
-│   │   │   ├── ui.css
-│   │   ├── design-system.ts
-│   │   ├── design-tokens.css
-│   │   ├── fallbacks.css
-│   │   ├── fix-build-errors.css
-│   │   ├── globals.css
-│   │   ├── MIGRATION_COMPLETE.md
-│   │   ├── MIGRATION_GUIDE.md
-│   │   ├── responsive/
-│   │   │   ├── desktop.css
-│   │   │   ├── mobile.css
-│   │   │   ├── special.css
-│   │   │   ├── tablet.css
-│   │   ├── STYLE_GUIDE.md
-│   │   ├── themes/
-│   │   │   ├── dark.css
-│   │   ├── utilities/
-│   │   │   ├── accessibility.css
-│   │   │   ├── animations.css
 │   ├── TestComponent.tsx
 │   ├── test-styles.html
-│   ├── test-utils/
-│   │   ├── comprehensive-test-config.ts
-│   │   ├── comprehensive-test-setup.tsx
-│   │   ├── index.tsx
-│   │   ├── navigation-test-utils.tsx
-│   │   ├── setup.ts
-│   │   ├── setup-a11y.ts
-│   │   ├── setup-integration.ts
-│   │   ├── setup-performance.ts
+│   ├── THEME_INCONSISTENCY_ANALYSIS.md
+│   ├── TYPE_CONSOLIDATION_COMPLETE.md
 │   ├── types/
 │   │   ├── api.ts
 │   │   ├── auth.ts
+│   │   ├── browser.ts
 │   │   ├── community.ts
 │   │   ├── conflict-of-interest.ts
 │   │   ├── constitutional.ts
+│   │   ├── core.ts
+│   │   ├── dashboard.ts
 │   │   ├── engagement-analytics.ts
 │   │   ├── expert.ts
+│   │   ├── form.ts
 │   │   ├── global.d.ts
+│   │   ├── guards.ts
+│   │   ├── index.ts
+│   │   ├── loading.ts
 │   │   ├── mobile.ts
 │   │   ├── navigation.ts
 │   │   ├── onboarding.ts
+│   │   ├── performance.ts
 │   │   ├── realtime.ts
+│   │   ├── security.ts
 │   │   ├── shims-shared.d.ts
 │   │   ├── shims-web-vitals.d.ts
 │   │   ├── user-dashboard.ts
+│   ├── update-fsd-imports.js
 │   ├── utils/
 │   │   ├── api.ts
 │   │   ├── archive/
@@ -1185,7 +1261,6 @@ client/
 │   │   │   ├── super-aggressive-suppressor.ts
 │   │   ├── assets.ts
 │   │   ├── backgroundSyncManager.ts
-│   │   ├── browser.ts
 │   │   ├── browser-logger.ts
 │   │   ├── bundle-analyzer.ts
 │   │   ├── cacheInvalidation.ts
@@ -1195,22 +1270,14 @@ client/
 │   │   ├── dev-tools.ts
 │   │   ├── emergency-triage.ts
 │   │   ├── env-config.ts
-│   │   ├── error-system-initialization.ts
-│   │   ├── EventBus.ts
 │   │   ├── i18n.ts
 │   │   ├── input-validation.ts
 │   │   ├── investor-demo-enhancements.ts
 │   │   ├── logger.ts
-│   │   ├── meta-tag-manager.ts
 │   │   ├── monitoring-init.ts
 │   │   ├── navigation-wrapper.ts
 │   │   ├── offlineAnalytics.ts
 │   │   ├── offlineDataManager.ts
-│   │   ├── performance.ts
-│   │   ├── performance-dashboard.ts
-│   │   ├── performance-init.ts
-│   │   ├── performance-monitor.ts
-│   │   ├── performance-optimizer.ts
 │   │   ├── preload-optimizer.ts
 │   │   ├── privacy-compliance.ts
 │   │   ├── rbac.ts
@@ -1298,6 +1365,80 @@ docs/
 │   ├── philosophical_threshold_poems.md
 │   ├── PRODUCTION_IMPLEMENTATION_GUIDE.md
 │   ├── strategy_template_flow.mermaid
+├── archived-scripts/
+│   ├── bill-tracking/
+│   ├── database/
+│   │   ├── migration-testing.ts
+│   │   ├── rollback-testing.ts
+│   │   ├── simple-connection-test.ts
+│   │   ├── test-connection.ts
+│   ├── financial-disclosure/
+│   │   ├── test-financial-disclosure-integration-unit.ts
+│   │   ├── test-financial-disclosure-simple.ts
+│   ├── miscellaneous/
+│   │   ├── accessibility-reporter.test.js
+│   │   ├── bug-detector.ts
+│   │   ├── run-bug-detector.ts
+│   │   ├── run-strategic-tests.cjs
+│   │   ├── schema-validation-test.ts
+│   │   ├── test-api-health.js
+│   │   ├── test-app.html
+│   │   ├── test-application.js
+│   │   ├── test-backend-only.js
+│   │   ├── test-build.js
+│   │   ├── test-comment-system.js
+│   │   ├── test-conflict-detection.ts
+│   │   ├── test-connection.html
+│   │   ├── test-financial-disclosure-integration.ts
+│   │   ├── test-imports.ts
+│   │   ├── test-minimal-server.js
+│   │   ├── test-mobile-navigation.html
+│   │   ├── test-profile-routes.ts
+│   │   ├── test-security-implementation.ts
+│   │   ├── test-security-monitoring.ts
+│   │   ├── test-security-monitoring-simple.ts
+│   │   ├── test-security-standalone.ts
+│   │   ├── test-sponsor-routes.js
+│   │   ├── test-sponsor-service.js
+│   │   ├── test-transparency-dashboard.ts
+│   │   ├── test-transparency-implementation.ts
+│   │   ├── test-user-profile-service.js
+│   │   ├── test-viewport.html
+│   │   ├── validate-user-profile.ts
+│   │   ├── verify-active-state.js
+│   │   ├── verify-alert-preferences.ts
+│   │   ├── verify-auth-system.js
+│   │   ├── verify-bill-status-monitor.ts
+│   │   ├── verify-bill-tracking.ts
+│   │   ├── verify-engagement-analytics.ts
+│   │   ├── verify-financial-disclosure-monitoring.js
+│   │   ├── verify-navigation-persistence.js
+│   │   ├── verify-notification-system.ts
+│   │   ├── verify-real-time-tracking.js
+│   │   ├── verify-transparency-task.ts
+│   │   ├── verify-user-profile-service.ts
+│   │   ├── verify-websocket-service.ts
+│   ├── README.md
+│   ├── security/
+│   │   ├── test-security-simple.cjs
+│   │   ├── test-security-simple.js
+│   ├── test-fixers/
+│   │   ├── disable-all-tests.ts
+│   │   ├── fix-failing-tests.ts
+│   │   ├── fix-navigation-tests.ts
+│   │   ├── fix-performance-tests.ts
+│   │   ├── fix-remaining-test-issues.ts
+│   │   ├── fix-schema-tests.ts
+│   │   ├── phase2-test-migration.js
+│   │   ├── test-status-summary.ts
+│   │   ├── update-test-configuration.ts
+│   │   ├── validate-test-config.js
+│   ├── transparency/
+│   │   ├── transparency-dashboard.js
+│   │   ├── transparency-dashboard-simple.js
+│   ├── user-profile/
+│   │   ├── validate-user-profile.js
+│   │   ├── validate-user-profile-static.ts
 ├── artifact-removal-summary.md
 ├── branch-analysis/
 │   ├── BRANCH_ANALYSIS_DOCUMENTATION_INDEX.md
@@ -1342,6 +1483,7 @@ docs/
 ├── Chanuka_Funding_Pitch.md
 ├── Chanuka_Platform_Complementarity_and_Accountability_Analysis.md
 ├── chanuka_requirements.txt
+├── chanuka_serpent_dove.md
 ├── CLIENT_COMPREHENSIVE_GAP_REMEDIATION.md
 ├── CLIENT_CONSOLIDATION_SUMMARY.md
 ├── CLIENT_GAP_FIXES_IMPLEMENTATION_STATUS.md
@@ -1436,6 +1578,19 @@ docs/
 ├── STORYBOOK_SETUP_GUIDE.md
 ├── structure_tools_guide.md
 ├── testing/
+│   ├── COLOCATION_VS_SEPARATION_COUNSEL.md
+│   ├── COMPONENT_TEST_COLOCATION_STRATEGY.md
+│   ├── CONSISTENCY_AND_COMPLEMENTARITY.md
+│   ├── EXECUTION_CHECKLIST.md
+│   ├── MASTER_IMPLEMENTATION_ROADMAP.md
+│   ├── MASTER_IMPLEMENTATION_TIMELINE.md
+│   ├── PARETO_PRINCIPLE_TESTING_ANALYSIS.md
+│   ├── PARETO_QUICK_REFERENCE.md
+│   ├── PHASE_4_REMEDIATION_AND_TESTING_STATUS.md
+│   ├── PHASE_4_STEP_2_COMPLETION.md
+│   ├── PHASE_4_STEP_3_COMPLETION.md
+│   ├── PHASE_4_STEP_4_IMPLEMENTATION_GUIDE.md
+│   ├── PHASE_5_INTEGRATION_ROADMAP.md
 │   ├── TEST_STATUS_SUMMARY.md
 │   ├── TESTING_ARCHITECTURE_DIAGRAM.md
 │   ├── TESTING_CONSOLIDATION_PHASE1.md
@@ -1444,6 +1599,7 @@ docs/
 │   ├── TESTING_IMPLEMENTATION_SUMMARY.md
 │   ├── TESTING_MIGRATION_CHECKLIST.md
 │   ├── TESTING_QUICK_START.md
+│   ├── UNIFIED_TESTING_REFERENCE.md
 ├── TESTING_UTILS_ANALYSIS.md
 ├── TESTING_UTILS_MIGRATION_COMPLETE.md
 ├── tests-module.md
@@ -1494,8 +1650,11 @@ logs/
 ├── logger_errors.txt
 ├── logger_files.txt
 ├── logger_files_clean.txt
+MOBILE_REDUNDANCY_CONSOLIDATION_ANALYSIS.md
+MOBILE_REDUNDANCY_DETAILED_COMPARISON.md
 nginx.conf
 nx.json
+ORPHANED_COMPONENTS_ANALYSIS.md
 package.json
 performance-baselines.json
 performance-budget-report.json
@@ -1512,7 +1671,6 @@ run_codebase_stats.bat
 runtime-dependency-check.js
 scripts/
 ├── accessibility/
-│   ├── accessibility-reporter.test.js
 ├── align-imports.ts
 ├── align-schema.ts
 ├── analyze-bundle.cjs
@@ -1544,22 +1702,18 @@ scripts/
 │   ├── init-strategic-database.ts
 │   ├── migrate.ts
 │   ├── migration-performance-profile.ts
-│   ├── migration-testing.ts
 │   ├── reset.ts
 │   ├── reset-and-migrate.ts
 │   ├── reset-database.ts
 │   ├── reset-database-fixed.ts
-│   ├── rollback-testing.ts
 │   ├── run-migrations.ts
 │   ├── run-reset.sh
 │   ├── run-reset.ts
 │   ├── schema-drift-detection.ts
 │   ├── setup.ts
 │   ├── setup-schema.ts
-│   ├── simple-connection-test.ts
 │   ├── simple-migrate.ts
 │   ├── simple-reset.ts
-│   ├── test-connection.ts
 ├── demo-repository-deployment.ts
 ├── deploy-error-handling.ts
 ├── deployment/
@@ -1570,7 +1724,6 @@ scripts/
 ├── deploy-search-optimization.ts
 ├── design-system-audit.js
 ├── diagnose-503-issues.js
-├── disable-all-tests.ts
 ├── domain-type-migration-plan.md
 ├── drop-schema.ts
 ├── dynamic-path-updater.js
@@ -1582,23 +1735,18 @@ scripts/
 ├── fix-config.json
 ├── fix-display-names.ts
 ├── fix-error-fallback.ts
-├── fix-failing-tests.ts
 ├── fix-frontend-imports.js
 ├── fix-import-paths.ts
 ├── fix-infrastructure-issues.ts
 ├── fix-lucide-imports.ts
 ├── fix-missing-exports.ts
-├── fix-navigation-tests.ts
-├── fix-performance-tests.ts
 ├── fix-plural-singular-consistency.ts
 ├── fix-property-naming-consistency.ts
 ├── fix-remaining-api-calls.js
 ├── fix-remaining-errors.ts
 ├── fix-remaining-imports.js
-├── fix-remaining-test-issues.ts
 ├── fix-schema-imports.ts
 ├── fix-schema-references.ts
-├── fix-schema-tests.ts
 ├── fix-server-logger-imports.js
 ├── fix-shared-core-imports.ts
 ├── fix-shared-imports.js
@@ -1627,10 +1775,8 @@ scripts/
 ├── performance-trend-analyzer.cjs
 ├── phase2-analyze.js
 ├── phase2-migration-generator.sh
-├── phase2-test-migration.js
 ├── rollback-cleanup.ts
 ├── run-adapter-cleanup.js
-├── run-strategic-tests.cjs
 ├── scan-migration-artifacts.sh
 ├── seeds/
 │   ├── legislative-seed.ts
@@ -1639,54 +1785,6 @@ scripts/
 ├── setup-playwright.js
 ├── standardize-imports.ts
 ├── strategic-contrast-migration.js
-├── test-backend-only.js
-├── testing/
-│   ├── bug-detector.ts
-│   ├── run-bug-detector.ts
-│   ├── services/
-│   │   ├── transparency-dashboard.js
-│   │   ├── transparency-dashboard-simple.js
-│   ├── test-api-health.js
-│   ├── test-app.html
-│   ├── test-application.js
-│   ├── test-build.js
-│   ├── test-comment-system.js
-│   ├── test-conflict-detection.ts
-│   ├── test-financial-disclosure-integration.ts
-│   ├── test-financial-disclosure-integration-unit.ts
-│   ├── test-financial-disclosure-simple.ts
-│   ├── test-minimal-server.js
-│   ├── test-mobile-navigation.html
-│   ├── test-profile-routes.ts
-│   ├── test-security-implementation.ts
-│   ├── test-security-monitoring.ts
-│   ├── test-security-monitoring-simple.ts
-│   ├── test-security-simple.cjs
-│   ├── test-security-simple.js
-│   ├── test-security-standalone.ts
-│   ├── test-sponsor-routes.js
-│   ├── test-sponsor-service.js
-│   ├── test-transparency-dashboard.ts
-│   ├── test-transparency-implementation.ts
-│   ├── test-user-profile-service.js
-│   ├── test-viewport.html
-│   ├── validate-user-profile.js
-│   ├── validate-user-profile.ts
-│   ├── validate-user-profile-static.ts
-│   ├── verify-active-state.js
-│   ├── verify-alert-preferences.ts
-│   ├── verify-auth-system.js
-│   ├── verify-bill-status-monitor.ts
-│   ├── verify-bill-tracking.ts
-│   ├── verify-engagement-analytics.ts
-│   ├── verify-financial-disclosure-monitoring.js
-│   ├── verify-navigation-persistence.js
-│   ├── verify-notification-system.ts
-│   ├── verify-real-time-tracking.js
-│   ├── verify-transparency-task.ts
-│   ├── verify-user-profile-service.ts
-│   ├── verify-websocket-service.ts
-├── test-status-summary.ts
 ├── typescript-fixer/
 │   ├── jest.config.js
 │   ├── package.json
@@ -1736,7 +1834,6 @@ scripts/
 │   ├── tsconfig.json
 ├── update-core-imports.js
 ├── update-core-references.js
-├── update-test-configuration.ts
 ├── validate_structure.ts
 ├── validate-config.js
 ├── validate-config-consistency.ts
@@ -1744,7 +1841,6 @@ scripts/
 ├── validate-new-domains.cjs
 ├── validate-property-naming.ts
 ├── validate-syntax.ts
-├── validate-test-config.js
 ├── verify-and-fix-project-structure.ts
 ├── verify-cleanup.ts
 ├── verify-project-structure.ts
@@ -2304,7 +2400,6 @@ server/
 │   ├── memory-monitor.ts
 │   ├── migration/
 │   │   ├── ab-testing.service.ts
-│   │   ├── ab-testing-service.ts
 │   │   ├── dashboard.service.ts
 │   │   ├── deployment.service.ts
 │   │   ├── deployment-monitoring-dashboard.ts
@@ -2413,7 +2508,6 @@ server/
 │   ├── managed-government-data-integration.ts
 │   ├── README-schema-validation.md
 │   ├── schema-validation-demo.ts
-│   ├── schema-validation-test.ts
 ├── simple-server.ts
 ├── tests/
 │   ├── features/
@@ -2428,7 +2522,6 @@ server/
 │   ├── utils/
 │   │   ├── logger.ts
 │   │   ├── test-helpers.ts
-├── test-setup.ts
 ├── tsconfig.json
 ├── types/
 │   ├── api.ts
@@ -2677,25 +2770,6 @@ shared/
 │   │   │   │   ├── bill-test-service.ts
 │   │   │   │   ├── notification-test-service.ts
 │   │   │   ├── validation.ts
-│   │   ├── testing/
-│   │   │   ├── ci-cd-runner.ts
-│   │   │   ├── dependency-injection-container.ts
-│   │   │   ├── dependency-validator.ts
-│   │   │   ├── example-usage.ts
-│   │   │   ├── form/
-│   │   │   │   ├── base-form-testing.ts
-│   │   │   │   ├── form-testing-utils.ts
-│   │   │   │   ├── testing-library-form-utils.ts
-│   │   │   ├── index.ts
-│   │   │   ├── integration-tests.ts
-│   │   │   ├── load-tester.ts
-│   │   │   ├── memory-leak-detector.ts
-│   │   │   ├── performance-benchmarks.ts
-│   │   │   ├── performance-monitor.ts
-│   │   │   ├── performance-regression-detector.ts
-│   │   │   ├── schema-agnostic-test-helper.ts
-│   │   │   ├── stress-tests.ts
-│   │   │   ├── test-data-factory.ts
 │   │   ├── types/
 │   │   │   ├── auth.types.ts
 │   │   │   ├── feature-flags.ts
@@ -2826,12 +2900,13 @@ shared/
 │   ├── transparency_intelligence.ts
 │   ├── universal_access.ts
 │   ├── validate-schemas.ts
-├── test-setup.ts
 ├── tsconfig.json
 start-dev.js
 tailwind.config.js
-test-connection.html
-test-imports.ts
+TESTING_ARCHITECTURE_ANALYSIS.md
+TESTING_CONSOLIDATION_ACTION_PLAN.md
+TESTING_CONSOLIDATION_COMPLETE.md
+TESTING_CONSOLIDATION_RUNBOOK.md
 test-results/
 tests/
 ├── api/
@@ -2850,8 +2925,39 @@ tests/
 ├── README.md
 ├── setup/
 │   ├── index.ts
+│   ├── modules/
+│   │   ├── client.ts
+│   │   ├── server.ts
+│   │   ├── shared.ts
 │   ├── test-environment.ts
 │   ├── vitest.ts
+├── utilities/
+│   ├── client/
+│   │   ├── comprehensive-test-config.ts
+│   │   ├── comprehensive-test-setup.tsx
+│   │   ├── index.ts
+│   │   ├── navigation-helpers.tsx
+│   │   ├── setup.ts
+│   │   ├── setup-a11y.ts
+│   │   ├── setup-integration.ts
+│   │   ├── setup-performance.ts
+│   ├── fixtures/
+│   │   ├── index.ts
+│   ├── index.ts
+│   ├── mocks/
+│   │   ├── index.ts
+│   ├── shared/
+│   │   ├── form/
+│   │   │   ├── base-form-testing.ts
+│   │   │   ├── form-testing-utils.ts
+│   │   │   ├── index.ts
+│   │   │   ├── testing-library-form-utils.ts
+│   │   ├── index.ts
+│   │   ├── integration-tests.ts
+│   │   ├── load-tester.ts
+│   │   ├── schema-agnostic-test-helper.ts
+│   │   ├── stress-tests.ts
+│   │   ├── test-data-factory.ts
 ├── utils/
 │   ├── test-helpers.ts
 ├── validation/
@@ -2888,4 +2994,4 @@ vitest.workspace.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-12-06 10:17:39
+Generated on: 2025-12-09 08:35:16

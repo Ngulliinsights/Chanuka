@@ -6,6 +6,7 @@
  */
 
 import { logger } from '../../utils/logger';
+
 import { SecureStorage } from './secure-storage';
 import { 
   CacheEntry, 
@@ -327,7 +328,7 @@ export class CacheStorageManager {
     const keysToDelete: string[] = [];
 
     // Check memory cache
-    for (const [key, entry] of this.memoryCache.entries()) {
+    for (const [key, entry] of Array.from(this.memoryCache.entries())) {
       if (entry.tags && tags.some(tag => entry.tags!.includes(tag))) {
         keysToDelete.push(key);
       }
@@ -357,7 +358,7 @@ export class CacheStorageManager {
       let deletedCount = 0;
 
       // Clean memory cache
-      for (const [key, entry] of this.memoryCache.entries()) {
+      for (const [key, entry] of Array.from(this.memoryCache.entries())) {
         let shouldDelete = false;
 
         // Remove expired entries
@@ -439,7 +440,7 @@ export class CacheStorageManager {
   getEntriesByTag(tag: string): Array<{ key: string; entry: CacheEntry }> {
     const entries: Array<{ key: string; entry: CacheEntry }> = [];
     
-    for (const [key, entry] of this.memoryCache.entries()) {
+    for (const [key, entry] of Array.from(this.memoryCache.entries())) {
       if (entry.tags?.includes(tag)) {
         entries.push({ key, entry });
       }
@@ -584,10 +585,10 @@ export class CacheStorageManager {
   }
 
   /**
-   * Cleanup method for proper shutdown
+   * Shutdown method for proper cleanup
    */
-  async cleanup(): Promise<void> {
+  async shutdown(): Promise<void> {
     this.stopCleanupTimer();
-    // Don't clear cache on cleanup, just stop the timer
+    // Don't clear cache on shutdown, just stop the timer
   }
 }

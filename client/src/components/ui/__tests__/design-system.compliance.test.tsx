@@ -19,9 +19,9 @@ import {
 } from '@client/shared/design-system/types/component-types';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button } from '@client/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@client/components/ui/card';
-import { Input } from '@client/components/ui/input';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@client/shared/design-system/primitives/card';
+import { Input } from '@client/shared/design-system/primitives/input';
 
 /**
  * Suite 1: Design Token Validation

@@ -8,10 +8,10 @@
 import { Settings, Save, TrendingUp, Target, Clock, BarChart3 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
 import { 
   Command,
   CommandDialog,
@@ -22,7 +22,7 @@ import {
   CommandItem,
   CommandShortcut,
   CommandSeparator
-} from '@/components/ui/command';
+} from '@client/shared/design-system/primitives/command';
 import { AdvancedSearchInterface } from '@/features/search/components/AdvancedSearchInterface';
 import { IntelligentAutocomplete } from '@/features/search/components/IntelligentAutocomplete';
 import { SavedSearches } from '@/features/search/components/SavedSearches';

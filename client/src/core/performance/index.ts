@@ -17,6 +17,11 @@ export {
   WebVitalsMonitor
 } from './web-vitals';
 
+// Performance monitoring
+export {
+  PerformanceMonitor
+} from './monitor';
+
 // Performance budgets
 export {
   PerformanceBudgetChecker
@@ -27,10 +32,11 @@ export {
   PerformanceAlertsManager
 } from './alerts';
 
-// Central monitoring system
-export {
-  PerformanceMonitor
-} from './monitor';
+// Import classes for the legacy export object
+import { WebVitalsMonitor } from './web-vitals';
+import { PerformanceBudgetChecker } from './budgets';
+import { PerformanceAlertsManager } from './alerts';
+import { PerformanceMonitor } from './monitor';
 
 // Convenience re-exports for common use cases
 export {
@@ -45,47 +51,54 @@ export {
   DEFAULT_PERFORMANCE_CONFIG
 } from './types';
 
-// Create singleton instances
-const performanceMonitor = PerformanceMonitor.getInstance();
-const webVitalsMonitor = performanceMonitor.getWebVitalsMonitor();
-const budgetChecker = performanceMonitor.getBudgetChecker();
-const alertsManager = performanceMonitor.getAlertsManager();
+// Lazy-loaded singleton instance to avoid initialization issues
+let performanceMonitor: PerformanceMonitor | null = null;
 
-// Export singleton instances
-export {
-  performanceMonitor,
-  webVitalsMonitor,
-  budgetChecker,
-  alertsManager
-};
+/**
+ * Gets or initializes the performance monitor singleton
+ */
+function getPerformanceMonitor(): PerformanceMonitor {
+  if (!performanceMonitor) {
+    performanceMonitor = PerformanceMonitor.getInstance();
+  }
+  return performanceMonitor;
+}
+
+// Export singleton getter
+export { getPerformanceMonitor };
 
 // Convenience functions for common operations
 export async function recordMetric(metric: PerformanceMetric): Promise<void> {
-  return performanceMonitor.recordCustomMetric(metric);
+  return getPerformanceMonitor().recordCustomMetric(metric);
 }
 
 export function getWebVitalsScores() {
-  return webVitalsMonitor.getWebVitalsScores();
+  const monitor = getPerformanceMonitor();
+  return monitor.getWebVitalsMonitor().getWebVitalsScores();
 }
 
 export function getOverallPerformanceScore(): number {
-  return webVitalsMonitor.getOverallScore();
+  const monitor = getPerformanceMonitor();
+  return monitor.getWebVitalsMonitor().getOverallScore();
 }
 
 export function getPerformanceStats(): PerformanceStats {
-  return performanceMonitor.getPerformanceStats();
+  return getPerformanceMonitor().getPerformanceStats();
 }
 
 export function getActiveAlerts(): PerformanceAlert[] {
-  return alertsManager.getActiveAlerts();
+  const monitor = getPerformanceMonitor();
+  return monitor.getAlertsManager().getActiveAlerts();
 }
 
 export function getBudgetCompliance() {
-  return budgetChecker.getComplianceStats();
+  const monitor = getPerformanceMonitor();
+  return monitor.getBudgetChecker().getComplianceStats();
 }
 
 export function checkBudget(metric: PerformanceMetric): BudgetCheckResult {
-  return budgetChecker.checkBudget(metric);
+  const monitor = getPerformanceMonitor();
+  return monitor.getBudgetChecker().checkBudget(metric);
 }
 
 export function setBudget(
@@ -94,42 +107,46 @@ export function setBudget(
   warning: number, 
   description?: string
 ): void {
-  return budgetChecker.setBudget(metric, budget, warning, description);
+  const monitor = getPerformanceMonitor();
+  return monitor.getBudgetChecker().setBudget(metric, budget, warning, description);
 }
 
 export function setAlertThreshold(metric: string, threshold: number): void {
-  return alertsManager.setThreshold(metric, threshold);
+  const monitor = getPerformanceMonitor();
+  return monitor.getAlertsManager().setThreshold(metric, threshold);
 }
 
 export function resolveAlert(alertId: string): boolean {
-  return alertsManager.resolveAlert(alertId);
+  const monitor = getPerformanceMonitor();
+  return monitor.getAlertsManager().resolveAlert(alertId);
 }
 
 export function addWebVitalsListener(listener: (metric: WebVitalsMetric) => void): void {
-  return webVitalsMonitor.addListener(listener);
+  const monitor = getPerformanceMonitor();
+  return monitor.getWebVitalsMonitor().addListener(listener);
 }
 
 export function addAlertListener(listener: (alert: PerformanceAlert) => void): void {
-  return alertsManager.addListener(listener);
+  const monitor = getPerformanceMonitor();
+  return monitor.getAlertsManager().addListener(listener);
 }
 
 export function exportPerformanceReport() {
-  return performanceMonitor.exportReport();
+  return getPerformanceMonitor().exportReport();
 }
 
 export function resetPerformanceData(): void {
-  return performanceMonitor.reset();
+  return getPerformanceMonitor().reset();
 }
 
 export function updatePerformanceConfig(config: Partial<PerformanceConfig>): void {
-  return performanceMonitor.updateConfig(config);
+  return getPerformanceMonitor().updateConfig(config);
 }
 
 export function stopPerformanceMonitoring(): void {
-  return performanceMonitor.stopMonitoring();
+  return getPerformanceMonitor().stopMonitoring();
 }
 
-// Performance measurement utilities
 export function measureAsync<T>(
   name: string,
   operation: () => Promise<T>
@@ -276,11 +293,8 @@ export const performanceUtils = {
   PerformanceBudgetChecker,
   PerformanceAlertsManager,
   
-  // Instances
-  performanceMonitor,
-  webVitalsMonitor,
-  budgetChecker,
-  alertsManager,
+  // Getter function for lazy initialization
+  getPerformanceMonitor,
   
   // Convenience functions
   recordMetric,

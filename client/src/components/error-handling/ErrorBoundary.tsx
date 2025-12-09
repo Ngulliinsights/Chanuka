@@ -8,9 +8,9 @@
 
 import { Component, ReactNode, ErrorInfo } from 'react';
 
+import { getBrowserInfo } from '@/core/browser';
 import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@/core/error';
-import { performanceMonitor } from '@/core/performance';
-import { getBrowserInfo } from '@/utils/browser';
+import { getPerformanceMonitor } from '@/core/performance';
 import { logger } from '@/utils/logger';
 import { startTrace, finishTrace } from '@/utils/tracing';
 
@@ -157,7 +157,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               component: 'ErrorBoundary',
               timestamp: Date.now(),
               browserInfo: getBrowserInfo(),
-              performanceMetrics: performanceMonitor.getPerformanceStats(),
+              performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
             },
           });
 
@@ -255,7 +255,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       recoverySuccessful: false,
       userFeedbackProvided: false,
       browserInfo: getBrowserInfo(),
-      performanceMetrics: performanceMonitor.getPerformanceStats(),
+      performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
       context: this.props.context,
     };
 
@@ -268,7 +268,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       componentStack: errorInfo.componentStack,
       context: this.props.context,
       browserInfo: getBrowserInfo(),
-      performanceMetrics: performanceMonitor.getPerformanceStats(),
+      performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
       recoveryAttempts: this.recoveryAttempts,
       hasRecoveryOptions: true,
     });

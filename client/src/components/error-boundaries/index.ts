@@ -4,10 +4,10 @@
  * This module will be removed in a future version.
  *
  * Migration Guide:
- * - ErrorBoundary -> @client/components/error-handling/ErrorBoundary
- * - withErrorBoundary -> @client/components/error-handling/withCommunityErrorBoundary
+ * - ErrorBoundary -> @client/core/error/components/ErrorBoundary
+ * - withErrorBoundary -> @client/core/error/components/withCommunityErrorBoundary
  * - useErrorHandler -> Use error handling utilities from @client/components/error-handling
- * - ErrorBoundaryProvider -> @client/components/error-handling/ErrorRecoveryManager
+ * - ErrorBoundaryProvider -> @client/core/error/components/ErrorRecoveryManager
  */
 
 // Re-export everything from the consolidated error-handling module

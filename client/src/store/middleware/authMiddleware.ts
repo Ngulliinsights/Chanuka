@@ -9,7 +9,7 @@ import { authApiService as authService } from '@client/core/api';
 import { logger } from '@client/utils/logger';
 import { rbacManager } from '@client/utils/rbac';
 import { securityMonitor } from '@client/utils/security';
-import { tokenManager } from '@client/utils/storage';
+import { tokenManager } from '@client/core/auth';
 
 import { logout, clearError } from '../slices/authSlice';
 import { setCurrentSession, recordActivity } from '../slices/sessionSlice';

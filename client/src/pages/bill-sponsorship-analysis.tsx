@@ -13,10 +13,10 @@ import {
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
 import { ImplementationWorkarounds } from '@client/features/bills/ui/implementation-workarounds';
 
 import {
@@ -26,10 +26,10 @@ import {
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
 
 import {
   useBillSponsorshipAnalysis as useSponsorshipAnalysis

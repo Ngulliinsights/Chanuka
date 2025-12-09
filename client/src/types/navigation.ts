@@ -1,3 +1,16 @@
+export interface NavigationItem {
+  id: string;
+  label: string;
+  path: string;
+  icon?: string;
+  children?: NavigationItem[];
+  permissions?: UserRole[];
+  isActive?: boolean;
+  badge?: string | number;
+  external?: boolean;
+  order?: number;
+}
+
 export interface BreadcrumbItem {
   label: string;
   path: string;

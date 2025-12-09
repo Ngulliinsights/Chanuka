@@ -1,6 +1,6 @@
 import React from 'react';
 
-import HybridDesignSystemTest from '@client/components/ui/test-components';
+import HybridDesignSystemTest from '@client/shared/design-system/primitives/test-components';
 
 /**
  * Design System Test Page

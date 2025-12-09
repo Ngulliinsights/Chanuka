@@ -13,12 +13,12 @@ import { Helmet } from 'react-helmet-async';
 
 import { GDPRComplianceManager } from '@client/components/privacy/GDPRComplianceManager';
 import { DataUsageReportDashboard } from '@client/components/privacy/DataUsageReportDashboard';
-import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
 import { Shield, FileText, Settings, Download, Eye, Lock } from 'lucide-react';
 
 export default function PrivacyCenterPage() {

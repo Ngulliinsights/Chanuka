@@ -39,7 +39,7 @@ export const typographyAccessibility = {
 } as const;
 
 // Typography utility functions
-export const typographyUtils = {
+export const accessibilityTypographyUtils = {
   /**
    * Apply font scaling based on user preference
    */
@@ -97,7 +97,7 @@ export const typographyUtils = {
     userPreference: keyof typeof typographyAccessibility.scaling = 'normal'
   ): string => {
     const baseSize = typographyAccessibility.minimumSizes[context];
-    return typographyUtils.applyFontScaling(baseSize, userPreference);
+    return accessibilityTypographyUtils.applyFontScaling(baseSize, userPreference);
   },
 } as const;
 

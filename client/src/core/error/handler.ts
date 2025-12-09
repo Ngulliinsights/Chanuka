@@ -10,6 +10,7 @@ import { ErrorAnalyticsService } from './analytics';
 import { ErrorDomain, ErrorSeverity } from './constants';
 import { ErrorRateLimiter } from './rate-limiter';
 import { ErrorReportingService } from './reporting';
+import type { ErrorReporter } from './types';
 import {
   AppError,
   ErrorContext,
@@ -36,6 +37,7 @@ class CoreErrorHandler {
   private rateLimiter: ErrorRateLimiter;
   private analytics: ErrorAnalyticsService;
   private reporting: ErrorReportingService;
+  private reporters: Set<ErrorReporter> = new Set();
   private isInitialized = false;
 
   private constructor() {
@@ -136,6 +138,11 @@ class CoreErrorHandler {
     // Report error
     this.reporting.reportError(error).catch(reportingError => {
       console.error('Error reporting failed:', reportingError);
+    });
+
+    // Send to additional reporters
+    this.reportToReporters(error).catch(reporterError => {
+      console.error('Error reporter failed:', reporterError);
     });
 
     // Notify listeners
@@ -526,6 +533,40 @@ class CoreErrorHandler {
   }
 
   /**
+   * Add an error reporter
+   */
+  addReporter(reporter: ErrorReporter): void {
+    this.reporters.add(reporter);
+  }
+
+  /**
+   * Remove an error reporter
+   */
+  removeReporter(reporter: ErrorReporter): boolean {
+    return this.reporters.delete(reporter);
+  }
+
+  /**
+   * Get all registered reporters
+   */
+  getReporters(): ErrorReporter[] {
+    return Array.from(this.reporters);
+  }
+
+  /**
+   * Report error to all registered reporters
+   */
+  private async reportToReporters(error: AppError): Promise<void> {
+    const reportPromises = Array.from(this.reporters).map(reporter =>
+      reporter.report(error).catch(reporterError => {
+        console.error('Error reporter failed:', reporterError);
+      })
+    );
+
+    await Promise.allSettled(reportPromises);
+  }
+
+  /**
    * Destroy the handler and clean up resources
    */
   destroy(): void {
@@ -540,6 +581,7 @@ class CoreErrorHandler {
     this.errors.clear();
     this.recoveryStrategies.clear();
     this.errorListeners.clear();
+    this.reporters.clear();
     this.pendingNotifications = [];
     this.isInitialized = false;
   }

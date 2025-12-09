@@ -9,33 +9,40 @@
 
 import {
   AlertCircle,
+  AlertTriangle,
+  Bookmark,
   ChevronDown,
   ChevronUp,
   Download,
+  Eye,
+  FileText,
+  Heart,
   LayoutGrid,
   LayoutList,
   Lightbulb,
+  MessageCircle,
   RefreshCw,
   Search,
+  Share2,
   Target,
+  TrendingUp,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { MobileLayout } from '@/components/mobile/layout/MobileLayout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@client/shared/design-system';
 import { copySystem } from '@/content/copy-system';
-import { useBills } from '@/features/bills/model/hooks/useBills';
-import type { Bill, BillsQueryParams } from '@/features/bills/model/types';
-import { useUserPreferences } from '@/features/users/hooks/useUserAPI';
+import { useBills } from '../model/hooks/useBills';
+import type { Bill, BillsQueryParams } from '../model/types';
+import { useUserPreferences } from '@client/core/auth';
 import { useDeviceInfo } from '@/hooks/mobile/useDeviceInfo';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -78,6 +85,14 @@ interface ExtendedFilters extends BillsQueryParams {
 interface ExtendedBill extends Bill {
   description?: string;
   sponsor_name?: string;
+  urgencyLevel?: string;
+  viewCount?: number;
+  saveCount?: number;
+  commentCount?: number;
+  shareCount?: number;
+  constitutionalFlags?: string[];
+  policyAreas?: string[];
+  introduced_date?: string;
 }
 
 // Extended response type with pagination metadata
@@ -309,6 +324,13 @@ export function BillsDashboard({
   const [sortBy, setSortBy] = useState<SortField>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [showPersonalizedHelp, setShowPersonalizedHelp] = useState(false);
+
+  // Mobile-specific state
+  const [activeTab, setActiveTab] = useState<'all' | 'urgent' | 'trending' | 'saved'>('all');
+  const [displayedBills, setDisplayedBills] = useState<ExtendedBill[]>([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Debounce the search input so we don't trigger API calls on every keystroke.
   // This improves performance and reduces unnecessary server load.
@@ -554,6 +576,109 @@ export function BillsDashboard({
   // Use our custom export hook
   const handleExport = useExportBills(bills);
 
+  // Mobile-specific bill card renderer
+  const renderMobileBillCard = (bill: ExtendedBill) => (
+    <Card
+      key={bill.id}
+      className="cursor-pointer transition-all duration-200 hover:shadow-md active:scale-[0.98] touch-manipulation"
+      onClick={() => window.location.href = `/bills/${bill.id}`}
+    >
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="text-base leading-tight line-clamp-2">
+            {bill.title}
+          </CardTitle>
+          <div className="flex flex-col gap-1 flex-shrink-0">
+            <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-800">
+              {bill.status}
+            </span>
+            {bill.urgencyLevel && bill.urgencyLevel !== 'LOW' && (
+              <span className="text-xs px-2 py-1 rounded bg-orange-100 text-orange-800">
+                {bill.urgencyLevel}
+              </span>
+            )}
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="pt-0">
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+          {bill.description || bill.title}
+        </p>
+
+        {/* Metadata row */}
+        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
+          <div className="flex items-center gap-1">
+            <Eye className="h-3 w-3" />
+            {bill.viewCount || 0}
+          </div>
+          {bill.introduced_date && (
+            <div className="flex items-center gap-1">
+              <span>{new Date(bill.introduced_date).toLocaleDateString()}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Policy areas */}
+        {bill.policyAreas && bill.policyAreas.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {bill.policyAreas.slice(0, 2).map((area) => (
+              <span key={area} className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                {area}
+              </span>
+            ))}
+            {bill.policyAreas.length > 2 && (
+              <span className="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded">
+                +{bill.policyAreas.length - 2}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Action buttons with 44px minimum touch target */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSave(bill.id || '');
+              }}
+              className="h-11 px-3 text-xs touch-manipulation"
+            >
+              <Heart className="h-4 w-4 mr-1" />
+              {bill.saveCount || 0}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleComment(bill.id || '');
+              }}
+              className="h-11 px-3 text-xs touch-manipulation"
+            >
+              <MessageCircle className="h-4 w-4 mr-1" />
+              {bill.commentCount || 0}
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleShare(bill.id || '');
+            }}
+            className="h-11 px-3 text-xs touch-manipulation"
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   // Calculate pagination metadata for display
   const currentPage = filters.page || 1;
   const pageSize = filters.pageSize || DEFAULT_PAGE_SIZE_DESKTOP;
@@ -609,7 +734,7 @@ export function BillsDashboard({
   // ============================================================================
 
   return (
-    <MobileLayout className={cn('container mx-auto px-4 py-6', className)}>
+    <div className={cn('container mx-auto px-4 py-6', className)}>
       {/* Header Section */}
       <div className="space-y-4 mb-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
@@ -721,6 +846,67 @@ export function BillsDashboard({
 
         {/* Statistics overview */}
         <StatsOverview stats={stats} />
+
+        {/* Mobile-specific tab navigation */}
+        {isMobile && (
+          <div className="bg-white border-b overflow-x-auto">
+            <div className="flex px-4 gap-2 min-w-max">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap touch-manipulation',
+                  activeTab === 'all'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-600'
+                )}
+              >
+                <FileText className="h-4 w-4" />
+                All Bills
+              </button>
+              <button
+                onClick={() => setActiveTab('urgent')}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap touch-manipulation',
+                  activeTab === 'urgent'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-600'
+                )}
+              >
+                <AlertTriangle className="h-4 w-4" />
+                Urgent
+                {stats.urgentCount > 0 && (
+                  <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                    {stats.urgentCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('trending')}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap touch-manipulation',
+                  activeTab === 'trending'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-600'
+                )}
+              >
+                <TrendingUp className="h-4 w-4" />
+                Trending
+              </button>
+              <button
+                onClick={() => setActiveTab('saved')}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap touch-manipulation',
+                  activeTab === 'saved'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-600'
+                )}
+              >
+                <Bookmark className="h-4 w-4" />
+                Saved
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Main content area with filter panel and bills grid */}
@@ -886,15 +1072,39 @@ export function BillsDashboard({
             </Card>
           ) : (
             <>
-              {/* Bills grid with virtualization */}
-              <VirtualBillGrid
-                bills={bills}
-                onSave={handleSave}
-                onShare={handleShare}
-                onComment={handleComment}
-                viewMode={viewMode}
-                isLoading={isFetching}
-              />
+              {/* Bills display - mobile vs desktop */}
+              {isMobile ? (
+                /* Mobile bills list */
+                <div className="space-y-4">
+                  {bills.map(renderMobileBillCard)}
+
+                  {/* Load more indicator for mobile */}
+                  {hasMultiplePages && (
+                    <div className="text-center py-4">
+                      <Button
+                        onClick={() => {
+                          // Load more functionality would go here
+                          console.log('Load more bills');
+                        }}
+                        variant="outline"
+                        className="touch-manipulation"
+                      >
+                        Load More Bills
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Desktop bills grid with virtualization */
+                <VirtualBillGrid
+                  bills={bills}
+                  onSave={handleSave}
+                  onShare={handleShare}
+                  onComment={handleComment}
+                  viewMode={viewMode}
+                  isLoading={isFetching}
+                />
+              )}
 
               {/* Pagination info */}
               {hasMultiplePages && (
@@ -916,6 +1126,6 @@ export function BillsDashboard({
           )}
         </div>
       </div>
-    </MobileLayout>
+    </div>
   );
 }

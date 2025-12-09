@@ -19,11 +19,7 @@ export { searchApiClient } from '../../core/api/search';
 export type * from './types';
 
 // Components
-export * from './components/SearchBar';
-export * from './components/IntelligentAutocomplete';
-export * from './components/AdvancedSearchInterface';
-export * from './components/SearchResults';
-export * from './components/SavedSearches';
+export * from './ui';
 
 // Hooks
 export * from './hooks/useSearch';

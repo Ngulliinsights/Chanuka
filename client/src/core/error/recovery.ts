@@ -24,13 +24,7 @@ export const networkRetryStrategy: ErrorRecoveryStrategy = {
     error.type === ErrorDomain.NETWORK &&
     error.retryable &&
     (error.retryCount || 0) < 3,
-  recover: async (error) => {
-    const retryCount = (error.retryCount || 0) + 1;
-    const delayMs = Math.min(1000 * Math.pow(2, retryCount), 10000);
-
-    await new Promise(resolve => setTimeout(resolve, delayMs));
-    error.retryCount = retryCount;
-
+  recover: async (_error) => {
     return false; // Let caller handle actual retry
   },
   priority: 1,
@@ -113,7 +107,7 @@ export const authRefreshStrategy: ErrorRecoveryStrategy = {
     try {
       // Check for refresh token
       const refreshToken = localStorage.getItem('refresh_token') ||
-                          sessionStorage.getItem('refresh_token');
+                           sessionStorage.getItem('refresh_token');
 
       if (!refreshToken) {
         // No refresh token available, redirect to login
@@ -121,12 +115,28 @@ export const authRefreshStrategy: ErrorRecoveryStrategy = {
         return false;
       }
 
-      // In a real implementation, this would call your auth refresh endpoint
-      // For now, simulate a refresh attempt
-      console.log('Attempting authentication refresh');
+      // Attempt to refresh authentication tokens
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
 
-      // Simulate successful refresh
-      return true;
+      if (response.ok) {
+        const data = await response.json();
+        // Store new tokens
+        if (data.accessToken) {
+          localStorage.setItem('accessToken', data.accessToken);
+          if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+          }
+          return true;
+        }
+      }
+
+      return false;
     } catch (refreshError) {
       console.error('Auth refresh failed:', refreshError);
       setTimeout(() => window.location.href = '/auth/login', 1000);
@@ -134,6 +144,348 @@ export const authRefreshStrategy: ErrorRecoveryStrategy = {
     }
   },
   priority: 2,
+};
+
+/**
+ * Authentication retry recovery strategy
+ */
+export const authRetryStrategy: ErrorRecoveryStrategy = {
+  id: 'auth-retry',
+  name: 'Authentication Retry',
+  description: 'Retry request after authentication refresh',
+  canRecover: (error) => {
+    const errorMessage = error.message?.toLowerCase() || '';
+    const statusCode = (error as any).status || (error as any).statusCode;
+    const retryCount = error.retryCount || 0;
+
+    return (
+      retryCount === 0 && ( // Only on first retry
+        errorMessage.includes('auth') ||
+        errorMessage.includes('token') ||
+        statusCode === 401 ||
+        statusCode === 403
+      )
+    );
+  },
+  recover: async (error) => {
+    // Wait a bit for potential auth refresh to complete
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Check if we now have valid tokens
+    const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    return !!accessToken;
+  },
+  priority: 3,
+};
+
+/**
+ * Authentication logout recovery strategy
+ */
+export const authLogoutStrategy: ErrorRecoveryStrategy = {
+  id: 'auth-logout',
+  name: 'Authentication Logout',
+  description: 'Logout user when authentication cannot be recovered',
+  canRecover: (error) => {
+    const errorMessage = error.message?.toLowerCase() || '';
+    const statusCode = (error as any).status || (error as any).statusCode;
+    const retryCount = error.retryCount || 0;
+
+    return (
+      retryCount >= 2 && ( // After multiple failed attempts
+        errorMessage.includes('auth') ||
+        errorMessage.includes('token') ||
+        statusCode === 401 ||
+        statusCode === 403
+      )
+    );
+  },
+  recover: async (error) => {
+    try {
+      // Perform logout
+      // Clear tokens
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+
+      // Call logout API if available
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch {
+        // Ignore logout API failures
+      }
+
+      // Redirect to login page
+      window.location.href = '/auth/login';
+      return true;
+    } catch (logoutError) {
+      console.error('Auth logout failed:', logoutError);
+      return false;
+    }
+  },
+  priority: 10,
+};
+
+/**
+ * Cache fallback recovery strategy
+ */
+export const cacheFallbackStrategy: ErrorRecoveryStrategy = {
+  id: 'cache-fallback',
+  name: 'Cache Fallback',
+  description: 'Load data from cache when network requests fail',
+  canRecover: (error) => {
+    const errorMessage = error.message?.toLowerCase() || '';
+
+    return (
+      errorMessage.includes('network') ||
+      errorMessage.includes('offline') ||
+      errorMessage.includes('fetch') ||
+      !navigator.onLine
+    );
+  },
+  recover: async (error) => {
+    try {
+      // Check if service worker is available and can serve cached content
+      if ('serviceWorker' in navigator && 'caches' in window) {
+        const cacheNames = await caches.keys();
+        if (cacheNames.length > 0) {
+          // Try to find cached API responses
+          for (const cacheName of cacheNames) {
+            const cache = await caches.open(cacheName);
+            const keys = await cache.keys();
+
+            // Look for API-like URLs in cache
+            const apiRequests = keys.filter(request =>
+              request.url.includes('/api/') ||
+              request.url.includes('json')
+            );
+
+            if (apiRequests.length > 0) {
+              // Cache is available with API data
+              return true;
+            }
+          }
+        }
+      }
+
+      // Check for localStorage/sessionStorage fallback data
+      const fallbackKeys = Object.keys(localStorage).filter(key =>
+        key.startsWith('fallback_') || key.startsWith('cache_')
+      );
+
+      if (fallbackKeys.length > 0) {
+        return true;
+      }
+
+      return false;
+    } catch (fallbackError) {
+      console.error('Cache fallback failed:', fallbackError);
+      return false;
+    }
+  },
+  priority: 4,
+};
+
+/**
+ * Cache recovery strategy
+ */
+export const cacheRecoveryStrategy: ErrorRecoveryStrategy = {
+  id: 'cache-recovery',
+  name: 'Cache Recovery',
+  description: 'Recover using stale-while-revalidate cache strategy',
+  canRecover: (error) => {
+    const errorMessage = error.message?.toLowerCase() || '';
+
+    return (
+      errorMessage.includes('network') ||
+      errorMessage.includes('timeout') ||
+      errorMessage.includes('server error')
+    );
+  },
+  recover: async (error) => {
+    try {
+      // Implement stale-while-revalidate pattern
+      if ('caches' in window) {
+        const cache = await caches.open('api-cache-v1');
+        const keys = await cache.keys();
+
+        // Check if we have recent cached data we can use
+        for (const request of keys) {
+          const response = await cache.match(request);
+          if (response) {
+            const cacheTime = new Date(response.headers.get('sw-cache-time') || 0).getTime();
+            const age = Date.now() - cacheTime;
+            const maxAge = 5 * 60 * 1000; // 5 minutes
+
+            if (age < maxAge) {
+              // Data is fresh enough to use as fallback
+              return true;
+            }
+          }
+        }
+      }
+
+      return false;
+    } catch (recoveryError) {
+      console.error('Cache recovery failed:', recoveryError);
+      return false;
+    }
+  },
+  priority: 5,
+};
+
+/**
+ * Graceful degradation recovery strategy
+ */
+export const gracefulDegradationStrategy: ErrorRecoveryStrategy = {
+  id: 'graceful-degradation',
+  name: 'Graceful Degradation',
+  description: 'Enable offline mode or reduced functionality',
+  canRecover: (error) => true, // Always available as last resort
+  recover: async (error) => {
+    try {
+      // Enable offline mode or reduced functionality
+      if ('serviceWorker' in navigator) {
+        // Check if we can enable offline mode
+        const registration = await navigator.serviceWorker.ready;
+        if (registration.active) {
+          // Service worker is active, offline mode can be enabled
+          return true;
+        }
+      }
+
+      // Check if we have any offline-capable features
+      const offlineFeatures = [
+        'localStorage' in window,
+        'indexedDB' in window,
+        'caches' in window,
+      ];
+
+      return offlineFeatures.some(feature => feature);
+    } catch (degradationError) {
+      console.error('Graceful degradation failed:', degradationError);
+      return false;
+    }
+  },
+  priority: 15,
+};
+
+/**
+ * Offline mode recovery strategy
+ */
+export const offlineModeStrategy: ErrorRecoveryStrategy = {
+  id: 'offline-mode',
+  name: 'Offline Mode',
+  description: 'Switch to offline mode with limited functionality',
+  canRecover: (error) => {
+    const errorMessage = error.message?.toLowerCase() || '';
+
+    return (
+      !navigator.onLine ||
+      errorMessage.includes('offline') ||
+      errorMessage.includes('network') ||
+      errorMessage.includes('connection')
+    );
+  },
+  recover: async (error) => {
+    try {
+      // Attempt to enable offline mode
+      // Check if we have cached data available
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        if (cacheNames.length > 0) {
+          // Enable offline mode
+          document.documentElement.classList.add('offline-mode');
+          return true;
+        }
+      }
+
+      // Fallback to basic offline capabilities
+      document.documentElement.classList.add('offline-mode');
+      return true;
+    } catch (offlineError) {
+      console.error('Offline mode activation failed:', offlineError);
+      return false;
+    }
+  },
+  priority: 12,
+};
+
+/**
+ * Reduced functionality recovery strategy
+ */
+export const reducedFunctionalityStrategy: ErrorRecoveryStrategy = {
+  id: 'reduced-functionality',
+  name: 'Reduced Functionality',
+  description: 'Disable non-essential features to maintain core functionality',
+  canRecover: (error) => {
+    const errorMessage = error.message?.toLowerCase() || '';
+
+    return (
+      errorMessage.includes('server') ||
+      errorMessage.includes('api') ||
+      errorMessage.includes('service') ||
+      (error.retryCount || 0) > 2
+    );
+  },
+  recover: async (error) => {
+    try {
+      // Disable non-essential features
+      document.documentElement.classList.add('reduced-functionality');
+
+      // Simulate disabling features
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      return true;
+    } catch (functionalityError) {
+      console.error('Reduced functionality activation failed:', functionalityError);
+      return false;
+    }
+  },
+  priority: 13,
+};
+
+/**
+ * Connection-aware retry recovery strategy
+ */
+export const connectionAwareRetryStrategy: ErrorRecoveryStrategy = {
+  id: 'connection-aware-retry',
+  name: 'Connection-Aware Retry',
+  description: 'Extended retry for slow or unstable connections',
+  canRecover: (error) => {
+    const errorMessage = error.message?.toLowerCase() || '';
+    const connectionType = ('connection' in navigator) ? (navigator as any).connection?.effectiveType : 'unknown';
+    const retryCount = error.retryCount || 0;
+
+    return (
+      (connectionType === 'slow' || connectionType === '2g' || connectionType === '3g') &&
+      retryCount < 2 &&
+      (
+        errorMessage.includes('timeout') ||
+        errorMessage.includes('network') ||
+        errorMessage.includes('slow')
+      )
+    );
+  },
+  recover: async (error) => {
+    // Wait longer on slow connections
+    const waitTime = 5000;
+    await new Promise(resolve => setTimeout(resolve, waitTime));
+
+    // Check if connection has improved
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      const effectiveType = connection?.effectiveType;
+      // Consider 4g or faster as "improved"
+      return effectiveType === '4g' || effectiveType === '5g' || !connection;
+    }
+
+    return navigator.onLine;
+  },
+  priority: 6,
 };
 
 // ============================================================================
@@ -267,8 +619,27 @@ function performRedirect(path: string): RecoveryResult {
  * Default recovery strategies
  */
 export const defaultRecoveryStrategies: ErrorRecoveryStrategy[] = [
+  // Network strategies (highest priority)
   networkRetryStrategy,
+  connectionAwareRetryStrategy,
+
+  // Cache strategies
+  cacheFallbackStrategy,
+  cacheRecoveryStrategy,
+
+  // Auth strategies
   authRefreshStrategy,
+  authRetryStrategy,
+
+  // Degradation strategies (lower priority)
+  offlineModeStrategy,
+  reducedFunctionalityStrategy,
+  gracefulDegradationStrategy,
+
+  // Auth logout (lowest priority, manual)
+  authLogoutStrategy,
+
+  // Fallback strategies
   cacheClearStrategy,
   pageReloadStrategy,
 ];

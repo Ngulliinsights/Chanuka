@@ -16,11 +16,11 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Progress } from '@client/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Progress } from '@client/shared/design-system/primitives/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
 import { logger } from '@client/utils/logger';
 
 interface MethodologyProps { bill_id?: string;

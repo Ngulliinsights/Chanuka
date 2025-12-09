@@ -12,7 +12,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 import { PerformanceDashboard } from '@client/components/performance/PerformanceDashboard';
-import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
+import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
 
 export default function PerformanceDashboardPage() {
   return (

@@ -3,12 +3,12 @@
  * Feature-Sliced Design - API Layer for Bills Feature
  */
 
+import type { Bill, Sponsor } from '@client/types';
+
 import { globalApiClient } from '@client/core/api/client';
 import { globalErrorHandler } from '@client/core/api/errors';
 import { mockBills, mockBillsStats } from '@client/data/mock/bills';
 import { logger } from '@client/utils/logger';
-
-import type { Bill, Sponsor, BillsQueryParams } from '../model/types';
 
 // API-specific types
 export interface BillsSearchParams {
@@ -77,7 +77,7 @@ export interface BillsStats {
   lastUpdated: string;
 }
 
-interface BillAnalysis {
+export interface BillAnalysis {
   billId: number;
   summary: string;
   impactAssessment: string;
@@ -86,7 +86,7 @@ interface BillAnalysis {
   keyPoints: string[];
 }
 
-interface BillCommentsResponse {
+export interface BillCommentsResponse {
   comments: BillComment[];
   pagination: {
     page: number;
@@ -96,11 +96,84 @@ interface BillCommentsResponse {
   };
 }
 
+export interface BillPollResponse {
+  id: number;
+  billId: number;
+  question: string;
+  options: string[];
+  section?: string;
+  createdAt: string;
+}
+
+export interface SponsorshipAnalysis {
+  billId: number;
+  totalSponsors: number;
+  partisanBalance: {
+    majority: string;
+    minority: string;
+  };
+  geographicDistribution: Record<string, number>;
+  analysisDate: string;
+}
+
+export interface PrimarySponsorAnalysis {
+  billId: number;
+  sponsor: Sponsor;
+  legislativeHistory: {
+    billsSponsored: number;
+    billsPassed: number;
+    successRate: number;
+  };
+  policyFocus: string[];
+}
+
+export interface CoSponsorsAnalysis {
+  billId: number;
+  coSponsors: Sponsor[];
+  bipartisanScore: number;
+  influentialMembers: Sponsor[];
+}
+
+export interface FinancialNetworkAnalysis {
+  billId: number;
+  topDonors: Array<{
+    name: string;
+    amount: number;
+    industry: string;
+  }>;
+  industryBreakdown: Record<string, number>;
+  potentialConflicts: string[];
+}
+
+// Type for mock bill structure to ensure type safety when transforming
+interface MockBill {
+  id: number;
+  title: string;
+  summary: string;
+  status: string;
+  billNumber: string;
+  introducedDate: string;
+  lastUpdated: string;
+  urgencyLevel: string;
+  policyAreas: string[];
+  constitutionalFlags: string[];
+  viewCount: number;
+  commentCount: number;
+  shareCount: number;
+  sponsors?: Array<{
+    id: number;
+    name: string;
+    party: string;
+    district: string;
+    position: string;
+  }>;
+}
+
 export class BillsApiService {
   private readonly defaultTimeout = 10000;
   private readonly defaultCacheTTL = 5 * 60 * 1000; // 5 minutes
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Retrieves paginated bills with comprehensive filtering capabilities.
@@ -205,11 +278,14 @@ export class BillsApiService {
       // Fallback to mock data - transform to model Bill type
       const mockBill = mockBills.find(bill => bill.id === id);
       if (mockBill) {
-        return this.transformMockBillToModelBill(mockBill);
+        return this.transformMockBillToModelBill(mockBill as unknown as MockBill);
       }
 
       // If specific bill not found, return first mock bill with updated ID
-      const fallbackBill = this.transformMockBillToModelBill({ ...mockBills[0], id });
+      const fallbackBill = this.transformMockBillToModelBill({
+        ...(mockBills[0] as unknown as MockBill),
+        id
+      });
       return fallbackBill;
     }
   }
@@ -276,7 +352,7 @@ export class BillsApiService {
    * Records user engagement metrics (views, saves, shares) to track
    * bill popularity and help surface relevant content to other users.
    */
-  async recordEngagement(billId: number, type: 'view' | 'save' | 'share'): Promise<BillEngagementData> {
+  async recordEngagement(billId: number, type: 'view' | 'save' | 'share'): Promise<BillEngagementData | null> {
     try {
       const response = await globalApiClient.post<BillEngagementData>(
         `/api/bills/${billId}/engagement`,
@@ -295,7 +371,7 @@ export class BillsApiService {
     } catch (error) {
       // Log but don't throw - engagement tracking shouldn't break user experience
       logger.warn('Failed to record engagement', { component: 'BillsApiService', billId, type, error });
-      return null as any;
+      return null;
     }
   }
 
@@ -410,9 +486,9 @@ export class BillsApiService {
   /**
    * Creates a poll for a bill discussion.
    */
-  async createBillPoll(billId: number, question: string, options: string[], section?: string): Promise<any> {
+  async createBillPoll(billId: number, question: string, options: string[], section?: string): Promise<BillPollResponse> {
     try {
-      const response = await globalApiClient.post(`/api/bills/${billId}/polls`, {
+      const response = await globalApiClient.post<BillPollResponse>(`/api/bills/${billId}/polls`, {
         question,
         options,
         section
@@ -424,7 +500,7 @@ export class BillsApiService {
       logger.info('Poll created successfully', {
         component: 'BillsApiService',
         billId,
-        pollId: (response.data as any)?.id
+        pollId: response.data.id
       });
 
       return response.data;
@@ -437,9 +513,9 @@ export class BillsApiService {
   /**
    * Fetches sponsorship analysis for a bill.
    */
-  async getBillSponsorshipAnalysis(billId: number): Promise<any> {
+  async getBillSponsorshipAnalysis(billId: number): Promise<SponsorshipAnalysis> {
     try {
-      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/analysis`, {
+      const response = await globalApiClient.get<SponsorshipAnalysis>(`/api/sponsorship/bills/${billId}/analysis`, {
         timeout: this.defaultTimeout,
         cacheTTL: 30 * 60 * 1000
       });
@@ -453,9 +529,9 @@ export class BillsApiService {
   /**
    * Fetches primary sponsor analysis for a bill.
    */
-  async getBillPrimarySponsorAnalysis(billId: number): Promise<any> {
+  async getBillPrimarySponsorAnalysis(billId: number): Promise<PrimarySponsorAnalysis> {
     try {
-      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/primary-sponsor`, {
+      const response = await globalApiClient.get<PrimarySponsorAnalysis>(`/api/sponsorship/bills/${billId}/primary-sponsor`, {
         timeout: this.defaultTimeout,
         cacheTTL: 30 * 60 * 1000
       });
@@ -469,9 +545,9 @@ export class BillsApiService {
   /**
    * Fetches co-sponsors analysis for a bill.
    */
-  async getBillCoSponsorsAnalysis(billId: number): Promise<any> {
+  async getBillCoSponsorsAnalysis(billId: number): Promise<CoSponsorsAnalysis> {
     try {
-      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/co-sponsors`, {
+      const response = await globalApiClient.get<CoSponsorsAnalysis>(`/api/sponsorship/bills/${billId}/co-sponsors`, {
         timeout: this.defaultTimeout,
         cacheTTL: 30 * 60 * 1000
       });
@@ -485,9 +561,9 @@ export class BillsApiService {
   /**
    * Fetches financial network analysis for a bill.
    */
-  async getBillFinancialNetworkAnalysis(billId: number): Promise<any> {
+  async getBillFinancialNetworkAnalysis(billId: number): Promise<FinancialNetworkAnalysis> {
     try {
-      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/financial-network`, {
+      const response = await globalApiClient.get<FinancialNetworkAnalysis>(`/api/sponsorship/bills/${billId}/financial-network`, {
         timeout: this.defaultTimeout,
         cacheTTL: 30 * 60 * 1000
       });
@@ -499,9 +575,10 @@ export class BillsApiService {
   }
 
   /**
-   * Transform mock bill data to model Bill type
+   * Transform mock bill data to model Bill type.
+   * This ensures compatibility between our mock data structure and the production Bill type.
    */
-  private transformMockBillToModelBill(mockBill: any): Bill {
+  private transformMockBillToModelBill(mockBill: MockBill): Bill {
     return {
       id: mockBill.id.toString(),
       title: mockBill.title,
@@ -510,7 +587,7 @@ export class BillsApiService {
       category: mockBill.policyAreas?.[0] || 'General',
       introduced_date: mockBill.introducedDate,
       last_action_date: mockBill.lastUpdated,
-      sponsors: mockBill.sponsors?.map((s: any) => ({
+      sponsors: mockBill.sponsors?.map((s) => ({
         id: s.id.toString(),
         name: s.name,
         party: s.party,
@@ -525,7 +602,6 @@ export class BillsApiService {
         views: mockBill.viewCount || 0,
         shares: mockBill.shareCount || 0,
         comments: mockBill.commentCount || 0,
-        bookmarks: 0,
         last_engaged_at: mockBill.lastUpdated
       }
     };
@@ -533,12 +609,12 @@ export class BillsApiService {
 
   /**
    * Provides mock data response when server is unavailable.
-   * Applies basic filtering and pagination to mock data.
+   * Applies basic filtering and pagination to mock data to simulate real API behavior.
    */
   private getMockBillsResponse(params: BillsSearchParams): PaginatedBillsResponse {
-    let filteredBills = [...mockBills];
+    let filteredBills = [...mockBills] as unknown as MockBill[];
 
-    // Apply basic filtering
+    // Apply basic filtering - each filter narrows down the results
     if (params.status?.length) {
       filteredBills = filteredBills.filter(bill =>
         params.status!.includes(bill.status)
@@ -553,7 +629,7 @@ export class BillsApiService {
 
     if (params.policyAreas?.length) {
       filteredBills = filteredBills.filter(bill =>
-        bill.policyAreas.some(area => params.policyAreas!.includes(area))
+        bill.policyAreas.some((area: string) => params.policyAreas!.includes(area))
       );
     }
 
@@ -572,29 +648,33 @@ export class BillsApiService {
       );
     }
 
-    // Apply sorting
+    // Apply sorting based on the specified criteria
     const sortBy = params.sortBy || 'date';
     const sortOrder = params.sortOrder || 'desc';
 
     filteredBills.sort((a, b) => {
       let comparison = 0;
 
+      // Each case calculates a numeric comparison between two bills
       switch (sortBy) {
-        case 'date':
+        case 'date': {
           comparison = new Date(a.lastUpdated).getTime() - new Date(b.lastUpdated).getTime();
           break;
-        case 'title':
+        }
+        case 'title': {
           comparison = a.title.localeCompare(b.title);
           break;
-        case 'urgency':
-          const urgencyOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1 };
-          comparison = (urgencyOrder[a.urgencyLevel as keyof typeof urgencyOrder] || 0) -
-                      (urgencyOrder[b.urgencyLevel as keyof typeof urgencyOrder] || 0);
+        }
+        case 'urgency': {
+          const urgencyOrder: Record<string, number> = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1 };
+          comparison = (urgencyOrder[a.urgencyLevel] || 0) - (urgencyOrder[b.urgencyLevel] || 0);
           break;
-        case 'engagement':
+        }
+        case 'engagement': {
           comparison = (a.viewCount + a.commentCount + a.shareCount) -
-                      (b.viewCount + b.commentCount + b.shareCount);
+            (b.viewCount + b.commentCount + b.shareCount);
           break;
+        }
         default:
           comparison = 0;
       }
@@ -602,7 +682,7 @@ export class BillsApiService {
       return sortOrder === 'desc' ? -comparison : comparison;
     });
 
-    // Apply pagination
+    // Apply pagination to simulate chunked data retrieval
     const page = params.page || 1;
     const limit = params.limit || 12;
     const startIndex = (page - 1) * limit;
@@ -627,9 +707,9 @@ export class BillsApiService {
 
   /**
    * Centralized error handling that uses the global error handler
-   * and enriches errors with context information.
+   * and enriches errors with context information for better debugging.
    */
-  private async handleError(error: any, operation: string, context?: Record<string, any>): Promise<Error> {
+  private async handleError(error: unknown, operation: string, context?: Record<string, unknown>): Promise<Error> {
     await globalErrorHandler.handleError(error as Error, {
       component: 'BillsApiService',
       operation,

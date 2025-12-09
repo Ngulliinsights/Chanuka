@@ -1,50 +1,35 @@
 /**
  * Unified Community Types
- * 
+ *
  * Single source of truth for all community and discussion types,
  * resolving conflicts identified in discussion_community_integration_analysis.md
  */
+
+import { Comment, CommentStatus } from '../../../types/core';
 
 // ============================================================================
 // UNIFIED COMMENT INTERFACE (resolves duplicate definitions)
 // ============================================================================
 
-export interface UnifiedComment {
-  id: string;
-  billId: number;           // Standardized to camelCase (was bill_id in some places)
-  parentId?: string;
-  authorId: string;
-  authorName: string;
-  authorAvatar?: string;
-  content: string;          // Standardized field name (was 'body' in some places)
-  createdAt: string;
-  updatedAt: string;
-  editedAt?: string;
-  
+export interface UnifiedComment extends Comment {
   // Threading support
   threadId?: string;
   depth: number;
   childCount: number;
-  
+
   // Engagement metrics
-  upvotes: number;
-  downvotes: number;
   score: number;
   userVote?: 'up' | 'down';
-  
+
   // Moderation
   isModerated: boolean;
   moderationReason?: string;
   isReported: boolean;
   reportCount: number;
-  
+
   // Quality metrics
-  qualityScore: number;
   isExpertVerified: boolean;
   hasSourceLinks: boolean;
-  
-  // Status
-  status: 'active' | 'hidden' | 'deleted' | 'pending_moderation';
 }
 
 // ============================================================================
@@ -53,7 +38,7 @@ export interface UnifiedComment {
 
 export interface UnifiedThread {
   id: string;
-  billId: number;
+  billId: string;
   title: string;
   description?: string;
   
@@ -138,7 +123,7 @@ export interface CommunityState {
 }
 
 export interface DiscussionState {
-  currentBillId?: number;
+  currentBillId?: string;
   currentThreadId?: string;
   selectedCommentId?: string;
   sortBy: 'newest' | 'oldest' | 'score' | 'quality';
@@ -153,7 +138,7 @@ export interface DiscussionState {
 // ============================================================================
 
 export interface CreateCommentRequest {
-  billId: number;           // Consistent camelCase
+  billId: string;           // Consistent camelCase
   content: string;
   parentId?: string;
   threadId?: string;
@@ -165,7 +150,7 @@ export interface UpdateCommentRequest {
 }
 
 export interface CreateThreadRequest {
-  billId: number;
+  billId: string;
   title: string;
   description?: string;
   category: UnifiedThread['category'];

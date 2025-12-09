@@ -9,7 +9,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
 import { authApiService } from '@client/core/api';
-import { SessionInfo } from '@client/types/auth';
+import { SessionInfo } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 // ============================================================================

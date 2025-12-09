@@ -11,14 +11,14 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
-import { EngagementDashboard } from '@client/components/analytics/engagement-dashboard';
-import { JourneyAnalyticsDashboard } from '@client/components/analytics/JourneyAnalyticsDashboard';
-import { RealTimeEngagementDashboard } from '@client/components/analytics/real-time-engagement-dashboard';
-import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
+import { EngagementDashboard } from '@client/features/analytics/ui/engagement-dashboard';
+import { JourneyAnalyticsDashboard } from '@client/features/analytics/ui/JourneyAnalyticsDashboard';
+import { RealTimeEngagementDashboard } from '@client/features/analytics/ui/real-time-engagement-dashboard';
+import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
 import { 
   BarChart3, 
   TrendingUp, 

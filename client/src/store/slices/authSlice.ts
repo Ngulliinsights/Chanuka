@@ -11,7 +11,7 @@ import { createSelector } from 'reselect';
 
 import { authApiService as authService } from '@client/core/api';
 import { LoginCredentials } from '@client/core/api/auth';
-import { User, RegisterData } from '@client/types/auth';
+import { User, RegisterData } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 export interface AuthState {

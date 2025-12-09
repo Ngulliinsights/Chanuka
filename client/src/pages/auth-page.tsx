@@ -10,17 +10,17 @@ import { AlertTriangle, CheckCircle, ArrowLeft, Shield, Mail } from 'lucide-reac
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { RegisterForm } from '@client/components/auth/ui/RegisterForm';
-import { LoginForm } from '@client/components/shared/auth/forms';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Button } from '@client/components/ui/button';
+import { RegisterForm } from '@client/features/users/ui/auth/ui/RegisterForm';
+import { LoginForm } from '@client/features/users/ui/auth/forms';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
+import { Button } from '@client/shared/design-system/primitives/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/components/ui/card';
+} from '@client/shared/design-system/primitives/card';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { logger } from '@client/utils/logger';
 

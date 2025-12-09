@@ -1,3 +1,5 @@
+import { Comment } from './core';
+
 export interface VoteRequest {
   vote: boolean;
 }
@@ -50,39 +52,23 @@ export interface LocalImpactMetrics {
   changes: Record<string, number>;
 }
 
-export interface Comment {
-  id: string;
-  billId: number;
-  parentId?: string;
-  authorId: string;
-  authorName: string;
-  authorAvatar?: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  editedAt?: string;
-  
+export interface CommunityComment extends Comment {
   // Voting system
-  upvotes: number;
-  downvotes: number;
   userVote?: 'up' | 'down' | null;
-  
+
   // Threading
-  replies: Comment[];
+  replies: CommunityComment[];
   replyCount: number;
   depth: number;
-  
+
   // Moderation
-  status: 'active' | 'hidden' | 'removed' | 'under_review';
   moderationFlags: ModerationFlag[];
   reportCount: number;
-  
+
   // Quality metrics
-  qualityScore: number;
   isHighQuality: boolean;
-  
+
   // Expert verification
-  isExpertComment: boolean;
   expertVerification?: {
     type: 'official' | 'domain' | 'identity';
     credibilityScore: number;
@@ -132,35 +118,35 @@ export interface ModerationFlag {
 export interface TypingIndicator {
   userId: string;
   userName: string;
-  billId: number;
+  billId: string;
   parentId?: string;
   timestamp: string;
 }
 
 export interface DiscussionThread {
   id: number;
-  billId: number;
+  billId: string;
   title?: string;
   description?: string;
   createdAt: string;
   updatedAt: string;
-  
+
   // Comments and engagement
-  comments: Comment[];
+  comments: CommunityComment[];
   totalComments: number;
   participantCount: number;
-  
+
   // Moderation
   isLocked: boolean;
   lockReason?: string;
   lockedBy?: string;
   lockedAt?: string;
-  
+
   // Quality metrics
   engagementScore: number;
   qualityScore: number;
   expertParticipation: number;
-  
+
   // Real-time updates
   lastActivity: string;
   activeUsers: string[];
@@ -181,7 +167,7 @@ export interface TrendingAlgorithmConfig {
 export interface CommentFormData {
   content: string;
   parentId?: string;
-  billId: number;
+  billId: string;
 }
 
 export interface CommentValidation {
@@ -214,9 +200,9 @@ export type ModerationViolationType =
 // Real-time events for WebSocket integration
 export interface CommentUpdateEvent {
   type: 'comment_added' | 'comment_updated' | 'comment_removed' | 'comment_voted';
-  billId: number;
+  billId: string;
   commentId: string;
-  comment?: Comment;
+  comment?: CommunityComment;
   userId?: string;
   timestamp: string;
 }
@@ -318,4 +304,4 @@ export type CommunityEntity =
   | Campaign
   | Petition
   | DiscussionThread
-  | Comment;
+  | CommunityComment;

@@ -885,7 +885,7 @@ export const globalApiClient = new UnifiedApiClientImpl({
 globalApiClient.addResponseInterceptor(new LoggingResponseInterceptor());
 
 // Initialize auth service with the API client to break circular dependency
-import { createAuthApiService } from './auth';
+import { createAuthApiService } from '../auth'; // Use consolidated auth system
 import { globalCache, CacheKeyGenerator } from './cache';
 import { globalConfig } from './config';
 export const authApiService = createAuthApiService(globalApiClient);

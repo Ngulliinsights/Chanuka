@@ -12,22 +12,22 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import CommunityHub from '@client/components/community/CommunityHub';
-import { ActivityFeed } from '@client/components/community/ActivityFeed';
-import { TrendingTopics } from '@client/components/community/TrendingTopics';
-import { ExpertInsights } from '@client/components/community/ExpertInsights';
-import { ActionCenter } from '@client/components/community/ActionCenter';
-import { CommunityFilters } from '@client/components/community/CommunityFilters';
-import { LocalImpactPanel } from '@client/components/community/LocalImpactPanel';
-import { CommunityStats } from '@client/components/community/CommunityStats';
-import AppLayout from '@client/components/layout/app-layout';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Input } from '@client/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Textarea } from '@client/components/ui/textarea';
+import CommunityHub from '@client/features/community/ui/CommunityHub';
+import { ActivityFeed } from '@client/features/community/ui/ActivityFeed';
+import { TrendingTopics } from '@client/features/community/ui/TrendingTopics';
+import { ExpertInsights } from '@client/features/community/ui/ExpertInsights';
+import { ActionCenter } from '@client/features/community/ui/ActionCenter';
+import { CommunityFilters } from '@client/features/community/ui/CommunityFilters';
+import { LocalImpactPanel } from '@client/features/community/ui/LocalImpactPanel';
+import { CommunityStats } from '@client/features/community/ui/CommunityStats';
+import AppLayout from '@client/shared/ui/layout/app-layout';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Input } from '@client/shared/design-system/primitives/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Textarea } from '@client/shared/design-system/primitives/textarea';
 
 interface Announcement {
   id: string;

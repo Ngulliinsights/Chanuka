@@ -15,10 +15,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
 import { ExpertBadge, ExpertBadgeGroup } from '@client/components/verification/ExpertBadge';
 import { ExpertVerificationDemo } from '@client/components/verification/ExpertVerificationDemo';
 import { VerificationWorkflow } from '@client/components/verification/VerificationWorkflow';

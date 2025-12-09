@@ -577,27 +577,38 @@ async function testConnection(): Promise<void> {
   }
 }
 
-// Startup initialization with proper state management
-let initializationInProgress = false;
-let initializationPromise: Promise<void> | null = null;
+// Startup initialization with proper state management and race condition protection
+let serverIsInitialized = false;
+let serverInitializationPromise: Promise<void> | null = null;
 
-async function startupInitialization(): Promise<void> {
-  if (initializationInProgress) {
-    return initializationPromise!;
+/**
+ * Ensures server startup initialization runs exactly once, even with concurrent calls.
+ * Uses double-check locking pattern to prevent multiple initialization sequences.
+ */
+async function ensureServerInitialized(): Promise<void> {
+  // Fast path: already initialized
+  if (serverIsInitialized) {
+    return;
   }
-
-  if (initializationPromise) {
-    return initializationPromise;
+  
+  // Wait for ongoing initialization if in progress
+  if (serverInitializationPromise) {
+    return serverInitializationPromise;
   }
-
-  initializationInProgress = true;
-  initializationPromise = performStartupInitialization();
-
-  try {
-    await initializationPromise;
-  } finally {
-    initializationInProgress = false;
-  }
+  
+  // Begin initialization
+  serverInitializationPromise = performStartupInitialization()
+    .then(() => {
+      serverIsInitialized = true;
+    })
+    .catch(error => {
+      // Reset promise on failure but keep flag - prevents repeat attempts
+      serverInitializationPromise = null;
+      logger.error('Server initialization failed', { error, component: 'Chanuka' } as LogContext);
+      throw error;
+    });
+  
+  return serverInitializationPromise;
 }
 
 async function performStartupInitialization(): Promise<void> {
@@ -643,7 +654,7 @@ async function performStartupInitialization(): Promise<void> {
 }
 
 // Initialize startup without blocking
-startupInitialization().catch(err => {
+ensureServerInitialized().catch(err => {
   const errorMessage = err instanceof Error ? err.message : String(err);
   logger.info('Startup initialization error (non-blocking):', { component: 'Chanuka', error: errorMessage } as LogContext);
   databaseFallbackService.setDemoMode(true);

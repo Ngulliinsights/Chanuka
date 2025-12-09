@@ -1,0 +1,332 @@
+/**
+ * Saved Searches Component
+ *
+ * Manages saved searches with email alert configuration and execution.
+ */
+
+import { format } from 'date-fns';
+import {
+  Search,
+  Star,
+  Play,
+  Trash2,
+  Bell,
+  BellOff
+} from 'lucide-react';
+import { useState } from 'react';
+
+import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@client/shared/design-system/interactive/Dialog';
+import { Label } from '@client/shared/design-system/primitives/typography/Label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system/primitives/select';
+import { Separator } from '@client/shared/design-system/primitives/separator';
+import { Switch } from '@client/shared/design-system/primitives/switch';
+import { useToast } from '../../../hooks/use-toast';
+
+import { useSavedSearches } from '../hooks/useSearch';
+import { intelligentSearch } from '../services/intelligent-search';
+import type { SavedSearch } from '../types';
+
+interface SavedSearchesProps {
+  onExecuteSearch?: (search: SavedSearch) => void;
+  className?: string;
+}
+
+interface EmailAlertConfig {
+  enabled: boolean;
+  frequency: 'immediate' | 'daily' | 'weekly';
+  threshold: number;
+}
+
+export function SavedSearches({
+  onExecuteSearch,
+  className = ''
+}: SavedSearchesProps) {
+  const [selectedSearch, setSelectedSearch] = useState<SavedSearch | null>(null);
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<EmailAlertConfig>({
+    enabled: false,
+    frequency: 'daily',
+    threshold: 1
+  });
+
+  const { toast } = useToast();
+  const { savedSearches, deleteSavedSearch, executeSavedSearch } = useSavedSearches();
+
+  const handleExecuteSearch = async (search: SavedSearch) => {
+    try {
+      if (onExecuteSearch) {
+        onExecuteSearch(search);
+      } else {
+        await executeSavedSearch.mutateAsync(search.id);
+      }
+
+      toast({
+        title: "Search Executed",
+        description: `"${search.name}" search has been executed.`
+      });
+    } catch (error) {
+      toast({
+        title: "Execution Failed",
+        description: "Failed to execute saved search.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteSearch = async (search: SavedSearch) => {
+    try {
+      await deleteSavedSearch.mutateAsync(search.id);
+    } catch (error) {
+      // Error handling is done in the hook
+    }
+  };
+
+  const handleConfigureAlerts = (search: SavedSearch) => {
+    setSelectedSearch(search);
+    // Load existing alert config if available
+    setAlertConfig({
+      enabled: search.emailAlerts?.enabled || false,
+      frequency: search.emailAlerts?.frequency || 'daily',
+      threshold: search.emailAlerts?.threshold || 1
+    });
+    setAlertDialogOpen(true);
+  };
+
+  const handleSaveAlertConfig = async () => {
+    if (!selectedSearch) return;
+
+    try {
+      await intelligentSearch.saveSearchWithAlerts({
+        name: selectedSearch.name,
+        query: selectedSearch.query,
+        emailAlerts: alertConfig,
+        isPublic: selectedSearch.is_public
+      });
+
+      toast({
+        title: "Alert Settings Saved",
+        description: `Email alerts ${alertConfig.enabled ? 'enabled' : 'disabled'} for "${selectedSearch.name}".`
+      });
+
+      setAlertDialogOpen(false);
+      setSelectedSearch(null);
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description: "Failed to save alert settings.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (savedSearches.isLoading) {
+    return (
+      <Card className={className}>
+        <CardContent className="p-6 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground mt-2">Loading saved searches...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (savedSearches.error) {
+    return (
+      <Card className={className}>
+        <CardContent className="p-6 text-center">
+          <p className="text-destructive">Failed to load saved searches</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const searches = savedSearches.data || [];
+
+  return (
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Star className="h-5 w-5" />
+            <span>Saved Searches</span>
+            <Badge variant="secondary">{searches.length}</Badge>
+          </div>
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent>
+        {searches.length === 0 ? (
+          <div className="text-center py-8">
+            <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">No saved searches</h3>
+            <p className="text-muted-foreground">
+              Save your searches to quickly access them later and set up email alerts.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {searches.map((search: SavedSearch) => (
+              <Card key={search.id} className="border-l-4 border-l-primary/20">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h4 className="font-medium truncate">{search.name}</h4>
+                        {search.is_public && (
+                          <Badge variant="outline" className="text-xs">Public</Badge>
+                        )}
+                        {search.emailAlerts?.enabled && (
+                          <Badge variant="secondary" className="text-xs flex items-center">
+                            <Bell className="h-3 w-3 mr-1" />
+                            Alerts
+                          </Badge>
+                        )}
+                      </div>
+
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        Query: {search.query.q}
+                      </p>
+
+                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                        <span>Created {format(new Date(search.created_at), 'MMM d, yyyy')}</span>
+                        <span>Used {search.useCount} times</span>
+                        {search.lastUsed && (
+                          <span>Last used {format(new Date(search.lastUsed), 'MMM d')}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2 ml-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleExecuteSearch(search)}
+                        disabled={executeSavedSearch.isPending}
+                      >
+                        <Play className="h-3 w-3 mr-1" />
+                        Run
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleConfigureAlerts(search)}
+                      >
+                        {search.emailAlerts?.enabled ? (
+                          <Bell className="h-3 w-3" />
+                        ) : (
+                          <BellOff className="h-3 w-3" />
+                        )}
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteSearch(search)}
+                        disabled={deleteSavedSearch.isPending}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Email Alert Configuration Dialog */}
+        <Dialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Configure Email Alerts</DialogTitle>
+            </DialogHeader>
+
+            {selectedSearch && (
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-medium mb-2">Search: {selectedSearch.name}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified when new results match your saved search.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label>Enable Email Alerts</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Receive notifications for new matching results
+                    </p>
+                  </div>
+                  <Switch
+                    checked={alertConfig.enabled}
+                    onCheckedChange={(checked) =>
+                      setAlertConfig(prev => ({ ...prev, enabled: checked }))
+                    }
+                  />
+                </div>
+
+                {alertConfig.enabled && (
+                  <>
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Alert Frequency</Label>
+                        <select
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          value={alertConfig.frequency}
+                          onChange={(e) =>
+                            setAlertConfig(prev => ({ ...prev, frequency: e.target.value as 'immediate' | 'daily' | 'weekly' }))
+                          }
+                        >
+                          <option value="immediate">Immediate</option>
+                          <option value="daily">Daily Digest</option>
+                          <option value="weekly">Weekly Summary</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Minimum Results Threshold</Label>
+                        <select
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          value={alertConfig.threshold.toString()}
+                          onChange={(e) =>
+                            setAlertConfig(prev => ({ ...prev, threshold: parseInt(e.target.value) }))
+                          }
+                        >
+                          <option value="1">1 or more new results</option>
+                          <option value="5">5 or more new results</option>
+                          <option value="10">10 or more new results</option>
+                            <SelectItem value="25">25 or more new results</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Only send alerts when at least this many new results are found
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex justify-end space-x-2">
+                  <Button variant="outline" onClick={() => setAlertDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveAlertConfig}>
+                    Save Alert Settings
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default SavedSearches;

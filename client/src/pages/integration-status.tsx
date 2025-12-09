@@ -9,13 +9,13 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 import { useIntegratedServices } from '@client/hooks/useIntegratedServices';
-import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Progress } from '@client/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
+import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Progress } from '@client/shared/design-system/primitives/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
 import { 
   CheckCircle, 
   AlertTriangle, 

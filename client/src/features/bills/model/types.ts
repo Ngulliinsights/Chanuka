@@ -1,18 +1,5 @@
 // Bills feature types
-export interface Bill {
-  id: string;
-  title: string;
-  summary: string;
-  status: string;
-  category: string;
-  introduced_date: string;
-  last_action_date?: string;
-  sponsors: Sponsor[];
-  comments: Comment[];
-  analysis?: BillAnalysis;
-  trackingCount?: number;
-  engagementMetrics?: EngagementMetrics;
-}
+import { Bill, Comment } from '../../../types';
 
 export interface Sponsor {
   id: string;
@@ -23,17 +10,6 @@ export interface Sponsor {
   conflictOfInterest?: ConflictOfInterest[];
 }
 
-export interface Comment {
-  id: string;
-  content: string;
-  authorId: string;
-  authorName: string;
-  created_at: string;
-  updated_at?: string;
-  parent_id?: string;
-  replies?: Comment[];
-  votes?: number;
-}
 
 export interface BillAnalysis {
   summary: string;

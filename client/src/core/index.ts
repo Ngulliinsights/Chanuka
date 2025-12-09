@@ -1,8 +1,13 @@
 /**
- * Core Cross-Cutting Concerns Module
+ * Core Module - Business Logic and Domain Services
  *
- * Unified exports for all core client-side functionality including
- * error handling, loading states, navigation, and other shared concerns.
+ * This module focuses on business logic, domain services, and feature-specific
+ * functionality. Technical infrastructure has been moved to the shared module
+ * following the architectural principle: "shared/ handles UI concerns and 
+ * infrastructure, core/ handles business logic."
+ *
+ * For technical infrastructure, see the shared/infrastructure module.
+ * For UI components and design system elements, see the shared module.
  */
 
 // ============================================================================
@@ -106,6 +111,73 @@ export {
 } from './browser';
 
 // ============================================================================
+// Authentication System
+// ============================================================================
+
+export {
+    // Main auth module
+    default as auth,
+
+    // Services
+    AuthApiService,
+    createAuthApiService,
+    authApiService,
+    TokenManager,
+    tokenManager,
+    SessionManager,
+    sessionManager,
+
+    // React Integration
+    AuthProvider,
+    useAuth,
+    useAuthStore,
+
+    // Redux Integration
+    authReducer,
+    authMiddleware,
+    createAuthMiddleware,
+
+    // HTTP Integration
+    AuthenticatedApiClient,
+    AuthenticationInterceptor,
+    TokenRefreshInterceptor,
+    createAuthInterceptors,
+
+    // Validation
+    validatePasswordComprehensive,
+    checkPasswordStrength,
+    validateEmailDomain,
+    validateFormBatch,
+    createDebouncedValidator,
+    formatValidationErrors,
+
+    // Configuration
+    createAuthConfig,
+    initializeAuth,
+    configureAuth,
+
+    // Constants
+    AUTH_VALIDATION_RULES,
+    AUTH_ERROR_MESSAGES,
+    SESSION_REFRESH_BUFFER_MS,
+    MINIMUM_REFRESH_DELAY_MS,
+
+    // Error Classes
+    AuthValidationError,
+    AuthenticationError,
+    AuthorizationError,
+    SessionExpiredError,
+    TokenRefreshError,
+
+    // Types
+    type AuthSettings,
+    type AuthInitOptions,
+    type AuthMiddlewareConfig,
+    type PasswordStrength,
+    type BatchValidationResult,
+} from './auth';
+
+// ============================================================================
 // Loading States (Placeholder - to be implemented)
 // ============================================================================
 
@@ -122,6 +194,22 @@ export {
 // ============================================================================
 
 // export { ... } from './dashboard';
+
+// ============================================================================
+// Business Logic and Domain Services
+// ============================================================================
+
+// API Services (business logic focused)
+export * from './api';
+
+// Community Services (business logic)
+export * from './community';
+
+// Dashboard Services (business logic)
+export * from './dashboard';
+
+// Navigation Services (business logic)
+export * from './navigation';
 
 // ============================================================================
 // Default Export

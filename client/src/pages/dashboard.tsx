@@ -7,9 +7,8 @@
 
 import React from 'react';
 
-import { UserDashboard } from '@client/components/shared/dashboard';
-import { SmartDashboard } from '@client/components/enhanced-user-flows/SmartDashboard';
-import { RealTimeDashboard } from '@client/components/realtime/RealTimeDashboard';
+import { UserDashboard, SmartDashboard } from '@client/shared/ui/dashboard';
+import { RealTimeDashboard } from '@client/shared/ui/realtime';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { logger } from '@client/utils/logger';

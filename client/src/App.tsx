@@ -2,17 +2,16 @@
 import { Suspense, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-// Internal component imports
-import { MobileHeader } from '@/components/mobile/layout';
-import { AppProviders } from '@client/components/AppProviders';
-import { ErrorBoundary } from '@client/components/error-handling/ErrorBoundary';
-import { EnhancedUXIntegration } from '@client/components/integration/EnhancedUXIntegration';
-import { LoadingStates } from '@client/components/loading/LoadingStates';
-import { OfflineProvider } from '@client/components/offline/offline-manager';
-import { UserJourneyOptimizer } from '@client/components/onboarding/UserJourneyOptimizer';
-import { CookieConsentBanner } from '@client/components/privacy';
-import { Toaster } from '@client/components/ui/toaster';
-import { UserAccountIntegration } from '@client/components/user/UserAccountIntegration';
+// Internal component imports - Updated to FSD structure
+import { MobileHeader } from '@client/shared/ui/mobile/layout';
+import { AppProviders } from '@client/app/providers/AppProviders';
+import { ErrorBoundary } from '@client/core/error/components';
+import { LoadingStates } from '@client/shared/ui/loading/LoadingStates';
+import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
+import { UserJourneyOptimizer } from '@client/shared/ui/onboarding/UserJourneyOptimizer';
+import { CookieConsentBanner } from '@client/shared/ui/privacy/CookieConsentBanner';
+import { Toaster } from '@client/shared/design-system/primitives/toaster';
+import { UserAccountIntegration } from '@client/features/users/ui/profile/UserAccountIntegration';
 import { useIsMobile } from '@client/hooks/use-mobile';
 import { logger } from '@client/utils/logger';
 
@@ -45,9 +44,6 @@ function App() {
           <UserAccountIntegration>
             <div />
           </UserAccountIntegration>
-          <EnhancedUXIntegration>
-            <div />
-          </EnhancedUXIntegration>
 
           {isMobile && <MobileHeader />}
 

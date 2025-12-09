@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { communityApiService } from '../../../core/api/community';
+import type {
+  CommentQueryOptions,
+  VoteResponse
+} from '../../../core/api/community';
 import { useToast } from '../../../hooks/use-toast';
 import type {
   Comment,
@@ -39,17 +43,29 @@ interface CreateThreadRequest {
   description?: string;
 }
 
+interface ShareRequest {
+  platform: string;
+  url: string;
+  title: string;
+  description?: string;
+}
+
+interface ShareResponse {
+  platform: string;
+  success: boolean;
+}
+
 /**
  * Hook for comments management
  */
-export function useComments(bill_id?: string, filters?: any) {
+export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
   const queryClient = useQueryClient();
 
   const comments = useQuery({
     queryKey: ['community', 'comments', bill_id, filters],
-    queryFn: () => bill_id ? communityApiService.getBillComments(parseInt(bill_id), filters as any) : Promise.resolve([]),
+    queryFn: () => bill_id ? communityApiService.getBillComments(parseInt(bill_id), filters) : Promise.resolve([]),
     staleTime: 2 * 60 * 1000, // 2 minutes
-   });
+  });
 
   const createComment = useMutation<Comment, Error, CreateCommentRequest>({
     mutationFn: async (request: CreateCommentRequest) => {
@@ -63,14 +79,11 @@ export function useComments(bill_id?: string, filters?: any) {
     },
     onSuccess: (newComment) => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments', (newComment as any).billId || (newComment as any).bill_id]
+        queryKey: ['community', 'comments', newComment.billId]
       });
       queryClient.setQueryData(
-        ['community', 'comments', (newComment as any).billId || (newComment as any).bill_id],
-        (old: any) => ({
-          ...old,
-          comments: [newComment, ...(old?.comments || [])]
-        })
+        ['community', 'comments', newComment.billId],
+        (old: Comment[] | undefined) => [newComment, ...(old || [])]
       );
     },
     onError: (error: Error) => {
@@ -81,9 +94,9 @@ export function useComments(bill_id?: string, filters?: any) {
   const updateComment = useMutation<Comment, Error, { comment_id: string; request: UpdateCommentRequest }>({
     mutationFn: ({ comment_id, request }: { comment_id: string; request: UpdateCommentRequest }) =>
       communityApiService.updateComment(comment_id, request.content),
-    onSuccess: (updatedComment) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments', (updatedComment as any).billId || (updatedComment as any).bill_id]
+        queryKey: ['community', 'comments']
       });
     },
     onError: (error: Error) => {
@@ -97,10 +110,7 @@ export function useComments(bill_id?: string, filters?: any) {
       // Remove from cache
       queryClient.setQueryData(
         ['community', 'comments'],
-        (old: any) => ({
-          ...old,
-          comments: old?.comments?.filter((c: Comment) => c.id !== comment_id) || []
-        })
+        (old: Comment[] | undefined) => old?.filter((c: Comment) => c.id !== comment_id) || []
       );
     },
     onError: (error: Error) => {
@@ -108,14 +118,14 @@ export function useComments(bill_id?: string, filters?: any) {
     },
   });
 
-  const voteOnComment = useMutation<any, Error, VoteRequest>({
+  const voteOnComment = useMutation<VoteResponse | null, Error, VoteRequest>({
     mutationFn: async (request: VoteRequest) => {
       const result = await communityApiService.voteComment(request.comment_id, request.vote_type);
       return result; // API returns VoteResponse | null
     },
-    onSuccess: (updatedComment) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments', (updatedComment as any).billId || (updatedComment as any).bill_id]
+        queryKey: ['community', 'comments']
       });
     },
     onError: (error: Error) => {
@@ -224,14 +234,14 @@ export function useThread(threadId: string | undefined) {
 export function useSocialSharing() {
   const { toast } = useToast();
 
-  const shareContent = useMutation<any, Error, any>({
-    mutationFn: (request: any) => {
+  const shareContent = useMutation<ShareResponse, Error, ShareRequest>({
+    mutationFn: (request: ShareRequest) => {
       // Note: communityApiService doesn't have sharing methods
       // This would need to be added
       console.log('Share content:', request);
-      return Promise.resolve({} as any);
+      return Promise.resolve({ platform: request.platform, success: true } as ShareResponse);
     },
-    onSuccess: (share) => {
+    onSuccess: (share: ShareResponse) => {
       toast({
         title: "Content shared!",
         description: `Shared to ${share.platform}`,
@@ -509,17 +519,17 @@ export function useLocalImpact(location?: { state?: string; district?: string; c
 /**
  * Hook for real-time community updates (would integrate with WebSocket)
  */
-export function useRealtimeCommunity(threadId?: string) {
+export function useRealtimeCommunity(_threadId?: string) {
   // This would integrate with WebSocket for real-time updates
   // For now, return a placeholder structure
-  console.log('Real-time community hook initialized for thread:', threadId);
+  console.log('Real-time community hook initialized for thread:', _threadId);
 
   return {
     isConnected: false,
     connectionStatus: 'disconnected' as const,
-    subscribeToThread: (_id: string) => {},
-    subscribeToComments: (_bill_id?: string) => {},
-    unsubscribe: () => {},
+    subscribeToThread: (_id: string) => { },
+    subscribeToComments: (_bill_id?: string) => { },
+    unsubscribe: () => { },
   };
 }
 

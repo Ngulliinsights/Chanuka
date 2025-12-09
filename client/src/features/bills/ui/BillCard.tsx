@@ -1,22 +1,22 @@
-import { 
-  Calendar, 
-  Users, 
-  TrendingUp, 
-  Eye, 
-  MessageCircle, 
-  Share2, 
-  Bookmark, 
+import {
+  Calendar,
+  Users,
+  TrendingUp,
+  Eye,
+  MessageCircle,
+  Share2,
+  Bookmark,
   BookmarkCheck,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Bill } from '@client/features/bills/model/types';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Button } from '@client/shared/design-system/primitives/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
 import { cn } from '@client/lib/utils';
+import type { Bill } from '@client/types/core';
 
 interface BillCardProps {
   bill: Bill;
@@ -62,23 +62,24 @@ const conflictColors = {
   high: 'chanuka-status-badge bg-red-100 text-red-800',
 };
 
-export function BillCard({ 
-  bill, 
-  onSave, 
-  onShare, 
-  onComment, 
-  isSaved = false, 
+export function BillCard({
+  bill,
+  onSave,
+  onShare,
+  onComment,
+  isSaved = false,
   showQuickActions = true,
-  viewMode = 'grid'
+  viewMode = 'grid',
 }: BillCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [quickActionFocus, setQuickActionFocus] = useState<string | null>(null);
 
-  const statusColor = statusColors[bill.status as keyof typeof statusColors] || statusColors.introduced;
-  
+  const statusColor =
+    statusColors[bill.status as keyof typeof statusColors] || statusColors.introduced;
+
   // Check for conflicts of interest
-  const hasConflicts = bill.sponsors?.some((sponsor) => 
-    sponsor.conflictOfInterest && sponsor.conflictOfInterest.length > 0
+  const hasConflicts = bill.sponsors?.some(
+    sponsor => sponsor.conflictOfInterest && sponsor.conflictOfInterest.length > 0
   );
   const conflictLevel = hasConflicts ? 'high' : 'low';
 
@@ -102,24 +103,24 @@ export function BillCard({
   const bookmarkCount = bill.engagementMetrics?.bookmarks || 0;
 
   // Use appropriate date field
-  const introducedDate = bill.introduced_date;
+  const introducedDate = bill.introducedDate;
 
   return (
-    <Card 
+    <Card
       className={cn(
-        "chanuka-card group relative transition-all duration-200 hover:shadow-lg hover:shadow-primary/10",
-        "border border-border hover:border-primary/20",
-        viewMode === 'list' && "flex flex-row"
+        'chanuka-card group relative transition-all duration-200 hover:shadow-lg hover:shadow-primary/10',
+        'border border-border hover:border-primary/20',
+        viewMode === 'list' && 'flex flex-row'
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Quick Actions Overlay */}
       {showQuickActions && (
-        <div 
+        <div
           className={cn(
-            "absolute top-2 right-2 flex gap-1 transition-all duration-200 z-10",
-            isHovered || quickActionFocus ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+            'absolute top-2 right-2 flex gap-1 transition-all duration-200 z-10',
+            isHovered || quickActionFocus ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
           )}
         >
           <Button
@@ -129,7 +130,7 @@ export function BillCard({
             onClick={() => onSave?.(bill.id)}
             onFocus={() => setQuickActionFocus('save')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={(e) => handleKeyDown(e, () => onSave?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onSave?.(bill.id))}
             aria-label={isSaved ? 'Remove from saved bills' : 'Save bill'}
           >
             {isSaved ? (
@@ -138,7 +139,7 @@ export function BillCard({
               <Bookmark className="h-4 w-4" />
             )}
           </Button>
-          
+
           <Button
             size="sm"
             variant="secondary"
@@ -146,12 +147,12 @@ export function BillCard({
             onClick={() => onShare?.(bill.id)}
             onFocus={() => setQuickActionFocus('share')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={(e) => handleKeyDown(e, () => onShare?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onShare?.(bill.id))}
             aria-label="Share bill"
           >
             <Share2 className="h-4 w-4" />
           </Button>
-          
+
           <Button
             size="sm"
             variant="secondary"
@@ -159,7 +160,7 @@ export function BillCard({
             onClick={() => onComment?.(bill.id)}
             onFocus={() => setQuickActionFocus('comment')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={(e) => handleKeyDown(e, () => onComment?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onComment?.(bill.id))}
             aria-label="View comments"
           >
             <MessageCircle className="h-4 w-4" />
@@ -168,10 +169,7 @@ export function BillCard({
       )}
 
       <CardHeader className="pb-3">
-        <div className={cn(
-          "flex items-start justify-between gap-2",
-          showQuickActions && "pr-20"
-        )}>
+        <div className={cn('flex items-start justify-between gap-2', showQuickActions && 'pr-20')}>
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="font-mono">{bill.id}</span>
@@ -185,10 +183,10 @@ export function BillCard({
                 </>
               )}
             </div>
-            
+
             <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors">
-              <Link 
-                to={`/bills/${bill.id}`} 
+              <Link
+                to={`/bills/${bill.id}`}
                 className="hover:underline focus:underline focus:outline-none"
                 tabIndex={0}
               >
@@ -204,14 +202,14 @@ export function BillCard({
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {bill.summary && (
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
             {bill.summary}
           </p>
         )}
-        
+
         {/* Status and Risk Badges */}
         <div className="flex flex-wrap gap-2">
           <Badge className={statusColor}>
@@ -225,7 +223,7 @@ export function BillCard({
             </Badge>
           )}
         </div>
-        
+
         {/* Metadata */}
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-4">
@@ -237,7 +235,7 @@ export function BillCard({
             )}
           </div>
         </div>
-        
+
         {/* Engagement Metrics */}
         <div className="flex items-center justify-between pt-2 border-t border-border">
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -245,19 +243,19 @@ export function BillCard({
               <Eye className="h-3 w-3" />
               <span>{formatEngagementCount(viewCount)}</span>
             </div>
-            
+
             <div className="flex items-center gap-1">
               <MessageCircle className="h-3 w-3" />
               <span>{formatEngagementCount(commentCount)}</span>
             </div>
-            
+
             <div className="flex items-center gap-1">
               <Bookmark className="h-3 w-3" />
               <span>{formatEngagementCount(bookmarkCount)}</span>
             </div>
           </div>
-          
-          <Link 
+
+          <Link
             to={`/bills/${bill.id}`}
             className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors text-sm"
             tabIndex={0}
@@ -270,4 +268,3 @@ export function BillCard({
     </Card>
   );
 }
-

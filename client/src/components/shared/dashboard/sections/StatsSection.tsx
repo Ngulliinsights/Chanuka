@@ -6,8 +6,8 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@client/components/ui/badge';
-import { Card, CardContent } from '@client/components/ui/card';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Card, CardContent } from '@client/shared/design-system/primitives/card';
 import { UserDashboardData } from '@client/types/user-dashboard';
 
 interface StatsSectionProps {

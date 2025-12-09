@@ -5,10 +5,11 @@
  * This is the foundation for all API communication in the application.
  */
 
-import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../error';
 import { logger } from '../../utils/logger';
-import { RetryHandler, RetryConfig } from './retry';
+import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../error';
+
 import { ApiCacheManager, CacheKeyGenerator } from './cache-manager';
+import { RetryHandler } from './retry';
 
 /**
  * HTTP methods supported by the API client

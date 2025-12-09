@@ -7,7 +7,7 @@ import { Shield } from 'lucide-react';
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
-import { LoginForm } from '@client/components/shared/auth/forms';
+import { LoginForm } from '@client/features/users/ui/auth/forms';
 import { useAuth } from '@client/features/users/hooks/useAuth';
 import { logger } from '@client/utils/logger';
 

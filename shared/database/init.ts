@@ -18,30 +18,37 @@ let initializationPromise: Promise<void> | null = null;
  * Initializes all database safety mechanisms with idempotent behavior.
  * Multiple calls to this function will safely return the same initialization promise,
  * preventing race conditions during concurrent initialization attempts.
+ * 
+ * Uses double-check locking pattern to minimize synchronization overhead:
+ * 1. First check: Return immediately if already initialized
+ * 2. Reuse existing promise if initialization is in progress
+ * 3. Only create new promise if neither condition is met
  */
 export async function initializeDatabaseSafety(): Promise<void> {
-  // If we're already initialized, return immediately to avoid redundant work
+  // Fast path: Already initialized, no synchronization overhead
   if (isInitialized) {
     logger.debug('Database safety mechanisms already initialized, skipping');
     return;
   }
 
-  // If initialization is in progress, return the existing promise to prevent
-  // concurrent initialization attempts that could cause conflicts
+  // If initialization is in progress, wait for the existing promise
+  // This prevents multiple concurrent initialization attempts
   if (initializationPromise) {
     logger.debug('Database safety initialization in progress, awaiting existing promise');
     return initializationPromise;
   }
 
-  // Create a new initialization promise that we'll reuse if called again during initialization
+  // Create a new initialization promise that subsequent concurrent calls will use
   initializationPromise = performInitialization();
   
   try {
     await initializationPromise;
     isInitialized = true;
   } catch (error) {
-    // Reset state on failure so initialization can be retried
+    // Reset promise but NOT isInitialized - prevents repeated init attempts
+    // if an error occurs. Can be retried by calling again after resolving the issue.
     initializationPromise = null;
+    logger.error('Database initialization failed, will retry on next call', { error });
     throw error;
   }
 }

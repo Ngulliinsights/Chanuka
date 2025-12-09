@@ -6,8 +6,8 @@
  * caching strategies, and comprehensive logging.
  */
 
-import { mockBills, mockBillsStats } from '@client/data/mock/bills';
-import { logger } from '@client/utils/logger';
+import { mockBills, mockBillsStats } from '../../data/mock/bills';
+import { logger } from '../../utils/logger';
 
 import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
@@ -80,7 +80,7 @@ export interface BillsStats {
   lastUpdated: string;
 }
 
-import type { Bill, Sponsor } from '@client/types';
+import type { Bill, Sponsor } from './types';
 
 // Additional response interfaces
 interface BillAnalysis {
@@ -297,7 +297,7 @@ export class BillsApiService {
    * Records user engagement metrics (views, saves, shares) to track
    * bill popularity and help surface relevant content to other users.
    */
-  async recordEngagement(billId: number, type: 'view' | 'save' | 'share'): Promise<BillEngagementData> {
+  async recordEngagement(billId: number, type: 'view' | 'save' | 'share'): Promise<BillEngagementData | null> {
     try {
       const response = await globalApiClient.post<BillEngagementData>(
         `/api/bills/${billId}/engagement`,
@@ -316,7 +316,7 @@ export class BillsApiService {
     } catch (error) {
       // Log but don't throw - engagement tracking shouldn't break user experience
       logger.warn('Failed to record engagement', { component: 'BillsApiService', billId, type, error });
-      return null as any;
+      return null;
     }
   }
 
@@ -431,9 +431,9 @@ export class BillsApiService {
   /**
    * Creates a poll for a bill discussion.
    */
-  async createBillPoll(billId: number, question: string, options: string[], section?: string): Promise<any> {
+  async createBillPoll(billId: number, question: string, options: string[], section?: string): Promise<{ id: string; question: string; options: string[] }> {
     try {
-      const response = await globalApiClient.post(`/api/bills/${billId}/polls`, {
+      const response = await globalApiClient.post<{ id: string; question: string; options: string[] }>(`/api/bills/${billId}/polls`, {
         question,
         options,
         section
@@ -445,7 +445,7 @@ export class BillsApiService {
       logger.info('Poll created successfully', {
         component: 'BillsApiService',
         billId,
-        pollId: (response.data as any)?.id
+        pollId: response.data.id
       });
 
       return response.data;
@@ -458,9 +458,9 @@ export class BillsApiService {
   /**
    * Fetches sponsorship analysis for a bill.
    */
-  async getBillSponsorshipAnalysis(billId: number): Promise<any> {
+  async getBillSponsorshipAnalysis(billId: number): Promise<Record<string, unknown>> {
     try {
-      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/analysis`, {
+      const response = await globalApiClient.get<Record<string, unknown>>(`/api/sponsorship/bills/${billId}/analysis`, {
         timeout: this.defaultTimeout,
         cacheTTL: 30 * 60 * 1000
       });
@@ -474,9 +474,9 @@ export class BillsApiService {
   /**
    * Fetches primary sponsor analysis for a bill.
    */
-  async getBillPrimarySponsorAnalysis(billId: number): Promise<any> {
+  async getBillPrimarySponsorAnalysis(billId: number): Promise<Record<string, unknown>> {
     try {
-      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/primary-sponsor`, {
+      const response = await globalApiClient.get<Record<string, unknown>>(`/api/sponsorship/bills/${billId}/primary-sponsor`, {
         timeout: this.defaultTimeout,
         cacheTTL: 30 * 60 * 1000
       });
@@ -490,9 +490,9 @@ export class BillsApiService {
   /**
    * Fetches co-sponsors analysis for a bill.
    */
-  async getBillCoSponsorsAnalysis(billId: number): Promise<any> {
+  async getBillCoSponsorsAnalysis(billId: number): Promise<Record<string, unknown>> {
     try {
-      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/co-sponsors`, {
+      const response = await globalApiClient.get<Record<string, unknown>>(`/api/sponsorship/bills/${billId}/co-sponsors`, {
         timeout: this.defaultTimeout,
         cacheTTL: 30 * 60 * 1000
       });
@@ -506,9 +506,9 @@ export class BillsApiService {
   /**
    * Fetches financial network analysis for a bill.
    */
-  async getBillFinancialNetworkAnalysis(billId: number): Promise<any> {
+  async getBillFinancialNetworkAnalysis(billId: number): Promise<Record<string, unknown>> {
     try {
-      const response = await globalApiClient.get(`/api/sponsorship/bills/${billId}/financial-network`, {
+      const response = await globalApiClient.get<Record<string, unknown>>(`/api/sponsorship/bills/${billId}/financial-network`, {
         timeout: this.defaultTimeout,
         cacheTTL: 30 * 60 * 1000
       });
@@ -574,11 +574,12 @@ export class BillsApiService {
         case 'title':
           comparison = a.title.localeCompare(b.title);
           break;
-        case 'urgency':
+        case 'urgency': {
           const urgencyOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1 };
           comparison = (urgencyOrder[a.urgencyLevel as keyof typeof urgencyOrder] || 0) - 
                       (urgencyOrder[b.urgencyLevel as keyof typeof urgencyOrder] || 0);
           break;
+        }
         case 'engagement':
           comparison = (a.viewCount + a.commentCount + a.shareCount) - 
                       (b.viewCount + b.commentCount + b.shareCount);
@@ -617,7 +618,7 @@ export class BillsApiService {
    * Centralized error handling that uses the global error handler
    * and enriches errors with context information.
    */
-  private async handleError(error: any, operation: string, context?: Record<string, any>): Promise<Error> {
+  private async handleError(error: unknown, operation: string, context?: Record<string, unknown>): Promise<Error> {
     await globalErrorHandler.handleError(error as Error, {
       component: 'BillsApiService',
       operation,
@@ -687,7 +688,7 @@ export interface SystemActivity {
     description: string;
     timestamp: string;
     user_id?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }>;
   active_users: Array<{
     user_id: string;
@@ -728,15 +729,13 @@ export interface SystemEnvironment {
   websocket_url: string;
   api_base_url: string;
   features: Record<string, boolean>;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
 }
 
 export class SystemApiService {
-  private readonly baseUrl: string;
   private readonly systemEndpoint: string;
 
   constructor(baseUrl: string = '/api') {
-    this.baseUrl = baseUrl;
     this.systemEndpoint = `${baseUrl}/system`;
   }
 
@@ -810,18 +809,19 @@ export class SystemApiService {
     }
   }
 
-  private async handleError(error: any, defaultMessage: string): Promise<Error> {
+  private async handleError(error: unknown, defaultMessage: string): Promise<Error> {
+    const err = error as { response?: { data?: { message?: string; error?: string }; status?: number }; message?: string };
     const errorMessage =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err?.message ||
       defaultMessage;
 
     const systemError = new Error(errorMessage);
     await globalErrorHandler.handleError(systemError, {
       component: 'SystemApiService',
       operation: 'system_operation',
-      status: error?.response?.status
+      status: err?.response?.status
     });
 
     return systemError;

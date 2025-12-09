@@ -7,8 +7,8 @@ import React, {
   useMemo,
 } from "react";
 
-import { MobileNavigation } from "@client/components/mobile/MobileNavigation";
-import { DesktopSidebar } from '@client/components/navigation';
+import { MobileNavigation } from "@client/shared/ui/mobile/MobileNavigation";
+import { DesktopSidebar } from '@client/shared/ui/navigation';
 import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from "@client/core/navigation/hooks/use-navigation-accessibility";
 import { useNavigationPerformance } from "@client/core/navigation/hooks/use-navigation-performance";
 import { useUnifiedNavigation } from "@client/core/navigation/hooks/use-unified-navigation";

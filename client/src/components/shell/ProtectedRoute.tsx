@@ -2,7 +2,7 @@ import { Shield, Lock, UserX, AlertTriangle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 import { LoadingStateManager } from '../loading/LoadingStates';

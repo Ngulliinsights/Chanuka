@@ -2,7 +2,7 @@ import React, { Suspense, useEffect, useState, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter } from 'react-router-dom';
 
-import { AuthProvider } from '@client/features/users/hooks/useAuth';
+import { AuthProvider } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 import { ThemeProvider } from '../../contexts/ThemeContext';

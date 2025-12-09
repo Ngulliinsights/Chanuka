@@ -25,9 +25,9 @@ import storage from 'redux-persist/lib/storage';
 
 import { logger } from '@client/utils/logger';
 
-// Import slices - auth and session slices are lazy loaded
+// Import slices - auth now comes from consolidated system
 import { apiMiddleware } from './middleware/apiMiddleware';
-import { authMiddleware } from './middleware/authMiddleware';
+import { authMiddleware, authReducer } from '@client/core/auth'; // Use consolidated auth system
 import { errorHandlingMiddleware } from './middleware/errorHandlingMiddleware';
 import { navigationPersistenceMiddleware } from './middleware/navigationPersistenceMiddleware';
 import { webSocketMiddleware } from './middleware/webSocketMiddleware';
@@ -40,8 +40,7 @@ import realTimeSlice from './slices/realTimeSlice';
 import uiSlice from './slices/uiSlice';
 import userDashboardSlice from './slices/userDashboardSlice';
 
-// Lazy load auth and session slices
-const authSlicePromise = import('./slices/authSlice');
+// Lazy load session slice (auth now comes from consolidated system)
 const sessionSlicePromise = import('./slices/sessionSlice');
 
 // Import middleware
@@ -82,15 +81,14 @@ const persistConfig = {
 
 // Async function to create store with lazy loaded slices
 export const createStore = async () => {
-  // Await lazy loaded slices
-  const [{ default: authSlice }, { default: sessionSlice }] = await Promise.all([
-    authSlicePromise,
+  // Await lazy loaded slices (auth now comes from consolidated system)
+  const [{ default: sessionSlice }] = await Promise.all([
     sessionSlicePromise
   ]);
 
-  // Root reducer with lazy loaded slices
+  // Root reducer with consolidated auth system
   const rootReducer = combineReducers({
-    auth: authSlice,
+    auth: authReducer, // Use consolidated auth reducer
     session: sessionSlice,
     navigation: navigationSlice,
     ui: uiSlice,

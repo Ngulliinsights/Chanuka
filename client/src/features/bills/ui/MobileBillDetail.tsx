@@ -1,67 +1,56 @@
 /**
- * Mobile Bill Detail Component
- * 
- * Mobile-optimized version of the bill detail page with touch-friendly interactions,
- * swipe navigation between tabs, and responsive layouts.
- * 
- * Features:
- * - Touch-optimized tab navigation with swipe gestures
- * - Mobile-friendly layouts and typography
- * - Quick actions with 44px minimum touch targets
- * - Progressive disclosure for complex content
- * - Mobile data visualizations
+ * Mobile Bill Detail Component - Optimized Version
+ *
+ * A mobile-first bill viewing experience with touch-optimized interactions,
+ * swipe navigation, and progressive content disclosure. This component demonstrates
+ * best practices for mobile web applications including proper memoization,
+ * accessibility support, and performance optimization.
  */
 
-import { 
-  ArrowLeft, 
-  Share2, 
-  Bell, 
+import {
+  ArrowLeft,
+  Share2,
+  Bell,
   Eye,
   Users,
   AlertTriangle,
   FileText,
   BarChart3,
   User,
-  // Use alternative icon names that exist in lucide-react
-  MessageSquare,  // Replaces MessageCircle
+  MessageSquare,
+  Bookmark,
+  Globe,
 } from 'lucide-react';
-import { useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useCallback, useMemo } from 'react';
 
-import { Globe, BookmarkPlus } from '@client/components/icons/SimpleIcons';
-// TODO: Implement mobile components
-// import {
-//   MobileLayout,
-//   MobileContainer,
-//   MobileSection,
-//   MobileTabSelector,
-//   useMobileTabs,
-//   SwipeGestures,
-//   MobileMetricCard,
-//   MobileBarChart,
-//   MobilePieChart,
-//   type MobileTab,
-//   type ChartData
-// } from '@client/mobile';
+// Type definitions for better type safety and code documentation
+interface ConstitutionalFlag {
+  id: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  provision: string;
+}
 
-// Simple fallback components
-const MobileLayout = ({ children }: { children: React.ReactNode }) => <div className="mobile-layout">{children}</div>;
-const MobileContainer = ({ children }: { children: React.ReactNode }) => <div className="mobile-container">{children}</div>;
-const MobileSection = ({ children }: { children: React.ReactNode }) => <div className="mobile-section">{children}</div>;
-const MobileTabSelector = ({ tabs, activeTab, onTabChange }: any) => <div>Tab Selector</div>;
-const useMobileTabs = (tabs: any[]) => ({ activeTab: tabs[0]?.id || '', setActiveTab: () => {} });
-const SwipeGestures = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
-const MobileMetricCard = ({ title, value }: { title: string; value: string | number }) => <div>{title}: {value}</div>;
-const MobileBarChart = ({ data }: { data: any }) => <div>Bar Chart</div>;
-const MobilePieChart = ({ data }: { data: any }) => <div>Pie Chart</div>;
+interface Sponsor {
+  id: string;
+  name: string;
+  role: string;
+  party: string;
+  avatar?: string;
+}
 
-type MobileTab = { id: string; label: string; };
-type ChartData = any;
-import { Avatar, AvatarFallback, AvatarImage } from '@client/components/ui/avatar';
-import { Badge } from '@client/components/ui/badge';
-import { Button } from '@client/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { cn } from '@client/lib/utils';
+interface RelatedBill {
+  id: number;
+  title: string;
+  relationship: string;
+}
+
+interface CommunityEngagement {
+  supportPercentage: number;
+  totalParticipants: number;
+  expertAnalyses: number;
+  discussions: number;
+}
 
 interface BillData {
   id: number;
@@ -76,39 +65,45 @@ interface BillData {
   saveCount: number;
   commentCount: number;
   shareCount: number;
-  constitutionalFlags: Array<{
-    id: string;
-    severity: 'low' | 'medium' | 'high' | 'critical';
-    description: string;
-    provision: string;
-  }>;
-  sponsors: Array<{
-    id: string;
-    name: string;
-    role: string;
-    party: string;
-    avatar?: string;
-  }>;
+  constitutionalFlags: ConstitutionalFlag[];
+  sponsors: Sponsor[];
   policyAreas: string[];
-  relatedBills: Array<{
-    id: number;
-    title: string;
-    relationship: string;
-  }>;
-  communityEngagement: {
-    supportPercentage: number;
-    totalParticipants: number;
-    expertAnalyses: number;
-    discussions: number;
-  };
+  relatedBills: RelatedBill[];
+  communityEngagement: CommunityEngagement;
 }
 
-// Mock bill data - in production, this would come from an API
-const mockBillData: BillData = {
+// Configuration constants - keeping these outside the component prevents recreation
+const STATUS_COLORS = {
+  introduced: 'bg-blue-100 text-blue-800',
+  committee: 'bg-yellow-100 text-yellow-800',
+  passed: 'bg-green-100 text-green-800',
+  failed: 'bg-red-100 text-red-800',
+  signed: 'bg-green-100 text-green-800',
+  vetoed: 'bg-red-100 text-red-800',
+} as const;
+
+const URGENCY_COLORS = {
+  low: 'bg-gray-100 text-gray-800',
+  medium: 'bg-yellow-100 text-yellow-800',
+  high: 'bg-orange-100 text-orange-800',
+  critical: 'bg-red-100 text-red-800',
+} as const;
+
+const SEVERITY_COLORS = {
+  critical: 'bg-red-100 text-red-800',
+  high: 'bg-orange-100 text-orange-800',
+  medium: 'bg-yellow-100 text-yellow-800',
+  low: 'bg-gray-100 text-gray-800',
+} as const;
+
+// Mock data - in production this would come from a data fetching hook
+const MOCK_BILL_DATA: BillData = {
   id: 1,
   title: 'Healthcare Access Reform Act',
-  summary: 'Comprehensive healthcare reform legislation aimed at improving access to healthcare services and reducing costs for all citizens. This bill introduces new provisions for universal coverage, prescription drug pricing controls, and expanded mental health services.',
-  fullText: 'SECTION 1. SHORT TITLE.\nThis Act may be cited as the "Healthcare Access Reform Act".\n\nSECTION 2. FINDINGS.\nCongress finds that...',
+  summary:
+    'Comprehensive healthcare reform legislation aimed at improving access to healthcare services and reducing costs for all citizens. This bill introduces new provisions for universal coverage, prescription drug pricing controls, and expanded mental health services.',
+  fullText:
+    'SECTION 1. SHORT TITLE.\nThis Act may be cited as the "Healthcare Access Reform Act".\n\nSECTION 2. FINDINGS.\nCongress finds that...',
   status: 'committee',
   urgency: 'high',
   introducedDate: '2024-01-15',
@@ -121,15 +116,15 @@ const mockBillData: BillData = {
     {
       id: '1',
       severity: 'medium',
-      description: 'Potential commerce clause implications',
-      provision: 'Section 3(a)'
+      description: 'Potential commerce clause implications requiring careful constitutional review',
+      provision: 'Section 3(a)',
     },
     {
       id: '2',
       severity: 'low',
-      description: 'State sovereignty considerations',
-      provision: 'Section 5(b)'
-    }
+      description: 'State sovereignty considerations in healthcare regulation',
+      provision: 'Section 5(b)',
+    },
   ],
   sponsors: [
     {
@@ -137,195 +132,412 @@ const mockBillData: BillData = {
       name: 'Rep. Sarah Johnson',
       role: 'Primary Sponsor',
       party: 'Democrat',
-      avatar: undefined
     },
     {
       id: '2',
       name: 'Sen. Michael Smith',
       role: 'Co-Sponsor',
       party: 'Republican',
-      avatar: undefined
-    }
+    },
   ],
   policyAreas: ['Healthcare', 'Social Policy', 'Budget'],
   relatedBills: [
     { id: 2, title: 'Mental Health Parity Act', relationship: 'Related' },
-    { id: 3, title: 'Prescription Drug Pricing Reform', relationship: 'Companion' }
+    { id: 3, title: 'Prescription Drug Pricing Reform', relationship: 'Companion' },
   ],
   communityEngagement: {
     supportPercentage: 67,
     totalParticipants: 1420,
     expertAnalyses: 8,
-    discussions: 23
-  }
+    discussions: 23,
+  },
 };
 
-// Status badge color mapping
-const statusColors = {
-  introduced: 'bg-blue-100 text-blue-800',
-  committee: 'bg-yellow-100 text-yellow-800',
-  passed: 'bg-green-100 text-green-800',
-  failed: 'bg-red-100 text-red-800',
-  signed: 'bg-green-100 text-green-800',
-  vetoed: 'bg-red-100 text-red-800',
-};
+// Utility function for conditional class names
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(' ');
+}
 
-// Urgency badge color mapping
-const urgencyColors = {
-  low: 'bg-gray-100 text-gray-800',
-  medium: 'bg-yellow-100 text-yellow-800',
-  high: 'bg-orange-100 text-orange-800',
-  critical: 'bg-red-100 text-red-800',
-};
+// Simple UI components that match the imported component API
+function Card({
+  children,
+  className = '',
+  onClick,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <div
+      className={cn('bg-white rounded-lg border shadow-sm', className)}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
+      {children}
+    </div>
+  );
+}
 
-export function MobileBillDetail() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  
-  // Component state
-  const [bill] = useState<BillData>(mockBillData);
+function CardHeader({ children }: { children: React.ReactNode }) {
+  return <div className="p-4 pb-2">{children}</div>;
+}
+
+function CardTitle({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <h2 className={cn('font-semibold', className)}>{children}</h2>;
+}
+
+function CardContent({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <div className={cn('p-4 pt-2', className)}>{children}</div>;
+}
+
+function Badge({
+  children,
+  className = '',
+  variant = 'default',
+}: {
+  children: React.ReactNode;
+  className?: string;
+  variant?: 'default' | 'outline';
+}) {
+  const baseClasses = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium';
+  const variantClasses = variant === 'outline' ? 'border' : '';
+  return <span className={cn(baseClasses, variantClasses, className)}>{children}</span>;
+}
+
+function Button({
+  children,
+  onClick,
+  variant = 'default',
+  size = 'default',
+  className = '',
+  ...props
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  variant?: 'default' | 'outline' | 'ghost' | 'primary';
+  size?: 'default' | 'sm';
+  className?: string;
+  [key: string]: unknown;
+}) {
+  const baseClasses =
+    'inline-flex items-center justify-center rounded-md font-medium transition-colors';
+  const sizeClasses = size === 'sm' ? 'px-3 py-1.5 text-sm' : 'px-4 py-2';
+  const variantClasses = {
+    default: 'bg-primary text-white hover:bg-primary/90',
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    outline: 'border border-gray-300 bg-white hover:bg-gray-50',
+    ghost: 'hover:bg-gray-100',
+  }[variant];
+
+  return (
+    <button
+      className={cn(baseClasses, sizeClasses, variantClasses, className)}
+      onClick={onClick}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Avatar({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn('relative flex shrink-0 overflow-hidden rounded-full', className)}>
+      {children}
+    </div>
+  );
+}
+
+function AvatarFallback({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-700 font-medium">
+      {children}
+    </div>
+  );
+}
+
+// Reusable metric card component for displaying statistics
+function MetricCard({
+  title,
+  value,
+  icon,
+}: {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-gray-500 mb-1">{title}</p>
+            <p className="text-xl font-semibold">{value}</p>
+          </div>
+          <div className="text-gray-400">{icon}</div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Simple bar chart component for mobile visualization
+function SimpleBarChart({
+  data,
+}: {
+  data: Array<{ label: string; value: number; color: string }>;
+}) {
+  const maxValue = Math.max(...data.map(d => d.value));
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Engagement Metrics</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {data.map(item => (
+            <div key={item.label}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm font-medium">{item.label}</span>
+                <span className="text-sm text-gray-600">{item.value}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className={cn('h-2 rounded-full', item.color)}
+                  style={{ width: `${(item.value / maxValue) * 100}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Simple pie chart component for mobile visualization
+function SimplePieChart({
+  data,
+}: {
+  data: Array<{ label: string; value: number; color: string }>;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Community Support</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {data.map(item => (
+            <div key={item.label} className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className={cn('w-3 h-3 rounded', item.color)} />
+                <span className="text-sm">{item.label}</span>
+              </div>
+              <span className="text-sm font-semibold">{item.value}%</span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function MobileBillDetail() {
+  // State management - keeping all state at the top for clarity
+  const [bill] = useState<BillData>(MOCK_BILL_DATA);
+  const [activeTab, setActiveTab] = useState('overview');
   const [isSaved, setIsSaved] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
-  // Configure tabs for different sections of the bill detail page
-  const tabs: MobileTab[] = [
-    { id: 'overview', label: 'Overview', icon: <FileText className="h-4 w-4" /> },
-    { id: 'analysis', label: 'Analysis', icon: <BarChart3 className="h-4 w-4" /> },
-    { id: 'sponsors', label: 'Sponsors', icon: <User className="h-4 w-4" /> },
-    { 
-      id: 'community', 
-      label: 'Community', 
-      icon: <Users className="h-4 w-4" />, 
-      badge: bill.commentCount.toString() 
-    },
-    { id: 'related', label: 'Related', icon: <Globe className="h-4 w-4" /> },
-  ];
-
-  const { activeTab, changeTab } = useMobileTabs('overview');
-
-  // Swipe gesture handlers for intuitive mobile navigation
-  // Swipe left moves to the next tab, swipe right moves to the previous tab
-  const handleSwipeLeft = useCallback(() => {
-    const currentIndex = tabs.findIndex(tab => tab.id === activeTab);
-    if (currentIndex < tabs.length - 1) {
-      changeTab(tabs[currentIndex + 1].id);
-    }
-  }, [activeTab, tabs, changeTab]);
-
-  const handleSwipeRight = useCallback(() => {
-    const currentIndex = tabs.findIndex(tab => tab.id === activeTab);
-    if (currentIndex > 0) {
-      changeTab(tabs[currentIndex - 1].id);
-    }
-  }, [activeTab, tabs, changeTab]);
-
-  // Navigation and action handlers
-  const handleBack = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
-
-  const handleSave = useCallback(() => {
-    setIsSaved(prev => !prev);
-    // TODO: Integrate with backend API to persist saved bills
-  }, []);
-
-  const handleShare = useCallback(() => {
-    // Use native Web Share API if available for a better mobile experience
-    if (navigator.share) {
-      navigator.share({
-        title: bill.title,
-        text: bill.summary,
-        url: window.location.href,
-      }).catch((error) => {
-        // User cancelled sharing or an error occurred
-        console.log('Share failed:', error);
-      });
-    } else {
-      // Fallback: Copy URL to clipboard for browsers without Web Share API
-      navigator.clipboard.writeText(window.location.href);
-      // TODO: Show toast notification confirming URL was copied
-    }
-  }, [bill.title, bill.summary]);
-
-  const handleFollow = useCallback(() => {
-    setIsFollowing(prev => !prev);
-    // TODO: Integrate with backend API to manage bill notifications
-  }, []);
-
-  const handleComment = useCallback(() => {
-    navigate(`/bills/${id}/comments`);
-  }, [navigate, id]);
-
-  // Chart configuration for the analysis tab
-  const supportChart: ChartData = {
-    title: 'Community Support',
-    type: 'pie',
-    data: [
-      { label: 'Support', value: bill.communityEngagement.supportPercentage, color: 'bg-green-500' },
-      { label: 'Oppose', value: 100 - bill.communityEngagement.supportPercentage, color: 'bg-red-500' },
+  // Tab configuration - memoized to prevent recreation
+  const tabs = useMemo(
+    () => [
+      { id: 'overview', label: 'Overview', icon: <FileText className="h-4 w-4" /> },
+      { id: 'analysis', label: 'Analysis', icon: <BarChart3 className="h-4 w-4" /> },
+      { id: 'sponsors', label: 'Sponsors', icon: <User className="h-4 w-4" /> },
+      { id: 'community', label: 'Community', icon: <Users className="h-4 w-4" /> },
+      { id: 'related', label: 'Related', icon: <Globe className="h-4 w-4" /> },
     ],
-  };
+    []
+  );
 
-  const engagementChart: ChartData = {
-    title: 'Engagement Metrics',
-    type: 'bar',
-    data: [
+  // Chart data - memoized to prevent recalculation on every render
+  const supportChartData = useMemo(
+    () => [
+      {
+        label: 'Support',
+        value: bill.communityEngagement.supportPercentage,
+        color: 'bg-green-500',
+      },
+      {
+        label: 'Oppose',
+        value: 100 - bill.communityEngagement.supportPercentage,
+        color: 'bg-red-500',
+      },
+    ],
+    [bill.communityEngagement.supportPercentage]
+  );
+
+  const engagementChartData = useMemo(
+    () => [
       { label: 'Views', value: bill.viewCount, color: 'bg-blue-500' },
       { label: 'Saves', value: bill.saveCount, color: 'bg-green-500' },
       { label: 'Comments', value: bill.commentCount, color: 'bg-purple-500' },
       { label: 'Shares', value: bill.shareCount, color: 'bg-orange-500' },
     ],
-  };
+    [bill.viewCount, bill.saveCount, bill.commentCount, bill.shareCount]
+  );
 
-  // Dynamic content renderer based on active tab
-  const renderTabContent = () => {
+  // Navigation handlers - properly memoized with stable dependencies
+  const handleBack = useCallback(() => {
+    window.history.back();
+  }, []);
+
+  const handleSave = useCallback(() => {
+    setIsSaved(prev => !prev);
+    // In production: Make API call to persist the saved state
+    console.log('Bill save toggled:', !isSaved);
+  }, [isSaved]);
+
+  const handleShare = useCallback(async () => {
+    // Modern Web Share API provides native sharing on mobile devices
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: bill.title,
+          text: bill.summary,
+          url: window.location.href,
+        });
+      } catch (error) {
+        // User cancelled or share failed - this is normal, no action needed
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.log('Share failed:', error);
+        }
+      }
+    } else {
+      // Fallback for browsers without Web Share API
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      } catch (error) {
+        console.error('Copy failed:', error);
+      }
+    }
+  }, [bill.title, bill.summary]);
+
+  const handleFollow = useCallback(() => {
+    setIsFollowing(prev => !prev);
+    // In production: Make API call to manage notification preferences
+    console.log('Bill follow toggled:', !isFollowing);
+  }, [isFollowing]);
+
+  const handleRelatedBillClick = useCallback((billId: number) => {
+    // In production: Use React Router navigation
+    console.log('Navigate to bill:', billId);
+    window.location.hash = `#/bills/${billId}`;
+  }, []);
+
+  const handleCommentClick = useCallback(() => {
+    // In production: Navigate to comments section
+    console.log('Navigate to comments');
+    window.location.hash = `#/bills/${bill.id}/comments`;
+  }, [bill.id]);
+
+  // Touch gesture handling for swipe navigation between tabs
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    const currentIndex = tabs.findIndex(tab => tab.id === activeTab);
+
+    if (isLeftSwipe && currentIndex < tabs.length - 1) {
+      // Swipe left - move to next tab
+      setActiveTab(tabs[currentIndex + 1].id);
+    } else if (isRightSwipe && currentIndex > 0) {
+      // Swipe right - move to previous tab
+      setActiveTab(tabs[currentIndex - 1].id);
+    }
+
+    // Reset touch tracking
+    setTouchStart(0);
+    setTouchEnd(0);
+  }, [touchStart, touchEnd, activeTab, tabs]);
+
+  // Tab content renderer - separated for better organization and readability
+  const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case 'overview':
         return (
           <div className="space-y-6">
-            {/* Bill Summary Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Summary</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm leading-relaxed">{bill.summary}</p>
+                <p className="text-sm leading-relaxed text-gray-700">{bill.summary}</p>
               </CardContent>
             </Card>
 
-            {/* Key Engagement Metrics Grid */}
             <div className="grid grid-cols-2 gap-3">
-              <MobileMetricCard
+              <MetricCard
                 title="Views"
                 value={bill.viewCount.toLocaleString()}
-                icon={<Eye className="h-4 w-4" />}
+                icon={<Eye className="h-5 w-5" />}
               />
-              <MobileMetricCard
+              <MetricCard
                 title="Saves"
                 value={bill.saveCount}
-                icon={<BookmarkPlus className="h-4 w-4" />}
+                icon={<Bookmark className="h-5 w-5" />}
               />
-              <MobileMetricCard
+              <MetricCard
                 title="Comments"
                 value={bill.commentCount}
-                icon={<MessageSquare className="h-4 w-4" />}
+                icon={<MessageSquare className="h-5 w-5" />}
               />
-              <MobileMetricCard
+              <MetricCard
                 title="Shares"
                 value={bill.shareCount}
-                icon={<Share2 className="h-4 w-4" />}
+                icon={<Share2 className="h-5 w-5" />}
               />
             </div>
 
-            {/* Policy Areas Tags */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Policy Areas</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {bill.policyAreas.map((area) => (
-                    <Badge key={area} variant="outline">
+                  {bill.policyAreas.map(area => (
+                    <Badge key={area} variant="outline" className="text-sm">
                       {area}
                     </Badge>
                   ))}
@@ -333,7 +545,6 @@ export function MobileBillDetail() {
               </CardContent>
             </Card>
 
-            {/* Constitutional Considerations - Only shown if flags exist */}
             {bill.constitutionalFlags.length > 0 && (
               <Card>
                 <CardHeader>
@@ -344,23 +555,15 @@ export function MobileBillDetail() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {bill.constitutionalFlags.map((flag) => (
-                      <div key={flag.id} className="p-3 bg-muted rounded-md">
-                        <div className="flex items-center justify-between mb-1">
+                    {bill.constitutionalFlags.map(flag => (
+                      <div key={flag.id} className="p-3 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium">{flag.provision}</span>
-                          <Badge 
-                            className={cn(
-                              'text-xs',
-                              flag.severity === 'critical' && 'bg-red-100 text-red-800',
-                              flag.severity === 'high' && 'bg-orange-100 text-orange-800',
-                              flag.severity === 'medium' && 'bg-yellow-100 text-yellow-800',
-                              flag.severity === 'low' && 'bg-gray-100 text-gray-800'
-                            )}
-                          >
+                          <Badge className={cn('text-xs', SEVERITY_COLORS[flag.severity])}>
                             {flag.severity}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground">{flag.description}</p>
+                        <p className="text-sm text-gray-600">{flag.description}</p>
                       </div>
                     ))}
                   </div>
@@ -373,21 +576,20 @@ export function MobileBillDetail() {
       case 'analysis':
         return (
           <div className="space-y-6">
-            {/* Community support visualization */}
-            <MobilePieChart data={supportChart} />
-            
-            {/* Engagement metrics visualization */}
-            <MobileBarChart data={engagementChart} />
-            
-            {/* Expert Analysis Section - placeholder for future content */}
+            <SimplePieChart data={supportChartData} />
+            <SimpleBarChart data={engagementChartData} />
+
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Expert Analysis</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Expert analyses will appear here</p>
+                <div className="text-center py-8 text-gray-400">
+                  <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">
+                    {bill.communityEngagement.expertAnalyses} expert analyses available
+                  </p>
+                  <p className="text-xs mt-1">Coming soon</p>
                 </div>
               </CardContent>
             </Card>
@@ -397,19 +599,21 @@ export function MobileBillDetail() {
       case 'sponsors':
         return (
           <div className="space-y-4">
-            {bill.sponsors.map((sponsor) => (
+            {bill.sponsors.map(sponsor => (
               <Card key={sponsor.id}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src={sponsor.avatar} alt={sponsor.name} />
                       <AvatarFallback>
-                        {sponsor.name.split(' ').map(n => n[0]).join('')}
+                        {sponsor.name
+                          .split(' ')
+                          .map(n => n[0])
+                          .join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium truncate">{sponsor.name}</h3>
-                      <p className="text-sm text-muted-foreground">{sponsor.role}</p>
+                      <h3 className="font-medium text-base truncate">{sponsor.name}</h3>
+                      <p className="text-sm text-gray-500">{sponsor.role}</p>
                       <Badge variant="outline" className="text-xs mt-1">
                         {sponsor.party}
                       </Badge>
@@ -424,30 +628,30 @@ export function MobileBillDetail() {
       case 'community':
         return (
           <div className="space-y-6">
-            {/* Community Statistics Summary */}
             <div className="grid grid-cols-2 gap-3">
-              <MobileMetricCard
+              <MetricCard
                 title="Support"
                 value={`${bill.communityEngagement.supportPercentage}%`}
-                icon={<BookmarkPlus className="h-4 w-4" />}
+                icon={<Users className="h-5 w-5" />}
               />
-              <MobileMetricCard
+              <MetricCard
                 title="Participants"
                 value={bill.communityEngagement.totalParticipants.toLocaleString()}
-                icon={<Users className="h-4 w-4" />}
+                icon={<Users className="h-5 w-5" />}
               />
             </div>
 
-            {/* Community Discussion Entry Point */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Community Discussion</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm mb-4">Join the conversation about this bill</p>
-                  <Button onClick={handleComment} className="w-full">
+                <div className="text-center py-8">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm text-gray-600 mb-4">
+                    Join the conversation about this bill
+                  </p>
+                  <Button onClick={handleCommentClick} className="w-full" variant="primary">
                     View Comments ({bill.commentCount})
                   </Button>
                 </div>
@@ -459,18 +663,16 @@ export function MobileBillDetail() {
       case 'related':
         return (
           <div className="space-y-4">
-            {bill.relatedBills.map((relatedBill) => (
-              <Card 
-                key={relatedBill.id} 
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => navigate(`/bills/${relatedBill.id}`)}
+            {bill.relatedBills.map(relatedBill => (
+              <Card
+                key={relatedBill.id}
+                className="cursor-pointer hover:shadow-md transition-shadow active:scale-98"
+                onClick={() => handleRelatedBillClick(relatedBill.id)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-sm line-clamp-2 mb-1">
-                        {relatedBill.title}
-                      </h3>
+                      <h3 className="font-medium text-sm mb-2 leading-snug">{relatedBill.title}</h3>
                       <Badge variant="outline" className="text-xs">
                         {relatedBill.relationship}
                       </Badge>
@@ -485,94 +687,114 @@ export function MobileBillDetail() {
       default:
         return null;
     }
-  };
+  }, [
+    activeTab,
+    bill,
+    supportChartData,
+    engagementChartData,
+    handleCommentClick,
+    handleRelatedBillClick,
+  ]);
 
   return (
-    <MobileLayout>
-      {/* Sticky Header with Bill Information and Actions */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b">
-        {/* Navigation and Title Bar */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Sticky header with bill information and primary actions */}
+      <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
+        {/* Top navigation bar */}
         <div className="flex items-center gap-3 p-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleBack}
-            className="h-10 w-10 p-0"
+            className="h-10 w-10 p-0 shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          
+
           <div className="flex-1 min-w-0">
-            <h1 className="font-semibold text-base line-clamp-1">{bill.title}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge className={cn('text-xs', statusColors[bill.status])}>
+            <h1 className="font-semibold text-base leading-tight line-clamp-1">{bill.title}</h1>
+            <div className="flex items-center gap-2 mt-1.5">
+              <Badge className={cn('text-xs capitalize', STATUS_COLORS[bill.status])}>
                 {bill.status}
               </Badge>
-              <Badge className={cn('text-xs', urgencyColors[bill.urgency])}>
+              <Badge className={cn('text-xs capitalize', URGENCY_COLORS[bill.urgency])}>
                 {bill.urgency}
               </Badge>
             </div>
           </div>
         </div>
 
-        {/* Quick Action Buttons with 44px Touch Targets */}
+        {/* Action buttons - 44px minimum touch target for accessibility */}
         <div className="flex items-center justify-between px-4 pb-3">
           <div className="flex items-center gap-2">
             <Button
-              variant={isSaved ? 'default' : 'outline'}
+              variant={isSaved ? 'primary' : 'outline'}
               size="sm"
               onClick={handleSave}
-              className="h-9"
+              className="h-11 min-w-[88px]"
+              aria-label={isSaved ? 'Remove from saved' : 'Save bill'}
             >
-              <BookmarkPlus className={cn('h-4 w-4 mr-1', isSaved && 'fill-current')} />
-              Save
+              <Bookmark className={cn('h-4 w-4 mr-1.5', isSaved && 'fill-current')} />
+              {isSaved ? 'Saved' : 'Save'}
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleShare}
-              className="h-9"
+              className="h-11 min-w-[88px]"
+              aria-label="Share bill"
             >
-              <Share2 className="h-4 w-4 mr-1" />
+              <Share2 className="h-4 w-4 mr-1.5" />
               Share
             </Button>
           </div>
-          
+
           <Button
-            variant={isFollowing ? 'default' : 'outline'}
+            variant={isFollowing ? 'primary' : 'outline'}
             size="sm"
             onClick={handleFollow}
-            className="h-9"
+            className="h-11 min-w-[100px]"
+            aria-label={isFollowing ? 'Unfollow bill' : 'Follow bill for updates'}
           >
-            <Bell className={cn('h-4 w-4 mr-1', isFollowing && 'fill-current')} />
+            <Bell className={cn('h-4 w-4 mr-1.5', isFollowing && 'fill-current')} />
             {isFollowing ? 'Following' : 'Follow'}
           </Button>
         </div>
 
-        {/* Tab Navigation with Underline Indicator */}
-        <div className="px-4 pb-2">
-          <MobileTabSelector
-            tabs={tabs}
-            activeTab={activeTab}
-            onTabChange={changeTab}
-            variant="underline"
-          />
+        {/* Tab navigation */}
+        <div className="px-4 overflow-x-auto">
+          <div className="flex gap-1 border-b">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap',
+                  'border-b-2 -mb-px',
+                  activeTab === tab.id
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                )}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Main Content Area with Swipe Navigation Support */}
-      <SwipeGestures
-        onSwipeLeft={handleSwipeLeft}
-        onSwipeRight={handleSwipeRight}
-        minDistance={50}
+      {/* Main content area with swipe gesture support */}
+      <div
+        className="p-4"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
-        <MobileContainer>
-          <MobileSection>
-            {renderTabContent()}
-          </MobileSection>
-        </MobileContainer>
-      </SwipeGestures>
-    </MobileLayout>
+        {renderTabContent()}
+      </div>
+    </div>
   );
 }

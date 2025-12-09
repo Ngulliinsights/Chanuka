@@ -6,10 +6,10 @@ import {
   Star
 } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@client/components/ui/avatar';
-import { Badge } from '@client/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system/primitives/avatar';
+import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
 
 import { ActivitySection } from '../sections/ActivitySection';
 import { BillsSection } from '../sections/BillsSection';

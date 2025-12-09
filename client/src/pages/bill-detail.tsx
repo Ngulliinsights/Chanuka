@@ -13,20 +13,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 
 // Bill Detail Components
-import BillAnalysisTab from '@client/components/bill-detail/BillAnalysisTab';
-import BillCommunityTab from '@client/components/bill-detail/BillCommunityTab';
-import BillFullTextTab from '@client/components/bill-detail/BillFullTextTab';
-import { BillHeader } from '@client/components/bill-detail/BillHeader';
-import BillOverviewTab from '@client/components/bill-detail/BillOverviewTab';
-import BillRelatedTab from '@client/components/bill-detail/BillRelatedTab';
-import BillSponsorsTab from '@client/components/bill-detail/BillSponsorsTab';
-import { CivicActionGuidance } from '@client/components/bill-detail/CivicActionGuidance';
-import { ConstitutionalAnalysisPanel } from '@client/components/bill-detail/ConstitutionalAnalysisPanel';
-import { ExpertAnalysisCard } from '@client/components/bill-detail/ExpertAnalysisCard';
-import { QuickActionsBar } from '@client/components/bill-detail/QuickActionsBar';
-import { Alert, AlertDescription } from '@client/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { UnifiedButton, UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '@client/components/ui/unified-components';
+import BillAnalysisTab from '@client/features/bills/ui/detail/BillAnalysisTab';
+import BillCommunityTab from '@client/features/bills/ui/detail/BillCommunityTab';
+import BillFullTextTab from '@client/features/bills/ui/detail/BillFullTextTab';
+import { BillHeader } from '@client/features/bills/ui/detail/BillHeader';
+import BillOverviewTab from '@client/features/bills/ui/detail/BillOverviewTab';
+import BillRelatedTab from '@client/features/bills/ui/detail/BillRelatedTab';
+import BillSponsorsTab from '@client/features/bills/ui/detail/BillSponsorsTab';
+import { CivicActionGuidance } from '@client/features/bills/ui/detail/CivicActionGuidance';
+import { ConstitutionalAnalysisPanel } from '@client/features/bills/ui/detail/ConstitutionalAnalysisPanel';
+import { ExpertAnalysisCard } from '@client/features/bills/ui/detail/ExpertAnalysisCard';
+import { QuickActionsBar } from '@client/features/bills/ui/detail/QuickActionsBar';
+import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { UnifiedButton, UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '@client/shared/design-system/primitives/unified-components';
 import type { Bill } from '@client/core/api/types';
 
 // Hooks and Services

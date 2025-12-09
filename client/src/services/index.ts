@@ -1,13 +1,24 @@
 /**
- * Services Index
- * Exports all services and types that were previously in repositories
+ * Services Index - Legacy Services (Pending Integration)
+ * 
+ * ⚠️  MIGRATION IN PROGRESS ⚠️
+ * 
+ * This directory contains legacy services that are being migrated to FSD structure.
+ * Most services have been successfully integrated into their appropriate locations:
+ * 
+ * - Core services → core/
+ * - Feature services → features/[feature]/services/
+ * - Shared services → shared/services/
+ * 
+ * See SERVICES_INTEGRATION_COMPLETE.md for full migration status.
  */
 
-// Export services
-export { authService } from './auth-service';
+// ============================================================================
+// REMAINING LEGACY SERVICES (Pending Integration)
+// ============================================================================
+
+// Legacy user service (to be integrated into features/users/services/)
 export { userService } from './userService';
-export { mockDataService } from './mockDataService';
-export { api } from './api';
 
 // Export types that were in repositories
 export interface DashboardFilters {

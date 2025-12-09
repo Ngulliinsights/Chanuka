@@ -20,13 +20,10 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   errorId,
   recoveryOptions,
   onRetry,
-  onFeedback,
   onReload,
   onContactSupport,
-  recoveryAttempted,
-  recoverySuccessful,
-  userFeedbackSubmitted,
-  showTechnicalDetails,
+  // Intentionally unused but part of the interface for extensibility:
+  // onFeedback, recoveryAttempted, recoverySuccessful, userFeedbackSubmitted, showTechnicalDetails
 }) => {
   // Determine severity for styling
   const severity = error.metadata?.severity || ErrorSeverity.HIGH;

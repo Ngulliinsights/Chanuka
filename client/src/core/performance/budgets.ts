@@ -5,7 +5,6 @@
  * budget compliance checking with detailed reporting.
  */
 
-import { logger } from '../../utils/logger';
 import { PerformanceBudget, PerformanceMetric, BudgetCheckResult } from './types';
 
 /**
@@ -118,11 +117,6 @@ export class PerformanceBudgetChecker {
         category: 'loading'
       }
     ];
-
-    logger.info('Default performance budgets initialized', {
-      component: 'PerformanceBudgetChecker',
-      budgetCount: this.budgets.length
-    });
   }
 
   /**
@@ -190,7 +184,7 @@ export class PerformanceBudgetChecker {
    */
   private generateRecommendations(
     metric: PerformanceMetric, 
-    budget: PerformanceBudget, 
+    _budget: PerformanceBudget, 
     status: 'warning' | 'fail'
   ): string[] {
     const recommendations: string[] = [];
@@ -301,13 +295,6 @@ export class PerformanceBudgetChecker {
     if (this.checkHistory.length > this.MAX_HISTORY) {
       this.checkHistory = this.checkHistory.slice(-this.MAX_HISTORY);
     }
-
-    logger.debug('Budget check recorded', {
-      component: 'PerformanceBudgetChecker',
-      metric: metric.name,
-      value: metric.value,
-      status: result.status
-    });
   }
 
   /**
@@ -339,20 +326,8 @@ export class PerformanceBudgetChecker {
 
     if (existingIndex >= 0) {
       this.budgets[existingIndex] = newBudget;
-      logger.info('Budget updated', { 
-        component: 'PerformanceBudgetChecker',
-        metric, 
-        budget, 
-        warning 
-      });
     } else {
       this.budgets.push(newBudget);
-      logger.info('Budget created', { 
-        component: 'PerformanceBudgetChecker',
-        metric, 
-        budget, 
-        warning 
-      });
     }
   }
 
@@ -363,10 +338,6 @@ export class PerformanceBudgetChecker {
     const index = this.budgets.findIndex(b => b.metric === metric);
     if (index >= 0) {
       this.budgets.splice(index, 1);
-      logger.info('Budget removed', { 
-        component: 'PerformanceBudgetChecker',
-        metric 
-      });
       return true;
     }
     return false;
@@ -467,7 +438,7 @@ export class PerformanceBudgetChecker {
   exportBudgets(): {
     timestamp: Date;
     budgets: PerformanceBudget[];
-    stats: ReturnType<typeof this.getComplianceStats>;
+    stats: any;
   } {
     return {
       timestamp: new Date(),
@@ -489,12 +460,6 @@ export class PerformanceBudgetChecker {
     });
 
     this.budgets = validBudgets;
-    
-    logger.info('Budgets imported', {
-      component: 'PerformanceBudgetChecker',
-      importedCount: validBudgets.length,
-      skippedCount: budgets.length - validBudgets.length
-    });
   }
 
   /**
@@ -502,8 +467,5 @@ export class PerformanceBudgetChecker {
    */
   resetHistory(): void {
     this.checkHistory = [];
-    logger.info('Budget check history reset', {
-      component: 'PerformanceBudgetChecker'
-    });
   }
 }

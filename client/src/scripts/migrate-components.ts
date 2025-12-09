@@ -27,17 +27,17 @@ const COMPONENT_MIGRATIONS: MigrationRule[] = [
   // Import migrations
   {
     pattern: /import\s*{\s*Button\s*}\s*from\s*['"]\.\.\/components\/ui\/button['"];?/g,
-    replacement: "import { UnifiedButton } from '@client/components/ui/unified-components';",
+    replacement: "import { UnifiedButton } from '@client/shared/design-system/primitives/unified-components';",
     description: 'Migrate Button import to UnifiedButton'
   },
   {
     pattern: /import\s*{\s*Card,\s*CardContent,\s*CardDescription,\s*CardHeader,\s*CardTitle\s*}\s*from\s*['"]\.\.\/components\/ui\/card['"];?/g,
-    replacement: "import { UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle } from '@client/components/ui/unified-components';",
+    replacement: "import { UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle } from '@client/shared/design-system/primitives/unified-components';",
     description: 'Migrate Card imports to Unified components'
   },
   {
     pattern: /import\s*{\s*Badge\s*}\s*from\s*['"]\.\.\/components\/ui\/badge['"];?/g,
-    replacement: "import { UnifiedBadge } from '@client/components/ui/unified-components';",
+    replacement: "import { UnifiedBadge } from '@client/shared/design-system/primitives/unified-components';",
     description: 'Migrate Badge import to UnifiedBadge'
   },
 

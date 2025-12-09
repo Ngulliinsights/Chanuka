@@ -5,6 +5,6 @@
 
 export * from './light';
 export * from './dark';
-export * from './highContrast';
+export * from './high-contrast';
 export * from './themeProvider';
 

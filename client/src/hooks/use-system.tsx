@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { api } from '@client/services/api';
+import api from '@/utils/api';
+import { globalApiClient } from '@client/core/api/client';
 import { logger } from '@client/utils/logger';
 
 export function useSystemHealth() {

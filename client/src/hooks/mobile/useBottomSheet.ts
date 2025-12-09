@@ -8,7 +8,7 @@
  * @example
  * ```tsx
  * import { useBottomSheet } from '@/hooks/mobile';
- * import { MobileBottomSheet } from '@/components/mobile/interaction';
+ * import { MobileBottomSheet } from '@client/shared/ui/mobile/interaction';
  *
  * export function MyComponent() {
  *   const { isOpen, onOpen, onClose, currentSnap, snapTo } = useBottomSheet({
