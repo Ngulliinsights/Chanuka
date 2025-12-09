@@ -178,28 +178,37 @@ export {
 } from './auth';
 
 // ============================================================================
-// Loading States (Placeholder - to be implemented)
+// Performance Monitoring
 // ============================================================================
 
-// export { ... } from './loading';
+export * from './performance';
 
 // ============================================================================
-// Navigation (Placeholder - to be implemented)
+// Loading States
 // ============================================================================
 
-// export { ... } from './navigation';
+export * from './loading';
 
 // ============================================================================
-// Dashboard (Placeholder - to be implemented)
+// Storage Management (Session, Token, Cache)
 // ============================================================================
 
-// export { ... } from './dashboard';
+// Storage Management (Session, Token, Cache)
+// Note: CacheEntry, CacheConfig, EvictionPolicy, and CacheStats are exported from api
+// to maintain single source of truth
+export * from './storage';
+
+// ============================================================================
+// Mobile Utilities
+// ============================================================================
+
+export * from './mobile';
 
 // ============================================================================
 // Business Logic and Domain Services
 // ============================================================================
 
-// API Services (business logic focused)
+// API Services (business logic focused) - includes cache types
 export * from './api';
 
 // Community Services (business logic)

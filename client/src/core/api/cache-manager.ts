@@ -8,17 +8,14 @@
 import { logger } from '../../utils/logger';
 
 /**
- * Cache entry with metadata
+ * Cache entry with metadata - imported from storage types
  */
-export interface CacheEntry<T = unknown> {
-  data: T;
-  timestamp: number;
-  ttl: number;
-  accessCount: number;
-  lastAccessed: number;
-  size: number;
-  tags?: string[];
-}
+import type { CacheEntry, CacheStats } from '../storage/types';
+
+/**
+ * Eviction policy type
+ */
+export type EvictionPolicy = 'LRU' | 'LFU' | 'FIFO' | 'TTL';
 
 /**
  * Cache configuration options
@@ -32,17 +29,6 @@ export interface CacheConfig {
   enableCompression: boolean;
   enableEncryption: boolean;
 }
-
-/**
- * Cache statistics
- */
-export interface CacheStats {
-  hits: number;
-  misses: number;
-  sets: number;
-  deletes: number;
-  evictions: number;
-  totalSize: number;
   entryCount: number;
   hitRate: number;
 }

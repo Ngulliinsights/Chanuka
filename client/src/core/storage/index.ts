@@ -9,8 +9,19 @@
  * - Cross-storage backend support
  */
 
-// Core storage types
-export * from './types';
+// Core storage types (excluding cache types to avoid duplication with api/cache-manager)
+export {
+  type StorageOptions,
+  type SessionInfo,
+  type TokenInfo,
+  type StorageStats,
+  type SessionValidation,
+  type TokenValidation,
+  type CleanupOptions,
+  type StorageError,
+  type StorageErrorCode,
+  type StorageBackend
+} from './types';
 
 // Secure storage
 export {
@@ -29,21 +40,13 @@ export {
   tokenManager
 } from '../auth/services/token-manager';
 
-// Cache storage
+// Cache storage (types are exported from api/cache-manager to avoid duplication)
 export {
-  CacheStorageManager,
-  type EvictionPolicy,
-  type CacheConfig
+  CacheStorageManager
 } from './cache-storage';
 
 // Convenience re-exports for common use cases
 export {
-  type StorageOptions,
-  type SessionInfo,
-  type TokenInfo,
-  type CacheEntry,
-  type StorageStats,
-  type CacheStats,
   type SessionValidation,
   type TokenValidation,
   type CleanupOptions,
@@ -51,6 +54,9 @@ export {
   type StorageErrorCode,
   type StorageBackend
 } from './types';
+
+// Note: CacheEntry, CacheStats, EvictionPolicy, and CacheConfig are exported from api/cache-manager
+// to avoid duplication and maintain single source of truth for cache-related types
 
 // Import classes first
 import { SecureStorage } from './secure-storage';
