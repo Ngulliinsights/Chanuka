@@ -11,7 +11,7 @@ import React, { useState, useMemo } from 'react';
 import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
 import { Button } from '@client/shared/design-system/primitives/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@client/shared/ui/ui/progress';
 
 interface ContributionData {
   id: string;

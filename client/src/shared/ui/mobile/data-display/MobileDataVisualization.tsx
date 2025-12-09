@@ -7,7 +7,7 @@
  * @component
  * @example
  * ```tsx
- * import { MobileDataVisualization } from '@/components/mobile/data-display';
+ * import { MobileDataVisualization } from '@client/shared/ui/mobile/data-display';
  * 
  * export function Analytics() {
  *   return (

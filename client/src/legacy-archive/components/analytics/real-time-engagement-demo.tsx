@@ -274,7 +274,7 @@ export function RealTimeEngagementDemo({ className }: RealTimeEngagementDemoProp
                   <h4 className="font-medium mb-2">Basic Usage</h4>
                   <div className="bg-muted p-4 rounded-lg">
                     <code className="text-sm">
-{`import { RealTimeEngagementDashboard } from '@/components/analytics';
+{`import { RealTimeEngagementDashboard } from '@client/shared/ui/analytics';
 
 // Global engagement view
 <RealTimeEngagementDashboard />

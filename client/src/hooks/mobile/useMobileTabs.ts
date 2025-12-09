@@ -8,7 +8,7 @@
  * @example
  * ```tsx
  * import { useMobileTabs } from '@/hooks/mobile';
- * import { MobileTabSelector } from '@/components/mobile/data-display';
+ * import { MobileTabSelector } from '@client/shared/ui/mobile/data-display';
  * 
  * export function MyTabbedContent() {
  *   const { activeTab, setActiveTab } = useMobileTabs('overview');

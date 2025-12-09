@@ -11,8 +11,8 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
-import { GDPRComplianceManager } from '@client/components/privacy/GDPRComplianceManager';
-import { DataUsageReportDashboard } from '@client/components/privacy/DataUsageReportDashboard';
+import { GDPRComplianceManager } from '@client/features/security/ui/privacy/GDPRComplianceManager';
+import { DataUsageReportDashboard } from '@client/features/security/ui/privacy/DataUsageReportDashboard';
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';

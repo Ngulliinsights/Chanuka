@@ -7,7 +7,7 @@
  * @component
  * @example
  * ```tsx
- * import { MobileChartCarousel } from '@/components/mobile/data-display';
+ * import { MobileChartCarousel } from '@client/shared/ui/mobile/data-display';
  * 
  * export function ChartsPage() {
  *   return (

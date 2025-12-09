@@ -1,25 +1,23 @@
-/**
- * Shared UI Components
- *
- * Components that are genuinely used across multiple features.
- * These components should have zero feature-specific logic.
- */
+// Barrel exports for shared components
 
-// Layout Components
-export { default as Layout } from './layout/Layout';
-export { default as Header } from './layout/Header';
-
-// Navigation Components
-export * from './navigation';
-
-// Loading Components
-export { default as LoadingSpinner } from './loading/LoadingSpinner';
-
-// Mobile Components
-export * from './mobile';
-
-// Dashboard Components
+// Dashboard components
 export * from './dashboard';
 
-// Real-time Components
-export * from './realtime';
+// Privacy components
+export * from './privacy';
+
+// Auth components
+export * from './auth';
+
+// Shared utilities
+export * from './utils';
+
+// Shared types and interfaces
+export * from './types';
+// Additional Shared UI Components
+export * from './loading';
+export * from './notifications';
+export * from './offline';
+export * from './accessibility';
+export * from './integration';
+export * from './examples';

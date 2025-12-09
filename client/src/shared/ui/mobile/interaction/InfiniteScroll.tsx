@@ -7,7 +7,7 @@
  * @component
  * @example
  * ```tsx
- * import { InfiniteScroll, useInfiniteScroll } from '@/components/mobile/interaction';
+ * import { InfiniteScroll, useInfiniteScroll } from '@client/shared/ui/mobile/interaction';
  * 
  * export function MyFeed() {
  *   const { isLoading, hasMore, onLoadMore } = useInfiniteScroll();

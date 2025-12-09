@@ -7,7 +7,7 @@
  * @component
  * @example
  * ```tsx
- * import { MobileTabSelector, useMobileTabs } from '@/components/mobile/data-display';
+ * import { MobileTabSelector, useMobileTabs } from '@client/shared/ui/mobile/data-display';
  * 
  * export function TabbedContent() {
  *   const { activeTab, setActiveTab } = useMobileTabs('overview');

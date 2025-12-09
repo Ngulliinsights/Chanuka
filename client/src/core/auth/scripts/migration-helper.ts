@@ -37,8 +37,8 @@ export const IMPORT_MAPPINGS = {
   "import { sessionManager } from '@/utils/storage'": "import { sessionManager } from '@/core/auth'",
   
   // Validation
-  "import { validatePasswordComprehensive } from '@/components/auth/utils/auth-validation'": "import { validatePasswordComprehensive } from '@/core/auth'",
-  "from '@/components/auth/utils/auth-validation'": "from '@/core/auth'"
+  "import { validatePasswordComprehensive } from '@client/shared/ui/auth/utils/auth-validation'": "import { validatePasswordComprehensive } from '@/core/auth'",
+  "from '@client/shared/ui/auth/utils/auth-validation'": "from '@/core/auth'"
 };
 
 /**

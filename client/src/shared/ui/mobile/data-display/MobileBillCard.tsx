@@ -7,7 +7,7 @@
  * @component
  * @example
  * ```tsx
- * import { MobileBillCard } from '@/components/mobile/data-display';
+ * import { MobileBillCard } from '@client/shared/ui/mobile/data-display';
  * 
  * export function BillsList() {
  *   return (

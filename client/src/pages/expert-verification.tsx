@@ -19,13 +19,13 @@ import { Badge } from '@client/shared/design-system/primitives/badge';
 import { Button } from '@client/shared/design-system/primitives/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
-import { ExpertBadge, ExpertBadgeGroup } from '@client/components/verification/ExpertBadge';
-import { ExpertVerificationDemo } from '@client/components/verification/ExpertVerificationDemo';
-import { VerificationWorkflow } from '@client/components/verification/VerificationWorkflow';
-import { CredibilityIndicator, CredibilityBreakdown } from '@client/components/verification/CredibilityScoring';
-import { ExpertProfileCard } from '@client/components/verification/ExpertProfileCard';
-import { CommunityValidation, ValidationSummary } from '@client/components/verification/CommunityValidation';
-import { ExpertConsensus, ConsensusIndicator } from '@client/components/verification/ExpertConsensus';
+import { ExpertBadge, ExpertBadgeGroup } from '@client/features/users/ui/verification/ExpertBadge';
+import { ExpertVerificationDemo } from '@client/features/users/ui/verification/ExpertVerificationDemo';
+import { VerificationWorkflow } from '@client/features/users/ui/verification/VerificationWorkflow';
+import { CredibilityIndicator, CredibilityBreakdown } from '@client/features/users/ui/verification/CredibilityScoring';
+import { ExpertProfileCard } from '@client/features/users/ui/verification/ExpertProfileCard';
+import { CommunityValidation, ValidationSummary } from '@client/features/users/ui/verification/CommunityValidation';
+import { ExpertConsensus, ConsensusIndicator } from '@client/features/users/ui/verification/ExpertConsensus';
 
 export default function ExpertVerification() {
   const [activeTab, setActiveTab] = useState('overview');

@@ -7,7 +7,7 @@
  * @component
  * @example
  * ```tsx
- * import { MobileBottomSheet, useBottomSheet } from '@/components/mobile/interaction';
+ * import { MobileBottomSheet, useBottomSheet } from '@client/shared/ui/mobile/interaction';
  *
  * export function MyPage() {
  *   const { isOpen, onClose, onOpen, snapPoints, currentSnap } = useBottomSheet({

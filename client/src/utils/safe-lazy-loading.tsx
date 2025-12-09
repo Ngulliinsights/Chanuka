@@ -670,13 +670,13 @@ export const SafeLazyPages = {
  */
 export const DynamicFeatureImports = {
   // Complex form components
-  MobileOptimizedForms: () => import("@/components/mobile/__archive__/mobile-optimized-forms"),
+  MobileOptimizedForms: () => import("@client/shared/ui/mobile/__archive__/mobile-optimized-forms"),
 
   // Large analysis components
-  AnalysisComponents: () => import("@client/components/analysis/comments"),
-  AnalysisStats: () => import("@client/components/analysis/stats"),
-  AnalysisTimeline: () => import("@client/components/analysis/timeline"),
-  AnalysisSection: () => import("@client/components/analysis/section"),
+  AnalysisComponents: () => import("@client/features/bills/ui/analysis/comments"),
+  AnalysisStats: () => import("@client/features/bills/ui/analysis/stats"),
+  AnalysisTimeline: () => import("@client/features/bills/ui/analysis/timeline"),
+  AnalysisSection: () => import("@client/features/bills/ui/analysis/section"),
 
   // Bill tracking components
   BillCard: () => import("@client/features/bills/ui/BillCard"),

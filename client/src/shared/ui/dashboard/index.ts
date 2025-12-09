@@ -1,66 +1,17 @@
-/**
- * Dashboard component barrel exports
- * Following navigation component export patterns
- */
+// Barrel exports for dashboard components
 
-// Main components
-export { ActivitySummary } from './activity-summary';
-export { ActionItems } from './action-items';
-export { TrackedTopics } from './tracked-topics';
-export { MonitoringDashboard } from './MonitoringDashboard';
-export { SmartDashboard } from './SmartDashboard';
 export { UserDashboard } from './UserDashboard';
-export { DashboardFramework } from './DashboardFramework';
+export { useDashboardData } from './useDashboardData';
 
-// Types
-export type {
-  DashboardSection,
-  ActionPriority,
-  TopicCategory,
-  ActionItem,
-  ActivitySummary as ActivitySummaryType,
-  TrackedTopic,
-  DashboardData,
-  DashboardConfig,
-  DashboardComponentProps,
-  UseDashboardResult
-} from './types';
+// Migration Dashboard
+export { MigrationDashboard } from './sections/MigrationDashboard';
+export { useMigrationDashboardData } from './useMigrationDashboardData';
 
-// Hooks
-export {
-  useDashboard,
-  useDashboardActions,
-  useDashboardTopics,
-  useDashboardConfig
-} from './hooks';
+// Variants
+export { FullPageDashboard } from './variants/FullPageDashboard';
+export { SectionDashboard } from './variants/SectionDashboard';
 
-// Validation utilities
-export {
-  validateActionItem,
-  validateActivitySummary,
-  validateTrackedTopic,
-  validateDashboardConfig,
-  validateDashboardData,
-  safeValidateActionItem,
-  safeValidateTrackedTopic,
-  safeValidateDashboardConfig
-} from './validation';
-
-// Error classes
-export {
-  DashboardError,
-  DashboardDataFetchError,
-  DashboardValidationError,
-  DashboardConfigurationError,
-  DashboardActionError,
-  DashboardTopicError,
-  DashboardErrorType
-} from './errors';
-
-// Recovery utilities
-export {
-  getRecoveryStrategy,
-  executeRecovery,
-  formatRecoverySuggestions
-} from './recovery';
-
+// Sections
+export { StatsSection } from './sections/StatsSection';
+export { ActivitySection } from './sections/ActivitySection';
+export { BillsSection } from './sections/BillsSection';

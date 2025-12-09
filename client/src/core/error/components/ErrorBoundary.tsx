@@ -1,31 +1,18 @@
 /**
  * Consolidated Enhanced Error Boundary Component
  *
- * Merges the best features from all error boundary implementations:
- * - Core's configurable architecture (8/10 quality)
- * - Components' superior user feedback system, advanced recovery options, and accessibility features (9/10 quality)
- *
- * Features:
- * - Configurable display modes and recovery strategies
- * - Advanced automatic recovery with timeout handling
- * - User feedback collection (rating + comments)
- * - Enhanced accessibility and better fallback UI
- * - Metrics collection and monitoring integration
- * - Browser/environment context collection
+ * This component consolidates advanced error boundary features from shared/core
+ * into the client implementation, including automatic recovery, enhanced context,
+ * user feedback, better UI, metrics collection, and monitoring integration.
  */
 
-import React, { Component, ErrorInfo } from 'react';
+import { Component, ReactNode, ErrorInfo } from 'react';
 
-import { coreErrorHandler } from '../handler';
-
-import { AppError, ErrorDomain, ErrorSeverity } from '../types';
-import {
-  ErrorBoundaryProps,
-  ErrorBoundaryState,
-  ErrorDisplayMode,
-  ErrorFallbackVariant,
-  RecoveryUIVariant,
-} from './types';
+import { getBrowserInfo } from '@/core/browser';
+import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@/core/error';
+import { getPerformanceMonitor } from '@/core/performance';
+import { logger } from '@/utils/logger';
+import { startTrace, finishTrace } from '@/utils/tracing';
 
 /**
  * Represents a recovery option for error handling
@@ -62,322 +49,257 @@ export interface UserFeedback {
 }
 
 /**
- * Error metrics for monitoring and analytics
+ * Props passed to error fallback components
  */
+export interface ErrorFallbackProps {
+  /** The error that occurred */
+  error: BaseError;
+  /** Unique identifier for this error instance */
+  errorId: string;
+  /** Available recovery options for this error */
+  recoveryOptions: RecoveryOption[];
+  /** Callback to retry the failed operation */
+  onRetry: () => void;
+  /** Callback to submit user feedback about the error */
+  onFeedback: (feedback: UserFeedback) => void;
+  /** Callback to reload the page */
+  onReload: () => void;
+  /** Callback to contact support */
+  onContactSupport: () => void;
+  /** Whether recovery has been attempted */
+  recoveryAttempted: boolean;
+  /** Whether recovery was successful */
+  recoverySuccessful: boolean;
+  /** Whether user feedback has been submitted */
+  userFeedbackSubmitted: boolean;
+  /** Whether to show technical details (for development) */
+  showTechnicalDetails?: boolean;
+}
+
+export interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: React.ComponentType<ErrorFallbackProps>;
+  onError?: (error: BaseError, errorInfo: ErrorInfo) => void;
+  enableRecovery?: boolean;
+  enableFeedback?: boolean;
+  maxRecoveryAttempts?: number;
+  recoveryTimeout?: number;
+  context?: string;
+  showTechnicalDetails?: boolean;
+  onMetricsCollected?: (metrics: ErrorMetrics) => void;
+}
+
+export interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: BaseError;
+  errorId?: string;
+  recoveryAttempted: boolean;
+  recoverySuccessful: boolean;
+  userFeedbackSubmitted: boolean;
+  recoveryAttempts: number;
+}
+
 export interface ErrorMetrics {
   errorId: string;
   timestamp: Date;
   component: string;
   errorType: string;
-  severity: string;
+  severity: ErrorSeverity;
   recoveryAttempts: number;
   recoverySuccessful: boolean;
   userFeedbackProvided: boolean;
-  browserInfo?: any;
-  performanceMetrics?: any;
+  browserInfo: unknown;
+  performanceMetrics: unknown;
   context?: string;
 }
 
-const DEFAULT_CONFIG = {
-  displayMode: 'inline' as ErrorDisplayMode,
-  fallbackVariant: 'user-friendly' as ErrorFallbackVariant,
-  recoveryVariant: 'buttons' as RecoveryUIVariant,
-  enableRecovery: true,
-  enableReporting: true,
-  enableLogging: true,
-  maxRetries: 3,
-};
-
 /**
- * Unified Error Boundary Component
+ * Consolidated Enhanced Error Boundary with comprehensive recovery and monitoring
  *
- * Consolidates all existing error boundary implementations into a single,
- * configurable component with support for different display modes and recovery strategies.
+ * Features:
+ * - Automatic recovery strategies with configurable options
+ * - Enhanced error context with browser/environment information
+ * - User feedback collection mechanisms
+ * - Better fallback UI with accessibility improvements
+ * - Error metrics collection and reporting
+ * - Integration with monitoring services
  */
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  private retryTimeoutId: number | null = null;
-  private resetTimeoutId: number | null = null;
   private recoveryAttempts = 0;
   private errorMetrics: ErrorMetrics[] = [];
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
-
     this.state = {
       hasError: false,
-      displayMode: props.displayMode || DEFAULT_CONFIG.displayMode,
-      retryCount: 0,
-      isRecovering: false,
-      recoveryAttempts: [],
       recoveryAttempted: false,
       recoverySuccessful: false,
       userFeedbackSubmitted: false,
+      recoveryAttempts: 0,
     };
   }
 
   /**
-   * React Error Boundary lifecycle method
-   * Converts thrown errors to AppError and updates state
+   * Updates state when an error is caught with enhanced error context
    */
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    // Convert to AppError using the unified error handler
-    const appError = error instanceof AppError ? error : coreErrorHandler.handleError({
-      message: error.message,
-      type: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      recoverable: true,
-      retryable: false,
-      context: {
-        component: 'ErrorBoundary',
-        error: error,
-        stack: error.stack,
-      },
-    });
+    // Convert to BaseError with enhanced context using shared BaseError system
+    const baseError =
+      error instanceof BaseError
+        ? error
+        : new BaseError(error.message, {
+            statusCode: 500,
+            code: 'REACT_ERROR_BOUNDARY',
+            domain: ErrorDomain.SYSTEM,
+            severity: ErrorSeverity.HIGH,
+            cause: error,
+            context: {
+              component: 'ErrorBoundary',
+              timestamp: Date.now(),
+              browserInfo: getBrowserInfo(),
+              performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
+            },
+          });
+
+    const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     return {
       hasError: true,
-      error: appError,
-      retryCount: 0,
-      isRecovering: false,
+      error: baseError,
+      errorId,
+      recoveryAttempted: false,
+      recoverySuccessful: false,
+      recoveryAttempts: 0,
     };
   }
 
   /**
    * Enhanced error processing with automatic recovery and metrics collection
    */
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    const appError = error instanceof AppError ? error : coreErrorHandler.handleError({
-      message: error.message,
-      type: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      recoverable: true,
-      retryable: false,
-      context: {
-        component: this.props.context || 'ErrorBoundary',
-        operation: 'error_boundary_catch',
-        error: error,
-        errorInfo: errorInfo,
-      },
+  override async componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Start a trace for this error handling flow
+    const trace = startTrace('ErrorBoundary.componentDidCatch', {
+      component: this.props.context || 'ErrorBoundary',
+      url: typeof window !== 'undefined' ? window.location.href : undefined,
     });
 
-    // Update state with enhanced error info
-    this.setState({
-      error: appError,
-      errorId: appError.id,
-      errorInfo: {
+    // Use unified error handler for comprehensive error processing
+    const appError = coreErrorHandler.handleError({
+      type: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      message: error.message,
+      details: {
+        name: error.name,
+        stack: error.stack,
         componentStack: errorInfo.componentStack,
+        reactErrorInfo: errorInfo,
+      },
+      context: {
+        component: this.props.context || 'ErrorBoundary',
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+      },
+      recoverable: this.props.enableRecovery !== false,
+      retryable: false,
+    });
+
+    // Update state with unified error data using shared BaseError system
+    this.setState({
+      error: new BaseError(appError.message, {
+        statusCode: 500,
+        code: 'REACT_ERROR_BOUNDARY',
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
+        context: { appError },
+      }),
+      errorId: appError.id,
+    });
+
+    const baseError = this.state.error!;
+    const errorId = appError.id;
+
+    // Enhance error with React-specific and environment context using shared BaseError system
+    const enhancedError = new BaseError(baseError.message, {
+      statusCode: baseError.statusCode,
+      code: baseError.code,
+      domain: baseError.metadata.domain,
+      severity: baseError.metadata.severity,
+      context: {
+        ...baseError.metadata?.context,
+        componentStack: errorInfo.componentStack,
+        errorBoundary: true,
+        reactErrorInfo: {
+          componentStack: errorInfo.componentStack,
+        },
+        url: typeof window !== 'undefined' ? window.location.href : undefined,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+        viewport:
+          typeof window !== 'undefined'
+            ? {
+                width: window.innerWidth,
+                height: window.innerHeight,
+              }
+            : undefined,
+        timestamp: Date.now(),
       },
     });
 
     // Collect comprehensive error metrics
     const metrics: ErrorMetrics = {
-      errorId: appError.id,
+      errorId,
       timestamp: new Date(),
       component: this.props.context || 'ErrorBoundary',
-      errorType: appError.code || 'UNKNOWN_ERROR',
-      severity: appError.severity,
+      errorType: enhancedError.code || 'UNKNOWN_ERROR',
+      severity: enhancedError.metadata?.severity || ErrorSeverity.HIGH,
       recoveryAttempts: this.recoveryAttempts,
       recoverySuccessful: false,
       userFeedbackProvided: false,
-      browserInfo: typeof navigator !== 'undefined' ? {
-        userAgent: navigator.userAgent,
-        language: navigator.language,
-        platform: navigator.platform,
-      } : undefined,
-      performanceMetrics: typeof performance !== 'undefined' ? {
-        timing: performance.timing,
-        memory: (performance as any).memory,
-      } : undefined,
+      browserInfo: getBrowserInfo(),
+      performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
       context: this.props.context,
     };
 
     this.errorMetrics.push(metrics);
 
-    // Log comprehensive error
-    if (this.props.enableLogging !== false) {
-      console.error('Enhanced error boundary caught error', {
-        component: 'ErrorBoundary',
-        errorId: appError.id,
-        componentStack: errorInfo.componentStack,
-        context: this.props.context,
-        browserInfo: metrics.browserInfo,
-        performanceMetrics: metrics.performanceMetrics,
-        recoveryAttempts: this.recoveryAttempts,
-        hasRecoveryOptions: true,
-      });
-    }
+    // Process through error handler chain (log comprehensive error)
+    logger.error('Enhanced error boundary caught error', {
+      component: 'ErrorBoundary',
+      errorId,
+      componentStack: errorInfo.componentStack,
+      context: this.props.context,
+      browserInfo: getBrowserInfo(),
+      performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
+      recoveryAttempts: this.recoveryAttempts,
+      hasRecoveryOptions: true,
+    });
 
     // Attempt automatic recovery if enabled
-    if (this.props.enableRecovery !== false) {
-      this.attemptAutomaticRecovery(this.generateRecoveryOptions(appError));
+    if (this.props.enableRecovery) {
+      await this.attemptAutomaticRecovery(this.generateRecoveryOptions(enhancedError));
     }
 
     // Call custom error handler
-    this.props.onError?.(appError, errorInfo);
+    if (this.props.onError) {
+      this.props.onError(enhancedError, errorInfo);
+    }
 
     // Report metrics
     if (this.props.onMetricsCollected) {
       this.props.onMetricsCollected(metrics);
     }
-  }
 
-  /**
-   * Cleanup timeouts on unmount
-   */
-  componentWillUnmount() {
-    if (this.retryTimeoutId) {
-      clearTimeout(this.retryTimeoutId);
-    }
-    if (this.resetTimeoutId) {
-      clearTimeout(this.resetTimeoutId);
-    }
-  }
-
-  /**
-   * Reset error boundary state
-   */
-  private resetError = () => {
-    this.setState({
-      hasError: false,
-      error: undefined,
-      errorId: undefined,
-      errorInfo: undefined,
-      retryCount: 0,
-      isRecovering: false,
-      recoveryAttempts: [],
-      recoveryAttempted: false,
-      recoverySuccessful: false,
-      userFeedbackSubmitted: false,
-    });
-  };
-
-  /**
-   * Handle user feedback submission
-   */
-  private handleFeedback = async (feedback: UserFeedback) => {
-    if (!this.state.errorId || !this.props.enableFeedback) return;
-
+    // Finish trace with outcome
     try {
-      // Enhance feedback with additional context
-      const enhancedFeedback: UserFeedback = {
-        ...feedback,
-        timestamp: new Date(),
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
-        sessionId: this.generateSessionId(),
-      };
-
-      // Log feedback for now (could be sent to analytics service)
-      console.info('User feedback submitted', {
-        component: 'ErrorBoundary',
-        errorId: this.state.errorId,
-        feedback: enhancedFeedback,
-      });
-
-      this.setState({ userFeedbackSubmitted: true });
-
-      // Update metrics
-      const latestMetric = this.errorMetrics[this.errorMetrics.length - 1];
-      if (latestMetric) {
-        latestMetric.userFeedbackProvided = true;
-      }
-
-      // Call custom feedback handler
-      this.props.onFeedback?.(enhancedFeedback);
-    } catch (error) {
-      console.error('Failed to submit user feedback', {
-        component: 'ErrorBoundary',
-        errorId: this.state.errorId,
-        error,
-      });
+      finishTrace(trace, { errorId: errorId, recovered: this.recoveryAttempts > 0 });
+    } catch (e) {
+      logger.debug('Trace finish failed in ErrorBoundary', { error: e });
     }
-  };
-
-  /**
-   * Handle page reload
-   */
-  private handleReload = () => {
-    if (typeof window !== 'undefined') {
-      window.location.reload();
-    }
-  };
-
-  /**
-   * Handle contact support
-   */
-  private handleContactSupport = () => {
-    console.info('User requested support contact', {
-      component: 'ErrorBoundary',
-      errorId: this.state.errorId,
-    });
-
-    // In a real implementation, this would open a support modal/chat
-    // For now, show an alert
-    if (typeof window !== 'undefined') {
-      alert(
-        'Support contact functionality would be implemented here. Please check the console for error details.'
-      );
-    }
-  };
-
-  /**
-   * Generate a session ID for tracking
-   */
-  private generateSessionId(): string {
-    // Generate a simple session ID based on timestamp and random string
-    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
-
-  /**
-   * Handle manual retry
-   */
-  private handleRetry = () => {
-    const { retryCount } = this.state;
-    const maxRetries = this.props.maxRetries || DEFAULT_CONFIG.maxRetries;
-
-    if (retryCount >= maxRetries) {
-      console.warn('Maximum retry attempts reached');
-      return;
-    }
-
-    this.setState(prevState => ({
-      retryCount: prevState.retryCount + 1,
-      isRecovering: true,
-    }));
-
-    // Call custom retry handler
-    this.props.onRetry?.(retryCount + 1);
-
-    // Reset error after a brief delay to allow re-rendering
-    this.retryTimeoutId = window.setTimeout(() => {
-      this.resetError();
-    }, 100);
-  };
-
-  /**
-   * Handle error reporting
-   */
-  private handleReport = () => {
-    const { error } = this.state;
-    if (!error) return;
-
-    // Report error using unified error handler
-    coreErrorHandler.handleError({
-      ...error,
-      context: {
-        ...error.context,
-        component: this.props.context || 'ErrorBoundary',
-        operation: 'user_reported_error',
-      },
-    });
-
-    // Call custom report handler
-    this.props.onReport?.(error);
-  };
 
   /**
    * Generate recovery options based on error type and context
    */
-  private generateRecoveryOptions(error: AppError): RecoveryOption[] {
+  private generateRecoveryOptions(error: BaseError): RecoveryOption[] {
     const options: RecoveryOption[] = [];
 
     // Always provide manual retry option
@@ -401,7 +323,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     });
 
     // Automatic recovery options based on error type
-    if (error.type === ErrorDomain.NETWORK) {
+    if (error.metadata?.domain === ErrorDomain.NETWORK) {
       options.push({
         id: 'retry_network',
         label: 'Retry Network Request',
@@ -416,7 +338,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       });
     }
 
-    if (error.type === ErrorDomain.SYSTEM) {
+    if (error.metadata?.domain === ErrorDomain.SYSTEM) {
       options.push({
         id: 'clear_cache',
         label: 'Clear Cache',
@@ -426,7 +348,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             try {
               localStorage.clear();
             } catch (e) {
-              console.warn('Failed to clear localStorage', { error: e });
+              logger.warn('Failed to clear localStorage', { error: e });
             }
           }
           this.handleRetry();
@@ -453,9 +375,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       try {
         this.recoveryAttempts++;
-        this.setState({ isRecovering: true });
-
-        console.info('Attempting automatic recovery', {
+        logger.info('Attempting automatic recovery', {
           component: 'ErrorBoundary',
           errorId: this.state.errorId,
           recoveryOption: option.id,
@@ -478,7 +398,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           hasError: false,
           error: undefined,
           errorId: undefined,
-          isRecovering: false,
         });
 
         // Update metrics
@@ -488,7 +407,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           latestMetric.recoveryAttempts = this.recoveryAttempts;
         }
 
-        console.info('Automatic error recovery successful', {
+        logger.info('Automatic error recovery successful', {
           component: 'ErrorBoundary',
           errorId: this.state.errorId,
           recoveryOption: option.id,
@@ -497,7 +416,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
         return;
       } catch (recoveryError) {
-        console.warn('Automatic recovery attempt failed', {
+        logger.warn('Automatic recovery attempt failed', {
           component: 'ErrorBoundary',
           errorId: this.state.errorId,
           recoveryOption: option.id,
@@ -508,11 +427,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // All automatic recovery attempts failed
-    this.setState({
-      recoveryAttempted: true,
-      recoverySuccessful: false,
-      isRecovering: false,
-    });
+    this.setState({ recoveryAttempted: true, recoverySuccessful: false });
 
     // Update metrics
     const latestMetric = this.errorMetrics[this.errorMetrics.length - 1];
@@ -522,69 +437,111 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
   }
 
-  /**
-   * Check if props have changed for reset
-   */
-  componentDidUpdate(prevProps: ErrorBoundaryProps) {
-    if (this.props.resetOnPropsChange && this.props.resetKeys) {
-      const hasChanged = this.props.resetKeys.some(
-        (key, index) => prevProps.resetKeys?.[index] !== key
-      );
+  private handleRetry = () => {
+    this.recoveryAttempts++;
+    this.setState({
+      hasError: false,
+      error: undefined,
+      errorId: undefined,
+      recoveryAttempted: false,
+      recoverySuccessful: false,
+    });
 
-      if (hasChanged && this.state.hasError) {
-        this.resetError();
+    logger.info('Manual retry attempted', {
+      component: 'ErrorBoundary',
+      attemptNumber: this.recoveryAttempts,
+    });
+  };
+
+  private handleFeedback = async (feedback: UserFeedback) => {
+    if (!this.state.errorId || !this.props.enableFeedback) return;
+
+    try {
+      // Enhance feedback with additional context
+      const enhancedFeedback: UserFeedback = {
+        ...feedback,
+        timestamp: new Date(),
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+        sessionId: this.generateSessionId(),
+      };
+
+      // Log feedback for now (could be sent to analytics service)
+      logger.info('User feedback submitted', {
+        component: 'ErrorBoundary',
+        errorId: this.state.errorId,
+        feedback: enhancedFeedback,
+      });
+
+      this.setState({ userFeedbackSubmitted: true });
+
+      // Update metrics
+      const latestMetric = this.errorMetrics[this.errorMetrics.length - 1];
+      if (latestMetric) {
+        latestMetric.userFeedbackProvided = true;
       }
+    } catch (error) {
+      logger.error('Failed to submit user feedback', {
+        component: 'ErrorBoundary',
+        errorId: this.state.errorId,
+        error,
+      });
     }
+  };
+
+  private handleReload = () => {
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
+  };
+
+  private handleContactSupport = () => {
+    logger.info('User requested support contact', {
+      component: 'ErrorBoundary',
+      errorId: this.state.errorId,
+    });
+
+    // In a real implementation, this would open a support modal/chat
+    // For now, show an alert
+    if (typeof window !== 'undefined') {
+      alert(
+        'Support contact functionality would be implemented here. Please check the console for error details.'
+      );
+    }
+  };
+
+  private generateSessionId(): string {
+    // Generate a simple session ID based on timestamp and random string
+    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  /**
-   * Render error UI or children
-   */
-  render() {
+  override render() {
     if (this.state.hasError && this.state.error) {
-      const displayMode = this.props.displayMode || DEFAULT_CONFIG.displayMode;
-      const fallbackVariant = this.props.fallbackVariant || DEFAULT_CONFIG.fallbackVariant;
-
-      // Use custom fallback if provided
-      if (this.props.customFallback) {
-        const CustomFallback = this.props.customFallback;
-        return (
-          <CustomFallback
-            error={this.state.error}
-            errorInfo={this.state.errorInfo}
-            displayMode={displayMode}
-            variant={fallbackVariant}
-            onRetry={this.handleRetry}
-            onReport={this.handleReport}
-            onDismiss={this.resetError}
-            showDetails={process.env.NODE_ENV === 'development'}
-            isDevelopment={process.env.NODE_ENV === 'development'}
-            context={this.props.context}
-          />
-        );
-      }
-
-      // Use enhanced default fallback with recovery options and user feedback
       const recoveryOptions = this.generateRecoveryOptions(this.state.error);
 
+      const fallbackProps: ErrorFallbackProps = {
+        error: this.state.error,
+        errorId: this.state.errorId!,
+        recoveryOptions,
+        onRetry: this.handleRetry,
+        onFeedback: this.handleFeedback,
+        onReload: this.handleReload,
+        onContactSupport: this.handleContactSupport,
+        recoveryAttempted: this.state.recoveryAttempted,
+        recoverySuccessful: this.state.recoverySuccessful,
+        userFeedbackSubmitted: this.state.userFeedbackSubmitted,
+      };
+
+      // Use custom fallback if provided
+      if (this.props.fallback) {
+        const FallbackComponent = this.props.fallback;
+        return <FallbackComponent {...fallbackProps} />;
+      }
+
+      // Default enhanced fallback UI
       return (
         <EnhancedErrorFallback
-          error={this.state.error}
-          errorId={this.state.errorId!}
-          recoveryOptions={recoveryOptions}
-          onRetry={this.handleRetry}
-          onFeedback={this.handleFeedback}
-          onReload={this.handleReload}
-          onContactSupport={this.handleContactSupport}
-          recoveryAttempted={this.state.recoveryAttempted}
-          recoverySuccessful={this.state.recoverySuccessful}
-          userFeedbackSubmitted={this.state.userFeedbackSubmitted}
+          {...fallbackProps}
           showTechnicalDetails={this.props.showTechnicalDetails}
-          displayMode={displayMode}
-          variant={fallbackVariant}
-          onReport={this.handleReport}
-          onDismiss={this.resetError}
-          context={this.props.context}
         />
       );
     }
@@ -593,96 +550,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 }
 
-/**
- * Higher-order component for wrapping components with error boundary
- */
-export function withErrorBoundary<P extends object>(
-  WrappedComponent: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
-) {
-  const WithErrorBoundaryComponent = (props: P) => (
-    <ErrorBoundary {...errorBoundaryProps}>
-      <WrappedComponent {...props} />
-    </ErrorBoundary>
-  );
-
-  WithErrorBoundaryComponent.displayName =
-    `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
-
-  return WithErrorBoundaryComponent;
-}
-
-/**
- * Hook for using error boundary functionality in functional components
- */
-export function useErrorBoundary() {
-  const [error, setError] = React.useState<AppError | null>(null);
-  const [retryCount, setRetryCount] = React.useState(0);
-  const [isRecovering, setIsRecovering] = React.useState(false);
-
-  const resetError = React.useCallback(() => {
-    setError(null);
-    setRetryCount(0);
-    setIsRecovering(false);
-  }, []);
-
-  const retry = React.useCallback(() => {
-    setRetryCount(prev => prev + 1);
-    setIsRecovering(true);
-    // Reset after brief delay
-    setTimeout(() => {
-      resetError();
-    }, 100);
-  }, [resetError]);
-
-  const reportError = React.useCallback(() => {
-    if (error) {
-      coreErrorHandler.handleError({
-        ...error,
-        context: {
-          ...error.context,
-          operation: 'user_reported_error',
-        },
-      });
-    }
-  }, [error]);
-
-  // Throw error to trigger error boundary
-  if (error) {
-    throw error;
-  }
-
-  return {
-    error,
-    hasError: error !== null,
-    retryCount,
-    isRecovering,
-    resetError,
-    retry,
-    reportError,
-    setError,
-  };
-}
-
 // Enhanced default fallback component with accessibility and user feedback
-function EnhancedErrorFallback(props: {
-  error: AppError;
-  errorId: string;
-  recoveryOptions: RecoveryOption[];
-  onRetry: () => void;
-  onFeedback: (feedback: UserFeedback) => void;
-  onReload: () => void;
-  onContactSupport: () => void;
-  recoveryAttempted: boolean;
-  recoverySuccessful: boolean;
-  userFeedbackSubmitted: boolean;
-  showTechnicalDetails?: boolean;
-  displayMode?: string;
-  variant?: string;
-  onReport?: () => void;
-  onDismiss?: () => void;
-  context?: string;
-}) {
+function EnhancedErrorFallback(props: ErrorFallbackProps & { showTechnicalDetails?: boolean }) {
   const {
     error,
     errorId,
@@ -840,7 +709,7 @@ function EnhancedErrorFallback(props: {
         </div>
 
         {/* User Feedback */}
-        {showTechnicalDetails !== false && (
+        {props.showTechnicalDetails !== false && (
           <div className="border-t border-gray-200 pt-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Help us improve</h3>
 
@@ -915,16 +784,16 @@ function EnhancedErrorFallback(props: {
                 </div>
                 <div>
                   <dt className="font-medium text-gray-900">Domain:</dt>
-                  <dd className="text-gray-700">{error.type}</dd>
+                  <dd className="text-gray-700">{error.metadata?.domain}</dd>
                 </div>
                 <div>
                   <dt className="font-medium text-gray-900">Severity:</dt>
-                  <dd className="text-gray-700">{error.severity}</dd>
+                  <dd className="text-gray-700">{error.metadata?.severity}</dd>
                 </div>
                 <div>
                   <dt className="font-medium text-gray-900">Timestamp:</dt>
                   <dd className="text-gray-700 font-mono">
-                    {error.timestamp ? new Date(error.timestamp).toISOString() : new Date().toISOString()}
+                    {(error.metadata?.timestamp || new Date()).toISOString()}
                   </dd>
                 </div>
                 {error.stack && (
@@ -944,4 +813,5 @@ function EnhancedErrorFallback(props: {
   );
 }
 
+// Default export for convenience
 export default ErrorBoundary;
