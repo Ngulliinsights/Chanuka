@@ -9,7 +9,7 @@
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
-import { cn } from "@client/utils/cn"
+import { cn } from "../utils/cn"
 
 const alertVariants = cva(
   [

@@ -1,5 +1,5 @@
 import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
-import { useAuth } from '@/features/users/hooks';
+import { useAuth } from '@client/core/auth';
 import type { NavigationSection } from '@client/types/navigation';
 
 import { DEFAULT_NAVIGATION_MAP } from '../constants';

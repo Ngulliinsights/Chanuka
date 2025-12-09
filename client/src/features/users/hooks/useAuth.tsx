@@ -4,7 +4,7 @@
  * This file has been replaced by the consolidated authentication system.
  * Please update your imports to use the new system:
  * 
- * Before: import { useAuth } from '@/features/users/hooks/useAuth'
+ * Before: import { useAuth } from '@client/core/auth'
  * After:  import { useAuth } from '@/core/auth'
  * 
  * @deprecated Use '@/core/auth' instead
@@ -22,7 +22,7 @@ export {
 export default {
   useAuth: () => {
     console.warn(
-      'DEPRECATED: useAuth from @/features/users/hooks/useAuth is deprecated. ' +
+      'DEPRECATED: useAuth from @client/core/auth is deprecated. ' +
       'Please import from @/core/auth instead.'
     );
     // eslint-disable-next-line react-hooks/rules-of-hooks

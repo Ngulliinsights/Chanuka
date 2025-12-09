@@ -221,7 +221,8 @@ class DataRetentionService {
       try {
         const policy = this.policies.get(record.retentionPolicyId);
         if (!policy) {
-          result.errors.push(`Policy not found for record ${record.id}`);\n          continue;
+          result.errors.push(`Policy not found for record ${record.id}`);
+          continue;
         }
 
         if (policy.archiveBeforeDelete && !record.archived) {

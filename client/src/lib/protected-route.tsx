@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { ReactNode } from 'react';
 import { Navigate } from "react-router-dom";
 
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 // TEMPORARY: Authentication bypass for preview purposes

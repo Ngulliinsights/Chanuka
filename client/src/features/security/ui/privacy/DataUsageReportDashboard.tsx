@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-import { useAuth } from '@client/features/users/hooks';
+import { useAuth } from '@client/core/auth';
 import { dataRetentionService, retentionUtils } from '@client/services/dataRetentionService';
 import { privacyAnalyticsService } from '@client/services/privacyAnalyticsService';
 import { logger } from '@client/utils/logger';

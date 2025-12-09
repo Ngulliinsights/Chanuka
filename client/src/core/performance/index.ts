@@ -17,11 +17,6 @@ export {
   WebVitalsMonitor
 } from './web-vitals';
 
-// Performance monitoring
-export {
-  PerformanceMonitor
-} from './monitor';
-
 // Performance budgets
 export {
   PerformanceBudgetChecker
@@ -32,11 +27,10 @@ export {
   PerformanceAlertsManager
 } from './alerts';
 
-// Import classes for the legacy export object
-import { WebVitalsMonitor } from './web-vitals';
-import { PerformanceBudgetChecker } from './budgets';
-import { PerformanceAlertsManager } from './alerts';
-import { PerformanceMonitor } from './monitor';
+// Central monitoring system
+export {
+  PerformanceMonitor
+} from './monitor';
 
 // Convenience re-exports for common use cases
 export {

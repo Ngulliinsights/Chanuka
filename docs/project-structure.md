@@ -69,187 +69,6 @@ client/
 │   ├── App.tsx
 │   │   ├── providers/
 │   │   │   ├── AppProviders.tsx
-│   ├── COMMUNITY_MIGRATION_COMPLETE.md
-│   ├── components/
-│   │   ├── accessibility/
-│   │   │   ├── accessibility-manager.tsx
-│   │   ├── admin/
-│   │   │   ├── admin-dashboard.tsx
-│   │   ├── analysis/
-│   │   │   ├── comments.tsx
-│   │   │   ├── section.tsx
-│   │   │   ├── stats.tsx
-│   │   │   ├── timeline.tsx
-│   │   ├── AppProviders.tsx
-│   │   ├── asset-loading/
-│   │   │   ├── AssetLoadingProvider.tsx
-│   │   ├── bills/
-│   │   │   ├── implementation-workarounds.tsx
-│   │   ├── bill-tracking/
-│   │   │   ├── real-time-tracker.tsx
-│   │   ├── compatibility/
-│   │   │   ├── BrowserCompatibilityChecker.tsx
-│   │   │   ├── BrowserCompatibilityReport.tsx
-│   │   │   ├── BrowserCompatibilityTester.tsx
-│   │   │   ├── FeatureFallbacks.tsx
-│   │   │   ├── useBrowserStatus.tsx
-│   │   ├── conflict-of-interest/
-│   │   │   ├── ConflictNetworkVisualization.tsx
-│   │   │   ├── ConflictOfInterestAnalysis.tsx
-│   │   │   ├── FinancialExposureTracker.tsx
-│   │   │   ├── HistoricalPatternAnalysis.tsx
-│   │   │   ├── ImplementationWorkaroundsTracker.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── TransparencyScoring.tsx
-│   │   ├── connection-status.tsx
-│   │   ├── database-status.tsx
-│   │   ├── education/
-│   │   │   ├── ConstitutionalContext.tsx
-│   │   │   ├── EducationalFramework.tsx
-│   │   │   ├── EducationalTooltip.tsx
-│   │   │   ├── HistoricalPrecedents.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── PlainLanguageSummary.tsx
-│   │   │   ├── ProcessEducation.tsx
-│   │   │   ├── README.md
-│   │   ├── error-boundaries/
-│   │   │   ├── index.ts
-│   │   │   ├── README.md
-│   │   ├── error-handling/
-│   │   │   ├── CommunityErrorBoundary.tsx
-│   │   │   ├── ErrorBoundary.tsx
-│   │   │   ├── ErrorFallback.tsx
-│   │   │   ├── ErrorRecoveryManager.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── ServiceUnavailable.tsx
-│   │   │   ├── SimpleErrorBoundary.tsx
-│   │   │   ├── UnifiedErrorBoundary.tsx
-│   │   │   ├── utils/
-│   │   │   │   ├── contextual-messages.ts
-│   │   │   │   ├── error-icons.tsx
-│   │   │   │   ├── error-normalizer.ts
-│   │   │   │   ├── error-reporter.ts
-│   │   │   │   ├── shared-error-display.tsx
-│   │   ├── examples/
-│   │   │   ├── SeamlessIntegrationExample.tsx
-│   │   ├── hooks/
-│   │   │   ├── useDatabaseStatus.ts
-│   │   ├── icons/
-│   │   │   ├── SimpleIcons.tsx
-│   │   ├── implementation/
-│   │   │   ├── workarounds.tsx
-│   │   ├── index.ts
-│   │   ├── integration/
-│   │   │   ├── EnhancedUXIntegration.tsx
-│   │   │   ├── IntegrationProvider.tsx
-│   │   │   ├── IntegrationTest.tsx
-│   │   ├── layout/
-│   │   │   ├── app-layout.tsx
-│   │   │   ├── errors.ts
-│   │   │   ├── index.ts
-│   │   │   ├── MOBILE_NAVIGATION_FIXES.md
-│   │   │   ├── sidebar.tsx
-│   │   │   ├── SimpleAppLayout.tsx
-│   │   │   ├── types.ts
-│   │   │   ├── validation.ts
-│   │   ├── LazyPageWrapper.tsx
-│   │   ├── loading/
-│   │   │   ├── AssetLoadingIndicator.tsx
-│   │   │   ├── constants.ts
-│   │   │   ├── core/
-│   │   │   │   ├── loadingCore.ts
-│   │   │   ├── errors.ts
-│   │   │   ├── FontFallback.tsx
-│   │   │   ├── GlobalLoadingIndicator.tsx
-│   │   │   ├── hooks/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useLoading.ts
-│   │   │   │   ├── useLoadingRecovery.ts
-│   │   │   │   ├── useLoadingState.ts
-│   │   │   │   ├── useProgressiveLoading.ts
-│   │   │   │   ├── useTimeoutAwareLoading.ts
-│   │   │   │   ├── useUnifiedLoading.ts
-│   │   │   ├── ImageFallback.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── LoadingDemo.tsx
-│   │   │   ├── LoadingStates.tsx
-│   │   │   ├── recovery.ts
-│   │   │   ├── ScriptFallback.tsx
-│   │   │   ├── types.ts
-│   │   │   ├── ui/
-│   │   │   │   ├── AvatarSkeleton.tsx
-│   │   │   │   ├── CardSkeleton.tsx
-│   │   │   │   ├── FormSkeleton.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── ListSkeleton.tsx
-│   │   │   │   ├── LoadingIndicator.tsx
-│   │   │   │   ├── ProgressiveLoader.tsx
-│   │   │   │   ├── Skeleton.tsx
-│   │   │   │   ├── TextSkeleton.tsx
-│   │   │   │   ├── TimeoutAwareLoader.tsx
-│   │   │   ├── utils/
-│   │   │   │   ├── connection-utils.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── loading-utils.ts
-│   │   │   │   ├── progress-utils.ts
-│   │   │   │   ├── timeout-utils.ts
-│   │   │   ├── validation.ts
-│   │   ├── MigrationManager.tsx
-│   │   ├── notifications/
-│   │   │   ├── index.ts
-│   │   │   ├── NotificationCenter.tsx
-│   │   │   ├── NotificationItem.tsx
-│   │   │   ├── notification-preferences.tsx
-│   │   │   ├── NotificationPreferences.tsx
-│   │   ├── offline/
-│   │   │   ├── offline-manager.tsx
-│   │   │   ├── OfflineModal.tsx
-│   │   ├── OfflineIndicator.tsx
-│   │   ├── OfflineModal.tsx
-│   │   ├── onboarding/
-│   │   │   ├── UserJourneyOptimizer.tsx
-│   │   ├── privacy/
-│   │   │   ├── CookieConsentBanner.tsx
-│   │   │   ├── DataUsageReportDashboard.tsx
-│   │   │   ├── GDPRComplianceManager.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── privacy-dashboard.tsx
-│   │   │   ├── privacy-policy.tsx
-│   │   │   ├── README.md
-│   │   ├── security/
-│   │   │   ├── SecureForm.tsx
-│   │   │   ├── SecurityDashboard.tsx
-│   │   │   ├── SecuritySettings.tsx
-│   │   ├── settings/
-│   │   │   ├── alert-preferences.tsx
-│   │   ├── shared/
-│   │   │   ├── dashboard/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── sections/
-│   │   │   │   │   ├── ActivitySection.tsx
-│   │   │   │   │   ├── BillsSection.tsx
-│   │   │   │   │   ├── MigrationDashboard.tsx
-│   │   │   │   │   ├── StatsSection.tsx
-│   │   │   │   ├── useDashboardData.ts
-│   │   │   │   ├── useMigrationDashboardData.ts
-│   │   │   │   ├── variants/
-│   │   │   │   │   ├── FullPageDashboard.tsx
-│   │   │   │   │   ├── SectionDashboard.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── privacy/
-│   │   │   │   ├── CompactInterface.tsx
-│   │   │   │   ├── controls/
-│   │   │   │   │   ├── ConsentControls.tsx
-│   │   │   │   │   ├── DataUsageControls.tsx
-│   │   │   │   │   ├── VisibilityControls.tsx
-│   │   │   │   ├── FullInterface.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── ModalInterface.tsx
-│   │   │   │   ├── PrivacyManager.tsx
-│   │   │   ├── types.ts
-│   │   │   ├── utils/
-│   │   │   │   ├── component-helpers.ts
-│   │   │   │   ├── index.ts
 │   │   ├── shell/
 │   │   │   ├── AppRouter.tsx
 │   │   │   ├── AppShell.tsx
@@ -257,65 +76,26 @@ client/
 │   │   │   ├── NavigationBar.tsx
 │   │   │   ├── ProtectedRoute.tsx
 │   │   │   ├── SkipLinks.tsx
-│   │   ├── system/
-│   │   │   ├── HealthCheck.tsx
+│   ├── COMMUNITY_MIGRATION_COMPLETE.md
+│   ├── components/
+│   │   ├── AppProviders.tsx
+│   │   ├── hooks/
+│   │   │   ├── useDatabaseStatus.ts
+│   │   ├── index.ts
+│   │   ├── integration/
+│   │   ├── LazyPageWrapper.tsx
+│   │   ├── MigrationManager.tsx
+│   │   ├── notifications/
+│   │   ├── settings/
+│   │   ├── shared/
+│   │   │   ├── dashboard/
+│   │   │   │   ├── sections/
+│   │   │   │   ├── variants/
+│   │   │   ├── index.ts
+│   │   │   ├── privacy/
+│   │   │   │   ├── controls/
+│   │   │   ├── utils/
 │   │   ├── transparency/
-│   │   │   ├── ConflictAnalysisDashboard.tsx
-│   │   │   ├── ConflictNetworkVisualization.tsx
-│   │   ├── ui/
-│   │   │   ├── __tests__/
-│   │   │   │   ├── design-system.compliance.test.tsx
-│   │   │   │   ├── integration-workflows.integration.test.tsx
-│   │   │   ├── accessibility.a11y.test.tsx
-│   │   │   ├── alert.stories.tsx
-│   │   │   ├── alert-badge.test.tsx
-│   │   │   ├── avatar.stories.tsx
-│   │   │   ├── avatar-tabs-progress.test.tsx
-│   │   │   ├── badge.stories.tsx
-│   │   │   ├── button.stories.tsx
-│   │   │   ├── button.test.tsx
-│   │   │   ├── card.stories.tsx
-│   │   │   ├── card.test.tsx
-│   │   │   ├── checkbox.stories.tsx
-│   │   │   ├── checkbox-switch-tooltip.test.tsx
-│   │   │   ├── components.tsx
-│   │   │   ├── dialog.stories.tsx
-│   │   │   ├── dialog.test.tsx
-│   │   │   ├── errors.ts
-│   │   │   ├── form-demo.tsx
-│   │   │   ├── hybrid-components.tsx
-│   │   │   ├── implementation-summary.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── input.stories.tsx
-│   │   │   ├── input.test.tsx
-│   │   │   ├── label.stories.tsx
-│   │   │   ├── label.test.tsx
-│   │   │   ├── migration-examples.tsx
-│   │   │   ├── progress.stories.tsx
-│   │   │   ├── recovery.ts
-│   │   │   ├── separator.tsx
-│   │   │   ├── simple-button.tsx
-│   │   │   ├── skeleton.tsx
-│   │   │   ├── switch.stories.tsx
-│   │   │   ├── tabs.stories.tsx
-│   │   │   ├── test-components.tsx
-│   │   │   ├── tooltip.stories.tsx
-│   │   │   ├── types.ts
-│   │   │   ├── unified-button.tsx
-│   │   │   ├── unified-components.tsx
-│   │   │   ├── unified-examples.tsx
-│   │   │   ├── validation.ts
-│   │   ├── verification/
-│   │   │   ├── CommunityValidation.tsx
-│   │   │   ├── CredibilityScoring.tsx
-│   │   │   ├── ExpertBadge.tsx
-│   │   │   ├── ExpertConsensus.tsx
-│   │   │   ├── ExpertProfileCard.tsx
-│   │   │   ├── ExpertVerificationDemo.tsx
-│   │   │   ├── index.ts
-│   │   │   ├── README.md
-│   │   │   ├── verification-list.tsx
-│   │   │   ├── VerificationWorkflow.tsx
 │   ├── COMPONENTS_CONSOLIDATION_STRATEGY.md
 │   ├── config/
 │   │   ├── api.ts
@@ -333,6 +113,7 @@ client/
 │   │   ├── copy-system.ts
 │   ├── contexts/
 │   │   ├── NavigationContext.tsx
+│   │   ├── ThemeContext.tsx
 │   ├── core/
 │   │   ├── api/
 │   │   │   ├── analytics.ts
@@ -380,7 +161,7 @@ client/
 │   │   │   ├── errors/
 │   │   │   │   ├── auth-errors.ts
 │   │   │   ├── hooks/
-│   │   │   │   ├── useAuth.ts
+│   │   │   │   ├── useAuth.tsx
 │   │   │   ├── index.ts
 │   │   │   ├── initialization.ts
 │   │   │   ├── MIGRATION.md
@@ -402,14 +183,19 @@ client/
 │   │   │   ├── utils/
 │   │   │   │   ├── validation.ts
 │   │   ├── browser/
+│   │   │   ├── BrowserCompatibilityChecker.tsx
+│   │   │   ├── BrowserCompatibilityReport.tsx
+│   │   │   ├── BrowserCompatibilityTester.tsx
 │   │   │   ├── browser-detector.ts
 │   │   │   ├── compatibility-manager.ts
 │   │   │   ├── constants.ts
 │   │   │   ├── environment.ts
 │   │   │   ├── feature-detector.ts
+│   │   │   ├── FeatureFallbacks.tsx
 │   │   │   ├── index.ts
 │   │   │   ├── polyfill-manager.ts
 │   │   │   ├── types.ts
+│   │   │   ├── useBrowserStatus.tsx
 │   │   ├── community/
 │   │   │   ├── hooks/
 │   │   │   │   ├── useRealtime.ts
@@ -436,12 +222,23 @@ client/
 │   │   │   ├── analytics.ts
 │   │   │   ├── classes.ts
 │   │   │   ├── components/
+│   │   │   │   ├── CommunityErrorBoundary.tsx
 │   │   │   │   ├── ErrorBoundary.tsx
 │   │   │   │   ├── ErrorFallback.tsx
+│   │   │   │   ├── ErrorRecoveryManager.tsx
 │   │   │   │   ├── example.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RecoveryUI.tsx
+│   │   │   │   ├── ServiceUnavailable.tsx
+│   │   │   │   ├── SimpleErrorBoundary.tsx
 │   │   │   │   ├── types.ts
+│   │   │   │   ├── UnifiedErrorBoundary.tsx
+│   │   │   │   ├── utils/
+│   │   │   │   │   ├── contextual-messages.ts
+│   │   │   │   │   ├── error-icons.tsx
+│   │   │   │   │   ├── error-normalizer.ts
+│   │   │   │   │   ├── error-reporter.ts
+│   │   │   │   │   ├── shared-error-display.tsx
 │   │   │   ├── constants.ts
 │   │   │   ├── factory.ts
 │   │   │   ├── handler.ts
@@ -535,10 +332,14 @@ client/
 │   │   │   ├── loaders.ts
 │   │   │   ├── realtime.ts
 │   │   │   ├── users.ts
+│   ├── DEBUGGING_COMPLETE_SUMMARY.md
 │   ├── demo/
 │   │   ├── community-integration-demo.ts
 │   ├── DESIGN_SYSTEM_APPROACH_RATIONALE.md
+│   ├── DESIGN_SYSTEM_CONSOLIDATION_PLAN.md
+│   ├── DESIGN_SYSTEM_CRITICAL_ANALYSIS.md
 │   ├── DESIGN_SYSTEM_INCONSISTENCY_ANALYSIS.md
+│   ├── DESIGN_SYSTEM_VALIDATION_REPORT.md
 │   ├── DevWrapper.tsx
 │   ├── docs/
 │   │   ├── accessibility-guide.md
@@ -548,6 +349,12 @@ client/
 │   │   ├── render-tracking-usage.tsx
 │   │   ├── WebSocketIntegrationExample.tsx
 │   ├── features/
+│   │   ├── admin/
+│   │   │   ├── index.ts
+│   │   │   ├── ui/
+│   │   │   │   ├── admin-dashboard.tsx
+│   │   │   │   ├── dashboard/
+│   │   │   │   ├── index.ts
 │   │   ├── analytics/
 │   │   │   ├── hooks/
 │   │   │   │   ├── index.ts
@@ -588,26 +395,51 @@ client/
 │   │   │   │   ├── analysis/
 │   │   │   │   │   ├── BillAnalysis.tsx
 │   │   │   │   │   ├── BillAnalysisTab.tsx
+│   │   │   │   │   ├── comments.tsx
+│   │   │   │   │   ├── conflict/
+│   │   │   │   │   ├── conflict-of-interest/
+│   │   │   │   │   │   ├── ConflictNetworkVisualization.tsx
+│   │   │   │   │   │   ├── ConflictOfInterestAnalysis.tsx
+│   │   │   │   │   │   ├── FinancialExposureTracker.tsx
+│   │   │   │   │   │   ├── HistoricalPatternAnalysis.tsx
+│   │   │   │   │   │   ├── ImplementationWorkaroundsTracker.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── TransparencyScoring.tsx
 │   │   │   │   │   ├── ConstitutionalAnalysisPanel.tsx
+│   │   │   │   │   ├── section.tsx
+│   │   │   │   │   ├── stats.tsx
+│   │   │   │   │   ├── timeline.tsx
 │   │   │   │   ├── BillCard.tsx
 │   │   │   │   ├── bill-list.tsx
 │   │   │   │   ├── BillList.tsx
 │   │   │   │   ├── BillRealTimeIndicator.tsx
 │   │   │   │   ├── bills-dashboard.tsx
+│   │   │   │   ├── bill-tracking/
 │   │   │   │   ├── bill-tracking.tsx
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── implementation-workarounds.tsx
 │   │   │   │   ├── detail/
 │   │   │   │   │   ├── BillCommunityTab.tsx
 │   │   │   │   │   ├── BillFullTextTab.tsx
 │   │   │   │   │   ├── BillHeader.tsx
 │   │   │   │   │   ├── BillOverviewTab.tsx
 │   │   │   │   │   ├── BillSponsorsTab.tsx
+│   │   │   │   ├── education/
+│   │   │   │   │   ├── README.md
 │   │   │   │   ├── filter-panel.tsx
+│   │   │   │   ├── implementation/
+│   │   │   │   │   ├── workarounds.tsx
 │   │   │   │   ├── implementation-workarounds.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── list/
 │   │   │   │   │   ├── BillCard.tsx
 │   │   │   │   ├── MobileBillDetail.tsx
 │   │   │   │   ├── stats-overview.tsx
+│   │   │   │   ├── tracking/
+│   │   │   │   │   ├── real-time-tracker.tsx
+│   │   │   │   ├── transparency/
+│   │   │   │   │   ├── ConflictAnalysisDashboard.tsx
+│   │   │   │   │   ├── ConflictNetworkVisualization.tsx
 │   │   │   │   ├── virtual-bill-grid.tsx
 │   │   ├── community/
 │   │   │   ├── hooks/
@@ -672,8 +504,21 @@ client/
 │   │   │   │   │   ├── SearchResultCard.tsx
 │   │   │   │   │   ├── SearchResults.tsx
 │   │   ├── security/
+│   │   │   ├── index.ts
 │   │   │   ├── ui/
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   ├── SecureForm.tsx
+│   │   │   │   │   ├── SecurityDashboard.tsx
+│   │   │   │   │   ├── SecuritySettings.tsx
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── privacy/
+│   │   │   │   │   ├── CookieConsentBanner.tsx
+│   │   │   │   │   ├── DataUsageReportDashboard.tsx
+│   │   │   │   │   ├── GDPRComplianceManager.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── privacy-dashboard.tsx
+│   │   │   │   │   ├── privacy-policy.tsx
+│   │   │   │   │   ├── README.md
 │   │   ├── users/
 │   │   │   ├── hooks/
 │   │   │   │   ├── index.ts
@@ -694,9 +539,28 @@ client/
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── useLoginForm.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── onboarding/
+│   │   │   │   │   ├── UserJourneyOptimizer.tsx
 │   │   │   │   ├── profile/
 │   │   │   │   │   ├── UserProfileSection.tsx
+│   │   │   │   ├── settings/
+│   │   │   │   │   ├── alert-preferences.tsx
+│   │   │   │   ├── verification/
+│   │   │   │   │   ├── CommunityValidation.tsx
+│   │   │   │   │   ├── CredibilityScoring.tsx
+│   │   │   │   │   ├── ExpertBadge.tsx
+│   │   │   │   │   ├── ExpertConsensus.tsx
+│   │   │   │   │   ├── ExpertProfileCard.tsx
+│   │   │   │   │   ├── ExpertVerificationDemo.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── README.md
+│   │   │   │   │   ├── verification-list.tsx
+│   │   │   │   │   ├── VerificationWorkflow.tsx
 │   ├── FEATURES_CONSISTENCY_ANALYSIS.md
+│   ├── FEATURES_CORE_INTEGRATION_ANALYSIS.md
+│   ├── FINAL_VALIDATION_REPORT.md
+│   ├── FSD_COMPLETION_PLAN.md
+│   ├── FSD_MIGRATION_REALITY_CHECK.md
 │   ├── FSD_MIGRATION_STATUS.md
 │   ├── FSD_PHASE2_COMPLETE.md
 │   ├── FSD_PHASE3_COMPLETE.md
@@ -750,63 +614,9 @@ client/
 │   ├── IMPORT_UPDATE_SUMMARY.md
 │   ├── index.css
 │   ├── INFRASTRUCTURE_INTEGRATION_SUMMARY.md
+│   ├── INTEGRATION_STATUS_REPORT.md
 │   ├── LEGACY_MIGRATION_COMPLETE.md
 │   ├── LEGACY_MIGRATION_STRATEGY.md
-│   ├── legacy-archive/
-│   │   ├── ARCHIVE_README.md
-│   │   ├── components/
-│   │   │   ├── analytics/
-│   │   │   │   ├── CivicScoreCard.tsx
-│   │   │   │   ├── ContributionRankings.tsx
-│   │   │   │   ├── EngagementAnalyticsDashboard.tsx
-│   │   │   │   ├── engagement-dashboard.tsx
-│   │   │   │   ├── EngagementMetricsChart.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── JourneyAnalyticsDashboard.tsx
-│   │   │   │   ├── real-time-engagement-dashboard.tsx
-│   │   │   │   ├── real-time-engagement-demo.tsx
-│   │   │   │   ├── SentimentTracker.tsx
-│   │   │   │   ├── TemporalAnalytics.tsx
-│   │   │   ├── bill-detail/
-│   │   │   │   ├── BillAnalysisTab.tsx
-│   │   │   │   ├── BillCommunityTab.tsx
-│   │   │   │   ├── BillFullTextTab.tsx
-│   │   │   │   ├── BillHeader.tsx
-│   │   │   │   ├── BillOverviewTab.tsx
-│   │   │   │   ├── BillRelatedTab.tsx
-│   │   │   │   ├── BillSponsorsTab.tsx
-│   │   │   │   ├── CivicActionGuidance.tsx
-│   │   │   │   ├── ConstitutionalAnalysisPanel.tsx
-│   │   │   │   ├── ConstitutionalFlagCard.tsx
-│   │   │   │   ├── ExpertAnalysisCard.tsx
-│   │   │   │   ├── QuickActionsBar.tsx
-│   │   │   │   ├── TabSkeleton.tsx
-│   │   │   ├── community/
-│   │   │   │   ├── ActionCenter.tsx
-│   │   │   │   ├── ActivityFeed.tsx
-│   │   │   │   ├── CommunityDataIntegration.tsx
-│   │   │   │   ├── CommunityFilters.tsx
-│   │   │   │   ├── CommunityHub.tsx
-│   │   │   │   ├── CommunityStats.tsx
-│   │   │   │   ├── ExpertInsights.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── LocalImpactPanel.tsx
-│   │   │   │   ├── README.md
-│   │   │   │   ├── TrendingTopics.tsx
-│   │   │   ├── discussion/
-│   │   │   │   ├── CommentForm.tsx
-│   │   │   │   ├── CommentItem.tsx
-│   │   │   │   ├── CommunityReporting.tsx
-│   │   │   │   ├── DiscussionDemo.tsx
-│   │   │   │   ├── DiscussionIntegration.tsx
-│   │   │   │   ├── DiscussionThread.tsx
-│   │   │   │   ├── index.ts
-│   │   │   ├── search/
-│   │   │   │   ├── advanced-search.tsx
-│   │   │   ├── user/
-│   │   │   │   ├── AccessibilitySettingsSection.tsx
-│   │   │   │   ├── UserAccountIntegration.tsx
-│   │   │   │   ├── UserProfileSection.tsx
 │   ├── lib/
 │   │   ├── form-builder.tsx
 │   │   ├── protected-route.tsx
@@ -815,7 +625,6 @@ client/
 │   │   ├── utils.ts
 │   │   ├── validation-schemas.test.ts
 │   │   ├── validation-schemas.ts
-│   ├── lucide.d.ts
 │   ├── main.tsx
 │   ├── MIGRATION_SUMMARY.md
 │   ├── monitoring/
@@ -938,13 +747,25 @@ client/
 │   │   │   │   ├── motion.ts
 │   │   │   │   ├── touch.ts
 │   │   │   │   ├── typography.ts
-│   │   │   ├── feedback/
+│   │   │   ├── components/
 │   │   │   │   ├── Alert.tsx
+│   │   │   │   ├── Avatar.tsx
 │   │   │   │   ├── Badge.tsx
+│   │   │   │   ├── Button.tsx
+│   │   │   │   ├── Card.tsx
+│   │   │   │   ├── Checkbox.tsx
+│   │   │   │   ├── Dialog.tsx
+│   │   │   │   ├── Input.tsx
+│   │   │   │   ├── Popover.tsx
+│   │   │   │   ├── Progress.tsx
+│   │   │   │   ├── Select.tsx
+│   │   │   │   ├── Switch.tsx
+│   │   │   │   ├── Tabs.tsx
+│   │   │   │   ├── Textarea.tsx
+│   │   │   ├── feedback/
 │   │   │   │   ├── ErrorMessage.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── LoadingSpinner.tsx
-│   │   │   │   ├── Progress.tsx
 │   │   │   │   ├── separator.tsx
 │   │   │   │   ├── skeleton.tsx
 │   │   │   │   ├── table.tsx
@@ -953,31 +774,20 @@ client/
 │   │   │   │   ├── Tooltip.tsx
 │   │   │   ├── index.ts
 │   │   │   ├── interactive/
-│   │   │   │   ├── button.tsx
 │   │   │   │   ├── Calendar.tsx
-│   │   │   │   ├── card.tsx
-│   │   │   │   ├── checkbox.tsx
 │   │   │   │   ├── Collapsible.tsx
 │   │   │   │   ├── Command.tsx
 │   │   │   │   ├── ContextMenu.tsx
-│   │   │   │   ├── Dialog.tsx
 │   │   │   │   ├── DropdownMenu.tsx
 │   │   │   │   ├── form.tsx
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── input.tsx
 │   │   │   │   ├── NavigationMenu.tsx
-│   │   │   │   ├── Popover.tsx
 │   │   │   │   ├── scroll-area.tsx
-│   │   │   │   ├── select.tsx
 │   │   │   │   ├── Sheet.tsx
 │   │   │   │   ├── Sidebar.tsx
-│   │   │   │   ├── switch.tsx
-│   │   │   │   ├── Tabs.tsx
-│   │   │   │   ├── textarea.tsx
 │   │   │   │   ├── ThemeToggle.tsx
 │   │   │   ├── lib/
 │   │   │   ├── media/
-│   │   │   │   ├── Avatar.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── Logo.tsx
 │   │   │   │   ├── OptimizedImage.tsx
@@ -999,13 +809,6 @@ client/
 │   │   │   │   │   ├── base.css
 │   │   │   │   │   ├── variables.css
 │   │   │   │   ├── chanuka-design-system.css
-│   │   │   │   ├── components/
-│   │   │   │   │   ├── buttons.css
-│   │   │   │   │   ├── forms.css
-│   │   │   │   │   ├── layout.css
-│   │   │   │   │   ├── progressive-disclosure.css
-│   │   │   │   │   ├── ui.css
-│   │   │   │   ├── design-system.ts
 │   │   │   │   ├── design-tokens.css
 │   │   │   │   ├── fallbacks.css
 │   │   │   │   ├── fix-build-errors.css
@@ -1058,19 +861,33 @@ client/
 │   │   │   │   ├── validation.ts
 │   │   ├── index.ts
 │   │   ├── infrastructure/
+│   │   │   ├── asset-loading/
+│   │   │   │   ├── AssetLoadingProvider.tsx
+│   │   │   ├── compatibility/
 │   │   │   ├── data-retention.ts
 │   │   │   ├── index.ts
 │   │   │   ├── INTEGRATION_COMPLETE.md
+│   │   │   ├── system/
+│   │   │   │   ├── HealthCheck.tsx
 │   │   ├── interfaces/
+│   │   │   ├── index.ts
 │   │   │   ├── unified-interfaces.ts
 │   │   ├── services/
 │   │   │   ├── data-retention.ts
+│   │   │   ├── index.ts
 │   │   │   ├── navigation.ts
 │   │   ├── testing/
 │   │   │   ├── index.ts
 │   │   │   ├── mock-data.ts
 │   │   │   ├── mock-users.ts
+│   │   ├── types/
+│   │   │   ├── analytics.ts
+│   │   │   ├── index.ts
+│   │   │   ├── search.ts
 │   │   ├── ui/
+│   │   │   ├── accessibility/
+│   │   │   │   ├── accessibility-manager.tsx
+│   │   │   ├── connection-status.tsx
 │   │   │   ├── dashboard/
 │   │   │   │   ├── action-items.tsx
 │   │   │   │   ├── activity-summary.tsx
@@ -1099,13 +916,19 @@ client/
 │   │   │   │   ├── MonitoringDashboard.tsx
 │   │   │   │   ├── recovery.ts
 │   │   │   │   ├── sections/
+│   │   │   │   │   ├── ActivitySection.tsx
+│   │   │   │   │   ├── BillsSection.tsx
 │   │   │   │   │   ├── CivicMetricsSection.tsx
 │   │   │   │   │   ├── EngagementHistorySection.tsx
+│   │   │   │   │   ├── MigrationDashboard.tsx
 │   │   │   │   │   ├── RecommendationsSection.tsx
+│   │   │   │   │   ├── StatsSection.tsx
 │   │   │   │   │   ├── TrackedBillsSection.tsx
 │   │   │   │   ├── SmartDashboard.tsx
 │   │   │   │   ├── tracked-topics.tsx
 │   │   │   │   ├── types.ts
+│   │   │   │   ├── useDashboardData.ts
+│   │   │   │   ├── useMigrationDashboardData.ts
 │   │   │   │   ├── UserDashboard.tsx
 │   │   │   │   ├── utils/
 │   │   │   │   │   ├── dashboard-config-utils.ts
@@ -1113,18 +936,77 @@ client/
 │   │   │   │   │   ├── dashboard-formatters.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   ├── validation.ts
+│   │   │   │   ├── variants/
+│   │   │   │   │   ├── FullPageDashboard.tsx
+│   │   │   │   │   ├── SectionDashboard.tsx
 │   │   │   │   ├── widgets/
 │   │   │   │   │   ├── DashboardGrid.tsx
 │   │   │   │   │   ├── DashboardStack.tsx
 │   │   │   │   │   ├── DashboardTabs.tsx
 │   │   │   │   │   ├── DashboardWidget.tsx
 │   │   │   │   │   ├── widget-types.ts
+│   │   │   ├── database-status.tsx
+│   │   │   ├── education/
+│   │   │   │   ├── ConstitutionalContext.tsx
+│   │   │   │   ├── EducationalFramework.tsx
+│   │   │   │   ├── EducationalTooltip.tsx
+│   │   │   │   ├── HistoricalPrecedents.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── PlainLanguageSummary.tsx
+│   │   │   │   ├── ProcessEducation.tsx
+│   │   │   │   ├── README.md
+│   │   │   ├── examples/
+│   │   │   │   ├── SeamlessIntegrationExample.tsx
 │   │   │   ├── index.ts
+│   │   │   ├── integration/
+│   │   │   │   ├── EnhancedUXIntegration.tsx
+│   │   │   │   ├── IntegrationProvider.tsx
+│   │   │   │   ├── IntegrationTest.tsx
 │   │   │   ├── layout/
 │   │   │   │   ├── Header.tsx
 │   │   │   │   ├── Layout.tsx
 │   │   │   ├── loading/
+│   │   │   │   ├── AssetLoadingIndicator.tsx
+│   │   │   │   ├── constants.ts
+│   │   │   │   ├── core/
+│   │   │   │   │   ├── loadingCore.ts
+│   │   │   │   ├── errors.ts
+│   │   │   │   ├── FontFallback.tsx
+│   │   │   │   ├── GlobalLoadingIndicator.tsx
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── useLoading.ts
+│   │   │   │   │   ├── useLoadingRecovery.ts
+│   │   │   │   │   ├── useLoadingState.ts
+│   │   │   │   │   ├── useProgressiveLoading.ts
+│   │   │   │   │   ├── useTimeoutAwareLoading.ts
+│   │   │   │   │   ├── useUnifiedLoading.ts
+│   │   │   │   ├── ImageFallback.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── LoadingDemo.tsx
 │   │   │   │   ├── LoadingSpinner.tsx
+│   │   │   │   ├── LoadingStates.tsx
+│   │   │   │   ├── recovery.ts
+│   │   │   │   ├── ScriptFallback.tsx
+│   │   │   │   ├── types.ts
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── AvatarSkeleton.tsx
+│   │   │   │   │   ├── CardSkeleton.tsx
+│   │   │   │   │   ├── FormSkeleton.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── ListSkeleton.tsx
+│   │   │   │   │   ├── LoadingIndicator.tsx
+│   │   │   │   │   ├── ProgressiveLoader.tsx
+│   │   │   │   │   ├── Skeleton.tsx
+│   │   │   │   │   ├── TextSkeleton.tsx
+│   │   │   │   │   ├── TimeoutAwareLoader.tsx
+│   │   │   │   ├── utils/
+│   │   │   │   │   ├── connection-utils.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── loading-utils.ts
+│   │   │   │   │   ├── progress-utils.ts
+│   │   │   │   │   ├── timeout-utils.ts
+│   │   │   │   ├── validation.ts
 │   │   │   ├── mobile/
 │   │   │   │   ├── data-display/
 │   │   │   │   │   ├── index.ts
@@ -1189,10 +1071,34 @@ client/
 │   │   │   │   │   ├── page-relationships.ts
 │   │   │   │   │   ├── route-access.ts
 │   │   │   │   ├── validation.ts
+│   │   │   ├── notifications/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── NotificationCenter.tsx
+│   │   │   │   ├── NotificationItem.tsx
+│   │   │   │   ├── notification-preferences.tsx
+│   │   │   │   ├── NotificationPreferences.tsx
+│   │   │   ├── offline/
+│   │   │   │   ├── OfflineIndicator.tsx
+│   │   │   │   ├── offline-manager.tsx
+│   │   │   │   ├── OfflineModal.tsx
+│   │   │   ├── privacy/
+│   │   │   │   ├── CompactInterface.tsx
+│   │   │   │   ├── controls/
+│   │   │   │   │   ├── ConsentControls.tsx
+│   │   │   │   │   ├── DataUsageControls.tsx
+│   │   │   │   │   ├── VisibilityControls.tsx
+│   │   │   │   ├── FullInterface.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── ModalInterface.tsx
+│   │   │   │   ├── PrivacyManager.tsx
 │   │   │   ├── realtime/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RealTimeDashboard.tsx
 │   │   │   │   ├── RealTimeNotifications.tsx
+│   │   │   ├── types.ts
+│   │   │   ├── utils/
+│   │   │   │   ├── component-helpers.ts
+│   │   │   │   ├── index.ts
 │   │   ├── validation/
 │   │   │   ├── base-validation.ts
 │   │   │   ├── index.ts
@@ -1221,7 +1127,6 @@ client/
 │   ├── stubs/
 │   │   ├── database-stub.ts
 │   │   ├── middleware-stub.ts
-│   ├── TestComponent.tsx
 │   ├── test-styles.html
 │   ├── THEME_INCONSISTENCY_ANALYSIS.md
 │   ├── TYPE_CONSOLIDATION_COMPLETE.md
@@ -1252,7 +1157,6 @@ client/
 │   │   ├── user-dashboard.ts
 │   ├── update-fsd-imports.js
 │   ├── utils/
-│   │   ├── api.ts
 │   │   ├── archive/
 │   │   │   ├── advanced-error-recovery.ts
 │   │   │   ├── connectionAwareLoading.ts
@@ -1261,13 +1165,11 @@ client/
 │   │   │   ├── super-aggressive-suppressor.ts
 │   │   ├── assets.ts
 │   │   ├── backgroundSyncManager.ts
-│   │   ├── browser-logger.ts
 │   │   ├── bundle-analyzer.ts
 │   │   ├── cacheInvalidation.ts
 │   │   ├── cn.ts
 │   │   ├── comprehensiveLoading.ts
 │   │   ├── demo-data-service.ts
-│   │   ├── dev-tools.ts
 │   │   ├── emergency-triage.ts
 │   │   ├── env-config.ts
 │   │   ├── i18n.ts
@@ -1287,18 +1189,13 @@ client/
 │   │   ├── render-tracking-integration.ts
 │   │   ├── route-preloading.ts
 │   │   ├── route-validation.ts
-│   │   ├── rum-integration.ts
 │   │   ├── safe-lazy-loading.tsx
 │   │   ├── security.ts
-│   │   ├── server-status.ts
-│   │   ├── service-recovery.ts
 │   │   ├── serviceWorker.ts
-│   │   ├── simple-lazy-pages.tsx
-│   │   ├── storage.ts
-│   │   ├── style-performance.ts
 │   │   ├── tracing.ts
 │   ├── validation/
 │   │   ├── index.ts
+│   ├── VALIDATION_CLEANUP_PLAN.md
 │   ├── vite-env.d.ts
 ├── tailwind.config.ts
 ├── tsconfig.json
@@ -1687,9 +1584,12 @@ scripts/
 ├── clean-shared-core-imports.ts
 ├── cleanup-deprecated-folders.ts
 ├── cleanup-legacy-adapters.js
+├── cleanup-orphaned-files.ts
 ├── cleanup-redundant-utils.js
+├── complete-fsd-migration.sh
 ├── complete-realignment.ts
 ├── complete-schema-fix.ts
+├── consolidate-redundant-implementations.ts
 ├── consolidate-sprawl.ts
 ├── database/
 │   ├── check-schema.ts
@@ -1728,13 +1628,16 @@ scripts/
 ├── drop-schema.ts
 ├── dynamic-path-updater.js
 ├── emergency-build-fix.ts
+├── emergency-design-system-consolidation.ts
 ├── execute-comprehensive-migration.ts
 ├── fix-all-imports.js
 ├── fix-all-shared-core-imports.ts
 ├── fix-api-response-calls.js
 ├── fix-config.json
+├── fix-design-system.ts
 ├── fix-display-names.ts
 ├── fix-error-fallback.ts
+├── fix-features-integration.ts
 ├── fix-frontend-imports.js
 ├── fix-import-paths.ts
 ├── fix-infrastructure-issues.ts
@@ -1749,6 +1652,7 @@ scripts/
 ├── fix-schema-references.ts
 ├── fix-server-logger-imports.js
 ├── fix-shared-core-imports.ts
+├── fix-shared-folder.ts
 ├── fix-shared-imports.js
 ├── fix-typescript-syntax-errors.ts
 ├── generate-bundle-report.js
@@ -1785,6 +1689,8 @@ scripts/
 ├── setup-playwright.js
 ├── standardize-imports.ts
 ├── strategic-contrast-migration.js
+├── test-consolidated-design-system.ts
+├── test-design-system-architecture.ts
 ├── typescript-fixer/
 │   ├── jest.config.js
 │   ├── package.json
@@ -1834,12 +1740,18 @@ scripts/
 │   ├── tsconfig.json
 ├── update-core-imports.js
 ├── update-core-references.js
+├── update-import-references.ts
 ├── validate_structure.ts
+├── validate-client-implementations.ts
 ├── validate-config.js
 ├── validate-config-consistency.ts
+├── validate-design-system.ts
+├── validate-design-system-final.ts
+├── validate-fsd-migration.ts
 ├── validate-imports.js
 ├── validate-new-domains.cjs
 ├── validate-property-naming.ts
+├── validate-shared-folder.ts
 ├── validate-syntax.ts
 ├── verify-and-fix-project-structure.ts
 ├── verify-cleanup.ts
@@ -2994,4 +2906,4 @@ vitest.workspace.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-12-09 08:35:16
+Generated on: 2025-12-09 17:05:48

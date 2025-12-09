@@ -13,7 +13,7 @@ import type {
   ConflictReport,
   AnalyticsResponse,
   UserActivity
-} from '@client/features/analytics/types';
+} from '@client/shared/types/analytics';
 import { logger } from '@client/utils/logger';
 
 import { globalErrorHandler } from './errors';

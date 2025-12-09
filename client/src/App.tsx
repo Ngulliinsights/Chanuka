@@ -8,10 +8,10 @@ import { AppProviders } from '@client/app/providers/AppProviders';
 import { ErrorBoundary } from '@client/core/error/components';
 import { LoadingStates } from '@client/shared/ui/loading/LoadingStates';
 import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
-import { UserJourneyOptimizer } from '@client/shared/ui/onboarding/UserJourneyOptimizer';
-import { CookieConsentBanner } from '@client/shared/ui/privacy/CookieConsentBanner';
-import { Toaster } from '@client/shared/design-system/primitives/toaster';
-import { UserAccountIntegration } from '@client/features/users/ui/profile/UserAccountIntegration';
+import { UserJourneyOptimizer } from '@client/features/users/ui/onboarding/UserJourneyOptimizer';
+import { CookieConsentBanner } from '@client/features/security/ui/privacy/CookieConsentBanner';
+import { Toaster } from '@client/shared/design-system/feedback/Toaster';
+
 import { useIsMobile } from '@client/hooks/use-mobile';
 import { logger } from '@client/utils/logger';
 
@@ -41,9 +41,7 @@ function App() {
             <div />
           </OfflineProvider>
           <UserJourneyOptimizer onPersonaSelected={() => {}} onSkip={() => {}} />
-          <UserAccountIntegration>
-            <div />
-          </UserAccountIntegration>
+
 
           {isMobile && <MobileHeader />}
 

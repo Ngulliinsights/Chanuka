@@ -1,0 +1,43 @@
+/**
+ * Shadow Design Tokens
+ * Consistent shadow system for depth and focus states
+ */
+
+export const shadowTokens = {
+  // Base shadows
+  base: {
+    none: 'none',
+    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+  },
+
+  // Component shadows
+  component: {
+    button: {
+      default: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+      hover: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+      pressed: '0 1px 2px 0 rgb(0 0 0 / 0.1)',
+    },
+    card: {
+      default: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+      hover: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+      pressed: '0 1px 2px 0 rgb(0 0 0 / 0.1)',
+      elevated: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+      error: '0 1px 3px 0 rgb(239 68 68 / 0.2), 0 1px 2px -1px rgb(239 68 68 / 0.1)',
+    },
+  },
+
+  // Interactive shadows
+  interactive: {
+    focus: {
+      primary: '0 0 0 2px rgb(14 165 233 / 0.5)',
+      accent: '0 0 0 2px rgb(239 68 68 / 0.5)',
+      success: '0 0 0 2px rgb(34 197 94 / 0.5)',
+      warning: '0 0 0 2px rgb(245 158 11 / 0.5)',
+      error: '0 0 0 2px rgb(239 68 68 / 0.5)',
+    },
+  },
+} as const;
+

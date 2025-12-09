@@ -1,7 +1,7 @@
 import { AlertTriangle, RefreshCw, Building } from 'lucide-react';
 import React from 'react';
 
-import { Button } from '../../ui/button';
+import { Button } from '@client/shared/design-system';
 
 /**
  * Shared error display utilities for consistent error UI patterns

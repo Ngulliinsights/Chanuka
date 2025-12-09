@@ -326,7 +326,7 @@ BrowserCompatibilityDetails.displayName = 'BrowserCompatibilityDetails';
 /**
  * USAGE EXAMPLE:
  * 
- * import { useBrowserCompatibilityStatus, BrowserCompatibilityWarning } from '@client/shared/infrastructure/compatibility/useBrowserStatus';
+ * import { useBrowserCompatibilityStatus, BrowserCompatibilityWarning } from '@client/core/browser/useBrowserStatus';
  * 
  * export function App() {
  *   return (

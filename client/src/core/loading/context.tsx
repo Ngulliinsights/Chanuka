@@ -6,7 +6,7 @@
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef, useMemo } from 'react';
 
-import { useErrorAnalytics } from '@client/features/analytics/hooks/useErrorAnalytics';
+// Removed circular dependency - error analytics should be injected via props
 import { logger } from '@client/utils/logger';
 
 import { loadingReducer } from './reducer';
@@ -50,7 +50,9 @@ export interface LoadingProviderProps {
   useConnectionAware?: () => ConnectionInfo;
   useOnlineStatus?: () => boolean;
   assetLoadingManager?: any;
-  errorAnalytics?: ReturnType<typeof useErrorAnalytics>;
+  errorAnalytics?: {
+    trackError: (error: Error, context?: Record<string, unknown>) => void;
+  };
 }
 
 const LoadingContext = createContext<LoadingContextValue | undefined>(undefined);

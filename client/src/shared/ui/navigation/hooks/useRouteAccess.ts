@@ -1,7 +1,7 @@
 import type { AccessDenialReason, UserRole } from '@client/types';
 
 import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
-import { useAuth } from '@/features/users/hooks';
+import { useAuth } from '@client/core/auth';
 import { NavigationValidationError, NavigationAccessDeniedError } from '@client/errors';
 import { getRecoverySuggestions, createRecoveryContext } from '@client/recovery';
 import { validateNavigationPath, validateUserRole } from '@client/validation';

@@ -301,9 +301,8 @@ export function SavedSearches({
                           <option value="1">1 or more new results</option>
                           <option value="5">5 or more new results</option>
                           <option value="10">10 or more new results</option>
-                            <SelectItem value="25">25 or more new results</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          <option value="25">25 or more new results</option>
+                        </select>
                         <p className="text-xs text-muted-foreground">
                           Only send alerts when at least this many new results are found
                         </p>

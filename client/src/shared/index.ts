@@ -44,3 +44,6 @@ export * from './interfaces';
 
 // Component templates
 export * from './templates';
+
+// Shared types
+export * from './types';

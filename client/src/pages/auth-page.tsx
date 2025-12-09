@@ -10,8 +10,8 @@ import { AlertTriangle, CheckCircle, ArrowLeft, Shield, Mail } from 'lucide-reac
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { RegisterForm } from '@client/features/users/ui/auth/ui/RegisterForm';
-import { LoginForm } from '@client/features/users/ui/auth/forms';
+import { RegisterForm } from '@client/core/auth';
+import { LoginForm } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
 import { Button } from '@client/shared/design-system/primitives/button';
 import {
@@ -21,7 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/shared/design-system/primitives/card';
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 type AuthMode =

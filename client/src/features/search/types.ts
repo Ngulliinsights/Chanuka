@@ -1,4 +1,19 @@
-// Search feature types
+// Re-export shared search types to maintain compatibility
+export type {
+  SearchRequest,
+  SaveSearchRequest,
+  SearchFilters,
+  AdvancedSearchOptions,
+  SearchResult as SharedSearchResult,
+  SearchResponse as SharedSearchResponse,
+  SearchMetadata as SharedSearchMetadata,
+  SavedSearch as SharedSavedSearch,
+  SearchHistory as SharedSearchHistory,
+  SearchSuggestion as SharedSearchSuggestion,
+  SearchAnalytics as SharedSearchAnalytics
+} from '@client/shared/types/search';
+
+// Feature-specific extensions and aliases
 export interface SearchQuery {
   q: string;
   type?: 'bills' | 'users' | 'comments' | 'all';
@@ -8,6 +23,7 @@ export interface SearchQuery {
   offset?: number;
 }
 
+// Extended search filters for feature-specific needs
 export interface SearchFilters {
   billStatus?: string[];
   dateRange?: {

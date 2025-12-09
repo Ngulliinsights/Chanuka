@@ -1,7 +1,7 @@
 import type { RelatedPage, UserRole } from '@client/types';
 
 import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
-import { useAuth } from '@/features/users/hooks';
+import { useAuth } from '@client/core/auth';
 import { NavigationValidationError } from '@client/errors';
 import { getRecoverySuggestions } from '@client/recovery';
 import { validateNavigationPath, validateUserRole, validateUseRelatedPagesOptions } from '@client/validation';

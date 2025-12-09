@@ -24,7 +24,7 @@ import { initializeStore } from '@client/store';
 import { CommunityUIProvider } from '@client/store/slices/communitySlice';
 import { assetLoadingManager } from '@client/utils/assets';
 import { AccessibilityProvider } from '@client/shared/ui/accessibility/accessibility-manager';
-import { SimpleErrorBoundary } from '@client/shared/ui/error/SimpleErrorBoundary';
+import { SimpleErrorBoundary } from '@client/core/error/components/SimpleErrorBoundary';
 import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
 
 // =============================================================================

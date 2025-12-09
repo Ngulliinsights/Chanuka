@@ -34,7 +34,7 @@ import type { Bill } from '@client/core/api/types';
 // Types
 import { BillStatus, UrgencyLevel, ComplexityLevel } from '@client/core/api/types';
 import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 export default function BillDetail() {

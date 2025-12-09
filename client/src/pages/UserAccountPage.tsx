@@ -14,10 +14,10 @@ import { PrivacyManager } from '@client/components/shared/privacy/PrivacyManager
 import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
 import { Card, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
-import { AccessibilitySettingsSection } from '@client/features/users/ui/profile/AccessibilitySettingsSection';
-import { UserAccountIntegration } from '@client/features/users/ui/profile/UserAccountIntegration';
-import { UserProfileSection } from '@client/features/users/ui/profile/UserProfileSection';
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { AccessibilitySettingsSection } from '@client/core/auth';
+import { UserAccountIntegration } from '@client/core/auth';
+import { UserProfileSection } from '@client/core/auth';
+import { useAuth } from '@client/core/auth';
 
 export default function UserAccountPage() {
   const { user, isAuthenticated } = useAuth();

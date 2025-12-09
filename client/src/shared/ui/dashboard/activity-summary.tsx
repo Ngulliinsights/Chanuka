@@ -5,7 +5,7 @@ import React from 'react';
 
 import { Button } from '../../design-system';
 import { Card, CardContent, CardHeader } from '../../design-system';
-
+import { handleError, measureAsync, recordMetric } from '../../../core';
 
 import { DashboardError } from './errors';
 import { validateActivitySummary } from './validation';
@@ -18,10 +18,11 @@ export const ActivitySummary: React.FC<DashboardComponentProps> = ({
 }) => {
   const { data, loading, error, actions, recovery } = useDashboard(config);
 
-  // Handle error reporting
+  // Handle error reporting using core error handler
   React.useEffect(() => {
-    if (error && onError) {
-      onError(error);
+    if (error) {
+      handleError(error, { component: 'ActivitySummary' });
+      onError?.(error);
     }
   }, [error, onError]);
 
@@ -45,19 +46,43 @@ export const ActivitySummary: React.FC<DashboardComponentProps> = ({
   }, [data.summary]);
 
   const handleRefresh = async () => {
-    try {
-      await actions.refresh();
-    } catch (refreshError) {
-      console.error('Failed to refresh activity summary:', refreshError);
-    }
+    await measureAsync('activity-summary-refresh', async () => {
+      try {
+        await actions.refresh();
+        await recordMetric({
+          name: 'activity-summary-refresh-success',
+          value: 1,
+          timestamp: new Date(),
+          category: 'user-interaction'
+        });
+      } catch (refreshError) {
+        handleError(refreshError, { 
+          component: 'ActivitySummary', 
+          operation: 'refresh' 
+        });
+        throw refreshError;
+      }
+    });
   };
 
   const handleRecovery = async () => {
-    try {
-      await recovery.recover();
-    } catch (recoveryError) {
-      console.error('Recovery failed:', recoveryError);
-    }
+    await measureAsync('activity-summary-recovery', async () => {
+      try {
+        await recovery.recover();
+        await recordMetric({
+          name: 'activity-summary-recovery-success',
+          value: 1,
+          timestamp: new Date(),
+          category: 'error-recovery'
+        });
+      } catch (recoveryError) {
+        handleError(recoveryError, { 
+          component: 'ActivitySummary', 
+          operation: 'recovery' 
+        });
+        throw recoveryError;
+      }
+    });
   };
 
   // Error state with recovery options

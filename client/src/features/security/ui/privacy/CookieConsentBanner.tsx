@@ -18,11 +18,8 @@ import React, { useState, useEffect } from 'react';
 import { logger } from '@client/utils/logger';
 import { privacyCompliance } from '@client/utils/privacy-compliance';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent } from '../ui/card';
-import { Label } from '../ui/label';
-import { Switch } from '../ui/switch';
+import { Badge, Button, Card, CardContent } from '@client/shared/design-system';
+import { Label, Switch } from '@client/shared/design-system';
 
 
 interface CookieCategory {

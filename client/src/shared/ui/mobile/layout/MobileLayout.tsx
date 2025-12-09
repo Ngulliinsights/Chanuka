@@ -5,15 +5,15 @@
 
 import React from 'react';
 
-import type { NavigationItem } from '../../../config';
-import { useDeviceInfo } from '../../../hooks/mobile/useDeviceInfo';
-import { useMobileNavigation } from '../../../hooks/mobile/useMobileNavigation';
-import { useScrollManager } from '../../../hooks/mobile/useScrollManager';
-import { cn } from '../../../lib/utils';
-import { OfflineStatusBanner } from '../feedback/OfflineStatusBanner';
-import { PullToRefresh } from '../interaction/PullToRefresh';
-import { ScrollToTopButton } from '../interaction/ScrollToTopButton';
-import { MobileNavigation } from '../MobileNavigation';
+import type { NavigationItem } from '@client/shared/config';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
+import { useMobileNavigation } from '@client/hooks/mobile/useMobileNavigation';
+import { useScrollManager } from '@client/hooks/mobile/useScrollManager';
+import { cn } from '@client/shared/design-system';
+import { OfflineStatusBanner } from '@client/shared/ui/mobile/feedback/OfflineStatusBanner';
+import { PullToRefresh } from '@client/shared/ui/mobile/interaction/PullToRefresh';
+import { ScrollToTopButton } from '@client/shared/ui/mobile/interaction/ScrollToTopButton';
+import { MobileNavigation } from '@client/shared/ui/mobile/MobileNavigation';
 
 import { AutoHideHeader } from './AutoHideHeader';
 

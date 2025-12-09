@@ -7,11 +7,11 @@ import { Shield, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { SocialLogin } from '@client/features/users/ui/auth/SocialLogin';
-import { RegisterForm } from '@client/features/users/ui/auth/ui/RegisterForm';
+import { SocialLogin } from '@client/core/auth';
+import { RegisterForm } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 export default function RegisterPage() {

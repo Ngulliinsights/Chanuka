@@ -1,7 +1,7 @@
 import type {
   SearchRequest,
   SaveSearchRequest
-} from '@client/features/search/types';
+} from '@client/shared/types/search';
 
 import { globalApiClient as api } from './index';
 

@@ -1,9 +1,9 @@
 import { Menu } from 'lucide-react';
 import React, { useId } from 'react';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/design-system';
 
-import { Button } from '../../ui/button';
+import { Button } from '@client/shared/design-system';
 
 interface AutoHideHeaderProps {
   visible: boolean;

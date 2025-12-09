@@ -12,7 +12,7 @@ import { Button } from '@client/shared/design-system/primitives/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
 import { Input } from '@client/shared/design-system/primitives/input';
 import { Label } from '@client/shared/design-system/primitives/label';
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { useAuth } from '@client/core/auth';
 import { validatePassword } from '@client/utils/security';
 
 export default function ResetPasswordPage() {

@@ -1,3 +1,4 @@
+import { PageLoader } from '@client/shared/ui/loading/LoadingStates';
 import React, {
   lazy,
   LazyExoticComponent,
@@ -5,14 +6,10 @@ import React, {
   Suspense,
   useEffect,
   useRef,
-} from "react";
+} from 'react';
 
-import {
-  PageLoader,
-} from "../components/loading/LoadingStates";
-
-import { logger } from "./logger";
-import { routePreloader } from "./route-preloading";
+import { logger } from './logger';
+import { routePreloader } from './route-preloading';
 
 /**
  * Component loading state management with proper cleanup
@@ -50,7 +47,9 @@ export function retryLazyComponentLoad<P extends object>(
 ): () => Promise<{ default: ComponentType<P> }> {
   return async () => {
     // Check if this component is already being loaded
-    const existingLoad = componentLoadingState.get(componentId) as Promise<{ default: ComponentType<P> }> | undefined;
+    const existingLoad = componentLoadingState.get(componentId) as
+      | Promise<{ default: ComponentType<P> }>
+      | undefined;
     if (existingLoad) {
       return existingLoad;
     }
@@ -62,23 +61,20 @@ export function retryLazyComponentLoad<P extends object>(
       } catch (error) {
         // If cached load fails, clear cache and retry
         loadedComponents.delete(componentId);
-        logger.warn(
-          `Cached component ${componentId} failed to load, retrying`,
-          { error }
-        );
+        logger.warn(`Cached component ${componentId} failed to load, retrying`, { error });
       }
     }
 
     // Create shared loading promise
     const loadingPromise = (async () => {
-      let lastError: Error = new Error("Component loading failed");
+      let lastError: Error = new Error('Component loading failed');
 
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
           const result = await importFn();
 
           // Validate component structure
-          if (!result?.default || typeof result.default !== "function") {
+          if (!result?.default || typeof result.default !== 'function') {
             throw new Error(
               `Invalid component '${componentId}': expected React component as default export`
             );
@@ -91,18 +87,17 @@ export function retryLazyComponentLoad<P extends object>(
           lastError = error as Error;
 
           const isChunkError =
-            lastError.message.includes("Loading chunk") ||
-            lastError.message.includes("ChunkLoadError") ||
-            lastError.name === "ChunkLoadError";
+            lastError.message.includes('Loading chunk') ||
+            lastError.message.includes('ChunkLoadError') ||
+            lastError.name === 'ChunkLoadError';
 
-          const shouldRetry =
-            attempt < maxRetries && (isChunkError || attempt === 0);
+          const shouldRetry = attempt < maxRetries && (isChunkError || attempt === 0);
 
           if (shouldRetry) {
             const delay = initialDelay * Math.pow(backoffFactor, attempt);
-            await new Promise((resolve) => setTimeout(resolve, delay));
+            await new Promise(resolve => setTimeout(resolve, delay));
 
-            if (process.env.NODE_ENV === "development") {
+            if (process.env.NODE_ENV === 'development') {
               console.warn(
                 `Retrying component '${componentId}' (attempt ${attempt + 2}/${
                   maxRetries + 1
@@ -149,9 +144,7 @@ export function retryLazyComponentLoad<P extends object>(
  * Stable fallback component created once to prevent re-renders
  * This is defined outside the function to ensure referential equality
  */
-const createStableErrorFallback = (
-  componentName: string
-): ComponentType<Record<string, never>> => {
+const createStableErrorFallback = (componentName: string): ComponentType<Record<string, never>> => {
   const StableFallback: ComponentType<Record<string, never>> = () => (
     <div className="p-4 text-center">
       <p className="text-red-600">Failed to load {componentName}</p>
@@ -189,23 +182,14 @@ function createSafeLazyComponent<P extends object>(
   componentName: string
 ): LazyExoticComponent<ComponentType<P>> {
   const componentId = `lazy-${componentName}`;
-  const retryableImport = retryLazyComponentLoad(
-    importFn,
-    componentId,
-    3,
-    1000,
-    2
-  );
+  const retryableImport = retryLazyComponentLoad(importFn, componentId, 3, 1000, 2);
 
   return lazy(async () => {
     try {
       const module = await retryableImport();
       return module;
     } catch (error) {
-      logger.error(
-        `Failed to load component ${componentName} after retries:`,
-        { error }
-      );
+      logger.error(`Failed to load component ${componentName} after retries:`, { error });
 
       // Get or create stable fallback component
       let StableFallback = fallbackComponentCache.get(componentName);
@@ -260,91 +244,86 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
   _exportName: string,
   options: {
     enablePreloading?: boolean;
-    preloadPriority?: "high" | "medium" | "low";
+    preloadPriority?: 'high' | 'medium' | 'low';
     connectionAware?: boolean;
     displayName?: string;
   } = {}
 ): LazyExoticComponent<ComponentType<P>> {
-  const {
-    enablePreloading = true,
-    displayName,
-  } = options;
+  const { enablePreloading = true, displayName } = options;
 
   // Extract meaningful component name from path if not provided
   const componentName =
-    displayName ||
-    path.split("/").pop()?.replace(".tsx", "").replace(".ts", "") ||
-    "UnknownPage";
+    displayName || path.split('/').pop()?.replace('.tsx', '').replace('.ts', '') || 'UnknownPage';
 
   const importFn = (() => {
     // Use dynamic import with proper path resolution
     switch (path) {
-      case "@/pages/home":
-        return import("@client/pages/home");
-      case "@/pages/dashboard":
-        return import("@client/pages/dashboard");
-      case "@/pages/bills-dashboard":
-        return import("@client/pages/bills-dashboard-page");
-      case "@/pages/bills-dashboard-page":
-        return import("@client/pages/bills-dashboard-page");
-      case "@/pages/enhanced-bills-dashboard":
-        return import("@client/pages/bills-dashboard-page");
-      case "@/pages/enhanced-bills-dashboard-page":
-        return import("@client/pages/bills-dashboard-page");
-      case "@/pages/auth-page":
-        return import("@client/pages/auth-page");
-      case "@/pages/authentication":
+      case '@/pages/home':
+        return import('@client/pages/home');
+      case '@/pages/dashboard':
+        return import('@client/pages/dashboard');
+      case '@/pages/bills-dashboard':
+        return import('@client/pages/bills-dashboard-page');
+      case '@/pages/bills-dashboard-page':
+        return import('@client/pages/bills-dashboard-page');
+      case '@/pages/enhanced-bills-dashboard':
+        return import('@client/pages/bills-dashboard-page');
+      case '@/pages/enhanced-bills-dashboard-page':
+        return import('@client/pages/bills-dashboard-page');
+      case '@/pages/auth-page':
+        return import('@client/pages/auth-page');
+      case '@/pages/authentication':
         // Redirect old AuthenticationPage imports to the new consolidated auth page
-        return import("@client/pages/auth-page");
+        return import('@client/pages/auth-page');
       // Legal / compliance pages
-      case "@/pages/terms":
-        return import("@client/pages/legal/terms");
-      case "@/pages/privacy":
-        return import("@client/pages/legal/privacy");
-      case "@/pages/cookie-policy":
-        return import("@client/pages/legal/cookie-policy");
-      case "@/pages/data-retention":
-        return import("@client/pages/legal/data-retention");
-      case "@/pages/accessibility":
-        return import("@client/pages/legal/accessibility");
-      case "@/pages/security":
-        return import("@client/pages/legal/security");
-      case "@/pages/acceptable-use":
-        return import("@client/pages/legal/acceptable-use");
-      case "@/pages/dmca":
-        return import("@client/pages/legal/dmca");
-      case "@/pages/compliance-ccpa":
-        return import("@client/pages/legal/compliance-ccpa");
-      case "@/pages/contact-legal":
-        return import("@client/pages/legal/contact-legal");
-      case "@/pages/bill-detail":
-        return import("@client/pages/bill-detail");
-      case "@/pages/bill-analysis":
-        return import("@client/pages/bill-analysis");
-      case "@/pages/community-input":
-        return import("@client/pages/community-input");
-      case "@/pages/expert-verification":
-        return import("@client/pages/expert-verification");
-      case "@/pages/search":
-        return import("@client/pages/search");
-      case "@/pages/profile":
-        return import("@client/pages/UserAccountPage");
-      case "@/pages/user-profile":
-        return import("@client/pages/UserAccountPage");
-      case "@/pages/user-dashboard":
-        return import("@client/pages/UserAccountPage");
-      case "@/pages/onboarding":
-        return import("@client/pages/onboarding");
-      case "@/pages/admin":
-        return import("@client/pages/admin");
-      case "@/pages/database-manager":
-        return import("@client/pages/database-manager");
-      case "@/pages/bill-sponsorship-analysis":
-        return import("@client/pages/bill-sponsorship-analysis");
-      case "@/pages/comments":
-        return import("@client/pages/comments");
-      case "@/pages/not-found":
-        return import("@client/pages/not-found");
+      case '@/pages/terms':
+        return import('@client/pages/legal/terms');
+      case '@/pages/privacy':
+        return import('@client/pages/legal/privacy');
+      case '@/pages/cookie-policy':
+        return import('@client/pages/legal/cookie-policy');
+      case '@/pages/data-retention':
+        return import('@client/pages/legal/data-retention');
+      case '@/pages/accessibility':
+        return import('@client/pages/legal/accessibility');
+      case '@/pages/security':
+        return import('@client/pages/legal/security');
+      case '@/pages/acceptable-use':
+        return import('@client/pages/legal/acceptable-use');
+      case '@/pages/dmca':
+        return import('@client/pages/legal/dmca');
+      case '@/pages/compliance-ccpa':
+        return import('@client/pages/legal/compliance-ccpa');
+      case '@/pages/contact-legal':
+        return import('@client/pages/legal/contact-legal');
+      case '@/pages/bill-detail':
+        return import('@client/pages/bill-detail');
+      case '@/pages/bill-analysis':
+        return import('@client/pages/bill-analysis');
+      case '@/pages/community-input':
+        return import('@client/pages/community-input');
+      case '@/pages/expert-verification':
+        return import('@client/pages/expert-verification');
+      case '@/pages/search':
+        return import('@client/pages/search');
+      case '@/pages/profile':
+        return import('@client/pages/UserAccountPage');
+      case '@/pages/user-profile':
+        return import('@client/pages/UserAccountPage');
+      case '@/pages/user-dashboard':
+        return import('@client/pages/UserAccountPage');
+      case '@/pages/onboarding':
+        return import('@client/pages/onboarding');
+      case '@/pages/admin':
+        return import('@client/pages/admin');
+      case '@/pages/database-manager':
+        return import('@client/pages/database-manager');
+      case '@/pages/bill-sponsorship-analysis':
+        return import('@client/pages/bill-sponsorship-analysis');
+      case '@/pages/comments':
+        return import('@client/pages/comments');
+      case '@/pages/not-found':
+        return import('@client/pages/not-found');
       default: {
         // Try to resolve the path by removing @/ and adding ../
         const relativePath = path.replace('@/', '../');
@@ -362,7 +341,7 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
   const component = createSafeLazyComponent(importFn, componentName);
 
   // Defer preloading registration to avoid module-load side effects
-  if (enablePreloading && typeof window !== "undefined") {
+  if (enablePreloading && typeof window !== 'undefined') {
     const preloadKey = `preload-${componentName}`;
 
     // Check existing registration
@@ -381,16 +360,16 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
         if (!entry || entry.promise) return;
 
         const preloadPromise = routePreloader
-          .preloadComponent(component as LazyExoticComponent<ComponentType<unknown>>, `/${componentName.toLowerCase()}`)
-          .catch((error) => {
+          .preloadComponent(
+            component as LazyExoticComponent<ComponentType<unknown>>,
+            `/${componentName.toLowerCase()}`
+          )
+          .catch(error => {
             // Reset registration on failure to allow retry
             preloadRegistry.delete(preloadKey);
 
-            if (process.env.NODE_ENV === "development") {
-              console.warn(
-                `Failed to register ${componentName} for preloading:`,
-                error
-              );
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(`Failed to register ${componentName} for preloading:`, error);
             }
           })
           .finally(() => {
@@ -428,8 +407,7 @@ export function createNamedExportLazy<P extends Record<string, never> = Record<s
   exportName: string,
   componentName: string
 ): LazyExoticComponent<ComponentType<P>> {
-  const moduleImport = (() =>
-    import(/* @vite-ignore */ path)) as () => Promise<
+  const moduleImport = (() => import(/* @vite-ignore */ path)) as () => Promise<
     Record<string, unknown>
   >;
 
@@ -438,16 +416,14 @@ export function createNamedExportLazy<P extends Record<string, never> = Record<s
     const Component = module[exportName] as ComponentType<P>;
 
     if (!Component) {
-      const availableExports = Object.keys(module).filter(
-        (k) => k !== "__esModule"
-      );
+      const availableExports = Object.keys(module).filter(k => k !== '__esModule');
       throw new Error(
         `Export '${exportName}' not found in module for component '${componentName}'. ` +
-          `Available exports: ${availableExports.join(", ") || "none"}`
+          `Available exports: ${availableExports.join(', ') || 'none'}`
       );
     }
 
-    if (typeof Component !== "function") {
+    if (typeof Component !== 'function') {
       throw new Error(
         `Export '${exportName}' in component '${componentName}' is not a valid React component. ` +
           `Type: ${typeof Component}`
@@ -478,189 +454,181 @@ export const SafeLazyWrapper: React.FC<SafeLazyWrapperProps> = ({
  * Heavy components are loaded dynamically to reduce initial bundle size
  */
 export const SafeLazyPages = {
-  HomePage: createSafeLazyPage("@/pages/home", "default", {
-    preloadPriority: "high",
+  HomePage: createSafeLazyPage('@/pages/home', 'default', {
+    preloadPriority: 'high',
     enablePreloading: true,
-    displayName: "HomePage",
+    displayName: 'HomePage',
   }),
-  BillsDashboard: createSafeLazyPage("@/pages/bills-dashboard-page", "default", {
-    preloadPriority: "high",
+  BillsDashboard: createSafeLazyPage('@/pages/bills-dashboard-page', 'default', {
+    preloadPriority: 'high',
     enablePreloading: true,
-    displayName: "BillsDashboard",
+    displayName: 'BillsDashboard',
   }),
-  Dashboard: createSafeLazyPage("@/pages/dashboard", "default", {
-    preloadPriority: "high",
+  Dashboard: createSafeLazyPage('@/pages/dashboard', 'default', {
+    preloadPriority: 'high',
     enablePreloading: true,
-    displayName: "Dashboard",
+    displayName: 'Dashboard',
   }),
-  BillDetail: createSafeLazyPage("@/pages/bill-detail", "default", {
-    preloadPriority: "medium",
+  BillDetail: createSafeLazyPage('@/pages/bill-detail', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "BillDetail",
+    displayName: 'BillDetail',
   }),
-  BillAnalysis: createSafeLazyPage("@/pages/bill-analysis", "default", {
-    preloadPriority: "medium",
+  BillAnalysis: createSafeLazyPage('@/pages/bill-analysis', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "BillAnalysis",
+    displayName: 'BillAnalysis',
   }),
-  CommunityInput: createSafeLazyPage("@/pages/community-input", "default", {
-    preloadPriority: "medium",
+  CommunityInput: createSafeLazyPage('@/pages/community-input', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "CommunityInput",
+    displayName: 'CommunityInput',
   }),
-  ExpertVerification: createSafeLazyPage(
-    "@/pages/expert-verification",
-    "default",
-    {
-      preloadPriority: "medium",
-      enablePreloading: true,
-      displayName: "ExpertVerification",
-    }
-  ),
-  SearchPage: createSafeLazyPage("@/pages/search", "default", {
-    preloadPriority: "low",
+  ExpertVerification: createSafeLazyPage('@/pages/expert-verification', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "SearchPage",
+    displayName: 'ExpertVerification',
   }),
-  AuthPage: createSafeLazyPage("@/pages/auth-page", "default", {
-    preloadPriority: "low",
+  SearchPage: createSafeLazyPage('@/pages/search', 'default', {
+    preloadPriority: 'low',
+    enablePreloading: true,
+    displayName: 'SearchPage',
+  }),
+  AuthPage: createSafeLazyPage('@/pages/auth-page', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "AuthPage",
+    displayName: 'AuthPage',
   }),
   // Legacy key kept but pointed to the consolidated auth page
-  AuthenticationPage: createSafeLazyPage("@/pages/auth-page", "default", {
-    preloadPriority: "low",
+  AuthenticationPage: createSafeLazyPage('@/pages/auth-page', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "AuthPage",
+    displayName: 'AuthPage',
   }),
-  Profile: createSafeLazyPage("@/pages/profile", "default", {
-    preloadPriority: "medium",
+  Profile: createSafeLazyPage('@/pages/profile', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "UserAccount",
+    displayName: 'UserAccount',
   }),
-  UserProfilePage: createSafeLazyPage("@/pages/user-profile", "default", {
-    preloadPriority: "medium",
+  UserProfilePage: createSafeLazyPage('@/pages/user-profile', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "UserAccount",
+    displayName: 'UserAccount',
   }),
-  UserDashboard: createSafeLazyPage("@/pages/user-dashboard", "default", {
-    preloadPriority: "medium",
+  UserDashboard: createSafeLazyPage('@/pages/user-dashboard', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "UserAccount",
+    displayName: 'UserAccount',
   }),
-  Onboarding: createSafeLazyPage("@/pages/onboarding", "default", {
-    preloadPriority: "low",
+  Onboarding: createSafeLazyPage('@/pages/onboarding', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "Onboarding",
+    displayName: 'Onboarding',
   }),
-  AdminPage: createSafeLazyPage("@/pages/admin", "default", {
-    preloadPriority: "low",
+  AdminPage: createSafeLazyPage('@/pages/admin', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "AdminPage",
+    displayName: 'AdminPage',
   }),
-  DatabaseManager: createSafeLazyPage("@/pages/database-manager", "default", {
-    preloadPriority: "low",
+  DatabaseManager: createSafeLazyPage('@/pages/database-manager', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "DatabaseManager",
+    displayName: 'DatabaseManager',
   }),
-  BillSponsorshipAnalysis: createSafeLazyPage(
-    "@/pages/bill-sponsorship-analysis",
-    "default",
-    {
-      preloadPriority: "medium",
-      enablePreloading: true,
-      displayName: "BillSponsorshipAnalysis",
-    }
-  ),
-  CommentsPage: createSafeLazyPage("@/pages/comments", "default", {
-    preloadPriority: "medium",
+  BillSponsorshipAnalysis: createSafeLazyPage('@/pages/bill-sponsorship-analysis', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "CommentsPage",
+    displayName: 'BillSponsorshipAnalysis',
   }),
-  NotFound: createSafeLazyPage("@/pages/not-found", "default", {
-    preloadPriority: "low",
+  CommentsPage: createSafeLazyPage('@/pages/comments', 'default', {
+    preloadPriority: 'medium',
+    enablePreloading: true,
+    displayName: 'CommentsPage',
+  }),
+  NotFound: createSafeLazyPage('@/pages/not-found', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "NotFound",
+    displayName: 'NotFound',
   }),
   // Legal / compliance pages
-  Terms: createSafeLazyPage("@/pages/terms", "default", {
-    preloadPriority: "low",
+  Terms: createSafeLazyPage('@/pages/terms', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "Terms",
+    displayName: 'Terms',
   }),
-  Privacy: createSafeLazyPage("@/pages/privacy", "default", {
-    preloadPriority: "low",
+  Privacy: createSafeLazyPage('@/pages/privacy', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "Privacy",
+    displayName: 'Privacy',
   }),
-  CookiePolicy: createSafeLazyPage("@/pages/cookie-policy", "default", {
-    preloadPriority: "low",
+  CookiePolicy: createSafeLazyPage('@/pages/cookie-policy', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "CookiePolicy",
+    displayName: 'CookiePolicy',
   }),
 
   // Analytics & Monitoring Pages
-  PerformanceDashboard: createSafeLazyPage("@/pages/performance-dashboard", "default", {
-    preloadPriority: "medium",
+  PerformanceDashboard: createSafeLazyPage('@/pages/performance-dashboard', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "PerformanceDashboard",
+    displayName: 'PerformanceDashboard',
   }),
-  AnalyticsDashboard: createSafeLazyPage("@/pages/analytics-dashboard", "default", {
-    preloadPriority: "medium",
+  AnalyticsDashboard: createSafeLazyPage('@/pages/analytics-dashboard', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "AnalyticsDashboard",
+    displayName: 'AnalyticsDashboard',
   }),
-  PrivacyCenter: createSafeLazyPage("@/pages/privacy-center", "default", {
-    preloadPriority: "medium",
+  PrivacyCenter: createSafeLazyPage('@/pages/privacy-center', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "PrivacyCenter",
+    displayName: 'PrivacyCenter',
   }),
 
   // Development Pages
-  IntegrationStatus: createSafeLazyPage("@/pages/integration-status", "default", {
-    preloadPriority: "low",
+  IntegrationStatus: createSafeLazyPage('@/pages/integration-status', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "IntegrationStatus",
+    displayName: 'IntegrationStatus',
   }),
-  DataRetention: createSafeLazyPage("@/pages/data-retention", "default", {
-    preloadPriority: "low",
+  DataRetention: createSafeLazyPage('@/pages/data-retention', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "DataRetention",
+    displayName: 'DataRetention',
   }),
-  Accessibility: createSafeLazyPage("@/pages/accessibility", "default", {
-    preloadPriority: "low",
+  Accessibility: createSafeLazyPage('@/pages/accessibility', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "Accessibility",
+    displayName: 'Accessibility',
   }),
-  Security: createSafeLazyPage("@/pages/security", "default", {
-    preloadPriority: "low",
+  Security: createSafeLazyPage('@/pages/security', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "Security",
+    displayName: 'Security',
   }),
-  AcceptableUse: createSafeLazyPage("@/pages/acceptable-use", "default", {
-    preloadPriority: "low",
+  AcceptableUse: createSafeLazyPage('@/pages/acceptable-use', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "AcceptableUse",
+    displayName: 'AcceptableUse',
   }),
-  DMCA: createSafeLazyPage("@/pages/dmca", "default", {
-    preloadPriority: "low",
+  DMCA: createSafeLazyPage('@/pages/dmca', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "DMCA",
+    displayName: 'DMCA',
   }),
-  CCPA: createSafeLazyPage("@/pages/compliance-ccpa", "default", {
-    preloadPriority: "low",
+  CCPA: createSafeLazyPage('@/pages/compliance-ccpa', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "CCPA",
+    displayName: 'CCPA',
   }),
-  ContactLegal: createSafeLazyPage("@/pages/contact-legal", "default", {
-    preloadPriority: "low",
+  ContactLegal: createSafeLazyPage('@/pages/contact-legal', 'default', {
+    preloadPriority: 'low',
     enablePreloading: false,
-    displayName: "ContactLegal",
+    displayName: 'ContactLegal',
   }),
-  PrivacySettings: createSafeLazyPage("@/pages/profile", "default", {
-    preloadPriority: "medium",
+  PrivacySettings: createSafeLazyPage('@/pages/profile', 'default', {
+    preloadPriority: 'medium',
     enablePreloading: true,
-    displayName: "UserAccount",
+    displayName: 'UserAccount',
   }),
 } as const;
 
@@ -670,22 +638,22 @@ export const SafeLazyPages = {
  */
 export const DynamicFeatureImports = {
   // Complex form components
-  MobileOptimizedForms: () => import("@client/shared/ui/mobile/__archive__/mobile-optimized-forms"),
+  // MobileOptimizedForms: () => import("@client/shared/ui/mobile/__archive__/mobile-optimized-forms"), // TODO: Fix broken import
 
   // Large analysis components
-  AnalysisComponents: () => import("@client/features/bills/ui/analysis/comments"),
-  AnalysisStats: () => import("@client/features/bills/ui/analysis/stats"),
-  AnalysisTimeline: () => import("@client/features/bills/ui/analysis/timeline"),
-  AnalysisSection: () => import("@client/features/bills/ui/analysis/section"),
+  AnalysisComponents: () => import('@client/features/bills/ui/analysis/comments'),
+  AnalysisStats: () => import('@client/features/bills/ui/analysis/stats'),
+  AnalysisTimeline: () => import('@client/features/bills/ui/analysis/timeline'),
+  AnalysisSection: () => import('@client/features/bills/ui/analysis/section'),
 
   // Bill tracking components
-  BillCard: () => import("@client/features/bills/ui/BillCard"),
-  BillList: () => import("@client/features/bills/ui/BillList"),
-  BillTracking: () => import("@client/features/bills/ui/bill-tracking"),
-  BillImplementation: () => import("@client/features/bills/ui/implementation-workarounds"),
+  BillCard: () => import('@client/features/bills/ui/BillCard'),
+  BillList: () => import('@client/features/bills/ui/BillList'),
+  BillTracking: () => import('@client/features/bills/ui/bill-tracking'),
+  BillImplementation: () => import('@client/features/bills/ui/implementation-workarounds'),
 
   // Chart and visualization libraries (if used)
-  Charts: () => import("recharts"),
+  Charts: () => import('recharts'),
 } as const;
 
 /**
@@ -693,36 +661,38 @@ export const DynamicFeatureImports = {
  */
 export const SafeLazySponsorshipPages = {
   SponsorshipOverviewWrapper: createNamedExportLazy(
-    "@/pages/bill-sponsorship-analysis",
-    "SponsorshipOverviewWrapper",
-    "SponsorshipOverviewWrapper"
+    '@/pages/bill-sponsorship-analysis',
+    'SponsorshipOverviewWrapper',
+    'SponsorshipOverviewWrapper'
   ),
   PrimarySponsorWrapper: createNamedExportLazy(
-    "@/pages/bill-sponsorship-analysis",
-    "PrimarySponsorWrapper",
-    "PrimarySponsorWrapper"
+    '@/pages/bill-sponsorship-analysis',
+    'PrimarySponsorWrapper',
+    'PrimarySponsorWrapper'
   ),
   CoSponsorsWrapper: createNamedExportLazy(
-    "@/pages/bill-sponsorship-analysis",
-    "CoSponsorsWrapper",
-    "CoSponsorsWrapper"
+    '@/pages/bill-sponsorship-analysis',
+    'CoSponsorsWrapper',
+    'CoSponsorsWrapper'
   ),
   FinancialNetworkWrapper: createNamedExportLazy(
-    "@/pages/bill-sponsorship-analysis",
-    "FinancialNetworkWrapper",
-    "FinancialNetworkWrapper"
+    '@/pages/bill-sponsorship-analysis',
+    'FinancialNetworkWrapper',
+    'FinancialNetworkWrapper'
   ),
   MethodologyWrapper: createNamedExportLazy(
-    "@/pages/bill-sponsorship-analysis",
-    "MethodologyWrapper",
-    "MethodologyWrapper"
+    '@/pages/bill-sponsorship-analysis',
+    'MethodologyWrapper',
+    'MethodologyWrapper'
   ),
 } as const;
 
 /**
  * Enhanced retryable lazy component with configurable options
  */
-export function createRetryableLazyComponent<P extends Record<string, never> = Record<string, never>>(
+export function createRetryableLazyComponent<
+  P extends Record<string, never> = Record<string, never>,
+>(
   importFn: () => Promise<{ default: ComponentType<P> }>,
   componentName: string,
   options: {
@@ -786,23 +756,25 @@ export function preloadLazyComponent<P extends object>(
 ): Promise<{ default: ComponentType<P> }> {
   try {
     // Check for standard preload method (Vite, webpack 5)
-    if (typeof (lazyComponent as { preload?: () => Promise<unknown> }).preload === "function") {
-      return (lazyComponent as { preload?: () => Promise<unknown> }).preload!() as Promise<{ default: ComponentType<P> }>;
+    if (typeof (lazyComponent as { preload?: () => Promise<unknown> }).preload === 'function') {
+      return (lazyComponent as { preload?: () => Promise<unknown> }).preload!() as Promise<{
+        default: ComponentType<P>;
+      }>;
     }
 
     // Fallback to React internals
     const payload = (lazyComponent as { _payload?: unknown })._payload;
 
-    if (payload && typeof (payload as { _result?: unknown })._result === "undefined") {
-      return (payload as { _init: (p: unknown) => Promise<unknown> })._init(payload) as Promise<{ default: ComponentType<P> }>;
+    if (payload && typeof (payload as { _result?: unknown })._result === 'undefined') {
+      return (payload as { _init: (p: unknown) => Promise<unknown> })._init(payload) as Promise<{
+        default: ComponentType<P>;
+      }>;
     }
 
     // Component already loaded
     return Promise.resolve({ default: lazyComponent as unknown as ComponentType<P> });
   } catch (error) {
-    return Promise.reject(
-      new Error("Failed to preload component: " + (error as Error).message)
-    );
+    return Promise.reject(new Error('Failed to preload component: ' + (error as Error).message));
   }
 }
 
@@ -827,7 +799,9 @@ export function usePreloadComponents(
   // Create a stable identifier for the component list
   // This prevents re-execution when the array reference changes
   const componentIdentifier = useRef(
-    components.map((c) => (c as unknown as { $$typeof?: symbol }).$$typeof?.toString() || Math.random()).join("-")
+    components
+      .map(c => (c as unknown as { $$typeof?: symbol }).$$typeof?.toString() || Math.random())
+      .join('-')
   );
 
   useEffect(() => {
@@ -841,18 +815,14 @@ export function usePreloadComponents(
 
   useEffect(() => {
     // Skip if condition not met or already preloaded
-    if (
-      !preloadCondition ||
-      hasPreloadedRef.current ||
-      typeof window === "undefined"
-    ) {
+    if (!preloadCondition || hasPreloadedRef.current || typeof window === 'undefined') {
       return;
     }
 
     // Create new identifier for current component list
     const newIdentifier = components
-      .map((c) => (c as unknown as { $$typeof?: symbol }).$$typeof?.toString() || Math.random())
-      .join("-");
+      .map(c => (c as unknown as { $$typeof?: symbol }).$$typeof?.toString() || Math.random())
+      .join('-');
 
     // If component list hasn't changed, skip
     if (newIdentifier === componentIdentifier.current) {
@@ -871,12 +841,12 @@ export function usePreloadComponents(
     const timeoutId = setTimeout(() => {
       if (signal.aborted || !isMountedRef.current) return;
 
-      components.forEach((component) => {
+      components.forEach(component => {
         if (signal.aborted || !isMountedRef.current) return;
 
-        preloadLazyComponent(component).catch((error) => {
-          if (process.env.NODE_ENV === "development" && !signal.aborted) {
-            console.warn("Failed to preload component:", error);
+        preloadLazyComponent(component).catch(error => {
+          if (process.env.NODE_ENV === 'development' && !signal.aborted) {
+            console.warn('Failed to preload component:', error);
           }
         });
       });
@@ -901,7 +871,7 @@ export function clearAllCaches(): void {
   preloadRegistry.clear();
   fallbackComponentCache.clear();
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("All lazy loading caches cleared");
+  if (process.env.NODE_ENV === 'development') {
+    console.log('All lazy loading caches cleared');
   }
 }

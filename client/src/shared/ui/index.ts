@@ -21,3 +21,15 @@ export * from './offline';
 export * from './accessibility';
 export * from './integration';
 export * from './examples';
+
+// Education components
+export * from './education';
+
+// Mobile components
+export * from './mobile';
+
+// Navigation components
+export * from './navigation';
+
+// Realtime components
+export * from './realtime';

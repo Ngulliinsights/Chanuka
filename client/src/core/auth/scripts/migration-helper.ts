@@ -12,9 +12,9 @@ import { logger } from '../../../utils/logger';
  */
 export const IMPORT_MAPPINGS = {
   // Hooks
-  "import { useAuth } from '@/features/users/hooks/useAuth'": "import { useAuth } from '@/core/auth'",
-  "import { useAuth } from '../features/users/hooks/useAuth'": "import { useAuth } from '@/core/auth'",
-  "from '@/features/users/hooks/useAuth'": "from '@/core/auth'",
+  "import { useAuth } from '@client/core/auth'": "import { useAuth } from '@/core/auth'",
+  "import { useAuth } from '@client/core/auth',
+  "from '@client/core/auth'": "from '@/core/auth'",
   
   // Redux
   "import { authSlice } from '@/store/slices/authSlice'": "import { authReducer } from '@/core/auth'",

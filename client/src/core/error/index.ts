@@ -104,11 +104,12 @@ export { ErrorAnalyticsService } from './analytics';
 export { ErrorReportingService } from './reporting';
 
 // Comprehensive Error Monitoring with Sentry Integration
-export {
-  errorMonitoring,
-  ErrorBoundary as SentryErrorBoundary,
-  errorUtils,
-} from './monitoring';
+// TODO: Re-enable when Sentry packages are installed
+// export {
+//   errorMonitoring,
+//   ErrorBoundary as SentryErrorBoundary,
+//   errorUtils,
+// } from './monitoring';
 
 // ============================================================================
 // Reporter Classes

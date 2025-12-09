@@ -1,33 +1,37 @@
 /**
- * Design System - UNIFIED EXPORT
- *
- * ✅ SINGLE SOURCE OF TRUTH - All components from unified /components/ directory
- * ✅ TOKEN-BASED - All components use design tokens via CSS custom properties
- * ✅ TYPE-SAFE - Full TypeScript support with IntelliSense
+ * Unified Design System
  * 
- * This is the main entry point for the Chanuka Design System.
- * Import everything you need from here:
+ * Single source of truth for all UI components.
  * 
- * import { Button, Card, Input, Alert } from '@client/shared/design-system';
+ * Usage:
+ * import { Button, Input, Card, Alert } from '@client/shared/design-system';
  */
 
-// ✅ UNIFIED COMPONENTS - Single source of truth for all UI components
-export * from './feedback';
-export * from './interactive';
-export * from './media';
-export * from './typography';
+// Core UI Components
+export { Button, buttonVariants, type ButtonProps } from './components/Button';
+export { Input, inputVariants, type InputProps } from './components/Input';
+export { Card, CardHeader, CardContent, CardFooter, type CardProps } from './components/Card';
+export { Alert, type AlertProps } from './components/Alert';
+export { Badge, type BadgeProps } from './components/Badge';
+export { Progress, type ProgressProps } from './components/Progress';
+export { Avatar, type AvatarProps } from './components/Avatar';
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/Select';
+export { Textarea, type TextareaProps } from './components/Textarea';
+export { Checkbox, type CheckboxProps } from './components/Checkbox';
+export { Switch, type SwitchProps } from './components/Switch';
+export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './components/Dialog';
+export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/Tabs';
 
-// Design Tokens - Colors, spacing, typography tokens
+// Design Tokens
 export * from './tokens';
 
-// Theme System - Light/dark mode and theme management
+// Themes
 export * from './themes';
 
-// Utilities - Design system utilities
+// Utilities
 export { cn } from './utils/cn';
+export * from './utils/validation';
 
-// Accessibility - A11y utilities and helpers
+// Accessibility
 export * from './accessibility';
-
-// Styles - CSS files and design tokens
-export * from './styles';

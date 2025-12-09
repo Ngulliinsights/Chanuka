@@ -7,8 +7,8 @@ import { Shield } from 'lucide-react';
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
-import { LoginForm } from '@client/features/users/ui/auth/forms';
-import { useAuth } from '@client/features/users/hooks/useAuth';
+import { LoginForm } from '@client/core/auth';
+import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 export default function LoginPage() {

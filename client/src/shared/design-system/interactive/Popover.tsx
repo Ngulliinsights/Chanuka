@@ -2,11 +2,8 @@ import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { AlertCircle } from "lucide-react"
 import * as React from "react"
 
-import { cn } from '@client/lib/utils'
-import { logger } from '@client/utils/logger';
-
-import { UIComponentError } from './errors';
-import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
+import { cn } from '../lib/utils'
+import { UIComponentError, attemptUIRecovery, getUIRecoverySuggestions } from '../utils'
 
 const Popover = PopoverPrimitive.Root
 
@@ -40,30 +37,30 @@ interface EnhancedPopoverProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>> = ({ children, onError, fallbackContent, open, onOpenChange, ...props }) => {
+const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>> = ({ 
+  children, 
+  onError, 
+  fallbackContent, 
+  open, 
+  onOpenChange, 
+  ...props 
+}) => {
   const [error, setError] = React.useState<UIComponentError | null>(null);
-  const [retryCount, setRetryCount] = React.useState(0);
 
   const handleError = React.useCallback(async (componentError: UIComponentError) => {
     setError(componentError);
     onError?.(componentError);
 
     try {
-      const recoveryResult = await attemptUIRecovery('enhanced-popover', componentError, retryCount);
+      const recoveryResult = await attemptUIRecovery(componentError);
       
       if (recoveryResult.success) {
-        setRetryCount(0);
         setError(null);
-      } else if (recoveryResult.shouldRetry) {
-        setRetryCount(prev => prev + 1);
-      } else {
-        const suggestions = getUIRecoverySuggestions(componentError);
-        logger.warn('Popover recovery failed', { suggestions });
       }
     } catch (recoveryError) {
-      logger.error('Popover recovery error', undefined, recoveryError);
+      console.error('Popover recovery error:', recoveryError);
     }
-  }, [onError, retryCount]);
+  }, [onError]);
 
   const handleOpenChange = React.useCallback((newOpen: boolean) => {
     try {
@@ -78,26 +75,6 @@ const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWitho
     }
   }, [onOpenChange, handleError]);
 
-  const ErrorBoundary = React.useCallback(({ children }: { children: React.ReactNode }) => {
-    try {
-      return <>{children}</>;
-    } catch (boundaryError) {
-      const componentError = new UIComponentError(
-        'enhanced-popover',
-        'render',
-        boundaryError instanceof Error ? boundaryError.message : 'Render error'
-      );
-      handleError(componentError);
-      
-      return (
-        <div className="p-3 text-sm text-destructive flex items-center gap-2 border border-destructive/20 rounded-md bg-destructive/10">
-          <AlertCircle className="h-4 w-4" />
-          <span>Content unavailable</span>
-        </div>
-      );
-    }
-  }, [handleError]);
-
   if (error && fallbackContent) {
     return <>{fallbackContent}</>;
   }
@@ -108,9 +85,7 @@ const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWitho
       onOpenChange={handleOpenChange}
       {...props}
     >
-      <ErrorBoundary>
-        {children}
-      </ErrorBoundary>
+      {children}
     </PopoverPrimitive.Root>
   );
 };
@@ -123,23 +98,10 @@ const EnhancedPopoverContent = React.forwardRef<
     onError?: (error: UIComponentError) => void;
   }
 >(({ className, align = "center", sideOffset = 4, onError, children, ...props }, ref) => {
-  const [retryCount, setRetryCount] = React.useState(0);
-
   const handleError = React.useCallback(async (componentError: UIComponentError) => {
     onError?.(componentError);
-
-    try {
-      const recoveryResult = await attemptUIRecovery('enhanced-popover-content', componentError, retryCount);
-      
-      if (recoveryResult.success) {
-        setRetryCount(0);
-      } else if (recoveryResult.shouldRetry) {
-        setRetryCount(prev => prev + 1);
-      }
-    } catch (recoveryError) {
-      logger.error('Popover content recovery error', undefined, recoveryError);
-    }
-  }, [onError, retryCount]);
+    await attemptUIRecovery(componentError);
+  }, [onError]);
 
   const ErrorBoundary = React.useCallback(({ children }: { children: React.ReactNode }) => {
     try {
@@ -189,4 +151,3 @@ export {
   EnhancedPopover,
   EnhancedPopoverContent
 }
-
