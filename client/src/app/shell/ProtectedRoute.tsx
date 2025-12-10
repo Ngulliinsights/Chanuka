@@ -1,4 +1,4 @@
-import { Shield, Lock, UserCheck, AlertTriangle } from 'lucide-react';
+import { Shield, Lock, CheckCircle, AlertTriangle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
@@ -35,7 +35,7 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
   const getIcon = () => {
     switch (reason) {
       case 'unauthenticated':
-        return <UserCheck className="h-12 w-12 text-blue-500" />;
+        return <CheckCircle className="h-12 w-12 text-blue-500" />;
       case 'insufficient_role':
         return <Shield className="h-12 w-12 text-orange-500" />;
       case 'unverified':
@@ -75,35 +75,35 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
     switch (reason) {
       case 'unauthenticated':
         return (
-          <Button asChild className="mt-4">
-            <a href={`/auth?redirect=${encodeURIComponent(currentPath)}`}>
+          <a href={`/auth?redirect=${encodeURIComponent(currentPath)}`} className="mt-4 inline-block">
+            <Button>
               Sign In
-            </a>
-          </Button>
+            </Button>
+          </a>
         );
       case 'insufficient_role':
         return (
-          <Button variant="outline" asChild className="mt-4">
-            <a href="/contact">
+          <a href="/contact" className="mt-4 inline-block">
+            <Button variant="outline">
               Request Access
-            </a>
-          </Button>
+            </Button>
+          </a>
         );
       case 'unverified':
         return (
-          <Button asChild className="mt-4">
-            <a href="/auth/verify">
+          <a href="/auth/verify" className="mt-4 inline-block">
+            <Button>
               Verify Account
-            </a>
-          </Button>
+            </Button>
+          </a>
         );
       default:
         return (
-          <Button variant="outline" asChild className="mt-4">
-            <a href="/">
+          <a href="/" className="mt-4 inline-block">
+            <Button variant="outline">
               Go Home
-            </a>
-          </Button>
+            </Button>
+          </a>
         );
     }
   };
@@ -127,11 +127,11 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
           <div className="flex flex-col space-y-3">
             {getActionButton()}
             
-            <Button variant="ghost" asChild>
-              <a href="/">
+            <a href="/">
+              <Button variant="ghost">
                 Return to Home
-              </a>
-            </Button>
+              </Button>
+            </a>
           </div>
         </div>
 

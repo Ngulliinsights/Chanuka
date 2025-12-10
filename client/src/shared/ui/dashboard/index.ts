@@ -1,6 +1,7 @@
 // Barrel exports for dashboard components
 
 export { UserDashboard } from './UserDashboard';
+export { SmartDashboard } from './SmartDashboard';
 export { useDashboardData } from './useDashboardData';
 
 // Migration Dashboard

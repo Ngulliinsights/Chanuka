@@ -1,4 +1,4 @@
-import { useAnalytics } from '@client/context';
+import { useAnalyticsDashboard } from '@client/context';
 import type { AnalyticsFilters } from '@client/types';
 import { Calendar, TrendingUp, Users, AlertTriangle, Download } from 'lucide-react';
 import { useState } from 'react';
@@ -16,7 +16,7 @@ export function AnalyticsDashboard() {
     }
   });
 
-  const analytics = useAnalytics();
+  // Using useAnalyticsDashboard hook from context
   // TODO: implement analytics dashboard data loading
   const isLoading = false;
   const error = null;

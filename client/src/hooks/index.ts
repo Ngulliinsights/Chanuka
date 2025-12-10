@@ -1,24 +1,17 @@
-/**
- * Hooks Index - Consolidated and Migrated
- * 
- * This file provides backward compatibility while hooks are migrated to their feature directories.
- * New code should import directly from feature directories.
- */
+// DEPRECATED - Hooks Index
+// This file has been reorganized for Feature-Sliced Design (FSD)
+// See DIRECTORY_ALIGNMENT_ANALYSIS.md for migration guide
 
-// ============================================================================
-// MIGRATED HOOKS - Import from new locations
-// ============================================================================
-
-// Auth Hooks (migrated to features/users/hooks)
+// Auth Hooks (in features/users/hooks)
 export { useAuth, AuthProvider } from '../features/users/hooks';
 
-// API Hooks (migrated to core/api/hooks)
+// API Hooks (in core/api/hooks)
 export { useApiConnection } from '../core/api/hooks';
 export { useApiWithFallback } from '../core/api/hooks';
 export { useSafeMutation } from '../core/api/hooks';
 export { useSafeQuery } from '../core/api/hooks';
 
-// Navigation Hooks (migrated to core/navigation/hooks)
+// Navigation Hooks (in core/navigation/hooks)
 export { useUnifiedNavigation, useNavigationSystem } from '../core/navigation/hooks';
 export { useKeyboardNavigation } from '../core/navigation/hooks';
 export { useBreadcrumbs } from '../core/navigation/hooks';
@@ -27,82 +20,60 @@ export { useNavigationPreferences } from '../core/navigation/hooks';
 export { useSidebar } from '../core/navigation/hooks';
 export { useMobileMenu } from '../core/navigation/hooks';
 
-// Loading Hooks (migrated to core/loading/hooks)
+// Loading Hooks (in core/loading/hooks)
 export { useTimeoutAwareLoading as useLoadingOperation } from '../core/loading/hooks';
 
-// Analytics Hooks (migrated to features/analytics/hooks)
-export { useJourneyTracker } from '../features/analytics/hooks';
-export { useErrorAnalytics } from '../features/analytics/hooks';
-export { useWebVitals } from '../features/analytics/hooks';
-export { useRenderTracker } from '../features/analytics/hooks';
-
-// Bills Hooks - NOT YET MIGRATED (migration from Zustand to React Query incomplete)
-// TODO: Create features/bills/hooks when API hooks are ready
-// export { 
-//   useBills,
-//   useBill,
-//   useBillComments,
-//   useBillSponsors,
-//   useBillAnalysis,
-//   useBillCategories,
-//   useBillStatuses,
-//   useAddBillComment,
-//   useRecordBillEngagement,
-//   useTrackBill
-// } from '../features/bills/hooks';
-
-// Community Hooks - NOT YET MIGRATED (migration from Zustand to React Query incomplete)
-// TODO: Create features/community/hooks when API hooks are ready
-// export { useCommunityRealTime, useTypingIndicators, useCommunityAnalytics } from '../features/community/hooks';
-
-// ============================================================================
-// REMAINING HOOKS - Still in hooks directory
-// ============================================================================
-
-// UI/Utility Hooks (staying in hooks)
-export { useToast } from './use-toast';
-export { useIsMobile as useMobile } from './use-mobile';
-export { useKeyboardFocus } from './use-keyboard-focus';
-export { useDebounce } from './useDebounce';
-export { useMediaQuery } from './useMediaQuery';
-export { useWebSocket } from './use-websocket';
-export { useCleanup } from './useCleanup';
-
-// System/Connection Hooks (staying in hooks)
+// Offline & Connection (in core/hooks)
 export { useOfflineDetection } from './useOfflineDetection';
 export { useOfflineCapabilities } from './useOfflineCapabilities';
 export { useConnectionAware } from './useConnectionAware';
 export { useServiceStatus } from './useServiceStatus';
 export { useOnlineStatus } from './use-online-status';
 
-// Error Recovery Hooks (staying in hooks)
+// Error Recovery (in core/hooks)
 export { useErrorRecovery } from './useErrorRecovery';
 
-// Feature-specific hooks that need feature directories created
-export { useI18n } from './use-i18n';
-export { useOnboarding } from './use-onboarding';
-export { useSystemHealth, useSystemStats, useSystemActivity, useSystemSchema, useSystemEnvironment } from './use-system';
+// Shared UI Hooks (in shared/hooks)
+export { useToast } from '../shared/hooks';
+export { useMobile } from '../shared/hooks';
+export { useKeyboardFocus } from '../shared/hooks';
+export { useDebounce } from '../shared/hooks';
+export { useMediaQuery } from '../shared/hooks';
+export { useWebSocket } from '../shared/hooks';
+export { useCleanup } from '../shared/hooks';
+export { useI18n } from '../shared/hooks';
+export { useProgressiveDisclosure } from '../shared/hooks';
+export { useRealTimeEngagement } from '../shared/hooks';
 
-// Engagement/Notification Hooks
-// TODO: Fix useNotifications import - migration issue
-// export { useNotifications } from './useNotifications';
-export { useRealTimeEngagement } from './useRealTimeEngagement';
-export { useProgressiveDisclosure } from './useProgressiveDisclosure';
+// Mobile hooks (in shared/hooks/mobile)
+export {
+  useBottomSheet,
+  useDeviceInfo,
+  useInfiniteScroll,
+  useMobileNavigation,
+  useMobileTabs,
+  usePullToRefresh,
+  useScrollManager,
+  useSwipeGesture,
+} from '../shared/hooks/mobile';
+
+// Analytics Hooks (in features/analytics/hooks)
+export { useJourneyTracker } from '../features/analytics/hooks';
+export { useErrorAnalytics } from '../features/analytics/hooks';
+export { useWebVitals } from '../features/analytics/hooks';
+export { useRenderTracker } from '../features/analytics/hooks';
+
+// System Hooks (feature-specific)
+export {
+  useSystemHealth,
+  useSystemStats,
+  useSystemActivity,
+  useSystemSchema,
+  useSystemEnvironment
+} from './use-system';
+
+// Other feature hooks
+export { useOnboarding } from './use-onboarding';
 export { useSecurity } from './useSecurity';
 export { useService } from './useService';
 export { useMockData } from './useMockData';
-
-// ============================================================================
-// DEPRECATION NOTICES
-// ============================================================================
-
-/**
- * @deprecated Import directly from feature directories:
- * - Auth hooks: import from 'features/users/hooks'
- * - API hooks: import from 'core/api/hooks'  
- * - Navigation hooks: import from 'core/navigation/hooks'
- * - Loading hooks: import from 'core/loading/hooks'
- * - Analytics hooks: import from 'features/analytics/hooks'
- * - Bills hooks: import from 'features/bills/hooks'
- * - Community hooks: import from 'features/community/hooks'
- */

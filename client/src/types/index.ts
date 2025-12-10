@@ -1,3 +1,30 @@
+/**
+ * DEPRECATED - This directory has been migrated
+ * 
+ * All types are being consolidated into: client/src/shared/types/
+ * 
+ * Update your imports:
+ * OLD: import type { User } from '@client/types';
+ * NEW: import type { User } from '@client/shared/types';
+ * 
+ * Timeline:
+ * - Phase 1 (NOW): Both old and new locations work
+ * - Phase 2 (1 week): Emit warnings on old imports
+ * - Phase 3 (2 weeks): Remove deprecated exports
+ * 
+ * @deprecated Use @client/shared/types instead
+ */
+
+'use strict';
+
+if (process.env.NODE_ENV === 'development') {
+  console.warn(
+    'Deprecated import: Use @client/shared/types instead of @client/types. ' +
+    'See DIRECTORY_ALIGNMENT_ANALYSIS.md for migration details.'
+  );
+}
+
+// For backward compatibility during migration - re-export everything
 // Security types
 export type {
   ThreatLevel,

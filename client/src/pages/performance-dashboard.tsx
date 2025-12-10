@@ -11,8 +11,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-import { PerformanceDashboard } from '@client/components/performance/PerformanceDashboard';
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
+import { PerformanceDashboard } from '@client/shared/ui/performance';
 
 export default function PerformanceDashboardPage() {
   return (

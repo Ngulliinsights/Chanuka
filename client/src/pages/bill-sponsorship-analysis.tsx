@@ -21,20 +21,7 @@ import { ImplementationWorkarounds } from '@client/features/bills/ui/implementat
 
 import {
   useBillSponsorshipAnalysis as useSponsorshipAnalysis
-} from '../features/bills/model/hooks/useBills';
-
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
-import {
-  useBillSponsorshipAnalysis as useSponsorshipAnalysis
-} from '../features/bills/model/hooks/useBills';
-import { ImplementationWorkarounds } from '../features/bills/ui/implementation-workarounds';
+} from '@client/features/bills/model/hooks/useBills';
 
 export default function BillSponsorshipAnalysis() {
   const { id } = useParams();

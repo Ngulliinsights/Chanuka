@@ -26,6 +26,12 @@ export * from './ui';
 // Infrastructure services (performance, error handling, browser compatibility, etc.)
 export * from './infrastructure';
 
+// Shared Hooks - utility and UI hooks
+export * from './hooks';
+
+// Shared Libraries - form utilities, route protection, query configuration
+export * from './lib';
+
 // Cross-cutting services (notification, etc.)
 export * from './services';
 

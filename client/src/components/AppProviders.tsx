@@ -21,7 +21,6 @@ import { useOfflineDetection } from '@client/hooks/useOfflineDetection';
 import { ThemeProvider } from '@client/contexts/ThemeContext';
 import { initializeStore } from '@client/store';
 import { CommunityUIProvider } from '@client/store/slices/communitySlice';
-import { assetLoadingManager } from '@client/utils/assets';
 
 import { ErrorBoundary } from '@client/core/error/components';
 import { OfflineProvider } from '@client/shared/ui/offline';
@@ -415,7 +414,7 @@ const PROVIDERS: ProviderConfig[] = [
       children: React.ReactNode;
     }>,
   },
-  { name: 'ErrorBoundary', component: SimpleErrorBoundary },
+  { name: 'ErrorBoundary', component: ErrorBoundary },
   { name: 'AuthProvider', component: AuthProvider },
   { name: 'CommunityUIProvider', component: CommunityUIProvider },
   { name: 'ThemeProvider', component: ThemeProvider },

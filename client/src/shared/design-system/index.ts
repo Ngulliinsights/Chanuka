@@ -88,16 +88,6 @@ export * from './accessibility';
 export * from './quality';
 
 // ════════════════════════════════════════════════════════════════════════════
-// INTEGRATION - THE INTEGRATOR (Cross-module Cohesion)
-// ════════════════════════════════════════════════════════════════════════════
-export * from './integration';
-
-// ════════════════════════════════════════════════════════════════════════════
-// STRATEGY - THE STRATEGIST (Vision, Sustainability, Long-term Goals)
-// ════════════════════════════════════════════════════════════════════════════
-export * from './strategy';
-
-// ════════════════════════════════════════════════════════════════════════════
 // 4 STRATEGIC PERSONAS FRAMEWORK & DOCUMENTATION
 // ════════════════════════════════════════════════════════════════════════════
 // THE ARCHITECT:  Design patterns, structural integrity

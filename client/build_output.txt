@@ -1,0 +1,24 @@
+
+> @chanuka/client@1.0.0 build C:\Users\Access Granted\Downloads\projects\SimpleTool\client
+> vite build
+
+✅ Environment variables validated successfully
+[33msrc/shared/design-system/interactive/Dialog.tsx (2:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[33msrc/shared/design-system/interactive/ContextMenu.tsx (2:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[33msrc/shared/design-system/interactive/Command.tsx (2:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[33msrc/shared/design-system/interactive/NavigationMenu.tsx (2:0): Error when using sourcemap for reporting an error: Can't resolve original location of error.[39m
+[33m[plugin vite:reporter] 
+(!) C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/store/slices/sessionSlice.ts is dynamically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/store/index.ts but also statically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/auth/service.ts, dynamic import will not move module into another chunk.
+[39m
+[33m[plugin vite:reporter] 
+(!) C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/performance/index.ts is dynamically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/main.tsx but also statically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/error/components/ErrorBoundary.tsx, dynamic import will not move module into another chunk.
+[39m
+[33m[plugin vite:reporter] 
+(!) C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/circuit-breaker-monitor.ts is dynamically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/circuit-breaker-client.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/circuit-breaker-client.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/interceptors.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/interceptors.ts but also statically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/index.ts, dynamic import will not move module into another chunk.
+[39m
+[33m[plugin vite:reporter] 
+(!) C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/auth/index.ts is dynamically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/auth/scripts/cleanup-old-auth.ts but also statically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/authenticated-client.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/authentication.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/client.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/api/index.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/core/auth/service.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/features/users/hooks/useAuth.tsx, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/services/userService.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/store/index.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/utils/rbac.ts, dynamic import will not move module into another chunk.
+[39m
+[33m[plugin vite:reporter] 
+(!) C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/utils/serviceWorker.ts is dynamically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/main.tsx but also statically imported by C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/hooks/useOfflineCapabilities.ts, C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/utils/backgroundSyncManager.ts, dynamic import will not move module into another chunk.
+[39m

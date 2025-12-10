@@ -23,26 +23,26 @@ import {
   CommandShortcut,
   CommandSeparator
 } from '@client/shared/design-system';
-import { AdvancedSearchInterface } from '@/features/search/components/AdvancedSearchInterface';
-import { IntelligentAutocomplete } from '@/features/search/components/IntelligentAutocomplete';
-import { SavedSearches } from '@/features/search/components/SavedSearches';
-import { SearchAnalyticsDashboard } from '@/features/search/components/SearchAnalyticsDashboard';
-import { SearchFilters } from '@/features/search/components/SearchFilters';
-import { SearchProgressIndicator } from '@/features/search/components/SearchProgressIndicator';
-import { SearchResultCard } from '@/features/search/components/SearchResultCard';
-import { SearchTips } from '@/features/search/components/SearchTips';
-import { useIntelligentSearch } from '@/features/search/hooks/useIntelligentSearch';
-import { usePopularSearches, useSearchHistory } from '@/features/search/hooks/useSearch';
-import { useStreamingSearch } from '@/features/search/hooks/useStreamingSearch';
-import { intelligentSearch } from '@/features/search/services/intelligent-search';
-import type { DualSearchRequest } from '@/features/search/services/intelligent-search';
+import { AdvancedSearchInterface } from '@client/features/search/components/AdvancedSearchInterface';
+import { IntelligentAutocomplete } from '@client/features/search/components/IntelligentAutocomplete';
+import { SavedSearches } from '@client/features/search/components/SavedSearches';
+import { SearchAnalyticsDashboard } from '@client/features/search/components/SearchAnalyticsDashboard';
+import { SearchFilters } from '@client/features/search/components/SearchFilters';
+import { SearchProgressIndicator } from '@client/features/search/components/SearchProgressIndicator';
+import { SearchResultCard } from '@client/features/search/components/SearchResultCard';
+import { SearchTips } from '@client/features/search/components/SearchTips';
+import { useIntelligentSearch } from '@client/features/search/hooks/useIntelligentSearch';
+import { usePopularSearches, useSearchHistory } from '@client/features/search/hooks/useSearch';
+import { useStreamingSearch } from '@client/features/search/hooks/useStreamingSearch';
+import { intelligentSearch } from '@client/features/search/services/intelligent-search';
+import type { DualSearchRequest } from '@client/features/search/services/intelligent-search';
 import type {
   SearchResult as ApiSearchResult,
   SavedSearch,
   SearchFilters as SearchFiltersType,
-} from '@/features/search/types';
-import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/utils/logger';
+} from '@client/features/search/types';
+import { useToast } from '@client/hooks/use-toast';
+import { logger } from '@client/utils/logger';
 
 // This type represents what SearchResultCard expects
 // It's a subset of the API SearchResult with only the types it can handle

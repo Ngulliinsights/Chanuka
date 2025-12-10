@@ -28,6 +28,7 @@ import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { UnifiedButton, UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '@client/shared/design-system';
 import type { Bill } from '@client/core/api/types';
+import { AnalysisDashboard } from '@client/features/analysis/ui/dashboard';
 
 // Hooks and Services
 
@@ -208,7 +209,7 @@ Personal data shall be adequate, relevant and limited to what is necessary in re
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabFromUrl = urlParams.get('tab');
-    if (tabFromUrl && ['overview', 'analysis', 'full-text', 'sponsors', 'community', 'related'].includes(tabFromUrl)) {
+    if (tabFromUrl && ['overview', 'analysis', 'conflict', 'full-text', 'sponsors', 'community', 'related'].includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, []);
@@ -360,9 +361,13 @@ Personal data shall be adequate, relevant and limited to what is necessary in re
           {/* Main Content Area */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="analysis">Analysis</TabsTrigger>
+                <TabsTrigger value="conflict">
+                  <span className="hidden sm:inline">Conflict</span>
+                  <span className="sm:hidden">COI</span>
+                </TabsTrigger>
                 <TabsTrigger value="full-text">Full Text</TabsTrigger>
                 <TabsTrigger value="sponsors">Sponsors</TabsTrigger>
                 <TabsTrigger value="community">Community</TabsTrigger>
@@ -381,6 +386,10 @@ Personal data shall be adequate, relevant and limited to what is necessary in re
                   <ConstitutionalAnalysisPanel bill={bill} />
                 )}
                 
+              </TabsContent>
+
+              <TabsContent value="conflict" className="space-y-6">
+                <AnalysisDashboard bill={bill} />
               </TabsContent>
 
               <TabsContent value="full-text">

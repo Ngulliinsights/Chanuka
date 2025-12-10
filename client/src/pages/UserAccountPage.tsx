@@ -9,8 +9,8 @@ import { useState } from 'react';
 import AppLayout from '@client/shared/ui/layout/app-layout';
 
 // Import consolidated components
-import { UserDashboard } from '@client/components/shared/dashboard';
-import { PrivacyManager } from '@client/components/shared/privacy/PrivacyManager';
+import { UserDashboard } from '@client/shared/ui/dashboard';
+import { PrivacyManager } from '@client/shared/ui/privacy';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Card, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';

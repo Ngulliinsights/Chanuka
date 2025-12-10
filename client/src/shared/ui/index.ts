@@ -19,7 +19,6 @@ export * from './loading';
 export * from './notifications';
 export * from './offline';
 export * from './accessibility';
-export * from './integration';
 export * from './examples';
 
 // Education components
