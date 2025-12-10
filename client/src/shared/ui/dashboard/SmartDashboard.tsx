@@ -26,9 +26,9 @@ import {
   Zap,
 } from 'lucide-react';
 
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Progress } from '@client/shared/design-system/primitives/progress';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
 
 // Type Definitions
 interface SmartDashboardProps {

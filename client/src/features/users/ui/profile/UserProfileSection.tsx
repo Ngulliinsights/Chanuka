@@ -8,9 +8,9 @@ import { Shield, User, Settings, Lock } from 'lucide-react';
 import { useState } from 'react';
 
 import { useAuth } from '@client/core/auth';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Switch } from '@client/shared/design-system/primitives/switch';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Switch } from '@client/shared/design-system';
 
 // Session Display Component
 function SessionDisplay() {

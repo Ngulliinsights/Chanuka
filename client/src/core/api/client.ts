@@ -8,10 +8,9 @@ import {
   ClientConfig,
   UnifiedApiClient
 } from './types';
-import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
+import { ErrorFactory } from '@client/core/error';
 
 import { logger } from '../../utils/logger';
-// Note: validationService import removed as it's not available
 
 // Request Interceptor Interface
 interface RequestInterceptor {
@@ -64,7 +63,6 @@ class CircuitBreaker {
       } else {
         this.metrics.failedRequests++;
         throw ErrorFactory.createNetworkError(
-          ErrorCode.NETWORK_SERVER_ERROR,
           `Circuit breaker is OPEN. Recovery in ${this.recoveryTimeout - timeSinceFailure}ms`
         );
       }
@@ -641,7 +639,6 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
       if (error instanceof Error && error.name === 'AbortError') {
         throw ErrorFactory.createNetworkError(
-          ErrorCode.NETWORK_TIMEOUT,
           `Request timeout after ${request.timeout}ms`
         );
       }
@@ -886,6 +883,6 @@ globalApiClient.addResponseInterceptor(new LoggingResponseInterceptor());
 
 // Initialize auth service with the API client to break circular dependency
 import { createAuthApiService } from '../auth'; // Use consolidated auth system
-import { globalCache, CacheKeyGenerator } from './cache';
+import { globalCache, CacheKeyGenerator } from './cache-manager';
 import { globalConfig } from './config';
 export const authApiService = createAuthApiService(globalApiClient);

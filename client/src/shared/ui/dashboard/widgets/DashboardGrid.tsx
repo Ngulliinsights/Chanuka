@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { cn } from '@client/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system';
 
 interface DashboardGridProps {
   /** Number of columns */

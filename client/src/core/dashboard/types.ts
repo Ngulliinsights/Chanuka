@@ -7,13 +7,13 @@ export type WidgetType = 'analytics' | 'performance' | 'engagement' | 'metrics' 
 export type WidgetSize = 'small' | 'medium' | 'large' | 'full';
 export type ChartType = 'line' | 'bar' | 'pie' | 'area' | 'scatter';
 
-export interface WidgetConfig {
+export interface WidgetConfig<T extends Record<string, unknown> = Record<string, unknown>> {
   id: string;
   type: WidgetType;
   title: string;
   size: WidgetSize;
   position: { x: number; y: number };
-  props: Record<string, any>;
+  props: T;
   permissions?: string[];
   refreshInterval?: number;
   dataSource?: string;
@@ -55,9 +55,9 @@ export interface DashboardState {
   config: DashboardConfig | null;
   loading: boolean;
   error: Error | null;
-  widgetData: Record<string, any>;
+  widgetData: Record<string, Record<string, unknown>>;
   widgetLoading: Record<string, boolean>;
-  widgetErrors: Record<string, Error>;
+  widgetErrors: Record<string, Error | null>;
 }
 
 // Widget-specific types
@@ -128,9 +128,9 @@ export interface ChartData {
   }>;
 }
 
-export interface WidgetProps {
-  config: WidgetConfig;
-  data?: any;
+export interface WidgetProps<T extends Record<string, unknown> = Record<string, unknown>> {
+  config: WidgetConfig<T>;
+  data?: T;
   loading?: boolean;
   error?: Error | null;
   onRefresh?: () => void;
@@ -143,7 +143,7 @@ export type DashboardAction =
   | { type: 'SET_CONFIG'; payload: DashboardConfig }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: Error | null }
-  | { type: 'SET_WIDGET_DATA'; payload: { widgetId: string; data: any } }
+  | { type: 'SET_WIDGET_DATA'; payload: { widgetId: string; data: Record<string, unknown> } }
   | { type: 'SET_WIDGET_LOADING'; payload: { widgetId: string; loading: boolean } }
   | { type: 'SET_WIDGET_ERROR'; payload: { widgetId: string; error: Error | null } }
   | { type: 'UPDATE_WIDGET_CONFIG'; payload: { widgetId: string; config: Partial<WidgetConfig> } }

@@ -223,3 +223,18 @@ export interface AnalyticsExportData {
   includeExpertData: boolean;
   includeTemporalData: boolean;
 }
+
+export interface AnalyticsFilters {
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  billId?: string;
+  userId?: string;
+  sentiment?: 'positive' | 'neutral' | 'negative';
+  minEngagement?: number;
+  expertOnly?: boolean;
+  sortBy?: 'recent' | 'engagement' | 'sentiment';
+  limit?: number;
+  offset?: number;
+}

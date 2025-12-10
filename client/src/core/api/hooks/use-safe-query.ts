@@ -11,7 +11,7 @@
 import { useQuery, useQueries, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { useRef, useCallback, useEffect, useMemo } from 'react';
 
-import { AuthenticatedApiClient } from '@client/utils/api';
+import { globalApiClient } from '@client/core/api';
 import { logger } from '@client/utils/logger';
 
 export interface SafeQueryOptions<T> extends Omit<UseQueryOptions<T>, 'queryFn'> {
@@ -81,12 +81,12 @@ export function useSafeQuery<T = any>(
     signal?.addEventListener('abort', abortHandler);
 
     try {
-      let result: APIResponse<T>;
+      let result: any;
 
       // Step 4: Make the actual API request based on auth requirements
       if (requireAuth) {
-        // Use authenticated API with built-in retry logic
-        result = await AuthenticatedAPI.get<T>(endpoint!, {
+        // Use global API client with built-in retry logic
+        result = await globalApiClient.get<T>(endpoint!, {
           signal: controller.signal,
           timeout,
           retries,
@@ -268,7 +268,7 @@ export function useCoordinatedQueries<T extends Record<string, any>>(
   const queryConfigs = useMemo(() => {
     return queries.map(q => ({
       queryKey: [q.key],
-      queryFn: () => AuthenticatedAPI.get(q.endpoint).then(res => res.data),
+      queryFn: () => globalApiClient.get(q.endpoint).then(res => res.data),
       enabled: q.options?.enabled !== false,
       staleTime: q.options?.staleTime ?? 5 * 60 * 1000,
       gcTime: q.options?.gcTime ?? 10 * 60 * 1000,

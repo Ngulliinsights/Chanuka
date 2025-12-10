@@ -12,15 +12,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { RegisterForm } from '@client/core/auth';
 import { LoginForm } from '@client/core/auth';
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
-import { Button } from '@client/shared/design-system/primitives/button';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system/primitives/card';
+} from '@client/shared/design-system';
 import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 

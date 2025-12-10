@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 
-import api from '@/utils/api';
 import { globalApiClient } from '@client/core/api/client';
 import { logger } from '@client/utils/logger';
 
 export function useSystemHealth() {
   return useQuery({
     queryKey: ['system', 'health'],
-    queryFn: () => api.get('/system/health'),
+    queryFn: () => globalApiClient.get('/system/health'),
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 }
@@ -15,7 +14,7 @@ export function useSystemHealth() {
 export function useSystemStats() {
   return useQuery({
     queryKey: ['system', 'stats'],
-    queryFn: () => systemApi.getStats(),
+    queryFn: () => globalApiClient.get('/system/stats'),
     refetchInterval: 60000, // Refetch every minute
   });
 }
@@ -23,7 +22,7 @@ export function useSystemStats() {
 export function useSystemActivity() {
   return useQuery({
     queryKey: ['system', 'activity'],
-    queryFn: () => systemApi.getActivity(),
+    queryFn: () => globalApiClient.get('/system/activity'),
     refetchInterval: 30000,
   });
 }

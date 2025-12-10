@@ -7,7 +7,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import { mockDataService, dataLoaders, RealTimeEvent } from '@client/services/mockDataService';
+import { mockDataService, RealTimeEvent } from '@client/shared/testing/mock-data';
+import { dataLoaders } from '@client/data/mock/loaders';
 import { logger } from '@client/utils/logger';
 
 /**

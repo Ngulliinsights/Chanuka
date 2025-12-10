@@ -16,9 +16,9 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { useWebSocket } from '@client/hooks/use-websocket';
 import { useNotifications } from '@client/hooks/useNotifications';
 

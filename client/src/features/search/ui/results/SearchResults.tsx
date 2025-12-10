@@ -22,13 +22,13 @@ import {
 } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent } from '@client/shared/design-system/primitives/card';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system/primitives/dropdown-menu';
-import { Progress } from '@client/shared/design-system/primitives/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system/primitives/select';
-import { Skeleton } from '@client/shared/design-system/primitives/skeleton';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
+import { Skeleton } from '@client/shared/design-system';
 
 // Type definitions for better type safety throughout the component
 interface SearchHighlight {

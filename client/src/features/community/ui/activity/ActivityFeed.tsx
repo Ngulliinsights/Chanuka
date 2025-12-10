@@ -29,10 +29,10 @@ import { useState, useCallback, memo } from 'react';
 
 import { cn } from '@client/lib/utils';
 import { ActivityItem } from '@client/types/community';
-import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system/primitives/avatar';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent } from '@client/shared/design-system/primitives/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
 
 interface ActivityFeedProps {
   activities: ActivityItem[];

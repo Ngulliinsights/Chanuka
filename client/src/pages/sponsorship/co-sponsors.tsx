@@ -15,12 +15,12 @@ import {
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Avatar, AvatarFallback } from '@client/shared/design-system/primitives/avatar';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Progress } from '@client/shared/design-system/primitives/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Avatar, AvatarFallback } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
 
 interface CosponsorProps { bill_id?: string;

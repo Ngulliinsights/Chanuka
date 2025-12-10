@@ -1,10 +1,10 @@
 import { Search, X, Clock, Star, TrendingUp } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent } from '@client/shared/design-system/primitives/card';
-import { Input } from '@client/shared/design-system/primitives/input';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
 import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '../../hooks/useSearch';
 
 // Define SearchSuggestion type locally

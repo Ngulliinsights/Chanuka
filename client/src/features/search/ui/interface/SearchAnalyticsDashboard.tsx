@@ -21,11 +21,11 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system/primitives/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { useToast } from '../../../hooks/use-toast';
 import { logger } from '../../../utils/logger';
 

@@ -1,5 +1,7 @@
 import { Comment } from './core';
 
+export type { Comment };
+
 export interface VoteRequest {
   vote: boolean;
 }

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
+import { Badge } from '@client/shared/design-system';
 import { cn } from '@client/lib/utils';
 import { BillRealTimeUpdate } from '@client/types/realtime';
 

@@ -6,9 +6,9 @@
 import { Moon, Sun, Monitor } from 'lucide-react';
 import React from 'react';
 
-import { useTheme, type ThemeContextType } from '@client/shared/design-system/theme/theme-provider';
+import { useTheme, type ThemeContextType } from '@client/shared/design-system';
 
-import { Button } from '../primitives';
+import { Button } from './Button';
 import {
   DropdownMenu,
   DropdownMenuContent,

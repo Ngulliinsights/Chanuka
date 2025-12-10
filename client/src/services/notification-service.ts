@@ -25,7 +25,7 @@ export interface Notification {
   message: string;
   timestamp: string;
   read: boolean;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 export type NotificationType = Notification['type'];
@@ -55,7 +55,7 @@ class NotificationService {
     if (s) s.delete(handler);
   }
 
-  private emit(eventName: string, payload: any) {
+  private emit(eventName: string, payload: unknown) {
     const s = this.listeners.get(eventName);
     if (s) {
       for (const h of Array.from(s)) {

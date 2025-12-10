@@ -1,16 +1,14 @@
 import React, { Suspense, useEffect, useState, useCallback } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter } from 'react-router-dom';
 
 import { AuthProvider } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
+import { ErrorBoundary } from '@client/core/error/components';
 
 import { ThemeProvider } from '../../contexts/ThemeContext';
-import { AccessibilityProvider } from '../accessibility/accessibility-manager';
-import { GlobalLoadingIndicator } from '../loading/GlobalLoadingIndicator';
-import { LoadingStateManager } from '../loading/LoadingStates';
-import { OfflineProvider } from '../offline/offline-manager';
-import { Toaster } from '../ui/toaster';
+import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
+import { OfflineProvider } from '@client/shared/ui/offline';
+import { Toaster } from '@client/shared/design-system';
 
 import { AppRouter } from './AppRouter';
 import { NavigationBar } from './NavigationBar';
@@ -265,14 +263,7 @@ export function AppShell({
         {/* Skip Links for Accessibility */}
         {enableAccessibility && <SkipLinks links={skipLinks} />}
 
-        {/* Global Loading Indicator */}
-        <GlobalLoadingIndicator
-          position="top-right"
-          showDetails={process.env.NODE_ENV === 'development'}
-          showProgress={true}
-          showConnectionStatus={true}
-          maxVisible={3}
-        />
+        {/* TODO: Add Global Loading Indicator component */}
 
         {/* Application Layout */}
         <div id="app-shell" className="min-h-screen bg-gray-50">
@@ -312,15 +303,6 @@ export function AppShell({
       {content}
     </AuthProvider>
   );
-
-  // Wrap with accessibility provider if enabled
-  if (enableAccessibility) {
-    content = (
-      <AccessibilityProvider>
-        {content}
-      </AccessibilityProvider>
-    );
-  }
 
   // Wrap with offline provider if enabled
   if (enableOfflineSupport) {

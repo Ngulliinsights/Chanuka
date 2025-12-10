@@ -2,10 +2,10 @@ import { Loader2, AlertCircle, Filter } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Link } from 'wouter';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@client/shared/design-system/primitives/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system/primitives/dropdown-menu';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@client/shared/design-system';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system';
 
 interface Bill {
   id: number;

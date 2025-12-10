@@ -7,11 +7,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Progress } from '@client/shared/design-system/primitives/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { navigationUtils } from '@client/utils/navigation';
 import { logger } from '@client/utils/logger';
 import { BarChart3, Clock, Users, Search, TrendingUp, AlertTriangle } from 'lucide-react';

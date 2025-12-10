@@ -12,9 +12,9 @@ import {
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { cn } from '@client/lib/utils';
 import type { Bill } from '@client/types/core';
 

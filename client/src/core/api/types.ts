@@ -406,6 +406,9 @@ export {
   type ErrorContext
 } from '../../core/error';
 
+// ErrorCode alias for compatibility
+export type ErrorCode = string | 'NETWORK_ERROR' | 'TIMEOUT' | 'VALIDATION_ERROR' | 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'CONFLICT' | 'SERVER_ERROR' | 'RATE_LIMITED' | 'UNKNOWN';
+
 // ============================================================================
 // Cache Types
 // ============================================================================

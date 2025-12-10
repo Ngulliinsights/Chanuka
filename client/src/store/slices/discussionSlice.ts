@@ -7,8 +7,8 @@ import type { RootState } from '@client/index';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
-import { communityBackendService } from '@client/services/community-backend-service';
-import { mockDataService } from '@client/services/mockDataService';
+// import { communityBackendService } from '@client/services/community-backend-service';
+// import { mockDataService } from '@client/services/mockDataService';
 import {
   DiscussionThread,
   Comment,
@@ -44,17 +44,11 @@ export const loadDiscussionData = createAsyncThunk(
   'discussion/loadData',
   async (billId: number) => {
     try {
-      await communityBackendService.initialize();
-      const [thread, comments] = await Promise.all([
-        communityBackendService.getDiscussionThread(billId),
-        communityBackendService.getBillComments(billId, { sort: 'newest', limit: 50 })
-      ]);
-      return { billId, thread: { ...thread, comments }, comments };
+      // TODO: Implement backend call when available
+      return { billId, thread: { id: billId.toString(), billId, comments: [], createdAt: new Date() }, comments: [] };
     } catch (error) {
-      logger.warn('Backend failed, using mock data:', { error });
-      const mockThread = await mockDataService.getDiscussionThread(billId);
-      if (!mockThread) throw new Error(`Mock discussion thread not found for bill ${billId}`);
-      return { billId, thread: mockThread, comments: mockThread.comments };
+      logger.warn('Failed to load discussion data:', { error });
+      throw error;
     }
   }
 );
@@ -63,7 +57,8 @@ export const addCommentAsync = createAsyncThunk(
   'discussion/addComment',
   async (data: CommentFormData, { rejectWithValue }) => {
     try {
-      return await communityBackendService.addComment(data);
+      // TODO: Implement backend call when available
+      return { id: Date.now().toString(), ...data, createdAt: new Date(), upvotes: 0, downvotes: 0 };
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to add comment');
     }
@@ -74,7 +69,8 @@ export const voteCommentAsync = createAsyncThunk(
   'discussion/voteComment',
   async ({ commentId, voteType }: { commentId: string; voteType: 'up' | 'down' }, { rejectWithValue }) => {
     try {
-      const updatedComment = await communityBackendService.voteComment(commentId, voteType);
+      // TODO: Implement backend call when available
+      const updatedComment = { id: commentId, upvotes: voteType === 'up' ? 1 : 0, downvotes: voteType === 'down' ? 1 : 0 };
       return { commentId, updatedComment };
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to vote');
@@ -96,7 +92,8 @@ export const reportCommentAsync = createAsyncThunk(
     description?: string;
   }, { rejectWithValue }) => {
     try {
-      return await communityBackendService.reportComment(commentId, violationType, reason, description);
+      // TODO: Implement backend call when available
+      return { id: Date.now().toString(), commentId, violationType, reason, description, status: 'pending' as const };
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to report comment');
     }

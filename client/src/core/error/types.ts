@@ -19,7 +19,7 @@ export interface RecoveryStrategy {
   description: string;
   automatic: boolean;
   action?: () => Promise<boolean> | boolean;
-  conditions?: (error: any, context?: any) => boolean;
+  conditions?: (error: AppError, context?: Partial<ErrorContext>) => boolean;
   priority?: number;
   maxRetries?: number;
   timeout?: number;
@@ -341,5 +341,5 @@ export enum NavigationErrorType {
 // Re-export shared error types for convenience
 // ============================================================================
 
-export { ErrorDomain, ErrorSeverity } from './constants';
+export { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
 

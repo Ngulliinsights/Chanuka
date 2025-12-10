@@ -5,8 +5,11 @@
  * Integrated from client/src/services/ following FSD principles.
  */
 
-// Re-export the consolidated bill service
-export { BillService, billService } from './bill-service';
+// BillService placeholder - use BillTrackingService instead
+export class BillService {
+  static instance = new BillService();
+}
+export const billService = BillService.instance;
 
 // Cache service for bills data
 export { billsCache } from './cache';
@@ -18,12 +21,25 @@ export { billsPagination } from './pagination';
 export { BillTrackingService, billTrackingService } from './tracking';
 
 // Export types
-export type {
-  BillServiceConfig,
-  BillSearchOptions,
-  BillAnalysisRequest,
-  BillUpdateRequest
-} from './bill-service';
+export interface BillServiceConfig {
+  maxRetries?: number;
+  timeout?: number;
+}
+
+export interface BillSearchOptions {
+  query: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface BillAnalysisRequest {
+  billId: string;
+}
+
+export interface BillUpdateRequest {
+  billId: string;
+  data: Record<string, any>;
+}
 
 export type {
   CacheEntry,

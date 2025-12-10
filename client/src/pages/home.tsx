@@ -22,9 +22,9 @@ import {
   Heart
 } from 'lucide-react';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { PretextDetectionPanel } from '@client/features/pretext-detection/components/PretextDetectionPanel';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { copySystem } from '@client/content/copy-system';

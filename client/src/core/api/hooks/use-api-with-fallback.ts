@@ -8,11 +8,9 @@
 import {
   ApiResponse,
   UnifiedError,
-  RequestOptions,
-  ErrorCode,
-  ErrorDomain,
-  ErrorSeverity
+  RequestOptions
 } from '@client/core/api/types';
+import { ErrorDomain, ErrorSeverity } from '@client/core/error';
 import { globalApiClient } from '@client/core/api/client';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 

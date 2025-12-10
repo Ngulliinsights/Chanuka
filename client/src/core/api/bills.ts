@@ -80,7 +80,7 @@ export interface BillsStats {
   lastUpdated: string;
 }
 
-import type { Bill, Sponsor } from './types';
+import type { Bill, Sponsor } from '../../types';
 
 // Additional response interfaces
 interface BillAnalysis {

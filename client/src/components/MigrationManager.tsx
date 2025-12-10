@@ -1,9 +1,6 @@
 import { GitBranch, CheckCircle, Clock, FileText, AlertTriangle } from 'lucide-react';
 
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Skeleton } from './ui/skeleton';
+import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Skeleton } from '@client/shared/design-system';
 
 
 interface Migration {

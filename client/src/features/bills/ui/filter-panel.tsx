@@ -29,12 +29,12 @@ import { useSearchParams } from 'react-router-dom';
 
 import { cn } from '@client/lib/utils';
 
-import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Checkbox } from '@client/shared/design-system/primitives/checkbox';
-import { Label } from '@client/shared/design-system/primitives/typography/Label';
-import { Separator } from '@client/shared/design-system/primitives/separator';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Checkbox } from '@client/shared/design-system';
+import { Label } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 import type { BillsQueryParams } from '../model/types';
 
 // ============================================================================

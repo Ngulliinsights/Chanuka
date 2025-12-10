@@ -89,7 +89,7 @@ export interface UserAction {
   type: 'view' | 'comment' | 'share' | 'bookmark' | 'vote';
   bill_id: string;
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface DashboardData {
@@ -113,11 +113,15 @@ export interface AnalyticsAlert {
   impact?: 'low' | 'medium' | 'high';
 }
 
+export interface ChartDataPoint {
+  [key: string]: string | number | boolean | null;
+}
+
 export interface ChartData {
   id: string;
   type: 'line' | 'bar' | 'pie' | 'area';
   title: string;
-  data: any[];
+  data: ChartDataPoint[];
   xAxis?: string;
   yAxis?: string;
   colors?: string[];

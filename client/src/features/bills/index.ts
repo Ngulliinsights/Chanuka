@@ -1,12 +1,18 @@
-// Bills feature barrel exports - Feature-Sliced Design
+/**
+ * Bills Feature - Tracking, Analysis, Legislative Monitoring
+ * Feature-Sliced Design barrel exports
+ */
 
-// Model layer
+// Model layer (types and hooks)
 export * from './model';
 
-// UI layer
+// Services layer (business logic)
+export * from './services';
+
+// UI Components
 export * from './ui';
 
-// API layer
+// API Layer
 export * from './api';
 
 

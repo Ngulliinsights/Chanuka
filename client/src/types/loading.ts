@@ -103,3 +103,41 @@ export interface LoadingResult {
   duration: number;
   retries: number;
 }
+
+// Additional missing types
+export interface LoadingComponentProps {
+  isLoading: boolean;
+  error?: string;
+  progress?: number;
+  message?: string;
+}
+
+export interface AdaptiveSettings {
+  autoReduce: boolean;
+  reduceOnLowNetwork: boolean;
+  reduceOnLowBattery: boolean;
+  prioritizeSpeed: boolean;
+  prioritizeQuality: boolean;
+}
+
+export interface AssetLoadingProgress {
+  assetId: string;
+  bytesLoaded: number;
+  totalBytes: number;
+  progress: number;
+  status: 'pending' | 'loading' | 'complete' | 'error';
+  error?: string;
+}
+
+export type LoadingType = 'sequential' | 'parallel' | 'lazy' | 'progressive';
+export type LoadingPriority = 'critical' | 'high' | 'normal' | 'low';
+
+export type ConnectionType = 'wifi' | 'cellular' | 'ethernet' | 'bluetooth' | 'none';
+export type LoadingScenario = 'initial' | 'paginated' | 'infinite-scroll' | 'real-time' | 'batch';
+export type ProgressiveStage = 'init' | 'loading' | 'progressive' | 'complete' | 'error';
+
+export interface LoadingError extends Error {
+  code: string;
+  retryable: boolean;
+  timestamp: Date;
+}

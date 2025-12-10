@@ -2,11 +2,11 @@ import { Users, DollarSign, Eye, MapPin, Calendar, ExternalLink } from 'lucide-r
 import React from 'react';
 
 import type { Bill } from '@client/types/core';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/Card';
-import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system/primitives/Avatar';
-import { Separator } from '@client/shared/design-system/primitives/Separator';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 
 interface BillSponsorsTabProps {
   bill: Bill;

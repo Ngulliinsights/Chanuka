@@ -3,10 +3,10 @@ import { Loader2, AlertCircle, Filter, LayoutGrid, LayoutList } from 'lucide-rea
 import { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system/primitives/dropdown-menu';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@client/shared/design-system';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system';
 import { cn } from '@client/lib/utils';
 
 import { BillCard } from './BillCard';

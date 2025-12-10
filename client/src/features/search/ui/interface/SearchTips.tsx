@@ -19,11 +19,11 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/Card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/Tabs';
-import { Separator } from '@client/shared/design-system/primitives/Separator';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 
 interface SearchTip {
   id: string;

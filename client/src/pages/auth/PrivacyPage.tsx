@@ -6,8 +6,8 @@
 import { Shield, Eye, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 
 export default function PrivacyPage() {
   return (

@@ -21,8 +21,8 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, memo } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Card, CardContent } from '@client/shared/design-system/primitives/card';
+import { Badge } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
 import { cn } from '@client/lib/utils';
 
 // Type definitions for better type safety and clarity

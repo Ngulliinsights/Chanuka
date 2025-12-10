@@ -2,11 +2,11 @@ import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 
 import React, { useState } from 'react';
 
 import type { Bill } from '@client/types/core';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/Card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/Tabs';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/Alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/shared/design-system';
 
 interface BillAnalysisTabProps {
   bill: Bill;

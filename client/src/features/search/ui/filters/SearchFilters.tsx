@@ -19,13 +19,13 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Calendar } from '@client/shared/design-system/primitives/calendar';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Checkbox } from '@client/shared/design-system/primitives/checkbox';
-import { Popover, PopoverContent, PopoverTrigger } from '@client/shared/design-system/primitives/popover';
-import { Separator } from '@client/shared/design-system/primitives/separator';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Calendar } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Checkbox } from '@client/shared/design-system';
+import { Popover, PopoverContent, PopoverTrigger } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 import { cn } from '@client/lib/utils';
 
 // Define SearchFilters type locally

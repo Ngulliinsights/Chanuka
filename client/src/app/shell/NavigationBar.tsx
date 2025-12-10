@@ -1,4 +1,4 @@
-import { Search, Bell, User, Settings } from 'lucide-react';
+import { Search, Bell, User, Settings, Menu, Home, Power } from 'lucide-react';
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -8,19 +8,7 @@ import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { cn } from '@client/lib/utils';
 import { logger } from '@client/utils/logger';
 
-import { Menu as MenuIcon, LogOut as LogOutIcon, Home as HomeIcon } from '../icons/SimpleIcons';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { Input } from '../ui/input';
+import { Avatar, AvatarFallback, AvatarImage, Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, Input } from '@client/shared/design-system';
 
 interface NavigationBarProps {
   className?: string;
@@ -359,7 +347,7 @@ export function NavigationBar({
                 className="mr-2 p-2"
                 aria-label="Toggle mobile menu"
               >
-                <MenuIcon className="h-5 w-5" />
+                <Menu className="h-5 w-5" />
               </Button>
             )}
 
@@ -368,7 +356,7 @@ export function NavigationBar({
               className="flex items-center space-x-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1"
               aria-label="Chanuka home"
             >
-              <HomeIcon className="h-6 w-6" />
+              <Home className="h-6 w-6" />
               <span className="hidden sm:block">Chanuka</span>
             </Link>
           </div>
@@ -609,7 +597,7 @@ export function NavigationBar({
                         onClick={handleLogout} 
                         className="flex items-center cursor-pointer"
                       >
-                        <LogOutIcon className="mr-2 h-4 w-4" />
+                        <Power className="mr-2 h-4 w-4" />
                         <span>Log out</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

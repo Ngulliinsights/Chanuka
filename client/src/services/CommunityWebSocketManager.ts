@@ -11,7 +11,7 @@ import { logger } from '@client/utils/logger';
 
 interface WebSocketMessage {
   type: string;
-  payload: any;
+  payload: Record<string, unknown>;
   timestamp?: string;
   billId?: number;
   userId?: string;
@@ -19,7 +19,7 @@ interface WebSocketMessage {
 
 interface SubscriptionHandler {
   event: string;
-  handler: (data: any) => void;
+  handler: (data: Record<string, unknown>) => void;
   unsubscribe: () => void;
 }
 
@@ -114,7 +114,7 @@ export class CommunityWebSocketManager {
   /**
    * Subscribe to an event
    */
-  subscribe(event: string, handler: (data: any) => void): () => void {
+  subscribe(event: string, handler: (data: Record<string, unknown>) => void): () => void {
     const subscriptionKey = `${event}-${Date.now()}-${Math.random()}`;
 
     const unsubscribe = eventBus.on(event, handler);
@@ -172,7 +172,7 @@ export class CommunityWebSocketManager {
   /**
    * Publish an event to all subscribers
    */
-  publish(event: string, data: any): void {
+  publish(event: string, data: Record<string, unknown>): void {
     eventBus.emit(event, data);
 
     // Also send to server if connected
@@ -312,14 +312,14 @@ export class CommunityWebSocketManager {
   /**
    * Send comment update
    */
-  sendCommentUpdate(billId: number, commentData: any): void {
+  sendCommentUpdate(billId: number, commentData: Record<string, unknown>): void {
     this.publish(`comment:update:${billId}`, commentData);
   }
 
   /**
    * Send vote update
    */
-  sendVoteUpdate(billId: number, voteData: any): void {
+  sendVoteUpdate(billId: number, voteData: Record<string, unknown>): void {
     this.publish(`vote:update:${billId}`, voteData);
   }
 }

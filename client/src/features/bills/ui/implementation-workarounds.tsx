@@ -3,12 +3,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 import { logger } from '@client/utils/logger';
 
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/feedback/Alert';
-import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@client/shared/design-system/interactive/Dialog';
-import { Textarea } from '@client/shared/design-system/primitives/textarea';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@client/shared/design-system';
+import { Textarea } from '@client/shared/design-system';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {

@@ -24,9 +24,9 @@ import { CivicActionGuidance } from '@client/features/bills/ui/detail/CivicActio
 import { ConstitutionalAnalysisPanel } from '@client/features/bills/ui/detail/ConstitutionalAnalysisPanel';
 import { ExpertAnalysisCard } from '@client/features/bills/ui/detail/ExpertAnalysisCard';
 import { QuickActionsBar } from '@client/features/bills/ui/detail/QuickActionsBar';
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
-import { UnifiedButton, UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '@client/shared/design-system/primitives/unified-components';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { UnifiedButton, UnifiedCard, UnifiedCardContent, UnifiedCardDescription, UnifiedCardHeader, UnifiedCardTitle, UnifiedToolbar, UnifiedToolbarButton, UnifiedToolbarSeparator } from '@client/shared/design-system';
 import type { Bill } from '@client/core/api/types';
 
 // Hooks and Services

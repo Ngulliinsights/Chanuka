@@ -176,3 +176,27 @@ export interface DashboardAction {
   handler: string;
   parameters?: Record<string, any>;
 }
+
+// Additional missing types
+export interface DashboardSettings {
+  id: string;
+  userId: string;
+  theme: 'light' | 'dark' | 'auto';
+  autoRefresh: boolean;
+  refreshInterval: number;
+  notifications: boolean;
+  layout: 'grid' | 'flex' | 'masonry';
+  defaultWidgets: string[];
+}
+
+export type WidgetType = 'chart' | 'table' | 'stat' | 'gauge' | 'progress' | 'list' | 'custom';
+
+export interface ChartData {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    borderColor?: string;
+    backgroundColor?: string;
+  }[];
+}

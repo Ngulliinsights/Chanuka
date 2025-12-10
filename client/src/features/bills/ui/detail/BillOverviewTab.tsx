@@ -2,9 +2,9 @@ import { Calendar, Users, FileText, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
 import type { Bill } from '@client/types/core';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/Card';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 
 interface BillOverviewTabProps {
   bill: Bill;

@@ -15,18 +15,16 @@ const defaultQueryClient = new QueryClient({
 
 // PersistGate causes DOM rehydration toggles that can trigger removeChild races
 // during HMR/fast reloads. We'll handle persistor bootstrapping manually.
-import { LoadingProvider } from '@/core/loading';
-import { AuthProvider } from '@/features/users/hooks';
-import { useConnectionAware } from '@/hooks/useConnectionAware';
-import { useOfflineDetection } from '@/hooks/useOfflineDetection';
+import { AuthProvider } from '@client/core/auth';
+import { useConnectionAware } from '@client/hooks/useConnectionAware';
+import { useOfflineDetection } from '@client/hooks/useOfflineDetection';
 import { ThemeProvider } from '@client/contexts/ThemeContext';
 import { initializeStore } from '@client/store';
 import { CommunityUIProvider } from '@client/store/slices/communitySlice';
 import { assetLoadingManager } from '@client/utils/assets';
 
-import { AccessibilityProvider } from './accessibility/accessibility-manager';
-import { SimpleErrorBoundary } from './error-handling/SimpleErrorBoundary';
-import { OfflineProvider } from './offline/offline-manager';
+import { ErrorBoundary } from '@client/core/error/components';
+import { OfflineProvider } from '@client/shared/ui/offline';
 
 // =============================================================================
 // TYPE DEFINITIONS
@@ -195,15 +193,19 @@ function LoadingProviderWithDeps({ children }: { children: React.ReactNode }) {
     ]
   );
 
-  return (
-    <LoadingProvider
-      useConnectionAware={() => connectionAdapter}
-      useOnlineStatus={() => isOnline}
-      assetLoadingManager={assetLoadingManager}
-    >
-      {children}
-    </LoadingProvider>
-  );
+  // TODO: LoadingProvider will be implemented in future phases
+  // For now, returning children directly
+  return children;
+
+  // return (
+  //   <LoadingProvider
+  //     useConnectionAware={() => connectionAdapter}
+  //     useOnlineStatus={() => isOnline}
+  //     assetLoadingManager={assetLoadingManager}
+  //   >
+  //     {children}
+  //   </LoadingProvider>
+  // );
 }
 
 // =============================================================================
@@ -418,8 +420,8 @@ const PROVIDERS: ProviderConfig[] = [
   { name: 'CommunityUIProvider', component: CommunityUIProvider },
   { name: 'ThemeProvider', component: ThemeProvider },
   { name: 'LoadingProvider', component: LoadingProviderWithDeps },
-  { name: 'AccessibilityProvider', component: AccessibilityProvider },
   { name: 'OfflineProvider', component: OfflineProvider },
+  // TODO: AccessibilityProvider not yet implemented
 ];
 
 // =============================================================================

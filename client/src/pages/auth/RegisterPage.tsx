@@ -9,8 +9,8 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { SocialLogin } from '@client/core/auth';
 import { RegisterForm } from '@client/core/auth';
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 

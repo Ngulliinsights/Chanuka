@@ -202,7 +202,7 @@ export class WebSocketService {
   /**
    * Handles WebSocket errors
    */
-  private handleError(error: any): void {
+  private handleError(error: unknown): void {
     this.connectionState = ConnectionState.FAILED;
     this.handlers.onError?.(error);
     
@@ -215,15 +215,15 @@ export class WebSocketService {
   /**
    * Handles bill updates from WebSocket
    */
-  private async handleBillUpdate(data: any): Promise<void> {
+  private async handleBillUpdate(data: Record<string, unknown>): Promise<void> {
     try {
       const update: BillUpdate = {
-        type: data.type,
+        type: (data.type as string) || 'update',
         data: {
-          billId: data.bill_id || data.billId,
-          ...data.update?.data
+          billId: (data.bill_id as number) || (data.billId as number),
+          ...(data.update as Record<string, unknown>)?.data
         },
-        timestamp: data.timestamp || new Date().toISOString()
+        timestamp: (data.timestamp as string) || new Date().toISOString()
       };
 
       // Process through business logic service
@@ -249,16 +249,16 @@ export class WebSocketService {
   /**
    * Handles notifications from WebSocket
    */
-  private handleNotification(notification: any): void {
+  private handleNotification(notification: Record<string, unknown>): void {
     try {
       const processedNotification: WebSocketNotification = {
-        id: notification.id || `notification_${Date.now()}`,
-        type: notification.type || 'info',
-        title: notification.title,
-        message: notification.message,
-        priority: notification.priority || 'normal',
-        data: notification.data,
-        timestamp: notification.timestamp || new Date().toISOString(),
+        id: (notification.id as string) || `notification_${Date.now()}`,
+        type: (notification.type as 'info' | 'warning' | 'error' | 'success') || 'info',
+        title: notification.title as string,
+        message: notification.message as string,
+        priority: (notification.priority as 'low' | 'normal' | 'high') || 'normal',
+        data: notification.data as Record<string, unknown> | undefined,
+        timestamp: (notification.timestamp as string) || new Date().toISOString(),
         read: false
       };
 
@@ -282,14 +282,14 @@ export class WebSocketService {
   /**
    * Handles generic messages for non-bill subscriptions
    */
-  private handleGenericMessage(subscription: WebSocketSubscription, message: any): void {
+  private handleGenericMessage(subscription: WebSocketSubscription, message: Record<string, unknown>): void {
     try {
       if (subscription.type === 'community') {
         const communityUpdate: CommunityUpdate = {
-          type: message.type || 'update',
+          type: (message.type as string) || 'update',
           discussionId: subscription.id as string,
-          data: message.data || message,
-          timestamp: message.timestamp || new Date().toISOString()
+          data: message.data as Record<string, unknown> || message,
+          timestamp: (message.timestamp as string) || new Date().toISOString()
         };
 
         this.handlers.onCommunityUpdate?.(communityUpdate);

@@ -18,7 +18,7 @@
 import { logger } from '@client/utils/logger';
 
 import { globalApiClient } from './client';
-import { ErrorCode, ErrorFactory } from './errors';
+import { ErrorFactory } from '@client/core/error';
 
 // ============================================================================
 // Type Definitions

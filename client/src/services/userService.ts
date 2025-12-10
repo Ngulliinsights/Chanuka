@@ -139,7 +139,7 @@ export interface UserEngagementHistory {
   entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
   entity_id: string;
   timestamp: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface UserPreferences {
@@ -175,14 +175,49 @@ export interface PrivacySettings {
   marketing_emails: boolean;
 }
 
+export interface Recommendation {
+  billId: number;
+  title: string;
+  relevanceScore: number;
+  reason: string;
+}
+
+export interface Notification {
+  id: string;
+  type: 'bill_update' | 'comment' | 'recommendation' | 'system';
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+}
+
 export interface DashboardData {
   profile: UserProfile;
   recent_activity: UserEngagementHistory[];
   saved_bills: SavedBill[];
-  trending_bills: any[];
-  recommendations: any[];
-  notifications: any[];
+  trending_bills: SavedBill[];
+  recommendations: Recommendation[];
+  notifications: Notification[];
   civic_score_trend: Array<{ date: string; score: number }>;
+}
+
+// ============================================================================
+// Service Interfaces for DI
+// ============================================================================
+
+interface IAuthService {
+  login(credentials: LoginCredentials): Promise<AuthSession>;
+  logout(): Promise<void>;
+  getCurrentUser(): Promise<AuthUser | null>;
+  refreshToken(): Promise<AuthTokens>;
+}
+
+interface IUserAPIService {
+  getProfile(userId: string): Promise<UserProfile>;
+  updateProfile(userId: string, data: Partial<UserProfile>): Promise<UserProfile>;
+  getDashboardData(userId: string): Promise<DashboardData>;
+  getUserPreferences(userId: string): Promise<UserPreferences>;
+  updateUserPreferences(userId: string, prefs: Partial<UserPreferences>): Promise<UserPreferences>;
 }
 
 // ============================================================================
@@ -202,8 +237,8 @@ class UserService {
   private readonly USER_CACHE_DURATION = 60 * 1000; // 1 minute
 
   constructor(
-    private authService: any,
-    private userApiService: any
+    private authService: IAuthService,
+    private userApiService: IUserAPIService
   ) {
     this.baseUrl = globalConfig.get('api').baseUrl;
   }
@@ -239,13 +274,12 @@ class UserService {
     try {
       this.validateRegistrationData(data);
 
-      const session: AuthSession = await this.authService.login({
+      const loginData: LoginCredentials = {
         email: data.email,
-        password: data.password,
-        name: data.name,
-        confirmPassword: data.confirmPassword,
-        acceptTerms: data.acceptTerms
-      } as any); // Using login as register for now, should be updated
+        password: data.password
+      };
+
+      const session: AuthSession = await this.authService.login(loginData);
       this.updateUserCache(session.user);
       this.scheduleTokenRefresh(session.tokens.expiresIn);
 
@@ -279,9 +313,12 @@ class UserService {
         return this.userCache.user!;
       }
 
-      const user: any = await this.authService.getCurrentUser();
-      this.updateUserCache(user);
-      return user;
+      const user = await this.authService.getCurrentUser();
+      if (user) {
+        this.updateUserCache(user);
+        return user;
+      }
+      throw new Error('No user returned from auth service');
     } catch (error) {
       logger.error('Failed to get current user', { error });
       throw error;
@@ -421,7 +458,7 @@ class UserService {
     action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
     entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
     entity_id: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }): Promise<void> {
     try {
       await this.userApiService.trackEngagement(action);
@@ -534,7 +571,15 @@ class UserService {
     return this.unsaveBill(billId.toString());
   }
 
-  async trackBill(userId: string, billId: number, notificationSettings?: any): Promise<{ id: number; notifications: any }> {
+  async trackBill(
+    userId: string,
+    billId: number,
+    notificationSettings?: {
+      statusChanges?: boolean;
+      newComments?: boolean;
+      expertAnalysis?: boolean;
+    }
+  ): Promise<{ id: number; notifications: typeof notificationSettings }> {
     // Mock implementation for now
     return { id: billId, notifications: notificationSettings };
   }
@@ -544,16 +589,54 @@ class UserService {
     return Promise.resolve();
   }
 
-  async getEngagementHistoryForUser(userId: string, options?: any): Promise<any> {
-    return this.getEngagementHistory(options?.page, options?.limit, options);
+  async getEngagementHistoryForUser(
+    userId: string,
+    options?: {
+      page?: number;
+      limit?: number;
+      filters?: EngagementHistoryFilters;
+    }
+  ): Promise<{
+    history: UserEngagementHistory[];
+    total: number;
+    page: number;
+    totalPages: number;
+    analytics: {
+      most_active_day: string;
+      total_actions: number;
+      action_breakdown: Record<string, number>;
+    };
+  }> {
+    return this.getEngagementHistory(options?.page, options?.limit, options?.filters);
   }
 
-  async trackEngagementForUser(userId: string, activity: any): Promise<any> {
+  async trackEngagementForUser(
+    userId: string,
+    activity: {
+      action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
+      entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
+      entity_id: string;
+      metadata?: Record<string, unknown>;
+    }
+  ): Promise<UserEngagementHistory> {
     await this.trackEngagement(activity);
-    return { id: Date.now(), ...activity, timestamp: new Date().toISOString() };
+    return {
+      id: `${Date.now()}`,
+      user_id: 'current',
+      ...activity,
+      timestamp: new Date().toISOString()
+    };
   }
 
-  async getCivicMetrics(userId: string, timeRange?: string): Promise<any> {
+  async getCivicMetrics(
+    userId: string,
+    timeRange?: string
+  ): Promise<{
+    bills_tracked: number;
+    comments_posted: number;
+    civic_score: number;
+    engagement_level: 'beginner' | 'active' | 'expert' | 'leader';
+  }> {
     // Mock implementation for now
     return {
       bills_tracked: 0,
@@ -573,7 +656,7 @@ class UserService {
     return achievements.achievements;
   }
 
-  async getRecommendations(userId: string, limit: number = 10): Promise<any[]> {
+  async getRecommendations(userId: string, limit: number = 10): Promise<Recommendation[]> {
     // Mock implementation for now
     return [];
   }
@@ -621,12 +704,27 @@ class UserService {
     return { ...current, ...controls };
   }
 
-  async requestDataExport(userId: string, request: any): Promise<{ exportId: string }> {
+  async requestDataExport(
+    userId: string,
+    request: {
+      format: 'json' | 'csv' | 'pdf';
+      includePersonalData: boolean;
+      includeActivityHistory: boolean;
+      includeMetrics: boolean;
+      includeComments: boolean;
+      dateRange?: { start: string; end: string };
+    }
+  ): Promise<{ exportId: string }> {
     // Mock implementation for now
     return { exportId: `export_${Date.now()}` };
   }
 
-  async recordActivity(activity: { action_type: string; entity_type: string; entity_id: string; metadata?: any }): Promise<void> {
+  async recordActivity(activity: {
+    action_type: string;
+    entity_type: string;
+    entity_id: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<void> {
     // Mock implementation for now
     return Promise.resolve();
   }
@@ -636,7 +734,7 @@ class UserService {
 // Export Singleton Instance
 // ============================================================================
 
-import { authService } from './auth-service';
+import { authService } from '@client/core/auth';
 
 import { userApi } from '@client/features/users/services/user-api';
 

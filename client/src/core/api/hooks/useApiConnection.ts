@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
-import { AuthenticatedApiClient } from '@client/utils/api';
+import { globalApiClient } from '@client/core/api';
 import { logger } from '@client/utils/logger';
 
 // Define types locally since they're not exported
@@ -49,7 +49,7 @@ export interface DiagnosisResult {
 const checkConnection = async (): Promise<ConnectionInfo> => {
   const startTime = Date.now();
   try {
-    await AuthenticatedAPI.get('/api/health');
+    await globalApiClient.get('/api/health');
     const latency = Date.now() - startTime;
     return {
       status: 'connected',
@@ -73,7 +73,7 @@ const checkConnection = async (): Promise<ConnectionInfo> => {
 
 const checkApiHealth = async (): Promise<HealthStatus> => {
   try {
-    const response = await AuthenticatedAPI.get('/api/health/detailed');
+    const response = await globalApiClient.get('/api/health/detailed');
     
     // Type guard: safely access the response data with proper type checking
     // We cast to our defined interface, providing TypeScript with structural information

@@ -8,8 +8,9 @@
 // Re-export the consolidated community service
 export { CommunityService, communityService } from './community-service';
 
-// Backend service for community API integration
+// Backend service for community API integration (real API with WebSocket support)
 export { communityBackendService } from './backend';
+export { communityBackend } from './backend'; // Alias for flexibility
 
 // Export types
 export type {

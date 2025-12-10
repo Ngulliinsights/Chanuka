@@ -7,7 +7,7 @@
 import React from 'react';
 import { Button } from '@client/shared/design-system';
 
-import { cn } from '@client/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system';
 import { DashboardConfig, DashboardLayoutConfig, DashboardThemeConfig } from '../types';
 
 interface DashboardHeaderProps {

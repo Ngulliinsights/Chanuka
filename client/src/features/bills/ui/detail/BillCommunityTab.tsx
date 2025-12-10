@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 
 import type { Bill } from '@client/types/core';
 import type { CommunityComment } from '@client/types/community';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/Card';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/Tabs';
-import { Separator } from '@client/shared/design-system/primitives/Separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 
 // TODO: ARCHITECTURAL DECISION NEEDED - Cross-feature dependency
 // This should either be moved to shared/ui or use a shared interface

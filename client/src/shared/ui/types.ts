@@ -37,19 +37,52 @@ export interface BaseComponentProps {
   testId?: string;
 }
 
-// Hook return types
+// Hook return types - Supporting types
+export interface DashboardStats {
+  totalBills: number;
+  totalComments: number;
+  activeTracking: number;
+  civicScore: number;
+  monthlyGrowth: number;
+}
+
+export interface ActivityRecord {
+  id: string;
+  type: 'view' | 'comment' | 'save' | 'share' | 'vote';
+  title: string;
+  timestamp: string;
+  details?: Record<string, unknown>;
+}
+
+export interface BillRecord {
+  id: string;
+  title: string;
+  status: string;
+  category: string;
+  engagementCount: number;
+}
+
+export interface PrivacySettings {
+  profileVisibility: 'public' | 'private' | 'contacts';
+  showActivity: boolean;
+  showMetrics: boolean;
+  showRecommendations: boolean;
+  allowDataExport: boolean;
+  allowAnalytics: boolean;
+}
+
 export interface UseDashboardDataReturn {
-  stats: any;
-  activity: any[];
-  bills: any[];
+  stats: DashboardStats;
+  activity: ActivityRecord[];
+  bills: BillRecord[];
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
 }
 
 export interface UsePrivacySettingsReturn {
-  settings: any;
-  updateSetting: (key: string, value: any) => Promise<void>;
+  settings: PrivacySettings;
+  updateSetting: <K extends keyof PrivacySettings>(key: K, value: PrivacySettings[K]) => Promise<void>;
   loading: boolean;
   error: string | null;
 }

@@ -8,11 +8,11 @@
 import { Search, Clock, TrendingUp, FileText, ArrowRight } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent } from '@client/shared/design-system/primitives/card';
-import { Input } from '@client/shared/design-system/primitives/input';
-import { Separator } from '@client/shared/design-system/primitives/separator';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { logger } from '../../../../utils/logger';
 import { intelligentSearch } from '../../services/intelligent-search';

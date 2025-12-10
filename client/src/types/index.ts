@@ -26,7 +26,16 @@ export type {
   LoadingCondition,
   LoadingAction,
   LoadingBatch,
-  LoadingResult
+  LoadingResult,
+  LoadingComponentProps,
+  AdaptiveSettings,
+  AssetLoadingProgress,
+  LoadingType,
+  LoadingPriority,
+  ConnectionType,
+  LoadingScenario,
+  ProgressiveStage,
+  LoadingError
 } from './loading';
 
 // Navigation types
@@ -64,7 +73,10 @@ export type {
   WidgetData,
   DashboardFilter,
   FilterOption,
-  DashboardAction
+  DashboardAction,
+  DashboardSettings,
+  WidgetType,
+  ChartData
 } from './dashboard';
 
 // Error types
@@ -127,6 +139,14 @@ export type {
   BrowserNetwork,
   BrowserAPIs
 } from './browser';
+
+// Engagement Analytics types
+export type {
+  LiveEngagementMetrics,
+  PersonalEngagementScore,
+  CommunitysentimentAnalysis,
+  AnalyticsFilters
+} from './engagement-analytics';
 
 // Form types
 export type {

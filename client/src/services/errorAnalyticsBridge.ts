@@ -10,6 +10,14 @@ import { coreErrorHandler } from '@client/core/error/handler';
 import { ErrorDomain, ErrorSeverity } from '@client/core/error/types';
 
 // Import analytics types
+
+interface TimeSeriesPoint {
+  timestamp: number;
+  value: number;
+  category?: string;
+  metadata?: Record<string, unknown>;
+}
+
 interface TimeRange {
   start: number;
   end: number;
@@ -37,13 +45,41 @@ interface ErrorOverviewMetrics {
   lastUpdated: number;
 }
 
+interface SeasonalityData {
+  period: number;
+  strength: number;
+  pattern: Record<string, number>;
+}
+
+interface AnomalyData {
+  timestamp: number;
+  value: number;
+  deviation: number;
+  severity: 'low' | 'medium' | 'high';
+  description: string;
+}
+
+interface ProjectionData {
+  timestamp: number;
+  predicted: number;
+  confidence: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
 interface ErrorTrendData {
-  timeSeries: any[];
+  timeSeries: TimeSeriesPoint[];
   growthRate: number;
-  seasonality: any;
-  anomalies: any[];
-  projections: any;
+  seasonality: SeasonalityData | null;
+  anomalies: AnomalyData[];
+  projections: ProjectionData[];
   period: string;
+}
+
+interface ErrorCluster {
+  id: string;
+  size: number;
+  centroid: Record<string, unknown>;
+  members: string[];
 }
 
 interface ErrorPattern {
@@ -56,26 +92,68 @@ interface ErrorPattern {
   affectedUsers: number;
   severity: string;
   domain: string;
-  cluster: any;
-  impact: any;
+  cluster: ErrorCluster | null;
+  impact: {
+    score: number;
+    metrics: Record<string, number>;
+  };
+  recommendations: string[];
+}
+
+interface StrategyEffectiveness {
+  strategyName: string;
+  successRate: number;
+  averageRecoveryTime: number;
+  usage: number;
+}
+
+interface RecoveryTimeDistribution {
+  min: number;
+  max: number;
+  mean: number;
+  median: number;
+  p95: number;
+  p99: number;
+}
+
+interface FailureAnalysisItem {
+  cause: string;
+  frequency: number;
+  affectedUsers: number;
   recommendations: string[];
 }
 
 interface RecoveryAnalytics {
   overallSuccessRate: number;
-  strategyEffectiveness: any[];
-  recoveryTimeDistribution: any;
-  failureAnalysis: any[];
+  strategyEffectiveness: StrategyEffectiveness[];
+  recoveryTimeDistribution: RecoveryTimeDistribution;
+  failureAnalysis: FailureAnalysisItem[];
   automatedRecoveryRate: number;
   manualInterventionRate: number;
 }
 
+interface AlertData {
+  id: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  message: string;
+  timestamp: number;
+  details?: Record<string, unknown>;
+}
+
+interface SystemHealthMetrics {
+  errorRate: number;
+  warningRate: number;
+  recoveryRate: number;
+  uptime: number;
+  lastCheck: number;
+}
+
 interface RealTimeMetrics {
   currentErrorRate: number;
-  activeAlerts: any[];
-  liveStream: any[];
-  systemHealth: any;
-  performanceMetrics: any;
+  activeAlerts: AlertData[];
+  liveStream: TimeSeriesPoint[];
+  systemHealth: SystemHealthMetrics;
+  performanceMetrics: Record<string, number>;
 }
 
 class ErrorAnalyticsBridge {

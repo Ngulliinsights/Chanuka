@@ -15,13 +15,13 @@ import {
 } from 'lucide-react';
 import React, { useState, useCallback, useMemo } from 'react';
 
-import { cn } from '@client/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system';
 import type { CommunityComment } from '@client/types/community';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Card, CardContent } from '@client/shared/design-system/primitives/Card';
-import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system/primitives/Avatar';
-import { Separator } from '@client/shared/design-system/primitives/Separator';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 
 type ModerationViolationType = 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'other';
 

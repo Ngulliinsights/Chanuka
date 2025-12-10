@@ -14,11 +14,11 @@ import { Helmet } from 'react-helmet-async';
 import { GDPRComplianceManager } from '@client/features/security/ui/privacy/GDPRComplianceManager';
 import { DataUsageReportDashboard } from '@client/features/security/ui/privacy/DataUsageReportDashboard';
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Shield, FileText, Settings, Download, Eye, Lock } from 'lucide-react';
 
 export default function PrivacyCenterPage() {

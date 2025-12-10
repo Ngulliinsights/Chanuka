@@ -6,8 +6,8 @@ import { forwardRef, createContext, useContext, useState, useCallback, useEffect
 import { useIsMobile } from '@client/hooks/use-mobile'
 import { cn } from '@client/lib/utils'
 
-import { Button } from '../primitives'
-import { Input } from '../primitives'
+import { Button } from './Button'
+import { Input } from './Input'
 import { Separator } from './separator'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './sheet'
 import { Skeleton } from './skeleton'

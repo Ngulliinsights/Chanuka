@@ -13,7 +13,6 @@ import { logger } from '../../../utils/logger';
 export const IMPORT_MAPPINGS = {
   // Hooks
   "import { useAuth } from '@client/core/auth'": "import { useAuth } from '@/core/auth'",
-  "import { useAuth } from '@client/core/auth',
   "from '@client/core/auth'": "from '@/core/auth'",
   
   // Redux

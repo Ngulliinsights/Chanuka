@@ -7,11 +7,11 @@ import { Shield, ArrowLeft, Loader2, AlertTriangle, CheckCircle, Mail } from 'lu
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Input } from '@client/shared/design-system/primitives/input';
-import { Label } from '@client/shared/design-system/primitives/label';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
+import { Label } from '@client/shared/design-system';
 import { useAuth } from '@client/core/auth';
 
 export default function ForgotPasswordPage() {

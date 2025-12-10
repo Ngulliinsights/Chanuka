@@ -28,6 +28,9 @@ export {
 // Service Unavailable Component - Specialized service outage display
 export { ServiceUnavailable } from './ServiceUnavailable';
 
+// Recovery UI Component
+export { default as RecoveryUI } from './RecoveryUI';
+
 // Error Recovery Manager - Recovery strategies and management
 export { ErrorRecoveryManager } from './ErrorRecoveryManager';
 

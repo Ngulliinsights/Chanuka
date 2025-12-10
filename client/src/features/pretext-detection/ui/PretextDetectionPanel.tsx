@@ -1,14 +1,14 @@
 import { Loader2, Shield, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/feedback/Alert';
-import { Button } from '@client/shared/design-system/primitives/button';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system/primitives/card';
+} from '@client/shared/design-system';
 import { usePretextAnalysis } from '../hooks/usePretextAnalysis';
 
 import { CivicActionToolbox } from './CivicActionToolbox';

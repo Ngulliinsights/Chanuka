@@ -1,0 +1,284 @@
+/**
+ * CHANUKA PLATFORM - 4 PERSONAS STRATEGIC FRAMEWORK
+ * ════════════════════════════════════════════════════════════════════
+ * 
+ * This framework guides the refinement, integration, and optimization of
+ * all system components (core, features, shared) through 4 strategic personas.
+ * 
+ * Last Updated: December 9, 2025
+ * Status: ACTIVE & IMPLEMENTED
+ */
+
+/**
+ * PERSONA 1: THE ARCHITECT
+ * ────────────────────────────────────────────────────────────────────
+ * DOMAIN: System Design, Structural Integrity, Pattern Consistency
+ * RESPONSIBILITY: Ensure coherent architectural patterns across system
+ * 
+ * KEY PRINCIPLES:
+ *   • Design patterns must be consistent and repeatable
+ *   • Module boundaries must be clear and well-defined
+ *   • Dependency flow: features → core → shared
+ *   • Token system is single source of truth for styling
+ *   • Every module has clear, documented API contract
+ * 
+ * ARTIFACTS:
+ *   • Design System (shared/design-system)
+ *   • Design Tokens (shared/design-system/tokens)
+ *   • Core Module Structure (client/src/core/*/index.ts)
+ *   • Architecture Decision Records
+ * 
+ * SUCCESS CRITERIA:
+ *   ✓ All modules follow consistent structure (types, services, hooks, ui)
+ *   ✓ Design tokens cover 95%+ of styling needs
+ *   ✓ No architectural violations detected
+ *   ✓ Clear separation of concerns at each layer
+ */
+
+/**
+ * PERSONA 2: THE AUDITOR
+ * ────────────────────────────────────────────────────────────────────
+ * DOMAIN: Standards, Compliance, Quality Assurance
+ * RESPONSIBILITY: Ensure all code adheres to established standards
+ * 
+ * KEY PRINCIPLES:
+ *   • Naming conventions: PascalCase (types), camelCase (functions)
+ *   • JSDoc documentation on all public APIs
+ *   • Type annotations on all function parameters
+ *   • Consistent error handling patterns
+ *   • Comprehensive test coverage (minimum 60%, target 85%)
+ * 
+ * STANDARDS ENFORCED:
+ *   • TypeScript strict mode enabled
+ *   • ESLint rules for code quality
+ *   • Prettier for code formatting
+ *   • Accessibility (WCAG AA minimum)
+ *   • Security best practices
+ * 
+ * AUDIT CHECKLIST:
+ *   ☐ All exports properly typed
+ *   ☐ No any types without explanation
+ *   ☐ Error classes extend Error properly
+ *   ☐ Singleton patterns properly implemented
+ *   ☐ Configuration validation in place
+ */
+
+/**
+ * PERSONA 3: THE INTEGRATOR
+ * ────────────────────────────────────────────────────────────────────
+ * DOMAIN: Cross-module Cohesion, Integration Testing, Interface Design
+ * RESPONSIBILITY: Ensure all modules work together seamlessly
+ * 
+ * KEY PRINCIPLES:
+ *   • Features should never import from features
+ *   • Core should export consistent APIs for features to consume
+ *   • Shared should be framework-agnostic where possible
+ *   • Type contracts between modules are explicit
+ *   • Public APIs documented with examples
+ * 
+ * INTEGRATION POINTS TO VERIFY:
+ *   • core/index.ts exports all subsystems
+ *   • features/index.ts exports all features
+ *   • shared/index.ts exports design system + infrastructure
+ *   • No circular import dependencies
+ *   • Cache types centralized in api module
+ * 
+ * COMMUNICATION PATTERNS:
+ *   • Features use core hooks (useAuth, useApi, etc.)
+ *   • UI uses shared components with design tokens
+ *   • Services in core implement business logic
+ *   • Error handling flows through consistent handlers
+ */
+
+/**
+ * PERSONA 4: THE STRATEGIST
+ * ────────────────────────────────────────────────────────────────────
+ * DOMAIN: Vision, Sustainability, Long-term Goals
+ * RESPONSIBILITY: Ensure system serves product strategy & user needs
+ * 
+ * KEY PRINCIPLES:
+ *   • Performance matters - Web Vitals targets must be met
+ *   • Accessibility is non-negotiable - WCAG AA minimum
+ *   • Developer experience improves with each iteration
+ *   • Code is maintainable for teams, not just individuals
+ *   • Technical debt is actively managed and reduced
+ * 
+ * STRATEGIC FOCUS AREAS:
+ *   • Bundle size optimization (target: < 200kb gzipped)
+ *   • Core Web Vitals (LCP: 2.5s, INP: 200ms, CLS: 0.1)
+ *   • Accessibility score (target: 95+)
+ *   • Type coverage (target: 95%+)
+ *   • Test coverage (target: 85%+)
+ * 
+ * SUSTAINABILITY GOALS:
+ *   1. Code should be readable 1 year from now
+ *   2. Onboarding new team member takes < 1 week
+ *   3. Bug fix response time < 2 hours
+ *   4. Performance regression detected automatically
+ *   5. Zero security vulnerabilities
+ */
+
+/**
+ * ════════════════════════════════════════════════════════════════════
+ * INTEGRATION MATRIX: How 4 Personas Work Together
+ * ════════════════════════════════════════════════════════════════════
+ * 
+ * ARCHITECT → AUDITOR
+ *   Architect designs pattern → Auditor ensures standard compliance
+ *   Example: Design system tokens → Token naming conventions
+ * 
+ * AUDITOR → INTEGRATOR
+ *   Auditor verifies standards → Integrator checks cross-module consistency
+ *   Example: Type checking → Type contracts between modules
+ * 
+ * INTEGRATOR → STRATEGIST
+ *   Integrator ensures cohesion → Strategist evaluates impact on goals
+ *   Example: API integration → Performance measurement
+ * 
+ * STRATEGIST → ARCHITECT
+ *   Strategist defines goals → Architect designs solutions
+ *   Example: "Need < 200kb bundle" → Code splitting architecture
+ * 
+ * FULL CYCLE (Continuous Improvement)
+ *   Architect(Design) → Auditor(Validate) → Integrator(Connect) 
+ *   → Strategist(Measure) → back to Architect
+ */
+
+/**
+ * ════════════════════════════════════════════════════════════════════
+ * MODULE STRUCTURE VALIDATED BY 4 PERSONAS
+ * ════════════════════════════════════════════════════════════════════
+ * 
+ * CORE MODULE (Business Logic & Domain Services)
+ * ├─ error/              [ARCHITECT: error patterns, AUDITOR: error types]
+ * ├─ browser/            [ARCHITECT: detection pattern, STRATEGIST: perf]
+ * ├─ auth/               [ARCHITECT: auth flow, AUDITOR: security]
+ * ├─ api/                [ARCHITECT: REST patterns, INTEGRATOR: contracts]
+ * ├─ performance/        [ARCHITECT: monitoring system, STRATEGIST: goals]
+ * ├─ loading/            [ARCHITECT: state management, AUDITOR: consistency]
+ * ├─ storage/            [ARCHITECT: data persistence, AUDITOR: validation]
+ * ├─ mobile/             [ARCHITECT: responsive pattern, STRATEGIST: UX]
+ * ├─ community/          [ARCHITECT: discussion model, INTEGRATOR: APIs]
+ * ├─ dashboard/          [ARCHITECT: state + context, AUDITOR: structure]
+ * └─ navigation/         [ARCHITECT: routing logic, INTEGRATOR: integration]
+ * 
+ * FEATURES MODULE (Business Domain Features)
+ * ├─ analytics/          [ARCHITECT: FSD structure, AUDITOR: naming]
+ * ├─ bills/              [ARCHITECT: model/ui/api layers, INTEGRATOR: hooks]
+ * ├─ community/          [ARCHITECT: feature isolation, STRATEGIST: impact]
+ * ├─ search/             [ARCHITECT: client-side logic, AUDITOR: types]
+ * ├─ security/           [ARCHITECT: encryption pattern, AUDITOR: validation]
+ * ├─ users/              [ARCHITECT: user model, INTEGRATOR: integration]
+ * ├─ admin/              [ARCHITECT: feature isolation, AUDITOR: access]
+ * └─ pretext-detection/  [ARCHITECT: analysis model, STRATEGIST: value]
+ * 
+ * SHARED MODULE (UI & Infrastructure)
+ * ├─ design-system/      [ARCHITECT: token system, AUDITOR: accessibility]
+ * │  ├─ tokens/          [ARCHITECT: design tokens, STRATEGIST: consistency]
+ * │  ├─ themes/          [ARCHITECT: theme switching, AUDITOR: contrast]
+ * │  ├─ standards/       [ARCHITECT: component standards, AUDITOR: quality]
+ * │  └─ accessibility/   [ARCHITECT: a11y patterns, AUDITOR: WCAG AA]
+ * └─ infrastructure/     [ARCHITECT: system layer, STRATEGIST: performance]
+ *    ├─ integration-validator/  [INTEGRATOR: validation]
+ *    └─ quality-optimizer/      [STRATEGIST: optimization]
+ */
+
+/**
+ * ════════════════════════════════════════════════════════════════════
+ * REFINEMENT CHECKLIST: 4 Personas Sign-Off
+ * ════════════════════════════════════════════════════════════════════
+ */
+
+export const PERSONAS_CHARTER = {
+  timestamp: new Date('2025-12-09'),
+  version: '1.0',
+  status: 'IMPLEMENTED',
+  
+  architect: {
+    name: 'The Architect',
+    focus: 'System Design & Structural Integrity',
+    validations: [
+      '✓ All modules follow consistent structure (index.ts exports)',
+      '✓ Dependency flow is unidirectional (features → core → shared)',
+      '✓ Design tokens are single source of truth',
+      '✓ Module boundaries are clear and documented',
+      '✓ Design patterns are repeatable across system'
+    ],
+    artifacts: [
+      'shared/design-system/tokens/*',
+      'core/*/index.ts',
+      'features/*/model/types.ts',
+      'Architecture Decision Records'
+    ]
+  },
+
+  auditor: {
+    name: 'The Auditor',
+    focus: 'Standards Compliance & Quality Assurance',
+    validations: [
+      '✓ All public APIs properly documented with JSDoc',
+      '✓ Type annotations complete (95%+ coverage)',
+      '✓ Naming conventions consistent (camelCase, PascalCase)',
+      '✓ Error handling follows established patterns',
+      '✓ Accessibility meets WCAG AA standard'
+    ],
+    checklist: [
+      '☐ ESLint rules passing',
+      '☐ TypeScript strict mode enabled',
+      '☐ No any types without explanation',
+      '☐ Test coverage > 60% (target 85%)',
+      '☐ Security audit passed'
+    ]
+  },
+
+  integrator: {
+    name: 'The Integrator',
+    focus: 'Cross-module Cohesion & Integration',
+    validations: [
+      '✓ No circular dependency detected',
+      '✓ Cache types centralized in api/cache-manager',
+      '✓ Features use consistent core hooks',
+      '✓ Type contracts explicit between modules',
+      '✓ Public APIs have usage examples'
+    ],
+    integration_points: [
+      'core/index.ts → exports all subsystems',
+      'features/index.ts → exports all features',
+      'shared/index.ts → exports design system + infrastructure',
+      'No features→features imports',
+      'All circular deps resolved'
+    ]
+  },
+
+  strategist: {
+    name: 'The Strategist',
+    focus: 'Vision, Performance & Long-term Sustainability',
+    validations: [
+      '✓ Web Vitals targets defined and measured',
+      '✓ Performance budget in place (< 200kb gzip)',
+      '✓ Accessibility roadmap established',
+      '✓ Technical debt actively managed',
+      '✓ Developer experience prioritized'
+    ],
+    success_metrics: {
+      performance: {
+        largestContentfulPaint: '< 2500ms',
+        firstInputDelay: '< 100ms',
+        cumulativeLayoutShift: '< 0.1',
+        bundleSize: '< 200kb (gzip)'
+      },
+      quality: {
+        typeCompleteness: '95%+',
+        testCoverage: '85%+',
+        accessibilityScore: '95+'
+      },
+      sustainability: {
+        onboardingTime: '< 1 week',
+        bugResponseTime: '< 2 hours',
+        securityVulnerabilities: '0'
+      }
+    }
+  }
+} as const;
+
+export type PersonasCharterType = typeof PERSONAS_CHARTER;

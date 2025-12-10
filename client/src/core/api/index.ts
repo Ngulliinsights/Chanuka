@@ -123,5 +123,20 @@ export { globalApiClient } from './client';
 // Types
 export * from './types';
 
+// Error handling
+export {
+  type APIErrorCode,
+  type APIErrorDetails,
+  type APIError,
+  NetworkError,
+  TimeoutError,
+  ValidationError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ServerError,
+  createAPIError
+} from './errors';
+
 // Re-export error types for convenience
 export { ErrorDomain, ErrorSeverity } from '../error';

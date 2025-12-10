@@ -7,8 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-import { getBrowserInfo } from '@client/core';
-import { runBrowserCompatibilityTests, CompatibilityTestSuite } from '@client/utils/browser-compatibility-tests';
+import { getBrowserInfo, getBrowserCompatibilityStatus, getCompatibilityWarnings } from '@client/core/browser';
 import { logger } from '@client/utils/logger';
 
 import BrowserCompatibilityTester from './BrowserCompatibilityTester';
@@ -23,30 +22,19 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
   onIssuesDetected
 }) => {
   const [browserInfo] = useState(() => getBrowserInfo());
-  const [testResults, setTestResults] = useState<CompatibilityTestSuite | null>(null);
+  const [compatibilityStatus] = useState(() => getBrowserCompatibilityStatus());
+  const [warnings] = useState(() => getCompatibilityWarnings());
   const [showTester, setShowTester] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Run basic compatibility check on mount
-    const runBasicCheck = async () => {
-      try {
-        const results = await runBrowserCompatibilityTests();
-        setTestResults(results);
-        
-        const criticalCount = results.criticalIssues.length;
-        const highCount = results.testResults.filter(t => !t.passed && t.severity === 'high').length;
-        
-        onIssuesDetected?.(criticalCount, highCount);
-      } catch (error) {
-        logger.error('Failed to run compatibility check:', { component: 'Chanuka' }, error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    runBasicCheck();
-  }, [onIssuesDetected]);
+    // Check for issues on mount
+    if (compatibilityStatus) {
+      const criticalCount = compatibilityStatus.score < 50 ? 1 : 0;
+      const highCount = warnings.length;
+      onIssuesDetected?.(criticalCount, highCount);
+    }
+  }, [onIssuesDetected, compatibilityStatus, warnings]);
 
   const getBrowserIcon = (browserName: string) => {
     switch (browserName) {

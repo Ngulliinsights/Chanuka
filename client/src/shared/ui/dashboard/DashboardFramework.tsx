@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { cn } from '@client/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   DashboardFrameworkProps,

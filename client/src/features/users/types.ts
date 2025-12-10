@@ -1,20 +1,6 @@
 // Users feature types
-import { User } from '../../types/core';
-
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  avatar?: string;
-  bio?: string;
-  location?: string;
-  interests: string[];
-  expertise: string[];
-  socialLinks: SocialLinks;
-  privacy_settings: PrivacySettings;
-  notificationPreferences: NotificationPreferences;
-}
+import { User, Bill } from '../../types/core';
+import { BillRecommendation } from '../../types/user-dashboard';
 
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
@@ -148,7 +134,7 @@ export interface SavedBillsFilters {
 }
 
 export interface SavedBillsResponse {
-  bills: any[];
+  bills: Bill[];
   total: number;
   page: number;
   totalPages: number;
@@ -162,8 +148,16 @@ export interface EngagementHistoryFilters {
   date_to?: string;
 }
 
+export interface EngagementHistoryItem {
+  action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
+  entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
+  entity_id: string;
+  timestamp: string;
+  metadata?: Record<string, unknown>;
+}
+
 export interface EngagementHistoryResponse {
-  history: any[];
+  history: EngagementHistoryItem[];
   total: number;
   page: number;
   totalPages: number;
@@ -175,24 +169,58 @@ export interface EngagementHistoryResponse {
   };
 }
 
-export interface EngagementAction {
-  action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
-  entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
-  entity_id: string;
-  metadata?: Record<string, any>;
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  bio?: string;
+  joined_date: string;
+  civic_score: number;
+  badge_count: number;
+  verification_status: 'unverified' | 'verified' | 'expert';
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  earned_at: string;
+  category: 'participation' | 'quality' | 'influence' | 'consistency';
+  icon?: string;
+}
+
+export interface Milestone {
+  id: string;
+  title: string;
+  description: string;
+  threshold: number;
+  current_progress: number;
+  target_date?: string;
+  reward?: string;
+}
+
+export interface Notification {
+  id: string;
+  type: 'bill_status' | 'new_comment' | 'expert_analysis' | 'system';
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  action_url?: string;
 }
 
 export interface DashboardData {
-  profile: any;
-  recent_activity: any[];
-  saved_bills: any[];
-  trending_bills: any[];
-  recommendations: any[];
-  notifications: any[];
+  profile: UserProfile;
+  recent_activity: EngagementHistoryItem[];
+  saved_bills: Bill[];
+  trending_bills: Bill[];
+  recommendations: BillRecommendation[];
+  notifications: Notification[];
   civic_score_trend: Array<{ date: string; score: number }>;
   achievements_progress: {
-    recent_badges: any[];
-    next_milestones: any[];
+    recent_badges: Achievement[];
+    next_milestones: Milestone[];
   };
 }
 

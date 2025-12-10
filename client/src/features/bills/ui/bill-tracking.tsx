@@ -11,15 +11,15 @@ import {
 } from 'lucide-react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Label } from '@client/shared/design-system/primitives/label';
-import { Separator } from '@client/shared/design-system/primitives/separator';
-import { Switch } from '@client/shared/design-system/primitives/switch';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Label } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
+import { Switch } from '@client/shared/design-system';
 import { useSafeQuery } from '@client/hooks/use-safe-query';
 import { useToast } from '@client/hooks/use-toast';
-import { authenticatedApi } from '@client/utils/api';
+import { globalApiClient } from '@client/core/api/client';
 
 interface BillTrackingProps {
   bill_id: number;
@@ -68,13 +68,13 @@ const BillTracking = ({
   // Check if user is tracking this bill and get their current preferences
   const { data: trackingStatus, isLoading: trackingLoading } = useSafeQuery<{ data: TrackingStatusResponse }>({
     queryKey: ['bill-tracking', bill_id],
-    queryFn: () => authenticatedApi.get(`/api/bill-tracking/${bill_id}/tracking-status`)
+    queryFn: () => globalApiClient.get(`/api/bill-tracking/${bill_id}/tracking-status`)
   });
 
   // Get engagement stats with longer stale time since these don't change frequently
   const { data: engagementStats } = useSafeQuery<{ data: EngagementStatsResponse }>({
     queryKey: ['bill-engagement', bill_id],
-    queryFn: () => authenticatedApi.get(`/api/bill-tracking/${bill_id}/engagement`),
+    queryFn: () => globalApiClient.get(`/api/bill-tracking/${bill_id}/engagement`),
     staleTime: 60000, // Consider data fresh for 1 minute
     refetchOnWindowFocus: false // Don't refetch when user returns to tab
   });
@@ -89,7 +89,7 @@ const BillTracking = ({
   // Track bill mutation
   const trackBillMutation = useMutation({
     mutationFn: async () => {
-      return authenticatedApi.post(`/api/bill-tracking/${bill_id}/track`, {
+      return globalApiClient.post(`/api/bill-tracking/${bill_id}/track`, {
         trackingType: 'follow',
         alertPreferences: preferences
       });
@@ -113,7 +113,7 @@ const BillTracking = ({
   // Untrack bill mutation
   const untrackBillMutation = useMutation({
     mutationFn: async () => {
-      return authenticatedApi.delete(`/api/bill-tracking/${bill_id}/track`);
+      return globalApiClient.delete(`/api/bill-tracking/${bill_id}/track`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bill-tracking', bill_id] });
@@ -134,7 +134,7 @@ const BillTracking = ({
   // Update preferences mutation - persists preference changes to backend
   const updatePreferencesMutation = useMutation({
     mutationFn: async (newPreferences: TrackingPreferences) => {
-      return authenticatedApi.patch(`/api/bill-tracking/${bill_id}/preferences`, {
+      return globalApiClient.patch(`/api/bill-tracking/${bill_id}/preferences`, {
         alertPreferences: newPreferences
       });
     },
@@ -157,7 +157,7 @@ const BillTracking = ({
   // Record view mutation - tracks bill views for analytics
   const recordViewMutation = useMutation({
     mutationFn: async () => {
-      return authenticatedApi.post(`/api/bill-tracking/${bill_id}/view`);
+      return globalApiClient.post(`/api/bill-tracking/${bill_id}/view`);
     }
   });
 

@@ -135,10 +135,19 @@ export interface TimeoutAwareLoaderProps extends LoadingStateProps {
   timeoutMessage?: string;
 }
 
+export interface ConnectionInfo {
+  isOnline: boolean;
+  connectionType: string;
+  effectiveType?: string;
+  downlink?: number;
+  rtt?: number;
+  saveData?: boolean;
+}
+
 export interface NetworkAwareLoaderProps extends LoadingStateProps {
   showNetworkDetails?: boolean;
   adaptToConnection?: boolean;
-  onConnectionChange?: (connectionInfo: any) => void;
+  onConnectionChange?: (connectionInfo: ConnectionInfo) => void;
 }
 
 export interface LoadingStateManagerProps {

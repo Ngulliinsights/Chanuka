@@ -2,7 +2,7 @@ import { Calendar, Clock, Users, Eye, Bookmark, MessageCircle, Share2 } from 'lu
 import React from 'react';
 
 import type { Bill } from '@client/types/core';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
+import { Badge } from '@client/shared/design-system';
 
 interface BillHeaderProps {
   bill: Bill;

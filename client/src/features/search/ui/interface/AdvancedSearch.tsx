@@ -19,30 +19,30 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@client/shared/design-system/primitives/collapsible';
+} from '@client/shared/design-system';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@client/shared/design-system/primitives/dialog';
-import { Input } from '@client/shared/design-system/primitives/input';
-import { Label } from '@client/shared/design-system/primitives/label';
-import { Separator } from '@client/shared/design-system/primitives/separator';
-import { Switch } from '@client/shared/design-system/primitives/switch';
+} from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
+import { Label } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
+import { Switch } from '@client/shared/design-system';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@client/shared/design-system/primitives/tooltip';
+} from '@client/shared/design-system';
 import { useToast } from '../../../hooks/use-toast';
 import type { DualSearchRequest } from '../../services/intelligent-search';
 

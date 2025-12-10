@@ -1,7 +1,0 @@
-/* Tailwind CSS directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Import Chanuka Design System */
-@import './chanuka-design-system.css';

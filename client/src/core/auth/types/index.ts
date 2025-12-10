@@ -264,3 +264,23 @@ export interface TokenValidation {
 
 // Legacy compatibility - re-export with old names
 export type AuthUser = User;
+
+// Additional missing types
+export interface AuthSession {
+  id: string;
+  userId: string;
+  token: string;
+  refreshToken?: string;
+  expiresAt: Date;
+  createdAt: Date;
+}
+
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordReset {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}

@@ -18,7 +18,7 @@ import { ApiService } from './types';
 
 import { logger } from '@client/utils/logger';
 
-import { globalErrorHandler, ErrorFactory, ErrorCode } from './errors';
+import { ErrorFactory } from '@client/core/error';
 
 // ============================================================================
 // Type Definitions
@@ -696,12 +696,12 @@ export const globalServiceLocator = ServiceLocator.getInstance();
 // Register core services - using dynamic imports to avoid circular dependencies
 const registerCoreServices = async () => {
   try {
-    const { BillTrackingService } = await import('@client/services/billTrackingService');
-    const { WebSocketService } = await import('@client/services/webSocketService');
+    const { BillTrackingService } = await import('@client/features/bills/services/tracking');
+    // const { WebSocketService } = await import('@client/services/webSocketService');
 
     // Register services with the global locator
     globalServiceLocator.registerService('billTrackingService', BillTrackingService);
-    globalServiceLocator.registerService('webSocketService', WebSocketService);
+    // globalServiceLocator.registerService('webSocketService', WebSocketService);
 
     logger.info('Core services registered successfully', { component: 'ServiceRegistry' });
   } catch (error) {

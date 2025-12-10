@@ -1,7 +1,7 @@
 import { AlertTriangle, Shield, FileText } from 'lucide-react';
 import React from 'react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 
 export const ImplementationWorkarounds: React.FC<{ bill_id: string }> = ({ bill_id }) => {
   return (

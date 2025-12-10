@@ -4,6 +4,14 @@
  * Manages saved searches with email alert configuration and execution.
  */
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Label } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
+import { Switch } from '@client/shared/design-system';
+
 import { format } from 'date-fns';
 import {
   Search,
@@ -13,16 +21,8 @@ import {
   Bell,
   BellOff
 } from 'lucide-react';
-import { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@client/shared/design-system/interactive/Dialog';
-import { Label } from '@client/shared/design-system/primitives/typography/Label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system/primitives/select';
-import { Separator } from '@client/shared/design-system/primitives/separator';
-import { Switch } from '@client/shared/design-system/primitives/switch';
+import { useState } from 'react';
 import { useToast } from '../../../hooks/use-toast';
 
 import { useSavedSearches } from '../hooks/useSearch';
@@ -275,12 +275,14 @@ export function SavedSearches({
 
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Alert Frequency</Label>
+                        <Label id="alert-frequency-label">Alert Frequency</Label>
                         <select
+                          aria-labelledby="alert-frequency-label"
+                          aria-label="Alert Frequency"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           value={alertConfig.frequency}
                           onChange={(e) =>
-                            setAlertConfig(prev => ({ ...prev, frequency: e.target.value as 'immediate' | 'daily' | 'weekly' }))
+                            setAlertConfig(prev => ({ ...prev, frequency: (e.target as HTMLSelectElement).value as 'immediate' | 'daily' | 'weekly' }))
                           }
                         >
                           <option value="immediate">Immediate</option>
@@ -290,12 +292,13 @@ export function SavedSearches({
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Minimum Results Threshold</Label>
+                        <Label id="alert-threshold-label">Minimum Results Threshold</Label>
                         <select
+                          aria-labelledby="alert-threshold-label"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           value={alertConfig.threshold.toString()}
                           onChange={(e) =>
-                            setAlertConfig(prev => ({ ...prev, threshold: parseInt(e.target.value) }))
+                            setAlertConfig(prev => ({ ...prev, threshold: parseInt((e.target as HTMLSelectElement).value) }))
                           }
                         >
                           <option value="1">1 or more new results</option>

@@ -2,11 +2,11 @@ import { FileText, Download, Search, Copy, BookOpen, Eye, EyeOff } from 'lucide-
 import React, { useState, useMemo } from 'react';
 
 import type { Bill } from '@client/types/core';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/Card';
-import { Input } from '@client/shared/design-system/primitives/Input';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Separator } from '@client/shared/design-system/primitives/Separator';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 
 interface BillFullTextTabProps {
   bill: Bill;

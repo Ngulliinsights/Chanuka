@@ -19,10 +19,10 @@ import {
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Progress } from '@client/shared/design-system/primitives/progress';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
 import { copySystem } from '@client/content/copy-system';
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { logger } from '@client/utils/logger';

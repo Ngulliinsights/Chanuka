@@ -19,10 +19,10 @@ import {
 import { useEffect, useState, useMemo } from 'react';
 
 import { cn } from '@client/lib/utils';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Progress } from '@client/shared/design-system/primitives/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Badge } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 import { CivicScoreCard } from '../metrics/CivicScoreCard';
 

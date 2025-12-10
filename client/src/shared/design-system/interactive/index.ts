@@ -1,29 +1,60 @@
 /**
  * Design System Interactive Components
  *
- * Interactive UI components for user interactions, navigation, and state management.
+ * Interactive UI components for user interactions, form controls, selection,
+ * navigation interaction, and state management.
+ * 
+ * STRATEGIC PLACEMENT:
+ * - Basic Form Controls: Button, Input, Textarea, Select, Checkbox, Switch
+ * - Composite Selectors: Tabs, Dialog, Popover
+ * - Advanced Navigation: NavigationMenu, DropdownMenu, ContextMenu
+ * - Layout Navigation: Sidebar, Sheet
+ * - Specialized: Calendar, Collapsible, Command
+ * - Utilities: ScrollArea, Form System, Theme Toggle
  */
 
-// Calendar Components
-export { Calendar, EnhancedCalendar } from './Calendar';
+// ════════════════════════════════════════════════════════════════════
+// BASIC FORM CONTROLS (Simple, atomic interactive elements)
+// ════════════════════════════════════════════════════════════════════
 
-// Collapsible Components
-export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './Collapsible';
+export { Button, buttonVariants, type ButtonProps } from './Button';
+export { Input, inputVariants, type InputProps } from './Input';
+export { Textarea } from './Textarea';
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
+export { Checkbox, type CheckboxProps } from './Checkbox';
+export { Switch, type SwitchProps } from './Switch';
 
-// Command Components
+// ════════════════════════════════════════════════════════════════════
+// COMPOSITE SELECTION COMPONENTS (Multi-element, modal-like)
+// ════════════════════════════════════════════════════════════════════
+
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 export {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut
-} from './Command';
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  EnhancedDialog
+} from './Dialog';
 
-// Context Menu Components
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  EnhancedPopover,
+  EnhancedPopoverContent
+} from './Popover';
+
+// ════════════════════════════════════════════════════════════════════
+// ADVANCED NAVIGATION (Menu systems, complex interaction patterns)
+// ════════════════════════════════════════════════════════════════════
+
 export {
   ContextMenu,
   ContextMenuTrigger,
@@ -42,22 +73,6 @@ export {
   ContextMenuRadioGroup
 } from './ContextMenu';
 
-// Dialog Components
-export {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogClose,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-  EnhancedDialog
-} from './Dialog';
-
-// Dropdown Menu Components
 export {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -78,7 +93,6 @@ export {
   EnhancedDropdownMenuItem
 } from './DropdownMenu';
 
-// Navigation Menu Components
 export {
   navigationMenuTriggerStyle,
   NavigationMenu,
@@ -91,30 +105,22 @@ export {
   NavigationMenuViewport
 } from './NavigationMenu';
 
-// Popover Components
 export {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  EnhancedPopover,
-  EnhancedPopoverContent
-} from './Popover';
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut
+} from './Command';
 
-// Sheet Components
-export {
-  Sheet,
-  SheetPortal,
-  SheetOverlay,
-  SheetTrigger,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
-  SheetDescription
-} from './Sheet';
+// ════════════════════════════════════════════════════════════════════
+// LAYOUT NAVIGATION (Full-page navigation patterns)
+// ════════════════════════════════════════════════════════════════════
 
-// Sidebar Components
 export {
   Sidebar,
   SidebarContent,
@@ -142,33 +148,33 @@ export {
   useSidebar
 } from './Sidebar';
 
-// Tabs Components
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
+export {
+  Sheet,
+  SheetPortal,
+  SheetOverlay,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription
+} from './Sheet';
 
-// Theme Components
-export { ThemeToggle, ThemeToggleButton } from './ThemeToggle';
+// ════════════════════════════════════════════════════════════════════
+// SPECIALIZED INTERACTION (Domain-specific, complex components)
+// ════════════════════════════════════════════════════════════════════
 
-// Form Components
-export { Button, buttonVariants, type ButtonProps } from './button';
-export { Input, inputVariants, type InputProps } from './input';
-export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-export { Textarea } from './textarea';
-export { Checkbox } from './checkbox';
-export { Switch } from './switch';
+export { Calendar, EnhancedCalendar } from './Calendar';
+
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './Collapsible';
+
+// ════════════════════════════════════════════════════════════════════
+// UTILITIES & SYSTEM (Layout, scrolling, form management)
+// ════════════════════════════════════════════════════════════════════
+
 export { ScrollArea, ScrollBar } from './scroll-area';
 
-// Layout Components
-export {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  cardVariants
-} from './card';
-
-// Form System
 export {
   useFormField,
   Form,
@@ -179,3 +185,5 @@ export {
   FormMessage,
   FormField,
 } from './form';
+
+export { ThemeToggle, ThemeToggleButton } from './ThemeToggle';

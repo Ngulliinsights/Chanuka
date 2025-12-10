@@ -114,7 +114,7 @@ export interface SearchSuggestion {
   score?: number;
   frequency?: number;
   id?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AdvancedSearchOptions {
@@ -178,7 +178,7 @@ export interface SearchEvent {
   queryId: string;
   query: string;
   timestamp: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 export interface LiveSearchResult {

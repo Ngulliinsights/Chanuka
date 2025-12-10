@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { correlationIdMiddleware } from '/utils/correlation-id';
+import { correlationIdMiddleware } from '../utils/correlation-id';
 import { MiddlewareFactory } from './factory';
 // import { logger } from '../observability/logging'; // Unused import
 

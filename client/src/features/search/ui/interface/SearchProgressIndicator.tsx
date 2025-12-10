@@ -18,11 +18,11 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Card, CardContent } from '@client/shared/design-system/primitives/Card';
-import { Progress } from '@client/shared/design-system/primitives/Progress';
-import { cn } from '@client/shared/design-system/utils/cn';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
+import { cn } from '@client/shared/design-system';
 
 interface SearchProgress {
   loaded: number;

@@ -16,13 +16,13 @@ import React, { useState, useEffect } from 'react';
 
 import { SecurityDashboard } from '@client/features/security/ui/dashboard/SecurityDashboard';
 import { SecuritySettings } from '@client/features/security/ui/dashboard/SecuritySettings';
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Input } from '@client/shared/design-system/primitives/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
-import { Textarea } from '@client/shared/design-system/primitives/textarea';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Textarea } from '@client/shared/design-system';
 import { getSecuritySystem } from '@client/security';
 import { logger } from '@client/utils/logger';
 

@@ -57,10 +57,9 @@ export interface TokenInfo {
 }
 
 /**
- * Cache entry with metadata - use type from ../api/cache-manager
- * This is kept for internal use but not exported to avoid duplication
+ * Cache entry with metadata
  */
-interface CacheEntry<T = unknown> {
+export interface CacheEntry<T = unknown> {
   data: T;
   timestamp: number;
   ttl?: number;
@@ -98,10 +97,9 @@ export interface StorageStats {
 }
 
 /**
- * Cache statistics - use type from ../api/cache-manager
- * This is kept for internal use but not exported to avoid duplication
+ * Cache statistics
  */
-interface CacheStats {
+export interface CacheStats {
   memoryEntries: number;
   persistedEntries: number;
   totalSize: number;

@@ -10,20 +10,20 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/primitives/feedback/Badge';
-import { Button } from '@client/shared/design-system/primitives/button';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system/primitives/card';
+} from '@client/shared/design-system';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@client/shared/design-system/interactive/Tabs';
+} from '@client/shared/design-system';
 
 // Define types locally
 interface CivicAction {

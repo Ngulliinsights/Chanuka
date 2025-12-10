@@ -29,6 +29,8 @@ export interface CacheConfig {
   enableCompression: boolean;
   enableEncryption: boolean;
 }
+
+export interface CacheStats {
   entryCount: number;
   hitRate: number;
 }

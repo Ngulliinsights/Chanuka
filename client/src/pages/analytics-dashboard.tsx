@@ -15,10 +15,10 @@ import { EngagementDashboard } from '@client/features/analytics/ui/engagement-da
 import { JourneyAnalyticsDashboard } from '@client/features/analytics/ui/JourneyAnalyticsDashboard';
 import { RealTimeEngagementDashboard } from '@client/features/analytics/ui/real-time-engagement-dashboard';
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
 import { 
   BarChart3, 
   TrendingUp, 

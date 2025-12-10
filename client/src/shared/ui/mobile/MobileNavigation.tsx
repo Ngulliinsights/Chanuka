@@ -10,10 +10,10 @@ import { BarChart3, Search, User, Settings, ArrowLeft, Bell } from 'lucide-react
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system/primitives/avatar';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@client/shared/design-system/primitives/sheet';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@client/shared/design-system';
 import type { NavigationItem } from '@client/config';
 import { useAuth } from '@client/hooks';
 import { useMobileNavigation } from '@client/hooks/mobile/useMobileNavigation';

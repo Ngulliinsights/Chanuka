@@ -2,8 +2,8 @@ import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 
 import React, { useState } from 'react';
 
 import { Bill } from '@client/core/api/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 interface BillAnalysisProps {
   bill: Bill;

@@ -161,9 +161,13 @@ export function formatProgressTime(
     return `${minutes}m ${remainingSeconds}s`;
   };
 
-  const result = {
+  const result: {
+    elapsed: string;
+    remaining?: string;
+    estimated?: string;
+  } = {
     elapsed: formatTime(elapsedSeconds),
-  } as any;
+  };
 
   if (estimateTotal && progress > 0 && progress < 100) {
     const estimatedTotal = (elapsed / progress) * 100;

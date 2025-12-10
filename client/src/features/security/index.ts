@@ -1,7 +1,7 @@
 /**
- * security Feature
+ * Security Feature - Privacy & Data Protection
  * Feature-Sliced Design exports
  */
 
-// UI layer
+// UI Components
 export * from './ui';

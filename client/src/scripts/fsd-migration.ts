@@ -190,11 +190,11 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
  */
 const IMPORT_MAPPINGS = {
   // Design System imports
-  '@client/shared/design-system/primitives/button': '@client/shared/design-system/primitives/Button',
-  '@client/shared/design-system/primitives/input': '@client/shared/design-system/primitives/Input',
-  '@client/shared/design-system/primitives/card': '@client/shared/design-system/primitives/Card',
-  '@client/shared/design-system/primitives/badge': '@client/shared/design-system/primitives/Badge',
-  '@client/shared/design-system/primitives/alert': '@client/shared/design-system/feedback/Alert',
+  '@client/shared/design-system/button': '@client/shared/design-system/Button',
+  '@client/shared/design-system/input': '@client/shared/design-system/Input',
+  '@client/shared/design-system/card': '@client/shared/design-system/Card',
+  '@client/shared/design-system/badge': '@client/shared/design-system/Badge',
+  '@client/shared/design-system/alert': '@client/shared/design-system/feedback/Alert',
 
   // Shared UI imports
   '@client/components/layout': '@client/shared/ui/layout',

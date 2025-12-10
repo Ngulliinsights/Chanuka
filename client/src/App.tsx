@@ -10,7 +10,7 @@ import { LoadingStates } from '@client/shared/ui/loading/LoadingStates';
 import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
 import { UserJourneyOptimizer } from '@client/features/users/ui/onboarding/UserJourneyOptimizer';
 import { CookieConsentBanner } from '@client/features/security/ui/privacy/CookieConsentBanner';
-import { Toaster } from '@client/shared/design-system/feedback/Toaster';
+import { Toaster } from '@client/shared/design-system';
 
 import { useIsMobile } from '@client/hooks/use-mobile';
 import { logger } from '@client/utils/logger';

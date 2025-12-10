@@ -6,14 +6,14 @@
 export interface CommunityWebSocketExtension {
   connect(): Promise<void>;
   disconnect(): void;
-  subscribeToUpdates(callback: (data: any) => void): () => void;
-  sendMessage(message: any): void;
+  subscribeToUpdates(callback: (data: Record<string, unknown>) => void): () => void;
+  sendMessage(message: Record<string, unknown>): void;
   isConnected(): boolean;
 }
 
 export class CommunityWebSocketManager implements CommunityWebSocketExtension {
   private ws: WebSocket | null = null;
-  private callbacks: Set<(data: any) => void> = new Set();
+  private callbacks: Set<(data: Record<string, unknown>) => void> = new Set();
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
@@ -27,7 +27,7 @@ export class CommunityWebSocketManager implements CommunityWebSocketExtension {
       try {
         // Use mock WebSocket for development
         if (process.env.NODE_ENV === 'development') {
-          this.ws = new MockWebSocket() as any;
+          this.ws = new MockWebSocket() as unknown as WebSocket;
           resolve();
           return;
         }
@@ -42,7 +42,7 @@ export class CommunityWebSocketManager implements CommunityWebSocketExtension {
 
         this.ws.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data);
+            const data = JSON.parse(event.data) as Record<string, unknown>;
             this.callbacks.forEach(callback => callback(data));
           } catch (error) {
             console.error('Failed to parse WebSocket message:', error);
@@ -71,14 +71,14 @@ export class CommunityWebSocketManager implements CommunityWebSocketExtension {
     this.callbacks.clear();
   }
 
-  subscribeToUpdates(callback: (data: any) => void): () => void {
+  subscribeToUpdates(callback: (data: Record<string, unknown>) => void): () => void {
     this.callbacks.add(callback);
     return () => {
       this.callbacks.delete(callback);
     };
   }
 
-  sendMessage(message: any): void {
+  sendMessage(message: Record<string, unknown>): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
     }

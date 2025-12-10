@@ -20,10 +20,10 @@ import {
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/Card';
-import { cn } from '@client/shared/design-system/utils/cn';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { cn } from '@client/shared/design-system';
 
 interface BillCardProps {
   bill: Bill;

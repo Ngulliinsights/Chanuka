@@ -54,8 +54,8 @@ The Chanuka platform is built on a comprehensive architecture that includes:
 
 ## 📖 Related Documentation
 
-- [Main Architecture](../architecture.md) - High-level system architecture
-- [Project Structure](../project-structure.md) - Codebase organization
-- [Setup Guide](../setup.md) - Development environment setup
+- [Main Architecture](../active/detailed-architecture.md) - High-level system architecture
+- [Project Structure](../reference/project-structure.md) - Codebase organization
+- [Setup Guide](../active/setup.md) - Development environment setup
 
 For questions or contributions, please refer to the main project documentation.

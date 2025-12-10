@@ -11,9 +11,9 @@ import AppLayout from '@client/shared/ui/layout/app-layout';
 // Import consolidated components
 import { UserDashboard } from '@client/components/shared/dashboard';
 import { PrivacyManager } from '@client/components/shared/privacy/PrivacyManager';
-import { Alert, AlertDescription } from '@client/shared/design-system/primitives/alert';
-import { Card, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/primitives/tabs';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Card, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { AccessibilitySettingsSection } from '@client/core/auth';
 import { UserAccountIntegration } from '@client/core/auth';
 import { UserProfileSection } from '@client/core/auth';

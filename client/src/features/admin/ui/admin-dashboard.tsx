@@ -2,15 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Users, FileText, MessageSquare as MessageCircle, Shield, Settings, Database, Activity } from 'lucide-react';
 import { useState } from 'react';
 
-import { authenticatedApi } from '@client/utils/api';
+import { globalApiClient } from '@client/core/api/client';
 import { logger } from '@client/utils/logger';
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
-import { MonitoringDashboard } from '../monitoring/monitoring-dashboard';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Progress } from '../ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+// import { MonitoringDashboard } from '../monitoring/monitoring-dashboard';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {
@@ -58,13 +54,13 @@ const useAdminStats = () => {
   return useQuery<AdminStats>({
     queryKey: ['admin', 'stats'],
     queryFn: async () => {
-      const response = await authenticatedApi.get<AdminStats>('/api/admin/dashboard/stats');
+      const response = await globalApiClient.get<AdminStats>('/api/admin/dashboard/stats');
 
       return response.data;
     },
     refetchInterval: 30000, // Refresh every 30 seconds
     staleTime: 25000, // Consider data stale after 25 seconds
-    retry: 1, // Let AuthenticatedAPI handle retries
+    retry: 1, // Let globalApiClient handle retries
     gcTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 };
@@ -74,13 +70,13 @@ const useSystemHealth = () => {
   return useQuery<SystemHealth>({
     queryKey: ['admin', 'health'],
     queryFn: async () => {
-      const response = await authenticatedApi.get<SystemHealth>('/api/admin/health');
+      const response = await globalApiClient.get<SystemHealth>('/api/admin/health');
 
       return response.data;
     },
     refetchInterval: 10000, // Refresh every 10 seconds
     staleTime: 8000, // Consider data stale after 8 seconds
-    retry: 1, // Let AuthenticatedAPI handle retries
+    retry: 1, // Let globalApiClient handle retries
     gcTime: 2 * 60 * 1000, // Cache for 2 minutes
   });
 };

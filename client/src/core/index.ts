@@ -221,6 +221,15 @@ export * from './dashboard';
 export * from './navigation';
 
 // ============================================================================
+// Core Type Exports (Consolidated)
+// ============================================================================
+
+// Export core domain types from consolidated locations
+export type { Bill, Comment, User, CommentStatus, Sponsor, BillAnalysis } from '../types/core';
+export type { UserProfile, UserPreferences as FeatureUserPreferences } from '../features/users/types';
+export type { SearchQuery, SearchResult, SearchFilters, SearchResponse, SearchMetadata } from '../features/search/types';
+
+// ============================================================================
 // Default Export
 // ============================================================================
 

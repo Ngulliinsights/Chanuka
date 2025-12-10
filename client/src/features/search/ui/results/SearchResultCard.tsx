@@ -21,10 +21,10 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/feedback';
-import { Tooltip } from '@client/shared/design-system/feedback';
-import { Button } from '@client/shared/design-system/primitives';
-import { Card, CardContent } from '@client/shared/design-system/primitives';
+import { Badge } from '@client/shared/design-system';
+import { Tooltip } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
 import { useToast } from '../../../hooks/use-toast';
 import type { SearchResult, SearchHighlight } from '../../types';
 import { cn } from '../../../lib/utils';

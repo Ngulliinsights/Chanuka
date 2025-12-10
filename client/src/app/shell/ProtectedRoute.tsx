@@ -1,13 +1,12 @@
-import { Shield, Lock, UserX, AlertTriangle } from 'lucide-react';
+import { Shield, Lock, UserCheck, AlertTriangle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
-import { LoadingStateManager } from '../loading/LoadingStates';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Button } from '../ui/button';
+import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
+import { Alert, AlertDescription, Button } from '@client/shared/design-system';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -36,7 +35,7 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
   const getIcon = () => {
     switch (reason) {
       case 'unauthenticated':
-        return <UserX className="h-12 w-12 text-blue-500" />;
+        return <UserCheck className="h-12 w-12 text-blue-500" />;
       case 'insufficient_role':
         return <Shield className="h-12 w-12 text-orange-500" />;
       case 'unverified':

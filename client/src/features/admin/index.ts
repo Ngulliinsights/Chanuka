@@ -1,7 +1,7 @@
 /**
- * admin Feature
+ * Admin Feature - System Administration & Monitoring
  * Feature-Sliced Design exports
  */
 
-// UI layer
+// UI Components
 export * from './ui';

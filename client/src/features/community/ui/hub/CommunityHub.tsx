@@ -23,10 +23,10 @@ import {
 import { useEffect, useState, useCallback } from 'react';
 
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
-import { cn } from '@client/shared/design-system/utils/cn';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Card, CardContent } from '@client/shared/design-system/primitives/Card';
+import { cn } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
 
 interface ExpertInsight {
   id: number;

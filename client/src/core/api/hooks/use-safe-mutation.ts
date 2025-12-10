@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 
-import { AuthenticatedApiClient } from '@client/utils/api';
+import { globalApiClient } from '@client/core/api';
 
 /**
  * A wrapper around React Query's useMutation that provides a simplified API for common mutations.
@@ -30,7 +30,7 @@ export function useSafePost<TData = any, TVariables = any>(
   options?: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'>
 ) {
   return useSafeMutation<TData, Error, TVariables>(
-    (variables: TVariables) => AuthenticatedAPI.post(endpoint, variables).then(res => res.data as TData),
+    (variables: TVariables) => globalApiClient.post(endpoint, variables).then(res => res.data as TData),
     options
   );
 }
@@ -46,7 +46,7 @@ export function useSafePut<TData = any, TVariables = any>(
   options?: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'>
 ) {
   return useSafeMutation<TData, Error, TVariables>(
-    (variables: TVariables) => AuthenticatedAPI.put(endpoint, variables).then(res => res.data as TData),
+    (variables: TVariables) => globalApiClient.put(endpoint, variables).then(res => res.data as TData),
     options
   );
 }
@@ -62,7 +62,7 @@ export function useSafeDelete<TData = any>(
   options?: Omit<UseMutationOptions<TData, Error, void>, 'mutationFn'>
 ) {
   return useSafeMutation<TData, Error, void>(
-    () => AuthenticatedAPI.delete(endpoint).then(res => res.data as TData),
+    () => globalApiClient.delete(endpoint).then(res => res.data as TData),
     options
   );
 }

@@ -66,7 +66,7 @@ export interface CommentPayload { content: string;
 
 export interface EngagementPayload { user_id: string;
   engagement_type: 'view' | 'share' | 'bookmark' | 'comment';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
  }
 
 // API response types

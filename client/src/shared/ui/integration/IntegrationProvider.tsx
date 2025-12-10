@@ -152,7 +152,7 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
         
         // Initialize UI recovery strategies
         try {
-          const { initializeUIRecoveryStrategies } = await import('@client/shared/design-system/primitives/recovery');
+          const { initializeUIRecoveryStrategies } = await import('@client/shared/design-system/recovery');
           initializeUIRecoveryStrategies();
           
           logger.info('UI component system integrated', {

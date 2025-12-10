@@ -15,11 +15,11 @@ import {
 import { useState } from 'react';
 
 import type { Bill } from '@client/types/core';
-import { Badge } from '@client/shared/design-system/primitives/Badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/primitives/Card';
-import { Progress } from '@client/shared/design-system/primitives/Progress';
-import { Button } from '@client/shared/design-system/primitives/Button';
-import { Separator } from '@client/shared/design-system/primitives/Separator';
+import { Badge } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 
 type SeverityLevel = 'low' | 'moderate' | 'high' | 'critical';
 

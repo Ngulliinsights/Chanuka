@@ -1,2 +1,3 @@
 // admin Feature UI Components
-export * from './components';
+export { default as AdminDashboard } from './admin-dashboard';
+// export * from './components';

@@ -4,9 +4,6 @@ Maximum depth: 7 levels
 
 ```
 .
-BRANCH_ANALYSIS_SUMMARY.txt
-BROWSER_ARCHITECTURE_REFACTORING.md
-BROWSER_COMPATIBILITY_GUIDE.md
 CHANGELOG.md
 clear-sw.html
 client/
@@ -61,10 +58,6 @@ client/
 │   ├── radix-bundle-analyzer.js
 │   ├── unregister-sw.js
 ├── src/
-│   ├── adapters/
-│   │   ├── seamless-shared-integration.ts
-│   │   ├── secure-storage-adapter.ts
-│   │   ├── shared-module-adapter.ts
 │   ├── app/
 │   ├── App.tsx
 │   │   ├── providers/
@@ -76,7 +69,6 @@ client/
 │   │   │   ├── NavigationBar.tsx
 │   │   │   ├── ProtectedRoute.tsx
 │   │   │   ├── SkipLinks.tsx
-│   ├── COMMUNITY_MIGRATION_COMPLETE.md
 │   ├── components/
 │   │   ├── AppProviders.tsx
 │   │   ├── hooks/
@@ -96,7 +88,6 @@ client/
 │   │   │   │   ├── controls/
 │   │   │   ├── utils/
 │   │   ├── transparency/
-│   ├── COMPONENTS_CONSOLIDATION_STRATEGY.md
 │   ├── config/
 │   │   ├── api.ts
 │   │   ├── development.ts
@@ -162,6 +153,9 @@ client/
 │   │   │   │   ├── auth-errors.ts
 │   │   │   ├── hooks/
 │   │   │   │   ├── useAuth.tsx
+│   │   │   ├── http/
+│   │   │   │   ├── authenticated-client.ts
+│   │   │   │   ├── authentication-interceptors.ts
 │   │   │   ├── index.ts
 │   │   │   ├── initialization.ts
 │   │   │   ├── MIGRATION.md
@@ -181,6 +175,9 @@ client/
 │   │   │   ├── types/
 │   │   │   │   ├── index.ts
 │   │   │   ├── utils/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── permission-helpers.ts
+│   │   │   │   ├── storage-helpers.ts
 │   │   │   │   ├── validation.ts
 │   │   ├── browser/
 │   │   │   ├── BrowserCompatibilityChecker.tsx
@@ -332,18 +329,9 @@ client/
 │   │   │   ├── loaders.ts
 │   │   │   ├── realtime.ts
 │   │   │   ├── users.ts
-│   ├── DEBUGGING_COMPLETE_SUMMARY.md
 │   ├── demo/
 │   │   ├── community-integration-demo.ts
-│   ├── DESIGN_SYSTEM_APPROACH_RATIONALE.md
-│   ├── DESIGN_SYSTEM_CONSOLIDATION_PLAN.md
-│   ├── DESIGN_SYSTEM_CRITICAL_ANALYSIS.md
-│   ├── DESIGN_SYSTEM_INCONSISTENCY_ANALYSIS.md
-│   ├── DESIGN_SYSTEM_VALIDATION_REPORT.md
 │   ├── DevWrapper.tsx
-│   ├── docs/
-│   │   ├── accessibility-guide.md
-│   │   ├── community-data-integration-summary.md
 │   ├── emergency-styles.css
 │   ├── examples/
 │   │   ├── render-tracking-usage.tsx
@@ -463,6 +451,7 @@ client/
 │   │   │   │   ├── hub/
 │   │   │   │   │   ├── CommunityHub.tsx
 │   │   │   │   ├── index.ts
+│   │   ├── index.ts
 │   │   ├── pretext-detection/
 │   │   │   ├── demo.md
 │   │   │   ├── hooks/
@@ -556,18 +545,6 @@ client/
 │   │   │   │   │   ├── README.md
 │   │   │   │   │   ├── verification-list.tsx
 │   │   │   │   │   ├── VerificationWorkflow.tsx
-│   ├── FEATURES_CONSISTENCY_ANALYSIS.md
-│   ├── FEATURES_CORE_INTEGRATION_ANALYSIS.md
-│   ├── FINAL_VALIDATION_REPORT.md
-│   ├── FSD_COMPLETION_PLAN.md
-│   ├── FSD_MIGRATION_REALITY_CHECK.md
-│   ├── FSD_MIGRATION_STATUS.md
-│   ├── FSD_PHASE2_COMPLETE.md
-│   ├── FSD_PHASE3_COMPLETE.md
-│   ├── FSD_PHASE3_PROGRESS.md
-│   ├── FSD_PHASE4_COMPLETE.md
-│   ├── FSD_PHASE5_COMPLETE.md
-│   ├── FSD_REORGANIZATION_PLAN.md
 │   ├── hooks/
 │   │   ├── index.ts
 │   │   ├── mobile/
@@ -610,13 +587,7 @@ client/
 │   │   ├── use-system.tsx
 │   │   ├── use-toast.ts
 │   │   ├── use-websocket.ts
-│   ├── IMPLEMENTATION_COMPARISON_ANALYSIS.md
-│   ├── IMPORT_UPDATE_SUMMARY.md
 │   ├── index.css
-│   ├── INFRASTRUCTURE_INTEGRATION_SUMMARY.md
-│   ├── INTEGRATION_STATUS_REPORT.md
-│   ├── LEGACY_MIGRATION_COMPLETE.md
-│   ├── LEGACY_MIGRATION_STRATEGY.md
 │   ├── lib/
 │   │   ├── form-builder.tsx
 │   │   ├── protected-route.tsx
@@ -626,7 +597,6 @@ client/
 │   │   ├── validation-schemas.test.ts
 │   │   ├── validation-schemas.ts
 │   ├── main.tsx
-│   ├── MIGRATION_SUMMARY.md
 │   ├── monitoring/
 │   │   ├── error-monitoring.ts
 │   │   ├── index.ts
@@ -696,22 +666,14 @@ client/
 │   ├── security/
 │   │   ├── config/
 │   │   │   ├── security-config.ts
-│   │   ├── csp/
-│   │   │   ├── CSPManager.ts
 │   │   ├── csp-manager.ts
 │   │   ├── csp-nonce.ts
-│   │   ├── csrf/
-│   │   │   ├── CSRFProtection.ts
 │   │   ├── csrf-protection.ts
 │   │   ├── headers/
 │   │   │   ├── SecurityHeaders.ts
 │   │   ├── index.ts
 │   │   ├── input-sanitizer.ts
 │   │   ├── rate-limiter.ts
-│   │   ├── rate-limiting/
-│   │   │   ├── RateLimiter.ts
-│   │   ├── sanitization/
-│   │   │   ├── InputSanitizer.ts
 │   │   ├── security-monitor.ts
 │   │   ├── security-service.ts
 │   │   ├── types/
@@ -735,11 +697,10 @@ client/
 │   │   ├── UserJourneyTracker.ts
 │   │   ├── userService.ts
 │   │   ├── webSocketService.ts
-│   ├── SERVICES_INTEGRATION_COMPLETE.md
-│   ├── SERVICES_INTEGRATION_EXECUTION.md
-│   ├── SERVICES_INTEGRATION_PLAN.md
 │   ├── shared/
 │   │   ├── design-system/
+│   │   │   ├── 4-personas-charter.ts.txt
+│   │   │   ├── 4-personas-implementation-guide.ts
 │   │   │   ├── accessibility/
 │   │   │   │   ├── contrast.ts
 │   │   │   │   ├── focus.ts
@@ -747,25 +708,17 @@ client/
 │   │   │   │   ├── motion.ts
 │   │   │   │   ├── touch.ts
 │   │   │   │   ├── typography.ts
-│   │   │   ├── components/
-│   │   │   │   ├── Alert.tsx
-│   │   │   │   ├── Avatar.tsx
-│   │   │   │   ├── Badge.tsx
-│   │   │   │   ├── Button.tsx
-│   │   │   │   ├── Card.tsx
-│   │   │   │   ├── Checkbox.tsx
-│   │   │   │   ├── Dialog.tsx
-│   │   │   │   ├── Input.tsx
-│   │   │   │   ├── Popover.tsx
-│   │   │   │   ├── Progress.tsx
-│   │   │   │   ├── Select.tsx
-│   │   │   │   ├── Switch.tsx
-│   │   │   │   ├── Tabs.tsx
-│   │   │   │   ├── Textarea.tsx
+│   │   │   ├── COMPLETION_REPORT.ts
+│   │   │   ├── COMPONENT_FLATTENING_EXECUTION_REPORT.ts
+│   │   │   ├── COMPONENT_FLATTENING_STRATEGY.ts
+│   │   │   ├── DIRECTORY_VALIDATION_FRAMEWORK.ts
 │   │   │   ├── feedback/
+│   │   │   │   ├── Alert.tsx
+│   │   │   │   ├── Badge.tsx
 │   │   │   │   ├── ErrorMessage.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── LoadingSpinner.tsx
+│   │   │   │   ├── Progress.tsx
 │   │   │   │   ├── separator.tsx
 │   │   │   │   ├── skeleton.tsx
 │   │   │   │   ├── table.tsx
@@ -773,25 +726,47 @@ client/
 │   │   │   │   ├── Toaster.tsx
 │   │   │   │   ├── Tooltip.tsx
 │   │   │   ├── index.ts
+│   │   │   ├── integration.ts
 │   │   │   ├── interactive/
+│   │   │   │   ├── Button.tsx
 │   │   │   │   ├── Calendar.tsx
+│   │   │   │   ├── Checkbox.tsx
 │   │   │   │   ├── Collapsible.tsx
 │   │   │   │   ├── Command.tsx
 │   │   │   │   ├── ContextMenu.tsx
+│   │   │   │   ├── Dialog.tsx
 │   │   │   │   ├── DropdownMenu.tsx
+│   │   │   │   ├── errors.ts
 │   │   │   │   ├── form.tsx
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── Input.tsx
 │   │   │   │   ├── NavigationMenu.tsx
+│   │   │   │   ├── Popover.tsx
+│   │   │   │   ├── recovery.ts
 │   │   │   │   ├── scroll-area.tsx
+│   │   │   │   ├── Select.tsx
+│   │   │   │   ├── separator.tsx
 │   │   │   │   ├── Sheet.tsx
 │   │   │   │   ├── Sidebar.tsx
+│   │   │   │   ├── skeleton.tsx
+│   │   │   │   ├── Switch.tsx
+│   │   │   │   ├── Tabs.tsx
+│   │   │   │   ├── Textarea.tsx
 │   │   │   │   ├── ThemeToggle.tsx
+│   │   │   │   ├── tooltip.tsx
+│   │   │   │   ├── types.ts
+│   │   │   │   ├── validation.ts
 │   │   │   ├── lib/
+│   │   │   │   ├── utils.ts
 │   │   │   ├── media/
+│   │   │   │   ├── Avatar.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── Logo.tsx
 │   │   │   │   ├── OptimizedImage.tsx
+│   │   │   ├── MIGRATION_SUMMARY.ts
+│   │   │   ├── quality.ts
 │   │   │   ├── README.md
+│   │   │   ├── REFINEMENT_STRATEGY.ts
 │   │   │   ├── responsive.css
 │   │   │   ├── responsive.ts
 │   │   │   ├── standards/
@@ -803,6 +778,7 @@ client/
 │   │   │   │   ├── interactive-states.ts
 │   │   │   │   ├── loading-states.ts
 │   │   │   │   ├── typography.ts
+│   │   │   ├── strategy.ts
 │   │   │   ├── styles/
 │   │   │   │   ├── accessibility.css
 │   │   │   │   ├── base/
@@ -845,9 +821,11 @@ client/
 │   │   │   │   ├── typography.ts
 │   │   │   │   ├── unified.ts
 │   │   │   │   ├── unified-export.ts
+│   │   │   │   ├── validation.ts
 │   │   │   ├── types/
 │   │   │   │   ├── component-types.ts
 │   │   │   ├── typography/
+│   │   │   │   ├── Card.tsx
 │   │   │   │   ├── heading.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── Label.tsx
@@ -855,8 +833,10 @@ client/
 │   │   │   ├── utils/
 │   │   │   │   ├── cn.ts
 │   │   │   │   ├── contrast.ts
+│   │   │   │   ├── errors.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── performance.ts
+│   │   │   │   ├── recovery.ts
 │   │   │   │   ├── responsive.ts
 │   │   │   │   ├── validation.ts
 │   │   ├── index.ts
@@ -867,6 +847,8 @@ client/
 │   │   │   ├── data-retention.ts
 │   │   │   ├── index.ts
 │   │   │   ├── INTEGRATION_COMPLETE.md
+│   │   │   ├── integration-validator.ts
+│   │   │   ├── quality-optimizer.ts
 │   │   │   ├── system/
 │   │   │   │   ├── HealthCheck.tsx
 │   │   ├── interfaces/
@@ -1101,8 +1083,8 @@ client/
 │   │   │   │   ├── index.ts
 │   │   ├── validation/
 │   │   │   ├── base-validation.ts
+│   │   │   ├── consolidated.ts
 │   │   │   ├── index.ts
-│   ├── SHARED_VS_CORE_ANALYSIS.md
 │   ├── store/
 │   │   ├── hooks.ts
 │   │   ├── index.ts
@@ -1128,8 +1110,6 @@ client/
 │   │   ├── database-stub.ts
 │   │   ├── middleware-stub.ts
 │   ├── test-styles.html
-│   ├── THEME_INCONSISTENCY_ANALYSIS.md
-│   ├── TYPE_CONSOLIDATION_COMPLETE.md
 │   ├── types/
 │   │   ├── api.ts
 │   │   ├── auth.ts
@@ -1155,20 +1135,14 @@ client/
 │   │   ├── shims-shared.d.ts
 │   │   ├── shims-web-vitals.d.ts
 │   │   ├── user-dashboard.ts
-│   ├── update-fsd-imports.js
 │   ├── utils/
-│   │   ├── archive/
-│   │   │   ├── advanced-error-recovery.ts
-│   │   │   ├── connectionAwareLoading.ts
-│   │   │   ├── development-error-recovery.ts
-│   │   │   ├── index.ts
-│   │   │   ├── super-aggressive-suppressor.ts
 │   │   ├── assets.ts
 │   │   ├── backgroundSyncManager.ts
 │   │   ├── bundle-analyzer.ts
 │   │   ├── cacheInvalidation.ts
 │   │   ├── cn.ts
 │   │   ├── comprehensiveLoading.ts
+│   │   ├── contrast.ts
 │   │   ├── demo-data-service.ts
 │   │   ├── emergency-triage.ts
 │   │   ├── env-config.ts
@@ -1191,11 +1165,11 @@ client/
 │   │   ├── route-validation.ts
 │   │   ├── safe-lazy-loading.tsx
 │   │   ├── security.ts
+│   │   ├── service-recovery.ts
 │   │   ├── serviceWorker.ts
 │   │   ├── tracing.ts
 │   ├── validation/
 │   │   ├── index.ts
-│   ├── VALIDATION_CLEANUP_PLAN.md
 │   ├── vite-env.d.ts
 ├── tailwind.config.ts
 ├── tsconfig.json
@@ -1205,7 +1179,7 @@ client/
 ├── vite.config.ts.timestamp-1764112502714-cf9fd8625f552.mjs
 ├── vite.production.config.ts
 ├── vite-plugin-suppress-warnings.js
-components.json
+consolidate-directories.sh
 cspell.config.yaml
 deployment/
 ├── cdn-config.js
@@ -1216,34 +1190,24 @@ deployment/
 ├── monitoring-dashboards.js
 ├── pipeline-config.yml
 ├── README.md
+DIRECTORY_CONSOLIDATION_ANALYSIS.md
 docker-compose.yml
 Dockerfile
 Dockerfile.client
 docs/
-├── analysis/
-│   ├── chanuka_implementation_guide.md
-│   ├── civic_engagement_framework.md
-│   ├── codebase-analysis.md
-│   ├── constitutional_analysis_framework.md
-│   ├── CRITICAL_FIXES_ROADMAP.md
-│   ├── discussion_community_integration_analysis.md
-│   ├── DISCUSSION_COMMUNITY_INTEGRATION_ANALYSIS_VALIDATED.md
-│   ├── legislative_framework.md
-│   ├── performance-budget-report.md
-│   ├── PHASE1_COMPLETE_SUMMARY.md
-│   ├── RACE_CONDITION_FIXES_SUMMARY.md
-│   ├── race-condition-analysis-report.md
-│   ├── STRATEGIC_MERGE_IMPLEMENTATION_GUIDE.md
-│   ├── UTILITY_CONSOLIDATION_PLAN.md
-│   ├── utils-usage-report.md
-├── API.md
+├── active/
+│   ├── configuration-guide.md
+│   ├── developer-onboarding.md
+│   ├── setup.md
+│   ├── troubleshooting-guide.md
 ├── architecture/
-├── architecture.md
 │   ├── ai-code-review/
 │   │   ├── design.md
 │   │   ├── implementation.md
 │   │   ├── requirements.md
 │   ├── application-flow.md
+│   ├── architecture.md
+│   ├── chanuka_architecture.txt
 │   ├── frameworks/
 │   │   ├── comprehensive-code-analysis.md
 │   │   ├── synthesis.md
@@ -1251,98 +1215,7 @@ docs/
 │   │   ├── unified-code-analysis.md
 │   │   ├── unified-code-analysis-v2.md
 │   │   ├── unified-coding.md
-├── archive/
-│   ├── 00_START_HERE.md
-│   ├── chanuka_webapp_copy.md
-│   ├── ezra-nehemiah-chanuka (1).md
-│   ├── MERGE_INTEGRATION_SUMMARY.md
-│   ├── MOBILE_QUICK_REFERENCE_CARD.md
-│   ├── PHASE2_FILES_CREATED.txt
-│   ├── PHASE2_KICKOFF_SUMMARY.md
-│   ├── philosophical_threshold_poems.md
-│   ├── PRODUCTION_IMPLEMENTATION_GUIDE.md
-│   ├── strategy_template_flow.mermaid
-├── archived-scripts/
-│   ├── bill-tracking/
-│   ├── database/
-│   │   ├── migration-testing.ts
-│   │   ├── rollback-testing.ts
-│   │   ├── simple-connection-test.ts
-│   │   ├── test-connection.ts
-│   ├── financial-disclosure/
-│   │   ├── test-financial-disclosure-integration-unit.ts
-│   │   ├── test-financial-disclosure-simple.ts
-│   ├── miscellaneous/
-│   │   ├── accessibility-reporter.test.js
-│   │   ├── bug-detector.ts
-│   │   ├── run-bug-detector.ts
-│   │   ├── run-strategic-tests.cjs
-│   │   ├── schema-validation-test.ts
-│   │   ├── test-api-health.js
-│   │   ├── test-app.html
-│   │   ├── test-application.js
-│   │   ├── test-backend-only.js
-│   │   ├── test-build.js
-│   │   ├── test-comment-system.js
-│   │   ├── test-conflict-detection.ts
-│   │   ├── test-connection.html
-│   │   ├── test-financial-disclosure-integration.ts
-│   │   ├── test-imports.ts
-│   │   ├── test-minimal-server.js
-│   │   ├── test-mobile-navigation.html
-│   │   ├── test-profile-routes.ts
-│   │   ├── test-security-implementation.ts
-│   │   ├── test-security-monitoring.ts
-│   │   ├── test-security-monitoring-simple.ts
-│   │   ├── test-security-standalone.ts
-│   │   ├── test-sponsor-routes.js
-│   │   ├── test-sponsor-service.js
-│   │   ├── test-transparency-dashboard.ts
-│   │   ├── test-transparency-implementation.ts
-│   │   ├── test-user-profile-service.js
-│   │   ├── test-viewport.html
-│   │   ├── validate-user-profile.ts
-│   │   ├── verify-active-state.js
-│   │   ├── verify-alert-preferences.ts
-│   │   ├── verify-auth-system.js
-│   │   ├── verify-bill-status-monitor.ts
-│   │   ├── verify-bill-tracking.ts
-│   │   ├── verify-engagement-analytics.ts
-│   │   ├── verify-financial-disclosure-monitoring.js
-│   │   ├── verify-navigation-persistence.js
-│   │   ├── verify-notification-system.ts
-│   │   ├── verify-real-time-tracking.js
-│   │   ├── verify-transparency-task.ts
-│   │   ├── verify-user-profile-service.ts
-│   │   ├── verify-websocket-service.ts
-│   ├── README.md
-│   ├── security/
-│   │   ├── test-security-simple.cjs
-│   │   ├── test-security-simple.js
-│   ├── test-fixers/
-│   │   ├── disable-all-tests.ts
-│   │   ├── fix-failing-tests.ts
-│   │   ├── fix-navigation-tests.ts
-│   │   ├── fix-performance-tests.ts
-│   │   ├── fix-remaining-test-issues.ts
-│   │   ├── fix-schema-tests.ts
-│   │   ├── phase2-test-migration.js
-│   │   ├── test-status-summary.ts
-│   │   ├── update-test-configuration.ts
-│   │   ├── validate-test-config.js
-│   ├── transparency/
-│   │   ├── transparency-dashboard.js
-│   │   ├── transparency-dashboard-simple.js
-│   ├── user-profile/
-│   │   ├── validate-user-profile.js
-│   │   ├── validate-user-profile-static.ts
-├── artifact-removal-summary.md
-├── branch-analysis/
-│   ├── BRANCH_ANALYSIS_DOCUMENTATION_INDEX.md
-│   ├── BRANCH_COMPARISON_DEEP_ANALYSIS.md
-│   ├── BRANCH_COMPARISON_MATRIX_AND_ROADMAP.md
-│   ├── EXECUTIVE_SUMMARY_BRANCH_ANALYSIS.md
-│   ├── QUICK_REFERENCE_BRANCH_COMPARISON.md
+│   ├── schema-domain-relationships.md
 ├── chanuka/
 │   ├── # Chanuka Platform Consolidation Impleme.md
 │   ├── api_strategy_doc.md
@@ -1361,10 +1234,7 @@ docs/
 │   ├── community-input_1751743369833.html
 │   ├── dashboard_1751743369900.html
 │   ├── design.md
-│   ├── dissertation.md
 │   ├── expert-verification_1751743369833.html
-│   ├── global_implications.md
-│   ├── Kenyan_constitution_2010.md
 │   ├── merged_bill_sponsorship.html
 │   ├── missing-strategic-features-analysis.md
 │   ├── philosophical_connections_analysis.md
@@ -1374,145 +1244,46 @@ docs/
 │   ├── strategic_additions_poems.md
 │   ├── strategic-ui-features-analysis.md
 │   ├── strategy_template_flow.mermaid
-│   ├── sustainable_uprising.md
-├── chanuka_architecture.txt
-├── CHANUKA_CLIENT_COMPREHENSIVE_IMPLEMENTATION_SUMMARY.md
-├── Chanuka_Funding_Pitch.md
-├── Chanuka_Platform_Complementarity_and_Accountability_Analysis.md
-├── chanuka_requirements.txt
-├── chanuka_serpent_dove.md
-├── CLIENT_COMPREHENSIVE_GAP_REMEDIATION.md
-├── CLIENT_CONSOLIDATION_SUMMARY.md
-├── CLIENT_GAP_FIXES_IMPLEMENTATION_STATUS.md
-├── CLIENT_IMPLEMENTATION_TACTICAL.md
-├── CLIENT_OPTIMIZATION_EXECUTIVE_SUMMARY.md
-├── CLIENT_OPTIMIZATION_INDEX.md
-├── CLIENT_OPTIMIZATION_STRATEGY.md
-├── CLIENT_QUICK_REFERENCE.md
-├── CLIENT_SHARED_MODULE_INTEGRATION_STRATEGY.md
-├── client-module.md
-├── COMPLETE_PROJECT_INDEX.md
-├── configuration-assessment.md
-├── configuration-guide.md
-├── core-error-handling-architecture.md
-├── DARK_MODE_IMPLEMENTATION.md
-├── database-cohesion-implementation-summary.md
-├── database-cohesion-migration-guide.md
-├── database-cohesion-strategy.md
-├── database-consolidation-final-plan.md
-├── database-consolidation-plan.md
-├── database-consolidation-refined-strategy.md
-├── database-integration-implementation-summary.md
-├── deployment-module.md
-├── design-system/
-│   ├── DESIGN_SYSTEM_INTEGRATION_COMPLETE.md
-│   ├── DESIGN_SYSTEM_INTEGRATION_GAP_ANALYSIS.md
-│   ├── DESIGN_SYSTEM_PHASE_2_COMPLETE.md
-├── detailed-architecture.md
-├── DIGITAL LAW 2018.pdf
-├── DIGITAL LAW AMENDMENTS AMENDMENTS (2025).pdf
+├── consolidated/
+│   ├── chanuka-platform-guide.md
+│   ├── client-optimization-guide.md
+│   ├── database-consolidation-guide.md
+│   ├── project-timeline.md
+│   ├── testing-implementation.md
+│   ├── testing-reference.md
+│   ├── testing-strategy.md
+│   ├── ui-ux-guide.md
 ├── docs-module.md
-├── documentation-standards.md
-├── domain-integration-completion-summary.md
-├── drizzle-module.md
-├── environment-config-assessment.md
-├── error-analytics-dashboard-architecture.md
-├── error-analytics-dashboard-types.md
-├── examples/
-│   ├── validation-integration-examples.ts
-├── FINAL_DELIVERY_REPORT.md
-├── IMPLEMENTATION_REALITY_CHECK.md
 ├── index.md
-├── infrastructure-guide.md
-├── INTEGRATION_IMPLEMENTATION_SUMMARY.md
-├── INTEGRATION_IMPROVEMENTS_SUMMARY.md
-├── migrations/
-│   ├── comprehensive-migration-strategy.md
-├── missing-tables-analysis.md
-├── mobile/
-│   ├── MOBILE_ARCHITECTURE_VISUAL_REFERENCE.md
-│   ├── MOBILE_REFACTORING_IMPLEMENTATION_CHECKLIST.md
-│   ├── MOBILE_REFACTORING_SETUP_SUMMARY.md
-├── MOBILE_DEVELOPMENT_GUIDE.md
-├── monitoring.md
-├── monorepo.md
-├── navigation/
-│   ├── NAVIGATION_CONSISTENCY_ANALYSIS_REPORT.md
-│   ├── NAVIGATION_CONSISTENCY_PHASE2_COMPLETE.md
-│   ├── NAVIGATION_UTILITIES_CONSOLIDATION_COMPLETE.md
-│   ├── NAVIGATION_UTILITIES_REDUNDANCY_ANALYSIS.md
-├── new-domains-integration-guide.md
-├── OPTIMIZATION_DELIVERY_SUMMARY.md
-├── OPTIMIZATION_VISUAL_GUIDE.md
-├── PHASE_2_COMPLETION_REPORT.md
-├── PHASE_3A_COMPLETION_REPORT.md
-├── PHASE_3C_FORM_VALIDATION.md
-├── PHASE_4_PRODUCTION_READINESS.md
-├── PHASE_4_QUICK_START.md
-├── PHASE1_TESTING_COMPLETE.md
-├── phase2/
-│   ├── PHASE2_DETAILED_STRATEGY.md
-│   ├── PHASE2_EXECUTION_PLAN.md
-│   ├── PHASE2_IMPLEMENTATION_GUIDE.md
-│   ├── PHASE2_QUICK_START.md
-│   ├── PHASE2_STATUS_READY.md
-├── PHASES_3C_4_DELIVERY_SUMMARY.md
-├── PHASES_3C_4_SUMMARY.md
-├── project/
-│   ├── brand-roadmap.md
-│   ├── manifesto.md
-│   ├── problem-statement.md
-├── project-overview.md
 ├── project-structure.md
-├── README.md
-├── schema-domain-relationships.md
-├── scripts-module.md
-├── SEAMLESS_INTEGRATION_GUIDE.md
-├── secure-environment-setup.md
-├── server-module.md
-├── setup.md
-├── shared-module.md
-├── STORYBOOK_SETUP_GUIDE.md
-├── structure_tools_guide.md
-├── testing/
-│   ├── COLOCATION_VS_SEPARATION_COUNSEL.md
-│   ├── COMPONENT_TEST_COLOCATION_STRATEGY.md
-│   ├── CONSISTENCY_AND_COMPLEMENTARITY.md
-│   ├── EXECUTION_CHECKLIST.md
-│   ├── MASTER_IMPLEMENTATION_ROADMAP.md
-│   ├── MASTER_IMPLEMENTATION_TIMELINE.md
-│   ├── PARETO_PRINCIPLE_TESTING_ANALYSIS.md
-│   ├── PARETO_QUICK_REFERENCE.md
-│   ├── PHASE_4_REMEDIATION_AND_TESTING_STATUS.md
-│   ├── PHASE_4_STEP_2_COMPLETION.md
-│   ├── PHASE_4_STEP_3_COMPLETION.md
-│   ├── PHASE_4_STEP_4_IMPLEMENTATION_GUIDE.md
-│   ├── PHASE_5_INTEGRATION_ROADMAP.md
-│   ├── TEST_STATUS_SUMMARY.md
-│   ├── TESTING_ARCHITECTURE_DIAGRAM.md
-│   ├── TESTING_CONSOLIDATION_PHASE1.md
-│   ├── TESTING_CONSOLIDATION_PROGRESS_SUMMARY.md
-│   ├── TESTING_DOCUMENTATION_INDEX.md
-│   ├── TESTING_IMPLEMENTATION_SUMMARY.md
-│   ├── TESTING_MIGRATION_CHECKLIST.md
-│   ├── TESTING_QUICK_START.md
-│   ├── UNIFIED_TESTING_REFERENCE.md
-├── TESTING_UTILS_ANALYSIS.md
-├── TESTING_UTILS_MIGRATION_COMPLETE.md
-├── tests-module.md
-├── UI_UX_ASSESSMENT_INDEX.md
-├── UI_UX_AUDIT_REPORT.md
-├── UI_UX_DELIVERABLES.md
-├── UI_UX_EXECUTIVE_SUMMARY.md
-├── UI_UX_QUICK_START.md
-├── UI_UX_REMEDIATION_PLAN.md
-├── UI_UX_VISUAL_DIAGRAMS.md
-├── ui-design-plan.md
-├── unified-api-client-architecture.md
-├── unified-components-documentation.md
-├── user-component-consolidation-architecture.md
-├── validation-services.md
-├── VITEST_CONFIG_SPRAWL_ANALYSIS.md
+├── reference/
+│   ├── API.md
+│   ├── api-consumer-guide.md
+│   ├── brand-roadmap.md
+│   ├── Chanuka_Funding_Pitch.md
+│   ├── chanuka_implementation_guide.md
+│   ├── chanuka_requirements.txt
+│   ├── chanuka_serpent_dove.md
+│   ├── chanuka_webapp_copy.md
+│   ├── civic_engagement_framework.md
+│   ├── constitutional_analysis_framework.md
+│   ├── DIGITAL LAW 2018.pdf
+│   ├── DIGITAL LAW AMENDMENTS AMENDMENTS (2025).pdf
+│   ├── dissertation.md
+│   ├── documentation-standards.md
+│   ├── ezra-nehemiah-chanuka (1).md
+│   ├── global_implications.md
+│   ├── Kenyan_constitution_2010.md
+│   ├── legislative_framework.md
+│   ├── maintenance-process.md
+│   ├── manifesto.md
+│   ├── philosophical_threshold_poems.md
+│   ├── problem-statement.md
+│   ├── project-structure.md
+│   ├── README.md
+│   ├── strategy_template_flow.mermaid
+│   ├── sustainable_uprising.md
+│   ├── user-manual.md
 drizzle/
 drizzle.config.ts
 ├── 0021_clean_comprehensive_schema.sql
@@ -1539,24 +1310,15 @@ drizzle.config.ts
 │   ├── 0021_snapshot.json
 │   ├── 20251104110148_snapshot.json
 fix-imports.js
-generate_concept_note.py
-generate_invitation.py
-generate_overview.py
 generate-structure-to-file.sh
 logs/
 ├── logger_errors.txt
 ├── logger_files.txt
 ├── logger_files_clean.txt
-MOBILE_REDUNDANCY_CONSOLIDATION_ANALYSIS.md
-MOBILE_REDUNDANCY_DETAILED_COMPARISON.md
 nginx.conf
 nx.json
-ORPHANED_COMPONENTS_ANALYSIS.md
 package.json
 performance-baselines.json
-performance-budget-report.json
-performance-budgets.json
-phase2-migration-commands.sh
 playwright.config.ts
 playwright-report/
 ├── index.html
@@ -1587,8 +1349,10 @@ scripts/
 ├── cleanup-orphaned-files.ts
 ├── cleanup-redundant-utils.js
 ├── complete-fsd-migration.sh
+├── complete-migrations.ts
 ├── complete-realignment.ts
 ├── complete-schema-fix.ts
+├── consolidate-imports.ts
 ├── consolidate-redundant-implementations.ts
 ├── consolidate-sprawl.ts
 ├── database/
@@ -1749,6 +1513,7 @@ scripts/
 ├── validate-design-system-final.ts
 ├── validate-fsd-migration.ts
 ├── validate-imports.js
+├── validate-migration-completion.ts
 ├── validate-new-domains.cjs
 ├── validate-property-naming.ts
 ├── validate-shared-folder.ts
@@ -2815,10 +2580,7 @@ shared/
 ├── tsconfig.json
 start-dev.js
 tailwind.config.js
-TESTING_ARCHITECTURE_ANALYSIS.md
-TESTING_CONSOLIDATION_ACTION_PLAN.md
 TESTING_CONSOLIDATION_COMPLETE.md
-TESTING_CONSOLIDATION_RUNBOOK.md
 test-results/
 tests/
 ├── api/
@@ -2906,4 +2668,4 @@ vitest.workspace.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-12-09 17:05:48
+Generated on: 2025-12-10 02:34:23

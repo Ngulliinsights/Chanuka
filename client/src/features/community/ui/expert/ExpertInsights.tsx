@@ -29,11 +29,11 @@ import { useState, useEffect, useCallback } from 'react';
 
 import { cn } from '@client/lib/utils';
 import { ExpertInsight } from '@client/types/community';
-import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system/primitives/avatar';
-import { Badge } from '@client/shared/design-system/primitives/badge';
-import { Button } from '@client/shared/design-system/primitives/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/primitives/card';
-import { Progress } from '@client/shared/design-system/primitives/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
 
 interface ExpertInsightsProps {
   insights: ExpertInsight[];
