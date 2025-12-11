@@ -3,13 +3,11 @@
  * Following navigation component patterns for alert components
  */
 
-import { CheckCircle as CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import React from 'react';
 
 import { cn } from '@/lib/utils';
-
-import { Alert, AlertDescription } from '@client/features/users/ui/settings/alert-preferences.tsx';
-import { Button } from '../../../../../../Button';
+import { Alert, AlertDescription, Button } from '@client/shared/design-system';
 
 export interface AuthAlertProps {
   type: 'success' | 'error' | 'warning' | 'info';

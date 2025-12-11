@@ -102,7 +102,7 @@ export class CSPNonceManager {
       'object-src': ["'none'"],
       'base-uri': ["'self'"],
       'form-action': ["'self'"],
-      'frame-ancestors': ["'none'"],
+      // frame-ancestors cannot be set via meta tag - must use HTTP headers only
       'upgrade-insecure-requests': []
     };
 

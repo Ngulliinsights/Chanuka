@@ -7,7 +7,8 @@
  */
 
 import { Bill } from '@shared/schema/foundation';
-import { BillUpdate, BillUpdateData, BillTrackingPreferences, EngagementMetrics } from '@client/types/api';
+
+import { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@client/types/api';
 import { logger } from '@client/utils/logger';
 
 export class BillTrackingService {
@@ -69,7 +70,7 @@ export class BillTrackingService {
     switch (update.type) {
       case 'status_change':
         if (data.oldStatus && data.newStatus) {
-          updates.status = data.newStatus as any;
+          updates.status = data.newStatus as 'drafted' | 'introduced' | 'first_reading' | 'second_reading' | 'committee_stage' | 'report_stage' | 'third_reading' | 'presidential_assent' | 'act_of_parliament' | 'withdrawn' | 'lapsed';
         }
         break;
 

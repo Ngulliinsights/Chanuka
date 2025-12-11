@@ -4,7 +4,6 @@
  */
 
 import { SecurityEvent } from '@client/types';
-
 import { logger } from '@client/utils/logger';
 
 export interface CSRFConfig {
@@ -21,7 +20,6 @@ interface ExtendedXMLHttpRequest extends XMLHttpRequest {
   _csrfMethod?: string;
   _csrfUrl?: string;
 }
-
 export class CSRFProtection {
   private config: CSRFConfig;
   private currentToken: string | null = null;
@@ -155,7 +153,7 @@ export class CSRFProtection {
     meta.content = token;
 
     // Store in window for JavaScript access
-    (window as any).__CSRF_TOKEN__ = token;
+    (window as unknown as Record<string, unknown>).__CSRF_TOKEN__ = token;
 
     // Store in sessionStorage for persistence
     try {
@@ -201,8 +199,8 @@ export class CSRFProtection {
 
   private interceptFetch(): void {
     const originalFetch = window.fetch;
-    const self = this; // Capture the class instance for use in the interceptor
     
+    // Use arrow function to preserve 'this' binding
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
       // Convert input to URL string to avoid Request reuse issues
       const url = typeof input === 'string' ? input : 
@@ -218,10 +216,10 @@ export class CSRFProtection {
       
       // Only add CSRF token to same-origin requests that need protection
       const tempRequest = new Request(url, { method: freshInit.method || 'GET' });
-      if (self.shouldAddToken(tempRequest)) {
-        const token = self.getToken();
+      if (this.shouldAddToken(tempRequest)) {
+        const token = this.getToken();
         if (token) {
-          (freshInit.headers as Headers).set(self.config.headerName, token);
+          (freshInit.headers as Headers).set(this.config.headerName, token);
         }
       }
       
@@ -230,7 +228,7 @@ export class CSRFProtection {
       
       // Check for CSRF validation errors
       if (response.status === 403 && response.headers.get('X-CSRF-Error')) {
-        self.handleCSRFError(tempRequest);
+        this.handleCSRFError(tempRequest);
       }
       
       return response;
@@ -240,10 +238,8 @@ export class CSRFProtection {
   private interceptXHR(): void {
     const originalOpen = XMLHttpRequest.prototype.open;
     const originalSend = XMLHttpRequest.prototype.send;
-    const self = this; // Capture the class instance
-    
-    // Store the CSRF protection instance globally so XHR can access it
-    (window as any).__CSRF_PROTECTION__ = this;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
     
     // Override the open method to capture request details
     XMLHttpRequest.prototype.open = function(
@@ -376,7 +372,6 @@ export class CSRFProtection {
     const securityEvent: Partial<SecurityEvent> = {
       type: 'csrf_attack',
       severity: 'high',
-      source: 'CSRFProtection',
       details: {
         url: request.url,
         method: request.method,
@@ -499,11 +494,12 @@ export const csrfProtection = new CSRFProtection({
 });
 
 // Export setup function for axios or other HTTP clients
-export function setupCSRFInterceptor(axiosInstance: any): void {
-  axiosInstance.interceptors.request.use((config: any) => {
+export function setupCSRFInterceptor(axiosInstance: { interceptors: { request: { use: (callback: (config: Record<string, unknown>) => Record<string, unknown>) => void } } }): void {
+  axiosInstance.interceptors.request.use((config: Record<string, unknown>) => {
     const token = csrfProtection.getToken();
     if (token) {
-      config.headers['X-CSRF-Token'] = token;
+      const headers = config.headers as Record<string, string>;
+      headers['X-CSRF-Token'] = token;
     }
     return config;
   });

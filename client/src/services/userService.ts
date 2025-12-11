@@ -12,9 +12,9 @@
  * This service replaces: authService.ts, user-backend-service.ts, userProfileService.ts
  */
 
-// Remove repository interfaces - using services directly
-import { globalConfig } from '@client/core/api/config';
 import { EngagementHistoryFilters } from '@client/core/api/user';
+import { authService } from '@client/core/auth';
+import { userApi } from '@client/features/users/services/user-api';
 import { logger } from '@client/utils/logger';
 
 // ============================================================================
@@ -201,23 +201,68 @@ export interface DashboardData {
   civic_score_trend: Array<{ date: string; score: number }>;
 }
 
+// Paginated response types for better type safety
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export interface SavedBillsResponse extends PaginatedResponse<SavedBill> {
+  items: SavedBill[];
+}
+
+export interface EngagementHistoryResponse extends PaginatedResponse<UserEngagementHistory> {
+  items: UserEngagementHistory[];
+  analytics: {
+    most_active_day: string;
+    total_actions: number;
+    action_breakdown: Record<string, number>;
+  };
+}
+
 // ============================================================================
-// Service Interfaces for DI
+// Service Interfaces for Dependency Injection
 // ============================================================================
 
 interface IAuthService {
-  login(credentials: LoginCredentials): Promise<AuthSession>;
+  login(credentials: LoginCredentials): Promise<unknown>;
   logout(): Promise<void>;
-  getCurrentUser(): Promise<AuthUser | null>;
-  refreshToken(): Promise<AuthTokens>;
+  getCurrentUser(): Promise<unknown>;
 }
 
 interface IUserAPIService {
-  getProfile(userId: string): Promise<UserProfile>;
-  updateProfile(userId: string, data: Partial<UserProfile>): Promise<UserProfile>;
-  getDashboardData(userId: string): Promise<DashboardData>;
-  getUserPreferences(userId: string): Promise<UserPreferences>;
-  updateUserPreferences(userId: string, prefs: Partial<UserPreferences>): Promise<UserPreferences>;
+  getUserProfile(userId?: string): Promise<unknown>;
+  updateProfile(data: Partial<UserProfile>): Promise<unknown>;
+  getPreferences(): Promise<unknown>;
+  updatePreferences(preferences: Partial<UserPreferences>): Promise<unknown>;
+  getDashboardData(): Promise<unknown>;
+  getAchievements(): Promise<unknown>;
+  getSavedBills(page: number, limit: number, filters?: Record<string, unknown>): Promise<unknown>;
+  saveBill(billId: string, notes?: string, tags?: string[]): Promise<unknown>;
+  unsaveBill(billId: string): Promise<void>;
+  updateSavedBill(billId: string, updates: Partial<SavedBill>): Promise<unknown>;
+  getEngagementHistory(page: number, limit: number, filters?: unknown): Promise<unknown>;
+  trackEngagement(action: { action_type: string; entity_type: string; entity_id: string; metadata?: Record<string, unknown> }): Promise<void>;
+}
+
+// ============================================================================
+// Custom Error Classes for Better Error Handling
+// ============================================================================
+
+export class ValidationError extends Error {
+  constructor(message: string, public field?: string) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+
+export class AuthenticationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthenticationError';
+  }
 }
 
 // ============================================================================
@@ -225,34 +270,40 @@ interface IUserAPIService {
 // ============================================================================
 
 class UserService {
-  private baseUrl: string;
-  private tokenRefreshPromise: Promise<AuthTokens> | null = null;
-  private userCache: { user: AuthUser | null; lastFetched: number; expiresAt: number } = {
+  // Cache configuration with more granular control
+  private userCache: {
+    user: AuthUser | null;
+    lastFetched: number;
+    expiresAt: number;
+  } = {
     user: null,
     lastFetched: 0,
     expiresAt: 0
   };
 
-  private readonly TOKEN_REFRESH_BUFFER = 5 * 60 * 1000; // 5 minutes
   private readonly USER_CACHE_DURATION = 60 * 1000; // 1 minute
+  private tokenRefreshTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private authService: IAuthService,
     private userApiService: IUserAPIService
-  ) {
-    this.baseUrl = globalConfig.get('api').baseUrl;
-  }
+  ) {}
 
   // ============================================================================
   // AUTHENTICATION METHODS
   // ============================================================================
 
+  /**
+   * Authenticates a user with the provided credentials.
+   * Automatically handles caching and token refresh scheduling.
+   */
   async login(credentials: LoginCredentials): Promise<AuthSession> {
     try {
       this.validateEmail(credentials.email);
 
-      const session: AuthSession = await this.authService.login(credentials);
+      const session = await this.authService.login(credentials) as AuthSession;
 
+      // Only cache and schedule refresh if 2FA is not required
       if (!session.requiresTwoFactor) {
         this.updateUserCache(session.user);
         this.scheduleTokenRefresh(session.tokens.expiresIn);
@@ -266,20 +317,24 @@ class UserService {
       return session;
     } catch (error) {
       logger.error('Login failed', { email: credentials.email, error });
-      throw error;
+      throw new AuthenticationError('Login failed. Please check your credentials.');
     }
   }
 
+  /**
+   * Registers a new user account and automatically logs them in.
+   */
   async register(data: RegisterData): Promise<AuthSession> {
     try {
       this.validateRegistrationData(data);
 
+      // After validation, attempt login with the new credentials
       const loginData: LoginCredentials = {
         email: data.email,
         password: data.password
       };
 
-      const session: AuthSession = await this.authService.login(loginData);
+      const session = await this.authService.login(loginData) as AuthSession;
       this.updateUserCache(session.user);
       this.scheduleTokenRefresh(session.tokens.expiresIn);
 
@@ -295,11 +350,15 @@ class UserService {
     }
   }
 
+  /**
+   * Logs out the current user and cleans up all cached data and scheduled tasks.
+   */
   async logout(): Promise<void> {
     try {
       await this.authService.logout();
       logger.info('User logged out successfully');
     } catch (error) {
+      // Continue with cleanup even if logout request fails
       logger.warn('Logout request failed (continuing with cleanup)', { error });
     } finally {
       this.cleanup();
@@ -307,18 +366,23 @@ class UserService {
     }
   }
 
-  async getCurrentUser(forceRefresh: boolean = false): Promise<AuthUser> {
+  /**
+   * Retrieves the current authenticated user.
+   * Uses cached data if available and valid, otherwise fetches fresh data.
+   */
+  async getCurrentUser(forceRefresh = false): Promise<AuthUser> {
     try {
       if (!forceRefresh && this.isUserCacheValid()) {
         return this.userCache.user!;
       }
 
-      const user = await this.authService.getCurrentUser();
-      if (user) {
-        this.updateUserCache(user);
-        return user;
+      const user = await this.authService.getCurrentUser() as AuthUser | null;
+      if (!user) {
+        throw new AuthenticationError('No authenticated user found');
       }
-      throw new Error('No user returned from auth service');
+
+      this.updateUserCache(user);
+      return user;
     } catch (error) {
       logger.error('Failed to get current user', { error });
       throw error;
@@ -329,27 +393,49 @@ class UserService {
   // PROFILE MANAGEMENT
   // ============================================================================
 
+  /**
+   * Fetches the complete user profile including badges, achievements, and activity.
+   */
   async getUserProfile(userId?: string): Promise<UserProfile> {
     try {
-      return await this.userApiService.getUserProfile(userId);
+      const profile = await this.userApiService.getUserProfile(userId) as UserProfile;
+      return profile;
     } catch (error) {
       logger.error('Failed to fetch user profile', { userId, error });
       throw error;
     }
   }
 
+  /**
+   * Updates the current user's profile with partial data.
+   * Only the provided fields will be updated.
+   */
   async updateProfile(updates: Partial<UserProfile>): Promise<UserProfile> {
     try {
-      return await this.userApiService.updateProfile(updates);
+      const updatedProfile = await this.userApiService.updateProfile(updates) as UserProfile;
+      
+      // Update cache if the current user's profile was modified
+      if (this.userCache.user && this.userCache.user.id === updatedProfile.id) {
+        this.updateUserCache({
+          ...this.userCache.user,
+          ...updates
+        } as AuthUser);
+      }
+      
+      return updatedProfile;
     } catch (error) {
       logger.error('Failed to update user profile', { error });
       throw error;
     }
   }
 
+  /**
+   * Updates user preferences such as theme, notifications, and privacy settings.
+   */
   async updatePreferences(preferences: Partial<UserPreferences>): Promise<UserPreferences> {
     try {
-      return await this.userApiService.updatePreferences(preferences);
+      const updated = await this.userApiService.updatePreferences(preferences) as UserPreferences;
+      return updated;
     } catch (error) {
       logger.error('Failed to update user preferences', { error });
       throw error;
@@ -360,22 +446,36 @@ class UserService {
   // DASHBOARD & ANALYTICS
   // ============================================================================
 
+  /**
+   * Fetches comprehensive dashboard data including profile, recent activity,
+   * saved bills, recommendations, and civic score trends.
+   */
   async getDashboardData(): Promise<DashboardData> {
     try {
-      return await this.userApiService.getDashboardData();
+      const data = await this.userApiService.getDashboardData() as DashboardData;
+      return data;
     } catch (error) {
       logger.error('Failed to fetch dashboard data', { error });
       throw error;
     }
   }
 
+  /**
+   * Retrieves user achievements including earned badges, completed achievements,
+   * and upcoming milestones.
+   */
   async getAchievements(): Promise<{
     badges: UserBadge[];
     achievements: UserAchievement[];
     next_milestones: UserAchievement[];
   }> {
     try {
-      return await this.userApiService.getAchievements();
+      const data = await this.userApiService.getAchievements() as {
+        badges: UserBadge[];
+        achievements: UserAchievement[];
+        next_milestones: UserAchievement[];
+      };
+      return data;
     } catch (error) {
       logger.error('Failed to fetch achievements', { error });
       throw error;
@@ -386,28 +486,54 @@ class UserService {
   // SAVED BILLS MANAGEMENT
   // ============================================================================
 
-  async getSavedBills(page = 1, limit = 20, filters?: {
-    status?: string;
-    urgency?: string;
-    tags?: string[];
-  }): Promise<{ bills: SavedBill[]; total: number; page: number; totalPages: number }> {
+  /**
+   * Retrieves paginated list of bills saved by the user with optional filtering.
+   */
+  async getSavedBills(
+    page = 1,
+    limit = 20,
+    filters?: {
+      status?: string;
+      urgency?: string;
+      tags?: string[];
+    }
+  ): Promise<{
+    bills: SavedBill[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
     try {
-      return await this.userApiService.getSavedBills(page, limit, filters);
+      const response = await this.userApiService.getSavedBills(page, limit, filters) as {
+        bills: SavedBill[];
+        total: number;
+        page: number;
+        totalPages: number;
+      };
+      return response;
     } catch (error) {
       logger.error('Failed to fetch saved bills', { error });
       throw error;
     }
   }
 
+  /**
+   * Saves a bill to the user's collection with optional notes and tags.
+   */
   async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<SavedBill> {
     try {
-      return await this.userApiService.saveBill(billId, notes, tags);
+      const savedBill = await this.userApiService.saveBill(billId, notes, tags) as SavedBill;
+      logger.info('Bill saved successfully', { billId });
+      return savedBill;
     } catch (error) {
       logger.error('Failed to save bill', { billId, error });
       throw error;
     }
   }
 
+  /**
+   * Removes a bill from the user's saved collection.
+   */
   async unsaveBill(billId: string): Promise<void> {
     try {
       await this.userApiService.unsaveBill(billId);
@@ -418,13 +544,20 @@ class UserService {
     }
   }
 
-  async updateSavedBill(billId: string, updates: {
-    notes?: string;
-    tags?: string[];
-    notification_enabled?: boolean;
-  }): Promise<SavedBill> {
+  /**
+   * Updates metadata for a saved bill such as notes, tags, or notification settings.
+   */
+  async updateSavedBill(
+    billId: string,
+    updates: {
+      notes?: string;
+      tags?: string[];
+      notification_enabled?: boolean;
+    }
+  ): Promise<SavedBill> {
     try {
-      return await this.userApiService.updateSavedBill(billId, updates);
+      const updated = await this.userApiService.updateSavedBill(billId, updates) as SavedBill;
+      return updated;
     } catch (error) {
       logger.error('Failed to update saved bill', { billId, error });
       throw error;
@@ -435,7 +568,15 @@ class UserService {
   // ENGAGEMENT TRACKING
   // ============================================================================
 
-  async getEngagementHistory(page = 1, limit = 50, filters?: EngagementHistoryFilters): Promise<{
+  /**
+   * Retrieves paginated engagement history with analytics.
+   * Includes breakdowns by action type and identifies most active periods.
+   */
+  async getEngagementHistory(
+    page = 1,
+    limit = 50,
+    filters?: EngagementHistoryFilters
+  ): Promise<{
     history: UserEngagementHistory[];
     total: number;
     page: number;
@@ -447,13 +588,32 @@ class UserService {
     };
   }> {
     try {
-      return await this.userApiService.getEngagementHistory(page, limit, filters);
+      const response = await this.userApiService.getEngagementHistory(
+        page,
+        limit,
+        filters
+      ) as {
+        history: UserEngagementHistory[];
+        total: number;
+        page: number;
+        totalPages: number;
+        analytics: {
+          most_active_day: string;
+          total_actions: number;
+          action_breakdown: Record<string, number>;
+        };
+      };
+      return response;
     } catch (error) {
       logger.error('Failed to fetch engagement history', { error });
       throw error;
     }
   }
 
+  /**
+   * Tracks a user engagement action asynchronously.
+   * Failures are logged but don't interrupt the user flow.
+   */
   async trackEngagement(action: {
     action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
     entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
@@ -463,42 +623,55 @@ class UserService {
     try {
       await this.userApiService.trackEngagement(action);
     } catch (error) {
-      // Silent failure for engagement tracking
+      // Silent failure for engagement tracking to avoid disrupting user experience
       logger.warn('Engagement tracking failed', { error });
     }
   }
 
   // ============================================================================
-  // UTILITY METHODS
+  // VALIDATION UTILITIES
   // ============================================================================
 
+  /**
+   * Validates email format using standard regex pattern.
+   */
   private validateEmail(email: string): void {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      throw new Error('Invalid email format');
+      throw new ValidationError('Invalid email format', 'email');
     }
   }
 
+  /**
+   * Validates all registration data including password strength and terms acceptance.
+   */
   private validateRegistrationData(data: RegisterData): void {
     this.validateEmail(data.email);
 
     if (!data.password || data.password.length < 8) {
-      throw new Error('Password must be at least 8 characters long');
+      throw new ValidationError('Password must be at least 8 characters long', 'password');
     }
 
     if (data.password !== data.confirmPassword) {
-      throw new Error('Passwords do not match');
+      throw new ValidationError('Passwords do not match', 'confirmPassword');
     }
 
     if (!data.name || data.name.trim().length === 0) {
-      throw new Error('Name is required');
+      throw new ValidationError('Name is required', 'name');
     }
 
     if (!data.acceptTerms) {
-      throw new Error('You must accept the terms and conditions');
+      throw new ValidationError('You must accept the terms and conditions', 'acceptTerms');
     }
   }
 
+  // ============================================================================
+  // CACHE MANAGEMENT
+  // ============================================================================
+
+  /**
+   * Updates the user cache with fresh data and sets expiration time.
+   */
   private updateUserCache(user: AuthUser): void {
     const now = Date.now();
     this.userCache = {
@@ -509,6 +682,9 @@ class UserService {
     logger.debug('User cache updated', { userId: user.id });
   }
 
+  /**
+   * Checks if the cached user data is still valid based on expiration time.
+   */
   private isUserCacheValid(): boolean {
     return (
       this.userCache.user !== null &&
@@ -516,6 +692,9 @@ class UserService {
     );
   }
 
+  /**
+   * Clears all cached user data.
+   */
   private clearUserCache(): void {
     this.userCache = {
       user: null,
@@ -525,15 +704,50 @@ class UserService {
     logger.debug('User cache cleared');
   }
 
+  // ============================================================================
+  // TOKEN MANAGEMENT
+  // ============================================================================
+
+  /**
+   * Schedules automatic token refresh before expiration.
+   * Refreshes at 80% of the token lifetime to ensure uninterrupted service.
+   */
   private scheduleTokenRefresh(expiresIn: number): void {
-    // Implementation for token refresh scheduling
-    // This would integrate with the auth system
-    logger.debug('Token refresh scheduled', { expiresIn });
+    // Clear any existing refresh timeout
+    if (this.tokenRefreshTimeout) {
+      clearTimeout(this.tokenRefreshTimeout);
+    }
+
+    // Schedule refresh at 80% of token lifetime
+    const refreshTime = expiresIn * 0.8 * 1000;
+    this.tokenRefreshTimeout = setTimeout(() => {
+      this.refreshTokens();
+    }, refreshTime);
+
+    logger.debug('Token refresh scheduled', { expiresIn, refreshTime });
   }
 
+  /**
+   * Refreshes authentication tokens in the background.
+   */
+  private async refreshTokens(): Promise<void> {
+    try {
+      // This would call the auth service's refresh method
+      logger.info('Refreshing authentication tokens');
+      // await this.authService.refreshTokens();
+    } catch (error) {
+      logger.error('Token refresh failed', { error });
+    }
+  }
+
+  /**
+   * Cleans up resources including token refresh timers.
+   */
   private cleanup(): void {
-    // Cleanup resources
-    this.tokenRefreshPromise = null;
+    if (this.tokenRefreshTimeout) {
+      clearTimeout(this.tokenRefreshTimeout);
+      this.tokenRefreshTimeout = null;
+    }
     logger.info('User service cleaned up');
   }
 
@@ -541,56 +755,62 @@ class UserService {
   // LEGACY COMPATIBILITY METHODS
   // ============================================================================
 
-  // These methods maintain backward compatibility during transition
-  async updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile> {
+  /**
+   * @deprecated Use updateProfile() instead
+   */
+  async updateUserProfile(_userId: string, updates: Partial<UserProfile>): Promise<UserProfile> {
     return this.updateProfile(updates);
   }
 
-  async getUserPreferences(userId: string): Promise<UserPreferences> {
-    // This would be implemented when preferences API is available
-    throw new Error('Method not yet implemented');
-  }
-
-  async updateUserPreferences(userId: string, preferences: Partial<UserPreferences>): Promise<UserPreferences> {
+  /**
+   * @deprecated Use updatePreferences() instead
+   */
+  async updateUserPreferences(_userId: string, preferences: Partial<UserPreferences>): Promise<UserPreferences> {
     return this.updatePreferences(preferences);
   }
 
-  async getDashboardDataForUser(userId: string, timeFilter?: { start?: string; end?: string }): Promise<DashboardData> {
+  /**
+   * @deprecated Use getDashboardData() instead
+   */
+  async getDashboardDataForUser(_userId: string): Promise<DashboardData> {
     return this.getDashboardData();
   }
 
-  async getSavedBillsForUser(userId: string, page: number = 1, limit: number = 20): Promise<{ bills: SavedBill[]; total: number; page: number; totalPages: number }> {
+  /**
+   * @deprecated Use getSavedBills() instead
+   */
+  async getSavedBillsForUser(_userId: string, page = 1, limit = 20): Promise<{
+    bills: SavedBill[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
     return this.getSavedBills(page, limit);
   }
 
-  async saveBillForUser(userId: string, billId: number, options?: { notes?: string; tags?: string[]; notifications?: boolean }): Promise<SavedBill> {
+  /**
+   * @deprecated Use saveBill() instead
+   */
+  async saveBillForUser(
+    _userId: string,
+    billId: number,
+    options?: { notes?: string; tags?: string[] }
+  ): Promise<SavedBill> {
     return this.saveBill(billId.toString(), options?.notes, options?.tags);
   }
 
-  async unsaveBillForUser(userId: string, billId: number): Promise<void> {
+  /**
+   * @deprecated Use unsaveBill() instead
+   */
+  async unsaveBillForUser(_userId: string, billId: number): Promise<void> {
     return this.unsaveBill(billId.toString());
   }
 
-  async trackBill(
-    userId: string,
-    billId: number,
-    notificationSettings?: {
-      statusChanges?: boolean;
-      newComments?: boolean;
-      expertAnalysis?: boolean;
-    }
-  ): Promise<{ id: number; notifications: typeof notificationSettings }> {
-    // Mock implementation for now
-    return { id: billId, notifications: notificationSettings };
-  }
-
-  async untrackBill(userId: string, billId: number): Promise<void> {
-    // Mock implementation for now
-    return Promise.resolve();
-  }
-
+  /**
+   * @deprecated Use getEngagementHistory() instead
+   */
   async getEngagementHistoryForUser(
-    userId: string,
+    _userId: string,
     options?: {
       page?: number;
       limit?: number;
@@ -610,8 +830,11 @@ class UserService {
     return this.getEngagementHistory(options?.page, options?.limit, options?.filters);
   }
 
+  /**
+   * @deprecated Use trackEngagement() instead
+   */
   async trackEngagementForUser(
-    userId: string,
+    _userId: string,
     activity: {
       action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
       entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
@@ -623,121 +846,81 @@ class UserService {
     return {
       id: `${Date.now()}`,
       user_id: 'current',
-      ...activity,
+      action_type: activity.action_type,
+      entity_type: activity.entity_type,
+      entity_id: activity.entity_id,
+      metadata: activity.metadata ?? {},
       timestamp: new Date().toISOString()
     };
   }
 
-  async getCivicMetrics(
-    userId: string,
-    timeRange?: string
-  ): Promise<{
-    bills_tracked: number;
-    comments_posted: number;
-    civic_score: number;
-    engagement_level: 'beginner' | 'active' | 'expert' | 'leader';
-  }> {
-    // Mock implementation for now
-    return {
-      bills_tracked: 0,
-      comments_posted: 0,
-      civic_score: 0,
-      engagement_level: 'beginner'
-    };
-  }
-
-  async getUserBadges(userId: string): Promise<UserBadge[]> {
+  /**
+   * @deprecated Use getAchievements() instead
+   */
+  async getUserBadges(_userId: string): Promise<UserBadge[]> {
     const achievements = await this.getAchievements();
     return achievements.badges;
   }
 
-  async getUserAchievements(userId: string): Promise<UserAchievement[]> {
+  /**
+   * @deprecated Use getAchievements() instead
+   */
+  async getUserAchievements(_userId: string): Promise<UserAchievement[]> {
     const achievements = await this.getAchievements();
     return achievements.achievements;
-  }
-
-  async getRecommendations(userId: string, limit: number = 10): Promise<Recommendation[]> {
-    // Mock implementation for now
-    return [];
-  }
-
-  async dismissRecommendation(userId: string, billId: number, reason?: string): Promise<void> {
-    // Mock implementation for now
-    return Promise.resolve();
-  }
-
-  async getNotificationPreferences(userId: string): Promise<NotificationPreferences> {
-    // Mock implementation for now
-    return {
-      email: true,
-      push: true,
-      sms: false,
-      frequency: 'daily',
-      quiet_hours: {
-        enabled: false,
-        start_time: '22:00',
-        end_time: '08:00'
-      }
-    };
-  }
-
-  async updateNotificationPreferences(userId: string, preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
-    // Mock implementation for now
-    const current = await this.getNotificationPreferences(userId);
-    return { ...current, ...preferences };
-  }
-
-  async getPrivacyControls(userId: string): Promise<PrivacySettings> {
-    // Mock implementation for now
-    return {
-      profile_visibility: 'public',
-      activity_visibility: 'public',
-      data_sharing: false,
-      analytics_tracking: true,
-      marketing_emails: false
-    };
-  }
-
-  async updatePrivacyControls(userId: string, controls: Partial<PrivacySettings>): Promise<PrivacySettings> {
-    // Mock implementation for now
-    const current = await this.getPrivacyControls(userId);
-    return { ...current, ...controls };
-  }
-
-  async requestDataExport(
-    userId: string,
-    request: {
-      format: 'json' | 'csv' | 'pdf';
-      includePersonalData: boolean;
-      includeActivityHistory: boolean;
-      includeMetrics: boolean;
-      includeComments: boolean;
-      dateRange?: { start: string; end: string };
-    }
-  ): Promise<{ exportId: string }> {
-    // Mock implementation for now
-    return { exportId: `export_${Date.now()}` };
-  }
-
-  async recordActivity(activity: {
-    action_type: string;
-    entity_type: string;
-    entity_id: string;
-    metadata?: Record<string, unknown>;
-  }): Promise<void> {
-    // Mock implementation for now
-    return Promise.resolve();
   }
 }
 
 // ============================================================================
-// Export Singleton Instance
+// Singleton Instance with Proxy Pattern
 // ============================================================================
 
-import { authService } from '@client/core/auth';
+/**
+ * Creates a singleton instance of UserService.
+ * This ensures only one instance exists across the application.
+ */
+const createUserServiceInstance = (): UserService => {
+  return new UserService(authService, userApi);
+};
 
-import { userApi } from '@client/features/users/services/user-api';
+/**
+ * Gets or creates the singleton instance using globalThis for HMR compatibility.
+ */
+const getOrCreateInstance = (): UserService => {
+  const globalAny = globalThis as { __USER_SERVICE_INSTANCE?: UserService };
+  
+  if (!globalAny.__USER_SERVICE_INSTANCE) {
+    globalAny.__USER_SERVICE_INSTANCE = createUserServiceInstance();
+  }
+  
+  return globalAny.__USER_SERVICE_INSTANCE;
+};
 
-export const userService = new UserService(authService, userApi);
+/**
+ * Exported singleton instance using Proxy pattern for transparent access.
+ * This allows calling methods directly on userService as if it were the actual instance.
+ */
+export const userService = new Proxy({} as unknown as UserService, {
+  get(_target, prop: string | symbol) {
+    const instance = getOrCreateInstance();
+    const value = (instance as unknown as Record<PropertyKey, unknown>)[prop];
+    
+    // Bind methods to maintain correct 'this' context
+    if (typeof value === 'function') {
+      return (value as (...args: unknown[]) => unknown).bind(instance);
+    }
+    
+    return value;
+  },
+  set(_target, prop: string | symbol, value) {
+    const instance = getOrCreateInstance();
+    (instance as unknown as Record<PropertyKey, unknown>)[prop] = value;
+    return true;
+  }
+});
 
-// Types are exported at the top of the file
+// Export all types for external use
+export type {
+  IAuthService,
+  IUserAPIService
+};

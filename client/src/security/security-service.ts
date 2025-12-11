@@ -3,8 +3,6 @@
  * Coordinates all security components and provides unified security management
  */
 
-import { SecurityEvent } from '@client/types';
-
 import { cspNonceManager } from './csp-nonce';
 import { csrfProtection, setupCSRFInterceptor } from './csrf-protection';
 import { inputSanitizer } from './input-sanitizer';
@@ -110,12 +108,14 @@ export class SecurityService {
 
   /**
    * Initialize Content Security Policy
+   * Note: frame-ancestors directive cannot be set via meta tag and must be delivered via HTTP headers
    */
   private initializeCSP(): void {
-    // Set initial CSP header if we can (this would typically be done server-side)
+    // CSP is ideally set server-side via HTTP headers for better security
+    // The meta tag approach is a fallback and has limitations (frame-ancestors directive not supported)
     const cspHeader = cspNonceManager.generateCSPHeader();
 
-    // Add meta tag for CSP (fallback)
+    // Add meta tag for CSP (fallback - note: some directives like frame-ancestors won't work)
     const existingCSP = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
     if (!existingCSP) {
       const meta = document.createElement('meta');
@@ -188,21 +188,24 @@ export class SecurityService {
   /**
    * Setup axios interceptors for security
    */
-  public setupAxiosInterceptors(axiosInstance: any): void {
+  public setupAxiosInterceptors(axiosInstance: { interceptors: { request: { use: (callback: (config: Record<string, unknown>) => Record<string, unknown>) => void } } }): void {
     if (this.config.enableCSRF) {
       setupCSRFInterceptor(axiosInstance);
     }
 
     // Add security headers to all requests
-    axiosInstance.interceptors.request.use((config: any) => {
+    axiosInstance.interceptors.request.use((config: Record<string, unknown>) => {
       // Add CSP nonce if available
       if (this.config.enableCSP) {
-        config.headers['X-CSP-Nonce'] = cspNonceManager.getCurrentNonce();
+        const headers = config.headers as Record<string, string>;
+        headers['X-CSP-Nonce'] = cspNonceManager.getCurrentNonce();
       }
 
       // Add security headers
-      config.headers['X-Requested-With'] = 'XMLHttpRequest';
-      config.headers['X-Content-Type-Options'] = 'nosniff';
+      const headers = config.headers as Record<string, string>;
+      headers['X-Requested-With'] = 'XMLHttpRequest';
+      // cspell: disable-next-line
+      headers['X-Content-Type-Options'] = 'nosniff';
 
       return config;
     });
@@ -233,11 +236,12 @@ export class SecurityService {
   /**
    * Validate input with schema
    */
-  public async validateInput<T>(schema: any, input: unknown): Promise<{ success: true; data: T } | { success: false; errors: string[] }> {
+  public async validateInput<T>(schema: Record<string, unknown>, input: unknown): Promise<{ success: true; data: T } | { success: false; errors: string[] }> {
     if (!this.config.enableInputSanitization) {
       return { success: true, data: input as T };
     }
-    return inputSanitizer.validateAndSanitize(schema, input);
+    const result = await inputSanitizer.validateAndSanitize(schema, input);
+    return result as { success: true; data: T } | { success: false; errors: string[] };
   }
 
   /**

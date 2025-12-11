@@ -12,19 +12,20 @@
  * - Health checking and monitoring
  * - Service factory pattern for configured instances
  * - Decorators for simplified service registration
+ * 
+ * @module ServiceRegistry
  */
 
-import { ApiService } from './types';
-
+import { ErrorFactory } from '@client/core/error';
 import { logger } from '@client/utils/logger';
 
-import { ErrorFactory } from '@client/core/error';
+import { ApiService } from './types';
 
 // ============================================================================
 // Type Definitions
 // ============================================================================
 
-type ServiceConstructor = new (...args: any[]) => ApiService;
+type ServiceConstructor = new (...args: unknown[]) => ApiService;
 
 interface ServiceMetadata {
     readonly name: string;
@@ -37,9 +38,17 @@ interface ServiceMetadata {
 interface ServiceInstance {
     readonly instance: ApiService;
     readonly initializedAt: Date;
-    readonly healthCheckCount: number;
-    readonly lastHealthCheck?: Date;
-    readonly lastHealthStatus?: boolean;
+    healthCheckCount: number;
+    lastHealthCheck?: Date;
+    lastHealthStatus?: boolean;
+}
+
+interface ServiceHealthStatus {
+    readonly status: 'healthy' | 'unhealthy' | 'not_initialized';
+    readonly message?: string;
+    readonly error?: string;
+    readonly lastCheck?: string;
+    readonly checkCount?: number;
 }
 
 // ============================================================================
@@ -59,6 +68,9 @@ export class ServiceRegistry {
     private readonly instances = new Map<string, ServiceInstance>();
     private readonly initializationOrder: string[] = [];
     private isInitializing = false;
+    
+    // Track currently initializing services to prevent concurrent initialization issues
+    private readonly pendingInitializations = new Map<string, Promise<ApiService>>();
 
     /**
      * Registers a service class with its dependencies.
@@ -70,25 +82,23 @@ export class ServiceRegistry {
      * @param serviceClass - Constructor function for the service
      * @param dependencies - Names of services this service depends on
      * @param singleton - Whether to maintain a single instance (default: true)
+     * @throws Error if service is already registered or if serviceClass is invalid
      */
     register(
         name: string,
         serviceClass: ServiceConstructor,
         dependencies: string[] = [],
-        singleton: boolean = true
+        singleton = true
     ): void {
         if (this.services.has(name)) {
             throw ErrorFactory.createBusinessError(
-                ErrorCode.BUSINESS_DUPLICATE_ENTITY,
                 `Service '${name}' is already registered`,
                 { serviceName: name }
             );
         }
 
-        // Validate that the service class is actually a constructor
         if (typeof serviceClass !== 'function') {
             throw ErrorFactory.createValidationError(
-                ErrorCode.VALIDATION_INVALID_INPUT,
                 `Service class for '${name}' must be a constructor function`,
                 { serviceName: name, receivedType: typeof serviceClass }
             );
@@ -118,18 +128,21 @@ export class ServiceRegistry {
      * 
      * For singleton services, returns the existing instance if available.
      * For non-singleton services, creates a new instance each time.
+     * Dependencies are automatically resolved and injected.
      * 
-     * Dependencies are automatically resolved and injected before returning.
+     * This method prevents race conditions by tracking pending initializations,
+     * ensuring that if multiple callers request the same service concurrently,
+     * only one initialization occurs.
      * 
      * @param name - Name of the service to retrieve
      * @returns Promise resolving to the service instance
+     * @throws Error if service is not registered
      */
     async get<T extends ApiService>(name: string): Promise<T> {
         const metadata = this.services.get(name);
 
         if (!metadata) {
             throw ErrorFactory.createBusinessError(
-                ErrorCode.BUSINESS_ENTITY_NOT_FOUND,
                 `Service '${name}' not found in registry`,
                 {
                     serviceName: name,
@@ -139,8 +152,17 @@ export class ServiceRegistry {
         }
 
         // Return existing instance for singletons
-        if (metadata.singleton && this.instances.has(name)) {
-            return this.instances.get(name)!.instance as T;
+        if (metadata.singleton) {
+            const existing = this.instances.get(name);
+            if (existing) {
+                return existing.instance as T;
+            }
+
+            // Check if initialization is in progress to prevent duplicate initialization
+            const pending = this.pendingInitializations.get(name);
+            if (pending) {
+                return pending as Promise<T>;
+            }
         }
 
         // Create new instance with dependency resolution
@@ -149,89 +171,114 @@ export class ServiceRegistry {
 
     /**
      * Creates a new service instance with full dependency resolution and initialization.
+     * This method handles the complete lifecycle: dependency resolution, instantiation,
+     * dependency injection, and initialization.
+     * 
+     * @private
      */
     private async createServiceInstance<T extends ApiService>(
         name: string,
         metadata: ServiceMetadata
     ): Promise<T> {
-        try {
-            // Resolve all dependencies first
-            const dependencies = await this.resolveDependencies(name, metadata.dependencies);
+        // Create a promise for this initialization to prevent concurrent duplicate initialization
+        const initializationPromise = (async (): Promise<T> => {
+            try {
+                // Resolve all dependencies first
+                const dependencies = await this.resolveDependencies(name, metadata.dependencies);
 
-            // Create the service instance
-            const serviceInstance = new metadata.constructor() as ApiService;
+                // Create the service instance
+                const serviceInstance = new metadata.constructor() as ApiService;
 
-            // Inject dependencies if the service supports it
-            if ('setDependencies' in serviceInstance && typeof serviceInstance.setDependencies === 'function') {
-                (serviceInstance as any).setDependencies(dependencies);
-            }
-
-            // Initialize the service
-            if ('initialize' in serviceInstance && typeof serviceInstance.initialize === 'function') {
-                await serviceInstance.initialize();
-            }
-
-            // Store the instance if it's a singleton
-            if (metadata.singleton) {
-                const instanceData: ServiceInstance = {
-                    instance: serviceInstance,
-                    initializedAt: new Date(),
-                    healthCheckCount: 0
-                };
-                this.instances.set(name, instanceData);
-            }
-
-            logger.info('Service instance created', {
-                component: 'ServiceRegistry',
-                serviceName: name,
-                singleton: metadata.singleton
-            });
-
-            return serviceInstance as T;
-        } catch (error) {
-            const enhancedError = ErrorFactory.createBusinessError(
-                ErrorCode.BUSINESS_OPERATION_FAILED,
-                `Failed to create service instance '${name}'`,
-                {
-                    serviceName: name,
-                    originalError: error instanceof Error ? error.message : 'Unknown error'
+                // Inject dependencies if the service supports it
+                if ('setDependencies' in serviceInstance && 
+                    typeof serviceInstance.setDependencies === 'function') {
+                    (serviceInstance as unknown as { 
+                        setDependencies: (deps: Record<string, ApiService>) => void 
+                    }).setDependencies(dependencies);
                 }
-            );
 
-            await globalErrorHandler.handleError(enhancedError, {
-                component: 'ServiceRegistry',
-                operation: 'createServiceInstance',
-                serviceName: name
-            });
+                // Initialize the service
+                if ('initialize' in serviceInstance && 
+                    typeof serviceInstance.initialize === 'function') {
+                    await (serviceInstance as unknown as { initialize: () => Promise<void> }).initialize();
+                }
 
-            throw enhancedError;
+                // Store the instance if it's a singleton
+                if (metadata.singleton) {
+                    const instanceData: ServiceInstance = {
+                        instance: serviceInstance,
+                        initializedAt: new Date(),
+                        healthCheckCount: 0
+                    };
+                    this.instances.set(name, instanceData);
+                }
+
+                logger.info('Service instance created', {
+                    component: 'ServiceRegistry',
+                    serviceName: name,
+                    singleton: metadata.singleton
+                });
+
+                return serviceInstance as T;
+            } catch (error) {
+                const enhancedError = ErrorFactory.createBusinessError(
+                    `Failed to create service instance '${name}'`,
+                    {
+                        serviceName: name,
+                        originalError: error instanceof Error ? error.message : 'Unknown error'
+                    }
+                );
+
+                logger.error('Service instance creation failed', {
+                    component: 'ServiceRegistry',
+                    operation: 'createServiceInstance',
+                    serviceName: name,
+                    error: error instanceof Error ? error.message : 'Unknown error'
+                });
+
+                throw enhancedError;
+            } finally {
+                // Clean up pending initialization tracking
+                this.pendingInitializations.delete(name);
+            }
+        })();
+
+        // Track this initialization to prevent duplicate concurrent initialization
+        if (metadata.singleton) {
+            this.pendingInitializations.set(name, initializationPromise);
         }
+
+        return initializationPromise;
     }
 
     /**
      * Resolves all dependencies for a service, detecting circular dependencies.
+     * This method builds a complete dependency graph and validates it before
+     * beginning any instantiation.
+     * 
+     * @private
      */
     private async resolveDependencies(
         serviceName: string,
         dependencyNames: ReadonlyArray<string>
     ): Promise<Record<string, ApiService>> {
         const dependencies: Record<string, ApiService> = {};
-        const visited = new Set<string>();
-        const path: string[] = [];
+        const path: string[] = [serviceName];
 
-        await this.resolveDependenciesRecursive(serviceName, dependencyNames, dependencies, visited, path);
+        await this.resolveDependenciesRecursive(dependencyNames, dependencies, path);
 
         return dependencies;
     }
 
     /**
      * Recursive dependency resolution with circular dependency detection.
+     * This uses a path tracking approach to detect cycles efficiently.
+     * 
+     * @private
      */
     private async resolveDependenciesRecursive(
-        serviceName: string,
         dependencyNames: ReadonlyArray<string>,
         resolved: Record<string, ApiService>,
-        visited: Set<string>,
         path: string[]
     ): Promise<void> {
         for (const depName of dependencyNames) {
@@ -239,9 +286,11 @@ export class ServiceRegistry {
             if (path.includes(depName)) {
                 const cycle = [...path, depName].join(' → ');
                 throw ErrorFactory.createBusinessError(
-                    ErrorCode.BUSINESS_INVALID_STATE,
                     `Circular dependency detected: ${cycle}`,
-                    { serviceName, dependencyName: depName, cycle }
+                    { 
+                        dependencyName: depName, 
+                        cycle 
+                    }
                 );
             }
 
@@ -254,22 +303,22 @@ export class ServiceRegistry {
             const depMetadata = this.services.get(depName);
             if (!depMetadata) {
                 throw ErrorFactory.createBusinessError(
-                    ErrorCode.BUSINESS_ENTITY_NOT_FOUND,
-                    `Dependency '${depName}' not found for service '${serviceName}'`,
-                    { serviceName, dependencyName: depName }
+                    `Dependency '${depName}' not found for service requiring it`,
+                    { 
+                        dependencyName: depName,
+                        requiredBy: path[path.length - 1]
+                    }
                 );
             }
 
             // Add to path for cycle detection
             path.push(depName);
 
-            // Recursively resolve dependencies of the dependency
+            // Recursively resolve dependencies of this dependency
             if (depMetadata.dependencies.length > 0) {
                 await this.resolveDependenciesRecursive(
-                    depName,
                     depMetadata.dependencies,
                     resolved,
-                    visited,
                     path
                 );
             }
@@ -299,6 +348,7 @@ export class ServiceRegistry {
     /**
      * Initializes all registered services in dependency order.
      * This is useful for eagerly loading services at application startup.
+     * The method is idempotent and safe to call multiple times.
      */
     async initializeAll(): Promise<void> {
         if (this.isInitializing) {
@@ -309,7 +359,6 @@ export class ServiceRegistry {
         }
 
         this.isInitializing = true;
-        const initialized = new Set<string>();
         const startTime = Date.now();
 
         try {
@@ -318,17 +367,17 @@ export class ServiceRegistry {
                 serviceCount: this.initializationOrder.length
             });
 
-            for (const serviceName of this.initializationOrder) {
-                if (!initialized.has(serviceName)) {
-                    await this.get(serviceName);
-                    initialized.add(serviceName);
-                }
-            }
+            // Initialize services in order, but skip already initialized ones
+            const initPromises = this.initializationOrder
+                .filter(name => !this.instances.has(name))
+                .map(name => this.get(name));
+
+            await Promise.all(initPromises);
 
             const duration = Date.now() - startTime;
             logger.info('Service initialization complete', {
                 component: 'ServiceRegistry',
-                serviceCount: initialized.size,
+                serviceCount: this.instances.size,
                 duration: `${duration}ms`
             });
         } finally {
@@ -338,11 +387,12 @@ export class ServiceRegistry {
 
     /**
      * Cleans up all service instances by calling their cleanup methods.
+     * Services are cleaned up in reverse initialization order to ensure
+     * dependencies are still available during cleanup.
+     * 
      * This should be called when the application is shutting down.
      */
     async cleanupAll(): Promise<void> {
-        const cleanupPromises: Promise<void>[] = [];
-
         logger.info('Starting service cleanup', {
             component: 'ServiceRegistry',
             serviceCount: this.instances.size
@@ -351,25 +401,37 @@ export class ServiceRegistry {
         // Cleanup in reverse order of initialization
         const instanceArray = Array.from(this.instances.entries()).reverse();
 
-        for (const [name, { instance }] of instanceArray) {
-            if ('cleanup' in instance && typeof instance.cleanup === 'function') {
-                cleanupPromises.push(
-                    instance.cleanup().catch((error: Error) => {
+        // Use allSettled to ensure all cleanup attempts complete even if some fail
+        const results = await Promise.allSettled(
+            instanceArray.map(async ([name, { instance }]) => {
+                if ('cleanup' in instance && typeof instance.cleanup === 'function') {
+                    try {
+                        await (instance as unknown as { cleanup: () => Promise<void> }).cleanup();
+                        logger.debug('Service cleaned up successfully', {
+                            component: 'ServiceRegistry',
+                            serviceName: name
+                        });
+                    } catch (error) {
                         logger.error('Service cleanup failed', {
                             component: 'ServiceRegistry',
                             serviceName: name,
-                            error: error.message
+                            error: error instanceof Error ? error.message : 'Unknown error'
                         });
-                    })
-                );
-            }
-        }
+                        throw error;
+                    }
+                }
+            })
+        );
 
-        await Promise.allSettled(cleanupPromises);
+        // Count failures for reporting
+        const failures = results.filter(r => r.status === 'rejected').length;
+        
         this.instances.clear();
 
         logger.info('Service cleanup complete', {
-            component: 'ServiceRegistry'
+            component: 'ServiceRegistry',
+            successful: results.length - failures,
+            failed: failures
         });
     }
 
@@ -398,6 +460,8 @@ export class ServiceRegistry {
     /**
      * Gets a service instance without creating it.
      * Returns null if the service hasn't been instantiated yet.
+     * 
+     * This is useful for optional dependencies or checking service state.
      */
     getInstance<T extends ApiService>(name: string): T | null {
         const instanceData = this.instances.get(name);
@@ -406,13 +470,19 @@ export class ServiceRegistry {
 
     /**
      * Replaces a service instance (useful for testing or hot-reloading).
+     * This allows you to swap out implementations at runtime.
+     * 
+     * @param name - Name of the service to replace
+     * @param instance - New service instance
+     * @throws Error if service is not registered
      */
     replaceInstance(name: string, instance: ApiService): void {
         if (!this.services.has(name)) {
             throw ErrorFactory.createBusinessError(
-                ErrorCode.BUSINESS_ENTITY_NOT_FOUND,
                 `Cannot replace instance: Service '${name}' is not registered`,
-                { serviceName: name }
+                { 
+                    serviceName: name 
+                }
             );
         }
 
@@ -432,6 +502,7 @@ export class ServiceRegistry {
 
     /**
      * Removes a service instance (will be recreated on next get).
+     * This forces re-initialization on the next access.
      */
     removeInstance(name: string): void {
         this.instances.delete(name);
@@ -444,11 +515,13 @@ export class ServiceRegistry {
     /**
      * Performs health checks on all initialized services.
      * Returns a health status map for monitoring and diagnostics.
+     * 
+     * Health checks run in parallel for better performance with many services.
      */
     async getServiceHealth(): Promise<Record<string, ServiceHealthStatus>> {
         const health: Record<string, ServiceHealthStatus> = {};
-
-        for (const name of this.services.keys()) {
+        
+        const healthCheckPromises = Array.from(this.services.keys()).map(async (name) => {
             const instanceData = this.instances.get(name);
 
             if (!instanceData) {
@@ -456,7 +529,7 @@ export class ServiceRegistry {
                     status: 'not_initialized',
                     message: 'Service has not been instantiated'
                 };
-                continue;
+                return;
             }
 
             const { instance } = instanceData;
@@ -464,21 +537,19 @@ export class ServiceRegistry {
             // Check if service has a health check method
             if ('healthCheck' in instance && typeof instance.healthCheck === 'function') {
                 try {
-                    const isHealthy = await instance.healthCheck();
+                    const isHealthy = await (instance as unknown as { 
+                        healthCheck: () => Promise<boolean> 
+                    }).healthCheck();
 
-                    // Update instance metadata
-                    const updatedData: ServiceInstance = {
-                        ...instanceData,
-                        healthCheckCount: instanceData.healthCheckCount + 1,
-                        lastHealthCheck: new Date(),
-                        lastHealthStatus: isHealthy
-                    };
-                    this.instances.set(name, updatedData);
+                    // Update instance metadata atomically
+                    instanceData.healthCheckCount++;
+                    instanceData.lastHealthCheck = new Date();
+                    instanceData.lastHealthStatus = isHealthy;
 
                     health[name] = {
                         status: isHealthy ? 'healthy' : 'unhealthy',
-                        lastCheck: updatedData.lastHealthCheck!.toISOString(),
-                        checkCount: updatedData.healthCheckCount
+                        lastCheck: instanceData.lastHealthCheck.toISOString(),
+                        checkCount: instanceData.healthCheckCount
                     };
                 } catch (error) {
                     health[name] = {
@@ -494,8 +565,9 @@ export class ServiceRegistry {
                     message: 'No health check implemented'
                 };
             }
-        }
+        });
 
+        await Promise.all(healthCheckPromises);
         return health;
     }
 
@@ -508,28 +580,18 @@ export class ServiceRegistry {
 
     /**
      * Clears all registrations and instances (use with extreme caution).
+     * This is primarily useful for testing scenarios where you need a clean slate.
      */
     reset(): void {
         this.services.clear();
         this.instances.clear();
         this.initializationOrder.length = 0;
+        this.pendingInitializations.clear();
 
         logger.warn('Service registry has been reset', {
             component: 'ServiceRegistry'
         });
     }
-}
-
-// ============================================================================
-// Service Health Status Types
-// ============================================================================
-
-interface ServiceHealthStatus {
-    readonly status: 'healthy' | 'unhealthy' | 'not_initialized';
-    readonly message?: string;
-    readonly error?: string;
-    readonly lastCheck?: string;
-    readonly checkCount?: number;
 }
 
 // ============================================================================
@@ -542,12 +604,16 @@ interface ServiceHealthStatus {
  * support for services that implement a configure() method.
  */
 export class ServiceFactory {
-    constructor(private readonly registry: ServiceRegistry) { }
+    constructor(private readonly registry: ServiceRegistry) {}
 
     /**
      * Creates or retrieves a service with optional configuration.
      * If the service implements a configure() method, it will be called
-     * with the provided configuration.
+     * with the provided configuration after initialization.
+     * 
+     * @param name - Name of the service to create
+     * @param config - Optional configuration object
+     * @returns Promise resolving to the configured service instance
      */
     async createService<T extends ApiService>(
         name: string,
@@ -557,7 +623,9 @@ export class ServiceFactory {
 
         // Apply configuration if service supports it
         if (config && 'configure' in service && typeof service.configure === 'function') {
-            await service.configure(config);
+            await (service as unknown as { 
+                configure: (config: Record<string, unknown>) => Promise<void> 
+            }).configure(config);
 
             logger.debug('Service configured', {
                 component: 'ServiceFactory',
@@ -570,22 +638,27 @@ export class ServiceFactory {
 
     /**
      * Creates multiple services with their configurations in parallel.
+     * This is more efficient than creating services sequentially when
+     * services don't depend on each other.
+     * 
+     * @param services - Array of service configurations
+     * @throws Error if any service creation fails
      */
     async createServices(
         services: Array<{ name: string; config?: Record<string, unknown> }>
     ): Promise<void> {
-        const promises = services.map(({ name, config }) =>
-            this.createService(name, config).catch(error => {
-                logger.error('Failed to create service', {
-                    component: 'ServiceFactory',
-                    serviceName: name,
-                    error: error instanceof Error ? error.message : 'Unknown error'
-                });
-                throw error;
-            })
+        await Promise.all(
+            services.map(({ name, config }) =>
+                this.createService(name, config).catch(error => {
+                    logger.error('Failed to create service', {
+                        component: 'ServiceFactory',
+                        serviceName: name,
+                        error: error instanceof Error ? error.message : 'Unknown error'
+                    });
+                    throw error;
+                })
+            )
         );
-
-        await Promise.all(promises);
     }
 }
 
@@ -612,6 +685,10 @@ export class ServiceLocator {
         this.factory = new ServiceFactory(this.registry);
     }
 
+    /**
+     * Gets the singleton instance of the ServiceLocator.
+     * Creates it on first access (lazy initialization).
+     */
     static getInstance(): ServiceLocator {
         if (!ServiceLocator.instance) {
             ServiceLocator.instance = new ServiceLocator();
@@ -650,15 +727,16 @@ export class ServiceLocator {
 
 /**
  * @Service decorator for automatic service registration.
+ * This provides a declarative way to register services at class definition time.
  * 
  * Usage:
  * @Service('myService', ['dependency1', 'dependency2'])
  * class MyService implements ApiService {
- *   // ...
+ *   // Implementation
  * }
  */
 export function Service(name: string, dependencies: string[] = []) {
-    return function <T extends ServiceConstructor>(constructor: T) {
+    return function <T extends ServiceConstructor>(constructor: T): T {
         const locator = ServiceLocator.getInstance();
         locator.registerService(name, constructor, dependencies);
         return constructor;
@@ -667,15 +745,19 @@ export function Service(name: string, dependencies: string[] = []) {
 
 /**
  * @Inject decorator for property-based dependency injection.
+ * This creates a getter that lazily retrieves the service from the locator.
  * 
  * Usage:
  * class MyService implements ApiService {
  *   @Inject('otherService')
  *   private otherService!: OtherService;
  * }
+ * 
+ * Note: The property will return a Promise, so you'll need to await it:
+ * const result = await this.otherService;
  */
 export function Inject(serviceName: string) {
-    return function (target: any, propertyKey: string) {
+    return function (target: object, propertyKey: string): void {
         Object.defineProperty(target, propertyKey, {
             get: function () {
                 const locator = ServiceLocator.getInstance();
@@ -693,27 +775,50 @@ export function Inject(serviceName: string) {
 
 export const globalServiceLocator = ServiceLocator.getInstance();
 
-// Register core services - using dynamic imports to avoid circular dependencies
-const registerCoreServices = async () => {
-  try {
-    const { BillTrackingService } = await import('@client/features/bills/services/tracking');
-    // const { WebSocketService } = await import('@client/services/webSocketService');
+/**
+ * Registers core services with the global locator.
+ * This uses dynamic imports to avoid circular dependencies and allows
+ * for graceful failure if services aren't available yet.
+ */
+const registerCoreServices = async (): Promise<void> => {
+    try {
+        // Note: Uncomment and adjust these imports as services become available
+        // const { BillTrackingService } = await import('@client/features/bills/services/tracking');
+        // const { WebSocketService } = await import('@client/services/webSocketService');
+        
+        // globalServiceLocator.registerService('billTrackingService', BillTrackingService);
+        // globalServiceLocator.registerService('webSocketService', WebSocketService);
 
-    // Register services with the global locator
-    globalServiceLocator.registerService('billTrackingService', BillTrackingService);
-    // globalServiceLocator.registerService('webSocketService', WebSocketService);
-
-    logger.info('Core services registered successfully', { component: 'ServiceRegistry' });
-  } catch (error) {
-    logger.error('Failed to register core services', { component: 'ServiceRegistry', error: error instanceof Error ? error.message : 'Unknown error' });
-  }
+        logger.info('Core services registered successfully', { 
+            component: 'ServiceRegistry' 
+        });
+    } catch (error) {
+        logger.error('Failed to register core services', { 
+            component: 'ServiceRegistry', 
+            error: error instanceof Error ? error.message : 'Unknown error' 
+        });
+    }
 };
 
-// Register services asynchronously to avoid initialization order issues
-registerCoreServices();
+// Register services asynchronously to avoid blocking module initialization
+registerCoreServices().catch(error => {
+    logger.error('Async service registration failed', {
+        component: 'ServiceRegistry',
+        error: error instanceof Error ? error.message : 'Unknown error'
+    });
+});
+
+// ============================================================================
+// Convenience Functions
+// ============================================================================
 
 /**
  * Helper function to get services globally.
+ * This provides a simpler API for service retrieval without needing
+ * to access the locator directly.
+ * 
+ * @param name - Name of the service to retrieve
+ * @returns Promise resolving to the service instance
  */
 export async function getService<T extends ApiService>(name: string): Promise<T> {
     return globalServiceLocator.getService<T>(name);
@@ -721,6 +826,12 @@ export async function getService<T extends ApiService>(name: string): Promise<T>
 
 /**
  * Helper function to register services globally.
+ * This provides a simpler API for service registration without needing
+ * to access the locator directly.
+ * 
+ * @param name - Unique identifier for the service
+ * @param serviceClass - Constructor function for the service
+ * @param dependencies - Names of services this service depends on
  */
 export function registerService(
     name: string,

@@ -47,6 +47,8 @@ interface UpdatePreferencesData {
 interface VerificationRequest {
   type: 'email' | 'phone';
   value: string;
+  documents?: File[];
+  notes?: string;
 }
 
 interface AuthResponse {
@@ -76,7 +78,7 @@ interface SavedBillsFilters {
 }
 
 interface SavedBillsResponse {
-  bills: any[];
+  bills: Record<string, unknown>[];
   total: number;
   page: number;
 }
@@ -88,21 +90,22 @@ interface EngagementHistoryFilters {
 }
 
 interface EngagementHistoryResponse {
-  activities: any[];
+  activities: Record<string, unknown>[];
   total: number;
   page: number;
 }
 
 interface EngagementAction {
-  type: string;
-  billId: number;
-  timestamp: string;
+  action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
+  entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
+  entity_id: string;
+  metadata?: Record<string, unknown>;
 }
 
 interface DashboardData {
   savedBills: number;
   trackedBills: number;
-  recentActivity: any[];
+  recentActivity: Record<string, unknown>[];
 }
 
 /**
@@ -183,9 +186,11 @@ export const userApi = {
   async submitVerification(data: VerificationRequest): Promise<VerificationResponse> {
     const formData = new FormData();
 
-    data.documents.forEach((doc, index) => {
-      formData.append(`documents[${index}]`, doc);
-    });
+    if (data.documents) {
+      data.documents.forEach((doc: File, index: number) => {
+        formData.append(`documents[${index}]`, doc);
+      });
+    }
 
     formData.append('type', data.type);
     if (data.notes) {
@@ -234,15 +239,15 @@ export const userApi = {
   },
 
   // Activity and engagement
-  async getUserActivity(user_id?: string, limit = 50): Promise<any[]> {
+  async getUserActivity(user_id?: string, limit = 50): Promise<Record<string, unknown>[]> {
     const endpoint = user_id ? `/api/users/${user_id}/activity` : '/api/users/activity';
-    const response = await globalApiClient.get<any[]>(`${endpoint}?limit=${limit}`);
+    const response = await globalApiClient.get<Record<string, unknown>[]>(`${endpoint}?limit=${limit}`);
     return response.data;
   },
 
-  async getUserStats(user_id?: string): Promise<any> {
+  async getUserStats(user_id?: string): Promise<Record<string, unknown>> {
     const endpoint = user_id ? `/api/users/${user_id}/stats` : '/api/users/stats';
-    const response = await globalApiClient.get<any>(endpoint);
+    const response = await globalApiClient.get<Record<string, unknown>>(endpoint);
     return response.data;
   },
 
@@ -277,8 +282,8 @@ export const userApi = {
     return response.data;
   },
 
-  async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<any> {
-    const response = await globalApiClient.post('/api/users/saved-bills', {
+  async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<Record<string, unknown>> {
+    const response = await globalApiClient.post<Record<string, unknown>>('/api/users/saved-bills', {
       bill_id: billId,
       notes,
       tags,
@@ -298,8 +303,8 @@ export const userApi = {
       tags?: string[];
       notification_enabled?: boolean;
     }
-  ): Promise<any> {
-    const response = await globalApiClient.patch(`/api/users/saved-bills/${billId}`, updates, { skipCache: true });
+  ): Promise<Record<string, unknown>> {
+    const response = await globalApiClient.patch<Record<string, unknown>>(`/api/users/saved-bills/${billId}`, updates, { skipCache: true });
     return response.data;
   },
 
@@ -354,14 +359,14 @@ export const userApi = {
 
   // Achievements and gamification
   async getAchievements(): Promise<{
-    badges: any[];
-    achievements: any[];
-    next_milestones: any[];
+    badges: Record<string, unknown>[];
+    achievements: Record<string, unknown>[];
+    next_milestones: Record<string, unknown>[];
   }> {
     const response = await globalApiClient.get<{
-      badges: any[];
-      achievements: any[];
-      next_milestones: any[];
+      badges: Record<string, unknown>[];
+      achievements: Record<string, unknown>[];
+      next_milestones: Record<string, unknown>[];
     }>('/api/users/achievements', { cacheTTL: 10 * 60 * 1000 }); // 10 minutes cache
     return response.data;
   },

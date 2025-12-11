@@ -5,6 +5,20 @@
 
 import { LoadingOperation, LoadingConfig } from '@client/types';
 
+// Loading scenario type definition
+export interface LoadingScenario {
+  id: string;
+  name: string;
+  description: string;
+  defaultTimeout: number;
+  retryStrategy: 'exponential' | 'linear' | 'none';
+  maxRetries: number;
+  priority: 'high' | 'medium' | 'low';
+  connectionAware: boolean;
+  progressTracking: boolean;
+  stages?: Array<{ id: string; message: string; duration?: number }> | undefined;
+}
+
 // Predefined loading scenarios - mapped to LoadingConfig
 export const LOADING_SCENARIOS: Record<string, LoadingConfig> = {
   PAGE_INITIAL: {
@@ -80,6 +94,86 @@ export const LOADING_SCENARIOS: Record<string, LoadingConfig> = {
   },
 };
 
+// Utility for creating loading operations from scenarios
+export function createOperationFromScenario(
+  scenario: LoadingScenario,
+  instanceId: string
+): LoadingOperation {
+  const adjustedTimeout = getAdjustedTimeout(
+    scenario.defaultTimeout,
+    scenario.priority === 'high' ? 'high' : scenario.priority === 'low' ? 'low' : 'normal'
+  );
+
+  return {
+    id: `${scenario.id}-${instanceId}`,
+    type: scenario.id.includes('page') ? 'page' :
+          scenario.id.includes('component') ? 'component' :
+          scenario.id.includes('api') ? 'api' : 'asset',
+    startTime: new Date(),
+    state: 'idle',
+    retryCount: 0,
+    maxRetries: scenario.maxRetries,
+    metadata: {
+      priority: scenario.priority,
+      timeout: adjustedTimeout,
+      retryStrategy: scenario.retryStrategy,
+      connectionAware: scenario.connectionAware,
+    },
+  };
+}
+
+// Create loading operation from config
+export function createOperationFromConfig(
+  config: LoadingConfig,
+  operationId: string
+): LoadingOperation {
+  return {
+    id: operationId,
+    type: 'loading',
+    startTime: new Date(),
+    state: 'idle',
+    retryCount: 0,
+    maxRetries: config.maxRetries,
+    metadata: {
+      timeout: config.timeout,
+      retryDelay: config.retryDelay,
+      priority: config.priority,
+      showProgress: config.showProgress,
+    },
+  };
+}
+
+// Create loading operation
+export function createLoadingOperation(
+  operationId: string,
+  options: Partial<LoadingConfig> = {}
+): LoadingOperation {
+  const config: LoadingConfig = {
+    timeout: options.timeout || 30000,
+    retryDelay: options.retryDelay || 1000,
+    maxRetries: options.maxRetries || 3,
+    priority: options.priority || 'normal',
+    showProgress: options.showProgress ?? false,
+    enableCaching: options.enableCaching ?? false,
+    cacheTimeout: options.cacheTimeout,
+  };
+
+  return {
+    id: operationId,
+    type: 'loading',
+    startTime: new Date(),
+    state: 'idle',
+    retryCount: 0,
+    maxRetries: config.maxRetries,
+    metadata: {
+      timeout: config.timeout,
+      retryDelay: config.retryDelay,
+      priority: config.priority,
+      showProgress: config.showProgress,
+    },
+  };
+}
+
 // Loading scenario builder
 export class LoadingScenarioBuilder {
   private config: Partial<LoadingConfig> = {};
@@ -134,58 +228,6 @@ export class LoadingScenarioBuilder {
       cacheTimeout: this.config.cacheTimeout,
     };
   }
-}
-
-// Create loading operation from config
-export function createOperationFromConfig(
-  config: LoadingConfig,
-  operationId: string
-): LoadingOperation {
-  return {
-    id: operationId,
-    type: 'loading',
-    startTime: new Date(),
-    state: 'idle',
-    retryCount: 0,
-    maxRetries: config.maxRetries,
-    metadata: {
-      timeout: config.timeout,
-      retryDelay: config.retryDelay,
-      priority: config.priority,
-      showProgress: config.showProgress,
-    },
-  };
-}
-
-// Create loading operation
-export function createLoadingOperation(
-  operationId: string,
-  options: Partial<LoadingConfig> = {}
-): LoadingOperation {
-  const config: LoadingConfig = {
-    timeout: options.timeout || 30000,
-    retryDelay: options.retryDelay || 1000,
-    maxRetries: options.maxRetries || 3,
-    priority: options.priority || 'normal',
-    showProgress: options.showProgress ?? false,
-    enableCaching: options.enableCaching ?? false,
-    cacheTimeout: options.cacheTimeout,
-  };
-
-  return {
-    id: operationId,
-    type: 'loading',
-    startTime: new Date(),
-    state: 'idle',
-    retryCount: 0,
-    maxRetries: config.maxRetries,
-    metadata: {
-      timeout: config.timeout,
-      retryDelay: config.retryDelay,
-      priority: config.priority,
-      showProgress: config.showProgress,
-    },
-  };
 }
 
 // Check if operation has timed out

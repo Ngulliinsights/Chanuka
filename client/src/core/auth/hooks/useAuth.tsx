@@ -16,6 +16,11 @@ import {
   useCallback,
 } from 'react';
 
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { logger } from '../../../utils/logger';
+import { getAuthApiService } from '../services/auth-api-service';
+import { sessionManager } from '../services/session-manager';
+import * as authActions from '../store/auth-slice';
 import type {
   User,
   RegisterData,
@@ -28,14 +33,8 @@ import type {
   DataExportRequest,
   DataDeletionRequest,
   AuthContextType,
+  LoginCredentials,
 } from '../types';
-
-import { getAuthApiService } from '../services/auth-api-service';
-import type { LoginCredentials } from '../types';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import * as authActions from '../store/auth-slice';
-import { logger } from '../../../utils/logger';
-import { sessionManager } from '../services/session-manager';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -56,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const user = useAppSelector(authActions.selectUser);
   const loading = useAppSelector(authActions.selectIsLoading);
-  const error = useAppSelector(authActions.selectAuthError);
   const sessionExpiry = useAppSelector(authActions.selectSessionExpiry);
   const isInitialized = useAppSelector(authActions.selectIsInitialized);
   const twoFactorRequired = useAppSelector(authActions.selectTwoFactorRequired);
@@ -85,9 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         await dispatch(authActions.validateStoredTokens()).unwrap();
       } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
         logger.error('Token validation failed:', { 
           component: 'AuthProvider', 
-          error: err 
+          error: errorMessage 
         });
       }
     };
@@ -117,9 +116,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       MINIMUM_REFRESH_DELAY_MS
     );
 
-    if (refreshTime > 0 && refreshTime < 24 * 60 * 60 * 1000) { // Max 24 hours
+    if (refreshTime > 0 && refreshTime < 24 * 60 * 60 * 1000) {
       const timeoutId = setTimeout(() => {
-        // Double-check component is still mounted before dispatching
         if (mountedRef.current && user && sessionExpiry) {
           dispatch(authActions.refreshTokens());
         }
@@ -133,15 +131,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /**
    * Helper to convert Redux results to AuthResponse format.
+   * Handles various response types from different auth actions.
    */
   const toAuthResponse = useCallback(
-    (result: { user?: User; sessionExpiry?: string }): AuthResponse => {
+    (result: unknown): AuthResponse => {
+      // Handle different response structures
+      if (result && typeof result === 'object') {
+        const obj = result as Record<string, unknown>;
+        return {
+          success: true,
+          data: {
+            user: (obj.user as unknown) || (obj.data as Record<string, unknown>)?.user,
+            sessionExpiry: (obj.sessionExpiry as unknown) || (obj.data as Record<string, unknown>)?.sessionExpiry,
+          },
+        };
+      }
       return {
         success: true,
-        data: {
-          user: result.user,
-          sessionExpiry: result.sessionExpiry,
-        },
+        data: {},
       };
     },
     []
@@ -207,12 +214,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (token: string): Promise<AuthResponse> => {
       try {
         const result = await dispatch(authActions.verifyEmail(token)).unwrap();
-        return { success: true, data: { user: result?.user } };
+        return toAuthResponse(result);
       } catch (err) {
         return toAuthError(err, 'Email verification failed');
       }
     },
-    [dispatch, toAuthError]
+    [dispatch, toAuthResponse, toAuthError]
   );
 
   const requestPasswordReset = useCallback(
@@ -230,14 +237,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const resetPassword = useCallback(
-    async (
-      token: string,
-      newPassword: string,
-      confirmPassword: string
-    ): Promise<AuthResponse> => {
+    async (token: string, password: string): Promise<AuthResponse> => {
       try {
         await dispatch(
-          authActions.resetPassword({ token, newPassword, confirmPassword })
+          authActions.resetPassword({ token, newPassword: password, confirmPassword: password })
         ).unwrap();
         return { success: true };
       } catch (err) {
@@ -543,7 +546,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     user,
     loading,
-    error,
     sessionExpiry,
     isInitialized,
     twoFactorRequired,
@@ -595,6 +597,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 /**
  * Custom hook to access authentication context.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   
@@ -611,13 +614,8 @@ export function useAuth(): AuthContextType {
 /**
  * Legacy compatibility hook for zustand-style auth store
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuthStore() {
   const user = useAppSelector(authActions.selectUser);
   return { user } as const;
 }
-
-export default {
-  AuthProvider,
-  useAuth,
-  useAuthStore,
-};

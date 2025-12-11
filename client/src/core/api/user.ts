@@ -51,7 +51,7 @@ export interface SavedBillsFilters {
  * Includes metadata for implementing infinite scroll or traditional pagination.
  */
 export interface SavedBillsResponse {
-  bills: any[];
+  bills: Record<string, unknown>[];
   total: number;
   page: number;
   totalPages: number;
@@ -74,7 +74,7 @@ export interface EngagementHistoryFilters {
  * Helps users understand their civic engagement patterns.
  */
 export interface EngagementHistoryResponse {
-  history: any[];
+  history: Record<string, unknown>[];
   total: number;
   page: number;
   totalPages: number;
@@ -94,7 +94,7 @@ export interface EngagementAction {
   action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
   entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
   entity_id: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -102,16 +102,16 @@ export interface EngagementAction {
  * into a single response to minimize API calls on the dashboard page.
  */
 export interface DashboardData {
-  profile: any;
-  recent_activity: any[];
-  saved_bills: any[];
-  trending_bills: any[];
-  recommendations: any[];
-  notifications: any[];
+  profile: Record<string, unknown>;
+  recent_activity: Record<string, unknown>[];
+  saved_bills: Record<string, unknown>[];
+  trending_bills: Record<string, unknown>[];
+  recommendations: Record<string, unknown>[];
+  notifications: Record<string, unknown>[];
   civic_score_trend: Array<{ date: string; score: number }>;
   achievements_progress: {
-    recent_badges: any[];
-    next_milestones: any[];
+    recent_badges: Record<string, unknown>[];
+    next_milestones: Record<string, unknown>[];
   };
 }
 
@@ -157,13 +157,13 @@ export class UserApiService {
    * @param userId - Optional user ID; omit to fetch current user's profile
    * @returns Complete user profile with stats, preferences, and settings
    */
-  async getUserProfile(userId?: string): Promise<any> {
+  async getUserProfile(userId?: string): Promise<Record<string, unknown>> {
     try {
       const endpoint = userId 
         ? `${this.baseUrl}/users/${userId}/profile` 
         : `${this.baseUrl}/users/profile`;
       
-      const response = await globalApiClient.get(endpoint, {
+      const response = await globalApiClient.get<Record<string, unknown>>(endpoint, {
         timeout: this.defaultTimeout,
         cacheTTL: this.profileCacheTTL
       });
@@ -194,9 +194,9 @@ export class UserApiService {
    * @param profileData - Partial profile data to update
    * @returns Updated profile object
    */
-  async updateProfile(profileData: Partial<any>): Promise<any> {
+  async updateProfile(profileData: Partial<Record<string, unknown>>): Promise<Record<string, unknown>> {
     try {
-      const response = await globalApiClient.put(
+      const response = await globalApiClient.put<Record<string, unknown>>(
         `${this.baseUrl}/users/profile`,
         profileData,
         { 
@@ -231,9 +231,9 @@ export class UserApiService {
    * @param preferences - Preference settings to update
    * @returns Updated preferences object
    */
-  async updatePreferences(preferences: Partial<any>): Promise<any> {
+  async updatePreferences(preferences: Partial<Record<string, unknown>>): Promise<Record<string, unknown>> {
     try {
-      const response = await globalApiClient.put(
+      const response = await globalApiClient.put<Record<string, unknown>>(
         `${this.baseUrl}/users/preferences`,
         preferences,
         { 
@@ -407,9 +407,9 @@ export class UserApiService {
    * @param tags - Optional tags for organization
    * @returns Saved bill object with metadata
    */
-  async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<any> {
+  async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<Record<string, unknown>> {
     try {
-      const response = await globalApiClient.post(
+      const response = await globalApiClient.post<Record<string, unknown>>(
         `${this.baseUrl}/users/saved-bills`,
         {
           bill_id: billId,
@@ -491,9 +491,9 @@ export class UserApiService {
       tags?: string[];
       notification_enabled?: boolean;
     }
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     try {
-      const response = await globalApiClient.patch(
+      const response = await globalApiClient.patch<Record<string, unknown>>(
         `${this.baseUrl}/users/saved-bills/${billId}`,
         updates,
         { 
@@ -640,12 +640,16 @@ export class UserApiService {
    * @returns Achievement data with progress indicators
    */
   async getAchievements(): Promise<{
-    badges: any[];
-    achievements: any[];
-    next_milestones: any[];
+    badges: Record<string, unknown>[];
+    achievements: Record<string, unknown>[];
+    next_milestones: Record<string, unknown>[];
   }> {
     try {
-      const response = await globalApiClient.get(
+      const response = await globalApiClient.get<{
+        badges: Record<string, unknown>[];
+        achievements: Record<string, unknown>[];
+        next_milestones: Record<string, unknown>[];
+      }>(
         `${this.baseUrl}/users/achievements`,
         {
           timeout: this.defaultTimeout,
@@ -654,9 +658,9 @@ export class UserApiService {
       );
 
       const data = response.data as {
-        badges: any[];
-        achievements: any[];
-        next_milestones: any[];
+        badges: Record<string, unknown>[];
+        achievements: Record<string, unknown>[];
+        next_milestones: Record<string, unknown>[];
       };
 
       logger.info('Achievements loaded', {
@@ -746,11 +750,12 @@ export class UserApiService {
    * @returns Enriched error object
    */
   private async handleError(
-    error: any, 
+    error: unknown, 
     operation: string, 
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ): Promise<Error> {
-    await globalErrorHandler.handleError(error as Error, {
+    const handler = globalErrorHandler as ((error: unknown, context?: Record<string, unknown>) => void);
+    handler(error, {
       component: 'UserApiService',
       operation,
       ...context
