@@ -18,8 +18,8 @@ import {
   SponsorData,
   ApiResponse
 } from './types.js';
-import { GovernmentDataService } from './government-data-service.js';
-import { ConflictResolutionService } from './conflict-resolution-service.js';
+import { GovernmentDataService } from '@server/infrastructure/external-data/government-data-service.ts';
+import { ConflictResolutionService } from '@server/infrastructure/external-data/conflict-resolution-service.ts';
 import { bills, sponsors, bill_cosponsors, sync_jobs, data_sources } from '@shared/schema';
 import { eq, and, gte, desc } from 'drizzle-orm';
 import { logger   } from '@shared/core';

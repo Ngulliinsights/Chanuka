@@ -8,12 +8,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import * as Boom from '@hapi/boom';
 import { billService, BillNotFoundError, CommentNotFoundError, ValidationError } from '@shared/application/bills.js';
-import { authenticateToken } from '../../../middleware/auth.js';
-import { asyncErrorHandler } from '../../../middleware/boom-error-middleware.js';
-import type { AuthenticatedRequest } from '../../../middleware/auth.js';
+import { authenticateToken } from '../../../../AuthAlert';
+import { asyncErrorHandler } from '../../../../boom-error-middleware';
+import type { AuthenticatedRequest } from '../../../../AuthAlert';
 import { errorAdapter } from '@/infrastructure/errors/error-adapter.js';
 import { logger  } from '@shared/core';
-import { securityAuditService } from '../../security/security-audit-service.js';
+import { securityAuditService } from '../../../../security-audit-service';
 import type { Bill, BillComment } from '@shared/schema';
 
 const router = Router();

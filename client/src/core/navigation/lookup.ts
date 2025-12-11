@@ -4,8 +4,9 @@
  * Handles navigation item lookup and path utilities
  */
 
-import { NavigationItem, NavigationSection, UserRole } from './types';
 import { logger } from '../../utils/logger';
+
+import { NavigationItem, NavigationSection } from './types';
 
 /**
  * Finds a navigation item by its path

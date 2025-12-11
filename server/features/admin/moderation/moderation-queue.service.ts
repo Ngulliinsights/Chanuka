@@ -13,8 +13,8 @@ import { bill,
  } from '@shared/shared/schema';
 import { eq, count, desc, sql, and, gte, SQL } from 'drizzle-orm';
 import { logger  } from '@shared/core';
-import { ContentModerationFilters, ModerationItem, PaginationInfo } from './types.js';
-import { contentAnalysisService } from './content-analysis.service.js';
+import { ContentModerationFilters, ModerationItem, PaginationInfo } from '@server/features/admin/moderation/types.ts';
+import { contentAnalysisService } from '@server/features/admin/moderation/content-analysis.service.ts';
 
 export class ModerationQueueService {
   private static instance: ModerationQueueService;

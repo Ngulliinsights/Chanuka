@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { logger } from '@/utils/logger';
+// logger import removed - currently unused
 
 /**
  * @deprecated The focus and keyboard navigation detection parts of this hook are deprecated.

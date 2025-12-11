@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 import { cn } from '../../design-system/utils/cn';
-import { Badge } from '../../design-system/primitives/Badge';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 
 interface NavigationItem {
   id: string;

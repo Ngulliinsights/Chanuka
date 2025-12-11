@@ -629,7 +629,7 @@ export class NotificationChannelService {
   private async sendViaAWSSNS(phone_number: string, message: string): Promise<string> {
     // This method is now implemented in the NotificationService class
     // For backward compatibility, we'll use the enhanced implementation
-    const { notificationService } = await import('./notification-service.js');
+    const { notificationService } = await import('@server/infrastructure/notifications/notification-service.ts');
     return notificationService['sendViaAWSSNS'](phone_number, message);
   }
 
@@ -641,7 +641,7 @@ export class NotificationChannelService {
   private async sendViaFirebase(tokens: string[], payload: any): Promise<string> {
     // This method is now implemented in the NotificationService class
     // For backward compatibility, we'll use the enhanced implementation
-    const { notificationService } = await import('./notification-service.js');
+    const { notificationService } = await import('@server/infrastructure/notifications/notification-service.ts');
     return notificationService['sendViaFirebase'](tokens, payload);
   }
 

@@ -6,7 +6,7 @@
 import type { ActionItem, ActionPriority } from '@client/types';
 import { useState, useCallback } from 'react';
 
-import { DashboardActionError } from '@client/errors';
+import { DashboardActionError } from '@client/core/error';
 import { validateActionItem } from '@client/validation';
 
 export interface UseDashboardActionsResult {

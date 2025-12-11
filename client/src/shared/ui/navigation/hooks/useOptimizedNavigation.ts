@@ -12,7 +12,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAppSelector, useAppDispatch } from '@client/hooks/redux';
 import { selectNavigationState } from '@client/store/slices/navigationSlice';
-import { navigationUtils } from '@client/utils/navigation';
+import { navigationUtils } from '@client/shared/ui/navigation/Navigation.tsx';
 import { logger } from '@client/utils/logger';
 
 interface OptimizedNavigationOptions {

@@ -1,4 +1,4 @@
-import { databaseService } from './database-service.js';
+import { databaseService } from '@server/infrastructure/database/database-service.ts';
 import { readDatabase } from '@shared/database';
 import * as schema from '@shared/schema';
 import bcrypt from 'bcrypt';

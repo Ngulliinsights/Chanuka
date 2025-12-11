@@ -2,7 +2,7 @@ import React from "react";
 
 import { useNavigationPreferences } from "@/core/navigation/hooks";
 
-import { Button } from "../ui/button";
+import { Button } from "@client/shared/design-system/interactive/Button.tsx";
 import {
   Dialog,
   DialogContent,
@@ -10,8 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
+import { Label } from "@client/shared/design-system/typography/Label.tsx";
+import { Switch } from "@client/shared/design-system/interactive/Switch.tsx";
 
 
 interface NavigationPreferencesDialogProps {

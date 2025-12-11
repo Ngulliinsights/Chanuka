@@ -3,7 +3,7 @@
  * Handles theme persistence and CSS variable updates
  */
 
-import { validateThemeContrast, generateContrastCSS } from '@client/utils/contrast';
+import { validateThemeContrast, generateContrastCSS } from '../utils/contrast';
 
 import { darkTheme } from './dark';
 import { highContrastTheme, darkHighContrastTheme } from './high-contrast';

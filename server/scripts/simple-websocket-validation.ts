@@ -111,7 +111,7 @@ class SimpleWebSocketValidator {
   private async validateBatchingService(): Promise<void> {
     try {
       // Test batching service import and basic functionality
-      const { BatchingService } = await import('../infrastructure/batching-service.js');
+      const { BatchingService } = await import('../../batching-service');
 
       const batchingService = new BatchingService({
         maxBatchSize: 5,
@@ -164,7 +164,7 @@ class SimpleWebSocketValidator {
 
       // Test notification channels service
       try {
-        const { notificationChannelService } = await import('../infrastructure/notifications/notification-channels.js');
+        const { notificationChannelService } = await import('../../notification-channels');
         
         const status = notificationChannelService.getStatus();
         
@@ -189,7 +189,7 @@ class SimpleWebSocketValidator {
     try {
       // Test WebSocket adapter
       try {
-        const { connectionMigrator, blueGreenDeployer } = await import('../infrastructure/websocket-adapter.js');
+        const { connectionMigrator, blueGreenDeployer } = await import('@server/infrastructure/websocket-adapter.ts');
         
         if (connectionMigrator && blueGreenDeployer) {
           this.addResult('websocket-adapter', 'passed', 'WebSocket migration adapter available');

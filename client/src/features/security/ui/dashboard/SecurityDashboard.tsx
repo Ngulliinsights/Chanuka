@@ -17,13 +17,13 @@ import React, { useState, useEffect } from 'react';
 
 import { logger } from '@client/utils/logger';
 
-import { getSecuritySystem } from '../../security';
-import { SecurityMetrics, SecurityAlert, SecurityEvent, VulnerabilityReport } from '../../security/types';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { getSecuritySystem } from '@client/features/security/ui/dashboard/SecurityDashboard.tsx';
+import { SecurityMetrics, SecurityAlert, SecurityEvent, VulnerabilityReport } from '@client/features/analytics/types.ts';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 
 interface SecurityDashboardProps {

@@ -3,8 +3,9 @@
  * Progress bars and indicators for loading operations
  */
 
-import { LoadingComponentProps } from '@client/types';
 import React from 'react';
+
+import { LoadingComponentProps } from '@client/types';
 
 export interface LoadingProgressProps extends LoadingComponentProps {
   progress: number;

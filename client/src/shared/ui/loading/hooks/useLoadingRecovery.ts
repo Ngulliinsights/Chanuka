@@ -7,7 +7,7 @@ import {
   getErrorRecoveryStrategy,
   LoadingTimeoutError,
   LoadingNetworkError 
-} from '@client/errors';
+} from '@client/core/error';
 
 export interface LoadingRecoveryState {
   canRecover: boolean;

@@ -6,7 +6,7 @@
 
 import { EventEmitter } from 'events';
 import { logger } from '@shared/core/observability/logging';
-import { BatchingService, BatchableMessage } from './batching-service.js';
+import { BatchingService, BatchableMessage } from '../../batching-service';
 
 // cSpell:ignore Batchable BatchableMessage
 

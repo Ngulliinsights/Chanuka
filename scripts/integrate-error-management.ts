@@ -121,7 +121,7 @@ function createErrorBoundaryComponent() {
   
   const errorBoundaryContent = `import React, { Component, ReactNode } from 'react';
 import { BaseError, ErrorDomain, ErrorSeverity } from '@shared/core';
-import { logger } from '../../utils/logger';
+import { logger } from '../client/src/utils/logger';
 
 interface Props {
   children: ReactNode;

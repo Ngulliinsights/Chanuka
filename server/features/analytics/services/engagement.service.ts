@@ -10,7 +10,7 @@ import { cacheService } from '@server/infrastructure/cache';
 // FIXED: Import cacheKeys from the correct location
 import { cache, cacheKeys   } from '@shared/core';
 import { buildTimeThreshold } from '@/utils/db-helpers';
-import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
+import { authenticateToken, AuthenticatedRequest } from '../../../../AuthAlert';
 import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse   } from '@shared/core';
 import { ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
 import { logger   } from '@shared/core';

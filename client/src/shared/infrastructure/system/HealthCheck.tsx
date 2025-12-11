@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { globalApiClient } from '@client/core/api/client';
+import { globalApiClient } from '@client/utils/logger';
 import { logger } from '@client/utils/logger';
 import api from '@/utils/api';
 

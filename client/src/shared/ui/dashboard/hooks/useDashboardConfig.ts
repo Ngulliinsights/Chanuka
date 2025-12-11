@@ -6,7 +6,7 @@
 import type { DashboardConfig, DashboardSection } from '@client/types';
 import { useState, useCallback, useEffect } from 'react';
 
-import { DashboardConfigurationError } from '@client/errors';
+import { DashboardConfigurationError } from '@client/core/error';
 import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/validation';
 
 const DEFAULT_CONFIG: DashboardConfig = {

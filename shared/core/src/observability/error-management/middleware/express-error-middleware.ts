@@ -7,9 +7,9 @@
 
 import { Request, Response, NextFunction } from 'express';
 
-import { logger } from '../../logging/index.js';
-import { BaseError, BaseErrorOptions, ErrorDomain, ErrorSeverity } from '../errors/base-error.js';
-import { ErrorHandlerChain } from '../handlers/error-handler-chain.js';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+import { BaseError, BaseErrorOptions, ErrorDomain, ErrorSeverity } from '@shared/core/src/observability/error-management/errors/base-error.ts';
+import { ErrorHandlerChain } from '@shared/core/src/observability/error-management/handlers/error-handler-chain.ts';
 
 export interface ErrorMiddlewareOptions {
   includeStackTrace?: boolean;

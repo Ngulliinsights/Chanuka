@@ -3,290 +3,215 @@
  * Consolidated from multiple implementations
  */
 
-import { LoadingOperation, LoadingType, LoadingPriority, LoadingScenario, ProgressiveStage, RetryStrategy } from '@client/types';
+import { LoadingOperation, LoadingConfig } from '@client/types';
 
-// Predefined loading scenarios
-export const LOADING_SCENARIOS: Record<string, LoadingScenario> = {
+// Predefined loading scenarios - mapped to LoadingConfig
+export const LOADING_SCENARIOS: Record<string, LoadingConfig> = {
   PAGE_INITIAL: {
-    id: 'page-initial',
-    name: 'Initial Page Load',
-    description: 'Loading the main page content and critical resources',
-    defaultTimeout: 15000,
-    retryStrategy: 'exponential',
+    timeout: 15000,
+    retryDelay: 1000,
     maxRetries: 2,
+    showProgress: true,
+    enableCaching: false,
     priority: 'high',
-    connectionAware: true,
-    progressTracking: true,
-    stages: [
-      { id: 'html', message: 'Loading page structure...', duration: 2000 },
-      { id: 'css', message: 'Loading styles...', duration: 1500 },
-      { id: 'js', message: 'Loading scripts...', duration: 3000 },
-      { id: 'data', message: 'Loading initial data...', duration: 2500 },
-    ],
   },
 
   PAGE_NAVIGATION: {
-    id: 'page-navigation',
-    name: 'Page Navigation',
-    description: 'Loading content when navigating between pages',
-    defaultTimeout: 10000,
-    retryStrategy: 'exponential',
+    timeout: 10000,
+    retryDelay: 1000,
     maxRetries: 2,
+    showProgress: false,
+    enableCaching: true,
     priority: 'high',
-    connectionAware: true,
-    progressTracking: false,
   },
 
   COMPONENT_LAZY: {
-    id: 'component-lazy',
-    name: 'Lazy Component Loading',
-    description: 'Loading components on demand',
-    defaultTimeout: 8000,
-    retryStrategy: 'linear',
+    timeout: 8000,
+    retryDelay: 500,
     maxRetries: 1,
-    priority: 'medium',
-    connectionAware: true,
-    progressTracking: false,
+    showProgress: false,
+    enableCaching: true,
+    priority: 'normal',
   },
 
   API_REQUEST: {
-    id: 'api-request',
-    name: 'API Request',
-    description: 'Loading data from API endpoints',
-    defaultTimeout: 12000,
-    retryStrategy: 'exponential',
+    timeout: 12000,
+    retryDelay: 1000,
     maxRetries: 3,
-    priority: 'medium',
-    connectionAware: true,
-    progressTracking: false,
+    showProgress: false,
+    enableCaching: true,
+    priority: 'normal',
   },
 
   FILE_UPLOAD: {
-    id: 'file-upload',
-    name: 'File Upload',
-    description: 'Uploading files to the server',
-    defaultTimeout: 60000,
-    retryStrategy: 'linear',
+    timeout: 60000,
+    retryDelay: 1000,
     maxRetries: 2,
+    showProgress: true,
+    enableCaching: false,
     priority: 'high',
-    connectionAware: true,
-    progressTracking: true,
-    stages: [
-      { id: 'prepare', message: 'Preparing file...', duration: 1000 },
-      { id: 'upload', message: 'Uploading...', duration: 30000 },
-      { id: 'process', message: 'Processing...', duration: 5000 },
-      { id: 'complete', message: 'Finalizing...', duration: 1000 },
-    ],
   },
 
   SEARCH_QUERY: {
-    id: 'search-query',
-    name: 'Search Query',
-    description: 'Performing search operations',
-    defaultTimeout: 8000,
-    retryStrategy: 'linear',
+    timeout: 8000,
+    retryDelay: 500,
     maxRetries: 2,
-    priority: 'medium',
-    connectionAware: true,
-    progressTracking: false,
+    showProgress: false,
+    enableCaching: true,
+    priority: 'normal',
   },
 
   BACKGROUND_SYNC: {
-    id: 'background-sync',
-    name: 'Background Sync',
-    description: 'Syncing data in the background',
-    defaultTimeout: 30000,
-    retryStrategy: 'exponential',
+    timeout: 30000,
+    retryDelay: 2000,
     maxRetries: 5,
+    showProgress: false,
+    enableCaching: true,
     priority: 'low',
-    connectionAware: true,
-    progressTracking: false,
   },
 
   ASSET_PRELOAD: {
-    id: 'asset-preload',
-    name: 'Asset Preloading',
-    description: 'Preloading assets for better performance',
-    defaultTimeout: 20000,
-    retryStrategy: 'linear',
+    timeout: 20000,
+    retryDelay: 1000,
     maxRetries: 1,
+    showProgress: true,
+    enableCaching: true,
     priority: 'low',
-    connectionAware: true,
-    progressTracking: true,
   },
 };
 
 // Loading scenario builder
 export class LoadingScenarioBuilder {
-  private scenario: Partial<LoadingScenario> = {};
+  private config: Partial<LoadingConfig> = {};
 
-  static create(id: string): LoadingScenarioBuilder {
-    const builder = new LoadingScenarioBuilder();
-    builder.scenario.id = id;
-    return builder;
-  }
-
-  name(name: string): LoadingScenarioBuilder {
-    this.scenario.name = name;
-    return this;
-  }
-
-  description(description: string): LoadingScenarioBuilder {
-    this.scenario.description = description;
-    return this;
+  static create(): LoadingScenarioBuilder {
+    return new LoadingScenarioBuilder();
   }
 
   timeout(timeout: number): LoadingScenarioBuilder {
-    this.scenario.defaultTimeout = timeout;
+    this.config.timeout = timeout;
     return this;
   }
 
-  retryStrategy(strategy: RetryStrategy): LoadingScenarioBuilder {
-    this.scenario.retryStrategy = strategy;
+  retryDelay(delay: number): LoadingScenarioBuilder {
+    this.config.retryDelay = delay;
     return this;
   }
 
   maxRetries(maxRetries: number): LoadingScenarioBuilder {
-    this.scenario.maxRetries = maxRetries;
+    this.config.maxRetries = maxRetries;
     return this;
   }
 
-  priority(priority: LoadingPriority): LoadingScenarioBuilder {
-    this.scenario.priority = priority;
+  priority(priority: 'low' | 'normal' | 'high' | 'critical'): LoadingScenarioBuilder {
+    this.config.priority = priority;
     return this;
   }
 
-  connectionAware(aware: boolean = true): LoadingScenarioBuilder {
-    this.scenario.connectionAware = aware;
+  showProgress(show: boolean = true): LoadingScenarioBuilder {
+    this.config.showProgress = show;
     return this;
   }
 
-  progressTracking(tracking: boolean = true): LoadingScenarioBuilder {
-    this.scenario.progressTracking = tracking;
+  enableCaching(enable: boolean = true): LoadingScenarioBuilder {
+    this.config.enableCaching = enable;
     return this;
   }
 
-  stages(stages: ProgressiveStage[]): LoadingScenarioBuilder {
-    this.scenario.stages = stages;
+  cacheTimeout(timeout: number): LoadingScenarioBuilder {
+    this.config.cacheTimeout = timeout;
     return this;
   }
 
-  build(): LoadingScenario {
-    if (!this.scenario.id) {
-      throw new Error('Scenario ID is required');
-    }
-
+  build(): LoadingConfig {
     return {
-      id: this.scenario.id,
-      name: this.scenario.name || this.scenario.id,
-      description: this.scenario.description || '',
-      defaultTimeout: this.scenario.defaultTimeout || 10000,
-      retryStrategy: this.scenario.retryStrategy || 'exponential',
-      maxRetries: this.scenario.maxRetries || 2,
-      priority: this.scenario.priority || 'medium',
-      connectionAware: this.scenario.connectionAware ?? true,
-      progressTracking: this.scenario.progressTracking ?? false,
-      stages: this.scenario.stages,
+      timeout: this.config.timeout || 10000,
+      retryDelay: this.config.retryDelay || 1000,
+      maxRetries: this.config.maxRetries || 2,
+      priority: this.config.priority || 'normal',
+      showProgress: this.config.showProgress ?? false,
+      enableCaching: this.config.enableCaching ?? false,
+      cacheTimeout: this.config.cacheTimeout,
     };
   }
 }
 
-// Create loading operation from scenario
-export function createOperationFromScenario(
-  scenario: LoadingScenario,
-  instanceId: string,
-  connectionInfo?: any
-): Omit<LoadingOperation, 'startTime' | 'retryCount'> {
-  const adjustedTimeout = connectionInfo
-    ? getAdjustedTimeout(scenario.defaultTimeout, connectionInfo.connectionType)
-    : scenario.defaultTimeout;
-
-  const stageId = scenario.stages?.[0]?.id;
-
+// Create loading operation from config
+export function createOperationFromConfig(
+  config: LoadingConfig,
+  operationId: string
+): LoadingOperation {
   return {
-    id: `${scenario.id}-${instanceId}`,
-    type: scenario.id.includes('page') ? 'page' :
-          scenario.id.includes('component') ? 'component' :
-          scenario.id.includes('api') ? 'api' : 'asset',
-    message: scenario.description,
-    priority: scenario.priority,
-    timeout: adjustedTimeout,
-    maxRetries: scenario.maxRetries,
-    connectionAware: scenario.connectionAware,
-    retryStrategy: scenario.retryStrategy,
-    retryDelay: 1000,
-    stage: stageId,
+    id: operationId,
+    type: 'loading',
+    startTime: new Date(),
+    state: 'idle',
+    retryCount: 0,
+    maxRetries: config.maxRetries,
+    metadata: {
+      timeout: config.timeout,
+      retryDelay: config.retryDelay,
+      priority: config.priority,
+      showProgress: config.showProgress,
+    },
   };
 }
 
 // Create loading operation
 export function createLoadingOperation(
-  type: LoadingType,
-  message: string,
-  options: Partial<LoadingOperation> = {}
+  operationId: string,
+  options: Partial<LoadingConfig> = {}
 ): LoadingOperation {
-  const now = Date.now();
+  const config: LoadingConfig = {
+    timeout: options.timeout || 30000,
+    retryDelay: options.retryDelay || 1000,
+    maxRetries: options.maxRetries || 3,
+    priority: options.priority || 'normal',
+    showProgress: options.showProgress ?? false,
+    enableCaching: options.enableCaching ?? false,
+    cacheTimeout: options.cacheTimeout,
+  };
 
   return {
-    id: options.id || `${type}_${now}_${Math.random().toString(36).substr(2, 9)}`,
-    type,
-    message,
-    priority: options.priority || 'medium',
-    timeout: options.timeout || 30000,
+    id: operationId,
+    type: 'loading',
+    startTime: new Date(),
+    state: 'idle',
     retryCount: 0,
-    maxRetries: options.maxRetries || 3,
-    startTime: now,
-    connectionAware: options.connectionAware ?? true,
-    retryStrategy: options.retryStrategy || 'exponential',
-    retryDelay: options.retryDelay || 1000,
-    error: options.error,
-    progress: options.progress,
-    stage: options.stage,
-    estimatedTime: options.estimatedTime,
-    timeoutWarningShown: false,
-    cancelled: false,
-    metadata: options.metadata,
+    maxRetries: config.maxRetries,
+    metadata: {
+      timeout: config.timeout,
+      retryDelay: config.retryDelay,
+      priority: config.priority,
+      showProgress: config.showProgress,
+    },
   };
 }
 
-// Generate unique operation ID
-export function generateOperationId(type: LoadingType, identifier: string): string {
-  return `${type}-${identifier}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
 // Check if operation has timed out
-export function hasOperationTimedOut(operation: LoadingOperation, currentTime?: number): boolean {
-  const now = currentTime || Date.now();
-  const timeout = operation.timeout || 30000;
-  return now - operation.startTime > timeout;
+export function hasOperationTimedOut(operation: LoadingOperation, timeoutMs: number = 30000, currentTime?: Date): boolean {
+  const now = currentTime || new Date();
+  const startTime = operation.startTime;
+  const elapsed = now.getTime() - startTime.getTime();
+  return elapsed > timeoutMs;
 }
 
-// Check if operation can retry
-export function canRetryOperation(operation: LoadingOperation): boolean {
-  return operation.retryCount < operation.maxRetries;
+// Calculate retry delay with exponential backoff
+export function calculateRetryDelay(retryCount: number, baseDelay: number = 1000): number {
+  return baseDelay * Math.pow(2, retryCount) + Math.random() * 1000;
 }
 
-// Calculate retry delay
-export function calculateRetryDelay(retryCount: number, strategy: RetryStrategy = 'exponential', baseDelay: number = 1000): number {
-  switch (strategy) {
-    case 'exponential':
-      return baseDelay * Math.pow(2, retryCount) + Math.random() * 1000;
-    case 'linear':
-      return baseDelay * (retryCount + 1);
-    case 'none':
-      return 0;
-    default:
-      return baseDelay;
-  }
-}
-
-// Get adjusted timeout based on connection
-export function getAdjustedTimeout(baseTimeout: number, connectionType: string): number {
-  switch (connectionType) {
-    case 'slow':
+// Get adjusted timeout based on priority
+export function getAdjustedTimeout(baseTimeout: number, priority: 'low' | 'normal' | 'high' | 'critical'): number {
+  switch (priority) {
+    case 'critical':
+      return baseTimeout;
+    case 'high':
+      return baseTimeout * 1.25;
+    case 'normal':
+      return baseTimeout * 1.5;
+    case 'low':
       return baseTimeout * 2;
-    case 'offline':
-      return baseTimeout * 3;
     default:
       return baseTimeout;
   }

@@ -20,9 +20,9 @@ import React from 'react';
 
 import { Notification, NotificationType } from '@client/services/notification-service';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Checkbox } from '../ui/checkbox';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Checkbox } from '@client/shared/design-system/interactive/Checkbox.tsx';
 
 interface NotificationItemProps {
   notification: Notification;

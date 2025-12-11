@@ -6,9 +6,9 @@ import { useWebSocket } from "@client/hooks/use-websocket";
 import { BillTrackingPreferences } from "@client/types/api";
 import { logger } from '@client/utils/logger';
 
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../../../../../../Badge";
+import { Button } from "../../../../../../Button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../../../Card";
 import {
   Select,
   SelectContent,
@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Switch } from "../ui/switch";
+import { Switch } from "../../../../../../Switch";
 
 
 interface RealTimeBillTrackerProps {

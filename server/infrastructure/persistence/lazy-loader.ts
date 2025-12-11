@@ -7,7 +7,7 @@
 
 import type { Result, Maybe } from '@shared/core';
 import { Ok, some, none } from '@shared/core';
-import { performanceMonitor } from './performance/performance-monitor';
+import { performanceMonitor } from '../../../performance-monitor';
 
 export interface LazyLoadOptions {
   /** Whether to load related data immediately */

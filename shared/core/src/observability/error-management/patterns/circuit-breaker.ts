@@ -84,8 +84,8 @@ class EventEmitter {
     return true;
   }
 }
-import { logger } from '../../logging/index.js';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../errors/base-error.js';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+import { BaseError, ErrorDomain, ErrorSeverity } from '@shared/core/src/observability/error-management/errors/base-error.ts';
 
 export interface CircuitBreakerMetrics {
   failures: number;

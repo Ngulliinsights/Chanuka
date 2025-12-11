@@ -19,8 +19,8 @@ import React from 'react';
 
 import { UserDashboardData, CivicImpactMetrics } from '@client/types/user-dashboard';
 
-import { Badge } from '../../ui/badge';
-import { Card, CardContent } from '../../ui/card';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
 
 
 interface DashboardStatsProps {

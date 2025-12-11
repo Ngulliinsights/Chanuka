@@ -12,8 +12,8 @@ import { LoadingSpinner } from '@client/core/loading/components/LoadingSpinner';
 import { useNotifications, useNotificationHistory } from '@client/hooks/useNotifications';
 import { NotificationCategory, NotificationType } from '@client/services/notification-service';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 

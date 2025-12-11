@@ -6,10 +6,10 @@
  */
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../errors/base-error.js';
-import { ErrorHandlerChain } from './error-handler-chain.js';
-import { UserErrorReporter } from '../reporting/user-error-reporter.js';
-import { logger } from '../../logging/index.js';
+import { BaseError, ErrorDomain, ErrorSeverity } from '@shared/core/src/observability/error-management/errors/base-error.ts';
+import { ErrorHandlerChain } from '@shared/core/src/observability/error-management/handlers/error-handler-chain.ts';
+import { UserErrorReporter } from '@shared/core/src/observability/error-management/reporting/user-error-reporter.ts';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
 
 export interface ErrorBoundaryState {
   hasError: boolean;

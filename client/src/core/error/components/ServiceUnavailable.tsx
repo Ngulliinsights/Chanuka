@@ -13,11 +13,11 @@ export const ServiceUnavailable: React.FC<ServiceUnavailableProps> = ({
 }) => {
   const [isRetrying, setIsRetrying] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [serviceStatus, setServiceStatus] = useState(serviceRecovery.getServiceStatus());
+  const [serviceStatus, setServiceStatus] = useState(serviceRecovery.getServiceStatus('main'));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setServiceStatus(serviceRecovery.getServiceStatus());
+      setServiceStatus(serviceRecovery.getServiceStatus('main'));
     }, 5000);
 
     return () => clearInterval(interval);
@@ -28,9 +28,8 @@ export const ServiceUnavailable: React.FC<ServiceUnavailableProps> = ({
     setRetryCount(prev => prev + 1);
 
     try {
-      const isHealthy = await serviceRecovery.performHealthCheck();
+      const isHealthy = await serviceRecovery.checkServiceHealth('main');
       if (isHealthy) {
-        serviceRecovery.resetServiceStatus();
         onRetry?.();
         // Reload the page to restore full functionality
         window.location.reload();
@@ -66,7 +65,7 @@ export const ServiceUnavailable: React.FC<ServiceUnavailableProps> = ({
           </h1>
           <p className="text-gray-600 mb-4">
             The Chanuka Legislative Transparency Platform is currently experiencing technical difficulties. 
-            We're working to restore service as quickly as possible.
+            We&apos;re working to restore service as quickly as possible.
           </p>
         </div>
 
@@ -75,19 +74,15 @@ export const ServiceUnavailable: React.FC<ServiceUnavailableProps> = ({
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Status:</span>
-              <span className={`font-medium ${serviceStatus.isOnline ? 'text-green-600' : 'text-red-600'}`}>
-                {serviceStatus.isOnline ? 'Online' : 'Offline'}
+              <span className={`font-medium ${serviceStatus?.isAvailable ? 'text-green-600' : 'text-red-600'}`}>
+                {serviceStatus?.isAvailable ? 'Available' : 'Unavailable'}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span>Failed Requests:</span>
-              <span className="font-medium text-gray-900">{serviceStatus.totalFailures}</span>
-            </div>
-            {serviceStatus.lastFailure && (
+            {serviceStatus?.lastChecked && (
               <div className="flex justify-between">
-                <span>Last Failure:</span>
+                <span>Last Checked:</span>
                 <span className="font-medium text-gray-900">
-                  {new Date(serviceStatus.lastFailure).toLocaleTimeString()}
+                  {new Date(serviceStatus.lastChecked).toLocaleTimeString()}
                 </span>
               </div>
             )}

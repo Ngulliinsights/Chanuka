@@ -8,7 +8,6 @@ import {
   generateBreadcrumbs,
   searchNavigationItems,
   NavigationItem,
-  UserRole
 } from './index';
 
 // Test data

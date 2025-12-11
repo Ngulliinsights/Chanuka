@@ -1,4 +1,4 @@
-import { AssetLoadingManager } from '@client/utils/asset-loading';
+import { AssetLoadingManager } from '../core/loading/utils/asset-loading';
 import React, { createContext, useContext, useEffect } from 'react';
 
 import { useOfflineDetection, OfflineDetectionState } from '@client/hooks/useOfflineDetection';

@@ -1083,8 +1083,8 @@ function testAnalyzeFileImports() {
   const originalReadFileSync = fs.readFileSync;
   const mockContent = `
     import { useState } from 'react';
-    import utils from './utils';
-    import config from '../../../config';
+    import utils from '../client/src/core/dashboard/utils';
+    import config from '../config.d';
     import shared from '@shared/helper';
   `;
   fs.readFileSync = () => mockContent;

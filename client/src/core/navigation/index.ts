@@ -79,15 +79,6 @@ export {
 } from './analytics';
 
 export {
-  getNavigationPreferences,
-  saveNavigationPreferences,
-  addToRecentPages,
-  addToFavorites,
-  removeFromFavorites,
-  isPageFavorite
-} from './preferences';
-
-export {
   findNavigationItemByPath,
   findNavigationItemById,
   getNavigationItemsBySection,

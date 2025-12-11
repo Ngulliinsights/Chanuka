@@ -13,7 +13,7 @@ import {
   LoadingError, 
   LoadingOperationFailedError,
   LoadingTimeoutError 
-} from '@client/errors';
+} from '@client/core/error';
 import { safeValidateLoadingOperation } from '@client/validation';
 
 import { 

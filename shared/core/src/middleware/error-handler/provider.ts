@@ -1,6 +1,6 @@
 import { MiddlewareProvider } from '../types';
 import { Request, Response, NextFunction } from 'express';
-import { createErrorMiddleware } from '../../observability/error-management/middleware/express-error-middleware.js';
+import { createErrorMiddleware } from '@shared/core/src/observability/error-management/middleware/express-error-middleware.ts';
 
 export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'errorHandler';

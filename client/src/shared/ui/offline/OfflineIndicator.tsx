@@ -6,7 +6,7 @@
  * migrated to `useOffline` / `OfflineStatus` over time and this wrapper removed.
  */
 
-import { OfflineStatus } from './offline/offline-manager';
+import { OfflineStatus } from '@client/shared/ui/offline/offline-manager.tsx';
 
 export { OfflineStatus as OfflineIndicator };
 

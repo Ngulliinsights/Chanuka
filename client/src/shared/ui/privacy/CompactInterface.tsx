@@ -14,11 +14,11 @@ import React from 'react';
 import { useAuth } from '@client/core/auth';
 import { PrivacySettings } from '@client/types/auth';
 
-import { Alert, AlertDescription } from '../../ui/alert';
-import { Button } from '../../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Label } from '../../ui/label';
-import { Switch } from '../../ui/switch';
+import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Label } from '@client/shared/design-system/typography/Label.tsx';
+import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
 
 
 import { ConsentControls } from './controls/ConsentControls';

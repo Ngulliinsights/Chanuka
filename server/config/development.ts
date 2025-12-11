@@ -1,7 +1,7 @@
 // Development environment configuration overrides
 // This file contains development-specific configuration values
 
-import { AppConfig } from './index.js';
+import { AppConfig } from '../../4-personas-implementation-guide';
 
 export const developmentConfig: Partial<AppConfig> = {
   // Development-specific overrides go here

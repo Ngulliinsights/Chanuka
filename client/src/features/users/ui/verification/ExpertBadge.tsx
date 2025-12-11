@@ -4,8 +4,8 @@ import { cn } from '@client/lib/utils';
 import { ExpertVerificationType } from '@client/types/expert';
 
 import { GraduationCap } from '../icons/SimpleIcons';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
-import { UnifiedBadge } from '../ui/unified-components';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/shared/design-system';
+import { UnifiedBadge } from '@client/shared/design-system';
 
 interface ExpertBadgeProps {
   verificationType: ExpertVerificationType;

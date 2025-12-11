@@ -1,13 +1,20 @@
-import { useNavigation } from '@client/context';
 import { useCallback, useEffect, useState } from 'react';
 
-import { logger } from '@/utils/logger';
-import { NavigationPreferences } from '@client/types/navigation';
+import { logger } from '@client/utils/logger';
 
 const PREFERENCES_STORAGE_KEY = 'navigation-preferences';
 
+interface NavigationPreferences {
+  defaultLandingPage: string;
+  favoritePages: string[];
+  recentlyVisited: string[];
+  compactMode: boolean;
+  showBreadcrumbs: boolean;
+  autoExpand: boolean;
+}
+
 // Deep equality check for navigation preferences to avoid JSON.stringify issues
-function deepEqual(obj1: any, obj2: any): boolean {
+function deepEqual(obj1: unknown, obj2: unknown): boolean {
   if (obj1 === obj2) return true;
   
   if (obj1 == null || obj2 == null) return obj1 === obj2;
@@ -18,7 +25,7 @@ function deepEqual(obj1: any, obj2: any): boolean {
   
   if (Array.isArray(obj1) !== Array.isArray(obj2)) return false;
   
-  if (Array.isArray(obj1)) {
+  if (Array.isArray(obj1) && Array.isArray(obj2)) {
     if (obj1.length !== obj2.length) return false;
     for (let i = 0; i < obj1.length; i++) {
       if (!deepEqual(obj1[i], obj2[i])) return false;
@@ -26,22 +33,33 @@ function deepEqual(obj1: any, obj2: any): boolean {
     return true;
   }
   
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
+  const keys1 = Object.keys(obj1 as Record<string, unknown>);
+  const keys2 = Object.keys(obj2 as Record<string, unknown>);
   
   if (keys1.length !== keys2.length) return false;
   
   for (const key of keys1) {
     if (!keys2.includes(key)) return false;
-    if (!deepEqual(obj1[key], obj2[key])) return false;
+    if (!deepEqual((obj1 as Record<string, unknown>)[key], (obj2 as Record<string, unknown>)[key])) return false;
   }
   
   return true;
 }
 
 export function useNavigationPreferences() {
-  const { preferences, updatePreferences } = useNavigation();
+  const [preferences, setPreferences] = useState<NavigationPreferences>({
+    defaultLandingPage: '/',
+    favoritePages: [],
+    recentlyVisited: [],
+    compactMode: false,
+    showBreadcrumbs: true,
+    autoExpand: false,
+  });
   const [isLoading, setIsLoading] = useState(true);
+
+  const updatePreferences = useCallback((updates: Partial<NavigationPreferences>) => {
+    setPreferences(prev => ({ ...prev, ...updates }));
+  }, []);
 
   // Load preferences from localStorage on mount only
   // This runs once when the component mounts to hydrate preferences from storage
@@ -103,7 +121,7 @@ export function useNavigationPreferences() {
   // Remove a page from favorites
   const removeFromFavorites = useCallback((path: string) => {
     updatePreferences({
-      favoritePages: preferences.favoritePages.filter(p => p !== path)
+      favoritePages: preferences.favoritePages.filter((p: string) => p !== path)
     });
   }, [preferences.favoritePages, updatePreferences]);
 

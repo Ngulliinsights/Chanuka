@@ -269,14 +269,18 @@ export function createAPIError(
 /**
  * Global error handler for API errors
  * @param error The error to handle
+ * @param context Optional context for the error
  */
-export const globalErrorHandler = (error: unknown): void => {
+export const globalErrorHandler = (error: unknown, context?: Record<string, unknown>): void => {
   if (error instanceof Error) {
-    console.error('API Error:', error.message);
+    console.error('API Error:', error.message, context);
   } else {
-    console.error('Unknown error:', error);
+    console.error('Unknown error:', error, context);
   }
 };
+
+// Support calling as .handleError() for backward compatibility
+(globalErrorHandler as any).handleError = globalErrorHandler;
 
 /**
  * Factory for creating typed API errors

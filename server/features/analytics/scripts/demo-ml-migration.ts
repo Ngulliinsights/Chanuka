@@ -6,7 +6,7 @@
 
 import { RealMLAnalysisService } from '@server/services/real-ml.service.ts';
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
-import MLMigrationConfigurator from './configure-ml-migration.js';
+import MLMigrationConfigurator from '@server/features/analytics/scripts/configure-ml-migration.ts';
 
 async function demonstrateMLMigration() {
     console.log('=== ML Service Migration Demo ===\n');

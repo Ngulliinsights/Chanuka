@@ -3,16 +3,16 @@
  * Provides adaptive loading strategies based on network conditions
  */
 
-import { ConnectionType, ConnectionInfo, LoadingPriority } from '@client/types';
+import { ConnectionType, ConnectionInfo } from '@client/types';
 
 /**
  * Get connection multiplier for adaptive timeouts and delays
  */
-export function getConnectionMultiplier(connectionType: ConnectionType): number {
+export function getConnectionMultiplier(connectionType: ConnectionType | undefined): number {
   switch (connectionType) {
-    case 'slow':
-      return 2;
-    case 'offline':
+    case 'cellular':
+      return 1.5;
+    case 'none':
       return 3;
     default:
       return 1;
@@ -20,26 +20,24 @@ export function getConnectionMultiplier(connectionType: ConnectionType): number 
 }
 
 /**
- * Determine if operation should be skipped based on connection and priority
+ * Determine if operation should be skipped based on online status and priority
  */
 export function shouldSkipOperation(
   isOnline: boolean,
-  connectionType: ConnectionType,
-  priority: LoadingPriority
+  priority: 'low' | 'normal' | 'high' | 'critical'
 ): boolean {
   if (!isOnline) return priority === 'low';
-  if (connectionType === 'slow') return priority === 'low';
   return false;
 }
 
 /**
  * Get optimal batch size for operations based on connection speed
  */
-export function getOptimalBatchSize(connectionType: ConnectionType): number {
+export function getOptimalBatchSize(connectionType: ConnectionType | undefined): number {
   switch (connectionType) {
-    case 'slow':
+    case 'cellular':
       return 1;
-    case 'offline':
+    case 'none':
       return 1;
     default:
       return 3;
@@ -53,17 +51,20 @@ export function detectConnectionType(): ConnectionInfo {
   if ('connection' in navigator) {
     const connection = (navigator as any).connection;
     return {
-      type: mapEffectiveTypeToConnectionType(connection.effectiveType),
+      online: navigator.onLine,
+      connectionType: mapEffectiveTypeToConnectionType(connection.effectiveType),
       effectiveType: connection.effectiveType,
       downlink: connection.downlink,
       rtt: connection.rtt,
-      saveData: connection.saveData,
+      lastChecked: new Date(),
     };
   }
 
   // Fallback detection
   return {
-    type: navigator.onLine ? 'fast' : 'offline',
+    online: navigator.onLine,
+    connectionType: navigator.onLine ? 'wifi' : 'none',
+    lastChecked: new Date(),
   };
 }
 
@@ -74,13 +75,13 @@ function mapEffectiveTypeToConnectionType(effectiveType?: string): ConnectionTyp
   switch (effectiveType) {
     case 'slow-2g':
     case '2g':
-      return 'offline';
+      return 'none';
     case '3g':
-      return 'slow';
+      return 'cellular';
     case '4g':
-      return 'fast';
+      return 'wifi';
     default:
-      return navigator.onLine ? 'fast' : 'offline';
+      return navigator.onLine ? 'wifi' : 'none';
   }
 }
 
@@ -89,13 +90,13 @@ function mapEffectiveTypeToConnectionType(effectiveType?: string): ConnectionTyp
  */
 export function isConnectionSuitableForPriority(
   connectionInfo: ConnectionInfo,
-  priority: LoadingPriority
+  priority: 'low' | 'normal' | 'high' | 'critical'
 ): boolean {
-  if (!navigator.onLine) {
-    return priority === 'high';
+  if (!connectionInfo.online) {
+    return priority === 'critical';
   }
 
-  if (connectionInfo.type === 'slow') {
+  if (connectionInfo.connectionType === 'cellular') {
     return priority !== 'low';
   }
 
@@ -107,7 +108,7 @@ export function isConnectionSuitableForPriority(
  */
 export function getAdaptiveTimeout(
   baseTimeout: number,
-  connectionType: ConnectionType
+  connectionType: ConnectionType | undefined
 ): number {
   const multiplier = getConnectionMultiplier(connectionType);
   return baseTimeout * multiplier;
@@ -118,7 +119,7 @@ export function getAdaptiveTimeout(
  */
 export function getAdaptiveRetryDelay(
   baseDelay: number,
-  connectionType: ConnectionType,
+  connectionType: ConnectionType | undefined,
   retryCount: number
 ): number {
   const multiplier = getConnectionMultiplier(connectionType);

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { securityAuditService } from './security-audit-service.js';
-import { intrusionDetectionService, ThreatDetectionResult } from './intrusion-detection-service.js';
+import { securityAuditService } from '@server/features/security/security-audit-service.ts';
+import { intrusionDetectionService, ThreatDetectionResult } from '@server/features/security/intrusion-detection-service.ts';
 import { database as db } from '@shared/database';
 import { pgTable, text, serial, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, desc, eq, or, count } from 'drizzle-orm';

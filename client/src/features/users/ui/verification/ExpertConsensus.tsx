@@ -16,11 +16,11 @@ import React, { useState } from 'react';
 import { cn } from '@client/lib/utils';
 import { ExpertConsensus as ExpertConsensusType } from '@client/types/expert';
 
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Progress } from '../ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
 
 
 interface ExpertConsensusProps {

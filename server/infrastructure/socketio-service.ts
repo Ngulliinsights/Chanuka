@@ -6,7 +6,7 @@
  */
 
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import { createAdapter } from '@socket.io/redis-adapter';
+import { createAdapter } from '../../redis-adapter';
 import { Server } from 'http';
 import * as jwt from 'jsonwebtoken';
 import Redis from 'ioredis';

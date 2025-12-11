@@ -8,7 +8,7 @@
 // Add this to the top of your server/index.ts file, after the diagnostic logging
 // but before importing other services
 
-import { initializeServer, setupGracefulShutdown } from './server-startup.js';
+import { initializeServer, setupGracefulShutdown } from '../server-startup';
 
 // Replace direct service imports with initialization-based access
 // Instead of:

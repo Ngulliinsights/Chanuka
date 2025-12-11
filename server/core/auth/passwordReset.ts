@@ -6,7 +6,7 @@ import { ValidationError } from '@shared/core/observability/error-management/err
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { and, eq, gt } from 'drizzle-orm';
-import { config } from '../../config/index.js';
+import { config } from '../../../config.d';
 import { sendTemplatedEmail } from '@server/infrastructure/notifications/email-service.js';
 
 // Reset token expiration time in minutes

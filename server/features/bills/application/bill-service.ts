@@ -4,8 +4,8 @@ import { databaseService } from '../../../infrastructure/database/database-servi
 import { bills, sponsors, Bill } from '@shared/schema.js';
 import { bill_engagement, comments } from '@shared/schema.js';
 import { logger } from '@shared/core';
-import type { AsyncServiceResult } from '../../../infrastructure/errors/result-adapter.js';
-import { withResultHandling } from '../../../infrastructure/errors/result-adapter.js';
+import type { AsyncServiceResult } from '../../../../result-adapter';
+import { withResultHandling } from '../../../../result-adapter';
 import { QueryCache, CacheHelpers, Cached } from '../../../infrastructure/cache/query-cache';
 import { serverCache } from '../../../infrastructure/cache/cache-service';
 

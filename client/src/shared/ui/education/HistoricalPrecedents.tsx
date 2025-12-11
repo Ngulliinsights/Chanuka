@@ -17,10 +17,10 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
 
 interface LegislationOutcome {
   id: string;

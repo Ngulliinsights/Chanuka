@@ -9,7 +9,7 @@
 
 import { logger } from '../../core/src/observability/logging';
 
-import { UnifiedConnectionManager } from './connection-manager.js';
+import { UnifiedConnectionManager } from '@shared/database/core/connection-manager.ts';
 
 // ============================================================================
 // TYPE DEFINITIONS

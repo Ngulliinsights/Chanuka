@@ -9,7 +9,7 @@ import React from 'react';
 
 import { TemporalFilter } from '@client/types/user-dashboard';
 
-import { Button } from '../../ui/button';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { 
   Select,
   SelectContent,

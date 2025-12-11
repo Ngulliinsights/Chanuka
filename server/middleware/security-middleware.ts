@@ -5,7 +5,7 @@ import { encryptionService } from '@server/features/security/encryption-service.
 import { inputValidationService } from '@server/core/validation/input-validation-service.ts';
 import { secureSessionService } from '@server/core/auth/secure-session-service.ts';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
-import { createRateLimit } from './rate-limiter.js';
+import { createRateLimit } from '../../client/src/core/error/rate-limiter';
 import { logger } from '@shared/core';
 import { getClientIP } from '@server/utils/request-utils.ts';
 

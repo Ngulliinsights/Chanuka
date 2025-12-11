@@ -4,8 +4,8 @@
 // Configuration for integrating BatchingService and MemoryAwareSocketService
 // with the existing WebSocket infrastructure
 
-import { BatchingService, BatchingConfig } from './batching-service.js';
-import { MemoryAwareSocketService, MemoryThresholds } from './memory-aware-socket-service.js';
+import { BatchingService, BatchingConfig } from '../../batching-service';
+import { MemoryAwareSocketService, MemoryThresholds } from '../../memory-aware-socket-service';
 import { logger } from '@shared/core/observability/logging';
 
 export interface WebSocketServiceConfig {

@@ -1,12 +1,12 @@
-import React, { Suspense, lazy, useCallback, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { logger } from '@client/utils/logger';
 
 import { ErrorBoundary } from '@client/core/error/components';
 import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
 
-import { ProtectedRoute, AdminRoute, ModeratorRoute, VerifiedUserRoute } from './ProtectedRoute';
+import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute';
 
 // Enhanced lazy loading with retry mechanism
 const createLazyComponent = (importFn: () => Promise<any>, componentName: string) => {
@@ -51,7 +51,6 @@ const SearchPage = createLazyComponent(() => import('@client/pages/search'), 'Se
 const AuthPage = createLazyComponent(() => import('@client/pages/auth-page'), 'Authentication');
 const TermsPage = createLazyComponent(() => import('@client/pages/legal/terms'), 'Terms');
 const PrivacyPage = createLazyComponent(() => import('@client/pages/legal/privacy'), 'Privacy');
-const CookiePolicyPage = createLazyComponent(() => import('@client/pages/legal/cookie-policy'), 'Cookie Policy');
 // Consolidated user account page
 const UserProfile = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Account');
 const UserDashboard = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Dashboard');
@@ -146,8 +145,12 @@ function RouteWrapper({
 }) {
   return (
     <ErrorBoundary
-      FallbackComponent={(props) => (
-        <RouteErrorFallback {...props} routeName={routeName} />
+      fallback={({ error, resetError }) => (
+        <RouteErrorFallback 
+          error={error} 
+          resetErrorBoundary={resetError} 
+          routeName={routeName} 
+        />
       )}
       onError={(error, errorInfo) => {
         logger.error(`Route error in ${routeName}:`, { component: 'AppRouter' }, {
@@ -156,6 +159,8 @@ function RouteWrapper({
           componentStack: errorInfo.componentStack
         });
       }}
+      context={`route:${routeName}`}
+      showTechnicalDetails={process.env.NODE_ENV === 'development'}
     >
       <Suspense fallback={<RouteLoadingFallback routeName={routeName} />}>
         {children}

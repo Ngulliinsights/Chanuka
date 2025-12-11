@@ -93,7 +93,7 @@ export class ComponentTemplateGenerator {
     }
     
     if (this.config.hasErrorHandling) {
-      exports.push(`export * from './errors';`, `export * from './recovery';`);
+      exports.push(`export * from '@client/shared/design-system/interactive/errors.ts';`, `export * from './recovery';`);
     }
     
     if (this.config.hasHooks) {
@@ -209,7 +209,7 @@ export interface Use${pascalName}Result {
     const pascalName = this.toPascalCase(componentName);
     
     const content = `import { z } from 'zod';
-import { ${pascalName}ValidationError } from './errors';
+import { ${pascalName}ValidationError } from '@client/shared/design-system/interactive/errors.ts';
 
 /**
  * ${pascalName} validation schemas and utilities
@@ -394,7 +394,7 @@ export class ${pascalName}RuntimeError extends ${pascalName}Error {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
     
-    const content = `import { ${pascalName}Error, ${pascalName}ErrorType } from './errors';
+    const content = `import { ${pascalName}Error, ${pascalName}ErrorType } from '@client/shared/design-system/interactive/errors.ts';
 
 /**
  * ${pascalName} error recovery strategies

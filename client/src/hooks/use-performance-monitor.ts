@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { logger } from '../utils/logger';
-import { runtimePerformanceMonitor } from '../utils/performance-monitor';
+import { runtimePerformanceMonitor } from '../../../performance-monitor';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -201,7 +201,7 @@ export function usePerformanceBudget(
   const checkBudget = useCallback(async () => {
     try {
       const metrics = runtimePerformanceMonitor.getMetrics();
-      const budgetResult = await import('../utils/performance').then(
+      const budgetResult = await import('../../../PerformanceDashboard').then(
         ({ performanceBudgetChecker }) => performanceBudgetChecker.checkBudgets(metrics)
       );
 
@@ -319,7 +319,7 @@ export function usePerformanceAlert(
     metrics: Record<string, any> = {}
   ) => {
     try {
-      await import('../utils/performance').then(({ performanceAlerts }) =>
+      await import('../../../PerformanceDashboard').then(({ performanceAlerts }) =>
         performanceAlerts.sendAlert({
           type,
           title: `${componentName}: ${title}`,
@@ -340,7 +340,7 @@ export function usePerformanceAlert(
    * Update alert configuration
    */
   const updateAlertConfig = useCallback((config: Partial<{ slack: boolean; email: boolean; github: boolean }>) => {
-    import('../utils/performance').then(({ performanceAlerts }) =>
+    import('../../../PerformanceDashboard').then(({ performanceAlerts }) =>
       performanceAlerts.updateConfig(config)
     );
   }, []);

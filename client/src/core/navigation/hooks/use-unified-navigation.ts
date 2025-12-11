@@ -1,5 +1,5 @@
 import { useKeyboardFocus } from '@/hooks/use-keyboard-focus';
-import { logger } from '@/utils/logger';
+// logger import removed - currently unused
 
 import { useNavigation } from '../context';
 

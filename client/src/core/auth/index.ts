@@ -293,36 +293,5 @@ export {
 // Default Export (Main Auth Module)
 // ============================================================================
 
-export default {
-  // Services
-  AuthApiService,
-  TokenManager,
-  SessionManager,
-  
-  // React Integration
-  AuthProvider,
-  useAuth,
-  
-  // Redux Integration
-  authReducer,
-  authMiddleware,
-  
-  // HTTP Integration
-  AuthenticatedApiClient,
-  
-  // Utilities
-  validatePasswordComprehensive,
-  checkPasswordStrength,
-  hasPermission,
-  hasRole,
-  
-  // Initialization
-  initializeAuth,
-  configureAuth,
-  
-  // Migration & Setup
-  initAuthSystem,
-  setupAuthForReact,
-  runMigrationHelper,
-  validateAuthSetup,
-};
+// All exports are available as named exports from this module.
+// Default export not needed - use named imports instead.

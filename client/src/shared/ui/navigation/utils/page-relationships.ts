@@ -1,6 +1,6 @@
 import type { NavigationItem, UserRole, RelatedPage } from '@client/types';
 
-import { NavigationValidationError } from '@client/errors';
+import { NavigationValidationError } from '@client/core/error';
 import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@client/validation';
 
 import { findNavigationItemByPath } from './navigation-utils';

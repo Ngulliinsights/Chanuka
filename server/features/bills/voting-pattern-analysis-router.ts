@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { votingPatternAnalysisService } from './voting-pattern-analysis.js';
+import { votingPatternAnalysisService } from '@server/features/bills/voting-pattern-analysis-router.ts';
 import { authenticateToken } from '@server/middleware/auth.js';
 import type { AuthenticatedRequest } from '@server/middleware/auth.js';
 import { UnifiedApiResponse  } from '@shared/core/utils/api';

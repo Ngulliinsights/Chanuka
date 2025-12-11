@@ -6,7 +6,7 @@
  * with accessibility compliance.
  */
 
-import { RefreshCw, Home, AlertCircle, ChevronDown, X } from 'lucide-react';
+import { RefreshCw, Building, AlertCircle, ChevronDown, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { AppError } from '../types';
@@ -55,7 +55,7 @@ export const RecoveryUI: React.FC<RecoveryUIProps> = ({
       id: 'home',
       label: 'Go Home',
       description: 'Return to the home page',
-      icon: <Home size={16} />,
+      icon: <Building size={16} />,
       variant: 'secondary',
     },
     {
@@ -310,7 +310,7 @@ const RecoveryModal: React.FC<{
         </div>
 
         <div id="recovery-modal-description" className="recovery-modal__description">
-          An error occurred. Choose how you'd like to proceed:
+          An error occurred. Choose how you&apos;d like to proceed:
         </div>
 
         <div className="recovery-modal__content">

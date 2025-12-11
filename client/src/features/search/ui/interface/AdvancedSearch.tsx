@@ -43,7 +43,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@client/shared/design-system';
-import { useToast } from '../../../hooks/use-toast';
+import { useToast } from '@client/hooks/use-toast.ts';
 import type { DualSearchRequest } from '../../services/intelligent-search';
 
 // Define types locally

@@ -9,8 +9,8 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { usePasswordVisibility } from '@client/hooks/usePasswordUtils';
 
-import { Input } from '../../../ui/input';
-import { Label } from '../../../ui/label';
+import { Input } from '../../../../../../Input';
+import { Label } from '../../../../../../Label';
 
 export interface AuthInputProps {
   name: string;

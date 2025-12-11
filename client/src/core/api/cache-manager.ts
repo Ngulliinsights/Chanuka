@@ -10,7 +10,10 @@ import { logger } from '../../utils/logger';
 /**
  * Cache entry with metadata - imported from storage types
  */
-import type { CacheEntry, CacheStats } from '../storage/types';
+import type { CacheEntry } from '../storage/types';
+
+// Re-export CacheEntry type
+export type { CacheEntry };
 
 /**
  * Eviction policy type
@@ -30,9 +33,20 @@ export interface CacheConfig {
   enableEncryption: boolean;
 }
 
+/**
+ * Extended cache statistics for API cache manager
+ */
 export interface CacheStats {
+  hits: number;
+  misses: number;
+  sets: number;
+  deletes: number;
+  evictions: number;
+  totalSize: number;
   entryCount: number;
   hitRate: number;
+  memoryEntries?: number;
+  persistedEntries?: number;
 }
 
 /**
@@ -111,7 +125,7 @@ export class ApiCacheManager {
     }
 
     // Update access metadata
-    entry.accessCount++;
+    entry.accessCount = (entry.accessCount ?? 0) + 1;
     entry.lastAccessed = Date.now();
     
     this.stats.hits++;
@@ -176,7 +190,7 @@ export class ApiCacheManager {
     if (entry) {
       this.cache.delete(fullKey);
       this.stats.deletes++;
-      this.stats.totalSize -= entry.size;
+      this.stats.totalSize -= entry.size ?? 0;
       this.stats.entryCount--;
 
       // Remove from persistent storage
@@ -338,7 +352,7 @@ export class ApiCacheManager {
       .map(([key, entry]) => ({ key, entry }))
       .sort((a, b) => {
         // LRU eviction: least recently used first
-        return a.entry.lastAccessed - b.entry.lastAccessed;
+        return (a.entry.lastAccessed ?? 0) - (b.entry.lastAccessed ?? 0);
       });
 
     let freedSize = 0;
@@ -346,7 +360,7 @@ export class ApiCacheManager {
 
     for (const { key, entry } of entries) {
       keysToEvict.push(key);
-      freedSize += entry.size;
+      freedSize += entry.size ?? 0;
       
       if (freedSize >= requiredSize) {
         break;
@@ -373,7 +387,7 @@ export class ApiCacheManager {
   private async evictByCount(): Promise<void> {
     const entries = Array.from(this.cache.entries())
       .map(([key, entry]) => ({ key, entry }))
-      .sort((a, b) => a.entry.lastAccessed - b.entry.lastAccessed);
+      .sort((a, b) => (a.entry.lastAccessed ?? 0) - (b.entry.lastAccessed ?? 0));
 
     // Evict 10% of entries or at least 1
     const evictCount = Math.max(1, Math.floor(this.config.maxEntries * 0.1));
@@ -394,7 +408,8 @@ export class ApiCacheManager {
    * Checks if a cache entry has expired
    */
   private isExpired(entry: CacheEntry): boolean {
-    return Date.now() - entry.timestamp > entry.ttl;
+    const ttl = entry.ttl ?? this.config.defaultTTL;
+    return Date.now() - entry.timestamp > ttl;
   }
 
   /**

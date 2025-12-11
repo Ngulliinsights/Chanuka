@@ -3,7 +3,6 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
-import type { AppError } from '@client/core/error';
 import { BaseError, ErrorSeverity, ErrorDomain } from '@client/utils/logger';
 import { logger } from '@client/utils/logger';
 
@@ -38,19 +37,22 @@ export function createErrorReporter(options: {
   enableTechnicalDetails?: boolean;
 }) {
   return {
-    report: (error: any) => {
+    report: (error: Record<string, unknown>) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       logger.error('User error reported', { 
         component: 'ErrorReporter',
         error 
       });
     },
     
-    generateReport: (error: BaseError, metadata?: any): ErrorReport => {
+    generateReport: (error: BaseError, _metadata?: Record<string, unknown>): ErrorReport => {
       const errorId = (error as any).errorId || `err_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       
       let recoveryOptions: Array<{ label: string; action: string; description?: string }>;
       
-      const recoveryStrategies = error.metadata?.recoveryStrategies as RecoveryStrategy[] | undefined;
+      // Note: recoveryStrategies may not be present in all ErrorMetadata instances
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const recoveryStrategies = (error.metadata as any)?.recoveryStrategies as RecoveryStrategy[] | undefined;
       
       if (recoveryStrategies && recoveryStrategies.length > 0) {
         recoveryOptions = recoveryStrategies.map(strategy => ({

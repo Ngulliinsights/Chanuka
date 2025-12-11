@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+
 import { AppError } from '../types';
 
 /**
@@ -36,8 +37,8 @@ export interface ErrorMetrics {
   recoveryAttempts: number;
   recoverySuccessful: boolean;
   userFeedbackProvided: boolean;
-  browserInfo?: any;
-  performanceMetrics?: any;
+  browserInfo?: Record<string, unknown>;
+  performanceMetrics?: Record<string, unknown>;
   context?: string;
 }
 
@@ -77,7 +78,7 @@ export interface ErrorBoundaryProps {
   maxRecoveryAttempts?: number;
   recoveryTimeout?: number;
   resetOnPropsChange?: boolean;
-  resetKeys?: any[];
+  resetKeys?: unknown[];
   context?: string;
   showTechnicalDetails?: boolean;
   onError?: (error: AppError, errorInfo: React.ErrorInfo) => void;

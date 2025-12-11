@@ -5,8 +5,9 @@
  * Consolidates WebSocket logic from CommunityWebSocketManager and EventBus.
  */
 
-import type { WebSocketEvents, UnifiedComment, UnifiedThread } from '../types';
+import type { WebSocketEvents } from '../types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type EventHandler<T = any> = (data: T) => void;
 
 export class WebSocketManager {
@@ -66,7 +67,9 @@ export class WebSocketManager {
           
           // Rejoin rooms after reconnection
           this.joinedRooms.forEach(room => {
-            this.send('join_room', { room });
+            if (this.ws?.readyState === WebSocket.OPEN) {
+              this.ws.send(JSON.stringify({ event: 'join_room', data: { room } }));
+            }
           });
           
           resolve();
@@ -115,7 +118,7 @@ export class WebSocketManager {
   /**
    * Send message to server
    */
-  send<K extends keyof WebSocketEvents>(event: K, data: any): void {
+  send<K extends keyof WebSocketEvents>(event: K, data: WebSocketEvents[K]): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ event, data }));
     } else {
@@ -180,7 +183,9 @@ export class WebSocketManager {
    */
   joinRoom(room: string): void {
     this.joinedRooms.add(room);
-    this.send('join_room', { room });
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ event: 'join_room', data: { room } }));
+    }
   }
 
   /**
@@ -188,7 +193,9 @@ export class WebSocketManager {
    */
   leaveRoom(room: string): void {
     this.joinedRooms.delete(room);
-    this.send('leave_room', { room });
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ event: 'leave_room', data: { room } }));
+    }
   }
 
   /**
@@ -201,7 +208,7 @@ export class WebSocketManager {
   /**
    * Handle incoming WebSocket messages
    */
-  private handleMessage(message: { event: keyof WebSocketEvents; data: any }): void {
+  private handleMessage(message: { event: keyof WebSocketEvents; data: Record<string, unknown> }): void {
     const { event, data } = message;
     const handlers = this.eventHandlers.get(event);
     

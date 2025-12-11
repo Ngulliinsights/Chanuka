@@ -2,7 +2,7 @@ import express, { type Express, type Request, type Response, type NextFunction }
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { createServer, type ViteDevServer } from '../node_modules/vite';
+import { createServer, type ViteDevServer } from '@server/vite.ts';
 import { type Server } from "http";
 
 /**

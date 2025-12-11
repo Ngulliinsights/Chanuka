@@ -4,7 +4,7 @@
  * Centralized configuration for all database services
  */
 
-import { DatabaseIntegrationConfig } from './database-integration.js';
+import { DatabaseIntegrationConfig } from '@server/infrastructure/database/database-integration.ts';
 
 export function createDatabaseConfig(): DatabaseIntegrationConfig {
   const isDevelopment = process.env.NODE_ENV === 'development';

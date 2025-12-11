@@ -3,15 +3,15 @@ import React, { useState, useEffect } from 'react';
 
 import { useToast } from '@client/hooks/use-toast';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Separator } from '../ui/separator';
-import { Switch } from '../ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Input } from '@client/shared/design-system/interactive/Input.tsx';
+import { Label } from '@client/shared/design-system/typography/Label.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system/interactive/Select.tsx';
+import { Separator } from '@client/shared/design-system/feedback/separator.tsx';
+import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
 
 
 // --- INTERFACES ---

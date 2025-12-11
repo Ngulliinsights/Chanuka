@@ -14,9 +14,9 @@
  */
 
 import { Server } from 'http';
-import { webSocketService } from './websocket.js';
-import { socketIOService } from './socketio-service.js';
-import { featureFlagService } from './feature-flags.js';
+import { webSocketService } from '../../WebSocketIntegrationExample';
+import { socketIOService } from '@server/infrastructure/socketio-service.ts';
+import { featureFlagService } from '../../feature-flags-service';
 import { logger } from '@shared/core/observability/logging';
 
 // ============================================================================

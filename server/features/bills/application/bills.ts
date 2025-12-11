@@ -11,7 +11,7 @@ import { BillServiceError } from '@shared/domain/errors/bill-errors';
 import { eq, and, sql } from 'drizzle-orm';
 import { bills } from '@shared/schema';
 import { databaseService } from '@/infrastructure/database/database-service';
-import type { IBillRepository } from '../../domain/interfaces/bill-repository.interface';
+import type { IBillRepository } from '../../../../bill-repository.interface';
 
 /**
  * Application service for bill operations

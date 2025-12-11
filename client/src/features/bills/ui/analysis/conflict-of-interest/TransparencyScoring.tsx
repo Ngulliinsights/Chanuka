@@ -11,11 +11,11 @@ import { RadialBarChart, RadialBar, ResponsiveContainer, BarChart, Bar, XAxis, Y
 
 import { TransparencyScore, ConflictAnalysis } from '@client/types/conflict-of-interest';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
-import { Progress } from '../ui/progress';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
 
 
 

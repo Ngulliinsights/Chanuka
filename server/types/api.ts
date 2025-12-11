@@ -32,7 +32,7 @@ export type {
   RegisterRequest,
   AuthResponse,
   HealthCheckResponse
-} from './common.js';
+} from '../../common-utils';
 
 // Import analysis types from domain features
 export type { BillAnalysis, SponsorshipAnalysis } from '../utils/missing-modules-fallback.js';
@@ -41,7 +41,7 @@ export type { BillAnalysis, SponsorshipAnalysis } from '../utils/missing-modules
 
 // Legacy functions for backward compatibility (deprecated)
 
-import type { ApiResponse, ErrorResponse, ResponseMetadata } from './common.js';
+import type { ApiResponse, ErrorResponse, ResponseMetadata } from '../../common-utils';
 
 /**
  * @deprecated Use ApiResponseWrapper from '@shared/core/utils/api-utils.ts instead.

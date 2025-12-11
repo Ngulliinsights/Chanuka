@@ -14,7 +14,7 @@ import { DomainEventPublisher } from '@shared/domain/events/bill-events';
 import { BillStatus, BillVoteType } from '@shared/schema';
 import { Result, Ok, Err } from '@shared/core';
 import { BillServiceError } from '@shared/domain/errors/bill-errors';
-import type { IBillRepository } from '../../domain/interfaces/bill-repository.interface';
+import type { IBillRepository } from '../../../../bill-repository.interface';
 
 /**
  * Application service for bill operations using repository pattern

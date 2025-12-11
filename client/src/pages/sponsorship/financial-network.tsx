@@ -5,10 +5,8 @@ import {
   ChevronRight,
   ChevronLeft,
   Building,
-  DollarSign,
   BarChart3,
   Share2,
-  Target
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -62,7 +60,7 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
               interconnectionRate: data.metrics?.interconnectionRate || 0,
               totalAffiliations: data.metrics?.totalConnections || 0,
               primarySponsorExposure: data.industryAnalysis?.breakdown?.[0]?.amount || 0,
-              totalFinancialExposure: data.industryAnalysis?.breakdown?.reduce((sum: number, item: any) => sum + item.amount, 0) || 0,
+              totalFinancialExposure: data.industryAnalysis?.breakdown?.reduce((sum: number, item: { amount: number }) => sum + item.amount, 0) || 0,
               industryBreakdown: data.industryAnalysis?.breakdown || []
             });
           }

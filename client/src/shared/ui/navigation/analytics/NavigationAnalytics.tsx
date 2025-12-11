@@ -8,7 +8,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { navigationUtils } from '@client/utils/navigation';
+import { navigationUtils } from '@client/shared/ui/navigation/Navigation.tsx';
 import { logger } from '@client/utils/logger';
 
 interface NavigationAnalyticsProps {

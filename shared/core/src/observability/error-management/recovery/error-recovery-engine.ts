@@ -6,8 +6,8 @@
  */
 
 import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
-import { ErrorRecoveryEngine, RecoverySuggestion } from '../types.js';
-import { logger } from '../../logging/index.js';
+import { ErrorRecoveryEngine, RecoverySuggestion } from '@shared/core/src/caching/types.ts';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
 
 export interface RecoveryRule {
   id: string;

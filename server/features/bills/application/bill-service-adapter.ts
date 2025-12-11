@@ -6,7 +6,7 @@
  * This allows gradual migration while preserving existing API contracts.
  */
 
-import { CachedBillService, BillFilters, PaginationOptions, PaginatedBills, BillWithEngagement, BillStats } from './bill-service.js';
+import { CachedBillService, BillFilters, PaginationOptions, PaginatedBills, BillWithEngagement, BillStats } from '@server/features/bills/application/bill-service-adapter.ts';
 import { ResultAdapter } from '@/infrastructure/errors/result-adapter.js';
 
 export class BillServiceAdapter {

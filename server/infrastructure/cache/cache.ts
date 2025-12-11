@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { cacheService, advancedCachingService } from './index.js';
+import { cacheService, advancedCachingService } from '../../../4-personas-implementation-guide';
 
 export const router = Router();
 

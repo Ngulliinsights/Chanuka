@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticateToken, AuthenticatedRequest } from '@server/middleware/auth.js';
-import { privacyService, PrivacyPreferences } from './privacy-service.js';
+import { privacyService, PrivacyPreferences } from '@server/features/privacy/privacy-service.ts';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
 import { logger   } from '@shared/core';
 

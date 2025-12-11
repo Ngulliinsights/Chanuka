@@ -3,21 +3,30 @@
  * Best practices: Widget-based architecture, data management, permissions
  */
 
-import { DashboardState, DashboardAction, DashboardConfig, WidgetConfig, DashboardLayout, DashboardSettings } from '@client/types';
-import React, { createContext, useContext, useReducer, useCallback, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
 
+import { DashboardState, WidgetConfig, DashboardLayout, DashboardSettings } from '@client/types';
 import { logger } from '@client/utils/logger';
-
-import { dashboardReducer } from './reducer';
 
 
 const initialState: DashboardState = {
-  config: null,
-  loading: false,
-  error: null,
-  widgetData: {},
-  widgetLoading: {},
-  widgetErrors: {},
+  id: '',
+  name: '',
+  widgets: [],
+  layout: {
+    type: 'grid',
+    columns: 12,
+    gap: 16,
+    responsive: [],
+    breakpoints: [],
+  },
+  userId: '',
+  isPublic: false,
+  tags: [],
+  autoRefresh: false,
+  refreshInterval: 300,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 export interface DashboardContextValue {
@@ -25,7 +34,7 @@ export interface DashboardContextValue {
   
   // Config management
   loadDashboard: (dashboardId: string) => Promise<void>;
-  saveDashboard: (config: DashboardConfig) => Promise<void>;
+  saveDashboard: (state: DashboardState) => Promise<void>;
   updateSettings: (settings: Partial<DashboardSettings>) => void;
   
   // Widget management
@@ -39,33 +48,35 @@ export interface DashboardContextValue {
   updateLayout: (layout: DashboardLayout) => void;
   
   // Data management
-  getWidgetData: (widgetId: string) => any;
-  isWidgetLoading: (widgetId: string) => boolean;
-  getWidgetError: (widgetId: string) => Error | null;
+  getWidget: (widgetId: string) => WidgetConfig | undefined;
 }
 
 const DashboardContext = createContext<DashboardContextValue | undefined>(undefined);
 
 export function createDashboardProvider(
   dashboardService: {
-    loadDashboard: (id: string) => Promise<DashboardConfig>;
-    saveDashboard: (config: DashboardConfig) => Promise<void>;
-    loadWidgetData: (widgetId: string, config: WidgetConfig) => Promise<any>;
+    loadDashboard: (id: string) => Promise<DashboardState>;
+    saveDashboard: (state: DashboardState) => Promise<void>;
+    loadWidgetData: (widgetId: string, config: WidgetConfig) => Promise<unknown>;
   }
 ) {
   return function DashboardProvider({ children }: { children: React.ReactNode }) {
-    const [state, dispatch] = useReducer(dashboardReducer, initialState);
+    const [state, setState] = useState<DashboardState>(initialState);
 
     // Auto-refresh widgets based on their refresh intervals
     useEffect(() => {
-      if (!state.config) return;
-
       const intervals: NodeJS.Timeout[] = [];
 
-      state.config.layout.widgets.forEach(widget => {
+      state.widgets.forEach((widget: WidgetConfig) => {
         if (widget.refreshInterval && widget.refreshInterval > 0) {
           const interval = setInterval(() => {
-            refreshWidget(widget.id);
+            // Use a self-executing function to avoid closure issues
+            const w = state.widgets.find(aw => aw.id === widget.id);
+            if (w) {
+              dashboardService.loadWidgetData(widget.id, w).catch((error) => {
+                logger.error('Failed to refresh widget:', { widgetId: widget.id }, error);
+              });
+            }
           }, widget.refreshInterval * 1000);
           intervals.push(interval);
         }
@@ -74,99 +85,90 @@ export function createDashboardProvider(
       return () => {
         intervals.forEach(interval => clearInterval(interval));
       };
-    }, [state.config]);
+    }, [state.widgets]);
 
     const loadDashboard = useCallback(async (dashboardId: string) => {
       try {
-        dispatch({ type: 'SET_LOADING', payload: true });
-        dispatch({ type: 'SET_ERROR', payload: null });
-
-        const config = await dashboardService.loadDashboard(dashboardId);
-        dispatch({ type: 'SET_CONFIG', payload: config });
-
-        // Load initial data for all widgets
-        await refreshAllWidgets();
+        const loadedState = await dashboardService.loadDashboard(dashboardId);
+        setState(loadedState);
       } catch (error) {
         logger.error('Failed to load dashboard:', { dashboardId }, error);
-        dispatch({ type: 'SET_ERROR', payload: error as Error });
-      } finally {
-        dispatch({ type: 'SET_LOADING', payload: false });
       }
     }, []);
 
-    const saveDashboard = useCallback(async (config: DashboardConfig) => {
+    const saveDashboard = useCallback(async (newState: DashboardState) => {
       try {
-        await dashboardService.saveDashboard(config);
-        dispatch({ type: 'SET_CONFIG', payload: config });
+        await dashboardService.saveDashboard(newState);
+        setState(newState);
       } catch (error) {
-        logger.error('Failed to save dashboard:', { configId: config.id }, error);
-        dispatch({ type: 'SET_ERROR', payload: error as Error });
+        logger.error('Failed to save dashboard:', { dashboardId: newState.id }, error);
       }
     }, []);
 
-    const updateSettings = useCallback((settings: Partial<DashboardSettings>) => {
-      dispatch({ type: 'UPDATE_SETTINGS', payload: settings });
+    const updateSettings = useCallback((_settings: Partial<DashboardSettings>) => {
+      // Update dashboard settings
+      setState(prev => ({
+        ...prev,
+        updatedAt: new Date(),
+      }));
     }, []);
 
     const addWidget = useCallback((widget: WidgetConfig) => {
-      dispatch({ type: 'ADD_WIDGET', payload: widget });
-      // Load initial data for the new widget
-      refreshWidget(widget.id);
+      setState(prev => ({
+        ...prev,
+        widgets: [...prev.widgets, widget],
+        updatedAt: new Date(),
+      }));
     }, []);
 
     const removeWidget = useCallback((widgetId: string) => {
-      dispatch({ type: 'REMOVE_WIDGET', payload: widgetId });
+      setState(prev => ({
+        ...prev,
+        widgets: prev.widgets.filter(w => w.id !== widgetId),
+        updatedAt: new Date(),
+      }));
     }, []);
 
     const updateWidget = useCallback((widgetId: string, config: Partial<WidgetConfig>) => {
-      dispatch({ type: 'UPDATE_WIDGET_CONFIG', payload: { widgetId, config } });
+      setState(prev => ({
+        ...prev,
+        widgets: prev.widgets.map(w =>
+          w.id === widgetId ? { ...w, ...config } : w
+        ),
+        updatedAt: new Date(),
+      }));
     }, []);
 
     const refreshWidget = useCallback(async (widgetId: string) => {
-      if (!state.config) return;
-
-      const widget = state.config.layout.widgets.find(w => w.id === widgetId);
+      const widget = state.widgets.find(w => w.id === widgetId);
       if (!widget) return;
 
       try {
-        dispatch({ type: 'SET_WIDGET_LOADING', payload: { widgetId, loading: true } });
-        dispatch({ type: 'SET_WIDGET_ERROR', payload: { widgetId, error: null } });
-
-        const data = await dashboardService.loadWidgetData(widgetId, widget);
-        dispatch({ type: 'SET_WIDGET_DATA', payload: { widgetId, data } });
+        await dashboardService.loadWidgetData(widgetId, widget);
       } catch (error) {
         logger.error('Failed to refresh widget:', { widgetId }, error);
-        dispatch({ type: 'SET_WIDGET_ERROR', payload: { widgetId, error: error as Error } });
-      } finally {
-        dispatch({ type: 'SET_WIDGET_LOADING', payload: { widgetId, loading: false } });
       }
-    }, [state.config]);
+    }, [state.widgets]);
 
     const refreshAllWidgets = useCallback(async () => {
-      if (!state.config) return;
-
-      const refreshPromises = state.config.layout.widgets.map(widget => 
-        refreshWidget(widget.id)
+      const refreshPromises = state.widgets.map(widget => 
+        dashboardService.loadWidgetData(widget.id, widget)
       );
 
       await Promise.allSettled(refreshPromises);
-    }, [state.config, refreshWidget]);
+    }, [state.widgets]);
 
     const updateLayout = useCallback((layout: DashboardLayout) => {
-      dispatch({ type: 'UPDATE_LAYOUT', payload: layout });
+      setState(prev => ({
+        ...prev,
+        layout,
+        updatedAt: new Date(),
+      }));
     }, []);
 
-    const getWidgetData = useCallback((widgetId: string) => {
-      return state.widgetData[widgetId];
-    }, [state.widgetData]);
-
-    const isWidgetLoading = useCallback((widgetId: string) => {
-      return state.widgetLoading[widgetId] || false;
-    }, [state.widgetLoading]);
-
-    const getWidgetError = useCallback((widgetId: string) => {
-      return state.widgetErrors[widgetId] || null;
-    }, [state.widgetErrors]);
+    const getWidget = useCallback((widgetId: string) => {
+      return state.widgets.find(w => w.id === widgetId);
+    }, [state.widgets]);
 
     const value: DashboardContextValue = useMemo(() => ({
       state,
@@ -179,9 +181,7 @@ export function createDashboardProvider(
       refreshWidget,
       refreshAllWidgets,
       updateLayout,
-      getWidgetData,
-      isWidgetLoading,
-      getWidgetError,
+      getWidget,
     }), [
       state,
       loadDashboard,
@@ -193,9 +193,7 @@ export function createDashboardProvider(
       refreshWidget,
       refreshAllWidgets,
       updateLayout,
-      getWidgetData,
-      isWidgetLoading,
-      getWidgetError,
+      getWidget,
     ]);
 
     return (

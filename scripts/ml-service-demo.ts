@@ -6,9 +6,9 @@
  * Demonstrates the ML service migration with feature flags and A/B testing.
  */
 
-import { MLServiceAdapter } from '../server/features/analytics/services/ml-adapter.service.js';
-import { initializeMLFeatureFlag, enableMLServiceRollout, getMLServiceStatus } from '../server/features/analytics/config/ml-feature-flag.config.js';
-import { realMLAnalysisService } from '../server/features/analytics/services/real-ml.service.js';
+import { MLServiceAdapter } from '../ml-adapter.service';
+import { initializeMLFeatureFlag, enableMLServiceRollout, getMLServiceStatus } from '../ml-feature-flag.config';
+import { realMLAnalysisService } from '../real-ml.service';
 
 // Mock logger for demo
 const logger = {
@@ -93,7 +93,7 @@ async function runMLServiceDemo() {
     const realTimes = [];
     
     // Test mock service directly
-    const { MLAnalysisService } = await import('../server/features/analytics/services/ml.service.js');
+    const { MLAnalysisService } = await import('./ml-service-demo');
     for (let i = 0; i < 3; i++) {
       const startTime = Date.now();
       await MLAnalysisService.analyzeStakeholderInfluence(testBillContent);

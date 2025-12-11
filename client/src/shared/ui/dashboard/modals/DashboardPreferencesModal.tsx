@@ -19,8 +19,8 @@ import React, { useState } from 'react';
 
 import { DashboardPreferences } from '@client/types/user-dashboard';
 
-import { Button } from '../../ui/button';
-import { Checkbox } from '../../ui/checkbox';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Checkbox } from '@client/shared/design-system/interactive/Checkbox.tsx';
 import {
   Dialog,
   DialogContent,
@@ -28,8 +28,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import { Input } from '../../ui/input';
-import { Label } from '../../ui/label';
+import { Input } from '@client/shared/design-system/interactive/Input.tsx';
+import { Label } from '@client/shared/design-system/typography/Label.tsx';
 import {
   Select,
   SelectContent,
@@ -37,7 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../ui/select';
-import { Switch } from '../../ui/switch';
+import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
 
 
 interface DashboardPreferencesModalProps {

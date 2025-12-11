@@ -1,4 +1,4 @@
-import { authService } from './auth-service.js';
+import { authService } from '@server/core/auth/auth-service.ts';
 import { logger  } from '@shared/core';
 
 export class SessionCleanupService {

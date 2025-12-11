@@ -18,8 +18,8 @@ import React, { useState } from 'react';
 
 import { DataExportRequest } from '@client/types/user-dashboard';
 
-import { Button } from '../../ui/button';
-import { Checkbox } from '../../ui/checkbox';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Checkbox } from '@client/shared/design-system/interactive/Checkbox.tsx';
 import {
   Dialog,
   DialogContent,
@@ -27,8 +27,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import { Input } from '../../ui/input';
-import { Label } from '../../ui/label';
+import { Input } from '@client/shared/design-system/interactive/Input.tsx';
+import { Label } from '@client/shared/design-system/typography/Label.tsx';
 import {
   Select,
   SelectContent,

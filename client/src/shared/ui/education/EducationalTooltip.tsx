@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '../ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/shared/design-system/feedback/Tooltip.tsx';
 
 interface EducationalTooltipProps {
   term: string;

@@ -1,6 +1,6 @@
 // Import fallback implementations for missing shared modules
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../utils/missing-modules-fallback.js';
-import { ExternalAPIErrorHandler } from './external-api-error-handler.js';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../missing-modules-fallback';
+import { ExternalAPIErrorHandler } from '../../external-api-error-handler';
 import { logger   } from '@shared/core';
 import { z } from 'zod';
 

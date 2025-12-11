@@ -6,12 +6,11 @@
  */
 
 import { globalApiClient } from '../../api/client';
+
 import type { 
-  UnifiedModeration, 
-  ModerationRequest, 
+  ModerationRequest,
+  UnifiedModeration,
   ViolationType,
-  UnifiedComment,
-  UnifiedThread 
 } from '../types';
 
 export class ModerationService {
@@ -95,7 +94,7 @@ export class ModerationService {
       const response = await globalApiClient.post('/api/moderation/auto-check', {
         content,
       });
-      return response.data;
+      return response.data as { shouldModerate: boolean; violations: ViolationType[]; confidence: number };
     } catch (error) {
       console.error('Auto-moderation check failed:', error);
       return {
@@ -118,7 +117,7 @@ export class ModerationService {
   }> {
     try {
       const response = await globalApiClient.get('/api/moderation/stats');
-      return response.data;
+      return response.data as { totalReports: number; pendingReports: number; resolvedReports: number; reportsByType: Record<ViolationType, number>; reportsByStatus: Record<string, number> };
     } catch (error) {
       console.error('Failed to fetch moderation stats:', error);
       return {
@@ -212,7 +211,7 @@ export class ModerationService {
   }> {
     try {
       const response = await globalApiClient.get(`/api/moderation/can-report/${userId}`);
-      return response.data;
+      return response.data as { canReport: boolean; reason?: string; nextAllowedTime?: Date };
     } catch (error) {
       console.error('Failed to check report permissions:', error);
       return { canReport: true };
@@ -230,7 +229,7 @@ export class ModerationService {
   }> {
     try {
       const response = await globalApiClient.get(`/api/moderation/user-history/${userId}`);
-      return response.data;
+      return response.data as { reports: UnifiedModeration[]; warnings: number; suspensions: number; lastAction?: Date };
     } catch (error) {
       console.error('Failed to fetch user moderation history:', error);
       return {

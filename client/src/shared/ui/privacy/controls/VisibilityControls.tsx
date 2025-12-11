@@ -8,9 +8,9 @@ import React from 'react';
 
 import { PrivacySettings } from '@client/types/auth';
 
-import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
-import { Label } from '../../../ui/label';
-import { Switch } from '../../../ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Label } from '@client/shared/design-system/typography/Label.tsx';
+import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
 
 interface VisibilityControlsProps {
   settings: PrivacySettings;

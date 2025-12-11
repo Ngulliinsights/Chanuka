@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '@shared/core';
 import { ApiValidationError } from '@shared/core/utils/api-utils.js';
-import { validationMetricsCollector } from './validation-metrics.js';
+import { validationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
 import {
   validateEmail,
   validatePhone,

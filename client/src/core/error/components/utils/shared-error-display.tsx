@@ -89,12 +89,10 @@ export function ErrorActions({
   retryCount = 0,
   maxRetries = 3
 }: Pick<ErrorDisplayProps, 'config' | 'onRetry' | 'onReport' | 'onGoHome' | 'retryCount' | 'maxRetries'>) {
-  const styles = getSeverityStyles(config.severity);
-
   return (
     <div className="space-y-2">
       {config.showRetry && onRetry && (
-        <Button onClick={onRetry} className="w-full" variant="default">
+        <Button onClick={onRetry} className="w-full" variant="primary">
           <RefreshCw className="h-4 w-4 mr-2" />
           Try Again {retryCount > 0 && `(${retryCount}/${maxRetries})`}
         </Button>

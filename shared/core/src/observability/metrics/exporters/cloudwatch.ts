@@ -1,6 +1,6 @@
 // import { Metric } from '../../../types';
 type Metric = any;
-import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
+import { Result, Ok, Err } from '@shared/core/src/primitives/types/result.ts';
 
 // ==================== CloudWatch Configuration ====================
 

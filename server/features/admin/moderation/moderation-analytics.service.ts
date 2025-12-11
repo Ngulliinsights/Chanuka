@@ -13,7 +13,7 @@ import { bill,
  } from '@shared/shared/schema';
 import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
 import { logger  } from '@shared/core';
-import { ContentAnalytics } from './types.js';
+import { ContentAnalytics } from '@server/features/admin/moderation/types.ts';
 
 export class ModerationAnalyticsService {
   private static instance: ModerationAnalyticsService;

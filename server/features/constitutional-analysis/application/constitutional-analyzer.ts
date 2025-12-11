@@ -5,9 +5,9 @@
 
 import { logger  } from '@shared/core';
 import { ConstitutionalProvision, LegalPrecedent, ConstitutionalAnalysis } from '@shared/schema/index.js';
-import { ProvisionMatcherService } from './provision-matcher.js';
-import { PrecedentFinderService } from './precedent-finder.js';
-import { ExpertFlaggingService } from './expert-flagging-service.js';
+import { ProvisionMatcherService } from '@server/features/constitutional-analysis/application/provision-matcher.ts';
+import { PrecedentFinderService } from '@server/features/constitutional-analysis/application/precedent-finder.ts';
+import { ExpertFlaggingService } from '@server/features/constitutional-analysis/application/expert-flagging-service.ts';
 import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository.js';
 import { LegalPrecedentsRepository } from '@shared/infrastructure/repositories/legal-precedents-repository.js';
 import { ConstitutionalAnalysesRepository } from '@shared/infrastructure/repositories/constitutional-analyses-repository.js';

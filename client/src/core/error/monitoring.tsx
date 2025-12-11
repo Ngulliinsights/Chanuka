@@ -19,15 +19,7 @@ interface ErrorContext {
   buildVersion?: string;
   feature?: string;
   action?: string;
-  metadata?: Record<string, any>;
-}
-
-interface PerformanceMetric {
-  name: string;
-  value: number;
-  unit: string;
-  timestamp: number;
-  context?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface CustomError extends Error {
@@ -67,13 +59,14 @@ class ErrorMonitoringService {
         
         // Performance monitoring
         integrations: [
+          // Use casting for BrowserTracing due to Sentry API differences
           new BrowserTracing({
             tracePropagationTargets: [
               'localhost',
               /^https:\/\/api\.chanuka\.ke/,
               /^https:\/\/.*\.chanuka\.ke/
             ],
-          }),
+          }) as any,
           
           // Session replay for debugging
           new Replay({
@@ -87,8 +80,9 @@ class ErrorMonitoringService {
 
         tracesSampleRate: config.tracesSampleRate || 0.1,
         
-        beforeSend: (event, hint) => {
-          return this.filterAndEnhanceError(event, hint);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        beforeSend: (event: any) => {
+          return this.filterAndEnhanceError(event);
         },
 
         beforeBreadcrumb: (breadcrumb) => {

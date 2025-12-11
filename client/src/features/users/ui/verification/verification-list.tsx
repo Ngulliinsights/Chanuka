@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { useBills } from '@client/features/bills/model/hooks/useBills';
 import { logger } from '@client/utils/logger';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { LoadingSpinner } from '../ui/loading-spinner';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { LoadingSpinner } from '@client/shared/design-system';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@client/shared/design-system';
 
 interface VerificationItem { id: number;
   bill_id: number;

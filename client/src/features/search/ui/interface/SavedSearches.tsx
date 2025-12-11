@@ -1,33 +1,26 @@
-/**
- * Saved Searches Component
- *
- * Manages saved searches with email alert configuration and execution.
- */
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Label } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import { Switch } from '@client/shared/design-system';
-
 import { format } from 'date-fns';
-import {
-  Search,
-  Star,
-  Play,
-  Trash2,
-  Bell,
-  BellOff
-} from 'lucide-react';
-
+import { Search, Star, ChevronRight, Trash, Bell } from 'lucide-react';
 import { useState } from 'react';
-import { useToast } from '../../../hooks/use-toast';
 
-import { useSavedSearches } from '../hooks/useSearch';
-import { intelligentSearch } from '../services/intelligent-search';
-import type { SavedSearch } from '../types';
+import { useSavedSearches } from '@client/features/search/hooks/useSearch';
+import { intelligentSearch } from '@client/features/search/services/intelligent-search';
+import type { SavedSearch } from '@client/features/search/types';
+import { useToast } from '@client/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Badge,
+  Label,
+  Separator,
+  Switch
+} from '@client/shared/design-system';
 
 interface SavedSearchesProps {
   onExecuteSearch?: (search: SavedSearch) => void;
@@ -206,7 +199,7 @@ export function SavedSearches({
                         onClick={() => handleExecuteSearch(search)}
                         disabled={executeSavedSearch.isPending}
                       >
-                        <Play className="h-3 w-3 mr-1" />
+                        <ChevronRight className="h-3 w-3 mr-1" />
                         Run
                       </Button>
 
@@ -215,11 +208,7 @@ export function SavedSearches({
                         size="sm"
                         onClick={() => handleConfigureAlerts(search)}
                       >
-                        {search.emailAlerts?.enabled ? (
-                          <Bell className="h-3 w-3" />
-                        ) : (
-                          <BellOff className="h-3 w-3" />
-                        )}
+                        <Bell className={`h-3 w-3 ${search.emailAlerts?.enabled ? '' : 'opacity-50'}`} />
                       </Button>
 
                       <Button
@@ -228,7 +217,7 @@ export function SavedSearches({
                         onClick={() => handleDeleteSearch(search)}
                         disabled={deleteSavedSearch.isPending}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
@@ -277,6 +266,7 @@ export function SavedSearches({
                       <div className="space-y-2">
                         <Label id="alert-frequency-label">Alert Frequency</Label>
                         <select
+                          id="alert-frequency"
                           aria-labelledby="alert-frequency-label"
                           aria-label="Alert Frequency"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -294,6 +284,8 @@ export function SavedSearches({
                       <div className="space-y-2">
                         <Label id="alert-threshold-label">Minimum Results Threshold</Label>
                         <select
+                          id="alert-threshold"
+                          title="Minimum Results Threshold"
                           aria-labelledby="alert-threshold-label"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           value={alertConfig.threshold.toString()}

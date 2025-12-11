@@ -6,10 +6,10 @@
  * from both existing database systems.
  */
 
-import type { ConnectionManagerConfig } from './connection-manager.js';
-import { createConnectionManager, closeConnectionManager } from './connection-manager.js';
-import { createDatabaseConfig } from './config.js';
-import { createHealthMonitor, stopHealthMonitor } from './health-monitor.js';
+import type { ConnectionManagerConfig } from '@shared/database/core/connection-manager.ts';
+import { createConnectionManager, closeConnectionManager } from '@shared/database/core/connection-manager.ts';
+import { createDatabaseConfig } from '@shared/database/core/config.ts';
+import { createHealthMonitor, stopHealthMonitor } from '@shared/database/core/health-monitor.ts';
 
 // ============================================================================
 // CONNECTION MANAGEMENT
@@ -36,7 +36,7 @@ export {
   type ConnectionManagerConfig,
   type ConnectionMetrics,
   type DatabaseHealthStatus,
-} from './connection-manager.js';
+} from '@shared/database/core/connection-manager.ts';
 
 // ============================================================================
 // CONFIGURATION
@@ -58,7 +58,7 @@ export {
   
   // Types
   type DatabaseEnvironmentConfig,
-} from './config.js';
+} from '@shared/database/core/config.ts';
 
 // ============================================================================
 // HEALTH MONITORING
@@ -77,7 +77,7 @@ export {
   type AlertRule,
   type Alert,
   type HealthMonitorConfig,
-} from './health-monitor.js';
+} from '@shared/database/core/health-monitor.ts';
 
 // ============================================================================
 // CONVENIENCE EXPORTS

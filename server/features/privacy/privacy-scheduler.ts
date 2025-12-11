@@ -1,5 +1,5 @@
 import * as cron from 'node-cron';
-import { privacyService } from './privacy-service.js';
+import { privacyService } from '@server/features/privacy/privacy-service.ts';
 import { auditLogger } from '@server/infrastructure/monitoring/index.js';
 import { logger   } from '@shared/core';
 

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
-import { ApiValidationError, ApiError, ApiSuccess } from './api-response.js';
-import { logger } from './shared-core-fallback.js';
-import { AuthenticatedRequest } from './missing-modules-fallback.js';
+import { ApiValidationError, ApiError, ApiSuccess } from '../../api-response-fixer';
+import { logger } from '@server/utils/shared-core-fallback.ts';
+import { AuthenticatedRequest } from '../../missing-modules-fallback';
 
 /**
  * Options for configuring the controller wrapper

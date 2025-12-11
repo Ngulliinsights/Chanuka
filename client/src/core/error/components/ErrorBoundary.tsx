@@ -290,7 +290,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     // Finish trace with outcome
     try {
-      finishTrace(trace, { errorId: errorId, recovered: this.recoveryAttempts > 0 });
+      const result = this.recoveryAttempts > 0 ? 'success' : 'error';
+      finishTrace(trace, result);
     } catch (e) {
       logger.debug('Trace finish failed in ErrorBoundary', { error: e });
     }

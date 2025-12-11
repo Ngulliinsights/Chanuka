@@ -4,11 +4,11 @@
  */
 
 import { UseLoadingResult, LoadingOperation, LoadingConfig, LoadingStats } from '@client/types';
-import { createLoadingOperation, generateOperationId } from '@client/utils/loading-utils';
+import { createLoadingOperation, generateOperationId } from '@client/shared/ui/loading/utils/loading-utils.ts';
 import { useState, useCallback, useRef, useEffect } from 'react';
 
 import { DEFAULT_LOADING_CONFIG } from '@client/constants';
-import { LoadingError, LoadingOperationFailedError } from '@client/errors';
+import { LoadingError, LoadingOperationFailedError } from '@client/core/error';
 import { createRecoveryContext, useLoadingRecovery } from '@client/recovery';
 import { validateLoadingOperation, safeValidateLoadingOperation } from '@client/validation';
 

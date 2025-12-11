@@ -18,7 +18,7 @@ import {
   BulkModerationOperation,
   PaginationInfo
 } from './types.js';
-import { moderationQueueService } from './moderation-queue.service.js';
+import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service.ts';
 
 export class ModerationDecisionService {
   private static instance: ModerationDecisionService;

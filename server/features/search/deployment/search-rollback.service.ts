@@ -372,7 +372,7 @@ export class SearchRollbackService {
       
       try {
         // Import search service dynamically to avoid circular dependencies
-        const { searchService } = await import('../application/search-service.js');
+        const { searchService } = await import('@server/features/search/application/search-service-direct.ts');
         
         const results = await searchService.search({
           query,

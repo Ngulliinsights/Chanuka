@@ -1,5 +1,5 @@
-import { DeploymentStatus, DeploymentOrchestrator } from './deployment-orchestrator.js';
-import { ValidationResult, StatisticalAnalysisResult, CrossPhaseValidationResult } from './repository-deployment-validator.js';
+import { DeploymentStatus, DeploymentOrchestrator } from '@server/infrastructure/migration/deployment-orchestrator.ts';
+import { ValidationResult, StatisticalAnalysisResult, CrossPhaseValidationResult } from '@server/infrastructure/migration/repository-deployment-validator.ts';
 import { logger } from '@/shared/core';
 import {
   AsyncServiceResult,

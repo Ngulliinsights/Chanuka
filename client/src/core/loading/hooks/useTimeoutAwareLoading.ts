@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 
 import { useLoading } from '@client/core/loading';
 import { logger } from '@client/utils/logger';
@@ -49,14 +49,13 @@ export function useTimeoutAwareLoading<T = any>(
   error: Error | null;
   isLoading: boolean;
 } {
-  const mergedConfig = { ...DEFAULT_TIMEOUT_CONFIG, ...config };
+  const mergedConfig = useMemo(() => ({ ...DEFAULT_TIMEOUT_CONFIG, ...config }), [config]);
   const {
-    startOperation,
-    completeOperation,
+    startApiLoading,
+    completeApiLoading,
     retryOperation,
     cancelOperation,
     getOperation,
-    state
   } = useLoading();
 
   const [data, setData] = useState<T | null>(null);
@@ -140,80 +139,9 @@ export function useTimeoutAwareLoading<T = any>(
     if (!operation) return;
 
     if (operation.error) {
-      setError(operation.error);
-      if (operation.error.message.includes('timed out')) {
-        setTimeoutState(prev => ({ ...prev, isTimeout: true }));
-      }
+      setError(operation.error as Error);
     }
   }, [operation]);
-
-  const execute = useCallback(async (operationFn: () => Promise<T>): Promise<T | null> => {
-    try {
-      // Reset state
-      setData(null);
-      setError(null);
-      setTimeoutState({
-        isWarning: false,
-        isTimeout: false,
-        timeElapsed: 0,
-        timeRemaining: mergedConfig.timeout,
-        retryCount: 0,
-        canRetry: true,
-        nextRetryIn: 0,
-      });
-      warningShownRef.current = false;
-      operationRef.current = operationFn;
-      startTimeRef.current = Date.now();
-
-      // Clear any pending retry
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
-      }
-
-      startOperation({
-        id: operationId,
-        type: 'api',
-        message: 'Loading...',
-        priority: 'medium',
-        timeout: mergedConfig.timeout,
-        maxRetries: mergedConfig.maxRetries,
-        connectionAware: true,
-      });
-
-      const result = await operationFn();
-      setData(result);
-      completeOperation(operationId, true);
-      return result;
-    } catch (err) {
-      const error = err as Error;
-      setError(error);
-      completeOperation(operationId, false, error);
-
-      // Auto-retry if enabled and not a timeout - use functional update to avoid dependency
-      if (mergedConfig.autoRetry && !error.message.includes('timed out')) {
-        setTimeoutState(prev => {
-          if (prev.retryCount < mergedConfig.maxRetries) {
-            const delay = mergedConfig.exponentialBackoff
-              ? mergedConfig.retryDelay * Math.pow(2, prev.retryCount)
-              : mergedConfig.retryDelay;
-
-            retryTimeoutRef.current = setTimeout(() => {
-              retry();
-            }, delay);
-
-            return {
-              ...prev,
-              nextRetryIn: delay,
-            };
-          }
-          return prev;
-        });
-      }
-
-      return null;
-    }
-  }, [operationId, mergedConfig, startOperation, completeOperation, retry]);
 
   const retry = useCallback(async (): Promise<T | null> => {
     if (!operationRef.current) {
@@ -244,15 +172,79 @@ export function useTimeoutAwareLoading<T = any>(
     try {
       const result = await operationRef.current();
       setData(result);
-      completeOperation(operationId, true);
+      completeApiLoading(operationId, true);
       return result;
     } catch (err) {
       const error = err as Error;
       setError(error);
-      completeOperation(operationId, false, error);
+      completeApiLoading(operationId, false, error);
       return null;
     }
-  }, [operationId, mergedConfig.maxRetries, retryOperation, completeOperation]);
+  }, [operationId, mergedConfig.maxRetries, retryOperation, completeApiLoading]);
+
+  const execute = useCallback(async (operationFn: () => Promise<T>): Promise<T | null> => {
+    try {
+      // Reset state
+      setData(null);
+      setError(null);
+      setTimeoutState({
+        isWarning: false,
+        isTimeout: false,
+        timeElapsed: 0,
+        timeRemaining: mergedConfig.timeout,
+        retryCount: 0,
+        canRetry: true,
+        nextRetryIn: 0,
+      });
+      warningShownRef.current = false;
+      operationRef.current = operationFn;
+      startTimeRef.current = Date.now();
+
+      // Clear any pending retry
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+
+      startApiLoading(operationId, 'Loading...', {
+        timeout: mergedConfig.timeout,
+        retryLimit: mergedConfig.maxRetries,
+        retryDelay: mergedConfig.retryDelay,
+      });
+
+      const result = await operationFn();
+      setData(result);
+      completeApiLoading(operationId, true);
+      return result;
+    } catch (err) {
+      const error = err as Error;
+      setError(error);
+      completeApiLoading(operationId, false, error);
+
+      // Auto-retry if enabled and not a timeout - use functional update to avoid dependency
+      if (mergedConfig.autoRetry && !error.message.includes('timed out')) {
+        setTimeoutState(prev => {
+          if (prev.retryCount < mergedConfig.maxRetries) {
+            const delay = mergedConfig.exponentialBackoff
+              ? mergedConfig.retryDelay * Math.pow(2, prev.retryCount)
+              : mergedConfig.retryDelay;
+
+            retryTimeoutRef.current = setTimeout(() => {
+              retry();
+            }, delay);
+
+            return {
+              ...prev,
+              nextRetryIn: delay,
+            };
+          }
+          return prev;
+        });
+      }
+
+      return null;
+    }
+  }, [operationId, mergedConfig, startApiLoading, completeApiLoading, retry]);
 
   const cancel = useCallback(() => {
     if (retryTimeoutRef.current) {

@@ -3,10 +3,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { cn } from '@client/lib/utils';
 
-import { Button } from '../ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { Progress } from '../ui/progress';
+import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 
 // Types for progressive disclosure navigation
 export interface NavigationSection {

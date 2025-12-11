@@ -4,10 +4,10 @@
  */
 
 import { LoadingState, LoadingType, LoadingPriority } from '@client/types';
-import { debounce } from '@client/utils/loading-utils';
+import { debounce } from '@client/shared/ui/loading/utils/loading-utils.ts';
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-import { LoadingError } from '@client/errors';
+import { LoadingError } from '@client/core/error';
 
 
 export interface LoadingStateOptions {

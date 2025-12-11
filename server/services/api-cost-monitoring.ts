@@ -13,7 +13,7 @@ let performanceMonitoring: any = null;
 const getPerformanceMonitoring = async () => {
   if (!performanceMonitoring) {
     try {
-      const { performanceMonitoring: pm } = await import('./performance-monitoring.js');
+      const { performanceMonitoring: pm } = await import('../../client/src/monitoring/performance-monitoring');
       performanceMonitoring = pm;
     } catch (error) {
       // Performance monitoring not available, continue without it

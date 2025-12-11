@@ -10,7 +10,7 @@ import { performance } from 'perf_hooks';
 
 // Import core utilities
 // import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting'; // Unused import
-import { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
+import { unifiedErrorHandler } from '@shared/core/src/observability/error-management/middleware/express-error-middleware.ts';
 import { setupGlobalErrorHandlers } from '../observability/error-management';
 // Removed - module deleted by design during development
 import { logger } from '../observability/logging';

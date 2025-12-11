@@ -14,10 +14,10 @@ import React, { useState, useCallback } from 'react';
 import { cn } from '@client/lib/utils';
 import { CommunityValidation as CommunityValidationType } from '@client/types/expert';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Textarea } from '../ui/textarea';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Textarea } from '@client/shared/design-system';
 
 
 interface CommunityValidationProps {

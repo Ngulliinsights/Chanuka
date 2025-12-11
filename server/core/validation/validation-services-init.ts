@@ -17,11 +17,11 @@ import { getDbInstance } from '@server/infrastructure/database/index.js';
 import { logger } from '@shared/core';
 
 // Import service classes
-import { ValidationMetricsCollector } from './validation-metrics.js';
-import { InputValidationService } from './input-validation-service.js';
-import { SchemaValidationService } from './schema-validation-service.js';
-import { DataIntegrityValidationService } from './data-validation-service.js';
-import { DataCompletenessService } from './data-completeness.js';
+import { ValidationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
+import { InputValidationService } from '@server/core/validation/input-validation-service.ts';
+import { SchemaValidationService } from '@server/core/validation/schema-validation-service.ts';
+import { DataIntegrityValidationService } from '@server/core/validation/data-validation-service.ts';
+import { DataCompletenessService } from '@server/core/validation/data-completeness.ts';
 
 /**
  * Validation Services Container

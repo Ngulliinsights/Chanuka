@@ -110,6 +110,10 @@ export interface LoadingComponentProps {
   error?: string;
   progress?: number;
   message?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  showMessage?: boolean;
+  className?: string;
+  'aria-label'?: string;
 }
 
 export interface AdaptiveSettings {

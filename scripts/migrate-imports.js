@@ -53,7 +53,7 @@ function processFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   let updated = content;
 
-  // Patterns: import ... from '...'; require('...'); import('...')
+  // Patterns: import ... from './migrate-imports'; require('...'); import('./migrate-imports')
   const regex = /(import\s+[^'"\n]+from\s+|import\s*\(|require\()(['"])([^'"\)]+)\2/g;
   updated = updated.replace(regex, (m, pfx, quote, imp) => {
     const migrated = migrateImportPath(imp);

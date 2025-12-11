@@ -4,12 +4,12 @@
 // Main orchestration service for processing citizen comments into structured arguments
 
 import { logger  } from '@shared/core';
-import { StructureExtractorService } from './structure-extractor.js';
-import { ClusteringService } from './clustering-service.js';
-import { EvidenceValidatorService } from './evidence-validator.js';
-import { CoalitionFinderService } from './coalition-finder.js';
-import { BriefGeneratorService } from './brief-generator.js';
-import { PowerBalancerService } from './power-balancer.js';
+import { StructureExtractorService } from '@server/features/argument-intelligence/application/structure-extractor.ts';
+import { ClusteringService } from '@server/features/argument-intelligence/application/clustering-service.ts';
+import { EvidenceValidatorService } from '@server/features/argument-intelligence/application/evidence-validator.ts';
+import { CoalitionFinderService } from '@server/features/argument-intelligence/application/coalition-finder.ts';
+import { BriefGeneratorService } from '@server/features/argument-intelligence/application/brief-generator.ts';
+import { PowerBalancerService } from '@server/features/argument-intelligence/application/power-balancer.ts';
 import { ArgumentRepository } from '@shared/infrastructure/repositories/argument-repository.js';
 import { BriefRepository } from '@shared/infrastructure/repositories/brief-repository.js';
 

@@ -6,7 +6,7 @@
  */
 
 import { Express } from 'express';
-import { boomErrorMiddleware, errorContextMiddleware } from './boom-error-middleware.js';
+import { boomErrorMiddleware, errorContextMiddleware } from '../../boom-error-middleware';
 import { logger  } from '@shared/core';
 
 /**

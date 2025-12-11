@@ -240,7 +240,11 @@ export class CommunityErrorBoundary extends Component<
 /**
  * Hook for creating incremental error boundaries that can handle partial failures
  */
-export function useIncrementalErrorBoundary() {
+/**
+ * Hook for creating incremental error boundaries that can handle partial failures
+ * Note: Exported as const to avoid fast-refresh issues
+ */
+export const useIncrementalErrorBoundary = () => {
   const [failedSections, setFailedSections] = React.useState<Set<string>>(new Set());
 
   const markSectionFailed = React.useCallback((sectionId: string) => {
@@ -265,16 +269,17 @@ export function useIncrementalErrorBoundary() {
     markSectionRecovered,
     isSectionFailed,
   };
-}
+};
 
 /**
  * Higher-order component for wrapping components with community error recovery
+ * Note: Exported as const to avoid fast-refresh issues
  */
-export function withCommunityErrorBoundary<P extends object>(
+export const withCommunityErrorBoundary = <P extends object>(
   Component: React.ComponentType<P>,
   errorBoundaryProps?: Omit<CommunityErrorBoundaryProps, 'children'>
-) {
-  const WrappedComponent = (props: P) => (
+): React.FC<P> => {
+  const WrappedComponent: React.FC<P> = (props: P) => (
     <CommunityErrorBoundary {...errorBoundaryProps}>
       <Component {...props} />
     </CommunityErrorBoundary>
@@ -283,6 +288,6 @@ export function withCommunityErrorBoundary<P extends object>(
   WrappedComponent.displayName = `withCommunityErrorBoundary(${Component.displayName || Component.name})`;
 
   return WrappedComponent;
-}
+};
 
 export default CommunityErrorBoundary;

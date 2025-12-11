@@ -6,7 +6,7 @@
 // Migrates from custom WebSocket service to Socket.IO with zero downtime
 
 import { Server } from 'socket.io';
-import { createAdapter } from '@socket.io/redis-adapter';
+import { createAdapter } from '../../redis-adapter';
 import { createClient } from 'redis';
 import { Server as HttpServer } from 'http';
 import { logger } from '@shared/core/observability/logging';

@@ -3,7 +3,7 @@
 // Provides REST endpoints for monitoring, analytics, and data export
 
 import { Router, Request, Response, NextFunction } from "express";
-import { FinancialDisclosureMonitoringService } from "./monitoring.js";
+import { FinancialDisclosureMonitoringService } from "@server/features/analytics/financial-disclosure/monitoring.ts";
 import { FinancialDisclosureAnalyticsService } from "@server/services/financial-disclosure.service.ts";
 import { ApiSuccess, ApiError  } from '@shared/core/utils/api-utils.js';
 import { z, ZodError } from "zod";

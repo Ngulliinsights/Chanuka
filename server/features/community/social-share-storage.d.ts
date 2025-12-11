@@ -1,7 +1,7 @@
 import { Redis } from 'ioredis';
 import { Pool } from 'pg';
 import type { InsertSocialShare, SocialShare } from '@shared/schema';
-import { BaseStorage } from './base/BaseStorage.js';
+import { BaseStorage } from '../../../BaseStorage.d';
 import { logger } from '@shared/core';
 export declare class SocialShareStorage extends BaseStorage<SocialShare> { constructor(redis: Redis, pool: Pool);
     static initializeSchema(pool: Pool): Promise<void>;

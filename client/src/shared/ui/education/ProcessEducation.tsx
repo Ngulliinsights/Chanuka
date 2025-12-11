@@ -17,10 +17,10 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Progress } from '../ui/progress';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 
 interface LegislativeStep {
   id: string;

@@ -6,9 +6,9 @@
  * with all safety mechanisms in place.
  */
 
-import { readDatabase, withTransaction } from './connection.js';
-import { executeQuery } from './pool.js';
-import { initializeDatabaseSafety, shutdownDatabaseSafety } from './init.js';
+import { readDatabase, withTransaction } from '../../connection-manager-metrics';
+import { executeQuery } from '../../pool';
+import { initializeDatabaseSafety, shutdownDatabaseSafety } from '../../client/src/core/auth/scripts/init-auth-system';
 import { bills as userTable } from '../schema/foundation';
 // import { eq } from 'drizzle-orm'; // Unused import
 import { logger } from '../core';

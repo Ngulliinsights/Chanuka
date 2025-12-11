@@ -7,8 +7,8 @@
 
 import { logger  } from '@shared/core';
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
-import { MLAnalysisService } from './ml.service.js';
-import { RealMLAnalysisService } from './real-ml.service.js';
+import { MLAnalysisService } from '@server/features/analytics/services/ml.service.ts';
+import { RealMLAnalysisService } from '@server/features/analytics/services/real-ml.service.ts';
 import type {
     AnalysisResult,
     ImplementationWorkaroundDetection,

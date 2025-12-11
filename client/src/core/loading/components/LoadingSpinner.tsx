@@ -3,8 +3,9 @@
  * Accessible, themeable loading indicator
  */
 
-import { LoadingComponentProps } from '@client/types';
 import React from 'react';
+
+import { LoadingComponentProps } from '@client/types';
 
 export interface LoadingSpinnerProps extends LoadingComponentProps {
   variant?: 'primary' | 'secondary' | 'white';

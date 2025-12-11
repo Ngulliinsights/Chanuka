@@ -3,8 +3,8 @@ import React from 'react';
 
 import { logger } from '@client/utils/logger';
 
-import { Badge } from '../ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 
 export function PrivacyPolicy() {
   return (

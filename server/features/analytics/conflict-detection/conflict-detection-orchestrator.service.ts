@@ -18,10 +18,10 @@ import {
   ConflictDetectionError,
   Stakeholder
 } from './types.js';
-import { conflictDetectionEngineService } from './conflict-detection-engine.service.js';
-import { stakeholderAnalysisService } from './stakeholder-analysis.service.js';
-import { conflictSeverityAnalyzerService } from './conflict-severity-analyzer.service.js';
-import { conflictResolutionRecommendationService } from './conflict-resolution-recommendation.service.js';
+import { conflictDetectionEngineService } from '@server/features/analytics/conflict-detection/conflict-detection-engine.service.ts';
+import { stakeholderAnalysisService } from '@server/features/analytics/conflict-detection/stakeholder-analysis.service.ts';
+import { conflictSeverityAnalyzerService } from '@server/features/analytics/conflict-detection/conflict-severity-analyzer.service.ts';
+import { conflictResolutionRecommendationService } from '@server/features/analytics/conflict-detection/conflict-resolution-recommendation.service.ts';
 
 export class ConflictDetectionOrchestratorService {
   private static instance: ConflictDetectionOrchestratorService;

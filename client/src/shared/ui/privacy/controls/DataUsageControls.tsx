@@ -8,10 +8,10 @@ import React from 'react';
 
 import { PrivacySettings, ConsentRecord } from '@client/types/auth';
 
-import { Button } from '../../../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
-import { Label } from '../../../ui/label';
-import { Switch } from '../../../ui/switch';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Label } from '@client/shared/design-system/typography/Label.tsx';
+import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
 
 
 interface DataUsageControlsProps {

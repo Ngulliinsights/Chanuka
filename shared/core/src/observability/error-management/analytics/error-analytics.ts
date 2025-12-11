@@ -6,7 +6,7 @@
  */
 
 import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
-import { ErrorAnalytics, ErrorDashboardData } from '../types.js';
+import { ErrorAnalytics, ErrorDashboardData } from '@shared/core/src/caching/types.ts';
 // import { logger } from '../observability/logging'; // Unused import
 
 export interface ErrorAnalyticsConfig {

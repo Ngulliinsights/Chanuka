@@ -10,6 +10,7 @@ import { useMemo } from 'react';
 
 import { globalApiClient } from '../../api/client';
 import { useUnifiedDiscussion } from './useUnifiedDiscussion';
+
 import type { UseCommunityReturn, UnifiedComment } from '../types';
 
 interface UseUnifiedCommunityOptions {
@@ -93,12 +94,15 @@ export function useUnifiedCommunity({
   };
 
   // Computed stats with defaults
-  const communityStats = useMemo(() => ({
-    totalComments: stats?.totalComments || discussion.comments.length,
-    totalThreads: stats?.totalThreads || discussion.threads.length,
-    activeUsers: stats?.activeUsers || discussion.activeUsers.length,
-    expertComments: stats?.expertComments || discussion.comments.filter(c => c.isExpertVerified).length,
-  }), [stats, discussion.comments, discussion.threads, discussion.activeUsers]);
+  const communityStats = useMemo(() => {
+    const statsData = stats as { totalComments?: number; totalThreads?: number; activeUsers?: number; expertComments?: number } | undefined;
+    return {
+      totalComments: statsData?.totalComments || discussion.comments.length,
+      totalThreads: statsData?.totalThreads || discussion.threads.length,
+      activeUsers: statsData?.activeUsers || discussion.activeUsers.length,
+      expertComments: statsData?.expertComments || discussion.comments.filter(c => c.isExpertVerified).length,
+    };
+  }, [stats, discussion.comments, discussion.threads, discussion.activeUsers]);
 
   return {
     discussion,

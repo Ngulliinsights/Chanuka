@@ -6,7 +6,7 @@
 
 import { PostgreSQLFullTextEngine } from '@server/features/search/engines/core/postgresql-fulltext.engine';
 import { semanticSearchEngine, SearchOptions, SearchResponse } from './semantic-search-engine';
-import { searchSyntaxParser, ParsedQuery } from './search-syntax-parser';
+import { searchSyntaxParser, ParsedQuery } from '@server/features/search/utils/search-syntax-parser.ts';
 import { logger } from '@shared/core';
 
 export interface EngineResult {

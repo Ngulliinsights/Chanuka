@@ -9,8 +9,8 @@
  * - Run comprehensive data validation checkpoints ensuring error response consistency
  */
 
-import { featureFlagsService } from './feature-flags.service.js';
-import { abTestingService } from './ab-testing.service.js';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags-service.ts';
+import { abTestingService } from '@server/infrastructure/migration/ab-testing.service.ts';
 import { errorAdapter } from '@shared/errors/error-adapter.js';
 import { errorHandler } from '@shared/errors/error-standardization.js';
 import { logger  } from '@shared/core';

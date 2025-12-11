@@ -14,11 +14,11 @@ import { useState, useCallback } from 'react';
 import { cn } from '@client/lib/utils';
 import { VerificationWorkflow as VerificationWorkflowType, VerificationStatus } from '@client/types/expert';
 
-import { Avatar, AvatarFallback } from '../ui/avatar';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Textarea } from '../ui/textarea';
+import { Avatar, AvatarFallback } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Textarea } from '@client/shared/design-system';
 
 
 interface VerificationWorkflowProps {

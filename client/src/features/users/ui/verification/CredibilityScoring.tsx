@@ -9,9 +9,9 @@ import { Star, Info, TrendingUp, Users, Award } from 'lucide-react';
 
 import { cn } from '@client/lib/utils';
 
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { Badge } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/shared/design-system';
 
 interface CredibilityIndicatorProps {
   score: number;

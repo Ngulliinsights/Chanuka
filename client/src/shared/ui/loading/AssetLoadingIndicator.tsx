@@ -1,6 +1,6 @@
 import { useLoadingRecovery } from '@client/hooks/useLoadingRecovery';
 import { AssetLoadingIndicatorProps as TypesAssetLoadingIndicatorProps } from '@client/types';
-import { useAssetLoading, LoadingProgress } from '@client/utils/asset-loading';
+import { useAssetLoading, LoadingProgress } from '../core/loading/utils/asset-loading';
 import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import React from 'react';
 

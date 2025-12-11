@@ -629,7 +629,7 @@ router.get('/slow-queries', async (req: AuthenticatedRequest, res: Response) => 
     const queryLimit = Math.min(parseInt(limit as string) || 50, 500);
 
     // Dynamic import allows this to work even if query executor isn't available
-    const { queryExecutor } = await import('../../infrastructure/database/core/query-executor.js');
+    const { queryExecutor } = await import('../../../query-executor');
     let slowQueries = queryExecutor.getSlowQueries(queryLimit);
 
     // Filter by SQL operation type if specified (e.g., SELECT, UPDATE)
@@ -709,7 +709,7 @@ router.get('/slow-queries', async (req: AuthenticatedRequest, res: Response) => 
  */
 router.delete('/slow-queries', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { queryExecutor } = await import('../../infrastructure/database/core/query-executor.js');
+    const { queryExecutor } = await import('../../../query-executor');
     queryExecutor.clearSlowQueries();
 
     // Log the action for audit compliance

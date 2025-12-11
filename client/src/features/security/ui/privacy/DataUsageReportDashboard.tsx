@@ -24,11 +24,11 @@ import { logger } from '@client/utils/logger';
 import { privacyCompliance } from '@client/utils/privacy-compliance';
 
 import { Globe } from '../icons/SimpleIcons';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 
 interface DataUsageStats {

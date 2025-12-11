@@ -22,10 +22,10 @@ import React from 'react';
 import { useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
 import { BillRecommendation } from '@client/types/user-dashboard';
 
-import { Badge } from '../../ui/badge';
-import { Button } from '../../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Progress } from '../../ui/progress';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 
 
 interface RecommendationsSectionProps {

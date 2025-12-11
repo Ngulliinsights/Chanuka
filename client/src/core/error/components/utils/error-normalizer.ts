@@ -15,25 +15,17 @@ import {
 
 
 export function normalizeError(
-  error: any,
+  error: Record<string, unknown> | unknown,
   errorType?: string,
-  errorSeverity?: ErrorSeverity,
-  context?: any
+  _errorSeverity?: ErrorSeverity,
+  _context?: Record<string, unknown>
 ): BaseError {
   if (error instanceof BaseError) {
     return error;
   }
 
-  const message = error?.message || String(error || 'Unknown error occurred');
-  const originalStack = error?.stack;
-
-  const errorContext = {
-    component: 'ErrorFallback',
-    errorContext: context,
-    originalError: error,
-    errorType,
-    normalizedAt: new Date().toISOString()
-  };
+  const message = (error as any)?.message || String(error || 'Unknown error occurred');
+  const originalStack = (error as any)?.stack;
 
   let normalizedError: BaseError;
 
@@ -59,7 +51,7 @@ export function normalizeError(
       break;
 
     default:
-      normalizedError = new BaseError(message, errorType || 'UNKNOWN_ERROR');
+      normalizedError = new BaseError(message, { code: errorType || 'UNKNOWN_ERROR' });
   }
 
   if (originalStack && !normalizedError.stack) {

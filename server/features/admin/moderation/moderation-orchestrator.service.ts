@@ -15,10 +15,10 @@ import {
   ContentAnalytics,
   PaginationInfo
 } from './types.js';
-import { contentAnalysisService } from './content-analysis.service.js';
-import { moderationQueueService } from './moderation-queue.service.js';
-import { moderationDecisionService } from './moderation-decision.service.js';
-import { moderationAnalyticsService } from './moderation-analytics.service.js';
+import { contentAnalysisService } from '@server/features/admin/moderation/content-analysis.service.ts';
+import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service.ts';
+import { moderationDecisionService } from '@server/features/admin/moderation/moderation-decision.service.ts';
+import { moderationAnalyticsService } from '@server/features/admin/moderation/moderation-analytics.service.ts';
 
 /**
  * Main orchestrator for the content moderation system.

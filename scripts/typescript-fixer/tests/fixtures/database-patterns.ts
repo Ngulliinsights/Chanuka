@@ -60,8 +60,8 @@ const users = await database.select()
   // Incorrect relative import paths
   INCORRECT_RELATIVE_PATHS: `
 // This should trigger: Cannot find module '../../../shared/database/connection'
-import { database, withTransaction } from '../../../shared/database/connection';
-import { databaseService } from '../../infrastructure/database/database-service';
+import { database, withTransaction } from '../../../../connection-manager-metrics';
+import { databaseService } from '../../../../database-service';
 
 const result = await withTransaction(async (tx) => {
   return await databaseService.withFallback(

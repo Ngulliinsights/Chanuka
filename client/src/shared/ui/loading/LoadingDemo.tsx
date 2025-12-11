@@ -4,9 +4,9 @@ import { useProgressiveLoading, useTimeoutAwareOperation, usePageLoading, useCom
 import { useLoading } from '@client/core/loading';
 import { logger } from '@client/utils/logger';
 
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
 
 import { 
   LoadingStateManager,

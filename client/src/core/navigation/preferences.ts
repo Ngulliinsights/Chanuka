@@ -6,7 +6,7 @@
 
 import { logger } from '../../utils/logger';
 
-import { NavigationPreferences, RecentPage } from './types';
+import { NavigationPreferences } from './types';
 
 /**
  * Gets user navigation preferences from localStorage

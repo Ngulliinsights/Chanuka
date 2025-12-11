@@ -12,17 +12,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { globalApiClient } from '../../api/client';
-import { WebSocketManager } from '../services/websocket-manager';
 import { StateSyncService } from '../services/state-sync.service';
+import { WebSocketManager } from '../services/websocket-manager';
+
 import type {
+  CreateCommentRequest,
+  CreateThreadRequest,
+  DiscussionState,
+  ModerationRequest,
   UnifiedComment,
   UnifiedThread,
-  CreateCommentRequest,
   UpdateCommentRequest,
-  CreateThreadRequest,
-  ModerationRequest,
   UseDiscussionReturn,
-  DiscussionState,
 } from '../types';
 
 interface UseUnifiedDiscussionOptions {
@@ -40,7 +41,7 @@ export function useUnifiedDiscussion({
 }: UseUnifiedDiscussionOptions): UseDiscussionReturn {
   const queryClient = useQueryClient();
   const [discussionState, setDiscussionState] = useState<DiscussionState>({
-    currentBillId: billId,
+    currentBillId: String(billId),
     sortBy: 'newest',
     filterBy: 'all',
     showModerated: false,
@@ -235,7 +236,7 @@ export function useUnifiedDiscussion({
     const unsubscribers = [
       // Comment events
       wsManager.on('comment:created', (data) => {
-        if (data.comment.billId === billId) {
+        if (data.comment.billId === String(billId)) {
           queryClient.setQueryData(
             ['comments', billId, discussionState.sortBy, discussionState.filterBy],
             (old: UnifiedComment[] = []) => [data.comment, ...old]
@@ -244,7 +245,7 @@ export function useUnifiedDiscussion({
       }),
 
       wsManager.on('comment:updated', (data) => {
-        if (data.comment.billId === billId) {
+        if (data.comment.billId === String(billId)) {
           queryClient.setQueryData(
             ['comments', billId, discussionState.sortBy, discussionState.filterBy],
             (old: UnifiedComment[] = []) => 
@@ -309,23 +310,23 @@ export function useUnifiedDiscussion({
   // ACTIONS
   // ============================================================================
 
-  const createComment = useCallback(async (data: CreateCommentRequest) => {
+  const createComment = useCallback(async (data: CreateCommentRequest): Promise<UnifiedComment> => {
     return createCommentMutation.mutateAsync(data);
   }, [createCommentMutation]);
 
-  const updateComment = useCallback(async (data: UpdateCommentRequest) => {
+  const updateComment = useCallback(async (data: UpdateCommentRequest): Promise<UnifiedComment> => {
     return updateCommentMutation.mutateAsync(data);
   }, [updateCommentMutation]);
 
-  const deleteComment = useCallback(async (commentId: string) => {
-    return deleteCommentMutation.mutateAsync(commentId);
+  const deleteComment = useCallback(async (commentId: string): Promise<void> => {
+    await deleteCommentMutation.mutateAsync(commentId);
   }, [deleteCommentMutation]);
 
-  const voteComment = useCallback(async (commentId: string, vote: 'up' | 'down') => {
-    return voteCommentMutation.mutateAsync({ commentId, vote });
+  const voteComment = useCallback(async (commentId: string, vote: 'up' | 'down'): Promise<void> => {
+    await voteCommentMutation.mutateAsync({ commentId, vote });
   }, [voteCommentMutation]);
 
-  const createThread = useCallback(async (data: CreateThreadRequest) => {
+  const createThread = useCallback(async (data: CreateThreadRequest): Promise<UnifiedThread> => {
     return createThreadMutation.mutateAsync(data);
   }, [createThreadMutation]);
 
@@ -336,27 +337,28 @@ export function useUnifiedDiscussion({
     }));
   }, []);
 
-  const reportContent = useCallback(async (data: ModerationRequest) => {
-    return reportContentMutation.mutateAsync(data);
+  const reportContent = useCallback(async (data: ModerationRequest): Promise<void> => {
+    await reportContentMutation.mutateAsync(data);
   }, [reportContentMutation]);
 
   const startTyping = useCallback(() => {
     if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
       wsManager.emit('user:typing', {
         threadId: discussionState.currentThreadId,
-        billId,
+        userId: 'current-user',
+        userName: 'Current User',
       });
     }
-  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId, billId]);
+  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
 
   const stopTyping = useCallback(() => {
     if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
       wsManager.emit('user:stopped_typing', {
         threadId: discussionState.currentThreadId,
-        billId,
+        userId: 'current-user',
       });
     }
-  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId, billId]);
+  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
 
   // ============================================================================
   // RETURN INTERFACE

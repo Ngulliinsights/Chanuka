@@ -12,9 +12,9 @@ import { useState } from 'react';
 
 import { Bill } from '@/core/api/types';
 
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
 
 import { ConstitutionalContext } from './ConstitutionalContext';
 import { EducationalTooltip } from './EducationalTooltip';

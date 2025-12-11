@@ -12,7 +12,7 @@ import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { navigationUtils } from '@client/utils/navigation';
+import { navigationUtils } from '@client/shared/ui/navigation/Navigation.tsx';
 import { logger } from '@client/utils/logger';
 import { BarChart3, Clock, Users, Search, TrendingUp, AlertTriangle } from 'lucide-react';
 

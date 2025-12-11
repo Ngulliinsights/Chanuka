@@ -1,10 +1,10 @@
 import { Search, AlertCircle, AlertTriangle, Info, Settings, ArrowLeft } from 'lucide-react';
 
-import { Alert, AlertDescription } from './ui/alert';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Skeleton } from './ui/skeleton';
+import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Skeleton } from '@client/shared/ui/loading/ui/Skeleton.tsx';
 
 
 

@@ -1,4 +1,4 @@
-import { Search, Bell, User, Settings, Menu as MenuIcon, Home, LogOut } from 'lucide-react';
+import { Search, Bell, User, Settings, LogOut, Menu, Home } from 'lucide-react';
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -347,7 +347,7 @@ export function NavigationBar({
                 className="mr-2 p-2"
                 aria-label="Toggle mobile menu"
               >
-                <MenuIcon className="h-5 w-5" />
+                <Menu className="h-5 w-5" />
               </Button>
             )}
 

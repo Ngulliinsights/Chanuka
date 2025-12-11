@@ -7,9 +7,9 @@ import { useLoading } from '@client/core/loading';
 import { cn } from '@client/lib/utils';
 import { logger } from '@client/utils/logger';
 
-import { Button } from '../ui/button';
-import { Card, CardContent } from '../ui/card';
-import { Progress } from '../ui/progress';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
+import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 
 export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
   position = 'top-right',

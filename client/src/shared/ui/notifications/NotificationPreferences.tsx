@@ -16,10 +16,10 @@ import {
   usePushNotifications, 
   useEmailNotifications 
 } from '../../hooks/useNotifications';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Input } from '@client/shared/design-system/interactive/Input.tsx';
+import { Label } from '@client/shared/design-system/typography/Label.tsx';
 import { 
   Select, 
   SelectContent, 
@@ -27,7 +27,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '../ui/select';
-import { Switch } from '../ui/switch';
+import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
 
 
 interface NotificationPreferencesProps {

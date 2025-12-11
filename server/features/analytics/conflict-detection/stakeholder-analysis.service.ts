@@ -13,7 +13,7 @@ import {
 import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
 import { getDefaultCache } from '@shared/core/caching/index.js';
 import { logger  } from '@shared/core';
-import { Stakeholder, StakeholderInterest } from './types.js';
+import { Stakeholder, StakeholderInterest } from '@server/features/analytics/conflict-detection/types.ts';
 
 export class StakeholderAnalysisService {
   private static instance: StakeholderAnalysisService;

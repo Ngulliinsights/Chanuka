@@ -25,9 +25,9 @@ import { Badge } from '@client/shared/design-system';
 import { Tooltip } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
-import { useToast } from '../../../hooks/use-toast';
+import { useToast } from '@client/hooks/use-toast.ts';
 import type { SearchResult, SearchHighlight } from '../../types';
-import { cn } from '../../../lib/utils';
+import { cn } from '@client/core/dashboard/utils.ts';
 
 interface SearchResultCardProps {
   result: SearchResult;

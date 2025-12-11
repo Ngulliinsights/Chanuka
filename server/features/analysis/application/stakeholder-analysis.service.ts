@@ -3,7 +3,7 @@ import * as schema from '@/shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger  } from '@shared/core';
 // Assuming ML service exists and is properly typed
-import { MLAnalysisService, MLStakeholderResult, MLBeneficiaryResult } from '../../analytics/services/ml.service.js'; // Adjust path and types
+import { MLAnalysisService, MLStakeholderResult, MLBeneficiaryResult } from '@server/features/analysis/infrastructure/adapters/ml-service-adapter.ts'; // Adjust path and types
 
 // --- Interface Definitions ---
 export interface StakeholderGroup {

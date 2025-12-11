@@ -5,13 +5,26 @@
  * resolving conflicts identified in discussion_community_integration_analysis.md
  */
 
-import { Comment, CommentStatus } from '../../../types/core';
+// ============================================================================
+// BASE COMMENT INTERFACE
+// ============================================================================
+
+export interface BaseComment {
+  id: string;
+  billId: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string;
+  content: string;
+  createdAt: string;
+  updatedAt?: string;
+}
 
 // ============================================================================
 // UNIFIED COMMENT INTERFACE (resolves duplicate definitions)
 // ============================================================================
 
-export interface UnifiedComment extends Comment {
+export interface UnifiedComment extends BaseComment {
   // Threading support
   threadId?: string;
   depth: number;

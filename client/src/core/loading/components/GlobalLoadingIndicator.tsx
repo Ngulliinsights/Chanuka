@@ -3,8 +3,9 @@
  * Shows loading state for the entire application
  */
 
-import { useLoading } from '@client/context';
 import React from 'react';
+
+import { useLoading } from '@client/context';
 
 import { LoadingProgress } from './LoadingProgress';
 import { LoadingSpinner } from './LoadingSpinner';

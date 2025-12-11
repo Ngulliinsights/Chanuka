@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Search, Bell, User } from 'lucide-react';
 
-import { Button } from '../../design-system/primitives/Button';
-import { Badge } from '../../design-system/primitives/Badge';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { cn } from '../../design-system/utils/cn';
 
 interface HeaderProps {

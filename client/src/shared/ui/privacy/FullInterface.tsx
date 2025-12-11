@@ -21,13 +21,13 @@ import {
   ConsentRecord
 } from '@client/types/auth';
 import { logger } from '@client/utils/logger';
-import { privacyCompliance } from '@client/utils/privacy-compliance';
+import { privacyCompliance } from '@client/utils/privacy-compliance.ts';
 
 import { ConsentModal } from '../../auth/ConsentModal';
-import { Alert, AlertDescription } from '../../ui/alert';
-import { Badge } from '../../ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
+import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
 const VisibilityControls = React.lazy(() => import('./controls/VisibilityControls').then(module => ({ default: module.VisibilityControls })));
 const DataUsageControls = React.lazy(() => import('./controls/DataUsageControls').then(module => ({ default: module.DataUsageControls })));
 const ConsentControls = React.lazy(() => import('./controls/ConsentControls').then(module => ({ default: module.ConsentControls })));

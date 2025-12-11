@@ -574,7 +574,7 @@ export class PerformanceMonitor {
   /**
    * Retrieves all Web Vitals metrics collected by the monitor.
    */
-  getWebVitalsMetrics(): WebVitalsMetric[] {
+  getWebVitalsMetrics(): ReadonlyArray<WebVitalsMetric> {
     return this.webVitalsMonitor.getMetrics();
   }
 

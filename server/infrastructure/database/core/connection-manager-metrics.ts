@@ -1,4 +1,4 @@
-import { getMonitoringService, MonitoringService } from '../../monitoring/monitoring';
+import { getMonitoringService, MonitoringService } from '@server/infrastructure/database/monitoring.ts';
 import { CircuitBreakerState } from './connection-manager';
 
 /**

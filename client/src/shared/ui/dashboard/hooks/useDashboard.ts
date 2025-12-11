@@ -17,7 +17,7 @@ import {
   DashboardDataFetchError, 
   DashboardActionError,
   DashboardTopicError 
-} from '@client/errors';
+} from '@client/core/error';
 import { getRecoveryStrategy, executeRecovery } from '@client/recovery';
 import { 
   validateDashboardData, 

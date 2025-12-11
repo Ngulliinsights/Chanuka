@@ -5,9 +5,9 @@
  * like Sentry, Rollbar, Bugsnag, and others.
  */
 
-import { logger } from '../../logging/index.js';
-import { BaseError } from '../errors/base-error.js';
-import { ErrorContext, ErrorTrackingIntegration } from '../types.js';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+import { BaseError } from '@shared/core/src/observability/error-management/errors/base-error.ts';
+import { ErrorContext, ErrorTrackingIntegration } from '@shared/core/src/caching/types.ts';
 
 export interface IntegrationConfig {
   dsn?: string;
@@ -67,7 +67,7 @@ export abstract class BaseErrorTrackingIntegration implements ErrorTrackingInteg
     }
   }
 
-  async getAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
+  async getAnalytics(): Promise<import('@shared/core/src/caching/types.ts').ErrorAnalytics> {
     if (!this.initialized) {
       throw new Error(`Integration not initialized: ${this.name}`);
     }
@@ -89,7 +89,7 @@ export abstract class BaseErrorTrackingIntegration implements ErrorTrackingInteg
 
   protected abstract doInitialize(): Promise<void>;
   protected abstract doTrackError(error: BaseError, context?: ErrorContext): Promise<void>;
-  protected abstract doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics>;
+  protected abstract doGetAnalytics(): Promise<import('@shared/core/src/caching/types.ts').ErrorAnalytics>;
   protected abstract doShutdown(): Promise<void>;
 }
 
@@ -166,7 +166,7 @@ export class SentryIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
+  protected async doGetAnalytics(): Promise<import('@shared/core/src/caching/types.ts').ErrorAnalytics> {
     // In a real implementation, this would fetch analytics from Sentry API
     return {
       totalErrors: 0,
@@ -231,7 +231,7 @@ export class RollbarIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
+  protected async doGetAnalytics(): Promise<import('@shared/core/src/caching/types.ts').ErrorAnalytics> {
     return {
       totalErrors: 0,
       errorRate: 0,
@@ -306,7 +306,7 @@ export class BugsnagIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
+  protected async doGetAnalytics(): Promise<import('@shared/core/src/caching/types.ts').ErrorAnalytics> {
     return {
       totalErrors: 0,
       errorRate: 0,
@@ -367,7 +367,7 @@ export class ConsoleIntegration extends BaseErrorTrackingIntegration {
     console.groupEnd();
   }
 
-  protected async doGetAnalytics(): Promise<import('../types.js').ErrorAnalytics> {
+  protected async doGetAnalytics(): Promise<import('@shared/core/src/caching/types.ts').ErrorAnalytics> {
     return {
       totalErrors: 0,
       errorRate: 0,

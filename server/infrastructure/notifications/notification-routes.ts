@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken, AuthenticatedRequest } from '@server/middleware/auth.js';
-import { notificationService } from './notification-service.js';
+import { notificationService } from '@server/infrastructure/notifications/notification-service.ts';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
-import { notificationChannelService } from './notification-channels.js';
-import { smartNotificationFilterService } from './smart-notification-filter.js';
+import { notificationChannelService } from '@server/infrastructure/notifications/notification-channels.ts';
+import { smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter.ts';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api-utils';
 import { logger   } from '@shared/core';

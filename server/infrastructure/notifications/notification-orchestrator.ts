@@ -1,10 +1,10 @@
 import { database as db, readDatabase } from '@shared/database';
 import { notifications, users, bill_tracking_preferences, bills } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
-import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
-import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
+import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from '@server/infrastructure/notifications/smart-notification-filter.ts';
+import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from '@server/infrastructure/notifications/notification-channels.ts';
 import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '@server/features/users/domain/user-preferences.ts';
-import { CombinedBillTrackingPreferences } from './types.js';
+import { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types.ts';
 import { logger   } from '@shared/core';
 
 /**

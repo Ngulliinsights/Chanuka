@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Separator } from '../ui/separator';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Separator } from '@client/shared/design-system/feedback/separator.tsx';
 
 interface QuickAccessItem {
   id: string;

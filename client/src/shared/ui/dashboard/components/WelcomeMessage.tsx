@@ -19,9 +19,9 @@ import React from 'react';
 import { User } from '@client/store/slices/authSlice';
 import { UserDashboardData } from '@client/types/user-dashboard';
 
-import { Badge } from '../../ui/badge';
-import { Button } from '../../ui/button';
-import { Card, CardContent } from '../../ui/card';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
 
 
 interface WelcomeMessageProps {

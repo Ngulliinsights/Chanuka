@@ -146,8 +146,6 @@ export { ErrorFactory } from './factory';
 
 export {
   ErrorBoundary,
-  withErrorBoundary,
-  useErrorBoundary,
   ErrorFallback,
   RecoveryUI,
 } from './components';
@@ -278,7 +276,7 @@ export function createError(
   severity: ErrorSeverity,
   message: string,
   options?: {
-    details?: any;
+    details?: Record<string, unknown>;
     context?: Partial<ErrorContext>;
     recoverable?: boolean;
     retryable?: boolean;
@@ -302,7 +300,7 @@ export function logError(
   type: ErrorDomain,
   severity: ErrorSeverity,
   message: string,
-  details?: any,
+  details?: Record<string, unknown>,
   context?: Partial<ErrorContext>
 ): AppError {
   return coreErrorHandler.handleError({
@@ -326,51 +324,61 @@ export function logError(
 export function bridgeToUnifiedHandler(): void {
   // This function can be called to establish deeper integration
   // between core error handler and unified error handler
-  if (typeof window !== 'undefined' && (window as any).unifiedErrorHandler) {
-    const unified = (window as any).unifiedErrorHandler;
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const windowAny = window as any;
+    if (windowAny.unifiedErrorHandler) {
+      const unified = windowAny.unifiedErrorHandler;
 
-    // Add core recovery strategies to unified handler
-    if (unified.addRecoveryStrategy) {
-      const coreStrategies = [
-        {
-          id: 'core-network-retry-bridge',
-          name: 'Core Network Retry (Bridged)',
-          description: 'Network retry bridged from core error system',
-          canRecover: (error: any) => error.type === 'network' && error.retryable,
-          recover: async (error: any) => {
-            try {
-              const result = await coreErrorHandler['attemptRecovery'](error);
-              return result.success;
-            } catch {
-              return false;
-            }
+      // Add core recovery strategies to unified handler
+      if (unified.addRecoveryStrategy) {
+        const coreStrategies = [
+          {
+            id: 'core-network-retry-bridge',
+            name: 'Core Network Retry (Bridged)',
+            description: 'Network retry bridged from core error system',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            canRecover: (error: any) => error.type === 'network' && error.retryable,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            recover: async (error: any) => {
+              try {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const result = await (coreErrorHandler as any)['attemptRecovery'](error);
+                return result.success;
+              } catch {
+                return false;
+              }
+            },
+            priority: 1,
           },
-          priority: 1,
-        },
-        {
-          id: 'core-cache-clear-bridge',
-          name: 'Core Cache Clear (Bridged)',
-          description: 'Cache clearing bridged from core error system',
-          canRecover: (error: any) => error.severity === 'critical',
-          recover: async (error: any) => {
-            try {
-              const result = await coreErrorHandler['attemptRecovery'](error);
-              return result.success;
-            } catch {
-              return false;
-            }
+          {
+            id: 'core-cache-clear-bridge',
+            name: 'Core Cache Clear (Bridged)',
+            description: 'Cache clearing bridged from core error system',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            canRecover: (error: any) => error.severity === 'critical',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            recover: async (error: any) => {
+              try {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const result = await (coreErrorHandler as any)['attemptRecovery'](error);
+                return result.success;
+              } catch {
+                return false;
+              }
+            },
+            priority: 2,
           },
-          priority: 2,
-        },
-      ];
+        ];
 
-      coreStrategies.forEach(strategy => {
-        try {
-          unified.addRecoveryStrategy(strategy);
-        } catch (e) {
-          console.warn('Failed to bridge recovery strategy to unified handler:', e);
-        }
-      });
+        coreStrategies.forEach(strategy => {
+          try {
+            unified.addRecoveryStrategy(strategy);
+          } catch (e) {
+            console.warn('Failed to bridge recovery strategy to unified handler:', e);
+          }
+        });
+      }
     }
   }
 }

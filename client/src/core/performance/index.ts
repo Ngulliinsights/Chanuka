@@ -9,6 +9,19 @@
  * - Performance optimization insights
  */
 
+import { PerformanceAlertsManager } from './alerts';
+import { PerformanceBudgetChecker } from './budgets';
+import { PerformanceMonitor } from './monitor';
+import type {
+  BudgetCheckResult,
+  PerformanceAlert,
+  PerformanceConfig,
+  PerformanceMetric,
+  PerformanceStats,
+  WebVitalsMetric
+} from './types';
+import { WebVitalsMonitor } from './web-vitals';
+
 // Core types
 export * from './types';
 
@@ -117,12 +130,12 @@ export function resolveAlert(alertId: string): boolean {
 
 export function addWebVitalsListener(listener: (metric: WebVitalsMetric) => void): void {
   const monitor = getPerformanceMonitor();
-  return monitor.getWebVitalsMonitor().addListener(listener);
+  monitor.getWebVitalsMonitor().addListener(listener);
 }
 
 export function addAlertListener(listener: (alert: PerformanceAlert) => void): void {
   const monitor = getPerformanceMonitor();
-  return monitor.getAlertsManager().addListener(listener);
+  monitor.getAlertsManager().addListener(listener);
 }
 
 export function exportPerformanceReport() {
@@ -145,7 +158,7 @@ export function measureAsync<T>(
   name: string,
   operation: () => Promise<T>
 ): Promise<T> {
-  return new Promise(async (resolve, reject) => {
+  return (async () => {
     const startTime = performance.now();
     
     try {
@@ -160,7 +173,7 @@ export function measureAsync<T>(
         metadata: { type: 'async-operation' }
       });
       
-      resolve(result);
+      return result;
     } catch (error) {
       const duration = performance.now() - startTime;
       
@@ -172,9 +185,9 @@ export function measureAsync<T>(
         metadata: { type: 'async-operation-error', error: String(error) }
       });
       
-      reject(error);
+      throw error;
     }
-  });
+  })();
 }
 
 export function measureSync<T>(

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
-import { AuthenticatedRequest } from '../../../middleware/auth.js';
+import { AuthenticatedRequest } from '../../../../AuthAlert';
 import { logger  } from '@shared/core';
 import { errorTracker } from '@/core/errors/error-tracker.js';
 

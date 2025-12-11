@@ -16,11 +16,11 @@ import { cn } from '@client/lib/utils';
 import { Expert, ExpertCredential, ExpertAffiliation } from '@client/types/expert';
 
 import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/SimpleIcons';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Separator } from '../ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
 
 
 import { CredibilityIndicator } from './CredibilityScoring';

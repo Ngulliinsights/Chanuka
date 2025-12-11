@@ -1,5 +1,5 @@
-import { sponsorService } from '../../sponsors/application/sponsor-service-direct.js';
-import { sponsorConflictAnalysisService } from '../../sponsors/application/sponsor-conflict-analysis.service.js';
+import { sponsorService } from '@server/features/sponsors/application/sponsor-service-direct.ts';
+import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts';
 // readDatabase import removed - not used in this service after refactor
 import { getSponsorshipsByBill, getSponsorAffiliations, getSectionConflictsForBill } from '@shared/repositories/sponsorship-repository.js';
 import { logger  } from '@shared/core';

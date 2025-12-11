@@ -16,13 +16,13 @@ import React, { useState, useEffect } from 'react';
 
 import { logger } from '@client/utils/logger';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Input } from '../ui/input';
-import { Separator } from '../ui/separator';
-import { Textarea } from '../ui/textarea';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card } from '@client/shared/design-system';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
+import { Textarea } from '@client/shared/design-system';
 // Using a simple date formatting function instead of date-fns
 const formatDistanceToNow = (date: Date) => {
   const now = new Date();

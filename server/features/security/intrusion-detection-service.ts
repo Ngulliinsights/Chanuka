@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { database as db } from '@shared/database';
-import { securityAuditService, SecurityEvent } from './security-audit-service.js';
-import { SecurityIncident } from './security-monitoring-service.js';
+import { securityAuditService, SecurityEvent } from '@server/features/security/security-audit-service.ts';
+import { SecurityIncident } from '@server/features/security/security-monitoring-service.ts';
 import { getEmailService } from '@server/infrastructure/notifications/email-service.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';

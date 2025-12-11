@@ -12,7 +12,7 @@ import { database as db } from '@shared/database';
 import { User, users } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '@shared/core/observability/logging';
-import { webSocketService } from './websocket.js';
+import { webSocketService } from '@server/infrastructure/websocket-adapter.ts';
 
 interface ConnectionState {
   user_id: string;

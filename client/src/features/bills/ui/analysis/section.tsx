@@ -1,11 +1,9 @@
 import { ReactNode } from 'react';
 import { Suspense } from 'react';
 
-import { logger } from '@client/utils/logger';
-
-import { ErrorBoundary } from '../error-handling/ErrorBoundary';
-import { Button } from '../ui/button';
-import { LoadingSpinner } from '../ui/loading-spinner';
+import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
+import { Button } from '@client/shared/design-system';
+import { LoadingSpinner } from '@client/shared/design-system';
 
 
 

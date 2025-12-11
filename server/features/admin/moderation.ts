@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { ApiSuccess, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
-import { contentModerationService } from "./content-moderation.js";
+import { contentModerationService } from "@server/features/admin/content-moderation.ts";
 import { authenticateToken, requireRole } from '@server/middleware/auth.js';
 import { logger   } from '@shared/core';
 

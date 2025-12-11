@@ -3,13 +3,13 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { logger } from '@client/utils/logger';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Textarea } from '../ui/textarea';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card } from '@client/shared/design-system';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
+import { Textarea } from '@client/shared/design-system';
 
 // Type definitions with improved specificity
 type Priority = 'low' | 'medium' | 'high' | 'critical';

@@ -6,14 +6,14 @@ import { databaseService } from '@/infrastructure/database/database-service.js';
 
 
 // Import individual analysis services and their result types
-import { constitutionalAnalysisService, ConstitutionalAnalysisResult } from './constitutional-analysis.service.js';
-import { stakeholderAnalysisService, StakeholderAnalysisResult } from './stakeholder-analysis.service.js';
-import { transparencyAnalysisService, TransparencyScoreResult } from './transparency-analysis.service.js';
-import { publicInterestAnalysisService, PublicInterestScoreResult } from './public-interest-analysis.service.js';
+import { constitutionalAnalysisService, ConstitutionalAnalysisResult } from '@server/features/analysis/application/constitutional-analysis.service.ts';
+import { stakeholderAnalysisService, StakeholderAnalysisResult } from '@server/features/analysis/application/stakeholder-analysis.service.ts';
+import { transparencyAnalysisService, TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service.ts';
+import { publicInterestAnalysisService, PublicInterestScoreResult } from '@server/features/analysis/application/public-interest-analysis.service.ts';
 // Import sponsor conflict analysis service and its necessary types/functions
 // Adjust path based on final location of sponsor conflict analysis
-import { sponsorConflictAnalysisService } from '../../sponsors/application/sponsor-conflict-analysis.service.js'; // Updated path
-import type { ConflictDetectionResult } from '../../sponsors/application/sponsor-conflict-analysis.service.js'; // Updated path
+import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts'; // Updated path
+import type { ConflictDetectionResult } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts'; // Updated path
 
 
 // --- Define ConflictSummary type based on sponsor conflict service output ---

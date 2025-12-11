@@ -20,9 +20,9 @@ import React, { useEffect, useState } from 'react';
 import { useWebSocket } from '@client/hooks/use-websocket';
 import { cn } from '@client/lib/utils';
 
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 
 interface RealTimeDashboardProps {
   className?: string;

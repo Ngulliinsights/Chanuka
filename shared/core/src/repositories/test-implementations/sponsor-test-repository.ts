@@ -9,7 +9,7 @@ import { ok, err, some, none } from '../../primitives';
 import type { Result, Maybe } from '../../primitives';
 import type { Sponsor, NewSponsor } from '../../../../schema/foundation';
 import type { ISponsorRepository } from '../interfaces/sponsor-repository.interface';
-import type { ITestDataFactory } from '../../testing/test-data-factory';
+import type { ITestDataFactory } from '../../../../../test-data-factory';
 
 export class SponsorTestRepository implements ISponsorRepository {
   private sponsors = new Map<string, Sponsor>();

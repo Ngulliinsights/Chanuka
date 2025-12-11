@@ -6,8 +6,8 @@
  */
 
 import { BaseError, ErrorSeverity } from '../errors/base-error';
-import { logger } from '../../logging/index.js';
-import { BaseError } from '../errors/base-error.js';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+import { BaseError } from '@shared/core/src/observability/error-management/errors/base-error.ts';
 
 export interface RetryOptions {
   maxAttempts?: number;

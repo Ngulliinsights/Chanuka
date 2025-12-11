@@ -16,7 +16,7 @@ import {
   DatabaseError,
   ValidationError as InvalidInputError
 } from '@/utils/errors.js';
-import { FinancialDisclosureConfig } from './config.js';
+import { FinancialDisclosureConfig } from '@server/features/analytics/financial-disclosure/config.ts';
 import type {
   FinancialDisclosure,
   FinancialAlert,

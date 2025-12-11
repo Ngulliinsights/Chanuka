@@ -1,7 +1,7 @@
 // Production environment configuration
 // This file contains production-specific configuration values
 
-import { AppConfig } from './index.js';
+import { AppConfig } from '../../4-personas-implementation-guide';
 
 export const productionConfig: AppConfig = {
   server: {

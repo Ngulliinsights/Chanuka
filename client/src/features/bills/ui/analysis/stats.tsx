@@ -1,7 +1,7 @@
 import { logger } from '@client/utils/logger';
 
-import { Card, CardContent, CardTitle } from '../ui/card';
-import { Progress } from '../ui/progress';
+import { Card, CardContent, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
 
 interface Bill {
   supportPercentage?: number;

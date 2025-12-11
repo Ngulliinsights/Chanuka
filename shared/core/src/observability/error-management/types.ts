@@ -2,7 +2,7 @@
  * Type definitions for Error Management System
  */
 
-import { BaseError, ErrorSeverity } from './errors/base-error.js';
+import { BaseError, ErrorSeverity } from '@shared/core/src/observability/error-management/errors/base-error.ts';
 
 // Import existing types
 export type {
@@ -10,7 +10,7 @@ export type {
   ErrorMetadata,
   RecoveryStrategy,
   ErrorDomain
-} from './errors/base-error.js';
+} from '@shared/core/src/observability/error-management/errors/base-error.ts';
 
 export type {
   CircuitBreakerOptions,

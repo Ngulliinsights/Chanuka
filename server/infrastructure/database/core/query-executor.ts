@@ -2,7 +2,7 @@ import { PoolClient, QueryResult as PgQueryResult, QueryResultRow } from 'pg';
 import { AsyncLocalStorage } from 'async_hooks';
 import { connectionManager } from './connection-manager';
 import { logger   } from '@shared/core';
-import { getMonitoringService } from '../../monitoring/monitoring';
+import { getMonitoringService } from '@server/infrastructure/database/monitoring.ts';
 
 /**
  * SQL query interface with parameters and metadata.

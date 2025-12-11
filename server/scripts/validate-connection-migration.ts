@@ -7,7 +7,7 @@
  * and tests zero downtime migration.
  */
 
-import { WebSocketMigrationDeployer, SocketIOWebSocketService } from './deploy-websocket-migration.js';
+import { WebSocketMigrationDeployer, SocketIOWebSocketService } from '../../deploy-websocket-migration';
 import { logger } from '@shared/core/observability/logging';
 import { createServer } from 'http';
 import { io as SocketIOClient } from 'socket.io-client';

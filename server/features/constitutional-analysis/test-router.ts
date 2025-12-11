@@ -3,7 +3,7 @@
 // ============================================================================
 // Simple test to verify the router compiles and works
 
-import { constitutionalAnalysisRouter } from './presentation/constitutional-analysis-router.js';
+import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/presentation/constitutional-analysis-router.ts';
 
 console.log('✅ Constitutional analysis router loaded successfully');
 console.log('Router has', Object.keys(constitutionalAnalysisRouter.stack || []).length, 'routes');

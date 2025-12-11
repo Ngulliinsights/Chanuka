@@ -1,7 +1,7 @@
 // import { Metric, PrometheusConfig } from '../../../types';
 type Metric = any;
 type PrometheusConfig = any;
-import { Result, Ok, Err } from '../../../../src/primitives/types/result.js';
+import { Result, Ok, Err } from '@shared/core/src/primitives/types/result.ts';
 
 // ==================== Enhanced Prometheus Exporter ====================
 

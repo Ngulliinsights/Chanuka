@@ -7,8 +7,8 @@
 
 import { QueryClient } from '@tanstack/react-query';
 
-import { WebSocketManager } from './websocket-manager';
 import type { UnifiedComment, UnifiedThread } from '../types';
+import { WebSocketManager } from './websocket-manager';
 
 export class StateSyncService {
   constructor(
@@ -21,7 +21,8 @@ export class StateSyncService {
    */
   syncCommentCreated(comment: UnifiedComment): void {
     // Update React Query cache optimistically
-    this.updateCommentsCache(comment.billId, (comments) => [comment, ...comments]);
+    const billId = typeof comment.billId === 'string' ? parseInt(comment.billId, 10) : comment.billId;
+    this.updateCommentsCache(billId, (comments) => [comment, ...comments]);
     
     // Broadcast via WebSocket if connected
     if (this.wsManager?.isConnected()) {
@@ -37,7 +38,8 @@ export class StateSyncService {
    */
   syncCommentUpdated(comment: UnifiedComment): void {
     // Update React Query cache
-    this.updateCommentsCache(comment.billId, (comments) =>
+    const billId = typeof comment.billId === 'string' ? parseInt(comment.billId, 10) : comment.billId;
+    this.updateCommentsCache(billId, (comments) =>
       comments.map(c => c.id === comment.id ? comment : c)
     );
     
@@ -56,18 +58,18 @@ export class StateSyncService {
     let billId: number | undefined;
     let threadId: string | undefined;
 
-    for (const [queryKey, data] of allQueries) {
+    for (const [, data] of allQueries) {
       if (Array.isArray(data)) {
         const comment = (data as UnifiedComment[]).find(c => c.id === commentId);
         if (comment) {
-          billId = comment.billId;
+          billId = typeof comment.billId === 'string' ? parseInt(comment.billId, 10) : comment.billId;
           threadId = comment.threadId;
           break;
         }
       }
     }
 
-    if (billId) {
+    if (billId !== undefined) {
       // Update React Query cache
       this.updateCommentsCache(billId, (comments) =>
         comments.filter(c => c.id !== commentId)
@@ -88,7 +90,8 @@ export class StateSyncService {
    */
   syncCommentVoted(comment: UnifiedComment): void {
     // Update React Query cache with new vote counts
-    this.updateCommentsCache(comment.billId, (comments) =>
+    const billId = typeof comment.billId === 'string' ? parseInt(comment.billId, 10) : comment.billId;
+    this.updateCommentsCache(billId, (comments) =>
       comments.map(c => c.id === comment.id ? comment : c)
     );
     
@@ -139,9 +142,10 @@ export class StateSyncService {
    */
   handleWebSocketEvent<T>(event: string, data: T): void {
     switch (event) {
-      case 'comment:created':
+      case 'comment:created': {
         const { comment: newComment } = data as { comment: UnifiedComment };
-        this.updateCommentsCache(newComment.billId, (comments) => {
+        const billId = typeof newComment.billId === 'string' ? parseInt(newComment.billId, 10) : newComment.billId;
+        this.updateCommentsCache(billId, (comments) => {
           // Avoid duplicates
           if (comments.some(c => c.id === newComment.id)) {
             return comments;
@@ -149,30 +153,35 @@ export class StateSyncService {
           return [newComment, ...comments];
         });
         break;
+      }
 
-      case 'comment:updated':
+      case 'comment:updated': {
         const { comment: updatedComment } = data as { comment: UnifiedComment };
-        this.updateCommentsCache(updatedComment.billId, (comments) =>
+        const billId = typeof updatedComment.billId === 'string' ? parseInt(updatedComment.billId, 10) : updatedComment.billId;
+        this.updateCommentsCache(billId, (comments) =>
           comments.map(c => c.id === updatedComment.id ? updatedComment : c)
         );
         break;
+      }
 
-      case 'comment:deleted':
+      case 'comment:deleted': {
         const { commentId } = data as { commentId: string };
         // Update all comment caches
         const queries = this.queryClient.getQueriesData({ queryKey: ['comments'] });
-        queries.forEach(([queryKey, queryData]) => {
+        queries.forEach(([, queryData]) => {
           if (Array.isArray(queryData)) {
             const filtered = (queryData as UnifiedComment[]).filter(c => c.id !== commentId);
-            this.queryClient.setQueryData(queryKey, filtered);
+            this.queryClient.setQueryData(queryData, filtered);
           }
         });
         break;
+      }
 
-      case 'thread:created':
+      case 'thread:created': {
         const { thread: newThread } = data as { thread: UnifiedThread };
+        const billId = typeof newThread.billId === 'string' ? parseInt(newThread.billId, 10) : newThread.billId;
         this.queryClient.setQueryData(
-          ['threads', newThread.billId],
+          ['threads', billId],
           (old: UnifiedThread[] = []) => {
             // Avoid duplicates
             if (old.some(t => t.id === newThread.id)) {
@@ -182,15 +191,18 @@ export class StateSyncService {
           }
         );
         break;
+      }
 
-      case 'thread:updated':
+      case 'thread:updated': {
         const { thread: updatedThread } = data as { thread: UnifiedThread };
+        const billId = typeof updatedThread.billId === 'string' ? parseInt(updatedThread.billId, 10) : updatedThread.billId;
         this.queryClient.setQueryData(
-          ['threads', updatedThread.billId],
+          ['threads', billId],
           (old: UnifiedThread[] = []) =>
             old.map(t => t.id === updatedThread.id ? updatedThread : t)
         );
         break;
+      }
     }
   }
 

@@ -8,8 +8,8 @@ import React from 'react';
 
 import { cn } from '@/lib/utils';
 
-import { Alert, AlertDescription } from '../../../ui/alert';
-import { Button } from '../../../ui/button';
+import { Alert, AlertDescription } from '@client/features/users/ui/settings/alert-preferences.tsx';
+import { Button } from '../../../../../../Button';
 
 export interface AuthAlertProps {
   type: 'success' | 'error' | 'warning' | 'info';

@@ -1,7 +1,7 @@
 import { getDbInstance, readDatabase } from '@server/infrastructure/database/index.js';
 import { sql } from 'drizzle-orm';
 import { logger   } from '@shared/core';
-import { validationMetricsCollector } from './validation-metrics.js';
+import { validationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
 import {
   complianceChecks,
   securityAuditLogs,
