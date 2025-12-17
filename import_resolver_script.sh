@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Import Resolver - Intelligent automatic import path fixing
-# This script analyzes broken imports and fixes them using project structure analysis
-# and TypeScript alias configuration while maintaining comprehensive safety checks
+# Import Resolver - Intelligent automatic import path fixing with content analysis
+# This script analyzes broken imports and fixes them using project structure analysis,
+# TypeScript alias configuration, AND actual file content matching to ensure logical resolution
 
 set -euo pipefail
 
@@ -32,12 +32,12 @@ declare -i FIXES_SUCCESSFUL=0
 declare -i FIXES_FAILED=0
 declare -i FIXES_SKIPPED=0
 declare -i FILES_PROCESSED=0
+declare -i CONTENT_MATCHES_USED=0
 
 # ============================================================================
 # UTILITY FUNCTIONS
 # ============================================================================
 
-# Cleanup temporary files on exit
 cleanup() {
     if [[ -d "$TEMP_DIR" ]]; then
         rm -rf "$TEMP_DIR"
@@ -45,7 +45,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Logging functions with consistent formatting
 log_info() {
     echo -e "${BLUE}ℹ${NC} $1" | tee -a "$LOG_FILE"
 }
@@ -81,7 +80,6 @@ check_prerequisites() {
     
     local missing_deps=()
     
-    # Check for required files
     if [[ ! -f "$ANALYSIS_FILE" ]]; then
         log_error "Import analysis file not found: $ANALYSIS_FILE"
         echo "         Run ./import_validator.sh first to generate the analysis"
@@ -94,7 +92,6 @@ check_prerequisites() {
         missing_deps+=("generate-structure-to-file.sh")
     fi
     
-    # Check for required commands
     if ! command -v python3 &> /dev/null; then
         log_error "python3 is required but not found"
         missing_deps+=("python3")
@@ -103,6 +100,11 @@ check_prerequisites() {
     if ! command -v sed &> /dev/null; then
         log_error "sed is required but not found"
         missing_deps+=("sed")
+    fi
+    
+    if ! command -v grep &> /dev/null; then
+        log_error "grep is required but not found"
+        missing_deps+=("grep")
     fi
     
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
@@ -122,7 +124,6 @@ create_backup() {
         log_info "Creating backup at: $BACKUP_DIR"
         mkdir -p "$BACKUP_DIR"
         
-        # Count files to backup for progress indication
         local total_files
         total_files=$(find . -type f \
             \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" \) \
@@ -134,7 +135,6 @@ create_backup() {
         
         log_info "Backing up $total_files source files..."
         
-        # Perform backup with error handling
         find . -type f \
             \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" \) \
             -not -path "*/node_modules/*" \
@@ -153,27 +153,25 @@ create_backup() {
 }
 
 # ============================================================================
-# FILE INDEX BUILDING
+# FILE INDEX BUILDING WITH CONTENT CACHING
 # ============================================================================
 
 build_file_index() {
-    log_info "Building comprehensive file index..."
+    log_info "Building comprehensive file index with export analysis..."
     
-    # Initialize index file
     : > "$TEMP_DIR/file_index.txt"
+    : > "$TEMP_DIR/export_cache.txt"
     
-    # Extract paths from structure markdown with better parsing
+    # Extract paths from structure markdown
     if [[ -f "$STRUCTURE_FILE" ]]; then
-        # This captures files from the tree structure, handling various tree characters
-        grep -E "\.(js|jsx|ts|tsx|py|go|java|rb)$" "$STRUCTURE_FILE" 2>/dev/null | \
+        grep -E "\.(js|jsx|ts|tsx)$" "$STRUCTURE_FILE" 2>/dev/null | \
             sed 's/^[│├└─ ]*//g' | \
             sed 's/\/$//g' | \
             grep -v '^```' | \
             sort -u >> "$TEMP_DIR/file_index.txt" || true
     fi
     
-    # Scan actual filesystem for completeness and accuracy
-    # This ensures we catch files that might not be in the structure doc
+    # Scan actual filesystem
     find . -type f \
         \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" \) \
         -not -path "*/node_modules/*" \
@@ -186,23 +184,125 @@ build_file_index() {
         -not -path "*/out/*" \
         2>/dev/null | sed 's|^\./||' >> "$TEMP_DIR/file_index.txt" || true
     
-    # Remove duplicates and sort for efficient searching
     sort -u "$TEMP_DIR/file_index.txt" -o "$TEMP_DIR/file_index.txt"
     
-    # Build a secondary index by filename for faster fuzzy matching
+    # Build filename index and analyze exports in parallel
+    log_info "Analyzing file exports for intelligent matching..."
+    
     while IFS= read -r filepath; do
         local filename
         filename=$(basename "$filepath")
         echo "${filename}|${filepath}" >> "$TEMP_DIR/filename_index.txt"
+        
+        # Extract exports from this file for content-aware matching
+        if [[ -f "$filepath" ]]; then
+            extract_exports "$filepath" >> "$TEMP_DIR/export_cache.txt"
+        fi
     done < "$TEMP_DIR/file_index.txt"
     
     sort "$TEMP_DIR/filename_index.txt" -o "$TEMP_DIR/filename_index.txt"
     
     local file_count
     file_count=$(wc -l < "$TEMP_DIR/file_index.txt")
-    log_success "Indexed $file_count files"
+    log_success "Indexed $file_count files with export information"
+}
+
+# ============================================================================
+# CONTENT ANALYSIS - Extract what a file exports
+# ============================================================================
+
+extract_exports() {
+    local filepath="$1"
     
-    log_debug "Sample index entries: $(head -3 "$TEMP_DIR/file_index.txt" | tr '\n' ', ')"
+    # Use Python for more robust export extraction
+    python3 << EOF
+import re
+import sys
+
+try:
+    with open("$filepath", 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+    
+    exports = set()
+    
+    # Match: export { Name1, Name2 }
+    for match in re.finditer(r'export\s*\{\s*([^}]+)\s*\}', content):
+        items = match.group(1)
+        for item in items.split(','):
+            name = item.strip().split()[0]  # Handle "Name as Alias"
+            exports.add(name)
+    
+    # Match: export const/let/var/function/class Name
+    for match in re.finditer(r'export\s+(?:const|let|var|function|class|interface|type|enum)\s+(\w+)', content):
+        exports.add(match.group(1))
+    
+    # Match: export default Name (capture the identifier if present)
+    default_match = re.search(r'export\s+default\s+(\w+)', content)
+    if default_match:
+        exports.add('default:' + default_match.group(1))
+    elif 'export default' in content:
+        exports.add('default')
+    
+    # Output format: filepath|export1,export2,export3
+    if exports:
+        print(f"$filepath|{','.join(sorted(exports))}")
+    else:
+        print(f"$filepath|")
+        
+except Exception as e:
+    # Silently fail for files we can't read
+    print(f"$filepath|", file=sys.stderr)
+    sys.exit(0)
+EOF
+}
+
+# ============================================================================
+# CONTENT-AWARE IMPORT EXTRACTION
+# ============================================================================
+
+extract_imported_names() {
+    local source_file="$1"
+    local import_statement="$2"
+    
+    # Extract what's being imported from the source file
+    python3 << EOF
+import re
+
+try:
+    with open("$source_file", 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+    
+    imported_names = set()
+    import_path = "$import_statement"
+    
+    # Find all import statements for this path
+    # Match: import { Name1, Name2 } from 'path'
+    pattern1 = rf"import\s*\{{\s*([^}}]+)\s*\}}\s*from\s*['\"]" + re.escape(import_path) + rf"['\"]"
+    for match in re.finditer(pattern1, content):
+        items = match.group(1)
+        for item in items.split(','):
+            # Handle "Name as Alias"
+            name = item.strip().split()[0]
+            imported_names.add(name)
+    
+    # Match: import Name from 'path' (default import)
+    pattern2 = rf"import\s+(\w+)\s+from\s*['\"]" + re.escape(import_path) + rf"['\"]"
+    for match in re.finditer(pattern2, content):
+        imported_names.add('default:' + match.group(1))
+    
+    # Match: import * as Name from 'path'
+    pattern3 = rf"import\s+\*\s+as\s+(\w+)\s+from\s*['\"]" + re.escape(import_path) + rf"['\"]"
+    for match in re.finditer(pattern3, content):
+        imported_names.add('*:' + match.group(1))
+    
+    # Output comma-separated list
+    if imported_names:
+        print(','.join(sorted(imported_names)))
+    
+except Exception:
+    # If we can't parse, return empty
+    pass
+EOF
 }
 
 # ============================================================================
@@ -216,7 +316,6 @@ detect_alias_config() {
     local client_tsconfig="client/tsconfig.json"
     local server_tsconfig="server/tsconfig.json"
     
-    # Look for tsconfig in common locations
     local config_file=""
     for cfg in "$tsconfig" "$client_tsconfig" "$server_tsconfig"; do
         if [[ -f "$cfg" ]]; then
@@ -233,24 +332,20 @@ detect_alias_config() {
     
     log_debug "Using config file: $config_file"
     
-    # Detect multi-codebase strategy (strategic approach)
     if grep -q '"@client/\*"' "$config_file" && \
        grep -q '"@server/\*"' "$config_file" && \
        grep -q '"@shared/\*"' "$config_file"; then
         echo "multi-codebase" > "$TEMP_DIR/alias_type.txt"
         log_success "Detected multi-codebase alias strategy (@client, @server, @shared)"
         
-        # Extract base paths for each alias
         grep -A 1 '"@client/\*"' "$config_file" | tail -1 | sed 's/.*"\(.*\)".*/\1/' | sed 's/\/\*$//' > "$TEMP_DIR/client_base.txt"
         grep -A 1 '"@server/\*"' "$config_file" | tail -1 | sed 's/.*"\(.*\)".*/\1/' | sed 's/\/\*$//' > "$TEMP_DIR/server_base.txt"
         grep -A 1 '"@shared/\*"' "$config_file" | tail -1 | sed 's/.*"\(.*\)".*/\1/' | sed 's/\/\*$//' > "$TEMP_DIR/shared_base.txt"
         
-    # Detect single-alias strategy
     elif grep -q '"@/\*"' "$config_file"; then
         echo "single-alias" > "$TEMP_DIR/alias_type.txt"
         log_success "Detected single-alias strategy (@)"
         
-        # Extract base path for @ alias
         grep -A 1 '"@/\*"' "$config_file" | tail -1 | sed 's/.*"\(.*\)".*/\1/' | sed 's/\/\*$//' > "$TEMP_DIR/alias_base.txt"
         
     else
@@ -260,27 +355,33 @@ detect_alias_config() {
 }
 
 # ============================================================================
-# IMPORT RESOLUTION LOGIC
+# INTELLIGENT IMPORT RESOLUTION WITH CONTENT MATCHING
 # ============================================================================
 
-# Find the best matching file for an import path
 find_best_match() {
     local import_path="$1"
     local source_file="$2"
     
     log_debug "Finding match for: $import_path (from: $source_file)"
     
-    # Normalize the import path for matching
+    # Extract what's being imported from the source file
+    local imported_names
+    imported_names=$(extract_imported_names "$source_file" "$import_path")
+    
+    if [[ -n "$imported_names" ]]; then
+        log_debug "Looking for exports: $imported_names"
+    fi
+    
     local clean_import
     clean_import=$(echo "$import_path" | sed -E 's/\.(jsx?|tsx?)$//')
     clean_import=$(echo "$clean_import" | sed 's/\/index$//')
     
-    # Strategy 1: Exact path match (most reliable)
+    # Strategy 1: Exact path match (most reliable when it exists)
     local exact_match
     exact_match=$(grep -F "$clean_import" "$TEMP_DIR/file_index.txt" | head -1 || true)
     
-    if [[ -n "$exact_match" ]]; then
-        log_debug "Found exact match: $exact_match"
+    if [[ -n "$exact_match" ]] && [[ -f "$exact_match" ]]; then
+        log_debug "Found exact path match: $exact_match"
         echo "$exact_match"
         return 0
     fi
@@ -289,7 +390,7 @@ find_best_match() {
     for ext in ".ts" ".tsx" ".js" ".jsx"; do
         local match
         match=$(grep -F "${clean_import}${ext}" "$TEMP_DIR/file_index.txt" | head -1 || true)
-        if [[ -n "$match" ]]; then
+        if [[ -n "$match" ]] && [[ -f "$match" ]]; then
             log_debug "Found match with extension: $match"
             echo "$match"
             return 0
@@ -300,14 +401,27 @@ find_best_match() {
     for index in "/index.ts" "/index.tsx" "/index.js" "/index.jsx"; do
         local match
         match=$(grep -F "${clean_import}${index}" "$TEMP_DIR/file_index.txt" | head -1 || true)
-        if [[ -n "$match" ]]; then
+        if [[ -n "$match" ]] && [[ -f "$match" ]]; then
             log_debug "Found index file match: $match"
             echo "$match"
             return 0
         fi
     done
     
-    # Strategy 4: Fuzzy filename match (least reliable, use with caution)
+    # Strategy 4: Content-aware fuzzy matching (only if we know what's being imported)
+    if [[ -n "$imported_names" ]]; then
+        local best_match
+        best_match=$(find_content_aware_match "$import_path" "$source_file" "$imported_names")
+        
+        if [[ -n "$best_match" ]]; then
+            CONTENT_MATCHES_USED=$((CONTENT_MATCHES_USED + 1))
+            log_debug "Found content-aware match: $best_match"
+            echo "$best_match"
+            return 0
+        fi
+    fi
+    
+    # Strategy 5: Contextual fuzzy filename match (use with caution)
     local filename
     filename=$(basename "$clean_import")
     
@@ -316,7 +430,7 @@ find_best_match() {
         fuzzy_matches=$(grep -i "^${filename}" "$TEMP_DIR/filename_index.txt" || true)
         
         if [[ -n "$fuzzy_matches" ]]; then
-            # Prefer matches in same feature directory
+            # Strongly prefer matches in same feature directory
             local source_feature
             source_feature=$(echo "$source_file" | cut -d'/' -f1-3)
             
@@ -324,8 +438,9 @@ find_best_match() {
             best_match=$(echo "$fuzzy_matches" | grep "$source_feature" | cut -d'|' -f2 | head -1 || \
                         echo "$fuzzy_matches" | cut -d'|' -f2 | head -1)
             
-            if [[ -n "$best_match" ]]; then
-                log_debug "Found fuzzy match: $best_match"
+            if [[ -n "$best_match" ]] && [[ -f "$best_match" ]]; then
+                log_warning "Using filename match (context-based): $best_match"
+                log_warning "Please verify this is the correct file!"
                 echo "$best_match"
                 return 0
             fi
@@ -336,7 +451,96 @@ find_best_match() {
     return 1
 }
 
-# Calculate relative path from source to target using Python
+# Find files that export what we're looking for
+find_content_aware_match() {
+    local import_path="$1"
+    local source_file="$2"
+    local imported_names="$3"
+    
+    local filename
+    filename=$(basename "$import_path" | sed -E 's/\.(jsx?|tsx?)$//')
+    
+    log_debug "Content-aware search for: $filename with exports: $imported_names"
+    
+    # Get all files with matching filename
+    local candidates
+    candidates=$(grep -i "^${filename}" "$TEMP_DIR/filename_index.txt" | cut -d'|' -f2 || true)
+    
+    if [[ -z "$candidates" ]]; then
+        return 1
+    fi
+    
+    # Score each candidate based on export matching
+    local best_match=""
+    local best_score=0
+    
+    while IFS= read -r candidate; do
+        if [[ ! -f "$candidate" ]]; then
+            continue
+        fi
+        
+        # Get exports for this candidate
+        local candidate_exports
+        candidate_exports=$(grep "^${candidate}|" "$TEMP_DIR/export_cache.txt" | cut -d'|' -f2 || echo "")
+        
+        if [[ -z "$candidate_exports" ]]; then
+            continue
+        fi
+        
+        # Calculate match score
+        local score=0
+        
+        # Convert to arrays for comparison
+        IFS=',' read -ra IMPORTS <<< "$imported_names"
+        IFS=',' read -ra EXPORTS <<< "$candidate_exports"
+        
+        # Count matching exports
+        for import_name in "${IMPORTS[@]}"; do
+            for export_name in "${EXPORTS[@]}"; do
+                if [[ "$import_name" == "$export_name" ]]; then
+                    score=$((score + 10))  # Exact match is very strong
+                elif [[ "$import_name" == *":"* ]] && [[ "$export_name" == *":"* ]]; then
+                    # Both are default exports
+                    score=$((score + 5))
+                fi
+            done
+        done
+        
+        # Bonus points for same directory context
+        local source_dir
+        local candidate_dir
+        source_dir=$(dirname "$source_file")
+        candidate_dir=$(dirname "$candidate")
+        
+        if [[ "$source_dir" == "$candidate_dir" ]]; then
+            score=$((score + 20))  # Same directory is very likely correct
+        elif [[ "$source_dir" == *"$(basename "$candidate_dir")"* ]]; then
+            score=$((score + 10))  # Related directory structure
+        fi
+        
+        log_debug "Candidate: $candidate, Score: $score, Exports: $candidate_exports"
+        
+        if [[ $score -gt $best_score ]]; then
+            best_score=$score
+            best_match="$candidate"
+        fi
+    done <<< "$candidates"
+    
+    # Only return match if score is significant (at least one export matched)
+    if [[ $best_score -ge 10 ]]; then
+        log_success "Content match found with score $best_score: $best_match"
+        echo "$best_match"
+        return 0
+    fi
+    
+    log_debug "No confident content match found (best score: $best_score)"
+    return 1
+}
+
+# ============================================================================
+# PATH CALCULATION
+# ============================================================================
+
 calculate_relative_path() {
     local source_file="$1"
     local target_file="$2"
@@ -351,11 +555,9 @@ target = "$target_file"
 try:
     rel = os.path.relpath(target, source)
     
-    # Ensure path starts with ./ or ../
     if not rel.startswith('..'):
         rel = './' + rel
     
-    # Remove file extension for TypeScript/JavaScript imports
     base = os.path.basename(rel)
     if '.' in base:
         parts = rel.rsplit('.', 1)
@@ -363,14 +565,12 @@ try:
             rel = parts[0]
     
     print(rel)
-except ValueError as e:
-    # Fallback if paths are on different drives (Windows) or other issues
+except ValueError:
     print(target)
     sys.exit(1)
 EOF
 }
 
-# Determine the best import path based on alias strategy and context
 determine_import_path() {
     local source_file="$1"
     local target_file="$2"
@@ -381,9 +581,6 @@ determine_import_path() {
     
     case "$alias_type" in
         multi-codebase)
-            # Strategic multi-codebase approach with clear boundaries
-            
-            # Determine which codebase each file belongs to
             local source_base=""
             local target_base=""
             
@@ -403,12 +600,9 @@ determine_import_path() {
                 target_base="shared"
             fi
             
-            # Apply strategic import rules based on boundaries
             if [[ "$target_base" == "shared" ]]; then
-                # Always use @shared for shared code (clear boundary marker)
                 echo "@shared/${target_file#shared/}"
             elif [[ "$source_base" == "$target_base" ]] && [[ -n "$source_base" ]]; then
-                # Same codebase - use alias for clarity
                 case "$target_base" in
                     client)
                         if [[ "$target_file" == client/src/* ]]; then
@@ -425,15 +619,12 @@ determine_import_path() {
                         ;;
                 esac
             else
-                # Cross-codebase or unclear context - use relative path
                 calculate_relative_path "$source_file" "$target_file"
             fi
             ;;
             
         single-alias)
-            # Single alias strategy - use @ for src directory
             if [[ "$target_file" == */src/* ]]; then
-                # Extract the part after src/
                 local after_src="${target_file#*/src/}"
                 echo "@/${after_src}"
             else
@@ -442,7 +633,6 @@ determine_import_path() {
             ;;
             
         *)
-            # Standard relative paths - safest default
             calculate_relative_path "$source_file" "$target_file"
             ;;
     esac
@@ -458,7 +648,7 @@ fix_import() {
     
     FIXES_ATTEMPTED=$((FIXES_ATTEMPTED + 1))
     
-    # Skip external package imports (they're not broken, just external)
+    # Skip external package imports
     if [[ "$old_import" =~ ^[@a-zA-Z][a-zA-Z0-9_-]*(/|$) ]] && \
        [[ "$old_import" != @/* ]]; then
         log_debug "Skipping external package: $old_import"
@@ -466,10 +656,12 @@ fix_import() {
         return 0
     fi
     
-    # Find the target file
+    # Find the target file using intelligent matching
     local target_file
     if ! target_file=$(find_best_match "$old_import" "$source_file"); then
-        log_warning "No match found for: $old_import in $source_file"
+        log_warning "No suitable match found for: $old_import in $source_file"
+        log_warning "This import may reference a file that was removed, renamed, or relocated."
+        log_warning "Manual review recommended to determine the correct replacement."
         FIXES_FAILED=$((FIXES_FAILED + 1))
         return 1
     fi
@@ -478,7 +670,6 @@ fix_import() {
     local new_import
     new_import=$(determine_import_path "$source_file" "$target_file")
     
-    # Verify new import is different and valid
     if [[ "$old_import" == "$new_import" ]]; then
         log_debug "Import already correct: $old_import"
         FIXES_SKIPPED=$((FIXES_SKIPPED + 1))
@@ -491,31 +682,18 @@ fix_import() {
     echo -e "   ${GREEN}+${NC} from '$new_import'"
     
     if [[ "$DRY_RUN" == "false" ]]; then
-        # Perform the actual replacement with proper escaping
         local escaped_old escaped_new
         
-        # Escape special regex characters in old import
         escaped_old=$(printf '%s\n' "$old_import" | sed 's/[[\.*^$/]/\\&/g')
-        
-        # Escape special sed replacement characters in new import
         escaped_new=$(printf '%s\n' "$new_import" | sed 's/[\/&]/\\&/g')
         
-        # Replace in various import formats
-        # ES6 static imports with single quotes
         sed -i "s|from '${escaped_old}'|from '${escaped_new}'|g" "$source_file"
-        
-        # ES6 static imports with double quotes
         sed -i "s|from \"${escaped_old}\"|from \"${escaped_new}\"|g" "$source_file"
-        
-        # Dynamic imports with single quotes
         sed -i "s|import('${escaped_old}')|import('${escaped_new}')|g" "$source_file"
-        
-        # Dynamic imports with double quotes
         sed -i "s|import(\"${escaped_old}\")|import(\"${escaped_new}\")|g" "$source_file"
         
         FIXES_SUCCESSFUL=$((FIXES_SUCCESSFUL + 1))
     else
-        # In dry run, count as successful to show what would happen
         FIXES_SUCCESSFUL=$((FIXES_SUCCESSFUL + 1))
     fi
     
@@ -527,7 +705,7 @@ fix_import() {
 # ============================================================================
 
 parse_and_fix_imports() {
-    log_info "Parsing import analysis and resolving issues..."
+    log_info "Parsing import analysis and resolving issues intelligently..."
     echo ""
     
     if [[ ! -f "$ANALYSIS_FILE" ]]; then
@@ -542,14 +720,12 @@ parse_and_fix_imports() {
     while IFS= read -r line; do
         line_number=$((line_number + 1))
         
-        # Detect the missing imports section
         if [[ "$line" == "## Missing or Invalid Imports" ]]; then
             in_missing_section=true
             log_debug "Found missing imports section at line $line_number"
             continue
         fi
         
-        # Stop when we reach the next major section
         if [[ "$in_missing_section" == true ]] && \
            [[ "$line" =~ ^##[[:space:]] ]] && \
            [[ "$line" != "## Missing or Invalid Imports" ]]; then
@@ -558,7 +734,6 @@ parse_and_fix_imports() {
         fi
         
         if [[ "$in_missing_section" == true ]]; then
-            # Extract file path from markdown heading (### `path/to/file.ts`)
             if [[ "$line" =~ ^###[[:space:]]\`([^\`]+)\` ]]; then
                 current_file="${BASH_REMATCH[1]}"
                 FILES_PROCESSED=$((FILES_PROCESSED + 1))
@@ -566,7 +741,6 @@ parse_and_fix_imports() {
                 continue
             fi
             
-            # Extract import path from list item (- ❌ `import/path`)
             if [[ "$line" =~ ^-[[:space:]][❌✗][[:space:]]\`([^\`]+)\` ]]; then
                 local import_path="${BASH_REMATCH[1]}"
                 
@@ -595,20 +769,33 @@ generate_summary() {
     echo -e "${CYAN}Import Resolution Summary${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    echo "  Files with issues: $FILES_PROCESSED"
-    echo "  Imports attempted: $FIXES_ATTEMPTED"
-    echo -e "  Successful:        ${GREEN}$FIXES_SUCCESSFUL${NC}"
-    echo -e "  Failed:            ${RED}$FIXES_FAILED${NC}"
-    echo -e "  Skipped:           ${YELLOW}$FIXES_SKIPPED${NC}"
+    echo "  Files with issues:     $FILES_PROCESSED"
+    echo "  Imports attempted:     $FIXES_ATTEMPTED"
+    echo -e "  Successful:            ${GREEN}$FIXES_SUCCESSFUL${NC}"
+    echo -e "  Failed:                ${RED}$FIXES_FAILED${NC}"
+    echo -e "  Skipped:               ${YELLOW}$FIXES_SKIPPED${NC}"
+    echo -e "  Content-aware matches: ${CYAN}$CONTENT_MATCHES_USED${NC}"
     
-    # Calculate success rate
     if [[ $FIXES_ATTEMPTED -gt 0 ]]; then
         local success_rate
         success_rate=$(( (FIXES_SUCCESSFUL * 100) / FIXES_ATTEMPTED ))
-        echo -e "  Success rate:      ${GREEN}${success_rate}%${NC}"
+        echo -e "  Success rate:          ${GREEN}${success_rate}%${NC}"
     fi
     
     echo ""
+    
+    if [[ $CONTENT_MATCHES_USED -gt 0 ]]; then
+        echo -e "${CYAN}ℹ${NC} Used intelligent content analysis for $CONTENT_MATCHES_USED imports"
+        echo "  These matches were based on actual exported functions/types"
+        echo ""
+    fi
+    
+    if [[ $FIXES_FAILED -gt 0 ]]; then
+        echo -e "${YELLOW}⚠${NC} $FIXES_FAILED imports could not be resolved automatically"
+        echo "  These may reference files that were removed, renamed, or relocated"
+        echo "  Please review the log and fix these manually"
+        echo ""
+    fi
     
     if [[ "$DRY_RUN" == "true" ]]; then
         echo -e "${YELLOW}⚠  DRY RUN MODE${NC} - No files were modified"
@@ -644,10 +831,18 @@ generate_summary() {
 
 show_help() {
     cat << EOF
-${CYAN}Import Resolver${NC} - Intelligent automatic import path fixing
+${CYAN}Enhanced Import Resolver${NC} - Content-Aware Import Path Fixing
 
-This script analyzes broken imports from import-analysis.md and automatically
-fixes them based on your project structure and TypeScript alias configuration.
+This script analyzes broken imports and automatically fixes them by examining
+the actual exports of candidate files, ensuring logical resolution based on
+what's actually being imported rather than just filename matching.
+
+${YELLOW}Key Features:${NC}
+    • Content-aware matching - analyzes what files export
+    • Detects removed/renamed files - won't force invalid matches
+    • Respects TypeScript alias configuration
+    • Considers directory context and feature boundaries
+    • Comprehensive safety checks and logging
 
 ${YELLOW}Usage:${NC}
     $0                              # Dry run (preview changes)
@@ -661,56 +856,32 @@ ${YELLOW}Environment Variables:${NC}
     DRY_RUN=true|false             Control whether to apply changes (default: true)
     DEBUG=true|false               Enable detailed debug output (default: false)
 
-${YELLOW}Safety Features:${NC}
-    • Dry run mode by default - preview before applying
-    • Automatic backup of all source files before changes
-    • Intelligent path resolution based on project structure
-    • Respects your alias configuration (@client, @server, @shared or @)
-    • Skips external package imports
-    • Comprehensive logging for troubleshooting
+${YELLOW}How It Works:${NC}
+    1. Extracts what each file exports (functions, types, classes)
+    2. Analyzes what the importing file is trying to import
+    3. Matches based on actual content, not just filenames
+    4. Considers directory context and project boundaries
+    5. Warns when files may have been intentionally removed
 
-${YELLOW}Prerequisites:${NC}
-    • docs/import-analysis.md (from import_validator.sh)
-    • docs/project-structure.md (from generate-structure-to-file.sh)
-    • python3 (for path calculations)
-
-${YELLOW}Import Strategy Detection:${NC}
-    The script automatically detects your import strategy:
-    • Multi-codebase: Uses @client, @server, @shared for clear boundaries
-    • Single-alias:   Uses @ for cleaner imports
-    • Standard:       Uses relative paths only
-
-${YELLOW}Examples:${NC}
-    # Preview what would be fixed
-    ./import_resolver.sh
-
-    # Apply fixes with confirmation
-    DRY_RUN=false ./import_resolver.sh
-
-    # Debug mode to see detailed resolution logic
-    DEBUG=true ./import_resolver.sh
-
-    # Restore from backup if needed
-    cp -r backup/imports-TIMESTAMP/* .
-
-${YELLOW}Workflow Integration:${NC}
-    1. Run structure generator:  ./generate-structure-to-file.sh
-    2. Run import validator:     ./import_validator.sh
-    3. Review analysis:          cat docs/import-analysis.md
-    4. Preview fixes:            ./import_resolver.sh
-    5. Apply fixes:              DRY_RUN=false ./import_resolver.sh
-    6. Verify changes:           npm run type-check && npm test
+${YELLOW}Example Scenario:${NC}
+    If you have:
+      - client/utils/formatDate.ts (exports: formatDate, parseDate)
+      - server/utils/formatDate.ts (exports: formatISO, formatSQL)
+    
+    And an import breaks: import { formatDate } from './utils/formatDate'
+    
+    The script will analyze which file actually exports 'formatDate' and
+    resolve to the correct one, rather than just picking the first match.
 
 EOF
 }
 
 main() {
-    # Initialize log file
     : > "$LOG_FILE"
     
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo -e "${CYAN}Import Resolver${NC} - Automatic Import Path Fixing"
+    echo -e "${CYAN}Enhanced Import Resolver${NC} - Content-Aware Import Fixing"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
     
@@ -726,7 +897,6 @@ main() {
     
     echo ""
     
-    # Execute resolution pipeline
     check_prerequisites
     detect_alias_config
     build_file_index
@@ -737,12 +907,10 @@ main() {
     
     generate_summary
     
-    # Copy log file to backup if we made changes
     if [[ "$DRY_RUN" == "false" ]]; then
         cp "$LOG_FILE" "$BACKUP_DIR/resolution.log"
     fi
     
-    # Exit with appropriate status code
     if [[ $FIXES_FAILED -gt 0 ]] || [[ $FIXES_ATTEMPTED -eq 0 ]]; then
         exit 1
     else
@@ -750,11 +918,9 @@ main() {
     fi
 }
 
-# Handle help flag
 if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
     show_help
     exit 0
 fi
 
-# Execute main function
 main

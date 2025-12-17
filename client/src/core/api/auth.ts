@@ -493,6 +493,18 @@ export class AuthApiService {
    * @returns Boolean indicating if tokens are valid
    */
   async validateStoredTokens(): Promise<boolean> {
+    // In development mode, skip server validation and check local storage
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+        logger.debug('Development mode: using local token validation', { hasToken: !!token });
+        return !!token;
+      } catch (error) {
+        logger.debug('Development mode: local token check failed', { error });
+        return false;
+      }
+    }
+
     try {
       const response = await this.apiClient.post<{ valid: boolean }>(
         `${this.authEndpoint}/validate-tokens`,
@@ -502,7 +514,7 @@ export class AuthApiService {
 
       return response.data?.valid ?? false;
     } catch (error) {
-      logger.warn('Token validation failed', { error });
+      logger.debug('Token validation failed (this is expected if backend is not running)', { error });
       return false;
     }
   }

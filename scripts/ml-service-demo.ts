@@ -4,11 +4,12 @@
  * ML Service Migration Demo Script
  * 
  * Demonstrates the ML service migration with feature flags and A/B testing.
+ * NOTE: This is a demo/test file - ML services are now handled via server/features/analytics
  */
 
-import { MLServiceAdapter } from '../ml-adapter.service';
-import { initializeMLFeatureFlag, enableMLServiceRollout, getMLServiceStatus } from '../ml-feature-flag.config';
-import { realMLAnalysisService } from '../real-ml.service';
+// import { MLServiceAdapter } from '../ml-adapter.service';
+// import { initializeMLFeatureFlag, enableMLServiceRollout, getMLServiceStatus } from '../ml-feature-flag.config';
+// import { realMLAnalysisService } from '../real-ml.service';
 
 // Mock logger for demo
 const logger = {

@@ -25,7 +25,7 @@ export async function initializeStrategicDatabase(options: InitOptions = {}): Pr
   try {
     // Step 1: Database Setup
     logger.info('📋 Step 1: Setting up database infrastructure...');
-    const { setupDatabase } = await import('../../setup-a11y');
+    const { setupDatabase } = await import('./setup');
     await setupDatabase({
       environment,
       migrate: !options.skipMigrations,
@@ -36,7 +36,7 @@ export async function initializeStrategicDatabase(options: InitOptions = {}): Pr
 
     // Step 2: Health Check
     logger.info('🏥 Step 2: Running comprehensive health check...');
-    const { runHealthCheck } = await import('../../health-check');
+    const { runHealthCheck } = await import('./health-check');
     const healthReport = await runHealthCheck({
       detailed: true,
       performance: true,

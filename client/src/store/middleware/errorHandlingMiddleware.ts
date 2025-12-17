@@ -1,29 +1,32 @@
 /**
- * Error Handling Middleware for Chanuka Client
+ * Error Handling Middleware for Client
  * 
  * Captures and handles errors from actions and API calls.
  */
 
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, Action } from '@reduxjs/toolkit';
 
 import { logger } from '@client/utils/logger';
 
-export const errorHandlingMiddleware: Middleware = (store) => (next) => (action) => {
+export const errorHandlingMiddleware: Middleware = (store) => (next) => (action: unknown) => {
+  const reduxAction = action as Action & { type: string };
   try {
     return next(action);
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
     logger.error('Action error caught by middleware', {
       component: 'ErrorHandlingMiddleware',
-      action: action.type,
-      error: error.toString()
+      action: reduxAction.type,
+      error: errorMessage
     });
     
     // Dispatch error action
     store.dispatch({
       type: 'error/actionError',
       payload: {
-        action: action.type,
-        error: error.toString(),
+        action: reduxAction.type,
+        error: errorMessage,
         timestamp: new Date().toISOString()
       }
     });

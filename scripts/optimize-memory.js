@@ -3,36 +3,36 @@
 /**
  * Emergency memory optimization script
  * Run this when experiencing high memory usage
+ * Usage: node --expose-gc scripts/optimize-memory.js
  */
 
-import { memoryOptimizer } from '../server/infrastructure/monitoring/memory-optimizer.js';
-import { systemHealthService } from '../server/infrastructure/monitoring/system-health.js';
-
+// Dynamic import for ESM modules
 async function optimizeMemory() {
-  console.log('🔧 Starting emergency memory optimization...');
+  console.log('🔧 Starting memory optimization...');
   
   try {
-    // Get current memory status
-    const beforeStats = await systemHealthService.getSystemMetrics();
-    console.log(`📊 Current memory usage: ${beforeStats.memory.percentage.toFixed(2)}%`);
+    // Get current memory status using built-in Node.js API
+    const memUsage = process.memoryUsage();
+    const heapPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+    console.log(`📊 Current memory usage: ${heapPercent.toFixed(2)}%`);
+    console.log(`   Heap: ${(memUsage.heapUsed / 1024 / 1024).toFixed(2)}MB / ${(memUsage.heapTotal / 1024 / 1024).toFixed(2)}MB`);
     
-    // Check if optimization is needed
-    if (memoryOptimizer.shouldOptimize()) {
-      console.log('⚠️  High memory usage detected, running optimization...');
+    // Attempt garbage collection if available
+    if (global.gc) {
+      console.log('⚠️  Running garbage collection...');
+      global.gc();
       
-      const result = await memoryOptimizer.optimizeMemory();
+      const afterGC = process.memoryUsage();
+      const freedMemory = (memUsage.heapUsed - afterGC.heapUsed) / 1024 / 1024;
+      const afterPercent = (afterGC.heapUsed / afterGC.heapTotal) * 100;
       
-      console.log('✅ Memory optimization completed!');
-      console.log(`📉 Memory freed: ${(result.memoryFreed / 1024 / 1024).toFixed(2)}MB`);
-      console.log(`🔧 Optimizations applied: ${result.optimizationsApplied.length}`);
-      result.optimizationsApplied.forEach(opt => console.log(`   - ${opt}`));
-      
-      // Get updated stats
-      const afterStats = await systemHealthService.getSystemMetrics();
-      console.log(`📊 New memory usage: ${afterStats.memory.percentage.toFixed(2)}%`);
-      
+      console.log('✅ Garbage collection completed!');
+      console.log(`📉 Memory freed: ${freedMemory.toFixed(2)}MB`);
+      console.log(`📊 New memory usage: ${afterPercent.toFixed(2)}%`);
+      console.log(`   Heap: ${(afterGC.heapUsed / 1024 / 1024).toFixed(2)}MB / ${(afterGC.heapTotal / 1024 / 1024).toFixed(2)}MB`);
     } else {
-      console.log('✅ Memory usage is within acceptable limits');
+      console.log('⚠️  Garbage collection not available');
+      console.log('💡 To enable GC, run with: node --expose-gc scripts/optimize-memory.js');
     }
     
   } catch (error) {

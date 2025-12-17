@@ -1,19 +1,20 @@
 /**
- * API Middleware for Chanuka Client
+ * API Middleware for Client
  * 
  * Handles API requests, caching, error handling, and retry logic.
  */
 
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, Action } from '@reduxjs/toolkit';
 
 import { logger } from '@client/utils/logger';
 
-export const apiMiddleware: Middleware = (store) => (next) => (action) => {
+export const apiMiddleware: Middleware = (_store) => (next) => (action: unknown) => {
+  const reduxAction = action as Action & { type: string };
   // Handle API-related actions
-  if (action.type?.startsWith('api/')) {
+  if (reduxAction.type?.startsWith('api/')) {
     logger.debug('API action dispatched', { 
       component: 'ApiMiddleware',
-      action: action.type
+      action: reduxAction.type
     });
   }
 

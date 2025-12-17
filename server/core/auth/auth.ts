@@ -4,7 +4,7 @@ import { authService } from "@server/core/auth/auth-service.ts";
 import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized  } from '@shared/core/utils/api-utils.js';
 import { ErrorCodes, HttpStatus, ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from '@server/middleware/rate-limiter.js';
-import { errorTracker } from '@shared/errors/error-tracker.js';
+import { errorTracker } from '@server/errors/error-tracker.js';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 
 export const router: Router = Router();

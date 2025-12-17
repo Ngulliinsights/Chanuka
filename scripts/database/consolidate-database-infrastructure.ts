@@ -38,7 +38,6 @@ class DatabaseConsolidator {
     console.log('🔄 Starting Database Infrastructure Consolidation...\n');
 
     try {
-      // Phase 1: Audit current state
       await this.auditCurrentUsage();
       
       // Phase 2: Identify redundancies

@@ -67,3 +67,13 @@ export { Ok, Err, ok, err, some, none } from './primitives/types';
 export type { BaseError } from './observability/error-management/errors/base-error';
 export type { ValidationError, NetworkError } from './observability/error-management/errors/specialized-errors';
 export type { ApiResponse, ApiError, ErrorResponse } from './utils/api-utils';
+
+// ============================================================================
+// Additional Exports - Added by Phase 1 fix
+// ============================================================================
+
+// Cache Utilities
+export { getDefaultCache, createCache } from './caching/cache-manager';
+
+// Observability Stack
+export { createObservabilityStack } from './observability/observability-stack';

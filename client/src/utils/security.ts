@@ -1089,11 +1089,32 @@ export class SecurityMonitor {
    * Implements various heuristics to identify potential security threats
    */
   private analyzeForSuspiciousActivity(event: SecurityEvent): void {
-    // Alert on high-risk individual events
-    if (event.riskScore >= 7) {
+    // In development mode, be less aggressive with alerts
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    // Skip certain event types in development that are expected
+    if (isDevelopment) {
+      const developmentIgnoreEvents = [
+        'csp_violation', // CSP violations are common in development with hot reload
+        'unhandled_rejection', // Vite hot reload can cause these
+        'network_error' // Development server connectivity issues
+      ];
+      
+      if (developmentIgnoreEvents.includes(event.eventType)) {
+        logger.debug('Ignoring development-expected security event', { 
+          eventType: event.eventType,
+          riskScore: event.riskScore 
+        });
+        return;
+      }
+    }
+
+    // Alert on high-risk individual events (higher threshold in development)
+    const alertThreshold = isDevelopment ? 9 : 7;
+    if (event.riskScore >= alertThreshold) {
       this.createAlert({
         alertType: 'high_risk_event',
-        severity: 'high',
+        severity: isDevelopment ? 'medium' : 'high',
         userId: event.userId,
         description: `High risk security event detected: ${event.eventType}`,
         metadata: event.details,
@@ -1176,11 +1197,20 @@ export class SecurityMonitor {
 
     this.alerts.push(fullAlert);
     
-    logger.warn('Security alert created', { 
-      alertType: fullAlert.alertType,
-      severity: fullAlert.severity,
-      description: fullAlert.description
-    });
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    if (isDevelopment) {
+      logger.debug('Security alert created (development mode)', { 
+        alertType: fullAlert.alertType,
+        severity: fullAlert.severity,
+        description: fullAlert.description
+      });
+    } else {
+      logger.warn('Security alert created', { 
+        alertType: fullAlert.alertType,
+        severity: fullAlert.severity,
+        description: fullAlert.description
+      });
+    }
 
     // In production, this could trigger webhooks, email notifications, etc.
     this.handleAlert(fullAlert);
@@ -1191,22 +1221,36 @@ export class SecurityMonitor {
    * This is where you'd implement automatic responses to threats
    */
   private handleAlert(alert: SuspiciousActivityAlert): void {
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
     switch (alert.severity) {
       case 'critical':
         // In production: immediately notify security team, possibly auto-block
-        logger.error('CRITICAL SECURITY ALERT', { alert });
+        if (isDevelopment) {
+          logger.debug('CRITICAL SECURITY ALERT (development mode)', { alert });
+        } else {
+          logger.error('CRITICAL SECURITY ALERT', { alert });
+        }
         break;
       case 'high':
         // In production: notify security team, flag for review
-        logger.warn('High severity security alert', { alert });
+        if (isDevelopment) {
+          logger.debug('High severity security alert (development mode)', { alert });
+        } else {
+          logger.warn('High severity security alert', { alert });
+        }
         break;
       case 'medium':
         // In production: log and monitor, notify if pattern continues
-        logger.warn('Medium severity security alert', { alert });
+        if (isDevelopment) {
+          logger.debug('Medium severity security alert (development mode)', { alert });
+        } else {
+          logger.warn('Medium severity security alert', { alert });
+        }
         break;
       case 'low':
         // In production: log for analysis
-        logger.info('Low severity security alert', { alert });
+        logger.debug('Low severity security alert', { alert });
         break;
     }
   }

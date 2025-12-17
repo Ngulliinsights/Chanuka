@@ -45,17 +45,20 @@ export class CSRFProtection {
     try {
       // Generate initial token
       await this.refreshToken();
-      
+
       // Set up automatic token refresh
       this.setupTokenRefresh();
-      
+
       // Intercept forms and AJAX requests
       this.setupRequestInterception();
-      
+
       // Set up token validation
       this.setupTokenValidation();
 
-      logger.info('CSRF Protection initialized successfully');
+      logger.info('CSRF Protection initialized successfully', {
+        component: 'CSRFProtection',
+        mode: process.env.NODE_ENV === 'development' ? 'development' : 'production'
+      });
     } catch (error) {
       // Properly handle the unknown error type by converting to an Error object
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -64,6 +67,12 @@ export class CSRFProtection {
         error: errorMessage,
         stack: error instanceof Error ? error.stack : undefined
       });
+
+      // In development mode, don't throw - just continue with client-side token
+      if (process.env.NODE_ENV === 'development') {
+        logger.warn('Continuing with client-side CSRF protection in development mode');
+        return;
+      }
       throw error;
     }
   }
@@ -72,7 +81,7 @@ export class CSRFProtection {
     try {
       // Try to get token from server first
       const serverToken = await this.fetchTokenFromServer();
-      
+
       if (serverToken) {
         this.currentToken = serverToken;
       } else {
@@ -82,10 +91,10 @@ export class CSRFProtection {
 
       // Set expiry time
       this.tokenExpiry = new Date(Date.now() + (this.config.refreshInterval || 30 * 60 * 1000));
-      
+
       // Store token in various places for access
       this.storeToken(this.currentToken);
-      
+
       logger.debug('CSRF token refreshed', {
         component: 'CSRFProtection',
         tokenPreview: this.currentToken.substring(0, 8) + '...',
@@ -98,6 +107,15 @@ export class CSRFProtection {
         error: errorMessage,
         stack: error instanceof Error ? error.stack : undefined
       });
+
+      // In development mode, generate a fallback token instead of throwing
+      if (process.env.NODE_ENV === 'development') {
+        logger.warn('Using fallback token generation in development mode');
+        this.currentToken = this.generateToken();
+        this.tokenExpiry = new Date(Date.now() + (this.config.refreshInterval || 30 * 60 * 1000));
+        this.storeToken(this.currentToken);
+        return;
+      }
       throw error;
     }
   }
@@ -121,19 +139,21 @@ export class CSRFProtection {
       if (response.ok) {
         const data = await response.json();
         return data.token;
-      } else if (response.status === 404) {
-        // Server doesn't have CSRF endpoint, generate client-side token
-        logger.debug('CSRF endpoint not available, using client-side token generation');
+      } else if (response.status === 404 || response.status === 500) {
+        // Server doesn't have CSRF endpoint or is failing, generate client-side token
+        logger.debug('CSRF endpoint not available or failing, using client-side token generation');
         return this.generateToken();
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      logger.warn('Failed to fetch CSRF token from server, using client-side generation', {
+      logger.debug('Failed to fetch CSRF token from server, using client-side generation', {
         component: 'CSRFProtection',
         error: errorMessage
       });
     }
-    return null;
+
+    // Always fallback to client-side generation
+    return this.generateToken();
   }
 
   private generateToken(): string {
@@ -189,31 +209,31 @@ export class CSRFProtection {
   private setupRequestInterception(): void {
     // Intercept fetch requests
     this.interceptFetch();
-    
+
     // Intercept XMLHttpRequest
     this.interceptXHR();
-    
+
     // Intercept form submissions
     this.interceptForms();
   }
 
   private interceptFetch(): void {
     const originalFetch = window.fetch;
-    
+
     // Use arrow function to preserve 'this' binding
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
       // Convert input to URL string to avoid Request reuse issues
-      const url = typeof input === 'string' ? input : 
-                  input instanceof URL ? input.toString() : 
-                  input.url;
-      
+      const url = typeof input === 'string' ? input :
+        input instanceof URL ? input.toString() :
+          input.url;
+
       // Create fresh init object to avoid modifying original
       const freshInit: RequestInit = {
         method: 'GET',
         ...init,
         headers: new Headers(init?.headers || {})
       };
-      
+
       // Only add CSRF token to same-origin requests that need protection
       const tempRequest = new Request(url, { method: freshInit.method || 'GET' });
       if (this.shouldAddToken(tempRequest)) {
@@ -222,15 +242,15 @@ export class CSRFProtection {
           (freshInit.headers as Headers).set(this.config.headerName, token);
         }
       }
-      
+
       // Make the request with fresh objects
       const response = await originalFetch(url, freshInit);
-      
+
       // Check for CSRF validation errors
       if (response.status === 403 && response.headers.get('X-CSRF-Error')) {
         this.handleCSRFError(tempRequest);
       }
-      
+
       return response;
     };
   }
@@ -240,9 +260,9 @@ export class CSRFProtection {
     const originalSend = XMLHttpRequest.prototype.send;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    
+
     // Override the open method to capture request details
-    XMLHttpRequest.prototype.open = function(
+    XMLHttpRequest.prototype.open = function (
       this: ExtendedXMLHttpRequest,
       method: string,
       url: string | URL,
@@ -253,7 +273,7 @@ export class CSRFProtection {
       // Store method and URL on the XHR instance for later use
       this._csrfMethod = method;
       this._csrfUrl = url.toString();
-      
+
       // Call the original open method with proper typing
       if (username !== undefined) {
         originalOpen.call(this, method, url, async, username, password ?? undefined);
@@ -261,16 +281,16 @@ export class CSRFProtection {
         originalOpen.call(this, method, url, async);
       }
     };
-    
+
     // Override the send method to add CSRF token
-    XMLHttpRequest.prototype.send = function(
+    XMLHttpRequest.prototype.send = function (
       this: ExtendedXMLHttpRequest,
       body?: Document | XMLHttpRequestBodyInit | null
     ): void {
       // Check if we have the necessary information and should add token
       if (this._csrfMethod && this._csrfUrl) {
         const request = new Request(this._csrfUrl, { method: this._csrfMethod });
-        
+
         if (self.shouldAddToken(request)) {
           const token = self.getToken();
           if (token) {
@@ -278,7 +298,7 @@ export class CSRFProtection {
           }
         }
       }
-      
+
       // Call the original send method
       originalSend.call(this, body);
     };
@@ -299,10 +319,10 @@ export class CSRFProtection {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node as Element;
-            const forms = element.tagName === 'FORM' 
+            const forms = element.tagName === 'FORM'
               ? [element as HTMLFormElement]
               : Array.from(element.querySelectorAll('form'));
-            
+
             forms.forEach(form => {
               if (this.shouldProtectForm(form)) {
                 this.addTokenToForm(form);
@@ -350,14 +370,14 @@ export class CSRFProtection {
 
     // Check if token field already exists
     let tokenField = form.querySelector(`input[name="${this.config.tokenName}"]`) as HTMLInputElement;
-    
+
     if (!tokenField) {
       tokenField = document.createElement('input');
       tokenField.type = 'hidden';
       tokenField.name = this.config.tokenName;
       form.appendChild(tokenField);
     }
-    
+
     tokenField.value = token;
   }
 
@@ -446,7 +466,7 @@ export class CSRFProtection {
   getTokenForRequest(): { name: string; value: string } | null {
     const token = this.getToken();
     if (!token) return null;
-    
+
     return {
       name: this.config.headerName,
       value: token
@@ -461,7 +481,7 @@ export class CSRFProtection {
       clearInterval(this.refreshTimer);
       this.refreshTimer = null;
     }
-    
+
     if (this.mutationObserver) {
       this.mutationObserver.disconnect();
       this.mutationObserver = null;
@@ -473,11 +493,11 @@ export class CSRFProtection {
    */
   getTokenMetadata(): { hasToken: boolean; isExpired: boolean; expiresIn: number } | null {
     if (!this.currentToken) return null;
-    
+
     const now = Date.now();
     const isExpired = this.tokenExpiry ? now > this.tokenExpiry.getTime() : false;
     const expiresIn = this.tokenExpiry ? Math.max(0, this.tokenExpiry.getTime() - now) : 0;
-    
+
     return {
       hasToken: true,
       isExpired,

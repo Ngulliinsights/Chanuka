@@ -13,7 +13,7 @@ import cors from 'cors';
 import { createServer, Server } from 'http';
 import helmet from 'helmet';
 import { pool } from '@shared/database';
-import { config } from '../config.d';
+// config.d is not needed at runtime
 
 // Feature Routes
 import { router as systemRouter } from '@server/features/admin/system';
@@ -28,13 +28,11 @@ import { router as authRouter } from '@server/core/auth/auth';
 import { router as usersRouter } from '@server/features/users/application/profile';
 import { router as verificationRouter } from '@server/features/users/application/verification';
 import { router as communityRouter } from '@server/features/community/community';
-import { notificationRoutes as notificationsRouter } from '../client/src/core/api/notifications';
+// import { notificationRoutes as notificationsRouter } from '../client/src/core/api/notifications';
+// Notifications handled via features
 import { router as searchRouter } from '@server/features/search/presentation/SearchController';
 import { router as privacyRouter } from '@server/features/privacy/privacy-routes';
 import { router as adminRouter } from '@server/features/admin/admin';
-import { router as cacheRouter } from '../cache-compressor';
-import { cacheCoordinator } from '../cache-compressor';
-import { router as externalApiManagementRouter } from '../external-api-management';
 import { router as externalApiDashboardRouter } from '@server/features/admin/external-api-dashboard';
 import coverageRouter from '@server/features/coverage/coverage-routes';
 import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/presentation/constitutional-analysis-router';
@@ -42,26 +40,25 @@ import { argumentIntelligenceRouter } from '@server/features/argument-intelligen
 import { router as recommendationRouter } from '@server/features/recommendation/presentation/RecommendationController';
 
 // Middleware imports
-import { migratedApiRateLimit } from '../migration-wrapper';
+import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
 import { enhancedSecurityService } from '@server/features/security/enhanced-security-service';
 import { SecuritySchemas, createValidationMiddleware } from '@server/core/validation/security-schemas';
-import { commandInjectionPrevention, fileUploadSecurity, securityRateLimit } from '../command-injection-prevention';
+import { commandInjectionPrevention, fileUploadSecurity } from '@server/middleware/command-injection-prevention';
 
 // Infrastructure Services
-import { auditMiddleware } from '../audit-log';
-// Fixed: Import the correct export (performanceMonitor, not performanceMiddleware)
-import { performanceMonitor } from '../performance-monitor';
+import { auditMiddleware } from '@server/infrastructure/monitoring/audit-log';
+import { performanceMonitor } from '@server/infrastructure/monitoring';
 
 // Create performance middleware from performanceMonitor
 const performanceMiddleware = (req: any, res: any, next: any) => {
-  const operationId = performanceMonitor.startOperation('http', `${req.method} ${req.path}`, {
+  const operationId = performanceMonitor.startOperation?.('http', `${req.method} ${req.path}`, {
     method: req.method,
     path: req.path,
     userAgent: req.get('User-Agent')
   });
 
   res.on('finish', () => {
-    performanceMonitor.endOperation(operationId, res.statusCode < 400, undefined, {
+    performanceMonitor.endOperation?.(operationId, res.statusCode < 400, undefined, {
       statusCode: res.statusCode,
       responseTime: Date.now() - req.startTime
     });
@@ -69,11 +66,7 @@ const performanceMiddleware = (req: any, res: any, next: any) => {
 
   next();
 };
-import { setupVite } from '../client/src/vite-env.d';
-import { databaseFallbackService } from "../database-fallback";
-import { webSocketService } from '../WebSocketIntegrationExample';
-import { notificationSchedulerService } from '../client/src/core/api/notifications';
-import { monitoringScheduler } from '../monitoring-scheduler';
+import { databaseFallbackService } from '@server/infrastructure/database/database-fallback';
 import { sessionCleanupService } from '@server/core/auth/session-cleanup';
 import { securityMonitoringService } from '@server/features/security/security-monitoring-service';
 import { privacySchedulerService } from '@server/features/privacy/privacy-scheduler';

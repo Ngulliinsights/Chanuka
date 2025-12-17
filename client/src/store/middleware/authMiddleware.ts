@@ -3,13 +3,14 @@
  * Handles authentication state changes, token refresh, and security monitoring
  */
 
-import { Middleware, Dispatch } from '@reduxjs/toolkit';
+import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 
 import { authApiService as authService } from '@client/core/api';
+import { tokenManager } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 import { rbacManager } from '@client/utils/rbac';
 import { securityMonitor } from '@client/utils/security';
-import { tokenManager } from '@client/core/auth';
+import { tokenRefreshDeduplicator } from '@client/utils/request-deduplicator';
 
 import { logout, clearError } from '../slices/authSlice';
 import { setCurrentSession, recordActivity } from '../slices/sessionSlice';
@@ -57,11 +58,15 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
     if (typeof action === 'object' && action !== null && 'type' in action && typeof action.type === 'string') {
       switch (action.type) {
         case 'auth/login/fulfilled':
-          handleLoginSuccess((action as any).payload as LoginFulfilledPayload, finalConfig, store.dispatch);
+          if ('payload' in action) {
+            handleLoginSuccess(action.payload as LoginFulfilledPayload, finalConfig, store.dispatch);
+          }
           break;
 
         case 'auth/login/rejected':
-          handleLoginFailure((action as any).error as LoginRejectedPayload, finalConfig);
+          if ('error' in action) {
+            handleLoginFailure(action.error as LoginRejectedPayload, finalConfig);
+          }
           break;
 
         case 'auth/logout/fulfilled':
@@ -69,7 +74,9 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
           break;
 
         case 'auth/setUser':
-          handleUserUpdate((action as any).payload as UserUpdatePayload, finalConfig);
+          if ('payload' in action) {
+            handleUserUpdate(action.payload as UserUpdatePayload, finalConfig);
+          }
           break;
 
         // Monitor for actions that require authentication
@@ -82,7 +89,7 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
             });
 
             // Dispatch logout to clear any stale state
-            store.dispatch(logout() as any);
+            store.dispatch(logout() as unknown as UnknownAction);
           }
           break;
       }
@@ -246,47 +253,49 @@ function checkTokenRefresh(
 }
 
 /**
- * Perform token refresh
+ * Perform token refresh with deduplication to prevent race conditions
  */
 async function performTokenRefresh(store: { dispatch: Dispatch }): Promise<void> {
-  try {
-    logger.debug('Attempting token refresh', { component: 'AuthMiddleware' });
+  return tokenRefreshDeduplicator.deduplicate('token-refresh', async () => {
+    try {
+      logger.debug('Attempting token refresh', { component: 'AuthMiddleware' });
 
-    const authTokens = await authService.refreshTokens();
+      const authTokens = await authService.instance.refreshTokens();
 
-    if (authTokens && authTokens.accessToken) {
-      // Convert AuthTokens to JWTTokens format for tokenManager
-      const jwtTokens = {
-        accessToken: authTokens.accessToken,
-        refreshToken: authTokens.refreshToken,
-        expiresAt: new Date(Date.now() + (authTokens.expiresIn * 1000)),
-        tokenType: authTokens.tokenType
-      };
+      if (authTokens && authTokens.accessToken) {
+        // Convert AuthTokens to JWTTokens format for tokenManager
+        const jwtTokens = {
+          accessToken: authTokens.accessToken,
+          refreshToken: authTokens.refreshToken,
+          expiresAt: new Date(Date.now() + (30 * 60 * 1000)), // Default 30 minutes
+          tokenType: authTokens.tokenType || 'Bearer'
+        };
 
-      tokenManager.storeTokens(jwtTokens);
+        tokenManager.storeTokens(jwtTokens);
 
-      // Clear any auth errors
-      store.dispatch(clearError());
+        // Clear any auth errors
+        store.dispatch(clearError());
 
-      logger.info('Token refreshed successfully', {
-        component: 'AuthMiddleware'
-      });
+        logger.info('Token refreshed successfully', {
+          component: 'AuthMiddleware'
+        });
 
-    } else {
-      logger.warn('Token refresh failed, logging out user', {
-        component: 'AuthMiddleware'
-      });
+      } else {
+        logger.warn('Token refresh failed, logging out user', {
+          component: 'AuthMiddleware'
+        });
 
-      // Token refresh failed, logout user
-      store.dispatch(logout() as any);
+        // Token refresh failed, logout user
+        store.dispatch(logout() as unknown as UnknownAction);
+      }
+
+    } catch (error) {
+      logger.error('Token refresh error:', { component: 'AuthMiddleware' }, error);
+
+      // On error, logout user for security
+      store.dispatch(logout() as unknown as UnknownAction);
     }
-
-  } catch (error) {
-    logger.error('Token refresh error:', { component: 'AuthMiddleware' }, error);
-
-    // On error, logout user for security
-    store.dispatch(logout() as any);
-  }
+  });
 }
 
 /**

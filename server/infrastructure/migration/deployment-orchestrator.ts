@@ -4,7 +4,7 @@ import {
   ValidationResult,
   StatisticalAnalysisResult,
   CrossPhaseValidationResult
-} from './repository-deployment-validator.js';
+} from './repository-deployment-validator';
 import { logger } from '@/shared/core';
 import {
   AsyncServiceResult,

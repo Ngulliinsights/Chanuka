@@ -6,6 +6,9 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+// Type for modal data - can be extended as needed
+type ModalData = Record<string, unknown> | null;
+
 interface UIState {
   // Theme and appearance
   theme: 'light' | 'dark' | 'system';
@@ -17,7 +20,7 @@ interface UIState {
 
   // Modals and overlays
   activeModal: string | null;
-  modalData: any;
+  modalData: ModalData;
 
   // Loading states - DEPRECATED: Use @core/loading instead
   globalLoading: boolean;
@@ -91,7 +94,7 @@ const uiSlice = createSlice({
     },
 
     // Modal management
-    openModal: (state, action: PayloadAction<{ modalId: string; data?: any }>) => {
+    openModal: (state, action: PayloadAction<{ modalId: string; data?: ModalData }>) => {
       state.activeModal = action.payload.modalId;
       state.modalData = action.payload.data;
     },

@@ -203,6 +203,22 @@ jobs:
           # Add production deployment commands here
           echo "✅ Production deployment completed"
 
+      - name: Functional validation (staging)
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          echo "🔍 Running functional validation on staging..."
+          cd ..
+          BASE_URL=${{ secrets.STAGING_URL || 'https://staging.chanuka.app' }} npm run validate:functional
+          echo "✅ Staging functional validation completed"
+
+      - name: Functional validation (production)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "🔍 Running functional validation on production..."
+          cd ..
+          BASE_URL=${{ secrets.PROD_URL || 'https://chanuka.app' }} npm run validate:functional
+          echo "✅ Production functional validation completed"
+
       - name: Notify deployment status
         uses: 8398a7/action-slack@v3
         if: always()

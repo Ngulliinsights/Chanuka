@@ -203,5 +203,18 @@ module.exports = {
         "stylelint/no-style-component": "off",
       },
     },
+    {
+      files: ["*.js"],
+      parser: "espree",
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: "module",
+        project: null,
+      },
+      rules: {
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+      },
+    },
   ],
 };

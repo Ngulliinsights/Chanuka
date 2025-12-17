@@ -15,12 +15,10 @@ import {
   ErrorPattern,
   RecoveryAnalytics,
   RealTimeMetrics,
-  errorAnalyticsRepository
+  errorAnalyticsRepository,
+  Alert,
+  ErrorEntry
 } from '../../services';
-
-interface Alert {
-  id: string;
-}
 
 interface ErrorAnalyticsState {
   // Data states
@@ -70,29 +68,33 @@ const initialState: ErrorAnalyticsState = {
 // Async thunks for data fetching
 export const fetchOverviewMetrics = createAsyncThunk(
   'errorAnalytics/fetchOverviewMetrics',
-  async (filters: DashboardFilters) => {
-    return await errorAnalyticsRepository.getOverviewMetrics(filters);
+  async (_filters: DashboardFilters) => {
+    // Note: Repository doesn't use filters yet, but we keep the interface for future enhancement
+    return await errorAnalyticsRepository.getOverviewMetrics(_filters);
   }
 );
 
 export const fetchTrendData = createAsyncThunk(
   'errorAnalytics/fetchTrendData',
-  async ({ period, filters }: { period: string; filters: DashboardFilters }) => {
-    return await errorAnalyticsRepository.getTrendData(period, filters);
+  async ({ period: _period, filters: _filters }: { period: string; filters: DashboardFilters }) => {
+    // Note: Repository doesn't use period/filters yet, but we keep the interface for future enhancement
+    return await errorAnalyticsRepository.getTrendData({ period: _period, filters: _filters });
   }
 );
 
 export const fetchPatterns = createAsyncThunk(
   'errorAnalytics/fetchPatterns',
-  async (filters: DashboardFilters) => {
-    return await errorAnalyticsRepository.getPatterns(filters);
+  async (_filters: DashboardFilters) => {
+    // Note: Repository doesn't use filters yet, but we keep the interface for future enhancement
+    return await errorAnalyticsRepository.getPatterns(_filters);
   }
 );
 
 export const fetchRecoveryAnalytics = createAsyncThunk(
   'errorAnalytics/fetchRecoveryAnalytics',
-  async (filters: DashboardFilters) => {
-    return await errorAnalyticsRepository.getRecoveryAnalytics(filters);
+  async (_filters: DashboardFilters) => {
+    // Note: Repository doesn't use filters yet, but we keep the interface for future enhancement
+    return await errorAnalyticsRepository.getRecoveryAnalytics(_filters);
   }
 );
 
@@ -157,7 +159,7 @@ const errorAnalyticsSlice = createSlice({
       state.lastRefresh = Date.now();
     },
 
-    addRealTimeError: (state, action: PayloadAction<any>) => {
+    addRealTimeError: (state, action: PayloadAction<ErrorEntry>) => {
       if (state.realTimeMetrics) {
         // Add to live stream, keeping only last 20
         state.realTimeMetrics.liveStream = [
@@ -175,7 +177,7 @@ const errorAnalyticsSlice = createSlice({
       if (state.realTimeMetrics) {
         state.realTimeMetrics.activeAlerts = [
           action.payload,
-          ...state.realTimeMetrics.activeAlerts.filter((alert: any) => alert.id !== action.payload.id)
+          ...state.realTimeMetrics.activeAlerts.filter((alert) => alert.id !== action.payload.id)
         ].slice(0, 10); // Keep only last 10 alerts
       }
     },
@@ -289,19 +291,24 @@ export const {
   clearData,
 } = errorAnalyticsSlice.actions;
 
+// Root state interface for selectors
+interface RootState {
+  errorAnalytics: ErrorAnalyticsState;
+}
+
 // Export selectors
-export const selectOverviewMetrics = (state: any) => state.errorAnalytics.overviewMetrics;
-export const selectTrendData = (state: any) => state.errorAnalytics.trendData;
-export const selectPatterns = (state: any) => state.errorAnalytics.patterns;
-export const selectRecoveryAnalytics = (state: any) => state.errorAnalytics.recoveryAnalytics;
-export const selectRealTimeMetrics = (state: any) => state.errorAnalytics.realTimeMetrics;
-export const selectFilters = (state: any) => state.errorAnalytics.filters;
-export const selectActiveTab = (state: any) => state.errorAnalytics.activeTab;
-export const selectIsLoading = (state: any) => state.errorAnalytics.isLoading;
-export const selectError = (state: any) => state.errorAnalytics.error;
-export const selectLastRefresh = (state: any) => state.errorAnalytics.lastRefresh;
-export const selectIsRealTimeEnabled = (state: any) => state.errorAnalytics.isRealTimeEnabled;
-export const selectConnectionStatus = (state: any) => state.errorAnalytics.connectionStatus;
+export const selectOverviewMetrics = (state: RootState) => state.errorAnalytics.overviewMetrics;
+export const selectTrendData = (state: RootState) => state.errorAnalytics.trendData;
+export const selectPatterns = (state: RootState) => state.errorAnalytics.patterns;
+export const selectRecoveryAnalytics = (state: RootState) => state.errorAnalytics.recoveryAnalytics;
+export const selectRealTimeMetrics = (state: RootState) => state.errorAnalytics.realTimeMetrics;
+export const selectFilters = (state: RootState) => state.errorAnalytics.filters;
+export const selectActiveTab = (state: RootState) => state.errorAnalytics.activeTab;
+export const selectIsLoading = (state: RootState) => state.errorAnalytics.isLoading;
+export const selectError = (state: RootState) => state.errorAnalytics.error;
+export const selectLastRefresh = (state: RootState) => state.errorAnalytics.lastRefresh;
+export const selectIsRealTimeEnabled = (state: RootState) => state.errorAnalytics.isRealTimeEnabled;
+export const selectConnectionStatus = (state: RootState) => state.errorAnalytics.connectionStatus;
 
 // Export reducer
 export default errorAnalyticsSlice.reducer;

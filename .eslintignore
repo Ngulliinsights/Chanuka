@@ -1,0 +1,25 @@
+# Build outputs
+dist/
+build/
+coverage/
+node_modules/
+
+# Generated files
+*.d.ts
+
+# Functional validator (JavaScript file, not TypeScript)
+functional_validator.js
+
+# Import validation utility
+validate_imports.js
+
+# Export validator (utility script)
+validator.mjs
+verify-exports.js
+
+# Shell scripts (not JavaScript/TypeScript)
+*.sh
+
+# Other JavaScript files that don't need TypeScript linting
+*.config.js
+*.config.cjs

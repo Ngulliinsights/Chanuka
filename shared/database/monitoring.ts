@@ -1,4 +1,4 @@
-import { monitorPoolHealth } from '../../pool';
+import { monitorPoolHealth } from './pool';
 import { logger } from '../core/src/observability/logging';
 
 // Performance monitoring is optional and loaded dynamically

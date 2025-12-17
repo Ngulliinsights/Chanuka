@@ -4,13 +4,13 @@ import {
   ValidationResult,
   StatisticalAnalysisResult,
   CrossPhaseValidationResult
-} from './repository-deployment-validator.js';
+} from './repository-deployment-validator';
 import { 
   DeploymentOrchestrator, 
   createDeploymentOrchestrator,
   DeploymentPlan,
   DeploymentStatus
-} from './deployment-orchestrator.js';
+} from './deployment-orchestrator';
 import { logger } from '@/shared/core';
 import {
   AsyncServiceResult,

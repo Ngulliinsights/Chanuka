@@ -32,6 +32,11 @@
     "iemobile",
     "Mbps",
     "longtask",
-    "exceedance"
+    "exceedance",
+    "upvotes",
+    "downvotes",
+    "requestfailed",
+    "networkidle",
+    "playwright"
   ]
 }

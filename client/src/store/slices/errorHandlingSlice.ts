@@ -24,7 +24,7 @@ export interface ErrorDetails {
   timestamp: number;
   userId?: string;
   sessionId?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   stackTrace?: string;
   userAgent?: string;
   url?: string;
@@ -347,7 +347,7 @@ const errorHandlingSlice = createSlice({
       .addCase(reportError.fulfilled, (state, action) => {
         errorHandlingSlice.caseReducers.addError(state, { payload: action.payload, type: 'addError' });
       })
-      .addCase(reportError.rejected, (state, action) => {
+      .addCase(reportError.rejected, (_state, action) => {
         logger.error('Failed to report error', { error: action.payload });
       });
 
@@ -374,7 +374,7 @@ const errorHandlingSlice = createSlice({
           logger.warn('Error recovery failed', { errorId });
         }
       })
-      .addCase(attemptRecovery.rejected, (state, action) => {
+      .addCase(attemptRecovery.rejected, (_state, action) => {
         logger.error('Recovery attempt failed', { error: action.payload });
       });
 

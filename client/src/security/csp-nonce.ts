@@ -69,17 +69,24 @@ export class CSPNonceManager {
    */
   public generateCSPHeader(): string {
     const nonce = this.getCurrentNonce();
+    const isDevelopment = process.env.NODE_ENV === 'development';
     
     const directives = {
       'default-src': ["'self'"],
-      'script-src': [
+      'script-src': isDevelopment ? [
+        "'self'",
+        `'nonce-${nonce}'`,
+        "'unsafe-eval'", // Required for Vite hot reload
+        "localhost:*",
+        "127.0.0.1:*"
+      ] : [
         "'self'",
         `'nonce-${nonce}'`,
         "'strict-dynamic'"
       ],
       'style-src': [
         "'self'",
-        "'unsafe-inline'", // Required for CSS-in-JS libraries
+        "'unsafe-inline'", // Required for CSS-in-JS libraries and development
         "https://fonts.googleapis.com"
       ],
       'font-src': [
@@ -92,7 +99,16 @@ export class CSPNonceManager {
         "https:",
         "blob:"
       ],
-      'connect-src': [
+      'connect-src': isDevelopment ? [
+        "'self'",
+        "ws:",
+        "wss:",
+        "ws://localhost:*",
+        "ws://127.0.0.1:*",
+        "http://localhost:*",
+        "http://127.0.0.1:*",
+        "https://api.chanuka.ke"
+      ] : [
         "'self'",
         "ws:",
         "wss:",

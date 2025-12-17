@@ -50,13 +50,15 @@ export class SecurityService {
   private threatCallbacks: ((threat: SecurityThreat) => void)[] = [];
 
   private constructor(config: Partial<SecurityConfig> = {}) {
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
     this.config = {
-      enableCSP: true,
+      enableCSP: !isDevelopment, // Disable CSP in development to avoid Vite conflicts
       enableCSRF: true,
-      enableRateLimit: true,
+      enableRateLimit: !isDevelopment, // Disable rate limiting in development
       enableVulnerabilityScanning: true,
       enableInputSanitization: true,
-      scanInterval: 300000, // 5 minutes
+      scanInterval: isDevelopment ? 600000 : 300000, // 10 minutes in dev, 5 minutes in prod
       ...config
     };
 
@@ -77,33 +79,46 @@ export class SecurityService {
    * Initialize security service
    */
   private async initialize(): Promise<void> {
-    console.log('🔒 Initializing Chanuka Security Service...');
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    console.log(`🔒 Initializing Security Service (${isDevelopment ? 'Development' : 'Production'} mode)...`);
 
-    // Initialize CSP if enabled
-    if (this.config.enableCSP) {
-      this.initializeCSP();
+    try {
+      // Initialize CSP if enabled
+      if (this.config.enableCSP) {
+        this.initializeCSP();
+      }
+
+      // Initialize CSRF protection if enabled
+      if (this.config.enableCSRF) {
+        await this.initializeCSRF();
+      }
+
+      // Initialize rate limiter if enabled
+      if (this.config.enableRateLimit) {
+        await clientRateLimiter.initialize();
+      }
+
+      // Initialize vulnerability scanner if enabled
+      if (this.config.enableVulnerabilityScanning) {
+        await vulnerabilityScanner.initialize();
+        this.startVulnerabilityScanning();
+      }
+
+      // Start threat monitoring
+      this.startThreatMonitoring();
+
+      console.log('✅ Security service initialized successfully');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('❌ Security service initialization failed:', errorMessage);
+
+      // In development mode, continue with reduced functionality
+      if (isDevelopment) {
+        console.warn('⚠️ Continuing with reduced security functionality in development mode');
+      } else {
+        throw error;
+      }
     }
-
-    // Initialize CSRF protection if enabled
-    if (this.config.enableCSRF) {
-      await this.initializeCSRF();
-    }
-
-    // Initialize rate limiter if enabled
-    if (this.config.enableRateLimit) {
-      await clientRateLimiter.initialize();
-    }
-
-    // Initialize vulnerability scanner if enabled
-    if (this.config.enableVulnerabilityScanning) {
-      await vulnerabilityScanner.initialize();
-      this.startVulnerabilityScanning();
-    }
-
-    // Start threat monitoring
-    this.startThreatMonitoring();
-
-    console.log('✅ Security service initialized successfully');
   }
 
   /**
@@ -140,23 +155,45 @@ export class SecurityService {
    * Start vulnerability scanning
    */
   private async startVulnerabilityScanning(): Promise<void> {
-    // Perform initial scan
-    const initialScan = await vulnerabilityScanner.scan();
-    console.log(`🔍 Initial security scan completed. Score: ${initialScan.score}/100`);
+    try {
+      // Perform initial scan
+      const initialScan = await vulnerabilityScanner.scan();
+      console.log(`🔍 Initial security scan completed. Score: ${initialScan.score}/100`);
 
-    if (initialScan.threats.length > 0) {
-      console.warn(`⚠️ Found ${initialScan.threats.length} security threats:`, initialScan.threats);
-    }
-
-    // Set up periodic scanning
-    if (this.config.scanInterval && this.config.scanInterval > 0) {
-      this.scanInterval = setInterval(async () => {
-        const scan = await vulnerabilityScanner.scan();
-        if (scan.threats.length > 0) {
-          console.warn(`🚨 Security scan found ${scan.threats.length} threats. Score: ${scan.score}/100`);
-          this.notifyThreats(scan.threats);
+      if (initialScan.threats.length > 0) {
+        const isDevelopment = process.env.NODE_ENV === 'development';
+        if (isDevelopment) {
+          console.warn(`⚠️ Found ${initialScan.threats.length} security threats (development mode):`, initialScan.threats);
+        } else {
+          console.warn(`⚠️ Found ${initialScan.threats.length} security threats:`, initialScan.threats);
         }
-      }, this.config.scanInterval);
+      }
+
+      // Set up periodic scanning
+      if (this.config.scanInterval && this.config.scanInterval > 0) {
+        this.scanInterval = setInterval(async () => {
+          try {
+            const scan = await vulnerabilityScanner.scan();
+            if (scan.threats.length > 0) {
+              console.warn(`🚨 Security scan found ${scan.threats.length} threats. Score: ${scan.score}/100`);
+              this.notifyThreats(scan.threats);
+            }
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            console.debug('Periodic security scan failed:', errorMessage);
+          }
+        }, this.config.scanInterval);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('Failed to start vulnerability scanning:', errorMessage);
+
+      // In development mode, don't throw
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Continuing without vulnerability scanning in development mode');
+      } else {
+        throw error;
+      }
     }
   }
 

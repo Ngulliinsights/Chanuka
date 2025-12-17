@@ -19,7 +19,7 @@ import type {
   TemporalFilter,
   DashboardPreferences
 } from '@client/types/user-dashboard';
-import { logger } from '@client/utils/logger';
+// import { logger } from '@client/utils/logger';
 
 import { useAppSelector, useAppDispatch } from '../hooks';
 import type { RootState } from '../index';
@@ -45,7 +45,7 @@ interface UserDashboardState {
 // Async thunks
 export const refreshRecommendations = createAsyncThunk(
   'userDashboard/refreshRecommendations',
-  async (_, { rejectWithValue }) => {
+  async (_request, { rejectWithValue }) => {
     try {
       // In a real implementation, this would call the ML recommendation API
       // For now, we'll simulate with mock data
@@ -298,7 +298,7 @@ const userDashboardSlice = createSlice({
     },
 
     // Real-time updates
-    handleRealTimeUpdate: (state, action: PayloadAction<{ type: string; data: any }>) => {
+    handleRealTimeUpdate: (state, action: PayloadAction<{ type: string; data: Record<string, unknown> }>) => {
       const { type, data } = action.payload;
       
       switch (type) {

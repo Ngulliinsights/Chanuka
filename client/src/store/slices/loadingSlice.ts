@@ -7,7 +7,7 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { LoadingStateData, LoadingOperation, LoadingAction, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats, LoadingType, LoadingPriority, RetryStrategy } from '@client/core/loading/types';
+import { LoadingStateData, LoadingOperation, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingStats, LoadingType, LoadingPriority } from '@client/core/loading/types';
 import { logger } from '@client/utils/logger';
 
 // Initial state based on core loading types
@@ -79,8 +79,8 @@ export const retryLoadingOperation = createAsyncThunk(
     'loading/retryOperation',
     async (id: string, { getState, rejectWithValue }) => {
         try {
-            const state = getState() as { loading: LoadingStateData };
-            const operation = state.loading.operations[id];
+            const loadingState = getState() as { loading: LoadingStateData };
+            const operation = loadingState.loading.operations[id];
 
             if (!operation) {
                 throw new Error(`Operation ${id} not found`);
@@ -101,14 +101,14 @@ export const timeoutLoadingOperation = createAsyncThunk(
     'loading/timeoutOperation',
     async (id: string, { getState, rejectWithValue }) => {
         try {
-            const state = getState() as { loading: LoadingStateData };
-            const operation = state.loading.operations[id];
+            const loadingState = getState() as { loading: LoadingStateData };
+            const operation = loadingState.loading.operations[id];
 
             if (!operation) {
                 throw new Error(`Operation ${id} not found`);
             }
 
-            const timeoutError = new Error(`Operation timed out after ${operation.timeout || state.loading.adaptiveSettings.defaultTimeout}ms`);
+            const timeoutError = new Error(`Operation timed out after ${operation.timeout || loadingState.loading.adaptiveSettings.defaultTimeout}ms`);
             return { id, error: timeoutError.message };
         } catch (error) {
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to timeout operation');
@@ -201,6 +201,94 @@ const loadingSlice = createSlice({
             state.stats = { ...state.stats, ...action.payload };
         },
 
+        // Atomic statistics updates to prevent race conditions
+        updateStatsAtomic: (state, action: PayloadAction<{
+            type: 'increment_completed' | 'increment_failed' | 'update_average_time' | 'increment_total';
+            payload?: { loadTime?: number };
+        }>) => {
+            const { type, payload } = action.payload;
+            
+            switch (type) {
+                case 'increment_completed':
+                    state.stats.completedOperations++;
+                    state.stats.totalOperations = Math.max(
+                        state.stats.totalOperations,
+                        state.stats.completedOperations + state.stats.failedOperations
+                    );
+                    break;
+                    
+                case 'increment_failed':
+                    state.stats.failedOperations++;
+                    state.stats.totalOperations = Math.max(
+                        state.stats.totalOperations,
+                        state.stats.completedOperations + state.stats.failedOperations
+                    );
+                    break;
+                    
+                case 'update_average_time':
+                    if (payload?.loadTime && typeof payload.loadTime === 'number') {
+                        const totalCompleted = state.stats.completedOperations;
+                        if (totalCompleted > 0) {
+                            state.stats.averageLoadTime = 
+                                (state.stats.averageLoadTime * (totalCompleted - 1) + payload.loadTime) / totalCompleted;
+                        }
+                    }
+                    break;
+
+                case 'increment_total':
+                    state.stats.totalOperations++;
+                    break;
+            }
+            
+            state.stats.lastUpdate = Date.now();
+        },
+
+        // Batch stats updates to reduce race conditions
+        batchStatsUpdate: (state, action: PayloadAction<Array<{
+            type: 'increment_completed' | 'increment_failed' | 'update_average_time' | 'increment_total';
+            payload?: { loadTime?: number };
+        }>>) => {
+            action.payload.forEach(update => {
+                // Apply each update atomically using the existing reducer logic
+                const currentState = state;
+                const { type, payload } = update;
+                
+                switch (type) {
+                    case 'increment_completed':
+                        currentState.stats.completedOperations++;
+                        currentState.stats.totalOperations = Math.max(
+                            currentState.stats.totalOperations,
+                            currentState.stats.completedOperations + currentState.stats.failedOperations
+                        );
+                        break;
+                        
+                    case 'increment_failed':
+                        currentState.stats.failedOperations++;
+                        currentState.stats.totalOperations = Math.max(
+                            currentState.stats.totalOperations,
+                            currentState.stats.completedOperations + currentState.stats.failedOperations
+                        );
+                        break;
+                        
+                    case 'update_average_time':
+                        if (payload?.loadTime && typeof payload.loadTime === 'number') {
+                            const totalCompleted = currentState.stats.completedOperations;
+                            if (totalCompleted > 0) {
+                                currentState.stats.averageLoadTime = 
+                                    (currentState.stats.averageLoadTime * (totalCompleted - 1) + payload.loadTime) / totalCompleted;
+                            }
+                        }
+                        break;
+
+                    case 'increment_total':
+                        currentState.stats.totalOperations++;
+                        break;
+                }
+            });
+            
+            state.stats.lastUpdate = Date.now();
+        },
+
         // Bulk operations
         clearCompletedOperations: (state) => {
             Object.keys(state.operations).forEach(id => {
@@ -238,6 +326,17 @@ const loadingSlice = createSlice({
         // Start operation
         builder
             .addCase(startLoadingOperation.fulfilled, (state, action) => {
+                const operationId = action.payload.id;
+                
+                // Check if operation already exists to prevent race conditions
+                if (state.operations[operationId]) {
+                    logger.warn('Operation already exists, skipping creation', {
+                        component: 'LoadingSlice',
+                        operationId
+                    });
+                    return; // Don't create duplicate operation
+                }
+
                 const operation: LoadingOperation = {
                     ...action.payload,
                     startTime: Date.now(),
@@ -246,15 +345,18 @@ const loadingSlice = createSlice({
                     cancelled: false,
                 };
 
-                state.operations[action.payload.id] = operation;
-                state.stats.totalOperations++;
-                state.stats.activeOperations = Object.keys(state.operations).length;
+                state.operations[operationId] = operation;
+                
+                // Use atomic stats update
+                const currentState = state;
+                currentState.stats.totalOperations++;
+                currentState.stats.activeOperations = Object.keys(currentState.operations).length;
 
                 // Update global loading states
-                state.globalLoading = state.stats.activeOperations > 0;
-                state.highPriorityLoading = Object.values(state.operations).some(op => op.priority === 'high');
+                currentState.globalLoading = currentState.stats.activeOperations > 0;
+                currentState.highPriorityLoading = Object.values(currentState.operations).some(op => op.priority === 'high');
 
-                state.stats.lastUpdate = Date.now();
+                currentState.stats.lastUpdate = Date.now();
             })
             .addCase(startLoadingOperation.rejected, (state, action) => {
                 logger.error('Failed to start loading operation', {
@@ -270,16 +372,45 @@ const loadingSlice = createSlice({
                 const operation = state.operations[id];
 
                 if (operation) {
+                    const loadTime = Date.now() - operation.startTime;
+                    
                     if (success) {
-                        state.stats.completedOperations++;
-                        // Calculate average load time
-                        const loadTime = Date.now() - operation.startTime;
-                        const totalCompleted = state.stats.completedOperations;
-                        state.stats.averageLoadTime =
-                            (state.stats.averageLoadTime * (totalCompleted - 1) + loadTime) / totalCompleted;
+                        // Use atomic batch stats update to prevent race conditions
+                        const updates = [
+                            { type: 'increment_completed' as const },
+                            { type: 'update_average_time' as const, payload: { loadTime } }
+                        ];
+                        
+                        // Apply updates atomically
+                        updates.forEach(update => {
+                            const { type, payload } = update;
+                            switch (type) {
+                                case 'increment_completed':
+                                    state.stats.completedOperations++;
+                                    state.stats.totalOperations = Math.max(
+                                        state.stats.totalOperations,
+                                        state.stats.completedOperations + state.stats.failedOperations
+                                    );
+                                    break;
+                                case 'update_average_time':
+                                    if (payload?.loadTime && typeof payload.loadTime === 'number') {
+                                        const totalCompleted = state.stats.completedOperations;
+                                        if (totalCompleted > 0) {
+                                            state.stats.averageLoadTime = 
+                                                (state.stats.averageLoadTime * (totalCompleted - 1) + payload.loadTime) / totalCompleted;
+                                        }
+                                    }
+                                    break;
+                            }
+                        });
                     } else {
-                        state.stats.failedOperations++;
                         operation.error = new Error(error);
+                        // Use atomic stats update
+                        state.stats.failedOperations++;
+                        state.stats.totalOperations = Math.max(
+                            state.stats.totalOperations,
+                            state.stats.completedOperations + state.stats.failedOperations
+                        );
                     }
 
                     // Remove completed operation
@@ -345,6 +476,8 @@ export const {
     setGlobalLoading,
     setHighPriorityLoading,
     updateStats,
+    updateStatsAtomic,
+    batchStatsUpdate,
     clearCompletedOperations,
     clearFailedOperations,
     resetLoadingState,

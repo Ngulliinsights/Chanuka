@@ -85,24 +85,27 @@ export const realTimeSlice = createSlice({
     subscribe: (state, action: PayloadAction<WebSocketSubscription>) => {
       const subscription = action.payload;
       switch (subscription.type) {
-        case 'bill':
+        case 'bill': {
           const billId = Number(subscription.id);
           if (!state.connection.bill_subscriptions.includes(billId)) {
             state.connection.bill_subscriptions.push(billId);
           }
           break;
-        case 'community':
+        }
+        case 'community': {
           const communityId = String(subscription.id);
           if (!state.connection.community_subscriptions.includes(communityId)) {
             state.connection.community_subscriptions.push(communityId);
           }
           break;
-        case 'expert':
+        }
+        case 'expert': {
           const expertId = String(subscription.id);
           if (!state.connection.expert_subscriptions.includes(expertId)) {
             state.connection.expert_subscriptions.push(expertId);
           }
           break;
+        }
         case 'user_notifications':
           state.connection.notification_subscriptions = true;
           break;
@@ -112,7 +115,7 @@ export const realTimeSlice = createSlice({
     unsubscribe: (state, action: PayloadAction<WebSocketSubscription>) => {
       const subscription = action.payload;
       switch (subscription.type) {
-        case 'bill':
+        case 'bill': {
           const billId = Number(subscription.id);
           const billIndex = state.connection.bill_subscriptions.indexOf(billId);
           if (billIndex > -1) {
@@ -121,7 +124,8 @@ export const realTimeSlice = createSlice({
           // Clear updates for unsubscribed bill
           delete state.billUpdates[billId];
           break;
-        case 'community':
+        }
+        case 'community': {
           const communityId = String(subscription.id);
           const communityIndex = state.connection.community_subscriptions.indexOf(communityId);
           if (communityIndex > -1) {
@@ -129,13 +133,15 @@ export const realTimeSlice = createSlice({
           }
           delete state.communityUpdates[communityId];
           break;
-        case 'expert':
+        }
+        case 'expert': {
           const expertId = String(subscription.id);
           const expertIndex = state.connection.expert_subscriptions.indexOf(expertId);
           if (expertIndex > -1) {
             state.connection.expert_subscriptions.splice(expertIndex, 1);
           }
           break;
+        }
         case 'user_notifications':
           state.connection.notification_subscriptions = false;
           break;

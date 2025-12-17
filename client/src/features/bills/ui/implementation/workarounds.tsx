@@ -1,15 +1,35 @@
-import { ChevronUp, ChevronDown, CheckCircle, Clock, DollarSign, Users, AlertCircle, Loader2 } from 'lucide-react';
+import {
+  ChevronUp,
+  ChevronDown,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  Users,
+  AlertCircle,
+  Loader2,
+} from 'lucide-react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-
-import { logger } from '@client/utils/logger';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card } from '@client/shared/design-system';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@client/shared/design-system';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
+import { logger } from '@client/utils/logger';
 
 // Type definitions with improved specificity
 type Priority = 'low' | 'medium' | 'high' | 'critical';
@@ -36,8 +56,9 @@ interface Workaround {
   };
 }
 
-interface ImplementationWorkaroundsProps { bill_id: number;
- }
+interface ImplementationWorkaroundsProps {
+  bill_id: number;
+}
 
 // Type-safe form state interface
 interface NewWorkaroundForm {
@@ -95,15 +116,11 @@ const isValidSortOption = (value: string): value is SortOption => {
   return ['recent', 'popular', 'priority'].includes(value);
 };
 
-const isValidStatus = (value: string): value is Status => {
-  return ['proposed', 'under_review', 'approved', 'implemented', 'rejected'].includes(value);
-};
-
 const isValidPriority = (value: string): value is Priority => {
   return ['low', 'medium', 'high', 'critical'].includes(value);
 };
 
-export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaroundsProps) {
+export function ImplementationWorkarounds({ bill_id }: ImplementationWorkaroundsProps) {
   const [workarounds, setWorkarounds] = useState<Workaround[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,7 +170,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
         sort: sortBy,
       });
 
-      const response = await fetch(`/api/bills/${ bill_id }/workarounds?${params}`);
+      const response = await fetch(`/api/bills/${bill_id}/workarounds?${params}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -175,8 +192,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
 
   // Optimized form validation with better type safety
   const isFormValid = useMemo(() => {
-    return newWorkaround.title.trim().length > 0 && 
-           newWorkaround.description.trim().length > 0;
+    return newWorkaround.title.trim().length > 0 && newWorkaround.description.trim().length > 0;
   }, [newWorkaround.title, newWorkaround.description]);
 
   const handleCreateWorkaround = useCallback(async () => {
@@ -186,11 +202,15 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
     try {
       const payload = {
         ...newWorkaround,
-        implementationCost: newWorkaround.implementationCost ? parseFloat(newWorkaround.implementationCost) : null,
-        timelineEstimate: newWorkaround.timelineEstimate ? parseInt(newWorkaround.timelineEstimate) : null,
+        implementationCost: newWorkaround.implementationCost
+          ? parseFloat(newWorkaround.implementationCost)
+          : null,
+        timelineEstimate: newWorkaround.timelineEstimate
+          ? parseInt(newWorkaround.timelineEstimate)
+          : null,
       };
 
-      const response = await fetch(`/api/bills/${ bill_id }/workarounds`, {
+      const response = await fetch(`/api/bills/${bill_id}/workarounds`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -215,30 +235,33 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
   }, [isFormValid, newWorkaround, bill_id, fetchWorkarounds]);
 
   // Optimized voting with loading states to prevent double-clicks
-  const handleVote = useCallback(async (workaroundId: number, type: VoteType) => {
-    // Prevent multiple votes while one is in progress
-    if (votingStates[workaroundId]) return;
+  const handleVote = useCallback(
+    async (workaroundId: number, type: VoteType) => {
+      // Prevent multiple votes while one is in progress
+      if (votingStates[workaroundId]) return;
 
-    setVotingStates(prev => ({ ...prev, [workaroundId]: true }));
+      setVotingStates(prev => ({ ...prev, [workaroundId]: true }));
 
-    try {
-      const response = await fetch(`/api/workarounds/${workaroundId}/vote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type }),
-      });
+      try {
+        const response = await fetch(`/api/workarounds/${workaroundId}/vote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type }),
+        });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        await fetchWorkarounds();
+      } catch (error) {
+        logger.error('Failed to vote:', { component: 'Chanuka' }, error);
+      } finally {
+        setVotingStates(prev => ({ ...prev, [workaroundId]: false }));
       }
-
-      await fetchWorkarounds();
-    } catch (error) {
-      logger.error('Failed to vote:', { component: 'Chanuka' }, error);
-    } finally {
-      setVotingStates(prev => ({ ...prev, [workaroundId]: false }));
-    }
-  }, [votingStates, fetchWorkarounds]);
+    },
+    [votingStates, fetchWorkarounds]
+  );
 
   // Type-safe form field update function
   const updateNewWorkaround = useCallback((field: keyof NewWorkaroundForm, value: string) => {
@@ -258,8 +281,8 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
         </div>
         <div className="flex flex-wrap gap-2">
           {entries.map(([stakeholder, support]) => (
-            <Badge 
-              key={stakeholder} 
+            <Badge
+              key={stakeholder}
               variant="outline"
               className={STAKEHOLDER_SUPPORT_COLORS[support] || 'border-gray-300 text-gray-700'}
             >
@@ -272,100 +295,112 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
   }, []);
 
   // Memoized workaround card rendering
-  const renderWorkaroundCard = useCallback((workaround: Workaround) => (
-    <Card key={workaround.id} className="p-6 transition-shadow hover:shadow-md">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-lg font-semibold">{workaround.title}</h3>
-            <Badge className={getPriorityColor(workaround.priority)}>
-              {workaround.priority.toUpperCase()}
-            </Badge>
-            <Badge className={getStatusColor(workaround.status)}>
-              {getStatusIcon(workaround.status)}
-              <span className="ml-1">{workaround.status.replace('_', ' ').toUpperCase()}</span>
-            </Badge>
+  const renderWorkaroundCard = useCallback(
+    (workaround: Workaround) => (
+      <Card key={workaround.id} className="p-6 transition-shadow hover:shadow-md">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className="text-lg font-semibold">{workaround.title}</h3>
+              <Badge className={getPriorityColor(workaround.priority)}>
+                {workaround.priority.toUpperCase()}
+              </Badge>
+              <Badge className={getStatusColor(workaround.status)}>
+                {getStatusIcon(workaround.status)}
+                <span className="ml-1">{workaround.status.replace('_', ' ').toUpperCase()}</span>
+              </Badge>
+            </div>
+
+            {workaround.category && (
+              <Badge variant="outline" className="mb-3">
+                {workaround.category}
+              </Badge>
+            )}
           </div>
 
-          {workaround.category && (
-            <Badge variant="outline" className="mb-3">
-              {workaround.category}
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleVote(workaround.id, 'up')}
+              disabled={votingStates[workaround.id]}
+              className="flex items-center gap-1 text-green-600 hover:text-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {votingStates[workaround.id] ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+              <span className="text-sm">{workaround.upvotes}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleVote(workaround.id, 'down')}
+              disabled={votingStates[workaround.id]}
+              className="flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {votingStates[workaround.id] ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+              <span className="text-sm">{workaround.downvotes}</span>
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => handleVote(workaround.id, 'up')}
-            disabled={votingStates[workaround.id]}
-            className="flex items-center gap-1 text-green-600 hover:text-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {votingStates[workaround.id] ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <ChevronUp className="w-4 h-4" />
+        <p className="text-gray-700 mb-4 leading-relaxed">{workaround.description}</p>
+
+        {/* Implementation Details */}
+        {(workaround.implementationCost || workaround.timelineEstimate) && (
+          <div className="flex items-center gap-6 text-sm text-gray-600 mb-4">
+            {workaround.implementationCost && (
+              <div className="flex items-center gap-1">
+                <DollarSign className="w-4 h-4" />
+                <span>${workaround.implementationCost.toLocaleString()}</span>
+              </div>
             )}
-            <span className="text-sm">{workaround.upvotes}</span>
-          </button>
 
-          <button
-            onClick={() => handleVote(workaround.id, 'down')}
-            disabled={votingStates[workaround.id]}
-            className="flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {votingStates[workaround.id] ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
+            {workaround.timelineEstimate && (
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{workaround.timelineEstimate} days</span>
+              </div>
             )}
-            <span className="text-sm">{workaround.downvotes}</span>
-          </button>
+          </div>
+        )}
+
+        {/* Stakeholder Support */}
+        {renderStakeholderSupport(workaround.stakeholderSupport)}
+
+        {/* Author */}
+        <div className="flex items-center justify-between mt-4 pt-4 border-t">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span>
+              Proposed by <strong>{workaround.author.name}</strong>
+            </span>
+            {workaround.author.expertise && (
+              <Badge variant="secondary" className="text-xs">
+                {workaround.author.expertise}
+              </Badge>
+            )}
+          </div>
+
+          <span className="text-sm text-gray-500">
+            {new Date(workaround.created_at).toLocaleDateString()}
+          </span>
         </div>
-      </div>
-
-      <p className="text-gray-700 mb-4 leading-relaxed">
-        {workaround.description}
-      </p>
-
-      {/* Implementation Details */}
-      {(workaround.implementationCost || workaround.timelineEstimate) && (
-        <div className="flex items-center gap-6 text-sm text-gray-600 mb-4">
-          {workaround.implementationCost && (
-            <div className="flex items-center gap-1">
-              <DollarSign className="w-4 h-4" />
-              <span>${workaround.implementationCost.toLocaleString()}</span>
-            </div>
-          )}
-
-          {workaround.timelineEstimate && (
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>{workaround.timelineEstimate} days</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Stakeholder Support */}
-      {renderStakeholderSupport(workaround.stakeholderSupport)}
-
-      {/* Author */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>Proposed by <strong>{workaround.author.name}</strong></span>
-          {workaround.author.expertise && (
-            <Badge variant="secondary" className="text-xs">
-              {workaround.author.expertise}
-            </Badge>
-          )}
-        </div>
-
-        <span className="text-sm text-gray-500">
-          {new Date(workaround.created_at).toLocaleDateString()}
-        </span>
-      </div>
-    </Card>
-  ), [getPriorityColor, getStatusColor, getStatusIcon, handleVote, votingStates, renderStakeholderSupport]);
+      </Card>
+    ),
+    [
+      getPriorityColor,
+      getStatusColor,
+      getStatusIcon,
+      handleVote,
+      votingStates,
+      renderStakeholderSupport,
+    ]
+  );
 
   return (
     <div className="space-y-6">
@@ -393,13 +428,13 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
               <Input
                 placeholder="Workaround title"
                 value={newWorkaround.title}
-                onChange={(e) => updateNewWorkaround('title', e.target.value)}
+                onChange={e => updateNewWorkaround('title', e.target.value)}
               />
 
               <Textarea
                 placeholder="Describe the implementation challenge and your proposed solution..."
                 value={newWorkaround.description}
-                onChange={(e) => updateNewWorkaround('description', e.target.value)}
+                onChange={e => updateNewWorkaround('description', e.target.value)}
                 className="min-h-[120px]"
               />
 
@@ -407,13 +442,10 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
                 <Input
                   placeholder="Category (e.g., Compliance, Infrastructure)"
                   value={newWorkaround.category}
-                  onChange={(e) => updateNewWorkaround('category', e.target.value)}
+                  onChange={e => updateNewWorkaround('category', e.target.value)}
                 />
 
-                <Select 
-                  value={newWorkaround.priority} 
-                  onValueChange={handlePriorityChange}
-                >
+                <Select value={newWorkaround.priority} onValueChange={handlePriorityChange}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -431,22 +463,19 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
                   placeholder="Implementation cost (USD)"
                   type="number"
                   value={newWorkaround.implementationCost}
-                  onChange={(e) => updateNewWorkaround('implementationCost', e.target.value)}
+                  onChange={e => updateNewWorkaround('implementationCost', e.target.value)}
                 />
 
                 <Input
                   placeholder="Timeline estimate (days)"
                   type="number"
                   value={newWorkaround.timelineEstimate}
-                  onChange={(e) => updateNewWorkaround('timelineEstimate', e.target.value)}
+                  onChange={e => updateNewWorkaround('timelineEstimate', e.target.value)}
                 />
               </div>
 
               <div className="flex gap-2">
-                <Button 
-                  onClick={handleCreateWorkaround}
-                  disabled={!isFormValid || isSubmitting}
-                >
+                <Button onClick={handleCreateWorkaround} disabled={!isFormValid || isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -456,8 +485,8 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
                     'Create Workaround'
                   )}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setShowCreateDialog(false)}
                   disabled={isSubmitting}
                 >
@@ -496,9 +525,7 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
           </SelectContent>
         </Select>
 
-        <Badge variant="secondary">
-          {workarounds.length} workarounds
-        </Badge>
+        <Badge variant="secondary">{workarounds.length} workarounds</Badge>
       </div>
 
       {/* Workarounds List */}
@@ -519,13 +546,10 @@ export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaround
             <p className="text-gray-600 mb-4">
               Be the first to propose an implementation workaround for this bills.
             </p>
-            <Button onClick={() => setShowCreateDialog(true)}>
-              Propose Workaround
-            </Button>
+            <Button onClick={() => setShowCreateDialog(true)}>Propose Workaround</Button>
           </Card>
         )}
       </div>
     </div>
   );
 }
-

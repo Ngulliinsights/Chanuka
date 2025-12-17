@@ -36,8 +36,7 @@
 
     // Project Structure
     "baseUrl": "./src",
-    // Silence TypeScript deprecation warnings for `baseUrl` until migration
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
 
     // Path Mappings
     "paths": {

@@ -146,7 +146,18 @@
     "dev:clean-start": "rm -rf node_modules/.vite && npm run dev:silent",
     "dev:no-errors": "NODE_ENV=development VITE_SUPPRESS_ALL_ERRORS=true npm run dev",
     "dev:ultra-silent": "VITE_LOG_LEVEL=silent NODE_ENV=development npm run dev",
-    "dev:perfect": "VITE_SUPPRESS_ALL=true VITE_LOG_LEVEL=silent npm run dev:ultra-silent"
+    "dev:perfect": "VITE_SUPPRESS_ALL=true VITE_LOG_LEVEL=silent npm run dev:ultra-silent",
+    "validate:functional": "node functional_validator.js",
+    "validate:functional:debug": "DEBUG=true node functional_validator.js",
+    "validate:functional:parallel": "PARALLEL=3 node functional_validator.js",
+    "validate:functional:staging": "BASE_URL=https://staging.chanuka.app node functional_validator.js",
+    "validate:setup": "node scripts/validate-functional-validator.js",
+    "validate:imports": "node validate_imports.js",
+    "validate:exports": "bash export_validator.sh",
+    "validate:import-paths": "bash import_validator.sh",
+    "fix:imports": "bash import_resolver_script.sh",
+    "fix:imports:apply": "DRY_RUN=false bash import_resolver_script.sh",
+    "docs:structure": "bash generate-structure-to-file.sh"
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.922.0",
@@ -271,7 +282,8 @@
     "typescript": "5.6.3",
     "vite": "^5.4.15",
     "vitest": "^3.2.4",
-    "webpack-bundle-analyzer": "^4.10.1"
+    "webpack-bundle-analyzer": "^4.10.1",
+    "chalk": "^5.3.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"

@@ -67,14 +67,29 @@ export interface RealTimeMetrics {
   activeIncidents: number;
   systemHealth: 'healthy' | 'warning' | 'critical';
   lastUpdated: string;
-  liveStream: unknown[];
+  liveStream: ErrorEntry[];
   currentErrorRate: number;
-  activeAlerts: Record<string, unknown>[];
+  activeAlerts: Alert[];
+}
+
+export interface ErrorEntry {
+  timestamp: string;
+  message: string;
+  severity: string;
+  component: string;
+}
+
+export interface Alert {
+  id: string;
+  type: string;
+  message: string;
+  severity: string;
+  timestamp: string;
 }
 
 // Mock error analytics repository
 export const errorAnalyticsRepository = {
-  async getOverviewMetrics(): Promise<OverviewMetrics> {
+  async getOverviewMetrics(_filters?: DashboardFilters): Promise<OverviewMetrics> {
     return {
       totalErrors: 1250,
       errorRate: 2.3,
@@ -85,21 +100,21 @@ export const errorAnalyticsRepository = {
     };
   },
 
-  async getTrendData(): Promise<TrendDataPoint[]> {
+  async getTrendData(_params?: { period: string; filters: DashboardFilters }): Promise<TrendDataPoint[]> {
     return [
       { timestamp: '2024-01-01', errorCount: 45, errorRate: 2.1, severity: 'medium' },
       { timestamp: '2024-01-02', errorCount: 52, errorRate: 2.4, severity: 'high' },
     ];
   },
 
-  async getPatterns(): Promise<ErrorPattern[]> {
+  async getPatterns(_filters?: DashboardFilters): Promise<ErrorPattern[]> {
     return [
       { pattern: 'Authentication timeout', frequency: 125, impact: 'high', trend: 'increasing' },
       { pattern: 'Database connection error', frequency: 89, impact: 'critical', trend: 'stable' },
     ];
   },
 
-  async getRecoveryAnalytics(): Promise<RecoveryAnalytics> {
+  async getRecoveryAnalytics(_filters?: DashboardFilters): Promise<RecoveryAnalytics> {
     return {
       averageRecoveryTime: 45,
       successRate: 94.5,

@@ -84,10 +84,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await dispatch(authActions.validateStoredTokens()).unwrap();
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err);
-        logger.error('Token validation failed:', { 
-          component: 'AuthProvider', 
-          error: errorMessage 
-        });
+        
+        // In development mode, log as debug instead of error to reduce noise
+        if (process.env.NODE_ENV === 'development') {
+          logger.debug('Token validation failed (expected in development):', { 
+            component: 'AuthProvider', 
+            error: errorMessage 
+          });
+        } else {
+          logger.error('Token validation failed:', { 
+            component: 'AuthProvider', 
+            error: errorMessage 
+          });
+        }
+        
+        // Always mark as initialized even if validation fails
+        dispatch(authActions.setInitialized(true));
       }
     };
 

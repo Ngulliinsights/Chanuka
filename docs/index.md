@@ -39,6 +39,11 @@ The active/ directory contains current, actively maintained documentation for on
 - [TESTING_QUICK_START.md](active/TESTING_QUICK_START.md) - Testing quick start guide
 - [UNIFIED_TESTING_REFERENCE.md](active/UNIFIED_TESTING_REFERENCE.md) - Unified testing reference
 
+### Testing & Validation
+
+- [functional-validator-guide.md](functional-validator-guide.md) - Functional validator usage guide and documentation
+- [testing_strategy.md](../testing_strategy.md) - Comprehensive testing strategy for client applications
+
 ### Reference Documentation
 
 The reference/ directory contains foundational and reference materials for the project.
@@ -162,6 +167,7 @@ The archive/ directory contains historical documentation and completed project p
 |----------|-------------|--------|
 | [project-timeline.md](consolidated/project-timeline.md) | Critical fixes and roadmap | Current |
 | [testing-reference.md](consolidated/testing-reference.md) | Testing status and summaries | Current |
+| [functional-validator-guide.md](functional-validator-guide.md) | Functional validator usage and configuration | Current |
 | [client-optimization-guide.md](consolidated/client-optimization-guide.md) | Race condition fixes documentation | Current |
 
 ### Technical Infrastructure
