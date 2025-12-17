@@ -58,7 +58,7 @@ export const darkTheme = {
     infoForeground: colorTokens.neutral[900],
   },
   
-  // CSS custom properties for dark theme
+  // CSS custom properties for dark theme - Updated to Chanuka brand palette
   cssVariables: {
     '--background': '240 10% 3.9%',
     '--foreground': '0 0% 98%',
@@ -66,23 +66,35 @@ export const darkTheme = {
     '--card-foreground': '0 0% 98%',
     '--popover': '240 9% 6%',
     '--popover-foreground': '0 0% 98%',
-    '--primary': '213 94% 68%',
+    // Primary: Deep Blue adjusted for dark mode
+    '--primary': '206 81% 60%',
     '--primary-foreground': '0 0% 9%',
-    '--secondary': '196 100% 68%',
+    // Secondary: Teal adjusted for dark mode
+    '--secondary': '198 77% 55%',
     '--secondary-foreground': '0 0% 9%',
+    // Muted: Neutral grays
     '--muted': '240 8% 9%',
     '--muted-foreground': '240 5% 65%',
-    '--accent': '28 94% 54%',
+    // Accent: Orange (maintains consistency)
+    '--accent': '32 93% 50%',
     '--accent-foreground': '0 0% 9%',
+    // Destructive/error
     '--destructive': '0 84% 70%',
     '--destructive-foreground': '0 0% 9%',
     '--border': '240 6% 18%',
     '--input': '240 6% 18%',
-    '--ring': '28 94% 54%',
+    '--ring': '32 93% 50%',
+    // Semantic colors (adjusted for dark mode)
     '--success': '142 76% 60%',
     '--warning': '43 96% 66%',
     '--danger': '0 84% 70%',
-    '--info': '213 94% 78%',
+    '--info': '206 81% 60%',
+    // Governance colors for political neutrality (dark mode)
+    '--governance-perspective1': '219 79% 65%',      // Perspective A (bright blue)
+    '--governance-perspective2': '261 80% 65%',      // Perspective B (bright purple)
+    '--governance-neutral': '142 76% 60%',            // Neutral/informational (bright green)
+    '--governance-amendment': '38 92% 65%',           // Amendment (bright amber)
+    '--governance-constitutional': '292 65% 65%',     // Constitutional (bright purple)
   },
 } as const;
 

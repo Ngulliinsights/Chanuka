@@ -181,7 +181,7 @@ export const VoiceConsistency = {
    */
   contractions: {
     recommended: ['it\'s', 'we\'ve', 'they\'re', 'here\'s', 'what\'s'],
-    avoid: ['cannot', 'do not'] // Use "can't", "don't" instead
+    avoid: ['cannot', 'do not'], // Use "can't", "don't" instead
     principle: 'Contractions make voice friendlier',
   },
 

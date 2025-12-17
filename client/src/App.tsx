@@ -10,27 +10,46 @@ import { LoadingStates } from '@client/shared/ui/loading/LoadingStates';
 import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
 import { UserJourneyOptimizer } from '@client/features/users/ui/onboarding/UserJourneyOptimizer';
 import { CookieConsentBanner } from '@client/features/security/ui/privacy/CookieConsentBanner';
-import { Toaster } from '@client/shared/design-system';
+import { Toaster, useBrandVoice, useLanguage } from '@client/shared/design-system';
 
 import { useIsMobile } from '@client/hooks/use-mobile';
 import { logger } from '@client/utils/logger';
 
+/**
+ * Main App Component
+ * 
+ * The App is wrapped by AppProviders in index.tsx, which includes:
+ * - Redux store (for global state)
+ * - React Query (for API data management)
+ * - ChanukaProviders (brand voice, multilingual, bandwidth-aware rendering)
+ * - Authentication, Theme, Accessibility providers
+ * 
+ * Design System Integration:
+ * - BrandVoiceProvider: Provides microcopy, tone, and brand personality
+ * - MultilingualProvider: Handles localization (English/Swahili)
+ * - LowBandwidthProvider: Detects network speed and optimizes rendering
+ * 
+ * Usage in components:
+ *   const { getMicrocopy } = useBrandVoice();
+ *   const { language, setLanguage } = useLanguage();
+ */
 function App() {
   const isMobile = useIsMobile();
+  const { getMicrocopy } = useBrandVoice();
+  const { language } = useLanguage();
 
   // Load user state on mount
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Your initialization logic here
-        logger.info('App initialized successfully');
+        logger.info('App initialized', { language });
       } catch (error) {
         logger.error('App initialization failed', { error });
       }
     };
 
     initializeApp();
-  }, []);
+  }, [language]);
 
   return (
     <BrowserRouter>
@@ -41,7 +60,6 @@ function App() {
             <div />
           </OfflineProvider>
           <UserJourneyOptimizer onPersonaSelected={() => {}} onSkip={() => {}} />
-
 
           {isMobile && <MobileHeader />}
 

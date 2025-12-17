@@ -143,3 +143,25 @@ export {
 // ════════════════════════════════════════════════════════════════════════════
 export * from './REFINEMENT_STRATEGY';
 
+// ════════════════════════════════════════════════════════════════════════════
+// DESIGN STANDARDS & GUIDELINES - THE STRATEGIST (Vision & Sustainability)
+// ════════════════════════════════════════════════════════════════════════════
+// Comprehensive standards for brand alignment, accessibility, and user inclusion:
+// - Political Neutrality: Balanced perspective presentation for legislation
+// - Multilingual Support: English, Swahili, and future language support
+// - Brand Personality: "Knowledgeable Friend" voice, tone, and microcopy
+// - Low-Bandwidth: Performance and offline-first design patterns
+// ════════════════════════════════════════════════════════════════════════════
+export * from './standards';
+
+// ════════════════════════════════════════════════════════════════════════════
+// DESIGN SYSTEM CONTEXT PROVIDERS - Standards Integration
+// ════════════════════════════════════════════════════════════════════════════
+// React contexts for applying design standards throughout the application:
+// - BrandVoiceProvider: Microcopy, tone, and voice consistency
+// - LowBandwidthProvider: Network adaptation and offline support
+// - MultilingualProvider: Localization and language support
+// - ChanukaProviders: All-in-one wrapper for complete standards
+// ════════════════════════════════════════════════════════════════════════════
+export * from './contexts';
+

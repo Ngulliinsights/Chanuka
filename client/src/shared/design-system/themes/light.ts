@@ -58,7 +58,7 @@ export const lightTheme = {
     infoForeground: '#ffffff',
   },
   
-  // CSS custom properties
+  // CSS custom properties - Updated to Chanuka brand palette
   cssVariables: {
     '--background': '0 0% 100%',
     '--foreground': '0 0% 9%',
@@ -66,22 +66,34 @@ export const lightTheme = {
     '--card-foreground': '0 0% 9%',
     '--popover': '0 0% 100%',
     '--popover-foreground': '0 0% 9%',
-    '--primary': '213 94% 23%',
+    // Primary: Deep Blue #0d3b66 (Chanuka brand - institutional authority)
+    '--primary': '206 81% 26%',
     '--primary-foreground': '0 0% 100%',
-    '--secondary': '196 100% 18%',
+    // Secondary: Teal #084c61 (transparency and clarity)
+    '--secondary': '198 77% 20%',
     '--secondary-foreground': '0 0% 100%',
+    // Muted: Neutral grays
     '--muted': '0 0% 96%',
     '--muted-foreground': '0 0% 45%',
-    '--accent': '28 94% 54%',
+    // Accent: Orange #f38a1f (energy and participation)
+    '--accent': '32 93% 50%',
     '--accent-foreground': '0 0% 100%',
+    // Destructive/error - now integrated with governance
     '--destructive': '0 84% 60%',
     '--destructive-foreground': '0 0% 100%',
     '--border': '214 32% 91%',
     '--input': '214 32% 91%',
-    '--ring': '28 94% 54%',
+    '--ring': '32 93% 50%',
+    // Semantic colors
     '--success': '142 71% 45%',
     '--warning': '43 96% 56%',
     '--danger': '0 84% 60%',
-    '--info': '213 94% 68%',
+    '--info': '206 81% 26%',
+    // Governance colors for political neutrality
+    '--governance-perspective1': '219 79% 46%',      // Perspective A (blue)
+    '--governance-perspective2': '261 80% 50%',      // Perspective B (purple)
+    '--governance-neutral': '142 71% 45%',            // Neutral/informational (green)
+    '--governance-amendment': '38 92% 50%',           // Amendment (amber)
+    '--governance-constitutional': '292 65% 47%',     // Constitutional (deep purple)
   },
 } as const;

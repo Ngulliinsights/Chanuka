@@ -56,7 +56,7 @@ export const highContrastTheme = {
     infoForeground: '#ffffff',
   },
   
-  // CSS custom properties for high contrast
+  // CSS custom properties for high contrast - Updated to Chanuka brand
   cssVariables: {
     '--background': '0 0% 100%',
     '--foreground': '0 0% 0%',
@@ -70,17 +70,24 @@ export const highContrastTheme = {
     '--secondary-foreground': '0 0% 0%',
     '--muted': '0 0% 94%',
     '--muted-foreground': '0 0% 0%',
-    '--accent': '213 100% 40%',
+    // Accent: Orange with high contrast
+    '--accent': '32 93% 40%',
     '--accent-foreground': '0 0% 100%',
     '--destructive': '0 100% 40%',
     '--destructive-foreground': '0 0% 100%',
     '--border': '0 0% 0%',
     '--input': '0 0% 0%',
-    '--ring': '25 100% 50%',
+    '--ring': '32 93% 50%',
     '--success': '120 100% 20%',
     '--warning': '30 100% 40%',
     '--danger': '0 100% 40%',
-    '--info': '213 100% 40%',
+    '--info': '206 81% 26%',
+    // Governance colors for high contrast
+    '--governance-perspective1': '219 100% 30%',     // Deep blue
+    '--governance-perspective2': '261 100% 30%',     // Deep purple
+    '--governance-neutral': '120 100% 20%',          // Deep green
+    '--governance-amendment': '32 100% 40%',         // Orange
+    '--governance-constitutional': '292 100% 30%',   // Deep purple
   },
   
   // High contrast specific overrides

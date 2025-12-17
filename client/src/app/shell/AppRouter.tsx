@@ -1,17 +1,22 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-
-import { logger } from '@client/utils/logger';
+import React, { Suspense, lazy, useEffect, useCallback, useMemo } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { ErrorBoundary } from '@client/core/error/components';
 import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
+import { logger } from '@client/utils/logger';
 
 import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute';
 
-// Enhanced lazy loading with retry mechanism
+/**
+ * Enhanced lazy loading with retry mechanism and error recovery.
+ * This wrapper ensures that transient network errors don't permanently
+ * break the application by providing a fallback UI with retry capability.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const createLazyComponent = (importFn: () => Promise<any>, componentName: string) => {
   return lazy(() => 
-    importFn().catch(error => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    importFn().catch((error: any) => {
       logger.error(`Failed to load ${componentName}:`, { component: 'AppRouter' }, error);
       
       // Return a fallback component that allows retry
@@ -51,7 +56,6 @@ const SearchPage = createLazyComponent(() => import('@client/pages/search'), 'Se
 const AuthPage = createLazyComponent(() => import('@client/pages/auth-page'), 'Authentication');
 const TermsPage = createLazyComponent(() => import('@client/pages/legal/terms'), 'Terms');
 const PrivacyPage = createLazyComponent(() => import('@client/pages/legal/privacy'), 'Privacy');
-// Consolidated user account page
 const UserProfile = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Account');
 const UserDashboard = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Dashboard');
 const AdminDashboard = createLazyComponent(() => import('@client/pages/admin'), 'Admin Dashboard');
@@ -68,9 +72,10 @@ interface RouteConfig {
 }
 
 /**
- * Route loading fallback component
+ * Route loading fallback component with consistent styling
  */
-function RouteLoadingFallback({ routeName }: { routeName?: string }) {
+// eslint-disable-next-line react/prop-types
+const RouteLoadingFallback = React.memo<{ routeName?: string }>(({ routeName }) => {
   return (
     <LoadingStateManager
       type="page"
@@ -80,20 +85,20 @@ function RouteLoadingFallback({ routeName }: { routeName?: string }) {
       showDetails={false}
     />
   );
-}
+});
+
+RouteLoadingFallback.displayName = 'RouteLoadingFallback';
 
 /**
- * Route error fallback component
+ * Route error fallback component with recovery options
  */
-function RouteErrorFallback({ 
-  error, 
-  resetErrorBoundary, 
-  routeName 
-}: { 
+/* eslint-disable react/prop-types */
+// eslint-disable-next-line react/prop-types
+const RouteErrorFallback = React.memo<{ 
   error: Error; 
   resetErrorBoundary: () => void; 
   routeName?: string;
-}) {
+}>(({ error, resetErrorBoundary, routeName }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
@@ -108,12 +113,14 @@ function RouteErrorFallback({
           <button
             onClick={resetErrorBoundary}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            type="button"
           >
             Try Again
           </button>
           <button
             onClick={() => window.location.href = '/'}
             className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+            type="button"
           >
             Go Home
           </button>
@@ -131,34 +138,33 @@ function RouteErrorFallback({
       </div>
     </div>
   );
-}
+});
+
+RouteErrorFallback.displayName = 'RouteErrorFallback';
 
 /**
- * Wrapper component for individual routes with error boundaries
+ * Wrapper component for individual routes with error boundaries.
+ * Memoized to prevent unnecessary re-renders when parent updates.
  */
-function RouteWrapper({ 
-  children, 
-  routeName 
-}: { 
+/* eslint-disable react/prop-types */
+// eslint-disable-next-line react/prop-types
+const RouteWrapper = React.memo<{ 
   children: React.ReactNode; 
   routeName: string;
-}) {
+}>(({ children, routeName }) => {
+  // Memoize error handler to prevent recreation on each render
+  const handleError = useCallback((error: Error, errorInfo?: { componentStack?: string | null }) => {
+    const componentStack = errorInfo?.componentStack;
+    logger.error(`Route error in ${routeName}:`, { component: 'AppRouter' }, {
+      error: error.message,
+      stack: error.stack,
+      componentStack
+    });
+  }, [routeName]);
+
   return (
     <ErrorBoundary
-      fallback={({ error, resetError }) => (
-        <RouteErrorFallback 
-          error={error} 
-          resetErrorBoundary={resetError} 
-          routeName={routeName} 
-        />
-      )}
-      onError={(error, errorInfo) => {
-        logger.error(`Route error in ${routeName}:`, { component: 'AppRouter' }, {
-          error: error.message,
-          stack: error.stack,
-          componentStack: errorInfo.componentStack
-        });
-      }}
+      onError={handleError}
       context={`route:${routeName}`}
       showTechnicalDetails={process.env.NODE_ENV === 'development'}
     >
@@ -167,10 +173,13 @@ function RouteWrapper({
       </Suspense>
     </ErrorBoundary>
   );
-}
+});
+
+RouteWrapper.displayName = 'RouteWrapper';
 
 /**
- * Route configuration with lazy loading and protection settings
+ * Route configuration with lazy loading and protection settings.
+ * Defined outside component to prevent recreation on each render.
  */
 const routes: RouteConfig[] = [
   // Public routes
@@ -233,7 +242,6 @@ const routes: RouteConfig[] = [
     ),
     protected: true
   },
-  // Consolidated account route. Keep legacy /profile as redirect below.
   {
     id: 'user-account',
     path: '/account',
@@ -272,6 +280,13 @@ const routes: RouteConfig[] = [
     requireVerification: true
   },
 
+  // Legacy redirect - preserve old profile links
+  {
+    id: 'legacy-profile-redirect',
+    path: '/profile',
+    element: <Navigate to="/account" replace />
+  },
+
   // Catch-all route
   {
     id: 'not-found',
@@ -280,15 +295,24 @@ const routes: RouteConfig[] = [
   }
 ];
 
-// Add a small in-memory redirect map for legacy routes to preserve links
-routes.unshift({
-  id: 'legacy-profile-redirect',
-  path: '/profile',
-  element: <Navigate to="/account" replace />,
-});
+/**
+ * Map of route IDs to their import functions for preloading.
+ * This allows us to trigger imports before navigation occurs.
+ */
+type PreloadMapEntry = () => Promise<{ default: React.ComponentType<unknown> }>;
+const preloadMap: Record<string, PreloadMapEntry> = {
+  'home': () => import('@client/pages/home'),
+  'bills-dashboard': () => import('@client/pages/bills-dashboard-page')
+};
 
 /**
- * AppRouter component handles all application routing with lazy loading and protection
+ * AppRouter component handles all application routing with lazy loading and protection.
+ * 
+ * Performance optimizations:
+ * - Memoized route configurations to prevent recreation
+ * - Stable callback references using useCallback
+ * - Lazy route preloading for critical paths
+ * - Proper error boundary scoping per route
  * 
  * Features:
  * - Lazy loading with code splitting
@@ -310,7 +334,7 @@ export function AppRouter() {
       search: location.search,
       hash: location.hash
     });
-  }, [location]);
+  }, [location.pathname, location.search, location.hash]);
 
   // Preload critical routes on app initialization
   useEffect(() => {
@@ -318,16 +342,15 @@ export function AppRouter() {
       const criticalRoutes = routes.filter(route => route.preload);
       
       for (const route of criticalRoutes) {
-        try {
-          // Trigger lazy loading for critical routes
-          // This is done by accessing the component, which triggers the import
-          if (route.id === 'home') {
-            import('@client/pages/home');
-          } else if (route.id === 'bills-dashboard') {
-            import('@client/pages/bills-dashboard-page');
+        const preloadFn = preloadMap[route.id];
+        if (preloadFn) {
+          try {
+            // Trigger lazy loading for critical routes
+            await preloadFn();
+          } catch (err: unknown) {
+            const errorObj = err instanceof Error ? { message: err.message, stack: err.stack } : { error: String(err) };
+            logger.warn(`Failed to preload route ${route.id}:`, { component: 'AppRouter' }, errorObj);
           }
-        } catch (error) {
-          logger.warn(`Failed to preload route ${route.id}:`, { component: 'AppRouter' }, error);
         }
       }
     };
@@ -335,41 +358,46 @@ export function AppRouter() {
     // Preload after a short delay to not block initial render
     const timeoutId = setTimeout(preloadRoutes, 1000);
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, []); // Empty deps - only run once on mount
 
-  // Handle route errors
-  const handleRouteError = useCallback((error: Error, errorInfo: { componentStack: string }) => {
+  // Memoized error handler for router-level errors
+  const handleRouteError = useCallback((error: Error, errorInfo?: { componentStack?: string | null }) => {
+    const componentStack = errorInfo?.componentStack;
     logger.error('Router error boundary caught error:', { component: 'AppRouter' }, {
       error: error.message,
       stack: error.stack,
-      componentStack: errorInfo.componentStack,
+      componentStack,
       currentPath: location.pathname
     });
   }, [location.pathname]);
 
+  // Memoized fallback component for router-level errors
+  // Note: This doesn't use the full ErrorFallbackProps as we're using a simpler pattern
+  // We leave fallback undefined to use ErrorBoundary's default error display
+  // or pass a custom component that matches ErrorFallbackProps interface
+
+  // Memoize route elements to prevent unnecessary re-renders.
+  // This is particularly important for routes with complex protection logic.
+  const routeElements = useMemo(() => {
+    return routes.map((route) => (
+      <Route
+        key={route.id}
+        path={route.path}
+        element={
+          <RouteWrapper routeName={route.id}>
+            {route.element}
+          </RouteWrapper>
+        }
+      />
+    ));
+  }, []); // Empty deps - routes are static
+
   return (
     <ErrorBoundary
-      FallbackComponent={({ error, resetErrorBoundary }) => (
-        <RouteErrorFallback 
-          error={error} 
-          resetErrorBoundary={resetErrorBoundary} 
-          routeName="Router" 
-        />
-      )}
       onError={handleRouteError}
     >
       <Routes>
-        {routes.map((route) => (
-          <Route
-            key={route.id}
-            path={route.path}
-            element={
-              <RouteWrapper routeName={route.id}>
-                {route.element}
-              </RouteWrapper>
-            }
-          />
-        ))}
+        {routeElements}
       </Routes>
     </ErrorBoundary>
   );

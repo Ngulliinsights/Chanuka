@@ -1,31 +1,35 @@
 import type { Store, UnknownAction } from '@reduxjs/toolkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-// Default QueryClient instance
+import { ThemeProvider } from '@client/contexts/ThemeContext';
+import { SimpleErrorBoundary } from '@client/core/error/components/SimpleErrorBoundary';
+import { LoadingProvider } from '@client/core/loading';
+import { AuthProvider } from '@client/features/users/hooks';
+import { useConnectionAware } from '@client/hooks/useConnectionAware';
+import { useOfflineDetection } from '@client/hooks/useOfflineDetection';
+import { ChanukaProviders } from '@client/shared/design-system';
+import { AccessibilityProvider } from '@client/shared/ui/accessibility/accessibility-manager';
+import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
+import { initializeStore } from '@client/store';
+import { CommunityUIProvider } from '@client/store/slices/communitySlice';
+import { assetLoadingManager } from '@client/utils/assets';
+
+/**
+ * Default QueryClient instance with optimized settings for the Chanuka platform.
+ * The configuration balances data freshness with performance by caching results
+ * for 5 minutes and retrying failed requests twice before giving up.
+ */
 const defaultQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
       retry: 2,
+      refetchOnWindowFocus: false, // Prevent excessive refetching
     },
   },
 });
-
-// PersistGate causes DOM rehydration toggles that can trigger removeChild races
-// during HMR/fast reloads. We'll handle persistor bootstrapping manually.
-import { LoadingProvider } from '@client/core/loading';
-import { AuthProvider } from '@client/features/users/hooks';
-import { useConnectionAware } from '@client/hooks/useConnectionAware';
-import { useOfflineDetection } from '@client/hooks/useOfflineDetection';
-import { ThemeProvider } from '@client/contexts/ThemeContext';
-import { initializeStore } from '@client/store';
-import { CommunityUIProvider } from '@client/store/slices/communitySlice';
-import { assetLoadingManager } from '@client/utils/assets';
-import { AccessibilityProvider } from '@client/shared/ui/accessibility/accessibility-manager';
-import { SimpleErrorBoundary } from '@client/core/error/components/SimpleErrorBoundary';
-import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
 
 // =============================================================================
 // TYPE DEFINITIONS
@@ -36,21 +40,18 @@ interface StoreData {
   persistor: unknown;
 }
 
-// Base provider config for standard providers
 interface BaseProviderConfig {
   name: string;
   component: React.ComponentType<{ children: React.ReactNode }>;
   props?: Record<string, unknown>;
 }
 
-// Special provider config for QueryClientProvider
 interface QueryProviderConfig {
   name: 'QueryClientProvider';
   component: React.ComponentType<{ client?: QueryClient; children: React.ReactNode }>;
   props?: Record<string, unknown>;
 }
 
-// Union type for all provider configs
 type ProviderConfig = BaseProviderConfig | QueryProviderConfig;
 
 interface ProviderOverrides {
@@ -80,11 +81,9 @@ interface AppProvidersProps {
 // =============================================================================
 
 /**
- * Singleton store management ensures the Redux store and persistor are created
- * only once during the application lifecycle, preventing duplicate initialization
- * and maintaining consistent state across provider remounts.
+ * Window interface extension for store caching.
+ * This allows the store to persist across HMR reloads in development.
  */
-// Use a window-backed cache to survive HMR and avoid duplicate initializations
 const STORE_CACHE_KEY = '__CHANUKA_REDUX_STORE__';
 
 interface WindowWithStoreCache extends Window {
@@ -97,6 +96,10 @@ interface WindowWithStoreCache extends Window {
 
 const windowWithCache = typeof window !== 'undefined' ? (window as WindowWithStoreCache) : null;
 
+/**
+ * Module-level store instances with window backup for HMR resilience.
+ * These variables maintain singleton state across component remounts.
+ */
 let storeInstance: Store<unknown, UnknownAction> | null =
   (windowWithCache?.[STORE_CACHE_KEY]?.store as Store<unknown, UnknownAction>) ?? null;
 
@@ -106,12 +109,23 @@ let initializationPromise: Promise<StoreData> | null =
   windowWithCache?.[STORE_CACHE_KEY]?.initializationPromise ?? null;
 
 /**
- * Creates or retrieves the singleton Redux store instance. This function
- * implements a promise-caching pattern to handle concurrent initialization
- * attempts gracefully, ensuring only one store is ever created.
+ * Creates or retrieves the singleton Redux store instance.
+ * 
+ * This function implements a promise-caching pattern to handle concurrent
+ * initialization attempts gracefully. When multiple components try to access
+ * the store simultaneously during app startup, they all receive the same
+ * promise instead of triggering multiple initialization sequences.
+ * 
+ * The pattern works like this:
+ * 1. First caller creates a new promise and starts initialization
+ * 2. Subsequent callers receive the same in-flight promise
+ * 3. Once initialization completes, all callers receive the same store instance
+ * 4. Failed initializations reset the promise to allow retry
+ * 
+ * This prevents race conditions and ensures only one store ever exists.
  */
 async function getOrCreateStore(): Promise<StoreData> {
-  // Return existing store if already initialized
+  // Fast path: Return existing store if already initialized
   if (storeInstance && persistorInstance) {
     return { store: storeInstance, persistor: persistorInstance };
   }
@@ -126,10 +140,12 @@ async function getOrCreateStore(): Promise<StoreData> {
     .then(({ store, persistor }) => {
       storeInstance = store;
       persistorInstance = persistor;
-      // cache on window so HMR / fast reloads reuse the same instances
+      
+      // Cache on window so HMR / fast reloads reuse the same instances
       if (windowWithCache) {
         windowWithCache[STORE_CACHE_KEY] = { store, persistor };
       }
+      
       return { store, persistor };
     })
     .catch(error => {
@@ -142,23 +158,26 @@ async function getOrCreateStore(): Promise<StoreData> {
   return initializationPromise;
 }
 
-// If Vite's HMR is active, ensure we don't keep stale references across module disposes
+/**
+ * HMR disposal handler for Vite.
+ * Preserves store state during hot module replacement while cleaning up
+ * the initialization promise to allow re-initialization if needed.
+ */
 if (import.meta.hot) {
   import.meta.hot.accept();
   import.meta.hot.dispose(() => {
     try {
       if (windowWithCache?.[STORE_CACHE_KEY]) {
-        // keep store around to preserve app state during HMR, but remove promise
         const cached = windowWithCache[STORE_CACHE_KEY];
         if (cached && cached.store && cached.persistor) {
-          // leave store/persistor intact, but clear initializationPromise to allow re-init if needed
+          // Keep store/persistor intact to preserve app state during HMR
           delete windowWithCache[STORE_CACHE_KEY]!.initializationPromise;
         } else {
           delete windowWithCache[STORE_CACHE_KEY];
         }
       }
     } catch (e) {
-      // swallow — HMR disposal should not break app
+      // Swallow errors - HMR disposal should not break app
     }
   });
 }
@@ -169,11 +188,18 @@ if (import.meta.hot) {
 
 /**
  * Wraps LoadingProvider with connection-aware and offline detection hooks.
+ * 
  * This adapter pattern transforms app-level connection state into the format
- * expected by the loading system, enabling intelligent loading behavior based
- * on network conditions.
+ * expected by the loading system. By separating these concerns, we maintain
+ * clean boundaries between different parts of the application while enabling
+ * intelligent loading behavior based on network conditions.
+ * 
+ * The component uses useMemo to prevent unnecessary re-renders when connection
+ * properties haven't actually changed, which is important because the loading
+ * provider sits high in the component tree and affects many children.
  */
-function LoadingProviderWithDeps({ children }: { children: React.ReactNode }) {
+// eslint-disable-next-line react/prop-types
+const LoadingProviderWithDeps = React.memo<{ children: React.ReactNode }>(({ children }) => {
   const connectionInfo = useConnectionAware();
   const { isOnline } = useOfflineDetection();
 
@@ -203,27 +229,34 @@ function LoadingProviderWithDeps({ children }: { children: React.ReactNode }) {
       {children}
     </LoadingProvider>
   );
-}
+});
+
+LoadingProviderWithDeps.displayName = 'LoadingProviderWithDeps';
 
 // =============================================================================
 // REDUX STORE PROVIDER
 // =============================================================================
 
 /**
- * Manages asynchronous Redux store initialization with proper loading and error
- * states. This component ensures the store is fully initialized before rendering
- * child components, providing a smooth user experience during app startup.
+ * Manages asynchronous Redux store initialization with proper loading and error states.
+ * 
+ * This component solves a critical problem: Redux store initialization is async
+ * (it needs to rehydrate from IndexedDB/localStorage), but React components expect
+ * providers to be available immediately. The component handles the async initialization
+ * gracefully by showing loading states and preventing access to uninitialized state.
+ * 
+ * The implementation avoids PersistGate because it can cause DOM manipulation issues
+ * during HMR and strict mode double renders. Instead, we manually subscribe to the
+ * persistor's bootstrap state and use stable loading components that don't toggle.
  */
-function ReduxStoreProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}): React.ReactElement | null {
+// eslint-disable-next-line react/prop-types
+const ReduxStoreProvider = React.memo<{ children: React.ReactNode }>(({ children }) => {
   const [storeData, setStoreData] = useState<StoreData | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const [bootstrapped, setBootstrapped] = useState(false);
   const mountedRef = useRef(true);
 
-  // Create stable loading component to prevent DOM manipulation issues
+  // Memoize stable loading component to prevent DOM manipulation issues
   const persistGateLoading = useMemo(
     () => (
       <div className="chanuka-loading-overlay contrast-aa" key="persist-gate-loading">
@@ -240,21 +273,12 @@ function ReduxStoreProvider({
     []
   );
 
-  // Track whether persistence has finished rehydration. We avoid PersistGate
-  // because it can toggle DOM children during rehydration and cause removeChild
-  // race errors during HMR / strict mode double renders. Instead we subscribe
-  // to the persistor and show the stable `persistGateLoading` until bootstrapped.
-  const [bootstrapped, setBootstrapped] = useState(false);
-
+  // Initialize store on mount
   useEffect(() => {
-    // Track component mount state to prevent state updates after unmount
     mountedRef.current = true;
-    console.log('[ReduxStoreProvider] Starting store initialization');
 
     getOrCreateStore()
       .then(data => {
-        console.log('[ReduxStoreProvider] Store initialized successfully, updating state');
-        // Only update state if component is still mounted
         if (mountedRef.current) {
           setStoreData(data);
         }
@@ -266,14 +290,12 @@ function ReduxStoreProvider({
         }
       });
 
-    // Cleanup function to prevent memory leaks
     return () => {
-      console.log('[ReduxStoreProvider] Component unmounting');
       mountedRef.current = false;
     };
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
 
-  // Subscribe to persistor bootstrapped state when storeData becomes available
+  // Subscribe to persistor bootstrapped state
   useEffect(() => {
     if (!storeData || !storeData.persistor) return;
 
@@ -286,71 +308,69 @@ function ReduxStoreProvider({
     let isSubscribed = true;
 
     try {
-      // If persistor already bootstrapped, flip immediately
-      if (persistor.getState && persistor.getState().bootstrapped) {
+      // If persistor already bootstrapped, update state immediately
+      if (persistor.getState?.()?.bootstrapped) {
         if (mountedRef.current && isSubscribed) {
           setBootstrapped(true);
         }
         return;
       }
 
-      // Otherwise subscribe until bootstrapped
+      // Subscribe until bootstrapped
       const unsubscribe = persistor.subscribe?.(() => {
         try {
-          if (persistor.getState && persistor.getState().bootstrapped) {
-            // Atomic check to prevent race condition with unmounting
+          if (persistor.getState?.()?.bootstrapped) {
             if (mountedRef.current && isSubscribed) {
               setBootstrapped(true);
             }
-            if (typeof unsubscribe === 'function') unsubscribe();
+            if (typeof unsubscribe === 'function') {
+              unsubscribe();
+            }
           }
         } catch (e) {
+          // On error, assume bootstrapped to prevent infinite loading
           if (mountedRef.current && isSubscribed) {
             setBootstrapped(true);
           }
         }
       });
 
-      // Cleanup subscription on unmount
       return () => {
         isSubscribed = false;
         try {
-          if (typeof unsubscribe === 'function') unsubscribe();
+          if (typeof unsubscribe === 'function') {
+            unsubscribe();
+          }
         } catch (e) {
-          // ignore
+          // Ignore cleanup errors
         }
       };
     } catch (e) {
+      // If subscription fails, assume bootstrapped
       setBootstrapped(true);
     }
   }, [storeData]);
 
-  // Error state: display user-friendly error with retry option
-  if (error) {
-    console.log('[ReduxStoreProvider] Rendering error state');
-    const errorConfig = {
-      children: {
-        title: { text: 'Store Initialization Error' },
-        description: {
-          text: 'Failed to initialize the application store. Please refresh the page.',
-        },
-        actions: { children: [{ onClick: () => window.location.reload() }] },
-      },
-    };
+  // Memoize error handler
+  const handleReload = useCallback(() => {
+    window.location.reload();
+  }, []);
 
+  // Error state
+  if (error) {
     return (
       <div className="chanuka-error-boundary contrast-aaa">
         <div className="chanuka-error-boundary-icon" aria-hidden="true">
           ⚠️
         </div>
-        <h2 className="chanuka-error-boundary-title">{errorConfig.children.title.text}</h2>
+        <h2 className="chanuka-error-boundary-title">Store Initialization Error</h2>
         <p className="chanuka-error-boundary-description">
-          {errorConfig.children.description.text}
+          Failed to initialize the application store. Please refresh the page.
         </p>
         <div className="chanuka-error-actions">
           <button
             type="button"
-            onClick={errorConfig.children.actions.children[0].onClick}
+            onClick={handleReload}
             className="chanuka-btn-contrast-safe"
             aria-label="Refresh page to retry initialization"
           >
@@ -361,9 +381,8 @@ function ReduxStoreProvider({
     );
   }
 
-  // Loading state: show spinner while store initializes
+  // Loading state
   if (!storeData) {
-    console.log('[ReduxStoreProvider] Rendering loading state');
     return (
       <div className="chanuka-loading-overlay contrast-aa">
         <div
@@ -378,18 +397,15 @@ function ReduxStoreProvider({
     );
   }
 
-  // Success state: render Redux provider. Show stable loading UI until
-  // persistor bootstraps to avoid rehydration DOM toggles.
-  console.log(
-    '[ReduxStoreProvider] Rendering success state, waiting for bootstrapped:',
-    bootstrapped
-  );
+  // Success state - show stable loading UI until persistor bootstraps
   return (
     <ReduxProvider store={storeData.store as Store<unknown, UnknownAction>}>
       {bootstrapped ? children : persistGateLoading}
     </ReduxProvider>
   );
-}
+});
+
+ReduxStoreProvider.displayName = 'ReduxStoreProvider';
 
 // =============================================================================
 // PROVIDER COMPOSITION CONFIGURATION
@@ -397,11 +413,21 @@ function ReduxStoreProvider({
 
 /**
  * Provider composition array defines the nesting order from innermost to outermost.
- * This order is critical: Redux must be innermost so all other providers can access
- * the store, while error boundaries should be outer to catch errors from all providers.
- *
- * The array is processed with reduceRight to build the nested structure efficiently
- * in a single pass, starting from the children and wrapping outward.
+ * 
+ * The order is carefully designed:
+ * 1. ReduxStoreProvider - Innermost, as all other providers may need store access
+ * 2. QueryClientProvider - React Query for data fetching
+ * 3. ErrorBoundary - Catch errors from all child providers
+ * 4. ChanukaProviders - Brand voice, multilingual, bandwidth-aware rendering
+ * 5. AuthProvider - Authentication context
+ * 6. CommunityUIProvider - Community-specific UI state
+ * 7. ThemeProvider - Theme context
+ * 8. LoadingProvider - Loading state management
+ * 9. AccessibilityProvider - Accessibility features
+ * 10. OfflineProvider - Outermost, can wrap everything with offline detection
+ * 
+ * This configuration is processed with reduceRight to build the nested structure
+ * efficiently in a single pass, starting from children and wrapping outward.
  */
 const PROVIDERS: ProviderConfig[] = [
   { name: 'ReduxStoreProvider', component: ReduxStoreProvider },
@@ -413,6 +439,7 @@ const PROVIDERS: ProviderConfig[] = [
     }>,
   },
   { name: 'ErrorBoundary', component: SimpleErrorBoundary },
+  { name: 'ChanukaProviders', component: ChanukaProviders },
   { name: 'AuthProvider', component: AuthProvider },
   { name: 'CommunityUIProvider', component: CommunityUIProvider },
   { name: 'ThemeProvider', component: ThemeProvider },
@@ -427,39 +454,51 @@ const PROVIDERS: ProviderConfig[] = [
 
 /**
  * AppProviders composes all application-level context providers into a single
- * nested structure. This centralized configuration makes the provider hierarchy
- * easy to understand, modify, and test. The component supports override injection
- * for testing scenarios and custom implementations.
- *
+ * nested structure.
+ * 
+ * This centralized configuration makes the provider hierarchy easy to understand,
+ * modify, and test. The component supports override injection for testing scenarios
+ * and custom implementations, making it flexible for different environments.
+ * 
+ * The composition uses reduceRight to build the nested structure efficiently,
+ * handling special cases like QueryClientProvider that require specific props.
+ * 
  * @param children - The application component tree to wrap with providers
  * @param overrides - Optional provider implementations for testing or customization
  * @param queryClient - React Query client instance (defaults to singleton)
  */
-export function AppProviders({ children, overrides = {}, queryClient }: AppProvidersProps) {
+export function AppProviders({ 
+  children, 
+  overrides = {}, 
+  queryClient 
+}: AppProvidersProps) {
   /**
    * Compose providers from innermost to outermost using reduceRight.
-   * Each iteration wraps the accumulated component tree in the next provider,
-   * handling special cases like QueryClientProvider that require specific props.
+   * 
+   * This approach is more efficient than nested JSX because it creates the
+   * entire tree in one pass. Each iteration wraps the accumulated component
+   * tree in the next provider, building from the inside out.
    */
-  const composedProviders = PROVIDERS.reduceRight((acc, provider) => {
-    // Use override component if provided, otherwise use default
-    const OverrideComponent = overrides[provider.name];
+  const composedProviders = useMemo(() => {
+    return PROVIDERS.reduceRight((acc, provider) => {
+      const OverrideComponent = overrides[provider.name];
 
-    // Special case: QueryClientProvider requires explicit client prop
-    if (provider.name === 'QueryClientProvider') {
-      const QueryComponent = (OverrideComponent || provider.component) as React.ComponentType<{
-        client?: QueryClient;
+      // Special case: QueryClientProvider requires explicit client prop
+      if (provider.name === 'QueryClientProvider') {
+        const QueryComponent = (OverrideComponent || provider.component) as React.ComponentType<{
+          client?: QueryClient;
+          children: React.ReactNode;
+        }>;
+        return <QueryComponent client={queryClient || defaultQueryClient}>{acc}</QueryComponent>;
+      }
+
+      // Standard case: wrap with provider component
+      const Component = (OverrideComponent || provider.component) as React.ComponentType<{
         children: React.ReactNode;
       }>;
-      return <QueryComponent client={queryClient || defaultQueryClient}>{acc}</QueryComponent>;
-    }
-
-    // Standard case: wrap with provider component
-    const Component = (OverrideComponent || provider.component) as React.ComponentType<{
-      children: React.ReactNode;
-    }>;
-    return <Component {...(provider.props || {})}>{acc}</Component>;
-  }, children);
+      return <Component {...(provider.props || {})}>{acc}</Component>;
+    }, children);
+  }, [children, overrides, queryClient]);
 
   return <>{composedProviders}</>;
 }
