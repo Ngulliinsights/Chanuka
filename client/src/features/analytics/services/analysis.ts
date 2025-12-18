@@ -6,8 +6,8 @@
  * transparency rating, and stakeholder impact analysis.
  */
 
-import { logger } from '@client/utils/logger';
 import { globalApiClient } from '@client/core/api/client';
+import { logger } from '@client/utils/logger';
 
 /**
  * Core interfaces for bill analysis system
@@ -93,7 +93,7 @@ class AnalysisService {
   /**
    * Validates that the analysis data has all required fields
    */
-  private validateAnalysisData(data: any): BillAnalysis {
+  private validateAnalysisData(data: unknown): BillAnalysis {
     const required = ['id', 'bill_id', 'conflictScore', 'transparencyRating'];
     const missing = required.filter(field => !(field in data));
     

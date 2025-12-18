@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
-import { ConflictAnalysis, FinancialInterest, VotingPattern } from '@client/types/conflict-of-interest';
+
+import { ConflictAnalysis } from '@client/types/conflict-of-interest';
 
 /**
  * Hook for fetching and managing conflict analysis data

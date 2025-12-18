@@ -13,25 +13,57 @@ import {
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import {
+  useBillSponsorshipAnalysis as useSponsorshipAnalysis
+} from '@client/features/bills/model/hooks/useBills';
+import { ImplementationWorkarounds } from '@client/features/bills/ui/implementation-workarounds';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { ImplementationWorkarounds } from '@client/features/bills/ui/implementation-workarounds';
 
-import {
-  useBillSponsorshipAnalysis as useSponsorshipAnalysis
-} from '@client/features/bills/model/hooks/useBills';
+// Define proper TypeScript interfaces for our data structures
+// This gives TypeScript complete knowledge of what properties exist and their types
+interface Sponsor {
+  id: string;
+  name: string;
+  constituency: string;
+  party: string;
+  position?: string;
+}
+
+interface FinancialBreakdown {
+  directInvestments: number;
+  indirectHoldings: number;
+  familyInterests: number;
+}
+
+interface SponsorshipData {
+  bill_id: string;
+  title: string;
+  number: string;
+  introduced: string;
+  status: string;
+  primarySponsor: Sponsor;
+  coSponsors: Sponsor[];
+  totalFinancialExposure: number;
+  industryAlignment: number;
+  transparencyScore: number;
+  conflictRisk: 'high' | 'medium' | 'low';
+  financialBreakdown: FinancialBreakdown;
+}
 
 export default function BillSponsorshipAnalysis() {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState('overview');
   
-  // Use the existing hooks for data fetching
+  // Fetch data with proper typing - cast the unknown type to our defined interface
+  // This tells TypeScript exactly what shape the data should have
   const { data: sponsorshipData } = useSponsorshipAnalysis(id || '');
+  const apiData = sponsorshipData as SponsorshipData | undefined;
 
-  // Mock data for demonstration when API is not available
-  const mockSponsorshipData = {
+  // Mock data with proper typing for demonstration
+  const mockSponsorshipData: SponsorshipData = {
     bill_id: id || '1',
     title: 'Climate Action Framework Bill 2024',
     number: 'Bill No. 15 of 2024',
@@ -48,7 +80,7 @@ export default function BillSponsorshipAnalysis() {
       { id: 'mp-002', name: 'Hon. James Mwangi', constituency: 'Kiambu East', party: 'Progressive Party' },
       { id: 'mp-003', name: 'Hon. Mary Achieng', constituency: 'Kisumu West', party: 'Democratic Union' }
     ],
-    totalFinancialExposure: 28700000, // KSh 28.7M
+    totalFinancialExposure: 28700000,
     industryAlignment: 73,
     transparencyScore: 85,
     conflictRisk: 'medium',
@@ -59,9 +91,12 @@ export default function BillSponsorshipAnalysis() {
     }
   };
 
-  const data = sponsorshipData || mockSponsorshipData;
+  // Use API data if available, otherwise fall back to mock data
+  // This ensures we always have properly typed data to work with
+  const data: SponsorshipData = apiData || mockSponsorshipData;
 
-  const formatCurrency = (amount: number) => {
+  // Helper function to format currency values consistently
+  const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-KE', {
       style: 'currency',
       currency: 'KES',
@@ -70,7 +105,8 @@ export default function BillSponsorshipAnalysis() {
     }).format(amount);
   };
 
-  const getConflictRiskColor = (risk: string) => {
+  // Helper function to determine styling based on risk level
+  const getConflictRiskColor = (risk: string): string => {
     switch (risk) {
       case 'high': return 'bg-red-100 text-red-800';
       case 'medium': return 'bg-orange-100 text-orange-800';
@@ -99,50 +135,48 @@ export default function BillSponsorshipAnalysis() {
         )}
       </div>
 
-      {/* Bill Overview */}
-      {data && (
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-xl">{data.title}</CardTitle>
-                <CardDescription>{data.number} • Introduced {data.introduced}</CardDescription>
-              </div>
-              <Badge className={getConflictRiskColor(data.conflictRisk)}>
-                {data.conflictRisk.toUpperCase()} CONFLICT RISK
-              </Badge>
+      {/* Bill Overview Card - displays key metrics at a glance */}
+      <Card className="mb-8">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl">{data.title}</CardTitle>
+              <CardDescription>{data.number} • Introduced {data.introduced}</CardDescription>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="text-center p-4 bg-red-50 rounded-lg">
-                <DollarSign className="w-8 h-8 text-red-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-red-600">
-                  {formatCurrency(data.totalFinancialExposure)}
-                </div>
-                <div className="text-sm text-gray-600">Total Financial Exposure</div>
+            <Badge className={getConflictRiskColor(data.conflictRisk)}>
+              {data.conflictRisk.toUpperCase()} CONFLICT RISK
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="text-center p-4 bg-red-50 rounded-lg">
+              <DollarSign className="w-8 h-8 text-red-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-red-600">
+                {formatCurrency(data.totalFinancialExposure)}
               </div>
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <BarChart3 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-600">{data.industryAlignment}%</div>
-                <div className="text-sm text-gray-600">Industry Alignment</div>
-              </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <Shield className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-600">{data.transparencyScore}%</div>
-                <div className="text-sm text-gray-600">Transparency Score</div>
-              </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <Users className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-600">{data.coSponsors.length + 1}</div>
-                <div className="text-sm text-gray-600">Total Sponsors</div>
-              </div>
+              <div className="text-sm text-gray-600">Total Financial Exposure</div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <BarChart3 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-blue-600">{data.industryAlignment}%</div>
+              <div className="text-sm text-gray-600">Industry Alignment</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <Shield className="w-8 h-8 text-green-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-green-600">{data.transparencyScore}%</div>
+              <div className="text-sm text-gray-600">Transparency Score</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <Users className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-purple-600">{data.coSponsors.length + 1}</div>
+              <div className="text-sm text-gray-600">Total Sponsors</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Main Analysis Tabs */}
+      {/* Main Analysis Tabs - organizes different aspects of the analysis */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -152,6 +186,7 @@ export default function BillSponsorshipAnalysis() {
           <TabsTrigger value="workarounds">Workarounds</TabsTrigger>
         </TabsList>
 
+        {/* Overview Tab - shows financial breakdown and risk assessment */}
         <TabsContent value="overview" className="space-y-6">
           <div className="grid lg:grid-cols-2 gap-6">
             <Card>
@@ -166,19 +201,19 @@ export default function BillSponsorshipAnalysis() {
                 <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                   <span className="font-medium">Direct Investments</span>
                   <span className="font-bold text-red-600">
-                    {formatCurrency(data?.financialBreakdown?.directInvestments || 0)}
+                    {formatCurrency(data.financialBreakdown.directInvestments)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
                   <span className="font-medium">Indirect Holdings</span>
                   <span className="font-bold text-orange-600">
-                    {formatCurrency(data?.financialBreakdown?.indirectHoldings || 0)}
+                    {formatCurrency(data.financialBreakdown.indirectHoldings)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
                   <span className="font-medium">Family Interests</span>
                   <span className="font-bold text-yellow-600">
-                    {formatCurrency(data?.financialBreakdown?.familyInterests || 0)}
+                    {formatCurrency(data.financialBreakdown.familyInterests)}
                   </span>
                 </div>
               </CardContent>
@@ -216,6 +251,7 @@ export default function BillSponsorshipAnalysis() {
           </div>
         </TabsContent>
 
+        {/* Primary Sponsor Tab - detailed analysis of the main sponsor */}
         <TabsContent value="primary" className="space-y-6">
           <Card>
             <CardHeader>
@@ -223,63 +259,64 @@ export default function BillSponsorshipAnalysis() {
               <CardDescription>Detailed analysis of the primary bill sponsor</CardDescription>
             </CardHeader>
             <CardContent>
-              {data?.primarySponsor && (
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4 p-6 bg-gray-50 rounded-lg">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Users className="w-8 h-8 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-gray-900">{data.primarySponsor.name}</h3>
-                      <p className="text-gray-600">{data.primarySponsor.constituency} • {data.primarySponsor.party}</p>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4 p-6 bg-gray-50 rounded-lg">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Users className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold text-gray-900">{data.primarySponsor.name}</h3>
+                    <p className="text-gray-600">{data.primarySponsor.constituency} • {data.primarySponsor.party}</p>
+                    {data.primarySponsor.position && (
                       <p className="text-sm text-gray-500 mt-1">{data.primarySponsor.position}</p>
-                      <div className="flex gap-2 mt-3">
-                        <Button size="sm" variant="outline">
-                          <Eye className="w-4 h-4 mr-1" />
-                          View Profile
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <BarChart3 className="w-4 h-4 mr-1" />
-                          Voting History
-                        </Button>
+                    )}
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" variant="outline">
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Profile
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <BarChart3 className="w-4 h-4 mr-1" />
+                        Voting History
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-3">Financial Interests</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Clean Energy Investments</span>
+                        <span className="font-medium">KSh 12.3M</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Environmental Consulting</span>
+                        <span className="font-medium">KSh 3.2M</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Green Technology Shares</span>
+                        <span className="font-medium">KSh 8.7M</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-semibold mb-3">Financial Interests</h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Clean Energy Investments</span>
-                          <span className="font-medium">KSh 12.3M</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Environmental Consulting</span>
-                          <span className="font-medium">KSh 3.2M</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Green Technology Shares</span>
-                          <span className="font-medium">KSh 8.7M</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-semibold mb-3">Committee Positions</h4>
-                      <div className="space-y-2">
-                        <Badge variant="secondary">Environment Committee (Chair)</Badge>
-                        <Badge variant="secondary">Energy Committee (Member)</Badge>
-                        <Badge variant="secondary">Climate Change Caucus (Founder)</Badge>
-                      </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">Committee Positions</h4>
+                    <div className="space-y-2">
+                      <Badge variant="secondary">Environment Committee (Chair)</Badge>
+                      <Badge variant="secondary">Energy Committee (Member)</Badge>
+                      <Badge variant="secondary">Climate Change Caucus (Founder)</Badge>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
+        {/* Co-Sponsors Tab - displays all co-sponsors with their details */}
         <TabsContent value="cosponsors" className="space-y-6">
           <Card>
             <CardHeader>
@@ -288,7 +325,7 @@ export default function BillSponsorshipAnalysis() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {data?.coSponsors?.map((sponsor: { id: string; name: string; constituency: string; party: string }) => (
+                {data.coSponsors.map((sponsor: Sponsor) => (
                   <div key={sponsor.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -313,6 +350,7 @@ export default function BillSponsorshipAnalysis() {
           </Card>
         </TabsContent>
 
+        {/* Financial Network Tab - shows corporate connections and lobbying */}
         <TabsContent value="financial" className="space-y-6">
           <Card>
             <CardHeader>
@@ -374,6 +412,7 @@ export default function BillSponsorshipAnalysis() {
           </Card>
         </TabsContent>
 
+        {/* Workarounds Tab - displays implementation workaround detection */}
         <TabsContent value="workarounds" className="space-y-6">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Implementation Workaround Detection</h2>
@@ -388,6 +427,9 @@ export default function BillSponsorshipAnalysis() {
     </div>
   );
 }
+
+// Wrapper components for different routing scenarios
+// These provide isolated views of specific analysis aspects
 
 export const SponsorshipOverviewWrapper: React.FC = () => {
   const { id } = useParams();
@@ -488,4 +530,3 @@ export const MethodologyWrapper: React.FC = () => {
     </div>
   );
 };
-

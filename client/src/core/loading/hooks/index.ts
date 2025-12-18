@@ -8,3 +8,5 @@ export {
   useSmartTimeoutRecovery,
   useProgressiveTimeout
 } from './useTimeoutAwareLoading';
+
+export { useOnlineStatus } from './useOnlineStatus';

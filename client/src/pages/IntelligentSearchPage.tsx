@@ -5,24 +5,7 @@
  * and provides a complete search experience with dual-engine capabilities.
  */
 
-import { Settings, Save, TrendingUp, Target, Clock, BarChart3 } from 'lucide-react';
-import { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { 
-  Command,
-  CommandDialog,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandShortcut,
-  CommandSeparator
-} from '@client/shared/design-system';
 import { AdvancedSearchInterface } from '@client/features/search/components/AdvancedSearchInterface';
 import { IntelligentAutocomplete } from '@client/features/search/components/IntelligentAutocomplete';
 import { SavedSearches } from '@client/features/search/components/SavedSearches';
@@ -31,6 +14,9 @@ import { SearchFilters } from '@client/features/search/components/SearchFilters'
 import { SearchProgressIndicator } from '@client/features/search/components/SearchProgressIndicator';
 import { SearchResultCard } from '@client/features/search/components/SearchResultCard';
 import { SearchTips } from '@client/features/search/components/SearchTips';
+import { Settings, Save, TrendingUp, Target, Clock, BarChart3 } from 'lucide-react';
+import { useState } from 'react';
+
 import { useIntelligentSearch } from '@client/features/search/hooks/useIntelligentSearch';
 import { usePopularSearches, useSearchHistory } from '@client/features/search/hooks/useSearch';
 import { useStreamingSearch } from '@client/features/search/hooks/useStreamingSearch';
@@ -42,6 +28,20 @@ import type {
   SearchFilters as SearchFiltersType,
 } from '@client/features/search/types';
 import { useToast } from '@client/hooks/use-toast';
+import { 
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator
+} from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
 
 // This type represents what SearchResultCard expects
@@ -364,6 +364,19 @@ export function IntelligentSearchPage() {
     }
   };
 
+  // Add keyboard shortcut for command palette - must be before early returns
+  React.useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setShowCommandPalette(open => !open);
+      }
+    };
+
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
+
   // Show analytics dashboard if enabled
   if (showAnalytics) {
     return (
@@ -397,19 +410,6 @@ export function IntelligentSearchPage() {
   }
 
   const displayResults = getDisplayableResults(results?.results || []);
-
-  // Add keyboard shortcut for command palette
-  React.useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setShowCommandPalette(open => !open);
-      }
-    };
-
-    document.addEventListener('keydown', down);
-    return () => document.removeEventListener('keydown', down);
-  }, []);
 
   return (
     <>

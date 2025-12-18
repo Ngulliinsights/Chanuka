@@ -8,32 +8,23 @@
  * - Privacy settings
  */
 
+import { Shield, FileText, Settings, Download, Eye, Lock } from 'lucide-react';
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 
-import { GDPRComplianceManager } from '@client/features/security/ui/privacy/GDPRComplianceManager';
-import { DataUsageReportDashboard } from '@client/features/security/ui/privacy/DataUsageReportDashboard';
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
+import { DataUsageReportDashboard } from '@client/features/security/ui/privacy/DataUsageReportDashboard';
+import { GDPRComplianceManager } from '@client/features/security/ui/privacy/GDPRComplianceManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Shield, FileText, Settings, Download, Eye, Lock } from 'lucide-react';
 
 export default function PrivacyCenterPage() {
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
     <>
-      <Helmet>
-        <title>Privacy Center - Chanuka Platform</title>
-        <meta 
-          name="description" 
-          content="Manage your privacy settings, view data usage reports, and access GDPR compliance tools." 
-        />
-      </Helmet>
-
       <ErrorBoundary>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8 space-y-6">

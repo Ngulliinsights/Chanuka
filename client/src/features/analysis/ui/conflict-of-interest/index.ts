@@ -5,5 +5,5 @@ export {
   HistoricalPatternAnalysis,
   TransparencyScoring,
   ImplementationWorkaroundsTracker
-} from '../../bills/ui/analysis/conflict-of-interest';
-export type { ConflictOfInterestAnalysisProps } from '../../bills/ui/analysis/conflict-of-interest';
+} from '@client/features/bills/ui/analysis/conflict-of-interest';
+export type { ConflictOfInterestAnalysisProps } from '@client/features/bills/ui/analysis/conflict-of-interest';

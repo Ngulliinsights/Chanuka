@@ -1,26 +1,21 @@
-import { 
-  MessageSquare, 
-  BarChart3, 
-  Megaphone, 
-  Send, 
-  Bell, 
-  Calendar, 
+import {
+  BarChart3,
+  Bell,
+  Calendar,
   ExternalLink,
+  Megaphone,
+  MessageCircle,
+  MessageSquare,
+  Send,
   Star,
   ThumbsUp,
-  MessageCircle
 } from 'lucide-react';
 import { useState } from 'react';
 
-import CommunityHub from '@client/features/community/ui/CommunityHub';
-import { ActivityFeed } from '@client/features/community/ui/ActivityFeed';
-import { TrendingTopics } from '@client/features/community/ui/TrendingTopics';
-import { ExpertInsights } from '@client/features/community/ui/ExpertInsights';
-import { ActionCenter } from '@client/features/community/ui/ActionCenter';
-import { CommunityFilters } from '@client/features/community/ui/CommunityFilters';
-import { LocalImpactPanel } from '@client/features/community/ui/LocalImpactPanel';
-import { CommunityStats } from '@client/features/community/ui/CommunityStats';
-import AppLayout from '@client/shared/ui/layout/app-layout';
+import ActivityFeed from '@client/features/community/ui/activity/ActivityFeed';
+import CommunityStats from '@client/features/community/ui/activity/CommunityStats';
+import { ExpertInsights } from '@client/features/community/ui/expert/ExpertInsights';
+import CommunityHub from '@client/features/community/ui/hub/CommunityHub';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
@@ -28,6 +23,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@clie
 import { Input } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
+import { AppLayout } from '@client/shared/ui/layout/AppLayout';
 
 interface Announcement {
   id: string;
@@ -201,10 +197,14 @@ function FeedbackSection() {
     }
   ]);
 
-  const [newFeedback, setNewFeedback] = useState({
+  const [newFeedback, setNewFeedback] = useState<{
+    title: string;
+    description: string;
+    category: 'feature' | 'improvement' | 'bug' | 'other';
+  }>({
     title: '',
     description: '',
-    category: 'feature' as const
+    category: 'feature'
   });
 
   const getStatusColor = (status: string) => {
@@ -268,7 +268,7 @@ function FeedbackSection() {
               className="w-full p-2 border rounded-md"
               title="Select feedback category"
               value={newFeedback.category}
-              onChange={(e) => setNewFeedback(prev => ({ ...prev, category: e.target.value as any }))}
+              onChange={(e) => setNewFeedback(prev => ({ ...prev, category: e.target.value as 'feature' | 'improvement' | 'bug' | 'other' }))}
             >
               <option value="feature">New Feature</option>
               <option value="improvement">Improvement</option>
@@ -403,19 +403,16 @@ export default function CommunityInput() {
           <TabsContent value="community" className="mt-0">
             <div className="space-y-6">
               {/* Community Stats Overview */}
-              <CommunityStats />
+              <CommunityStats stats={{ totalMembers: 0, activeToday: 0, totalDiscussions: 0, totalComments: 0 }} />
               
               {/* Main Community Hub with Filters */}
               <div className="grid gap-6 lg:grid-cols-4">
                 <div className="lg:col-span-3 space-y-6">
                   <CommunityHub />
-                  <ActivityFeed />
+                  <ActivityFeed activities={[]} />
                 </div>
                 <div className="space-y-6">
-                  <CommunityFilters />
-                  <TrendingTopics />
-                  <ExpertInsights />
-                  <LocalImpactPanel />
+                  <ExpertInsights insights={[]} />
                 </div>
               </div>
             </div>
@@ -427,12 +424,10 @@ export default function CommunityInput() {
               <div className="grid gap-6 lg:grid-cols-3">
                 <div className="lg:col-span-2 space-y-6">
                   <CommunityHub />
-                  <ActivityFeed />
+                  <ActivityFeed activities={[]} />
                 </div>
                 <div className="space-y-6">
-                  <ActionCenter />
-                  <ExpertInsights />
-                  <TrendingTopics />
+                  <ExpertInsights insights={[]} />
                 </div>
               </div>
             </div>

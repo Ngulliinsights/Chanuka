@@ -1,22 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
 
+import { useToast } from '@client/hooks/use-toast';
 import { apiRequest, queryClient } from '@client/lib/queryClient';
-import { logger } from '@client/utils/logger';
 
-import { useToast } from './use-toast';
 
-interface OnboardingProgress {
-  achievement_type: string;
-  achievement_value: number;
-  description: string;
-}
+import type { OnboardingProgressUpdate } from '../types/onboarding';
 
 export function useOnboarding() {
   const { toast } = useToast();
 
   // Update onboarding progress mutation
   const updateProgressMutation = useMutation({
-    mutationFn: async (progress: OnboardingProgress) => {
+    mutationFn: async (progress: OnboardingProgressUpdate) => {
       const res = await apiRequest('POST', '/api/user/onboarding', progress);
       return res.json();
     },

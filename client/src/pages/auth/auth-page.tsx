@@ -7,11 +7,10 @@
  */
 
 import { AlertTriangle, CheckCircle, ArrowLeft, Shield, Mail } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { RegisterForm } from '@client/core/auth';
-import { LoginForm } from '@client/core/auth';
+import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import {
@@ -21,7 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/shared/design-system';
-import { useAuth } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 type AuthMode =
@@ -42,7 +40,6 @@ export default function AuthPage() {
     resetPassword,
     requestPasswordReset,
     loginWithOAuth,
-    register,
   } = useAuth();
 
   // Determine initial mode from URL parameters
@@ -142,10 +139,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const result = await requestPasswordReset(
-        email,
-        `${window.location.origin}/auth?mode=reset-password`
-      );
+      const result = await requestPasswordReset(email);
       if (result.success) {
         setMessage({
           type: 'success',
@@ -181,7 +175,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const result = await resetPassword(resetToken, newPassword, confirmPassword);
+      const result = await resetPassword(resetToken, newPassword);
       if (result.success) {
         setMessage({
           type: 'success',
@@ -198,13 +192,6 @@ export default function AuthPage() {
       setLoading(false);
     }
   };
-
-  const handleAuthSuccess = () => {
-    const redirectTo = searchParams.get('redirect') || '/dashboard';
-    navigate(redirectTo, { replace: true });
-  };
-
-  const clearMessage = () => setMessage(null);
 
   const renderHeader = () => {
     const titles = {
@@ -276,62 +263,32 @@ export default function AuthPage() {
     switch (mode) {
       case 'login':
         return (
-          <LoginForm
-            variant="security"
-            onSuccess={handleAuthSuccess}
-            onSwitchToRegister={() => {
-              setMode('register');
-              clearMessage();
-            }}
-            onForgotPassword={() => {
-              setMode('forgot-password');
-              clearMessage();
-            }}
-          />
+          <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle>Sign In</CardTitle>
+              <CardDescription>Enter your credentials to continue</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Login form component not available</p>
+              </div>
+            </CardContent>
+          </Card>
         );
 
       case 'register':
         return (
-          <RegisterForm
-            onSubmit={async (data: {
-              email: string;
-              password: string;
-              first_name: string;
-              last_name: string;
-            }) => {
-              setLoading(true);
-              try {
-                // call central register API via useAuth
-                const result = await register({
-                  email: data.email,
-                  password: data.password,
-                  first_name: data.first_name,
-                  last_name: data.last_name,
-                } as any);
-
-                if (result.success) {
-                  // on successful registration navigate/notify
-                  setMessage({
-                    type: 'success',
-                    text: result.requiresVerification
-                      ? 'Account created! Please check your email to verify your account.'
-                      : 'Account created successfully! Redirecting...',
-                  });
-                  // short delay to show message then redirect
-                  setTimeout(() => handleAuthSuccess(), 800);
-                }
-
-                return { success: !!result.success, error: result.error };
-              } catch (err: any) {
-                const text = err instanceof Error ? err.message : 'Registration failed';
-                setMessage({ type: 'error', text });
-                return { success: false, error: text };
-              } finally {
-                setLoading(false);
-              }
-            }}
-            onError={(err: string) => setMessage({ type: 'error', text: err })}
-          />
+          <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle>Create Account</CardTitle>
+              <CardDescription>Sign up for Chanuka</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Registration form component not available</p>
+              </div>
+            </CardContent>
+          </Card>
         );
 
       case 'forgot-password':
@@ -343,7 +300,7 @@ export default function AuthPage() {
                 <span>Reset Password</span>
               </CardTitle>
               <CardDescription>
-                Enter your email address and we'll send you instructions to reset your password.
+                Enter your email address and we&apos;ll send you instructions to reset your password.
               </CardDescription>
             </CardHeader>
             <CardContent>

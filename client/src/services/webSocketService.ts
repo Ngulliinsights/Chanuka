@@ -17,7 +17,7 @@ import {
   RealTimeHandlers 
 } from '../types/api';
 
-import { billTrackingService } from './billTrackingService';
+import { billTrackingService } from '../features/bills/services/tracking';
 
 export class WebSocketService {
   private wsManager: UnifiedWebSocketManager;
@@ -204,11 +204,13 @@ export class WebSocketService {
    */
   private handleError(error: unknown): void {
     this.connectionState = ConnectionState.FAILED;
-    this.handlers.onError?.(error);
-    
+    // Ensure we pass an Error object to handlers that expect Error
+    const normalizedError = error instanceof Error ? error : new Error(typeof error === 'string' ? error : 'Unknown error');
+    this.handlers.onError?.(normalizedError);
+
     logger.error('WebSocket error', {
       component: 'WebSocketService',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: normalizedError.message
     });
   }
 

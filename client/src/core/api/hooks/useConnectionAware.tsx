@@ -1,6 +1,26 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
+ * Network Information API interface for connection monitoring
+ */
+interface NetworkInformation {
+  effectiveType?: string;
+  downlink?: number;
+  rtt?: number;
+  addEventListener(type: 'change', listener: () => void): void;
+  removeEventListener(type: 'change', listener: () => void): void;
+}
+
+/**
+ * Extended Navigator interface with connection properties
+ */
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkInformation;
+  mozConnection?: NetworkInformation;
+  webkitConnection?: NetworkInformation;
+}
+
+/**
  * Detailed information about the user's network connection
  */
 export interface ConnectionInfo {
@@ -60,9 +80,9 @@ export function useConnectionAware(): ConnectionInfo {
       }
 
       // Try to get connection object with vendor prefixes for compatibility
-      const connection = (navigator as any).connection || 
-                        (navigator as any).mozConnection || 
-                        (navigator as any).webkitConnection;
+      const connection = (navigator as NavigatorWithConnection).connection || 
+                        (navigator as NavigatorWithConnection).mozConnection || 
+                        (navigator as NavigatorWithConnection).webkitConnection;
 
       if (!connection) {
         // Network Information API not available - assume fast connection
@@ -96,11 +116,11 @@ export function useConnectionAware(): ConnectionInfo {
         connectionType = 'slow';
       } 
       // Secondary check: 3g with poor metrics is considered slow
-      else if (effectiveType === '3g' && (downlink < 1.5 || rtt > 300)) {
+      else if (effectiveType === '3g' && ((downlink && downlink < 1.5) || (rtt && rtt > 300))) {
         connectionType = 'slow';
       }
       // Tertiary check: any connection with critically poor metrics
-      else if (downlink < 0.5 || rtt > 500) {
+      else if ((downlink && downlink < 0.5) || (rtt && rtt > 500)) {
         connectionType = 'slow';
       }
 
@@ -139,9 +159,9 @@ export function useConnectionAware(): ConnectionInfo {
     window.addEventListener('offline', debouncedUpdateConnectionInfo);
 
     // Listen for connection quality changes if API is available
-    const connection = (navigator as any).connection || 
-                      (navigator as any).mozConnection || 
-                      (navigator as any).webkitConnection;
+    const connection = (navigator as NavigatorWithConnection).connection || 
+                      (navigator as NavigatorWithConnection).mozConnection || 
+                      (navigator as NavigatorWithConnection).webkitConnection;
 
     if (connection) {
       connection.addEventListener('change', debouncedUpdateConnectionInfo);

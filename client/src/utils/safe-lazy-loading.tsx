@@ -263,18 +263,18 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
       case '@/pages/dashboard':
         return import('@client/pages/dashboard');
       case '@/pages/bills-dashboard':
-        return import('@client/pages/bills-dashboard-page');
+        return import('@/pages/bills/bills-dashboard-page');
       case '@/pages/bills-dashboard-page':
-        return import('@client/pages/bills-dashboard-page');
+        return import('@/pages/bills/bills-dashboard-page');
       case '@/pages/enhanced-bills-dashboard':
-        return import('@client/pages/bills-dashboard-page');
+        return import('@/pages/bills/bills-dashboard-page');
       case '@/pages/enhanced-bills-dashboard-page':
-        return import('@client/pages/bills-dashboard-page');
+        return import('@/pages/bills/bills-dashboard-page');
       case '@/pages/auth-page':
-        return import('@client/pages/auth-page');
+        return import('@/pages/auth/auth-page');
       case '@/pages/authentication':
         // Redirect old AuthenticationPage imports to the new consolidated auth page
-        return import('@client/pages/auth-page');
+        return import('@/pages/auth/auth-page');
       // Legal / compliance pages
       case '@/pages/terms':
         return import('@client/pages/legal/terms');
@@ -297,9 +297,9 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
       case '@/pages/contact-legal':
         return import('@client/pages/legal/contact-legal');
       case '@/pages/bill-detail':
-        return import('@client/pages/bill-detail');
+        return import('@/pages/bills/bill-detail');
       case '@/pages/bill-analysis':
-        return import('@client/pages/bill-analysis');
+        return import('@/pages/bills/bill-analysis');
       case '@/pages/community-input':
         return import('@client/pages/community-input');
       case '@/pages/expert-verification':
@@ -315,11 +315,11 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
       case '@/pages/onboarding':
         return import('@client/pages/onboarding');
       case '@/pages/admin':
-        return import('@client/pages/admin');
+        return import('@/pages/admin/admin');
       case '@/pages/database-manager':
         return import('@client/pages/database-manager');
       case '@/pages/bill-sponsorship-analysis':
-        return import('@client/pages/bill-sponsorship-analysis');
+        return import('@/pages/bills/bill-sponsorship-analysis');
       case '@/pages/comments':
         return import('@client/pages/comments');
       case '@/pages/not-found':

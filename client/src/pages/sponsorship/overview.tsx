@@ -47,7 +47,7 @@ interface AnalysisData {
   };
 }
 
-export default function sponsorhipOverview({ bill_id  }: OverviewProps) { const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
+export default function SponsorshipOverview({ bill_id  }: OverviewProps) { const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -126,7 +126,7 @@ export default function sponsorhipOverview({ bill_id  }: OverviewProps) { const 
         <div className="flex items-center justify-center min-h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading sponsorhip analysis...</p>
+            <p className="text-muted-foreground">Loading sponsorship analysis...</p>
           </div>
         </div>
       </div>
@@ -154,7 +154,7 @@ export default function sponsorhipOverview({ bill_id  }: OverviewProps) { const 
         <div className="text-center py-12">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">No Analysis Available</h3>
-          <p className="text-muted-foreground">sponsorhip analysis data is not available for this bills.</p>
+          <p className="text-muted-foreground">Sponsorship analysis data is not available for this bill.</p>
         </div>
       </div>
     );
@@ -181,7 +181,7 @@ export default function sponsorhipOverview({ bill_id  }: OverviewProps) { const 
         </Link>
 
         <h1 className="text-3xl font-bold text-foreground mb-2">
-          sponsorhip Overview
+          Sponsorship Overview
         </h1>
         <p className="text-muted-foreground">
           {analysis.title} ({analysis.number})

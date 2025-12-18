@@ -14,7 +14,7 @@ const TEST_ENDPOINTS = [
   '/api',
   '/src/main.tsx',
   '/src/index.css',
-  '/favicon.svg',
+  '/symbol.svg',
   '/manifest.webmanifest'
 ];
 

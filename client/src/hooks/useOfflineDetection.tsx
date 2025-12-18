@@ -91,7 +91,7 @@ export function useOfflineDetection(): OfflineDetectionState & {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const response = await fetch('/favicon.ico', {
+      const response = await fetch('/symbol.svg', {
         method: 'HEAD',
         cache: 'no-cache',
         signal: controller.signal,

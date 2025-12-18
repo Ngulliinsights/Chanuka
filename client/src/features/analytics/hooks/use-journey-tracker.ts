@@ -136,9 +136,11 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
 
   // Cleanup on unmount
   useEffect(() => {
+    const currentTracker = tracker.current;
+    const currentSessionId = sessionIdRef.current;
     return () => {
       // End journey when component unmounts (user leaves)
-      if (tracker.current.getJourney(sessionIdRef.current)) {
+      if (currentTracker.getJourney(currentSessionId)) {
         endJourney();
       }
     };

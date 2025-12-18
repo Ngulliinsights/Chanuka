@@ -3,7 +3,7 @@
  * Provides password validation and strength checking
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface PasswordStrength {
   score: number; // 0-4

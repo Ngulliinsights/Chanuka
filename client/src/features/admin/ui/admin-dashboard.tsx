@@ -3,10 +3,9 @@ import { Users, FileText, MessageSquare as MessageCircle, Shield, Settings, Data
 import { useState } from 'react';
 
 import { globalApiClient } from '@client/core/api/client';
-import { logger } from '@client/utils/logger';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
-// import { MonitoringDashboard } from '../monitoring/monitoring-dashboard';
+import { MonitoringDashboard } from '@client/shared/ui/dashboard/MonitoringDashboard';
+import { logger } from '@client/utils/logger';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {

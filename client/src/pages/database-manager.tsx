@@ -1,20 +1,18 @@
 import { 
   Database, 
-  Server, 
   Activity, 
   HardDrive, 
   Users, 
   FileText, 
   RefreshCw, 
   Download, 
-  Upload, 
   AlertTriangle,
   CheckCircle,
   Clock,
-  Trash2,
+  Trash,
   Settings
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
@@ -404,7 +402,7 @@ export default function DatabaseManager() {
                   </Button>
                   
                   <Button variant="outline" className="w-full">
-                    <Upload className="h-4 w-4 mr-2" />
+                    <Download className="h-4 w-4 mr-2" />
                     Restore from Backup
                   </Button>
                 </div>
@@ -465,7 +463,7 @@ export default function DatabaseManager() {
                   </Button>
                   
                   <Button variant="outline" className="w-full justify-start">
-                    <Trash2 className="h-4 w-4 mr-2" />
+                    <Trash className="h-4 w-4 mr-2" />
                     Clean Temporary Data
                   </Button>
                   

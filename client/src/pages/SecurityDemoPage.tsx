@@ -9,30 +9,28 @@ import {
   CheckCircle, 
   Lock,
   Eye,
-  Zap,
   Activity
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import { SecurityDashboard } from '@client/features/security/ui/dashboard/SecurityDashboard';
 import { SecuritySettings } from '@client/features/security/ui/dashboard/SecuritySettings';
+import { getSecuritySystem } from '@client/security';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
-import { getSecuritySystem } from '@client/security';
 import { logger } from '@client/utils/logger';
 
 export default function SecurityDemoPage() {
   const [testInput, setTestInput] = useState('');
-  const [sanitizedResult, setSanitizedResult] = useState<any>(null);
+  const [sanitizedResult, setSanitizedResult] = useState<{ sanitized?: string; error?: string; wasModified?: boolean; threats?: Array<{ severity: string; type: string; description: string }> } | null>(null);
   const [csrfToken, setCsrfToken] = useState<string>('');
   const [cspNonce, setCspNonce] = useState<string>('');
-  const [rateLimitStatus, setRateLimitStatus] = useState<any>(null);
-  const [vulnerabilities, setVulnerabilities] = useState<any[]>([]);
+  const [rateLimitStatus, setRateLimitStatus] = useState<{ currentRequests?: number; maxRequests?: number; windowMs?: number; blocked?: boolean; testResults?: { totalRequests: number; rateLimitedRequests: number } } | null>(null);
+  const [vulnerabilities, setVulnerabilities] = useState<Array<{ severity?: string; type?: string; description?: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -60,8 +58,8 @@ export default function SecurityDemoPage() {
       setRateLimitStatus(rateLimitInfo);
 
       // Get vulnerabilities
-      const vulns = securitySystem.vulnerabilityScanner.getVulnerabilities();
-      setVulnerabilities(vulns);
+      const vulnerabilityReports = securitySystem.vulnerabilityScanner.getVulnerabilities();
+      setVulnerabilities(vulnerabilityReports);
 
     } catch (error) {
       logger.error('Failed to load security info', { component: 'SecurityDemoPage' }, error);
@@ -119,21 +117,21 @@ export default function SecurityDemoPage() {
       setIsLoading(false);
     }
   };
-
-  const runVulnerabilityScan = async () => {
-    setIsLoading(true);
-    try {
-      const securitySystem = getSecuritySystem();
-      if (securitySystem) {
-        const newVulns = await securitySystem.vulnerabilityScanner.scan();
-        setVulnerabilities(newVulns);
-      }
-    } catch (error) {
-      logger.error('Vulnerability scan failed', { component: 'SecurityDemoPage' }, error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Vulnerability scan functionality - currently not exposed in UI
+  // const runVulnerabilityScan = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const securitySystem = getSecuritySystem();
+  //     if (securitySystem) {
+  //       const newVulnerabilityReports = await securitySystem.vulnerabilityScanner.scan();
+  //       setVulnerabilities(newVulnerabilityReports);
+  //     }
+  //   } catch (error) {
+  //     logger.error('Vulnerability scan failed', { component: 'SecurityDemoPage' }, error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const triggerSecurityEvent = () => {
     // Simulate a security event
@@ -214,7 +212,7 @@ export default function SecurityDemoPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Rate Limiting</CardTitle>
-                <Zap className="h-4 w-4 text-muted-foreground" />
+                <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">Active</div>
@@ -316,13 +314,13 @@ export default function SecurityDemoPage() {
                     <div>
                       <label className="text-sm font-medium">Threats Detected</label>
                       <div className="mt-1 space-y-2">
-                        {sanitizedResult.threats.map((threat: any, index: number) => (
+                        {sanitizedResult.threats.map((threat, index: number) => (
                           <Alert key={index}>
                             <AlertTriangle className="h-4 w-4" />
                             <AlertDescription className="flex items-center justify-between">
                               <div>
                                 <div className="flex items-center space-x-2">
-                                  <Badge className={getSeverityColor(threat.severity)}>
+                                  <Badge className={getSeverityColor(threat.severity || '')}>
                                     {threat.severity}
                                   </Badge>
                                   <span className="font-medium">{threat.type}</span>
@@ -409,15 +407,15 @@ export default function SecurityDemoPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <label className="font-medium">Current Requests</label>
-                    <div className="text-lg font-bold">{rateLimitStatus.currentRequests}</div>
+                    <div className="text-lg font-bold">{rateLimitStatus.currentRequests || 0}</div>
                   </div>
                   <div>
                     <label className="font-medium">Max Requests</label>
-                    <div className="text-lg font-bold">{rateLimitStatus.maxRequests}</div>
+                    <div className="text-lg font-bold">{rateLimitStatus.maxRequests || 0}</div>
                   </div>
                   <div>
                     <label className="font-medium">Window</label>
-                    <div className="text-lg font-bold">{Math.round(rateLimitStatus.windowMs / 1000)}s</div>
+                    <div className="text-lg font-bold">{Math.round((rateLimitStatus.windowMs || 0) / 1000)}s</div>
                   </div>
                   <div>
                     <label className="font-medium">Status</label>
@@ -429,7 +427,7 @@ export default function SecurityDemoPage() {
               )}
 
               <Button onClick={testRateLimit} disabled={isLoading}>
-                <Zap className="h-4 w-4 mr-2" />
+                <Activity className="h-4 w-4 mr-2" />
                 {isLoading ? 'Testing...' : 'Test Rate Limiting'}
               </Button>
 

@@ -22,7 +22,7 @@ export { Progress, progressVariants, type ProgressProps } from './Progress';
 // USER NOTIFICATIONS (Alerts to user, informational messages)
 // ════════════════════════════════════════════════════════════════════
 
-export { Toast } from './Toast';
+export { Toast, type ToastProps, type ToastActionElement } from './Toast';
 export { Toaster } from './Toaster';
 export { Tooltip } from './Tooltip';
 

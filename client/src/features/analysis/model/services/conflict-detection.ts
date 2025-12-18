@@ -22,9 +22,9 @@ export interface ConflictDetectionService {
  */
 export class MockConflictDetectionService implements ConflictDetectionService {
   async detectConflicts(
-    sponsorId: string,
-    billTopics: string[],
-    financialInterests: FinancialInterest[]
+    _sponsorId: string,
+    _billTopics: string[],
+    _financialInterests: FinancialInterest[]
   ): Promise<ConflictAnalysis> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -57,12 +57,12 @@ export class MockConflictDetectionService implements ConflictDetectionService {
     };
   }
 
-  async analyzeFinancialExposure(sponsorId: string): Promise<FinancialInterest[]> {
+  async analyzeFinancialExposure(_sponsorId: string): Promise<FinancialInterest[]> {
     await new Promise(resolve => setTimeout(resolve, 200));
     return [];
   }
 
-  async calculateTransparencyScore(sponsorId: string): Promise<number> {
+  async calculateTransparencyScore(_sponsorId: string): Promise<number> {
     await new Promise(resolve => setTimeout(resolve, 150));
     return 58;
   }

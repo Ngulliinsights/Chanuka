@@ -280,7 +280,7 @@ export function createAdaptiveLoader(config: AdaptiveLoadingConfig) {
  * Connection testing utilities
  */
 
-export async function testConnection(url: string = '/favicon.ico', timeout: number = 5000): Promise<boolean> {
+export async function testConnection(url: string = '/symbol.svg', timeout: number = 5000): Promise<boolean> {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -299,7 +299,7 @@ export async function testConnection(url: string = '/favicon.ico', timeout: numb
 }
 
 export async function measureConnectionSpeed(
-  testUrl: string = '/favicon.ico',
+  testUrl: string = '/symbol.svg',
   testSize: number = 1024
 ): Promise<{ speed: number; latency: number } | null> {
   try {
@@ -333,7 +333,7 @@ export async function measureConnectionSpeed(
 
 export function createOfflineDetector(
   testInterval: number = 30000,
-  testUrl: string = '/favicon.ico'
+  testUrl: string = '/symbol.svg'
 ) {
   let isOnline = navigator.onLine;
   let testTimer: NodeJS.Timeout;

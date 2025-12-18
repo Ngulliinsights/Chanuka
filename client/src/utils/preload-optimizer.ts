@@ -161,7 +161,7 @@ export const smartPreloads: PreloadConfig[] = [
   
   // Critical images - preload only if visible
   {
-    href: '/favicon.svg',
+    href: '/symbol.svg',
     as: 'image',
     type: 'image/svg+xml',
     priority: 'low'

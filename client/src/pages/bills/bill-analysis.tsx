@@ -5,12 +5,12 @@ import {
   Clock, 
   AlertTriangle, 
   CheckCircle, 
-  XCircle,
+  X,
   ArrowLeft,
   FileText,
   BarChart3
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
@@ -149,7 +149,7 @@ export default function BillAnalysis() {
     switch (compliance) {
       case 'Compliant': return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'Concerns': return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-      case 'Violations': return <XCircle className="h-5 w-5 text-red-600" />;
+      case 'Violations': return <X className="h-5 w-5 text-red-600" />;
       default: return <AlertTriangle className="h-5 w-5 text-gray-600" />;
     }
   };

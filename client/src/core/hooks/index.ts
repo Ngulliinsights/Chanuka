@@ -6,9 +6,9 @@
  */
 
 // Infrastructure hooks - these manage system-level concerns
-export { useOfflineDetection } from '../loading/hooks';
-export { useConnectionAware } from '../api/hooks';
-export { useServiceStatus } from '../api/hooks';
+export { useOfflineDetection } from '../../hooks/useOfflineDetection';
+export { useConnectionAware } from '../api/hooks/useConnectionAware';
+export { useServiceStatus } from '../api/hooks/useServiceStatus';
 export { useOnlineStatus } from '../loading/hooks';
 
 // These are placeholder re-exports during migration

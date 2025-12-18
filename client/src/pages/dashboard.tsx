@@ -7,10 +7,10 @@
 
 import React from 'react';
 
-import { UserDashboard, SmartDashboard } from '@client/shared/ui/dashboard';
-import { RealTimeDashboard } from '@client/shared/ui/realtime';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
+import { UserDashboard, SmartDashboard } from '@client/shared/ui/dashboard';
+import { RealTimeDashboard } from '@client/shared/ui/realtime';
 import { logger } from '@client/utils/logger';
 
 export default function Dashboard() {
@@ -20,17 +20,17 @@ export default function Dashboard() {
   React.useEffect(() => {
     logger.info('Enhanced Dashboard page loaded', {
       component: 'Dashboard',
-      userPersona: user?.persona || 'unknown',
+      userId: user?.id || 'unknown',
       isMobile,
       timestamp: new Date().toISOString()
     });
 
     // Activity tracking is now handled by React Query mutations
     // TODO: Add activity tracking mutation when needed
-  }, [user?.persona, isMobile]);
+  }, [user?.id, isMobile]);
 
   // Use smart dashboard for personalized experience
-  if (user?.persona) {
+  if (user) {
     return (
       <div className="min-h-screen bg-background">
         <div className={`container mx-auto px-4 py-6 ${isMobile ? 'space-y-4' : 'space-y-6'}`}>

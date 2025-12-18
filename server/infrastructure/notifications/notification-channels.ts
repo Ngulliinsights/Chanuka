@@ -600,9 +600,9 @@ export class NotificationChannelService {
           }
         }
       },
-      webpush: {
+        webpush: {
         notification: {
-          icon: config.icon || '/icon-192x192.png',
+          icon: config.icon || '/symbol.svg',
           vibrate: config.vibration !== false ? [200, 100, 200] : undefined
         }
       }

@@ -1,14 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useToast } from '../../../hooks/use-toast';
+import { userApi } from '../services/user-api';
 import type {
   LoginCredentials,
   RegisterData,
   UpdateProfileData,
   UpdatePreferencesData,
-  VerificationRequest
-} from '../../../types';
-import { userApi } from '../services/user-api';
+  VerificationRequest,
+  UserProfile
+} from '../types';
 
 /**
  * Hook for user authentication operations
@@ -129,9 +130,9 @@ export function useProfile(user_id?: string) {
   const updateAvatar = useMutation({
     mutationFn: (file: File) => userApi.updateAvatar(file),
     onSuccess: (data) => {
-      queryClient.setQueryData(['profile'], (old: any) => ({
+      queryClient.setQueryData(['profile'], (old: UserProfile) => ({
         ...old,
-        profile: { ...old.profile, avatar: data.avatar }
+        avatar: data.avatar
       }));
       toast({
         title: "Avatar updated",

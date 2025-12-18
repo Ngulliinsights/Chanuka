@@ -4,15 +4,15 @@
  */
 
 import { Shield, Eye, EyeOff, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
+import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
-import { useAuth } from '@client/core/auth';
 import { validatePassword } from '@client/utils/security';
 
 export default function ResetPasswordPage() {
@@ -27,7 +27,14 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [passwordValidation, setPasswordValidation] = useState<any>(null);
+  interface PasswordValidation {
+    isValid: boolean;
+    strength: 'weak' | 'fair' | 'good' | 'strong' | string;
+    score: number;
+    errors: string[];
+  }
+
+  const [passwordValidation, setPasswordValidation] = useState<PasswordValidation | null>(null);
 
   const token = searchParams.get('token');
 
@@ -40,7 +47,7 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     if (password) {
       const validation = validatePassword(password);
-      setPasswordValidation(validation);
+      setPasswordValidation(validation as unknown as PasswordValidation);
     }
   }, [password]);
 
@@ -118,11 +125,11 @@ export default function ResetPasswordPage() {
                 <p className="text-sm text-gray-600">
                   You will be redirected to the sign-in page shortly, or you can click the button below.
                 </p>
-                <Button asChild className="w-full">
-                  <Link to="/auth/login">
+                <Link to="/auth/login">
+                  <Button className="w-full">
                     Continue to Sign In
-                  </Link>
-                </Button>
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
@@ -269,11 +276,11 @@ export default function ResetPasswordPage() {
                 )}
               </Button>
 
-              <Button asChild variant="ghost" className="w-full">
-                <Link to="/auth/login">
+              <Link to="/auth/login">
+                <Button variant="ghost" className="w-full">
                   Back to Sign In
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </form>
           </CardContent>
         </Card>

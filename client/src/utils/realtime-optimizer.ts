@@ -28,13 +28,13 @@ interface OptimizationConfig {
 }
 
 interface MessageBatch {
-  messages: any[];
+  messages: string[];
   timestamp: number;
   size: number;
 }
 
 interface DeltaState {
-  lastSnapshot: any;
+  lastSnapshot: Record<string, unknown>;
   lastUpdateTime: number;
 }
 
@@ -461,12 +461,25 @@ class RealtimeOptimizer {
   /**
    * Calculate delta between two objects
    */
-  private calculateDelta(oldObj: any, newObj: any): any {
-    const delta: any = {};
+  private calculateDelta(oldObj: Record<string, unknown>, newObj: Record<string, unknown>): Record<string, unknown> {
+    const delta: Record<string, unknown> = {};
 
     for (const key in newObj) {
-      if (newObj[key] !== oldObj[key]) {
-        delta[key] = newObj[key];
+      const newVal = newObj[key];
+      const oldVal = oldObj[key];
+
+      try {
+        // Prefer structural comparison for objects where possible
+        const newJson = JSON.stringify(newVal);
+        const oldJson = JSON.stringify(oldVal);
+        if (newJson !== oldJson) {
+          delta[key] = newVal;
+        }
+      } catch {
+        // Fallback to reference/primitive comparison
+        if (newVal !== oldVal) {
+          delta[key] = newVal;
+        }
       }
     }
 

@@ -1,12 +1,11 @@
-import { Shield, Lock, CheckCircle, AlertTriangle } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
-import { logger } from '@client/utils/logger';
-
-import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
 import { Alert, AlertDescription, Button } from '@client/shared/design-system';
+import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
+import { logger } from '@client/utils/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -35,13 +34,13 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
   const getIcon = () => {
     switch (reason) {
       case 'unauthenticated':
-        return <CheckCircle className="h-12 w-12 text-blue-500" />;
+        return <LucideIcons.CheckCircle className="h-12 w-12 text-blue-500" />;
       case 'insufficient_role':
-        return <Shield className="h-12 w-12 text-orange-500" />;
+        return <LucideIcons.Shield className="h-12 w-12 text-orange-500" />;
       case 'unverified':
-        return <AlertTriangle className="h-12 w-12 text-yellow-500" />;
+        return <LucideIcons.AlertTriangle className="h-12 w-12 text-yellow-500" />;
       default:
-        return <Lock className="h-12 w-12 text-gray-500" />;
+        return <LucideIcons.Lock className="h-12 w-12 text-gray-500" />;
     }
   };
 
@@ -137,7 +136,7 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
 
         {/* Additional help information */}
         <Alert className="mt-4">
-          <AlertTriangle className="h-4 w-4" />
+          <LucideIcons.AlertTriangle className="h-4 w-4" />
           <AlertDescription>
             If you believe this is an error, please contact our support team for assistance.
           </AlertDescription>
@@ -208,7 +207,7 @@ export function ProtectedRoute({
   if (loading || !authCheckComplete) {
     return showLoadingState ? (
       <LoadingStateManager
-        type="auth"
+        type="page"
         state="loading"
         message="Checking authentication..."
         className="min-h-screen"
@@ -290,6 +289,7 @@ export function ProtectedRoute({
 /**
  * Higher-order component for creating protected routes with specific requirements
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function createProtectedRoute(defaultProps: Partial<ProtectedRouteProps>) {
   return function ProtectedRouteWrapper(props: ProtectedRouteProps) {
     return <ProtectedRoute {...defaultProps} {...props} />;

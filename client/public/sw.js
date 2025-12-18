@@ -66,7 +66,7 @@ const CONFIG = {
   API_TIMEOUT: 10000, // 10 seconds
   STATIC_ASSETS: [
     '/',
-    '/favicon.ico',
+    '/symbol.svg',
     '/manifest.json'
   ]
 };
@@ -75,8 +75,8 @@ const CONFIG = {
 const DEFAULT_NOTIFICATION = {
   title: 'Chanuka Notification',
   body: 'You have a new notification',
-  icon: '/favicon.ico',
-  badge: '/favicon.ico',
+  icon: '/symbol.svg',
+  badge: '/symbol.svg',
   tag: 'chanuka-notification',
   data: {},
   requireInteraction: false,

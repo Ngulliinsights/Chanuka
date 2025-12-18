@@ -6,35 +6,55 @@
  * for discussion threads, expert verification, and community analytics.
  */
 
+// Type imports first
+import type { DiscussionThread, Comment, CommentFormData } from '@client/types/community';
+
 import { communityApiService } from '@client/core/api/community';
 import { globalWebSocketPool } from '@client/core/api/websocket';
-import { Expert } from '@client/types/expert';
 import { logger } from '@client/utils/logger';
+import type { BillUpdateType } from '@client/core/api/websocket';
 
-import {
-  ActivityItem,
-  TrendingTopic,
-  ExpertInsight,
-  CommunityStats,
-  LocalImpactMetrics
-} from '../../../types/community';
-import {
-  DiscussionThread,
-  Comment,
-  CommentFormData,
-  CommentReport,
-  ModerationViolationType
-} from '../../../types/discussion';
-
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-  metadata?: {
-    timestamp: string;
-    source: string;
-    processingTime: number;
+// Define proper types instead of 'any'
+interface WebSocketBillUpdate {
+  update: {
+    type: 'new_comment' | 'comment_update' | 'expert_contribution' | 'comment_voted' | 'comment_reported';
+    data: Record<string, unknown>;
   };
+  bill_id: number;
+  timestamp: string;
+}
+
+interface WebSocketNotification {
+  type: 'community_activity' | 'expert_verification' | 'moderation_action' | 
+        'comment_reply' | 'expert_insight' | 'campaign_update' | 'petition_milestone';
+  userId?: string;
+  verificationType?: string;
+  credibilityScore?: number;
+  commentId?: string;
+  parentId?: string;
+  billId?: number;
+  authorName?: string;
+  insight?: string;
+  expertName?: string;
+  campaignId?: string;
+  updateType?: string;
+  newCount?: number;
+  milestone?: number;
+  petitionId?: string;
+  currentSignatures?: number;
+  goal?: number;
+  timestamp: string;
+}
+
+interface CommentQueryOptions {
+  sort?: 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
+  expertOnly?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+interface WebSocketUpdateType {
+  type: 'new_comment';
 }
 
 class CommunityBackendService {
@@ -97,24 +117,29 @@ class CommunityBackendService {
   private setupWebSocketListeners(): void {
     const wsManager = globalWebSocketPool.getConnection('ws://localhost:8080');
 
-    wsManager.on('billUpdate', (data: any) => {
-      if (data.update?.type === 'new_comment' || 
-          data.update?.type === 'comment_update' ||
-          data.update?.type === 'expert_contribution' ||
-          data.update?.type === 'comment_voted' ||
-          data.update?.type === 'comment_reported') {
+    // Accept unknown payloads from the WebSocket manager and narrow locally
+    wsManager.on('billUpdate', (raw: unknown) => {
+      const data = raw as WebSocketBillUpdate;
+      if (data?.update && (
+          data.update.type === 'new_comment' || 
+          data.update.type === 'comment_update' ||
+          data.update.type === 'expert_contribution' ||
+          data.update.type === 'comment_voted' ||
+          data.update.type === 'comment_reported')) {
         this.handleCommunityUpdate(data);
       }
     });
 
-    wsManager.on('notification', (data: any) => {
-      if (data.type === 'community_activity' || 
+    wsManager.on('notification', (raw: unknown) => {
+      const data = raw as WebSocketNotification;
+      if (data && (
+          data.type === 'community_activity' || 
           data.type === 'expert_verification' ||
           data.type === 'moderation_action' ||
           data.type === 'comment_reply' ||
           data.type === 'expert_insight' ||
           data.type === 'campaign_update' ||
-          data.type === 'petition_milestone') {
+          data.type === 'petition_milestone')) {
         this.handleCommunityNotification(data);
       }
     });
@@ -131,7 +156,7 @@ class CommunityBackendService {
   /**
    * Handle real-time community updates
    */
-  private handleCommunityUpdate(data: any): void {
+  private handleCommunityUpdate(data: WebSocketBillUpdate): void {
     window.dispatchEvent(new CustomEvent('communityUpdate', { 
       detail: {
         type: data.update.type,
@@ -145,7 +170,7 @@ class CommunityBackendService {
   /**
    * Handle community notifications
    */
-  private handleCommunityNotification(data: any): void {
+  private handleCommunityNotification(data: WebSocketNotification): void {
     window.dispatchEvent(new CustomEvent('communityNotification', { 
       detail: data 
     }));
@@ -182,7 +207,9 @@ class CommunityBackendService {
     });
   }
 
-  private handleExpertVerificationNotification(data: any): void {
+  private handleExpertVerificationNotification(data: WebSocketNotification): void {
+    if (!data.userId) return;
+    
     window.dispatchEvent(new CustomEvent('expertVerificationUpdate', {
       detail: {
         userId: data.userId,
@@ -193,7 +220,9 @@ class CommunityBackendService {
     }));
   }
 
-  private handleCommentReplyNotification(data: any): void {
+  private handleCommentReplyNotification(data: WebSocketNotification): void {
+    if (!data.commentId) return;
+    
     window.dispatchEvent(new CustomEvent('commentReply', {
       detail: {
         commentId: data.commentId,
@@ -205,7 +234,9 @@ class CommunityBackendService {
     }));
   }
 
-  private handleExpertInsightNotification(data: any): void {
+  private handleExpertInsightNotification(data: WebSocketNotification): void {
+    if (!data.billId) return;
+    
     window.dispatchEvent(new CustomEvent('expertInsightAdded', {
       detail: {
         billId: data.billId,
@@ -216,7 +247,9 @@ class CommunityBackendService {
     }));
   }
 
-  private handleCampaignUpdateNotification(data: any): void {
+  private handleCampaignUpdateNotification(data: WebSocketNotification): void {
+    if (!data.campaignId) return;
+    
     window.dispatchEvent(new CustomEvent('campaignUpdate', {
       detail: {
         campaignId: data.campaignId,
@@ -228,7 +261,9 @@ class CommunityBackendService {
     }));
   }
 
-  private handlePetitionMilestoneNotification(data: any): void {
+  private handlePetitionMilestoneNotification(data: WebSocketNotification): void {
+    if (!data.petitionId) return;
+    
     window.dispatchEvent(new CustomEvent('petitionMilestone', {
       detail: {
         petitionId: data.petitionId,
@@ -263,12 +298,7 @@ class CommunityBackendService {
    */
   async getBillComments(
     billId: number,
-    options: {
-      sort?: 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
-      expertOnly?: boolean;
-      limit?: number;
-      offset?: number;
-    } = {}
+    options: CommentQueryOptions = {}
   ): Promise<Comment[]> {
     try {
       return await communityApiService.getBillComments(billId, options);
@@ -314,7 +344,8 @@ class CommunityBackendService {
       return;
     }
 
-    wsManager.subscribeToBill(billId, ['new_comment'] as any);
+    const updateTypes: BillUpdateType[] = ['new_comment'];
+    wsManager.subscribeToBill(billId, updateTypes);
     
     logger.info('Subscribed to discussion updates', { 
       component: 'CommunityBackendService', 
@@ -338,13 +369,6 @@ class CommunityBackendService {
     logger.info('Subscribed to community updates', { 
       component: 'CommunityBackendService' 
     });
-  }
-
-  /**
-   * Get authentication token from storage
-   */
-  private getAuthToken(): string {
-    return localStorage.getItem('authToken') || '';
   }
 
   /**

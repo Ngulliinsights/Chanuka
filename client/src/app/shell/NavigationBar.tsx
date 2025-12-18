@@ -1,14 +1,13 @@
-import { Search, Bell, User, Settings, LogOut, Menu, Home } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { useNavigation } from '@client/core/navigation/context';
 import { useAuth } from '@client/core/auth';
+import { useNavigation } from '@client/core/navigation/context';
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { cn } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
-
 import { Avatar, AvatarFallback, AvatarImage, Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, Input } from '@client/shared/design-system';
+import { logger } from '@client/utils/logger';
 
 interface NavigationBarProps {
   className?: string;
@@ -347,7 +346,7 @@ export function NavigationBar({
                 className="mr-2 p-2"
                 aria-label="Toggle mobile menu"
               >
-                <Menu className="h-5 w-5" />
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
               </Button>
             )}
 
@@ -356,7 +355,7 @@ export function NavigationBar({
               className="flex items-center space-x-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1"
               aria-label="Chanuka home"
             >
-              <Home className="h-6 w-6" />
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
               <span className="hidden sm:block">Chanuka</span>
             </Link>
           </div>
@@ -366,7 +365,7 @@ export function NavigationBar({
             <div className="flex-1 max-w-lg mx-8 relative">
               <form onSubmit={handleSearchSubmit} className="relative">
                 <div className="relative">
-                  <Search 
+                  <LucideIcons.Search 
                     className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" 
                     aria-hidden="true"
                   />
@@ -484,7 +483,7 @@ export function NavigationBar({
                 className="p-2"
                 aria-label="Search"
               >
-                <Search className="h-5 w-5" />
+                <LucideIcons.Search className="h-5 w-5" />
               </Button>
             )}
 
@@ -497,7 +496,7 @@ export function NavigationBar({
                     className="relative p-2"
                     aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
                   >
-                    <Bell className="h-5 w-5" />
+                    <LucideIcons.Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
                       <Badge
                         variant="destructive"
@@ -582,13 +581,13 @@ export function NavigationBar({
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/account" className="flex items-center cursor-pointer">
-                          <User className="mr-2 h-4 w-4" />
+                          <LucideIcons.User className="mr-2 h-4 w-4" />
                           <span>Profile</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to="/account/settings" className="flex items-center cursor-pointer">
-                          <Settings className="mr-2 h-4 w-4" />
+                          <LucideIcons.Settings className="mr-2 h-4 w-4" />
                           <span>Settings</span>
                         </Link>
                       </DropdownMenuItem>
@@ -597,7 +596,7 @@ export function NavigationBar({
                         onClick={handleLogout} 
                         className="flex items-center cursor-pointer"
                       >
-                        <LogOut className="mr-2 h-4 w-4" />
+                        <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                         <span>Log out</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

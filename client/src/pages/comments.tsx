@@ -441,7 +441,7 @@ export default function CommentsPage() {
               </div>
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                <p>Focus on the bill's content and implications</p>
+                <p>Focus on the bill&apos;s content and implications</p>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>

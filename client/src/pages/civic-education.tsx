@@ -1,12 +1,11 @@
 import {
-  Play,
-  BookOpen,
+  ArrowRight,
+  FileText,
   Target,
   Clock,
   CheckCircle,
-  Video,
+  Monitor,
   TrendingUp,
-  Lightbulb,
   ChevronRight,
   Star,
   Award,
@@ -378,7 +377,7 @@ const CivicEducationPage: React.FC = () => {
         {/* Header section with title and description */}
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <BookOpen className="w-12 h-12 text-blue-600" />
+            <FileText className="w-12 h-12 text-blue-600" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Civic Education Center
             </h1>
@@ -412,11 +411,11 @@ const CivicEducationPage: React.FC = () => {
               Learning Paths
             </TabsTrigger>
             <TabsTrigger value="video-library" className="flex items-center gap-2">
-              <Video className="w-4 h-4" />
+              <Monitor className="w-4 h-4" />
               Video Library
             </TabsTrigger>
             <TabsTrigger value="case-studies" className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4" />
+              <Star className="w-4 h-4" />
               Case Studies
             </TabsTrigger>
           </TabsList>
@@ -429,7 +428,7 @@ const CivicEducationPage: React.FC = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="w-5 h-5" />
+                      <FileText className="w-5 h-5" />
                       Choose Your Path
                     </CardTitle>
                     <CardDescription>
@@ -465,7 +464,7 @@ const CivicEducationPage: React.FC = () => {
                                 {path.estimatedTime}
                               </span>
                               <span className="flex items-center gap-1">
-                                <Play className="w-3 h-3" />
+                                <ArrowRight className="w-3 h-3" />
                                 {path.modules.length} modules
                               </span>
                             </div>
@@ -537,7 +536,7 @@ const CivicEducationPage: React.FC = () => {
                       {/* Module list with completion tracking */}
                       <div>
                         <h3 className="font-semibold mb-3 flex items-center gap-2">
-                          <Play className="w-4 h-4" />
+                          <ArrowRight className="w-4 h-4" />
                           Course Modules
                         </h3>
                         <div className="space-y-3">
@@ -580,7 +579,7 @@ const CivicEducationPage: React.FC = () => {
                                       onClick={() => markModuleComplete(module.id)}
                                       className="flex items-center gap-1"
                                     >
-                                      <Play className="w-3 h-3" />
+                                      <ArrowRight className="w-3 h-3" />
                                       Watch
                                     </Button>
                                   )}
@@ -664,7 +663,7 @@ const CivicEducationPage: React.FC = () => {
                         onClick={() => markModuleComplete(module.id)}
                         disabled={completedModules.has(module.id)}
                       >
-                        <Play className="w-4 h-4 mr-2" />
+                        <ArrowRight className="w-4 h-4 mr-2" />
                         {completedModules.has(module.id) ? 'Watched' : 'Watch Video'}
                       </Button>
                     </CardContent>
@@ -724,7 +723,7 @@ const CivicEducationPage: React.FC = () => {
 
                     <div>
                       <h4 className="font-semibold mb-3 flex items-center gap-2">
-                        <Lightbulb className="w-4 h-4" />
+                        <Target className="w-4 h-4" />
                         Key Lessons
                       </h4>
                       <div className="space-y-2">
@@ -742,7 +741,7 @@ const CivicEducationPage: React.FC = () => {
 
                     {study.videoUrl && (
                       <Button className="w-full md:w-auto">
-                        <Video className="w-4 h-4 mr-2" />
+                        <Monitor className="w-4 h-4 mr-2" />
                         Watch Case Study Video
                       </Button>
                     )}

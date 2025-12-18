@@ -33,7 +33,7 @@ import { ImplementationWorkaroundsTracker } from './ImplementationWorkaroundsTra
 import { TransparencyScoring } from './TransparencyScoring';
 
 
-interface ConflictOfInterestAnalysisProps {
+export interface ConflictOfInterestAnalysisProps {
   bill: Bill;
 }
 

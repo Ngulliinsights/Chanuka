@@ -21,16 +21,16 @@ import type {
 /**
  * Configuration interface for cache behavior
  */
-interface CacheConfig {
-  ttl: number;
-  maxSize?: number;
-}
+// interface CacheConfig {
+//   ttl: number;
+//   maxSize?: number;
+// }
 
 // Cache configuration constants
-const CACHE_CONFIG: CacheConfig = {
-  ttl: 5 * 60 * 1000, // 5 minutes
-  maxSize: 100
-};
+// const CACHE_CONFIG: CacheConfig = {
+//   ttl: 5 * 60 * 1000, // 5 minutes
+//   maxSize: 100
+// };
 
 /**
  * Cache entry structure with metadata
@@ -46,7 +46,7 @@ interface CacheEntry<T> {
  * Handles data transformation, caching, and complex analytics workflows.
  */
 export class AnalyticsService {
-  private cache = new Map<string, CacheEntry<any>>();
+  private cache = new Map<string, CacheEntry<unknown>>();
   private readonly defaultCacheTTL = 5 * 60 * 1000; // 5 minutes
   private readonly maxCacheSize = 100; // Prevent unlimited memory growth
 
@@ -111,7 +111,7 @@ export class AnalyticsService {
       .reduce((acc, key) => {
         acc[key] = filters[key as keyof AnalyticsFilters];
         return acc;
-      }, {} as any);
+      }, {} as AnalyticsFilters);
     
     return `${prefix}-${JSON.stringify(sortedFilters)}`;
   }
@@ -203,12 +203,12 @@ export class AnalyticsService {
     billId: string, 
     filters?: AnalyticsFilters
   ): Promise<BillAnalytics & { 
-    conflicts: any[]; 
+    conflicts: unknown[]; 
     riskLevel: 'low' | 'medium' | 'high';
   }> {
     const cacheKey = this.generateCacheKey(`bill-${billId}`, filters);
     const cached = this.getCached<BillAnalytics & { 
-      conflicts: any[]; 
+      conflicts: unknown[]; 
       riskLevel: 'low' | 'medium' | 'high';
     }>(cacheKey);
     
@@ -224,7 +224,7 @@ export class AnalyticsService {
 
     // Merge conflict data with analytics and calculate risk
     const enhancedData: BillAnalytics & { 
-      conflicts: any[]; 
+      conflicts: unknown[]; 
       riskLevel: 'low' | 'medium' | 'high';
     } = {
       ...analytics,
@@ -421,7 +421,7 @@ export class AnalyticsService {
    * Retrieves stakeholder analysis with impact scoring.
    * Assesses stakeholder influence and potential effects on outcomes.
    */
-  async getStakeholderAnalysis(billId?: string): Promise<any[]> {
+  async getStakeholderAnalysis(billId?: string): Promise<unknown[]> {
     const rawData = await analyticsApiService.getStakeholderAnalysis(billId);
 
     // Ensure we're working with an array and enhance with impact scores
@@ -444,7 +444,7 @@ export class AnalyticsService {
   async exportAnalytics(
     filters?: AnalyticsFilters, 
     format: 'csv' | 'json' = 'json'
-  ): Promise<any> {
+  ): Promise<unknown> {
     const rawData = await analyticsApiService.exportAnalytics(filters, format);
     return this.formatExportData(rawData, format);
   }
@@ -540,7 +540,7 @@ export class AnalyticsService {
    * Determines risk level for a bill based on conflict severity distribution.
    * Uses weighted analysis of conflict levels to categorize risk.
    */
-  private calculateBillRiskLevel(conflicts: any[]): 'low' | 'medium' | 'high' {
+  private calculateBillRiskLevel(conflicts: unknown[]): 'low' | 'medium' | 'high' {
     const highSeverityConflicts = conflicts.filter(
       c => c.conflict_level === 'high'
     ).length;
@@ -564,7 +564,7 @@ export class AnalyticsService {
    * Analyzes engagement trends over time to identify patterns.
    * Compares recent activity with previous period to detect directional changes.
    */
-  private analyzeEngagementTrends(dailyData: any[]): {
+  private analyzeEngagementTrends(dailyData: unknown[]): {
     direction: 'up' | 'down' | 'stable';
     changePercent: number;
     momentum: number;
@@ -615,7 +615,7 @@ export class AnalyticsService {
    * Calculates engagement score using weighted metrics.
    * Different engagement types are weighted based on their relative value.
    */
-  private calculateEngagementScore(metrics: any): number {
+  private calculateEngagementScore(metrics: unknown): number {
     // Define weights for different engagement types
     const weights = {
       views: 0.3,      // Base engagement
@@ -687,7 +687,7 @@ export class AnalyticsService {
    * Generates actionable recommendations based on conflict analysis.
    * Provides guidance for addressing identified conflicts.
    */
-  private generateConflictRecommendations(conflicts: any[]): string[] {
+  private generateConflictRecommendations(conflicts: unknown[]): string[] {
     const recommendations: string[] = [];
 
     if (conflicts.length === 0) {
@@ -731,7 +731,7 @@ export class AnalyticsService {
    * Calculates overall conflict priority score for resource allocation.
    * Combines conflict severity and confidence levels into single metric.
    */
-  private calculateConflictPriority(conflicts: any[]): number {
+  private calculateConflictPriority(conflicts: unknown[]): number {
     if (conflicts.length === 0) {
       return 0;
     }
@@ -845,7 +845,7 @@ export class AnalyticsService {
    * Calculates stakeholder impact score based on position and reach.
    * Considers both sentiment and affected population size.
    */
-  private calculateStakeholderImpact(stakeholder: any): number {
+  private calculateStakeholderImpact(stakeholder: unknown): number {
     // Map impact sentiment to numeric values
     const impactValues: Record<string, number> = {
       positive: 1,
@@ -865,7 +865,7 @@ export class AnalyticsService {
    * Calculates sentiment score for a topic.
    * Currently uses placeholder logic; should be replaced with ML model.
    */
-  private calculateTopicSentiment(topic: any): number {
+  private calculateTopicSentiment(topic: unknown): number {
     // TODO: Integrate with sentiment analysis model
     // Placeholder logic based on topic properties
     const baseScore = topic.count ? Math.min(topic.count / 100, 1) : 0.5;
@@ -877,7 +877,7 @@ export class AnalyticsService {
    * Calculates trend velocity indicating rate of topic growth.
    * Higher velocity means faster-growing topics.
    */
-  private calculateTrendVelocity(topic: any): number {
+  private calculateTrendVelocity(topic: unknown): number {
     // Velocity based on count and trend direction
     const baseVelocity = topic.count || 0;
 
@@ -898,7 +898,7 @@ export class AnalyticsService {
    * Formats export data according to requested format.
    * Handles transformation from internal representation to export format.
    */
-  private formatExportData(data: any, format: string): any {
+  private formatExportData(data: unknown, format: string): unknown {
     if (format === 'csv') {
       return this.convertToCSV(data);
     }
@@ -911,7 +911,7 @@ export class AnalyticsService {
    * Converts data to CSV format with proper escaping.
    * Handles array data structures for tabular export.
    */
-  private convertToCSV(data: any): string {
+  private convertToCSV(data: unknown): string {
     if (!Array.isArray(data) || data.length === 0) {
       return '';
     }
@@ -920,7 +920,7 @@ export class AnalyticsService {
     const headers = Object.keys(data[0]);
     
     // Escape CSV values to handle commas and quotes
-    const escapeCSVValue = (value: any): string => {
+    const escapeCSVValue = (value: unknown): string => {
       const stringValue = String(value ?? '');
       
       // Wrap in quotes if contains comma, quote, or newline
@@ -947,7 +947,7 @@ export class AnalyticsService {
    * Calculates system health score from current metrics.
    * Provides normalized 0-1 score indicating overall system health.
    */
-  private calculateSystemHealthScore(metrics: any): number {
+  private calculateSystemHealthScore(metrics: unknown): number {
     // Normalize active users (assuming 100 is target healthy level)
     const targetActiveUsers = 100;
     const userScore = Math.min(
@@ -1003,7 +1003,7 @@ export class AnalyticsService {
    * Calculates momentum (acceleration) of a trend over time.
    * Positive momentum indicates accelerating growth.
    */
-  private calculateMomentum(dataPoints: any[]): number {
+  private calculateMomentum(dataPoints: unknown[]): number {
     if (dataPoints.length < 3) {
       return 0;
     }

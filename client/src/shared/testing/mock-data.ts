@@ -6,7 +6,7 @@
  * and real-time simulation throughout the application.
  */
 
-import { DiscussionThread } from '@client/types/discussion';
+import type { DiscussionThread } from '@client/types/community';
 import { logger } from '@client/utils/logger';
 
 // Note: These imports would need to be updated based on actual mock data structure

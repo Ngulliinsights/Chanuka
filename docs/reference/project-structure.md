@@ -32,8 +32,7 @@ client/
 │   ├── Chanuka_logo.png
 │   ├── Chanuka_logo.svg
 │   ├── Chanuka_logo.webp
-│   ├── favicon.ico
-│   ├── favicon.svg
+│   ├── symbol.svg
 │   ├── icon-144x144.png
 │   ├── logo-192.png
 │   ├── manifest.json

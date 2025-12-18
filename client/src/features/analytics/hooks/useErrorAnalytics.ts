@@ -47,7 +47,6 @@ export function useErrorAnalytics(options: UseErrorAnalyticsOptions = {}) {
 
   const dispatch = useDispatch();
   const refreshTimerRef = useRef<NodeJS.Timeout>();
-  const webSocketRef = useRef<any>();
 
   // Selectors
   const overviewMetrics = useSelector(selectOverviewMetrics);
@@ -120,7 +119,7 @@ export function useErrorAnalytics(options: UseErrorAnalyticsOptions = {}) {
     dispatch(updateFilters(newFilters));
   }, [dispatch]);
 
-  const updateTimeRange = useCallback((timeRange: any) => {
+  const updateTimeRange = useCallback((timeRange: unknown) => {
     dispatch(updateFilters({ timeRange }));
   }, [dispatch]);
 
@@ -210,7 +209,7 @@ export function useErrorAnalytics(options: UseErrorAnalyticsOptions = {}) {
   // Initial data load
   useEffect(() => {
     loadAllData();
-  }, []); // Only run once on mount
+  }, [loadAllData]); // Only run once on mount
 
   // Cleanup on unmount
   useEffect(() => {
@@ -275,15 +274,15 @@ export function useRealTimeErrorMonitoring() {
   const realTimeMetrics = useSelector(selectRealTimeMetrics);
   const connectionStatus = useSelector(selectConnectionStatus);
 
-  const addRealTimeError = useCallback((error: any) => {
+  const addRealTimeError = useCallback((error: unknown) => {
     dispatch({ type: 'errorAnalytics/addRealTimeError', payload: error });
   }, [dispatch]);
 
-  const addRealTimeAlert = useCallback((alert: any) => {
+  const addRealTimeAlert = useCallback((alert: unknown) => {
     dispatch({ type: 'errorAnalytics/addRealTimeAlert', payload: alert });
   }, [dispatch]);
 
-  const updateRealTimeMetrics = useCallback((metrics: any) => {
+  const updateRealTimeMetrics = useCallback((metrics: unknown) => {
     dispatch({ type: 'errorAnalytics/updateRealTimeMetrics', payload: metrics });
   }, [dispatch]);
 

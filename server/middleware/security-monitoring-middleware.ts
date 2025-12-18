@@ -27,7 +27,7 @@ export class SecurityMonitoringMiddleware {
       enableBehavioralAnalysis: true,
       enableRealTimeBlocking: true,
       enableAuditLogging: true,
-      bypassPaths: ['/health', '/metrics', '/favicon.ico'],
+      bypassPaths: ['/health', '/metrics', '/symbol.svg'],
       alertThreshold: 70,
       ...options
     };
@@ -401,7 +401,7 @@ export const securityMonitoringMiddleware = new SecurityMonitoringMiddleware({
   enableBehavioralAnalysis: true,
   enableRealTimeBlocking: process.env.NODE_ENV === 'production',
   enableAuditLogging: true,
-  bypassPaths: ['/health', '/metrics', '/favicon.ico', '/api/health'],
+  bypassPaths: ['/health', '/metrics', '/symbol.svg', '/api/health'],
   alertThreshold: 70
 });
 

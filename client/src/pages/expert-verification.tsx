@@ -10,22 +10,18 @@ import {
   Clock,
   Star,
   Award,
-  FileText,
-  Eye
+  FileText
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { ExpertBadge, ExpertBadgeGroup } from '@client/features/users/ui/verification/ExpertBadge';
+import { ExpertBadge } from '@client/features/users/ui/verification/ExpertBadge';
+import { ExpertConsensus } from '@client/features/users/ui/verification/ExpertConsensus';
+import { ExpertProfileCard } from '@client/features/users/ui/verification/ExpertProfileCard';
 import { ExpertVerificationDemo } from '@client/features/users/ui/verification/ExpertVerificationDemo';
 import { VerificationWorkflow } from '@client/features/users/ui/verification/VerificationWorkflow';
-import { CredibilityIndicator, CredibilityBreakdown } from '@client/features/users/ui/verification/CredibilityScoring';
-import { ExpertProfileCard } from '@client/features/users/ui/verification/ExpertProfileCard';
-import { CommunityValidation, ValidationSummary } from '@client/features/users/ui/verification/CommunityValidation';
-import { ExpertConsensus, ConsensusIndicator } from '@client/features/users/ui/verification/ExpertConsensus';
+import { Badge } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 export default function ExpertVerification() {
   const [activeTab, setActiveTab] = useState('overview');

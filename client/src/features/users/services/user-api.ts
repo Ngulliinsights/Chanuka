@@ -39,21 +39,21 @@ interface UpdateProfileData {
 }
 
 interface UpdatePreferencesData {
-  theme?: 'light' | 'dark';
+  theme?: 'light' | 'dark' | 'system';
   notifications?: boolean;
   privacy?: 'public' | 'private';
 }
 
 interface VerificationRequest {
-  type: 'email' | 'phone';
-  value: string;
-  documents?: File[];
+  type: 'citizen' | 'expert';
+  documents: File[];
   notes?: string;
 }
 
 interface AuthResponse {
   user: User;
   token: string;
+  refresh_token: string;
   expiresAt: string;
 }
 

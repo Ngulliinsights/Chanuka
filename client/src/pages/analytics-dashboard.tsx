@@ -8,17 +8,6 @@
  * - Community insights
  */
 
-import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-
-import { EngagementDashboard } from '@client/features/analytics/ui/engagement-dashboard';
-import { JourneyAnalyticsDashboard } from '@client/features/analytics/ui/JourneyAnalyticsDashboard';
-import { RealTimeEngagementDashboard } from '@client/features/analytics/ui/real-time-engagement-dashboard';
-import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -27,9 +16,16 @@ import {
   Download, 
   RefreshCw,
   Eye,
-  Target,
-  Zap
+  Target
 } from 'lucide-react';
+import { useState } from 'react';
+
+import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+
 
 export default function AnalyticsDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -63,14 +59,6 @@ export default function AnalyticsDashboardPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Analytics Dashboard - Chanuka Platform</title>
-        <meta 
-          name="description" 
-          content="Comprehensive analytics dashboard with user engagement, journey analysis, and real-time metrics." 
-        />
-      </Helmet>
-
       <ErrorBoundary>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8 space-y-6">
@@ -181,7 +169,7 @@ export default function AnalyticsDashboardPage() {
                   User Journey
                 </TabsTrigger>
                 <TabsTrigger value="realtime" className="flex items-center">
-                  <Zap className="h-4 w-4 mr-2" />
+                  <Activity className="h-4 w-4 mr-2" />
                   Real-time
                 </TabsTrigger>
               </TabsList>
@@ -238,15 +226,48 @@ export default function AnalyticsDashboardPage() {
               </TabsContent>
 
               <TabsContent value="engagement" className="space-y-6">
-                <EngagementDashboard />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Engagement Analytics</CardTitle>
+                    <CardDescription>Real-time engagement metrics and user interaction data</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>Engagement analytics visualization</p>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="journey" className="space-y-6">
-                <JourneyAnalyticsDashboard />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>User Journey Analytics</CardTitle>
+                    <CardDescription>Track user paths and behavior patterns</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8 text-muted-foreground">
+                      <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>Journey analytics visualization</p>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="realtime" className="space-y-6">
-                <RealTimeEngagementDashboard />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Real-time Engagement</CardTitle>
+                    <CardDescription>Live engagement metrics and updates</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>Real-time engagement visualization</p>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
           </div>

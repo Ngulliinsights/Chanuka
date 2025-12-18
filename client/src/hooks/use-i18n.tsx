@@ -1,12 +1,12 @@
-import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, ReactNode, useState, useEffect, useCallback, useMemo } from 'react';
 
 import { en } from '@client/utils/i18n';
-import { logger } from '@client/utils/logger';
 
 type Translations = typeof en;
 
 interface I18nContextType {
-  t: (key: string, values?: Record<string, any>) => string;
+  t: (key: string, values?: Record<string, unknown>) => string;
   changeLanguage: (lang: string) => void;
   language: string;
 }
@@ -24,35 +24,30 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [language]);
 
-  const t = (key: string, values?: Record<string, any>): string => {
-    // Split the key by dots to access nested properties
+  const t = useCallback((key: string, values?: Record<string, unknown>): string => {
     const keys = key.split('.');
-    
-    // Traverse the translations object using the keys
-    let value: any = translations;
+
+    let value: unknown = translations as unknown;
     for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+      if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, k)) {
+        value = (value as Record<string, unknown>)[k];
       } else {
-        // Return the key if translation not found
         return key;
       }
     }
 
-    // If the value is not a string, return the key
     if (typeof value !== 'string') {
       return key;
     }
 
-    // Replace placeholders with values if provided
     if (values) {
       return Object.entries(values).reduce((acc, [k, v]) => {
         return acc.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v));
-      }, value);
+      }, value as string);
     }
 
-    return value;
-  };
+    return value as string;
+  }, [translations]);
 
   const changeLanguage = useCallback((lang: string) => {
     setLanguage(lang);

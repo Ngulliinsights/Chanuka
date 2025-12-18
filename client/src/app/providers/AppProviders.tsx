@@ -4,10 +4,10 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { ThemeProvider } from '@client/contexts/ThemeContext';
+import { useConnectionAware } from '@client/core/api/hooks/useConnectionAware';
 import { SimpleErrorBoundary } from '@client/core/error/components/SimpleErrorBoundary';
 import { LoadingProvider } from '@client/core/loading';
 import { AuthProvider } from '@client/features/users/hooks';
-import { useConnectionAware } from '@client/hooks/useConnectionAware';
 import { useOfflineDetection } from '@client/hooks/useOfflineDetection';
 import { ChanukaProviders } from '@client/shared/design-system';
 import { AccessibilityProvider } from '@client/shared/ui/accessibility/accessibility-manager';

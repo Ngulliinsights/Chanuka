@@ -8,7 +8,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useCallback } from 'react';
 
-import { logger } from '@client/utils/logger';
+import { logger, type RenderStats } from '@client/utils/logger';
 
 interface UseRenderTrackerOptions {
   componentName: string;
@@ -19,9 +19,9 @@ interface UseRenderTrackerOptions {
 }
 
 interface RenderTrackerHook {
-  trackRender: (trigger: string, additionalData?: any) => void;
+  trackRender: (trigger: string, additionalData?: Record<string, unknown>) => void;
   trackPerformance: (renderDuration: number) => void;
-  getRenderStats: () => any;
+  getRenderStats: () => RenderStats;
   clearStats: () => void;
 }
 
@@ -85,14 +85,14 @@ export function useRenderTracker(options: UseRenderTrackerOptions): RenderTracke
         component: componentName,
         renderDuration,
         timestamp: currentTime,
-        memoryUsage: (performance as any).memory?.usedJSHeapSize
+        memoryUsage: (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize
       });
     }
 
     lastRenderTimeRef.current = currentTime;
   });
 
-  const trackRender = useCallback((trigger: string, additionalData?: any) => {
+  const trackRender = useCallback((trigger: string, additionalData?: Record<string, unknown>) => {
     renderCountRef.current += 1;
     const currentTime = Date.now();
     
@@ -114,7 +114,7 @@ export function useRenderTracker(options: UseRenderTrackerOptions): RenderTracke
       component: componentName,
       renderDuration,
       timestamp: Date.now(),
-      memoryUsage: (performance as any).memory?.usedJSHeapSize
+      memoryUsage: (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize
     });
 
     if (renderDuration > performanceThreshold) {

@@ -5,11 +5,12 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { DashboardLayoutConfig, UseDashboardLayoutReturn } from '../types';
+
+import { DashboardLayout } from '../types';
 
 interface UseDashboardLayoutOptions {
   /** Initial layout configuration */
-  initialLayout?: Partial<DashboardLayoutConfig>;
+  initialLayout?: Partial<DashboardLayout>;
   /** Breakpoints for responsive behavior */
   breakpoints?: {
     mobile: number;
@@ -18,11 +19,20 @@ interface UseDashboardLayoutOptions {
   };
 }
 
+interface UseDashboardLayoutReturn {
+  layout: DashboardLayout;
+  updateLayout: (updates: Partial<DashboardLayout>) => void;
+  sidebarOpen: boolean;
+  toggleSidebar: () => void;
+  isMobile: boolean;
+  breakpoint: 'mobile' | 'tablet' | 'desktop';
+}
+
 /**
  * useDashboardLayout Hook
  */
 export const useDashboardLayout = (
-  initialConfig: DashboardLayoutConfig,
+  initialConfig: DashboardLayout,
   options: UseDashboardLayoutOptions = {}
 ): UseDashboardLayoutReturn => {
   const {
@@ -35,7 +45,7 @@ export const useDashboardLayout = (
   } = options;
 
   // Layout state
-  const [layout, setLayout] = useState<DashboardLayoutConfig>({
+  const [layout, setLayout] = useState<DashboardLayout>({
     ...initialConfig,
     ...initialLayout,
   });
@@ -43,7 +53,6 @@ export const useDashboardLayout = (
   // Responsive state
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentBreakpoint, setCurrentBreakpoint] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-  const [windowWidth, setWindowWidth] = useState<number>(0);
 
   // Determine current breakpoint
   const getBreakpoint = useCallback((width: number): 'mobile' | 'tablet' | 'desktop' => {
@@ -56,7 +65,6 @@ export const useDashboardLayout = (
   useEffect(() => {
     const updateResponsiveState = () => {
       const width = window.innerWidth;
-      setWindowWidth(width);
 
       const breakpoint = getBreakpoint(width);
       setCurrentBreakpoint(breakpoint);
@@ -76,8 +84,8 @@ export const useDashboardLayout = (
   }, [getBreakpoint, currentBreakpoint]);
 
   // Layout update handler
-  const updateLayout = useCallback((updates: Partial<DashboardLayoutConfig>) => {
-    setLayout(prev => ({ ...prev, ...updates }));
+  const updateLayout = useCallback((updates: Partial<DashboardLayout>) => {
+    setLayout((prev: DashboardLayout) => ({ ...prev, ...updates }));
   }, []);
 
   // Sidebar toggle handler

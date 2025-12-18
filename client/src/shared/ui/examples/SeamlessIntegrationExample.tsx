@@ -5,7 +5,7 @@
  * with progressive enhancement and graceful fallbacks.
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { 
   useValidation, 
@@ -16,8 +16,7 @@ import {
   useAnonymity,
   useProgressiveEnhancement,
   useIntegrationStatus
-} from '../../hooks/useSeamlessIntegration';
-import { ProgressiveEnhancement } from '../integration/IntegrationProvider';
+} from '../../../hooks/useSeamlessIntegration';
 
 interface ExampleFormData {
   email: string;
@@ -57,7 +56,7 @@ export function SeamlessIntegrationExample() {
   const relativeTime = formatting.relativeTime(new Date(Date.now() - 86400000)); // Yesterday
 
   // String manipulation examples
-  const slugifiedTitle = strings.slugify(formData.title);
+  const slugTitle = strings.slugify(formData.title);
   const truncatedTitle = strings.truncate(formData.title, 20);
   const titleCaseTitle = strings.titleCase(formData.title);
 
@@ -67,12 +66,8 @@ export function SeamlessIntegrationExample() {
   const chunkedData = arrays.chunk(sampleData, 3);
 
   // Civic utilities examples
-  const mockBill = {
-    status: 'SECOND_READING' as const,
-    lastUpdated: new Date().toISOString()
-  };
-  const urgencyScore = civic.calculateUrgencyScore(mockBill);
-  const engagementSummary = civic.generateEngagementSummary(mockBill);
+  const urgencyScore = civic.calculateUrgencyScore();
+  const engagementSummary = civic.generateEngagementSummary();
 
   // Anonymity examples
   const anonymousId = anonymity.generateId();
@@ -226,7 +221,7 @@ export function SeamlessIntegrationExample() {
                 <div className="p-3 bg-green-50 rounded">
                   <h3 className="font-medium text-green-900 mb-2">String Manipulation</h3>
                   <div className="text-sm space-y-1">
-                    <div>Slug: {slugifiedTitle}</div>
+                    <div>Slug: {slugTitle}</div>
                     <div>Truncated: {truncatedTitle}</div>
                     <div>Title Case: {titleCaseTitle}</div>
                   </div>
@@ -244,17 +239,7 @@ export function SeamlessIntegrationExample() {
               </div>
 
               {/* Civic Utilities */}
-              <ProgressiveEnhancement
-                requiresShared={shouldEnableFeature('civic-scoring')}
-                fallback={
-                  <div className="p-3 bg-gray-50 rounded">
-                    <h3 className="font-medium text-gray-700 mb-2">Civic Utilities</h3>
-                    <p className="text-sm text-gray-600">
-                      Enhanced civic features require shared modules
-                    </p>
-                  </div>
-                }
-              >
+              {shouldEnableFeature('civic-scoring') ? (
                 <div className="p-3 bg-orange-50 rounded">
                   <h3 className="font-medium text-orange-900 mb-2">Civic Utilities</h3>
                   <div className="text-sm space-y-1">
@@ -262,20 +247,17 @@ export function SeamlessIntegrationExample() {
                     <div>Summary: {engagementSummary}</div>
                   </div>
                 </div>
-              </ProgressiveEnhancement>
+              ) : (
+                <div className="p-3 bg-gray-50 rounded">
+                  <h3 className="font-medium text-gray-700 mb-2">Civic Utilities</h3>
+                  <p className="text-sm text-gray-600">
+                    Enhanced civic features require shared modules
+                  </p>
+                </div>
+              )}
 
               {/* Anonymity Features */}
-              <ProgressiveEnhancement
-                requiresShared={shouldEnableFeature('anonymity-management')}
-                fallback={
-                  <div className="p-3 bg-gray-50 rounded">
-                    <h3 className="font-medium text-gray-700 mb-2">Anonymity Features</h3>
-                    <p className="text-sm text-gray-600">
-                      Enhanced anonymity features require shared modules
-                    </p>
-                  </div>
-                }
-              >
+              {shouldEnableFeature('anonymity-management') ? (
                 <div className="p-3 bg-red-50 rounded">
                   <h3 className="font-medium text-red-900 mb-2">Anonymity Features</h3>
                   <div className="text-sm space-y-1">
@@ -283,7 +265,14 @@ export function SeamlessIntegrationExample() {
                     <div>Pseudonyms: {pseudonymSuggestions.join(', ')}</div>
                   </div>
                 </div>
-              </ProgressiveEnhancement>
+              ) : (
+                <div className="p-3 bg-gray-50 rounded">
+                  <h3 className="font-medium text-gray-700 mb-2">Anonymity Features</h3>
+                  <p className="text-sm text-gray-600">
+                    Enhanced anonymity features require shared modules
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -293,7 +282,7 @@ export function SeamlessIntegrationExample() {
           <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <h3 className="font-medium text-yellow-800 mb-2">Recommendations</h3>
             <ul className="text-sm text-yellow-700 space-y-1">
-              {diagnostics.recommendations.map((rec, index) => (
+              {diagnostics.recommendations.map((rec: string, index: number) => (
                 <li key={index}>• {rec}</li>
               ))}
             </ul>

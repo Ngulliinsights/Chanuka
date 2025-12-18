@@ -48,17 +48,18 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
 
 // Lazy-loaded page components with enhanced error handling
 const HomePage = createLazyComponent(() => import('@client/pages/home'), 'Home Page');
-const BillsDashboard = createLazyComponent(() => import('@client/pages/bills-dashboard-page'), 'Bills Dashboard');
-const BillDetail = createLazyComponent(() => import('@client/pages/bill-detail'), 'Bill Detail');
-const BillAnalysis = createLazyComponent(() => import('@client/pages/bill-analysis'), 'Bill Analysis');
+const BillsDashboard = createLazyComponent(() => import('@/pages/bills/bills-dashboard-page'), 'Bills Dashboard');
+const BillDetail = createLazyComponent(() => import('@/pages/bills/bill-detail'), 'Bill Detail');
+const BillAnalysis = createLazyComponent(() => import('@/pages/bills/bill-analysis'), 'Bill Analysis');
 const CommunityHub = createLazyComponent(() => import('@client/pages/community-input'), 'Community Hub');
 const SearchPage = createLazyComponent(() => import('@client/pages/search'), 'Search Page');
-const AuthPage = createLazyComponent(() => import('@client/pages/auth-page'), 'Authentication');
+const AuthPage = createLazyComponent(() => import('@/pages/auth/auth-page'), 'Authentication');
+const Onboarding = createLazyComponent(() => import('@client/pages/onboarding'), 'Onboarding');
 const TermsPage = createLazyComponent(() => import('@client/pages/legal/terms'), 'Terms');
 const PrivacyPage = createLazyComponent(() => import('@client/pages/legal/privacy'), 'Privacy');
 const UserProfile = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Account');
 const UserDashboard = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Dashboard');
-const AdminDashboard = createLazyComponent(() => import('@client/pages/admin'), 'Admin Dashboard');
+const AdminDashboard = createLazyComponent(() => import('@/pages/admin/admin'), 'Admin Dashboard');
 const NotFoundPage = createLazyComponent(() => import('@client/pages/not-found'), 'Not Found');
 
 interface RouteConfig {
@@ -221,6 +222,11 @@ const routes: RouteConfig[] = [
     element: <AuthPage />
   },
   {
+    id: 'onboarding',
+    path: '/onboarding',
+    element: <Onboarding />
+  },
+  {
     id: 'terms',
     path: '/terms',
     element: <TermsPage />
@@ -302,7 +308,7 @@ const routes: RouteConfig[] = [
 type PreloadMapEntry = () => Promise<{ default: React.ComponentType<unknown> }>;
 const preloadMap: Record<string, PreloadMapEntry> = {
   'home': () => import('@client/pages/home'),
-  'bills-dashboard': () => import('@client/pages/bills-dashboard-page')
+  'bills-dashboard': () => import('@/pages/bills/bills-dashboard-page')
 };
 
 /**

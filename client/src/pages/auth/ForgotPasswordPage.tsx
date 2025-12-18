@@ -4,15 +4,15 @@
  */
 
 import { Shield, ArrowLeft, Loader2, AlertTriangle, CheckCircle, Mail } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
-import { useAuth } from '@client/core/auth';
 
 export default function ForgotPasswordPage() {
   const { requestPasswordReset } = useAuth();
@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
               Check your email
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              We've sent a password reset link to {email}
+              We&apos;ve sent a password reset link to {email}
             </p>
           </div>
 
@@ -60,16 +60,16 @@ export default function ForgotPasswordPage() {
               <div className="text-center space-y-4">
                 <Mail className="mx-auto h-8 w-8 text-blue-600" />
                 <p className="text-sm text-gray-600">
-                  If an account with that email exists, you'll receive a password reset link shortly.
+                  If an account with that email exists, you&apos;ll receive a password reset link shortly.
                   The link will expire in 1 hour for security reasons.
                 </p>
                 <div className="space-y-2">
-                  <Button asChild className="w-full">
-                    <Link to="/auth/login">
+                  <Link to="/auth/login">
+                    <Button className="w-full">
                       <ArrowLeft className="h-4 w-4 mr-2" />
                       Back to Sign In
-                    </Link>
-                  </Button>
+                    </Button>
+                  </Link>
                   <Button 
                     variant="outline" 
                     onClick={() => {
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
             Reset your password
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Enter your email address and we'll send you a link to reset your password
+            Enter your email address and we&apos;ll send you a link to reset your password
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
           <CardHeader>
             <CardTitle>Password Reset</CardTitle>
             <CardDescription>
-              We'll send you a secure link to reset your password
+              We&apos;ll send you a secure link to reset your password
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -147,12 +147,12 @@ export default function ForgotPasswordPage() {
                 )}
               </Button>
 
-              <Button asChild variant="ghost" className="w-full">
-                <Link to="/auth/login">
+              <Link to="/auth/login">
+                <Button variant="ghost" className="w-full">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Sign In
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </form>
           </CardContent>
         </Card>

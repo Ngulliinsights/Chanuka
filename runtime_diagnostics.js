@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-undef */
+
 /**
  * Runtime Diagnostics & Leak Detector - Final Edition v4.0
  * 
@@ -30,8 +32,9 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { chromium } from 'playwright';
+
 import chalk from 'chalk';
+import { chromium } from 'playwright';
 
 // ============================================================================
 // CONFIGURATION SYSTEM
@@ -384,8 +387,12 @@ class MemoryLeakDetector {
    */
   async forceGarbageCollection() {
     try {
+      // eslint-disable-next-line no-undef
+      // eslint-disable-next-line no-undef
       await this.page.evaluate(() => {
+        // eslint-disable-next-line no-undef
         if (typeof window.gc === 'function') {
+          // eslint-disable-next-line no-undef
           window.gc();
           return true;
         }
@@ -405,7 +412,8 @@ class MemoryLeakDetector {
     try {
       // Rapid scrolling creates and destroys scroll event contexts
       for (let i = 0; i < 10; i++) {
-        await this.page.evaluate(() => {
+        // eslint-disable-next-line no-undef
+      await this.page.evaluate(() => {
           window.scrollTo(0, Math.random() * document.body.scrollHeight);
         });
         await this.page.waitForTimeout(100);
@@ -430,7 +438,8 @@ class MemoryLeakDetector {
   
   async captureMemorySnapshot(timestamp) {
     try {
-      const metrics = await this.page.evaluate(() => {
+      const metrics = // eslint-disable-next-line no-undef
+      await this.page.evaluate(() => {
         // Chrome's performance.memory provides heap size information
         // This is more accurate than trying to track individual objects
         if (performance.memory) {
@@ -608,7 +617,10 @@ class InfiniteRenderDetector {
    * This hooks into both React DevTools and console methods to catch loops.
    */
   async injectMonitoring() {
-    await this.page.evaluate(() => {
+    // eslint-disable-next-line no-undef
+    // eslint-disable-next-line no-undef
+      await this.page.evaluate(() => {
+      // eslint-disable-next-line no-undef
       window.__diagnosticData = {
         renders: [],
         consoleCallCount: 0,
@@ -681,7 +693,8 @@ class InfiniteRenderDetector {
     
     while (Date.now() - startTime < duration) {
       try {
-        const data = await this.page.evaluate(() => {
+        const data = // eslint-disable-next-line no-undef
+      await this.page.evaluate(() => {
           const result = { ...window.__diagnosticData };
           // Reset render array for next collection to avoid memory growth
           window.__diagnosticData.renders = [];
@@ -836,7 +849,8 @@ class RaceConditionDetector {
    * We need to know when requests start and when they complete to detect overlaps.
    */
   async injectAsyncMonitoring() {
-    await this.page.evaluate(() => {
+    // eslint-disable-next-line no-undef
+      await this.page.evaluate(() => {
       window.__asyncMonitor = { operations: [] };
       
       const originalFetch = window.fetch;
@@ -879,6 +893,7 @@ class RaceConditionDetector {
   
   async collectAsyncData() {
     try {
+      // eslint-disable-next-line no-undef
       const data = await this.page.evaluate(() => window.__asyncMonitor || {});
       if (data.operations) {
         this.asyncOperations = data.operations;
@@ -1063,7 +1078,10 @@ class ResourceLeakDetector {
    * This approach gives us exact counts of what's not being cleaned up.
    */
   async injectResourceMonitoring() {
-    await this.page.evaluate(() => {
+    // eslint-disable-next-line no-undef
+    // eslint-disable-next-line no-undef
+      await this.page.evaluate(() => {
+      // eslint-disable-next-line no-undef
       window.__resourceMonitor = {
         timers: new Set(),
         intervals: new Set(),
@@ -1072,6 +1090,7 @@ class ResourceLeakDetector {
       };
       
       // Hook setTimeout/clearTimeout
+      // eslint-disable-next-line no-undef
       const originalSetTimeout = window.setTimeout;
       window.setTimeout = function(...args) {
         const id = originalSetTimeout.apply(this, args);

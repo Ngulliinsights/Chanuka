@@ -17,17 +17,3 @@ export {
   useAuthStore,
   type AuthContextType 
 } from '../../../core/auth';
-
-// Legacy default export for compatibility
-export default {
-  useAuth: () => {
-    console.warn(
-      'DEPRECATED: useAuth from @client/core/auth is deprecated. ' +
-      'Please import from @/core/auth instead.'
-    );
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { useAuth } = require('../../../core/auth');
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useAuth();
-  }
-};

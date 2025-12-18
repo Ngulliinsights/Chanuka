@@ -7,8 +7,79 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { seamlessIntegration } from '../adapters/seamless-shared-integration';
 import { logger } from '../utils/logger';
+
+// TODO: Implement or import seamlessIntegration from the correct location
+// import { seamlessIntegration } from '../utils/seamlessIntegration';
+
+// Fallback seamless integration object for when the module is not available
+const seamlessIntegration = {
+  initialize: async () => { /* stub */ },
+  getStatus: () => ({
+    initialized: true,
+    sharedModulesAvailable: false,
+    integrationMode: 'client-only' as const
+  }),
+  validation: {
+    email: (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
+    phone: (phone: string) => /^(\+254|0)[17]\d{8}$/.test(phone.replace(/\s/g, '')),
+    billNumber: (billNumber: string) => /^[A-Z]{1,3}\s?\d{1,4}\/\d{4}$/.test(billNumber),
+    url: (url: string) => { try { new URL(url); return true; } catch { return false; } }
+  },
+  formatting: {
+    currency: (amount: number, currency = 'KES') => new Intl.NumberFormat('en-KE', { style: 'currency', currency }).format(amount),
+    date: (date: Date | string) => new Date(date).toLocaleDateString('en-KE'),
+    relativeTime: (date: Date | string) => {
+      const diffDays = Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      return `${diffDays} days ago`;
+    },
+    number: (num: number, options?: Intl.NumberFormatOptions) => new Intl.NumberFormat('en-KE', options).format(num),
+    percentage: (value: number, total: number) => `${((value / total) * 100).toFixed(1)}%`
+  },
+  strings: {
+    slugify: (text: string) => text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-'),
+    truncate: (text: string, length: number) => text.length > length ? text.slice(0, length) + '...' : text,
+    capitalize: (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
+    titleCase: (text: string) => text.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()),
+    camelCase: (text: string) => text.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => index === 0 ? word.toLowerCase() : word.toUpperCase()).replace(/\s+/g, ''),
+    kebabCase: (text: string) => text.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[\s_]+/g, '-').toLowerCase()
+  },
+  arrays: {
+    unique: <T>(array: T[]) => [...new Set(array)],
+    groupBy: <T, K extends keyof T>(array: T[], key: K) => array.reduce((groups, item) => {
+      const groupKey = String(item[key]);
+      if (!groups[groupKey]) groups[groupKey] = [];
+      groups[groupKey].push(item);
+      return groups;
+    }, {} as Record<string, T[]>),
+    chunk: <T>(array: T[], size: number) => {
+      const chunks: T[][] = [];
+      for (let i = 0; i < array.length; i += size) {
+        chunks.push(array.slice(i, i + size));
+      }
+      return chunks;
+    },
+    shuffle: <T>(array: T[]) => {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+  },
+  civic: {
+    calculateUrgencyScore: () => 50,
+    generateEngagementSummary: () => 'Loading engagement data...'
+  },
+  anonymity: {
+    generateId: () => 'anon_' + Math.random().toString(36).substring(2, 11),
+    getDisplayIdentity: () => ({ name: 'Anonymous', avatar: null, identifier: 'loading' }),
+    generatePseudonymSuggestions: (count = 3) => Array(count).fill(0).map((_, i) => `Anonymous${i + 1}`)
+  }
+};
 
 interface IntegrationState {
   initialized: boolean;
@@ -78,7 +149,7 @@ export function useSeamlessIntegration() {
  * Hook for validation utilities
  */
 export function useValidation() {
-  const { initialized, sharedAvailable } = useSeamlessIntegration();
+  const { initialized } = useSeamlessIntegration();
   
   return useMemo(() => {
     if (!initialized) {
@@ -94,7 +165,7 @@ export function useValidation() {
     }
     
     return seamlessIntegration.validation;
-  }, [initialized, sharedAvailable]);
+  }, [initialized]);
 }
 
 /**

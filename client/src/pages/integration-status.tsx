@@ -5,17 +5,6 @@
  * Shows real-time status of Tier 1 integrations and system health
  */
 
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
-
-import { useIntegratedServices } from '@client/hooks/useIntegratedServices';
-import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Alert, AlertDescription } from '@client/shared/design-system';
 import { 
   CheckCircle, 
   AlertTriangle, 
@@ -24,10 +13,18 @@ import {
   Shield, 
   Lock, 
   Smartphone, 
-  Palette,
+  Monitor,
   Activity,
   BarChart3
 } from 'lucide-react';
+
+import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
+import { useIntegratedServices } from '@client/hooks/useIntegratedServices';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/shared/design-system';
 
 export default function IntegrationStatusPage() {
   const { isReady, status, error, services, security, privacy, mobile } = useIntegratedServices();
@@ -74,11 +71,6 @@ export default function IntegrationStatusPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Integration Status - Chanuka Platform</title>
-        <meta name="description" content="Development dashboard for monitoring orphaned module integration status" />
-      </Helmet>
-
       <ErrorBoundary>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8 space-y-6">
@@ -194,7 +186,7 @@ export default function IntegrationStatusPage() {
                       <div>✓ Privacy Analytics</div>
                       <div>✓ Consent Management</div>
                       <div>✓ Data Export/Delete</div>
-                      <div>✓ Anonymization</div>
+                      <div>✓ Data Anonymization</div>
                     </div>
                   )}
                 </CardContent>
@@ -227,7 +219,7 @@ export default function IntegrationStatusPage() {
               <Card className={getStatusColor(status.ui)}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center">
-                    <Palette className="h-5 w-5 mr-2" />
+                    <Monitor className="h-5 w-5 mr-2" />
                     UI System
                   </CardTitle>
                   <CardDescription>Design system, components</CardDescription>

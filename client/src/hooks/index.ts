@@ -26,9 +26,8 @@ export { useTimeoutAwareLoading as useLoadingOperation } from '../core/loading/h
 // Offline & Connection (in core/hooks)
 export { useOfflineDetection } from './useOfflineDetection';
 export { useOfflineCapabilities } from './useOfflineCapabilities';
-export { useConnectionAware } from './useConnectionAware';
-export { useServiceStatus } from './useServiceStatus';
-export { useOnlineStatus } from './use-online-status';
+export { useOnlineStatus } from '../core/hooks';
+
 
 // Error Recovery (in core/hooks)
 export { useErrorRecovery } from './useErrorRecovery';

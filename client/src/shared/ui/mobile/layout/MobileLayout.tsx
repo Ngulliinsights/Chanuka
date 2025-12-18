@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import type { NavigationItem } from '@client/shared/config';
+import type { NavigationItem } from '@client/config/navigation';
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { useMobileNavigation } from '@client/hooks/mobile/useMobileNavigation';
 import { useScrollManager } from '@client/hooks/mobile/useScrollManager';
