@@ -1,452 +1,240 @@
 # Core Real-time Module
 
-This module consolidates all WebSocket and real-time functionality following Feature-Sliced Design (FSD) principles. It replaces scattered WebSocket implementations with a unified, optimized system.
+A consolidated WebSocket and real-time functionality module for the Feature-Sliced Design (FSD) architecture. This module serves as the single source of truth for all real-time features in the application.
 
-## Architecture Overview
+## Overview
+
+This module consolidates all WebSocket and real-time functionality that was previously scattered across the codebase into a single, well-organized location at `client/src/core/realtime/`. The consolidation follows FSD principles and provides a clean, type-safe API for real-time features.
+
+## Architecture
 
 ```
-core/realtime/
-├── index.ts                    # Main exports
-├── types.ts                    # Consolidated type definitions
-├── config.ts                   # Configuration management
-├── websocket/
-│   ├── manager.ts             # Unified WebSocket manager
-│   └── pool.ts                # Connection pooling (future)
-├── services/
+client/src/core/realtime/
+├── index.ts              # Main entry point
+├── types/               # TypeScript type definitions
+├── config.ts            # Configuration management
+├── websocket/           # WebSocket infrastructure
+│   └── manager.ts       # Unified WebSocket manager
+├── services/            # Real-time services
 │   ├── realtime-service.ts    # Main orchestration service
 │   ├── bill-tracking.ts       # Bill tracking service
-│   ├── community.ts           # Community features service
-│   └── notifications.ts       # Notification service
-├── hooks/
-│   ├── use-websocket.ts       # Main WebSocket hook
-│   ├── use-bill-tracking.ts   # Bill tracking hook
+│   ├── community.ts          # Community features service
+│   └── notifications.ts      # Notifications service
+├── hooks/               # React hooks
+│   ├── use-websocket.ts          # General WebSocket hook
+│   ├── use-bill-tracking.ts      # Bill tracking hook
 │   ├── use-community-realtime.ts # Community real-time hook
-│   └── use-realtime-engagement.ts # Engagement analytics hook
-├── utils/
-│   ├── event-emitter.ts       # Enhanced event emitter
-│   └── optimizer.ts           # Real-time optimization utilities
-└── examples/
-    └── integration-example.tsx # Usage examples
+│   └── use-realtime-engagement-legacy.ts # Legacy hook (deprecated)
+└── utils/               # Utilities
+    └── event-emitter.ts # Enhanced event emitter
 ```
 
-## Key Features
+## Features
 
-### 🔄 Unified WebSocket Management
-- Single WebSocket connection for all real-time features
-- Automatic reconnection with exponential backoff
-- Connection pooling and optimization
-- Heartbeat monitoring and health checks
+### Core WebSocket Management
+- **Unified WebSocket Manager**: Single instance managing all WebSocket connections
+- **Automatic Reconnection**: Built-in reconnection logic with exponential backoff
+- **Heartbeat Monitoring**: Connection health monitoring
+- **Message Batching**: Optimized message transmission
+- **Subscription Management**: Dynamic subscription/unsubscription
 
-### 📊 Bill Tracking
-- Real-time bill status updates
-- Engagement metrics (views, comments, shares)
-- Amendment notifications
-- Voting schedule alerts
+### Real-time Services
+- **Bill Tracking**: Real-time bill status, engagement metrics, and updates
+- **Community Features**: Discussion threads, typing indicators, comments, votes
+- **Notifications**: User notifications, system alerts, push notifications
+- **Expert Activities**: Expert insights and activity tracking
 
-### 💬 Community Features
-- Live discussion updates
-- Typing indicators
-- Comment and vote real-time updates
-- Expert activity notifications
+### React Hooks
+- **useWebSocket**: General WebSocket connection management
+- **useBillTracking**: Bill-specific real-time features
+- **useCommunityRealTime**: Community discussion features
+- **useRealTimeEngagement**: Legacy hook (deprecated)
 
-### 🔔 Notifications
-- Real-time user notifications
-- System alerts and announcements
-- Priority-based notification handling
-- Read/unread state management
+## Usage
 
-### ⚡ Performance Optimizations
-- Message batching and compression
-- Intelligent caching strategies
-- Memory-efficient data structures
-- Automatic cleanup and garbage collection
-
-## Usage Examples
-
-### Basic WebSocket Connection
+### Basic Setup
 
 ```typescript
-import { useWebSocket } from '@client/core/realtime';
+import { RealTimeService, realTimeService } from '@client/core/realtime';
+
+// Initialize the real-time service
+await realTimeService.initialize(authToken);
+
+// Check connection status
+const isConnected = realTimeService.isConnected();
+```
+
+### Using Hooks
+
+```typescript
+import { useBillTracking, useCommunityRealTime } from '@client/core/realtime';
 
 function MyComponent() {
-  const {
-    isConnected,
-    isConnecting,
-    connectionQuality,
-    error,
-    connect,
-    disconnect
-  } = useWebSocket({
-    autoConnect: true,
-    token: userToken
-  });
-
-  return (
-    <div>
-      <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
-      <p>Quality: {connectionQuality}</p>
-      {error && <p>Error: {error}</p>}
-    </div>
-  );
-}
-```
-
-### Bill Tracking
-
-```typescript
-import { useBillTracking } from '@client/core/realtime';
-
-function BillTracker({ billId }: { billId: number }) {
-  const {
-    subscribeToBill,
-    unsubscribeFromBill,
-    getBillUpdates,
-    getEngagementMetrics
+  const { 
+    subscribeToBill, 
+    unsubscribeFromBill, 
+    getBillUpdates 
   } = useBillTracking();
 
-  useEffect(() => {
-    subscribeToBill(billId);
-    return () => unsubscribeFromBill(billId);
-  }, [billId]);
-
-  const updates = getBillUpdates(billId);
-  const metrics = getEngagementMetrics(billId);
-
-  return (
-    <div>
-      <h3>Bill Updates ({updates.length})</h3>
-      {updates.map(update => (
-        <div key={update.timestamp}>
-          {update.type}: {JSON.stringify(update.data)}
-        </div>
-      ))}
-      
-      {metrics && (
-        <div>
-          <p>Views: {metrics.viewCount}</p>
-          <p>Comments: {metrics.commentCount}</p>
-        </div>
-      )}
-    </div>
-  );
-}
-```
-
-### Community Real-time Features
-
-```typescript
-import { useCommunityRealTime } from '@client/core/realtime';
-
-function CommunityDiscussion({ billId }: { billId: number }) {
-  const {
-    subscribeToDiscussion,
-    sendTypingIndicator,
-    stopTypingIndicator,
-    sendCommentUpdate,
-    typingIndicators
+  const { 
+    subscribeToDiscussion, 
+    sendTypingIndicator, 
+    typingIndicators 
   } = useCommunityRealTime();
 
+  // Subscribe to bill updates
   useEffect(() => {
-    subscribeToDiscussion(billId);
-  }, [billId]);
+    subscribeToBill(123);
+    return () => unsubscribeFromBill(123);
+  }, [subscribeToBill, unsubscribeFromBill]);
 
-  const handleStartTyping = () => {
-    sendTypingIndicator(billId);
-  };
-
-  const handleStopTyping = () => {
-    stopTypingIndicator(billId);
-  };
-
-  const handleSubmitComment = (commentData: any) => {
-    sendCommentUpdate(billId, commentData);
-  };
-
-  const currentTyping = typingIndicators.get(`${billId}_root`) || [];
-
+  // Get bill updates
+  const updates = getBillUpdates(123);
+  
   return (
     <div>
-      <textarea
-        onFocus={handleStartTyping}
-        onBlur={handleStopTyping}
-        placeholder="Write a comment..."
-      />
-      
-      {currentTyping.length > 0 && (
-        <p>{currentTyping.length} user(s) typing...</p>
-      )}
+      {/* Render updates */}
     </div>
   );
 }
 ```
 
-### Direct Service Usage
+### Direct Service Access
 
 ```typescript
 import { realTimeService } from '@client/core/realtime';
 
-// Initialize the service
-await realTimeService.initialize(userToken);
-
-// Get individual services
-const billService = realTimeService.getBillTrackingService();
+// Access specific services
+const billTrackingService = realTimeService.getBillTrackingService();
 const communityService = realTimeService.getCommunityService();
 const notificationService = realTimeService.getNotificationService();
 
-// Subscribe to events
-const unsubscribe = realTimeService.on('connectionChange', (connected) => {
-  console.log('Connection status:', connected);
-});
+// Subscribe to a bill
+billTrackingService.subscribeToBill(123);
 
-// Get statistics
-const stats = realTimeService.getStats();
-console.log('Real-time stats:', stats);
+// Send a comment update
+communityService.sendCommentUpdate(123, { text: 'Great bill!' });
 
-// Cleanup
-unsubscribe();
-await realTimeService.shutdown();
+// Get notifications
+const notifications = notificationService.getAllNotifications();
 ```
 
 ## Configuration
 
-### Environment Variables
-
-```env
-# WebSocket URL
-VITE_WS_URL=ws://localhost:3001/ws
-
-# Connection settings
-VITE_WS_HEARTBEAT_INTERVAL=30000
-VITE_WS_RECONNECT_ATTEMPTS=5
-VITE_WS_RECONNECT_DELAY=2000
-
-# Feature flags
-VITE_WS_COMPRESSION_ENABLED=false
-VITE_WS_BATCHING_ENABLED=true
-```
-
-### Custom Configuration
+The module supports environment-specific configuration:
 
 ```typescript
-import { getRealTimeConfig } from '@client/core/realtime/config';
+import { getRealTimeConfig } from '@client/core/realtime';
 
-const customConfig = {
-  ...getRealTimeConfig(),
-  websocket: {
-    ...getRealTimeConfig().websocket,
-    heartbeat: {
-      enabled: true,
-      interval: 15000, // 15 seconds
-      timeout: 5000    // 5 seconds
-    },
-    reconnect: {
-      enabled: true,
-      maxAttempts: 10,
-      delay: 1000,
-      backoff: 'exponential'
-    }
-  }
-};
+const config = getRealTimeConfig();
+// Returns configuration based on NODE_ENV
 ```
+
+### Configuration Options
+
+- **WebSocket URL**: Different URLs for development/production
+- **Heartbeat**: Connection monitoring interval
+- **Reconnection**: Automatic reconnection settings
+- **Batching**: Message batching optimization
+- **Security**: Origin validation and security settings
 
 ## Migration Guide
 
-### From Legacy WebSocket Services
+### From Scattered Implementations
 
-#### Before (Legacy)
-```typescript
-// Old scattered approach
-import { webSocketService } from '@client/services/webSocketService';
-import { communityWebSocketManager } from '@client/services/CommunityWebSocketManager';
-import { useWebSocket } from '@client/hooks/use-websocket';
+If you're migrating from scattered WebSocket implementations:
 
-// Multiple connections and services
-webSocketService.connect();
-communityWebSocketManager.connect();
-```
+1. **Remove old WebSocket files** from various locations
+2. **Update imports** to use the consolidated module
+3. **Replace direct WebSocket usage** with hooks or services
+4. **Test thoroughly** to ensure functionality is preserved
 
-#### After (Consolidated)
-```typescript
-// New unified approach
-import { 
-  realTimeService, 
-  useWebSocket, 
-  useBillTracking, 
-  useCommunityRealTime 
-} from '@client/core/realtime';
+### Legacy Hook Deprecation
 
-// Single service managing everything
-await realTimeService.initialize(token);
+The `useRealTimeEngagement` hook is deprecated. Migrate to:
 
-// Specialized hooks for different features
-const websocket = useWebSocket();
-const billTracking = useBillTracking();
-const community = useCommunityRealTime();
-```
+- `useBillTracking` for bill-specific features
+- `useCommunityRealTime` for community features
 
-### Import Updates
+## Best Practices
 
-The migration script automatically updates imports, but manual updates may be needed:
+1. **Always unsubscribe** from subscriptions when components unmount
+2. **Use hooks** for React components instead of direct service access
+3. **Handle errors** appropriately - services include error logging
+4. **Monitor connection status** for better UX
+5. **Use TypeScript** for full type safety
 
-```typescript
-// Old imports
-import { webSocketService } from '@client/services/webSocketService';
-import { useWebSocket } from '@client/hooks/use-websocket';
-import { CommunityWebSocketManager } from '@client/services/CommunityWebSocketManager';
+## Error Handling
 
-// New imports
-import { 
-  realTimeService,
-  useWebSocket,
-  useBillTracking,
-  useCommunityRealTime
-} from '@client/core/realtime';
-```
+The module includes comprehensive error handling:
 
-## Performance Considerations
+- Automatic reconnection with exponential backoff
+- Connection timeout handling
+- Message validation
+- Service-level error logging
 
-### Memory Management
-- Automatic cleanup of old messages and notifications
-- Configurable limits for cached data
-- Efficient data structures (Maps vs Arrays)
-- Garbage collection of inactive subscriptions
+## Performance Optimizations
 
-### Network Optimization
-- Message batching to reduce network calls
-- Compression for large payloads (configurable)
-- Intelligent reconnection strategies
-- Connection pooling for multiple features
-
-### CPU Optimization
-- Event emitter with microtask scheduling
-- Debounced updates for high-frequency events
-- Lazy loading of non-critical features
-- Efficient message routing and filtering
+- **Message Batching**: Reduces WebSocket traffic
+- **Connection Pooling**: Single WebSocket connection for all features
+- **Efficient Event Emitting**: Optimized listener management
+- **Memory Management**: Automatic cleanup of old data
 
 ## Testing
 
-### Unit Tests
 ```typescript
-import { UnifiedWebSocketManager } from '@client/core/realtime/websocket/manager';
-import { BillTrackingService } from '@client/core/realtime/services/bill-tracking';
-
-describe('BillTrackingService', () => {
-  let service: BillTrackingService;
-  let mockWsManager: jest.Mocked<UnifiedWebSocketManager>;
-
-  beforeEach(() => {
-    mockWsManager = createMockWebSocketManager();
-    service = new BillTrackingService(mockWsManager);
-  });
-
-  it('should subscribe to bill updates', () => {
-    service.subscribeToBill(123);
-    expect(mockWsManager.subscribe).toHaveBeenCalledWith(
-      'bill:123',
-      expect.any(Function)
-    );
-  });
-});
+// Mock the real-time service for testing
+jest.mock('@client/core/realtime', () => ({
+  realTimeService: {
+    isConnected: jest.fn(() => true),
+    getBillTrackingService: jest.fn(() => ({
+      subscribeToBill: jest.fn(),
+      unsubscribeFromBill: jest.fn(),
+      getBillUpdates: jest.fn(() => [])
+    }))
+  }
+}));
 ```
 
-### Integration Tests
-```typescript
-import { realTimeService } from '@client/core/realtime';
+## Future Enhancements
 
-describe('Real-time Integration', () => {
-  beforeEach(async () => {
-    await realTimeService.initialize('test-token');
-  });
+- **Plugin System**: Allow custom real-time features
+- **Performance Monitoring**: Built-in analytics
+- **Advanced Batching**: More sophisticated message batching
+- **Multi-tenancy**: Support for multiple environments
 
-  afterEach(async () => {
-    await realTimeService.shutdown();
-  });
+## Contributing
 
-  it('should handle end-to-end bill tracking', async () => {
-    const billService = realTimeService.getBillTrackingService();
-    
-    // Subscribe to bill
-    billService.subscribeToBill(123);
-    
-    // Simulate WebSocket message
-    const mockMessage = {
-      type: 'bill_update',
-      bill_id: 123,
-      update: { type: 'status_change', data: { newStatus: 'passed' } }
-    };
-    
-    // Verify update is processed
-    const updates = billService.getBillUpdates(123);
-    expect(updates).toHaveLength(1);
-    expect(updates[0].data.newStatus).toBe('passed');
-  });
-});
-```
+When contributing to this module:
+
+1. Follow the established patterns in existing services
+2. Add comprehensive TypeScript types
+3. Include error handling and logging
+4. Write tests for new functionality
+5. Update this README with new features
 
 ## Troubleshooting
 
 ### Common Issues
 
-#### Connection Problems
-```typescript
-// Check connection status
-const stats = realTimeService.getStats();
-console.log('Connection state:', stats.connectionState);
+1. **Connection Fails**: Check WebSocket URL configuration
+2. **Messages Not Received**: Verify subscription topics
+3. **Memory Leaks**: Ensure proper cleanup in useEffect
+4. **Type Errors**: Check import paths and type definitions
 
-// Manual reconnection
-if (!realTimeService.isConnected()) {
-  await realTimeService.connect(newToken);
-}
+### Debug Mode
+
+Enable debug logging:
+
+```typescript
+// Set logger to debug level
+logger.setLevel('debug');
 ```
 
-#### Memory Leaks
-```typescript
-// Ensure proper cleanup
-useEffect(() => {
-  const billService = realTimeService.getBillTrackingService();
-  billService.subscribeToBill(billId);
-  
-  return () => {
-    // Always unsubscribe on unmount
-    billService.unsubscribeFromBill(billId);
-  };
-}, [billId]);
-```
+## Support
 
-#### Performance Issues
-```typescript
-// Monitor service statistics
-const stats = realTimeService.getStats();
-if (stats.subscriptionCount > 50) {
-  console.warn('High subscription count may impact performance');
-}
-
-// Use specialized hooks instead of direct service access
-const { getBillUpdates } = useBillTracking(); // ✅ Optimized
-// vs
-const updates = realTimeService.getBillTrackingService().getBillUpdates(billId); // ❌ Direct access
-```
-
-## Future Enhancements
-
-- [ ] WebSocket connection pooling
-- [ ] Advanced message compression
-- [ ] Machine learning for predictive caching
-- [ ] Real-time collaboration features
-- [ ] Advanced analytics and monitoring
-- [ ] Multi-tenant support
-- [ ] Offline synchronization
-- [ ] Push notification integration
-
-## Contributing
-
-When adding new real-time features:
-
-1. **Add types** to `types.ts`
-2. **Create service** in `services/` directory
-3. **Add hook** in `hooks/` directory
-4. **Update main service** to orchestrate new feature
-5. **Add tests** for all new functionality
-6. **Update documentation** and examples
-
-Follow the established patterns for consistency and maintainability.
+For issues or questions:
+1. Check existing GitHub issues
+2. Review the troubleshooting section
+3. Consult the TypeScript definitions
+4. Reach out to the development team

@@ -1,37 +1,10 @@
-/**
- * Real-time WebSocket Integration Types
- * 
- * Defines interfaces for real-time bill updates, community engagement,
- * and notification systems that extend the existing WebSocket implementation.
- */
-
-// Extended WebSocket message types for civic engagement
-export interface CivicWebSocketMessage {
-  type: 'connected' | 'subscribed' | 'unsubscribed' | 'bill_update' | 'community_update' | 
-        'engagement_metrics' | 'expert_activity' | 'notification' | 'error' | 'pong';
-  
-  // Bill-specific updates
-  bill_id?: number;
-  update?: BillRealTimeUpdate;
-  
-  // Community engagement updates
-  community_update?: CommunityRealTimeUpdate;
-  engagement_metrics?: EngagementMetricsUpdate;
-  expert_activity?: ExpertActivityUpdate;
-  
-  // Notifications
-  notification?: RealTimeNotification;
-  
-  // Error handling
-  message?: string;
-  data?: any;
-  timestamp?: string;
-}
+// Client-specific realtime types
+// These types are specific to the client-side real-time functionality
 
 export interface BillRealTimeUpdate {
   type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' | 
         'engagement_change' | 'constitutional_flag' | 'expert_analysis';
-  data: any;
+  data: Record<string, unknown>;
   timestamp: string;
   bill_id: number;
 }
@@ -125,7 +98,7 @@ export interface CivicWebSocketState {
   isConnected: boolean;
   isConnecting: boolean;
   error: string | null;
-  lastMessage: CivicWebSocketMessage | null;
+  lastMessage: Record<string, unknown> | null;
   reconnectAttempts: number;
   
   // Subscription tracking - using arrays for Immer compatibility
@@ -154,7 +127,7 @@ export interface PollingFallbackConfig {
 }
 
 // Real-time update handlers
-export type RealTimeUpdateHandler = (update: CivicWebSocketMessage) => void;
+export type RealTimeUpdateHandler = (update: Record<string, unknown>) => void;
 
 export interface RealTimeHandlers {
   onBillUpdate?: (update: BillRealTimeUpdate) => void;

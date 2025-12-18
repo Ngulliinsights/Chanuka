@@ -7,8 +7,8 @@
 
 import { QueryClient, DefaultOptions } from '@tanstack/react-query';
 
-import { getStore } from '@client/store';
-import { setOnlineStatus } from '@client/store/slices/uiSlice';
+import { getStore } from '../infrastructure/store';
+import { setOnlineStatus } from '../infrastructure/store/slices/uiSlice';
 
 // ============================================================================
 // QUERY CLIENT CONFIGURATION
@@ -23,9 +23,10 @@ const queryConfig: DefaultOptions = {
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
     
     // Retry configuration
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: unknown) => {
       // Don't retry on 4xx errors (client errors)
-      if (error?.status >= 400 && error?.status < 500) {
+      const errorWithStatus = error as { status?: number };
+      if (errorWithStatus?.status && errorWithStatus.status >= 400 && errorWithStatus.status < 500) {
         return false;
       }
       
@@ -48,8 +49,9 @@ const queryConfig: DefaultOptions = {
   
   mutations: {
     // Retry mutations once on network errors
-    retry: (failureCount, error: any) => {
-      if (error?.name === 'NetworkError' && failureCount < 1) {
+    retry: (failureCount, error: unknown) => {
+      const errorWithName = error as { name?: string };
+      if (errorWithName?.name === 'NetworkError' && failureCount < 1) {
         return true;
       }
       return false;
@@ -74,7 +76,7 @@ export const queryKeys = {
   bills: {
     all: ['bills'] as const,
     lists: () => [...queryKeys.bills.all, 'list'] as const,
-    list: (filters: Record<string, any>) => [...queryKeys.bills.lists(), filters] as const,
+    list: (filters: Record<string, unknown>) => [...queryKeys.bills.lists(), filters] as const,
     details: () => [...queryKeys.bills.all, 'detail'] as const,
     detail: (id: string | number) => [...queryKeys.bills.details(), id] as const,
     analysis: (id: string | number) => [...queryKeys.bills.detail(id), 'analysis'] as const,
@@ -93,7 +95,7 @@ export const queryKeys = {
   // Search
   search: {
     all: ['search'] as const,
-    results: (query: string, filters: Record<string, any>) => 
+    results: (query: string, filters: Record<string, unknown>) => 
       [...queryKeys.search.all, 'results', query, filters] as const,
     suggestions: (query: string) => 
       [...queryKeys.search.all, 'suggestions', query] as const,
@@ -206,11 +208,11 @@ export const cacheUtils = {
   getStats: () => {
     const cache = queryClient.getQueryCache();
     const queries = cache.getAll();
-    
+
     return {
       totalQueries: queries.length,
-      staleQueries: queries.filter(q => q.isStale()).length,
-      fetchingQueries: queries.filter(q => q.isFetching()).length,
+      staleQueries: queries.filter(q => q.isStale).length,
+      fetchingQueries: queries.filter(q => q.state.fetchStatus === 'fetching').length,
       errorQueries: queries.filter(q => q.state.status === 'error').length,
     };
   },
@@ -259,22 +261,18 @@ export const configureOfflineSupport = () => {
  * Global error handler for React Query
  */
 export const setupGlobalErrorHandler = () => {
+  // Global error handling is now done through the QueryClient configuration
+  // Individual components should handle errors using onError in their hooks
+  
+  // Set up global mutation defaults without onError (not supported in setMutationDefaults)
   queryClient.setMutationDefaults(['bills', 'create'], {
-    onError: (error: any) => {
-      console.error('Mutation error:', error);
-
-      // Notifications are now handled by React Query hooks in components
-      // Components can use useToast or other notification systems
-    },
+    retry: false,
   });
 
+  // Set up global query defaults without onError (not supported in setQueryDefaults)
   queryClient.setQueryDefaults(['bills'], {
-    onError: (error: any) => {
-      console.error('Query error:', error);
-
-      // Notifications are now handled by React Query hooks in components
-      // Components can use useToast or other notification systems
-    },
+    retry: 3,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

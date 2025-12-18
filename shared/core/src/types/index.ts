@@ -7,6 +7,7 @@
 
 // Export all type files
 export * from './auth.types';
+export * from './realtime';
 // Export services types with explicit exports to resolve ValidationResult conflict
 export type {
   Services,

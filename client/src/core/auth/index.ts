@@ -124,6 +124,7 @@ export {
   register,
   logout,
   refreshTokens,
+  clearError,
   verifyEmail,
   requestPasswordReset,
   resetPassword,

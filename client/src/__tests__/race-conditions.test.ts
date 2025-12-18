@@ -4,8 +4,9 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
 import { configureStore } from '@reduxjs/toolkit';
-import { loadingSlice, startLoadingOperation, completeLoadingOperation } from '../store/slices/loadingSlice';
+import { loadingSlice, startLoadingOperation, completeLoadingOperation } from '../shared/infrastructure/store/slices/loadingSlice';
 
 // Mock logger to prevent console spam during tests
 vi.mock('../utils/logger', () => ({
@@ -35,7 +36,7 @@ describe('Race Condition Fixes', () => {
   describe('Loading Slice Race Conditions', () => {
     it('should handle concurrent statistics updates safely', async () => {
       // Simulate concurrent completion events
-      const promises = Array(100).fill(null).map((_, index) => 
+      const promises = Array(100).fill(null).map(() => 
         store.dispatch(loadingSlice.actions.updateStatsAtomic({
           type: 'increment_completed'
         }))
@@ -119,7 +120,7 @@ describe('Race Condition Fixes', () => {
         store.dispatch(completeLoadingOperation({
           id,
           success: index % 2 === 0,
-          error: index % 2 !== 0 ? 'Test error' : undefined
+          error: index % 2 !== 0 ? new Error('Test error') : undefined
         }))
       );
 
@@ -384,7 +385,7 @@ describe('Race Condition Fixes', () => {
           return store.dispatch(completeLoadingOperation({
             id,
             success: false,
-            error: 'Simulated failure'
+            error: new Error('Simulated failure')
           }));
         } else {
           return store.dispatch(completeLoadingOperation({

@@ -6,31 +6,17 @@
  * session management, and business logic orchestration.
  */
 
-import { LoginCredentials } from '@client/core/api/auth';
 import { authApiService } from '@client/core/api/auth';
-import { AuthUser } from '@client/core/api/auth';
-import { globalApiClient } from '@client/core/api/client';
-import { getStore } from '@client/store';
-import { setCurrentSession } from '@client/store/slices/sessionSlice';
+import type { AuthUser, LoginCredentials } from '@client/core/api/auth';
+import { tokenManager } from '@client/core/auth';
+import type { AuthTokens as JWTTokens, SessionInfo } from '@client/core/auth';
+import { getStore } from '@client/shared/infrastructure/store';
+import { setCurrentSession } from '@client/shared/infrastructure/store/slices/sessionSlice';
 import { logger } from '@client/utils/logger';
-import { privacyCompliance } from '@client/utils/privacy-compliance';
 import { rbacManager } from '@client/utils/rbac';
-import { validatePassword, securityMonitor } from '@client/utils/security';
-import { tokenManager, sessionManager } from '@client/core/auth';
-import type { AuthTokens as JWTTokens } from '@client/core/auth';
+import { securityMonitor, validatePassword } from '@client/utils/security';
 
-import {
-  User,
-  RegisterData,
-  AuthResponse,
-  TwoFactorSetup,
-  PrivacySettings,
-  SecurityEvent,
-  SuspiciousActivityAlert,
-  SessionInfo,
-  DataExportRequest,
-  DataDeletionRequest,
-} from './types';
+import type { AuthResponse, RegisterData, User } from './types';
 
 /**
  * Configuration for AuthService token refresh behavior
@@ -40,6 +26,25 @@ interface AuthServiceConfig {
     bufferMinutes: number;
     maxRetries: number;
   };
+}
+
+/**
+ * Extended LoginCredentials to include rememberMe option
+ */
+interface ExtendedLoginCredentials extends LoginCredentials {
+  rememberMe?: boolean;
+}
+
+/**
+ * Session information structure matching the store's expected format
+ */
+interface SessionData {
+  id: string;
+  createdAt: string;
+  lastActive: string;
+  ipAddress: string;
+  deviceInfo: string;
+  current: boolean;
 }
 
 /**
@@ -87,7 +92,7 @@ export class AuthService {
   /**
    * Authenticates a user with email/password credentials
    */
-  async login(credentials: LoginCredentials): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
+  async login(credentials: ExtendedLoginCredentials): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
     const deviceFingerprint = securityMonitor.generateDeviceFingerprint();
     const currentIP = '0.0.0.0'; // In production, obtain from request headers
 
@@ -98,10 +103,11 @@ export class AuthService {
     }
 
     try {
+      // Prepare login request with proper typing
       const session = await authApiService.login({
         email: credentials.email,
         password: credentials.password,
-        rememberMe: (credentials as any).remember_me,
+        rememberMe: credentials.rememberMe,
         twoFactorToken: credentials.twoFactorToken,
       });
 
@@ -118,6 +124,7 @@ export class AuthService {
         deviceFingerprint
       );
 
+      // Store tokens with proper structure
       const tokens: JWTTokens = {
         accessToken: session.tokens.accessToken,
         refreshToken: session.tokens.refreshToken,
@@ -134,6 +141,7 @@ export class AuthService {
       });
       securityMonitor.logSecurityEvent(securityEvent);
 
+      // Convert and cache user
       const user = convertAuthUserToUser(session.user);
       this.currentUser = user;
       this.scheduleTokenRefresh(session.expiresAt ? new Date(session.expiresAt).getTime() : tokens.expiresAt.getTime());
@@ -142,14 +150,16 @@ export class AuthService {
         ? new Date(session.expiresAt).toISOString()
         : new Date(tokens.expiresAt).toISOString();
 
-      const sessionInfo = {
+      // Create properly typed session info
+      const sessionInfo: SessionData = {
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         lastActive: new Date().toISOString(),
-        ipAddress: '',
+        ipAddress: currentIP,
         deviceInfo: navigator.userAgent,
         current: true
       };
+      
       getStore().dispatch(setCurrentSession(sessionInfo));
       rbacManager.clearUserCache(session.user.id);
 
@@ -188,6 +198,7 @@ export class AuthService {
 
       const deviceFingerprint = securityMonitor.generateDeviceFingerprint();
 
+      // Prepare registration data
       const registerData = {
         email: data.email,
         password: data.password,
@@ -198,6 +209,7 @@ export class AuthService {
 
       const session = await authApiService.register(registerData);
 
+      // Store tokens with proper structure
       const tokens: JWTTokens = {
         accessToken: session.tokens.accessToken,
         refreshToken: session.tokens.refreshToken,
@@ -214,6 +226,7 @@ export class AuthService {
       });
       securityMonitor.logSecurityEvent(securityEvent);
 
+      // Convert and cache user
       const user = convertAuthUserToUser(session.user);
       this.currentUser = user;
       this.scheduleTokenRefresh(session.expiresAt ? new Date(session.expiresAt).getTime() : tokens.expiresAt.getTime());
@@ -222,12 +235,16 @@ export class AuthService {
         ? new Date(session.expiresAt).toISOString()
         : new Date(tokens.expiresAt).toISOString();
 
-      const sessionInfo = {
-        userId: user.id,
-        sessionId: crypto.randomUUID(),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      // Create session info for Redux store
+      const sessionInfo: SessionInfo = {
+        id: crypto.randomUUID(),
+        deviceInfo: navigator.userAgent,
+        ipAddress: '0.0.0.0', // Would be provided by server in production
+        lastActive: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        current: true
       };
-      sessionManager.createSession(sessionInfo);
+      getStore().dispatch(setCurrentSession(sessionInfo));
 
       return {
         success: true,
@@ -253,13 +270,18 @@ export class AuthService {
         const securityEvent = securityMonitor.createSecurityEvent(user.id, 'logout');
         securityMonitor.logSecurityEvent(securityEvent);
 
-        getStore().dispatch(setCurrentSession(null as any));
+        // Clear session from store
+        const { resetSessionState } = await import('@client/shared/infrastructure/store/slices/sessionSlice');
+        getStore().dispatch(resetSessionState());
         rbacManager.clearUserCache(user.id);
+        
+        // Call API logout endpoint
         await authApiService.logout();
       }
     } catch (error) {
       logger.error('Logout request failed:', { component: 'AuthService' }, error);
     } finally {
+      // Always clean up local state
       this.clearTokenRefreshTimer();
       this.currentUser = null;
       tokenManager.clearTokens();
@@ -271,9 +293,11 @@ export class AuthService {
    */
   async refreshTokens(): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
     try {
+      // Request new tokens from API
       const tokens = await authApiService.refreshTokens();
       const user = await authApiService.getCurrentUser();
 
+      // Structure tokens properly
       const jwtTokens: JWTTokens = {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
@@ -283,15 +307,23 @@ export class AuthService {
 
       tokenManager.storeTokens(jwtTokens);
 
+      // Update cached user and schedule next refresh
       const convertedUser = convertAuthUserToUser(user);
       this.currentUser = convertedUser;
       this.scheduleTokenRefresh(jwtTokens.expiresAt.getTime());
 
       const sessionExpiry = new Date(jwtTokens.expiresAt).toISOString();
 
-      return { success: true, data: { user: convertedUser, tokens: jwtTokens }, user: convertedUser, sessionExpiry };
+      return { 
+        success: true, 
+        data: { user: convertedUser, tokens: jwtTokens }, 
+        user: convertedUser, 
+        sessionExpiry 
+      };
     } catch (error) {
       logger.error('Token refresh failed:', { component: 'AuthService' }, error);
+      
+      // Clean up on refresh failure
       this.clearTokenRefreshTimer();
       this.currentUser = null;
       tokenManager.clearTokens();
@@ -327,15 +359,18 @@ export class AuthService {
   }
 
   /**
-   * Schedule automatic token refresh
+   * Schedule automatic token refresh before expiration
+   * @param expiresAt - Token expiration timestamp in milliseconds
    */
   private scheduleTokenRefresh(expiresAt: number): void {
     this.clearTokenRefreshTimer();
     
+    // Calculate when to refresh (buffer time before actual expiration)
     const bufferMs = this.config.tokenRefresh.bufferMinutes * 60 * 1000;
     const refreshAt = expiresAt - bufferMs;
     const delay = refreshAt - Date.now();
 
+    // Only schedule if the refresh time is in the future
     if (delay > 0) {
       this.tokenRefreshTimer = setTimeout(() => {
         this.refreshTokens().catch(error => {
@@ -346,7 +381,7 @@ export class AuthService {
   }
 
   /**
-   * Clear token refresh timer
+   * Clear any existing token refresh timer
    */
   private clearTokenRefreshTimer(): void {
     if (this.tokenRefreshTimer) {
@@ -354,13 +389,10 @@ export class AuthService {
       this.tokenRefreshTimer = null;
     }
   }
-
-  // Additional methods would continue here...
-  // (The full implementation is quite long, so I'm showing the key methods)
 }
 
-// Export singleton instance
+// Export singleton instance for easy consumption
 export const authService = new AuthService();
 
-// Export default
+// Export default for compatibility
 export default authService;

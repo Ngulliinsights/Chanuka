@@ -1,1150 +1,1082 @@
-// Consolidated WebSocket Service for Unified API Client Architecture
-// Fully type-safe, optimized, and production-ready implementation
-// Unified infrastructure consolidating all WebSocket managers
+/**
+ * WebSocket API Module
+ * 
+ * Server-side WebSocket API handlers and endpoints.
+ * This module handles WebSocket connections, authentication, and message routing
+ * for the server-side API. Client-side WebSocket functionality is handled by
+ * client/src/core/realtime/.
+ */
 
-import { store } from '@client/store';
-import {
-  updateConnectionState,
-  addBillUpdate,
-  addCommunityUpdate,
-  addNotification,
-  addExpertActivity,
-  updateEngagementMetrics
-} from '@client/store/slices/realTimeSlice';
+import { Server } from 'http';
+import { IncomingMessage } from 'http';
 
-import { WebSocketConfig, Subscription, ConnectionState } from './types';
+import { v4 as uuidv4 } from 'uuid';
+import { WebSocket, WebSocketServer } from 'ws';
+
+import { logger } from '@client/utils/logger';
+
+import type { WebSocketMessage } from '../../core/api/types/websocket';
 
 // ============================================================================
 // Type Definitions
 // ============================================================================
 
-type EventListener<T = unknown> = (data: T) => void;
-
-// Core message types
-interface WebSocketMessage {
-  type: string;
-  topic?: string;
-  data?: unknown;
-  timestamp?: number;
-  [key: string]: unknown;
+/**
+ * Extended WebSocket interface with authentication and subscription data
+ */
+interface AuthenticatedWebSocket extends WebSocket {
+  userId?: string;
+  sessionId?: string;
+  subscriptions: Set<string>;
+  connectionTime: number;
+  lastActivity: number;
 }
 
-interface HeartbeatMessage extends WebSocketMessage {
-  type: 'heartbeat' | 'ping' | 'pong';
+/**
+ * Connection information passed during client verification
+ */
+interface VerifyClientInfo {
+  origin: string;
+  secure: boolean;
+  req: IncomingMessage;
 }
 
-interface SubscriptionMessage extends WebSocketMessage {
-  type: 'subscribe' | 'unsubscribe';
-  topic: string;
-  filters?: Record<string, unknown>;
-  subscriptionId: string;
+/**
+ * Complete connection object stored in the connection map
+ */
+interface WebSocketConnection {
+  id: string;
+  ws: AuthenticatedWebSocket;
+  userId?: string;
+  sessionId: string;
+  subscriptions: Set<string>;
+  connectionTime: number;
+  lastActivity: number;
 }
 
-interface BatchMessage extends WebSocketMessage {
-  type: 'batch';
-  messages: WebSocketMessage[];
-  timestamp: number;
+/**
+ * Statistics tracking for the WebSocket server
+ */
+interface WebSocketStats {
+  totalConnections: number;
+  authenticatedConnections: number;
+  totalSubscriptions: number;
+  messagesReceived: number;
+  messagesSent: number;
+  errors: number;
+}
+
+/**
+ * Configuration options for the WebSocket server
+ */
+interface WebSocketServerConfig {
+  heartbeatInterval?: number;
+  staleConnectionTimeout?: number;
+  maxConnectionAge?: number;
+  cleanupInterval?: number;
 }
 
 // ============================================================================
-// Bill Update Type Definitions
+// WebSocket API Server
 // ============================================================================
 
-export interface BillsWebSocketConfig {
-  readonly autoReconnect: boolean;
-  readonly maxReconnectAttempts: number;
-  readonly reconnectDelay: number;
-  readonly heartbeatInterval: number;
-  readonly batchUpdateInterval: number;
-  readonly maxBatchSize: number;
-}
-
-export interface BillStatusUpdate {
-  bill_id: number;
-  oldStatus: string;
-  newStatus: string;
-  timestamp: string;
-  reason?: string;
-  metadata?: Record<string, unknown>;
-}
-
-export interface BillEngagementUpdate {
-  bill_id: number;
-  viewCount?: number;
-  saveCount?: number;
-  commentCount?: number;
-  shareCount?: number;
-  timestamp: string;
-}
-
-export interface BillAmendmentUpdate {
-  bill_id: number;
-  amendment_id: string;
-  type: 'added' | 'modified' | 'removed';
-  title: string;
-  summary: string;
-  timestamp: string;
-}
-
-export interface BillVotingUpdate {
-  bill_id: number;
-  voting_date: string;
-  voting_type: 'committee' | 'floor' | 'final';
-  chamber: 'house' | 'senate' | 'both';
-  timestamp: string;
-}
-
-export type BillRealTimeUpdate =
-  | BillStatusUpdate
-  | BillEngagementUpdate
-  | BillAmendmentUpdate
-  | BillVotingUpdate;
-
-type BillUpdateType = 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
-
-interface BillUpdateMessage extends WebSocketMessage {
-  type: 'billUpdate' | 'bill_update';
-  bill_id: number;
-  update: {
-    type: string;
-    data: BillRealTimeUpdate;
+export class WebSocketAPIServer {
+  private wss: WebSocketServer | null = null;
+  private connections = new Map<string, WebSocketConnection>();
+  private messageHandlers = new Map<string, MessageHandler>();
+  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private cleanupInterval: NodeJS.Timeout | null = null;
+  private config: Required<WebSocketServerConfig>;
+  private stats: WebSocketStats = {
+    totalConnections: 0,
+    authenticatedConnections: 0,
+    totalSubscriptions: 0,
+    messagesReceived: 0,
+    messagesSent: 0,
+    errors: 0
   };
-  timestamp: number; // Changed from string to match WebSocketMessage
-}
 
-interface BatchedBillUpdatesMessage extends WebSocketMessage {
-  type: 'batchedBillUpdates' | 'batched_updates';
-  updates: BillRealTimeUpdate[];
-}
-
-
-// ============================================================================
-// Enhanced Event Emitter with Type Safety
-// ============================================================================
-
-class EventEmitter {
-  private events: Map<string, Set<EventListener>> = new Map();
-
-  on(event: string, listener: EventListener): () => void {
-    if (!this.events.has(event)) {
-      this.events.set(event, new Set());
-    }
-    this.events.get(event)!.add(listener);
-
-    return () => this.off(event, listener);
-  }
-
-  off(event: string, listener: EventListener): void {
-    const listeners = this.events.get(event);
-    if (listeners) {
-      listeners.delete(listener);
-      if (listeners.size === 0) {
-        this.events.delete(event);
-      }
-    }
-  }
-
-  emit(event: string, data?: unknown): void {
-    const listeners = this.events.get(event);
-    if (!listeners || listeners.size === 0) return;
-
-    const listenerArray = Array.from(listeners);
-
-    if (listenerArray.length > 10) {
-      setTimeout(() => {
-        listenerArray.forEach(callback => {
-          try {
-            callback(data);
-          } catch (error) {
-            console.error(`Error in event listener for '${event}':`, error);
-          }
-        });
-      }, 0);
-    } else {
-      listenerArray.forEach(callback => {
-        try {
-          queueMicrotask(() => callback(data));
-        } catch (error) {
-          console.error(`Error in event listener for '${event}':`, error);
-        }
-      });
-    }
-  }
-
-  removeAllListeners(event?: string): void {
-    if (event) {
-      this.events.delete(event);
-    } else {
-      this.events.clear();
-    }
-  }
-}
-
-// ============================================================================
-// Error Handling
-// ============================================================================
-
-function handleError(error: Error, context?: Record<string, unknown>): void {
-  console.error('[WebSocket Error]', {
-    message: error.message,
-    stack: error.stack,
-    ...context
-  });
-}
-
-// ============================================================================
-// Unified WebSocket Manager
-// ============================================================================
-
-export class UnifiedWebSocketManager {
-  private static instance: UnifiedWebSocketManager | null = null;
-  private ws: WebSocket | null = null;
-  private config: WebSocketConfig;
-  private subscriptions = new Map<string, Subscription>();
-  private reconnectAttempts = 0;
-  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
-  private batchTimer: ReturnType<typeof setInterval> | null = null;
-  private messageQueue: WebSocketMessage[] = [];
-  private maxQueueSize = 100;
-  private connectionState: ConnectionState = ConnectionState.DISCONNECTED;
-  private eventEmitter = new EventEmitter();
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private connectionPromise: Promise<void> | null = null;
-  private currentToken: string | null = null;
-  private connectedAt: number | null = null;
-  private lastPongTime: number | null = null;
-
-  // Bill-specific properties
-  private billsConfig: BillsWebSocketConfig;
-  private subscribedBills = new Set<number>();
-  private updateQueue: BillRealTimeUpdate[] = [];
-  private billsBatchTimer: ReturnType<typeof setInterval> | null = null;
-
-  constructor(config: WebSocketConfig, billsConfig?: Partial<BillsWebSocketConfig>) {
-    this.config = config;
-    this.billsConfig = {
-      autoReconnect: true,
-      maxReconnectAttempts: 5,
-      reconnectDelay: 2000,
-      heartbeatInterval: 30000,
-      batchUpdateInterval: 1000,
-      maxBatchSize: 50,
-      ...billsConfig
+  constructor(
+    private server: Server,
+    config: WebSocketServerConfig = {}
+  ) {
+    // Set default configuration values
+    this.config = {
+      heartbeatInterval: config.heartbeatInterval ?? 10000,
+      staleConnectionTimeout: config.staleConnectionTimeout ?? 30000,
+      maxConnectionAge: config.maxConnectionAge ?? 24 * 60 * 60 * 1000,
+      cleanupInterval: config.cleanupInterval ?? 60000
     };
   }
 
-  static getInstance(): UnifiedWebSocketManager {
-    if (!UnifiedWebSocketManager.instance) {
-      UnifiedWebSocketManager.instance = globalWebSocketPool.getConnection('ws://localhost:8080');
+  // ==========================================================================
+  // Server Initialization
+  // ==========================================================================
+
+  /**
+   * Initialize the WebSocket server and set up event handlers
+   */
+  async initialize(): Promise<void> {
+    try {
+      // Create WebSocket server with proper options
+      this.wss = new WebSocketServer({ 
+        server: this.server,
+        path: '/api/ws',
+        verifyClient: this.verifyClient.bind(this)
+      });
+
+      // Set up event handlers
+      this.setupEventHandlers();
+
+      // Start background tasks
+      this.startHeartbeat();
+      this.startCleanup();
+
+      logger.info('WebSocket API server initialized', {
+        component: 'WebSocketAPIServer',
+        path: '/api/ws',
+        config: this.config
+      });
+    } catch (error) {
+      logger.error('Failed to initialize WebSocket API server', {
+        component: 'WebSocketAPIServer'
+      }, error);
+      throw error;
     }
-    return UnifiedWebSocketManager.instance;
   }
 
-  async connect(token?: string): Promise<void> {
-    if (this.connectionPromise &&
-        this.connectionState === ConnectionState.CONNECTING &&
-        this.currentToken === token) {
-      return this.connectionPromise;
-    }
+  /**
+   * Gracefully shut down the WebSocket server
+   */
+  async shutdown(): Promise<void> {
+    try {
+      // Close all active connections with proper closure code
+      this.connections.forEach(connection => {
+        connection.ws.close(1001, 'Server shutting down');
+      });
 
-    if (this.connectionState === ConnectionState.CONNECTED &&
-        this.isConnected() &&
-        this.currentToken === token) {
-      return Promise.resolve();
-    }
+      // Stop background tasks
+      this.stopHeartbeat();
+      this.stopCleanup();
 
-    this.currentToken = token || null;
-    this.cleanup(false);
-    this.connectionPromise = null;
-
-    this.connectionPromise = new Promise((resolve, reject) => {
-      this.connectionState = ConnectionState.CONNECTING;
-
-      store.dispatch(updateConnectionState({
-        isConnecting: true,
-        error: null
-      }));
-
-      try {
-        const wsUrl = token
-          ? `${this.config.url}?token=${encodeURIComponent(token)}`
-          : this.config.url;
-        this.ws = new WebSocket(wsUrl, this.config.protocols as string[]);
-
-        const connectionTimeout = setTimeout(() => {
-          if (this.connectionState === ConnectionState.CONNECTING) {
-            this.ws?.close();
-            reject(new Error('Connection timeout'));
-          }
-        }, 10000);
-
-        this.ws.onopen = () => {
-          clearTimeout(connectionTimeout);
-          this.onConnected();
-          resolve();
-        };
-
-        this.ws.onmessage = (event) => this.onMessage(event);
-        this.ws.onclose = (event) => this.onDisconnected(event);
-        this.ws.onerror = (error) => {
-          clearTimeout(connectionTimeout);
-          this.onError(error);
-
-          if (this.connectionState === ConnectionState.CONNECTING) {
-            reject(error);
-          }
-        };
-      } catch (error) {
-        this.connectionState = ConnectionState.DISCONNECTED;
-        reject(error);
+      // Close WebSocket server
+      if (this.wss) {
+        await new Promise<void>((resolve, reject) => {
+          this.wss!.close((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+        this.wss = null;
       }
+
+      // Clear connections
+      this.connections.clear();
+
+      logger.info('WebSocket API server shut down gracefully', {
+        component: 'WebSocketAPIServer',
+        finalStats: this.stats
+      });
+    } catch (error) {
+      logger.error('Error during WebSocket API server shutdown', {
+        component: 'WebSocketAPIServer'
+      }, error);
+      throw error;
+    }
+  }
+
+  // ==========================================================================
+  // Client Verification
+  // ==========================================================================
+
+  /**
+   * Verify incoming WebSocket connections before accepting them
+   */
+  private async verifyClient(info: VerifyClientInfo): Promise<boolean> {
+    try {
+      const token = this.extractToken(info.req);
+      
+      if (!token) {
+        logger.warn('WebSocket connection rejected: No token provided', {
+          component: 'WebSocketAPIServer',
+          origin: info.origin
+        });
+        return false;
+      }
+
+      // Validate token and check rate limits in parallel for better performance
+      const [isValid, withinLimits] = await Promise.all([
+        this.authenticateWebSocket(token),
+        this.checkRateLimit(token)
+      ]);
+
+      if (!isValid || !withinLimits) {
+        logger.warn('WebSocket connection rejected: Authentication or rate limit failed', {
+          component: 'WebSocketAPIServer',
+          origin: info.origin,
+          isValid,
+          withinLimits
+        });
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      logger.error('Error verifying WebSocket client', {
+        component: 'WebSocketAPIServer'
+      }, error);
+      return false;
+    }
+  }
+
+  /**
+   * Extract authentication token from request headers or query parameters
+   */
+  private extractToken(req: IncomingMessage): string | null {
+    // Check Authorization header first
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      return authHeader.substring(7);
+    }
+    
+    // Fall back to query parameter
+    if (req.url) {
+      try {
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        return url.searchParams.get('token');
+      } catch (error) {
+        logger.error('Error parsing URL for token extraction', {
+          component: 'WebSocketAPIServer'
+        }, error);
+      }
+    }
+    
+    return null;
+  }
+
+  // ==========================================================================
+  // Event Handlers
+  // ==========================================================================
+
+  /**
+   * Set up WebSocket server event handlers
+   */
+  private setupEventHandlers(): void {
+    if (!this.wss) return;
+
+    this.wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
+      this.handleConnection(ws as AuthenticatedWebSocket, req);
     });
 
-    return this.connectionPromise;
+    this.wss.on('error', (error: Error) => {
+      logger.error('WebSocket server error', {
+        component: 'WebSocketAPIServer'
+      }, error);
+      this.stats.errors++;
+    });
+
+    this.wss.on('close', () => {
+      logger.info('WebSocket server closed', {
+        component: 'WebSocketAPIServer',
+        stats: this.stats
+      });
+    });
   }
 
-  disconnect(): void {
-    this.cleanup(true);
-    this.currentToken = null;
-    this.messageQueue = [];
-    this.connectionState = ConnectionState.DISCONNECTED;
-    this.eventEmitter.emit('disconnected');
+  /**
+   * Handle new WebSocket connection
+   */
+  private handleConnection(ws: AuthenticatedWebSocket, req: IncomingMessage): void {
+    const connectionId = uuidv4();
+    const token = this.extractToken(req);
+    
+    // Initialize connection properties
+    ws.subscriptions = new Set();
+    ws.connectionTime = Date.now();
+    ws.lastActivity = Date.now();
+
+    // Authenticate connection asynchronously
+    this.authenticateConnection(ws, token).then(userId => {
+      ws.userId = userId;
+      ws.sessionId = uuidv4();
+
+      // Store connection in the connections map
+      const connection: WebSocketConnection = {
+        id: connectionId,
+        ws,
+        userId,
+        sessionId: ws.sessionId,
+        subscriptions: ws.subscriptions,
+        connectionTime: ws.connectionTime,
+        lastActivity: ws.lastActivity
+      };
+
+      this.connections.set(connectionId, connection);
+      this.stats.totalConnections++;
+      if (userId) this.stats.authenticatedConnections++;
+
+      logger.info('WebSocket connection established', {
+        component: 'WebSocketAPIServer',
+        connectionId,
+        userId,
+        sessionId: ws.sessionId
+      });
+
+      // Set up connection-specific event handlers
+      ws.on('message', (data: Buffer) => {
+        this.handleMessage(connectionId, data);
+      });
+
+      ws.on('close', (code: number, reason: Buffer) => {
+        this.handleDisconnection(connectionId, code, reason);
+      });
+
+      ws.on('error', (error: Error) => {
+        this.handleConnectionError(connectionId, error);
+      });
+
+      ws.on('pong', () => {
+        // Update last activity on pong receipt
+        const conn = this.connections.get(connectionId);
+        if (conn) {
+          conn.lastActivity = Date.now();
+          conn.ws.lastActivity = Date.now();
+        }
+      });
+
+      // Send welcome message to establish connection
+      this.sendMessage(ws, {
+        type: 'connected',
+        data: {
+          connectionId,
+          sessionId: ws.sessionId,
+          serverTime: new Date().toISOString()
+        }
+      });
+
+    }).catch(error => {
+      logger.error('Failed to authenticate WebSocket connection', {
+        component: 'WebSocketAPIServer',
+        connectionId
+      }, error);
+      ws.close(1008, 'Authentication failed');
+    });
   }
 
-  subscribe(topic: string, callback: (message: unknown) => void, options?: {
-    filters?: Record<string, unknown>;
-    priority?: 'high' | 'medium' | 'low';
-  }): string {
-    const subscriptionId = this.generateSubscriptionId();
-
-    const subscription: Subscription = {
-      id: subscriptionId,
-      topic,
-      filters: options?.filters,
-      callback,
-      priority: options?.priority || 'medium'
-    };
-
-    this.subscriptions.set(subscriptionId, subscription);
-
-    if (this.isConnected()) {
-      this.sendSubscriptionMessage(subscription);
+  /**
+   * Authenticate a WebSocket connection using the provided token
+   */
+  private async authenticateConnection(
+    _ws: AuthenticatedWebSocket, 
+    token: string | null
+  ): Promise<string | undefined> {
+    if (!token) return undefined;
+    
+    try {
+      const user = await this.authenticateWebSocket(token);
+      return user;
+    } catch (error) {
+      logger.error('Authentication error', {
+        component: 'WebSocketAPIServer'
+      }, error);
+      throw new Error('Authentication failed');
     }
-
-    return subscriptionId;
   }
 
-  subscribeToBill(bill_id: number, subscriptionTypes?: BillUpdateType[]): string {
-    const message: WebSocketMessage = {
-      type: 'subscribe',
-      data: { bill_id, subscriptionTypes }
-    };
-
-    if (!this.isConnected()) {
-      console.warn('WebSocket not connected. Queueing subscription.');
-      this.queueMessage(message);
-      return `bill_${bill_id}`;
-    }
-
-    this.send(message);
-    return `bill_${bill_id}`;
-  }
-
-  unsubscribeFromBill(bill_id: number): void {
-    const message: WebSocketMessage = {
-      type: 'unsubscribe',
-      data: { bill_id }
-    };
-
-    // cSpell:ignore unsubscription
-    if (!this.isConnected()) {
-      console.warn('WebSocket not connected. Queueing unsubscription.');
-      this.queueMessage(message);
+  /**
+   * Handle incoming messages from clients
+   */
+  private handleMessage(connectionId: string, data: Buffer): void {
+    const connection = this.connections.get(connectionId);
+    if (!connection) {
+      logger.warn('Received message for non-existent connection', {
+        component: 'WebSocketAPIServer',
+        connectionId
+      });
       return;
     }
 
-    this.send(message);
-  }
+    try {
+      // Update last activity timestamp
+      const now = Date.now();
+      connection.lastActivity = now;
+      connection.ws.lastActivity = now;
 
-  unsubscribe(subscriptionId: string): void {
-    const subscription = this.subscriptions.get(subscriptionId);
-    if (!subscription) return;
+      // Parse and validate the message
+      const messageText = data.toString('utf8');
+      const message = JSON.parse(messageText) as WebSocketMessage;
+      
+      if (!this.validateMessage(message)) {
+        this.sendError(connection.ws, 'Invalid message format');
+        this.stats.errors++;
+        return;
+      }
 
-    this.subscriptions.delete(subscriptionId);
+      this.stats.messagesReceived++;
 
-    // cSpell:ignore unsubscription
-    if (this.isConnected()) {
-      this.sendUnsubscriptionMessage(subscription);
+      logger.debug('Received WebSocket message', {
+        component: 'WebSocketAPIServer',
+        connectionId,
+        messageType: message.type
+      });
+
+      // Route message to the appropriate handler
+      this.routeMessage(connection, message);
+
+    } catch (error) {
+      this.stats.errors++;
+      logger.error('Error handling WebSocket message', {
+        component: 'WebSocketAPIServer',
+        connectionId
+      }, error);
+      this.sendError(connection.ws, 'Failed to process message');
     }
   }
 
-  send(message: WebSocketMessage): void {
-    if (this.isConnected()) {
+  /**
+   * Handle client disconnection
+   */
+  private handleDisconnection(connectionId: string, code: number, reason: Buffer): void {
+    const connection = this.connections.get(connectionId);
+    if (!connection) return;
+
+    // Calculate connection duration for logging
+    const duration = Date.now() - connection.connectionTime;
+
+    // Clean up connection
+    this.connections.delete(connectionId);
+    this.stats.totalConnections--;
+    if (connection.userId) this.stats.authenticatedConnections--;
+
+    // Update subscription count
+    this.stats.totalSubscriptions -= connection.subscriptions.size;
+
+    logger.info('WebSocket connection closed', {
+      component: 'WebSocketAPIServer',
+      connectionId,
+      userId: connection.userId,
+      code,
+      reason: reason.toString('utf8'),
+      duration,
+      subscriptionCount: connection.subscriptions.size
+    });
+  }
+
+  /**
+   * Handle connection errors
+   */
+  private handleConnectionError(connectionId: string, error: Error): void {
+    this.stats.errors++;
+    logger.error('WebSocket connection error', {
+      component: 'WebSocketAPIServer',
+      connectionId
+    }, error);
+    
+    // Optionally close the connection on error
+    const connection = this.connections.get(connectionId);
+    if (connection) {
+      connection.ws.close(1011, 'Internal error');
+    }
+  }
+
+  // ==========================================================================
+  // Message Routing
+  // ==========================================================================
+
+  /**
+   * Route message to the appropriate handler based on message type
+   */
+  private routeMessage(connection: WebSocketConnection, message: WebSocketMessage): void {
+    const handler = this.messageHandlers.get(message.type);
+    
+    if (handler) {
       try {
-        const payload = JSON.stringify(message);
-        if (payload.length > 1024 * 1024) {
-          throw new Error('Message too large');
-        }
-        this.ws!.send(payload);
+        handler(connection, message);
       } catch (error) {
-        handleError(error as Error, {
-          component: 'websocket',
-          operation: 'send'
-        });
-        this.emit('error', { message: 'Failed to send message', error });
-        throw error;
+        this.stats.errors++;
+        logger.error('Error in message handler', {
+          component: 'WebSocketAPIServer',
+          messageType: message.type,
+          connectionId: connection.id
+        }, error);
+        this.sendError(connection.ws, 'Failed to process message');
       }
     } else {
-      this.queueMessage(message);
+      logger.warn('Unknown message type received', {
+        component: 'WebSocketAPIServer',
+        messageType: message.type,
+        connectionId: connection.id
+      });
+      this.sendError(connection.ws, `Unknown message type: ${message.type}`);
     }
   }
 
-  getConnectionState(): ConnectionState {
-    return this.connectionState;
-  }
+  // ==========================================================================
+  // Message Handler Registration
+  // ==========================================================================
 
-  getSubscriptionCount(): number {
-    return this.subscriptions.size;
-  }
-
-  on(event: string, listener: EventListener): () => void {
-    return this.eventEmitter.on(event, listener);
-  }
-
-  off(event: string, listener: EventListener): void {
-    this.eventEmitter.off(event, listener);
-  }
-
-  private emit(event: string, data?: unknown): void {
-    this.eventEmitter.emit(event, data);
-  }
-
-  private onConnected(): void {
-    this.connectionState = ConnectionState.CONNECTED;
-    this.reconnectAttempts = 0;
-    this.connectedAt = Date.now();
-    this.lastPongTime = Date.now();
-
-    store.dispatch(updateConnectionState({
-      isConnected: true,
-      isConnecting: false,
-      error: null,
-      connection_quality: 'excellent',
-      last_heartbeat: new Date().toISOString(),
-      reconnectAttempts: 0
-    }));
-
-    if (this.config.heartbeat.enabled) {
-      this.startHeartbeat();
+  /**
+   * Register a handler for a specific message type
+   */
+  registerMessageHandler(type: string, handler: MessageHandler): void {
+    if (this.messageHandlers.has(type)) {
+      logger.warn('Overwriting existing message handler', {
+        component: 'WebSocketAPIServer',
+        messageType: type
+      });
     }
-
-    if (this.config.message.batching) {
-      this.startBatchProcessing();
-    }
-
-    this.startBillsBatchProcessing();
-    this.resubscribeAll();
-    this.resubscribeAllBills();
-    this.flushMessageQueue();
-
-    this.eventEmitter.emit('connected');
+    this.messageHandlers.set(type, handler);
+    
+    logger.debug('Registered message handler', {
+      component: 'WebSocketAPIServer',
+      messageType: type
+    });
   }
 
-  private onMessage(event: MessageEvent): void {
-    try {
-      const message: WebSocketMessage = this.config.message.compression
-        ? this.decompressMessage(event.data)
-        : JSON.parse(event.data);
-
-      if (message.type === 'heartbeat' || message.type === 'pong') {
-        this.handleHeartbeat(message as HeartbeatMessage);
-        return;
-      }
-
-      if (message.type === 'billUpdate' || message.type === 'bill_update') {
-        this.handleBillUpdateMessage(message as unknown as BillUpdateMessage);
-        return;
-      }
-
-      if (message.type === 'batchedBillUpdates' || message.type === 'batched_updates') {
-        this.handleBatchedBillUpdatesMessage(message as BatchedBillUpdatesMessage);
-        return;
-      }
-
-      if (message.type === 'community_update' || message.type === 'communityUpdate') {
-        this.handleCommunityUpdateMessage(message);
-        return;
-      }
-
-      if (message.type === 'notification') {
-        this.handleNotificationMessage(message);
-        return;
-      }
-
-      if (message.type === 'expert_activity' || message.type === 'expertActivity') {
-        this.handleExpertActivityMessage(message);
-        return;
-      }
-
-      if (message.type === 'engagement_metrics' || message.type === 'engagementMetrics') {
-        this.handleEngagementMetricsMessage(message);
-        return;
-      }
-
-      this.routeMessage(message);
-    } catch (error) {
-      handleError(error as Error, {
-        component: 'websocket',
-        operation: 'onMessage'
+  /**
+   * Unregister a message handler
+   */
+  unregisterMessageHandler(type: string): void {
+    const existed = this.messageHandlers.delete(type);
+    
+    if (existed) {
+      logger.debug('Unregistered message handler', {
+        component: 'WebSocketAPIServer',
+        messageType: type
       });
     }
   }
 
-  private onDisconnected(event: CloseEvent): void {
-    const wasConnected = this.connectionState === ConnectionState.CONNECTED;
-    this.connectionState = event.code === 1000 ? ConnectionState.DISCONNECTED : ConnectionState.RECONNECTING;
+  // ==========================================================================
+  // Subscription Management
+  // ==========================================================================
 
-    store.dispatch(updateConnectionState({
-      isConnected: false,
-      isConnecting: this.connectionState === ConnectionState.RECONNECTING,
-      connection_quality: 'disconnected',
-      error: null
-    }));
-
-    this.stopHeartbeat();
-
-    if (this.batchTimer) {
-      clearInterval(this.batchTimer);
-      this.batchTimer = null;
-    }
-
-    this.ws = null;
-
-    if (this.config.reconnect.enabled && event.code !== 1000 && wasConnected && this.reconnectAttempts < this.config.reconnect.maxAttempts) {
-      this.scheduleReconnect();
-    } else if (this.reconnectAttempts >= this.config.reconnect.maxAttempts) {
-      this.connectionState = ConnectionState.FAILED;
-      console.error('Max reconnection attempts reached');
-      store.dispatch(updateConnectionState({
-        isConnected: false,
-        isConnecting: false,
-        connection_quality: 'disconnected',
-        error: 'Max reconnection attempts reached'
-      }));
-    }
-
-    this.eventEmitter.emit('disconnected', event);
-  }
-
-  private onError(error: Event | Error): void {
-    this.connectionState = ConnectionState.FAILED;
-
-    const errorObj = error instanceof Error ? error : new Error('WebSocket connection error');
-
-    handleError(errorObj, {
-      component: 'websocket',
-      operation: 'connection'
-    });
-
-    this.eventEmitter.emit('error', errorObj);
-  }
-
-  private routeMessage(message: WebSocketMessage): void {
-    const matchingSubscriptions = Array.from(this.subscriptions.values())
-      .filter(sub => this.matchesSubscription(sub, message));
-
-    matchingSubscriptions.forEach(sub => {
-      try {
-        sub.callback(message);
-      } catch (error) {
-        handleError(error as Error, {
-          component: 'websocket',
-          operation: 'routeMessage',
-          subscriptionId: sub.id
-        });
-      }
-    });
-
-    this.eventEmitter.emit('message', message);
-  }
-
-  private matchesSubscription(subscription: Subscription, message: WebSocketMessage): boolean {
-    if (subscription.topic !== message.topic && subscription.topic !== '*') {
+  /**
+   * Subscribe a connection to a topic
+   */
+  subscribeToTopic(connectionId: string, topic: string): boolean {
+    const connection = this.connections.get(connectionId);
+    if (!connection) {
+      logger.warn('Cannot subscribe non-existent connection', {
+        component: 'WebSocketAPIServer',
+        connectionId,
+        topic
+      });
       return false;
     }
 
-    if (subscription.filters) {
-      return this.matchesFilters(message, subscription.filters);
+    const wasNew = !connection.subscriptions.has(topic);
+    connection.subscriptions.add(topic);
+    connection.ws.subscriptions.add(topic);
+    
+    if (wasNew) {
+      this.stats.totalSubscriptions++;
+      logger.info('Subscribed to topic', {
+        component: 'WebSocketAPIServer',
+        connectionId,
+        topic
+      });
     }
 
-    return true;
+    return wasNew;
   }
 
-  private matchesFilters(message: WebSocketMessage, filters: Record<string, unknown>): boolean {
-    for (const [key, expectedValue] of Object.entries(filters)) {
-      const actualValue = message[key];
+  /**
+   * Unsubscribe a connection from a topic
+   */
+  unsubscribeFromTopic(connectionId: string, topic: string): boolean {
+    const connection = this.connections.get(connectionId);
+    if (!connection) {
+      logger.warn('Cannot unsubscribe non-existent connection', {
+        component: 'WebSocketAPIServer',
+        connectionId,
+        topic
+      });
+      return false;
+    }
 
-      if (Array.isArray(expectedValue)) {
-        if (!expectedValue.includes(actualValue)) {
-          return false;
+    const existed = connection.subscriptions.has(topic);
+    if (existed) {
+      connection.subscriptions.delete(topic);
+      connection.ws.subscriptions.delete(topic);
+      this.stats.totalSubscriptions--;
+
+      logger.info('Unsubscribed from topic', {
+        component: 'WebSocketAPIServer',
+        connectionId,
+        topic
+      });
+    }
+
+    return existed;
+  }
+
+  /**
+   * Get all connections subscribed to a topic
+   */
+  getTopicSubscribers(topic: string): WebSocketConnection[] {
+    const subscribers: WebSocketConnection[] = [];
+    this.connections.forEach(connection => {
+      if (connection.subscriptions.has(topic)) {
+        subscribers.push(connection);
+      }
+    });
+    return subscribers;
+  }
+
+  // ==========================================================================
+  // Message Broadcasting
+  // ==========================================================================
+
+  /**
+   * Broadcast a message to all connections subscribed to a topic
+   */
+  broadcastToTopic(
+    topic: string, 
+    message: WebSocketMessage, 
+    excludeUserId?: string
+  ): number {
+    let sentCount = 0;
+    
+    this.connections.forEach(connection => {
+      if (connection.subscriptions.has(topic)) {
+        // Optionally exclude specific user
+        if (excludeUserId && connection.userId === excludeUserId) {
+          return;
         }
-      } else if (actualValue !== expectedValue) {
+
+        if (this.sendMessage(connection.ws, message)) {
+          sentCount++;
+        }
+      }
+    });
+
+    logger.debug('Broadcasted message to topic', {
+      component: 'WebSocketAPIServer',
+      topic,
+      sentCount,
+      excludedUser: excludeUserId
+    });
+
+    return sentCount;
+  }
+
+  /**
+   * Broadcast a message to all connections for a specific user
+   */
+  broadcastToUser(userId: string, message: WebSocketMessage): number {
+    let sentCount = 0;
+    
+    this.connections.forEach(connection => {
+      if (connection.userId === userId) {
+        if (this.sendMessage(connection.ws, message)) {
+          sentCount++;
+        }
+      }
+    });
+
+    logger.debug('Broadcasted message to user', {
+      component: 'WebSocketAPIServer',
+      userId,
+      sentCount
+    });
+
+    return sentCount;
+  }
+
+  /**
+   * Broadcast a message to all connected clients
+   */
+  broadcastToAll(message: WebSocketMessage, excludeUserId?: string): number {
+    let sentCount = 0;
+    
+    this.connections.forEach(connection => {
+      if (excludeUserId && connection.userId === excludeUserId) {
+        return;
+      }
+
+      if (this.sendMessage(connection.ws, message)) {
+        sentCount++;
+      }
+    });
+
+    logger.debug('Broadcasted message to all connections', {
+      component: 'WebSocketAPIServer',
+      sentCount,
+      excludedUser: excludeUserId
+    });
+
+    return sentCount;
+  }
+
+  // ==========================================================================
+  // Message Sending
+  // ==========================================================================
+
+  /**
+   * Send a message to a specific WebSocket connection
+   * Returns true if successful, false otherwise
+   */
+  private sendMessage(ws: AuthenticatedWebSocket, message: WebSocketMessage): boolean {
+    try {
+      // Only send if connection is open
+      if (ws.readyState !== WebSocket.OPEN) {
         return false;
       }
-    }
 
+      const data = JSON.stringify(message);
+      ws.send(data);
+      this.stats.messagesSent++;
+      return true;
+    } catch (error) {
+      this.stats.errors++;
+      logger.error('Error sending WebSocket message', {
+        component: 'WebSocketAPIServer'
+      }, error);
+      return false;
+    }
+  }
+
+  /**
+   * Send an error message to a client
+   */
+  private sendError(ws: AuthenticatedWebSocket, error: string): boolean {
+    return this.sendMessage(ws, {
+      type: 'error',
+      data: { error },
+      timestamp: Date.now()
+    });
+  }
+
+  // ==========================================================================
+  // Background Tasks
+  // ==========================================================================
+
+  /**
+   * Start the heartbeat mechanism to detect stale connections
+   */
+  private startHeartbeat(): void {
+    this.heartbeatInterval = setInterval(() => {
+      const now = Date.now();
+      
+      this.connections.forEach(connection => {
+        // Check for stale connections that haven't responded
+        const timeSinceActivity = now - connection.lastActivity;
+        
+        if (timeSinceActivity > this.config.staleConnectionTimeout) {
+          logger.warn('Closing stale connection', {
+            component: 'WebSocketAPIServer',
+            connectionId: connection.id,
+            timeSinceActivity
+          });
+          connection.ws.close(1001, 'Connection timeout');
+          return;
+        }
+
+        // Send ping to keep connection alive
+        if (connection.ws.readyState === WebSocket.OPEN) {
+          try {
+            connection.ws.ping();
+          } catch (error) {
+            logger.error('Error sending ping', {
+              component: 'WebSocketAPIServer',
+              connectionId: connection.id
+            }, error);
+          }
+        }
+      });
+    }, this.config.heartbeatInterval);
+
+    logger.debug('Heartbeat mechanism started', {
+      component: 'WebSocketAPIServer',
+      interval: this.config.heartbeatInterval
+    });
+  }
+
+  /**
+   * Stop the heartbeat mechanism
+   */
+  private stopHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+      logger.debug('Heartbeat mechanism stopped', {
+        component: 'WebSocketAPIServer'
+      });
+    }
+  }
+
+  /**
+   * Start the cleanup task to close old connections
+   */
+  private startCleanup(): void {
+    this.cleanupInterval = setInterval(() => {
+      const now = Date.now();
+
+      this.connections.forEach(connection => {
+        const connectionAge = now - connection.connectionTime;
+        
+        if (connectionAge > this.config.maxConnectionAge) {
+          logger.info('Closing old connection', {
+            component: 'WebSocketAPIServer',
+            connectionId: connection.id,
+            age: connectionAge
+          });
+          connection.ws.close(1001, 'Connection exceeded maximum age');
+        }
+      });
+    }, this.config.cleanupInterval);
+
+    logger.debug('Cleanup task started', {
+      component: 'WebSocketAPIServer',
+      interval: this.config.cleanupInterval
+    });
+  }
+
+  /**
+   * Stop the cleanup task
+   */
+  private stopCleanup(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+      logger.debug('Cleanup task stopped', {
+        component: 'WebSocketAPIServer'
+      });
+    }
+  }
+
+  // ==========================================================================
+  // Statistics and Monitoring
+  // ==========================================================================
+
+  /**
+   * Get current server statistics
+   */
+  getStats(): WebSocketStats {
+    return { ...this.stats };
+  }
+
+  /**
+   * Get the current number of active connections
+   */
+  getConnectionCount(): number {
+    return this.connections.size;
+  }
+
+  /**
+   * Get detailed information about a specific connection
+   */
+  getConnectionDetails(connectionId: string): WebSocketConnection | undefined {
+    const connection = this.connections.get(connectionId);
+    if (!connection) return undefined;
+
+    // Return a copy to prevent external modification
+    return {
+      id: connection.id,
+      ws: connection.ws,
+      userId: connection.userId,
+      sessionId: connection.sessionId,
+      subscriptions: new Set(connection.subscriptions),
+      connectionTime: connection.connectionTime,
+      lastActivity: connection.lastActivity
+    };
+  }
+
+  /**
+   * Get all active connections for a user
+   */
+  getUserConnections(userId: string): WebSocketConnection[] {
+    const userConnections: WebSocketConnection[] = [];
+    this.connections.forEach(connection => {
+      if (connection.userId === userId) {
+        userConnections.push(connection);
+      }
+    });
+    return userConnections;
+  }
+
+  /**
+   * Reset statistics counters
+   */
+  resetStats(): void {
+    this.stats = {
+      totalConnections: 0,
+      authenticatedConnections: 0,
+      totalSubscriptions: 0,
+      messagesReceived: 0,
+      messagesSent: 0,
+      errors: 0
+    };
+    logger.info('Statistics reset', {
+      component: 'WebSocketAPIServer'
+    });
+  }
+
+  /**
+   * Simple authentication for WebSocket connections
+   */
+  private async authenticateWebSocket(token: string): Promise<string | undefined> {
+    // TODO: Implement proper authentication
+    return token ? 'user_' + token.substring(0, 8) : undefined;
+  }
+
+  /**
+   * Simple rate limiting check
+   */
+  private async checkRateLimit(_token: string): Promise<boolean> {
+    // TODO: Implement proper rate limiting
     return true;
   }
 
-  private sendSubscriptionMessage(subscription: Subscription): void {
-    const message: SubscriptionMessage = {
-      type: 'subscribe',
-      topic: subscription.topic,
-      filters: subscription.filters,
-      subscriptionId: subscription.id
-    };
-    this.send(message);
-  }
-
-  // cSpell:ignore Unsubscription
-  private sendUnsubscriptionMessage(subscription: Subscription): void {
-    const message: SubscriptionMessage = {
-      type: 'unsubscribe',
-      topic: subscription.topic,
-      subscriptionId: subscription.id
-    };
-    this.send(message);
-  }
-
-  private resubscribeAll(): void {
-    this.subscriptions.forEach(subscription => {
-      this.sendSubscriptionMessage(subscription);
-    });
-  }
-
-  private resubscribeAllBills(): void {
-    this.subscribedBills.forEach(billId => {
-      this.subscribeToBill(billId, [
-        'status_change',
-        'new_comment',
-        'amendment',
-        'voting_scheduled'
-      ]);
-    });
-
-    console.info('Re-subscribed to all bills', {
-      billCount: this.subscribedBills.size
-    });
-  }
-
-  private queueMessage(message: WebSocketMessage): void {
-    if (this.messageQueue.length >= this.maxQueueSize) {
-      this.messageQueue.shift();
-      console.warn('Message queue full, removing oldest message');
-    }
-    this.messageQueue.push(message);
-  }
-
-  private flushMessageQueue(): void {
-    if (this.messageQueue.length === 0) return;
-
-    console.log(`Flushing ${this.messageQueue.length} queued messages`);
-    const queue = [...this.messageQueue];
-    this.messageQueue = [];
-
-    queue.forEach(message => {
-      try {
-        this.send(message);
-      } catch (error) {
-        console.error('Error sending queued message:', error);
-        this.queueMessage(message);
-      }
-    });
-  }
-
-  private startHeartbeat(): void {
-    this.stopHeartbeat();
-
-    this.heartbeatTimer = setInterval(() => {
-      if (!this.isConnected()) {
-        this.stopHeartbeat();
-        return;
-      }
-
-      if (this.lastPongTime && Date.now() - this.lastPongTime > 45000) {
-        console.warn('No pong received, connection appears dead');
-        this.ws?.close(4000, 'Heartbeat timeout');
-        return;
-      }
-
-      this.send({ type: 'ping' });
-    }, this.config.heartbeat.interval);
-  }
-
-  private stopHeartbeat(): void {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
-    }
-  }
-
-  private handleHeartbeat(_message: HeartbeatMessage): void {
-    this.lastPongTime = Date.now();
-  }
-
-  private startBatchProcessing(): void {
-    this.batchTimer = setInterval(() => {
-      if (this.messageQueue.length > 0) {
-        this.processBatch();
-      }
-    }, this.config.message.batchInterval);
-  }
-
-  private processBatch(): void {
-    const batch = this.messageQueue.splice(0, this.config.message.batchSize);
-
-    if (batch.length > 0) {
-      const batchMessage: BatchMessage = {
-        type: 'batch',
-        messages: batch,
-        timestamp: Date.now()
-      };
-      this.send(batchMessage);
-    }
-  }
-
-  // ============================================================================
-  // Bill-specific batch processing
-  // ============================================================================
-
-  private startBillsBatchProcessing(): void {
-    if (this.billsBatchTimer) {
-      clearInterval(this.billsBatchTimer);
-    }
-
-    this.billsBatchTimer = setInterval(() => {
-      if (this.updateQueue.length > 0) {
-        this.processBillsBatchedUpdates();
-      }
-    }, this.billsConfig.batchUpdateInterval);
-  }
-
-  private processBillsBatchedUpdates(): void {
-    if (this.updateQueue.length === 0) return;
-
-    const updates = this.updateQueue.splice(0, this.billsConfig.maxBatchSize);
-    const updatesByBill = new Map<number, BillRealTimeUpdate[]>();
-
-    updates.forEach(update => {
-      const billId = update.bill_id;
-      if (!updatesByBill.has(billId)) {
-        updatesByBill.set(billId, []);
-      }
-      updatesByBill.get(billId)!.push(update);
-    });
-
-    updatesByBill.forEach((billUpdates, billId) => {
-      try {
-        this.processBillUpdates(billId, billUpdates);
-      } catch (error) {
-        console.error('Failed to process updates for bill', {
-          billId,
-          updateCount: billUpdates.length,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
-    });
-  }
-
-  private queueBillUpdate(update: BillRealTimeUpdate): void {
-    this.updateQueue.push(update);
-
-    if (this.updateQueue.length > this.billsConfig.maxBatchSize * 2) {
-      this.updateQueue = this.updateQueue.slice(-this.billsConfig.maxBatchSize);
-      console.warn('Bill update queue overflow, removed oldest updates');
-    }
-  }
-
-  private processBillUpdates(billId: number, updates: BillRealTimeUpdate[]): void {
-    updates.forEach(update => {
-      const updateType = this.getBillUpdateType(update);
-      const timestamp = update.timestamp || new Date().toISOString();
-      store.dispatch(addBillUpdate({
-        type: updateType as 'status_change' | 'engagement_change' | 'amendment' | 'voting_scheduled',
-        data: update,
-        timestamp,
-        bill_id: update.bill_id
-      }));
-    });
-
-    updates.forEach(update => {
-      this.eventEmitter.emit('billUpdate', {
-        bill_id: billId,
-        update: {
-          type: this.getBillUpdateType(update),
-          data: update
-        },
-        timestamp: update.timestamp || new Date().toISOString()
-      });
-    });
-
-    if (updates.length > 1) {
-      this.eventEmitter.emit('batchedBillUpdates', {
-        bill_id: billId,
-        updates: updates.map(update => ({
-          type: this.getBillUpdateType(update),
-          data: update
-        })),
-        timestamp: new Date().toISOString()
-      });
-    }
-  }
-
-  private getBillUpdateType(update: BillRealTimeUpdate): string {
-    if (this.isBillStatusUpdate(update)) return 'status_change';
-    if (this.isBillEngagementUpdate(update)) return 'engagement_change';
-    if (this.isBillAmendmentUpdate(update)) return 'amendment';
-    if (this.isBillVotingUpdate(update)) return 'voting_scheduled';
-    return 'unknown';
-  }
-
-  private isBillStatusUpdate(update: BillRealTimeUpdate): update is BillStatusUpdate {
-    return 'oldStatus' in update && 'newStatus' in update;
-  }
-
-  private isBillEngagementUpdate(update: BillRealTimeUpdate): update is BillEngagementUpdate {
-    return 'viewCount' in update || 'saveCount' in update || 
-           'commentCount' in update || 'shareCount' in update;
-  }
-
-  private isBillAmendmentUpdate(update: BillRealTimeUpdate): update is BillAmendmentUpdate {
-    return 'amendment_id' in update;
-  }
-
-  private isBillVotingUpdate(update: BillRealTimeUpdate): update is BillVotingUpdate {
-    return 'voting_date' in update;
-  }
-
-  private handleBillUpdateMessage(message: BillUpdateMessage): void {
-    try {
-      const { bill_id, update, timestamp } = message;
-
-      this.queueBillUpdate({
-        ...update.data,
-        bill_id,
-        timestamp: new Date(timestamp).toISOString()
-      } as BillRealTimeUpdate);
-    } catch (error) {
-      console.error('Failed to handle bill update message', { error, message });
-    }
-  }
-
-  private handleBatchedBillUpdatesMessage(message: BatchedBillUpdatesMessage): void {
-    try {
-      const updates: BillRealTimeUpdate[] = Array.isArray(message.updates) ? message.updates : [];
-
-      updates.forEach((update: BillRealTimeUpdate) => {
-        this.queueBillUpdate({
-          ...update,
-          timestamp: update.timestamp || new Date().toISOString()
-        });
-      });
-
-      if (this.updateQueue.length >= this.billsConfig.maxBatchSize) {
-        this.processBillsBatchedUpdates();
-      }
-    } catch (error) {
-      console.error('Failed to handle batched bill updates', { error, message });
-    }
-  }
-
-  private handleCommunityUpdateMessage(message: WebSocketMessage): void {
-    try {
-      // Cast to expected Redux type - validation should happen at message parsing
-      store.dispatch(addCommunityUpdate(message as never));
-    } catch (error) {
-      console.error('Failed to handle community update', { error, message });
-    }
-  }
-
-  private handleNotificationMessage(message: WebSocketMessage): void {
-    try {
-      // Cast to expected Redux type - validation should happen at message parsing
-      store.dispatch(addNotification(message as never));
-    } catch (error) {
-      console.error('Failed to handle notification', { error, message });
-    }
-  }
-
-  private handleExpertActivityMessage(message: WebSocketMessage): void {
-    try {
-      // Cast to expected Redux type - validation should happen at message parsing
-      store.dispatch(addExpertActivity(message as never));
-    } catch (error) {
-      console.error('Failed to handle expert activity', { error, message });
-    }
-  }
-
-  private handleEngagementMetricsMessage(message: WebSocketMessage): void {
-    try {
-      // Cast to expected Redux type - validation should happen at message parsing
-      store.dispatch(updateEngagementMetrics(message as never));
-    } catch (error) {
-      console.error('Failed to handle engagement metrics', { error, message });
-    }
-  }
-
-  private scheduleReconnect(): void {
-    if (this.reconnectTimer) return;
-
-    this.reconnectAttempts++;
-
-    const baseDelay = Math.min(
-      this.config.reconnect.baseDelay * Math.pow(this.config.reconnect.backoffMultiplier, this.reconnectAttempts - 1),
-      this.config.reconnect.maxDelay
-    );
-
-    const delay = Math.random() * baseDelay;
-
-    console.log(`Scheduling reconnect attempt ${this.reconnectAttempts}/${this.config.reconnect.maxAttempts} in ${Math.round(delay)}ms`);
-
-    this.reconnectTimer = setTimeout(() => {
-      this.reconnectTimer = null;
-      if (this.currentToken) {
-        this.connect(this.currentToken).catch(error => {
-          console.error('Reconnection failed:', error);
-        });
-      }
-    }, delay);
-  }
-
-  private generateSubscriptionId(): string {
-    return `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private decompressMessage(data: string): WebSocketMessage {
-    return JSON.parse(data);
-  }
-
-  // ============================================================================
-  // Public utility methods
-  // ============================================================================
-
-  getConnectionStatus(): {
-    connected: boolean;
-    reconnectAttempts: number;
-    readyState: number | null;
-    maxReconnectAttempts: number;
-    state: ConnectionState;
-    queuedMessages: number;
-  } {
-    return {
-      connected: this.isConnected(),
-      reconnectAttempts: this.reconnectAttempts,
-      readyState: this.ws?.readyState ?? null,
-      maxReconnectAttempts: this.config.reconnect.maxAttempts,
-      state: this.connectionState,
-      queuedMessages: this.messageQueue.length
-    };
-  }
-
-  getConnectionMetrics(): {
-    status: ConnectionState;
-    uptime: number | null;
-    reconnectAttempts: number;
-    maxReconnectAttempts: number;
-    lastConnected: Date | null;
-    lastPong: Date | null;
-    queuedMessages: number;
-  } {
-    return {
-      status: this.connectionState,
-      uptime: this.connectedAt ? Date.now() - this.connectedAt : null,
-      reconnectAttempts: this.reconnectAttempts,
-      maxReconnectAttempts: this.config.reconnect.maxAttempts,
-      lastConnected: this.connectedAt ? new Date(this.connectedAt) : null,
-      lastPong: this.lastPongTime ? new Date(this.lastPongTime) : null,
-      queuedMessages: this.messageQueue.length
-    };
-  }
-
-  subscribeToBillUpdates(billId: number, updateTypes?: BillUpdateType[]): void {
-    if (this.subscribedBills.has(billId)) return;
-
-    try {
-      this.subscribeToBill(billId, updateTypes);
-      this.subscribedBills.add(billId);
-
-      console.info('Subscribed to bill updates', {
-        billId,
-        updateTypes,
-        totalSubscriptions: this.subscribedBills.size
-      });
-    } catch (error) {
-      console.error('Failed to subscribe to bill updates', { billId, error });
-      throw error;
-    }
-  }
-
-  unsubscribeFromBillUpdates(billId: number): void {
-    if (!this.subscribedBills.has(billId)) return;
-
-    try {
-      this.unsubscribeFromBill(billId);
-      this.subscribedBills.delete(billId);
-    } catch (error) {
-      console.error('Failed to unsubscribe from bill updates', { billId, error });
-      throw error;
-    }
-  }
-
-  getBillSubscriptionStatus(): {
-    subscribedBills: number[];
-    subscriptionCount: number;
-    updateQueueSize: number;
-    isConnected: boolean;
-  } {
-    return {
-      subscribedBills: Array.from(this.subscribedBills),
-      subscriptionCount: this.subscribedBills.size,
-      updateQueueSize: this.updateQueue.length,
-      isConnected: this.isConnected()
-    };
-  }
-
-  isConnected(): boolean {
-    return this.ws !== null &&
-           this.ws.readyState === WebSocket.OPEN &&
-           this.connectionState === ConnectionState.CONNECTED;
-  }
-
-  private cleanup(normalClose: boolean = false): void {
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-
-    this.stopHeartbeat();
-
-    if (this.batchTimer) {
-      clearInterval(this.batchTimer);
-      this.batchTimer = null;
-    }
-
-    if (this.billsBatchTimer) {
-      clearInterval(this.billsBatchTimer);
-      this.billsBatchTimer = null;
-    }
-
-    if (this.updateQueue.length > 0) {
-      this.processBillsBatchedUpdates();
-    }
-
-    this.updateQueue = [];
-
-    if (this.ws) {
-      const wsToClose = this.ws;
-      this.ws = null;
-
-      wsToClose.onopen = null;
-      wsToClose.onmessage = null;
-      wsToClose.onclose = null;
-      wsToClose.onerror = null;
-
-      if (normalClose) {
-        wsToClose.close(1000, 'Client disconnect');
-      } else {
-        wsToClose.close();
-      }
-    }
-
-    this.connectedAt = null;
-    this.lastPongTime = null;
-
-    if (this.connectionPromise) {
-      this.connectionPromise = null;
-    }
+  /**
+   * Simple message validation
+   */
+  private validateMessage(message: WebSocketMessage): boolean {
+    return !!(message && typeof message.type === 'string' && message.type.length > 0);
   }
 }
 
 // ============================================================================
-// WebSocket Connection Pool
+// Message Handler Type
 // ============================================================================
 
-export class WebSocketConnectionPool {
-  private connections = new Map<string, UnifiedWebSocketManager>();
-  private defaultConfig: WebSocketConfig;
-  private defaultBillsConfig: BillsWebSocketConfig;
+/**
+ * Function signature for message handlers
+ */
+export type MessageHandler = (
+  connection: WebSocketConnection, 
+  message: WebSocketMessage
+) => void | Promise<void>;
 
-  constructor(defaultConfig: WebSocketConfig, defaultBillsConfig?: BillsWebSocketConfig) {
-    this.defaultConfig = defaultConfig;
-    this.defaultBillsConfig = defaultBillsConfig || {
-      autoReconnect: true,
-      maxReconnectAttempts: 5,
-      reconnectDelay: 2000,
-      heartbeatInterval: 30000,
-      batchUpdateInterval: 1000,
-      maxBatchSize: 50
-    };
-  }
+// ============================================================================
+// Default Message Handlers
+// ============================================================================
 
-  getConnection(url: string, config?: Partial<WebSocketConfig>, billsConfig?: Partial<BillsWebSocketConfig>): UnifiedWebSocketManager {
-    if (!this.connections.has(url)) {
-      const wsConfig = { ...this.defaultConfig, ...config, url };
-      const mergedBillsConfig = { ...this.defaultBillsConfig, ...billsConfig };
-      const manager = new UnifiedWebSocketManager(wsConfig, mergedBillsConfig);
-      this.connections.set(url, manager);
-    }
-    return this.connections.get(url)!;
-  }
+/**
+ * Built-in message handlers for common operations
+ */
+export const defaultMessageHandlers = {
+  /**
+   * Handle subscription requests
+   */
+  subscribe: (connection: WebSocketConnection, message: WebSocketMessage) => {
+    const topics = Array.isArray(message.data) ? message.data : [message.data];
+    
+    const subscribedTopics: string[] = [];
+    topics.forEach(topic => {
+      if (typeof topic === 'string' && topic.trim()) {
+        connection.ws.subscriptions.add(topic);
+        connection.subscriptions.add(topic);
+        subscribedTopics.push(topic);
+      }
+    });
 
-  removeConnection(url: string): void {
-    const connection = this.connections.get(url);
-    if (connection) {
-      connection.disconnect();
-      this.connections.delete(url);
-    }
-  }
+    logger.info('Processed subscribe message', {
+      component: 'WebSocketAPI',
+      connectionId: connection.id,
+      topics: subscribedTopics
+    });
 
-  getAllConnections(): UnifiedWebSocketManager[] {
-    return Array.from(this.connections.values());
-  }
+    // Send confirmation
+    connection.ws.send(JSON.stringify({
+      type: 'subscribed',
+      data: { topics: subscribedTopics },
+      timestamp: Date.now()
+    }));
+  },
 
-  disconnectAll(): void {
-    this.connections.forEach(connection => connection.disconnect());
-    this.connections.clear();
+  /**
+   * Handle unsubscription requests
+   */
+  unsubscribe: (connection: WebSocketConnection, message: WebSocketMessage) => {
+    const topics = Array.isArray(message.data) ? message.data : [message.data];
+    
+    const unsubscribedTopics: string[] = [];
+    topics.forEach(topic => {
+      if (typeof topic === 'string') {
+        if (connection.ws.subscriptions.has(topic)) {
+          connection.ws.subscriptions.delete(topic);
+          connection.subscriptions.delete(topic);
+          unsubscribedTopics.push(topic);
+        }
+      }
+    });
+
+    logger.info('Processed unsubscribe message', {
+      component: 'WebSocketAPI',
+      connectionId: connection.id,
+      topics: unsubscribedTopics
+    });
+
+    // Send confirmation
+    connection.ws.send(JSON.stringify({
+      type: 'unsubscribed',
+      data: { topics: unsubscribedTopics },
+      timestamp: Date.now()
+    }));
+  },
+
+  /**
+   * Handle ping requests from clients
+   */
+  ping: (connection: WebSocketConnection) => {
+    // Send pong response
+    connection.ws.send(JSON.stringify({
+      type: 'pong',
+      timestamp: Date.now()
+    }));
+  },
+
+  /**
+   * Handle client ready notifications
+   */
+  ready: (connection: WebSocketConnection) => {
+    logger.info('Client marked as ready', {
+      component: 'WebSocketAPI',
+      connectionId: connection.id,
+      userId: connection.userId
+    });
+
+    // Send acknowledgment
+    connection.ws.send(JSON.stringify({
+      type: 'ready_ack',
+      data: { status: 'ready' },
+      timestamp: Date.now()
+    }));
   }
+};
+
+// ============================================================================
+// Factory Function
+// ============================================================================
+
+/**
+ * Create and initialize a WebSocket API server
+ */
+export async function createWebSocketAPIServer(
+  server: Server,
+  config?: WebSocketServerConfig
+): Promise<WebSocketAPIServer> {
+  const wsServer = new WebSocketAPIServer(server, config);
+  await wsServer.initialize();
+  
+  // Register default handlers
+  Object.entries(defaultMessageHandlers).forEach(([type, handler]) => {
+    wsServer.registerMessageHandler(type, handler);
+  });
+  
+  return wsServer;
 }
 
 // ============================================================================
-// Global WebSocket Pool Instance
+// Exports
 // ============================================================================
 
-export const globalWebSocketPool = new WebSocketConnectionPool({
-  url: 'ws://localhost:8080',
-  reconnect: {
-    enabled: true,
-    maxAttempts: 5,
-    baseDelay: 1000,
-    maxDelay: 30000,
-    backoffMultiplier: 2
-  },
-  heartbeat: {
-    enabled: true,
-    interval: 30000,
-    timeout: 45000
-  },
-  message: {
-    compression: false,
-    batching: true,
-    batchSize: 10,
-    batchInterval: 1000
-  }
-}, {
-  autoReconnect: true,
-  maxReconnectAttempts: 5,
-  reconnectDelay: 2000,
-  heartbeatInterval: 30000,
-  batchUpdateInterval: 1000,
-  maxBatchSize: 50
-});
+export type { 
+  WebSocketConnection, 
+  WebSocketStats, 
+  AuthenticatedWebSocket,
+  VerifyClientInfo,
+  WebSocketServerConfig
+};

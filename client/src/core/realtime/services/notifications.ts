@@ -5,7 +5,7 @@
  * including user notifications, system alerts, and push notifications.
  */
 
-import { UnifiedWebSocketManager } from '../websocket/manager';
+import { UnifiedWebSocketManager } from '../manager';
 import { 
   WebSocketNotification, 
   WebSocketMessage 

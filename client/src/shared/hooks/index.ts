@@ -15,7 +15,13 @@ export { useWebSocket } from '../../hooks/use-websocket';
 export { useCleanup } from '../../hooks/useCleanup';
 
 // Internationalization
-export { useI18n } from '../../hooks/use-i18n';
+export { useI18n } from './use-i18n';
+
+// Service utilities
+export { useService, useServices, useServiceAvailable, useServiceHealth } from './useService';
+
+// Mock data utilities
+export { useMockData, useMockDataBatch, useRealTimeEvents, useMockDataService } from './useMockData';
 
 // Mobile-specific hooks
 export * from './mobile';

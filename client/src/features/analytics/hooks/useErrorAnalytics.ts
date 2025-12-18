@@ -30,7 +30,7 @@ import {
   selectLastRefresh,
   selectIsRealTimeEnabled,
   selectConnectionStatus,
-} from '@client/store/slices/errorAnalyticsSlice';
+} from '@client/shared/infrastructure/store/slices/errorAnalyticsSlice';
 
 interface UseErrorAnalyticsOptions {
   enableRealTime?: boolean;

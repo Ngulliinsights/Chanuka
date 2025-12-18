@@ -37,6 +37,9 @@
     "downvotes",
     "requestfailed",
     "networkidle",
-    "playwright"
+    "playwright",
+    "Deduplicator",
+    "deduplicator",
+    "unsub"
   ]
 }

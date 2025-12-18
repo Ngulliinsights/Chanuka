@@ -5,7 +5,7 @@
  * typing indicators, and expert activities through WebSocket connections.
  */
 
-import { UnifiedWebSocketManager } from '../websocket/manager';
+import { UnifiedWebSocketManager } from '../manager';
 import { 
   CommunityUpdate, 
   TypingIndicator, 

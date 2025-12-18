@@ -8,7 +8,7 @@
 
 import { Bill } from '@shared/schema/foundation';
 
-import { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@client/types/api';
+import type { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@client/core/api/types';
 import { logger } from '@client/utils/logger';
 
 export class BillTrackingService {
@@ -23,6 +23,7 @@ export class BillTrackingService {
       email: false,
       push: false,
     },
+    trackedBills: [],
   };
 
   /**

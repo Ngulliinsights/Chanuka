@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Bill } from '@/core/api/types';
+import type { Bill } from '@client/types';
 
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';

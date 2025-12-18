@@ -54,7 +54,7 @@ export {
   configureOfflineSupport,
   setupGlobalErrorHandler,
   devUtils
-} from '../lib/react-query-config';
+} from '../shared/lib/react-query-config';
 
 export { 
   apiRequest, 

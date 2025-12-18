@@ -7,7 +7,7 @@
 
 import { faker } from '@faker-js/faker';
 
-import { Bill as ReadonlyBill, BillStatus, UrgencyLevel, ComplexityLevel, ConstitutionalFlag, Severity } from '@client/core/api/types';
+import { BillStatus, UrgencyLevel, ComplexityLevel, type ConstitutionalFlag, type Severity } from '@client/core/api/types/bill';
 
 interface BillsStats {
   totalBills: number;

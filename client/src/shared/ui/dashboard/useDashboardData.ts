@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { useAuthStore } from '@client/store/slices/authSlice';
-import { useUserDashboardSelectors, useUserDashboardStore } from '@client/store/slices/userDashboardSlice';
+import { useAuth } from '@client/core/auth';
+import { useUserDashboardSelectors, useUserDashboardStore } from '../../infrastructure/store/slices/userDashboardSlice';
 import { logger } from '@client/utils/logger';
 
 export interface UseDashboardDataOptions {
@@ -13,7 +13,7 @@ export interface UseDashboardDataOptions {
 export function useDashboardData(options: UseDashboardDataOptions = {}) {
   const { autoLoad = true, trackEngagement = false, activeTab } = options;
 
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const {
     dashboardData,
     loading,

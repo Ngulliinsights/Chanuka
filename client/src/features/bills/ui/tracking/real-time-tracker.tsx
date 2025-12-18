@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useWebSocket } from "@client/hooks/use-websocket";
-import { BillTrackingPreferences } from "@client/types/api";
+import type { BillTrackingPreferences } from '@client/core/api/types';
 import { logger } from '@client/utils/logger';
 
 import { Badge } from "../../../../../../Badge";

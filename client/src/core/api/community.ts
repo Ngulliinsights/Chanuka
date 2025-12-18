@@ -1252,13 +1252,15 @@ export class CommunityApiService {
     // Ensure we have an Error object to work with
     const errorObj = error instanceof Error ? error : new Error(String(error));
     
-    // globalErrorHandler may be a function (back-compat). Call it and await if it returns a promise.
-    const maybePromise = globalErrorHandler(errorObj, {
+    // globalErrorHandler may be a function that optionally returns a Promise.
+    // Call it and treat the result as unknown, then check for a `then` function.
+    const maybePromise: unknown = globalErrorHandler(errorObj, {
       component: 'CommunityApiService',
       operation,
       ...context
-    });
-    if (maybePromise && typeof (maybePromise as any).then === 'function') {
+    }) as unknown;
+
+    if (maybePromise && typeof (maybePromise as { then?: unknown }).then === 'function') {
       await maybePromise as Promise<void>;
     }
     

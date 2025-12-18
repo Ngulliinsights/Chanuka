@@ -5,11 +5,11 @@
  * See `use-safe-query.ts` and `use-safe-mutation.ts` for the new, consolidated API.
  */
 
-import {
+import type {
   ApiResponse,
   UnifiedError,
   RequestOptions
-} from '@client/core/api/types';
+} from '@client/core/api/types/request';
 import { ErrorDomain, ErrorSeverity } from '@client/core/error';
 import { globalApiClient } from '@client/core/api/client';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';

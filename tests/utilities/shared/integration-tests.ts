@@ -1,7 +1,6 @@
 import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
 import type { CacheService } from '../../../interfaces';
-import type { RateLimitStore } from '../../../client/src/core/api/types';
 import { UnifiedLogger } from '../../../client/src/utils/logger';
 import { ValidationService } from '@shared/core/src/validation/validation-service-wrapper.ts';
 

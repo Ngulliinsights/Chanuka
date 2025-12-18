@@ -72,7 +72,4 @@ export {
 } from './use-system';
 
 // Other feature hooks
-export { useOnboarding } from './use-onboarding';
-export { useSecurity } from './useSecurity';
-export { useService } from './useService';
-export { useMockData } from './useMockData';
+export { useSecurity, useSecureForm, useRateLimit } from '../features/security/hooks/useSecurity';

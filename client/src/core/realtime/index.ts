@@ -1,12 +1,16 @@
 /**
  * Core Real-time Module
- * 
+ *
  * Consolidated WebSocket and real-time functionality for the FSD architecture.
  * This module serves as the single source of truth for all real-time features.
  */
 
+// Core Real-time Hub (primary interface)
+export { RealTimeHub, realTimeHub } from './hub';
+export type { RealTimeHubState } from './hub';
+
 // Core WebSocket infrastructure
-export { UnifiedWebSocketManager } from './websocket/manager';
+export { UnifiedWebSocketManager } from './manager';
 
 // Real-time services
 export { RealTimeService, realTimeService } from './services/realtime-service';
@@ -26,11 +30,11 @@ export { useRealTimeEngagement } from './hooks/use-realtime-engagement-legacy';
 export * from './types';
 
 // Configuration
-export { 
-  defaultWebSocketConfig, 
-  defaultRealTimeConfig, 
-  getWebSocketConfig, 
-  getRealTimeConfig 
+export {
+  defaultWebSocketConfig,
+  defaultRealTimeConfig,
+  getWebSocketConfig,
+  getRealTimeConfig
 } from './config';
 
 // Utilities

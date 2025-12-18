@@ -6,15 +6,17 @@
  * for discussion threads, expert verification, and community analytics.
  */
 
-// Type imports first
-import type { DiscussionThread, Comment, CommentFormData } from '@client/types/community';
-
 import { communityApiService } from '@client/core/api/community';
-import { globalWebSocketPool } from '@client/core/api/websocket';
+import type { DiscussionThreadMetadata } from '@client/core/api/community';
+import type { CommentFormData } from '@client/core/api/types/community';
+import { realTimeService } from '@client/core/realtime';
+import type { Comment } from '@client/types/community';
 import { logger } from '@client/utils/logger';
-import type { BillUpdateType } from '@client/core/api/websocket';
 
-// Define proper types instead of 'any'
+// ============================================================================
+// Type Definitions
+// ============================================================================
+
 interface WebSocketBillUpdate {
   update: {
     type: 'new_comment' | 'comment_update' | 'expert_contribution' | 'comment_voted' | 'comment_reported';
@@ -53,9 +55,9 @@ interface CommentQueryOptions {
   offset?: number;
 }
 
-interface WebSocketUpdateType {
-  type: 'new_comment';
-}
+// ============================================================================
+// Community Backend Service
+// ============================================================================
 
 class CommunityBackendService {
   private baseUrl: string;
@@ -115,42 +117,50 @@ class CommunityBackendService {
    * Set up WebSocket listeners for real-time community features
    */
   private setupWebSocketListeners(): void {
-    const wsManager = globalWebSocketPool.getConnection('ws://localhost:8080');
-
-    // Accept unknown payloads from the WebSocket manager and narrow locally
-    wsManager.on('billUpdate', (raw: unknown) => {
+    // Set up event listeners for community updates
+    realTimeService.on('billUpdate', (raw: unknown) => {
       const data = raw as WebSocketBillUpdate;
-      if (data?.update && (
-          data.update.type === 'new_comment' || 
-          data.update.type === 'comment_update' ||
-          data.update.type === 'expert_contribution' ||
-          data.update.type === 'comment_voted' ||
-          data.update.type === 'comment_reported')) {
+      if (data?.update && this.isValidCommunityUpdateType(data.update.type)) {
         this.handleCommunityUpdate(data);
       }
     });
 
-    wsManager.on('notification', (raw: unknown) => {
+    realTimeService.on('notification', (raw: unknown) => {
       const data = raw as WebSocketNotification;
-      if (data && (
-          data.type === 'community_activity' || 
-          data.type === 'expert_verification' ||
-          data.type === 'moderation_action' ||
-          data.type === 'comment_reply' ||
-          data.type === 'expert_insight' ||
-          data.type === 'campaign_update' ||
-          data.type === 'petition_milestone')) {
+      if (data && this.isValidNotificationType(data.type)) {
         this.handleCommunityNotification(data);
       }
     });
 
-    wsManager.on('connected', () => {
+    realTimeService.on('connected', () => {
       this.onWebSocketConnected();
     });
 
-    wsManager.on('disconnected', () => {
+    realTimeService.on('disconnected', () => {
       this.onWebSocketDisconnected();
     });
+  }
+
+  /**
+   * Type guard for community update types
+   */
+  private isValidCommunityUpdateType(type: string): boolean {
+    return ['new_comment', 'comment_update', 'expert_contribution', 'comment_voted', 'comment_reported'].includes(type);
+  }
+
+  /**
+   * Type guard for notification types
+   */
+  private isValidNotificationType(type: string): boolean {
+    return [
+      'community_activity', 
+      'expert_verification', 
+      'moderation_action',
+      'comment_reply',
+      'expert_insight',
+      'campaign_update',
+      'petition_milestone'
+    ].includes(type);
   }
 
   /**
@@ -282,12 +292,13 @@ class CommunityBackendService {
   /**
    * Get discussion thread for a bill
    */
-  async getDiscussionThread(billId: number): Promise<DiscussionThread> {
+  async getDiscussionThread(billId: number): Promise<DiscussionThreadMetadata> {
     try {
       return await communityApiService.getDiscussionThread(billId);
     } catch (error) {
       logger.error('Failed to fetch discussion thread', { 
-        component: 'CommunityBackendService' 
+        component: 'CommunityBackendService',
+        billId
       }, error as Error);
       throw error;
     }
@@ -304,7 +315,8 @@ class CommunityBackendService {
       return await communityApiService.getBillComments(billId, options);
     } catch (error) {
       logger.error('Failed to fetch bill comments', { 
-        component: 'CommunityBackendService' 
+        component: 'CommunityBackendService',
+        billId
       }, error as Error);
       throw error;
     }
@@ -316,16 +328,17 @@ class CommunityBackendService {
   async addComment(data: CommentFormData): Promise<Comment> {
     try {
       const result = await communityApiService.addComment({
-        billId: data.billId,
+        billId: Number(data.billId),
         content: data.content,
-        parentId: data.parentId
+        parentId: data.parentId?.toString()
       });
 
-      this.subscribeToDiscussion(data.billId);
+      this.subscribeToDiscussion(Number(data.billId));
       return result;
     } catch (error) {
       logger.error('Failed to add comment', { 
-        component: 'CommunityBackendService' 
+        component: 'CommunityBackendService',
+        billId: data.billId
       }, error as Error);
       throw error;
     }
@@ -334,22 +347,21 @@ class CommunityBackendService {
   /**
    * Subscribe to real-time updates for a bill's discussion
    */
-  subscribeToDiscussion(billId: number): void {
-    const wsManager = globalWebSocketPool.getConnection('ws://localhost:8080');
-    
-    if (!wsManager.getConnectionStatus().connected) {
-      logger.warn('WebSocket not connected. Cannot subscribe to discussion updates.', { 
-        component: 'CommunityBackendService' 
+  subscribeToDiscussion(billId: number | string): void {
+    if (!realTimeService.isConnected()) {
+      logger.warn('WebSocket not connected. Cannot subscribe to discussion updates.', {
+        component: 'CommunityBackendService'
       });
       return;
     }
 
-    const updateTypes: BillUpdateType[] = ['new_comment'];
-    wsManager.subscribeToBill(billId, updateTypes);
-    
-    logger.info('Subscribed to discussion updates', { 
-      component: 'CommunityBackendService', 
-      billId 
+    const normalizedBillId = Number(billId);
+    const communityService = realTimeService.getCommunityService();
+    communityService.subscribeToDiscussion(normalizedBillId);
+
+    logger.info('Subscribed to discussion updates', {
+      component: 'CommunityBackendService',
+      billId: normalizedBillId
     });
   }
 
@@ -357,17 +369,19 @@ class CommunityBackendService {
    * Subscribe to community-wide real-time updates
    */
   subscribeToCommunityUpdates(): void {
-    const wsManager = globalWebSocketPool.getConnection('ws://localhost:8080');
-    
-    if (!wsManager.getConnectionStatus().connected) {
-      logger.warn('WebSocket not connected. Cannot subscribe to community updates.', { 
-        component: 'CommunityBackendService' 
+    if (!realTimeService.isConnected()) {
+      logger.warn('WebSocket not connected. Cannot subscribe to community updates.', {
+        component: 'CommunityBackendService'
       });
       return;
     }
 
-    logger.info('Subscribed to community updates', { 
-      component: 'CommunityBackendService' 
+    const communityService = realTimeService.getCommunityService();
+    communityService.subscribeToExpertUpdates();
+    communityService.subscribeToModerationEvents();
+
+    logger.info('Subscribed to community updates', {
+      component: 'CommunityBackendService'
     });
   }
 
@@ -382,7 +396,10 @@ class CommunityBackendService {
   }
 }
 
-// Export singleton instance
+// ============================================================================
+// Export Singleton Instance
+// ============================================================================
+
 export const communityBackendService = new CommunityBackendService();
 
 export default communityBackendService;

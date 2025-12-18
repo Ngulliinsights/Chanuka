@@ -13,8 +13,8 @@ import type {
   UserProfile,
   NotificationPreferences,
 } from '../../../services/userService';
-import { useAuthStore } from '../../../store/slices/authSlice';
-import { useUserDashboardStore } from '../../../store/slices/userDashboardSlice';
+import { useAuth } from '@client/core/auth';
+import { useUserDashboardStore } from '../../../shared/infrastructure/store/slices/userDashboardSlice';
 import type {
   PrivacyControls,
   DataExportRequest,

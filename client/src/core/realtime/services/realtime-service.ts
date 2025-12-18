@@ -5,18 +5,27 @@
  * Provides a unified interface for WebSocket connections, subscriptions, and real-time updates.
  */
 
-import { UnifiedWebSocketManager } from '../websocket/manager';
-import { BillTrackingService } from './bill-tracking';
-import { CommunityService } from './community';
-import { NotificationService } from './notifications';
+import { logger } from '@client/utils/logger';
+
 import { getRealTimeConfig } from '../config';
+import { UnifiedWebSocketManager } from '../manager';
 import { 
   RealTimeConfig, 
   ConnectionState, 
   WebSocketSubscription,
-  RealTimeHandlers 
+  RealTimeHandlers,
+  WebSocketMessage
 } from '../types';
-import { logger } from '@client/utils/logger';
+
+import { BillTrackingService } from './bill-tracking';
+import { CommunityService } from './community';
+import { NotificationService } from './notifications';
+
+/**
+ * Type for event listener callbacks
+ * Used for connection and error event handlers
+ */
+type EventCallback = (data: unknown) => void;
 
 export class RealTimeService {
   private static instance: RealTimeService | null = null;
@@ -131,7 +140,7 @@ export class RealTimeService {
   subscribe(subscription: WebSocketSubscription): string {
     const topic = `${subscription.type}:${subscription.id}`;
     
-    return this.wsManager.subscribe(topic, (message) => {
+    return this.wsManager.subscribe(topic, (message: WebSocketMessage) => {
       this.handleMessage(subscription, message);
     });
   }
@@ -164,11 +173,11 @@ export class RealTimeService {
     this.handlers = { ...handlers };
   }
 
-  on(event: string, listener: (data: any) => void): () => void {
+  on(event: string, listener: EventCallback): () => void {
     return this.wsManager.on(event, listener);
   }
 
-  off(event: string, listener: (data: any) => void): void {
+  off(event: string, listener: EventCallback): void {
     this.wsManager.off(event, listener);
   }
 
@@ -214,7 +223,10 @@ export class RealTimeService {
       });
     });
 
-    this.wsManager.on('error', (error: Error) => {
+    // Error event handler - properly typed to handle unknown error data
+    this.wsManager.on('error', (data: unknown) => {
+      // Convert unknown data to Error type for the handler
+      const error = data instanceof Error ? data : new Error(String(data));
       this.handlers.onError?.(error);
       logger.error('WebSocket error', {
         component: 'RealTimeService'
@@ -222,7 +234,7 @@ export class RealTimeService {
     });
   }
 
-  private handleMessage(subscription: WebSocketSubscription, message: any): void {
+  private handleMessage(subscription: WebSocketSubscription, message: WebSocketMessage): void {
     try {
       switch (subscription.type) {
         case 'bill':
