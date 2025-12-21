@@ -1,24 +1,61 @@
-import type { NavigationItem, UserRole, AccessDenialReason } from '@client/types';
-
-import { NavigationAccessDeniedError, InvalidNavigationPathError } from '@client/core/error';
+import { InvalidNavigationPathError } from '@client/core/error';
+import type { NavigationItem, UserRole } from '@client/types';
 import { validateNavigationPath, validateUserRole } from '@client/validation';
 
+
 import { findNavigationItemByPath } from './navigation-utils';
+
+/**
+ * Reason why access to a route was denied
+ */
+export type AccessDenialReason = 
+  | 'unauthenticated' 
+  | 'admin_required' 
+  | 'insufficient_role' 
+  | 'custom_condition';
+
+/**
+ * User object interface
+ */
+interface User {
+  id: string;
+  role: UserRole;
+  [key: string]: unknown;
+}
+
+/**
+ * Result of a route access check
+ */
+interface RouteAccessResult {
+  canAccess: boolean;
+  denialReason: AccessDenialReason | null;
+  requiredRole?: UserRole[];
+}
+
+/**
+ * Extended navigation item with access control properties
+ */
+interface NavigationItemWithAccess extends NavigationItem {
+  requiresAuth?: boolean;
+  adminOnly?: boolean;
+  allowedRoles?: UserRole[];
+  condition?: (userRole: UserRole, user: User | null) => boolean;
+}
 
 /**
  * Checks if a user can access a specific route
  */
 export const checkRouteAccess = (
   path: string,
-  user_role: UserRole,
-  user: any | null
-): { canAccess: boolean; denialReason: AccessDenialReason | null; requiredRole?: UserRole[] } => {
+  userRole: UserRole,
+  user: User | null
+): RouteAccessResult => {
   try {
     // Validate inputs
     validateNavigationPath(path);
-    validateUserRole(user_role);
+    validateUserRole(userRole);
 
-    const navigationItem = findNavigationItemByPath(path);
+    const navigationItem = findNavigationItemByPath(path) as NavigationItemWithAccess | null;
 
     // Public routes (no navigation item) are always accessible
     if (!navigationItem) {
@@ -35,7 +72,7 @@ export const checkRouteAccess = (
     }
 
     // Check admin requirement
-    if (navigationItem.adminOnly && user_role !== 'admin') {
+    if (navigationItem.adminOnly && userRole !== 'admin') {
       return {
         canAccess: false,
         denialReason: 'admin_required',
@@ -44,7 +81,7 @@ export const checkRouteAccess = (
     }
 
     // Check role requirements
-    if (navigationItem.allowedRoles && !navigationItem.allowedRoles.includes(user_role)) {
+    if (navigationItem.allowedRoles && !navigationItem.allowedRoles.includes(userRole)) {
       return {
         canAccess: false,
         denialReason: 'insufficient_role',
@@ -53,7 +90,7 @@ export const checkRouteAccess = (
     }
 
     // Check custom conditions
-    if (navigationItem.condition && !navigationItem.condition(user_role, user)) {
+    if (navigationItem.condition && !navigationItem.condition(userRole, user)) {
       return {
         canAccess: false,
         denialReason: 'custom_condition',
@@ -78,17 +115,17 @@ export const checkRouteAccess = (
  * Gets the access denial reason for a navigation item
  */
 export const getAccessDenialReason = (
-  item: NavigationItem | null,
-  user_role: UserRole,
-  user: any | null
+  item: NavigationItemWithAccess | null,
+  userRole: UserRole,
+  user: User | null
 ): AccessDenialReason | null => {
   if (!item) return null;
 
   try {
     if (item.requiresAuth && !user) return 'unauthenticated';
-    if (item.adminOnly && user_role !== 'admin') return 'admin_required';
-    if (item.allowedRoles && !item.allowedRoles.includes(user_role)) return 'insufficient_role';
-    if (item.condition && !item.condition(user_role, user)) return 'custom_condition';
+    if (item.adminOnly && userRole !== 'admin') return 'admin_required';
+    if (item.allowedRoles && !item.allowedRoles.includes(userRole)) return 'insufficient_role';
+    if (item.condition && !item.condition(userRole, user)) return 'custom_condition';
 
     return null;
   } catch (error) {
@@ -110,8 +147,8 @@ export const getRequiredRoleForAccess = (
     validateNavigationPath(path);
     validateUserRole(currentRole);
 
-    const item = findNavigationItemByPath(path);
-    if (!item || !item.allowedRoles) return null;
+    const item = findNavigationItemByPath(path) as NavigationItemWithAccess | null;
+    if (!item?.allowedRoles) return null;
 
     // If current role is not in allowed roles, return required roles
     if (!item.allowedRoles.includes(currentRole)) {
@@ -124,4 +161,3 @@ export const getRequiredRoleForAccess = (
     return null;
   }
 };
-

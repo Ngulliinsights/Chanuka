@@ -8,7 +8,7 @@
  * - Form validation helpers
  */
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/utils/logger';
 import { createError } from '../../error';
 import { ErrorDomain, ErrorSeverity } from '../../error/constants';
 

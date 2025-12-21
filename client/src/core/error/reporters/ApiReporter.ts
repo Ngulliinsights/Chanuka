@@ -16,7 +16,7 @@ export interface ApiReporterConfig {
   retryDelay?: number;
   timeout?: number;
   headers?: Record<string, string>;
-  transformPayload?: (errors: AppError[]) => any;
+  transformPayload?: (errors: AppError[]) => unknown;
   onSuccess?: (response: Response, errors: AppError[]) => void;
   onError?: (error: Error, errors: AppError[]) => void;
 }
@@ -30,6 +30,7 @@ export class ApiReporter implements ErrorReporter {
   constructor(config: Partial<ApiReporterConfig>) {
     this.config = {
       endpoint: '/api/errors',
+      apiKey: undefined,
       batchSize: 10,
       flushInterval: 30000,
       retryAttempts: 3,
@@ -40,7 +41,7 @@ export class ApiReporter implements ErrorReporter {
       onSuccess: () => {},
       onError: () => {},
       ...config,
-    };
+    } as Required<ApiReporterConfig>;
   }
 
   async initialize(): Promise<void> {

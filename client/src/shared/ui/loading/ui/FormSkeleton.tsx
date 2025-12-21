@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../../design-system/lib/utils';
 
 import { Skeleton } from './Skeleton';
 
@@ -12,7 +12,7 @@ interface FormSkeletonProps {
   buttonCount?: number;
 }
 
-export const FormSkeleton: React.FC<FormSkeletonProps> = ({
+export const FormSkeleton = React.memo(<FormSkeletonProps> = ({
   className,
   fieldCount = 4,
   showLabels = true,
@@ -49,6 +49,9 @@ export const FormSkeleton: React.FC<FormSkeletonProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 
 export default FormSkeleton;

@@ -92,12 +92,15 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ section, onUpdate: _o
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 /**
  * Dashboard Tabs Component
  */
-export const DashboardTabs: React.FC<DashboardTabsProps> = ({
+export const DashboardTabs = React.memo(<DashboardTabsProps> = ({
   defaultTab,
   sections,
   className,
@@ -207,6 +210,9 @@ export const DashboardTabs: React.FC<DashboardTabsProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 
 DashboardTabs.displayName = 'DashboardTabs';

@@ -9,6 +9,8 @@
  * user data, saved bills, and activity history.
  */
 
+import React from 'react';
+
 import { useQuery } from '@tanstack/react-query';
 import {
   AlertTriangle,

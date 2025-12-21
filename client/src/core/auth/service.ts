@@ -7,7 +7,7 @@
  */
 
 import { authApiService } from '@client/core/api/auth';
-import type { AuthUser, LoginCredentials } from '@client/core/api/auth';
+import type { AuthUser } from '@client/core/api/auth';
 import { tokenManager } from '@client/core/auth';
 import type { AuthTokens as JWTTokens, SessionInfo } from '@client/core/auth';
 import { getStore } from '@client/shared/infrastructure/store';
@@ -31,20 +31,11 @@ interface AuthServiceConfig {
 /**
  * Extended LoginCredentials to include rememberMe option
  */
-interface ExtendedLoginCredentials extends LoginCredentials {
+interface ExtendedLoginCredentials {
+  email: string;
+  password: string;
   rememberMe?: boolean;
-}
-
-/**
- * Session information structure matching the store's expected format
- */
-interface SessionData {
-  id: string;
-  createdAt: string;
-  lastActive: string;
-  ipAddress: string;
-  deviceInfo: string;
-  current: boolean;
+  twoFactorToken?: string;
 }
 
 /**
@@ -128,7 +119,7 @@ export class AuthService {
       const tokens: JWTTokens = {
         accessToken: session.tokens.accessToken,
         refreshToken: session.tokens.refreshToken,
-        expiresAt: new Date(Date.now() + session.tokens.expiresIn * 1000),
+        expiresIn: session.tokens.expiresIn,
         tokenType: session.tokens.tokenType,
       };
 
@@ -144,20 +135,29 @@ export class AuthService {
       // Convert and cache user
       const user = convertAuthUserToUser(session.user);
       this.currentUser = user;
-      this.scheduleTokenRefresh(session.expiresAt ? new Date(session.expiresAt).getTime() : tokens.expiresAt.getTime());
+      const expiresAt = new Date(Date.now() + session.tokens.expiresIn * 1000);
+      this.scheduleTokenRefresh(session.expiresAt ? new Date(session.expiresAt).getTime() : expiresAt.getTime());
 
       const sessionExpiry = session.expiresAt
         ? new Date(session.expiresAt).toISOString()
-        : new Date(tokens.expiresAt).toISOString();
+        : expiresAt.toISOString();
 
       // Create properly typed session info
-      const sessionInfo: SessionData = {
-        id: crypto.randomUUID(),
+      const sessionInfo: SessionInfo = {
+        userId: session.user.id,
+        sessionId: crypto.randomUUID(),
+        token: session.tokens.accessToken,
+        refreshToken: session.tokens.refreshToken,
         createdAt: new Date().toISOString(),
-        lastActive: new Date().toISOString(),
-        ipAddress: currentIP,
-        deviceInfo: navigator.userAgent,
-        current: true
+        expiresAt: new Date(Date.now() + session.tokens.expiresIn * 1000).toISOString(),
+        lastAccessedAt: new Date().toISOString(),
+        permissions: [],
+        roles: [],
+        metadata: {
+          ipAddress: currentIP,
+          deviceInfo: navigator.userAgent,
+          current: true
+        }
       };
       
       getStore().dispatch(setCurrentSession(sessionInfo));
@@ -213,7 +213,7 @@ export class AuthService {
       const tokens: JWTTokens = {
         accessToken: session.tokens.accessToken,
         refreshToken: session.tokens.refreshToken,
-        expiresAt: new Date(Date.now() + session.tokens.expiresIn * 1000),
+        expiresIn: session.tokens.expiresIn,
         tokenType: session.tokens.tokenType,
       };
 
@@ -229,20 +229,29 @@ export class AuthService {
       // Convert and cache user
       const user = convertAuthUserToUser(session.user);
       this.currentUser = user;
-      this.scheduleTokenRefresh(session.expiresAt ? new Date(session.expiresAt).getTime() : tokens.expiresAt.getTime());
+      const expiresAt = new Date(Date.now() + session.tokens.expiresIn * 1000);
+      this.scheduleTokenRefresh(session.expiresAt ? new Date(session.expiresAt).getTime() : expiresAt.getTime());
 
       const sessionExpiry = session.expiresAt
         ? new Date(session.expiresAt).toISOString()
-        : new Date(tokens.expiresAt).toISOString();
+        : expiresAt.toISOString();
 
       // Create session info for Redux store
       const sessionInfo: SessionInfo = {
-        id: crypto.randomUUID(),
-        deviceInfo: navigator.userAgent,
-        ipAddress: '0.0.0.0', // Would be provided by server in production
-        lastActive: new Date().toISOString(),
+        userId: session.user.id,
+        sessionId: crypto.randomUUID(),
+        token: session.tokens.accessToken,
+        refreshToken: session.tokens.refreshToken,
         createdAt: new Date().toISOString(),
-        current: true
+        expiresAt: new Date(Date.now() + session.tokens.expiresIn * 1000).toISOString(),
+        lastAccessedAt: new Date().toISOString(),
+        permissions: [],
+        roles: [],
+        metadata: {
+          deviceInfo: navigator.userAgent,
+          ipAddress: '0.0.0.0', // Would be provided by server in production
+          current: true
+        }
       };
       getStore().dispatch(setCurrentSession(sessionInfo));
 
@@ -301,7 +310,7 @@ export class AuthService {
       const jwtTokens: JWTTokens = {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
-        expiresAt: new Date(Date.now() + tokens.expiresIn * 1000),
+        expiresIn: tokens.expiresIn,
         tokenType: tokens.tokenType,
       };
 
@@ -310,9 +319,10 @@ export class AuthService {
       // Update cached user and schedule next refresh
       const convertedUser = convertAuthUserToUser(user);
       this.currentUser = convertedUser;
-      this.scheduleTokenRefresh(jwtTokens.expiresAt.getTime());
+      const expiresAt = new Date(Date.now() + tokens.expiresIn * 1000);
+      this.scheduleTokenRefresh(expiresAt.getTime());
 
-      const sessionExpiry = new Date(jwtTokens.expiresAt).toISOString();
+      const sessionExpiry = expiresAt.toISOString();
 
       return { 
         success: true, 

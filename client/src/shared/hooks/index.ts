@@ -11,7 +11,6 @@ export { useIsMobile as useMobile } from '../../hooks/use-mobile';
 export { useKeyboardFocus } from '../../hooks/use-keyboard-focus';
 export { useDebounce } from '../../hooks/useDebounce';
 export { useMediaQuery } from '../../hooks/useMediaQuery';
-export { useWebSocket } from '../../hooks/use-websocket';
 export { useCleanup } from '../../hooks/useCleanup';
 
 // Internationalization
@@ -38,5 +37,4 @@ export {
 // Progressive disclosure and UX
 export { useProgressiveDisclosure } from '../../hooks/useProgressiveDisclosure';
 
-// Real-time engagement
-export { useRealTimeEngagement } from '../../hooks/useRealTimeEngagement';
+

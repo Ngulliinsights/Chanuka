@@ -8,8 +8,8 @@
  * - Custom metrics collection
  */
 
-import { errorMonitoring } from '@client/services/error-monitoring';
-import { getPerformanceMonitor } from '@client/core/performance';
+import ErrorMonitoring from '@client/monitoring/error-monitoring';
+// import { getPerformanceMonitor } from '@client/core/performance';
 
 interface MonitoringConfig {
   environment: string;
@@ -35,6 +35,7 @@ interface MonitoringConfig {
 class MonitoringInitializer {
   private config: MonitoringConfig;
   private initialized = false;
+  private errorMonitoring?: any;
 
   constructor(config: MonitoringConfig) {
     this.config = config;
@@ -91,7 +92,8 @@ class MonitoringInitializer {
   private async initializeErrorMonitoring(): Promise<void> {
     console.log('🐛 Initializing error monitoring...');
 
-    errorMonitoring.initialize({
+    this.errorMonitoring = new ErrorMonitoring();
+    this.errorMonitoring.initialize({
       dsn: this.config.sentry!.dsn,
       environment: this.config.environment,
       release: this.config.version,
@@ -102,13 +104,13 @@ class MonitoringInitializer {
 
     // Set initial context
     if (this.config.userId) {
-      errorMonitoring.setUserContext({
+      this.errorMonitoring.setUserContext({
         id: this.config.userId,
         sessionId: this.generateSessionId()
       });
     }
 
-    errorMonitoring.setFeatureContext('monitoring-init', 'initialize');
+    this.errorMonitoring.setFeatureContext('monitoring-init', 'initialize');
   }
 
   /**
@@ -117,15 +119,15 @@ class MonitoringInitializer {
   private async initializePerformanceMonitoring(): Promise<void> {
     console.log('⚡ Initializing performance monitoring...');
 
-    performanceMonitoring.initialize({
-      reportingEndpoint: '/api/performance/metrics',
-      batchSize: 10,
-      reportingInterval: 30000,
-      userId: this.config.userId
-    });
+    // performanceMonitoring.initialize({
+    //   reportingEndpoint: '/api/performance/metrics',
+    //   batchSize: 10,
+    //   reportingInterval: 30000,
+    //   userId: this.config.userId
+    // });
 
     // Track initial page load
-    performanceMonitoring.trackPageView(window.location.pathname, document.referrer);
+    // performanceMonitoring.trackPageView(window.location.pathname, document.referrer);
   }
 
   /**
@@ -168,7 +170,7 @@ class MonitoringInitializer {
   private setupGlobalErrorHandlers(): void {
     // Unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {
-      errorMonitoring.captureError(
+      this.errorMonitoring.captureError(
         new Error(`Unhandled Promise Rejection: ${event.reason}`),
         {
           feature: 'global-error-handler',
@@ -183,7 +185,7 @@ class MonitoringInitializer {
 
     // Global JavaScript errors
     window.addEventListener('error', (event) => {
-      errorMonitoring.captureError(
+      this.errorMonitoring.captureError(
         event.error || new Error(event.message),
         {
           feature: 'global-error-handler',
@@ -201,7 +203,7 @@ class MonitoringInitializer {
     window.addEventListener('error', (event) => {
       if (event.target && event.target !== window) {
         const target = event.target as HTMLElement;
-        errorMonitoring.captureError(
+        this.errorMonitoring.captureError(
           new Error(`Resource loading failed: ${target.tagName}`),
           {
             feature: 'resource-loading',
@@ -227,16 +229,16 @@ class MonitoringInitializer {
         const longTaskObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
             if (entry.duration > 50) { // Tasks longer than 50ms
-              performanceMonitoring.recordCustomMetric({
-                name: 'long_task',
-                value: entry.duration,
-                unit: 'milliseconds',
-                context: {
-                  startTime: entry.startTime,
-                  name: entry.name
-                },
-                timestamp: Date.now()
-              });
+              // performanceMonitoring.recordCustomMetric({
+              //   name: 'long_task',
+              //   value: entry.duration,
+              //   unit: 'milliseconds',
+              //   context: {
+              //     startTime: entry.startTime,
+              //     name: entry.name
+              //   },
+              //   timestamp: Date.now()
+              // });
             }
           }
         });
@@ -249,20 +251,20 @@ class MonitoringInitializer {
       // Navigation observer
       try {
         const navigationObserver = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            const navEntry = entry as PerformanceNavigationTiming;
+          for (const _entry of list.getEntries()) {
+            // const navEntry = entry as PerformanceNavigationTiming; // Unused variable
             
-            performanceMonitoring.recordCustomMetric({
-              name: 'navigation_timing',
-              value: navEntry.loadEventEnd - (navEntry as any).navigationStart,
-              unit: 'milliseconds',
-              context: {
-                type: navEntry.type,
-                redirectCount: navEntry.redirectCount,
-                transferSize: navEntry.transferSize
-              },
-              timestamp: Date.now()
-            });
+            // performanceMonitoring.recordCustomMetric({
+            //   name: 'navigation_timing',
+            //   value: navEntry.loadEventEnd - (navEntry as any).navigationStart,
+            //   unit: 'milliseconds',
+            //   context: {
+            //     type: navEntry.type,
+            //     redirectCount: navEntry.redirectCount,
+            //     transferSize: navEntry.transferSize
+            //   },
+            //   timestamp: Date.now()
+            // });
           }
         });
 
@@ -286,12 +288,12 @@ class MonitoringInitializer {
 
       // Track important interactions
       if (['button', 'a', 'input'].includes(tagName) || target.getAttribute('role') === 'button') {
-        performanceMonitoring.trackInteraction(
-          'click',
-          `${tagName}${id ? `#${id}` : ''}${className ? `.${className.split(' ')[0]}` : ''}`
-        );
+        // performanceMonitoring.trackInteraction(
+        //   'click',
+        //   `${tagName}${id ? `#${id}` : ''}${className ? `.${className.split(' ')[0]}` : ''}`
+        // );
 
-        errorMonitoring.addBreadcrumb(
+        this.errorMonitoring.addBreadcrumb(
           `User clicked ${tagName}${id ? ` #${id}` : ''}`,
           'user',
           'info',
@@ -305,9 +307,9 @@ class MonitoringInitializer {
       const form = event.target as HTMLFormElement;
       const formId = form.id || form.name || 'unnamed-form';
 
-      performanceMonitoring.trackInteraction('form-submit', formId);
+      // performanceMonitoring.trackInteraction('form-submit', formId);
       
-      errorMonitoring.addBreadcrumb(
+      this.errorMonitoring.addBreadcrumb(
         `Form submitted: ${formId}`,
         'user',
         'info',
@@ -319,15 +321,15 @@ class MonitoringInitializer {
     document.addEventListener('visibilitychange', () => {
       const state = document.visibilityState;
       
-      performanceMonitoring.recordCustomMetric({
-        name: 'page_visibility_change',
-        value: state === 'visible' ? 1 : 0,
-        unit: 'boolean',
-        context: { state },
-        timestamp: Date.now()
-      });
+      // performanceMonitoring.recordCustomMetric({
+      //   name: 'page_visibility_change',
+      //   value: state === 'visible' ? 1 : 0,
+      //   unit: 'boolean',
+      //   context: { state },
+      //   timestamp: Date.now()
+      // });
 
-      errorMonitoring.addBreadcrumb(
+      this.errorMonitoring.addBreadcrumb(
         `Page visibility changed to ${state}`,
         'navigation',
         'info',
@@ -343,7 +345,7 @@ class MonitoringInitializer {
     this.config.userId = userId;
 
     if (this.config.enableErrorMonitoring) {
-      errorMonitoring.setUserContext({
+      this.errorMonitoring.setUserContext({
         id: userId,
         ...userInfo
       });
@@ -361,15 +363,15 @@ class MonitoringInitializer {
    * Track custom business events
    */
   trackBusinessEvent(eventName: string, properties?: Record<string, any>): void {
-    performanceMonitoring.recordCustomMetric({
-      name: `business_event_${eventName}`,
-      value: 1,
-      unit: 'count',
-      context: properties,
-      timestamp: Date.now()
-    });
+    // performanceMonitoring.recordCustomMetric({
+    //   name: `business_event_${eventName}`,
+    //   value: 1,
+    //   unit: 'count',
+    //   context: properties,
+    //   timestamp: Date.now()
+    // });
 
-    errorMonitoring.addBreadcrumb(
+    this.errorMonitoring.addBreadcrumb(
       `Business event: ${eventName}`,
       'business',
       'info',

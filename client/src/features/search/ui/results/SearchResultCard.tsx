@@ -26,7 +26,7 @@ import { Tooltip } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
 import { useToast } from '@client/hooks/use-toast.ts';
-import type { SearchResult, SearchHighlight } from '../../types';
+import type { SearchResult, SearchHighlight } from '@client/types';
 import { cn } from '@client/core/dashboard/utils.ts';
 
 interface SearchResultCardProps {

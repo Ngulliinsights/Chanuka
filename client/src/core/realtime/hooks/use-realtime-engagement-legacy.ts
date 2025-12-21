@@ -117,7 +117,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
   // Data Access Methods
   // ============================================================================
 
-  const getRecentUpdates = useCallback((billId: number, limit: number = 10): any[] => {
+  const getRecentUpdates = useCallback((billId: number, limit: number = 10): unknown[] => {
     try {
       const updates = billTrackingService.getBillUpdates(billId);
       return updates.slice(-limit);
@@ -142,7 +142,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
     }
   }, []);
 
-  const getTypingIndicators = useCallback((billId: number, parentId?: string): any[] => {
+  const getTypingIndicators = useCallback((billId: number, parentId?: string): unknown[] => {
     try {
       return communityService.getTypingIndicators(billId, parentId);
     } catch (error) {

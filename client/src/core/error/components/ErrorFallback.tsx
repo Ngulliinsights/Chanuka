@@ -2,8 +2,75 @@ import React from 'react';
 
 import { ErrorSeverity } from '@client/core/error';
 
-import { ErrorFallbackProps } from './ErrorBoundary';
-import { SharedErrorDisplay, ErrorDisplayConfig } from './utils/shared-error-display';
+// Define types inline to avoid import issues
+interface ErrorFallbackProps {
+  error: {
+    message: string;
+    metadata?: {
+      severity?: ErrorSeverity;
+    };
+  };
+  errorId: string;
+  recoveryOptions: Array<{
+    id: string;
+    label: string;
+    description: string;
+    action: () => void;
+    automatic: boolean;
+  }>;
+  onRetry: () => void;
+  onReload: () => void;
+  onContactSupport: () => void;
+}
+
+interface ErrorDisplayConfig {
+  variant: 'page' | 'inline';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  showIcon: boolean;
+  showRetry: boolean;
+  showReport: boolean;
+  showGoHome: boolean;
+  customMessage?: string;
+  customActions?: React.ReactNode;
+}
+
+// Simple SharedErrorDisplay component
+const SharedErrorDisplay: React.FC<{
+  error: any;
+  config: ErrorDisplayConfig;
+  onRetry: () => void;
+  onReport: () => void;
+  onGoHome: () => void;
+  context: string;
+}> = ({ error, config, onRetry, onReport, onGoHome, context }) => {
+  return (
+    <div className={`error-display error-display--${config.variant} error-display--${config.severity}`}>
+      <div className="error-display__content">
+        <h2 className="error-display__title">Something went wrong</h2>
+        <p className="error-display__message">{config.customMessage || error.message}</p>
+        <div className="error-display__actions">
+          {config.showRetry && (
+            <button type="button" onClick={onRetry} className="error-display__button error-display__button--primary">
+              Try Again
+            </button>
+          )}
+          {config.showGoHome && (
+            <button type="button" onClick={onGoHome} className="error-display__button error-display__button--secondary">
+              Go Home
+            </button>
+          )}
+          {config.showReport && (
+            <button type="button" onClick={onReport} className="error-display__button error-display__button--secondary">
+              Report Issue
+            </button>
+          )}
+        </div>
+        {config.customActions}
+        <div className="error-display__context">{context}</div>
+      </div>
+    </div>
+  );
+};
 
 /**
  * Consolidated Error Fallback Component
@@ -22,8 +89,6 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   onRetry,
   onReload,
   onContactSupport,
-  // Intentionally unused but part of the interface for extensibility:
-  // onFeedback, recoveryAttempted, recoverySuccessful, userFeedbackSubmitted, showTechnicalDetails
 }) => {
   // Determine severity for styling
   const severity = error.metadata?.severity || ErrorSeverity.HIGH;
@@ -53,6 +118,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
     .slice(0, 2) // Limit to 2 manual options
     .map(option => (
       <button
+        type="button"
         key={option.id}
         onClick={() => option.action()}
         className="w-full text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"

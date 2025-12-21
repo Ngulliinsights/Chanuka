@@ -8,7 +8,7 @@ import React from 'react';
 
 import { cn } from '@/lib/utils';
 
-import { Button } from '../../../../../../Button';
+import { Button } from '@client/../../Button';
 
 export interface AuthButtonProps {
   type?: 'button' | 'submit' | 'reset';
@@ -21,7 +21,7 @@ export interface AuthButtonProps {
   onClick?: () => void;
 }
 
-export const AuthButton: React.FC<AuthButtonProps> = ({
+export const AuthButton = React.memo(<AuthButtonProps> = ({
   type = 'button',
   variant = 'primary',
   size = 'md',
@@ -66,10 +66,13 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
       {children}
     </Button>
   );
+);
+
+function 1(
 };
 
 // Specialized button components
-export const SubmitButton: React.FC<Omit<AuthButtonProps, 'type'> & {
+export const SubmitButton = React.memo(<Omit<AuthButtonProps, 'type'> & {
   mode: 'login' | 'register';
 }> = ({ mode, loading, children, ...props }) => (
   <AuthButton
@@ -86,7 +89,9 @@ export const SubmitButton: React.FC<Omit<AuthButtonProps, 'type'> & {
   </AuthButton>
 );
 
-export const ModeToggleButton: React.FC<{
+function 1(
+
+export const ModeToggleButton = React.memo(<{
   currentMode: 'login' | 'register';
   onToggle: () => void;
   disabled?: boolean;
@@ -108,7 +113,9 @@ export const ModeToggleButton: React.FC<{
   </button>
 );
 
-export const RetryButton: React.FC<{
+function 1(
+
+export const RetryButton = React.memo(<{
   onRetry: () => void;
   loading?: boolean;
   disabled?: boolean;
@@ -126,3 +133,5 @@ export const RetryButton: React.FC<{
     {loading ? 'Retrying...' : 'Try Again'}
   </AuthButton>
 );
+
+function 1(

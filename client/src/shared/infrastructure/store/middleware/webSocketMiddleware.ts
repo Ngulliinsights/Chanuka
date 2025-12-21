@@ -11,12 +11,14 @@ import { Middleware, Dispatch, Action } from '@reduxjs/toolkit';
 import { ConnectionState } from '@client/core/api/types';
 import { realTimeService } from '@client/core/realtime';
 import {
-  WebSocketSubscription,
-  RealTimeHandlers
+  WebSocketSubscription
 } from '@client/core/realtime/types';
 import {
   CivicWebSocketState,
-  PollingFallbackConfig
+  PollingFallbackConfig,
+  RealTimeHandlers,
+  BillRealTimeUpdate,
+  RealTimeNotification
 } from '@client/types/realtime';
 import { logger } from '@client/utils/logger';
 
@@ -24,7 +26,8 @@ import {
   updateConnectionState,
   addBillUpdate,
   addNotification
-} from './state/realTimeSlice';
+} from '../slices/realTimeSlice';
+
 
 // WebSocket middleware configuration
 interface WebSocketConfig {
@@ -264,21 +267,24 @@ class WebSocketMiddlewareAdapter {
       this.updateConnectionState();
     });
 
-    realTimeService.on('error', (error: Error) => {
+    realTimeService.on('error', (data: unknown) => {
+      const error = data as Error;
       logger.error('WebSocket error', {
         component: 'WebSocketMiddleware'
       }, error);
-      this.handlers.onError?.(error);
+      this.handlers.onError?.(error.message);
       this.updateConnectionState();
     });
 
     // Listen to specific real-time events
-    realTimeService.on('billUpdate', (update) => {
+    realTimeService.on('billUpdate', (data: unknown) => {
+      const update = data as BillRealTimeUpdate;
       this.handlers.onBillUpdate?.(update);
       this.reduxDispatch?.(addBillUpdate(update));
     });
 
-    realTimeService.on('notification', (notification) => {
+    realTimeService.on('notification', (data: unknown) => {
+      const notification = data as RealTimeNotification;
       this.handlers.onNotification?.(notification);
       this.reduxDispatch?.(addNotification(notification));
     });

@@ -3,12 +3,10 @@
  * Following navigation component patterns for hook implementation
  */
 
-import { LoadingState, LoadingType, LoadingPriority } from '@client/types';
-import { debounce } from '@client/shared/ui/loading/utils/loading-utils.ts';
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-import { LoadingError } from '@client/core/error';
-
+import { LoadingState } from '../types';
+import { debounce } from '../utils/loading-utils';
 
 export interface LoadingStateOptions {
   initialState?: LoadingState;
@@ -37,7 +35,7 @@ export interface UseLoadingStateResult {
   
   // Utilities
   withLoading: <T>(asyncFn: () => Promise<T>) => Promise<T>;
-  withLoadingCallback: <T extends any[]>(fn: (...args: T) => Promise<any>) => (...args: T) => Promise<void>;
+  withLoadingCallback: <T extends unknown[]>(fn: (...args: T) => Promise<unknown>) => (...args: T) => Promise<void>;
 }
 
 export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingStateResult {
@@ -53,11 +51,18 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
   const [error, setErrorState] = useState<Error | null>(null);
   const autoResetTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Debounced state setter
-  const debouncedSetState = useCallback(
-    debounceMs > 0 ? debounce(setState, debounceMs) : setState,
-    [debounceMs]
-  );
+  // Create debounced setter inline to satisfy React hooks rules
+  const debouncedSetState = useCallback((newState: LoadingState) => {
+    if (debounceMs > 0) {
+      const debouncedFn = debounce((...args: unknown[]) => {
+        const state = args[0] as LoadingState;
+        setState(state);
+      }, debounceMs);
+      debouncedFn(newState);
+    } else {
+      setState(newState);
+    }
+  }, [debounceMs]);
 
   // Clear auto-reset timeout
   const clearAutoReset = useCallback(() => {
@@ -90,13 +95,13 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
     };
   }, [clearAutoReset]);
 
-  const setLoading = useCallback((message?: string) => {
+  const setLoading = useCallback((_message?: string) => {
     clearAutoReset();
     setErrorState(null);
     debouncedSetState('loading');
   }, [clearAutoReset, debouncedSetState]);
 
-  const setSuccess = useCallback((message?: string) => {
+  const setSuccess = useCallback((_message?: string) => {
     clearAutoReset();
     setErrorState(null);
     debouncedSetState('success');
@@ -144,8 +149,8 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
   }, [setLoading, setSuccess, setError]);
 
   // Utility function to create loading-wrapped callbacks
-  const withLoadingCallback = useCallback(<T extends any[]>(
-    fn: (...args: T) => Promise<any>
+  const withLoadingCallback = useCallback(<T extends unknown[]>(
+    fn: (...args: T) => Promise<unknown>
   ) => {
     return async (...args: T): Promise<void> => {
       try {
@@ -185,7 +190,6 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
  */
 
 export interface UseMultiLoadingStateOptions {
-  debounceMs?: number;
   onStateChange?: (states: Record<string, LoadingState>) => void;
 }
 
@@ -213,16 +217,13 @@ export interface UseMultiLoadingStateResult {
 }
 
 export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}): UseMultiLoadingStateResult {
-  const { debounceMs = 0, onStateChange } = options;
+  const { onStateChange } = options;
   
   const [states, setStates] = useState<Record<string, LoadingState>>({});
   const [errors, setErrors] = useState<Record<string, Error | null>>({});
 
-  // Debounced state setter
-  const debouncedSetStates = useCallback(
-    debounceMs > 0 ? debounce(setStates, debounceMs) : setStates,
-    [debounceMs]
-  );
+  // Note: Removed debouncedSetStates as it's not used in the current implementation
+  // Direct state updates are used instead for better performance
 
   // Notify state changes
   useEffect(() => {
@@ -230,17 +231,17 @@ export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}):
   }, [states, onStateChange]);
 
   const updateState = useCallback((key: string, state: LoadingState, error?: Error | null) => {
-    debouncedSetStates(prev => ({ ...prev, [key]: state }));
+    setStates((prev: Record<string, LoadingState>) => ({ ...prev, [key]: state }));
     if (error !== undefined) {
-      setErrors(prev => ({ ...prev, [key]: error }));
+      setErrors((prev: Record<string, Error | null>) => ({ ...prev, [key]: error }));
     }
-  }, [debouncedSetStates]);
+  }, []);
 
-  const setLoading = useCallback((key: string, message?: string) => {
+  const setLoading = useCallback((key: string, _message?: string) => {
     updateState(key, 'loading', null);
   }, [updateState]);
 
-  const setSuccess = useCallback((key: string, message?: string) => {
+  const setSuccess = useCallback((key: string, _message?: string) => {
     updateState(key, 'success', null);
   }, [updateState]);
 
@@ -321,4 +322,3 @@ export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}):
     withLoading,
   };
 }
-

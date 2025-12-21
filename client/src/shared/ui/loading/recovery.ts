@@ -3,9 +3,8 @@
  * Following navigation component patterns for recovery handling
  */
 
-import { LoadingConfig, ConnectionType } from '@client/types';
-
 import { LoadingError, LoadingTimeoutError, LoadingNetworkError, isRetryableError } from './errors';
+import { LoadingConfig, ConnectionType } from './types';
 
 export interface RecoveryContext {
   operationId: string;
@@ -51,7 +50,8 @@ export class LoadingRecoveryManager {
     // Timeout recovery strategy
     this.strategies.set('timeout', async (context) => {
       if (context.error instanceof LoadingTimeoutError) {
-        const delay = Math.min(context.config.errorHandling.retryDelay * (context.retryCount + 1), 10000);
+        const retryDelay = context.config.errorHandling?.retryDelay || context.config.retryDelay;
+        const delay = Math.min(retryDelay * (context.retryCount + 1), 10000);
         return { success: true, delay, strategy: 'timeout-backoff' };
       }
       return { success: false };
@@ -63,7 +63,7 @@ export class LoadingRecoveryManager {
         if (!context.connectionInfo.isOnline) {
           return { success: false, strategy: 'offline' };
         }
-        
+
         const delay = context.connectionInfo.connectionType === 'slow' ? 5000 : 2000;
         return { success: true, delay, strategy: 'network-wait' };
       }
@@ -72,16 +72,18 @@ export class LoadingRecoveryManager {
 
     // Generic retry strategy
     this.strategies.set('generic', async (context) => {
-      if (isRetryableError(context.error) && context.retryCount < context.config.errorHandling.maxRetries) {
-        const delay = context.config.errorHandling.retryDelay;
-        return { success: true, delay, strategy: 'generic-retry' };
+      const maxRetries = context.config.errorHandling?.maxRetries || context.config.maxRetries;
+      const retryDelay = context.config.errorHandling?.retryDelay || context.config.retryDelay;
+
+      if (isRetryableError(context.error) && context.retryCount < maxRetries) {
+        return { success: true, delay: retryDelay, strategy: 'generic-retry' };
       }
       return { success: false };
     });
   }
 
   async attemptRecovery(context: RecoveryContext): Promise<RecoveryResult> {
-    for (const [name, strategy] of this.strategies) {
+    for (const [name, strategy] of Array.from(this.strategies.entries())) {
       try {
         const result = await strategy(context);
         if (result.success) {
@@ -103,23 +105,26 @@ export class LoadingRecoveryManager {
     if (error instanceof LoadingTimeoutError) {
       return ['Check your internet connection', 'Try again in a moment'];
     }
-    
+
     if (error instanceof LoadingNetworkError) {
       return ['Check your network connection', 'Try switching networks'];
     }
-    
+
     return ['Try refreshing the page', 'Check your connection'];
   }
 }
 
-export function useLoadingRecovery(config: LoadingConfig) {
+export function useLoadingRecovery(_config: LoadingConfig) {
   const manager = new LoadingRecoveryManager();
-  
+
   return {
     attemptRecovery: (context: RecoveryContext) => manager.attemptRecovery(context),
-    canAttemptRecovery: (error: LoadingError, retryCount: number, maxRetries: number) => 
+    canAttemptRecovery: (error: LoadingError, retryCount: number, maxRetries: number) =>
       manager.canAttemptRecovery(error, retryCount, maxRetries),
     getSuggestions: (error: LoadingError) => manager.getSuggestions(error),
+    updateError: (_error: LoadingError) => {
+      // No-op: manager doesn't maintain error state
+    },
   };
 }
 

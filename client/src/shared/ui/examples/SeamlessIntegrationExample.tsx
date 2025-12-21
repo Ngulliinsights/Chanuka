@@ -16,7 +16,7 @@ import {
   useAnonymity,
   useProgressiveEnhancement,
   useIntegrationStatus
-} from '../../../hooks/useSeamlessIntegration';
+} from '@client/hooks/useSeamlessIntegration';
 
 interface ExampleFormData {
   email: string;

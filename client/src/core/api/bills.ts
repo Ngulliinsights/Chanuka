@@ -7,6 +7,7 @@
  */
 
 import { mockBills, mockBillsStats } from '../../data/mock/bills';
+import type { Bill, Sponsor } from '../../types';
 import { logger } from '../../utils/logger';
 
 import { globalApiClient } from './client';
@@ -80,7 +81,7 @@ export interface BillsStats {
   lastUpdated: string;
 }
 
-import type { Bill, Sponsor } from '../../types';
+
 
 // Additional response interfaces
 interface BillAnalysis {
@@ -541,7 +542,7 @@ export class BillsApiService {
 
     if (params.policyAreas?.length) {
       filteredBills = filteredBills.filter(bill => 
-        bill.policyAreas.some(area => params.policyAreas!.includes(area))
+        bill.policyAreas.some((area: string) => params.policyAreas!.includes(area))
       );
     }
 
@@ -619,7 +620,7 @@ export class BillsApiService {
    * and enriches errors with context information.
    */
   private async handleError(error: unknown, operation: string, context?: Record<string, unknown>): Promise<Error> {
-    await globalErrorHandler.handleError(error as Error, {
+    await globalErrorHandler(error as Error, {
       component: 'BillsApiService',
       operation,
       ...context
@@ -818,7 +819,7 @@ export class SystemApiService {
       defaultMessage;
 
     const systemError = new Error(errorMessage);
-    await globalErrorHandler.handleError(systemError, {
+    await globalErrorHandler(systemError, {
       component: 'SystemApiService',
       operation: 'system_operation',
       status: err?.response?.status

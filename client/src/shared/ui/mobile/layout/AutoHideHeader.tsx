@@ -1,5 +1,5 @@
-import { Menu } from 'lucide-react';
-import React, { useId } from 'react';
+import { MenuIcon as Menu } from 'lucide-react';
+import { useId } from 'react';
 
 import { cn } from '@client/shared/design-system';
 

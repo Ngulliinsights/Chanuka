@@ -7,13 +7,13 @@ import { ThemeProvider } from '@client/contexts/ThemeContext';
 import { useConnectionAware } from '@client/core/api/hooks/useConnectionAware';
 import { SimpleErrorBoundary } from '@client/core/error/components/SimpleErrorBoundary';
 import { LoadingProvider } from '@client/core/loading';
+import { CommunityUIProvider } from '@client/features/community/store/slices/communitySlice';
 import { AuthProvider } from '@client/features/users/hooks';
 import { useOfflineDetection } from '@client/hooks/useOfflineDetection';
 import { ChanukaProviders } from '@client/shared/design-system';
+import { initializeStore } from '@client/shared/infrastructure/store';
 import { AccessibilityProvider } from '@client/shared/ui/accessibility/accessibility-manager';
 import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
-import { initializeStore } from '@client/store';
-import { CommunityUIProvider } from '@client/store/slices/communitySlice';
 import { assetLoadingManager } from '@client/utils/assets';
 
 /**
@@ -136,24 +136,23 @@ async function getOrCreateStore(): Promise<StoreData> {
   }
 
   // Create new initialization promise
-  initializationPromise = initializeStore()
-    .then(({ store, persistor }) => {
-      storeInstance = store;
-      persistorInstance = persistor;
-      
-      // Cache on window so HMR / fast reloads reuse the same instances
-      if (windowWithCache) {
-        windowWithCache[STORE_CACHE_KEY] = { store, persistor };
-      }
-      
-      return { store, persistor };
-    })
-    .catch(error => {
-      // Reset promise on failure to allow retry
-      initializationPromise = null;
-      console.error('Redux store initialization failed:', error);
-      throw error;
-    });
+  initializationPromise = Promise.resolve().then(() => {
+    const { store, persistor } = initializeStore();
+    storeInstance = store;
+    persistorInstance = persistor;
+    
+    // Cache on window so HMR / fast reloads reuse the same instances
+    if (windowWithCache) {
+      windowWithCache[STORE_CACHE_KEY] = { store, persistor };
+    }
+    
+    return { store, persistor };
+  }).catch((error: any) => {
+    // Reset promise on failure to allow retry
+    initializationPromise = null;
+    console.error('Redux store initialization failed:', error);
+    throw error;
+  });
 
   return initializationPromise;
 }
@@ -398,6 +397,10 @@ const ReduxStoreProvider = React.memo<{ children: React.ReactNode }>(({ children
   }
 
   // Success state - show stable loading UI until persistor bootstraps
+  if (!storeData) {
+    return <div>Loading store...</div>;
+  }
+  
   return (
     <ReduxProvider store={storeData.store as Store<unknown, UnknownAction>}>
       {bootstrapped ? children : persistGateLoading}

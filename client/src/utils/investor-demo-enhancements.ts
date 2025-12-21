@@ -5,7 +5,7 @@
  * while maintaining authenticity and avoiding obvious mock data patterns.
  */
 
-import { getDemoEngagementMetrics, DEMO_BILLS, filterDemoBills } from './demo-data-service';
+import { getDemoEngagementMetrics, filterDemoBills } from './demo-data-service';
 
 export interface DemoScenario {
   id: string;

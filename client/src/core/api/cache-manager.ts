@@ -6,10 +6,6 @@
  */
 
 import { logger } from '../../utils/logger';
-
-/**
- * Cache entry with metadata - imported from storage types
- */
 import type { CacheEntry } from '../storage/types';
 
 // Re-export CacheEntry type
@@ -468,7 +464,7 @@ export class ApiCacheManager {
             const entry = JSON.parse(entryData) as CacheEntry;
             if (!this.isExpired(entry)) {
               this.cache.set(key, entry);
-              this.stats.totalSize += entry.size;
+              this.stats.totalSize += entry.size || 0;
               this.stats.entryCount++;
             } else {
               storage.removeItem(key);
@@ -500,15 +496,15 @@ export class ApiCacheManager {
   /**
    * Gets entry from persistent storage
    */
-  private async getFromStorage<T>(key: string): Promise<CacheEntry<T> | null> {
+  private async getFromStorage<T>(key: string): Promise<CacheEntry<T> | undefined> {
     try {
       const storage = this.getStorage();
-      if (!storage) return null;
+      if (!storage) return undefined;
 
       const entryData = storage.getItem(key);
       if (entryData) {
         const entry = JSON.parse(entryData) as CacheEntry<T>;
-        return this.isExpired(entry) ? null : entry;
+        return this.isExpired(entry) ? undefined : entry;
       }
     } catch (error) {
       logger.warn('Failed to get cache entry from storage', {
@@ -517,7 +513,7 @@ export class ApiCacheManager {
         error
       });
     }
-    return null;
+    return undefined;
   }
 
   /**
@@ -639,7 +635,7 @@ export class CacheKeyGenerator {
    */
   static generate(
     url: string, 
-    params?: Record<string, any>, 
+    params?: Record<string, unknown>, 
     method: string = 'GET'
   ): string {
     const normalizedUrl = url.toLowerCase();
@@ -652,13 +648,13 @@ export class CacheKeyGenerator {
   /**
    * Sorts and stringifies parameters for consistent key generation
    */
-  private static sortParams(params: Record<string, any>): string {
+  private static sortParams(params: Record<string, unknown>): string {
     const sorted = Object.keys(params)
       .sort()
       .reduce((result, key) => {
         result[key] = params[key];
         return result;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, unknown>);
 
     return `:${JSON.stringify(sorted)}`;
   }

@@ -1,6 +1,5 @@
-import { useLoadingRecovery } from '@client/hooks/useLoadingRecovery';
-import { AssetLoadingIndicatorProps as TypesAssetLoadingIndicatorProps } from '@client/types';
-import { useAssetLoading, LoadingProgress } from '../core/loading/utils/asset-loading';
+import { useLoadingRecovery } from './hooks/useLoadingRecovery';
+import { AssetLoadingIndicatorProps, LoadingProgress } from './types';
 import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import React from 'react';
 
@@ -30,7 +29,7 @@ export interface AssetLoadingIndicatorProps {
   position?: 'fixed' | 'relative' | 'absolute';
 }
 
-export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
+export const AssetLoadingIndicator = React.memo(<AssetLoadingIndicatorProps> = ({
   className,
   showDetails = false,
   showProgress = true,
@@ -316,6 +315,9 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 // Hook for controlling asset loading indicator visibility
@@ -349,7 +351,7 @@ interface AssetLoadingContextType {
 
 const AssetLoadingContext = React.createContext<AssetLoadingContextType | undefined>(undefined);
 
-export const AssetLoadingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AssetLoadingProvider = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
   const { isVisible, config, show, hide } = useAssetLoadingIndicator();
   
   const contextValue = useMemo(() => ({
@@ -364,6 +366,9 @@ export const AssetLoadingProvider: React.FC<{ children: React.ReactNode }> = ({ 
       {isVisible && <AssetLoadingIndicator {...config} />}
     </AssetLoadingContext.Provider>
   );
+);
+
+function 1(
 };
 
 export const useAssetLoadingContext = () => {
@@ -372,10 +377,13 @@ export const useAssetLoadingContext = () => {
     throw new Error('useAssetLoadingContext must be used within AssetLoadingProvider');
   }
   return context;
+);
+
+function 1(
 };
 
 // Specialized loading indicators for different scenarios
-export const CriticalAssetLoader: React.FC<{ className?: string }> = ({ className }) => {
+export const CriticalAssetLoader = React.memo(<{ className?: string }> = ({ className }) => {
   return (
     <AssetLoadingIndicator
       className={className}
@@ -385,9 +393,12 @@ export const CriticalAssetLoader: React.FC<{ className?: string }> = ({ classNam
       position="fixed"
     />
   );
+);
+
+function 1(
 };
 
-export const InlineAssetLoader: React.FC<{ className?: string }> = ({ className }) => {
+export const InlineAssetLoader = React.memo(<{ className?: string }> = ({ className }) => {
   return (
     <AssetLoadingIndicator
       className={className}
@@ -397,10 +408,13 @@ export const InlineAssetLoader: React.FC<{ className?: string }> = ({ className 
       position="relative"
     />
   );
+);
+
+function 1(
 };
 
 // Component for showing asset loading progress in development
-export const DevAssetLoadingDebug: React.FC = () => {
+export const DevAssetLoadingDebug = React.memo( = () => {
   const { progress, getStats } = useAssetLoading();
   const [stats, setStats] = React.useState(getStats());
   
@@ -432,5 +446,8 @@ export const DevAssetLoadingDebug: React.FC = () => {
       )}
     </div>
   );
+);
+
+function 1(
 };
 

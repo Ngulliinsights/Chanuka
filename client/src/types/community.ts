@@ -25,8 +25,27 @@ export interface TrendingTopic {
 export interface ExpertInsight {
   id: string;
   authorId: string;
+  expertName: string;
+  expertAvatar?: string;
+  title?: string;
   summary: string;
-  publishedAt?: string;
+  content?: string;
+  confidence?: number;
+  communityValidation?: {
+    upvotes: number;
+    downvotes: number;
+    validationScore: number;
+  };
+  methodology?: string;
+  sources?: string[];
+  policyAreas?: string[];
+  billTitle?: string;
+  billId?: number;
+  comments?: number;
+  shares?: number;
+  lastUpdated?: string;
+  specializations?: string[];
+  timestamp?: string;
 }
 
 export interface Campaign {

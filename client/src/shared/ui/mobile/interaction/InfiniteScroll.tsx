@@ -22,7 +22,7 @@
  */
 
 import React from 'react';
-import type { InfiniteScrollConfig } from '@/types/mobile';
+import type { InfiniteScrollConfig } from '@client/types/mobile';
 
 interface InfiniteScrollProps extends InfiniteScrollConfig {
   children: React.ReactNode;
@@ -34,7 +34,7 @@ interface InfiniteScrollProps extends InfiniteScrollConfig {
  * Wraps scrollable content with infinite scroll pagination.
  */
 export const InfiniteScroll = React.forwardRef<HTMLDivElement, InfiniteScrollProps>(
-  ({ isLoading, hasMore, onLoadMore, threshold, disabled, children }, ref) => {
+  ({ isLoading, children }, ref) => {
     return (
       <div ref={ref} className="infinite-scroll">
         {/* Component implementation will be added here */}

@@ -8,7 +8,7 @@
  */
 
 // Re-export from the new location for backward compatibility
-export { searchApiClient as searchApi } from '../../../core/api/search';
+export { searchApiClient as searchApi } from '@client/core/api/search';
 
 
 

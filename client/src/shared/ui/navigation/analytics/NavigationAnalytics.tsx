@@ -1,22 +1,18 @@
 /**
  * Navigation Analytics Component
- * 
+ *
  * Advanced analytics integration for navigation behavior tracking.
  * Implements Phase 2 recommendations for navigation analytics.
  */
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, createContext, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { navigationUtils } from '@client/shared/ui/navigation/Navigation.tsx';
 import { logger } from '@client/utils/logger';
 
-interface NavigationAnalyticsProps {
-  children: React.ReactNode;
-  enablePageViews?: boolean;
-  enableUserJourney?: boolean;
-  enablePerformanceTracking?: boolean;
-}
+// ============================================================================
+// Types
+// ============================================================================
 
 interface NavigationMetrics {
   pageLoadTime: number;
@@ -26,19 +22,41 @@ interface NavigationMetrics {
   mostVisitedPages: string[];
 }
 
+interface NavigationAnalyticsContextType {
+  metrics: NavigationMetrics;
+  reportAnalytics: () => void;
+}
+
+// ============================================================================
+// Context
+// ============================================================================
+
+const NavigationAnalyticsContext = createContext<NavigationAnalyticsContextType | null>(null);
+
+// ============================================================================
+// Component
+// ============================================================================
+
+interface NavigationAnalyticsProps {
+  children: React.ReactNode;
+  enablePageViews?: boolean;
+  enableUserJourney?: boolean;
+  enablePerformanceTracking?: boolean;
+}
+
 export function NavigationAnalytics({
   children,
   enablePageViews = true,
   enableUserJourney = true,
-  enablePerformanceTracking = true
+  enablePerformanceTracking = true,
 }: NavigationAnalyticsProps) {
   const location = useLocation();
-  const [metrics, setMetrics] = React.useState<NavigationMetrics>({
+  const [metrics, setMetrics] = useState<NavigationMetrics>({
     pageLoadTime: 0,
     navigationTime: 0,
     userInteractions: 0,
     searchQueries: [],
-    mostVisitedPages: []
+    mostVisitedPages: [],
   });
 
   // Track page views
@@ -46,23 +64,24 @@ export function NavigationAnalytics({
     if (!enablePageViews) return;
 
     const startTime = performance.now();
-    
-    navigationUtils.trackNavigationEvent('page_view', {
+
+    // Simple tracking without external dependencies
+    logger.info('Navigation page view', {
       path: location.pathname,
-      source: 'navigation_analytics'
+      source: 'navigation_analytics',
     });
 
     // Track page load performance
     if (enablePerformanceTracking) {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
-        entries.forEach((entry) => {
+        entries.forEach(entry => {
           if (entry.entryType === 'navigation') {
             const navEntry = entry as PerformanceNavigationTiming;
             setMetrics(prev => ({
               ...prev,
               pageLoadTime: navEntry.loadEventEnd - navEntry.loadEventStart,
-              navigationTime: performance.now() - startTime
+              navigationTime: performance.now() - startTime,
             }));
           }
         });
@@ -81,7 +100,7 @@ export function NavigationAnalytics({
     const handleUserInteraction = () => {
       setMetrics(prev => ({
         ...prev,
-        userInteractions: prev.userInteractions + 1
+        userInteractions: prev.userInteractions + 1,
       }));
     };
 
@@ -104,7 +123,7 @@ export function NavigationAnalytics({
       logger.info('Navigation Analytics Report', {
         path: location.pathname,
         metrics,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Here you could send to analytics service
@@ -120,31 +139,35 @@ export function NavigationAnalytics({
     return () => clearInterval(interval);
   }, [reportAnalytics]);
 
+  const contextValue: NavigationAnalyticsContextType = {
+    metrics,
+    reportAnalytics,
+  };
+
   return (
-    <NavigationAnalyticsContext.Provider value={{ metrics, reportAnalytics }}>
+    <NavigationAnalyticsContext.Provider value={contextValue}>
       {children}
     </NavigationAnalyticsContext.Provider>
   );
 }
 
-// Context for accessing analytics data
-const NavigationAnalyticsContext = React.createContext<{
-  metrics: NavigationMetrics;
-  reportAnalytics: () => void;
-} | null>(null);
+// ============================================================================
+// Hook
+// ============================================================================
 
 export function useNavigationAnalytics() {
-  const context = React.useContext(NavigationAnalyticsContext);
+  const context = useContext(NavigationAnalyticsContext);
   if (!context) {
-    throw new Error('useNavigationAnalytics must be used within NavigationAnalytics');
+    throw new Error('useNavigationAnalytics must be used within NavigationAnalytics provider');
   }
   return context;
 }
 
-// HOC for wrapping components with analytics
-export function withNavigationAnalytics<P extends object>(
-  Component: React.ComponentType<P>
-) {
+// ============================================================================
+// HOC
+// ============================================================================
+
+export function withNavigationAnalytics<P extends object>(Component: React.ComponentType<P>) {
   return function AnalyticsWrappedComponent(props: P) {
     return (
       <NavigationAnalytics>

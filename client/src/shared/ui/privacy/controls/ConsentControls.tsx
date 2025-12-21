@@ -3,19 +3,18 @@
  * GDPR consent management and notification preferences
  */
 
+import React from 'react';
 import {
   Bell,
   Download,
   Trash,
-  AlertTriangle,
-  Info
+  AlertTriangle
 } from 'lucide-react';
-import React from 'react';
 
 import { PrivacySettings } from '@client/types/auth';
 
 import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+// import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 import { Label } from '@client/shared/design-system/typography/Label.tsx';

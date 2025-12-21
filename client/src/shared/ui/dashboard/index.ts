@@ -1,5 +1,9 @@
 // Barrel exports for dashboard components
 
+// Types
+export * from './types';
+
+// Components
 export { UserDashboard } from './UserDashboard';
 export { SmartDashboard } from './SmartDashboard';
 export { useDashboardData } from './useDashboardData';

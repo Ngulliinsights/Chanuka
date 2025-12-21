@@ -120,6 +120,8 @@ export const TOKEN_REFRESH_THRESHOLD_MINUTES = 5;
 export const MAX_TOKEN_REFRESH_ATTEMPTS = 3;
 export const TOKEN_STORAGE_NAMESPACE = 'auth';
 export const SESSION_STORAGE_NAMESPACE = 'session';
+export const TOKEN_KEY = 'auth_tokens';
+export const SESSION_KEY = 'current_session';
 
 // ==========================================================================
 // Security Constants
@@ -307,6 +309,8 @@ export default {
   MAX_TOKEN_REFRESH_ATTEMPTS,
   TOKEN_STORAGE_NAMESPACE,
   SESSION_STORAGE_NAMESPACE,
+  TOKEN_KEY,
+  SESSION_KEY,
   SECURITY_SETTINGS,
   OAUTH_PROVIDERS,
   OAUTH_SCOPES,

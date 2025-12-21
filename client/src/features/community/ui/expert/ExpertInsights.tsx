@@ -16,9 +16,8 @@ import {
   MessageSquare, 
   Share2,
   ExternalLink,
-  BookOpen,
+  Book,
   Award,
-  TrendingUp,
   Clock,
   ChevronDown,
   ChevronUp,
@@ -28,12 +27,12 @@ import {
 import { useState, useEffect, useCallback } from 'react';
 
 import { cn } from '@client/lib/utils';
-import { ExpertInsight } from '@client/types/community';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
+import { ExpertInsight } from '@client/types/community';
 
 interface ExpertInsightsProps {
   insights: ExpertInsight[];
@@ -57,25 +56,25 @@ export function ExpertInsights({
     };
   }, []);
 
-  const getConfidenceColor = (confidence: number) => {
+  const getConfidenceColor = (confidence: number): string => {
     if (confidence >= 0.8) return 'text-green-600';
     if (confidence >= 0.6) return 'text-yellow-600';
     return 'text-red-600';
   };
 
-  const getConfidenceLabel = (confidence: number) => {
+  const getConfidenceLabel = (confidence: number): string => {
     if (confidence >= 0.8) return 'High Confidence';
     if (confidence >= 0.6) return 'Medium Confidence';
     return 'Low Confidence';
   };
 
-  const getValidationColor = (score: number) => {
+  const getValidationColor = (score: number): string => {
     if (score >= 0.7) return 'text-green-600';
     if (score >= 0.4) return 'text-yellow-600';
     return 'text-red-600';
   };
 
-  const formatTimeAgo = (timestamp: string) => {
+  const formatTimeAgo = (timestamp: string): string => {
     try {
       return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     } catch {
@@ -83,7 +82,7 @@ export function ExpertInsights({
     }
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string): string => {
     return name
       .split(' ')
       .map(n => n[0])
@@ -110,10 +109,8 @@ export function ExpertInsights({
       const newVotes = new Map(prev);
 
       if (currentVote === voteType) {
-        // Remove vote if clicking the same vote
         newVotes.delete(insightId);
       } else {
-        // Set new vote
         newVotes.set(insightId, voteType);
       }
 
@@ -124,10 +121,10 @@ export function ExpertInsights({
     console.log(`Voted ${voteType} on insight ${insightId}`);
   }, []);
 
-  const handleShare = (insight: ExpertInsight) => {
+  const handleShare = useCallback((insight: ExpertInsight) => {
     // TODO: Implement sharing functionality
     console.log('Sharing insight:', insight.id);
-  };
+  }, []);
 
   if (insights.length === 0) {
     return (
@@ -178,15 +175,15 @@ export function ExpertInsights({
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <ThumbsUp className="h-3 w-3" />
-                    <span>{insight.communityValidation.upvotes}</span>
+                    <span>{insight.communityValidation?.upvotes ?? 0}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <MessageSquare className="h-3 w-3" />
-                    <span>{insight.comments}</span>
+                    <span>{insight.comments ?? 0}</span>
                   </div>
-                  <div className={cn('flex items-center gap-1', getConfidenceColor(insight.confidence))}>
+                  <div className={cn('flex items-center gap-1', getConfidenceColor(insight.confidence ?? 0))}>
                     <Award className="h-3 w-3" />
-                    <span>{Math.round(insight.confidence * 100)}%</span>
+                    <span>{Math.round((insight.confidence ?? 0) * 100)}%</span>
                   </div>
                 </div>
               </div>
@@ -202,10 +199,11 @@ export function ExpertInsights({
       {insights.map((insight) => {
         const isExpanded = expandedInsights.has(insight.id);
         const userVote = votedInsights.get(insight.id);
-        const shouldTruncate = insight.content.length > 300;
+        const content = insight.content ?? '';
+        const shouldTruncate = content.length > 300;
         const displayContent = shouldTruncate && !isExpanded 
-          ? insight.content.slice(0, 300) + '...' 
-          : insight.content;
+          ? content.slice(0, 300) + '...' 
+          : content;
 
         return (
           <Card key={insight.id} className="chanuka-card">
@@ -224,29 +222,35 @@ export function ExpertInsights({
                     </Badge>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    {insight.specializations.slice(0, 3).map((spec) => (
-                      <Badge key={spec} variant="secondary" className="text-xs">
-                        {spec}
-                      </Badge>
-                    ))}
-                    {insight.specializations.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{insight.specializations.length - 3} more
-                      </Badge>
-                    )}
-                  </div>
+                  {insight.specializations && insight.specializations.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      {insight.specializations.slice(0, 3).map((spec: string) => (
+                        <Badge key={spec} variant="secondary" className="text-xs">
+                          {spec}
+                        </Badge>
+                      ))}
+                      {insight.specializations.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{insight.specializations.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                  )}
 
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{formatTimeAgo(insight.timestamp)}</span>
-                    </div>
+                    {insight.timestamp && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{formatTimeAgo(insight.timestamp)}</span>
+                      </div>
+                    )}
                     
-                    <div className={cn('flex items-center gap-1', getConfidenceColor(insight.confidence))}>
-                      <Award className="h-4 w-4" />
-                      <span>{getConfidenceLabel(insight.confidence)}</span>
-                    </div>
+                    {insight.confidence !== undefined && (
+                      <div className={cn('flex items-center gap-1', getConfidenceColor(insight.confidence))}>
+                        <Award className="h-4 w-4" />
+                        <span>{getConfidenceLabel(insight.confidence)}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -254,7 +258,9 @@ export function ExpertInsights({
 
             <CardContent className="space-y-4">
               {/* Insight Title */}
-              <h3 className="text-xl font-semibold leading-tight">{insight.title}</h3>
+              {insight.title && (
+                <h3 className="text-xl font-semibold leading-tight">{insight.title}</h3>
+              )}
 
               {/* Summary */}
               <div className="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
@@ -263,66 +269,72 @@ export function ExpertInsights({
               </div>
 
               {/* Content */}
-              <div className="prose prose-sm max-w-none">
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                  {displayContent}
-                </p>
-                {shouldTruncate && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleExpanded(insight.id)}
-                    className="text-xs p-0 h-auto mt-2"
-                  >
-                    {isExpanded ? (
-                      <>
-                        <ChevronUp className="h-4 w-4 mr-1" />
-                        Show less
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="h-4 w-4 mr-1" />
-                        Read more
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
+              {content && (
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {displayContent}
+                  </p>
+                  {shouldTruncate && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleExpanded(insight.id)}
+                      className="text-xs p-0 h-auto mt-2"
+                    >
+                      {isExpanded ? (
+                        <>
+                          <ChevronUp className="h-4 w-4 mr-1" />
+                          Show less
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-4 w-4 mr-1" />
+                          Read more
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              )}
 
               {/* Confidence and Methodology */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h5 className="font-medium text-sm mb-2">Confidence Level</h5>
-                  <div className="flex items-center gap-2">
-                    <Progress value={insight.confidence * 100} className="flex-1" />
-                    <span className={cn('text-sm font-medium', getConfidenceColor(insight.confidence))}>
-                      {Math.round(insight.confidence * 100)}%
-                    </span>
+                {insight.confidence !== undefined && (
+                  <div>
+                    <h5 className="font-medium text-sm mb-2">Confidence Level</h5>
+                    <div className="flex items-center gap-2">
+                      <Progress value={insight.confidence * 100} className="flex-1" />
+                      <span className={cn('text-sm font-medium', getConfidenceColor(insight.confidence))}>
+                        {Math.round(insight.confidence * 100)}%
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div>
-                  <h5 className="font-medium text-sm mb-2">Community Validation</h5>
-                  <div className="flex items-center gap-2">
-                    <Progress 
-                      value={insight.communityValidation.validationScore * 100} 
-                      className="flex-1" 
-                    />
-                    <span className={cn(
-                      'text-sm font-medium', 
-                      getValidationColor(insight.communityValidation.validationScore)
-                    )}>
-                      {Math.round(insight.communityValidation.validationScore * 100)}%
-                    </span>
+                {insight.communityValidation && (
+                  <div>
+                    <h5 className="font-medium text-sm mb-2">Community Validation</h5>
+                    <div className="flex items-center gap-2">
+                      <Progress 
+                        value={insight.communityValidation.validationScore * 100} 
+                        className="flex-1" 
+                      />
+                      <span className={cn(
+                        'text-sm font-medium', 
+                        getValidationColor(insight.communityValidation.validationScore)
+                      )}>
+                        {Math.round(insight.communityValidation.validationScore * 100)}%
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Methodology */}
               {insight.methodology && (
                 <div>
                   <h5 className="font-medium text-sm mb-2 flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
+                    <Book className="h-4 w-4" />
                     Methodology
                   </h5>
                   <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">
@@ -339,7 +351,7 @@ export function ExpertInsights({
                     Sources & References
                   </h5>
                   <div className="space-y-2">
-                    {insight.sources.map((source, index) => (
+                    {insight.sources.map((source: string, index: number) => (
                       <div key={index} className="flex items-center gap-2 text-sm">
                         <FileText className="h-4 w-4 text-muted-foreground" />
                         <a 
@@ -358,11 +370,11 @@ export function ExpertInsights({
               )}
 
               {/* Policy Areas */}
-              {insight.policyAreas.length > 0 && (
+              {insight.policyAreas && insight.policyAreas.length > 0 && (
                 <div>
                   <h5 className="font-medium text-sm mb-2">Policy Areas</h5>
                   <div className="flex flex-wrap gap-2">
-                    {insight.policyAreas.map((area) => (
+                    {insight.policyAreas.map((area: string) => (
                       <Badge key={area} variant="outline" className="text-xs">
                         {area}
                       </Badge>
@@ -380,11 +392,13 @@ export function ExpertInsights({
                       <p className="text-sm text-muted-foreground">{insight.billTitle}</p>
                     </div>
                     {insight.billId && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={`/bills/${insight.billId}`}>
-                          View Bill
-                          <ExternalLink className="h-4 w-4 ml-2" />
-                        </a>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.location.href = `/bills/${insight.billId}`}
+                      >
+                        View Bill
+                        <ExternalLink className="h-4 w-4 ml-2" />
                       </Button>
                     )}
                   </div>
@@ -408,7 +422,7 @@ export function ExpertInsights({
                       'h-4 w-4',
                       userVote === 'up' && 'fill-current'
                     )} />
-                    <span>{insight.communityValidation.upvotes}</span>
+                    <span>{insight.communityValidation?.upvotes ?? 0}</span>
                   </Button>
 
                   {/* Downvote */}
@@ -425,13 +439,13 @@ export function ExpertInsights({
                       'h-4 w-4',
                       userVote === 'down' && 'fill-current'
                     )} />
-                    <span>{insight.communityValidation.downvotes}</span>
+                    <span>{insight.communityValidation?.downvotes ?? 0}</span>
                   </Button>
 
                   {/* Comments */}
                   <Button variant="ghost" size="sm" className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
-                    <span>{insight.comments}</span>
+                    <span>{insight.comments ?? 0}</span>
                   </Button>
 
                   {/* Share */}
@@ -442,14 +456,16 @@ export function ExpertInsights({
                     className="flex items-center gap-2"
                   >
                     <Share2 className="h-4 w-4" />
-                    <span>{insight.shares}</span>
+                    <span>{insight.shares ?? 0}</span>
                   </Button>
                 </div>
 
                 {/* Last Updated */}
-                <div className="text-xs text-muted-foreground">
-                  Updated {formatTimeAgo(insight.lastUpdated)}
-                </div>
+                {insight.lastUpdated && (
+                  <div className="text-xs text-muted-foreground">
+                    Updated {formatTimeAgo(insight.lastUpdated)}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

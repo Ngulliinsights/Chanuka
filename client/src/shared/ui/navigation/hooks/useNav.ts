@@ -1,4 +1,4 @@
-import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
+import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';
 import { useAuth } from '@client/core/auth';
 import type { NavigationSection } from '@client/types/navigation';
 

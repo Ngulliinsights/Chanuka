@@ -12,7 +12,7 @@ import { useQuery, useQueries, UseQueryOptions, UseQueryResult } from '@tanstack
 import { useRef, useCallback, useEffect, useMemo } from 'react';
 
 import { globalApiClient } from '@client/core/api';
-import { logger } from '@client/utils/logger';
+// import { logger } from '@client/utils/logger';
 
 export interface SafeQueryOptions<T> extends Omit<UseQueryOptions<T>, 'queryFn'> {
   endpoint?: string;
@@ -25,7 +25,7 @@ export interface SafeQueryOptions<T> extends Omit<UseQueryOptions<T>, 'queryFn'>
   onSuccess?: (data: T) => void;
 }
 
-export function useSafeQuery<T = any>(
+export function useSafeQuery<T = unknown>(
   options: SafeQueryOptions<T>
 ): UseQueryResult<T> & {
   refetchSafely: () => Promise<void>;
@@ -81,7 +81,7 @@ export function useSafeQuery<T = any>(
     signal?.addEventListener('abort', abortHandler);
 
     try {
-      let result: any;
+      let result: { data?: T; error?: string; status?: number };
 
       // Step 4: Make the actual API request based on auth requirements
       if (requireAuth) {
@@ -89,8 +89,7 @@ export function useSafeQuery<T = any>(
         result = await globalApiClient.get<T>(endpoint!, {
           signal: controller.signal,
           timeout,
-          retries,
-          retryDelay
+          retries
         });
       } else {
         // Use standard fetch for public endpoints with timeout handling
@@ -158,7 +157,7 @@ export function useSafeQuery<T = any>(
         signal.removeEventListener('abort', abortHandler);
       }
     }
-  }, [endpoint, requireAuth, timeout, retries, retryDelay, onError, onSuccess]);
+  }, [endpoint, requireAuth, timeout, retries, onError, onSuccess]);
 
   // Configure React Query with our enhanced query function
   const query = useQuery<T>({
@@ -218,7 +217,7 @@ export function useSafeQuery<T = any>(
  *   endpoint: '/api/admin/users'
  * });
  */
-export function useAdminQuery<T = any>(
+export function useAdminQuery<T = unknown>(
   options: Omit<SafeQueryOptions<T>, 'requireAuth'>
 ): UseQueryResult<T> & {
   refetchSafely: () => Promise<void>;
@@ -247,11 +246,11 @@ export function useAdminQuery<T = any>(
  * ]);
  * // Access data.profile and data.settings
  */
-export function useCoordinatedQueries<T extends Record<string, any>>(
+export function useCoordinatedQueries<T extends Record<string, unknown>>(
   queries: Array<{
     key: string;
     endpoint: string;
-    options?: Partial<SafeQueryOptions<any>>;
+    options?: Partial<SafeQueryOptions<unknown>>;
   }>
 ): {
   data: Partial<T>;

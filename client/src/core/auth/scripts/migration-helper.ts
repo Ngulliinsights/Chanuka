@@ -5,7 +5,7 @@
  * to the new consolidated auth system.
  */
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 /**
  * Import mapping from old to new locations
@@ -75,7 +75,7 @@ export const FILES_TO_REMOVE = [
 /**
  * Generate migration instructions for a specific file
  */
-export function generateMigrationInstructions(filePath: string, fileContent: string): {
+export function generateMigrationInstructions(_filePath: string, fileContent: string): {
   hasChanges: boolean;
   instructions: Array<{
     type: 'import' | 'code' | 'remove';

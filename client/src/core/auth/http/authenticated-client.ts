@@ -10,7 +10,10 @@ export interface AuthenticatedApiClientConfig {
 }
 
 export class AuthenticatedApiClient {
-  constructor(private config: AuthenticatedApiClientConfig = {}) {}
+  constructor(private config: AuthenticatedApiClientConfig = {}) {
+    // Configuration is stored for potential future use
+    this.config = { ...config };
+  }
 
   async get<T>(url: string): Promise<T> {
     const response = await fetch(url, {
@@ -22,7 +25,7 @@ export class AuthenticatedApiClient {
     return response.json() as Promise<T>;
   }
 
-  async post<T>(url: string, data: any): Promise<T> {
+  async post<T>(url: string, data: unknown): Promise<T> {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -34,7 +37,7 @@ export class AuthenticatedApiClient {
     return response.json() as Promise<T>;
   }
 
-  async put<T>(url: string, data: any): Promise<T> {
+  async put<T>(url: string, data: unknown): Promise<T> {
     const response = await fetch(url, {
       method: 'PUT',
       headers: {

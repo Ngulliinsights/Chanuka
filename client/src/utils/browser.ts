@@ -10,6 +10,6 @@ export function getBrowserInfo(): { name: string; version: string } {
   return { name: 'Unknown', version: 'Unknown' };
 }
 
-export function supportsFeature(feature: string): boolean {
+export function supportsFeature(_feature: string): boolean {
   return true;
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../../design-system/lib/utils';
 
 import { Skeleton } from './Skeleton';
 
@@ -13,7 +13,7 @@ interface ListSkeletonProps {
   showActions?: boolean;
 }
 
-export const ListSkeleton: React.FC<ListSkeletonProps> = ({
+export const ListSkeleton = React.memo(<ListSkeletonProps> = ({
   className,
   itemCount = 5,
   showAvatar = false,
@@ -53,6 +53,9 @@ export const ListSkeleton: React.FC<ListSkeletonProps> = ({
       ))}
     </div>
   );
+);
+
+function 1(
 };
 
 export default ListSkeleton;

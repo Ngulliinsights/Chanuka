@@ -15,10 +15,10 @@
  * @module PerformanceApiService
  */
 
+import { ErrorFactory } from '@client/core/error';
 import { logger } from '@client/utils/logger';
 
 import { globalApiClient } from './client';
-import { ErrorFactory } from '@client/core/error';
 
 // ============================================================================
 // Type Definitions
@@ -233,10 +233,8 @@ export class PerformanceApiService {
   async reportMetrics(payload: MetricsPayload): Promise<void> {
     if (!payload?.sessionId) {
       throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
         'Session ID is required to report metrics',
-        { payload },
-        { component: 'PerformanceApi', operation: 'reportMetrics' }
+        { payload, component: 'PerformanceApi', operation: 'reportMetrics' }
       );
     }
 
@@ -262,14 +260,14 @@ export class PerformanceApiService {
       });
 
       throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
         'Failed to send performance metrics to the server',
         { 
           sessionId: payload.sessionId,
           metricsCount: payload.metrics.length,
-          originalError: error 
-        },
-        { component: 'PerformanceApi', operation: 'reportMetrics' }
+          originalError: error,
+          component: 'PerformanceApi',
+          operation: 'reportMetrics'
+        }
       );
     }
   }
@@ -311,19 +309,15 @@ export class PerformanceApiService {
   ): Promise<PerformanceAnalytics> {
     if (!userId?.trim()) {
       throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
         'User ID is required to retrieve analytics',
-        { userId },
-        { component: 'PerformanceApi', operation: 'getUserAnalytics' }
+        { userId, component: 'PerformanceApi', operation: 'getUserAnalytics' }
       );
     }
 
     if (dateRange && (!dateRange.start || !dateRange.end)) {
       throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
         'Date range must include both start and end dates',
-        { userId, dateRange },
-        { component: 'PerformanceApi', operation: 'getUserAnalytics' }
+        { userId, dateRange, component: 'PerformanceApi', operation: 'getUserAnalytics' }
       );
     }
 
@@ -351,10 +345,8 @@ export class PerformanceApiService {
       });
 
       throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
         'Failed to retrieve user performance analytics',
-        { userId, dateRange, originalError: error },
-        { component: 'PerformanceApi', operation: 'getUserAnalytics' }
+        { userId, dateRange, originalError: error, component: 'PerformanceApi', operation: 'getUserAnalytics' }
       );
     }
   }
@@ -393,10 +385,8 @@ export class PerformanceApiService {
       });
 
       throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
         'Failed to retrieve performance benchmarks',
-        { originalError: error },
-        { component: 'PerformanceApi', operation: 'getBenchmarks' }
+        { originalError: error, component: 'PerformanceApi', operation: 'getBenchmarks' }
       );
     }
   }
@@ -434,19 +424,15 @@ export class PerformanceApiService {
   async reportIssue(issue: PerformanceIssue): Promise<void> {
     if (!issue?.sessionId) {
       throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
         'Session ID is required to report performance issue',
-        { issue },
-        { component: 'PerformanceApi', operation: 'reportIssue' }
+        { issue, component: 'PerformanceApi', operation: 'reportIssue' }
       );
     }
 
     if (!issue.type || !issue.severity || !issue.description) {
       throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
         'Type, severity, and description are required fields',
-        { issue },
-        { component: 'PerformanceApi', operation: 'reportIssue' }
+        { issue, component: 'PerformanceApi', operation: 'reportIssue' }
       );
     }
 
@@ -472,10 +458,8 @@ export class PerformanceApiService {
       });
 
       throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
         'Failed to report performance issue',
-        { issue, originalError: error },
-        { component: 'PerformanceApi', operation: 'reportIssue' }
+        { issue, originalError: error, component: 'PerformanceApi', operation: 'reportIssue' }
       );
     }
   }
@@ -510,10 +494,8 @@ export class PerformanceApiService {
   async getRecommendations(sessionId: string): Promise<PerformanceRecommendation[]> {
     if (!sessionId?.trim()) {
       throw ErrorFactory.createValidationError(
-        ErrorCode.VALIDATION_INVALID_INPUT,
         'Session ID is required to retrieve recommendations',
-        { sessionId },
-        { component: 'PerformanceApi', operation: 'getRecommendations' }
+        { sessionId, component: 'PerformanceApi', operation: 'getRecommendations' }
       );
     }
 
@@ -531,10 +513,8 @@ export class PerformanceApiService {
       });
 
       throw ErrorFactory.createNetworkError(
-        ErrorCode.NETWORK_REQUEST_FAILED,
         'Failed to retrieve performance recommendations',
-        { sessionId, originalError: error },
-        { component: 'PerformanceApi', operation: 'getRecommendations' }
+        { sessionId, originalError: error, component: 'PerformanceApi', operation: 'getRecommendations' }
       );
     }
   }

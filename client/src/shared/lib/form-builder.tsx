@@ -437,7 +437,7 @@ export function useFormBuilder<T extends FieldValues>({
  *   ({ form }) => (
  *     <form onSubmit={form.onSubmit(handleRegister)}>
  *       <input {...form.register('email')} />
- *       <input {...form.register('password')} type="password" />
+ *       <input {...form.register('password')} type="password" aria-label="Password input" />
  *       <button disabled={form.isSubmitting}>Register</button>
  *     </form>
  *   ),

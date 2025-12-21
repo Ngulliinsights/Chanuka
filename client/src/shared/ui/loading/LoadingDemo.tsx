@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-import { useProgressiveLoading, useTimeoutAwareOperation, usePageLoading, useComponentLoading } from '@client/core/loading';
-import { useLoading } from '@client/core/loading';
+import { useProgressiveLoading, useTimeoutAwareLoading, useLoading } from './hooks';
 import { logger } from '@client/utils/logger';
 
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
@@ -13,7 +12,7 @@ import {
   PageLoader,
   ComponentLoader,
   ConnectionAwareLoader,
-} from './LoadingStates';
+} from './ui';
 
 export const LoadingDemo: React.FC = () => {
   const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>('idle');
@@ -273,13 +272,13 @@ export const LoadingDemo: React.FC = () => {
                   <div className="flex space-x-2">
                     <Button 
                       onClick={simulateProgressiveLoading}
-                      disabled={progressiveLoading.isLoading}
+                      disabled={progressiveLoading.state === 'loading'}
                     >
                       Start Progressive Loading
                     </Button>
                     <Button 
-                      onClick={() => progressiveLoading.isLoading && progressiveLoading.start()}
-                      disabled={!progressiveLoading.isLoading}
+                      onClick={() => progressiveLoading.state === 'loading' && progressiveLoading.start()}
+                      disabled={progressiveLoading.state !== 'loading'}
                       variant="outline"
                     >
                       Restart
@@ -287,15 +286,15 @@ export const LoadingDemo: React.FC = () => {
                   </div>
                   
                   <div className="h-64 border rounded">
-                    {progressiveLoading.isLoading ? (
+                    {progressiveLoading.state === 'loading' ? (
                       <div className="p-4">
                         <LoadingStateManager
                           type="component"
                           state="loading"
-                          message={progressiveStages[progressiveLoading.currentStage]?.message || "Loading..."}
+                          message={progressiveLoading.currentStage?.message || "Loading..."}
                         />
                         <div className="mt-4 text-sm text-muted-foreground text-center">
-                          Stage {progressiveLoading.currentStage + 1} of {progressiveStages.length}
+                          Stage {progressiveLoading.currentStageIndex + 1} of {progressiveStages.length}
                         </div>
                       </div>
                     ) : (
@@ -326,7 +325,7 @@ export const LoadingDemo: React.FC = () => {
                       <h4 className="font-medium mb-2">Active Operations</h4>
                       <div className="text-sm space-y-1">
                             <div>Total: {Object.keys(loadingContextState.operations).length}</div>
-                            <div>High Priority: {Object.values(loadingContextState.operations).filter(op => op.priority === 'high').length}</div>
+                            <div>High Priority: {Object.values(loadingContextState.operations).filter((op: any) => op.priority === 'high').length}</div>
                             <div>Global Loading: {loadingContextState.globalLoading ? 'Yes' : 'No'}</div>
                             <div>Connection: {loadingContextState.isOnline ? 'Online' : 'Offline'}</div>
                           </div>

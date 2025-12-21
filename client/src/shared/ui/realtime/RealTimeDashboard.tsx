@@ -5,21 +5,21 @@
  * using the integrated WebSocket client with polling fallback.
  */
 
+import React from 'react';
 import { 
   Bell, 
   Activity, 
   Users, 
   MessageSquare, 
   TrendingUp,
-  Wifi,
-  WifiOff,
-  AlertCircle
+  AlertCircle,
+  CheckCircle,
+  AlertTriangle
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
-import { useWebSocket } from '@client/hooks/use-websocket';
+// import { useWebSocket } from '@client/hooks/use-websocket';
 import { cn } from '@client/lib/utils';
-
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
@@ -37,24 +37,31 @@ export function RealTimeDashboard({
   showEngagementMetrics = true,
   showRecentActivity = true
 }: RealTimeDashboardProps) {
-  const {
-    isConnected,
-    isConnecting,
-    connectionQuality,
-    error,
-    notifications,
-    notificationCount,
-    getRecentActivity,
-    markNotificationRead,
-    connect
-  } = useWebSocket({
-    autoConnect: true,
-    subscriptions: [
-      { type: 'user_notifications', id: 'user' }
-    ]
-  });
+  // Placeholder for useWebSocket hook
+  const isConnected = false;
+  const isConnecting = false;
+  const error = null;
+  const notifications: Array<{
+    id: string;
+    type: string;
+    message: string;
+    title: string;
+    timestamp: Date;
+    created_at: string;
+    read: boolean;
+  }> = [];
+  const notificationCount = 0;
+  const getRecentActivity = useCallback((_limit?: number) => [], []);
+  const markNotificationRead = (_id: string) => {};
+  const connect = () => {};
 
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [recentActivity, setRecentActivity] = useState<Array<{
+    id: string;
+    type: string;
+    message: string;
+    timestamp: string;
+    user?: string;
+  }>>([]);
 
   // Update recent activity periodically
   useEffect(() => {
@@ -70,34 +77,14 @@ export function RealTimeDashboard({
 
   const getConnectionIcon = () => {
     if (isConnecting) return <Activity className="h-4 w-4 animate-spin" />;
-    if (!isConnected) return <WifiOff className="h-4 w-4 text-red-500" />;
-    
-    switch (connectionQuality) {
-      case 'excellent':
-        return <Wifi className="h-4 w-4 text-green-500" />;
-      case 'good':
-        return <Wifi className="h-4 w-4 text-yellow-500" />;
-      case 'poor':
-        return <Wifi className="h-4 w-4 text-orange-500" />;
-      default:
-        return <WifiOff className="h-4 w-4 text-red-500" />;
-    }
+    if (!isConnected) return <AlertTriangle className="h-4 w-4 text-red-500" />;
+    return <CheckCircle className="h-4 w-4 text-green-500" />;
   };
 
   const getConnectionStatus = () => {
     if (isConnecting) return 'Connecting...';
     if (!isConnected) return 'Disconnected';
-    
-    switch (connectionQuality) {
-      case 'excellent':
-        return 'Excellent Connection';
-      case 'good':
-        return 'Good Connection';
-      case 'poor':
-        return 'Poor Connection';
-      default:
-        return 'Disconnected';
-    }
+    return 'Connected';
   };
 
   const formatTimestamp = (timestamp: string) => {

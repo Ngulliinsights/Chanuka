@@ -13,7 +13,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../../ui/dialog';
+} from '@client/shared/design-system/interactive/Dialog';
 
 import { FullInterface } from './FullInterface';
 

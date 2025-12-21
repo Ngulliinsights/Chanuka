@@ -13,6 +13,7 @@ export type { HttpMethod, LogLevel, SortOrder, ErrorCode } from './common';
 export type { PaginationParams, PaginationInfo, PaginatedResponse, VoteType } from './common';
 export { ErrorDomain, ErrorSeverity } from './common';
 export type { UnifiedError, ErrorContext } from './common';
+export type { ApiClient, UnifiedApiClient } from './common';
 
 // ============================================================================
 // Bill Types
@@ -80,15 +81,13 @@ export {
 // ============================================================================
 
 export type {
-  ApiRequest,
-  ApiResponse,
   RequestPriority,
-  RequestOptions,
   RetryConfig,
   CacheOptions,
   CacheInvalidationTrigger,
   ValidationOptions,
 } from './request';
+export type { ApiRequest, ApiResponse, RequestOptions } from './common';
 
 // ============================================================================
 // Cache Types
@@ -145,6 +144,23 @@ export {
   type DisplayPreferences,
   type UserPreferences,
 } from './preferences';
+
+// ============================================================================
+// Error Response Types
+// ============================================================================
+
+export type {
+  ApiErrorResponse,
+  AxiosErrorResponse,
+  FetchErrorResponse,
+  UnknownError,
+  ErrorContext,
+  PrivacySettings,
+  DataExportRequest,
+  DataExportResponse,
+  DataDeletionRequest,
+  DataDeletionResponse,
+} from './error-response';
 
 // ============================================================================
 // WebSocket Types

@@ -69,6 +69,8 @@ const DashboardErrorFallback: React.FC<{ error: Error; resetErrorBoundary: () =>
   </div>
 );
 
+function 1(
+
 /**
  * Loading Skeleton for Dashboard Framework
  */
@@ -106,12 +108,14 @@ const DashboardLoadingSkeleton: React.FC = () => (
   </div>
 );
 
+function 1(
+
 /**
  * Dashboard Framework Component
  *
  * Main component that orchestrates the entire dashboard system.
  */
-export const DashboardFramework: React.FC<DashboardFrameworkProps> = ({
+export const DashboardFramework = React.memo(<DashboardFrameworkProps> = ({
   config,
   headerContent,
   sidebarContent,
@@ -348,6 +352,9 @@ export const DashboardFramework: React.FC<DashboardFrameworkProps> = ({
       </div>
     </ErrorBoundary>
   );
+);
+
+function 1(
 };
 
 DashboardFramework.displayName = 'DashboardFramework';

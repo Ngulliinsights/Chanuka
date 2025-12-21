@@ -23,7 +23,7 @@ interface DashboardGridProps {
   /** Grid items (widgets) */
   children: React.ReactNode;
   /** Layout change handler */
-  onLayoutChange?: (layout: any[]) => void;
+  onLayoutChange?: (layout: unknown[]) => void;
   /** Custom className */
   className?: string;
   /** Is grid editable */
@@ -35,7 +35,7 @@ interface DashboardGridProps {
 /**
  * Dashboard Grid Component
  */
-export const DashboardGrid: React.FC<DashboardGridProps> = ({
+export const DashboardGrid = React.memo(<DashboardGridProps> = ({
   columns = 3,
   rowHeight = 120,
   gap = 24,
@@ -228,6 +228,9 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 
 DashboardGrid.displayName = 'DashboardGrid';

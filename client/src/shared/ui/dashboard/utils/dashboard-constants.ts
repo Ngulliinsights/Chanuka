@@ -3,7 +3,7 @@
  * Following navigation component constants patterns
  */
 
-import type { DashboardConfig, ActionPriority, TopicCategory, DashboardSection } from '@client/types';
+import type { DashboardConfig, ActionPriority, TopicCategory, DashboardSection } from '../types';
 
 export const dashboardConstants = {
   // Default configuration values
@@ -14,7 +14,7 @@ export const dashboardConstants = {
     enableAutoRefresh: true,
     showCompletedActions: false,
     defaultView: 'activity' as DashboardSection
-  } as DashboardConfig,
+  } as Partial<DashboardConfig>,
 
   // Refresh intervals (in milliseconds)
   REFRESH_INTERVALS: {

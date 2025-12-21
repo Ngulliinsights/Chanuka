@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
 
-import type { OnboardingStatus } from '../../../types/onboarding';
+import type { OnboardingStatus } from '@client/types/onboarding';
 import { OnboardingService } from '../services/onboarding-service';
 
 export function useOnboardingRedirect() {

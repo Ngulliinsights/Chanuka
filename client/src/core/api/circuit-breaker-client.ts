@@ -28,7 +28,7 @@ export interface RequestConfig extends RequestInit {
   skipRetry?: boolean;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   status: number;
   headers: Headers;
@@ -44,9 +44,9 @@ export class CircuitBreakerClient {
 
   constructor(config: CircuitBreakerClientConfig) {
     this.config = {
-      timeout: 10000,
       correlationIdHeader: 'X-Correlation-ID',
-      ...config
+      ...config,
+      timeout: config.timeout || 10000
     };
 
     this.retryHandler = createRetryHandler(
@@ -58,7 +58,7 @@ export class CircuitBreakerClient {
   /**
    * Makes an HTTP request with circuit breaker and retry logic
    */
-  async request<T = any>(
+  async request<T = unknown>(
     url: string,
     config: RequestConfig = {}
   ): Promise<ApiResponse<T>> {
@@ -228,11 +228,11 @@ export class CircuitBreakerClient {
   /**
    * Convenience methods for common HTTP verbs
    */
-  async get<T = any>(url: string, config: Omit<RequestConfig, 'method'> = {}): Promise<ApiResponse<T>> {
+  async get<T = unknown>(url: string, config: Omit<RequestConfig, 'method'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(url, { ...config, method: 'GET' });
   }
 
-  async post<T = any>(url: string, data?: any, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
+  async post<T = unknown>(url: string, data?: unknown, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
       method: 'POST',
@@ -244,7 +244,7 @@ export class CircuitBreakerClient {
     });
   }
 
-  async put<T = any>(url: string, data?: any, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
+  async put<T = unknown>(url: string, data?: unknown, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
       method: 'PUT',
@@ -256,7 +256,7 @@ export class CircuitBreakerClient {
     });
   }
 
-  async patch<T = any>(url: string, data?: any, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
+  async patch<T = unknown>(url: string, data?: unknown, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
       method: 'PATCH',
@@ -268,7 +268,7 @@ export class CircuitBreakerClient {
     });
   }
 
-  async delete<T = any>(url: string, config: Omit<RequestConfig, 'method'> = {}): Promise<ApiResponse<T>> {
+  async delete<T = unknown>(url: string, config: Omit<RequestConfig, 'method'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(url, { ...config, method: 'DELETE' });
   }
 
@@ -299,7 +299,7 @@ export class CircuitBreakerClient {
 
   private createHttpError(response: Response, correlationId: string): BaseError {
     const isServerError = response.status >= 500;
-    const isClientError = response.status >= 400 && response.status < 500;
+    // const _isClientError = response.status >= 400 && response.status < 500;
 
     let domain = ErrorDomain.EXTERNAL_SERVICE;
     let severity = ErrorSeverity.MEDIUM;

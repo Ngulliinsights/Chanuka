@@ -38,7 +38,7 @@ export interface LoadingOperation {
   priority: LoadingPriority;
   progress?: number;
   stage?: string;
-  error?: Error;
+  error?: string; // Changed from Error to string to match usage
   startTime: number;
   timeout?: number;
   retryCount: number;
@@ -54,15 +54,22 @@ export interface LoadingStats {
 }
 
 export interface LoadingConfig {
+  timeout: number;
+  retryDelay: number;
+  maxRetries: number;
+  showProgress: boolean;
+  enableCaching: boolean;
+  priority: LoadingPriority;
+  
   // Validation settings
-  validation: {
+  validation?: {
     enabled: boolean;
     strict: boolean;
     validateProgress: boolean;
   };
   
   // Error handling settings
-  errorHandling: {
+  errorHandling?: {
     enableRecovery: boolean;
     maxRetries: number;
     retryDelay: number;
@@ -70,14 +77,14 @@ export interface LoadingConfig {
   };
   
   // Performance settings
-  performance: {
+  performance?: {
     enableMemoization: boolean;
     debounceMs: number;
     maxConcurrentOperations: number;
   };
   
   // Display settings
-  display: {
+  display?: {
     autoHide: boolean;
     autoHideDelay: number;
     showProgress: boolean;

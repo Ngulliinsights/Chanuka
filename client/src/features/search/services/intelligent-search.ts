@@ -14,8 +14,8 @@
 
 import Fuse, { type IFuseOptions } from 'fuse.js';
 
-import { searchApiClient } from '../../../core/api/search';
-import { logger } from '../../../utils/logger';
+import { searchApiClient } from '@client/core/api/search';
+import { logger } from '@client/utils/logger';
 import type { SearchResult, SearchMetadata } from '../types';
 
 interface SearchSuggestion {
@@ -438,7 +438,7 @@ class IntelligentSearchService {
   /**
    * Get or create Fuse instance with memory-efficient caching
    */
-  private getFuseInstance(type: string, data: any[]): Fuse<any> {
+  private getFuseInstance(type: string, data: unknown[]): Fuse<any> {
     const cacheKey = `${type}-${data.length}`;
     const cached = this.fuseInstances.get(cacheKey);
 

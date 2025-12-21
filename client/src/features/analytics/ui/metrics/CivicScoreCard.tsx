@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Civic Score Card Component
  * 
@@ -16,7 +17,6 @@ import {
   Calendar,
   Flame
 } from 'lucide-react';
-import React from 'react';
 
 import { cn } from '@client/lib/utils';
 import { Badge } from '@client/shared/design-system';

@@ -4,17 +4,16 @@
  * Centralized initialization for the entire authentication system
  */
 
-import { logger } from '../../../utils/logger';
-import { createError } from '../../error';
-import { ErrorDomain, ErrorSeverity } from '../../error/constants';
-
-import { AuthApiService, setAuthApiService } from '../services/auth-api-service';
-import { tokenManager } from '../services/token-manager';
-import { sessionManager } from '../services/session-manager';
-import { createAuthConfig, validateAuthConfig, type AuthSettings } from './auth-config';
+import { logger } from '@client/utils/logger';
 
 import type { UnifiedApiClient } from '../../api/types';
+import { createError } from '../../error';
+import { ErrorDomain, ErrorSeverity } from '../../error/constants';
+import { AuthApiService, setAuthApiService } from '../services/auth-api-service';
+import { sessionManager } from '../services/session-manager';
+import { tokenManager } from '../services/token-manager';
 
+import { createAuthConfig, validateAuthConfig, type AuthSettings } from './auth-config';
 /**
  * Authentication initialization options
  */
@@ -89,10 +88,10 @@ async function performInitialization(options: AuthInitOptions): Promise<void> {
     
     if (!validation.isValid) {
       throw createError(
-        ErrorDomain.CONFIGURATION,
+        ErrorDomain.SYSTEM,
         ErrorSeverity.HIGH,
         `Invalid auth configuration: ${validation.errors.join(', ')}`,
-        { errors: validation.errors }
+        { details: { errors: validation.errors } }
       );
     }
 
@@ -174,7 +173,7 @@ async function initializeStorageManagers(settings: AuthSettings): Promise<void> 
 /**
  * Restore session from storage
  */
-async function restoreSession(options: AuthInitOptions): Promise<void> {
+async function restoreSession(_options: AuthInitOptions): Promise<void> {
   try {
     const currentSession = sessionManager.getCurrentSession();
     
@@ -203,7 +202,7 @@ async function restoreSession(options: AuthInitOptions): Promise<void> {
 /**
  * Validate stored tokens
  */
-async function validateStoredTokens(options: AuthInitOptions): Promise<void> {
+async function validateStoredTokens(_options: AuthInitOptions): Promise<void> {
   try {
     const hasTokens = await tokenManager.isTokenValid();
     
@@ -242,7 +241,7 @@ async function validateStoredTokens(options: AuthInitOptions): Promise<void> {
 export async function configureAuth(newSettings: Partial<AuthSettings>): Promise<void> {
   if (!authSystemState.isInitialized) {
     throw createError(
-      ErrorDomain.CONFIGURATION,
+      ErrorDomain.SYSTEM,
       ErrorSeverity.MEDIUM,
       'Authentication system not initialized'
     );
@@ -250,7 +249,7 @@ export async function configureAuth(newSettings: Partial<AuthSettings>): Promise
 
   if (!authSystemState.settings) {
     throw createError(
-      ErrorDomain.CONFIGURATION,
+      ErrorDomain.SYSTEM,
       ErrorSeverity.MEDIUM,
       'No current settings to update'
     );
@@ -292,10 +291,10 @@ export async function configureAuth(newSettings: Partial<AuthSettings>): Promise
     const validation = validateAuthConfig(updatedSettings);
     if (!validation.isValid) {
       throw createError(
-        ErrorDomain.CONFIGURATION,
+        ErrorDomain.SYSTEM,
         ErrorSeverity.MEDIUM,
         `Invalid configuration update: ${validation.errors.join(', ')}`,
-        { errors: validation.errors }
+        { details: { errors: validation.errors } }
       );
     }
 
@@ -377,7 +376,7 @@ export async function cleanupAuth(): Promise<void> {
 export function ensureAuthInitialized(): void {
   if (!authSystemState.isInitialized) {
     throw createError(
-      ErrorDomain.CONFIGURATION,
+      ErrorDomain.SYSTEM,
       ErrorSeverity.HIGH,
       'Authentication system not initialized. Call initializeAuth() first.'
     );

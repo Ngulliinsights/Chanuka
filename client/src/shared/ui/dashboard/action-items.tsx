@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from "../../design-system";
 
 import { validateActionItem } from "./validation";
 
-export const ActionItems: React.FC<DashboardComponentProps> = ({
+export const ActionItems = React.memo(<DashboardComponentProps> = ({
   className = "",
   config,
   onError,
@@ -309,4 +309,7 @@ export const ActionItems: React.FC<DashboardComponentProps> = ({
       </CardContent>
     </Card>
   );
+);
+
+function 1(
 };

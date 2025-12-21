@@ -3,14 +3,13 @@
  * Following navigation component patterns for hook implementation
  */
 
-import { LoadingStage, LoadingState } from '@client/types';
-import { calculateStageProgress, ProgressTracker } from '@client/shared/ui/loading/utils/progress-utils.ts';
-import { createTimeoutManager } from '@client/shared/ui/loading/utils/timeout-utils.ts';
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-import { LoadingError, LoadingStageError } from '@client/core/error';
-import { validateLoadingStage } from '@client/validation';
-
+import { LoadingError, LoadingStageError } from '../errors';
+import { LoadingStage, LoadingState } from '../types';
+import { calculateStageProgress, ProgressTracker } from '../utils/progress-utils';
+import { createTimeoutManager } from '../utils/timeout-utils';
+import { validateLoadingStage } from '../validation';
 
 export interface UseProgressiveLoadingOptions {
   stages: LoadingStage[];
@@ -60,6 +59,11 @@ export interface UseProgressiveLoadingResult {
   isLastStage: boolean;
 }
 
+interface TimeoutManager {
+  start: () => void;
+  stop: () => void;
+}
+
 export function useProgressiveLoading(options: UseProgressiveLoadingOptions): UseProgressiveLoadingResult {
   const {
     stages,
@@ -81,7 +85,7 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
   const [skippedStages, setSkippedStages] = useState<string[]>([]);
 
   const progressTrackerRef = useRef<ProgressTracker>();
-  const timeoutManagerRef = useRef<any>();
+  const timeoutManagerRef = useRef<TimeoutManager | null>(null);
 
   // Initialize progress tracker
   useEffect(() => {
@@ -102,6 +106,25 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
       onError?.(validationError);
     }
   }, [stages, onError]);
+
+  const failCurrentStage = useCallback((errorInput: Error | string) => {
+    const currentStage = currentStageIndex >= 0 && currentStageIndex < stages.length ? 
+      stages[currentStageIndex] : null;
+
+    if (!currentStage) return;
+
+    const stageError = errorInput instanceof LoadingError ? errorInput : new LoadingStageError(
+      currentStage.id,
+      currentStage.message,
+      typeof errorInput === 'string' ? errorInput : errorInput.message
+    );
+
+    setFailedStages(prev => [...prev, currentStage.id]);
+    setError(stageError);
+    setState('error');
+    onStageError?.(currentStage.id, stageError);
+    onError?.(stageError);
+  }, [currentStageIndex, stages, onStageError, onError]);
 
   // Setup timeout for current stage
   useEffect(() => {
@@ -136,7 +159,7 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
         timeoutManagerRef.current.stop();
       }
     };
-  }, [currentStageIndex, stages, timeout]);
+  }, [currentStageIndex, stages, timeout, failCurrentStage]);
 
   const currentStage: LoadingStage | null = currentStageIndex >= 0 && currentStageIndex < stages.length ? 
     (stages[currentStageIndex] || null) : null;
@@ -197,16 +220,6 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     }
   }, [stages.length]);
 
-  const setStageProgress = useCallback((progress: number) => {
-    const clampedProgress = Math.min(100, Math.max(0, progress));
-    setStageProgressState(clampedProgress);
-    progressTrackerRef.current?.setStageProgress(clampedProgress);
-
-    if (autoAdvance && clampedProgress >= 100 && currentStage) {
-      completeCurrentStage();
-    }
-  }, [autoAdvance, currentStage]);
-
   const completeCurrentStage = useCallback(() => {
     if (!currentStage) return;
 
@@ -221,23 +234,17 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     }
   }, [currentStage, currentStageIndex, stages.length, onStageComplete, nextStage, onComplete]);
 
-  const failCurrentStage = useCallback((errorInput: Error | string) => {
-    if (!currentStage) return;
+  const setStageProgress = useCallback((progress: number) => {
+    const clampedProgress = Math.min(100, Math.max(0, progress));
+    setStageProgressState(clampedProgress);
+    progressTrackerRef.current?.setStageProgress(clampedProgress);
 
-    const stageError = errorInput instanceof LoadingError ? errorInput : new LoadingStageError(
-      currentStage.id,
-      currentStage.message,
-      typeof errorInput === 'string' ? errorInput : errorInput.message
-    );
+    if (autoAdvance && clampedProgress >= 100 && currentStage) {
+      completeCurrentStage();
+    }
+  }, [autoAdvance, currentStage, completeCurrentStage]);
 
-    setFailedStages(prev => [...prev, currentStage.id]);
-    setError(stageError);
-    setState('error');
-    onStageError?.(currentStage.id, stageError);
-    onError?.(stageError);
-  }, [currentStage, onStageError, onError]);
-
-  const skipCurrentStage = useCallback((reason?: string) => {
+  const skipCurrentStage = useCallback((_reason?: string) => {
     if (!currentStage) return;
 
     setSkippedStages(prev => [...prev, currentStage.id]);
@@ -321,16 +328,13 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
 }
 
 /**
- * Hook for managing multiple progressive loading operations
+ * Multi-operation management utilities
+ * 
+ * NOTE: Due to React's Rules of Hooks, we cannot dynamically create hooks in loops.
+ * Instead, use the combineProgressiveLoadings helper to combine multiple hook instances.
  */
 
-export interface UseMultiProgressiveLoadingOptions {
-  operations: Record<string, UseProgressiveLoadingOptions>;
-  onAllComplete?: () => void;
-  onAnyError?: (operationId: string, error: LoadingError) => void;
-}
-
-export interface UseMultiProgressiveLoadingResult {
+export interface MultiProgressiveLoadingResult {
   operations: Record<string, UseProgressiveLoadingResult>;
   overallProgress: number;
   isAnyLoading: boolean;
@@ -339,37 +343,22 @@ export interface UseMultiProgressiveLoadingResult {
   
   startAll: () => void;
   resetAll: () => void;
-  startOperation: (operationId: string) => void;
-  resetOperation: (operationId: string) => void;
 }
 
-export function useMultiProgressiveLoading(
-  options: UseMultiProgressiveLoadingOptions
-): UseMultiProgressiveLoadingResult {
-  const { operations: operationConfigs, onAllComplete, onAnyError } = options;
-  
-  const operations: Record<string, UseProgressiveLoadingResult> = {};
-  
-  // Create individual progressive loading hooks
-  Object.entries(operationConfigs).forEach(([operationId, config]) => {
-    operations[operationId] = useProgressiveLoading({
-      ...config,
-      onComplete: () => {
-        config.onComplete?.();
-        
-        // Check if all operations are complete
-        const allComplete = Object.values(operations).every(op => op.isComplete);
-        if (allComplete) {
-          onAllComplete?.();
-        }
-      },
-      onError: (error) => {
-        config.onError?.(error);
-        onAnyError?.(operationId, error);
-      },
-    });
-  });
-
+/**
+ * Helper function to create multiple progressive loading instances
+ * Usage: Call this at the component level for each operation you need
+ * 
+ * Example:
+ * ```tsx
+ * const operation1 = useProgressiveLoading(config1);
+ * const operation2 = useProgressiveLoading(config2);
+ * const multiOps = combineProgressiveLoadings({ op1: operation1, op2: operation2 });
+ * ```
+ */
+export function combineProgressiveLoadings(
+  operations: Record<string, UseProgressiveLoadingResult>
+): MultiProgressiveLoadingResult {
   const overallProgress = Object.values(operations).length > 0 ?
     Object.values(operations).reduce((sum, op) => sum + op.progress, 0) / Object.values(operations).length :
     0;
@@ -378,21 +367,13 @@ export function useMultiProgressiveLoading(
   const isAllComplete = Object.values(operations).every(op => op.isComplete);
   const hasAnyError = Object.values(operations).some(op => op.state === 'error');
 
-  const startAll = useCallback(() => {
+  const startAll = () => {
     Object.values(operations).forEach(op => op.start());
-  }, [operations]);
+  };
 
-  const resetAll = useCallback(() => {
+  const resetAll = () => {
     Object.values(operations).forEach(op => op.reset());
-  }, [operations]);
-
-  const startOperation = useCallback((operationId: string) => {
-    operations[operationId]?.start();
-  }, [operations]);
-
-  const resetOperation = useCallback((operationId: string) => {
-    operations[operationId]?.reset();
-  }, [operations]);
+  };
 
   return {
     operations,
@@ -400,11 +381,7 @@ export function useMultiProgressiveLoading(
     isAnyLoading,
     isAllComplete,
     hasAnyError,
-    
     startAll,
     resetAll,
-    startOperation,
-    resetOperation,
   };
 }
-

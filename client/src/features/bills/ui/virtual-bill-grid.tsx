@@ -1,3 +1,4 @@
+import React from 'react';
 import { Bill } from '../model/types';
 import { cn } from '@client/lib/utils';
 

@@ -73,7 +73,11 @@ export function SavedSearches({
     try {
       await deleteSavedSearch.mutateAsync(search.id);
     } catch (error) {
-      // Error handling is done in the hook
+      // Error handling is done in the mutation hook
+      // Additional logging for debugging
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to delete saved search:', error);
+      }
     }
   };
 

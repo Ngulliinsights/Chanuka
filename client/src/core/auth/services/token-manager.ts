@@ -7,23 +7,13 @@
  * - All token-related functionality
  */
 
-import { logger } from '../../../utils/logger';
-import { SecureStorage } from '../../storage/secure-storage';
+import { logger } from '@client/utils/logger';
+
 import { createError } from '../../error';
 import { ErrorDomain, ErrorSeverity } from '../../error/constants';
-
-import type { AuthTokens } from '../types';
-
-/**
- * Unified token information interface
- */
-export interface TokenInfo {
-  accessToken: string;
-  refreshToken?: string;
-  expiresAt: Date;
-  tokenType: 'Bearer' | 'Basic';
-  scope?: string[];
-}
+import { SecureStorage } from '../../storage/secure-storage';
+import { TOKEN_KEY, TOKEN_STORAGE_NAMESPACE } from '../constants/auth-constants';
+import type { AuthTokens, TokenInfo } from '../types';
 
 /**
  * TokenManager handles authentication token storage with encryption.
@@ -32,8 +22,8 @@ export interface TokenInfo {
 export class TokenManager {
   private static instance: TokenManager;
   private storage: SecureStorage;
-  private readonly tokenKey = 'auth_tokens';
-  private readonly authNamespace = 'auth';
+  private readonly tokenKey = TOKEN_KEY;
+  private readonly authNamespace = TOKEN_STORAGE_NAMESPACE;
   private currentTokens: TokenInfo | null = null;
 
   private constructor() {
@@ -75,10 +65,10 @@ export class TokenManager {
     } catch (error) {
       logger.error('Failed to store tokens', { error });
       throw createError(
-        ErrorDomain.STORAGE,
+        ErrorDomain.DATABASE,
         ErrorSeverity.HIGH,
         'Failed to store authentication tokens',
-        { tokenInfo, error }
+        { details: { tokenInfo, error } }
       );
     }
   }
@@ -278,7 +268,7 @@ export class TokenManager {
         accessToken: authTokens.accessToken,
         refreshToken: authTokens.refreshToken,
         expiresAt: new Date(Date.now() + authTokens.expiresIn * 1000),
-        tokenType: authTokens.tokenType || 'Bearer',
+        tokenType: (authTokens.tokenType as 'Bearer' | 'Basic') || 'Bearer',
         scope: []
       };
     }

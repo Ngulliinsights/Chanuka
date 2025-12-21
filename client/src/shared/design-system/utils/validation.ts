@@ -259,7 +259,7 @@ export function validateDate(date: Date | string, minDate?: Date, maxDate?: Date
   }
 }
 
-export function validateTableData(data: unknown[], columns: Array<{ key: string; validator?: z.ZodSchema; required?: boolean }>): any[] {
+export function validateTableData(data: unknown[], columns: Array<{ key: string; validator?: z.ZodSchema; required?: boolean }>): unknown[] {
   try {
     const validatedData = TableDataSchema.parse(data);
     

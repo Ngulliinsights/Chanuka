@@ -22,7 +22,7 @@
 
 import React from 'react';
 
-import type { ChartData } from '@/types/mobile';
+import type { ChartData } from '@client/types/mobile';
 
 interface MobileChartCarouselProps {
   charts: ChartData[];

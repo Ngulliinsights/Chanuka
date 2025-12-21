@@ -379,7 +379,7 @@ export const timeoutInterceptor = (defaultTimeout: number = 10000): RequestInter
     }, defaultTimeout);
 
     // Store timeout ID for potential cleanup
-    (controller.signal as any).__timeoutId = timeoutId;
+    (controller.signal as AbortSignal & { __timeoutId?: NodeJS.Timeout }).__timeoutId = timeoutId;
 
     return {
       ...config,
@@ -555,7 +555,7 @@ export const cacheHeaderInterceptor: ResponseInterceptor = (response) => {
     };
 
     // Store metadata on the response object for later use
-    (response as any).__cacheMetadata = metadata;
+    (response as Response & { __cacheMetadata?: typeof metadata }).__cacheMetadata = metadata;
   }
 
   return response;

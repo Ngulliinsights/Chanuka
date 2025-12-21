@@ -14,7 +14,7 @@ interface PretextWatchCardProps {
   onReportIssue: () => void;
 }
 
-export const PretextWatchCard: React.FC<PretextWatchCardProps> = ({
+export const PretextWatchCard = React.memo(<PretextWatchCardProps> = ({
   score,
   onViewDetails,
   onTakeAction,
@@ -145,4 +145,7 @@ export const PretextWatchCard: React.FC<PretextWatchCardProps> = ({
       </CardContent>
     </Card>
   );
+);
+
+function 1(
 };

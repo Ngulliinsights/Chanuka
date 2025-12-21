@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useNavigationPreferences } from "@/core/navigation/hooks";
+import { useNavigationPreferences } from "@client/core/navigation/hooks";
 
 import { Button } from "@client/shared/design-system/interactive/Button.tsx";
 import {
@@ -18,7 +18,7 @@ interface NavigationPreferencesDialogProps {
   trigger: React.ReactNode;
 }
 
-export const NavigationPreferencesDialog: React.FC<
+export const NavigationPreferencesDialog = React.memo(<
   NavigationPreferencesDialogProps
 > = ({ trigger }) => {
   const [open, setOpen] = React.useState(false);
@@ -73,6 +73,9 @@ export const NavigationPreferencesDialog: React.FC<
       </DialogContent>
     </Dialog>
   );
+);
+
+function 1(
 };
 
 export default NavigationPreferencesDialog;

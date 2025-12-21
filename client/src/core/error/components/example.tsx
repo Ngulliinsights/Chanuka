@@ -10,16 +10,19 @@ import React from 'react';
 import { ErrorBoundary, ErrorFallback, RecoveryUI, withErrorBoundary, useErrorBoundary, ErrorFallbackProps } from './index';
 
 // Example 1: Basic Error Boundary with default settings
-export const BasicErrorBoundaryExample: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const BasicErrorBoundaryExample = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ErrorBoundary>
       {children}
     </ErrorBoundary>
   );
+);
+
+function 1(
 };
 
 // Example 2: Error Boundary with inline display mode
-export const InlineErrorBoundaryExample: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const InlineErrorBoundaryExample = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ErrorBoundary
       displayMode="inline"
@@ -38,10 +41,13 @@ export const InlineErrorBoundaryExample: React.FC<{ children: React.ReactNode }>
       {children}
     </ErrorBoundary>
   );
+);
+
+function 1(
 };
 
 // Example 3: Error Boundary with page-level error display
-export const PageErrorBoundaryExample: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PageErrorBoundaryExample = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ErrorBoundary
       displayMode="page"
@@ -53,6 +59,9 @@ export const PageErrorBoundaryExample: React.FC<{ children: React.ReactNode }> =
       {children}
     </ErrorBoundary>
   );
+);
+
+function 1(
 };
 
 // Example 4: Using withErrorBoundary HOC
@@ -71,8 +80,10 @@ export const WrappedComponentExample = withErrorBoundary(
   }
 );
 
+function 1(
+
 // Example 5: Using useErrorBoundary hook in functional component
-export const HookExample: React.FC = () => {
+export const HookExample = React.memo( = () => {
   const { error, hasError, retry, reportError, resetError } = useErrorBoundary();
 
   const throwError = () => {
@@ -108,9 +119,12 @@ export const HookExample: React.FC = () => {
 
   return (
     <div>
-      <button onClick={throwError}>Throw Error</button>
+      <button type="button" onClick={throwError}>Throw Error</button>
     </div>
   );
+);
+
+function 1(
 };
 
 // Example 6: Custom error fallback
@@ -125,15 +139,18 @@ const CustomErrorFallback: React.FC<ErrorFallbackProps> = ({
       <h3>🚨 Custom Error!</h3>
       <p>{error.message}</p>
       <div>
-        {onRetry && <button onClick={onRetry}>Retry</button>}
-        {onReport && <button onClick={onReport}>Report</button>}
-        {onDismiss && <button onClick={onDismiss}>Dismiss</button>}
+        {onRetry && <button type="button" onClick={onRetry}>Retry</button>}
+        {onReport && <button type="button" onClick={onReport}>Report</button>}
+        {onDismiss && <button type="button" onClick={onDismiss}>Dismiss</button>}
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
-export const CustomFallbackExample: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CustomFallbackExample = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ErrorBoundary
       customFallback={CustomErrorFallback}
@@ -142,10 +159,13 @@ export const CustomFallbackExample: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </ErrorBoundary>
   );
+);
+
+function 1(
 };
 
 // Example 7: Error prone component for testing
-export const ErrorProneComponent: React.FC<{ shouldError?: boolean }> = ({ shouldError = false }) => {
+export const ErrorProneComponent = React.memo(<{ shouldError?: boolean }> = ({ shouldError = false }) => {
   if (shouldError) {
     throw new Error('This is a test error for demonstration purposes');
   }
@@ -156,17 +176,20 @@ export const ErrorProneComponent: React.FC<{ shouldError?: boolean }> = ({ shoul
       <p>Set shouldError to true to see the error boundary in action.</p>
     </div>
   );
+);
+
+function 1(
 };
 
 // Example 8: Complete integration example
-export const CompleteExample: React.FC = () => {
+export const CompleteExample = React.memo( = () => {
   const [shouldError, setShouldError] = React.useState(false);
 
   return (
     <div>
       <h2>Unified Error Boundary Examples</h2>
 
-      <button onClick={() => setShouldError(!shouldError)}>
+      <button type="button" onClick={() => setShouldError(!shouldError)}>
         {shouldError ? 'Fix Error' : 'Trigger Error'}
       </button>
 
@@ -181,4 +204,7 @@ export const CompleteExample: React.FC = () => {
       </PageErrorBoundaryExample>
     </div>
   );
+);
+
+function 1(
 };

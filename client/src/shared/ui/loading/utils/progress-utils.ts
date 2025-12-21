@@ -3,9 +3,8 @@
  * Following navigation component patterns for utility organization
  */
 
-import { LoadingProgress, LoadingStage } from '@client/types';
-
-import { validateLoadingProgress } from '@client/validation';
+import { LoadingStage } from '../types';
+// import { validateLoadingProgress } from '../validation';
 
 /**
  * Progress calculation utilities

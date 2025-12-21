@@ -1,25 +1,26 @@
 /**
  * @deprecated This hook is deprecated and will be removed in a future version.
  * Please use `useSafeQuery` for data fetching and `useSafeMutation` for mutations.
- * 
+ *
  * See `use-safe-query.ts` and `use-safe-mutation.ts` for the new, consolidated API.
  */
 
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { globalApiClient } from '@client/core/api/client';
+import type { UnifiedError } from '@client/core/api/types/common';
 import type {
   ApiResponse,
-  UnifiedError,
   RequestOptions
 } from '@client/core/api/types/request';
-import { ErrorDomain, ErrorSeverity } from '@client/core/error';
-import { globalApiClient } from '@client/core/api/client';
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { handleError, ErrorDomain, ErrorSeverity } from '@client/core/error';
 
 export interface UseApiOptions extends Omit<RequestOptions, 'method'> {
   enabled?: boolean;
   refetchOnWindowFocus?: boolean;
   refetchInterval?: number;
   fallbackKey?: string;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: UnifiedError) => void;
 }
 
@@ -35,7 +36,7 @@ export interface UseApiResult<T> {
   clearError: () => void;
 }
 
-export function useApiWithFallback<T = any>(
+export function useApiWithFallback<T = unknown>(
   endpoint: string,
   options: UseApiOptions = {}
 ): UseApiResult<T> {
@@ -53,8 +54,9 @@ export function useApiWithFallback<T = any>(
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
   const isMountedRef = useRef(true);
+  const fetchOptionsRef = useRef(fetchOptions);
 
-  // Update refs when callbacks change, but don't trigger re-fetches
+  // Update refs when values change
   useEffect(() => {
     onSuccessRef.current = onSuccess;
   }, [onSuccess]);
@@ -62,6 +64,10 @@ export function useApiWithFallback<T = any>(
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
+
+  useEffect(() => {
+    fetchOptionsRef.current = fetchOptions;
+  }, [fetchOptions]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -72,12 +78,6 @@ export function useApiWithFallback<T = any>(
       }
     };
   }, []);
-
-  // Memoize fetchOptions to prevent unnecessary re-renders
-  // Only recreate when the actual values change
-  const stableFetchOptions = useMemo(() => fetchOptions, [
-    JSON.stringify(fetchOptions)
-  ]);
 
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<UnifiedError | null>(null);
@@ -111,7 +111,7 @@ export function useApiWithFallback<T = any>(
         : undefined;
 
       const response: ApiResponse<T> = await globalApiClient.get(endpoint, {
-        ...stableFetchOptions,
+        ...fetchOptionsRef.current,
         fallbackData,
         signal: abortControllerRef.current.signal,
       });
@@ -129,25 +129,22 @@ export function useApiWithFallback<T = any>(
         // Fallback data is available even though request failed
         setData(response.data as T | null);
         setFromFallback(true);
-        const error: UnifiedError = {
-          id: crypto.randomUUID(),
-          code: ErrorCode.NETWORK_REQUEST_FAILED,
+        const fetchError = handleError({
+          code: 'NETWORK_ERROR',
           message: response.message || `Request failed with status ${response.status}`,
-          domain: ErrorDomain.NETWORK,
+          type: ErrorDomain.NETWORK,
           severity: ErrorSeverity.MEDIUM,
-          timestamp: new Date().toISOString(),
           recoverable: true,
           retryable: true,
-          reported: false
-        };
-        setError(error);
-        onErrorRef.current?.(error);
+        });
+        setError(fetchError);
+        onErrorRef.current?.(fetchError);
       }
     } catch (err) {
       // Only handle error if we're still mounted and it's not an abort
       if (!isMountedRef.current) return;
 
-      if ((err as any).name === 'AbortError') {
+      if ((err as Error).name === 'AbortError') {
         // Request was cancelled, don't treat as error
         return;
       }
@@ -165,7 +162,7 @@ export function useApiWithFallback<T = any>(
         abortControllerRef.current = null;
       }
     }
-  }, [endpoint, enabled, fallbackKey, stableFetchOptions]);
+  }, [endpoint, enabled, fallbackKey]);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -247,13 +244,13 @@ export function useApiWithFallback<T = any>(
 }
 
 // Hook for mutations (POST, PUT, DELETE)
-export interface UseMutationOptions<TData = any, TVariables = any> extends Omit<RequestOptions, 'method'> {
+export interface UseMutationOptions<TData = unknown, TVariables = unknown> extends Omit<RequestOptions, 'method'> {
   onSuccess?: (data: TData, variables: TVariables) => void;
   onError?: (error: UnifiedError, variables: TVariables) => void;
   onSettled?: (data: TData | null, error: UnifiedError | null, variables: TVariables) => void;
 }
 
-export interface UseMutationResult<TData = any, TVariables = any> {
+export interface UseMutationResult<TData = unknown, TVariables = unknown> {
   mutate: (variables: TVariables) => Promise<void>;
   mutateAsync: (variables: TVariables) => Promise<TData>;
   data: TData | null;
@@ -264,7 +261,7 @@ export interface UseMutationResult<TData = any, TVariables = any> {
   reset: () => void;
 }
 
-export function useMutation<TData = any, TVariables = any>(
+export function useMutation<TData = unknown, TVariables = unknown>(
   mutationFn: (variables: TVariables) => Promise<ApiResponse<TData>>,
   options: UseMutationOptions<TData, TVariables> = {}
 ): UseMutationResult<TData, TVariables> {
@@ -326,17 +323,14 @@ export function useMutation<TData = any, TVariables = any>(
         return response.data;
       } else {
         // Create a unified error from the response
-        const safeError: UnifiedError = {
-          id: crypto.randomUUID(),
-          code: ErrorCode.NETWORK_REQUEST_FAILED,
+        const safeError = handleError({
+          code: 'NETWORK_ERROR',
           message: response.message || `Request failed with status ${response.status}`,
-          domain: ErrorDomain.NETWORK,
+          type: ErrorDomain.NETWORK,
           severity: ErrorSeverity.MEDIUM,
-          timestamp: new Date().toISOString(),
           recoverable: true,
           retryable: true,
-          reported: false
-        };
+        });
         resultError = safeError;
         setError(resultError);
         onErrorRef.current?.(resultError, variables);
@@ -390,14 +384,14 @@ export function useMutation<TData = any, TVariables = any>(
 }
 
 // Specialized hooks for common API patterns
-export function useApiQuery<T = any>(
+export function useApiQuery<T = unknown>(
   endpoint: string,
   options: UseApiOptions = {}
 ): UseApiResult<T> {
   return useApiWithFallback<T>(endpoint, options);
 }
 
-export function useApiPost<TData = any, TVariables = any>(
+export function useApiPost<TData = unknown, TVariables = unknown>(
   endpoint: string,
   options: UseMutationOptions<TData, TVariables> = {}
 ): UseMutationResult<TData, TVariables> {
@@ -407,7 +401,7 @@ export function useApiPost<TData = any, TVariables = any>(
   );
 }
 
-export function useApiPut<TData = any, TVariables = any>(
+export function useApiPut<TData = unknown, TVariables = unknown>(
   endpoint: string,
   options: UseMutationOptions<TData, TVariables> = {}
 ): UseMutationResult<TData, TVariables> {
@@ -417,7 +411,7 @@ export function useApiPut<TData = any, TVariables = any>(
   );
 }
 
-export function useApiDelete<TData = any>(
+export function useApiDelete<TData = unknown>(
   endpoint: string,
   options: UseMutationOptions<TData, void> = {}
 ): UseMutationResult<TData, void> {

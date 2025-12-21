@@ -5,33 +5,50 @@
  * and real-time updates.
  */
 
-import { Bell, Filter, Settings, Archive, Trash2, CheckCheck, X } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Bell, Filter, Settings, Check, X, Trash } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
 
-import { LoadingSpinner } from '@client/core/loading/components/LoadingSpinner';
 import { useNotifications, useNotificationHistory } from '@client/hooks/useNotifications';
-import { NotificationCategory, NotificationType } from '@client/services/notification-service';
-
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import {
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel
-} from '../ui/dropdown-menu';
+} from '@client/shared/design-system';
+import { LoadingSpinner } from '@client/shared/ui/loading';
 
 import { NotificationItem } from './NotificationItem';
-import { NotificationPreferences } from './NotificationPreferences';
-
+import NotificationPreferences from './NotificationPreferences';
 
 interface NotificationCenterProps {
   className?: string;
   maxHeight?: string;
   showPreferences?: boolean;
 }
+
+interface CategoryCounts {
+  community: number;
+  bills: number;
+  expert: number;
+  moderation: number;
+  system: number;
+  security: number;
+  [key: string]: number;
+}
+
+interface CategoryOption {
+  value: string;
+  label: string;
+  count?: number;
+}
+
+type BulkActionType = 'read' | 'delete' | 'archive';
+type ViewType = 'recent' | 'history';
 
 export function NotificationCenter({ 
   className = '', 
@@ -62,29 +79,28 @@ export function NotificationCenter({
 
   const [isOpen, setIsOpen] = useState(false);
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<NotificationCategory | 'all'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedNotifications, setSelectedNotifications] = useState<string[]>([]);
-  const [view, setView] = useState<'recent' | 'history'>('recent');
+  const [view, setView] = useState<ViewType>('recent');
 
   // Load history when switching to history view
   useEffect(() => {
     if (view === 'history') {
       loadHistory({
-        category: selectedCategory === 'all' ? undefined : selectedCategory,
         limit: 50
       });
     }
-  }, [view, selectedCategory, loadHistory]);
+  }, [view, loadHistory]);
 
-  const handleNotificationClick = async (notificationId: string) => {
+  const handleNotificationClick = useCallback(async (notificationId: string) => {
     try {
       await markAsRead(notificationId);
-    } catch (error) {
-      console.error('Failed to mark notification as read:', error);
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err);
     }
-  };
+  }, [markAsRead]);
 
-  const handleBulkAction = async (action: 'read' | 'delete' | 'archive') => {
+  const handleBulkAction = useCallback(async (action: BulkActionType) => {
     if (selectedNotifications.length === 0) return;
 
     try {
@@ -101,40 +117,60 @@ export function NotificationCenter({
           break;
       }
       setSelectedNotifications([]);
-    } catch (error) {
-      console.error(`Failed to ${action} notifications:`, error);
+    } catch (err) {
+      console.error(`Failed to ${action} notifications:`, err);
     }
-  };
+  }, [selectedNotifications, bulkMarkAsRead, bulkDelete, archiveOld]);
 
-  const handleSelectNotification = (notificationId: string, selected: boolean) => {
+  const handleSelectNotification = useCallback((notificationId: string, selected: boolean) => {
     setSelectedNotifications(prev => 
       selected 
         ? [...prev, notificationId]
         : prev.filter(id => id !== notificationId)
     );
-  };
+  }, []);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     const currentNotifications = view === 'recent' ? notifications : history;
     const allIds = currentNotifications.map(n => n.id);
     setSelectedNotifications(
       selectedNotifications.length === allIds.length ? [] : allIds
     );
-  };
+  }, [view, notifications, history, selectedNotifications.length]);
 
   const filteredNotifications = (view === 'recent' ? notifications : history).filter(
     notification => selectedCategory === 'all' || notification.category === selectedCategory
   );
 
-  const categoryOptions: Array<{ value: NotificationCategory | 'all'; label: string; count?: number }> = [
-    { value: 'all', label: 'All', count: Object.values(categories).reduce((sum, count) => sum + count, 0) },
-    { value: 'community', label: 'Community', count: categories.community },
-    { value: 'bills', label: 'Bills', count: categories.bills },
-    { value: 'expert', label: 'Expert', count: categories.expert },
-    { value: 'moderation', label: 'Moderation', count: categories.moderation },
-    { value: 'system', label: 'System', count: categories.system },
-    { value: 'security', label: 'Security', count: categories.security }
+  // Create extended categories with proper typing
+  const extendedCategories: CategoryCounts = {
+    community: (categories as Partial<CategoryCounts>).community ?? 0,
+    bills: (categories as Partial<CategoryCounts>).bills ?? 0,
+    expert: (categories as Partial<CategoryCounts>).expert ?? 0,
+    moderation: (categories as Partial<CategoryCounts>).moderation ?? 0,
+    system: (categories as Partial<CategoryCounts>).system ?? 0,
+    security: (categories as Partial<CategoryCounts>).security ?? 0
+  };
+
+  const totalCount = Object.values(extendedCategories).reduce((sum, count) => sum + count, 0);
+
+  const categoryOptions: CategoryOption[] = [
+    { value: 'all', label: 'All', count: totalCount },
+    { value: 'community', label: 'Community', count: extendedCategories.community },
+    { value: 'bills', label: 'Bills', count: extendedCategories.bills },
+    { value: 'expert', label: 'Expert', count: extendedCategories.expert },
+    { value: 'moderation', label: 'Moderation', count: extendedCategories.moderation },
+    { value: 'system', label: 'System', count: extendedCategories.system },
+    { value: 'security', label: 'Security', count: extendedCategories.security }
   ];
+
+  const handleLoadMore = useCallback(() => {
+    loadMore({});
+  }, [loadMore]);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+  }, []);
 
   return (
     <div className={`relative ${className}`}>
@@ -160,7 +196,7 @@ export function NotificationCenter({
       {/* Notification Panel */}
       {isOpen && (
         <div 
-          className="absolute right-0 top-full mt-2 w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+          className={`absolute right-0 top-full mt-2 w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden`}
           style={{ maxHeight }}
         >
           {/* Header */}
@@ -180,7 +216,7 @@ export function NotificationCenter({
               {/* View Toggle */}
               <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1">
                 <Button
-                  variant={view === 'recent' ? 'default' : 'ghost'}
+                  variant={view === 'recent' ? 'secondary' : 'ghost'}
                   size="sm"
                   className="text-xs px-2 py-1"
                   onClick={() => setView('recent')}
@@ -188,7 +224,7 @@ export function NotificationCenter({
                   Recent
                 </Button>
                 <Button
-                  variant={view === 'history' ? 'default' : 'ghost'}
+                  variant={view === 'history' ? 'secondary' : 'ghost'}
                   size="sm"
                   className="text-xs px-2 py-1"
                   onClick={() => setView('history')}
@@ -200,18 +236,17 @@ export function NotificationCenter({
               {/* Actions Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-1">
+                  <Button variant="ghost" size="sm" className="p-1" aria-label="Settings">
                     <Settings className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuItem onClick={() => markAllAsRead()}>
-                    <CheckCheck className="h-4 w-4 mr-2" />
+                    <Check className="h-4 w-4 mr-2" />
                     Mark all as read
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleBulkAction('archive')}>
-                    <Archive className="h-4 w-4 mr-2" />
                     Archive old
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -231,7 +266,8 @@ export function NotificationCenter({
                 variant="ghost"
                 size="sm"
                 className="p-1"
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
+                aria-label="Close notifications"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -249,7 +285,7 @@ export function NotificationCenter({
               {categoryOptions.map(option => (
                 <Button
                   key={option.value}
-                  variant={selectedCategory === option.value ? 'default' : 'outline'}
+                  variant={selectedCategory === option.value ? 'secondary' : 'outline'}
                   size="sm"
                   className="text-xs px-2 py-1"
                   onClick={() => setSelectedCategory(option.value)}
@@ -286,8 +322,9 @@ export function NotificationCenter({
                     size="sm"
                     className="text-xs px-2 py-1"
                     onClick={() => handleBulkAction('delete')}
+                    aria-label="Delete selected"
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash className="h-3 w-3" />
                   </Button>
                   <Button
                     variant="outline"
@@ -312,6 +349,7 @@ export function NotificationCenter({
                   size="sm"
                   className="p-1"
                   onClick={clearError}
+                  aria-label="Dismiss error"
                 >
                   <X className="h-3 w-3" />
                 </Button>
@@ -359,7 +397,7 @@ export function NotificationCenter({
                 variant="outline"
                 size="sm"
                 className="w-full"
-                onClick={() => loadMore({ category: selectedCategory === 'all' ? undefined : selectedCategory })}
+                onClick={handleLoadMore}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -378,17 +416,15 @@ export function NotificationCenter({
 
       {/* Preferences Modal */}
       {showPreferencesModal && (
-        <NotificationPreferences
-          isOpen={showPreferencesModal}
-          onClose={() => setShowPreferencesModal(false)}
-        />
+        <NotificationPreferences />
       )}
 
       {/* Click outside to close */}
       {isOpen && (
         <div
           className="fixed inset-0 z-40"
-          onClick={() => setIsOpen(false)}
+          onClick={handleClose}
+          aria-hidden="true"
         />
       )}
     </div>

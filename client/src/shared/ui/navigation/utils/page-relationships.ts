@@ -51,7 +51,7 @@ export const calculateRelevanceScore = (
   relationship: { type: string; weight: number; context: string },
   user_role: UserRole,
   preferences: any,
-  user: any | null,
+  user: unknown | null,
   allowedRoles?: UserRole[]
 ): number => {
   try {
@@ -98,7 +98,7 @@ export const calculateRelevanceScore = (
 export const getPageRelationships = (
   currentPath: string,
   user_role: UserRole,
-  user: any | null,
+  user: unknown | null,
   preferences: any
 ): RelatedPage[] => {
   try {
@@ -148,7 +148,7 @@ export const getPageRelationships = (
 export const generateBreadcrumbRelationships = (
   currentPath: string,
   user_role: UserRole,
-  user: any | null
+  user: unknown | null
 ): RelatedPage[] => {
   try {
     // Validate inputs

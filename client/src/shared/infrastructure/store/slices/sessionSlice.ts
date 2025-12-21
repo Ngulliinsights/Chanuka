@@ -8,7 +8,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
-import { authApiService } from '@client/core/api';
+import { authApiService } from '@client/core/auth';
 import { SessionInfo } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
@@ -408,7 +408,7 @@ export const checkConcurrentSessions = createAsyncThunk(
         throw new Error('Request cancelled');
       }
 
-      const otherSessions = sessions.filter(s => !s.current);
+      const otherSessions = sessions.filter((s: SessionInfo) => !s.current);
 
       if (otherSessions.length > 0) {
         const warning: SessionWarning = {

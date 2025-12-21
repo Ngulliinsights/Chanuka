@@ -6,7 +6,7 @@
 
 import { logger } from '../../utils/logger';
 
-import type { UnifiedApiClient } from './types';
+import type { UnifiedApiClient, PrivacySettings, DataExportResponse, DataDeletionResponse, UnknownError, AxiosErrorResponse } from './types';
 
 // ============================================================================
 // Core Authentication Types
@@ -428,7 +428,7 @@ export class AuthApiService {
    * @param settings - Privacy settings to update
    * @throws Error if update fails
    */
-  async updatePrivacySettings(settings: any): Promise<void> {
+  async updatePrivacySettings(settings: PrivacySettings): Promise<void> {
     try {
       await this.apiClient.post(
         `${this.authEndpoint}/privacy-settings`,
@@ -449,7 +449,7 @@ export class AuthApiService {
    * @returns Data export request details
    * @throws Error if request fails
    */
-  async requestDataExport(): Promise<any> {
+  async requestDataExport(): Promise<DataExportResponse> {
     try {
       const response = await this.apiClient.post(
         `${this.authEndpoint}/data-export`,
@@ -471,7 +471,7 @@ export class AuthApiService {
    * @returns Data deletion request details
    * @throws Error if request fails
    */
-  async requestDataDeletion(): Promise<any> {
+  async requestDataDeletion(): Promise<DataDeletionResponse> {
     try {
       const response = await this.apiClient.post(
         `${this.authEndpoint}/data-deletion`,
@@ -1008,12 +1008,14 @@ export class AuthApiService {
    * @param defaultMessage - Default message if error details unavailable
    * @returns Error object with user-friendly message
    */
-  private async handleAuthError(error: any, defaultMessage: string): Promise<Error> {
+  private async handleAuthError(error: unknown, defaultMessage: string): Promise<Error> {
+    const errorResponse = error as UnknownError;
+    
     // Extract error message from various possible error structures
     const errorMessage =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
+      (errorResponse as AxiosErrorResponse)?.response?.data?.message ||
+      (errorResponse as AxiosErrorResponse)?.response?.data?.error ||
+      (errorResponse as Error)?.message ||
       defaultMessage;
 
     const authError = new Error(errorMessage);
@@ -1022,8 +1024,8 @@ export class AuthApiService {
     logger.error('Authentication error', {
       component: 'AuthApiService',
       operation: 'authentication',
-      status: error?.response?.status,
-      endpoint: error?.config?.url,
+      status: (errorResponse as AxiosErrorResponse)?.response?.status,
+      endpoint: (errorResponse as AxiosErrorResponse)?.config?.url,
       error: errorMessage
     });
 

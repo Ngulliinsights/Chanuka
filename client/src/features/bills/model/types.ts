@@ -1,5 +1,5 @@
 // Bills feature types
-import { Bill, Comment } from '../../../types';
+import { Bill, Comment } from '@client/types';
 
 export interface Sponsor {
   id: string;

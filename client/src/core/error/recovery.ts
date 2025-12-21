@@ -41,7 +41,7 @@ export const cacheClearStrategy: ErrorRecoveryStrategy = {
   canRecover: (error) =>
     error.severity === ErrorSeverity.CRITICAL &&
     error.recoverable,
-  recover: async (error) => {
+  recover: async (_error) => {
     try {
       // Clear all caches
       if ('caches' in window) {
@@ -86,7 +86,7 @@ export const pageReloadStrategy: ErrorRecoveryStrategy = {
   canRecover: (error) =>
     error.severity >= ErrorSeverity.HIGH &&
     error.recoverable,
-  recover: async (error) => {
+  recover: async (_error) => {
     setTimeout(() => window.location.reload(), 1000);
     return true;
   },
@@ -103,11 +103,11 @@ export const authRefreshStrategy: ErrorRecoveryStrategy = {
   canRecover: (error) =>
     error.type === ErrorDomain.AUTHENTICATION &&
     error.recoverable,
-  recover: async (error) => {
+  recover: async (_error) => {
     try {
       // Check for refresh token
       const refreshToken = localStorage.getItem('refresh_token') ||
-                           sessionStorage.getItem('refresh_token');
+        sessionStorage.getItem('refresh_token');
 
       if (!refreshToken) {
         // No refresh token available, redirect to login
@@ -155,7 +155,7 @@ export const authRetryStrategy: ErrorRecoveryStrategy = {
   description: 'Retry request after authentication refresh',
   canRecover: (error) => {
     const errorMessage = error.message?.toLowerCase() || '';
-    const statusCode = (error as any).status || (error as any).statusCode;
+    const statusCode = (error as { status?: number; statusCode?: number }).status || (error as { status?: number; statusCode?: number }).statusCode;
     const retryCount = error.retryCount || 0;
 
     return (
@@ -167,7 +167,7 @@ export const authRetryStrategy: ErrorRecoveryStrategy = {
       )
     );
   },
-  recover: async (error) => {
+  recover: async (_error) => {
     // Wait a bit for potential auth refresh to complete
     await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -187,7 +187,7 @@ export const authLogoutStrategy: ErrorRecoveryStrategy = {
   description: 'Logout user when authentication cannot be recovered',
   canRecover: (error) => {
     const errorMessage = error.message?.toLowerCase() || '';
-    const statusCode = (error as any).status || (error as any).statusCode;
+    const statusCode = (error as { status?: number; statusCode?: number }).status || (error as { status?: number; statusCode?: number }).statusCode;
     const retryCount = error.retryCount || 0;
 
     return (
@@ -199,7 +199,7 @@ export const authLogoutStrategy: ErrorRecoveryStrategy = {
       )
     );
   },
-  recover: async (error) => {
+  recover: async (_error) => {
     try {
       // Perform logout
       // Clear tokens
@@ -246,7 +246,7 @@ export const cacheFallbackStrategy: ErrorRecoveryStrategy = {
       !navigator.onLine
     );
   },
-  recover: async (error) => {
+  recover: async (_error) => {
     try {
       // Check if service worker is available and can serve cached content
       if ('serviceWorker' in navigator && 'caches' in window) {
@@ -305,7 +305,7 @@ export const cacheRecoveryStrategy: ErrorRecoveryStrategy = {
       errorMessage.includes('server error')
     );
   },
-  recover: async (error) => {
+  recover: async (_error) => {
     try {
       // Implement stale-while-revalidate pattern
       if ('caches' in window) {
@@ -344,8 +344,8 @@ export const gracefulDegradationStrategy: ErrorRecoveryStrategy = {
   id: 'graceful-degradation',
   name: 'Graceful Degradation',
   description: 'Enable offline mode or reduced functionality',
-  canRecover: (error) => true, // Always available as last resort
-  recover: async (error) => {
+  canRecover: (_error) => true, // Always available as last resort
+  recover: async (_error) => {
     try {
       // Enable offline mode or reduced functionality
       if ('serviceWorker' in navigator) {
@@ -390,7 +390,7 @@ export const offlineModeStrategy: ErrorRecoveryStrategy = {
       errorMessage.includes('connection')
     );
   },
-  recover: async (error) => {
+  recover: async (_error) => {
     try {
       // Attempt to enable offline mode
       // Check if we have cached data available
@@ -431,7 +431,7 @@ export const reducedFunctionalityStrategy: ErrorRecoveryStrategy = {
       (error.retryCount || 0) > 2
     );
   },
-  recover: async (error) => {
+  recover: async (_error) => {
     try {
       // Disable non-essential features
       document.documentElement.classList.add('reduced-functionality');
@@ -457,7 +457,7 @@ export const connectionAwareRetryStrategy: ErrorRecoveryStrategy = {
   description: 'Extended retry for slow or unstable connections',
   canRecover: (error) => {
     const errorMessage = error.message?.toLowerCase() || '';
-    const connectionType = ('connection' in navigator) ? (navigator as any).connection?.effectiveType : 'unknown';
+    const connectionType = ('connection' in navigator) ? (navigator as { connection?: { effectiveType?: string } }).connection?.effectiveType : 'unknown';
     const retryCount = error.retryCount || 0;
 
     return (
@@ -470,14 +470,14 @@ export const connectionAwareRetryStrategy: ErrorRecoveryStrategy = {
       )
     );
   },
-  recover: async (error) => {
+  recover: async (_error) => {
     // Wait longer on slow connections
     const waitTime = 5000;
     await new Promise(resolve => setTimeout(resolve, waitTime));
 
     // Check if connection has improved
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as { connection?: { effectiveType?: string } }).connection;
       const effectiveType = connection?.effectiveType;
       // Consider 4g or faster as "improved"
       return effectiveType === '4g' || effectiveType === '5g' || !connection;
@@ -495,11 +495,11 @@ export const connectionAwareRetryStrategy: ErrorRecoveryStrategy = {
 /**
  * Execute a recovery action
  */
-export async function executeRecovery(errorId: string, action: RecoveryAction): Promise<RecoveryResult> {
+export async function executeRecovery(_errorId: string, action: RecoveryAction): Promise<RecoveryResult> {
   try {
     switch (action) {
       case RecoveryAction.RETRY:
-        return await performRetry(errorId);
+        return await performRetry(_errorId);
 
       case RecoveryAction.CACHE_CLEAR:
         return await performCacheClear();
@@ -530,7 +530,7 @@ export async function executeRecovery(errorId: string, action: RecoveryAction): 
 /**
  * Perform a retry operation
  */
-async function performRetry(errorId: string): Promise<RecoveryResult> {
+async function performRetry(_errorId: string): Promise<RecoveryResult> {
   // For retry operations, we don't need to access the error directly
   // The retry logic should be handled by the calling code
   // This function just implements the backoff delay
@@ -673,31 +673,40 @@ export function useRecovery() {
 /**
  * Check if an error is recoverable
  */
-export function isRecoverable(error: any): boolean {
+export function isRecoverable(error: unknown): boolean {
   if (!error) return false;
 
-  // Check if it's an AppError with recovery flags
-  if (error.recoverable !== undefined) {
-    return error.recoverable;
-  }
+  // Type guard to check if error is an object with expected properties
+  if (typeof error === 'object' && error !== null) {
+    const errorObj = error as {
+      recoverable?: boolean;
+      type?: string;
+      severity?: string;
+    };
 
-  // Check error type and severity for default recoverability
-  const errorType = error.type || ErrorDomain.UNKNOWN;
-  const errorSeverity = error.severity || ErrorSeverity.MEDIUM;
+    // Check if it's an AppError with recovery flags
+    if (errorObj.recoverable !== undefined) {
+      return errorObj.recoverable;
+    }
 
-  // Network errors are generally recoverable
-  if (errorType === ErrorDomain.NETWORK) {
-    return true;
-  }
+    // Check error type and severity for default recoverability
+    const errorType = errorObj.type || ErrorDomain.UNKNOWN;
+    const errorSeverity = errorObj.severity || ErrorSeverity.MEDIUM;
 
-  // High severity errors are generally not recoverable
-  if (errorSeverity >= ErrorSeverity.CRITICAL) {
-    return false;
-  }
+    // Network errors are generally recoverable
+    if (errorType === ErrorDomain.NETWORK) {
+      return true;
+    }
 
-  // Authentication errors are recoverable
-  if (errorType === ErrorDomain.AUTHENTICATION) {
-    return true;
+    // High severity errors are generally not recoverable
+    if (errorSeverity >= ErrorSeverity.CRITICAL) {
+      return false;
+    }
+
+    // Authentication errors are recoverable
+    if (errorType === ErrorDomain.AUTHENTICATION) {
+      return true;
+    }
   }
 
   return false;

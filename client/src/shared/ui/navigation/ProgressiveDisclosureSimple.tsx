@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Clock, MapPin, Menu, CheckCircle, Circle, ArrowRight, BookOpen, Target } from 'lucide-react';
+import { ChevronDown, ChevronRight, Clock, MapPin, MenuIcon as Menu, CheckCircle, Circle, ArrowRight, BookOpenIcon as BookOpen, Target } from 'lucide-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 // Enhanced types for progressive disclosure

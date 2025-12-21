@@ -41,6 +41,9 @@ export const FONT_STACKS: Record<string, FontFallbackConfig> = {
     fallbacks: ['Inter', 'SF Pro Display', 'system-ui'],
     generic: 'sans-serif',
   },
+);
+
+function 1(
 };
 
 /**
@@ -64,7 +67,7 @@ export interface FontFallbackProps {
   enableSwap?: boolean;
 }
 
-export const FontFallback: React.FC<FontFallbackProps> = ({
+export const FontFallback = React.memo(<FontFallbackProps> = ({
   fontFamily,
   children,
   className,
@@ -155,6 +158,9 @@ export const FontFallback: React.FC<FontFallbackProps> = ({
       {children}
     </div>
   );
+);
+
+function 1(
 };
 
 /**

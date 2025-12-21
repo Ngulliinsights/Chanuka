@@ -256,7 +256,7 @@ class ErrorAnalyticsBridge {
   /**
    * Filter errors based on dashboard filters
    */
-  private filterErrors(errors: any[], filters: DashboardFilters): any[] {
+  private filterErrors(errors: unknown[], filters: DashboardFilters): unknown[] {
     return errors.filter(error => {
       // Time range filter
       if (error.timestamp < filters.timeRange.start || error.timestamp > filters.timeRange.end) {
@@ -295,7 +295,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate error rate for time range
    */
-  private calculateErrorRate(errors: any[], timeRange: TimeRange): number {
+  private calculateErrorRate(errors: unknown[], timeRange: TimeRange): number {
     const durationMs = timeRange.end - timeRange.start;
     const durationMinutes = durationMs / (60 * 1000);
     return durationMinutes > 0 ? errors.length / durationMinutes : 0;
@@ -304,7 +304,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate current error rate (last 5 minutes)
    */
-  private calculateCurrentErrorRate(errors: any[]): number {
+  private calculateCurrentErrorRate(errors: unknown[]): number {
     const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
     const recentErrors = errors.filter(e => e.timestamp > fiveMinutesAgo);
     return recentErrors.length / 5; // per minute
@@ -313,7 +313,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate unique errors
    */
-  private calculateUniqueErrors(errors: any[]): number {
+  private calculateUniqueErrors(errors: unknown[]): number {
     const messages = new Set(errors.map(e => e.message));
     return messages.size;
   }
@@ -321,7 +321,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate affected users
    */
-  private calculateAffectedUsers(errors: any[]): number {
+  private calculateAffectedUsers(errors: unknown[]): number {
     const users = new Set(errors.map(e => e.context?.userId).filter(Boolean));
     return users.size;
   }
@@ -329,7 +329,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate average resolution time
    */
-  private calculateAverageResolutionTime(errors: any[]): number {
+  private calculateAverageResolutionTime(errors: unknown[]): number {
     const resolvedErrors = errors.filter(e => e.recovered && e.recoveryTime);
     if (resolvedErrors.length === 0) return 0;
 
@@ -340,7 +340,7 @@ class ErrorAnalyticsBridge {
   /**
    * Build severity distribution
    */
-  private buildSeverityDistribution(errors: any[]): Record<string, number> {
+  private buildSeverityDistribution(errors: unknown[]): Record<string, number> {
     const distribution = {
       [ErrorSeverity.CRITICAL]: 0,
       [ErrorSeverity.HIGH]: 0,
@@ -360,7 +360,7 @@ class ErrorAnalyticsBridge {
   /**
    * Build domain distribution
    */
-  private buildDomainDistribution(errors: any[]): Record<string, number> {
+  private buildDomainDistribution(errors: unknown[]): Record<string, number> {
     const distribution = {
       [ErrorDomain.NETWORK]: 0,
       [ErrorDomain.AUTHENTICATION]: 0,
@@ -381,9 +381,9 @@ class ErrorAnalyticsBridge {
   /**
    * Build time series data
    */
-  private buildTimeSeries(errors: any[], period: string, filters: DashboardFilters): any[] {
+  private buildTimeSeries(errors: unknown[], period: string, filters: DashboardFilters): unknown[] {
     const intervalMs = this.getIntervalMs(period);
-    const intervals: { [key: number]: any[] } = {};
+    const intervals: { [key: number]: unknown[] } = {};
 
     errors.forEach(error => {
       const interval = Math.floor(error.timestamp / intervalMs) * intervalMs;
@@ -419,7 +419,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate growth rate from time series
    */
-  private calculateGrowthRate(timeSeries: any[]): number {
+  private calculateGrowthRate(timeSeries: unknown[]): number {
     if (timeSeries.length < 2) return 0;
 
     const recent = timeSeries.slice(-10);
@@ -434,7 +434,7 @@ class ErrorAnalyticsBridge {
   /**
    * Detect seasonality in time series
    */
-  private detectSeasonality(timeSeries: any[]): any {
+  private detectSeasonality(timeSeries: unknown[]): any {
     // Simple seasonality detection - in real implementation would use statistical analysis
     return {
       detected: false,
@@ -447,7 +447,7 @@ class ErrorAnalyticsBridge {
   /**
    * Detect anomalies in time series
    */
-  private detectAnomalies(timeSeries: any[]): any[] {
+  private detectAnomalies(timeSeries: unknown[]): unknown[] {
     if (timeSeries.length < 10) return [];
 
     const values = timeSeries.map(p => p.totalErrors);
@@ -469,7 +469,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate trend projections
    */
-  private calculateProjections(timeSeries: any[]): any {
+  private calculateProjections(timeSeries: unknown[]): any {
     if (timeSeries.length < 5) return { nextHour: 0, nextDay: 0, nextWeek: 0, confidence: 0 };
 
     const recent = timeSeries.slice(-5);
@@ -491,8 +491,8 @@ class ErrorAnalyticsBridge {
   /**
    * Detect error patterns
    */
-  private detectErrorPatterns(errors: any[], filters: DashboardFilters): ErrorPattern[] {
-    const patternMap: { [key: string]: any[] } = {};
+  private detectErrorPatterns(errors: unknown[], filters: DashboardFilters): ErrorPattern[] {
+    const patternMap: { [key: string]: unknown[] } = {};
 
     errors.forEach(error => {
       const key = `${error.message}-${error.context?.component || 'unknown'}`;
@@ -567,8 +567,8 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate strategy effectiveness
    */
-  private calculateStrategyEffectiveness(recoveredErrors: any[]): any[] {
-    const strategies: { [key: string]: any[] } = {};
+  private calculateStrategyEffectiveness(recoveredErrors: unknown[]): unknown[] {
+    const strategies: { [key: string]: unknown[] } = {};
 
     recoveredErrors.forEach(error => {
       const strategy = error.recoveryStrategy || 'manual';
@@ -590,7 +590,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate recovery time distribution
    */
-  private calculateRecoveryTimeDistribution(recoveredErrors: any[]): any {
+  private calculateRecoveryTimeDistribution(recoveredErrors: unknown[]): any {
     const times = recoveredErrors.map(e => e.recoveryTime || 300000).sort((a, b) => a - b);
 
     return {
@@ -606,7 +606,7 @@ class ErrorAnalyticsBridge {
   /**
    * Calculate recovery failures
    */
-  private calculateRecoveryFailures(failedErrors: any[]): any[] {
+  private calculateRecoveryFailures(failedErrors: unknown[]): unknown[] {
     return failedErrors.slice(0, 10).map(error => ({
       strategyId: error.recoveryStrategy || 'none',
       errorId: error.id,
@@ -620,7 +620,7 @@ class ErrorAnalyticsBridge {
   /**
    * Generate active alerts
    */
-  private generateActiveAlerts(recentErrors: any[]): any[] {
+  private generateActiveAlerts(recentErrors: unknown[]): unknown[] {
     const alerts = [];
 
     // High error rate alert

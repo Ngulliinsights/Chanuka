@@ -43,8 +43,11 @@ declare module 'lucide-react' {
    */
   export const Activity: FC<IconProps>;
   export const AlertTriangle: FC<IconProps>;
+  export const Award: FC<IconProps>;
   export const BarChart3: FC<IconProps>;
   export const Bell: FC<IconProps>;
+  export const Book: FC<IconProps>;
+  export const BookOpen: FC<IconProps>;
   export const Calendar: FC<IconProps>;
   export const CheckCircle: FC<IconProps>;
   export const Clock: FC<IconProps>;
@@ -57,9 +60,26 @@ declare module 'lucide-react' {
   export const Search: FC<IconProps>;
   export const Send: FC<IconProps>;
   export const Shield: FC<IconProps>;
+  export const Sparkles: FC<IconProps>;
   export const Star: FC<IconProps>;
   export const Target: FC<IconProps>;
   export const ThumbsUp: FC<IconProps>;
   export const TrendingUp: FC<IconProps>;
   export const Users: FC<IconProps>;
+  export const Trophy: FC<IconProps>;
+  export const X: FC<IconProps>;
+  export const Zap: FC<IconProps>;
+  export const Flame: FC<IconProps>;
+}
+
+declare module 'lucide-react/Sparkles' {
+ import type { FC } from 'react';
+ const Sparkles: FC<IconProps>;
+ export default Sparkles;
+}
+
+declare module 'lucide-react/BookOpen' {
+ import type { FC } from 'react';
+ const BookOpen: FC<IconProps>;
+ export default BookOpen;
 }

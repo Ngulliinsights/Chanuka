@@ -1,5 +1,6 @@
-import { Loader2 } from 'lucide-react';
 import React from 'react';
+import { Loader2 } from 'lucide-react';
+
 
 interface LoadingStateManagerProps {
   type: 'page' | 'component' | 'data';
@@ -108,7 +109,7 @@ export function LoadingStateManager({
   );
 }
 
-export function PageLoader({ size = 'lg', message = 'Loading page...' }: { size?: 'sm' | 'md' | 'lg', message?: string }) {
+export function PageLoader({ message = 'Loading page...' }: { size?: 'sm' | 'md' | 'lg', message?: string }) {
   return (
     <LoadingStateManager
       type="page"
@@ -119,7 +120,7 @@ export function PageLoader({ size = 'lg', message = 'Loading page...' }: { size?
   );
 }
 
-export function ComponentLoader({ size = 'md', message = 'Loading component...' }: { size?: 'sm' | 'md' | 'lg', message?: string }) {
+export function ComponentLoader({ message = 'Loading component...' }: { size?: 'sm' | 'md' | 'lg', message?: string }) {
   return (
     <LoadingStateManager
       type="component"
@@ -130,7 +131,7 @@ export function ComponentLoader({ size = 'md', message = 'Loading component...' 
   );
 }
 
-export function ConnectionAwareLoader({ size = 'md', message = 'Connecting...', showMessage = true }: { size?: 'sm' | 'md' | 'lg', message?: string, showMessage?: boolean }) {
+export function ConnectionAwareLoader({ message = 'Connecting...', showMessage = true }: { size?: 'sm' | 'md' | 'lg', message?: string, showMessage?: boolean }) {
   return (
     <LoadingStateManager
       type="data"

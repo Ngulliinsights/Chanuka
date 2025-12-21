@@ -1,3 +1,4 @@
+import React from 'react';
 import { useToast } from '@client/hooks/use-toast'
 import { logger } from '@client/utils/logger';
 

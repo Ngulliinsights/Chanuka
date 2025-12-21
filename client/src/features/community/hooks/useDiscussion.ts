@@ -13,15 +13,15 @@
 
 import { useMemo } from 'react';
 
-import { useUnifiedDiscussion } from '../../../core/community/hooks/useUnifiedDiscussion';
-import type { ViolationType } from '../../../core/community/types';
+import { useUnifiedDiscussion } from '@client/core/community/hooks/useUnifiedDiscussion';
+import type { ViolationType } from '@client/core/community/types';
 import type {
   Comment,
   DiscussionThread,
   CommentFormData,
   ModerationViolationType,
   TypingIndicator
-} from '../../../types/community';
+} from '@client/types/community';
 interface UseDiscussionOptions {
   billId: number;
   autoSubscribe?: boolean;

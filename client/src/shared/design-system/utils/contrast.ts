@@ -177,7 +177,7 @@ export function validateThemeContrast(theme: Record<string, any>): {
     level: 'AA' | 'AAA' | 'FAIL';
   }>;
 } {
-  const issues: any[] = [];
+  const issues: unknown[] = [];
   
   // Common color combinations to check
   const combinations = [

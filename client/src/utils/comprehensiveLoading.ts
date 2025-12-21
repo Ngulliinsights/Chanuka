@@ -1,4 +1,4 @@
-import { LoadingOperation } from '@client/core/loading/types';
+import { LoadingOperation } from '@client/shared/ui/loading';
 
 // Utility functions for comprehensive loading management
 
@@ -400,16 +400,15 @@ export function createOperationFromScenario(
     id: `${scenario.id}-${instanceId}`,
     type: scenario.id.includes('page') ? 'page' : 
           scenario.id.includes('component') ? 'component' :
-          scenario.id.includes('api') ? 'api' : 'asset',
+          scenario.id.includes('api') ? 'network-aware' : 'inline',
     message: scenario.description,
     priority: scenario.priority,
     timeout: adjustedTimeout,
     maxRetries: scenario.maxRetries,
     connectionAware: scenario.connectionAware,
     stage: stageId,
-    // include retry policy details expected by LoadingOperation shape
-    retryStrategy: scenario.retryStrategy,
-    retryDelay: calculateRetryDelay(0, scenario.retryStrategy),
+    // retryStrategy removed - not part of LoadingOperation interface
+    // retryDelay removed - not part of LoadingOperation interface
   };
 }
 

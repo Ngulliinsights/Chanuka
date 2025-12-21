@@ -3,7 +3,7 @@
  * Handles offline functionality, data synchronization, and network status
  */
 
-import { Network, Database, RefreshCw } from 'lucide-react';
+import { Network } from 'lucide-react';
 import React, { 
   createContext, 
   useContext, 
@@ -16,16 +16,26 @@ import React, {
 import { logger } from '@client/utils/logger';
 
 interface OfflineData {
-  bills: any[];
-  user: any;
-  preferences: any;
+  bills: Array<{
+    id: number;
+    title: string;
+    status: string;
+    summary?: string;
+  }>;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    preferences: Record<string, unknown>;
+  } | null;
+  preferences: Record<string, unknown>;
   lastSync: number;
 }
 
 interface PendingAction {
   id: string;
   type: string;
-  data: any;
+  data: Record<string, unknown>;
   timestamp: number;
   retryCount: number;
 }
@@ -35,10 +45,10 @@ interface OfflineContextType {
   isServiceWorkerReady: boolean;
   offlineData: OfflineData | null;
   pendingActions: PendingAction[];
-  addPendingAction: (type: string, data: any) => void;
+  addPendingAction: (type: string, data: Record<string, unknown>) => void;
   syncPendingActions: () => Promise<void>;
-  cacheData: (key: keyof OfflineData, data: any) => void;
-  getCachedData: (key: keyof OfflineData) => any;
+  cacheData: (key: keyof OfflineData, data: OfflineData[keyof OfflineData]) => void;
+  getCachedData: (key: keyof OfflineData) => OfflineData[keyof OfflineData] | null;
   clearOfflineData: () => void;
 }
 
@@ -54,6 +64,111 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
   const [offlineData, setOfflineData] = useState<OfflineData | null>(null);
   const [pendingActions, setPendingActions] = useState<PendingAction[]>([]);
   const dbRef = useRef<IDBDatabase | null>(null);
+
+  // Load offline data from IndexedDB
+  const loadOfflineData = useCallback(async () => {
+    if (!dbRef.current) return;
+
+    try {
+      const transaction = dbRef.current.transaction(['data'], 'readonly');
+      const store = transaction.objectStore('data');
+      
+      const dataRequest = store.get('offlineData');
+      dataRequest.onsuccess = () => {
+        if (dataRequest.result) {
+          setOfflineData(dataRequest.result.value);
+        }
+      };
+
+      // Load pending actions
+      const actionsTransaction = dbRef.current.transaction(['actions'], 'readonly');
+      const actionsStore = actionsTransaction.objectStore('actions');
+      const actionsRequest = actionsStore.getAll();
+      
+      actionsRequest.onsuccess = () => {
+        setPendingActions(actionsRequest.result || []);
+      };
+    } catch (error) {
+      logger.error('Failed to load offline data:', { component: 'Chanuka' }, error);
+    }
+  }, []);
+
+  // Sync pending actions when online
+  const syncPendingActions = useCallback(async () => {
+    if (!isOnline || !dbRef.current || pendingActions.length === 0) return;
+
+    logger.info('Syncing pending actions:', { component: 'Chanuka', count: pendingActions.length });
+
+    // Process individual action
+    const processAction = async (action: PendingAction) => {
+      switch (action.type) {
+        case 'track-bill':
+          await fetch('/api/bills/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(action.data)
+          });
+          break;
+        
+        case 'untrack-bill':
+          await fetch('/api/bills/untrack', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(action.data)
+          });
+          break;
+        
+        case 'update-preferences':
+          await fetch('/api/user/preferences', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(action.data)
+          });
+          break;
+        
+        default:
+          logger.warn('Unknown action type:', { component: 'Chanuka', type: action.type });
+      }
+    };
+
+    for (const action of pendingActions) {
+      try {
+        await processAction(action);
+        
+        // Remove successful action
+        const transaction = dbRef.current.transaction(['actions'], 'readwrite');
+        const store = transaction.objectStore('actions');
+        await store.delete(action.id);
+        
+        setPendingActions(prev => prev.filter(a => a.id !== action.id));
+      } catch (error) {
+        logger.error('Failed to sync action:', { component: 'Chanuka', action: action.type, error });
+        
+        // Increment retry count
+        const updatedAction = {
+          ...action,
+          retryCount: action.retryCount + 1
+        };
+
+        if (updatedAction.retryCount < 3) {
+          const transaction = dbRef.current.transaction(['actions'], 'readwrite');
+          const store = transaction.objectStore('actions');
+          await store.put(updatedAction);
+          
+          setPendingActions(prev => 
+            prev.map(a => a.id === action.id ? updatedAction : a)
+          );
+        } else {
+          // Remove after 3 failed attempts
+          const transaction = dbRef.current.transaction(['actions'], 'readwrite');
+          const store = transaction.objectStore('actions');
+          await store.delete(action.id);
+          
+          setPendingActions(prev => prev.filter(a => a.id !== action.id));
+        }
+      }
+    }
+  }, [isOnline, pendingActions]);
 
   // Initialize IndexedDB for offline storage
   useEffect(() => {
@@ -88,14 +203,14 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     };
 
     initDB();
-  }, []);
+  }, [loadOfflineData]);
 
   // Register service worker
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
-          logger.info('Service Worker registered:', { component: 'Chanuka' }, registration);
+          logger.info('Service Worker registered:', { component: 'Chanuka', registration: registration.scope });
           setIsServiceWorkerReady(true);
           
           // Listen for updates
@@ -135,43 +250,21 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
-
-  // Load offline data from IndexedDB
-  const loadOfflineData = useCallback(async () => {
-    if (!dbRef.current) return;
-
-    try {
-      const transaction = dbRef.current.transaction(['data'], 'readonly');
-      const store = transaction.objectStore('data');
-      
-      const dataRequest = store.get('offlineData');
-      dataRequest.onsuccess = () => {
-        if (dataRequest.result) {
-          setOfflineData(dataRequest.result.value);
-        }
-      };
-
-      // Load pending actions
-      const actionsTransaction = dbRef.current.transaction(['actions'], 'readonly');
-      const actionsStore = actionsTransaction.objectStore('actions');
-      const actionsRequest = actionsStore.getAll();
-      
-      actionsRequest.onsuccess = () => {
-        setPendingActions(actionsRequest.result || []);
-      };
-    } catch (error) {
-      logger.error('Failed to load offline data:', { component: 'Chanuka' }, error);
-    }
-  }, []);
+  }, [syncPendingActions]);
 
   // Cache data for offline use
-  const cacheData = useCallback(async (key: keyof OfflineData, data: any) => {
+  const cacheData = useCallback(async (key: keyof OfflineData, data: OfflineData[keyof OfflineData]) => {
     if (!dbRef.current) return;
 
     try {
-      const currentData = offlineData || { bills: [], user: null, preferences: null, lastSync: 0 };
-      const newOfflineData = {
+      const currentData = offlineData || { 
+        bills: [], 
+        user: null, 
+        preferences: {}, 
+        lastSync: 0 
+      };
+      
+      const newOfflineData: OfflineData = {
         ...currentData,
         [key]: data,
         lastSync: Date.now()
@@ -192,12 +285,12 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
   }, [offlineData]);
 
   // Get cached data
-  const getCachedData = useCallback((key: keyof OfflineData) => {
-    return offlineData?.[key] || null;
+  const getCachedData = useCallback((key: keyof OfflineData): OfflineData[keyof OfflineData] | null => {
+    return offlineData?.[key] ?? null;
   }, [offlineData]);
 
   // Add pending action for later sync
-  const addPendingAction = useCallback(async (type: string, data: any) => {
+  const addPendingAction = useCallback(async (type: string, data: Record<string, unknown>) => {
     if (!dbRef.current) return;
 
     const action: PendingAction = {
@@ -218,83 +311,6 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       logger.error('Failed to add pending action:', { component: 'Chanuka' }, error);
     }
   }, []);
-
-  // Sync pending actions when online
-  const syncPendingActions = useCallback(async () => {
-    if (!isOnline || !dbRef.current || pendingActions.length === 0) return;
-
-    logger.info('Syncing pending actions:', { component: 'Chanuka' }, pendingActions.length);
-
-    for (const action of pendingActions) {
-      try {
-        await processAction(action);
-        
-        // Remove successful action
-        const transaction = dbRef.current.transaction(['actions'], 'readwrite');
-        const store = transaction.objectStore('actions');
-        await store.delete(action.id);
-        
-        setPendingActions(prev => prev.filter(a => a.id !== action.id));
-      } catch (error) {
-        logger.error('Failed to sync action:', { component: 'Chanuka' }, action, error);
-        
-        // Increment retry count
-        const updatedAction = {
-          ...action,
-          retryCount: action.retryCount + 1
-        };
-
-        if (updatedAction.retryCount < 3) {
-          const transaction = dbRef.current.transaction(['actions'], 'readwrite');
-          const store = transaction.objectStore('actions');
-          await store.put(updatedAction);
-          
-          setPendingActions(prev => 
-            prev.map(a => a.id === action.id ? updatedAction : a)
-          );
-        } else {
-          // Remove after 3 failed attempts
-          const transaction = dbRef.current.transaction(['actions'], 'readwrite');
-          const store = transaction.objectStore('actions');
-          await store.delete(action.id);
-          
-          setPendingActions(prev => prev.filter(a => a.id !== action.id));
-        }
-      }
-    }
-  }, [isOnline, pendingActions]);
-
-  // Process individual action
-  const processAction = async (action: PendingAction) => {
-    switch (action.type) {
-      case 'track-bill':
-        await fetch('/api/bills/track', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(action.data)
-        });
-        break;
-      
-      case 'untrack-bill':
-        await fetch('/api/bills/untrack', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(action.data)
-        });
-        break;
-      
-      case 'update-preferences':
-        await fetch('/api/user/preferences', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(action.data)
-        });
-        break;
-      
-      default:
-        console.warn('Unknown action type:', action.type);
-    }
-  };
 
   // Clear all offline data
   const clearOfflineData = useCallback(async () => {
@@ -382,6 +398,7 @@ export function OfflineStatus({ className = '', showDetails = false }: OfflineSt
             <span>Back online</span>
             {pendingActions.length > 0 && (
               <button
+                type="button"
                 onClick={syncPendingActions}
                 className="ml-2 underline hover:no-underline"
               >
@@ -392,7 +409,7 @@ export function OfflineStatus({ className = '', showDetails = false }: OfflineSt
         ) : (
           <>
             <Network className="h-4 w-4" />
-            <span>You're offline</span>
+            <span>You&apos;re offline</span>
             {showDetails && pendingActions.length > 0 && (
               <span className="ml-2">
                 ({pendingActions.length} actions pending)
@@ -408,11 +425,14 @@ export function OfflineStatus({ className = '', showDetails = false }: OfflineSt
 /**
  * Offline-First Data Hook
  * Provides data with offline fallback
+ * 
+ * Note: This hook is exported from a component file for convenience.
+ * For optimal Fast Refresh support, consider moving to a separate utilities file.
  */
 export function useOfflineData<T>(
   key: string,
   fetchFn: () => Promise<T>,
-  dependencies: any[] = []
+  dependencies: unknown[] = []
 ) {
   const { isOnline, getCachedData, cacheData } = useOffline();
   const [data, setData] = useState<T | null>(null);
@@ -428,12 +448,12 @@ export function useOfflineData<T>(
         // Try to fetch fresh data
         const freshData = await fetchFn();
         setData(freshData);
-        await cacheData(key as any, freshData);
+        await cacheData(key as keyof OfflineData, freshData as OfflineData[keyof OfflineData]);
       } else {
         // Use cached data
-        const cachedData = getCachedData(key as any);
+        const cachedData = getCachedData(key as keyof OfflineData);
         if (cachedData) {
-          setData(cachedData);
+          setData(cachedData as T);
         } else {
           throw new Error('No cached data available');
         }
@@ -442,9 +462,9 @@ export function useOfflineData<T>(
       setError(err instanceof Error ? err.message : 'Unknown error');
       
       // Try cached data as fallback
-      const cachedData = getCachedData(key as any);
+      const cachedData = getCachedData(key as keyof OfflineData);
       if (cachedData) {
-        setData(cachedData);
+        setData(cachedData as T);
         setError('Using cached data (offline)');
       }
     } finally {
@@ -454,10 +474,10 @@ export function useOfflineData<T>(
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchData, ...dependencies]);
 
   return { data, loading, error, refetch: fetchData };
 }
 
 export default OfflineProvider;
-

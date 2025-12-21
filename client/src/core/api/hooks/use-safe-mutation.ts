@@ -9,7 +9,7 @@ import { globalApiClient } from '@client/core/api';
  * @param mutationFn The async function that performs the mutation.
  * @param options React Query mutation options.
  */
-export function useSafeMutation<TData = any, TError = Error, TVariables = any>(
+export function useSafeMutation<TData = unknown, TError = Error, TVariables = unknown>(
   mutationFn: (variables: TVariables) => Promise<TData>,
   options?: Omit<UseMutationOptions<TData, TError, TVariables>, 'mutationFn'>
 ): UseMutationResult<TData, TError, TVariables> {
@@ -25,7 +25,7 @@ export function useSafeMutation<TData = any, TError = Error, TVariables = any>(
  * @param endpoint The API endpoint to hit.
  * @param options Mutation options.
  */
-export function useSafePost<TData = any, TVariables = any>(
+export function useSafePost<TData = unknown, TVariables = unknown>(
   endpoint: string,
   options?: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'>
 ) {
@@ -41,7 +41,7 @@ export function useSafePost<TData = any, TVariables = any>(
  * @param endpoint The API endpoint to hit.
  * @param options Mutation options.
  */
-export function useSafePut<TData = any, TVariables = any>(
+export function useSafePut<TData = unknown, TVariables = unknown>(
   endpoint: string,
   options?: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'>
 ) {
@@ -57,7 +57,7 @@ export function useSafePut<TData = any, TVariables = any>(
  * @param endpoint The API endpoint to hit.
  * @param options Mutation options.
  */
-export function useSafeDelete<TData = any>(
+export function useSafeDelete<TData = unknown>(
   endpoint: string,
   options?: Omit<UseMutationOptions<TData, Error, void>, 'mutationFn'>
 ) {

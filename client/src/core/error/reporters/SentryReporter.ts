@@ -25,7 +25,7 @@ export interface SentryReporterConfig {
 
 export class SentryReporter implements ErrorReporter {
   private config: Required<SentryReporterConfig>;
-  private sentry: any = null;
+  private sentry: typeof import('@sentry/browser') | null = null;
   private isInitialized = false;
 
   constructor(config: Partial<SentryReporterConfig> = {}) {
@@ -57,7 +57,7 @@ export class SentryReporter implements ErrorReporter {
         sampleRate: this.config.sampleRate,
         integrations: [],
         maxBreadcrumbs: this.config.maxBreadcrumbs,
-        beforeSend: (event: any) => {
+        beforeSend: (event: import('@sentry/browser').ErrorEvent) => {
           // Add custom tags
           if (this.config.tags) {
             event.tags = { ...event.tags, ...this.config.tags };
@@ -93,7 +93,7 @@ export class SentryReporter implements ErrorReporter {
 
     try {
       // Set error context
-      this.sentry.withScope((scope: any) => {
+      this.sentry.withScope((scope: import('@sentry/browser').Scope) => {
         // Add error metadata
         scope.setTag('error_domain', error.type);
         scope.setTag('error_severity', error.severity);
@@ -146,7 +146,7 @@ export class SentryReporter implements ErrorReporter {
 
         // Set level based on severity
         const level = this.mapSeverityToLevel(error.severity);
-        scope.setLevel(level);
+        scope.setLevel(level as import('@sentry/browser').SeverityLevel);
 
         // Add extra data
         if (error.details) {
@@ -155,7 +155,7 @@ export class SentryReporter implements ErrorReporter {
 
         // Capture the error
         if (error.cause instanceof Error) {
-          this.sentry.captureException(error.cause, {
+          this.sentry?.captureException(error.cause, {
             contexts: {
               appError: {
                 id: error.id,
@@ -173,21 +173,7 @@ export class SentryReporter implements ErrorReporter {
           });
         } else {
           // Capture as message if no cause error
-          this.sentry.captureMessage(error.message, level, {
-            contexts: {
-              appError: {
-                id: error.id,
-                type: error.type,
-                severity: error.severity,
-                code: error.code,
-                recoverable: error.recoverable,
-                retryable: error.retryable,
-                timestamp: error.timestamp,
-                context: error.context,
-                details: error.details,
-              },
-            },
-          });
+          this.sentry?.captureMessage(error.message, level as import('@sentry/browser').SeverityLevel);
         }
       });
     } catch (reportError) {
@@ -210,7 +196,7 @@ export class SentryReporter implements ErrorReporter {
     }
   }
 
-  private addBreadcrumbs(scope: any, error: AppError): void {
+  private addBreadcrumbs(scope: import('@sentry/browser').Scope, error: AppError): void {
     // Add error-specific breadcrumbs
     if (error.context?.operation) {
       scope.addBreadcrumb({
@@ -254,7 +240,7 @@ export class SentryReporter implements ErrorReporter {
 
   setUser(user: SentryReporterConfig['user']): void {
     this.config.user = { ...this.config.user, ...user };
-    if (this.sentry && this.isInitialized) {
+    if (this.sentry && this.isInitialized && user) {
       this.sentry.setUser(user);
     }
   }
@@ -266,11 +252,16 @@ export class SentryReporter implements ErrorReporter {
   addBreadcrumb(breadcrumb: {
     message: string;
     category?: string;
-    level?: string;
-    data?: Record<string, any>;
+    level?: import('@sentry/browser').SeverityLevel;
+    data?: Record<string, unknown>;
   }): void {
     if (this.sentry && this.isInitialized && this.config.enableBreadcrumbs) {
-      this.sentry.addBreadcrumb(breadcrumb);
+      this.sentry.addBreadcrumb({
+        message: breadcrumb.message,
+        category: breadcrumb.category,
+        level: breadcrumb.level as import('@sentry/browser').SeverityLevel,
+        data: breadcrumb.data
+      });
     }
   }
 

@@ -9,6 +9,9 @@ export interface AuthConfig {
   enableSessionValidation: boolean;
   maxFailedAttempts: number;
   lockoutDuration: number;
+  tokenRefreshEndpoint: string;
+  tokenRefreshThreshold: number;
+  maxRefreshAttempts: number;
 }
 
 export const DEFAULT_AUTH_CONFIG: AuthConfig = {
@@ -17,24 +20,27 @@ export const DEFAULT_AUTH_CONFIG: AuthConfig = {
   enableSessionValidation: true,
   maxFailedAttempts: 5,
   lockoutDuration: 15 * 60 * 1000, // 15 minutes
+  tokenRefreshEndpoint: '/api/auth/refresh',
+  tokenRefreshThreshold: 5,
+  maxRefreshAttempts: 3,
 };
 
 export class AuthenticationInterceptor {
   constructor(private config: AuthConfig = DEFAULT_AUTH_CONFIG) {}
 
-  intercept(request: any): any {
+  intercept(request: Record<string, unknown>): Record<string, unknown> {
     // Add authentication token to request headers if available
     const token = localStorage.getItem('auth_token');
     if (token) {
       request.headers = request.headers || {};
-      request.headers['Authorization'] = `Bearer ${token}`;
+      (request.headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
     return request;
   }
 }
 
 export class TokenRefreshInterceptor {
-  intercept(response: any): any {
+  intercept(response: { status: number; [key: string]: unknown }): { status: number; [key: string]: unknown } | Promise<Record<string, unknown>> {
     // Handle 401 responses by attempting token refresh
     if (response.status === 401) {
       // Trigger token refresh logic
@@ -43,7 +49,7 @@ export class TokenRefreshInterceptor {
     return response;
   }
 
-  private refreshToken(): Promise<any> {
+  private refreshToken(): Promise<Record<string, unknown>> {
     // Refresh token implementation
     return Promise.resolve({});
   }

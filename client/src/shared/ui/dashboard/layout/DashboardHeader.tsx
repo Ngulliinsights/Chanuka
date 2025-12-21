@@ -32,7 +32,7 @@ interface DashboardHeaderProps {
 /**
  * Dashboard Header Component
  */
-export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
+export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
   config,
   content,
   onThemeChange,
@@ -292,6 +292,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </div>
     </header>
   );
+);
+
+function 1(
 };
 
 DashboardHeader.displayName = 'DashboardHeader';

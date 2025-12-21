@@ -1,28 +1,18 @@
 /**
  * Welcome Message Component
- * 
+ *
  * Displays personalized welcome message with quick stats and tips.
  */
 
 import { formatDistanceToNow } from 'date-fns';
-import { 
-  X, 
-  Sparkles, 
-  TrendingUp, 
-  BookOpen, 
-  MessageSquare,
-  Award,
-  Calendar
-} from 'lucide-react';
+import { X, TrendingUp, MessageSquare, Award, Calendar, BookOpen, Sparkles } from 'lucide-react';
 import React from 'react';
 
-import { User } from '@client/store/slices/authSlice';
-import { UserDashboardData } from '@client/types/user-dashboard';
-
+import { User } from '@client/core/auth/types';
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
-
+import { UserDashboardData } from '@client/types/user-dashboard';
 
 interface WelcomeMessageProps {
   user: User;
@@ -44,8 +34,8 @@ export function WelcomeMessage({ user, stats, onDismiss }: WelcomeMessageProps) 
     if (stats.totalBillsTracked === 0) {
       return {
         icon: <BookOpen className="h-4 w-4" />,
-        text: "Start by tracking a few bills that interest you to get personalized updates.",
-        action: "Browse Bills"
+        text: 'Start by tracking a few bills that interest you to get personalized updates.',
+        action: 'Browse Bills',
       };
     }
 
@@ -53,22 +43,22 @@ export function WelcomeMessage({ user, stats, onDismiss }: WelcomeMessageProps) 
       return {
         icon: <MessageSquare className="h-4 w-4" />,
         text: "Join the conversation by commenting on bills you're tracking.",
-        action: "View Discussions"
+        action: 'View Discussions',
       };
     }
 
     if (stats.streakDays < 7) {
       return {
         icon: <TrendingUp className="h-4 w-4" />,
-        text: "Build your civic engagement streak by checking in regularly.",
-        action: "View Activity"
+        text: 'Build your civic engagement streak by checking in regularly.',
+        action: 'View Activity',
       };
     }
 
     return {
       icon: <Award className="h-4 w-4" />,
       text: "You're doing great! Keep engaging to improve your civic impact score.",
-      action: "View Metrics"
+      action: 'View Metrics',
     };
   };
 
@@ -95,12 +85,12 @@ export function WelcomeMessage({ user, stats, onDismiss }: WelcomeMessageProps) 
                     <BookOpen className="h-3 w-3" />
                     {stats.totalBillsTracked} bills tracked
                   </Badge>
-                  
+
                   <Badge variant="outline" className="flex items-center gap-1">
                     <MessageSquare className="h-3 w-3" />
                     {stats.totalComments} comments
                   </Badge>
-                  
+
                   {stats.streakDays > 0 && (
                     <Badge variant="outline" className="flex items-center gap-1">
                       <TrendingUp className="h-3 w-3" />
@@ -121,13 +111,9 @@ export function WelcomeMessage({ user, stats, onDismiss }: WelcomeMessageProps) 
             {/* Personalized Tip */}
             {tip && (
               <div className="flex items-start gap-3 p-3 bg-white/50 rounded-lg">
-                <div className="text-civic-community mt-0.5">
-                  {tip.icon}
-                </div>
+                <div className="text-civic-community mt-0.5">{tip.icon}</div>
                 <div className="flex-1">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {tip.text}
-                  </p>
+                  <p className="text-sm text-muted-foreground mb-2">{tip.text}</p>
                   <Button variant="outline" size="sm">
                     {tip.action}
                   </Button>

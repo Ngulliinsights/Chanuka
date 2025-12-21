@@ -1,3 +1,4 @@
+import React from 'react';
 import { Shield, Award, CheckCircle, User, Star, Building } from 'lucide-react';
 
 import { cn } from '@client/lib/utils';

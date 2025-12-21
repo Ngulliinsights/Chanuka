@@ -1276,7 +1276,7 @@ export function useAnalytics() {
  *   }
  * );
  */
-export function withAnalytics<T extends (...args: any[]) => any>(
+export function withAnalytics<T extends (...args: unknown[]) => any>(
   category: string,
   action: string,
   fn: T,
@@ -1317,7 +1317,7 @@ export function trackMethod(category: string, action: string) {
   ) {
     const originalMethod = descriptor.value;
 
-    descriptor.value = function (...args: any[]) {
+    descriptor.value = function (...args: unknown[]) {
       privacyAnalyticsService.track(category, action, propertyKey, undefined, {
         args: args.length,
       });

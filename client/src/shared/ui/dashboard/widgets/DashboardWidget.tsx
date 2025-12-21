@@ -5,9 +5,11 @@
  */
 
 import React, { useState, useCallback } from 'react';
+
 import { Card, CardHeader, CardTitle, CardContent } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { cn } from '@client/shared/design-system';
+
 import { WidgetConfig, WidgetData, WidgetEvent } from './widget-types';
 
 interface DashboardWidgetProps {
@@ -18,10 +20,10 @@ interface DashboardWidgetProps {
   /** Custom content */
   children?: React.ReactNode;
   /** Event handlers */
-  onUpdate?: (config: Partial<WidgetConfig>) => void;
+  _onUpdate?: (config: Partial<WidgetConfig>) => void;
   onRemove?: () => void;
-  onResize?: (width: number, height: number) => void;
-  onMove?: (x: number, y: number) => void;
+  _onResize?: (width: number, height: number) => void;
+  _onMove?: (x: number, y: number) => void;
   onEvent?: (event: WidgetEvent) => void;
   /** Custom className */
   className?: string;
@@ -34,14 +36,14 @@ interface DashboardWidgetProps {
 /**
  * Dashboard Widget Component
  */
-export const DashboardWidget: React.FC<DashboardWidgetProps> = ({
+export const DashboardWidget = React.memo(<DashboardWidgetProps> = ({
   config,
   data,
   children,
-  onUpdate,
+  _onUpdate,
   onRemove,
-  onResize,
-  onMove,
+  _onResize,
+  _onMove,
   onEvent,
   className,
   isDragging = false,
@@ -177,7 +179,7 @@ export const DashboardWidget: React.FC<DashboardWidgetProps> = ({
             {config.behavior?.refreshable && (
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={handleRefresh}
                 aria-label={`Refresh ${config.title}`}
                 className="h-8 w-8"
@@ -203,7 +205,7 @@ export const DashboardWidget: React.FC<DashboardWidgetProps> = ({
             {config.behavior?.removable && (
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={handleEdit}
                 aria-label={`Edit ${config.title}`}
                 className="h-8 w-8"
@@ -229,7 +231,7 @@ export const DashboardWidget: React.FC<DashboardWidgetProps> = ({
             {config.behavior?.collapsible && (
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={handleCollapse}
                 aria-label={isCollapsed ? `Expand ${config.title}` : `Collapse ${config.title}`}
                 aria-expanded={!isCollapsed}
@@ -256,7 +258,7 @@ export const DashboardWidget: React.FC<DashboardWidgetProps> = ({
             {config.behavior?.removable && (
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={handleRemove}
                 aria-label={`Remove ${config.title}`}
                 className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -329,6 +331,9 @@ export const DashboardWidget: React.FC<DashboardWidgetProps> = ({
       )}
     </Card>
   );
+);
+
+function 1(
 };
 
 DashboardWidget.displayName = 'DashboardWidget';

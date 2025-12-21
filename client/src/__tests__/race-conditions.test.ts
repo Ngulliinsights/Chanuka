@@ -3,9 +3,9 @@
  * Tests for the implemented race condition fixes
  */
 
+import { configureStore } from '@reduxjs/toolkit';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { configureStore } from '@reduxjs/toolkit';
 import { loadingSlice, startLoadingOperation, completeLoadingOperation } from '../shared/infrastructure/store/slices/loadingSlice';
 
 // Mock logger to prevent console spam during tests
@@ -36,7 +36,7 @@ describe('Race Condition Fixes', () => {
   describe('Loading Slice Race Conditions', () => {
     it('should handle concurrent statistics updates safely', async () => {
       // Simulate concurrent completion events
-      const promises = Array(100).fill(null).map(() => 
+      const promises = Array(100).fill(null).map(() =>
         store.dispatch(loadingSlice.actions.updateStatsAtomic({
           type: 'increment_completed'
         }))
@@ -51,9 +51,9 @@ describe('Race Condition Fixes', () => {
 
     it('should prevent duplicate operations with same ID', async () => {
       const operationId = 'test-operation';
-      
+
       // Try to create multiple operations with same ID
-      const promises = Array(10).fill(null).map(() => 
+      const promises = Array(10).fill(null).map(() =>
         store.dispatch(startLoadingOperation({
           id: operationId,
           type: 'api',
@@ -74,7 +74,7 @@ describe('Race Condition Fixes', () => {
     it('should handle concurrent completion operations safely', async () => {
       // First, create some operations
       const operationIds = ['op1', 'op2', 'op3', 'op4', 'op5'];
-      
+
       for (const id of operationIds) {
         await store.dispatch(startLoadingOperation({
           id,
@@ -86,7 +86,7 @@ describe('Race Condition Fixes', () => {
       }
 
       // Now complete them all concurrently
-      const completionPromises = operationIds.map(id => 
+      const completionPromises = operationIds.map(id =>
         store.dispatch(completeLoadingOperation({
           id,
           success: true
@@ -104,7 +104,7 @@ describe('Race Condition Fixes', () => {
     it('should handle mixed success/failure completions concurrently', async () => {
       // Create operations
       const operationIds = Array(20).fill(null).map((_, i) => `op-${i}`);
-      
+
       for (const id of operationIds) {
         await store.dispatch(startLoadingOperation({
           id,
@@ -116,7 +116,7 @@ describe('Race Condition Fixes', () => {
       }
 
       // Complete half successfully, half with failures
-      const completionPromises = operationIds.map((id, index) => 
+      const completionPromises = operationIds.map((id, index) =>
         store.dispatch(completeLoadingOperation({
           id,
           success: index % 2 === 0,
@@ -140,7 +140,7 @@ describe('Race Condition Fixes', () => {
       ];
 
       // Apply batch update multiple times concurrently
-      const promises = Array(50).fill(null).map(() => 
+      const promises = Array(50).fill(null).map(() =>
         store.dispatch(loadingSlice.actions.batchStatsUpdate(batchUpdates))
       );
 
@@ -163,7 +163,7 @@ describe('Race Condition Fixes', () => {
 
       async queueSubscriptionOperation(operation: () => Promise<void>) {
         this.subscriptionQueue.push(operation);
-        
+
         if (!this.processingSubscriptions) {
           await this.processSubscriptionQueue();
         }
@@ -171,7 +171,7 @@ describe('Race Condition Fixes', () => {
 
       async processSubscriptionQueue() {
         this.processingSubscriptions = true;
-        
+
         while (this.subscriptionQueue.length > 0) {
           const operation = this.subscriptionQueue.shift();
           if (operation) {
@@ -182,18 +182,18 @@ describe('Race Condition Fixes', () => {
             }
           }
         }
-        
+
         this.processingSubscriptions = false;
       }
 
       subscribe(subscription: { type: string; id: string }) {
         return this.queueSubscriptionOperation(async () => {
           const key = `${subscription.type}:${subscription.id}`;
-          
+
           if (this.subscriptionIds.has(key)) {
             return; // Already subscribed
           }
-          
+
           this.subscriptionIds.set(key, `sub-${Date.now()}`);
         });
       }
@@ -224,7 +224,7 @@ describe('Race Condition Fixes', () => {
     it('should handle rapid subscribe/unsubscribe operations', async () => {
       const wsAdapter = new MockWebSocketAdapter();
       const subscription = { type: 'bill', id: '123' };
-      
+
       // Rapid subscribe/unsubscribe operations
       const promises = Array(100).fill(null).map((_, index) => {
         if (index % 2 === 0) {
@@ -235,7 +235,7 @@ describe('Race Condition Fixes', () => {
       });
 
       await Promise.allSettled(promises);
-      
+
       // Should not crash and final state should be consistent
       expect(wsAdapter.getSubscriptionCount()).toBeGreaterThanOrEqual(0);
       expect(wsAdapter.getSubscriptionCount()).toBeLessThanOrEqual(1);
@@ -243,7 +243,7 @@ describe('Race Condition Fixes', () => {
 
     it('should handle concurrent subscriptions to different resources', async () => {
       const wsAdapter = new MockWebSocketAdapter();
-      
+
       // Subscribe to multiple different resources concurrently
       const subscriptions = Array(50).fill(null).map((_, index) => ({
         type: 'bill',
@@ -264,7 +264,7 @@ describe('Race Condition Fixes', () => {
 
     it('should debounce connection state updates', async () => {
       const wsAdapter = new MockWebSocketAdapter();
-      
+
       // Trigger many rapid connection state updates
       const promises = Array(20).fill(null).map(() => {
         wsAdapter.updateConnectionState();
@@ -272,10 +272,10 @@ describe('Race Condition Fixes', () => {
       });
 
       await Promise.all(promises);
-      
+
       // Wait for debounce to complete
       await new Promise(resolve => setTimeout(resolve, 150));
-      
+
       // Should not crash - this tests the debouncing mechanism
       expect(true).toBe(true);
     });
@@ -317,7 +317,7 @@ describe('Race Condition Fixes', () => {
       };
 
       // Make 10 concurrent identical requests
-      const promises = Array(10).fill(null).map(() => 
+      const promises = Array(10).fill(null).map(() =>
         deduplicator.deduplicate('test-key', mockRequest)
       );
 
@@ -325,10 +325,10 @@ describe('Race Condition Fixes', () => {
 
       // Should only call the function once
       expect(callCount).toBe(1);
-      
+
       // All results should be the same
       expect(results.every(result => result === 'result-1')).toBe(true);
-      
+
       // No pending requests after completion
       expect(deduplicator.getPendingCount()).toBe(0);
     });
@@ -354,10 +354,10 @@ describe('Race Condition Fixes', () => {
 
       // Should call function 3 times (key1, key2, key3)
       expect(callCount).toBe(3);
-      
+
       // First and third results should be the same (key1 deduplication)
       expect(results[0]).toBe(results[2]);
-      
+
       // Other results should be different
       expect(results[1]).not.toBe(results[0]);
       expect(results[3]).not.toBe(results[0]);
@@ -368,7 +368,7 @@ describe('Race Condition Fixes', () => {
     it('should handle errors in concurrent operations gracefully', async () => {
       // Create operations that will fail
       const operationIds = ['fail1', 'fail2', 'success1'];
-      
+
       for (const id of operationIds) {
         await store.dispatch(startLoadingOperation({
           id,

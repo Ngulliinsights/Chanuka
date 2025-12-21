@@ -162,7 +162,7 @@ export function useAnalyticsExport() {
       analyticsService.exportAnalytics(filters, format),
     onSuccess: (data, { format }) => {
       // Create download link
-      const blob = new Blob([data], {
+      const blob = new Blob([data as string], {
         type: format === 'csv' ? 'text/csv' : 'application/json'
       });
       const url = URL.createObjectURL(blob);

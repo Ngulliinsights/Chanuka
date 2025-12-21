@@ -100,12 +100,15 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ section, onUpdate }) 
       </div>
     </section>
   );
+);
+
+function 1(
 };
 
 /**
  * Dashboard Stack Component
  */
-export const DashboardStack: React.FC<DashboardStackProps> = ({
+export const DashboardStack = React.memo(<DashboardStackProps> = ({
   spacing = 'normal',
   sections,
   className,
@@ -164,6 +167,9 @@ export const DashboardStack: React.FC<DashboardStackProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 
 DashboardStack.displayName = 'DashboardStack';

@@ -3,9 +3,8 @@
  * Following navigation component configuration patterns
  */
 
-import type { DashboardConfig, DashboardSection } from '../types';
-
 import { DashboardConfigurationError } from '../errors';
+import type { DashboardConfig, DashboardSection } from '../types';
 import { validateDashboardConfig } from '../validation';
 
 import { dashboardConstants } from './dashboard-constants';
@@ -134,48 +133,37 @@ export function validateConfigurationLimits(config: Partial<DashboardConfig>): {
   const warnings: string[] = [];
 
   // Check refresh interval
-  if (config.refreshInterval !== undefined) {
-    if (config.refreshInterval < dashboardConstants.LIMITS.MIN_REFRESH_INTERVAL) {
+  const refreshInterval = config.refreshInterval;
+  if (refreshInterval !== undefined && refreshInterval !== null && typeof refreshInterval === 'number') {
+    if (refreshInterval < dashboardConstants.LIMITS.MIN_REFRESH_INTERVAL) {
       errors.push('Refresh interval too short');
     }
-    if (config.refreshInterval > dashboardConstants.LIMITS.MAX_REFRESH_INTERVAL) {
+    if (refreshInterval > dashboardConstants.LIMITS.MAX_REFRESH_INTERVAL) {
       errors.push(`Refresh interval too long (maximum: ${dashboardConstants.LIMITS.MAX_REFRESH_INTERVAL}ms)`);
     }
-    if (config.refreshInterval < dashboardConstants.REFRESH_INTERVALS.NORMAL) {
+    if (refreshInterval < dashboardConstants.REFRESH_INTERVALS.NORMAL) {
       warnings.push('Fast refresh intervals may increase data usage');
     }
   }
 
   // Check max items limits
-  if (config.maxActionItems !== undefined) {
-    if (config.maxActionItems > dashboardConstants.LIMITS.MAX_ACTION_ITEMS_DISPLAY) {
+  const maxActionItems = config.maxActionItems;
+  if (maxActionItems !== undefined && maxActionItems !== null && typeof maxActionItems === 'number') {
+    if (maxActionItems > dashboardConstants.LIMITS.MAX_ACTION_ITEMS_DISPLAY) {
       warnings.push(`High action item limit may affect performance (recommended: ${dashboardConstants.DEFAULT_CONFIG.maxActionItems})`);
     }
-    if (config.maxActionItems < 1) {
+    if (maxActionItems < 1) {
       errors.push('Must display at least 1 action item');
     }
   }
 
   // Check max tracked topics limits
-  if (config.maxTrackedTopics !== undefined) {
-    if (config.maxTrackedTopics > dashboardConstants.LIMITS.MAX_TRACKED_TOPICS_DISPLAY) {
+  const maxTrackedTopics = config.maxTrackedTopics;
+  if (maxTrackedTopics !== undefined && maxTrackedTopics !== null && typeof maxTrackedTopics === 'number') {
+    if (maxTrackedTopics > dashboardConstants.LIMITS.MAX_TRACKED_TOPICS_DISPLAY) {
       warnings.push(`High topic limit may affect performance (recommended: ${dashboardConstants.DEFAULT_CONFIG.maxTrackedTopics})`);
     }
-    if (config.maxTrackedTopics < 1) {
-      errors.push('Must display at least 1 tracked topic');
-    }
-  }
-
-  // Check for performance warnings
-  if (config.refreshInterval !== undefined && config.refreshInterval < dashboardConstants.REFRESH_INTERVALS.NORMAL) {
-    warnings.push('Fast refresh intervals may increase data usage');
-  }
-
-  if (config.maxTrackedTopics !== undefined) {
-    if (config.maxTrackedTopics > dashboardConstants.LIMITS.MAX_TRACKED_TOPICS_DISPLAY) {
-      warnings.push(`High topic limit may affect performance (recommended: ${dashboardConstants.DEFAULT_CONFIG.maxTrackedTopics})`);
-    }
-    if (config.maxTrackedTopics < 1) {
+    if (maxTrackedTopics < 1) {
       errors.push('Must display at least 1 tracked topic');
     }
   }
@@ -200,27 +188,27 @@ export function getConfigurationRecommendations(usage: {
 
   // Refresh interval recommendations
   if (usage.dataUsageConcern) {
-    recommendations.refreshInterval = dashboardConstants.REFRESH_INTERVALS.VERY_SLOW;
-    recommendations.enableAutoRefresh = false;
+    (recommendations as DashboardConfig).refreshInterval = dashboardConstants.REFRESH_INTERVALS.VERY_SLOW;
+    (recommendations as DashboardConfig).enableAutoRefresh = false;
   } else if (usage.performanceConcern) {
-    recommendations.refreshInterval = dashboardConstants.REFRESH_INTERVALS.SLOW;
+    (recommendations as DashboardConfig).refreshInterval = dashboardConstants.REFRESH_INTERVALS.SLOW;
   } else if (usage.activityLevel === 'high') {
-    recommendations.refreshInterval = dashboardConstants.REFRESH_INTERVALS.FAST;
+    (recommendations as DashboardConfig).refreshInterval = dashboardConstants.REFRESH_INTERVALS.FAST;
   }
 
   // Display limits based on performance concerns
   if (usage.performanceConcern) {
-    recommendations.maxActionItems = 5;
-    recommendations.maxTrackedTopics = 10;
+    (recommendations as DashboardConfig).maxActionItems = 5;
+    (recommendations as DashboardConfig).maxTrackedTopics = 10;
   } else if (usage.activityLevel === 'high') {
-    recommendations.maxActionItems = 20;
-    recommendations.maxTrackedTopics = 30;
+    (recommendations as DashboardConfig).maxActionItems = 20;
+    (recommendations as DashboardConfig).maxTrackedTopics = 30;
   }
 
   // Session-based recommendations
   if (usage.averageSessionDuration && usage.averageSessionDuration < 300000) { // Less than 5 minutes
-    recommendations.enableAutoRefresh = false;
-    recommendations.showCompletedActions = false;
+    (recommendations as DashboardConfig).enableAutoRefresh = false;
+    (recommendations as DashboardConfig).showCompletedActions = false;
   }
 
   return recommendations;
@@ -258,4 +246,3 @@ export function importDashboardConfig(configJson: string): DashboardConfig {
     );
   }
 }
-

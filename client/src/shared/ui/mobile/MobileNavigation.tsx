@@ -92,12 +92,15 @@ const TouchUtils = {
     element.addEventListener('touchend', handler);
     return () => element.removeEventListener('touchend', handler);
   },
+);
+
+function 1(
 };
 
 /**
  * Unified Mobile Navigation Component
  */
-export const MobileNavigation: React.FC<MobileNavigationProps> = ({
+export const MobileNavigation = React.memo(<MobileNavigationProps> = ({
   mode = 'both',
   items = DEFAULT_NAVIGATION_ITEMS as unknown as NavigationItem[],
   user,
@@ -386,6 +389,9 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
       {renderBottomNavigation()}
     </div>
   );
+);
+
+function 1(
 };
 
 export default MobileNavigation;

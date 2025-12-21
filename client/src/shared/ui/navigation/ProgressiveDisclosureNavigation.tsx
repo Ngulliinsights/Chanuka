@@ -1,4 +1,5 @@
-import { ChevronDown, ChevronRight, Clock, MapPin, ArrowRight, Menu } from 'lucide-react';
+import React from 'react';
+import { ChevronDown, ChevronRight, Clock, MapPin, ArrowRight, MenuIcon as Menu } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { cn } from '@client/lib/utils';
@@ -55,6 +56,8 @@ const ComplexityIndicator: React.FC<{ complexity: 1 | 2 | 3; className?: string 
   </div>
 );
 
+function 1(
+
 // Reading time indicator component
 const ReadingTimeIndicator: React.FC<{ minutes: number; className?: string }> = ({ 
   minutes, 
@@ -65,6 +68,8 @@ const ReadingTimeIndicator: React.FC<{ minutes: number; className?: string }> = 
     <span>{minutes} min read</span>
   </div>
 );
+
+function 1(
 
 // Context navigation helper component
 const ContextNavigationHelper: React.FC<{
@@ -124,6 +129,9 @@ const ContextNavigationHelper: React.FC<{
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 // Mobile tab selector dropdown
@@ -171,6 +179,9 @@ const MobileTabSelector: React.FC<{
       </DropdownMenu>
     </div>
   );
+);
+
+function 1(
 };
 
 // Reading path guidance component
@@ -218,6 +229,9 @@ const ReadingPathGuidance: React.FC<{
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 // Progress tracking component
@@ -262,6 +276,9 @@ const ProgressTracker: React.FC<{
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 // Collapsible section component
@@ -341,10 +358,13 @@ const CollapsibleSection: React.FC<{
       </Collapsible>
     </div>
   );
+);
+
+function 1(
 };
 
 // Main Progressive Disclosure Navigation component
-export const ProgressiveDisclosureNavigation: React.FC<ProgressiveDisclosureNavigationProps> = ({
+export const ProgressiveDisclosureNavigation = React.memo(<ProgressiveDisclosureNavigationProps> = ({
   sections,
   readingPaths = [],
   currentSectionId,
@@ -444,6 +464,9 @@ export const ProgressiveDisclosureNavigation: React.FC<ProgressiveDisclosureNavi
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 export default ProgressiveDisclosureNavigation;

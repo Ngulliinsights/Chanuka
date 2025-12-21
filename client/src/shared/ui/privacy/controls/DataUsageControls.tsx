@@ -3,8 +3,8 @@
  * Analytics, marketing, data sharing consents
  */
 
-import { Database, Info } from 'lucide-react';
 import React from 'react';
+import { Database, Info } from 'lucide-react';
 
 import { PrivacySettings, ConsentRecord } from '@client/types/auth';
 

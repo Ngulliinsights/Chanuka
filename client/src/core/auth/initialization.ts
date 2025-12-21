@@ -29,7 +29,7 @@ interface AuthConfig {
 interface AuthState {
   isInitialized: boolean;
   isAuthenticated: boolean;
-  user: any | null;
+  user: unknown | null;
   token: string | null;
   refreshToken: string | null;
   expiresAt: number | null;
@@ -308,7 +308,7 @@ class AuthServiceInitializer {
     }, timeoutMs);
   }
 
-  private parseToken(token: string): any {
+  private parseToken(token: string): { exp: number; user?: unknown } | null {
     try {
       const payload = token.split('.')[1];
       if (!payload) return null;
@@ -324,7 +324,7 @@ class AuthServiceInitializer {
     }
   }
 
-  private isTokenExpired(tokenData: any): boolean {
+  private isTokenExpired(tokenData: { exp?: number }): boolean {
     if (!tokenData.exp) return true;
     
     const now = Math.floor(Date.now() / 1000);

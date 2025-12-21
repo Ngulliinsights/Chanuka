@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === 'development') {
 // Security types
 export type {
   ThreatLevel,
-  SecurityEvent,
+  // SecurityEvent, // Duplicate - exported below
   VulnerabilityReport,
   CSRFToken,
   SecurityAudit,
@@ -40,30 +40,23 @@ export type {
   SecurityMetrics
 } from './security';
 
-// Loading types
+// Loading types are now exported from the loading system
 export type {
-  LoadingState,
-  LoadingOperation,
-  ConnectionInfo,
-  LoadingConfig,
-  LoadingQueue,
-  LoadingMetrics,
-  LoadingContext,
-  LoadingStrategy,
-  LoadingCondition,
-  LoadingAction,
-  LoadingBatch,
-  LoadingResult,
-  LoadingComponentProps,
-  AdaptiveSettings,
-  AssetLoadingProgress,
+  LoadingSize,
   LoadingType,
-  LoadingPriority,
+  LoadingState,
+  LoadingPhase,
   ConnectionType,
-  LoadingScenario,
-  ProgressiveStage,
-  LoadingError
-} from './loading';
+  LoadingPriority,
+  LoadingStateProps,
+  LoadingProgress,
+  LoadingStage,
+  LoadingOperation,
+  LoadingStats,
+  LoadingConfig,
+  UseLoadingResult,
+  LoadingIndicatorProps,
+} from '../shared/ui/loading';
 
 // Navigation types
 export type {
@@ -108,19 +101,12 @@ export type {
 
 // Error types
 export type {
-  ErrorDomain,
-  RecoveryStrategy,
-  ErrorBoundaryState,
-  ErrorReport,
-  ErrorHandler,
-  ErrorRecoveryConfig,
-  RecoveryCondition,
-  ErrorAnalytics,
-  ErrorFrequency,
-  ErrorTrend,
+  ErrorInfo,
   ErrorBoundaryProps,
+  ErrorHandler,
   ErrorContextValue,
-  ErrorNotification
+  ErrorNotification,
+  ErrorTrend,
 } from './error';
 
 export { AppError } from './error';
@@ -237,15 +223,8 @@ export type {
   PrivacyDashboardProps
 } from '../core/auth';
 
-// Core API types
-export type {
-  BillsQueryParams,
-  CommentPayload,
-  EngagementPayload,
-  BillsResponse,
-  BillCategoriesResponse,
-  BillStatusesResponse
-} from './core/api/types';
+// Core API types - re-exported from core/api/types
+export * from '../core/api/types';
 
 // Type guards and utilities
 export {

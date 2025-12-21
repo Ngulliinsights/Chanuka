@@ -16,6 +16,7 @@ readonly BACKUP_DIR="backup/imports-$(date +%Y%m%d_%H%M%S)"
 readonly DRY_RUN="${DRY_RUN:-true}"
 readonly TEMP_DIR=$(mktemp -d)
 readonly LOG_FILE="${TEMP_DIR}/resolver.log"
+readonly MAX_PARALLEL_JOBS="${MAX_PARALLEL_JOBS:-4}"
 
 # Color codes for terminal output
 readonly RED='\033[0;31m'
@@ -34,6 +35,11 @@ declare -i FIXES_SKIPPED=0
 declare -i FILES_PROCESSED=0
 declare -i CONTENT_MATCHES_USED=0
 
+# Cache for expensive operations
+declare -A RELATIVE_PATH_CACHE
+declare -A EXPORT_CONTENT_CACHE
+declare -A IMPORT_CACHE
+
 # ============================================================================
 # UTILITY FUNCTIONS
 # ============================================================================
@@ -42,8 +48,10 @@ cleanup() {
     if [[ -d "$TEMP_DIR" ]]; then
         rm -rf "$TEMP_DIR"
     fi
+    # Clean up any background jobs
+    jobs -p | xargs -r kill 2>/dev/null || true
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 log_info() {
     echo -e "${BLUE}ℹ${NC} $1" | tee -a "$LOG_FILE"
@@ -92,27 +100,31 @@ check_prerequisites() {
         missing_deps+=("generate-structure-to-file.sh")
     fi
     
-    if ! command -v python3 &> /dev/null; then
-        log_error "python3 is required but not found"
-        missing_deps+=("python3")
-    fi
+    # Check for required commands
+    for cmd in node sed grep find; do
+        if ! command -v "$cmd" &> /dev/null; then
+            log_error "$cmd is required but not found"
+            missing_deps+=("$cmd")
+        fi
+    done
     
-    if ! command -v sed &> /dev/null; then
-        log_error "sed is required but not found"
-        missing_deps+=("sed")
-    fi
-    
-    if ! command -v grep &> /dev/null; then
-        log_error "grep is required but not found"
-        missing_deps+=("grep")
+    # Verify Node.js version (we need at least v12 for modern features)
+    if command -v node &> /dev/null; then
+        local node_version
+        node_version=$(node --version | sed 's/v//' | cut -d'.' -f1)
+        if [[ $node_version -lt 12 ]]; then
+            log_error "Node.js version 12 or higher required (found v$node_version)"
+            missing_deps+=("node>=12")
+        fi
     fi
     
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
         log_error "Missing required dependencies: ${missing_deps[*]}"
-        exit 1
+        return 1
     fi
     
     log_success "All prerequisites verified"
+    return 0
 }
 
 # ============================================================================
@@ -124,6 +136,7 @@ create_backup() {
         log_info "Creating backup at: $BACKUP_DIR"
         mkdir -p "$BACKUP_DIR"
         
+        # Use find with -print0 for filenames with spaces
         local total_files
         total_files=$(find . -type f \
             \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" \) \
@@ -131,10 +144,12 @@ create_backup() {
             -not -path "*/dist/*" \
             -not -path "*/build/*" \
             -not -path "*/.git/*" \
-            -not -path "*/backup/*" 2>/dev/null | wc -l)
+            -not -path "*/backup/*" \
+            2>/dev/null | wc -l)
         
         log_info "Backing up $total_files source files..."
         
+        # Use tar for efficient backup
         find . -type f \
             \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" \) \
             -not -path "*/node_modules/*" \
@@ -142,8 +157,9 @@ create_backup() {
             -not -path "*/build/*" \
             -not -path "*/.git/*" \
             -not -path "*/backup/*" \
-            -exec cp --parents {} "$BACKUP_DIR/" \; 2>/dev/null || {
-                log_warning "Some files could not be backed up (may not affect operation)"
+            -print0 2>/dev/null | \
+            tar --null -T - -czf "$BACKUP_DIR/backup.tar.gz" 2>/dev/null || {
+                log_warning "Backup creation had warnings (may not affect operation)"
             }
         
         log_success "Backup created successfully"
@@ -153,7 +169,7 @@ create_backup() {
 }
 
 # ============================================================================
-# FILE INDEX BUILDING WITH CONTENT CACHING
+# FILE INDEX BUILDING WITH PARALLEL PROCESSING
 # ============================================================================
 
 build_file_index() {
@@ -161,8 +177,9 @@ build_file_index() {
     
     : > "$TEMP_DIR/file_index.txt"
     : > "$TEMP_DIR/export_cache.txt"
+    : > "$TEMP_DIR/filename_index.txt"
     
-    # Extract paths from structure markdown
+    # Extract paths from structure markdown (fast)
     if [[ -f "$STRUCTURE_FILE" ]]; then
         grep -E "\.(js|jsx|ts|tsx)$" "$STRUCTURE_FILE" 2>/dev/null | \
             sed 's/^[│├└─ ]*//g' | \
@@ -171,7 +188,7 @@ build_file_index() {
             sort -u >> "$TEMP_DIR/file_index.txt" || true
     fi
     
-    # Scan actual filesystem
+    # Scan actual filesystem (slower but necessary)
     find . -type f \
         \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" \) \
         -not -path "*/node_modules/*" \
@@ -182,131 +199,209 @@ build_file_index() {
         -not -path "*/backup/*" \
         -not -path "*/.next/*" \
         -not -path "*/out/*" \
-        2>/dev/null | sed 's|^\./||' >> "$TEMP_DIR/file_index.txt" || true
+        -print0 2>/dev/null | \
+        xargs -0 -I {} echo {} | \
+        sed 's|^\./||' >> "$TEMP_DIR/file_index.txt" || true
     
+    # Deduplicate while preserving order
     sort -u "$TEMP_DIR/file_index.txt" -o "$TEMP_DIR/file_index.txt"
     
-    # Build filename index and analyze exports in parallel
-    log_info "Analyzing file exports for intelligent matching..."
+    local total_files
+    total_files=$(wc -l < "$TEMP_DIR/file_index.txt")
     
-    while IFS= read -r filepath; do
-        local filename
-        filename=$(basename "$filepath")
-        echo "${filename}|${filepath}" >> "$TEMP_DIR/filename_index.txt"
-        
-        # Extract exports from this file for content-aware matching
-        if [[ -f "$filepath" ]]; then
-            extract_exports "$filepath" >> "$TEMP_DIR/export_cache.txt"
-        fi
-    done < "$TEMP_DIR/file_index.txt"
+    if [[ $total_files -eq 0 ]]; then
+        log_error "No source files found in project"
+        return 1
+    fi
     
-    sort "$TEMP_DIR/filename_index.txt" -o "$TEMP_DIR/filename_index.txt"
+    log_info "Analyzing exports for $total_files files (using parallel processing)..."
     
-    local file_count
-    file_count=$(wc -l < "$TEMP_DIR/file_index.txt")
-    log_success "Indexed $file_count files with export information"
+    # Process files in parallel using xargs
+    cat "$TEMP_DIR/file_index.txt" | \
+        xargs -P "$MAX_PARALLEL_JOBS" -I {} bash -c '
+            filepath="{}"
+            filename=$(basename "$filepath")
+            echo "${filename}|${filepath}" >> "'"$TEMP_DIR"'/filename_index.txt.tmp"
+            
+            if [[ -f "$filepath" ]]; then
+                # Call extract_exports function and append to temp cache
+                '"$(declare -f extract_exports)"'
+                extract_exports "$filepath" >> "'"$TEMP_DIR"'/export_cache.txt.tmp" 2>/dev/null || true
+            fi
+        ' 2>/dev/null || true
+    
+    # Consolidate temporary files
+    if [[ -f "$TEMP_DIR/filename_index.txt.tmp" ]]; then
+        sort "$TEMP_DIR/filename_index.txt.tmp" > "$TEMP_DIR/filename_index.txt"
+        rm "$TEMP_DIR/filename_index.txt.tmp"
+    fi
+    
+    if [[ -f "$TEMP_DIR/export_cache.txt.tmp" ]]; then
+        sort "$TEMP_DIR/export_cache.txt.tmp" > "$TEMP_DIR/export_cache.txt"
+        rm "$TEMP_DIR/export_cache.txt.tmp"
+    fi
+    
+    log_success "Indexed $total_files files with export information"
+    return 0
 }
 
 # ============================================================================
-# CONTENT ANALYSIS - Extract what a file exports
+# CONTENT ANALYSIS - Extract what a file exports using Node.js
 # ============================================================================
 
 extract_exports() {
     local filepath="$1"
     
-    # Use Python for more robust export extraction
-    python3 << EOF
-import re
-import sys
+    # Return cached result if available
+    if [[ -n "${EXPORT_CONTENT_CACHE[$filepath]:-}" ]]; then
+        echo "${EXPORT_CONTENT_CACHE[$filepath]}"
+        return 0
+    fi
+    
+    # Use Node.js for robust export extraction
+    # Node.js is perfect for this since we're analyzing JS/TS files anyway
+    local result
+    result=$(node << 'NODESCRIPT' "$filepath"
+const fs = require('fs');
+const filepath = process.argv[1];
 
-try:
-    with open("$filepath", 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read()
+try {
+    const content = fs.readFileSync(filepath, 'utf8');
+    const exports = new Set();
     
-    exports = set()
+    // Match: export { Name1, Name2 } or export type { Name1, Name2 }
+    // We use a regex that captures the content between braces
+    const namedExportPattern = /export\s+(?:type\s+)?\{\s*([^}]+)\s*\}/g;
+    let match;
+    while ((match = namedExportPattern.exec(content)) !== null) {
+        const items = match[1];
+        // Split by comma and handle "Name as Alias" syntax
+        items.split(',').forEach(item => {
+            const parts = item.trim().split(/\s+/);
+            const name = parts[0];
+            // Skip keywords and empty strings
+            if (name && name !== 'type' && name !== 'as') {
+                exports.add(name);
+            }
+        });
+    }
     
-    # Match: export { Name1, Name2 }
-    for match in re.finditer(r'export\s*\{\s*([^}]+)\s*\}', content):
-        items = match.group(1)
-        for item in items.split(','):
-            name = item.strip().split()[0]  # Handle "Name as Alias"
-            exports.add(name)
+    // Match: export const/let/var/function/class Name
+    // This handles direct exports of declarations
+    const declarationPattern = /export\s+(?:const|let|var|function|class|interface|type|enum)\s+(\w+)/g;
+    while ((match = declarationPattern.exec(content)) !== null) {
+        exports.add(match[1]);
+    }
     
-    # Match: export const/let/var/function/class Name
-    for match in re.finditer(r'export\s+(?:const|let|var|function|class|interface|type|enum)\s+(\w+)', content):
-        exports.add(match.group(1))
+    // Match: export default Name
+    // We capture the identifier if present, or just mark that there's a default
+    const defaultMatch = /export\s+default\s+(\w+)/.exec(content);
+    if (defaultMatch) {
+        exports.add('default:' + defaultMatch[1]);
+    } else if (content.includes('export default')) {
+        exports.add('default');
+    }
     
-    # Match: export default Name (capture the identifier if present)
-    default_match = re.search(r'export\s+default\s+(\w+)', content)
-    if default_match:
-        exports.add('default:' + default_match.group(1))
-    elif 'export default' in content:
-        exports.add('default')
+    // Match: export * from (re-exports)
+    // This indicates the file re-exports everything from another module
+    if (/export\s+\*/.test(content)) {
+        exports.add('*');
+    }
     
-    # Output format: filepath|export1,export2,export3
-    if exports:
-        print(f"$filepath|{','.join(sorted(exports))}")
-    else:
-        print(f"$filepath|")
-        
-except Exception as e:
-    # Silently fail for files we can't read
-    print(f"$filepath|", file=sys.stderr)
-    sys.exit(0)
-EOF
+    // Output format: filepath|export1,export2,export3
+    const exportList = Array.from(exports).sort().join(',');
+    console.log(`${filepath}|${exportList}`);
+    
+} catch (error) {
+    // Silently fail for files we can't read
+    console.log(`${filepath}|`);
+    process.exit(0);
+}
+NODESCRIPT
+)
+    
+    # Cache the result for future use
+    EXPORT_CONTENT_CACHE[$filepath]="$result"
+    echo "$result"
 }
 
 # ============================================================================
-# CONTENT-AWARE IMPORT EXTRACTION
+# CONTENT-AWARE IMPORT EXTRACTION using Node.js
 # ============================================================================
 
 extract_imported_names() {
     local source_file="$1"
     local import_statement="$2"
     
-    # Extract what's being imported from the source file
-    python3 << EOF
-import re
+    # Create cache key to avoid re-parsing the same file/import combination
+    local cache_key="${source_file}:${import_statement}"
+    
+    # Check cache first
+    if [[ -n "${IMPORT_CACHE[$cache_key]:-}" ]]; then
+        echo "${IMPORT_CACHE[$cache_key]}"
+        return 0
+    fi
+    
+    # Extract what's being imported from the source file using Node.js
+    local result
+    result=$(node << 'NODESCRIPT' "$source_file" "$import_statement"
+const fs = require('fs');
+const sourceFile = process.argv[1];
+const importPath = process.argv[2];
 
-try:
-    with open("$source_file", 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read()
+try {
+    const content = fs.readFileSync(sourceFile, 'utf8');
+    const importedNames = new Set();
     
-    imported_names = set()
-    import_path = "$import_statement"
+    // Escape special regex characters in the import path
+    const escapedPath = importPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     
-    # Find all import statements for this path
-    # Match: import { Name1, Name2 } from 'path'
-    pattern1 = rf"import\s*\{{\s*([^}}]+)\s*\}}\s*from\s*['\"]" + re.escape(import_path) + rf"['\"]"
-    for match in re.finditer(pattern1, content):
-        items = match.group(1)
-        for item in items.split(','):
-            # Handle "Name as Alias"
-            name = item.strip().split()[0]
-            imported_names.add(name)
+    // Match: import { Name1, Name2 } from 'path' or import type { Name1, Name2 } from 'path'
+    // This captures named imports
+    const namedPattern = new RegExp(`import\\s+(?:type\\s+)?\\{\\s*([^}]+)\\s*\\}\\s*from\\s*['"]${escapedPath}['"]`, 'g');
+    let match;
+    while ((match = namedPattern.exec(content)) !== null) {
+        const items = match[1];
+        items.split(',').forEach(item => {
+            // Handle "Name as Alias" - we want the original name
+            const parts = item.trim().split(/\s+/);
+            if (parts[0] && parts[0] !== 'type') {
+                importedNames.add(parts[0]);
+            }
+        });
+    }
     
-    # Match: import Name from 'path' (default import)
-    pattern2 = rf"import\s+(\w+)\s+from\s*['\"]" + re.escape(import_path) + rf"['\"]"
-    for match in re.finditer(pattern2, content):
-        imported_names.add('default:' + match.group(1))
+    // Match: import Name from 'path' (default import)
+    const defaultPattern = new RegExp(`import\\s+(\\w+)\\s+from\\s*['"]${escapedPath}['"]`, 'g');
+    while ((match = defaultPattern.exec(content)) !== null) {
+        importedNames.add('default:' + match[1]);
+    }
     
-    # Match: import * as Name from 'path'
-    pattern3 = rf"import\s+\*\s+as\s+(\w+)\s+from\s*['\"]" + re.escape(import_path) + rf"['\"]"
-    for match in re.finditer(pattern3, content):
-        imported_names.add('*:' + match.group(1))
+    // Match: import * as Name from 'path' (namespace import)
+    const namespacePattern = new RegExp(`import\\s+\\*\\s+as\\s+(\\w+)\\s+from\\s*['"]${escapedPath}['"]`, 'g');
+    while ((match = namespacePattern.exec(content)) !== null) {
+        importedNames.add('*:' + match[1]);
+    }
     
-    # Output comma-separated list
-    if imported_names:
-        print(','.join(sorted(imported_names)))
+    // Output comma-separated list
+    if (importedNames.size > 0) {
+        console.log(Array.from(importedNames).sort().join(','));
+    }
     
-except Exception:
-    # If we can't parse, return empty
-    pass
-EOF
+} catch (error) {
+    // If we can't parse, return empty
+}
+NODESCRIPT
+)
+    
+    # Cache the result
+    IMPORT_CACHE[$cache_key]="$result"
+    
+    echo "$result"
 }
 
 # ============================================================================
-# ALIAS CONFIGURATION DETECTION
+# ALIAS CONFIGURATION DETECTION using Node.js for JSON parsing
 # ============================================================================
 
 detect_alias_config() {
@@ -327,31 +422,84 @@ detect_alias_config() {
     if [[ -z "$config_file" ]]; then
         log_warning "No tsconfig.json found - using standard relative paths"
         echo "standard" > "$TEMP_DIR/alias_type.txt"
-        return
+        return 0
     fi
     
     log_debug "Using config file: $config_file"
     
-    if grep -q '"@client/\*"' "$config_file" && \
-       grep -q '"@server/\*"' "$config_file" && \
-       grep -q '"@shared/\*"' "$config_file"; then
-        echo "multi-codebase" > "$TEMP_DIR/alias_type.txt"
-        log_success "Detected multi-codebase alias strategy (@client, @server, @shared)"
+    # Use Node.js to properly parse JSON (handles comments, trailing commas, etc.)
+    node << 'NODESCRIPT' "$config_file" "$TEMP_DIR"
+const fs = require('fs');
+const configFile = process.argv[1];
+const tempDir = process.argv[2];
+
+try {
+    // Read the file and strip comments (tsconfig.json often has comments)
+    let content = fs.readFileSync(configFile, 'utf8');
+    
+    // Remove single-line comments
+    content = content.replace(/\/\/.*$/gm, '');
+    
+    // Remove multi-line comments
+    content = content.replace(/\/\*[\s\S]*?\*\//g, '');
+    
+    // Parse the cleaned JSON
+    const config = JSON.parse(content);
+    const paths = config.compilerOptions?.paths || {};
+    
+    // Check for multi-codebase aliases
+    if (paths['@client/*'] && paths['@server/*'] && paths['@shared/*']) {
+        fs.writeFileSync(`${tempDir}/alias_type.txt`, 'multi-codebase');
         
-        grep -A 1 '"@client/\*"' "$config_file" | tail -1 | sed 's/.*"\(.*\)".*/\1/' | sed 's/\/\*$//' > "$TEMP_DIR/client_base.txt"
-        grep -A 1 '"@server/\*"' "$config_file" | tail -1 | sed 's/.*"\(.*\)".*/\1/' | sed 's/\/\*$//' > "$TEMP_DIR/server_base.txt"
-        grep -A 1 '"@shared/\*"' "$config_file" | tail -1 | sed 's/.*"\(.*\)".*/\1/' | sed 's/\/\*$//' > "$TEMP_DIR/shared_base.txt"
+        // Extract base paths for each alias
+        const clientBase = paths['@client/*'][0].replace('/*', '');
+        const serverBase = paths['@server/*'][0].replace('/*', '');
+        const sharedBase = paths['@shared/*'][0].replace('/*', '');
         
-    elif grep -q '"@/\*"' "$config_file"; then
-        echo "single-alias" > "$TEMP_DIR/alias_type.txt"
-        log_success "Detected single-alias strategy (@)"
+        fs.writeFileSync(`${tempDir}/alias_paths.txt`, 
+            `client|${clientBase}\nserver|${serverBase}\nshared|${sharedBase}`);
         
-        grep -A 1 '"@/\*"' "$config_file" | tail -1 | sed 's/.*"\(.*\)".*/\1/' | sed 's/\/\*$//' > "$TEMP_DIR/alias_base.txt"
+        console.log('Detected multi-codebase alias strategy (@client, @server, @shared)');
+    }
+    // Check for single @ alias
+    else if (paths['@/*']) {
+        fs.writeFileSync(`${tempDir}/alias_type.txt`, 'single-alias');
         
-    else
-        echo "standard" > "$TEMP_DIR/alias_type.txt"
-        log_success "No aliases detected - using standard relative paths"
-    fi
+        const base = paths['@/*'][0].replace('/*', '');
+        fs.writeFileSync(`${tempDir}/alias_paths.txt`, `base|${base}`);
+        
+        console.log('Detected single-alias strategy (@)');
+    }
+    // No aliases detected
+    else {
+        fs.writeFileSync(`${tempDir}/alias_type.txt`, 'standard');
+        console.log('No aliases detected - using standard relative paths');
+    }
+    
+} catch (error) {
+    // If parsing fails, default to standard
+    fs.writeFileSync(`${tempDir}/alias_type.txt`, 'standard');
+    console.log('Error parsing config, using standard relative paths');
+}
+NODESCRIPT
+    
+    # Read what Node.js determined and log accordingly
+    local alias_type
+    alias_type=$(cat "$TEMP_DIR/alias_type.txt")
+    
+    case "$alias_type" in
+        multi-codebase)
+            log_success "Detected multi-codebase alias strategy (@client, @server, @shared)"
+            ;;
+        single-alias)
+            log_success "Detected single-alias strategy (@)"
+            ;;
+        *)
+            log_success "No aliases detected - using standard relative paths"
+            ;;
+    esac
+    
+    return 0
 }
 
 # ============================================================================
@@ -364,7 +512,7 @@ find_best_match() {
     
     log_debug "Finding match for: $import_path (from: $source_file)"
     
-    # Extract what's being imported from the source file
+    # Extract what's being imported to help with content-aware matching
     local imported_names
     imported_names=$(extract_imported_names "$source_file" "$import_path")
     
@@ -372,6 +520,7 @@ find_best_match() {
         log_debug "Looking for exports: $imported_names"
     fi
     
+    # Normalize the import path by removing extensions and /index suffixes
     local clean_import
     clean_import=$(echo "$import_path" | sed -E 's/\.(jsx?|tsx?)$//')
     clean_import=$(echo "$clean_import" | sed 's/\/index$//')
@@ -387,7 +536,7 @@ find_best_match() {
     fi
     
     # Strategy 2: Match with common extensions
-    for ext in ".ts" ".tsx" ".js" ".jsx"; do
+    for ext in ".ts" ".tsx" ".js" ".jsx" ".mjs" ".cjs"; do
         local match
         match=$(grep -F "${clean_import}${ext}" "$TEMP_DIR/file_index.txt" | head -1 || true)
         if [[ -n "$match" ]] && [[ -f "$match" ]]; then
@@ -408,7 +557,7 @@ find_best_match() {
         fi
     done
     
-    # Strategy 4: Content-aware fuzzy matching (only if we know what's being imported)
+    # Strategy 4: Content-aware matching (only if we know what's being imported)
     if [[ -n "$imported_names" ]]; then
         local best_match
         best_match=$(find_content_aware_match "$import_path" "$source_file" "$imported_names")
@@ -421,7 +570,7 @@ find_best_match() {
         fi
     fi
     
-    # Strategy 5: Contextual fuzzy filename match (use with caution)
+    # Strategy 5: Contextual fuzzy filename match (last resort)
     local filename
     filename=$(basename "$clean_import")
     
@@ -430,7 +579,7 @@ find_best_match() {
         fuzzy_matches=$(grep -i "^${filename}" "$TEMP_DIR/filename_index.txt" || true)
         
         if [[ -n "$fuzzy_matches" ]]; then
-            # Strongly prefer matches in same feature directory
+            # Prefer matches in same feature directory
             local source_feature
             source_feature=$(echo "$source_file" | cut -d'/' -f1-3)
             
@@ -451,7 +600,7 @@ find_best_match() {
     return 1
 }
 
-# Find files that export what we're looking for
+# Find files that export what we're looking for (optimized scoring)
 find_content_aware_match() {
     local import_path="$1"
     local source_file="$2"
@@ -474,31 +623,30 @@ find_content_aware_match() {
     local best_match=""
     local best_score=0
     
+    local source_dir
+    source_dir=$(dirname "$source_file")
+    
     while IFS= read -r candidate; do
-        if [[ ! -f "$candidate" ]]; then
-            continue
-        fi
+        [[ ! -f "$candidate" ]] && continue
         
-        # Get exports for this candidate
+        # Get exports for this candidate from our cache
         local candidate_exports
         candidate_exports=$(grep "^${candidate}|" "$TEMP_DIR/export_cache.txt" | cut -d'|' -f2 || echo "")
         
-        if [[ -z "$candidate_exports" ]]; then
-            continue
-        fi
+        [[ -z "$candidate_exports" ]] && continue
         
         # Calculate match score
         local score=0
         
-        # Convert to arrays for comparison
+        # Convert comma-separated strings to arrays for comparison
         IFS=',' read -ra IMPORTS <<< "$imported_names"
         IFS=',' read -ra EXPORTS <<< "$candidate_exports"
         
-        # Count matching exports
+        # Count matching exports (higher weight for exact matches)
         for import_name in "${IMPORTS[@]}"; do
             for export_name in "${EXPORTS[@]}"; do
                 if [[ "$import_name" == "$export_name" ]]; then
-                    score=$((score + 10))  # Exact match is very strong
+                    score=$((score + 10))  # Exact match is strong evidence
                 elif [[ "$import_name" == *":"* ]] && [[ "$export_name" == *":"* ]]; then
                     # Both are default exports
                     score=$((score + 5))
@@ -506,19 +654,17 @@ find_content_aware_match() {
             done
         done
         
-        # Bonus points for same directory context
-        local source_dir
+        # Bonus points for directory context (files in same directory are more likely correct)
         local candidate_dir
-        source_dir=$(dirname "$source_file")
         candidate_dir=$(dirname "$candidate")
         
         if [[ "$source_dir" == "$candidate_dir" ]]; then
-            score=$((score + 20))  # Same directory is very likely correct
+            score=$((score + 20))  # Same directory is very strong signal
         elif [[ "$source_dir" == *"$(basename "$candidate_dir")"* ]]; then
             score=$((score + 10))  # Related directory structure
         fi
         
-        log_debug "Candidate: $candidate, Score: $score, Exports: $candidate_exports"
+        log_debug "Candidate: $candidate, Score: $score"
         
         if [[ $score -gt $best_score ]]; then
             best_score=$score
@@ -526,49 +672,72 @@ find_content_aware_match() {
         fi
     done <<< "$candidates"
     
-    # Only return match if score is significant (at least one export matched)
+    # Only return match if score indicates confidence (at least one export matched)
     if [[ $best_score -ge 10 ]]; then
         log_success "Content match found with score $best_score: $best_match"
         echo "$best_match"
         return 0
     fi
     
-    log_debug "No confident content match found (best score: $best_score)"
+    log_debug "No confident content match (best score: $best_score)"
     return 1
 }
 
 # ============================================================================
-# PATH CALCULATION
+# PATH CALCULATION using Node.js (with caching)
 # ============================================================================
 
 calculate_relative_path() {
     local source_file="$1"
     local target_file="$2"
     
-    python3 << EOF
-import os
-import sys
+    # Check cache first to avoid redundant calculations
+    local cache_key="${source_file}:${target_file}"
+    if [[ -n "${RELATIVE_PATH_CACHE[$cache_key]:-}" ]]; then
+        echo "${RELATIVE_PATH_CACHE[$cache_key]}"
+        return 0
+    fi
+    
+    # Use Node.js path module for reliable path calculations
+    local result
+    result=$(node << 'NODESCRIPT' "$source_file" "$target_file"
+const path = require('path');
 
-source = os.path.dirname("$source_file")
-target = "$target_file"
+const sourceFile = process.argv[1];
+const targetFile = process.argv[2];
 
-try:
-    rel = os.path.relpath(target, source)
+try {
+    // Get the directory of the source file
+    const sourceDir = path.dirname(sourceFile);
     
-    if not rel.startswith('..'):
-        rel = './' + rel
+    // Calculate relative path from source directory to target
+    let relativePath = path.relative(sourceDir, targetFile);
     
-    base = os.path.basename(rel)
-    if '.' in base:
-        parts = rel.rsplit('.', 1)
-        if parts[1] in ['js', 'jsx', 'ts', 'tsx', 'mjs', 'cjs']:
-            rel = parts[0]
+    // Ensure relative paths start with ./
+    if (!relativePath.startsWith('..')) {
+        relativePath = './' + relativePath;
+    }
     
-    print(rel)
-except ValueError:
-    print(target)
-    sys.exit(1)
-EOF
+    // Remove file extension for imports (JS/TS convention)
+    const ext = path.extname(relativePath);
+    if (['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs'].includes(ext)) {
+        relativePath = relativePath.slice(0, -ext.length);
+    }
+    
+    // Normalize to forward slashes (even on Windows)
+    relativePath = relativePath.replace(/\\/g, '/');
+    
+    console.log(relativePath);
+} catch (error) {
+    console.log(targetFile);
+    process.exit(1);
+}
+NODESCRIPT
+)
+    
+    # Cache the result for future use
+    RELATIVE_PATH_CACHE[$cache_key]="$result"
+    echo "$result"
 }
 
 determine_import_path() {
@@ -581,35 +750,26 @@ determine_import_path() {
     
     case "$alias_type" in
         multi-codebase)
+            # Determine which codebase each file belongs to
             local source_base=""
             local target_base=""
             
-            if [[ "$source_file" == client/* ]]; then
-                source_base="client"
-            elif [[ "$source_file" == server/* ]]; then
-                source_base="server"
-            elif [[ "$source_file" == shared/* ]]; then
-                source_base="shared"
-            fi
+            for base in client server shared; do
+                [[ "$source_file" == ${base}/* ]] && source_base="$base"
+                [[ "$target_file" == ${base}/* ]] && target_base="$base"
+            done
             
-            if [[ "$target_file" == client/* ]]; then
-                target_base="client"
-            elif [[ "$target_file" == server/* ]]; then
-                target_base="server"
-            elif [[ "$target_file" == shared/* ]]; then
-                target_base="shared"
-            fi
-            
+            # Shared code always uses alias (accessible from anywhere)
             if [[ "$target_base" == "shared" ]]; then
                 echo "@shared/${target_file#shared/}"
+            # Same codebase - use alias if configured
             elif [[ "$source_base" == "$target_base" ]] && [[ -n "$source_base" ]]; then
                 case "$target_base" in
                     client)
-                        if [[ "$target_file" == client/src/* ]]; then
-                            echo "@client/${target_file#client/src/}"
-                        else
-                            echo "@client/${target_file#client/}"
-                        fi
+                        # Remove src prefix if present
+                        local path="${target_file#client/}"
+                        path="${path#src/}"
+                        echo "@client/${path}"
                         ;;
                     server)
                         echo "@server/${target_file#server/}"
@@ -618,12 +778,14 @@ determine_import_path() {
                         calculate_relative_path "$source_file" "$target_file"
                         ;;
                 esac
+            # Cross-codebase - use relative path
             else
                 calculate_relative_path "$source_file" "$target_file"
             fi
             ;;
             
         single-alias)
+            # Check if file is in src directory (common convention)
             if [[ "$target_file" == */src/* ]]; then
                 local after_src="${target_file#*/src/}"
                 echo "@/${after_src}"
@@ -633,13 +795,14 @@ determine_import_path() {
             ;;
             
         *)
+            # No aliases - always use relative paths
             calculate_relative_path "$source_file" "$target_file"
             ;;
     esac
 }
 
 # ============================================================================
-# IMPORT FIXING
+# IMPORT FIXING (with atomic file updates)
 # ============================================================================
 
 fix_import() {
@@ -648,9 +811,12 @@ fix_import() {
     
     FIXES_ATTEMPTED=$((FIXES_ATTEMPTED + 1))
     
-    # Skip external package imports
-    if [[ "$old_import" =~ ^[@a-zA-Z][a-zA-Z0-9_-]*(/|$) ]] && \
-       [[ "$old_import" != @/* ]]; then
+    # Skip external package imports (improved detection)
+    # External packages don't start with ./ or ../ or @/ (our aliases)
+    if [[ "$old_import" =~ ^[a-zA-Z@][a-zA-Z0-9_@/-]*$ ]] && \
+       [[ "$old_import" != @/* ]] && \
+       [[ "$old_import" != ./* ]] && \
+       [[ "$old_import" != ../* ]]; then
         log_debug "Skipping external package: $old_import"
         FIXES_SKIPPED=$((FIXES_SKIPPED + 1))
         return 0
@@ -660,8 +826,7 @@ fix_import() {
     local target_file
     if ! target_file=$(find_best_match "$old_import" "$source_file"); then
         log_warning "No suitable match found for: $old_import in $source_file"
-        log_warning "This import may reference a file that was removed, renamed, or relocated."
-        log_warning "Manual review recommended to determine the correct replacement."
+        log_warning "This import may reference a deleted, renamed, or relocated file."
         FIXES_FAILED=$((FIXES_FAILED + 1))
         return 1
     fi
@@ -670,6 +835,7 @@ fix_import() {
     local new_import
     new_import=$(determine_import_path "$source_file" "$target_file")
     
+    # Skip if already correct
     if [[ "$old_import" == "$new_import" ]]; then
         log_debug "Import already correct: $old_import"
         FIXES_SKIPPED=$((FIXES_SKIPPED + 1))
@@ -682,17 +848,28 @@ fix_import() {
     echo -e "   ${GREEN}+${NC} from '$new_import'"
     
     if [[ "$DRY_RUN" == "false" ]]; then
-        local escaped_old escaped_new
+        # Create temp file for atomic update (prevents data loss on failure)
+        local temp_file="${source_file}.tmp.$$"
         
+        # Escape special characters for sed
+        local escaped_old escaped_new
         escaped_old=$(printf '%s\n' "$old_import" | sed 's/[[\.*^$/]/\\&/g')
         escaped_new=$(printf '%s\n' "$new_import" | sed 's/[\/&]/\\&/g')
         
-        sed -i "s|from '${escaped_old}'|from '${escaped_new}'|g" "$source_file"
-        sed -i "s|from \"${escaped_old}\"|from \"${escaped_new}\"|g" "$source_file"
-        sed -i "s|import('${escaped_old}')|import('${escaped_new}')|g" "$source_file"
-        sed -i "s|import(\"${escaped_old}\")|import(\"${escaped_new}\")|g" "$source_file"
-        
-        FIXES_SUCCESSFUL=$((FIXES_SUCCESSFUL + 1))
+        # Perform replacements safely - handles both single and double quotes
+        if sed "s|from ['\"]${escaped_old}['\"]|from '${escaped_new}'|g; \
+                s|import(['\"]${escaped_old}['\"])|import('${escaped_new}')|g" \
+                "$source_file" > "$temp_file"; then
+            
+            # Only replace original if sed succeeded
+            mv "$temp_file" "$source_file"
+            FIXES_SUCCESSFUL=$((FIXES_SUCCESSFUL + 1))
+        else
+            log_error "Failed to update $source_file"
+            rm -f "$temp_file"
+            FIXES_FAILED=$((FIXES_FAILED + 1))
+            return 1
+        fi
     else
         FIXES_SUCCESSFUL=$((FIXES_SUCCESSFUL + 1))
     fi
@@ -705,13 +882,10 @@ fix_import() {
 # ============================================================================
 
 parse_and_fix_imports() {
-    log_info "Parsing import analysis and resolving issues intelligently..."
+    log_info "Parsing import analysis and resolving issues..."
     echo ""
     
-    if [[ ! -f "$ANALYSIS_FILE" ]]; then
-        log_error "Analysis file not found: $ANALYSIS_FILE"
-        return 1
-    fi
+    [[ ! -f "$ANALYSIS_FILE" ]] && { log_error "Analysis file not found: $ANALYSIS_FILE"; return 1; }
     
     local current_file=""
     local in_missing_section=false
@@ -720,12 +894,14 @@ parse_and_fix_imports() {
     while IFS= read -r line; do
         line_number=$((line_number + 1))
         
+        # Detect the section we care about
         if [[ "$line" == "## Missing or Invalid Imports" ]]; then
             in_missing_section=true
             log_debug "Found missing imports section at line $line_number"
             continue
         fi
         
+        # Exit when we hit another section (sections start with ##)
         if [[ "$in_missing_section" == true ]] && \
            [[ "$line" =~ ^##[[:space:]] ]] && \
            [[ "$line" != "## Missing or Invalid Imports" ]]; then
@@ -734,6 +910,7 @@ parse_and_fix_imports() {
         fi
         
         if [[ "$in_missing_section" == true ]]; then
+            # Parse file headers (### followed by backtick-wrapped filename)
             if [[ "$line" =~ ^###[[:space:]]\`([^\`]+)\` ]]; then
                 current_file="${BASH_REMATCH[1]}"
                 FILES_PROCESSED=$((FILES_PROCESSED + 1))
@@ -741,6 +918,7 @@ parse_and_fix_imports() {
                 continue
             fi
             
+            # Parse import lines (starts with - and has ❌ or ✗)
             if [[ "$line" =~ ^-[[:space:]][❌✗][[:space:]]\`([^\`]+)\` ]]; then
                 local import_path="${BASH_REMATCH[1]}"
                 
@@ -757,6 +935,7 @@ parse_and_fix_imports() {
     done < "$ANALYSIS_FILE"
     
     log_debug "Processed $FILES_PROCESSED files with import issues"
+    return 0
 }
 
 # ============================================================================
@@ -784,41 +963,41 @@ generate_summary() {
     
     echo ""
     
-    if [[ $CONTENT_MATCHES_USED -gt 0 ]]; then
+    [[ $CONTENT_MATCHES_USED -gt 0 ]] && {
         echo -e "${CYAN}ℹ${NC} Used intelligent content analysis for $CONTENT_MATCHES_USED imports"
         echo "  These matches were based on actual exported functions/types"
         echo ""
-    fi
+    }
     
-    if [[ $FIXES_FAILED -gt 0 ]]; then
+    [[ $FIXES_FAILED -gt 0 ]] && {
         echo -e "${YELLOW}⚠${NC} $FIXES_FAILED imports could not be resolved automatically"
-        echo "  These may reference files that were removed, renamed, or relocated"
-        echo "  Please review the log and fix these manually"
+        echo "  These may reference deleted, renamed, or relocated files"
+        echo "  Review the log and fix these manually"
         echo ""
-    fi
+    }
     
     if [[ "$DRY_RUN" == "true" ]]; then
         echo -e "${YELLOW}⚠  DRY RUN MODE${NC} - No files were modified"
         echo ""
-        echo "  To apply these changes, run:"
+        echo "  To apply changes:"
         echo -e "  ${CYAN}DRY_RUN=false $0${NC}"
         echo ""
-        echo "  Or with debug output:"
+        echo "  With debug output:"
         echo -e "  ${CYAN}DEBUG=true DRY_RUN=false $0${NC}"
     else
         echo -e "${GREEN}✓ Changes applied successfully${NC}"
         echo ""
-        echo "  Backup location: $BACKUP_DIR"
-        echo "  Log file:        $LOG_FILE"
+        echo "  Backup:     $BACKUP_DIR/backup.tar.gz"
+        echo "  Log file:   $LOG_FILE"
         echo ""
-        echo "  Recommended next steps:"
-        echo "    1. Review changes:    git diff"
-        echo "    2. Type checking:     npm run type-check"
-        echo "    3. Run tests:         npm test"
-        echo "    4. Lint files:        npm run lint"
+        echo "  Next steps:"
+        echo "    1. Review:      git diff"
+        echo "    2. Type check:  npm run type-check"
+        echo "    3. Test:        npm test"
+        echo "    4. Lint:        npm run lint"
         echo ""
-        echo "  If issues occur, restore from backup:"
-        echo "    cp -r $BACKUP_DIR/* ."
+        echo "  To restore backup:"
+        echo "    tar -xzf $BACKUP_DIR/backup.tar.gz"
     fi
     
     echo ""
@@ -833,16 +1012,18 @@ show_help() {
     cat << EOF
 ${CYAN}Enhanced Import Resolver${NC} - Content-Aware Import Path Fixing
 
-This script analyzes broken imports and automatically fixes them by examining
-the actual exports of candidate files, ensuring logical resolution based on
-what's actually being imported rather than just filename matching.
+Intelligently analyzes and fixes broken imports by examining actual file 
+exports, ensuring logical resolution based on what's being imported rather
+than just filename matching.
 
 ${YELLOW}Key Features:${NC}
-    • Content-aware matching - analyzes what files export
-    • Detects removed/renamed files - won't force invalid matches
+    • Content-aware matching using export analysis
+    • Parallel processing for faster execution
+    • Intelligent caching to avoid redundant work
+    • Detects removed/renamed files
     • Respects TypeScript alias configuration
-    • Considers directory context and feature boundaries
-    • Comprehensive safety checks and logging
+    • Atomic file updates for safety
+    • Pure Node.js implementation (no Python required)
 
 ${YELLOW}Usage:${NC}
     $0                              # Dry run (preview changes)
@@ -853,25 +1034,27 @@ ${YELLOW}Options:${NC}
     --help, -h                      Show this help message
 
 ${YELLOW}Environment Variables:${NC}
-    DRY_RUN=true|false             Control whether to apply changes (default: true)
-    DEBUG=true|false               Enable detailed debug output (default: false)
+    DRY_RUN=true|false             Apply changes (default: true)
+    DEBUG=true|false               Enable debug output (default: false)
+    MAX_PARALLEL_JOBS=N            Parallel jobs (default: 4)
 
-${YELLOW}How It Works:${NC}
-    1. Extracts what each file exports (functions, types, classes)
-    2. Analyzes what the importing file is trying to import
-    3. Matches based on actual content, not just filenames
-    4. Considers directory context and project boundaries
-    5. Warns when files may have been intentionally removed
+${YELLOW}How Content Matching Works:${NC}
+    1. Extracts exports from all project files using Node.js
+    2. Analyzes what the importing file needs
+    3. Scores candidates based on export matches
+    4. Considers directory context and boundaries
+    5. Only suggests matches with high confidence
 
-${YELLOW}Example Scenario:${NC}
+${YELLOW}Example:${NC}
     If you have:
-      - client/utils/formatDate.ts (exports: formatDate, parseDate)
-      - server/utils/formatDate.ts (exports: formatISO, formatSQL)
+      - client/utils/formatDate.ts → exports: formatDate, parseDate
+      - server/utils/formatDate.ts → exports: formatISO, formatSQL
     
-    And an import breaks: import { formatDate } from './utils/formatDate'
+    And an import breaks:
+      import { formatDate } from './utils/formatDate'
     
-    The script will analyze which file actually exports 'formatDate' and
-    resolve to the correct one, rather than just picking the first match.
+    The script analyzes which file exports 'formatDate' and resolves to
+    the correct one based on actual content, not just filename similarity.
 
 EOF
 }
@@ -885,21 +1068,15 @@ main() {
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
     
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log_warning "Running in DRY RUN mode - no files will be modified"
-    else
-        log_info "Running in LIVE mode - files will be modified"
-    fi
-    
-    if [[ "${DEBUG:-false}" == "true" ]]; then
-        log_info "Debug mode enabled - detailed output will be shown"
-    fi
+    [[ "$DRY_RUN" == "true" ]] && log_warning "Running in DRY RUN mode - no files will be modified"
+    [[ "$DRY_RUN" == "false" ]] && log_info "Running in LIVE mode - files will be modified"
+    [[ "${DEBUG:-false}" == "true" ]] && log_info "Debug mode enabled"
     
     echo ""
     
-    check_prerequisites
-    detect_alias_config
-    build_file_index
+    check_prerequisites || exit 1
+    detect_alias_config || exit 1
+    build_file_index || exit 1
     create_backup
     
     echo ""
@@ -907,20 +1084,14 @@ main() {
     
     generate_summary
     
-    if [[ "$DRY_RUN" == "false" ]]; then
-        cp "$LOG_FILE" "$BACKUP_DIR/resolution.log"
-    fi
+    [[ "$DRY_RUN" == "false" ]] && cp "$LOG_FILE" "$BACKUP_DIR/resolution.log"
     
-    if [[ $FIXES_FAILED -gt 0 ]] || [[ $FIXES_ATTEMPTED -eq 0 ]]; then
-        exit 1
-    else
-        exit 0
-    fi
+    # Exit with appropriate code
+    [[ $FIXES_FAILED -gt 0 ]] || [[ $FIXES_ATTEMPTED -eq 0 ]] && exit 1
+    exit 0
 }
 
-if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
-    show_help
-    exit 0
-fi
+# Entry point
+[[ "${1:-}" =~ ^(-h|--help)$ ]] && { show_help; exit 0; }
 
-main
+main "$@"

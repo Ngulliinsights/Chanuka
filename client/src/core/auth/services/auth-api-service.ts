@@ -7,8 +7,12 @@
  * - All authentication-related API operations
  */
 
-import { logger } from '../../../utils/logger';
-import type { 
+import { logger } from '@client/utils/logger';
+ 
+import type { UnifiedApiClient } from '../../api/types';
+import { createError } from '../../error';
+import { ErrorDomain, ErrorSeverity } from '../../error/constants';
+import type {
   User,
   LoginCredentials,
   RegisterData,
@@ -26,23 +30,17 @@ import type {
   DataDeletionRequest,
 } from '../types';
 
-import type { UnifiedApiClient } from '../../api/types';
-import { createError } from '../../error';
-import { ErrorDomain, ErrorSeverity } from '../../error/constants';
-
 /**
  * Centralized service for all authentication-related API operations.
  * Provides consistent error handling, logging, and type safety across
  * the authentication layer.
  */
 export class AuthApiService {
-  private readonly baseUrl: string;
   private readonly authEndpoint: string;
   private readonly apiClient: UnifiedApiClient;
 
   constructor(apiClient: UnifiedApiClient, baseUrl: string = '/api') {
     this.apiClient = apiClient;
-    this.baseUrl = baseUrl;
     this.authEndpoint = `${baseUrl}/auth`;
   }
 
@@ -85,7 +83,7 @@ export class AuthApiService {
           ErrorDomain.VALIDATION,
           ErrorSeverity.MEDIUM,
           'Passwords do not match',
-          { field: 'confirmPassword' }
+          { context: { field: 'confirmPassword' } }
         );
       }
 
@@ -94,7 +92,7 @@ export class AuthApiService {
           ErrorDomain.VALIDATION,
           ErrorSeverity.MEDIUM,
           'Terms and conditions must be accepted',
-          { field: 'acceptTerms' }
+          { context: { field: 'acceptTerms' } }
         );
       }
 
@@ -348,12 +346,12 @@ export class AuthApiService {
    */
   async resetPassword(reset: PasswordReset): Promise<void> {
     try {
-      if (reset.newPassword !== reset.confirmPassword) {
+      if (reset.password !== reset.confirmPassword) {
         throw createError(
           ErrorDomain.VALIDATION,
           ErrorSeverity.MEDIUM,
           'Passwords do not match',
-          { field: 'confirmPassword' }
+          { context: { field: 'confirmPassword' } }
         );
       }
 
@@ -580,7 +578,7 @@ export class AuthApiService {
         ErrorDomain.AUTHENTICATION,
         ErrorSeverity.HIGH,
         error.message,
-        { originalError: error }
+        { details: { originalError: error } }
       );
     }
 
@@ -588,7 +586,7 @@ export class AuthApiService {
       ErrorDomain.AUTHENTICATION,
       ErrorSeverity.HIGH,
       defaultMessage,
-      { originalError: error }
+      { details: { originalError: error } }
     );
   }
 }

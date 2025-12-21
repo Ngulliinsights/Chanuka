@@ -22,7 +22,7 @@ interface DashboardContentProps {
 /**
  * Dashboard Content Component
  */
-export const DashboardContent: React.FC<DashboardContentProps> = ({
+export const DashboardContent = React.memo(<DashboardContentProps> = ({
   id = 'main-content',
   config,
   children,
@@ -59,6 +59,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       </div>
     </main>
   );
+);
+
+function 1(
 };
 
 DashboardContent.displayName = 'DashboardContent';

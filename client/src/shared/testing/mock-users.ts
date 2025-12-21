@@ -202,9 +202,9 @@ class MockUserDataService {
    * Generates realistic user interaction data
    */
   generateUserInteractions(userId: string, billIds: number[]): {
-    comments: any[];
-    votes: any[];
-    follows: any[];
+    comments: unknown[];
+    votes: unknown[];
+    follows: unknown[];
   } {
     const interactions = {
       comments: [],

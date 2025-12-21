@@ -69,7 +69,15 @@ export class ConfigurationService {
    * without traversing the entire object structure.
    */
   getNested<T>(path: string): T | undefined {
-    const result = path.split('.').reduce((obj: any, key) => obj?.[key], this.config);
+    const result = path.split('.').reduce(
+      (obj: Record<string, unknown> | undefined, key) => {
+        if (obj && typeof obj === 'object' && key in obj) {
+          return obj[key] as Record<string, unknown>;
+        }
+        return undefined;
+      },
+      this.config as unknown as Record<string, unknown>
+    );
     return result as T | undefined;
   }
 
@@ -320,31 +328,65 @@ export class ConfigurationService {
   /**
    * Deep merges two objects, with the source taking precedence over the target.
    * This preserves nested objects and arrays while allowing selective overrides.
+   * Builds the result object immutably to avoid readonly property assignment errors.
    */
-  private deepMerge<T>(target: T, source: Partial<T>): T {
-    const result = { ...target };
-
-    for (const key in source) {
-      if (source.hasOwnProperty(key)) {
-        const sourceValue = source[key];
-        const targetValue = result[key];
-
-        if (this.isObject(sourceValue) && this.isObject(targetValue)) {
-          result[key] = this.deepMerge(targetValue, sourceValue as any);
-        } else if (sourceValue !== undefined) {
-          result[key] = sourceValue as T[typeof key];
+  private deepMerge(
+    target: ServiceConfig,
+    source: Partial<ServiceConfig>
+  ): ServiceConfig {
+    // Build api config by merging nested properties
+    const apiConfig = source.api 
+      ? {
+          ...target.api,
+          ...source.api,
+          cache: source.api.cache 
+            ? { ...target.api.cache, ...source.api.cache }
+            : target.api.cache,
+          retry: source.api.retry 
+            ? { ...target.api.retry, ...source.api.retry }
+            : target.api.retry,
+          rateLimit: source.api.rateLimit 
+            ? { ...target.api.rateLimit, ...source.api.rateLimit }
+            : target.api.rateLimit
         }
-      }
-    }
+      : target.api;
+
+    // Build websocket config by merging nested properties
+    const websocketConfig = source.websocket
+      ? {
+          ...target.websocket,
+          ...source.websocket,
+          reconnect: source.websocket.reconnect
+            ? { ...target.websocket.reconnect, ...source.websocket.reconnect }
+            : target.websocket.reconnect,
+          heartbeat: source.websocket.heartbeat
+            ? { ...target.websocket.heartbeat, ...source.websocket.heartbeat }
+            : target.websocket.heartbeat,
+          message: source.websocket.message
+            ? { ...target.websocket.message, ...source.websocket.message }
+            : target.websocket.message,
+          authentication: source.websocket.authentication
+            ? { ...target.websocket.authentication, ...source.websocket.authentication }
+            : target.websocket.authentication
+        }
+      : target.websocket;
+
+    // Build the complete result object immutably
+    const result: ServiceConfig = {
+      api: apiConfig,
+      websocket: websocketConfig,
+      features: source.features 
+        ? { ...target.features, ...source.features }
+        : target.features,
+      limits: source.limits
+        ? { ...target.limits, ...source.limits }
+        : target.limits,
+      monitoring: source.monitoring
+        ? { ...target.monitoring, ...source.monitoring }
+        : target.monitoring
+    };
 
     return result;
-  }
-
-  /**
-   * Type guard to check if a value is a plain object (not an array or null).
-   */
-  private isObject(value: any): value is Record<string, any> {
-    return value !== null && typeof value === 'object' && !Array.isArray(value);
   }
 
   /**
@@ -376,7 +418,7 @@ export class ConfigurationService {
    * If an observer throws an error, it's caught and logged but doesn't
    * prevent other observers from being notified.
    */
-  private notifyObservers(key: string, newValue: any, oldValue: any): void {
+  private notifyObservers(key: string, newValue: unknown, oldValue: unknown): void {
     for (const observer of this.configObservers) {
       try {
         observer.onConfigChange(key, newValue, oldValue);
@@ -635,16 +677,40 @@ export class MonitoringConfigValidator implements ConfigValidator {
 // ============================================================================
 
 /**
+ * Type guard for cache configuration
+ */
+interface CacheConfig {
+  defaultTTL: number;
+  maxSize: number;
+  storage: string;
+  compression: boolean;
+  encryption: boolean;
+  evictionPolicy: string;
+}
+
+/**
+ * Type guard for WebSocket configuration  
+ */
+interface WebSocketConfig {
+  url: string;
+  protocols?: string[];
+  reconnect: Record<string, unknown>;
+  heartbeat: Record<string, unknown>;
+  message: Record<string, unknown>;
+  authentication?: Record<string, unknown>;
+}
+
+/**
  * Observer that reacts to cache configuration changes.
  * In a real implementation, this would reconfigure the cache manager.
  */
 export class CacheConfigObserver implements ConfigObserver {
   constructor() {}
 
-  onConfigChange(key: string, newValue: any, oldValue: any): void {
+  onConfigChange(key: string, newValue: unknown, oldValue: unknown): void {
     if (key === 'api' || key === 'config') {
-      const newCacheConfig = key === 'api' ? newValue.cache : newValue.api?.cache;
-      const oldCacheConfig = key === 'api' ? oldValue?.cache : oldValue?.api?.cache;
+      const newCacheConfig = this.extractCacheConfig(key, newValue);
+      const oldCacheConfig = this.extractCacheConfig(key, oldValue);
 
       if (newCacheConfig && this.hasChanged(newCacheConfig, oldCacheConfig)) {
         logger.info('Cache configuration updated', {
@@ -659,7 +725,34 @@ export class CacheConfigObserver implements ConfigObserver {
     }
   }
 
-  private hasChanged(newConfig: any, oldConfig: any): boolean {
+  private extractCacheConfig(key: string, value: unknown): CacheConfig | null {
+    if (key === 'api' && this.isApiConfig(value)) {
+      return value.cache;
+    }
+    if (key === 'config' && this.isServiceConfig(value)) {
+      return value.api?.cache || null;
+    }
+    return null;
+  }
+
+  private isApiConfig(value: unknown): value is { cache: CacheConfig } {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      'cache' in value &&
+      typeof value.cache === 'object'
+    );
+  }
+
+  private isServiceConfig(value: unknown): value is { api?: { cache: CacheConfig } } {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      'api' in value
+    );
+  }
+
+  private hasChanged(newConfig: CacheConfig, oldConfig: CacheConfig | null): boolean {
     return JSON.stringify(newConfig) !== JSON.stringify(oldConfig);
   }
 }
@@ -671,10 +764,10 @@ export class CacheConfigObserver implements ConfigObserver {
 export class WebSocketConfigObserver implements ConfigObserver {
   constructor() {}
 
-  onConfigChange(key: string, newValue: any, oldValue: any): void {
+  onConfigChange(key: string, newValue: unknown, oldValue: unknown): void {
     if (key === 'websocket' || key === 'config') {
-      const newWsConfig = key === 'websocket' ? newValue : newValue.websocket;
-      const oldWsConfig = key === 'websocket' ? oldValue : oldValue?.websocket;
+      const newWsConfig = this.extractWebSocketConfig(key, newValue);
+      const oldWsConfig = this.extractWebSocketConfig(key, oldValue);
 
       if (newWsConfig && this.hasChanged(newWsConfig, oldWsConfig)) {
         logger.info('WebSocket configuration updated', {
@@ -690,7 +783,34 @@ export class WebSocketConfigObserver implements ConfigObserver {
     }
   }
 
-  private hasChanged(newConfig: any, oldConfig: any): boolean {
+  private extractWebSocketConfig(key: string, value: unknown): WebSocketConfig | null {
+    if (key === 'websocket' && this.isWebSocketConfig(value)) {
+      return value;
+    }
+    if (key === 'config' && this.isServiceConfig(value)) {
+      return value.websocket;
+    }
+    return null;
+  }
+
+  private isWebSocketConfig(value: unknown): value is WebSocketConfig {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      'url' in value &&
+      typeof value.url === 'string'
+    );
+  }
+
+  private isServiceConfig(value: unknown): value is { websocket: WebSocketConfig } {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      'websocket' in value
+    );
+  }
+
+  private hasChanged(newConfig: WebSocketConfig, oldConfig: WebSocketConfig | null): boolean {
     return JSON.stringify(newConfig) !== JSON.stringify(oldConfig);
   }
 }
@@ -698,6 +818,16 @@ export class WebSocketConfigObserver implements ConfigObserver {
 // ============================================================================
 // Environment Configuration Loader
 // ============================================================================
+
+/**
+ * Type for cache storage options
+ */
+type CacheStorage = 'memory' | 'localStorage' | 'indexedDB';
+
+/**
+ * Type for cache eviction policy
+ */
+type EvictionPolicy = 'lru' | 'lfu' | 'fifo' | 'ttl';
 
 /**
  * Loads configuration from environment variables.
@@ -721,10 +851,10 @@ export class EnvironmentConfigLoader {
         cache: {
           defaultTTL: this.getEnvNumber('VITE_CACHE_TTL') || 5 * 60 * 1000,
           maxSize: this.getEnvNumber('VITE_CACHE_MAX_SIZE') || 100,
-          storage: (this.getEnvString('REACT_APP_CACHE_STORAGE') || 'memory') as any,
+          storage: this.getCacheStorage(),
           compression: this.getEnvBoolean('REACT_APP_CACHE_COMPRESSION', false),
           encryption: this.getEnvBoolean('REACT_APP_CACHE_ENCRYPTION', false),
-          evictionPolicy: (this.getEnvString('REACT_APP_CACHE_EVICTION') || 'lru') as any
+          evictionPolicy: this.getEvictionPolicy()
         }
       },
       websocket: {
@@ -765,7 +895,7 @@ export class EnvironmentConfigLoader {
       monitoring: {
         enableMetrics: this.getEnvBoolean('REACT_APP_ENABLE_METRICS', true),
         enableTracing: this.getEnvBoolean('REACT_APP_ENABLE_TRACING', false),
-        logLevel: (this.getEnvString('REACT_APP_LOG_LEVEL') || 'info') as LogLevel,
+        logLevel: this.getLogLevel(),
         sampleRate: this.getEnvNumber('REACT_APP_SAMPLE_RATE') || 1.0
       }
     };
@@ -786,6 +916,24 @@ export class EnvironmentConfigLoader {
     const value = process.env[key];
     if (value === undefined) return defaultValue;
     return value.toLowerCase() === 'true';
+  }
+
+  private static getCacheStorage(): CacheStorage {
+    const storage = this.getEnvString('REACT_APP_CACHE_STORAGE') || 'memory';
+    const validStorages: CacheStorage[] = ['memory', 'localStorage', 'indexedDB'];
+    return validStorages.includes(storage as CacheStorage) ? (storage as CacheStorage) : 'memory';
+  }
+
+  private static getEvictionPolicy(): EvictionPolicy {
+    const policy = this.getEnvString('REACT_APP_CACHE_EVICTION') || 'lru';
+    const validPolicies: EvictionPolicy[] = ['lru', 'lfu', 'fifo', 'ttl'];
+    return validPolicies.includes(policy as EvictionPolicy) ? (policy as EvictionPolicy) : 'lru';
+  }
+
+  private static getLogLevel(): LogLevel {
+    const level = this.getEnvString('REACT_APP_LOG_LEVEL') || 'info';
+    const validLevels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
+    return validLevels.includes(level as LogLevel) ? (level as LogLevel) : 'info';
   }
 }
 

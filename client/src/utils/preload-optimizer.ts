@@ -72,7 +72,9 @@ class PreloadOptimizer {
     const timeout = setTimeout(() => {
       if (!this.usedResources.has(config.href)) {
         this.removePreload(config.href);
-        console.warn(`Removed unused preload: ${config.href}`);
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`Removed unused preload: ${config.href}`);
+        }
       }
     }, 10000); // 10 second timeout
 

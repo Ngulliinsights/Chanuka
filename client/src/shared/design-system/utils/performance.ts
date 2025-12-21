@@ -238,7 +238,7 @@ export const performanceMonitoring = {
   /**
    * Monitor layout shifts
    */
-  monitorLayoutShifts: (callback: (entries: any[]) => void): PerformanceObserver => {
+  monitorLayoutShifts: (callback: (entries: unknown[]) => void): PerformanceObserver => {
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries() as any[];
       callback(entries);

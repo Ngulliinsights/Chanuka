@@ -143,7 +143,9 @@ export class RoutePreloader {
         this.preloadedRoutes.add(routePath);
       }
     } catch (error) {
-      console.warn(`Failed to preload route ${routePath}:`, error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`Failed to preload route ${routePath}:`, error);
+      }
       // Remove failed promise so it can be retried
       this.preloadPromises.delete(routePath);
     }

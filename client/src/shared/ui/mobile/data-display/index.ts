@@ -11,7 +11,7 @@
 export { MobileDataVisualization } from './MobileDataVisualization';
 
 // Tab components
-export { MobileTabSelector, useMobileTabs } from './MobileTabSelector';
+export { MobileTabSelector } from './MobileTabSelector';
 export type { MobileTab } from './MobileTabSelector';
 
 // Card components

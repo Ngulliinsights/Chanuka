@@ -86,23 +86,34 @@ class CoreErrorHandler {
    * Handle an error with comprehensive processing including analytics and reporting
    */
   handleError(errorData: Partial<AppError>): AppError {
-    // Create standardized error object
-    const error: AppError = {
-      id: this.generateErrorId(),
-      type: ErrorDomain.UNKNOWN,
-      severity: ErrorSeverity.MEDIUM,
-      message: 'An unknown error occurred',
-      timestamp: Date.now(),
-      recoverable: true,
-      retryable: false,
-      retryCount: 0,
-      context: {
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        timestamp: Date.now(),
-      },
-      ...errorData,
-    };
+    // Create standardized error object using AppError constructor
+    const error = new AppError(
+      errorData.message || 'An unknown error occurred',
+      errorData.code || 'UNKNOWN_ERROR',
+      errorData.type || ErrorDomain.UNKNOWN,
+      errorData.severity || ErrorSeverity.MEDIUM,
+      {
+        statusCode: errorData.statusCode,
+        context: {
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          timestamp: Date.now(),
+          ...errorData.context,
+        },
+        userId: errorData.userId,
+        sessionId: errorData.sessionId,
+        recoverable: errorData.recoverable ?? true,
+        retryable: errorData.retryable ?? false,
+        recoveryStrategies: errorData.recoveryStrategies || [],
+        retryCount: errorData.retryCount || 0,
+        recovered: errorData.recovered ?? false,
+        recoveryStrategy: errorData.recoveryStrategy,
+        cause: errorData.cause,
+        metadata: errorData.metadata,
+        correlationId: errorData.correlationId || this.generateErrorId(),
+        details: errorData.details,
+      }
+    );
 
     // Check rate limiting
     const rateLimitResult = this.rateLimiter.shouldLimit(error);
@@ -173,8 +184,21 @@ class CoreErrorHandler {
       try {
         const success = await strategy.recover(error);
         if (success) {
-          error.recovered = true;
-          error.recoveryStrategy = strategy.id;
+          // Create a new error instance with recovery information
+          const recoveredError = new AppError(
+            error.message,
+            error.code,
+            error.type,
+            error.severity,
+            {
+              ...error,
+              recovered: true,
+              recoveryStrategy: strategy.id,
+            }
+          );
+
+          // Update the stored error
+          this.errors.set(error.id, recoveredError);
 
           return {
             success: true,
@@ -226,7 +250,21 @@ class CoreErrorHandler {
         const delayMs = Math.min(1000 * Math.pow(2, retryCount), 10000);
 
         await new Promise(resolve => setTimeout(resolve, delayMs));
-        error.retryCount = retryCount;
+        
+        // Create a new error instance with incremented retry count
+        const retriedError = new AppError(
+          error.message,
+          error.code,
+          error.type,
+          error.severity,
+          {
+            ...error,
+            retryCount,
+          }
+        );
+
+        // Update the stored error
+        this.errors.set(error.id, retriedError);
 
         // The actual retry logic should be handled by the calling code
         return false; // Let caller handle the retry

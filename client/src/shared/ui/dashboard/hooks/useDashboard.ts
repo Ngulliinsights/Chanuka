@@ -26,7 +26,7 @@ import {
   safeValidateDashboardConfig 
 } from '@client/validation';
 
-import { useBills } from '@/features/bills/hooks/useBills';
+import { useBills } from '@client/features/bills/hooks/useBills';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds

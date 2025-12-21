@@ -178,7 +178,7 @@ export function generateResponsiveLayout(
  * Format chart data for different chart types
  */
 export function formatChartData(
-  rawData: any[],
+  rawData: unknown[],
   chartType: 'line' | 'bar' | 'pie' | 'area',
   labelField: string,
   valueField: string

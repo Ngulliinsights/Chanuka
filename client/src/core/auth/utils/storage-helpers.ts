@@ -40,7 +40,7 @@ export function retrieveSecurely(key: string): string | null {
   return localStorage.getItem(key);
 }
 
-export function getCurrentSession(): any {
+export function getCurrentSession(): { token: string } | null {
   const token = getStorageToken();
   return token ? { token } : null;
 }

@@ -411,9 +411,10 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     // Cleanup function removes intervals and prevents memory leaks
     // This is critical for preventing memory leaks when components unmount
     return () => {
-      if (intervalRefs.current.connectionInterval) {
-        clearInterval(intervalRefs.current.connectionInterval);
-        intervalRefs.current.connectionInterval = undefined;
+      const currentIntervals = intervalRefs.current;
+      if (currentIntervals.connectionInterval) {
+        clearInterval(currentIntervals.connectionInterval);
+        currentIntervals.connectionInterval = undefined;
       }
     };
   }, [autoStart, checkInterval, enableHealthChecks, performConnectionCheck, performHealthCheck]);
@@ -434,9 +435,10 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
 
     // Clear interval on cleanup to prevent checks after unmount
     return () => {
-      if (intervalRefs.current.healthInterval) {
-        clearInterval(intervalRefs.current.healthInterval);
-        intervalRefs.current.healthInterval = undefined;
+      const currentIntervals = intervalRefs.current;
+      if (currentIntervals.healthInterval) {
+        clearInterval(currentIntervals.healthInterval);
+        currentIntervals.healthInterval = undefined;
       }
     };
   }, [enableHealthChecks, autoStart, checkInterval, performHealthCheck]);
@@ -520,7 +522,7 @@ export function useConnectionStatus(): {
     window.addEventListener('offline', handleOffline);
 
     // Connection monitor listener with smart updates and mount state checking
-    const handleConnectionUpdate = (info: ConnectionInfo) => {
+    const _handleConnectionUpdate = (info: ConnectionInfo) => {
       if (!isMountedRef.current) return;
       
       setConnectionInfo(prevInfo => {

@@ -3,15 +3,15 @@ import { Loader2, Network, AlertCircle, Clock, X, RefreshCw } from 'lucide-react
 import React from 'react';
 import { createPortal } from 'react-dom';
 
-import { useLoading } from '@client/core/loading';
-import { cn } from '@client/lib/utils';
+import { useLoading } from './hooks/useLoading';
+import { cn } from '../../design-system/lib/utils';
 import { logger } from '@client/utils/logger';
 
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
 import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 
-export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
+export const GlobalLoadingIndicator = React.memo(<GlobalLoadingIndicatorProps> = ({
   position = 'top-right',
   showDetails = true,
   showProgress = true,
@@ -299,10 +299,13 @@ export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
 
   // Render to portal for proper z-index handling
   return createPortal(indicator, document.body);
+);
+
+function 1(
 };
 
 // Simplified version for minimal display
-export const MinimalGlobalLoadingIndicator: React.FC<{
+export const MinimalGlobalLoadingIndicator = React.memo(<{
   className?: string;
 }> = ({ className }) => {
   const { state, shouldShowGlobalLoader } = useLoading();
@@ -338,6 +341,9 @@ export const MinimalGlobalLoadingIndicator: React.FC<{
   );
 
   return createPortal(indicator, document.body);
+);
+
+function 1(
 };
 
 // Hook for controlling global loading indicator
@@ -365,5 +371,8 @@ export const useGlobalLoadingIndicator = () => {
     hide,
     updateConfig,
   };
+);
+
+function 1(
 };
 

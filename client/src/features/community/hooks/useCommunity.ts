@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { communityApiService } from '../../../core/api/community';
+import { communityApiService } from '@client/core/api/community';
 import type {
   CommentQueryOptions,
   VoteResponse
-} from '../../../core/api/community';
-import { useToast } from '../../../hooks/use-toast';
+} from '@client/core/api/community';
+import { useToast } from '@client/hooks/use-toast';
 import type {
   Comment,
   DiscussionThread
-} from '../../../types/community';
+} from '@client/types/community';
 
 // Define CommunityFilters interface locally since it's not exported from types
 interface CommunityFilters {

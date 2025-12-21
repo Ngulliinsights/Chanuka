@@ -1575,7 +1575,7 @@ export function sanitizeURL(url: string): string {
  * @example
  * const result = validateInput(email, 'email');
  * if (!result.isValid) {
- *   console.log(result.errors);
+ *   logger.warn('Validation failed', { errors: result.errors });
  * }
  */
 export function validateInput(value: unknown, type: string): { isValid: boolean; errors: string[] } {
@@ -1600,7 +1600,7 @@ export function sanitizeInput(input: string): string {
  * @example
  * const strength = validatePassword(password);
  * if (!strength.isValid) {
- *   console.log(strength.feedback);
+ *   logger.warn('Password validation failed', { feedback: strength.feedback });
  * }
  */
 export function validatePassword(password: string): PasswordStrength {

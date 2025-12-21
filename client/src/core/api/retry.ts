@@ -128,7 +128,7 @@ export class RetryHandler {
    * Executes an operation with retry logic and returns a result object
    */
   async safeExecute<T>(operation: () => Promise<T>): Promise<RetryResult<T>> {
-    let attempts = 0;
+    const attempts = 0;
     
     try {
       const result = await this.execute(operation);
@@ -257,7 +257,7 @@ export async function safeRetryOperation<T>(
 export function createHttpRetryHandler(config?: Partial<RetryConfig>): RetryHandler {
   return new RetryHandler({
     ...config,
-    retryCondition: (error: Error, attempt: number) => {
+    retryCondition: (error: Error, _attempt: number) => {
       const message = error.message.toLowerCase();
       
       // Retry on network errors

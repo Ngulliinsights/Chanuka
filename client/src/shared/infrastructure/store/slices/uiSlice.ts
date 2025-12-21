@@ -96,7 +96,7 @@ const uiSlice = createSlice({
     // Modal management
     openModal: (state, action: PayloadAction<{ modalId: string; data?: ModalData }>) => {
       state.activeModal = action.payload.modalId;
-      state.modalData = action.payload.data;
+      state.modalData = action.payload.data || null;
     },
     closeModal: (state) => {
       state.activeModal = null;

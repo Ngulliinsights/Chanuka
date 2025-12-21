@@ -155,11 +155,24 @@ This Act shall take effect 180 days after the date of enactment.
     }
   };
 
-  const highlightSearchTerm = (text: string, term: string) => {
+  const highlightSearchTerm = (text: string, term: string): React.ReactNode => {
     if (!term) return text;
     
-    const regex = new RegExp(`(${term})`, 'gi');
-    return text.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+    // Escape special regex characters to prevent regex injection
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedTerm})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => {
+      if (part.toLowerCase() === term.toLowerCase()) {
+        return (
+          <mark key={index} className="bg-yellow-200 px-1 rounded">
+            {part}
+          </mark>
+        );
+      }
+      return part;
+    });
   };
 
   return (
@@ -281,13 +294,7 @@ This Act shall take effect 180 days after the date of enactment.
                 >
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">
-                      {searchTerm ? (
-                        <span dangerouslySetInnerHTML={{ 
-                          __html: highlightSearchTerm(section.title, searchTerm) 
-                        }} />
-                      ) : (
-                        section.title
-                      )}
+                      {searchTerm ? highlightSearchTerm(section.title, searchTerm) : section.title}
                     </CardTitle>
                     <div className="flex items-center gap-2">
                       {showLineNumbers && (
@@ -307,13 +314,7 @@ This Act shall take effect 180 days after the date of enactment.
                     <Separator className="mb-4" />
                     <div className="relative">
                       <pre className="whitespace-pre-wrap text-sm leading-relaxed font-mono bg-muted/30 p-4 rounded-lg overflow-x-auto">
-                        {searchTerm ? (
-                          <span dangerouslySetInnerHTML={{ 
-                            __html: highlightSearchTerm(section.content, searchTerm) 
-                          }} />
-                        ) : (
-                          section.content
-                        )}
+                        {searchTerm ? highlightSearchTerm(section.content, searchTerm) : section.content}
                       </pre>
                       
                       <div className="flex items-center gap-2 mt-3">

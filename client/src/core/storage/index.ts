@@ -45,28 +45,16 @@ export {
   CacheStorageManager
 } from './cache-storage';
 
-// Convenience re-exports for common use cases
-export {
-  type SessionValidation,
-  type TokenValidation,
-  type CleanupOptions,
-  type StorageError,
-  type StorageErrorCode,
-  type StorageBackend
-} from './types';
-
-// Note: CacheEntry, CacheStats, EvictionPolicy, and CacheConfig are exported from api/cache-manager
-// to avoid duplication and maintain single source of truth for cache-related types
-
 // Import classes first
-import { SecureStorage } from './secure-storage';
+import { SessionManager, sessionManager } from '../auth/services/session-manager';
+import { TokenManager, tokenManager } from '../auth/services/token-manager';
+
 import { CacheStorageManager } from './cache-storage';
-// SessionManager and TokenManager are imported above from auth module
+import { SecureStorage } from './secure-storage';
 
 // Create singleton instances
 const secureStorage = SecureStorage.getInstance();
 const cacheStorageManager = CacheStorageManager.getInstance();
-// sessionManager and tokenManager are imported from auth module
 
 // Export singleton instances
 export {
@@ -92,7 +80,22 @@ export async function retrieveSecurely<T>(
 }
 
 export function getCurrentSession(): import('./types').SessionInfo | null {
-  return sessionManager.getCurrentSession();
+  const authSession = sessionManager.getCurrentSession();
+  if (!authSession) return null;
+  
+  // Convert auth SessionInfo to storage SessionInfo format
+  return {
+    userId: authSession.userId,
+    sessionId: authSession.sessionId,
+    expiresAt: new Date(authSession.expiresAt), // Convert string to Date
+    refreshToken: authSession.refreshToken,
+    permissions: authSession.permissions,
+    metadata: authSession.metadata,
+    createdAt: authSession.createdAt ? new Date(authSession.createdAt) : undefined,
+    lastAccessedAt: authSession.lastAccessedAt ? new Date(authSession.lastAccessedAt) : undefined,
+    ipAddress: authSession.ipAddress,
+    userAgent: authSession.userAgent,
+  };
 }
 
 export function isAuthenticated(): boolean {
@@ -146,12 +149,12 @@ export async function clearAllStorage(): Promise<void> {
 }
 
 // Storage statistics
-export function getStorageStats() {
+export async function getStorageStats() {
   return {
     secure: secureStorage.getStats(),
     cache: cacheStorageManager.getStats(),
     session: sessionManager.getSessionStats(),
-    tokens: tokenManager.getTokenStats()
+    tokens: await tokenManager.getTokenMetadata()
   };
 }
 

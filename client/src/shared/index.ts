@@ -13,11 +13,40 @@
 // Design System and UI Components
 // ============================================================================
 
-// Design System
+// Design System - Primary source for design tokens and components
 export * from './design-system';
 
-// Shared UI Components
-export * from './ui';
+// Shared UI Components - Export only existing items
+export {
+  // Navigation components
+  Navigation,
+  DesktopSidebar,
+  
+  // Loading components
+  LoadingIndicator,
+  
+  // Dashboard components
+  UserDashboard,
+  
+  // Notification components
+  NotificationCenter,
+  NotificationItem,
+  
+  // Mobile components
+  InfiniteScroll,
+  AutoHideHeader,
+  
+  // Privacy components
+  PrivacyManager,
+  
+  // Realtime components
+  RealTimeDashboard,
+  RealTimeNotifications,
+  
+  // Education components
+  EducationalFramework,
+  ConstitutionalContext,
+} from './ui';
 
 // ============================================================================
 // Technical Infrastructure
@@ -26,14 +55,25 @@ export * from './ui';
 // Infrastructure services (performance, error handling, browser compatibility, etc.)
 export * from './infrastructure';
 
-// Shared Hooks - utility and UI hooks
-export * from './hooks';
+// Shared Hooks - Export only existing hooks
+export {
+  useProgressiveDisclosure,
+} from './hooks';
 
-// Shared Libraries - form utilities, route protection, query configuration
-export * from './lib';
+// Shared Libraries - Export only non-conflicting items
+export {
+  ProtectedRoute,
+  queryClient,
+  queryKeys,
+  invalidateQueries,
+  prefetchQueries,
+  cacheUtils,
+} from './lib';
 
-// Cross-cutting services (notification, etc.)
-export * from './services';
+// Cross-cutting services - Export only existing services
+// export {
+//   notificationService,
+// } from './services';
 
 // Testing infrastructure
 export * from './testing';
@@ -42,14 +82,11 @@ export * from './testing';
 // Shared Utilities and Validation
 // ============================================================================
 
-// Validation utilities
-export * from './validation';
+// Validation utilities - Export specific items to avoid conflicts
+export type { ValidationResult as SharedValidationResult } from './validation';
 
-// Interface definitions
-export * from './interfaces';
+// Interface definitions - Export specific items to avoid conflicts  
+export type { UnifiedInterfaces } from './interfaces';
 
 // Component templates
 export * from './templates';
-
-// Shared types
-export * from './types';

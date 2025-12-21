@@ -9,27 +9,36 @@ export interface TooltipProps {
   delayDuration?: number;
 }
 
-export const TooltipProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TooltipProvider = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <TooltipPrimitive.Provider delayDuration={200}>
       {children}
     </TooltipPrimitive.Provider>
   );
+);
+
+function 1(
 };
 
-export const Tooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const Tooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
   return <TooltipPrimitive.Root>{children}</TooltipPrimitive.Root>;
+);
+
+function 1(
 };
 
-export const TooltipTrigger: React.FC<{ children: React.ReactNode; asChild?: boolean }> = ({ children, asChild = false }) => {
+export const TooltipTrigger = React.memo(<{ children: React.ReactNode; asChild?: boolean }> = ({ children, asChild = false }) => {
   return (
     <TooltipPrimitive.Trigger asChild={asChild}>
       {children}
     </TooltipPrimitive.Trigger>
   );
+);
+
+function 1(
 };
 
-export const TooltipContent: React.FC<{
+export const TooltipContent = React.memo(<{
   children: React.ReactNode;
   side?: 'top' | 'right' | 'bottom' | 'left';
   align?: 'start' | 'center' | 'end';
@@ -47,4 +56,7 @@ export const TooltipContent: React.FC<{
       <TooltipPrimitive.Arrow className="fill-[hsl(var(--color-card))]" />
     </TooltipPrimitive.Content>
   );
+);
+
+function 1(
 };

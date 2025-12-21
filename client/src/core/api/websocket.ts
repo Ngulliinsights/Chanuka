@@ -44,7 +44,7 @@ interface VerifyClientInfo {
 /**
  * Complete connection object stored in the connection map
  */
-interface WebSocketConnection {
+export interface WebSocketConnection {
   id: string;
   ws: AuthenticatedWebSocket;
   userId?: string;

@@ -19,6 +19,7 @@ export enum ErrorDomain {
     CACHE = 'cache',
     BUSINESS_LOGIC = 'business_logic',
     SECURITY = 'security',
+    SESSION = 'session',
     SYSTEM = 'system',
     RESOURCE = 'resource',
     RATE_LIMITING = 'rate_limiting',

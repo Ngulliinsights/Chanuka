@@ -9,6 +9,17 @@ import { getCircuitBreakerStats } from '@client/core/api/interceptors';
 import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
 import { logger } from '@client/utils/logger';
 
+export interface CircuitBreakerState {
+  state: 'open' | 'closed' | 'half-open';
+  failures: number;
+  successes: number;
+  rejected: number;
+  failureRate: number;
+  averageResponseTime: number;
+  lastFailureTime?: number;
+  lastSuccessTime?: number;
+}
+
 export interface CircuitBreakerEvent {
   serviceName: string;
   state: 'open' | 'closed' | 'half-open';
@@ -238,7 +249,7 @@ export class CircuitBreakerMonitor {
   /**
    * Gets circuit breaker statistics
    */
-  getCircuitBreakerStatistics(): Record<string, any> {
+  getCircuitBreakerStatistics(): Record<string, CircuitBreakerState> {
     return getCircuitBreakerStats();
   }
 
@@ -299,8 +310,8 @@ export class CircuitBreakerMonitor {
         serviceName,
         healthy: state.state === 'closed',
         state: state.state as 'open' | 'closed' | 'half-open',
-        lastFailure: state.lastFailureTime,
-        lastSuccess: state.lastSuccessTime,
+        lastFailure: state.lastFailureTime ? new Date(state.lastFailureTime) : undefined,
+        lastSuccess: (state as CircuitBreakerState).lastSuccessTime ? new Date((state as CircuitBreakerState).lastSuccessTime) : undefined,
         failureRate: state.failureRate || 0,
         averageResponseTime: state.averageResponseTime || 0,
         totalRequests: (state.failures || 0) + (state.successes || 0),

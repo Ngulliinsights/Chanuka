@@ -3,11 +3,10 @@
  * Following navigation component patterns for core functionality
  */
 
-import { LoadingOperation, LoadingConfig, LoadingStats } from '@client/types';
-
-import { DEFAULT_LOADING_CONFIG } from '@client/constants';
-import { LoadingError } from '@client/core/error';
-import { validateLoadingOperation } from '@client/validation';
+import { LoadingOperation, LoadingConfig, LoadingStats } from '../types';
+import { DEFAULT_LOADING_CONFIG } from '../constants';
+import { LoadingError } from '../errors';
+import { validateLoadingOperation } from '../validation';
 
 export class LoadingCore {
   private operations: Map<string, LoadingOperation> = new Map();
@@ -24,7 +23,7 @@ export class LoadingCore {
   }
 
   public addOperation(operation: LoadingOperation): void {
-    if (this.config.validation.enabled) {
+    if (this.config.validation?.enabled) {
       validateLoadingOperation(operation);
     }
     

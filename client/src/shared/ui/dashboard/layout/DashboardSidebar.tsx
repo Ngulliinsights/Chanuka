@@ -29,7 +29,7 @@ interface DashboardSidebarProps {
 /**
  * Dashboard Sidebar Component
  */
-export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
+export const DashboardSidebar = React.memo(<DashboardSidebarProps> = ({
   config,
   content,
   isOpen,
@@ -254,6 +254,9 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       </aside>
     </>
   );
+);
+
+function 1(
 };
 
 DashboardSidebar.displayName = 'DashboardSidebar';

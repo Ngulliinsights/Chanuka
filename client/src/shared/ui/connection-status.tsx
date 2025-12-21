@@ -1,7 +1,7 @@
 import { AlertCircle, CheckCircle, Network, RefreshCw, Settings } from 'lucide-react';
 import { useState } from 'react';
 
-import { logger } from '@/utils/logger';
+import { logger } from '@client/utils/logger';
 import { useApiConnection } from '@client/core/api/hooks/useApiConnection';
 
 interface ConnectionStatusProps {
@@ -95,6 +95,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
         </div>
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={handleRefresh}
             disabled={isLoading}
             className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50"
@@ -103,6 +104,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
           <button
+            type="button"
             onClick={handleDiagnose}
             className="p-1 text-gray-500 hover:text-gray-700"
             title="Run diagnostics"

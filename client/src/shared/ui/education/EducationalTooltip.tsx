@@ -141,7 +141,7 @@ export function EducationalTooltip({
 }
 
 // Predefined educational tooltips for common terms
-export const LegalTermTooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const LegalTermTooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => (
   <EducationalTooltip
     term="Legal Precedent"
     definition="A legal decision or principle established in a previous case that is either binding or persuasive for future similar cases."
@@ -157,7 +157,9 @@ export const LegalTermTooltip: React.FC<{ children: React.ReactNode }> = ({ chil
   </EducationalTooltip>
 );
 
-export const ConstitutionalTermTooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+function 1(
+
+export const ConstitutionalTermTooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => (
   <EducationalTooltip
     term="Constitutional Review"
     definition="The process of examining whether laws, policies, or government actions comply with the constitution."
@@ -173,7 +175,9 @@ export const ConstitutionalTermTooltip: React.FC<{ children: React.ReactNode }> 
   </EducationalTooltip>
 );
 
-export const ProceduralTermTooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+function 1(
+
+export const ProceduralTermTooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => (
   <EducationalTooltip
     term="Committee Stage"
     definition="The phase where a parliamentary committee examines a bill in detail, hears evidence, and may propose amendments."
@@ -189,7 +193,9 @@ export const ProceduralTermTooltip: React.FC<{ children: React.ReactNode }> = ({
   </EducationalTooltip>
 );
 
-export const CivicTermTooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+function 1(
+
+export const CivicTermTooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => (
   <EducationalTooltip
     term="Public Participation"
     definition="The process by which citizens can engage with and influence government decision-making and policy development."
@@ -205,3 +211,5 @@ export const CivicTermTooltip: React.FC<{ children: React.ReactNode }> = ({ chil
     {children}
   </EducationalTooltip>
 );
+
+function 1(

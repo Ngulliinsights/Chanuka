@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../../design-system/lib/utils';
 
-import { Skeleton } from './Skeleton';
+// import { Skeleton } from './Skeleton';
 
 interface AvatarSkeletonProps {
   className?: string;
@@ -10,7 +10,7 @@ interface AvatarSkeletonProps {
   shape?: 'circle' | 'square' | 'rounded';
 }
 
-export const AvatarSkeleton: React.FC<AvatarSkeletonProps> = ({
+export const AvatarSkeleton = React.memo(<AvatarSkeletonProps> = ({
   className,
   size = 'md',
   shape = 'circle',
@@ -50,6 +50,9 @@ export const AvatarSkeleton: React.FC<AvatarSkeletonProps> = ({
       aria-hidden="true"
     />
   );
+);
+
+function 1(
 };
 
 export default AvatarSkeleton;

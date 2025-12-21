@@ -56,9 +56,9 @@ export default function LoginPage() {
           <div className="bg-white shadow rounded-lg p-6 text-center text-muted-foreground">
             <p>Login component is not available in this build. Use the shared login form component.</p>
             <div className="mt-4 flex justify-center gap-2">
-              <button onClick={handleLoginSuccess} className="px-4 py-2 bg-blue-600 text-white rounded">Simulate Sign In</button>
-              <button onClick={handleSwitchToRegister} className="px-4 py-2 border rounded">Register</button>
-              <button onClick={handleForgotPassword} className="px-4 py-2 border rounded">Forgot</button>
+              <button type="button" onClick={handleLoginSuccess} className="px-4 py-2 bg-blue-600 text-white rounded">Simulate Sign In</button>
+              <button type="button" onClick={handleSwitchToRegister} className="px-4 py-2 border rounded">Register</button>
+              <button type="button" onClick={handleForgotPassword} className="px-4 py-2 border rounded">Forgot</button>
             </div>
           </div>
         </div>

@@ -1,9 +1,8 @@
-import { SkeletonProps } from '@client/types';
 import React from 'react';
+import { SkeletonProps } from '../types';
+import { cn } from '../../../design-system/lib/utils';
 
-import { cn } from '@/lib/utils';
-
-export const Skeleton: React.FC<SkeletonProps> = ({
+export const Skeleton = React.memo(<SkeletonProps> = ({
   className,
   width,
   height,
@@ -23,6 +22,9 @@ export const Skeleton: React.FC<SkeletonProps> = ({
       {...props}
     />
   );
+);
+
+function 1(
 };
 
 export default Skeleton;

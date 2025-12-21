@@ -10,7 +10,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { communityApiService } from '@client/core/api/community';
 import { useActivityFeed as storeActivityFeed, useTrendingTopics as storeTrendingTopics, useExpertInsights as storeExpertInsights, useCommunityStats as storeCommunityStats } from '../store/slices/communitySlice';
 
-import { useToast } from '../../../hooks/use-toast';
+import { useToast } from '@client/hooks/use-toast';
 
 /**
  * Hook for loading and managing activity feed

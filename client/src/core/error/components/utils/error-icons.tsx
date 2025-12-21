@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Error Icon Utility
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability

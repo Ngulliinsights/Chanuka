@@ -226,8 +226,8 @@ export interface AnalyticsExportData {
 
 export interface AnalyticsFilters {
   dateRange?: {
-    start: Date;
-    end: Date;
+    start: string;
+    end: string;
   };
   billId?: string;
   userId?: string;

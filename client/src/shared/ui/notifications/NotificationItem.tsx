@@ -13,13 +13,13 @@ import {
   FileText, 
   Settings,
   ExternalLink,
-  Trash2,
-  Check
+  Trash,
+  Check,
+  Award
 } from 'lucide-react';
 import React from 'react';
 
 import { Notification, NotificationType } from '@client/services/notification-service';
-
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Checkbox } from '@client/shared/design-system/interactive/Checkbox.tsx';
@@ -42,7 +42,7 @@ export function NotificationItem({
   showActions = true
 }: NotificationItemProps) {
   const getNotificationIcon = (type: NotificationType) => {
-    const iconMap = {
+    const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
       comment_reply: MessageCircle,
       expert_response: User,
       mention: MessageCircle,
@@ -54,24 +54,29 @@ export function NotificationItem({
       expert_insight: User,
       bill_update: FileText,
       system_alert: Settings,
-      security_alert: AlertTriangle
+      security_alert: AlertTriangle,
+      // Add missing mappings for notification types
+      bill_status: FileText,
+      comment: MessageCircle,
+      expert_analysis: User,
+      achievement: Award
     };
 
     const IconComponent = iconMap[type] || Settings;
     return <IconComponent className="h-4 w-4" />;
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = (priority?: string) => {
     const colorMap = {
       urgent: 'bg-red-500',
       high: 'bg-orange-500',
       medium: 'bg-blue-500',
       low: 'bg-gray-500'
     };
-    return colorMap[priority as keyof typeof colorMap] || colorMap.medium;
+    return colorMap[(priority || 'medium') as keyof typeof colorMap] || colorMap.medium;
   };
 
-  const getCategoryColor = (category: string) => {
+  const getCategoryColor = (category?: string) => {
     const colorMap = {
       community: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
       bills: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
@@ -80,7 +85,7 @@ export function NotificationItem({
       system: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
       security: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
     };
-    return colorMap[category as keyof typeof colorMap] || colorMap.system;
+    return colorMap[(category || 'system') as keyof typeof colorMap] || colorMap.system;
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -93,13 +98,17 @@ export function NotificationItem({
 
   const handleActionClick = (action: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (action === 'delete') {
       onDelete?.();
     } else if (action === 'open' && notification.actionUrl) {
       window.open(notification.actionUrl, '_blank');
     }
   };
+
+  const actionText = notification.data?.actionText;
+  const actionUrl = notification.data?.actionUrl;
+  const communityContext = notification.data?.communityContext;
 
   return (
     <div
@@ -117,7 +126,7 @@ export function NotificationItem({
             checked={selected}
             onCheckedChange={onSelect}
             className="mt-1"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
           />
         )}
 
@@ -134,10 +143,10 @@ export function NotificationItem({
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <h4 className={`text-sm font-medium ${!notification.read ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}>
-                {notification.title}
+                {String(notification.title)}
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                {notification.message}
+                {String(notification.message)}
               </p>
             </div>
 
@@ -149,7 +158,7 @@ export function NotificationItem({
                     variant="ghost"
                     size="sm"
                     className="p-1 h-6 w-6"
-                    onClick={(e) => handleActionClick('open', e)}
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleActionClick('open', e)}
                     title="Open link"
                   >
                     <ExternalLink className="h-3 w-3" />
@@ -161,7 +170,7 @@ export function NotificationItem({
                     variant="ghost"
                     size="sm"
                     className="p-1 h-6 w-6"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
                       onClick?.();
                     }}
@@ -175,10 +184,10 @@ export function NotificationItem({
                   variant="ghost"
                   size="sm"
                   className="p-1 h-6 w-6 text-red-500 hover:text-red-700"
-                  onClick={(e) => handleActionClick('delete', e)}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleActionClick('delete', e)}
                   title="Delete notification"
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <Trash className="h-3 w-3" />
                 </Button>
               </div>
             )}
@@ -187,11 +196,11 @@ export function NotificationItem({
           {/* Metadata */}
           <div className="flex items-center gap-2 mt-2">
             <Badge variant="secondary" className={`text-xs ${getCategoryColor(notification.category)}`}>
-              {notification.category}
+              {String(notification.category || 'General')}
             </Badge>
             
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+              {formatDistanceToNow(new Date((notification.createdAt || notification.timestamp) as string), { addSuffix: true })}
             </span>
 
             {notification.priority === 'urgent' && (
@@ -200,7 +209,7 @@ export function NotificationItem({
               </Badge>
             )}
 
-            {notification.isCommunityRelated && (
+            {notification.type === 'comment' && (
               <Badge variant="outline" className="text-xs">
                 Community
               </Badge>
@@ -208,28 +217,32 @@ export function NotificationItem({
           </div>
 
           {/* Action Button */}
-          {notification.actionText && notification.actionUrl && (
+          {Boolean(actionText) && Boolean(actionUrl) && (
             <div className="mt-2">
               <Button
                 variant="outline"
                 size="sm"
                 className="text-xs"
-                onClick={(e) => handleActionClick('open', e)}
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleActionClick('open', e)}
               >
-                {notification.actionText}
+                {String(actionText)}
                 <ExternalLink className="h-3 w-3 ml-1" />
               </Button>
             </div>
           )}
 
           {/* Community Context */}
-          {notification.communityContext && (
+          {Boolean(communityContext) && typeof communityContext === 'object' && communityContext !== null && (
             <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {notification.communityContext.billId && (
-                <span>Bill #{notification.communityContext.billId}</span>
-              )}
-              {notification.communityContext.expertId && (
-                <span className="ml-2">Expert: {notification.communityContext.expertId}</span>
+              {typeof communityContext === 'object' && communityContext !== null && (
+                <>
+                  {'billId' in communityContext && (
+                    <span>Bill #{String(communityContext.billId)}</span>
+                  )}
+                  {'expertId' in communityContext && (
+                    <span className="ml-2">Expert: {String(communityContext.expertId)}</span>
+                  )}
+                </>
               )}
             </div>
           )}

@@ -100,7 +100,7 @@ export function useNavigationPerformance() {
   /**
    * Optimized callback that prevents unnecessary re-renders
    */
-  const useOptimizedCallback = useCallback(<T extends (...args: any[]) => any>(
+  const useOptimizedCallback = useCallback(<T extends (...args: unknown[]) => any>(
     callback: T,
     deps: React.DependencyList
   ): T => {
@@ -119,7 +119,7 @@ export function useNavigationPerformance() {
   /**
    * Debounced function for performance-sensitive operations
    */
-  const useDebounced = useCallback(<T extends (...args: any[]) => any>(
+  const useDebounced = useCallback(<T extends (...args: unknown[]) => any>(
     func: T,
     delay: number
   ): T => {
@@ -139,7 +139,7 @@ export function useNavigationPerformance() {
   /**
    * Throttled function for high-frequency events
    */
-  const useThrottled = useCallback(<T extends (...args: any[]) => any>(
+  const useThrottled = useCallback(<T extends (...args: unknown[]) => any>(
     func: T,
     delay: number
   ): T => {

@@ -20,7 +20,7 @@ interface DashboardFooterProps {
 /**
  * Dashboard Footer Component
  */
-export const DashboardFooter: React.FC<DashboardFooterProps> = ({
+export const DashboardFooter = React.memo(<DashboardFooterProps> = ({
   config,
   content,
   className,
@@ -116,6 +116,9 @@ export const DashboardFooter: React.FC<DashboardFooterProps> = ({
       </div>
     </footer>
   );
+);
+
+function 1(
 };
 
 DashboardFooter.displayName = 'DashboardFooter';

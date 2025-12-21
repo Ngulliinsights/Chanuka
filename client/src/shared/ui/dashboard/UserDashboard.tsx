@@ -150,7 +150,7 @@ interface FullPageDashboardProps {
   preferences: any;
   privacyControls: any;
   timeFilter: any;
-  filteredEngagementHistory: any[];
+  filteredEngagementHistory: unknown[];
   engagementStats: any;
   refreshDashboard: () => void;
   setTimeFilter: (filter: any) => void;

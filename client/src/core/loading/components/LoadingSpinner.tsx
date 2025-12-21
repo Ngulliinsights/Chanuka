@@ -7,12 +7,14 @@ import React from 'react';
 
 import { LoadingComponentProps } from '@client/types';
 
-export interface LoadingSpinnerProps extends LoadingComponentProps {
+export interface LoadingSpinnerProps extends Omit<LoadingComponentProps, 'isLoading'> {
+  isLoading?: boolean; // Make isLoading optional
   variant?: 'primary' | 'secondary' | 'white';
   thickness?: 'thin' | 'medium' | 'thick';
 }
 
 export function LoadingSpinner({
+  isLoading = true,
   size = 'md',
   message,
   showMessage = true,
@@ -51,6 +53,11 @@ export function LoadingSpinner({
     'flex flex-col items-center justify-center gap-2',
     className,
   ].filter(Boolean).join(' ');
+
+  // Don't render anything if not loading
+  if (!isLoading) {
+    return null;
+  }
 
   return (
     <div

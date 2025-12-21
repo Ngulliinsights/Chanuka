@@ -17,7 +17,7 @@ export function DevWrapper({ children }: DevWrapperProps) {
 
       // Reduce React strict mode issues
       const originalWarn = console.warn;
-      console.warn = (...args: any[]) => {
+      console.warn = (...args: unknown[]) => {
         const message = args.join(' ');
         if (
           message.includes('Warning: ReactDOM.render is no longer supported') ||

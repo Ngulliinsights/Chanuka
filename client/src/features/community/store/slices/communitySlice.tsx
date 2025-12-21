@@ -37,7 +37,7 @@ import {
   ReactNode,
 } from 'react';
 
-import { communityApiService } from '../../core/api/community';
+import { communityApiService } from '@client/core/api/community';
 import type {
   ActivityItem,
   TrendingTopic,
@@ -46,7 +46,7 @@ import type {
   Petition,
   CommunityStats,
   LocalImpactMetrics,
-} from '../../types/community';
+} from '@client/types/community';
 
 // ============================================================================
 // Complete Type Definitions
@@ -186,7 +186,6 @@ interface RealTimeUpdate {
 // ============================================================================
 // API Client with Error Handling
 // ============================================================================
-
 
 // ============================================================================
 // Query Keys Factory - Type-safe cache management

@@ -1,12 +1,8 @@
 /**
- * Loading hooks barrel exports
- * Following navigation component patterns for hook organization
+ * Loading hooks barrel exports - SIMPLIFIED
+ * Core hooks only
  */
 
-export * from './useLoading';
-export * from './useLoadingState';
-export * from './useProgressiveLoading';
-export * from './useTimeoutAwareLoading';
-export * from './useLoadingRecovery';
-export * from './useUnifiedLoading';
+export { useLoading } from './useLoading';
+export { useLoadingState } from './useLoadingState';
 

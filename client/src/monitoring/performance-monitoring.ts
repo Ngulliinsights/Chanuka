@@ -1,4 +1,5 @@
-import { getCLS, getFID, getFCP, getLCP, getTTFB, Metric } from 'web-vitals';
+// Modern web-vitals v3+ uses 'on' prefix instead of 'get' prefix
+import { onCLS, onFID, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
 
 interface PerformanceMetrics {
   coreWebVitals: CoreWebVitals;
@@ -63,6 +64,52 @@ interface ConnectionInfo {
   saveData: boolean;
 }
 
+// Extended Performance API with memory property (Chrome-specific)
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  };
+}
+
+// Extended Navigator with connection APIs
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkInformation;
+  mozConnection?: NetworkInformation;
+  webkitConnection?: NetworkInformation;
+}
+
+// Network Information API interface
+interface NetworkInformation {
+  effectiveType?: string;
+  downlink?: number;
+  rtt?: number;
+  saveData?: boolean;
+}
+
+// Layout Shift Entry extends PerformanceEntry
+interface LayoutShiftEntry extends PerformanceEntry {
+  value: number;
+  sources?: Array<{
+    node?: Node;
+    previousRect?: DOMRectReadOnly;
+    currentRect?: DOMRectReadOnly;
+  }>;
+}
+
+// Metrics payload structure for analytics
+interface MetricsPayload {
+  timestamp: number;
+  url: string;
+  userAgent: string;
+  viewport: {
+    width: number;
+    height: number;
+  };
+  metrics: PerformanceMetrics;
+}
+
 class PerformanceMonitoring {
   private static instance: PerformanceMonitoring;
   private metrics: PerformanceMetrics;
@@ -110,87 +157,94 @@ class PerformanceMonitoring {
   }
 
   private initializeMonitoring(): void {
-    // Core Web Vitals
+    // Core Web Vitals - these are Google's key metrics for user experience
     this.setupCoreWebVitals();
     
-    // Custom metrics
+    // Custom metrics specific to your application needs
     this.setupCustomMetrics();
     
-    // Performance observers
+    // Performance observers watch for specific browser events
     this.setupPerformanceObservers();
     
-    // Navigation timing
+    // Navigation timing tracks page load performance
     this.setupNavigationTiming();
     
-    // Start continuous monitoring
+    // Start continuous monitoring for ongoing metrics
     this.startContinuousMonitoring();
   }
 
   private setupCoreWebVitals(): void {
-    // Largest Contentful Paint
-    getLCP((metric: Metric) => {
+    // Largest Contentful Paint - measures when the largest content element becomes visible
+    // Good: < 2.5s, Needs Improvement: 2.5-4s, Poor: > 4s
+    onLCP((metric: Metric) => {
       this.metrics.coreWebVitals.lcp = metric.value;
-      this.reportMetric('LCP', metric.value, 2500); // Good: < 2.5s
+      this.reportMetric('LCP', metric.value, 2500);
       this.notifyMetricsUpdate();
     });
 
-    // First Input Delay
-    getFID((metric: Metric) => {
+    // First Input Delay - measures time from first user interaction to browser response
+    // Good: < 100ms, Needs Improvement: 100-300ms, Poor: > 300ms
+    onFID((metric: Metric) => {
       this.metrics.coreWebVitals.fid = metric.value;
-      this.reportMetric('FID', metric.value, 100); // Good: < 100ms
+      this.reportMetric('FID', metric.value, 100);
       this.notifyMetricsUpdate();
     });
 
-    // Cumulative Layout Shift
-    getCLS((metric: Metric) => {
+    // Cumulative Layout Shift - measures visual stability (unexpected layout movements)
+    // Good: < 0.1, Needs Improvement: 0.1-0.25, Poor: > 0.25
+    onCLS((metric: Metric) => {
       this.metrics.coreWebVitals.cls = metric.value;
-      this.reportMetric('CLS', metric.value, 0.1); // Good: < 0.1
+      this.reportMetric('CLS', metric.value, 0.1);
       this.notifyMetricsUpdate();
     });
 
-    // First Contentful Paint
-    getFCP((metric: Metric) => {
+    // First Contentful Paint - measures when the first text or image appears
+    // Good: < 1.8s, Needs Improvement: 1.8-3s, Poor: > 3s
+    onFCP((metric: Metric) => {
       this.metrics.coreWebVitals.fcp = metric.value;
-      this.reportMetric('FCP', metric.value, 1800); // Good: < 1.8s
+      this.reportMetric('FCP', metric.value, 1800);
       this.notifyMetricsUpdate();
     });
 
-    // Time to First Byte
-    getTTFB((metric: Metric) => {
+    // Time to First Byte - measures server response time
+    // Good: < 800ms, Needs Improvement: 800-1800ms, Poor: > 1800ms
+    onTTFB((metric: Metric) => {
       this.metrics.coreWebVitals.ttfb = metric.value;
-      this.reportMetric('TTFB', metric.value, 800); // Good: < 800ms
+      this.reportMetric('TTFB', metric.value, 800);
       this.notifyMetricsUpdate();
     });
   }
 
   private setupCustomMetrics(): void {
-    // DOM Content Loaded
+    // Track when the DOM structure is fully loaded and parsed
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         this.metrics.customMetrics.domContentLoaded = performance.now();
         this.notifyMetricsUpdate();
       });
     } else {
+      // Document already loaded
       this.metrics.customMetrics.domContentLoaded = 0;
     }
 
-    // Window Load
+    // Track when all resources (images, scripts, etc.) have finished loading
     if (document.readyState !== 'complete') {
       window.addEventListener('load', () => {
         this.metrics.customMetrics.windowLoad = performance.now();
         this.notifyMetricsUpdate();
       });
     } else {
+      // Window already loaded
       this.metrics.customMetrics.windowLoad = 0;
     }
 
-    // Time to Interactive (simplified calculation)
+    // Calculate Time to Interactive - when page becomes fully interactive
     this.calculateTimeToInteractive();
 
-    // Memory usage
+    // Track JavaScript memory usage (Chrome-specific)
     this.updateMemoryUsage();
 
-    // Connection info
+    // Track network connection quality
     this.updateConnectionInfo();
   }
 
@@ -200,7 +254,7 @@ class PerformanceMonitoring {
       return;
     }
 
-    // Resource timing observer
+    // Resource timing observer - tracks loading of all page resources
     try {
       const resourceObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
@@ -213,7 +267,7 @@ class PerformanceMonitoring {
       console.warn('Resource timing observer failed:', error);
     }
 
-    // Navigation timing observer
+    // Navigation timing observer - tracks overall page navigation performance
     try {
       const navigationObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
@@ -226,7 +280,7 @@ class PerformanceMonitoring {
       console.warn('Navigation timing observer failed:', error);
     }
 
-    // User timing observer
+    // User timing observer - tracks custom performance marks and measures
     try {
       const userTimingObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
@@ -239,7 +293,7 @@ class PerformanceMonitoring {
       console.warn('User timing observer failed:', error);
     }
 
-    // Long task observer
+    // Long task observer - identifies JavaScript tasks that block the main thread
     try {
       const longTaskObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
@@ -252,11 +306,11 @@ class PerformanceMonitoring {
       console.warn('Long task observer failed:', error);
     }
 
-    // Layout shift observer
+    // Layout shift observer - tracks unexpected visual changes on the page
     try {
       const layoutShiftObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          this.processLayoutShift(entry as any);
+          this.processLayoutShift(entry as LayoutShiftEntry);
         }
       });
       layoutShiftObserver.observe({ entryTypes: ['layout-shift'] });
@@ -281,12 +335,12 @@ class PerformanceMonitoring {
 
     this.metrics.resourceTiming.push(resource);
 
-    // Alert on slow resources
-    if (entry.duration > 3000) { // 3 seconds
+    // Alert on slow resources (taking more than 3 seconds)
+    if (entry.duration > 3000) {
       this.reportSlowResource(resource);
     }
 
-    // Keep resource timing array manageable
+    // Keep resource timing array manageable to prevent memory issues
     if (this.metrics.resourceTiming.length > 100) {
       this.metrics.resourceTiming = this.metrics.resourceTiming.slice(-50);
     }
@@ -295,6 +349,7 @@ class PerformanceMonitoring {
   }
 
   private processNavigationTiming(entry: PerformanceNavigationTiming): void {
+    // Calculate key navigation phases
     this.metrics.navigationTiming = {
       domainLookup: entry.domainLookupEnd - entry.domainLookupStart,
       tcpConnect: entry.connectEnd - entry.connectStart,
@@ -326,37 +381,43 @@ class PerformanceMonitoring {
   }
 
   private processLongTask(entry: PerformanceEntry): void {
+    // Tasks longer than 50ms can cause jank and poor user experience
     if (entry.duration > 50) {
       this.reportLongTask(entry.duration, entry.startTime);
     }
   }
 
-  private processLayoutShift(entry: any): void {
+  private processLayoutShift(entry: LayoutShiftEntry): void {
+    // Layout shifts above 0.1 indicate poor visual stability
     if (entry.value > 0.1) {
-      this.reportLayoutShift(entry.value, entry.sources);
+      this.reportLayoutShift(entry.value, entry.sources || []);
     }
   }
 
   private calculateTimeToInteractive(): void {
-    // Simplified TTI calculation
-    // In a real implementation, this would be more sophisticated
+    // Time to Interactive is when the page becomes fully responsive to user input
+    // This is a simplified calculation - production implementations would be more sophisticated
     setTimeout(() => {
       const longTasks = performance.getEntriesByType('longtask');
       const lastLongTask = longTasks[longTasks.length - 1];
       
       if (lastLongTask) {
+        // TTI is after the last long task completes
         this.metrics.customMetrics.timeToInteractive = lastLongTask.startTime + lastLongTask.duration;
       } else {
+        // No long tasks means the page became interactive quickly
         this.metrics.customMetrics.timeToInteractive = performance.now();
       }
       
       this.notifyMetricsUpdate();
-    }, 5000); // Wait 5 seconds after page load
+    }, 5000); // Wait 5 seconds after page load to calculate TTI
   }
 
   private updateMemoryUsage(): void {
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
+    // Memory API is Chrome-specific and helps detect memory leaks
+    const perfWithMemory = performance as PerformanceWithMemory;
+    if (perfWithMemory.memory) {
+      const memory = perfWithMemory.memory;
       this.metrics.customMetrics.memoryUsage = {
         usedJSHeapSize: memory.usedJSHeapSize,
         totalJSHeapSize: memory.totalJSHeapSize,
@@ -366,21 +427,22 @@ class PerformanceMonitoring {
   }
 
   private updateConnectionInfo(): void {
-    const connection = (navigator as any).connection || 
-                      (navigator as any).mozConnection || 
-                      (navigator as any).webkitConnection;
+    // Network Information API provides details about the user's connection quality
+    const nav = navigator as NavigatorWithConnection;
+    const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
     
     if (connection) {
       this.metrics.customMetrics.connectionInfo = {
-        effectiveType: connection.effectiveType,
-        downlink: connection.downlink,
-        rtt: connection.rtt,
-        saveData: connection.saveData,
+        effectiveType: connection.effectiveType || 'unknown',
+        downlink: connection.downlink || 0,
+        rtt: connection.rtt || 0,
+        saveData: connection.saveData || false,
       };
     }
   }
 
   private setupNavigationTiming(): void {
+    // Fallback for older browsers that use performance.timing instead of PerformanceObserver
     if (performance.timing) {
       const timing = performance.timing;
       this.metrics.navigationTiming = {
@@ -395,6 +457,7 @@ class PerformanceMonitoring {
   }
 
   private startContinuousMonitoring(): void {
+    // Periodically update metrics that can change over time
     this.metricsCollectionInterval = setInterval(() => {
       this.updateMemoryUsage();
       this.updateConnectionInfo();
@@ -403,8 +466,8 @@ class PerformanceMonitoring {
   }
 
   private collectPerformanceMetrics(): void {
-    // Collect and send metrics to monitoring service
-    const metricsPayload = {
+    // Prepare metrics payload for sending to analytics service
+    const metricsPayload: MetricsPayload = {
       timestamp: Date.now(),
       url: window.location.href,
       userAgent: navigator.userAgent,
@@ -415,17 +478,17 @@ class PerformanceMonitoring {
       metrics: this.metrics,
     };
 
-    // Send to analytics service
+    // Send metrics to your analytics backend
     this.sendMetricsToService(metricsPayload);
   }
 
-  private sendMetricsToService(payload: any): void {
-    // In a real implementation, this would send to your analytics service
+  private sendMetricsToService(payload: MetricsPayload): void {
+    // Use sendBeacon when available - it's more reliable during page unload
     if (navigator.sendBeacon) {
       const data = JSON.stringify(payload);
       navigator.sendBeacon('/api/metrics', data);
     } else {
-      // Fallback for browsers without sendBeacon
+      // Fallback to fetch with keepalive for browsers without sendBeacon
       fetch('/api/metrics', {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -440,7 +503,9 @@ class PerformanceMonitoring {
   }
 
   // Utility methods
+
   private getResourceType(url: string): string {
+    // Classify resources by their URL patterns for better analysis
     if (url.includes('.js')) return 'script';
     if (url.includes('.css')) return 'stylesheet';
     if (url.match(/\.(png|jpg|jpeg|gif|svg|webp)$/)) return 'image';
@@ -450,11 +515,12 @@ class PerformanceMonitoring {
   }
 
   private reportMetric(name: string, value: number, threshold: number): void {
+    // Classify metrics based on thresholds (good, needs improvement, poor)
     const status = value <= threshold ? 'good' : value <= threshold * 2 ? 'needs-improvement' : 'poor';
     
     console.log(`${name}: ${value}ms (${status})`);
     
-    // Report to external monitoring if needed
+    // Report poor metrics to external monitoring for alerting
     if (status === 'poor') {
       this.reportPerformanceIssue(name, value, threshold);
     }
@@ -468,34 +534,57 @@ class PerformanceMonitoring {
     console.warn(`Long task detected: ${duration}ms at ${startTime}ms`);
   }
 
-  private reportLayoutShift(value: number, sources: any[]): void {
+  private reportLayoutShift(
+    value: number, 
+    sources: Array<{
+      node?: Node;
+      previousRect?: DOMRectReadOnly;
+      currentRect?: DOMRectReadOnly;
+    }>
+  ): void {
     console.warn(`Layout shift detected: ${value}`, sources);
   }
 
   private reportPerformanceIssue(metric: string, value: number, threshold: number): void {
-    // This would integrate with your error monitoring service
+    // Integrate with your error monitoring service to alert on performance issues
     console.error(`Performance issue: ${metric} = ${value} (threshold: ${threshold})`);
   }
 
   private notifyMetricsUpdate(): void {
+    // Notify registered callbacks when metrics are updated
     if (this.onMetricsUpdate) {
       this.onMetricsUpdate(this.metrics);
     }
   }
 
-  // Public API
+  // Public API - methods for application code to interact with performance monitoring
+
+  /**
+   * Get a snapshot of all current performance metrics
+   */
   getMetrics(): PerformanceMetrics {
     return { ...this.metrics };
   }
 
+  /**
+   * Register a callback to be notified when metrics are updated
+   */
   onMetricsChange(callback: (metrics: PerformanceMetrics) => void): void {
     this.onMetricsUpdate = callback;
   }
 
+  /**
+   * Create a performance mark at the current time
+   * Useful for measuring custom application events
+   */
   mark(name: string): void {
     performance.mark(name);
   }
 
+  /**
+   * Create a performance measure between two marks or from a mark to now
+   * This helps measure the duration of custom operations
+   */
   measure(name: string, startMark?: string, endMark?: string): void {
     if (startMark && endMark) {
       performance.measure(name, startMark, endMark);
@@ -506,24 +595,36 @@ class PerformanceMonitoring {
     }
   }
 
+  /**
+   * Get all collected resource timing data
+   */
   getResourceTimings(): ResourceTiming[] {
     return [...this.metrics.resourceTiming];
   }
 
+  /**
+   * Get Core Web Vitals metrics
+   */
   getCoreWebVitals(): CoreWebVitals {
     return { ...this.metrics.coreWebVitals };
   }
 
+  /**
+   * Get custom application metrics
+   */
   getCustomMetrics(): CustomMetrics {
     return { ...this.metrics.customMetrics };
   }
 
+  /**
+   * Clean up all observers and intervals when monitoring is no longer needed
+   */
   destroy(): void {
-    // Clean up observers
+    // Disconnect all performance observers
     this.observers.forEach(observer => observer.disconnect());
     this.observers = [];
 
-    // Clear interval
+    // Clear the metrics collection interval
     if (this.metricsCollectionInterval) {
       clearInterval(this.metricsCollectionInterval);
       this.metricsCollectionInterval = null;

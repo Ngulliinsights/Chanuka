@@ -1,3 +1,4 @@
+import React from 'react';
 import { logger } from '@client/utils/logger';
 
 import { Card, CardContent, CardTitle } from '@client/shared/design-system';

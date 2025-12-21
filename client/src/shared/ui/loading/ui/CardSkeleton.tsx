@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../../design-system/lib/utils';
 
 import { Skeleton } from './Skeleton';
 
@@ -14,7 +14,7 @@ interface CardSkeletonProps {
   lines?: number;
 }
 
-export const CardSkeleton: React.FC<CardSkeletonProps> = ({
+export const CardSkeleton = React.memo(<CardSkeletonProps> = ({
   className,
   showAvatar = false,
   showTitle = true,
@@ -66,6 +66,9 @@ export const CardSkeleton: React.FC<CardSkeletonProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 
 export default CardSkeleton;

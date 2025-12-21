@@ -13,8 +13,8 @@ import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
-import { useDebounce } from '../../../../hooks/useDebounce';
-import { logger } from '../../../../utils/logger';
+import { useDebounce } from '@client/hooks/useDebounce';
+import { logger } from '@client/utils/logger';
 import { intelligentSearch } from '../../services/intelligent-search';
 
 // Define types locally

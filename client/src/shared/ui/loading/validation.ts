@@ -43,7 +43,7 @@ export const LoadingOperationSchema = z.object({
   priority: LoadingPrioritySchema,
   progress: z.number().min(0).max(100).optional(),
   stage: z.string().max(100, 'Stage name too long').optional(),
-  error: z.instanceof(Error).optional(),
+  error: z.string().optional(), // Changed from Error to string
   startTime: z.number().int().min(0),
   timeout: z.number().int().min(1000).optional(), // Minimum 1 second
   retryCount: z.number().int().min(0),
@@ -55,29 +55,35 @@ export const LoadingOperationSchema = z.object({
 });
 
 export const LoadingConfigSchema = z.object({
+  timeout: z.number().int().min(1000).max(300000), // 1s to 5 minutes
+  retryDelay: z.number().int().min(100).max(30000), // 100ms to 30s
+  maxRetries: z.number().int().min(0).max(10),
+  showProgress: z.boolean(),
+  enableCaching: z.boolean(),
+  priority: LoadingPrioritySchema,
   validation: z.object({
     enabled: z.boolean(),
     strict: z.boolean(),
     validateProgress: z.boolean(),
-  }),
+  }).optional(),
   errorHandling: z.object({
     enableRecovery: z.boolean(),
     maxRetries: z.number().int().min(0).max(10),
     retryDelay: z.number().int().min(100).max(30000), // 100ms to 30s
     fallbackComponent: z.any().optional(),
-  }),
+  }).optional(),
   performance: z.object({
     enableMemoization: z.boolean(),
     debounceMs: z.number().int().min(0).max(5000), // 0 to 5 seconds
     maxConcurrentOperations: z.number().int().min(1).max(20),
-  }),
+  }).optional(),
   display: z.object({
     autoHide: z.boolean(),
     autoHideDelay: z.number().int().min(1000).max(60000), // 1s to 60s
     showProgress: z.boolean(),
     showDetails: z.boolean(),
     position: z.enum(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'center']),
-  }),
+  }).optional(),
 });
 
 export const LoadingStatsSchema = z.object({

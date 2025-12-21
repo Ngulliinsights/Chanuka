@@ -5,9 +5,10 @@
  * instead returning result objects for type-safe error handling.
  */
 
+import { logger } from '../../utils/logger';
+
 import { BaseApiClient, ApiRequest, ApiResponse, RequestBody } from './base-client';
 import { ApiError } from './base-client';
-import { logger } from '../../utils/logger';
 
 /**
  * Result type for safe API operations

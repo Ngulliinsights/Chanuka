@@ -360,7 +360,7 @@ export function SearchAnalyticsDashboard({
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm" dangerouslySetInnerHTML={{ __html: 'Fast < 100ms' }} />
+                    <span className="text-sm">Fast &lt; 100ms</span>
                     <span className="font-medium">{analyticsData.performance.responseTimeDistribution.fast}%</span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
@@ -382,7 +382,7 @@ export function SearchAnalyticsDashboard({
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-sm" dangerouslySetInnerHTML={{ __html: 'Slow > 500ms' }} />
+                    <span className="text-sm">Slow &gt; 500ms</span>
                     <span className="font-medium">{analyticsData.performance.responseTimeDistribution.slow}%</span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">

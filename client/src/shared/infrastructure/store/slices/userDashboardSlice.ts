@@ -21,7 +21,7 @@ import type {
 } from '@client/types/user-dashboard';
 // import { logger } from '@client/utils/logger';
 
-import { useAppSelector, useAppDispatch } from '../../../hooks/store';
+import { useAppSelector, useAppDispatch } from '@client/hooks/store';
 import type { RootState } from '../index';
 
 interface UserDashboardState {
@@ -310,7 +310,7 @@ const userDashboardSlice = createSlice({
             if (billIndex !== -1 && typeof data.newStatus === 'string') {
               const validStatuses = ['committee', 'introduced', 'passed', 'failed', 'signed', 'vetoed'];
               if (validStatuses.includes(data.newStatus)) {
-                state.dashboardData.trackedBills[billIndex].status = data.newStatus as any;
+                state.dashboardData.trackedBills[billIndex].status = data.newStatus as 'committee' | 'introduced' | 'passed' | 'failed' | 'signed' | 'vetoed';
                 state.dashboardData.trackedBills[billIndex].lastStatusChange = new Date().toISOString();
               }
             }

@@ -2,22 +2,22 @@
  * Permission Helpers for Auth
  */
 
-export function checkPermission(permission: string): boolean {
+export function checkPermission(_permission: string): boolean {
   // Check if user has specific permission
   return true;
 }
 
-export function hasRole(role: string): boolean {
+export function hasRole(_role: string): boolean {
   // Check if user has specific role
   return true;
 }
 
-export function hasAnyRole(roles: string[]): boolean {
+export function hasAnyRole(_roles: string[]): boolean {
   // Check if user has any of the specified roles
   return true;
 }
 
-export function requiresPermission(permissions: string[]): boolean {
+export function requiresPermission(_permissions: string[]): boolean {
   // Check if all permissions are granted
   return true;
 }
@@ -27,7 +27,7 @@ export function hasPermission(permission: string): boolean {
   return checkPermission(permission);
 }
 
-export function checkResourcePermission(resource: string, action: string): boolean {
+export function checkResourcePermission(_resource: string, _action: string): boolean {
   // Check if user has permission for specific resource action
   return true;
 }

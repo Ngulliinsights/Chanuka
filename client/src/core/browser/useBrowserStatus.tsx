@@ -54,6 +54,9 @@ const ProgressBarFill: React.FC<ProgressBarFillProps> = ({ score }) => {
       }}
     />
   );
+);
+
+function 1(
 };
 
 ProgressBarFill.displayName = 'ProgressBarFill';
@@ -163,7 +166,7 @@ export function useShouldBlockBrowser(): boolean {
  * Shows a warning if the compatibility score is below 80.
  * Can be placed near the top of the app to inform users of potential issues.
  */
-export const BrowserCompatibilityWarning: React.FC = () => {
+export const BrowserCompatibilityWarning = React.memo( = () => {
   const status = useBrowserCompatibilityStatus();
 
   if (!status || status.compatibilityScore >= 80) {
@@ -208,6 +211,9 @@ export const BrowserCompatibilityWarning: React.FC = () => {
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 BrowserCompatibilityWarning.displayName = 'BrowserCompatibilityWarning';
@@ -218,7 +224,7 @@ BrowserCompatibilityWarning.displayName = 'BrowserCompatibilityWarning';
  * Shows browser name, version, features, and recommendations.
  * Useful for debugging or detailed compatibility information.
  */
-export const BrowserCompatibilityDetails: React.FC = () => {
+export const BrowserCompatibilityDetails = React.memo( = () => {
   const status = useBrowserCompatibilityStatus();
 
   if (!status) {
@@ -313,6 +319,9 @@ export const BrowserCompatibilityDetails: React.FC = () => {
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 BrowserCompatibilityDetails.displayName = 'BrowserCompatibilityDetails';

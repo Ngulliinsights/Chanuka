@@ -8,7 +8,7 @@
 import { logger } from '../../utils/logger';
 import { tokenManager } from '../auth';
 
-import { ErrorInterceptor, ApiError } from './base-client';
+import { ApiError } from './base-client';
 import { ApiRequest } from './types';
 
 /**

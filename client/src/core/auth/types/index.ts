@@ -167,13 +167,33 @@ export interface DataDeletionRequest {
 }
 
 export interface SessionInfo {
-  id: string;
-  deviceInfo: string;
-  ipAddress: string;
-  location?: string;
-  lastActive: string;
+  // Core identifiers
+  userId: string;
+  sessionId: string;
+
+  // Authentication tokens
+  token: string;
+  refreshToken?: string;
+
+  // Temporal data (stored as ISO string for serialization)
   createdAt: string;
-  current: boolean;
+  expiresAt: string;
+  lastAccessedAt?: string;
+
+  // Authorization
+  permissions?: string[];
+  roles?: string[];
+
+  // Additional metadata
+  metadata?: Record<string, unknown>;
+
+  // Device/context information (optional)
+  deviceId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+
+  // Legacy compatibility
+  current?: boolean;
 }
 
 export interface AuthContextType {
@@ -257,8 +277,8 @@ export interface PrivacyDashboardProps {
 export interface AuthTokens {
   accessToken: string;
   refreshToken?: string;
-  expiresAt: Date;
-  tokenType: 'Bearer' | 'Basic';
+  expiresIn: number;
+  tokenType?: string;
   scope?: string[];
 }
 
@@ -272,9 +292,13 @@ export interface TokenInfo {
 
 export interface SessionValidation {
   isValid: boolean;
-  expiresAt: Date;
-  timeUntilExpiry: number;
-  shouldRefresh: boolean;
+  expiresAt?: Date;
+  timeUntilExpiry?: number;
+  shouldRefresh?: boolean;
+  reason?: 'not_found' | 'expired' | 'invalid_format' | 'corrupted' | 'revoked';
+  expiresIn?: number; // milliseconds until expiration
+  warnings?: string[];
+  metadata?: Record<string, unknown>;
 }
 
 export interface TokenValidation {
@@ -306,3 +330,62 @@ export interface PasswordReset {
   password: string;
   confirmPassword: string;
 }
+
+/**
+ * Session creation parameters
+ */
+export interface CreateSessionParams {
+  userId: string;
+  token: string;
+  refreshToken?: string;
+  expiresIn: number; // milliseconds
+  permissions?: string[];
+  roles?: string[];
+  metadata?: Record<string, unknown>;
+  deviceId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+/**
+ * Session update parameters (all optional)
+ */
+export interface UpdateSessionParams {
+  token?: string;
+  refreshToken?: string;
+  expiresAt?: string;
+  permissions?: string[];
+  roles?: string[];
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Session statistics
+ */
+export interface SessionStats {
+  sessionId: string;
+  userId: string;
+  isValid: boolean;
+  expiresIn: number; // milliseconds
+  duration: number | null; // milliseconds since creation
+  lastAccessed: number | null; // milliseconds since last access
+  permissionCount: number;
+  hasRefreshToken: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Session event types
+ */
+export type SessionEvent =
+  | 'session:created'
+  | 'session:updated'
+  | 'session:expired'
+  | 'session:cleared'
+  | 'session:extended'
+  | 'session:warning';
+
+/**
+ * Session event listener
+ */
+export type SessionEventListener = (event: SessionEvent, data?: unknown) => void;

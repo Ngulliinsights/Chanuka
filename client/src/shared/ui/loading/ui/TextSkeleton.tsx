@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../../design-system/lib/utils';
 
 import { Skeleton } from './Skeleton';
 
@@ -11,7 +11,7 @@ interface TextSkeletonProps {
   width?: string | number;
 }
 
-export const TextSkeleton: React.FC<TextSkeletonProps> = ({
+export const TextSkeleton = React.memo(<TextSkeletonProps> = ({
   className,
   lines = 1,
   variant = 'body',
@@ -68,6 +68,9 @@ export const TextSkeleton: React.FC<TextSkeletonProps> = ({
       ))}
     </div>
   );
+);
+
+function 1(
 };
 
 export default TextSkeleton;

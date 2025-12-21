@@ -21,7 +21,7 @@ export interface ImageFallbackProps extends Omit<React.ImgHTMLAttributes<HTMLIma
  * - Accessible error states
  * - Progressive enhancement
  */
-export const ImageFallback: React.FC<ImageFallbackProps> = ({
+export const ImageFallback = React.memo(<ImageFallbackProps> = ({
   src,
   alt,
   fallbackSrc,
@@ -152,22 +152,29 @@ export const ImageFallback: React.FC<ImageFallbackProps> = ({
       }}
     />
   );
+);
+
+function 1(
 };
 
 // Default placeholder component
-export const ImagePlaceholder: React.FC<{ className?: string }> = ({ className }) => (
+export const ImagePlaceholder = React.memo(<{ className?: string }> = ({ className }) => (
   <div className={cn('animate-pulse bg-muted rounded-md flex items-center justify-center', className)}>
     <Eye className="h-8 w-8 text-muted-foreground/50" />
   </div>
 );
 
+function 1(
+
 // Specialized image component with built-in loading states
-export const SafeImage: React.FC<ImageFallbackProps> = (props) => (
+export const SafeImage = React.memo(<ImageFallbackProps> = (props) => (
   <ImageFallback
     {...props}
     placeholder={<ImagePlaceholder className="w-full h-full" />}
   />
 );
+
+function 1(
 
 export default ImageFallback;
 

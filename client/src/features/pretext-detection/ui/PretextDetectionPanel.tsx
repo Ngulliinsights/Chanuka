@@ -23,7 +23,7 @@ interface CivicAction {
   estimatedTime: string;
   difficulty: 'easy' | 'medium' | 'hard';
   successRate?: number;
-  localContacts: any[];
+  localContacts: unknown[];
 }
 
 interface RightsCard {
@@ -31,8 +31,8 @@ interface RightsCard {
   scenario: string;
   title: string;
   description: string;
-  steps: any[];
-  contacts: any[];
+  steps: unknown[];
+  contacts: unknown[];
   lastUpdated: Date;
   language: 'en' | 'sw' | 'other';
 }
@@ -60,9 +60,12 @@ const isPretextIndicator = (value: unknown): value is PretextIndicator => {
     typeof (value as PretextIndicator).description === 'string' &&
     Array.isArray((value as PretextIndicator).evidence)
   );
+);
+
+function 1(
 };
 
-export const PretextDetectionPanel: React.FC<PretextDetectionPanelProps> = ({ billId }) => {
+export const PretextDetectionPanel = React.memo(<PretextDetectionPanelProps> = ({ billId }) => {
   // Destructure with the correct property names from the hook
   const {
     analysis: hookAnalysis,
@@ -294,4 +297,7 @@ export const PretextDetectionPanel: React.FC<PretextDetectionPanelProps> = ({ bi
       </Alert>
     </div>
   );
+);
+
+function 1(
 };

@@ -1,6 +1,6 @@
 import type { RelatedPage, UserRole } from '@client/types';
 
-import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
+import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';
 import { useAuth } from '@client/core/auth';
 import { NavigationValidationError } from '@client/core/error';
 import { getRecoverySuggestions } from '@client/recovery';

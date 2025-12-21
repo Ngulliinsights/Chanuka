@@ -1,3 +1,4 @@
+import React from 'react';
 import { ConflictOfInterestAnalysis } from '@client/features/bills/ui/analysis/conflict-of-interest';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import type { Bill } from '@client/types';

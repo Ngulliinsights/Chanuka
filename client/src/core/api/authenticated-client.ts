@@ -8,7 +8,7 @@
 import { logger } from '../../utils/logger';
 import { tokenManager } from '../auth';
 
-import { AuthenticationInterceptor, TokenRefreshInterceptor, DEFAULT_AUTH_CONFIG, AuthConfig } from './authentication';
+import { /* AuthenticationInterceptor, */ TokenRefreshInterceptor, DEFAULT_AUTH_CONFIG, AuthConfig } from './authentication';
 import { BaseApiClient, ApiClientConfig, ApiRequest, RequestBody } from './base-client';
 
 /**
@@ -42,7 +42,7 @@ export class AuthenticatedApiClient extends BaseApiClient {
    */
   private setupAuthInterceptors(): void {
     // Create interceptors
-    const authInterceptor = new AuthenticationInterceptor();
+    // const _authInterceptor = new AuthenticationInterceptor();
     this.tokenRefreshInterceptor = new TokenRefreshInterceptor(this.authConfig);
 
     // Add request interceptor for token injection

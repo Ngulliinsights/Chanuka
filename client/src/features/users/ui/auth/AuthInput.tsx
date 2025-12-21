@@ -9,8 +9,8 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { usePasswordVisibility } from '@client/hooks/usePasswordUtils';
 
-import { Input } from '../../../../../../Input';
-import { Label } from '../../../../../../Label';
+import { Input } from '@client/../../Input';
+import { Label } from '@client/../../Label';
 
 export interface AuthInputProps {
   name: string;
@@ -31,7 +31,7 @@ export interface AuthInputProps {
   autoComplete?: string;
 }
 
-export const AuthInput: React.FC<AuthInputProps> = ({
+export const AuthInput = React.memo(<AuthInputProps> = ({
   name,
   label,
   type,
@@ -116,10 +116,13 @@ export const AuthInput: React.FC<AuthInputProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 
 // Specialized input components
-export const EmailInput: React.FC<Omit<AuthInputProps, 'name' | 'type'> & { icon?: React.ComponentType<{ className?: string }> }> = (props) => (
+export const EmailInput = React.memo(<Omit<AuthInputProps, 'name' | 'type'> & { icon?: React.ComponentType<{ className?: string }> }> = (props) => (
   <AuthInput
     {...props}
     name="email"
@@ -127,7 +130,9 @@ export const EmailInput: React.FC<Omit<AuthInputProps, 'name' | 'type'> & { icon
   />
 );
 
-export const PasswordInput: React.FC<Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>> = (props) => (
+function 1(
+
+export const PasswordInput = React.memo(<Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>> = (props) => (
   <AuthInput
     {...props}
     name="password"
@@ -136,7 +141,9 @@ export const PasswordInput: React.FC<Omit<AuthInputProps, 'name' | 'type' | 'sho
   />
 );
 
-export const ConfirmPasswordInput: React.FC<Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>> = (props) => (
+function 1(
+
+export const ConfirmPasswordInput = React.memo(<Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>> = (props) => (
   <AuthInput
     {...props}
     name="confirmPassword"
@@ -145,7 +152,9 @@ export const ConfirmPasswordInput: React.FC<Omit<AuthInputProps, 'name' | 'type'
   />
 );
 
-export const NameInput: React.FC<Omit<AuthInputProps, 'type'> & { fieldType: 'first_name' | 'last_name' }> = ({
+function 1(
+
+export const NameInput = React.memo(<Omit<AuthInputProps, 'type'> & { fieldType: 'first_name' | 'last_name' }> = ({
   fieldType,
   ...props
 }) => (
@@ -155,3 +164,5 @@ export const NameInput: React.FC<Omit<AuthInputProps, 'type'> & { fieldType: 'fi
     type="text"
   />
 );
+
+function 1(

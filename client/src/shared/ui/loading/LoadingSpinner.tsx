@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { cn } from '../../design-system/utils/cn';
 
 interface LoadingSpinnerProps {

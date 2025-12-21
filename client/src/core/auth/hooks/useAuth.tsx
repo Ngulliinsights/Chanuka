@@ -1,23 +1,17 @@
 /**
  * Consolidated useAuth Hook
- * 
+ *
  * Unified implementation that consolidates:
  * - useAuth hook from features/users/hooks/useAuth.tsx
  * - React Context + Redux integration
  * - All authentication functionality
  */
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  ReactNode,
-  useRef,
-  useCallback,
-} from 'react';
+import { createContext, useContext, useEffect, ReactNode, useRef, useCallback } from 'react';
 
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { logger } from '../../../utils/logger';
+import { useAppDispatch, useAppSelector } from '@client/shared/hooks/store';
+import { logger } from '@client/utils/logger';
+
 import { getAuthApiService } from '../services/auth-api-service';
 import { sessionManager } from '../services/session-manager';
 import * as authActions from '../store/auth-slice';
@@ -43,7 +37,7 @@ const MINIMUM_REFRESH_DELAY_MS = 60 * 1000;
 
 /**
  * Consolidated authentication provider that integrates React Context with Redux.
- * 
+ *
  * This provider handles:
  * - Authentication state management via Redux
  * - Automatic token refresh
@@ -53,12 +47,13 @@ const MINIMUM_REFRESH_DELAY_MS = 60 * 1000;
 export function AuthProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(authActions.selectUser);
-  const loading = useAppSelector(authActions.selectIsLoading);
-  const sessionExpiry = useAppSelector(authActions.selectSessionExpiry);
-  const isInitialized = useAppSelector(authActions.selectIsInitialized);
-  const twoFactorRequired = useAppSelector(authActions.selectTwoFactorRequired);
-  const isAuthenticated = useAppSelector(authActions.selectIsAuthenticated);
+  // Create wrapper selectors that work with the actual Redux state
+  const user = useAppSelector((state: any) => state.auth?.user || null);
+  const loading = useAppSelector((state: any) => state.auth?.isLoading || false);
+  const sessionExpiry = useAppSelector((state: any) => state.auth?.sessionExpiry || null);
+  const isInitialized = useAppSelector((state: any) => state.auth?.isInitialized || false);
+  const twoFactorRequired = useAppSelector((state: any) => state.auth?.twoFactorRequired || false);
+  const isAuthenticated = useAppSelector((state: any) => state.auth?.isAuthenticated || false);
 
   const mountedRef = useRef(true);
 
@@ -72,9 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsubscribeWarning: (() => void) | undefined;
     if (sessionManager && typeof sessionManager.onWarning === 'function') {
       unsubscribeWarning = sessionManager.onWarning((warning: string) => {
-        logger.warn('Session warning:', { 
-          component: 'AuthProvider', 
-          warning 
+        logger.warn('Session warning:', {
+          component: 'AuthProvider',
+          warning,
         });
       });
     }
@@ -84,20 +79,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await dispatch(authActions.validateStoredTokens()).unwrap();
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err);
-        
+
         // In development mode, log as debug instead of error to reduce noise
         if (process.env.NODE_ENV === 'development') {
-          logger.debug('Token validation failed (expected in development):', { 
-            component: 'AuthProvider', 
-            error: errorMessage 
+          logger.debug('Token validation failed (expected in development):', {
+            component: 'AuthProvider',
+            error: errorMessage,
           });
         } else {
-          logger.error('Token validation failed:', { 
-            component: 'AuthProvider', 
-            error: errorMessage 
+          logger.error('Token validation failed:', {
+            component: 'AuthProvider',
+            error: errorMessage,
           });
         }
-        
+
         // Always mark as initialized even if validation fails
         dispatch(authActions.setInitialized(true));
       }
@@ -145,37 +140,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * Helper to convert Redux results to AuthResponse format.
    * Handles various response types from different auth actions.
    */
-  const toAuthResponse = useCallback(
-    (result: unknown): AuthResponse => {
-      // Handle different response structures
-      if (result && typeof result === 'object') {
-        const obj = result as Record<string, unknown>;
-        return {
-          success: true,
-          data: {
-            user: (obj.user as unknown) || (obj.data as Record<string, unknown>)?.user,
-            sessionExpiry: (obj.sessionExpiry as unknown) || (obj.data as Record<string, unknown>)?.sessionExpiry,
-          },
-        };
-      }
+  const toAuthResponse = useCallback((result: unknown): AuthResponse => {
+    // Handle different response structures
+    if (result && typeof result === 'object') {
+      const obj = result as Record<string, unknown>;
       return {
         success: true,
-        data: {},
+        data: {
+          user: (obj.user as unknown) || (obj.data as Record<string, unknown>)?.user,
+          sessionExpiry:
+            (obj.sessionExpiry as unknown) || (obj.data as Record<string, unknown>)?.sessionExpiry,
+        },
       };
-    },
-    []
-  );
+    }
+    return {
+      success: true,
+      data: {},
+    };
+  }, []);
 
   /**
    * Helper to convert errors to AuthResponse format.
    */
-  const toAuthError = useCallback(
-    (err: unknown, defaultMessage: string): AuthResponse => {
-      const message = err instanceof Error ? err.message : defaultMessage;
-      return { success: false, error: message };
-    },
-    []
-  );
+  const toAuthError = useCallback((err: unknown, defaultMessage: string): AuthResponse => {
+    const message = err instanceof Error ? err.message : defaultMessage;
+    return { success: false, error: message };
+  }, []);
 
   // ==========================================================================
   // Core Authentication Methods
@@ -235,11 +225,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const requestPasswordReset = useCallback(
-    async (email: string, redirectUrl?: string): Promise<AuthResponse> => {
+    async (email: string, _redirectUrl?: string): Promise<AuthResponse> => {
       try {
-        await dispatch(
-          authActions.requestPasswordReset({ email, redirectUrl })
-        ).unwrap();
+        await dispatch(authActions.requestPasswordReset({ email })).unwrap();
         return { success: true };
       } catch (err) {
         return toAuthError(err, 'Password reset request failed');
@@ -252,7 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (token: string, password: string): Promise<AuthResponse> => {
       try {
         await dispatch(
-          authActions.resetPassword({ token, newPassword: password, confirmPassword: password })
+          authActions.resetPassword({ token, password: password, confirmPassword: password })
         ).unwrap();
         return { success: true };
       } catch (err) {
@@ -268,9 +256,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: 'User not authenticated' };
       }
       try {
-        await dispatch(
-          authActions.changePassword({ currentPassword, newPassword })
-        ).unwrap();
+        await dispatch(authActions.changePassword({ currentPassword, newPassword })).unwrap();
         return { success: true };
       } catch (err) {
         return toAuthError(err, 'Password change failed');
@@ -342,9 +328,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: 'User not authenticated' };
       }
       try {
-        const result = await dispatch(
-          authActions.updateUserProfile(updates)
-        ).unwrap();
+        const result = await dispatch(authActions.updateUserProfile(updates)).unwrap();
         return { success: true, data: { user: result } };
       } catch (err) {
         return toAuthError(err, 'Profile update failed');
@@ -360,9 +344,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginWithOAuth = useCallback(
     async (code: string, state?: string): Promise<AuthResponse> => {
       try {
-        const result = await dispatch(
-          authActions.loginWithOAuth({ code, state })
-        ).unwrap();
+        const result = await dispatch(authActions.loginWithOAuth({ code, state })).unwrap();
         return toAuthResponse(result);
       } catch (err) {
         return toAuthError(err, 'OAuth login failed');
@@ -371,18 +353,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [dispatch, toAuthResponse, toAuthError]
   );
 
-  const getOAuthUrl = useCallback(
-    (provider: string, state?: string): string => {
-      try {
-        const authService = getAuthApiService();
-        return authService.getOAuthUrl(provider, state);
-      } catch (error) {
-        logger.warn('getOAuthUrl failed', { error, provider });
-        return '';
-      }
-    },
-    []
-  );
+  const getOAuthUrl = useCallback((provider: string, state?: string): string => {
+    try {
+      const authService = getAuthApiService();
+      return authService.getOAuthUrl(provider, state);
+    } catch (error) {
+      logger.warn('getOAuthUrl failed', { error, provider });
+      return '';
+    }
+  }, []);
 
   // ==========================================================================
   // Session Management
@@ -441,9 +420,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: 'User not authenticated' };
       }
       try {
-        await dispatch(
-          authActions.updatePrivacySettings(settings)
-        ).unwrap();
+        await dispatch(authActions.updatePrivacySettings(settings)).unwrap();
         return { success: true };
       } catch (err) {
         return toAuthError(err, 'Update privacy settings failed');
@@ -457,9 +434,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!user) {
         throw new Error('User not authenticated');
       }
-      return await dispatch(
-        authActions.requestDataExport({ format, includes })
-      ).unwrap();
+      return await dispatch(authActions.requestDataExport({ format, includes })).unwrap();
     },
     [dispatch, user]
   );
@@ -612,14 +587,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-  
+
   if (context === undefined) {
     throw new Error(
       'useAuth must be used within an AuthProvider. ' +
-      'Wrap your component tree with <AuthProvider> to use authentication features.'
+        'Wrap your component tree with <AuthProvider> to use authentication features.'
     );
   }
-  
+
   return context;
 }
 
@@ -628,6 +603,6 @@ export function useAuth(): AuthContextType {
  */
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuthStore() {
-  const user = useAppSelector(authActions.selectUser);
+  const user = useAppSelector((state: any) => state.auth?.user || null);
   return { user } as const;
 }

@@ -3,7 +3,7 @@
  * Following navigation component patterns for constants
  */
 
-import type { LoadingConfig, LoadingSize, LoadingType, LoadingPriority } from '@client/types';
+import type { LoadingConfig, LoadingSize, LoadingType, LoadingPriority } from './types';
 
 export const DEFAULT_LOADING_SIZE: LoadingSize = 'md';
 export const DEFAULT_LOADING_TYPE: LoadingType = 'component';
@@ -49,6 +49,12 @@ export const PROGRESS_PHASES = {
 } as const;
 
 export const DEFAULT_LOADING_CONFIG: LoadingConfig = {
+  timeout: LOADING_TIMEOUTS.MEDIUM,
+  retryDelay: RETRY_DELAYS.MEDIUM,
+  maxRetries: MAX_RETRIES.MEDIUM,
+  showProgress: true,
+  enableCaching: false,
+  priority: 'medium',
   validation: {
     enabled: true,
     strict: false,

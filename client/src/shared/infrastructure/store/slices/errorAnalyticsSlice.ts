@@ -18,7 +18,7 @@ import {
   errorAnalyticsRepository,
   Alert,
   ErrorEntry
-} from '../../services';
+} from '@client/services';
 
 interface ErrorAnalyticsState {
   // Data states

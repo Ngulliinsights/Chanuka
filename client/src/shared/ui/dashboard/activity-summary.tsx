@@ -5,12 +5,12 @@ import React from 'react';
 
 import { Button } from '../../design-system';
 import { Card, CardContent, CardHeader } from '../../design-system';
-import { handleError, measureAsync, recordMetric } from '../../../core';
+import { handleError, measureAsync, recordMetric } from '@client/core';
 
 import { DashboardError } from './errors';
 import { validateActivitySummary } from './validation';
 
-export const ActivitySummary: React.FC<DashboardComponentProps> = ({ 
+export const ActivitySummary = React.memo(<DashboardComponentProps> = ({ 
   className = '',
   config,
   onError,
@@ -193,5 +193,8 @@ export const ActivitySummary: React.FC<DashboardComponentProps> = ({
       </CardContent>
     </Card>
   );
+);
+
+function 1(
 };
 

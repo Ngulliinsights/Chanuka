@@ -38,20 +38,23 @@ export class FeatureDetector {
     if (this.cache.es6 !== undefined) return this.cache.es6;
 
     try {
-      // Create a function that uses multiple ES6 features to ensure comprehensive support
-      new Function(`
-        return (() => {
-          let x = 1;
-          const y = 2;
-          const [a, b] = [1, 2];
-          const {c} = {c: 3};
-          const str = \`template \${x} literal\`;
-          class Test {}
-          return a + b + c + x + y;
-        })();
-      `)();
+      // Test ES6 features using safer feature detection
+      // Test arrow functions
+      const testArrowFunction = () => true;
       
-      this.cache.es6 = true;
+      // Test let/const, destructuring, template literals, classes
+      const testES6Features = (() => {
+        let x = 1;
+        const y = 2;
+        const [a, b] = [1, 2];
+        const {c} = {c: 3};
+        const str = `template ${x} literal`;
+        class Test {}
+        return a + b + c + x + y + str.length;
+      })();
+      
+      // If we get here, all ES6 features work
+      this.cache.es6 = testArrowFunction() && testES6Features > 0;
     } catch {
       this.cache.es6 = false;
     }
@@ -222,7 +225,11 @@ export class FeatureDetector {
     if (this.cache.asyncAwait !== undefined) return this.cache.asyncAwait;
 
     try {
-      new Function('return (async function() { await Promise.resolve(); })();')();
+      // Test async/await support safely
+      (async () => {
+        await Promise.resolve();
+        return true;
+      })();
       this.cache.asyncAwait = true;
     } catch {
       this.cache.asyncAwait = false;

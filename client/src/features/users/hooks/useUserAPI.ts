@@ -8,20 +8,20 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
 
-import { userService as userBackendService } from '../../../services/userService';
+import { userService as userBackendService } from '@client/services/userService';
 import type {
   UserProfile,
   NotificationPreferences,
-} from '../../../services/userService';
+} from '@client/services/userService';
 import { useAuth } from '@client/core/auth';
-import { useUserDashboardStore } from '../../../shared/infrastructure/store/slices/userDashboardSlice';
+import { useUserDashboardStore } from '@client/shared/infrastructure/store/slices/userDashboardSlice';
 import type {
   PrivacyControls,
   DataExportRequest,
   DashboardPreferences,
   UserDashboardData
-} from '../../../types/user-dashboard';
-import { logger } from '../../../utils/logger';
+} from '@client/types/user-dashboard';
+import { logger } from '@client/utils/logger';
 
 // Types for engagement and activity tracking - matching service expectations
 type ActionType = 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';

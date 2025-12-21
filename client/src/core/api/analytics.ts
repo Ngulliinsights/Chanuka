@@ -12,12 +12,15 @@ import type {
   EngagementReport,
   ConflictReport,
   AnalyticsResponse,
-  UserActivity
+  UserActivity,
+  AnalyticsAlert,
+  StakeholderAnalysis,
+  AnalyticsExport
 } from '@client/shared/types/analytics';
 import { logger } from '@client/utils/logger';
 
 import { globalErrorHandler } from './errors';
-import type { UnifiedApiClient } from './types';
+import type { ApiClient, UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
 
 
 /**
@@ -26,13 +29,13 @@ import type { UnifiedApiClient } from './types';
  * the analytics layer.
  */
 export class AnalyticsApiService {
-  private readonly baseUrl: string;
+  // private readonly _baseUrl: string;
   private readonly analyticsEndpoint: string;
-  private readonly apiClient: UnifiedApiClient;
+  private readonly apiClient: ApiClient;
 
-  constructor(apiClient: UnifiedApiClient, baseUrl: string = '/api') {
+  constructor(apiClient: ApiClient, baseUrl: string = '/api') {
     this.apiClient = apiClient;
-    this.baseUrl = baseUrl;
+    // this._baseUrl = baseUrl;
     this.analyticsEndpoint = `${baseUrl}/analytics`;
   }
 
@@ -206,9 +209,9 @@ export class AnalyticsApiService {
   /**
    * Get analytics alerts
    */
-  async getAlerts(acknowledged = false): Promise<any[]> {
+  async getAlerts(acknowledged = false): Promise<AnalyticsAlert[]> {
     try {
-      const response = await this.apiClient.get<any[]>(
+      const response = await this.apiClient.get<AnalyticsAlert[]>(
         `${this.analyticsEndpoint}/alerts?acknowledged=${acknowledged}`
       );
 
@@ -256,11 +259,11 @@ export class AnalyticsApiService {
   /**
    * Get stakeholder impact analysis
    */
-  async getStakeholderAnalysis(bill_id?: string): Promise<any> {
+  async getStakeholderAnalysis(bill_id?: string): Promise<StakeholderAnalysis[]> {
     try {
       const endpoint = bill_id ? `${this.analyticsEndpoint}/stakeholders/${bill_id}` : `${this.analyticsEndpoint}/stakeholders`;
 
-      const response = await this.apiClient.get<any>(endpoint);
+      const response = await this.apiClient.get<StakeholderAnalysis[]>(endpoint);
 
       return response.data;
     } catch (error) {
@@ -272,7 +275,7 @@ export class AnalyticsApiService {
   /**
    * Export analytics data
    */
-  async exportAnalytics(filters?: AnalyticsFilters, format: 'csv' | 'json' = 'json'): Promise<any> {
+  async exportAnalytics(filters?: AnalyticsFilters, format: 'csv' | 'json' = 'json'): Promise<AnalyticsExport> {
     try {
       const params = new URLSearchParams();
       params.append('format', format);
@@ -282,7 +285,7 @@ export class AnalyticsApiService {
         params.append('end_date', filters.dateRange.end);
       }
 
-      const response = await this.apiClient.get<any>(
+      const response = await this.apiClient.get<AnalyticsExport>(
         `${this.analyticsEndpoint}/export?${params.toString()}`
       );
 
@@ -320,20 +323,22 @@ export class AnalyticsApiService {
   /**
    * Centralized error handling for analytics operations.
    */
-  private async handleAnalyticsError(error: any, defaultMessage: string): Promise<Error> {
+  private async handleAnalyticsError(error: unknown, defaultMessage: string): Promise<Error> {
+    const errorResponse = error as UnknownError;
+    
     const errorMessage =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
+      (errorResponse as AxiosErrorResponse)?.response?.data?.message ||
+      (errorResponse as AxiosErrorResponse)?.response?.data?.error ||
+      (errorResponse as Error)?.message ||
       defaultMessage;
 
     const analyticsError = new Error(errorMessage);
 
-    await globalErrorHandler.handleError(analyticsError, {
+    await globalErrorHandler(analyticsError, {
       component: 'AnalyticsApiService',
       operation: 'analytics',
-      status: error?.response?.status,
-      endpoint: error?.config?.url
+      status: (errorResponse as AxiosErrorResponse)?.response?.status,
+      endpoint: (errorResponse as AxiosErrorResponse)?.config?.url
     });
 
     return analyticsError;

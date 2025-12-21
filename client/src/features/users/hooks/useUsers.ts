@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useToast } from '../../../hooks/use-toast';
+import { useToast } from '@client/hooks/use-toast';
 import { userApi } from '../services/user-api';
 import type {
   LoginCredentials,

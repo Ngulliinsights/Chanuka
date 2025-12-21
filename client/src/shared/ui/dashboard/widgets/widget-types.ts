@@ -4,8 +4,6 @@
  * Type definitions for dashboard widgets
  */
 
-import { ReactNode } from 'react';
-
 // Base Widget Types
 export type WidgetType =
   | 'chart'

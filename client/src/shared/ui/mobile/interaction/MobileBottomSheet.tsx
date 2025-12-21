@@ -17,7 +17,7 @@
  *
  *   return (
  *     <>
- *       <button onClick={onOpen}>Open Sheet</button>
+ *       <button type="button" onClick={onOpen}>Open Sheet</button>
  *       <MobileBottomSheet
  *         isOpen={isOpen}
  *         onClose={onClose}
@@ -36,7 +36,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { BottomSheetConfig } from '@/types/mobile';
+import type { BottomSheetConfig } from '@client/types/mobile';
 
 interface MobileBottomSheetProps extends BottomSheetConfig {
   children: React.ReactNode;

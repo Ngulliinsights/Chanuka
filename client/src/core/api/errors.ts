@@ -35,20 +35,20 @@ export interface APIErrorDetails {
 }
 
 export interface APIError extends Error, APIErrorDetails {
-  toJSON(): Record<string, any>;
+  toJSON(): Record<string, unknown>;
 }
 
 export class NetworkError extends Error implements APIError {
   code: APIErrorCode = 'NETWORK_ERROR';
   status = 0;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   retryable = true;
   timestamp = new Date();
   path?: string;
   method?: string;
 
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message);
     this.message = message;
     this.details = details || {};
@@ -71,13 +71,13 @@ export class TimeoutError extends Error implements APIError {
   code: APIErrorCode = 'TIMEOUT';
   status = 408;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   retryable = true;
   timestamp = new Date();
   path?: string;
   method?: string;
 
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message);
     this.message = message;
     this.details = details || {};
@@ -100,13 +100,13 @@ export class ValidationError extends Error implements APIError {
   code: APIErrorCode = 'VALIDATION_ERROR';
   status = 400;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   retryable = false;
   timestamp = new Date();
   path?: string;
   method?: string;
 
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message);
     this.message = message;
     this.details = details || {};
@@ -129,13 +129,13 @@ export class UnauthorizedError extends Error implements APIError {
   code: APIErrorCode = 'UNAUTHORIZED';
   status = 401;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   retryable = false;
   timestamp = new Date();
   path?: string;
   method?: string;
 
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message);
     this.message = message;
     this.details = details || {};
@@ -158,13 +158,13 @@ export class ForbiddenError extends Error implements APIError {
   code: APIErrorCode = 'FORBIDDEN';
   status = 403;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   retryable = false;
   timestamp = new Date();
   path?: string;
   method?: string;
 
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message);
     this.message = message;
     this.details = details || {};
@@ -187,13 +187,13 @@ export class NotFoundError extends Error implements APIError {
   code: APIErrorCode = 'NOT_FOUND';
   status = 404;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   retryable = false;
   timestamp = new Date();
   path?: string;
   method?: string;
 
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message);
     this.message = message;
     this.details = details || {};
@@ -216,13 +216,13 @@ export class ServerError extends Error implements APIError {
   code: APIErrorCode = 'SERVER_ERROR';
   status = 500;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   retryable = true;
   timestamp = new Date();
   path?: string;
   method?: string;
 
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message);
     this.message = message;
     this.details = details || {};
@@ -244,8 +244,8 @@ export class ServerError extends Error implements APIError {
 export function createAPIError(
   code: APIErrorCode,
   message: string,
-  status?: number,
-  details?: Record<string, any>
+  _status?: number,
+  details?: Record<string, unknown>
 ): APIError {
   switch (code) {
     case 'NETWORK_ERROR':
@@ -280,17 +280,17 @@ export const globalErrorHandler = (error: unknown, context?: Record<string, unkn
 };
 
 // Support calling as .handleError() for backward compatibility
-(globalErrorHandler as any).handleError = globalErrorHandler;
+(globalErrorHandler as unknown as { handleError: typeof globalErrorHandler }).handleError = globalErrorHandler;
 
 /**
  * Factory for creating typed API errors
  */
 export const ErrorFactory = {
-  network: (message: string, details?: Record<string, any>) => new NetworkError(message, details),
-  timeout: (message: string, details?: Record<string, any>) => new TimeoutError(message, details),
-  validation: (message: string, details?: Record<string, any>) => new ValidationError(message, details),
-  unauthorized: (message: string, details?: Record<string, any>) => new UnauthorizedError(message, details),
-  forbidden: (message: string, details?: Record<string, any>) => new ForbiddenError(message, details),
-  notFound: (message: string, details?: Record<string, any>) => new NotFoundError(message, details),
-  server: (message: string, details?: Record<string, any>) => new ServerError(message, details),
+  network: (message: string, details?: Record<string, unknown>) => new NetworkError(message, details),
+  timeout: (message: string, details?: Record<string, unknown>) => new TimeoutError(message, details),
+  validation: (message: string, details?: Record<string, unknown>) => new ValidationError(message, details),
+  unauthorized: (message: string, details?: Record<string, unknown>) => new UnauthorizedError(message, details),
+  forbidden: (message: string, details?: Record<string, unknown>) => new ForbiddenError(message, details),
+  notFound: (message: string, details?: Record<string, unknown>) => new NotFoundError(message, details),
+  server: (message: string, details?: Record<string, unknown>) => new ServerError(message, details),
 };

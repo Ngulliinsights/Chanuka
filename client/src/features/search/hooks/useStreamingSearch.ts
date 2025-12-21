@@ -8,8 +8,8 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-import { useToast } from '../../../hooks/use-toast';
-import { logger } from '../../../utils/logger';
+import { useToast } from '@client/hooks/use-toast';
+import { logger } from '@client/utils/logger';
 import { streamingSearchService } from '../services/streaming-search';
 
 // Define types locally

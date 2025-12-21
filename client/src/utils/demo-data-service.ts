@@ -207,7 +207,7 @@ export function filterDemoBills(filters: {
 /**
  * Generate demo comments for a bill
  */
-export function getDemoBillComments(billId: number) {
+export function getDemoBillComments(_billId: number) {
   const comments = [
     {
       id: 1,

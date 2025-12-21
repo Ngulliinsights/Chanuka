@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { logger } from '@client/utils/logger';
 
 export interface WebSocketOptions {
@@ -68,6 +69,38 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectCountRef = useRef(0);
 
+  const startPollingFallback = useCallback(() => {
+    // Simulate polling for notifications and activity
+    const pollInterval = setInterval(() => {
+      // Simulate receiving notifications
+      if (Math.random() > 0.8) {
+        const newNotification = {
+          id: `notification_${Date.now()}`,
+          title: 'Bill Update',
+          message: 'A bill you\'re following has been updated',
+          created_at: new Date().toISOString(),
+          read: false
+        };
+
+        setNotifications(prev => [newNotification, ...prev.slice(0, 9)]);
+      }
+
+      // Simulate activity updates
+      if (Math.random() > 0.9) {
+        const newActivity = {
+          id: `activity_${Date.now()}`,
+          type: 'bill_updated',
+          timestamp: new Date().toISOString(),
+          bill_id: `B${Math.floor(Math.random() * 1000)}`
+        };
+
+        setRecentActivity(prev => [newActivity, ...prev.slice(0, 19)]);
+      }
+    }, 5000);
+
+    return () => clearInterval(pollInterval);
+  }, []);
+
   const connect = useCallback(() => {
     if (isConnecting || isConnected) return;
 
@@ -77,7 +110,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     try {
       // In a real implementation, this would connect to actual WebSocket
       // For now, we'll simulate connection and use polling fallback
-      
+
       logger.info('WebSocket connection attempted', {
         component: 'useWebSocket',
         subscriptions: subscriptions.length
@@ -86,26 +119,26 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       // Simulate connection delay
       setTimeout(() => {
         setIsConnecting(false);
-        
+
         // Simulate connection failure for demo (would be real WebSocket in production)
         if (Math.random() > 0.7) {
           setIsConnected(true);
           setConnectionQuality('good');
           reconnectCountRef.current = 0;
-          
+
           // Start polling fallback
           startPollingFallback();
-          
+
           logger.info('WebSocket connected successfully', {
             component: 'useWebSocket'
           });
         } else {
           setError('Connection failed, using polling fallback');
           setConnectionQuality('poor');
-          
+
           // Start polling fallback immediately
           startPollingFallback();
-          
+
           logger.warn('WebSocket connection failed, using polling fallback', {
             component: 'useWebSocket'
           });
@@ -115,7 +148,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     } catch (err) {
       setIsConnecting(false);
       setError(err instanceof Error ? err.message : 'Connection failed');
-      
+
       // Schedule reconnect
       if (reconnectCountRef.current < reconnectAttempts) {
         reconnectCountRef.current++;
@@ -124,14 +157,14 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
         }, reconnectInterval);
       }
     }
-  }, [isConnecting, isConnected, subscriptions, reconnectAttempts, reconnectInterval]);
+  }, [isConnecting, isConnected, subscriptions.length, startPollingFallback, reconnectAttempts, reconnectInterval]); // startPollingFallback omitted to avoid circular dependency
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
     }
-    
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
@@ -148,46 +181,16 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     });
   }, []);
 
-  const startPollingFallback = useCallback(() => {
-    // Simulate polling for notifications and activity
-    const pollInterval = setInterval(() => {
-      // Simulate receiving notifications
-      if (Math.random() > 0.8) {
-        const newNotification = {
-          id: `notification_${Date.now()}`,
-          title: 'Bill Update',
-          message: 'A bill you\'re following has been updated',
-          created_at: new Date().toISOString(),
-          read: false
-        };
-        
-        setNotifications(prev => [newNotification, ...prev.slice(0, 9)]);
-      }
 
-      // Simulate activity updates
-      if (Math.random() > 0.9) {
-        const newActivity = {
-          id: `activity_${Date.now()}`,
-          type: 'bill_updated',
-          timestamp: new Date().toISOString(),
-          bill_id: `B${Math.floor(Math.random() * 1000)}`
-        };
-        
-        setRecentActivity(prev => [newActivity, ...prev.slice(0, 19)]);
-      }
-    }, 5000);
-
-    return () => clearInterval(pollInterval);
-  }, []);
 
   const getRecentActivity = useCallback((limit: number) => {
     return recentActivity.slice(0, limit);
   }, [recentActivity]);
 
   const markNotificationRead = useCallback((id: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id 
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === id
           ? { ...notification, read: true }
           : notification
       )

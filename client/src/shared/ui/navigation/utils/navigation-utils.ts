@@ -1,5 +1,5 @@
 
-import { InvalidNavigationPathError } from '@/core/error';
+import { InvalidNavigationPathError } from '@client/core/error';
 import { validateNavigationPath } from '@client/validation';
 
 import { DEFAULT_NAVIGATION_MAP } from '../constants';

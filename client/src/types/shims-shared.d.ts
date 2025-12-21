@@ -10,10 +10,10 @@
 declare module '@shared/core' {
   // Logger shape used across client code
   export interface Logger {
-    debug(...args: any[]): void;
-    info(message: string, ...meta: any[]): void;
-    warn(message: string | Error, ...meta: any[]): void;
-    error(message: string | Error, ...meta: any[]): void;
+    debug(message: string, context?: Record<string, unknown>, meta?: Record<string, unknown>): void;
+    info(message: string, context?: Record<string, unknown>, meta?: Record<string, unknown>): void;
+    warn(message: string | Error, context?: Record<string, unknown>, meta?: Record<string, unknown>): void;
+    error(message: string | Error, context?: Record<string, unknown>, meta?: Record<string, unknown>): void;
   }
 
   export const logger: Logger;
@@ -96,7 +96,7 @@ declare module '@shared/core/validation' {
   export interface ValidationService {
     validate<T>(schema: ZodSchema<T>, data: unknown): Promise<T>;
     validateSafe<T>(schema: ZodSchema<T>, data: unknown): Promise<{ success: boolean; data?: T; error?: any }>;
-    validateBatch(...args: any[]): Promise<any>;
+    validateBatch<T>(schemas: Array<{ schema: ZodSchema<T>; data: unknown }>): Promise<Array<{ success: boolean; data?: T; error?: unknown }>>;
     registerSchema(name: string, schema: ZodSchema<any>): void;
     getSchema(name: string): ZodSchema<any> | undefined;
   }

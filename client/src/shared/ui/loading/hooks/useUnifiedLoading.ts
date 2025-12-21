@@ -1,28 +1,24 @@
-import { 
-  LoadingOperation, 
-  LoadingConfig, 
-  LoadingStats, 
-  UseLoadingResult,
-  LoadingType,
-  LoadingPriority 
-} from '@client/types';
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 
-import { DEFAULT_LOADING_CONFIG } from '@client/constants';
+import { DEFAULT_LOADING_CONFIG } from '../constants';
 import { 
   LoadingError, 
   LoadingOperationFailedError,
   LoadingTimeoutError 
-} from '@client/core/error';
-import { safeValidateLoadingOperation } from '@client/validation';
-
+} from '../errors';
+import { 
+  LoadingOperation, 
+  LoadingConfig, 
+  LoadingStats, 
+  UseLoadingResult
+} from '../types';
 import { 
   createLoadingOperation, 
-  generateOperationId,
   hasOperationTimedOut,
   canRetryOperation,
   calculateRetryDelay 
 } from '../utils/loading-utils';
+import { safeValidateLoadingOperation } from '../validation';
 
 export interface UseUnifiedLoadingOptions {
   config?: Partial<LoadingConfig>;
@@ -32,7 +28,12 @@ export interface UseUnifiedLoadingOptions {
 }
 
 export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLoadingResult {
-  const config = { ...DEFAULT_LOADING_CONFIG, ...options.config };
+  // Memoize config to prevent recreation on every render
+  const config = useMemo(
+    () => ({ ...DEFAULT_LOADING_CONFIG, ...options.config }),
+    [options.config]
+  );
+
   const [operations, setOperations] = useState<Map<string, LoadingOperation>>(new Map());
   const [stats, setStats] = useState<LoadingStats>({
     loaded: 0,
@@ -61,7 +62,6 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
   // Check for timeouts
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = Date.now();
       const timedOutOperations: string[] = [];
 
       operationsRef.current.forEach((operation, id) => {
@@ -80,7 +80,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
                 id,
                 operation.timeout || 30000
               );
-              newMap.set(id, { ...operation, error: timeoutError });
+              newMap.set(id, { ...operation, error: timeoutError.message });
             }
           });
           return newMap;
@@ -119,10 +119,10 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
         operationData
       );
 
-      if (config.validation.enabled) {
+      if (config.validation?.enabled) {
         const validation = safeValidateLoadingOperation(operation);
         if (!validation.success) {
-          if (config.validation.strict) {
+          if (config.validation?.strict) {
             throw validation.error;
           } else {
             console.warn('Loading operation validation warning:', validation.error?.message);
@@ -174,7 +174,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
       if (operation) {
         const updatedOperation = {
           ...operation,
-          error,
+          error: error.message, // Store as string to match LoadingOperation type
           retryCount: operation.retryCount + 1,
         };
         
@@ -241,7 +241,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
   const isLoading = operations.size > 0;
   const hasErrors = Array.from(operations.values()).some(op => op.error);
   const currentError = hasErrors ? 
-    Array.from(operations.values()).find(op => op.error)?.error || null : 
+    new Error(Array.from(operations.values()).find(op => op.error)?.error || 'Unknown error') : 
     null;
 
   // Calculate overall progress
@@ -251,8 +251,9 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
     phase: hasErrors ? 'critical' as const : isLoading ? 'critical' as const : 'complete' as const,
   } : null;
 
-  const canRecover = currentError instanceof LoadingError && hasErrors;
-  const suggestions = currentError instanceof LoadingError ? 
+  // Fix: canRecover should be boolean, not boolean | null
+  const canRecover = Boolean(currentError && hasErrors);
+  const suggestions = currentError ? 
     ['Try refreshing the page', 'Check your connection'] : 
     [];
 
@@ -277,7 +278,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
   return {
     isLoading,
     progress,
-    error: currentError instanceof Error ? currentError : null,
+    error: currentError,
     stats,
     actions: {
       start: startOperation,
@@ -294,4 +295,3 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
     },
   };
 }
-

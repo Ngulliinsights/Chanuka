@@ -22,7 +22,7 @@ export interface ScriptFallbackProps {
  * ScriptFallback component provides graceful script loading with fallbacks
  * and error recovery mechanisms.
  */
-export const ScriptFallback: React.FC<ScriptFallbackProps> = ({
+export const ScriptFallback = React.memo(<ScriptFallbackProps> = ({
   src,
   fallbackSrc,
   children,
@@ -42,7 +42,7 @@ export const ScriptFallback: React.FC<ScriptFallbackProps> = ({
 
   const loadScript = useCallback((
     scriptSrc: string,
-    isRetry = false
+    _isRetry = false
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       // Check if script is already loaded
@@ -112,7 +112,11 @@ export const ScriptFallback: React.FC<ScriptFallbackProps> = ({
           onLoad?.();
           return;
         } catch (fallbackError) {
-          // Fallback also failed
+          // Fallback also failed - log for debugging
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Script fallback failed:', fallbackError);
+          }
+          onError?.(fallbackError as Error);
         }
       }
 
@@ -200,6 +204,9 @@ export const ScriptFallback: React.FC<ScriptFallbackProps> = ({
       {children}
     </div>
   ) : null;
+);
+
+function 1(
 };
 
 /**
@@ -294,7 +301,10 @@ export function useScriptFallback(
             }
             return;
           } catch (fallbackError) {
-            // Continue to retry logic
+            // Continue to retry logic - log for debugging
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('Script retry fallback failed:', fallbackError);
+            }
           }
         }
 

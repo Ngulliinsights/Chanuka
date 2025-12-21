@@ -95,7 +95,7 @@ export default function RegisterPage() {
           <div className="bg-white shadow rounded-lg p-4 text-center text-muted-foreground mb-4">
             <p>Social login integration not available in this build.</p>
             <div className="mt-3">
-              <button disabled={loading} onClick={() => handleSocialLoginSuccess({ provider: 'mock' })} className="px-3 py-1 border rounded">Simulate Social Login</button>
+              <button type="button" disabled={loading} onClick={() => handleSocialLoginSuccess({ provider: 'mock' })} className="px-3 py-1 border rounded">Simulate Social Login</button>
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function RegisterPage() {
               <div className="bg-white shadow rounded-lg p-6 text-center text-muted-foreground">
                 <p>Registration form component is not available in this build.</p>
                 <div className="mt-3">
-                  <button disabled={loading} onClick={() => handleRegisterSubmit({ email: 'test@example.com', password: 'password', first_name: 'Test', last_name: 'User' })} className="px-3 py-1 bg-blue-600 text-white rounded">Simulate Register</button>
+                  <button type="button" disabled={loading} onClick={() => handleRegisterSubmit({ email: 'test@example.com', password: 'password', first_name: 'Test', last_name: 'User' })} className="px-3 py-1 bg-blue-600 text-white rounded">Simulate Register</button>
                 </div>
               </div>
             </div>

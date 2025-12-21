@@ -47,9 +47,15 @@ export interface NotificationPreferences {
   /** Notify about community updates and announcements */
   communityUpdates: boolean;
   /** Delivery frequency for batched notifications */
-  frequency: 'immediate' | 'daily' | 'weekly';
+  frequency: 'immediate' | 'daily' | 'weekly' | 'hourly';
   /** Optional quiet hours when notifications should be suppressed */
-  quietHours: { start: string; end: string } | null;
+  quietHours: { 
+    start: string; 
+    end: string; 
+    enabled?: boolean;
+    startTime?: string;
+    endTime?: string;
+  } | null;
 }
 
 /**
@@ -74,6 +80,14 @@ export interface Notification {
   read: boolean;
   /** Additional structured data specific to notification type */
   data?: Record<string, unknown>;
+  /** Category for grouping and filtering notifications */
+  category?: 'community' | 'bills' | 'expert' | 'moderation' | 'system' | 'security' | string;
+  /** Priority level for visual emphasis */
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  /** URL to navigate to when notification is clicked */
+  actionUrl?: string;
+  /** Creation timestamp for sorting and display */
+  createdAt?: string;
 }
 
 /**
@@ -91,6 +105,10 @@ export interface LoadNotificationsOptions {
   type?: NotificationType;
   /** Only load unread notifications */
   unreadOnly?: boolean;
+  /** Maximum number of notifications to return */
+  limit?: number;
+  /** Filter by notification category */
+  category?: string;
 }
 
 // ============================================================================

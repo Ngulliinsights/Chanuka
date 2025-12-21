@@ -6,12 +6,12 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { logger } from '@/utils/logger';
+import { logger } from '@client/utils/logger';
 
 // Import the orphaned modules we're integrating
-import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@/utils/security';
-import { PrivacyAnalyticsService } from '@/services/privacyAnalyticsService';
-import { DeviceDetector, TouchHandler } from '@/core/mobile';
+import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/utils/security';
+import { PrivacyAnalyticsService } from '@client/services/privacyAnalyticsService';
+import { DeviceDetector, TouchHandler } from '@client/core/mobile';
 
 // ============================================================================
 // TYPES & INTERFACES

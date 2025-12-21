@@ -1,26 +1,23 @@
 // Main API Client with HTTP Methods, Retry Logic, and Caching
 // Optimized implementation with enhanced error handling and performance
 
+import { ErrorFactory } from '@client/core/error';
+import globalErrorHandler, { ErrorDomain } from '@client/core/error';
+
+import { logger } from '../../utils/logger';
+import { createAuthApiService } from '../auth';
+
+import { globalCache, CacheKeyGenerator } from './cache-manager';
+import { globalConfig } from './config';
 import {
   ApiRequest,
   ApiResponse,
   RequestOptions,
   ClientConfig,
-  UnifiedApiClient
+  UnifiedApiClient,
+  RequestInterceptor,
+  ResponseInterceptor
 } from './types';
-import { ErrorFactory } from '@client/core/error';
-
-import { logger } from '../../utils/logger';
-
-// Request Interceptor Interface
-interface RequestInterceptor {
-  intercept(request: ApiRequest): Promise<ApiRequest> | ApiRequest;
-}
-
-// Response Interceptor Interface
-interface ResponseInterceptor {
-  intercept(response: ApiResponse): Promise<ApiResponse> | ApiResponse;
-}
 
 // Circuit Breaker State
 enum CircuitState {
@@ -29,13 +26,21 @@ enum CircuitState {
   HALF_OPEN = 'half_open'
 }
 
+// Circuit Breaker Metrics Interface
+interface CircuitBreakerMetrics {
+  totalRequests: number;
+  successfulRequests: number;
+  failedRequests: number;
+  circuitOpenings: number;
+}
+
 // Circuit Breaker for fault tolerance with enhanced monitoring
 class CircuitBreaker {
   private state: CircuitState = CircuitState.CLOSED;
   private failureCount = 0;
   private lastFailureTime = 0;
   private successCount = 0;
-  private readonly metrics = {
+  private readonly metrics: CircuitBreakerMetrics = {
     totalRequests: 0,
     successfulRequests: 0,
     failedRequests: 0,
@@ -115,7 +120,7 @@ class CircuitBreaker {
     return this.state;
   }
 
-  getMetrics() {
+  getMetrics(): CircuitBreakerMetrics {
     return { ...this.metrics };
   }
 
@@ -137,6 +142,17 @@ interface RetryConfig {
   onRetry?: (error: Error, attempt: number, delayMs: number) => void;
 }
 
+// Health Status Interface
+interface HealthStatus {
+  circuitBreakerState: CircuitState;
+  circuitBreakerMetrics: CircuitBreakerMetrics;
+  activeRequests: number;
+  totalRequests: number;
+}
+
+// Type for fetch config that interceptors work with
+type FetchConfig = RequestInit & { url: string };
+
 // Main API Client Implementation
 export class UnifiedApiClientImpl implements UnifiedApiClient {
   private baseUrl: string;
@@ -157,30 +173,43 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
   // Core HTTP Methods with type safety
   async get<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
-    return this.request<T>('GET', endpoint, undefined, options);
+    return this.requestInternal<T>('GET', endpoint, undefined, options);
   }
 
-  async post<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    return this.request<T>('POST', endpoint, data, options);
+  async post<T>(endpoint: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.requestInternal<T>('POST', endpoint, data, options);
   }
 
-  async put<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    return this.request<T>('PUT', endpoint, data, options);
+  async put<T>(endpoint: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.requestInternal<T>('PUT', endpoint, data, options);
   }
 
-  async patch<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    return this.request<T>('PATCH', endpoint, data, options);
+  async patch<T>(endpoint: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.requestInternal<T>('PATCH', endpoint, data, options);
   }
 
   async delete<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
-    return this.request<T>('DELETE', endpoint, undefined, options);
+    return this.requestInternal<T>('DELETE', endpoint, undefined, options);
+  }
+
+  // Public request method that matches the UnifiedApiClient interface
+  async request<T>(request: ApiRequest): Promise<ApiResponse<T>> {
+    return this.requestInternal<T>(
+      request.method,
+      request.url,
+      request.body,
+      {
+        headers: request.headers as Record<string, string>,
+        timeout: request.timeout
+      }
+    );
   }
 
   // Main request method with comprehensive error handling and caching
-  private async request<T>(
+  private async requestInternal<T>(
     method: string,
     endpoint: string,
-    data?: any,
+    data?: unknown,
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     const startTime = Date.now();
@@ -258,13 +287,13 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   private async buildRequest(
     method: string,
     endpoint: string,
-    data: any,
+    data: unknown,
     options: RequestOptions | undefined,
     requestId: string
   ): Promise<ApiRequest> {
-    let request: ApiRequest = {
+    const request: ApiRequest = {
       id: requestId,
-      method: method as any,
+      method: method as ApiRequest['method'],
       url: this.buildUrl(endpoint, options?.params),
       headers: { ...this.headers, ...options?.headers },
       body: data,
@@ -272,12 +301,24 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       timestamp: new Date().toISOString()
     };
 
+    return request;
+  }
+
+  // Convert ApiRequest to FetchConfig and apply interceptors
+  private async applyRequestInterceptors(request: ApiRequest): Promise<FetchConfig> {
+    let fetchConfig: FetchConfig = {
+      url: request.url,
+      method: request.method,
+      headers: request.headers,
+      body: request.body ? JSON.stringify(request.body) : undefined
+    };
+
     // Apply request interceptors sequentially
     for (const interceptor of this.requestInterceptors) {
-      request = await interceptor.intercept(request);
+      fetchConfig = await interceptor(fetchConfig);
     }
 
-    return request;
+    return fetchConfig;
   }
 
   // Execute request with full resilience features
@@ -318,11 +359,36 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
   // Apply all response interceptors
   private async applyResponseInterceptors<T>(response: ApiResponse<T>): Promise<ApiResponse<T>> {
-    let processedResponse: ApiResponse<T> = response;
+    // Convert ApiResponse to Response for interceptors
+    const nativeResponse = new Response(
+      JSON.stringify(response.data),
+      {
+        status: response.status,
+        statusText: response.statusText,
+        headers: new Headers(response.headers)
+      }
+    );
+
+    let processedResponse: Response = nativeResponse;
+
+    // Apply response interceptors
     for (const interceptor of this.responseInterceptors) {
-      processedResponse = await interceptor.intercept(processedResponse) as ApiResponse<T>;
+      processedResponse = await interceptor(processedResponse);
     }
-    return processedResponse;
+
+    // If the response was modified, update our ApiResponse
+    if (processedResponse !== nativeResponse) {
+      const newData = await this.parseResponse(processedResponse);
+      return {
+        ...response,
+        status: processedResponse.status,
+        statusText: processedResponse.statusText,
+        headers: this.headersToObject(processedResponse.headers),
+        data: newData as T
+      };
+    }
+
+    return response;
   }
 
   // Validate response against schema
@@ -334,7 +400,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     if (options?.responseSchema && response.data) {
       try {
         // Note: validationService not available, skipping validation
-        const validatedData = response.data; // await validationService.validate(options.responseSchema, response.data);
+        const validatedData = response.data;
         return {
           ...response,
           data: validatedData
@@ -408,12 +474,16 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     }
 
     // Log error through global handler
-    await globalErrorHandler.handleError(error as Error, {
-      component: 'api-client',
-      operation: 'request',
-      requestId,
-      method,
-      endpoint
+    globalErrorHandler.handleError({
+      message: (error as Error).message,
+      type: ErrorDomain.NETWORK,
+      context: {
+        component: 'api-client',
+        operation: 'request',
+        requestId,
+        method,
+        endpoint
+      }
     });
 
     // Return error response (preserving original behavior)
@@ -423,7 +493,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       status: 0,
       statusText: 'Error',
       headers: {},
-      data: null as any,
+      data: null as T,
       timestamp: new Date().toISOString(),
       duration: Date.now() - startTime,
       cached: false,
@@ -600,10 +670,11 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     }, request.timeout);
 
     try {
-      const response = await fetch(request.url, {
-        method: request.method,
-        headers: request.headers,
-        body: request.body ? JSON.stringify(request.body) : undefined,
+      // Apply request interceptors to get fetch config
+      const fetchConfig = await this.applyRequestInterceptors(request);
+
+      const response = await fetch(fetchConfig.url, {
+        ...fetchConfig,
         signal: controller.signal
       });
 
@@ -659,9 +730,9 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     });
 
     try {
-      const authService = (globalThis as any).authService;
-      if (authService?.refreshTokens) {
-        await authService.refreshTokens();
+      const authService = (globalThis as Record<string, unknown>).authService;
+      if (authService && typeof authService === 'object' && 'refreshTokens' in authService) {
+        await (authService.refreshTokens as () => Promise<void>)();
 
         logger.info('Token refresh successful, retrying request', {
           component: 'ApiClient',
@@ -682,19 +753,18 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   }
 
   // Service Registry Management
-  registerService(name: string, _service: any): void {
+  registerService(_name: string, _service: unknown): void {
     logger.info('Service registered', {
       component: 'ApiClient',
-      serviceName: name
+      serviceName: _name
     });
   }
 
-  getService<T>(name: string): T {
-    throw new Error(`Service ${name} not found in registry`);
+  getService<T>(_name: string): T {
+    throw new Error(`Service ${_name} not found in registry`);
   }
 
-  hasService(name: string): boolean {
-    // For now, always return false as we don't have a registry
+  hasService(_name: string): boolean {
     return false;
   }
 
@@ -707,6 +777,22 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     logger.info('API client reconfigured', {
       component: 'ApiClient',
       baseUrl: this.baseUrl,
+      timeout: this.timeout
+    });
+  }
+
+  setBaseUrl(baseUrl: string): void {
+    this.baseUrl = baseUrl;
+    logger.info('Base URL updated', {
+      component: 'ApiClient',
+      baseUrl: this.baseUrl
+    });
+  }
+
+  setTimeout(timeout: number): void {
+    this.timeout = timeout;
+    logger.info('Timeout updated', {
+      component: 'ApiClient',
       timeout: this.timeout
     });
   }
@@ -770,7 +856,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   }
 
   // Health and Monitoring
-  getHealthStatus() {
+  getHealthStatus(): HealthStatus {
     return {
       circuitBreakerState: this.circuitBreaker.getState(),
       circuitBreakerMetrics: this.circuitBreaker.getMetrics(),
@@ -780,7 +866,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   }
 
   // Utility Methods
-  private buildUrl(endpoint: string, params?: Record<string, any>): string {
+  private buildUrl(endpoint: string, params?: Record<string, unknown>): string {
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
 
     if (!params || Object.keys(params).length === 0) {
@@ -798,7 +884,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     return paramString ? `${url}?${paramString}` : url;
   }
 
-  private async parseResponse(response: Response): Promise<any> {
+  private async parseResponse(response: Response): Promise<unknown> {
     const contentType = response.headers.get('content-type');
 
     if (!contentType) {
@@ -832,38 +918,35 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   }
 }
 
-// Default Interceptors
-export class AuthRequestInterceptor implements RequestInterceptor {
-  constructor(private getToken: () => string | null) { }
-
-  async intercept(request: ApiRequest): Promise<ApiRequest> {
-    const token = this.getToken();
+// Helper function to create request interceptor
+export const createAuthRequestInterceptor = (getToken: () => string | null): RequestInterceptor => {
+  return async (config: FetchConfig): Promise<FetchConfig> => {
+    const token = getToken();
     if (token) {
       return {
-        ...request,
+        ...config,
         headers: {
-          ...request.headers,
+          ...config.headers,
           'Authorization': `Bearer ${token}`
         }
       };
     }
-    return request;
-  }
-}
+    return config;
+  };
+};
 
-export class LoggingResponseInterceptor implements ResponseInterceptor {
-  async intercept(response: ApiResponse): Promise<ApiResponse> {
+// Helper function to create logging response interceptor
+export const createLoggingResponseInterceptor = (): ResponseInterceptor => {
+  return async (response: Response): Promise<Response> => {
     const logLevel = response.status >= 400 ? 'warn' : 'debug';
     logger[logLevel]('API Response received', {
       component: 'ApiClient',
       status: response.status,
-      statusText: response.statusText,
-      duration: `${response.duration}ms`,
-      cached: response.cached
+      statusText: response.statusText
     });
     return response;
-  }
-}
+  };
+};
 
 // Global API client instance
 export const globalApiClient = new UnifiedApiClientImpl({
@@ -879,10 +962,8 @@ export const globalApiClient = new UnifiedApiClientImpl({
 });
 
 // Initialize with default interceptors
-globalApiClient.addResponseInterceptor(new LoggingResponseInterceptor());
+globalApiClient.addResponseInterceptor(createLoggingResponseInterceptor());
 
 // Initialize auth service with the API client to break circular dependency
-import { createAuthApiService } from '../auth'; // Use consolidated auth system
-import { globalCache, CacheKeyGenerator } from './cache-manager';
-import { globalConfig } from './config';
+
 export const authApiService = createAuthApiService(globalApiClient);

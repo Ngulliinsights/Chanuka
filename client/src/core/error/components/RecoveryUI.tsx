@@ -9,8 +9,37 @@
 import { RefreshCw, Building, AlertCircle, ChevronDown, X } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { AppError } from '../types';
-import { RecoveryUIProps, RecoveryAction } from './types';
+// Define types inline since imports are not working
+interface AppError {
+  message: string;
+  code?: string;
+  stack?: string;
+}
+
+interface RecoveryAction {
+  id: string;
+  label: string;
+  description?: string;
+  icon?: React.ReactNode;
+  variant: 'primary' | 'secondary';
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+interface RecoveryUIProps {
+  error: AppError;
+  variant: 'buttons' | 'dropdown' | 'modal' | 'inline-actions';
+  onRetry: () => void;
+  onRefresh: () => void;
+  onGoHome: () => void;
+  onReport: () => void;
+  onCustomAction?: (actionId: string) => void;
+  isRecovering?: boolean;
+  retryCount?: number;
+  maxRetries?: number;
+  availableActions?: RecoveryAction[];
+  className?: string;
+}
 
 /**
  * Main Recovery UI Component
@@ -25,9 +54,9 @@ export const RecoveryUI: React.FC<RecoveryUIProps> = ({
   onGoHome,
   onReport,
   onCustomAction,
-  isRecovering,
-  retryCount,
-  maxRetries,
+  isRecovering = false,
+  retryCount = 0,
+  maxRetries = 3,
   availableActions,
   className = '',
 }) => {
@@ -38,7 +67,10 @@ export const RecoveryUI: React.FC<RecoveryUIProps> = ({
     {
       id: 'retry',
       label: 'Try Again',
-      description: retryCount > 0 ? `Retry attempt ${retryCount + 1} of ${maxRetries}` : 'Retry the failed operation',
+      description:
+        retryCount > 0
+          ? `Retry attempt ${retryCount + 1} of ${maxRetries}`
+          : 'Retry the failed operation',
       icon: <RefreshCw size={16} />,
       variant: 'primary',
       disabled: isRecovering || retryCount >= maxRetries,
@@ -144,8 +176,9 @@ const RecoveryButtons: React.FC<{
 }> = ({ actions, onAction, className }) => {
   return (
     <div className={`${className} recovery-buttons`} role="group" aria-label="Recovery actions">
-      {actions.map((action) => (
+      {actions.map(action => (
         <button
+          type="button"
           key={action.id}
           onClick={() => onAction(action.id)}
           disabled={action.disabled}
@@ -176,24 +209,26 @@ const RecoveryInlineActions: React.FC<{
 
   return (
     <div className={`${className} recovery-inline-actions`}>
-      <span className="recovery-inline-actions__text">
-        What would you like to do?
-      </span>
+      <span className="recovery-inline-actions__text">What would you like to do?</span>
       <div className="recovery-inline-actions__buttons">
         {primaryAction && (
           <button
+            type="button"
             onClick={() => onAction(primaryAction.id)}
             disabled={primaryAction.disabled}
             className={`recovery-inline-button recovery-inline-button--primary ${primaryAction.loading ? 'recovery-inline-button--loading' : ''}`}
             aria-label={primaryAction.description || primaryAction.label}
           >
-            {primaryAction.loading && <RefreshCw size={14} className="recovery-inline-button__spinner" />}
+            {primaryAction.loading && (
+              <RefreshCw size={14} className="recovery-inline-button__spinner" />
+            )}
             {primaryAction.icon && !primaryAction.loading && primaryAction.icon}
             {primaryAction.label}
           </button>
         )}
-        {secondaryActions.map((action) => (
+        {secondaryActions.map(action => (
           <button
+            type="button"
             key={action.id}
             onClick={() => onAction(action.id)}
             disabled={action.disabled}
@@ -228,6 +263,7 @@ const RecoveryDropdown: React.FC<{
   return (
     <div className={`${className} recovery-dropdown`}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="recovery-dropdown__trigger"
         aria-expanded={isOpen}
@@ -235,15 +271,19 @@ const RecoveryDropdown: React.FC<{
         aria-label="Recovery options"
       >
         <span>Recovery Options</span>
-        <ChevronDown size={16} className={`recovery-dropdown__arrow ${isOpen ? 'recovery-dropdown__arrow--open' : ''}`} />
+        <ChevronDown
+          size={16}
+          className={`recovery-dropdown__arrow ${isOpen ? 'recovery-dropdown__arrow--open' : ''}`}
+        />
       </button>
 
       {isOpen && (
         <>
           <div className="recovery-dropdown__backdrop" onClick={() => setIsOpen(false)} />
           <div className="recovery-dropdown__menu" role="menu">
-            {actions.map((action) => (
+            {actions.map(action => (
               <button
+                type="button"
                 key={action.id}
                 onClick={() => handleAction(action.id)}
                 disabled={action.disabled}
@@ -251,12 +291,16 @@ const RecoveryDropdown: React.FC<{
                 role="menuitem"
                 aria-label={action.description || action.label}
               >
-                {action.loading && <RefreshCw size={14} className="recovery-dropdown__item-spinner" />}
+                {action.loading && (
+                  <RefreshCw size={14} className="recovery-dropdown__item-spinner" />
+                )}
                 {action.icon && !action.loading && action.icon}
                 <div className="recovery-dropdown__item-content">
                   <span className="recovery-dropdown__item-label">{action.label}</span>
                   {action.description && (
-                    <span className="recovery-dropdown__item-description">{action.description}</span>
+                    <span className="recovery-dropdown__item-description">
+                      {action.description}
+                    </span>
                   )}
                 </div>
               </button>
@@ -301,6 +345,7 @@ const RecoveryModal: React.FC<{
             Recovery Options
           </h3>
           <button
+            type="button"
             onClick={() => setIsOpen(false)}
             className="recovery-modal__close"
             aria-label="Close recovery options"
@@ -319,15 +364,18 @@ const RecoveryModal: React.FC<{
           </div>
 
           <div className="recovery-modal__actions" role="group" aria-label="Recovery actions">
-            {actions.map((action) => (
+            {actions.map(action => (
               <button
+                type="button"
                 key={action.id}
                 onClick={() => handleAction(action.id)}
                 disabled={action.disabled}
                 className={`recovery-modal__action recovery-modal__action--${action.variant} ${action.loading ? 'recovery-modal__action--loading' : ''}`}
                 aria-label={action.description || action.label}
               >
-                {action.loading && <RefreshCw size={16} className="recovery-modal__action-spinner" />}
+                {action.loading && (
+                  <RefreshCw size={16} className="recovery-modal__action-spinner" />
+                )}
                 {action.icon && !action.loading && action.icon}
                 <div className="recovery-modal__action-content">
                   <span className="recovery-modal__action-label">{action.label}</span>

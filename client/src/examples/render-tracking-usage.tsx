@@ -74,9 +74,9 @@ export function ManualRenderTrackingExample() {
       <p>Count: {count}</p>
       <p>Data items: {data.length}</p>
 
-      <button onClick={handleIncrement}>Increment Count</button>
+      <button type="button" onClick={handleIncrement}>Increment Count</button>
 
-      <button onClick={handleDataLoad}>Load Data</button>
+      <button type="button" onClick={handleDataLoad}>Load Data</button>
 
       <button
         onClick={() => {
@@ -91,7 +91,7 @@ export function ManualRenderTrackingExample() {
         <h4>Render Stats:</h4>
         <pre>{JSON.stringify(renderTracker.getRenderStats(), null, 2)}</pre>
 
-        <button onClick={renderTracker.clearStats}>Clear Stats</button>
+        <button type="button" onClick={renderTracker.clearStats}>Clear Stats</button>
       </div>
     </div>
   );
@@ -105,8 +105,8 @@ const SimpleCounter = ({ initialValue = 0 }: { initialValue?: number }) => {
     <div>
       <h3>HOC Tracked Counter</h3>
       <p>Value: {value}</p>
-      <button onClick={() => setValue((v) => v + 1)}>Increment</button>
-      <button onClick={() => setValue((v) => v - 1)}>Decrement</button>
+      <button type="button" onClick={() => setValue((v) => v + 1)}>Increment</button>
+      <button type="button" onClick={() => setValue((v) => v - 1)}>Decrement</button>
     </div>
   );
 };
@@ -193,8 +193,8 @@ export function RenderTrackingDashboard() {
       <h3>Render Tracking Dashboard</h3>
 
       <div style={{ marginBottom: "20px" }}>
-        <button onClick={refreshStats}>Refresh Stats</button>
-        <button onClick={clearAllStats} style={{ marginLeft: "10px" }}>
+        <button type="button" onClick={refreshStats}>Refresh Stats</button>
+        <button type="button" onClick={clearAllStats} style={{ marginLeft: "10px" }}>
           Clear All Stats
         </button>
       </div>
@@ -214,7 +214,7 @@ export function RenderTrackingDashboard() {
           value={selectedComponent}
           onChange={(e) => setSelectedComponent(e.target.value)}
         />
-        <button onClick={clearComponentStats} style={{ marginLeft: "10px" }}>
+        <button type="button" onClick={clearComponentStats} style={{ marginLeft: "10px" }}>
           Clear Component Stats
         </button>
 

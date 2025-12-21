@@ -1046,7 +1046,7 @@ export class ErrorAnalyticsService {
       );
 
       const domainCounts = this.aggregateByDomain(hourErrors);
-      const primaryDomain = (Object.entries(domainCounts).sort(([, a], [, b]) => b - a)[0]?.[0] as ErrorDomain) || 'unknown';
+      const primaryDomain = (Object.entries(domainCounts).sort(([, a], [, b]) => b - a)[0]?.[0] as ErrorDomain) || ErrorDomain.UNKNOWN;
 
       counts.push(hourErrors.length);
 

@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Skeleton Component - UNIFIED & TOKEN-BASED
  *

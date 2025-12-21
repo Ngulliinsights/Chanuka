@@ -16,4 +16,4 @@ export {
   AuthProvider, 
   useAuthStore,
   type AuthContextType 
-} from '../../../core/auth';
+} from '@client/core/auth';

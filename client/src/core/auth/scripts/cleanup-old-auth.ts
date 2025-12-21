@@ -5,7 +5,7 @@
  * after migrating to the consolidated auth system.
  */
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 interface CleanupTask {
   name: string;

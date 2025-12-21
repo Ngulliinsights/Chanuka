@@ -70,7 +70,7 @@ interface CivicActionToolboxProps {
   onRightsCardOpen: (card: RightsCard) => void;
 }
 
-export const CivicActionToolbox: React.FC<CivicActionToolboxProps> = ({
+export const CivicActionToolbox = React.memo(<CivicActionToolboxProps> = ({
   billId: _billId,
   actions,
   rightsCards,
@@ -233,4 +233,7 @@ export const CivicActionToolbox: React.FC<CivicActionToolboxProps> = ({
       </CardContent>
     </Card>
   );
+);
+
+function 1(
 };

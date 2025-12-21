@@ -1,7 +1,7 @@
+import React from 'react';
 import { GitBranch, CheckCircle, Clock, FileText, AlertTriangle } from 'lucide-react';
 
 import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Skeleton } from '@client/shared/design-system';
-
 
 interface Migration {
   name: string;
@@ -141,4 +141,3 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
     </Card>
   );
 }
-

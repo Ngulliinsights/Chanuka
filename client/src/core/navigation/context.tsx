@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { RootState } from '@client/store';
+import { RootState } from '../../shared/infrastructure/store';
 import {
   setCurrentPath,
   updateBreadcrumbs,
@@ -21,8 +21,8 @@ import {
   updatePreferences,
   addToRecentPages,
   clearPersistedState,
-} from '@client/store/slices/navigationSlice';
-import { UserRole } from '@client/types/navigation';
+} from '../../shared/infrastructure/store/slices/navigationSlice';
+import { UserRole } from '../../types/navigation';
 
 import { NavigationContextValue, BreadcrumbItem, RelatedPage } from './types';
 import { generateBreadcrumbs, calculateRelatedPages, determineNavigationSection, isNavigationPathActive } from './utils';
@@ -44,7 +44,7 @@ export function createNavigationProvider(
     const { isMobile } = useDeviceInfo();
 
     // Select navigation state from Redux store
-    const state = useSelector((state: RootState) => state.navigation);
+    const state = useSelector((state: RootState) => (state as any).navigation);
 
     // Handle mounting
     useEffect(() => {

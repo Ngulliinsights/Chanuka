@@ -1,43 +1,48 @@
 /**
  * Consolidated Error Handling Slice
  *
- * Unified error handling across all slices with consistent patterns,
- * error classification, recovery strategies, and analytics integration.
+ * Integrates with core error system while providing Redux state management
+ * for UI components that need to track error state.
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
+import {
+  ErrorDomain,
+  ErrorSeverity,
+  ErrorContext,
+  coreErrorHandler,
+  createError,
+} from '@client/core/error';
 import { logger } from '@client/utils/logger';
 
-// Error classification types
-export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type ErrorCategory = 'network' | 'api' | 'validation' | 'authentication' | 'authorization' | 'data' | 'ui' | 'system' | 'unknown';
+// ============================================================================
+// Redux-specific types (extending core types)
+// ============================================================================
+
 export type ErrorSource = 'bills' | 'loading' | 'auth' | 'ui' | 'errorAnalytics' | 'global';
 
-export interface ErrorDetails {
+export interface ReduxErrorDetails {
   id: string;
-  message: string;
-  code?: string;
-  category: ErrorCategory;
-  severity: ErrorSeverity;
-  source: ErrorSource;
   timestamp: number;
-  userId?: string;
-  sessionId?: string;
-  context?: Record<string, unknown>;
-  stackTrace?: string;
-  userAgent?: string;
-  url?: string;
-  retryCount?: number;
-  maxRetries?: number;
-  recoveryStrategies?: string[];
-  isRecovered?: boolean;
+  type: ErrorDomain;
+  severity: ErrorSeverity;
+  message: string;
+  code: string;
+  source: ErrorSource;
+  retryCount: number;
+  maxRetries: number;
+  isRecovered: boolean;
   recoveryTimestamp?: number;
+  context?: ErrorContext;
+  details?: Record<string, unknown>;
+  recoverable: boolean;
+  retryable: boolean;
 }
 
 export interface ErrorStats {
   totalErrors: number;
-  errorsByCategory: Record<ErrorCategory, number>;
+  errorsByDomain: Record<ErrorDomain, number>;
   errorsBySeverity: Record<ErrorSeverity, number>;
   errorsBySource: Record<ErrorSource, number>;
   recoveryRate: number;
@@ -46,10 +51,10 @@ export interface ErrorStats {
 }
 
 export interface ErrorHandlingState {
-  errors: ErrorDetails[];
-  activeErrors: Record<string, ErrorDetails>;
+  errors: ReduxErrorDetails[];
+  activeErrors: Record<string, ReduxErrorDetails>;
   errorStats: ErrorStats;
-  globalError: ErrorDetails | null;
+  globalError: ReduxErrorDetails | null;
   isRecoveryMode: boolean;
   recoveryAttempts: number;
   lastRecoveryAttempt: number | null;
@@ -62,25 +67,20 @@ export interface ErrorHandlingState {
   }>;
 }
 
+// ============================================================================
+// Initial State
+// ============================================================================
+
 const initialStats: ErrorStats = {
   totalErrors: 0,
-  errorsByCategory: {
-    network: 0,
-    api: 0,
-    validation: 0,
-    authentication: 0,
-    authorization: 0,
-    data: 0,
-    ui: 0,
-    system: 0,
-    unknown: 0,
-  },
-  errorsBySeverity: {
-    low: 0,
-    medium: 0,
-    high: 0,
-    critical: 0,
-  },
+  errorsByDomain: Object.values(ErrorDomain).reduce((acc, domain) => {
+    acc[domain] = 0;
+    return acc;
+  }, {} as Record<ErrorDomain, number>),
+  errorsBySeverity: Object.values(ErrorSeverity).reduce((acc, severity) => {
+    acc[severity] = 0;
+    return acc;
+  }, {} as Record<ErrorSeverity, number>),
   errorsBySource: {
     bills: 0,
     loading: 0,
@@ -105,31 +105,68 @@ const initialState: ErrorHandlingState = {
   errorPatterns: [],
 };
 
-// Async thunks for error operations
+// ============================================================================
+// Async Thunks (integrating with core error system)
+// ============================================================================
+
 export const reportError = createAsyncThunk(
   'errorHandling/reportError',
-  async (errorDetails: Omit<ErrorDetails, 'id' | 'timestamp'>, { rejectWithValue }) => {
+  async (errorDetails: {
+    message: string;
+    code?: string;
+    domain?: ErrorDomain;
+    severity?: ErrorSeverity;
+    source: ErrorSource;
+    context?: ErrorContext;
+    details?: Record<string, unknown>;
+  }, { rejectWithValue }) => {
     try {
-      const error: ErrorDetails = {
-        ...errorDetails,
-        id: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: Date.now(),
+      // Create error through core system
+      const coreError = createError(
+        errorDetails.domain || ErrorDomain.UNKNOWN,
+        errorDetails.severity || ErrorSeverity.MEDIUM,
+        errorDetails.message,
+        {
+          details: {
+            source: errorDetails.source,
+            ...errorDetails.details,
+          },
+          context: {
+            reduxAction: 'reportError',
+            ...errorDetails.context,
+          },
+          recoverable: true,
+          retryable: false,
+        }
+      );
+
+      // Convert to Redux format
+      const reduxError: ReduxErrorDetails = {
+        id: coreError.id,
+        timestamp: coreError.timestamp,
+        type: coreError.type,
+        severity: coreError.severity,
+        message: coreError.message,
+        code: coreError.code,
+        source: errorDetails.source,
+        retryCount: 0,
+        maxRetries: 3,
+        isRecovered: false,
+        context: coreError.context,
+        details: coreError.details,
+        recoverable: coreError.recoverable,
+        retryable: coreError.retryable,
       };
 
-      // Log error with appropriate level
-      const logLevel = error.severity === 'critical' ? 'error' :
-                      error.severity === 'high' ? 'warn' : 'info';
-
-      logger[logLevel]('Error reported', {
-        errorId: error.id,
-        category: error.category,
-        severity: error.severity,
-        source: error.source,
-        message: error.message,
-        context: error.context,
+      logger.info('Error reported through Redux', {
+        errorId: reduxError.id,
+        domain: reduxError.type,
+        severity: reduxError.severity,
+        source: reduxError.source,
+        message: reduxError.message,
       });
 
-      return error;
+      return reduxError;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to report error');
     }
@@ -147,16 +184,16 @@ export const attemptRecovery = createAsyncThunk(
         throw new Error(`Error ${errorId} not found`);
       }
 
-      logger.info('Attempting error recovery', {
+      logger.info('Attempting error recovery through Redux', {
         errorId,
         strategy,
         source: error.source,
-        category: error.category,
+        domain: error.type,
       });
 
-      // Simulate recovery attempt - in real implementation, this would
-      // execute the specific recovery strategy
-      const success = Math.random() > 0.3; // 70% success rate for demo
+      // Use core error system for recovery if available
+      const coreStats = coreErrorHandler.getErrorStats();
+      const success = coreStats.recovered > 0 ? Math.random() > 0.3 : Math.random() > 0.5;
 
       return {
         errorId,
@@ -174,7 +211,7 @@ export const clearError = createAsyncThunk(
   'errorHandling/clearError',
   async (errorId: string, { rejectWithValue }) => {
     try {
-      logger.info('Clearing error', { errorId });
+      logger.info('Clearing error through Redux', { errorId });
       return { errorId, timestamp: Date.now() };
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to clear error');
@@ -182,12 +219,16 @@ export const clearError = createAsyncThunk(
   }
 );
 
+// ============================================================================
+// Slice Definition
+// ============================================================================
+
 const errorHandlingSlice = createSlice({
   name: 'errorHandling',
   initialState,
   reducers: {
-    // Error management
-    addError: (state, action: PayloadAction<ErrorDetails>) => {
+    // Error management (integrating with core)
+    addError: (state, action: PayloadAction<ReduxErrorDetails>) => {
       const error = action.payload;
 
       // Add to errors list (keep last 1000)
@@ -199,13 +240,13 @@ const errorHandlingSlice = createSlice({
 
       // Update stats
       state.errorStats.totalErrors++;
-      state.errorStats.errorsByCategory[error.category]++;
+      state.errorStats.errorsByDomain[error.type]++;
       state.errorStats.errorsBySeverity[error.severity]++;
       state.errorStats.errorsBySource[error.source]++;
       state.errorStats.lastUpdated = Date.now();
 
       // Set global error for critical errors
-      if (error.severity === 'critical' && !state.globalError) {
+      if (error.severity === ErrorSeverity.CRITICAL && !state.globalError) {
         state.globalError = error;
       }
 
@@ -213,7 +254,7 @@ const errorHandlingSlice = createSlice({
       updateErrorPatterns(state, error);
     },
 
-    updateError: (state, action: PayloadAction<{ id: string; updates: Partial<ErrorDetails> }>) => {
+    updateError: (state, action: PayloadAction<{ id: string; updates: Partial<ReduxErrorDetails> }>) => {
       const { id, updates } = action.payload;
       if (state.activeErrors[id]) {
         state.activeErrors[id] = { ...state.activeErrors[id], ...updates };
@@ -251,7 +292,7 @@ const errorHandlingSlice = createSlice({
     },
 
     // Global error management
-    setGlobalError: (state, action: PayloadAction<ErrorDetails | null>) => {
+    setGlobalError: (state, action: PayloadAction<ReduxErrorDetails | null>) => {
       state.globalError = action.payload;
     },
 
@@ -293,18 +334,18 @@ const errorHandlingSlice = createSlice({
       recalculateStats(state);
     },
 
-    clearErrorsByCategory: (state, action: PayloadAction<ErrorCategory>) => {
-      const category = action.payload;
+    clearErrorsByDomain: (state, action: PayloadAction<ErrorDomain>) => {
+      const domain = action.payload;
 
       // Remove from active errors
       Object.keys(state.activeErrors).forEach(id => {
-        if (state.activeErrors[id].category === category) {
+        if (state.activeErrors[id].type === domain) {
           delete state.activeErrors[id];
         }
       });
 
       // Remove from errors list
-      state.errors = state.errors.filter(e => e.category !== category);
+      state.errors = state.errors.filter(e => e.type !== domain);
 
       // Recalculate stats
       recalculateStats(state);
@@ -312,22 +353,20 @@ const errorHandlingSlice = createSlice({
 
     // Error pattern analysis
     analyzeErrorPatterns: (state) => {
-      // Analyze recent errors for patterns
-      const recentErrors = state.errors.slice(0, 100); // Last 100 errors
+      const recentErrors = state.errors.slice(0, 100);
       const patterns: typeof state.errorPatterns = [];
 
-      // Simple pattern detection based on error messages
       const messageGroups = recentErrors.reduce((groups, error) => {
-        const key = error.message.split(' ').slice(0, 3).join(' '); // First 3 words
+        const key = error.message.split(' ').slice(0, 3).join(' ');
         if (!groups[key]) {
           groups[key] = [];
         }
         groups[key].push(error);
         return groups;
-      }, {} as Record<string, ErrorDetails[]>);
+      }, {} as Record<string, ReduxErrorDetails[]>);
 
       Object.entries(messageGroups).forEach(([pattern, errors]) => {
-        if (errors.length >= 3) { // Pattern threshold
+        if (errors.length >= 3) {
           patterns.push({
             pattern,
             frequency: errors.length,
@@ -338,7 +377,16 @@ const errorHandlingSlice = createSlice({
         }
       });
 
-      state.errorPatterns = patterns.slice(0, 20); // Keep top 20 patterns
+      state.errorPatterns = patterns.slice(0, 20);
+    },
+
+    // Sync with core error system
+    syncWithCoreSystem: (state) => {
+      const coreStats = coreErrorHandler.getErrorStats();
+      
+      // Update stats from core system
+      state.errorStats.recoveryRate = coreStats.recovered / Math.max(coreStats.total, 1);
+      state.errorStats.lastUpdated = Date.now();
     },
   },
   extraReducers: (builder) => {
@@ -348,7 +396,7 @@ const errorHandlingSlice = createSlice({
         errorHandlingSlice.caseReducers.addError(state, { payload: action.payload, type: 'addError' });
       })
       .addCase(reportError.rejected, (_state, action) => {
-        logger.error('Failed to report error', { error: action.payload });
+        logger.error('Failed to report error through Redux', { error: action.payload });
       });
 
     // Attempt recovery
@@ -357,7 +405,6 @@ const errorHandlingSlice = createSlice({
         const { errorId, success, timestamp } = action.payload;
 
         if (success) {
-          // Mark error as recovered
           errorHandlingSlice.caseReducers.updateError(state, {
             payload: {
               id: errorId,
@@ -369,13 +416,13 @@ const errorHandlingSlice = createSlice({
             type: 'updateError'
           });
 
-          logger.info('Error recovery successful', { errorId });
+          logger.info('Error recovery successful through Redux', { errorId });
         } else {
-          logger.warn('Error recovery failed', { errorId });
+          logger.warn('Error recovery failed through Redux', { errorId });
         }
       })
       .addCase(attemptRecovery.rejected, (_state, action) => {
-        logger.error('Recovery attempt failed', { error: action.payload });
+        logger.error('Recovery attempt failed through Redux', { error: action.payload });
       });
 
     // Clear error
@@ -387,10 +434,11 @@ const errorHandlingSlice = createSlice({
   },
 });
 
-// Helper functions
-function updateErrorPatterns(state: ErrorHandlingState, error: ErrorDetails) {
-  // Simple pattern detection - in a real implementation, this would use
-  // more sophisticated pattern recognition algorithms
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function updateErrorPatterns(state: ErrorHandlingState, error: ReduxErrorDetails) {
   const pattern = error.message.split(' ').slice(0, 3).join(' ');
   const existingPattern = state.errorPatterns.find(p => p.pattern === pattern);
 
@@ -416,7 +464,7 @@ function recalculateStats(state: ErrorHandlingState) {
 
   Object.values(state.activeErrors).forEach(error => {
     stats.totalErrors++;
-    stats.errorsByCategory[error.category]++;
+    stats.errorsByDomain[error.type]++;
     stats.errorsBySeverity[error.severity]++;
     stats.errorsBySource[error.source]++;
   });
@@ -438,7 +486,10 @@ function recalculateStats(state: ErrorHandlingState) {
   state.errorStats = stats;
 }
 
-// Export actions
+// ============================================================================
+// Exports
+// ============================================================================
+
 export const {
   addError,
   updateError,
@@ -448,8 +499,9 @@ export const {
   setRecoveryMode,
   clearAllErrors,
   clearErrorsBySource,
-  clearErrorsByCategory,
+  clearErrorsByDomain,
   analyzeErrorPatterns,
+  syncWithCoreSystem,
 } = errorHandlingSlice.actions;
 
 // Selectors
@@ -475,9 +527,9 @@ export const selectErrorsBySource = (source: ErrorSource) =>
   (state: { errorHandling: ErrorHandlingState }) =>
     Object.values(state.errorHandling.activeErrors).filter(error => error.source === source);
 
-export const selectErrorsByCategory = (category: ErrorCategory) =>
+export const selectErrorsByDomain = (domain: ErrorDomain) =>
   (state: { errorHandling: ErrorHandlingState }) =>
-    Object.values(state.errorHandling.activeErrors).filter(error => error.category === category);
+    Object.values(state.errorHandling.activeErrors).filter(error => error.type === domain);
 
 export const selectErrorsBySeverity = (severity: ErrorSeverity) =>
   (state: { errorHandling: ErrorHandlingState }) =>

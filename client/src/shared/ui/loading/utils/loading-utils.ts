@@ -3,10 +3,9 @@
  * Following navigation component patterns for utility organization
  */
 
-import { LoadingOperation, LoadingStage, LoadingProgress, LoadingPriority, LoadingType } from '@client/types';
-
-import { LOADING_PRIORITIES, LOADING_TIMEOUTS, RETRY_DELAYS } from '@client/constants';
-import { validateLoadingOperation, validateLoadingStage } from '@client/validation';
+import { LoadingOperation, LoadingStage, LoadingProgress, LoadingPriority, LoadingType } from '../types';
+import { LOADING_PRIORITIES, LOADING_TIMEOUTS, RETRY_DELAYS } from '../constants';
+import { validateLoadingOperation, validateLoadingStage } from '../validation';
 
 /**
  * Generate unique operation ID
@@ -273,7 +272,7 @@ export function createCommonStages(scenario: 'page-load' | 'data-fetch' | 'asset
 /**
  * Debounce function for loading updates
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   delay: number
 ): (...args: Parameters<T>) => void {
@@ -288,7 +287,7 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * Throttle function for loading updates
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   delay: number
 ): (...args: Parameters<T>) => void {

@@ -84,7 +84,7 @@ export function EngagementAnalyticsDashboard({
 }: EngagementAnalyticsDashboardProps) {
   const [activeTab, setActiveTab] = useState('overview');
   const [timeRange, setTimeRange] = useState<'hour' | 'day' | 'week' | 'month'>('day');
-  const [isConnected, setIsConnected] = useState(true);
+  const [isConnected] = useState(true);
   
   // Mock data for demonstration
   const [liveMetrics, setLiveMetrics] = useState<LiveMetrics>({
@@ -98,7 +98,7 @@ export function EngagementAnalyticsDashboard({
     trendingTopics: 8
   });
 
-  const [personalScore, setPersonalScore] = useState<PersonalCivicScore>({
+  const [personalScore] = useState<PersonalCivicScore>({
     totalScore: 68,
     level: 'Civic Advocate',
     nextLevelProgress: 40,

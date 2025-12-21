@@ -1,26 +1,76 @@
-import { useAnalyticsDashboard } from '@client/context';
-import type { AnalyticsFilters } from '@client/types';
 import { Calendar, TrendingUp, Users, AlertTriangle, Download } from 'lucide-react';
 import { useState } from 'react';
 
+import { useAnalyticsDashboard } from '@client/context';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
+import type { AnalyticsFilters } from '@client/types';
+
+// Type definitions for dashboard data structure
+interface DashboardSummary {
+  totalBills: number;
+  totalEngagement: number;
+  averageEngagementRate: number;
+  conflictsDetected: number;
+  trendingTopics: string[];
+  topStakeholderGroups: string[];
+}
+
+interface BillEngagement {
+  views: number;
+  comments: number;
+}
+
+interface TopBill {
+  id: string;
+  title: string;
+  status: string;
+  engagement: BillEngagement;
+}
+
+interface RecentActivity {
+  user_id: string;
+  totalEngagement: number;
+  activityScore: number;
+  lastActive: string;
+}
+
+interface Alert {
+  id: string;
+  title: string;
+  description: string;
+  severity: 'high' | 'medium' | 'low';
+  created_at: string;
+  acknowledged: boolean;
+}
+
+interface DashboardData {
+  summary: DashboardSummary;
+  topBills: TopBill[];
+  recentActivity: RecentActivity[];
+  alerts: Alert[];
+}
+
 export function AnalyticsDashboard() {
-  const [filters, setFilters] = useState<AnalyticsFilters>({
+  const [filters] = useState<AnalyticsFilters>({
     dateRange: {
-      start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] || '', // 30 days ago
-      end: new Date().toISOString().split('T')[0] || '', // today
+      start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      end: new Date().toISOString(),
     }
   });
 
-  // Using useAnalyticsDashboard hook from context
-  // TODO: implement analytics dashboard data loading
-  const isLoading = false;
-  const error = null;
-  const dashboard = { data: [] };
+  // Hook to fetch dashboard data
+  const { data: dashboard, isLoading, error } = useAnalyticsDashboard(filters);
+
+  // Export handlers (commented out - implement when export mutation is available)
+  const handleExport = (format: 'csv' | 'json') => {
+    console.log(`Exporting as ${format}`, filters);
+    // TODO: Implement export functionality
+    // exportMutation.mutate({ filters, format });
+  };
 
   if (isLoading) {
     return (
@@ -60,7 +110,7 @@ export function AnalyticsDashboard() {
     );
   }
 
-  const { summary, topBills, recentActivity, alerts } = dashboard;
+  const { summary, topBills, recentActivity, alerts } = dashboard as DashboardData;
 
   return (
     <div className="space-y-6">
@@ -75,16 +125,14 @@ export function AnalyticsDashboard() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={() => exportMutation.mutate({ filters, format: 'csv' })}
-            disabled={exportMutation.isPending}
+            onClick={() => handleExport('csv')}
           >
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>
           <Button
             variant="outline"
-            onClick={() => exportMutation.mutate({ filters, format: 'json' })}
-            disabled={exportMutation.isPending}
+            onClick={() => handleExport('json')}
           >
             <Download className="h-4 w-4 mr-2" />
             Export JSON
@@ -164,7 +212,7 @@ export function AnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {summary.trendingTopics.slice(0, 5).map((topic, index) => (
+                  {summary.trendingTopics.slice(0, 5).map((topic: string, index: number) => (
                     <div key={topic} className="flex items-center justify-between">
                       <span className="text-sm">{topic}</span>
                       <Badge variant="secondary">#{index + 1}</Badge>
@@ -180,7 +228,7 @@ export function AnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {summary.topStakeholderGroups.slice(0, 5).map((group, index) => (
+                  {summary.topStakeholderGroups.slice(0, 5).map((group: string, index: number) => (
                     <div key={group} className="flex items-center justify-between">
                       <span className="text-sm">{group}</span>
                       <Badge variant="outline">#{index + 1}</Badge>
@@ -199,7 +247,7 @@ export function AnalyticsDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topBills.slice(0, 10).map((bill, index) => (
+                {topBills.slice(0, 10).map((bill: TopBill, index: number) => (
                   <div key={bill.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
                       <div className="text-2xl font-bold text-muted-foreground">
@@ -232,8 +280,8 @@ export function AnalyticsDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                { recentActivity.slice(0, 10).map((activity) => (
-                  <div key={activity.user_id } className="flex items-center justify-between p-4 border rounded-lg">
+                {recentActivity.slice(0, 10).map((activity: RecentActivity) => (
+                  <div key={activity.user_id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <div className="font-medium">User Activity</div>
                       <div className="text-sm text-muted-foreground">
@@ -265,7 +313,7 @@ export function AnalyticsDashboard() {
                 <p className="text-muted-foreground">No active alerts</p>
               ) : (
                 <div className="space-y-4">
-                  {alerts.map((alert) => (
+                  {alerts.map((alert: Alert) => (
                     <div key={alert.id} className="flex items-start justify-between p-4 border rounded-lg">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">

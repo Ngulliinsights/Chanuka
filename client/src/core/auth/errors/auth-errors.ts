@@ -1,10 +1,9 @@
 /**
  * Authentication Error Classes
- * 
+ *
  * Specialized error classes for authentication-related errors
  */
 
-import { createError } from '../../error';
 import { ErrorDomain, ErrorSeverity } from '../../error/constants';
 
 /**
@@ -220,6 +219,66 @@ export class EmailVerificationRequiredError extends AuthError {
   }
 }
 
+/**
+ * Session invalid error
+ */
+export class SessionInvalidError extends AuthError {
+  public readonly sessionId?: string;
+  public readonly reason?: string;
+
+  constructor(
+    message: string = 'Session is invalid',
+    sessionId?: string,
+    reason?: string,
+    context?: Record<string, unknown>
+  ) {
+    super(message, ErrorSeverity.HIGH, 'SESSION_INVALID', context, false);
+    this.name = 'SessionInvalidError';
+    this.sessionId = sessionId;
+    this.reason = reason;
+  }
+}
+
+/**
+ * Session not found error
+ */
+export class SessionNotFoundError extends AuthError {
+  public readonly sessionId?: string;
+
+  constructor(
+    message: string = 'Session not found',
+    sessionId?: string,
+    context?: Record<string, unknown>
+  ) {
+    super(message, ErrorSeverity.HIGH, 'SESSION_NOT_FOUND', context, false);
+    this.name = 'SessionNotFoundError';
+    this.sessionId = sessionId;
+  }
+}
+
+/**
+ * Session revoked error
+ */
+export class SessionRevokedError extends AuthError {
+  public readonly sessionId?: string;
+  public readonly revokedAt?: Date;
+  public readonly reason?: string;
+
+  constructor(
+    message: string = 'Session has been revoked',
+    sessionId?: string,
+    revokedAt?: Date,
+    reason?: string,
+    context?: Record<string, unknown>
+  ) {
+    super(message, ErrorSeverity.HIGH, 'SESSION_REVOKED', context, false);
+    this.name = 'SessionRevokedError';
+    this.sessionId = sessionId;
+    this.revokedAt = revokedAt;
+    this.reason = reason;
+  }
+}
+
 // ==========================================================================
 // Error Factory Functions
 // ==========================================================================
@@ -341,6 +400,39 @@ export function createEmailVerificationRequiredError(
   return new EmailVerificationRequiredError(undefined, email, context);
 }
 
+/**
+ * Creates a session invalid error
+ */
+export function createSessionInvalidError(
+  sessionId?: string,
+  reason?: string,
+  context?: Record<string, unknown>
+): SessionInvalidError {
+  return new SessionInvalidError(undefined, sessionId, reason, context);
+}
+
+/**
+ * Creates a session not found error
+ */
+export function createSessionNotFoundError(
+  sessionId?: string,
+  context?: Record<string, unknown>
+): SessionNotFoundError {
+  return new SessionNotFoundError(undefined, sessionId, context);
+}
+
+/**
+ * Creates a session revoked error
+ */
+export function createSessionRevokedError(
+  sessionId?: string,
+  revokedAt?: Date,
+  reason?: string,
+  context?: Record<string, unknown>
+): SessionRevokedError {
+  return new SessionRevokedError(undefined, sessionId, revokedAt, reason, context);
+}
+
 // ==========================================================================
 // Error Type Guards
 // ==========================================================================
@@ -415,6 +507,18 @@ export function isEmailVerificationRequiredError(error: unknown): error is Email
   return error instanceof EmailVerificationRequiredError;
 }
 
+export function isSessionInvalidError(error: unknown): error is SessionInvalidError {
+  return error instanceof SessionInvalidError;
+}
+
+export function isSessionNotFoundError(error: unknown): error is SessionNotFoundError {
+  return error instanceof SessionNotFoundError;
+}
+
+export function isSessionRevokedError(error: unknown): error is SessionRevokedError {
+  return error instanceof SessionRevokedError;
+}
+
 export default {
   // Error classes
   AuthError,
@@ -427,6 +531,9 @@ export default {
   OAuthError,
   AccountLockedError,
   EmailVerificationRequiredError,
+  SessionInvalidError,
+  SessionNotFoundError,
+  SessionRevokedError,
   
   // Factory functions
   createValidationError,
@@ -438,6 +545,9 @@ export default {
   createOAuthError,
   createAccountLockedError,
   createEmailVerificationRequiredError,
+  createSessionInvalidError,
+  createSessionNotFoundError,
+  createSessionRevokedError,
   
   // Type guards
   isAuthError,
@@ -450,4 +560,7 @@ export default {
   isOAuthError,
   isAccountLockedError,
   isEmailVerificationRequiredError,
+  isSessionInvalidError,
+  isSessionNotFoundError,
+  isSessionRevokedError,
 };

@@ -2,6 +2,7 @@ export interface NavigationItem {
   id: string;
   label: string;
   path: string;
+  href: string;
   icon?: string;
   children?: NavigationItem[];
   permissions?: UserRole[];
@@ -9,6 +10,11 @@ export interface NavigationItem {
   badge?: string | number;
   external?: boolean;
   order?: number;
+  section?: NavigationSection;
+  adminOnly?: boolean;
+  requiresAuth?: boolean;
+  allowedRoles?: UserRole[];
+  condition?: (userRole: UserRole, user: any) => boolean;
 }
 
 export interface BreadcrumbItem {

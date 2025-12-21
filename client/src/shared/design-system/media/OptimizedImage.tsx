@@ -18,7 +18,7 @@ export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageEl
   className?: string;
 }
 
-export const OptimizedImage: React.FC<OptimizedImageProps> = ({
+export const OptimizedImage = React.memo(<OptimizedImageProps> = ({
   src,
   alt,
   width,
@@ -178,6 +178,9 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 
 // Avatar component with optimized image
@@ -189,7 +192,7 @@ export interface OptimizedAvatarProps {
   className?: string;
 }
 
-export const OptimizedAvatar: React.FC<OptimizedAvatarProps> = ({
+export const OptimizedAvatar = React.memo(<OptimizedAvatarProps> = ({
   src,
   alt,
   size = 'md',
@@ -234,6 +237,9 @@ export const OptimizedAvatar: React.FC<OptimizedAvatarProps> = ({
       priority={size === 'xl'} // Prioritize larger avatars
     />
   );
+);
+
+function 1(
 };
 
 // Card image component
@@ -244,7 +250,7 @@ export interface OptimizedCardImageProps {
   className?: string;
 }
 
-export const OptimizedCardImage: React.FC<OptimizedCardImageProps> = ({
+export const OptimizedCardImage = React.memo(<OptimizedCardImageProps> = ({
   src,
   alt,
   aspectRatio = 'video',
@@ -266,6 +272,9 @@ export const OptimizedCardImage: React.FC<OptimizedCardImageProps> = ({
       />
     </div>
   );
+);
+
+function 1(
 };
 
 // Hero image component
@@ -277,7 +286,7 @@ export interface OptimizedHeroImageProps {
   children?: React.ReactNode;
 }
 
-export const OptimizedHeroImage: React.FC<OptimizedHeroImageProps> = ({
+export const OptimizedHeroImage = React.memo(<OptimizedHeroImageProps> = ({
   src,
   alt,
   overlay = false,
@@ -303,5 +312,8 @@ export const OptimizedHeroImage: React.FC<OptimizedHeroImageProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 

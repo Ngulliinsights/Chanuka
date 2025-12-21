@@ -3,12 +3,11 @@
  * Following navigation component patterns for hook implementation
  */
 
-import { LoadingState } from '@client/types';
-import { createTimeoutManager, TimeoutManager } from '@client/shared/ui/loading/utils/timeout-utils.ts';
-import { formatTimeRemaining } from '@client/shared/ui/loading/utils/timeout-utils.ts';
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-import { LoadingError, LoadingTimeoutError } from '@client/core/error';
+import { LoadingError, LoadingTimeoutError } from '../errors';
+import { LoadingState } from '../types';
+import { createTimeoutManager, TimeoutManager, formatTimeRemaining } from '../utils/timeout-utils';
 
 export interface UseTimeoutAwareLoadingOptions {
   timeout?: number;
@@ -357,14 +356,15 @@ export function useMultiTimeoutAwareLoading(
   const [operations, setOperations] = useState<Record<string, UseTimeoutAwareLoadingResult>>({});
   
   const createOperation = useCallback((operationId: string, operationOptions?: UseTimeoutAwareLoadingOptions) => {
-    const operation = useTimeoutAwareLoading({
+    // Return configuration object instead of calling hooks
+    const operationConfig = {
       timeout: defaultTimeout,
       ...operationOptions,
       onTimeout: () => {
         operationOptions?.onTimeout?.();
         onAnyTimeout?.(operationId);
       },
-      onStateChange: (state) => {
+      onStateChange: (state: LoadingState) => {
         operationOptions?.onStateChange?.(state);
         
         // Check if all operations are complete
@@ -377,10 +377,11 @@ export function useMultiTimeoutAwareLoading(
           }
         }
       },
-    });
+    };
     
-    setOperations(prev => ({ ...prev, [operationId]: operation }));
-    return operation;
+    // Store the configuration instead of the hook result
+    setOperations(prev => ({ ...prev, [operationId]: operationConfig as any }));
+    return operationConfig as any;
   }, [defaultTimeout, onAnyTimeout, onAllComplete, operations]);
 
   const startOperation = useCallback((operationId: string, operationOptions?: UseTimeoutAwareLoadingOptions) => {

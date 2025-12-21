@@ -3,9 +3,50 @@
  * Centralized security event monitoring and alerting system
  */
 
-import { SecurityEvent, SecurityAlert, SecurityMetrics, SecuritySeverity } from '@client/types';
-
+import { SecurityMetrics, ThreatLevel } from '@client/types';
 import { logger } from '@client/utils/logger';
+
+// Type definitions for missing types
+export type SecuritySeverity = 'low' | 'medium' | 'high' | 'critical';
+
+export type SecurityEventType = 
+  | 'login' 
+  | 'logout' 
+  | 'password_change' 
+  | 'permission_change' 
+  | 'suspicious_activity'
+  | 'rate_limit_exceeded'
+  | 'xss_attempt'
+  | 'csp_violation'
+  | 'script_injection'
+  | 'iframe_injection'
+  | 'session_hijack_attempt'
+  | 'brute_force_attack';
+
+export interface SecurityAlert {
+  id: string;
+  timestamp: Date;
+  type: string;
+  severity: SecuritySeverity;
+  message: string;
+  details: Record<string, unknown>;
+  acknowledged: boolean;
+}
+
+export interface ExtendedSecurityEvent {
+  id: string;
+  type: SecurityEventType;
+  description: string;
+  severity: SecuritySeverity;
+  timestamp: string;
+  metadata?: Record<string, unknown>;
+  source: string;
+  details: Record<string, unknown>;
+  sessionId?: string;
+  userAgent?: string;
+  userId?: string;
+  resolved: boolean;
+}
 
 export interface SecurityMonitorConfig {
   enabled: boolean;
@@ -16,9 +57,21 @@ export interface SecurityMonitorConfig {
   alertEndpoint?: string;
 }
 
+export interface ExtendedSecurityMetrics extends SecurityMetrics {
+  totalEvents: number;
+  eventsByType: Record<string, number>;
+  eventsBySeverity: Record<SecuritySeverity, number>;
+  vulnerabilitiesFound: number;
+  vulnerabilitiesFixed: number;
+  rateLimitViolations: number;
+  cspViolations: number;
+  lastScanTime: Date;
+  systemHealth: 'healthy' | 'warning' | 'critical';
+}
+
 export class SecurityMonitor {
   private config: SecurityMonitorConfig;
-  private events: SecurityEvent[] = [];
+  private events: ExtendedSecurityEvent[] = [];
   private alerts: SecurityAlert[] = [];
   private monitoringTimer: NodeJS.Timeout | null = null;
   private eventCounter: number = 0;
@@ -53,16 +106,16 @@ export class SecurityMonitor {
         monitoringInterval: this.config.monitoringInterval
       });
     } catch (error) {
-      logger.error('Failed to initialize Security Monitor', error);
+      logger.error('Failed to initialize Security Monitor', { error });
       throw error;
     }
   }
 
   private setupEventListeners(): void {
     // Listen for security events from other components
-    document.addEventListener('security-event', (event: CustomEvent) => {
+    document.addEventListener('security-event', ((event: CustomEvent) => {
       this.recordEvent(event.detail);
-    });
+    }) as EventListener);
 
     // Listen for browser security events
     window.addEventListener('error', (event) => {
@@ -107,7 +160,7 @@ export class SecurityMonitor {
           // Check for script tags
           if (element.tagName === 'SCRIPT') {
             this.recordEvent({
-              type: 'suspicious_activity',
+              type: 'script_injection',
               severity: 'high',
               source: 'SecurityMonitor',
               details: {
@@ -122,7 +175,7 @@ export class SecurityMonitor {
           // Check for iframe injections
           if (element.tagName === 'IFRAME') {
             this.recordEvent({
-              type: 'suspicious_activity',
+              type: 'iframe_injection',
               severity: 'high',
               source: 'SecurityMonitor',
               details: {
@@ -221,18 +274,18 @@ export class SecurityMonitor {
     }
   }
 
-  private recordEvent(eventData: Partial<SecurityEvent>): void {
-    const event: SecurityEvent = {
+  private recordEvent(eventData: Partial<ExtendedSecurityEvent>): void {
+    const event: ExtendedSecurityEvent = {
       id: `sec-${Date.now()}-${++this.eventCounter}`,
-      timestamp: new Date(),
-      type: eventData.type || 'suspicious_activity',
+      timestamp: new Date().toISOString(),
+      type: (eventData.type || 'suspicious_activity') as SecurityEventType,
+      description: eventData.description || 'Security event recorded',
       severity: eventData.severity || 'medium',
       source: eventData.source || 'Unknown',
       userId: this.getCurrentUserId(),
-      sessionId: this.getSessionId(),
-      ipAddress: this.getClientIP(),
-      userAgent: navigator.userAgent,
       details: eventData.details || {},
+      sessionId: this.getSessionId(),
+      userAgent: navigator.userAgent,
       resolved: false
     };
 
@@ -259,7 +312,7 @@ export class SecurityMonitor {
     }
   }
 
-  private checkForAlerts(event: SecurityEvent): void {
+  private checkForAlerts(event: ExtendedSecurityEvent): void {
     // Count recent events of the same type
     const recentEvents = this.getRecentEvents(5 * 60 * 1000); // Last 5 minutes
     const sameTypeEvents = recentEvents.filter(e => e.type === event.type);
@@ -281,7 +334,7 @@ export class SecurityMonitor {
     this.checkAttackPatterns(event);
   }
 
-  private checkAttackPatterns(event: SecurityEvent): void {
+  private checkAttackPatterns(event: ExtendedSecurityEvent): void {
     const recentEvents = this.getRecentEvents(10 * 60 * 1000); // Last 10 minutes
     
     // Check for brute force patterns
@@ -372,11 +425,11 @@ export class SecurityMonitor {
         body: JSON.stringify(alert)
       });
     } catch (error) {
-      logger.error('Failed to send security alert to backend', error);
+      logger.error('Failed to send security alert to backend', { error });
     }
   }
 
-  private async sendRealTimeAlert(event: SecurityEvent): Promise<void> {
+  private async sendRealTimeAlert(event: ExtendedSecurityEvent): Promise<void> {
     // Create immediate alert for critical events
     const alert: SecurityAlert = {
       id: `critical-${event.id}`,
@@ -431,18 +484,20 @@ export class SecurityMonitor {
   }
 
   private cleanupOldEvents(): void {
-    const cutoff = new Date(Date.now() - (24 * 60 * 60 * 1000)); // 24 hours ago
-    this.events = this.events.filter(event => event.timestamp > cutoff);
-    this.alerts = this.alerts.filter(alert => alert.timestamp > cutoff);
+    const cutoffTime = Date.now() - (24 * 60 * 60 * 1000); // 24 hours ago
+    const cutoffDate = new Date(cutoffTime).toISOString();
+    
+    this.events = this.events.filter(event => event.timestamp > cutoffDate);
+    this.alerts = this.alerts.filter(alert => alert.timestamp.toISOString() > cutoffDate);
   }
 
-  private generateMetrics(): SecurityMetrics {
-    const eventsByType = this.events.reduce((acc, event) => {
+  private generateMetrics(): ExtendedSecurityMetrics {
+    const eventsByType = this.events.reduce<Record<string, number>>((acc, event) => {
       acc[event.type] = (acc[event.type] || 0) + 1;
       return acc;
-    }, {} as Record<string, number>);
+    }, {});
 
-    const eventsBySeverity = this.events.reduce((acc, event) => {
+    const eventsBySeverity = this.events.reduce<Record<SecuritySeverity, number>>((acc, event) => {
       acc[event.severity] = (acc[event.severity] || 0) + 1;
       return acc;
     }, {} as Record<SecuritySeverity, number>);
@@ -458,8 +513,23 @@ export class SecurityMonitor {
     }
 
     return {
+      // Properties from SecurityMetrics
+      totalIncidents: this.events.filter(e => e.severity === 'high' || e.severity === 'critical').length,
+      incidentsBySeverity: {
+        low: eventsBySeverity.low || 0,
+        medium: eventsBySeverity.medium || 0,
+        high: eventsBySeverity.high || 0,
+        critical: eventsBySeverity.critical || 0
+      } as Record<ThreatLevel, number>,
+      averageResolutionTime: 0, // Would be calculated from resolved incidents
+      complianceScore: Math.max(0, 100 - (criticalEvents * 20) - (highEvents * 5)),
+      lastAuditDate: new Date(),
+      vulnerabilitiesCount: eventsByType['xss_attempt'] || 0 + eventsByType['script_injection'] || 0,
+      activeThreats: this.events.filter(e => !e.resolved && (e.severity === 'high' || e.severity === 'critical')).length,
+      
+      // Extended properties
       totalEvents: this.events.length,
-      eventsByType: eventsByType as Record<any, number>,
+      eventsByType,
       eventsBySeverity,
       vulnerabilitiesFound: 0, // Would be populated by vulnerability scanner
       vulnerabilitiesFixed: 0,
@@ -470,9 +540,11 @@ export class SecurityMonitor {
     };
   }
 
-  private getRecentEvents(timeWindowMs: number): SecurityEvent[] {
-    const cutoff = new Date(Date.now() - timeWindowMs);
-    return this.events.filter(event => event.timestamp > cutoff);
+  private getRecentEvents(timeWindowMs: number): ExtendedSecurityEvent[] {
+    const cutoffTime = Date.now() - timeWindowMs;
+    const cutoffDate = new Date(cutoffTime).toISOString();
+    
+    return this.events.filter(event => event.timestamp > cutoffDate);
   }
 
   private escalateSeverity(severity: SecuritySeverity): SecuritySeverity {
@@ -506,12 +578,6 @@ export class SecurityMonitor {
     }
   }
 
-  private getClientIP(): string | undefined {
-    // Client-side IP detection is limited and unreliable
-    // This would typically be handled server-side
-    return undefined;
-  }
-
   private setupCleanup(): void {
     // Clean up old data every hour
     setInterval(() => {
@@ -522,21 +588,21 @@ export class SecurityMonitor {
   /**
    * Get all security events
    */
-  getEvents(): SecurityEvent[] {
+  getEvents(): ExtendedSecurityEvent[] {
     return [...this.events];
   }
 
   /**
    * Get events by type
    */
-  getEventsByType(type: string): SecurityEvent[] {
+  getEventsByType(type: string): ExtendedSecurityEvent[] {
     return this.events.filter(event => event.type === type);
   }
 
   /**
    * Get events by severity
    */
-  getEventsBySeverity(severity: SecuritySeverity): SecurityEvent[] {
+  getEventsBySeverity(severity: SecuritySeverity): ExtendedSecurityEvent[] {
     return this.events.filter(event => event.severity === severity);
   }
 
@@ -577,7 +643,7 @@ export class SecurityMonitor {
   /**
    * Get security metrics
    */
-  getMetrics(): SecurityMetrics {
+  getMetrics(): ExtendedSecurityMetrics {
     return this.generateMetrics();
   }
 

@@ -78,7 +78,9 @@ export async function sendMessageToServiceWorker(message: ServiceWorkerMessage):
       }
     };
 
-    navigator.serviceWorker.controller.postMessage(message, [messageChannel.port2]);
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage(message, [messageChannel.port2]);
+    }
     
     // Timeout after 10 seconds
     setTimeout(() => {
@@ -130,8 +132,15 @@ export async function unregisterServiceWorker(): Promise<boolean> {
   }
 }
 
-// Initialize network status listeners
-if (typeof window !== 'undefined') {
+/**
+ * Initialize network status listeners
+ * @returns cleanup function to remove event listeners
+ */
+export function initializeNetworkListeners(): () => void {
+  if (typeof window === 'undefined') {
+    return () => {}; // No-op for SSR
+  }
+
   const updateNetworkStatus = () => {
     const wasOnline = networkStatus;
     networkStatus = navigator.onLine;
@@ -149,4 +158,15 @@ if (typeof window !== 'undefined') {
 
   window.addEventListener('online', updateNetworkStatus);
   window.addEventListener('offline', updateNetworkStatus);
+  
+  // Return cleanup function
+  return () => {
+    window.removeEventListener('online', updateNetworkStatus);
+    window.removeEventListener('offline', updateNetworkStatus);
+  };
+}
+
+// Auto-initialize network listeners
+if (typeof window !== 'undefined') {
+  initializeNetworkListeners();
 }

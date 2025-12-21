@@ -1,6 +1,7 @@
+import React from 'react';
 import { ProgressiveDisclosureNavigation } from './ProgressiveDisclosureNavigation';
 
-import type { NavigationSection, ReadingPath } from '@/core/navigation/hooks/useProgressiveDisclosure';
+import type { NavigationSection, ReadingPath } from '@client/core/navigation/hooks/useProgressiveDisclosure';
 
 // Demo component to test Progressive Disclosure Navigation
 export const ProgressiveDisclosureDemo = () => {

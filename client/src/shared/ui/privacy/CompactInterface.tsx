@@ -3,13 +3,13 @@
  * Simplified interface for settings pages
  */
 
+import React from 'react';
 import {
   Shield,
   Settings,
   AlertTriangle,
   Info
 } from 'lucide-react';
-import React from 'react';
 
 import { useAuth } from '@client/core/auth';
 import { PrivacySettings } from '@client/types/auth';
@@ -21,7 +21,7 @@ import { Label } from '@client/shared/design-system/typography/Label.tsx';
 import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
 
 
-import { ConsentControls } from './controls/ConsentControls';
+// import { ConsentControls } from './controls/ConsentControls';
 import { DataUsageControls } from './controls/DataUsageControls';
 import { VisibilityControls } from './controls/VisibilityControls';
 
@@ -68,7 +68,7 @@ export function CompactInterface({
             <AlertDescription>
               Quick privacy controls. For comprehensive settings,
               <Button
-                variant="link"
+                variant="ghost"
                 className="p-0 h-auto ml-1"
                 onClick={onOpenFullSettings}
               >
@@ -98,11 +98,17 @@ export function CompactInterface({
         onConsentChange={(type, granted) => {
           // Handle consent changes - this would need to be implemented
           // based on the specific consent type
-          console.log('Consent change:', type, granted);
+          // Handle consent changes - implementation would go here
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Consent change:', type, granted);
+          }
         }}
         onOpenConsentModal={(type) => {
           // Handle opening consent modal - this would need to be implemented
-          console.log('Open consent modal for:', type);
+          // Handle opening consent modal - implementation would go here
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Open consent modal for:', type);
+          }
         }}
       />
 

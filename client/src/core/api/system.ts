@@ -16,6 +16,7 @@ import { logger } from '@client/utils/logger';
 
 import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
+import type { UnknownError, AxiosErrorResponse } from './types';
 
 // ============================================================================
 // System Types
@@ -263,7 +264,6 @@ export interface SystemEnvironment {
  * ```
  */
 export class SystemApiService {
-  private readonly baseUrl: string;
   private readonly systemEndpoint: string;
 
   /**
@@ -272,7 +272,6 @@ export class SystemApiService {
    * @param baseUrl - Base API URL, defaults to '/api'
    */
   constructor(baseUrl: string = '/api') {
-    this.baseUrl = baseUrl;
     this.systemEndpoint = `${baseUrl}/system`;
     
     logger.debug('SystemApiService initialized', {
@@ -589,22 +588,24 @@ export class SystemApiService {
    * @param defaultMessage - Fallback message if error details unavailable
    * @returns Processed Error object with user-friendly message
    */
-  private async handleSystemError(error: any, defaultMessage: string): Promise<Error> {
+  private async handleSystemError(error: unknown, defaultMessage: string): Promise<Error> {
+    const errorResponse = error as UnknownError;
+    
     // Extract error message from various possible structures
     // Priority: response.data.message > response.data.error > error.message > default
     const errorMessage =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
+      (errorResponse as AxiosErrorResponse)?.response?.data?.message ||
+      (errorResponse as AxiosErrorResponse)?.response?.data?.error ||
+      (errorResponse as Error)?.message ||
       defaultMessage;
 
     const systemError = new Error(errorMessage);
 
     // Report to unified error handler for tracking and logging
-    await globalErrorHandler.handleError(systemError, {
+    globalErrorHandler(systemError, {
       component: 'SystemApiService',
       operation: 'system_operation',
-      status: error?.response?.status,
+      status: (errorResponse as AxiosErrorResponse)?.response?.status,
       endpoint: error?.config?.url
     });
 

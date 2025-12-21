@@ -220,6 +220,12 @@ export interface DashboardConfig {
   layout: AppDashboardLayout;
   permissions: PermissionConfig;
   settings: DashboardSettings;
+  // Additional configuration properties
+  refreshInterval?: number;
+  maxActionItems?: number;
+  maxTrackedTopics?: number;
+  enableAutoRefresh?: boolean;
+  showCompletedActions?: boolean;
 }
 
 export interface PermissionConfig {
@@ -414,3 +420,28 @@ export interface UseDashboardResult {
   };
 }
 
+// ============================================================================
+// Widget Component Props Types
+// ============================================================================
+
+export interface DashboardStackProps {
+  spacing?: 'tight' | 'normal' | 'loose';
+  direction?: 'vertical' | 'horizontal';
+  widgets: AppWidgetConfig[];
+  onUpdate?: (widgets: AppWidgetConfig[]) => void;
+}
+
+export interface DashboardTabsProps {
+  sections: DashboardSectionConfig[];
+  activeSection?: string;
+  onSectionChange?: (sectionId: string) => void;
+}
+
+export interface DashboardSectionConfig {
+  id: string;
+  title: string;
+  icon?: string;
+  widgets: AppWidgetConfig[];
+  visible?: boolean;
+  order?: number;
+}

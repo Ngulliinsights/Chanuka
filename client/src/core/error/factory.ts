@@ -22,22 +22,24 @@ export class ErrorFactory {
     details?: Record<string, unknown>,
     context?: Partial<ErrorContext>
   ): AppError {
-    return {
-      id: this.generateErrorId(),
-      type: ErrorDomain.NETWORK,
-      severity: ErrorSeverity.MEDIUM,
+    return new AppError(
       message,
-      details,
-      context: {
-        component: (context?.component as string) || 'network',
-        operation: (context?.operation as string) || 'request',
-        timestamp: Date.now(),
-        ...context
-      } as ErrorContext,
-      recoverable: true,
-      retryable: true,
-      timestamp: Date.now()
-    };
+      'NETWORK_ERROR',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        details,
+        context: {
+          component: (context?.component as string) || 'network',
+          operation: (context?.operation as string) || 'request',
+          timestamp: Date.now(),
+          ...context
+        } as ErrorContext,
+        recoverable: true,
+        retryable: true,
+        correlationId: this.generateErrorId()
+      }
+    );
   }
 
   /**
@@ -48,22 +50,24 @@ export class ErrorFactory {
     details?: Record<string, unknown>,
     context?: Partial<ErrorContext>
   ): AppError {
-    return {
-      id: this.generateErrorId(),
-      type: ErrorDomain.AUTHENTICATION,
-      severity: ErrorSeverity.HIGH,
+    return new AppError(
       message,
-      details,
-      context: {
-        component: (context?.component as string) || 'auth',
-        operation: (context?.operation as string) || 'authenticate',
-        timestamp: Date.now(),
-        ...context
-      } as ErrorContext,
-      recoverable: false,
-      retryable: false,
-      timestamp: Date.now()
-    };
+      'AUTH_ERROR',
+      ErrorDomain.AUTHENTICATION,
+      ErrorSeverity.HIGH,
+      {
+        details,
+        context: {
+          component: (context?.component as string) || 'auth',
+          operation: (context?.operation as string) || 'authenticate',
+          timestamp: Date.now(),
+          ...context
+        } as ErrorContext,
+        recoverable: false,
+        retryable: false,
+        correlationId: this.generateErrorId()
+      }
+    );
   }
 
   /**
@@ -74,22 +78,24 @@ export class ErrorFactory {
     details?: Record<string, unknown>,
     context?: Partial<ErrorContext>
   ): AppError {
-    return {
-      id: this.generateErrorId(),
-      type: ErrorDomain.VALIDATION,
-      severity: ErrorSeverity.LOW,
+    return new AppError(
       message,
-      details,
-      context: {
-        component: (context?.component as string) || 'validation',
-        operation: (context?.operation as string) || 'validate',
-        timestamp: Date.now(),
-        ...context
-      } as ErrorContext,
-      recoverable: true,
-      retryable: false,
-      timestamp: Date.now()
-    };
+      'VALIDATION_ERROR',
+      ErrorDomain.VALIDATION,
+      ErrorSeverity.LOW,
+      {
+        details,
+        context: {
+          component: (context?.component as string) || 'validation',
+          operation: (context?.operation as string) || 'validate',
+          timestamp: Date.now(),
+          ...context
+        } as ErrorContext,
+        recoverable: true,
+        retryable: false,
+        correlationId: this.generateErrorId()
+      }
+    );
   }
 
   /**
@@ -100,22 +106,24 @@ export class ErrorFactory {
     details?: Record<string, unknown>,
     context?: Partial<ErrorContext>
   ): AppError {
-    return {
-      id: this.generateErrorId(),
-      type: ErrorDomain.BUSINESS_LOGIC,
-      severity: ErrorSeverity.MEDIUM,
+    return new AppError(
       message,
-      details,
-      context: {
-        component: (context?.component as string) || 'business',
-        operation: (context?.operation as string) || 'process',
-        timestamp: Date.now(),
-        ...context
-      } as ErrorContext,
-      recoverable: false,
-      retryable: false,
-      timestamp: Date.now()
-    };
+      'BUSINESS_ERROR',
+      ErrorDomain.BUSINESS_LOGIC,
+      ErrorSeverity.MEDIUM,
+      {
+        details,
+        context: {
+          component: (context?.component as string) || 'business',
+          operation: (context?.operation as string) || 'process',
+          timestamp: Date.now(),
+          ...context
+        } as ErrorContext,
+        recoverable: false,
+        retryable: false,
+        correlationId: this.generateErrorId()
+      }
+    );
   }
 
   /**
@@ -126,22 +134,24 @@ export class ErrorFactory {
     details?: Record<string, unknown>,
     context?: Partial<ErrorContext>
   ): AppError {
-    return {
-      id: this.generateErrorId(),
-      type: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
+    return new AppError(
       message,
-      details,
-      context: {
-        component: (context?.component as string) || 'system',
-        operation: (context?.operation as string) || 'unknown',
-        timestamp: Date.now(),
-        ...context
-      } as ErrorContext,
-      recoverable: true,
-      retryable: false,
-      timestamp: Date.now()
-    };
+      'SYSTEM_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.HIGH,
+      {
+        details,
+        context: {
+          component: (context?.component as string) || 'system',
+          operation: (context?.operation as string) || 'unknown',
+          timestamp: Date.now(),
+          ...context
+        } as ErrorContext,
+        recoverable: true,
+        retryable: false,
+        correlationId: this.generateErrorId()
+      }
+    );
   }
 
   private static generateErrorId(): string {

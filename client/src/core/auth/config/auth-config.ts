@@ -140,33 +140,56 @@ const ENVIRONMENT_OVERRIDES: Record<string, Partial<AuthSettings>> = {
   development: {
     security: {
       enableMonitoring: false,
+      enableAutoRefresh: true,
+      enableSessionValidation: true,
       maxFailedAttempts: 10, // More lenient in dev
+      lockoutDuration: 300000, // 5 minutes
     },
     validation: {
       password: {
         minLength: 6, // Easier testing in dev
         strongMinLength: 8,
+        requireUppercase: false,
+        requireLowercase: false,
+        requireNumbers: false,
+        requireSpecialChars: false,
+      },
+      email: {
+        maxLength: 254,
+      },
+      name: {
+        minLength: 2,
+        maxLength: 50,
       },
     },
   },
 
   test: {
     api: {
+      baseUrl: '/api',
+      authEndpoint: '/api/auth',
       timeout: 5000, // Faster timeouts in tests
     },
     security: {
       enableMonitoring: false,
       enableAutoRefresh: false,
+      enableSessionValidation: false,
+      maxFailedAttempts: 10,
+      lockoutDuration: 5, // 5 minutes
     },
     session: {
       maxDuration: 60, // 1 hour for tests
+      warningThreshold: 5,
       monitoringInterval: 10000, // 10 seconds
+      storageNamespace: 'session',
     },
   },
 
   production: {
     security: {
       enableMonitoring: true,
+      enableAutoRefresh: true,
+      enableSessionValidation: true,
       maxFailedAttempts: 3, // Stricter in production
       lockoutDuration: 30, // 30 minutes
     },
@@ -174,6 +197,17 @@ const ENVIRONMENT_OVERRIDES: Record<string, Partial<AuthSettings>> = {
       password: {
         minLength: 10, // Stronger passwords in production
         strongMinLength: 14,
+        requireUppercase: true,
+        requireLowercase: true,
+        requireNumbers: true,
+        requireSpecialChars: true,
+      },
+      email: {
+        maxLength: 254,
+      },
+      name: {
+        minLength: 2,
+        maxLength: 50,
       },
     },
   },
@@ -246,6 +280,11 @@ export function createAuthConfig(
  */
 export function toAuthConfig(settings: AuthSettings): AuthConfig {
   return {
+    enableMonitoring: settings.security.enableMonitoring,
+    enableAutoRefresh: settings.security.enableAutoRefresh,
+    enableSessionValidation: settings.security.enableSessionValidation,
+    maxFailedAttempts: settings.security.maxFailedAttempts,
+    lockoutDuration: settings.security.lockoutDuration,
     tokenRefreshEndpoint: `${settings.api.authEndpoint}/refresh`,
     tokenRefreshThreshold: settings.tokens.refreshThreshold,
     maxRefreshAttempts: settings.tokens.maxRefreshAttempts,

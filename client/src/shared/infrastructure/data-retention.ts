@@ -27,7 +27,7 @@ interface DataRecord {
   userId?: string;
   createdAt: string;
   lastAccessed?: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   retentionPolicyId: string;
   scheduledDeletion?: string;
   archived: boolean;
@@ -204,7 +204,7 @@ class DataRetentionService {
     const result = {
       deletedRecords: 0,
       archivedRecords: 0,
-      errors: []
+      errors: [] as string[]
     };
 
     const now = new Date();
@@ -357,7 +357,7 @@ class DataRetentionService {
   }> {
     const result = {
       deletedRecords: 0,
-      errors: []
+      errors: [] as string[]
     };
 
     const userRecords = Array.from(this.records.values()).filter(

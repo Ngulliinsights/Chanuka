@@ -16,6 +16,9 @@ const sizeClasses = {
   md: 'h-8 w-8', 
   lg: 'h-12 w-12',
   xl: 'h-16 w-16'
+);
+
+function 1(
 };
 
 const textSizeClasses = {
@@ -23,9 +26,12 @@ const textSizeClasses = {
   md: 'text-lg',
   lg: 'text-xl', 
   xl: 'text-2xl'
+);
+
+function 1(
 };
 
-export const Logo: React.FC<LogoProps> = ({ 
+export const Logo = React.memo(<LogoProps> = ({ 
   className = '', 
   size = 'md', 
   showText = true,
@@ -62,6 +68,9 @@ export const Logo: React.FC<LogoProps> = ({
       )}
     </div>
   );
+);
+
+function 1(
 };
 
 export default Logo;

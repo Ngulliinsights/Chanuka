@@ -1,13 +1,12 @@
-import { LoadingOperation } from '@client/types';
 import { useState, useCallback, useRef } from 'react';
 
-import { 
-  LoadingError, 
-  isRetryableError, 
+import {
+  LoadingError,
+  isRetryableError,
   getErrorRecoveryStrategy,
   LoadingTimeoutError,
-  LoadingNetworkError 
-} from '@client/core/error';
+  LoadingNetworkError
+} from '../errors';
 
 export interface LoadingRecoveryState {
   canRecover: boolean;
@@ -30,6 +29,7 @@ export interface UseLoadingRecoveryResult {
   canRecover: (error: LoadingError) => boolean;
   getSuggestions: (error: LoadingError) => string[];
   reset: () => void;
+  updateError: (error: LoadingError | null) => void;
 }
 
 export function useLoadingRecovery(
@@ -57,7 +57,7 @@ export function useLoadingRecovery(
     if (!isRetryableError(error)) {
       return false;
     }
-    
+
     return recoveryState.recoveryAttempts < maxRecoveryAttempts;
   }, [recoveryState.recoveryAttempts, maxRecoveryAttempts]);
 
@@ -70,9 +70,18 @@ export function useLoadingRecovery(
 
     if (error instanceof LoadingTimeoutError) {
       strategies.push(async () => {
-        // Strategy 1: Increase timeout and retry
+        // Strategy 1: Wait and check if network conditions improved
         await new Promise(resolve => setTimeout(resolve, 1000));
-        return true;
+        // Check if we can reach the network
+        try {
+          const response = await fetch('/api/health', {
+            method: 'HEAD',
+            signal: AbortSignal.timeout(5000)
+          });
+          return response.ok;
+        } catch {
+          return false;
+        }
       });
     }
 
@@ -82,21 +91,37 @@ export function useLoadingRecovery(
         await new Promise(resolve => setTimeout(resolve, 2000));
         return navigator.onLine;
       });
-      
+
       strategies.push(async () => {
-        // Strategy 2: Try with reduced functionality
-        return true;
+        // Strategy 2: Try with exponential backoff
+        const backoffDelay = Math.min(1000 * Math.pow(2, recoveryState.recoveryAttempts), 10000);
+        await new Promise(resolve => setTimeout(resolve, backoffDelay));
+
+        // Test connectivity with a lightweight request
+        try {
+          const response = await fetch('/api/ping', {
+            method: 'HEAD',
+            signal: AbortSignal.timeout(3000)
+          });
+          return response.ok;
+        } catch {
+          return false;
+        }
       });
     }
 
-    // Generic retry strategy
+    // Generic retry strategy with exponential backoff
     strategies.push(async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return Math.random() > 0.3; // Simulate recovery success
+      const backoffDelay = Math.min(500 * Math.pow(2, recoveryState.recoveryAttempts), 5000);
+      await new Promise(resolve => setTimeout(resolve, backoffDelay));
+
+      // For generic errors, we can only retry and hope conditions improved
+      // This is more realistic than random success
+      return navigator.onLine && document.visibilityState === 'visible';
     });
 
     return strategies;
-  }, []);
+  }, [recoveryState.recoveryAttempts]);
 
   const recover = useCallback(async (): Promise<boolean> => {
     if (!currentError.current || !canRecover(currentError.current)) {
@@ -110,7 +135,7 @@ export function useLoadingRecovery(
 
     try {
       const strategies = recoveryStrategies.current;
-      
+
       for (const strategy of strategies) {
         try {
           const success = await strategy();
@@ -121,7 +146,7 @@ export function useLoadingRecovery(
               recoveryAttempts: prev.recoveryAttempts + 1,
               canRecover: true
             }));
-            
+
             onRecoverySuccess?.();
             return true;
           }
@@ -170,11 +195,11 @@ export function useLoadingRecovery(
   // Update recovery state when error changes
   const updateError = useCallback((error: LoadingError | null) => {
     currentError.current = error;
-    
+
     if (error) {
       const canRecoverError = canRecover(error);
       const suggestions = getSuggestions(error);
-      
+
       setRecoveryState(prev => ({
         ...prev,
         canRecover: canRecoverError,
@@ -201,6 +226,6 @@ export function useLoadingRecovery(
     getSuggestions,
     reset,
     updateError
-  } as UseLoadingRecoveryResult & { updateError: (error: LoadingError | null) => void };
+  };
 }
 

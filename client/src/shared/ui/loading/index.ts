@@ -1,107 +1,60 @@
 /**
- * Loading component barrel exports
- * Following navigation component patterns for clean imports
+ * Loading component barrel exports - SIMPLIFIED
+ * Core loading functionality only
  */
 
-// Export types
+// Export core types
 export type {
   LoadingSize,
   LoadingType,
   LoadingState,
-  LoadingPhase,
-  ConnectionType,
-  LoadingPriority,
-  LoadingStateProps,
-  LoadingProgress,
-  LoadingStage,
-  LoadingOperation,
-  LoadingStats,
+  LoadingProps,
   LoadingConfig,
-  UseLoadingResult,
-} from './types';
+} from '../types';
 
-// Export hooks
+// Export core hooks only
 export {
   useLoading,
   useLoadingState,
-  useMultiLoadingState,
-  useProgressiveLoading,
-  useMultiProgressiveLoading,
-  useTimeoutAwareLoading,
-  useMultiTimeoutAwareLoading,
 } from './hooks';
 
-// Export UI components (will be created in next task)
-export * from './ui';
+// Export core UI components
+export {
+  LoadingIndicator,
+} from './ui';
 
-// Export skeleton components for layout stability
-export type {
-  SkeletonProps,
-} from './types';
+export { default as LoadingSpinner } from './LoadingSpinner';
 
+// Export essential skeleton components
 export {
   Skeleton,
   CardSkeleton,
   ListSkeleton,
-  FormSkeleton,
-  TextSkeleton,
-  AvatarSkeleton,
 } from './ui';
 
-// Export utilities
-export * from './utils';
-
-// Export constants
+// Export core utilities
 export {
-  DEFAULT_LOADING_SIZE,
-  DEFAULT_LOADING_TYPE,
-  DEFAULT_LOADING_PRIORITY,
-  LOADING_SIZES,
-  LOADING_TIMEOUTS,
-  RETRY_DELAYS,
-  MAX_RETRIES,
-  DEFAULT_LOADING_CONFIG,
-  LOADING_MESSAGES,
-  LOADING_STAGES,
-} from './constants';
+  validateLoadingProgress,
+  validateLoadingConfig,
+} from './validation';
 
-// Export error types
+// Export simplified error types
 export {
   LoadingError,
   LoadingTimeoutError,
-  LoadingValidationError,
-  LoadingConfigurationError,
-  LoadingOperationFailedError,
-  LoadingNetworkError,
-  LoadingAssetError,
-  LoadingStageError,
-  LoadingErrorType,
   isLoadingError,
   isTimeoutError,
-  isValidationError,
-  isNetworkError,
-  isAssetError,
-  isStageError,
 } from './errors';
 
-// Export validation functions
+// Export core constants
 export {
-  validateLoadingProgress,
-  validateLoadingStage,
-  validateLoadingOperation,
-  validateLoadingConfig,
-  validateLoadingStats,
-  safeValidateLoadingProgress,
-  safeValidateLoadingOperation,
-  safeValidateLoadingConfig,
-} from './validation';
-
-// Export recovery utilities
-export {
-  LoadingRecoveryManager,
-  useLoadingRecovery,
-  createRecoveryContext,
-} from './recovery';
+  DEFAULT_LOADING_SIZE,
+  DEFAULT_LOADING_TYPE,
+  LOADING_SIZES,
+  LOADING_TIMEOUTS,
+  MAX_RETRIES,
+  DEFAULT_LOADING_CONFIG,
+} from './constants';
 
 
 

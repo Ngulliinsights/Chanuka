@@ -47,7 +47,7 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   },
 ];
 
-export const QuickAccessNav: React.FC<QuickAccessNavProps> = ({
+export const QuickAccessNav = React.memo(<QuickAccessNavProps> = ({
   showTitle = true,
   maxItems = 5,
   className = "",
@@ -96,6 +96,9 @@ export const QuickAccessNav: React.FC<QuickAccessNavProps> = ({
       </div>
     </div>
   );
+);
+
+function 1(
 };
 
 export default QuickAccessNav;

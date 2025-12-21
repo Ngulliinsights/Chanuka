@@ -362,8 +362,11 @@ class EmergencyTriageTool {
       if (!maybeRoot.current) return;
       const fiber = maybeRoot.current;
       this.traverseFiber(fiber);
-    } catch (_error) {
-      // Silently ignore DevTools errors
+    } catch (error) {
+      // DevTools errors should not break emergency triage
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('DevTools traversal error:', error);
+      }
     }
   }
 
@@ -416,8 +419,11 @@ class EmergencyTriageTool {
         });
 
         observer.observe({ entryTypes: ['longtask'] });
-      } catch (_error) {
-        // PerformanceObserver not supported
+      } catch (error) {
+        // PerformanceObserver not supported in this environment
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('PerformanceObserver not supported:', error);
+        }
       }
     }
   }

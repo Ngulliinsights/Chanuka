@@ -6,7 +6,7 @@
  */
 
 import { ErrorDomain, ErrorSeverity } from './constants';
-import { ErrorContext, ErrorMetadata, AppError, NavigationErrorType } from './types';
+import { ErrorContext, ErrorMetadata, NavigationErrorType } from './types';
 
 // ============================================================================
 // BASE ERROR CLASSES (Migrated from utils/errors.ts)

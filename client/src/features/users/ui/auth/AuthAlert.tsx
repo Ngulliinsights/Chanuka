@@ -18,7 +18,7 @@ export interface AuthAlertProps {
   'data-testid'?: string;
 }
 
-export const AuthAlert: React.FC<AuthAlertProps> = ({
+export const AuthAlert = React.memo(<AuthAlertProps> = ({
   type,
   message,
   onRetry,
@@ -101,21 +101,32 @@ export const AuthAlert: React.FC<AuthAlertProps> = ({
       </div>
     </Alert>
   );
+);
+
+function 1(
 };
 
 // Specialized alert components
-export const SuccessAlert: React.FC<Omit<AuthAlertProps, 'type'>> = (props) => (
+export const SuccessAlert = React.memo(<Omit<AuthAlertProps, 'type'>> = (props) => (
   <AuthAlert {...props} type="success" />
 );
 
-export const ErrorAlert: React.FC<Omit<AuthAlertProps, 'type'>> = (props) => (
+function 1(
+
+export const ErrorAlert = React.memo(<Omit<AuthAlertProps, 'type'>> = (props) => (
   <AuthAlert {...props} type="error" />
 );
 
-export const WarningAlert: React.FC<Omit<AuthAlertProps, 'type'>> = (props) => (
+function 1(
+
+export const WarningAlert = React.memo(<Omit<AuthAlertProps, 'type'>> = (props) => (
   <AuthAlert {...props} type="warning" />
 );
 
-export const InfoAlert: React.FC<Omit<AuthAlertProps, 'type'>> = (props) => (
+function 1(
+
+export const InfoAlert = React.memo(<Omit<AuthAlertProps, 'type'>> = (props) => (
   <AuthAlert {...props} type="info" />
 );
+
+function 1(
