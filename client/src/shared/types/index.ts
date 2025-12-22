@@ -8,6 +8,9 @@
 // Re-export all types from original location for backward compatibility during migration
 export * from '../../types';
 
+// Dashboard types
+export * from './dashboard';
+
 // Planned: After migration, specific type exports will be organized here
 // - Analytics types (from features/analytics/model/types)
 // - Common types (core domain types)

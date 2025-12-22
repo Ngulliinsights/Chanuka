@@ -4,7 +4,6 @@
  * TypeScript definitions for the WebSocket API server
  */
 
-import type { BillUpdate } from './bill';
 
 // ============================================================================
 // Core WebSocket Types

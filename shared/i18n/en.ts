@@ -265,3 +265,8 @@ export const en = {
 
 
 
+
+const defaultExport = {
+  // Generated default export
+};
+export default defaultExport;

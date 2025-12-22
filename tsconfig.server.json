@@ -18,8 +18,8 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "exactOptionalPropertyTypes": false,
-    "noUncheckedIndexedAccess": false
-    ,
+    "noUncheckedIndexedAccess": false,
+    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "@/*": [

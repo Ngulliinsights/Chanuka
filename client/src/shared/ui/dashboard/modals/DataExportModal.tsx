@@ -4,19 +4,16 @@
  * Allows users to export their personal data for GDPR compliance.
  */
 
-import { 
-  Download, 
-  FileText, 
-  Database, 
-  Calendar,
+import {
+  Download,
+  FileText,
+  Database,
   CheckCircle,
   AlertCircle,
   Loader2,
   Info
 } from 'lucide-react';
-import React, { useState } from 'react';
-
-import { DataExportRequest } from '@client/types/user-dashboard';
+import { useState } from 'react';
 
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Checkbox } from '@client/shared/design-system/interactive/Checkbox.tsx';
@@ -26,16 +23,17 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../../ui/dialog';
+} from '@client/shared/design-system/interactive/Dialog.tsx';
 import { Input } from '@client/shared/design-system/interactive/Input.tsx';
-import { Label } from '@client/shared/design-system/typography/Label.tsx';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../ui/select';
+} from '@client/shared/design-system/interactive/Select.tsx';
+import { Label } from '@client/shared/design-system/typography/Label.tsx';
+import { DataExportRequest } from '@client/types/user-dashboard';
 
 
 interface DataExportModalProps {

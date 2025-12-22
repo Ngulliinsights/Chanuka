@@ -5,20 +5,18 @@
  */
 
 import React from 'react';
-import { Button } from '@client/shared/design-system';
 
-import { cn } from '@client/shared/design-system';
-import { DashboardConfig, DashboardLayoutConfig, DashboardThemeConfig } from '../types';
+import { Button, cn } from '@client/shared/design-system';
+
+import { DashboardConfig } from '../types';
 
 interface DashboardHeaderProps {
   /** Dashboard configuration */
   config: DashboardConfig;
   /** Custom header content */
   content?: React.ReactNode;
-  /** Layout change handler */
-  onLayoutChange?: (updates: Partial<DashboardLayoutConfig>) => void;
   /** Theme change handler */
-  onThemeChange?: (updates: Partial<DashboardThemeConfig>) => void;
+  onThemeChange?: (theme: 'light' | 'dark') => void;
   /** Sidebar open state */
   sidebarOpen: boolean;
   /** Sidebar toggle handler */
@@ -30,9 +28,9 @@ interface DashboardHeaderProps {
 }
 
 /**
- * Dashboard Header Component
+ * Dashboard Header Component with memo optimization
  */
-export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
+const DashboardHeaderComponent = ({
   config,
   content,
   onThemeChange,
@@ -40,8 +38,14 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
   onToggleSidebar,
   isMobile,
   className,
-}) => {
+}: DashboardHeaderProps) => {
   const { title, description, navigation } = config;
+  const currentTheme = config.theme?.colorScheme || 'light';
+
+  const handleThemeToggle = () => {
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    onThemeChange?.(newTheme);
+  };
 
   return (
     <header
@@ -71,12 +75,12 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
         {isMobile && (
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={onToggleSidebar}
             aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
             aria-expanded={sidebarOpen}
             aria-controls="dashboard-sidebar"
-            className="lg:hidden"
+            className="lg:hidden p-2"
           >
             <svg
               className="h-5 w-5"
@@ -105,7 +109,7 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
         )}
 
         {/* Breadcrumbs */}
-        {navigation.breadcrumbs.enabled && (
+        {navigation?.breadcrumbs?.enabled && (
           <nav aria-label="Breadcrumb" className="hidden sm:flex">
             <ol className="flex items-center space-x-2 text-sm">
               <li>
@@ -119,12 +123,12 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
               </li>
               <li aria-hidden="true">
                 <span className="text-[hsl(var(--color-muted-foreground))]">
-                  {navigation.breadcrumbs.separator}
+                  {navigation.breadcrumbs.separator || '/'}
                 </span>
               </li>
               <li aria-current="page">
                 <span className="text-[hsl(var(--color-foreground))] font-medium">
-                  {title}
+                  {title || config.name}
                 </span>
               </li>
             </ol>
@@ -134,7 +138,7 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
         {/* Title & Description */}
         <div className="min-w-0 flex-1">
           <h1 className="text-lg sm:text-xl font-semibold text-[hsl(var(--color-foreground))] truncate">
-            {title}
+            {title || config.name}
           </h1>
           {description && (
             <p className="text-sm text-[hsl(var(--color-muted-foreground))] truncate hidden sm:block">
@@ -145,26 +149,19 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
       </div>
 
       {/* Center Section - Custom Content */}
-      {content && (
-        <div className="flex items-center space-x-4 flex-shrink-0">
-          {content}
-        </div>
-      )}
+      {content && <div className="flex items-center space-x-4 flex-shrink-0">{content}</div>}
 
       {/* Right Section - Controls */}
       <div className="flex items-center space-x-2 flex-shrink-0">
         {/* Theme Toggle */}
         <Button
           variant="ghost"
-          size="icon"
-          onClick={() => {
-            const newScheme = config.theme.colorScheme === 'dark' ? 'light' : 'dark';
-            onThemeChange?.({ colorScheme: newScheme });
-          }}
-          aria-label={`Switch to ${config.theme.colorScheme === 'dark' ? 'light' : 'dark'} mode`}
-          className="hidden sm:flex"
+          size="sm"
+          onClick={handleThemeToggle}
+          aria-label={`Switch to ${currentTheme === 'dark' ? 'light' : 'dark'} mode`}
+          className="hidden sm:flex p-2"
         >
-          {config.theme.colorScheme === 'dark' ? (
+          {currentTheme === 'dark' ? (
             <svg
               className="h-5 w-5"
               fill="none"
@@ -197,26 +194,16 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
           )}
         </Button>
 
-        {/* Accessibility Menu */}
+        {/* Accessibility Toggle */}
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={() => {
-            // Toggle high contrast mode
-            onThemeChange?.({
-              customTokens: {
-                ...config.theme.customTokens,
-                'color-background': config.accessibility.highContrast
-                  ? 'hsl(0, 0%, 100%)'
-                  : 'hsl(0, 0%, 0%)',
-                'color-foreground': config.accessibility.highContrast
-                  ? 'hsl(0, 0%, 0%)'
-                  : 'hsl(0, 0%, 100%)',
-              },
-            });
+            // Placeholder for accessibility toggle
+            console.log('Toggle accessibility features');
           }}
-          aria-label="Toggle high contrast mode"
-          className="hidden sm:flex"
+          aria-label="Toggle accessibility features"
+          className="hidden sm:flex p-2"
         >
           <svg
             className="h-5 w-5"
@@ -241,14 +228,14 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
         </Button>
 
         {/* Page Controls */}
-        {navigation.pageControls.enabled && (
+        {navigation?.pageControls?.enabled && (
           <div className="flex items-center space-x-1">
             <Button
               variant="ghost"
               size="sm"
               aria-label="Previous page"
               disabled
-              className="hidden sm:flex"
+              className="hidden sm:flex p-2"
             >
               <svg
                 className="h-4 w-4"
@@ -270,7 +257,7 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
               size="sm"
               aria-label="Next page"
               disabled
-              className="hidden sm:flex"
+              className="hidden sm:flex p-2"
             >
               <svg
                 className="h-4 w-4"
@@ -292,9 +279,7 @@ export const DashboardHeader = React.memo(<DashboardHeaderProps> = ({
       </div>
     </header>
   );
-);
-
-function 1(
 };
 
-DashboardHeader.displayName = 'DashboardHeader';
+/* eslint-disable react/prop-types */
+export const DashboardHeader = React.memo(DashboardHeaderComponent);

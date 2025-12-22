@@ -4,9 +4,9 @@
  * Core API request and response type definitions
  */
 
+import type { BaseApiConfig, BaseApiRequest, BaseApiResponse, BaseWebSocketMessage, BaseBillData } from './base';
 import { ZodSchema } from 'zod';
 
-import type { HttpMethod } from './common';
 
 // ============================================================================
 // Request Types

@@ -15,6 +15,8 @@ validate_imports.js
 
 # Export validator (utility script)
 validator.mjs
+import-validator.mjs
+generate-structure.mjs
 verify-exports.js
 
 # Shell scripts (not JavaScript/TypeScript)

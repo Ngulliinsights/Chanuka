@@ -137,3 +137,4 @@ export interface User {
   privacySettings?: PrivacySettings;
   consentGiven?: ConsentRecord[];
 }
+export const logger = console;

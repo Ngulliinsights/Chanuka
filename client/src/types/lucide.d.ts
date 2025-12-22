@@ -42,6 +42,7 @@ declare module 'lucide-react' {
    * Re-export other standard icons for completeness
    */
   export const Activity: FC<IconProps>;
+  export const AlertCircle: FC<IconProps>;
   export const AlertTriangle: FC<IconProps>;
   export const Award: FC<IconProps>;
   export const BarChart3: FC<IconProps>;
@@ -54,22 +55,33 @@ declare module 'lucide-react' {
   export const Eye: FC<IconProps>;
   export const ExternalLink: FC<IconProps>;
   export const FileText: FC<IconProps>;
+  export const Flame: FC<IconProps>;
+  export const Grid3X3: FC<IconProps>; // Modern replacement for Grid
+  export const LayoutGrid: FC<IconProps>;
+  export const List: FC<IconProps>;
+  export const Loader2: FC<IconProps>;
+  export const Maximize2: FC<IconProps>;
+  export const Megaphone: FC<IconProps>;
   export const MessageCircle: FC<IconProps>;
   export const MessageSquare: FC<IconProps>;
-  export const Megaphone: FC<IconProps>;
+  export const Network: FC<IconProps>;
+  export const RefreshCw: FC<IconProps>;
   export const Search: FC<IconProps>;
   export const Send: FC<IconProps>;
+  export const Settings: FC<IconProps>;
   export const Shield: FC<IconProps>;
   export const Sparkles: FC<IconProps>;
   export const Star: FC<IconProps>;
   export const Target: FC<IconProps>;
   export const ThumbsUp: FC<IconProps>;
   export const TrendingUp: FC<IconProps>;
-  export const Users: FC<IconProps>;
   export const Trophy: FC<IconProps>;
+  export const Users: FC<IconProps>;
   export const X: FC<IconProps>;
   export const Zap: FC<IconProps>;
-  export const Flame: FC<IconProps>;
+
+  // Aliases for compatibility
+  export const Grid: FC<IconProps>; // Alias for Grid3X3
 }
 
 declare module 'lucide-react/Sparkles' {

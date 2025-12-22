@@ -1,9 +1,9 @@
-import React from 'react';
+import { BarChart3, Search, Bell, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Menu, Search, Bell, User } from 'lucide-react';
 
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+
 import { cn } from '../../design-system/utils/cn';
 
 interface HeaderProps {
@@ -37,11 +37,11 @@ export default function Header({
         {onMenuToggle && (
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={onMenuToggle}
             className="md:hidden"
           >
-            <Menu className="h-5 w-5" />
+            <BarChart3 className="h-5 w-5" />
           </Button>
         )}
         
@@ -71,14 +71,14 @@ export default function Header({
       <div className="flex items-center gap-2">
         {/* Mobile Search */}
         {showSearch && (
-          <Button variant="ghost" size="icon" className="md:hidden">
+          <Button variant="ghost" size="sm" className="md:hidden">
             <Search className="h-5 w-5" />
           </Button>
         )}
 
         {/* Notifications */}
         {showNotifications && (
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-5 w-5" />
             {notificationCount > 0 && (
               <Badge 
@@ -93,7 +93,7 @@ export default function Header({
 
         {/* User Menu */}
         {showUserMenu && (
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="sm">
             <User className="h-5 w-5" />
           </Button>
         )}

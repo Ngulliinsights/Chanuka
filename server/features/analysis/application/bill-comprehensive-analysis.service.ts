@@ -289,3 +289,7 @@ export class BillComprehensiveAnalysisService {
 
 export const billComprehensiveAnalysisService = new BillComprehensiveAnalysisService();
 
+
+export type MLStakeholderResult = any; // Generated type - please implement
+
+export type MLBeneficiaryResult = any; // Generated type - please implement

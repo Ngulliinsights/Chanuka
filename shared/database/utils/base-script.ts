@@ -57,28 +57,28 @@ export class DatabaseScriptLogger {
   /**
    * Log script start
    */
-  logStart(message: string, details?: any): void {
+  logStart(message: string, details?: unknown): void {
     this.logger.info(`🚀 ${message}`, details);
   }
 
   /**
    * Log successful operation
    */
-  logSuccess(message: string, details?: any): void {
+  logSuccess(message: string, details?: unknown): void {
     this.logger.info(`✅ ${message}`, details);
   }
 
   /**
    * Log operation in progress
    */
-  logOperation(message: string, details?: any): void {
+  logOperation(message: string, details?: unknown): void {
     this.logger.info(`🔧 ${message}`, details);
   }
 
   /**
    * Log warning
    */
-  logWarning(message: string, details?: any): void {
+  logWarning(message: string, details?: unknown): void {
     this.logger.warn(`⚠️ ${message}`, details);
   }
 
@@ -92,14 +92,14 @@ export class DatabaseScriptLogger {
   /**
    * Log completion
    */
-  logComplete(message: string, duration: number, details?: any): void {
+  logComplete(message: string, duration: number, details?: unknown): void {
     this.logger.info(`🏁 ${message} (${duration}ms)`, details);
   }
 
   /**
    * Log verbose information (only if verbose mode is enabled)
    */
-  logVerbose(message: string, details?: any): void {
+  logVerbose(message: string, details?: unknown): void {
     if (this.verbose) {
       this.logger.debug(`🔍 ${message}`, details);
     }
@@ -108,7 +108,7 @@ export class DatabaseScriptLogger {
   /**
    * Log dry run information
    */
-  logDryRun(message: string, details?: any): void {
+  logDryRun(message: string, details?: unknown): void {
     this.logger.info(`🧪 [DRY RUN] ${message}`, details);
   }
 

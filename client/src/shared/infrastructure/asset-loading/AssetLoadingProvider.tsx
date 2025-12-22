@@ -1,7 +1,14 @@
 // Asset loading functionality will be implemented separately
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useMemo } from 'react';
 
 import { useOfflineDetection, OfflineDetectionState } from '@client/hooks/useOfflineDetection';
+
+// Mock AssetLoadingManager class for now
+class AssetLoadingManager {
+  updateConnectionState(_state: OfflineDetectionState) {
+    // Mock implementation
+  }
+}
 
 interface AssetLoadingContextType {
   assetManager: AssetLoadingManager;
@@ -35,7 +42,7 @@ export function EnhancedAssetLoadingProvider({ children }: { children: React.Rea
   }, [connectionState]);
 
   const contextValue = useMemo(() => ({
-    assetManager: assetManagerRef.current,
+    assetManager: assetManagerRef.current!,
     connectionState
   }), [connectionState]);
 

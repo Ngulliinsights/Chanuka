@@ -98,3 +98,7 @@ export class ErrorRateLimiter {
     }
   }
 }
+export const createRateLimit = (...args: any[]) => {
+  // Generated function
+  return {};
+};

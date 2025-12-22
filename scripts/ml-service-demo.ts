@@ -94,7 +94,6 @@ async function runMLServiceDemo() {
     const realTimes = [];
     
     // Test mock service directly
-    const { MLAnalysisService } = await import('./ml-service-demo');
     for (let i = 0; i < 3; i++) {
       const startTime = Date.now();
       await MLAnalysisService.analyzeStakeholderInfluence(testBillContent);

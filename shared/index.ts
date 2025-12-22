@@ -10,7 +10,7 @@
 // ============================================================================
 
 // Core utilities and services
-export * from './core/src/index';
+export * from './core/index';
 
 // Database infrastructure
 export * from './database/index';
@@ -45,26 +45,25 @@ export type {
   User,
   Bill,
   Committee,
-  UserProfile,
-  
-  // Anonymity types
-  AnonymityLevel,
-  DisplayIdentity,
-  
+  UserProfile
+} from './schema/index';
+
+export type {
   // Core types
   Result,
   Maybe,
   BaseError,
   ApiResponse
-} from './schema/index';
+} from './core/index';
 
 // ============================================================================
 // UTILITY COLLECTIONS
 // ============================================================================
 
 // Export utility collections for easy access
-export { utils } from './core/src/utils/common-utils';
-export { validation, formatting, strings, arrays, functions, objects, civic } from './core/src/utils/common-utils';
+import { utils } from './core/utils/common-utils';
+export { utils };
+export { validation, formatting, strings, arrays, functions, objects, civic } from './core/utils/common-utils';
 
 // ============================================================================
 // CONFIGURATION HELPERS
@@ -95,7 +94,7 @@ export const createSharedConfig = (environment: 'development' | 'test' | 'stagin
 // HEALTH CHECK UTILITIES
 // ============================================================================
 
-export const healthCheck = async () => {
+export const healthCheck = async (): Promise<void> => {
   try {
     // Import database health check
     const { getDatabaseHealth } = await import('./database/index');

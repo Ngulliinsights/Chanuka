@@ -1,3 +1,11 @@
+
+// Forward declarations to resolve circular dependencies
+declare module './types' {
+  export interface ForwardDeclaredType {
+    [key: string]: any;
+  }
+}
+
 import { EventEmitter } from 'events';
 import { PoolClient } from 'pg';
 import { pool, EnhancedPool, PoolMetrics, checkPoolHealth, PoolHealthStatus } from '@shared/database/pool';

@@ -4,8 +4,8 @@
  * Shared types and utilities used across multiple modules
  */
 
+import type { BaseApiConfig, BaseApiRequest, BaseApiResponse, BaseWebSocketMessage, BaseBillData } from './base';
 import { ZodSchema } from 'zod';
-import type { RequestInterceptor, ResponseInterceptor } from './config';
 
 // ============================================================================
 // Common Enums and Types

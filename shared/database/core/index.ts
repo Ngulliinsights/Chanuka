@@ -106,7 +106,7 @@ export {
  * const users = await db.select().from(usersTable);
  * ```
  */
-export async function initializeDatabase(config?: Partial<ConnectionManagerConfig>) {
+export async function initializeDatabase(config?: Partial<ConnectionManagerConfig>): Promise<void> {
   const dbConfig = createDatabaseConfig();
   const finalConfig = { ...dbConfig, ...config };
   
@@ -161,7 +161,7 @@ export async function shutdownDatabase(): Promise<void> {
  * @param environment Development environment ('development' | 'test')
  * @returns Basic connection manager
  */
-export async function quickSetup(environment: 'development' | 'test' = 'development') {
+export async function quickSetup(environment: 'development' | 'test' = 'development'): Promise<void> {
   const config = createDatabaseConfig(environment);
   return await createConnectionManager(config);
 }

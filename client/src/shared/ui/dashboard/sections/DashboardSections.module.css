@@ -1,0 +1,188 @@
+/* Dashboard Sections CSS Module */
+
+/* Status Colors */
+.statusIntroduced {
+  border-color: hsl(var(--status-introduced));
+}
+
+.statusCommittee {
+  border-color: hsl(var(--status-committee));
+}
+
+.statusPassed {
+  border-color: hsl(var(--status-passed));
+}
+
+.statusFailed {
+  border-color: hsl(var(--status-failed));
+}
+
+.statusSigned {
+  border-color: hsl(var(--status-signed));
+}
+
+.statusVetoed {
+  border-color: hsl(var(--status-vetoed));
+}
+
+/* Urgency Colors */
+.urgencyCritical {
+  border-color: hsl(var(--civic-urgent));
+}
+
+.urgencyHigh {
+  border-color: hsl(var(--status-high));
+}
+
+.urgencyMedium {
+  border-color: hsl(var(--status-moderate));
+}
+
+.urgencyLow {
+  border-color: hsl(var(--status-low));
+}
+
+/* Activity Colors */
+.activityView {
+  background-color: hsl(var(--civic-transparency));
+}
+
+.activityComment {
+  background-color: hsl(var(--civic-community));
+}
+
+.activityShare {
+  background-color: hsl(var(--civic-community));
+}
+
+.activitySave {
+  background-color: hsl(var(--civic-urgent));
+}
+
+.activityVote {
+  background-color: hsl(var(--civic-expert));
+}
+
+.activityExpertContribution {
+  background-color: hsl(var(--civic-expert));
+}
+
+/* Confidence Colors */
+.confidenceHigh {
+  border-color: hsl(var(--civic-expert));
+  color: hsl(var(--civic-expert));
+}
+
+.confidenceMedium {
+  border-color: hsl(var(--civic-community));
+  color: hsl(var(--civic-community));
+}
+
+.confidenceLow {
+  border-color: hsl(var(--civic-transparency));
+  color: hsl(var(--civic-transparency));
+}
+
+/* Reason Colors */
+.reasonInterestMatch {
+  background-color: hsl(var(--civic-community));
+}
+
+.reasonActivityPattern {
+  background-color: hsl(var(--civic-transparency));
+}
+
+.reasonExpertRecommendation {
+  background-color: hsl(var(--civic-expert));
+}
+
+.reasonTrending {
+  background-color: hsl(var(--civic-constitutional));
+}
+
+/* Score Colors */
+.scoreExcellent {
+  border-color: hsl(var(--civic-expert));
+  color: hsl(var(--civic-expert));
+}
+
+.scoreGood {
+  border-color: hsl(var(--civic-community));
+  color: hsl(var(--civic-community));
+}
+
+.scoreFair {
+  border-color: hsl(var(--civic-transparency));
+  color: hsl(var(--civic-transparency));
+}
+
+.scorePoor {
+  border-color: hsl(var(--civic-urgent));
+  color: hsl(var(--civic-urgent));
+}
+
+/* Achievement Colors */
+.achievementEngagement {
+  background-color: hsl(var(--civic-community));
+}
+
+.achievementExpertise {
+  background-color: hsl(var(--civic-expert));
+}
+
+.achievementParticipation {
+  background-color: hsl(var(--civic-transparency));
+}
+
+.achievementImpact {
+  background-color: hsl(var(--civic-constitutional));
+}
+
+/* Progress Bar Custom Properties */
+.progressExcellent {
+  --progress-background: hsl(var(--civic-expert));
+}
+
+.progressGood {
+  --progress-background: hsl(var(--civic-community));
+}
+
+.progressFair {
+  --progress-background: hsl(var(--civic-transparency));
+}
+
+.progressPoor {
+  --progress-background: hsl(var(--civic-urgent));
+}
+
+/* Common utility classes */
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: white;
+}
+
+.largeIconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: white;
+}
+
+.scoreDisplay {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.statDisplay {
+  font-size: 1.5rem;
+  font-weight: bold;
+}

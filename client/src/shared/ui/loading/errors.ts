@@ -126,3 +126,31 @@ export function getErrorDisplayMessage(error: LoadingError): string {
   }
 }
 
+
+export class LoadingNetworkError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LoadingNetworkError';
+  }
+}
+
+export class LoadingValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LoadingValidationError';
+  }
+}
+
+export class LoadingOperationFailedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LoadingOperationFailedError';
+  }
+}
+
+export class LoadingStageError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LoadingStageError';
+  }
+}

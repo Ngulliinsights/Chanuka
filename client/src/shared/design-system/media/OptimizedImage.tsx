@@ -18,7 +18,7 @@ export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageEl
   className?: string;
 }
 
-export const OptimizedImage = React.memo(<OptimizedImageProps> = ({
+export const OptimizedImage = React.memo<OptimizedImageProps>(({
   src,
   alt,
   width,
@@ -178,10 +178,9 @@ export const OptimizedImage = React.memo(<OptimizedImageProps> = ({
       )}
     </div>
   );
-);
+});
 
-function 1(
-};
+OptimizedImage.displayName = 'OptimizedImage';
 
 // Avatar component with optimized image
 export interface OptimizedAvatarProps {
@@ -192,7 +191,7 @@ export interface OptimizedAvatarProps {
   className?: string;
 }
 
-export const OptimizedAvatar = React.memo(<OptimizedAvatarProps> = ({
+export const OptimizedAvatar = React.memo<OptimizedAvatarProps>(({
   src,
   alt,
   size = 'md',
@@ -237,10 +236,9 @@ export const OptimizedAvatar = React.memo(<OptimizedAvatarProps> = ({
       priority={size === 'xl'} // Prioritize larger avatars
     />
   );
-);
+});
 
-function 1(
-};
+OptimizedAvatar.displayName = 'OptimizedAvatar';
 
 // Card image component
 export interface OptimizedCardImageProps {
@@ -250,7 +248,7 @@ export interface OptimizedCardImageProps {
   className?: string;
 }
 
-export const OptimizedCardImage = React.memo(<OptimizedCardImageProps> = ({
+export const OptimizedCardImage = React.memo<OptimizedCardImageProps>(({
   src,
   alt,
   aspectRatio = 'video',
@@ -272,10 +270,9 @@ export const OptimizedCardImage = React.memo(<OptimizedCardImageProps> = ({
       />
     </div>
   );
-);
+});
 
-function 1(
-};
+OptimizedCardImage.displayName = 'OptimizedCardImage';
 
 // Hero image component
 export interface OptimizedHeroImageProps {
@@ -286,7 +283,7 @@ export interface OptimizedHeroImageProps {
   children?: React.ReactNode;
 }
 
-export const OptimizedHeroImage = React.memo(<OptimizedHeroImageProps> = ({
+export const OptimizedHeroImage = React.memo<OptimizedHeroImageProps>(({
   src,
   alt,
   overlay = false,
@@ -312,8 +309,6 @@ export const OptimizedHeroImage = React.memo(<OptimizedHeroImageProps> = ({
       )}
     </div>
   );
-);
+});
 
-function 1(
-};
-
+OptimizedHeroImage.displayName = 'OptimizedHeroImage';

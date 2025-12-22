@@ -96,4 +96,15 @@ words:
   - croissance
   - ccpa
   - CCPA
+  - Cooldown
+  - cooldown
   - themechange
+  - pycache
+  - Batchable
+  - setex
+  - sadd
+  - srem
+  - smembers
+  - socketio
+  - venv
+  - Downvoted

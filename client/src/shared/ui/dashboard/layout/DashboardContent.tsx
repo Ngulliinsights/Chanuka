@@ -4,8 +4,11 @@
  * Main content area with responsive layout and accessibility
  */
 
+import PropTypes from 'prop-types';
 import React from 'react';
+
 import { cn } from '@client/shared/design-system';
+
 import { DashboardConfig } from '../types';
 
 interface DashboardContentProps {
@@ -22,12 +25,12 @@ interface DashboardContentProps {
 /**
  * Dashboard Content Component
  */
-export const DashboardContent = React.memo(<DashboardContentProps> = ({
+function DashboardContentComponent({
   id = 'main-content',
   config,
   children,
   className,
-}) => {
+}: DashboardContentProps) {
   return (
     <main
       id={id}
@@ -54,14 +57,21 @@ export const DashboardContent = React.memo(<DashboardContentProps> = ({
       tabIndex={-1} // Allow programmatic focus
     >
       {/* Content wrapper for consistent spacing */}
-      <div className="max-w-full">
-        {children}
-      </div>
+      <div className="max-w-full">{children}</div>
     </main>
   );
-);
+}
 
-function 1(
+DashboardContentComponent.propTypes = {
+  id: PropTypes.string,
+  config: PropTypes.shape({
+    title: PropTypes.string,
+  }),
+  children: PropTypes.node,
+  className: PropTypes.string,
 };
 
-DashboardContent.displayName = 'DashboardContent';
+/**
+ * Dashboard Content Component with memo optimization
+ */
+export const DashboardContent = React.memo(DashboardContentComponent);

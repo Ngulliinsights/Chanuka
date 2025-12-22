@@ -141,6 +141,7 @@ module.exports = {
       },
       rules: {
         "react/react-in-jsx-scope": "off", // Not needed with React 17+
+        "react/prop-types": "off", // Disable PropTypes for TypeScript files
         "@typescript-eslint/no-unused-vars": [
           "error",
           { argsIgnorePattern: "^_" },

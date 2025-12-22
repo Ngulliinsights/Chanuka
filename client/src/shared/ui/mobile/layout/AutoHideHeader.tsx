@@ -1,8 +1,7 @@
-import { MenuIcon as Menu } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { useId } from 'react';
 
 import { cn } from '@client/shared/design-system';
-
 import { Button } from '@client/shared/design-system';
 
 interface AutoHideHeaderProps {
@@ -34,7 +33,7 @@ export function AutoHideHeader({ visible, onMenuClick }: AutoHideHeaderProps): J
           aria-label="Open navigation menu"
           aria-controls="navigation-drawer"
         >
-          <Menu className="h-5 w-5" />
+          <BarChart3 className="h-5 w-5" />
         </Button>
         {/* Additional header content */}
       </div>

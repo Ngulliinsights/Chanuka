@@ -204,8 +204,8 @@ export const colorTokens = {
     },
   },
 
-  // Secondary colors (alias for compatibility)
-  secondary: {
+  // Gray colors (alias for compatibility)
+  gray: {
     50: '#f8fafc',
     100: '#f1f5f9',
     200: '#e2e8f0',

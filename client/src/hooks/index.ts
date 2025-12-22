@@ -38,11 +38,9 @@ export { useMobile } from '../shared/hooks';
 export { useKeyboardFocus } from '../shared/hooks';
 export { useDebounce } from '../shared/hooks';
 export { useMediaQuery } from '../shared/hooks';
-export { useWebSocket } from '../shared/hooks';
 export { useCleanup } from '../shared/hooks';
 export { useI18n } from '../shared/hooks';
 export { useProgressiveDisclosure } from '../shared/hooks';
-export { useRealTimeEngagement } from '../shared/hooks';
 
 // Mobile hooks (in shared/hooks/mobile)
 export {

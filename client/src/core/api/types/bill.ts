@@ -4,7 +4,7 @@
  * Type definitions for bill-related domain models
  */
 
-import type { PaginationParams } from './common';
+import type { BaseApiConfig, BaseApiRequest, BaseApiResponse, BaseWebSocketMessage, BaseBillData } from './base';
 import type { Sponsor } from './sponsor';
 
 // ============================================================================

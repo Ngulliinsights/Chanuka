@@ -19,12 +19,12 @@ import {
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { copySystem } from '@client/content/copy-system';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-import { copySystem } from '@client/content/copy-system';
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { logger } from '@client/utils/logger';
 
 interface TestResult {

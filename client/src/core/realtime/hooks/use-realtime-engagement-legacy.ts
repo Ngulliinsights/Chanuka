@@ -6,17 +6,19 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { realTimeService } from '../services/realtime-service';
+
 import { logger } from '@client/utils/logger';
+
+import { realTimeService } from '../services/realtime-service';
 
 export interface RealTimeEngagementHookReturn {
   isConnected: boolean;
   subscribedBills: Set<number>;
   subscribeToBill: (billId: number) => void;
   unsubscribeFromBill: (billId: number) => void;
-  getRecentUpdates: (billId: number, limit?: number) => any[];
-  getEngagementMetrics: (billId: number) => any;
-  getTypingIndicators: (billId: number, parentId?: string) => any[];
+  getRecentUpdates: (billId: number, limit?: number) => unknown[];
+  getEngagementMetrics: (billId: number) => unknown;
+  getTypingIndicators: (billId: number, parentId?: string) => unknown[];
   sendTypingIndicator: (billId: number, parentId?: string) => void;
   stopTypingIndicator: (billId: number, parentId?: string) => void;
 }
@@ -27,7 +29,6 @@ export interface RealTimeEngagementHookReturn {
 export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [subscribedBills, setSubscribedBills] = useState<Set<number>>(new Set());
-  const [billData, setBillData] = useState<Map<number, any>>(new Map());
 
   const billTrackingService = realTimeService.getBillTrackingService();
   const communityService = realTimeService.getCommunityService();
@@ -79,7 +80,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
         billId
       }, error);
     }
-  }, [subscribedBills]);
+  }, [subscribedBills, billTrackingService]);
 
   const unsubscribeFromBill = useCallback((billId: number) => {
     if (!subscribedBills.has(billId)) {
@@ -94,13 +95,6 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
         return newSet;
       });
 
-      // Clear cached data
-      setBillData(prev => {
-        const newMap = new Map(prev);
-        newMap.delete(billId);
-        return newMap;
-      });
-
       logger.info('Unsubscribed from bill (legacy)', {
         component: 'useRealTimeEngagement',
         billId
@@ -111,7 +105,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
         billId
       }, error);
     }
-  }, [subscribedBills]);
+  }, [subscribedBills, billTrackingService]);
 
   // ============================================================================
   // Data Access Methods
@@ -128,9 +122,9 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
       }, error);
       return [];
     }
-  }, []);
+  }, [billTrackingService]);
 
-  const getEngagementMetrics = useCallback((billId: number): any => {
+  const getEngagementMetrics = useCallback((billId: number): unknown => {
     try {
       return billTrackingService.getEngagementMetrics(billId);
     } catch (error) {
@@ -140,7 +134,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
       }, error);
       return null;
     }
-  }, []);
+  }, [billTrackingService]);
 
   const getTypingIndicators = useCallback((billId: number, parentId?: string): unknown[] => {
     try {
@@ -152,7 +146,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
       }, error);
       return [];
     }
-  }, []);
+  }, [communityService]);
 
   const sendTypingIndicator = useCallback((billId: number, parentId?: string) => {
     try {
@@ -167,7 +161,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
         billId
       }, error);
     }
-  }, []);
+  }, [communityService]);
 
   const stopTypingIndicator = useCallback((billId: number, parentId?: string) => {
     try {
@@ -182,7 +176,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
         billId
       }, error);
     }
-  }, []);
+  }, [communityService]);
 
   // ============================================================================
   // Cleanup on Unmount
@@ -202,7 +196,7 @@ export function useRealTimeEngagement(): RealTimeEngagementHookReturn {
         }
       }
     };
-  }, [subscribedBills]);
+  }, [subscribedBills, billTrackingService]);
 
   // Log deprecation warning
   useEffect(() => {

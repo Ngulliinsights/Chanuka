@@ -11,21 +11,19 @@ import {
   MessageSquare, 
   Share2, 
   Heart, 
-  ThumbsUp, 
-  ThumbsDown,
+  ThumbsUp,
   BookOpen,
   Award,
-  ExternalLink,
-  Clock,
-  TrendingUp
+  ExternalLink
 } from 'lucide-react';
-import React from 'react';
-
-import { EngagementHistoryItem } from '@client/types/user-dashboard';
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+
+import { EngagementHistoryItem } from '@client/types/user-dashboard';
+
+import styles from './DashboardSections.module.css';
 
 
 
@@ -81,21 +79,27 @@ export function EngagementHistorySection({
 
   const getActivityDescription = (item: EngagementHistoryItem) => {
     switch (item.type) {
-      case 'view':
+      case 'view': {
         return `Viewed ${item.billTitle || 'a bill'}`;
-      case 'comment':
+      }
+      case 'comment': {
         return `Commented on ${item.billTitle || 'a bill'}`;
-      case 'share':
+      }
+      case 'share': {
         const target = item.metadata?.shareTarget;
         return `Shared ${item.billTitle || 'a bill'}${target ? ` on ${target}` : ''}`;
-      case 'save':
+      }
+      case 'save': {
         return `Saved ${item.billTitle || 'a bill'}`;
-      case 'vote':
+      }
+      case 'vote': {
         const voteType = item.metadata?.voteType;
         return `${voteType === 'up' ? 'Upvoted' : 'Downvoted'} a comment on ${item.billTitle || 'a bill'}`;
-      case 'expert_contribution':
+      }
+      case 'expert_contribution': {
         const contributionType = item.metadata?.contributionType;
         return `Provided ${contributionType || 'expert input'} on ${item.billTitle || 'a bill'}`;
+      }
       default:
         return 'Unknown activity';
     }
@@ -208,8 +212,7 @@ export function EngagementHistorySection({
                   >
                     {/* Activity Icon */}
                     <div 
-                      className="flex items-center justify-center w-8 h-8 rounded-full text-white"
-                      style={{ backgroundColor: getActivityColor(item.type) }}
+                      className={`${styles.iconContainer} ${styles[`activity${item.type.charAt(0).toUpperCase() + item.type.slice(1)}`]}`}
                     >
                       {getActivityIcon(item.type)}
                     </div>
@@ -273,7 +276,7 @@ export function EngagementHistorySection({
                 { type: 'save', label: 'Saves', count: history.filter(h => h.type === 'save').length }
               ].map((stat) => (
                 <div key={stat.type} className="text-center">
-                  <div className="text-2xl font-bold" style={{ color: getActivityColor(stat.type as any) }}>
+                  <div className={`${styles.statDisplay} ${styles[`activity${stat.type.charAt(0).toUpperCase() + stat.type.slice(1)}`]}`} data-activity-type={stat.type}>
                     {stat.count}
                   </div>
                   <div className="text-xs text-muted-foreground">{stat.label}</div>

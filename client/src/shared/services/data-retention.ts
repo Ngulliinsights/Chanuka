@@ -447,7 +447,7 @@ class DataRetentionService {
     }
   }
 
-  private async performDataCleanup(dataType: string, policy: RetentionPolicy): Promise<{
+  private async performDataCleanup(_dataType: string, _policy: RetentionPolicy): Promise<{
     processed: number;
     deleted: number;
     archived: number;

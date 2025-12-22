@@ -13,7 +13,7 @@ import { users } from '../schema/foundation';
 /**
  * Example: Safe database initialization
  */
-export const initializeApp = async () => {
+export const initializeApp = async (): Promise<void> => {
   try {
     // Initialize all safety mechanisms
     await initializeDatabaseSafety();
@@ -28,7 +28,7 @@ export const initializeApp = async () => {
 /**
  * Example: Safe read operation
  */
-export const safeReadExample = async (user_id: string) => {
+export const safeReadExample = async (user_id: string): Promise<void> => {
   try {
     // Use read database for read operations
     const result = await readDatabase.query.users.findFirst({
@@ -45,7 +45,7 @@ export const safeReadExample = async (user_id: string) => {
 /**
  * Example: Safe write operation with transaction
  */
-export const safeWriteExample = async (userData: any) => {
+export const safeWriteExample = async (userData: any): Promise<void> => {
   try {
     return await withTransaction(async (tx: any) => {
       // All operations within this transaction are protected
@@ -66,7 +66,7 @@ export const safeWriteExample = async (userData: any) => {
 /**
  * Example: Safe raw query execution
  */
-export const safeRawQueryExample = async (bill_id: number) => {
+export const safeRawQueryExample = async (bill_id: number): Promise<void> => {
   try {
     const result = await executeQuery({
       text: 'SELECT * FROM bills WHERE id = $1',
@@ -84,7 +84,7 @@ export const safeRawQueryExample = async (bill_id: number) => {
 /**
  * Example: Concurrent operations (demonstrating thread safety)
  */
-export const safeConcurrentExample = async () => {
+export const safeConcurrentExample = async (): Promise<void> => {
   try {
     // These operations can run concurrently without race conditions
     const promises = Array.from({ length: 10 }, (_, i) =>
@@ -106,7 +106,7 @@ export const safeConcurrentExample = async () => {
 /**
  * Example: Graceful shutdown
  */
-export const shutdownApp = async () => {
+export const shutdownApp = async (): Promise<void> => {
   try {
     await shutdownDatabaseSafety();
     logger.info('Application database layer shut down safely');
@@ -119,7 +119,7 @@ export const shutdownApp = async () => {
 /**
  * Example: Error handling in action
  */
-export const errorHandlingExample = async () => {
+export const errorHandlingExample = async (): Promise<void> => {
   try {
     // This will automatically be protected by circuit breakers and retry logic
     await executeQuery({

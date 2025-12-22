@@ -53,9 +53,14 @@ export class UIDateError extends UIComponentError {
   }
 }
 
-export class UIDialogError extends Error {
-  constructor(message: string) {
-    super(message);
+export class UIDialogError extends UIComponentError {
+  constructor(
+    componentName: string,
+    operation: string,
+    message: string,
+    recoverable: boolean = true
+  ) {
+    super(componentName, operation, message, recoverable);
     this.name = 'UIDialogError';
   }
 }

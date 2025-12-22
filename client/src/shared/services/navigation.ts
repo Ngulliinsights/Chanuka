@@ -18,7 +18,7 @@ interface NavigationState {
 
 interface NavigationOptions {
   replace?: boolean;
-  state?: any;
+  state?: Record<string, unknown>;
   preserveQuery?: boolean;
   preserveHash?: boolean;
 }
@@ -28,7 +28,7 @@ interface RouteDefinition {
   name: string;
   component?: string;
   title?: string;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
   children?: RouteDefinition[];
 }
 
@@ -55,7 +55,7 @@ class NavigationService {
 
     // Listen for browser navigation events
     window.addEventListener('popstate', this.handlePopState.bind(this));
-    
+
     // Listen for hash changes
     window.addEventListener('hashchange', this.handleHashChange.bind(this));
 
@@ -73,15 +73,15 @@ class NavigationService {
   navigate(path: string, options: NavigationOptions = {}): void {
     try {
       const previousPath = this.currentState.currentPath;
-      
+
       // Build the full URL
       let fullPath = path;
-      
+
       if (options.preserveQuery && Object.keys(this.currentState.query).length > 0) {
         const queryString = new URLSearchParams(this.currentState.query).toString();
         fullPath += (fullPath.includes('?') ? '&' : '?') + queryString;
       }
-      
+
       if (options.preserveHash && this.currentState.hash) {
         fullPath += this.currentState.hash;
       }
@@ -174,7 +174,7 @@ class NavigationService {
    */
   updateQuery(params: Record<string, string | null>, options: NavigationOptions = {}): void {
     const currentQuery = { ...this.currentState.query };
-    
+
     // Update or remove parameters
     Object.entries(params).forEach(([key, value]) => {
       if (value === null) {
@@ -186,7 +186,7 @@ class NavigationService {
 
     const queryString = new URLSearchParams(currentQuery).toString();
     const newPath = this.currentState.currentPath + (queryString ? `?${queryString}` : '');
-    
+
     this.navigate(newPath, { ...options, preserveHash: true });
   }
 
@@ -195,7 +195,7 @@ class NavigationService {
    */
   addListener(listener: NavigationListener): () => void {
     this.listeners.push(listener);
-    
+
     // Return unsubscribe function
     return () => {
       const index = this.listeners.indexOf(listener);
@@ -220,7 +220,7 @@ class NavigationService {
    */
   registerRoute(route: RouteDefinition): void {
     this.routes.set(route.path, route);
-    
+
     logger.debug('Route registered', {
       component: 'NavigationService',
       path: route.path,
@@ -247,7 +247,7 @@ class NavigationService {
    */
   navigateToRoute(routeName: string, params: Record<string, string> = {}, options: NavigationOptions = {}): void {
     const route = Array.from(this.routes.values()).find(r => r.name === routeName);
-    
+
     if (!route) {
       throw new Error(`Route not found: ${routeName}`);
     }
@@ -266,12 +266,12 @@ class NavigationService {
    */
   matchesPath(pattern: string): boolean {
     const currentPath = this.currentState.currentPath;
-    
+
     // Convert pattern to regex (simple implementation)
     const regexPattern = pattern
       .replace(/:[^/]+/g, '([^/]+)') // Replace :param with capture group
       .replace(/\*/g, '.*'); // Replace * with wildcard
-    
+
     const regex = new RegExp(`^${regexPattern}$`);
     return regex.test(currentPath);
   }
@@ -282,21 +282,21 @@ class NavigationService {
   extractParams(pattern: string): Record<string, string> {
     const currentPath = this.currentState.currentPath;
     const params: Record<string, string> = {};
-    
+
     const patternParts = pattern.split('/');
     const pathParts = currentPath.split('/');
-    
+
     if (patternParts.length !== pathParts.length) {
       return params;
     }
-    
+
     patternParts.forEach((part, index) => {
       if (part.startsWith(':')) {
         const paramName = part.slice(1);
         params[paramName] = pathParts[index];
       }
     });
-    
+
     return params;
   }
 
@@ -305,20 +305,20 @@ class NavigationService {
    */
   buildUrl(path: string, params?: Record<string, string>, query?: Record<string, string>): string {
     let url = path;
-    
+
     // Replace path parameters
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         url = url.replace(`:${key}`, encodeURIComponent(value));
       });
     }
-    
+
     // Add query parameters
     if (query && Object.keys(query).length > 0) {
       const queryString = new URLSearchParams(query).toString();
       url += (url.includes('?') ? '&' : '?') + queryString;
     }
-    
+
     return url;
   }
 
@@ -328,7 +328,7 @@ class NavigationService {
 
   private getCurrentNavigationState(): NavigationState {
     const url = new URL(window.location.href);
-    
+
     return {
       currentPath: url.pathname,
       previousPath: null,
@@ -341,9 +341,9 @@ class NavigationService {
   private updateNavigationState(previousPath: string): void {
     const newState = this.getCurrentNavigationState();
     newState.previousPath = previousPath;
-    
+
     this.currentState = newState;
-    
+
     // Notify listeners
     this.notifyListeners();
   }
@@ -364,7 +364,7 @@ class NavigationService {
   private handlePopState(event: PopStateEvent): void {
     const previousPath = this.currentState.currentPath;
     this.updateNavigationState(previousPath);
-    
+
     logger.debug('Browser navigation detected', {
       component: 'NavigationService',
       from: previousPath,
@@ -376,7 +376,7 @@ class NavigationService {
   private handleHashChange(event: HashChangeEvent): void {
     const previousPath = this.currentState.currentPath;
     this.updateNavigationState(previousPath);
-    
+
     logger.debug('Hash change detected', {
       component: 'NavigationService',
       oldHash: new URL(event.oldURL).hash,

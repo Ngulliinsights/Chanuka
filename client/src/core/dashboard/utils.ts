@@ -332,3 +332,6 @@ export function validateDashboardConfig(config: any): { valid: boolean; errors: 
   };
 }
 
+
+const defaultExport = {};
+export default defaultExport;

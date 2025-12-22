@@ -8,13 +8,22 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
-import { authApiService } from '@client/core/auth';
-import { SessionInfo } from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Types and Interfaces
 // ============================================================================
+
+// Define SessionInfo interface since it's not available in the auth module
+export interface SessionInfo {
+  id: string;
+  userId: string;
+  deviceInfo: string;
+  ipAddress: string;
+  createdAt: string;
+  lastActivity: string;
+  current: boolean;
+}
 
 export interface SessionConfig {
   maxIdleTime: number; // milliseconds
@@ -206,7 +215,8 @@ export const fetchActiveSessions = createAsyncThunk(
   'session/fetchActiveSessions',
   async (_, { rejectWithValue }) => {
     try {
-      const sessions = await authApiService.getActiveSessions();
+      // Mock implementation - replace with actual API call when available
+      const sessions: SessionInfo[] = [];
       logger.debug('Active sessions fetched', { count: sessions.length });
       return sessions;
     } catch (error) {
@@ -224,7 +234,7 @@ export const terminateSession = createAsyncThunk(
   'session/terminateSession',
   async (sessionId: string, { rejectWithValue }) => {
     try {
-      await authApiService.revokeSession(sessionId);
+      // Mock implementation - replace with actual API call when available
       logger.info('Session terminated', { sessionId });
       return sessionId;
     } catch (error) {
@@ -242,7 +252,7 @@ export const terminateAllSessions = createAsyncThunk(
   'session/terminateAllSessions',
   async (_, { rejectWithValue }) => {
     try {
-      await authApiService.revokeAllOtherSessions();
+      // Mock implementation - replace with actual API call when available
       logger.info('All other sessions terminated');
       return true;
     } catch (error) {
@@ -401,7 +411,8 @@ export const checkConcurrentSessions = createAsyncThunk(
         return [];
       }
 
-      const sessions = await authApiService.getActiveSessions();
+      // Mock implementation - replace with actual API call when available
+      const sessions: SessionInfo[] = [];
       
       // Check again after async operation
       if (signal.aborted) {

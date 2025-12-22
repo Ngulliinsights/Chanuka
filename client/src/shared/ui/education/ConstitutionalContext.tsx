@@ -7,16 +7,15 @@ import {
   AlertTriangle,
   CheckCircle,
   Info,
-  Gavel,
   FileText,
   Users
 } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 
 interface ConstitutionalProvision {
   id: string;
@@ -51,8 +50,6 @@ interface ConstitutionalContextProps {
  * Features: Article-by-article analysis, constitutional basis, conflict identification
  */
 export function ConstitutionalContext({ 
-  billId, 
-  billTitle, 
   provisions,
   className = ""
 }: ConstitutionalContextProps) {
@@ -161,7 +158,7 @@ export function ConstitutionalContext({
         <CardContent>
           <div className="flex flex-wrap gap-2">
             <Button
-              variant={selectedConstitutionalArticle === null ? "default" : "outline"}
+              variant={selectedConstitutionalArticle === null ? "primary" : "outline"}
               size="sm"
               onClick={() => setSelectedConstitutionalArticle(null)}
             >
@@ -170,7 +167,7 @@ export function ConstitutionalContext({
             {allConstitutionalArticles.map((article) => (
               <Button
                 key={article}
-                variant={selectedConstitutionalArticle === article ? "default" : "outline"}
+                variant={selectedConstitutionalArticle === article ? "primary" : "outline"}
                 size="sm"
                 onClick={() => setSelectedConstitutionalArticle(article)}
               >
@@ -202,7 +199,7 @@ export function ConstitutionalContext({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
-                        <Gavel className="h-4 w-4 text-purple-600" />
+                        <Scale className="h-4 w-4 text-purple-600" />
                         <div>
                           <CardTitle className="text-base">
                             Section {provision.sectionNumber}: {provision.title}
@@ -217,8 +214,10 @@ export function ConstitutionalContext({
                                 variant="outline" 
                                 className={`text-xs ${getImpactColor(cb.impact)}`}
                               >
-                                {getImpactIcon(cb.impact)}
-                                <span className="ml-1">{cb.article}</span>
+                                <span className="inline-flex items-center gap-1">
+                                  {getImpactIcon(cb.impact)}
+                                  <span>{cb.article}</span>
+                                </span>
                               </Badge>
                             ))}
                           </div>
@@ -257,7 +256,7 @@ export function ConstitutionalContext({
                             </div>
                             <h5 className="font-medium text-sm mb-1">{cb.title}</h5>
                             <p className="text-xs text-muted-foreground mb-2 font-mono leading-relaxed">
-                              "{cb.text}"
+                              &quot;{cb.text}&quot;
                             </p>
                             <p className="text-sm">{cb.explanation}</p>
                           </div>
@@ -329,7 +328,7 @@ export function ConstitutionalContext({
             </Button>
             <Button variant="outline" className="justify-start h-auto p-3">
               <div className="flex items-center gap-3">
-                <Gavel className="h-4 w-4" />
+                <Scale className="h-4 w-4" />
                 <div className="text-left">
                   <div className="font-medium">Constitutional Cases</div>
                   <div className="text-xs opacity-80">Explore relevant court decisions</div>

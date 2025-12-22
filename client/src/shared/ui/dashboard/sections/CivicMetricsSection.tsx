@@ -1,33 +1,35 @@
 /**
  * Civic Metrics Section Component
- * 
+ *
  * Displays personal civic engagement scoring, achievements, and impact comparisons.
  */
 
 import { format } from 'date-fns';
-import { 
-  TrendingUp, 
-  Award, 
-  Users, 
-  Target, 
+import {
+  TrendingUp,
+  Award,
+  Users,
+  Target,
   BarChart3,
   Trophy,
-  Medal,
   Star,
   ExternalLink,
   Info,
-  Calendar
+  Calendar,
 } from 'lucide-react';
-import React from 'react';
-
-import { CivicImpactMetrics } from '@client/types/user-dashboard';
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system/typography/Card.tsx';
+import { CivicImpactMetrics } from '@client/types/user-dashboard';
 
-
+import styles from './DashboardSections.module.css';
 
 interface CivicMetricsSectionProps {
   metrics: CivicImpactMetrics | undefined;
@@ -35,17 +37,38 @@ interface CivicMetricsSectionProps {
   compact?: boolean;
 }
 
-export function CivicMetricsSection({ 
-  metrics, 
-  loading = false, 
-  compact = false 
+export function CivicMetricsSection({
+  metrics,
+  loading = false,
+  compact = false,
 }: CivicMetricsSectionProps) {
+  const getScoreClass = (score: number) => {
+    if (score >= 80) return styles.scoreExcellent;
+    if (score >= 60) return styles.scoreGood;
+    if (score >= 40) return styles.scoreFair;
+    return styles.scorePoor;
+  };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'hsl(var(--civic-expert))';
-    if (score >= 60) return 'hsl(var(--civic-community))';
-    if (score >= 40) return 'hsl(var(--status-moderate))';
-    return 'hsl(var(--status-high))';
+  const getProgressClass = (score: number) => {
+    if (score >= 80) return styles.progressExcellent;
+    if (score >= 60) return styles.progressGood;
+    if (score >= 40) return styles.progressFair;
+    return styles.progressPoor;
+  };
+
+  const getAchievementClass = (category: string) => {
+    switch (category) {
+      case 'participation':
+        return styles.achievementEngagement;
+      case 'quality':
+        return styles.achievementExpertise;
+      case 'influence':
+        return styles.achievementImpact;
+      case 'consistency':
+        return styles.achievementParticipation;
+      default:
+        return styles.achievementEngagement;
+    }
   };
 
   const getScoreLabel = (score: number) => {
@@ -70,21 +93,6 @@ export function CivicMetricsSection({
     }
   };
 
-  const getAchievementColor = (category: string) => {
-    switch (category) {
-      case 'participation':
-        return 'hsl(var(--civic-community))';
-      case 'quality':
-        return 'hsl(var(--civic-expert))';
-      case 'influence':
-        return 'hsl(var(--civic-constitutional))';
-      case 'consistency':
-        return 'hsl(var(--civic-transparency))';
-      default:
-        return 'hsl(var(--civic-community))';
-    }
-  };
-
   if (loading) {
     return (
       <Card>
@@ -99,7 +107,7 @@ export function CivicMetricsSection({
             <div className="animate-pulse">
               <div className="h-8 bg-muted rounded w-1/3 mb-4"></div>
               <div className="space-y-2">
-                {[1, 2, 3, 4].map((i) => (
+                {[1, 2, 3, 4].map(i => (
                   <div key={i} className="flex items-center gap-3">
                     <div className="h-4 bg-muted rounded w-1/4"></div>
                     <div className="h-2 bg-muted rounded flex-1"></div>
@@ -146,10 +154,7 @@ export function CivicMetricsSection({
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
             Civic Impact
-            <Badge 
-              variant="outline"
-              style={{ borderColor: getScoreColor(metrics.personalScore) }}
-            >
+            <Badge variant="outline" className={getScoreClass(metrics.personalScore)}>
               {getScoreLabel(metrics.personalScore)}
             </Badge>
           </CardTitle>
@@ -164,23 +169,16 @@ export function CivicMetricsSection({
       <CardContent className="space-y-6">
         {/* Overall Score */}
         <div className="text-center">
-          <div 
-            className="text-4xl font-bold mb-2"
-            style={{ color: getScoreColor(metrics.personalScore) }}
-          >
+          <div className={`${styles.scoreDisplay} ${getScoreClass(metrics.personalScore)}`}>
             {metrics.personalScore}
           </div>
-          <p className="text-sm text-muted-foreground">
-            Your Civic Engagement Score
-          </p>
-          
+          <p className="text-sm text-muted-foreground">Your Civic Engagement Score</p>
+
           {/* Percentile comparison */}
           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
             <div className="flex items-center justify-between text-sm">
-              <span>You're in the top {100 - metrics.comparisons.percentile}%</span>
-              <span className="font-medium">
-                {metrics.comparisons.percentile}th percentile
-              </span>
+              <span>You&apos;re in the top {100 - metrics.comparisons.percentile}%</span>
+              <span className="font-medium">{metrics.comparisons.percentile}th percentile</span>
             </div>
             <div className="mt-2 text-xs text-muted-foreground">
               Average user score: {metrics.comparisons.averageUser}
@@ -191,20 +189,14 @@ export function CivicMetricsSection({
         {/* Score Breakdown */}
         <div className="space-y-4">
           <h4 className="font-medium text-sm">Score Breakdown</h4>
-          
+
           {Object.entries(metrics.scoreBreakdown).map(([category, score]) => (
             <div key={category} className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="capitalize font-medium">{category}</span>
                 <span className="font-mono">{score}</span>
               </div>
-              <Progress 
-                value={score} 
-                className="h-2"
-                style={{ 
-                  '--progress-background': getScoreColor(score)
-                } as React.CSSProperties}
-              />
+              <Progress value={score} className={`h-2 ${getProgressClass(score)}`} />
             </div>
           ))}
         </div>
@@ -216,25 +208,22 @@ export function CivicMetricsSection({
               <Trophy className="h-4 w-4" />
               Recent Achievements
             </h4>
-            
+
             <div className="space-y-3">
-              {metrics.achievements.slice(0, compact ? 2 : 5).map((achievement) => (
+              {metrics.achievements.slice(0, compact ? 2 : 5).map(achievement => (
                 <div
                   key={achievement.id}
                   className="flex items-start gap-3 p-3 rounded-lg bg-muted/30"
                 >
-                  <div 
-                    className="flex items-center justify-center w-8 h-8 rounded-full text-white"
-                    style={{ backgroundColor: getAchievementColor(achievement.category) }}
+                  <div
+                    className={`${styles.largeIconContainer} ${getAchievementClass(achievement.category)}`}
                   >
                     {getAchievementIcon(achievement.category)}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <h5 className="font-medium text-sm">{achievement.title}</h5>
-                    <p className="text-xs text-muted-foreground">
-                      {achievement.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="outline" className="text-xs">
                         {achievement.category}
@@ -257,9 +246,9 @@ export function CivicMetricsSection({
               <Calendar className="h-4 w-4" />
               Monthly Progress
             </h4>
-            
+
             <div className="space-y-3">
-              {metrics.monthlyTrend.slice(-3).map((month) => (
+              {metrics.monthlyTrend.slice(-3).map(month => (
                 <div key={month.month} className="flex items-center justify-between">
                   <div className="text-sm">
                     {format(new Date(month.month + '-01'), 'MMMM yyyy')}

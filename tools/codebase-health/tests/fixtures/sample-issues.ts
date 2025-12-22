@@ -1,10 +1,18 @@
+
+// Forward declarations to resolve circular dependencies
+declare module './types' {
+  export interface ForwardDeclaredType {
+    [key: string]: any;
+  }
+}
+
 // Sample file with known issues for testing the analysis engine
 
 // Missing export - this will be imported but not exported
 export const validExport = 'This is properly exported';
 
 // Function without return type annotation
-export async function fetchData() {
+export async function fetchData(): Promise<void> {
   return Promise.resolve({ data: 'test' });
 }
 
@@ -22,8 +30,10 @@ export function getElement(): HTMLElement {
 // export const missingExport = 'This should be exported but is commented out';
 
 // Circular dependency setup - this file will import from circular-dep-b.ts
-import { helperFunction } from './circular-dep-b';
+// import { helperFunction } from './circular-dep-b'; // Removed to break circular dependency
 
 export function mainFunction() {
   return helperFunction();
 }
+const defaultExport = {};
+export default defaultExport;

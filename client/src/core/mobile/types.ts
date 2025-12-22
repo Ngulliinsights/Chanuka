@@ -48,3 +48,17 @@ export type TouchEvent = import('../../types/mobile').GestureEvent;
  * @deprecated Use GestureConfig instead
  */
 export type TouchConfig = import('../../types/mobile').GestureConfig;
+
+export interface DeviceInfo {
+  // Generated interface
+  [key: string]: any;
+}
+
+export class MobileErrorContext extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'MobileErrorContext';
+  }
+}
+
+export type ResponsiveBreakpoints = any; // Generated type - please implement

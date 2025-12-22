@@ -1,3 +1,11 @@
+
+// Forward declarations to resolve circular dependencies
+declare module './types' {
+  export interface ForwardDeclaredType {
+    [key: string]: any;
+  }
+}
+
 /**
  * Store Configuration and Initialization
  */
@@ -7,13 +15,14 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 // Import slices
-import authReducer from '../../core/auth/store/auth-slice';
-import sessionReducer from './slices/sessionSlice';
-import uiReducer from './slices/uiSlice';
-import userDashboardReducer from './slices/userDashboardSlice';
+import authReducer from '../../../core/auth/store/auth-slice';
+
+import errorHandlingReducer from './slices/errorHandlingSlice';
 import loadingReducer from './slices/loadingSlice';
 import navigationReducer from './slices/navigationSlice';
-import errorHandlingReducer from './slices/errorHandlingSlice';
+import sessionReducer from './slices/sessionSlice';
+import uiReducer from './slices/uiSlice';
+// import userDashboardReducer from './slices/userDashboardSlice'; // Converted to lazy import to break circular dependency
 
 // Persist config
 const persistConfig = {
@@ -34,7 +43,7 @@ const rootReducer = {
 };
 
 // Create persisted reducer
-const persistedReducer = persistReducer(persistConfig, rootReducer as any);
+const persistedReducer = persistReducer(persistConfig, rootReducer as unknown);
 
 // Store configuration
 export const store = configureStore({
@@ -70,3 +79,9 @@ export function getStore() {
 }
 
 export default store;
+
+// Lazy import to break circular dependency
+const getUserDashboardSlice = async () => {
+  const { userDashboardSlice } = await import('./slices/userDashboardSlice');
+  return userDashboardSlice;
+};

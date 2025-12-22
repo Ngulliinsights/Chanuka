@@ -10,6 +10,13 @@ import { logger } from '../../client/src/types/core';
 // TYPE DEFINITIONS
 // ============================================================================
 
+
+// Common type imports for better type safety
+type AsyncFunction<T = void> = (...args: any[]) => Promise<T>;
+type SafeAny = unknown;
+type DatabaseConnection = any; // TODO: Replace with actual DB connection type
+type LoggerInstance = any; // TODO: Replace with actual logger type
+
 /**
  * Complete type-safe schema definition providing compile-time validation
  * for all database operations throughout the application.
@@ -78,7 +85,7 @@ export interface PoolCollection {
  */
 interface QueryExecutionOptions {
   text: string;
-  params?: any[] | Record<string, any>;
+  params?: unknown[] | Record<string, any>;
   pool?: EnhancedPool;
   context?: string;
 }
@@ -446,13 +453,13 @@ const setupPool = (is_readOnly = false, name = is_readOnly ? 'read' : 'write'): 
 
   // Handle pool-level errors with contextual logging
   newPool.on('error', (err: Error) => {
-    const pgError = err as any;
+    const pgError = err as unknown;
     logger.error(`Pool error in ${name}`, {
       error: err.message,
       detail: pgError.detail,
       code: pgError.code,
-      poolSize: (newPool as any).totalCount || 0,
-      waiting: (newPool as any).waitingCount || 0,
+      poolSize: (newPool as unknown).totalCount || 0,
+      waiting: (newPool as unknown).waitingCount || 0,
       circuitBreakerState: circuitBreaker.getState(),
       component: 'DatabasePool',
     });
@@ -494,7 +501,7 @@ const setupPool = (is_readOnly = false, name = is_readOnly ? 'read' : 'write'): 
 
   // Attach enhanced methods to pool instance
   newPool.getMetrics = () =>
-    metricsTracker.getMetrics((newPool as any).totalCount || 0, (newPool as any).waitingCount || 0);
+    metricsTracker.getMetrics((newPool as unknown).totalCount || 0, (newPool as unknown).waitingCount || 0);
   newPool.resetMetrics = () => metricsTracker.reset();
   newPool.trackQuery = (queryDuration: number) => metricsTracker.trackQuery(queryDuration);
   newPool.circuitBreaker = circuitBreaker;
@@ -515,13 +522,13 @@ export const rawWritePool = setupPool(false, 'write');
 export const pool = rawGeneralPool;
 
 // Create type-safe Drizzle ORM instances for each pool
-export const db = drizzle<FullDatabaseSchema>(rawGeneralPool as any, { 
+export const db = drizzle<FullDatabaseSchema>(rawGeneralPool as unknown, { 
   schema: validateSchemaType(schema) 
 });
-export const readDb = drizzle<FullDatabaseSchema>(rawReadPool as any, { 
+export const readDb = drizzle<FullDatabaseSchema>(rawReadPool as unknown, { 
   schema: validateSchemaType(schema) 
 });
-export const writeDb = drizzle<FullDatabaseSchema>(rawWritePool as any, { 
+export const writeDb = drizzle<FullDatabaseSchema>(rawWritePool as unknown, { 
   schema: validateSchemaType(schema) 
 });
 
@@ -563,7 +570,7 @@ async function retryWithBackoff<T>(
       }
 
       // Skip retry for permanent errors like constraint violations
-      const pgError = error as any;
+      const pgError = error as unknown;
       if (pgError.code && NON_RETRYABLE_ERROR_CODES.has(pgError.code)) {
         throw error;
       }
@@ -663,7 +670,7 @@ export const executeQuery = async <T extends pg.QueryResultRow = any>(
   } catch (error: unknown) {
     const duration = Date.now() - start;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const pgError = error as any;
+    const pgError = error as unknown;
 
     logger.error('Query execution failed', {
       error: errorMessage,
@@ -703,9 +710,9 @@ export const checkPoolHealth = async (
   poolName: string
 ): Promise<PoolHealthStatus> => {
   try {
-    const maxConnections = (pool as any).options?.max || CONFIG.DEFAULT_MAX_POOL_SIZE;
-    const totalConnections = (pool as any).totalCount || 0;
-    const waitingClients = (pool as any).waitingCount || 0;
+    const maxConnections = (pool as unknown).options?.max || CONFIG.DEFAULT_MAX_POOL_SIZE;
+    const totalConnections = (pool as unknown).totalCount || 0;
+    const waitingClients = (pool as unknown).waitingCount || 0;
     const utilizationPercentage = maxConnections > 0 
       ? (totalConnections / maxConnections) * 100 
       : 0;

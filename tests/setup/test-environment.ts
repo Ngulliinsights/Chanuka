@@ -36,7 +36,7 @@ global.WebSocket = vi.fn().mockImplementation(() => ({
   OPEN: 1,
   CLOSING: 2,
   CLOSED: 3,
-})) as any;
+})) as unknown;
 
 // Add WebSocket constants
 Object.defineProperty(global.WebSocket, 'CONNECTING', { value: 0 });
@@ -58,7 +58,7 @@ if (!global.crypto) {
       }
       return array;
     }),
-  } as any;
+  } as unknown;
 }
 
 // Mock BroadcastChannel
@@ -91,7 +91,7 @@ beforeAll(() => {
   console.log = vi.fn();
   
   // Store originals for restoration if needed
-  (global as any).originalConsole = {
+  (global as unknown).originalConsole = {
     error: originalConsoleError,
     warn: originalConsoleWarn,
     log: originalConsoleLog,
@@ -100,10 +100,10 @@ beforeAll(() => {
 
 afterAll(() => {
   // Restore console methods
-  if ((global as any).originalConsole) {
-    console.error = (global as any).originalConsole.error;
-    console.warn = (global as any).originalConsole.warn;
-    console.log = (global as any).originalConsole.log;
+  if ((global as unknown).originalConsole) {
+    console.error = (global as unknown).originalConsole.error;
+    console.warn = (global as unknown).originalConsole.warn;
+    console.log = (global as unknown).originalConsole.log;
   }
 });
 
@@ -128,11 +128,11 @@ afterEach(() => {
 declare global {
   var testUtils: {
     nextTick: () => Promise<void>;
-    mockApiResponse: (data: any, options?: { delay?: number; error?: Error }) => Promise<any>;
+    mockApiResponse: (data: any, options?: { delay?: number; error?: Error }) => Promise<unknown>;
     mockQueryResponse: (data: any, options?: { isLoading?: boolean; error?: Error }) => any;
     mockMutationResponse: (options?: { isLoading?: boolean; error?: Error; data?: any }) => any;
-    createMockUser: (overrides?: any) => any;
-    createMockBill: (overrides?: any) => any;
+    createMockUser: (overrides?: unknown) => any;
+    createMockBill: (overrides?: unknown) => any;
     redis: {
       createMock: () => any;
       resetMocks: () => void;

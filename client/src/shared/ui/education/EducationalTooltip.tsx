@@ -1,18 +1,21 @@
-import { 
-  HelpCircle, 
-  Info, 
-  BookOpen, 
-  Scale, 
-  Users, 
+import {
+  HelpCircle,
+  Info,
+  BookOpen,
+  Scale,
+  Users,
   Clock,
-  AlertTriangle,
   CheckCircle,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/shared/design-system/feedback/Tooltip.tsx';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@client/shared/design-system/feedback/Tooltip.tsx';
 
 interface EducationalTooltipProps {
   term: string;
@@ -39,26 +42,35 @@ export function EducationalTooltip({
   learnMoreUrl,
   children,
   side = 'top',
-  className = ""
+  className = '',
 }: EducationalTooltipProps) {
-  
   const getContextIcon = (context: string) => {
     switch (context) {
-      case 'legal': return <Scale className="h-3 w-3 text-purple-600" />;
-      case 'procedural': return <Clock className="h-3 w-3 text-blue-600" />;
-      case 'constitutional': return <BookOpen className="h-3 w-3 text-indigo-600" />;
-      case 'civic': return <Users className="h-3 w-3 text-green-600" />;
-      default: return <Info className="h-3 w-3 text-gray-600" />;
+      case 'legal':
+        return <Scale className="h-3 w-3 text-purple-600" />;
+      case 'procedural':
+        return <Clock className="h-3 w-3 text-blue-600" />;
+      case 'constitutional':
+        return <BookOpen className="h-3 w-3 text-indigo-600" />;
+      case 'civic':
+        return <Users className="h-3 w-3 text-green-600" />;
+      default:
+        return <Info className="h-3 w-3 text-gray-600" />;
     }
   };
 
   const getContextColor = (context: string) => {
     switch (context) {
-      case 'legal': return 'text-purple-600 bg-purple-50 border-purple-200';
-      case 'procedural': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'constitutional': return 'text-indigo-600 bg-indigo-50 border-indigo-200';
-      case 'civic': return 'text-green-600 bg-green-50 border-green-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'legal':
+        return 'text-purple-600 bg-purple-50 border-purple-200';
+      case 'procedural':
+        return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'constitutional':
+        return 'text-indigo-600 bg-indigo-50 border-indigo-200';
+      case 'civic':
+        return 'text-green-600 bg-green-50 border-green-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
@@ -71,8 +83,9 @@ export function EducationalTooltip({
             <HelpCircle className="h-3 w-3 text-muted-foreground hover:text-foreground transition-colors" />
           </span>
         </TooltipTrigger>
-        <TooltipContent side={side} className="max-w-sm p-0">
-          <div className="p-4 space-y-3">
+        <TooltipContent side={side}>
+          <div className="max-w-sm p-0">
+            <div className="p-4 space-y-3">
             {/* Header */}
             <div className="flex items-center gap-2">
               {getContextIcon(context)}
@@ -96,7 +109,10 @@ export function EducationalTooltip({
                 </h5>
                 <ul className="space-y-1">
                   {examples.map((example, index) => (
-                    <li key={index} className="text-xs text-muted-foreground flex items-start gap-1">
+                    <li
+                      key={index}
+                      className="text-xs text-muted-foreground flex items-start gap-1"
+                    >
                       <span className="w-1 h-1 rounded-full bg-muted-foreground mt-1.5 flex-shrink-0"></span>
                       {example}
                     </li>
@@ -122,7 +138,7 @@ export function EducationalTooltip({
             {/* Learn More */}
             {learnMoreUrl && (
               <div className="pt-2 border-t">
-                <a 
+                <a
                   href={learnMoreUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -134,6 +150,7 @@ export function EducationalTooltip({
               </div>
             )}
           </div>
+          </div>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -141,75 +158,71 @@ export function EducationalTooltip({
 }
 
 // Predefined educational tooltips for common terms
-export const LegalTermTooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => (
+interface TooltipComponentProps {
+  children: React.ReactNode;
+}
+
+export const LegalTermTooltip = ({ children }: TooltipComponentProps) => (
   <EducationalTooltip
     term="Legal Precedent"
     definition="A legal decision or principle established in a previous case that is either binding or persuasive for future similar cases."
     context="legal"
     examples={[
-      "Supreme Court rulings that establish constitutional interpretations",
-      "High Court decisions that guide lower court judgments"
+      'Supreme Court rulings that establish constitutional interpretations',
+      'High Court decisions that guide lower court judgments',
     ]}
-    relatedTerms={["Case Law", "Stare Decisis", "Judicial Review"]}
+    relatedTerms={['Case Law', 'Stare Decisis', 'Judicial Review']}
     learnMoreUrl="https://example.com/legal-precedents"
   >
     {children}
   </EducationalTooltip>
 );
 
-function 1(
-
-export const ConstitutionalTermTooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => (
+export const ConstitutionalTermTooltip = ({ children }: TooltipComponentProps) => (
   <EducationalTooltip
     term="Constitutional Review"
     definition="The process of examining whether laws, policies, or government actions comply with the constitution."
     context="constitutional"
     examples={[
-      "Judicial review of new legislation",
-      "Constitutional court challenges to government policies"
+      'Judicial review of new legislation',
+      'Constitutional court challenges to government policies',
     ]}
-    relatedTerms={["Judicial Review", "Constitutional Court", "Bill of Rights"]}
+    relatedTerms={['Judicial Review', 'Constitutional Court', 'Bill of Rights']}
     learnMoreUrl="https://example.com/constitutional-review"
   >
     {children}
   </EducationalTooltip>
 );
 
-function 1(
-
-export const ProceduralTermTooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => (
+export const ProceduralTermTooltip = ({ children }: TooltipComponentProps) => (
   <EducationalTooltip
     term="Committee Stage"
     definition="The phase where a parliamentary committee examines a bill in detail, hears evidence, and may propose amendments."
     context="procedural"
     examples={[
-      "Health Committee reviewing healthcare legislation",
-      "Finance Committee examining budget bills"
+      'Health Committee reviewing healthcare legislation',
+      'Finance Committee examining budget bills',
     ]}
-    relatedTerms={["Parliamentary Procedure", "Bill Reading", "Amendment Process"]}
+    relatedTerms={['Parliamentary Procedure', 'Bill Reading', 'Amendment Process']}
     learnMoreUrl="https://example.com/committee-stage"
   >
     {children}
   </EducationalTooltip>
 );
 
-function 1(
-
-export const CivicTermTooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => (
+export const CivicTermTooltip = ({ children }: TooltipComponentProps) => (
   <EducationalTooltip
     term="Public Participation"
     definition="The process by which citizens can engage with and influence government decision-making and policy development."
     context="civic"
     examples={[
-      "Public comment periods on proposed regulations",
-      "Town halls and community consultations",
-      "Citizen advisory committees"
+      'Public comment periods on proposed regulations',
+      'Town halls and community consultations',
+      'Citizen advisory committees',
     ]}
-    relatedTerms={["Civic Engagement", "Democratic Participation", "Public Consultation"]}
+    relatedTerms={['Civic Engagement', 'Democratic Participation', 'Public Consultation']}
     learnMoreUrl="https://example.com/public-participation"
   >
     {children}
   </EducationalTooltip>
 );
-
-function 1(

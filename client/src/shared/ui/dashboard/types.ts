@@ -14,7 +14,7 @@ export interface WidgetConfig {
   description?: string;
   position: WidgetPosition;
   size: WidgetSize;
-  settings: Record<string, any>;
+  settings: Record<string, unknown>;
   dataSource?: string;
   refreshInterval?: number;
   permissions?: string[];
@@ -152,7 +152,7 @@ export interface DashboardTemplate {
 
 export interface WidgetData {
   widgetId: string;
-  data: any;
+  data: unknown;
   timestamp: Date;
   cacheKey?: string;
   expiresAt?: Date;
@@ -163,7 +163,7 @@ export interface DashboardFilter {
   id: string;
   type: 'date' | 'category' | 'status' | 'custom';
   label: string;
-  value: any;
+  value: unknown;
   options?: FilterOption[];
   multiple: boolean;
   required: boolean;
@@ -171,7 +171,7 @@ export interface DashboardFilter {
 
 export interface FilterOption {
   label: string;
-  value: any;
+  value: unknown;
   count?: number;
 }
 
@@ -182,7 +182,7 @@ export interface DashboardActionType {
   icon?: string;
   permissions?: string[];
   handler: string;
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -199,7 +199,7 @@ export interface AppWidgetConfig {
   title: string;
   size: WidgetSizeType;
   position: { x: number; y: number };
-  props: Record<string, any>;
+  props: Record<string, unknown>;
   permissions?: string[];
   refreshInterval?: number;
   dataSource?: string;
@@ -216,6 +216,7 @@ export interface AppDashboardLayout {
 export interface DashboardConfig {
   id: string;
   name: string;
+  title?: string;
   description?: string;
   layout: AppDashboardLayout;
   permissions: PermissionConfig;
@@ -226,6 +227,20 @@ export interface DashboardConfig {
   maxTrackedTopics?: number;
   enableAutoRefresh?: boolean;
   showCompletedActions?: boolean;
+  // Navigation configuration
+  navigation?: {
+    breadcrumbs?: {
+      enabled: boolean;
+      separator?: string;
+    };
+    pageControls?: {
+      enabled: boolean;
+    };
+  };
+  // Theme configuration
+  theme?: {
+    colorScheme: 'light' | 'dark' | 'auto';
+  };
 }
 
 export interface PermissionConfig {
@@ -247,7 +262,7 @@ export interface AppDashboardState {
   config: DashboardConfig | null;
   loading: boolean;
   error: Error | null;
-  widgetData: Record<string, any>;
+  widgetData: Record<string, unknown>;
   widgetLoading: Record<string, boolean>;
   widgetErrors: Record<string, Error>;
 }
@@ -324,7 +339,7 @@ export interface ChartData {
 
 export interface WidgetProps {
   config: AppWidgetConfig;
-  data?: any;
+  data?: unknown;
   loading?: boolean;
   error?: Error | null;
   onRefresh?: () => void;
@@ -337,7 +352,7 @@ export type DashboardAction =
   | { type: 'SET_CONFIG'; payload: DashboardConfig }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: Error | null }
-  | { type: 'SET_WIDGET_DATA'; payload: { widgetId: string; data: any } }
+  | { type: 'SET_WIDGET_DATA'; payload: { widgetId: string; data: unknown } }
   | { type: 'SET_WIDGET_LOADING'; payload: { widgetId: string; loading: boolean } }
   | { type: 'SET_WIDGET_ERROR'; payload: { widgetId: string; error: Error | null } }
   | { type: 'UPDATE_WIDGET_CONFIG'; payload: { widgetId: string; config: Partial<AppWidgetConfig> } }
@@ -352,9 +367,9 @@ export type DashboardAction =
 
 export interface DashboardComponentProps {
   className?: string;
-  config?: any;
+  config?: unknown;
   onError?: (error: Error) => void;
-  onDataChange?: (data: any) => void;
+  onDataChange?: (data: unknown) => void;
 }
 
 // ============================================================================
@@ -444,4 +459,30 @@ export interface DashboardSectionConfig {
   widgets: AppWidgetConfig[];
   visible?: boolean;
   order?: number;
+}
+export interface DashboardFrameworkProps {
+  // Generated interface
+  [key: string]: any;
+}
+
+export interface DashboardLayoutConfig {
+  // Generated interface
+  [key: string]: any;
+}
+
+export interface DashboardThemeConfig {
+  // Generated interface
+  [key: string]: any;
+}
+
+export interface DashboardAccessibilityConfig {
+  // Generated interface
+  [key: string]: any;
+}
+
+export class ErrorInfo extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ErrorInfo';
+  }
 }

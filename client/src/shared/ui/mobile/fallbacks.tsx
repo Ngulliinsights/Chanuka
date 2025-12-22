@@ -7,6 +7,13 @@
 
 import React from 'react';
 
+import type { MobileTab, ChartData } from './constants';
+
+// Re-export hooks from separate files
+export { useBottomSheet } from './hooks/useBottomSheet';
+export { useInfiniteScroll } from './hooks/useInfiniteScroll';
+export { useMobileTabs } from './hooks/useMobileTabs';
+
 // Layout fallbacks
 export const MobileLayout = ({
   children,
@@ -64,12 +71,7 @@ export const MobileGrid = ({
 );
 
 // Interaction fallbacks
-export const useBottomSheet = () => ({
-  isOpen: false,
-  open: () => {},
-  close: () => {},
-});
-
+// Interaction fallbacks
 export const InfiniteScroll = ({
   children,
   ...props
@@ -81,12 +83,6 @@ export const InfiniteScroll = ({
     {children}
   </div>
 );
-
-export const useInfiniteScroll = () => ({
-  hasNextPage: false,
-  fetchNextPage: () => {},
-  isFetchingNextPage: false,
-});
 
 export const MobileTabSelector = ({
   _tabs,
@@ -104,11 +100,7 @@ export const MobileTabSelector = ({
   </div>
 );
 
-export const useMobileTabs = (_tabs: unknown[]) => ({
-  activeTab: '',
-  setActiveTab: () => {},
-});
-
+// Data display fallbacks
 // Data display fallbacks
 export const MobileMetricCard = ({
   title,
@@ -151,5 +143,4 @@ export const SwipeGestures = ({
 );
 
 // Type definitions for fallbacks
-export type MobileTab = { id: string; label: string; icon?: React.ReactNode; badge?: string };
-export type ChartData = Record<string, string | number>;
+export type { MobileTab, ChartData } from './constants';

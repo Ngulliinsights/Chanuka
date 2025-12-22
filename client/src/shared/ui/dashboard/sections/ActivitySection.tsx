@@ -3,11 +3,9 @@ import {
   Activity,
   Eye,
   MessageSquare,
-  Bookmark,
-  Vote
+  Vote,
+  Star
 } from 'lucide-react';
-import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
@@ -101,7 +99,7 @@ function getActivityIcon(actionType: string) {
   const iconMap = {
     view: <Eye className="h-4 w-4 text-blue-500" />,
     comment: <MessageSquare className="h-4 w-4 text-green-500" />,
-    save: <Bookmark className="h-4 w-4 text-yellow-500" />,
+    save: <Star className="h-4 w-4 text-yellow-500" />,
     vote: <Vote className="h-4 w-4 text-red-500" />
   };
   return iconMap[actionType as keyof typeof iconMap] || <Activity className="h-4 w-4 text-gray-500" />;

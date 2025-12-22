@@ -9,41 +9,38 @@ export interface TooltipProps {
   delayDuration?: number;
 }
 
-export const TooltipProvider = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
+export const TooltipProvider = React.memo<{ children: React.ReactNode }>(({ children }) => {
   return (
     <TooltipPrimitive.Provider delayDuration={200}>
       {children}
     </TooltipPrimitive.Provider>
   );
-);
+});
 
-function 1(
-};
+TooltipProvider.displayName = 'TooltipProvider';
 
-export const Tooltip = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
+export const Tooltip = React.memo<{ children: React.ReactNode }>(({ children }) => {
   return <TooltipPrimitive.Root>{children}</TooltipPrimitive.Root>;
-);
+});
 
-function 1(
-};
+Tooltip.displayName = 'Tooltip';
 
-export const TooltipTrigger = React.memo(<{ children: React.ReactNode; asChild?: boolean }> = ({ children, asChild = false }) => {
+export const TooltipTrigger = React.memo<{ children: React.ReactNode; asChild?: boolean }>(({ children, asChild = false }) => {
   return (
     <TooltipPrimitive.Trigger asChild={asChild}>
       {children}
     </TooltipPrimitive.Trigger>
   );
-);
+});
 
-function 1(
-};
+TooltipTrigger.displayName = 'TooltipTrigger';
 
-export const TooltipContent = React.memo(<{
+export const TooltipContent = React.memo<{
   children: React.ReactNode;
   side?: 'top' | 'right' | 'bottom' | 'left';
   align?: 'start' | 'center' | 'end';
   hidden?: boolean;
-}> = ({ children, side = 'top', align = 'center', hidden = false }) => {
+}>(({ children, side = 'top', align = 'center', hidden = false }) => {
   if (hidden) return null;
 
   return (
@@ -56,7 +53,6 @@ export const TooltipContent = React.memo(<{
       <TooltipPrimitive.Arrow className="fill-[hsl(var(--color-card))]" />
     </TooltipPrimitive.Content>
   );
-);
+});
 
-function 1(
-};
+TooltipContent.displayName = 'TooltipContent';

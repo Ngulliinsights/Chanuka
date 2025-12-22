@@ -10,7 +10,11 @@ export type {
   LoadingState,
   LoadingProps,
   LoadingConfig,
-} from '../types';
+  LoadingOperation,
+  LoadingPriority,
+  LoadingStats,
+  LoadingProgress,
+} from './types';
 
 // Export core hooks only
 export {

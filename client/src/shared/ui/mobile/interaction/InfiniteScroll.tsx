@@ -22,7 +22,9 @@
  */
 
 import React from 'react';
+
 import type { InfiniteScrollConfig } from '@client/types/mobile';
+import { INFINITE_SCROLL_DEFAULTS } from '../constants';
 
 interface InfiniteScrollProps extends InfiniteScrollConfig {
   children: React.ReactNode;
@@ -46,18 +48,5 @@ export const InfiniteScroll = React.forwardRef<HTMLDivElement, InfiniteScrollPro
 );
 
 InfiniteScroll.displayName = 'InfiniteScroll';
-
-/**
- * Hook for managing infinite scroll state
- * Extract this to hooks/mobile/useInfiniteScroll.ts
- */
-export function useInfiniteScroll() {
-  // Hook implementation will be added here
-  return {
-    isLoading: false,
-    hasMore: true,
-    onLoadMore: async () => {},
-  };
-}
 
 export default InfiniteScroll;

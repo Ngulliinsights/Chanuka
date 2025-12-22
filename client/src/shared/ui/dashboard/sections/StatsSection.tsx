@@ -1,10 +1,8 @@
 import {
-  Bookmark,
   TrendingUp,
   MessageSquare,
   Award
 } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
@@ -13,11 +11,10 @@ import { UserDashboardData } from '@client/types/user-dashboard';
 interface StatsSectionProps {
   stats: UserDashboardData['stats'] | undefined;
   civicMetrics?: UserDashboardData['civicMetrics'];
-  loading?: boolean;
   variant?: 'full' | 'compact';
 }
 
-export function StatsSection({ stats, civicMetrics, loading, variant = 'full' }: StatsSectionProps) {
+export function StatsSection({ stats, civicMetrics, variant = 'full' }: StatsSectionProps) {
   if (variant === 'compact') {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -28,7 +25,7 @@ export function StatsSection({ stats, civicMetrics, loading, variant = 'full' }:
                 <p className="text-sm font-medium text-muted-foreground">Bills Tracked</p>
                 <p className="text-2xl font-bold">{stats?.totalBillsTracked || 0}</p>
               </div>
-              <Bookmark className="h-8 w-8 text-blue-500" />
+              <TrendingUp className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
@@ -85,7 +82,7 @@ export function StatsSection({ stats, civicMetrics, loading, variant = 'full' }:
                 {civicMetrics?.scoreBreakdown?.influence || 0}% influence score
               </p>
             </div>
-            <Bookmark className="h-8 w-8 text-blue-500" />
+            <TrendingUp className="h-8 w-8 text-blue-500" />
           </div>
         </CardContent>
       </Card>

@@ -3,11 +3,11 @@
  * Specialized hook for action items functionality
  */
 
-import type { ActionItem, ActionPriority } from '@client/types';
 import { useState, useCallback } from 'react';
 
 import { DashboardActionError } from '@client/core/error';
-import { validateActionItem } from '@client/validation';
+import { validateActionItem } from '@client/core/validation';
+import type { ActionItem, ActionPriority } from '@client/shared/types';
 
 export interface UseDashboardActionsResult {
   actions: ActionItem[];
@@ -36,7 +36,7 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
 
     try {
       const newAction: ActionItem = {
-        id: `action-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `action-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         title: actionData.title,
         description: actionData.description,
         priority: actionData.priority,
@@ -54,8 +54,8 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       await new Promise(resolve => setTimeout(resolve, 500));
 
       setActions(prev => [...prev, newAction]);
-    } catch (actionError: any) {
-      const error = new DashboardActionError('add', actionError?.message || 'Add action failed');
+    } catch (actionError: unknown) {
+      const error = new DashboardActionError('add', actionError instanceof Error ? actionError.message : 'Add action failed');
       setError(error);
       throw error;
     } finally {
@@ -77,7 +77,7 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       if (!existingAction) {
         throw new Error(`Action with ID ${actionId} not found`);
       }
-      
+
       const updatedAction: ActionItem = {
         id: existingAction.id,
         title: updates.title ?? existingAction.title,
@@ -96,11 +96,11 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       // TODO: Replace with actual API call
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      setActions(prev => prev.map(action => 
+      setActions(prev => prev.map(action =>
         action.id === actionId ? updatedAction : action
       ));
-    } catch (actionError: any) {
-      const error = new DashboardActionError('update', actionError?.message || 'Update action failed', { actionId });
+    } catch (actionError: unknown) {
+      const error = new DashboardActionError('update', actionError instanceof Error ? actionError.message : 'Update action failed', { actionId });
       setError(error);
       throw error;
     } finally {
@@ -111,8 +111,8 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
   const completeAction = useCallback(async (actionId: string) => {
     try {
       await updateAction(actionId, { completed: true });
-    } catch (actionError: any) {
-      const error = new DashboardActionError('complete', actionError?.message || 'Complete action failed', { actionId });
+    } catch (actionError: unknown) {
+      const error = new DashboardActionError('complete', actionError instanceof Error ? actionError.message : 'Complete action failed', { actionId });
       setError(error);
       throw error;
     }
@@ -132,8 +132,8 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       await new Promise(resolve => setTimeout(resolve, 300));
 
       setActions(prev => prev.filter(action => action.id !== actionId));
-    } catch (actionError: any) {
-      const error = new DashboardActionError('delete', actionError?.message || 'Delete action failed', { actionId });
+    } catch (actionError: unknown) {
+      const error = new DashboardActionError('delete', actionError instanceof Error ? actionError.message : 'Delete action failed', { actionId });
       setError(error);
       throw error;
     } finally {
@@ -159,7 +159,7 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
   }, [actions]);
 
   const sortByPriority = useCallback((): ActionItem[] => {
-    const priorityOrder = { 'High': 0, 'Medium': 1, 'Low': 2 };
+    const priorityOrder: Record<ActionPriority, number> = { 'High': 0, 'Medium': 1, 'Low': 2 };
     return [...actions].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
   }, [actions]);
 

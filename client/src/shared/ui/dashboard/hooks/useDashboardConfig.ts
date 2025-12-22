@@ -3,11 +3,11 @@
  * Handles dashboard settings and preferences
  */
 
-import type { DashboardConfig, DashboardSection } from '@client/types';
 import { useState, useCallback, useEffect } from 'react';
 
 import { DashboardConfigurationError } from '@client/core/error';
-import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/validation';
+import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/core/validation';
+import type { DashboardConfig, DashboardSection } from '@client/shared/types';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds
@@ -80,9 +80,9 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
       await new Promise(resolve => setTimeout(resolve, 200));
 
       setConfig(newConfig);
-    } catch (configError: any) {
+    } catch (configError: unknown) {
       const error = new DashboardConfigurationError(
-        `Failed to update configuration: ${configError?.message || 'Update failed'}`,
+        `Failed to update configuration: ${configError instanceof Error ? configError.message : 'Update failed'}`,
         { updates, originalConfig: config }
       );
       setError(error);
@@ -108,9 +108,9 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
       } catch (error) {
         console.warn('Failed to clear dashboard config from localStorage:', error);
       }
-    } catch (configError: any) {
+    } catch (configError: unknown) {
       const error = new DashboardConfigurationError(
-        `Failed to reset configuration: ${configError?.message || 'Reset failed'}`
+        `Failed to reset configuration: ${configError instanceof Error ? configError.message : 'Reset failed'}`
       );
       setError(error);
       throw error;
@@ -155,9 +155,9 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
       await new Promise(resolve => setTimeout(resolve, 300));
 
       setConfig(importedConfig);
-    } catch (configError: any) {
+    } catch (configError: unknown) {
       const error = new DashboardConfigurationError(
-        `Failed to import configuration: ${configError?.message || 'Import failed'}`,
+        `Failed to import configuration: ${configError instanceof Error ? configError.message : 'Import failed'}`,
         { configJson }
       );
       setError(error);

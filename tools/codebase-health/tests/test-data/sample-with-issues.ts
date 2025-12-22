@@ -4,7 +4,7 @@ import { WrongImportName } from './correct-file'; // Incorrect import name
 import * as fs from 'fs';
 
 // Missing return type for async function
-export async function fetchData(url: string) {
+export async function fetchData(url: string): Promise<void> {
   const response = await fetch(url);
   return response.json();
 }
@@ -26,3 +26,4 @@ export function calculateSum(a: number, b: number) {
 
 // Circular dependency example (would import from file that imports this)
 export { CircularDependency } from './circular-import-file';
+export type WrongImportName = any; // Generated type - please implement

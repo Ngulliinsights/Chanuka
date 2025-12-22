@@ -1,0 +1,80 @@
+/* Dashboard Stats Component Styles */
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.statValue[data-color="hsl(var(--civic-constitutional))"] {
+  color: hsl(var(--civic-constitutional));
+}
+
+.statValue[data-color="hsl(var(--civic-expert))"] {
+  color: hsl(var(--civic-expert));
+}
+
+.statValue[data-color="hsl(var(--civic-community))"] {
+  color: hsl(var(--civic-community));
+}
+
+.statValue[data-color="hsl(var(--civic-transparency))"] {
+  color: hsl(var(--civic-transparency));
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.iconContainer[data-bg-color="hsl(var(--civic-constitutional))"] {
+  background-color: hsl(var(--civic-constitutional) / 0.2);
+}
+
+.iconContainer[data-bg-color="hsl(var(--civic-expert))"] {
+  background-color: hsl(var(--civic-expert) / 0.2);
+}
+
+.iconContainer[data-bg-color="hsl(var(--civic-community))"] {
+  background-color: hsl(var(--civic-community) / 0.2);
+}
+
+.iconContainer[data-bg-color="hsl(var(--civic-transparency))"] {
+  background-color: hsl(var(--civic-transparency) / 0.2);
+}
+
+.icon[data-color="hsl(var(--civic-constitutional))"] {
+  color: hsl(var(--civic-constitutional));
+}
+
+.icon[data-color="hsl(var(--civic-expert))"] {
+  color: hsl(var(--civic-expert));
+}
+
+.icon[data-color="hsl(var(--civic-community))"] {
+  color: hsl(var(--civic-community));
+}
+
+.icon[data-color="hsl(var(--civic-transparency))"] {
+  color: hsl(var(--civic-transparency));
+}
+
+.badge[data-border-color="hsl(var(--civic-constitutional))"] {
+  border-color: hsl(var(--civic-constitutional));
+}
+
+.badge[data-border-color="hsl(var(--civic-expert))"] {
+  border-color: hsl(var(--civic-expert));
+}
+
+.badge[data-border-color="hsl(var(--civic-community))"] {
+  border-color: hsl(var(--civic-community));
+}
+
+.badge[data-border-color="hsl(var(--civic-transparency))"] {
+  border-color: hsl(var(--civic-transparency));
+}

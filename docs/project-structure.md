@@ -1,6 +1,6 @@
 # Project Structure
 
-**Generated:** 12/20/2025, 5:09:09 PM
+**Generated:** 12/22/2025, 5:18:51 PM
 **Max Depth:** 7 levels
 
 ```
@@ -24,6 +24,8 @@
 │   │   │   └── radix-bundle-analysis.json
 │   │   ├── design-system-audit-report.json
 │   │   └── design-system-audit-report.md
+│   ├── scripts/
+│   │   └── contrast-check.js
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── providers/
@@ -72,6 +74,7 @@
 │   │   │   │   │   ├── community.ts
 │   │   │   │   │   ├── config.ts
 │   │   │   │   │   ├── engagement.ts
+│   │   │   │   │   ├── error-response.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── preferences.ts
 │   │   │   │   │   ├── request.ts
@@ -204,6 +207,7 @@
 │   │   │   │   ├── analytics.ts
 │   │   │   │   ├── classes.ts
 │   │   │   │   ├── constants.ts
+│   │   │   │   ├── dashboard-errors.ts
 │   │   │   │   ├── factory.ts
 │   │   │   │   ├── handler.ts
 │   │   │   │   ├── index.ts
@@ -295,11 +299,17 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── manager.ts
 │   │   │   │   └── README.md
+│   │   │   ├── recovery/
+│   │   │   │   ├── dashboard-recovery.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── storage/
 │   │   │   │   ├── cache-storage.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── secure-storage.ts
 │   │   │   │   └── types.ts
+│   │   │   ├── validation/
+│   │   │   │   ├── dashboard-validation.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── CONSOLIDATION_SUMMARY.md
 │   │   │   ├── index.ts
 │   │   │   ├── MIGRATION_GUIDE.md
@@ -377,6 +387,8 @@
 │   │   │   ├── bills/
 │   │   │   │   ├── api/
 │   │   │   │   │   └── index.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useBills.ts
 │   │   │   │   ├── model/
 │   │   │   │   │   ├── hooks/
 │   │   │   │   │   │   ├── index.ts
@@ -571,6 +583,7 @@
 │   │   │   │   ├── useScrollManager.ts
 │   │   │   │   └── useSwipeGesture.ts
 │   │   │   ├── index.ts
+│   │   │   ├── store.ts
 │   │   │   ├── use-keyboard-focus.ts
 │   │   │   ├── use-mobile.tsx
 │   │   │   ├── use-performance-monitor.ts
@@ -780,7 +793,6 @@
 │   │   │   │   │   │   ├── mobile.css
 │   │   │   │   │   │   ├── special.css
 │   │   │   │   │   │   └── tablet.css
-│   │   │   │   │   ├── themes/
 │   │   │   │   │   ├── utilities/
 │   │   │   │   │   │   ├── accessibility.css
 │   │   │   │   │   │   └── animations.css
@@ -902,13 +914,16 @@
 │   │   │   │   └── mock-users.ts
 │   │   │   ├── types/
 │   │   │   │   ├── analytics.ts
+│   │   │   │   ├── dashboard.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── search-response.ts
 │   │   │   │   └── search.ts
 │   │   │   ├── ui/
 │   │   │   │   ├── accessibility/
 │   │   │   │   │   └── accessibility-manager.tsx
 │   │   │   │   ├── dashboard/
 │   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── DashboardStats.module.css
 │   │   │   │   │   │   ├── DashboardStats.tsx
 │   │   │   │   │   │   ├── TimeFilterSelector.tsx
 │   │   │   │   │   │   └── WelcomeMessage.tsx
@@ -925,6 +940,7 @@
 │   │   │   │   │   │   ├── ActivitySection.tsx
 │   │   │   │   │   │   ├── BillsSection.tsx
 │   │   │   │   │   │   ├── CivicMetricsSection.tsx
+│   │   │   │   │   │   ├── DashboardSections.module.css
 │   │   │   │   │   │   ├── EngagementHistorySection.tsx
 │   │   │   │   │   │   ├── MigrationDashboard.tsx
 │   │   │   │   │   │   ├── RecommendationsSection.tsx
@@ -974,17 +990,28 @@
 │   │   │   │   │   └── README.md
 │   │   │   │   ├── examples/
 │   │   │   │   │   └── SeamlessIntegrationExample.tsx
+│   │   │   │   ├── icons/
 │   │   │   │   ├── integration/
+│   │   │   │   │   ├── context/
+│   │   │   │   │   │   └── IntegrationContext.ts
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   └── useIntegration.ts
 │   │   │   │   │   ├── EnhancedUXIntegration.tsx
 │   │   │   │   │   ├── IntegrationProvider.tsx
-│   │   │   │   │   └── IntegrationTest.tsx
+│   │   │   │   │   ├── IntegrationTest.tsx
+│   │   │   │   │   └── types.ts
 │   │   │   │   ├── lazy/
 │   │   │   │   │   └── LazyPageWrapper.tsx
 │   │   │   │   ├── loading/
+│   │   │   │   │   ├── context/
+│   │   │   │   │   │   └── AssetLoadingContext.tsx
 │   │   │   │   │   ├── core/
 │   │   │   │   │   │   └── loadingCore.ts
 │   │   │   │   │   ├── hooks/
 │   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── useAssetLoading.ts
+│   │   │   │   │   │   ├── useAssetLoadingContext.ts
+│   │   │   │   │   │   ├── useAssetLoadingIndicatorState.ts
 │   │   │   │   │   │   ├── useLoading.ts
 │   │   │   │   │   │   ├── useLoadingRecovery.ts
 │   │   │   │   │   │   ├── useLoadingState.ts
@@ -1004,6 +1031,7 @@
 │   │   │   │   │   │   ├── connection-utils.ts
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   ├── loading-utils.ts
+│   │   │   │   │   │   ├── loadingUtils.ts
 │   │   │   │   │   │   ├── progress-utils.ts
 │   │   │   │   │   ├── AssetLoadingIndicator.tsx
 │   │   │   │   │   ├── constants.ts
@@ -1032,6 +1060,10 @@
 │   │   │   │   │   │   └── MobileTabSelector.tsx
 │   │   │   │   │   ├── feedback/
 │   │   │   │   │   │   └── OfflineStatusBanner.tsx
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   ├── useBottomSheet.ts
+│   │   │   │   │   │   ├── useInfiniteScroll.ts
+│   │   │   │   │   │   └── useMobileTabs.ts
 │   │   │   │   │   ├── interaction/
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   ├── InfiniteScroll.tsx
@@ -1039,6 +1071,7 @@
 │   │   │   │   │   │   ├── PullToRefresh.tsx
 │   │   │   │   │   │   ├── ScrollToTopButton.tsx
 │   │   │   │   │   │   └── SwipeGestures.tsx
+│   │   │   │   │   ├── constants.ts
 │   │   │   │   │   ├── fallbacks.tsx
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── mobile-navigation-enhancements.css
@@ -1133,6 +1166,10 @@
 │   │   │   ├── community.ts
 │   │   │   ├── conflict-of-interest.ts
 │   │   │   ├── constitutional.ts
+│   │   │   ├── core.d.ts
+│   │   │   ├── core.d.ts.map
+│   │   │   ├── core.js
+│   │   │   ├── core.js.map
 │   │   │   ├── core.ts
 │   │   │   ├── dashboard.ts
 │   │   │   ├── engagement-analytics.ts
@@ -1312,7 +1349,10 @@
 │   │   ├── sustainable_uprising.md
 │   │   └── user-manual.md
 │   ├── CLIENT_DEEP_DIVE_ANALYSIS.md
+│   ├── CLIENT_FIXES_FINAL_SUMMARY.md
+│   ├── CLIENT_VALIDATION_COMPLETE.md
 │   ├── COMPLETED_ISSUES_ARCHIVE_README.md
+│   ├── CRITICAL_FIXES_SUMMARY.md
 │   ├── DESIGN_SYSTEM_COMPLETE.md
 │   ├── docs-module.md
 │   ├── DOCUMENTATION_ORGANIZATION_COMPLETE.md
@@ -1332,12 +1372,15 @@
 │   ├── phase1-quick-reference.md
 │   ├── project-structure.md
 │   ├── race-condition-analysis.md
+│   ├── RECOVERY_UI_FIX_SUMMARY.md
 │   ├── RESOLUTION_STATUS_REPORT.md
 │   ├── RESOLVED_ISSUES_INDEX.md
 │   ├── runtime-diagnostics.md
 │   ├── SHARED_UI_BUG_ANALYSIS.md
 │   ├── SHARED_UI_FIX_PLAN.md
+│   ├── SHARED_UI_FIXES_IMPLEMENTED.md
 │   ├── SHARED_UI_GUIDELINES.md
+│   ├── SHARED_UI_IMPLEMENTATION_COMPLETE.md
 │   ├── SHARED_UI_IMPLEMENTATION_SUMMARY.md
 │   ├── TYPE_SYSTEM_AUDIT_REPORT.md
 │   ├── TYPE_SYSTEM_COMPLETION_SUMMARY.md
@@ -1489,12 +1532,15 @@
 │   ├── dynamic-path-updater.js
 │   ├── emergency-design-system-consolidation.ts
 │   ├── execute-comprehensive-migration.ts
+│   ├── final-client-cleanup.sh
 │   ├── fix-all-imports.js
 │   ├── fix-all-shared-core-imports.ts
 │   ├── fix-api-response-calls.js
+│   ├── fix-client-issues.sh
 │   ├── fix-config.json
 │   ├── fix-design-system.ts
 │   ├── fix-display-names.ts
+│   ├── fix-error-components.sh
 │   ├── fix-error-fallback.ts
 │   ├── fix-features-integration.ts
 │   ├── fix-frontend-imports.js
@@ -1505,6 +1551,7 @@
 │   ├── fix-plural-singular-consistency.ts
 │   ├── fix-property-naming-consistency.ts
 │   ├── fix-remaining-api-calls.js
+│   ├── fix-remaining-client-issues.sh
 │   ├── fix-remaining-errors.ts
 │   ├── fix-remaining-imports.js
 │   ├── fix-schema-imports.ts
@@ -1513,6 +1560,7 @@
 │   ├── fix-shared-core-imports.ts
 │   ├── fix-shared-folder.ts
 │   ├── fix-shared-imports.js
+│   ├── fix-shared-ui-bugs.sh
 │   ├── fix-shared-ui.sh
 │   ├── fix-typescript-syntax-errors.ts
 │   ├── generate-bundle-report.js
@@ -1532,6 +1580,7 @@
 │   ├── migrate-imports.js
 │   ├── migrate-logging.js
 │   ├── migrate-shared-types.ts
+│   ├── migrate-to-unified-websocket.ts
 │   ├── ml-service-demo.ts
 │   ├── optimize-memory.js
 │   ├── performance-budget-enforcer.cjs
@@ -1539,9 +1588,11 @@
 │   ├── performance-trend-analyzer.cjs
 │   ├── phase2-analyze.js
 │   ├── phase2-migration-generator.sh
+│   ├── prepare-module-deletion.ts
 │   ├── rollback-cleanup.ts
 │   ├── run-adapter-cleanup.js
 │   ├── scan-migration-artifacts.sh
+│   ├── scan-remaining-imports.js
 │   ├── setup-playwright.js
 │   ├── standardize-imports.ts
 │   ├── strategic-contrast-migration.js
@@ -1551,6 +1602,7 @@
 │   ├── update-core-references.js
 │   ├── update-import-references.ts
 │   ├── validate_structure.ts
+│   ├── validate-client-codebase.js
 │   ├── validate-client-implementations.ts
 │   ├── validate-config-consistency.ts
 │   ├── validate-config.js
@@ -1563,6 +1615,7 @@
 │   ├── validate-new-domains.cjs
 │   ├── validate-property-naming.ts
 │   ├── validate-shared-folder.ts
+│   ├── validate-shared-ui.js
 │   ├── validate-syntax.ts
 │   ├── verify-and-fix-project-structure.ts
 │   ├── verify-cleanup.ts
@@ -2144,21 +2197,74 @@
 │   │   │   │   ├── hybrid-bill-repository.ts
 │   │   │   │   └── index.ts
 │   │   │   └── lazy-loader.ts
-│   │   ├── realtime/
-│   │   │   ├── connection-migrator.ts
-│   │   │   ├── memory-monitor.ts
-│   │   │   ├── redis-adapter.ts
-│   │   │   └── socketio-service.ts
 │   │   ├── security/
 │   │   │   ├── data-privacy-service.ts
 │   │   │   ├── input-validation-service.ts
 │   │   ├── validation/
 │   │   │   └── repository-validation.ts
+│   │   ├── websocket/
+│   │   │   ├── adapters/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── native-websocket-adapter.ts
+│   │   │   │   ├── redis-adapter.ts
+│   │   │   │   ├── socketio-adapter.ts
+│   │   │   │   └── websocket-adapter.ts
+│   │   │   ├── batching/
+│   │   │   │   ├── batching-service.ts
+│   │   │   │   └── index.ts
+│   │   │   ├── config/
+│   │   │   │   ├── base-config.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── runtime-config.ts
+│   │   │   ├── core/
+│   │   │   │   ├── connection-manager.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── message-handler.ts
+│   │   │   │   ├── operation-queue-manager.ts
+│   │   │   │   ├── subscription-manager.ts
+│   │   │   │   └── websocket-service.ts
+│   │   │   ├── memory/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── leak-detector-handler.ts
+│   │   │   │   ├── memory-manager.ts
+│   │   │   │   └── progressive-degradation.ts
+│   │   │   ├── migration/
+│   │   │   │   ├── connection-migrator.ts
+│   │   │   │   ├── health-validator.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── state-manager.ts
+│   │   │   │   ├── traffic-controller.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── monitoring/
+│   │   │   │   ├── health-checker.test.ts
+│   │   │   │   ├── health-checker.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── metrics-reporter.test.ts
+│   │   │   │   ├── metrics-reporter.ts
+│   │   │   │   ├── run-tests.js
+│   │   │   │   ├── statistics-collector.test.ts
+│   │   │   │   ├── statistics-collector.ts
+│   │   │   │   └── TEST_SUMMARY.md
+│   │   │   ├── utils/
+│   │   │   │   ├── circular-buffer.test.ts
+│   │   │   │   ├── circular-buffer.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── lru-cache.test.ts
+│   │   │   │   ├── lru-cache.ts
+│   │   │   │   ├── priority-queue.test.ts
+│   │   │   │   └── priority-queue.ts
+│   │   │   ├── backward-compatibility.test.ts
+│   │   │   ├── index.ts
+│   │   │   ├── integration-demo.js
+│   │   │   ├── README.md
+│   │   │   ├── service-validation.js
+│   │   │   ├── test-runner.js
+│   │   │   ├── tsconfig.json
+│   │   │   ├── types.ts
+│   │   │   └── VALIDATION_SUMMARY.md
 │   │   ├── demo-data.ts
 │   │   ├── feature-flags.ts
-│   │   ├── index.ts
-│   │   ├── websocket-adapter.ts
-│   │   └── websocket.ts
+│   │   └── index.ts
 │   ├── middleware/
 │   │   ├── auth.ts
 │   │   ├── boom-error-middleware.ts
@@ -2204,10 +2310,15 @@
 │   ├── tests/
 │   │   ├── features/
 │   │   ├── integration/
+│   │   │   ├── websocket-backward-compatibility.test.ts
+│   │   │   └── websocket-service.test.ts
 │   │   ├── performance/
 │   │   ├── security/
 │   │   ├── services/
 │   │   ├── unit/
+│   │   │   ├── infrastructure/
+│   │   │   │   └── websocket/
+│   │   │   │       └── connection-manager.test.ts
 │   │   │   └── mocks/
 │   │   │       └── mock-data.ts
 │   │   ├── utils/
@@ -2243,304 +2354,302 @@
 │   └── vite.ts
 ├── shared/
 │   ├── core/
-│   │   ├── src/
-│   │   │   ├── cache/
-│   │   │   │   └── index.ts
-│   │   │   ├── caching/
-│   │   │   │   ├── adapters/
-│   │   │   │   │   ├── ai-cache.ts
-│   │   │   │   │   ├── browser-adapter.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── memory-adapter.ts
-│   │   │   │   │   └── multi-tier-adapter.ts
-│   │   │   │   ├── clustering/
-│   │   │   │   │   └── cluster-manager.ts
-│   │   │   │   ├── compression/
-│   │   │   │   │   └── cache-compressor.ts
-│   │   │   │   ├── core/
-│   │   │   │   │   ├── base-adapter.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── interfaces.ts
-│   │   │   │   │   └── key-generator.ts
-│   │   │   │   ├── monitoring/
-│   │   │   │   │   └── metrics-collector.ts
-│   │   │   │   ├── patterns/
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── serialization/
-│   │   │   │   │   └── cache-serializer.ts
-│   │   │   │   ├── tagging/
-│   │   │   │   │   └── tag-manager.ts
-│   │   │   │   ├── utilities/
-│   │   │   │   │   ├── cache-compressor.ts
-│   │   │   │   │   ├── cache-tag-manager.ts
-│   │   │   │   │   └── cache-warmer.ts
-│   │   │   │   ├── warming/
-│   │   │   │   │   └── cache-warmer.ts
+│   │   ├── cache/
+│   │   │   └── index.ts
+│   │   ├── caching/
+│   │   │   ├── adapters/
 │   │   │   │   ├── ai-cache.ts
-│   │   │   │   ├── cache-factory.ts
-│   │   │   │   ├── caching-service.ts
-│   │   │   │   ├── decorators.ts
-│   │   │   │   ├── factory.ts
-│   │   │   │   ├── feature-flags.ts
-│   │   │   │   ├── icaching-service.ts
+│   │   │   │   ├── browser-adapter.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── memory-adapter.ts
+│   │   │   │   └── multi-tier-adapter.ts
+│   │   │   ├── clustering/
+│   │   │   │   └── cluster-manager.ts
+│   │   │   ├── compression/
+│   │   │   │   └── cache-compressor.ts
+│   │   │   ├── core/
+│   │   │   │   ├── base-adapter.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── interfaces.ts
-│   │   │   │   ├── key-generator.ts
-│   │   │   │   ├── simple-factory.ts
-│   │   │   │   ├── single-flight-cache.ts
-│   │   │   │   ├── test-basic.ts
-│   │   │   │   ├── test-comprehensive.ts
-│   │   │   │   ├── types.ts
-│   │   │   │   └── validation.ts
-│   │   │   ├── config/
+│   │   │   │   └── key-generator.ts
+│   │   │   ├── monitoring/
+│   │   │   │   └── metrics-collector.ts
+│   │   │   ├── patterns/
+│   │   │   │   └── index.ts
+│   │   │   ├── serialization/
+│   │   │   │   └── cache-serializer.ts
+│   │   │   ├── tagging/
+│   │   │   │   └── tag-manager.ts
+│   │   │   ├── utilities/
+│   │   │   │   ├── cache-compressor.ts
+│   │   │   │   ├── cache-tag-manager.ts
+│   │   │   │   └── cache-warmer.ts
+│   │   │   ├── warming/
+│   │   │   │   └── cache-warmer.ts
+│   │   │   ├── ai-cache.ts
+│   │   │   ├── cache-factory.ts
+│   │   │   ├── caching-service.ts
+│   │   │   ├── decorators.ts
+│   │   │   ├── factory.ts
+│   │   │   ├── feature-flags.ts
+│   │   │   ├── icaching-service.ts
+│   │   │   ├── index.ts
+│   │   │   ├── interfaces.ts
+│   │   │   ├── key-generator.ts
+│   │   │   ├── simple-factory.ts
+│   │   │   ├── single-flight-cache.ts
+│   │   │   ├── test-basic.ts
+│   │   │   ├── test-comprehensive.ts
+│   │   │   ├── types.ts
+│   │   │   └── validation.ts
+│   │   ├── config/
+│   │   │   ├── index.ts
+│   │   │   ├── manager.ts
+│   │   │   ├── schema.ts
+│   │   │   ├── types.ts
+│   │   │   └── utilities.ts
+│   │   ├── middleware/
+│   │   │   ├── auth/
+│   │   │   │   └── provider.ts
+│   │   │   ├── cache/
+│   │   │   │   └── provider.ts
+│   │   │   ├── error-handler/
+│   │   │   │   └── provider.ts
+│   │   │   ├── rate-limit/
+│   │   │   │   └── provider.ts
+│   │   │   ├── validation/
+│   │   │   │   └── provider.ts
+│   │   │   ├── ai-deduplication.ts
+│   │   │   ├── ai-middleware.ts
+│   │   │   ├── config.ts
+│   │   │   ├── factory.ts
+│   │   │   ├── feature-flags.ts
+│   │   │   ├── index.ts
+│   │   │   ├── registry.ts
+│   │   │   ├── types.ts
+│   │   │   └── unified.ts
+│   │   ├── modernization/
+│   │   │   ├── cleanup/
+│   │   │   │   ├── cli.ts
+│   │   │   │   ├── executor.ts
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── manager.ts
-│   │   │   │   ├── schema.ts
-│   │   │   │   ├── types.ts
-│   │   │   │   └── utilities.ts
-│   │   │   ├── middleware/
-│   │   │   │   ├── auth/
-│   │   │   │   │   └── provider.ts
-│   │   │   │   ├── cache/
-│   │   │   │   │   └── provider.ts
-│   │   │   │   ├── error-handler/
-│   │   │   │   │   └── provider.ts
-│   │   │   │   ├── rate-limit/
-│   │   │   │   │   └── provider.ts
-│   │   │   │   ├── validation/
-│   │   │   │   │   └── provider.ts
-│   │   │   │   ├── ai-deduplication.ts
-│   │   │   │   ├── ai-middleware.ts
-│   │   │   │   ├── config.ts
-│   │   │   │   ├── factory.ts
-│   │   │   │   ├── feature-flags.ts
+│   │   │   │   └── orchestrator.ts
+│   │   │   ├── analysis.ts
+│   │   │   ├── index.ts
+│   │   │   ├── orchestrator.ts
+│   │   │   ├── progress.ts
+│   │   │   ├── types.ts
+│   │   │   └── validation.ts
+│   │   ├── observability/
+│   │   │   ├── error-management/
+│   │   │   │   ├── analytics/
+│   │   │   │   │   └── error-analytics.ts
+│   │   │   │   ├── errors/
+│   │   │   │   │   ├── base-error.ts
+│   │   │   │   │   └── specialized-errors.ts
+│   │   │   │   ├── handlers/
+│   │   │   │   │   ├── error-boundary.tsx
+│   │   │   │   │   └── error-handler-chain.ts
+│   │   │   │   ├── integrations/
+│   │   │   │   │   └── error-tracking-integration.ts
+│   │   │   │   ├── middleware/
+│   │   │   │   │   └── express-error-middleware.ts
+│   │   │   │   ├── monitoring/
+│   │   │   │   │   └── error-monitor.ts
+│   │   │   │   ├── patterns/
+│   │   │   │   │   ├── circuit-breaker.ts
+│   │   │   │   │   └── retry-patterns.ts
+│   │   │   │   ├── recovery/
+│   │   │   │   │   └── error-recovery-engine.ts
+│   │   │   │   ├── reporting/
+│   │   │   │   │   └── user-error-reporter.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── health/
+│   │   │   │   ├── checks/
+│   │   │   │   │   ├── database-check.ts
+│   │   │   │   │   ├── memory-check.ts
+│   │   │   │   │   └── redis-check.ts
+│   │   │   │   ├── checks.ts
+│   │   │   │   ├── health-checker.ts
+│   │   │   │   ├── health-service.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── middleware.ts
+│   │   │   │   ├── server-health.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── logging/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── logger.ts
+│   │   │   │   ├── logging-service.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── metrics/
+│   │   │   │   ├── exporters/
+│   │   │   │   │   ├── cloudwatch.ts
+│   │   │   │   │   ├── prometheus.ts
+│   │   │   │   │   └── statsd.ts
+│   │   │   │   ├── collectors.ts
+│   │   │   │   ├── exporters.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── registry.ts
-│   │   │   │   ├── types.ts
-│   │   │   │   └── unified.ts
-│   │   │   ├── modernization/
-│   │   │   │   ├── cleanup/
-│   │   │   │   │   ├── cli.ts
-│   │   │   │   │   ├── executor.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── orchestrator.ts
-│   │   │   │   ├── analysis.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── tracing/
+│   │   │   │   ├── context.ts
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── orchestrator.ts
-│   │   │   │   ├── progress.ts
-│   │   │   │   ├── types.ts
-│   │   │   │   └── validation.ts
-│   │   │   ├── observability/
-│   │   │   │   ├── error-management/
-│   │   │   │   │   ├── analytics/
-│   │   │   │   │   │   └── error-analytics.ts
-│   │   │   │   │   ├── errors/
-│   │   │   │   │   │   ├── base-error.ts
-│   │   │   │   │   │   └── specialized-errors.ts
-│   │   │   │   │   ├── handlers/
-│   │   │   │   │   │   ├── error-boundary.tsx
-│   │   │   │   │   │   └── error-handler-chain.ts
-│   │   │   │   │   ├── integrations/
-│   │   │   │   │   │   └── error-tracking-integration.ts
-│   │   │   │   │   ├── middleware/
-│   │   │   │   │   │   └── express-error-middleware.ts
-│   │   │   │   │   ├── monitoring/
-│   │   │   │   │   │   └── error-monitor.ts
-│   │   │   │   │   ├── patterns/
-│   │   │   │   │   │   ├── circuit-breaker.ts
-│   │   │   │   │   │   └── retry-patterns.ts
-│   │   │   │   │   ├── recovery/
-│   │   │   │   │   │   └── error-recovery-engine.ts
-│   │   │   │   │   ├── reporting/
-│   │   │   │   │   │   └── user-error-reporter.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── types.ts
-│   │   │   │   ├── health/
-│   │   │   │   │   ├── checks/
-│   │   │   │   │   │   ├── database-check.ts
-│   │   │   │   │   │   ├── memory-check.ts
-│   │   │   │   │   │   └── redis-check.ts
-│   │   │   │   │   ├── checks.ts
-│   │   │   │   │   ├── health-checker.ts
-│   │   │   │   │   ├── health-service.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── middleware.ts
-│   │   │   │   │   ├── server-health.ts
-│   │   │   │   │   └── types.ts
-│   │   │   │   ├── logging/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── logger.ts
-│   │   │   │   │   ├── logging-service.ts
-│   │   │   │   │   └── types.ts
-│   │   │   │   ├── metrics/
-│   │   │   │   │   ├── exporters/
-│   │   │   │   │   │   ├── cloudwatch.ts
-│   │   │   │   │   │   ├── prometheus.ts
-│   │   │   │   │   │   └── statsd.ts
-│   │   │   │   │   ├── collectors.ts
-│   │   │   │   │   ├── exporters.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── registry.ts
-│   │   │   │   │   └── types.ts
-│   │   │   │   ├── tracing/
-│   │   │   │   │   ├── context.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── span.ts
-│   │   │   │   │   ├── tracer.ts
-│   │   │   │   │   └── types.ts
-│   │   │   │   ├── correlation.ts
+│   │   │   │   ├── span.ts
+│   │   │   │   ├── tracer.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── correlation.ts
+│   │   │   ├── index.ts
+│   │   │   ├── interfaces.ts
+│   │   │   ├── iobservability-stack.ts
+│   │   │   ├── middleware.ts
+│   │   │   ├── observability-stack-service.ts
+│   │   │   ├── stack.ts
+│   │   │   ├── telemetry.ts
+│   │   │   └── types.ts
+│   │   ├── performance/
+│   │   │   ├── budgets.ts
+│   │   │   ├── index.ts
+│   │   │   ├── method-timing.ts
+│   │   │   ├── monitoring.ts
+│   │   │   └── unified-monitoring.ts
+│   │   ├── primitives/
+│   │   │   ├── constants/
+│   │   │   │   ├── http-status.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── time.ts
+│   │   │   ├── types/
+│   │   │   │   ├── branded.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── maybe.ts
+│   │   │   │   └── result.ts
+│   │   │   └── index.ts
+│   │   ├── rate-limiting/
+│   │   │   ├── adapters/
+│   │   │   │   ├── fixed-window-adapter.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── memory-adapter.ts
+│   │   │   │   ├── sliding-window-adapter.ts
+│   │   │   │   └── token-bucket-adapter.ts
+│   │   │   ├── algorithms/
+│   │   │   │   ├── fixed-window.ts
+│   │   │   │   ├── interfaces.ts
+│   │   │   │   ├── sliding-window.ts
+│   │   │   │   └── token-bucket.ts
+│   │   │   ├── core/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── interfaces.ts
-│   │   │   │   ├── iobservability-stack.ts
-│   │   │   │   ├── middleware.ts
-│   │   │   │   ├── observability-stack-service.ts
-│   │   │   │   ├── stack.ts
-│   │   │   │   ├── telemetry.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── performance/
-│   │   │   │   ├── budgets.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── method-timing.ts
-│   │   │   │   ├── monitoring.ts
-│   │   │   │   └── unified-monitoring.ts
-│   │   │   ├── primitives/
-│   │   │   │   ├── constants/
-│   │   │   │   │   ├── http-status.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── time.ts
-│   │   │   │   ├── types/
-│   │   │   │   │   ├── branded.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── maybe.ts
-│   │   │   │   │   └── result.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── rate-limiting/
-│   │   │   │   ├── adapters/
-│   │   │   │   │   ├── fixed-window-adapter.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── memory-adapter.ts
-│   │   │   │   │   ├── sliding-window-adapter.ts
-│   │   │   │   │   └── token-bucket-adapter.ts
-│   │   │   │   ├── algorithms/
-│   │   │   │   │   ├── fixed-window.ts
-│   │   │   │   │   ├── interfaces.ts
-│   │   │   │   │   ├── sliding-window.ts
-│   │   │   │   │   └── token-bucket.ts
-│   │   │   │   ├── core/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── interfaces.ts
-│   │   │   │   │   └── service.ts
-│   │   │   │   ├── middleware/
-│   │   │   │   │   ├── express-middleware.ts
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── services/
-│   │   │   │   │   └── rate-limiting-service.ts
-│   │   │   │   ├── stores/
-│   │   │   │   │   ├── memory-store.ts
-│   │   │   │   │   └── redis-store.ts
-│   │   │   │   ├── ai-rate-limiter.ts
-│   │   │   │   ├── factory.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── metrics.ts
-│   │   │   │   ├── middleware.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── repositories/
-│   │   │   │   ├── interfaces/
-│   │   │   │   │   ├── bill-repository.interface.ts
-│   │   │   │   │   └── sponsor-repository.interface.ts
-│   │   │   │   ├── test-implementations/
-│   │   │   │   │   ├── bill-test-repository.ts
-│   │   │   │   │   └── sponsor-test-repository.ts
+│   │   │   │   └── service.ts
+│   │   │   ├── middleware/
+│   │   │   │   ├── express-middleware.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── services/
-│   │   │   │   ├── interfaces/
-│   │   │   │   │   ├── bill-service.interface.ts
-│   │   │   │   │   └── notification-service.interface.ts
-│   │   │   │   ├── test-implementations/
-│   │   │   │   │   ├── bill-test-service.ts
-│   │   │   │   │   └── notification-test-service.ts
-│   │   │   │   ├── cache.ts
-│   │   │   │   ├── composition.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── rate-limit.ts
-│   │   │   │   └── validation.ts
-│   │   │   ├── types/
-│   │   │   │   ├── auth.types.ts
-│   │   │   │   ├── feature-flags.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── realtime.ts
-│   │   │   │   ├── services.ts
-│   │   │   │   └── validation-types.ts
-│   │   │   ├── utils/
-│   │   │   │   ├── api/
-│   │   │   │   │   ├── circuit-breaker.ts
-│   │   │   │   │   ├── client.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── interceptors.ts
-│   │   │   │   ├── examples/
-│   │   │   │   │   └── concurrency-migration-example.ts
-│   │   │   │   ├── formatting/
-│   │   │   │   │   ├── currency.ts
-│   │   │   │   │   ├── date-time.ts
-│   │   │   │   │   ├── document.ts
-│   │   │   │   │   ├── file-size.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── location.ts
-│   │   │   │   │   └── status.ts
-│   │   │   │   ├── images/
-│   │   │   │   │   └── image-utils.ts
-│   │   │   │   ├── anonymity-interface.ts
-│   │   │   │   ├── anonymity-service.ts
-│   │   │   │   ├── api-utils.ts
-│   │   │   │   ├── async-utils.ts
-│   │   │   │   ├── browser-logger.ts
-│   │   │   │   ├── cache-utils.ts
-│   │   │   │   ├── common-utils.ts
-│   │   │   │   ├── concurrency-adapter.ts
-│   │   │   │   ├── constants.ts
-│   │   │   │   ├── correlation-id.ts
-│   │   │   │   ├── dashboard-utils.ts
-│   │   │   │   ├── data-utils.ts
-│   │   │   │   ├── http-utils.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── loading-utils.ts
-│   │   │   │   ├── navigation-utils.ts
-│   │   │   │   ├── number-utils.ts
-│   │   │   │   ├── performance-utils.ts
-│   │   │   │   ├── race-condition-prevention.ts
-│   │   │   │   ├── regex-patterns.ts
-│   │   │   │   ├── response-helpers.ts
-│   │   │   │   ├── security-utils.ts
-│   │   │   │   ├── string-utils.ts
-│   │   │   │   └── type-guards.ts
-│   │   │   ├── validation/
-│   │   │   │   ├── adapters/
-│   │   │   │   │   ├── custom-adapter.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── joi-adapter.ts
-│   │   │   │   │   └── zod-adapter.ts
-│   │   │   │   ├── core/
-│   │   │   │   │   ├── base-adapter.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── interfaces.ts
-│   │   │   │   │   └── validation-service.ts
-│   │   │   │   ├── middleware/
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── schemas/
-│   │   │   │   │   ├── auth.ts
-│   │   │   │   │   ├── common.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── property.ts
-│   │   │   │   ├── constants.ts
-│   │   │   │   ├── helpers.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── ivalidation-service.ts
-│   │   │   │   ├── middleware.ts
-│   │   │   │   ├── sanitization.ts
-│   │   │   │   ├── types.ts
-│   │   │   │   ├── validation-service-wrapper.ts
-│   │   │   │   └── validation-service.ts
+│   │   │   │   └── rate-limiting-service.ts
+│   │   │   ├── stores/
+│   │   │   │   ├── memory-store.ts
+│   │   │   │   └── redis-store.ts
+│   │   │   ├── ai-rate-limiter.ts
+│   │   │   ├── factory.ts
+│   │   │   ├── index.ts
+│   │   │   ├── metrics.ts
+│   │   │   ├── middleware.ts
+│   │   │   └── types.ts
+│   │   ├── repositories/
+│   │   │   ├── interfaces/
+│   │   │   │   ├── bill-repository.interface.ts
+│   │   │   │   └── sponsor-repository.interface.ts
+│   │   │   ├── test-implementations/
+│   │   │   │   ├── bill-test-repository.ts
+│   │   │   │   └── sponsor-test-repository.ts
 │   │   │   └── index.ts
+│   │   ├── services/
+│   │   │   ├── interfaces/
+│   │   │   │   ├── bill-service.interface.ts
+│   │   │   │   └── notification-service.interface.ts
+│   │   │   ├── test-implementations/
+│   │   │   │   ├── bill-test-service.ts
+│   │   │   │   └── notification-test-service.ts
+│   │   │   ├── cache.ts
+│   │   │   ├── composition.ts
+│   │   │   ├── index.ts
+│   │   │   ├── rate-limit.ts
+│   │   │   └── validation.ts
+│   │   ├── types/
+│   │   │   ├── auth.types.ts
+│   │   │   ├── feature-flags.ts
+│   │   │   ├── index.ts
+│   │   │   ├── realtime.ts
+│   │   │   ├── services.ts
+│   │   │   └── validation-types.ts
+│   │   ├── utils/
+│   │   │   ├── api/
+│   │   │   │   ├── circuit-breaker.ts
+│   │   │   │   ├── client.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── interceptors.ts
+│   │   │   ├── examples/
+│   │   │   │   └── concurrency-migration-example.ts
+│   │   │   ├── formatting/
+│   │   │   │   ├── currency.ts
+│   │   │   │   ├── date-time.ts
+│   │   │   │   ├── document.ts
+│   │   │   │   ├── file-size.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── location.ts
+│   │   │   │   └── status.ts
+│   │   │   ├── images/
+│   │   │   │   └── image-utils.ts
+│   │   │   ├── anonymity-interface.ts
+│   │   │   ├── anonymity-service.ts
+│   │   │   ├── api-utils.ts
+│   │   │   ├── async-utils.ts
+│   │   │   ├── browser-logger.ts
+│   │   │   ├── cache-utils.ts
+│   │   │   ├── common-utils.ts
+│   │   │   ├── concurrency-adapter.ts
+│   │   │   ├── constants.ts
+│   │   │   ├── correlation-id.ts
+│   │   │   ├── dashboard-utils.ts
+│   │   │   ├── data-utils.ts
+│   │   │   ├── http-utils.ts
+│   │   │   ├── index.ts
+│   │   │   ├── loading-utils.ts
+│   │   │   ├── navigation-utils.ts
+│   │   │   ├── number-utils.ts
+│   │   │   ├── performance-utils.ts
+│   │   │   ├── race-condition-prevention.ts
+│   │   │   ├── regex-patterns.ts
+│   │   │   ├── response-helpers.ts
+│   │   │   ├── security-utils.ts
+│   │   │   ├── string-utils.ts
+│   │   │   └── type-guards.ts
+│   │   ├── validation/
+│   │   │   ├── adapters/
+│   │   │   │   ├── custom-adapter.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── joi-adapter.ts
+│   │   │   │   └── zod-adapter.ts
+│   │   │   ├── core/
+│   │   │   │   ├── base-adapter.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── interfaces.ts
+│   │   │   │   └── validation-service.ts
+│   │   │   ├── middleware/
+│   │   │   │   └── index.ts
+│   │   │   ├── schemas/
+│   │   │   │   ├── auth.ts
+│   │   │   │   ├── common.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── property.ts
+│   │   │   ├── constants.ts
+│   │   │   ├── helpers.ts
+│   │   │   ├── index.ts
+│   │   │   ├── ivalidation-service.ts
+│   │   │   ├── middleware.ts
+│   │   │   ├── sanitization.ts
+│   │   │   ├── types.ts
+│   │   │   ├── validation-service-wrapper.ts
+│   │   │   └── validation-service.ts
 │   │   └── index.ts
 │   ├── database/
 │   │   ├── core/
@@ -2566,10 +2675,6 @@
 │   │   ├── en.ts
 │   │   └── index.ts
 │   ├── infrastructure/
-│   │   └── realtime/
-│   │       ├── batching-service.ts
-│   │       ├── memory-aware-socket-service.ts
-│   │       └── websocket-config.ts
 │   ├── platform/
 │   │   ├── kenya/
 │   │   │   └── anonymity/
@@ -2718,6 +2823,9 @@
 │   └── top-orphans-loc.json
 ├── CHANGELOG.md
 ├── clear-sw.html
+├── client-fix-report-20251220-180156.md
+├── CONSOLIDATION_PLAN.md
+├── CONSOLIDATION_SUMMARY.md
 ├── cspell.config.yaml
 ├── DESIGN_SYSTEM_DELIVERY.md
 ├── DESIGN_SYSTEM_INDEX.md
@@ -2727,8 +2835,10 @@
 ├── DOCUMENTATION_AUDIT_REPORT.md
 ├── DOCUMENTATION_INDEX.md
 ├── drizzle.config.ts
+├── error-components-fix-report-20251221-102246.md
 ├── export_validator_old_v7.sh
 ├── export_validator.sh
+├── final-cleanup-report-20251220-193413.md
 ├── fix-imports.js
 ├── functional_validator.js
 ├── generate-structure-to-file.sh
@@ -2748,9 +2858,13 @@
 ├── race-condition-analyzer.js
 ├── race-condition-tests.spec.js
 ├── README.md
+├── REALTIME_INTEGRATION_SUMMARY.md
+├── remaining-fixes-report-20251220-184518.md
 ├── run_codebase_stats.bat
 ├── runtime_diagnostics.js
 ├── runtime-dependency-check.js
+├── shared-ui-fix-report-20251220-174354.md
+├── shared-ui-fix-report-20251220-174615.md
 ├── START_HERE.md
 ├── start-dev.js
 ├── STORE_MIGRATION_ASSESSMENT.md
@@ -2759,6 +2873,7 @@
 ├── testing_strategy.md
 ├── tsconfig.json
 ├── tsconfig.server.json
+├── TYPESCRIPT_ESLINT_FIXES_SUMMARY.md
 ├── validate_imports.js
 ├── validator.mjs
 ├── verify-exports.js
@@ -2770,7 +2885,6 @@
 ## Excluded
 
 The following are excluded from this view:
-
 - Hidden files and directories (starting with `.`)
 - `node_modules`
 - `dist`
@@ -2790,5 +2904,4 @@ The following are excluded from this view:
 - `temp`
 
 ---
-
-_Generated by Project Structure Generator_
+*Generated by Project Structure Generator*

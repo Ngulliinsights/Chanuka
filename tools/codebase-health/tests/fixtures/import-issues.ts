@@ -14,3 +14,8 @@ export function useImports() {
   // console.log(missingExport); // This would cause runtime error
   // console.log(SampleIssues); // This would cause runtime error
 }
+export type missingExport = any; // Generated type - please implement
+
+export default function defaultFunction() {
+  // Generated default export
+}

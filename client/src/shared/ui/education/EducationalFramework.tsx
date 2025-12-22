@@ -2,19 +2,17 @@ import {
   BookOpen, 
   Scale, 
   Clock, 
-  Hammer, 
-  Lightbulb,
+  Zap,
   Users,
   HelpCircle,
   ExternalLink
 } from 'lucide-react';
 import { useState } from 'react';
 
-import type { Bill } from '@client/types';
-
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import type { Bill } from '@client/types';
 
 import { ConstitutionalContext } from './ConstitutionalContext';
 import { EducationalTooltip } from './EducationalTooltip';
@@ -271,7 +269,7 @@ export function EducationalFramework({ bill, className = "" }: EducationalFramew
       <Card className="border-l-4 border-l-emerald-500">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5 text-emerald-600" />
+            <Zap className="h-5 w-5 text-emerald-600" />
             Educational Framework
           </CardTitle>
           <CardDescription>
@@ -296,7 +294,7 @@ export function EducationalFramework({ bill, className = "" }: EducationalFramew
               <div className="text-xs text-muted-foreground">Past outcomes</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-emerald-50">
-              <Hammer className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+              <Scale className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
               <div className="text-sm font-medium">Process</div>
               <div className="text-xs text-muted-foreground">How it works</div>
             </div>
@@ -320,7 +318,7 @@ export function EducationalFramework({ bill, className = "" }: EducationalFramew
             Historical
           </TabsTrigger>
           <TabsTrigger value="process" className="text-xs lg:text-sm">
-            <Hammer className="h-4 w-4 mr-1 lg:mr-2" />
+            <Scale className="h-4 w-4 mr-1 lg:mr-2" />
             Process
           </TabsTrigger>
         </TabsList>

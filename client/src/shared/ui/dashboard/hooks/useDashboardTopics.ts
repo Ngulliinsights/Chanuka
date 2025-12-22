@@ -3,11 +3,11 @@
  * Specialized hook for tracked topics functionality
  */
 
-import type { TrackedTopic, TopicCategory } from '@client/types';
 import { useState, useCallback } from 'react';
 
 import { DashboardTopicError } from '@client/core/error';
-import { validateTrackedTopic } from '@client/validation';
+import { validateTrackedTopic } from '@client/core/validation';
+import type { TrackedTopic, TopicCategory } from '@client/shared/types';
 
 export interface UseDashboardTopicsResult {
   topics: TrackedTopic[];
@@ -37,7 +37,7 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
 
     try {
       const newTopic: TrackedTopic = {
-        id: `topic-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `topic-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         name: topicData.name,
         category: topicData.category,
         billCount: topicData.billCount,
@@ -182,7 +182,7 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
     return topics.filter(topic => 
       topic.name.toLowerCase().includes(lowercaseQuery) ||
       topic.description?.toLowerCase().includes(lowercaseQuery) ||
-      topic.keywords?.some(keyword => keyword.toLowerCase().includes(lowercaseQuery))
+      topic.keywords?.some((keyword: string) => keyword.toLowerCase().includes(lowercaseQuery))
     );
   }, [topics]);
 

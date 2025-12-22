@@ -86,3 +86,6 @@ export interface UsePrivacySettingsReturn {
   loading: boolean;
   error: string | null;
 }
+export interface ErrorInfo {
+  [key: string]: any;
+}

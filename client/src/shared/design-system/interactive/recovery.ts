@@ -2,12 +2,38 @@
  * Dialog Recovery Utilities
  */
 
-export function attemptUIRecovery(error: Error): boolean {
-  console.warn('Attempting UI recovery for dialog error:', error);
-  return true;
+import { UIDialogError } from './errors';
+
+export interface RecoveryResult {
+  success: boolean;
+  shouldRetry: boolean;
+  message?: string;
 }
 
-export function getUIRecoverySuggestions(error: Error): string[] {
+export async function attemptUIRecovery(
+  componentName: string,
+  error: UIDialogError,
+  retryCount: number
+): Promise<RecoveryResult> {
+  console.warn('Attempting UI recovery for dialog error:', error);
+  
+  // Simple recovery logic
+  if (retryCount < 3) {
+    return {
+      success: false,
+      shouldRetry: true,
+      message: 'Retrying operation'
+    };
+  }
+  
+  return {
+    success: false,
+    shouldRetry: false,
+    message: 'Max retries exceeded'
+  };
+}
+
+export function getUIRecoverySuggestions(error: UIDialogError): string[] {
   return [
     'Check dialog is properly mounted in DOM',
     'Verify dialog trigger element is accessible',

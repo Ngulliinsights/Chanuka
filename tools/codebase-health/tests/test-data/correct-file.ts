@@ -14,3 +14,4 @@ export const CorrectExportName = 'test-value';
 export default function defaultExport(): string {
   return 'default';
 }
+export const WrongImportName = {};

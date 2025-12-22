@@ -6,7 +6,6 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./*"],
       "@shared": ["."],
@@ -27,16 +26,6 @@
       "@tests/*": ["../tests/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ]
+  "include": ["**/*.ts", "**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
-
-

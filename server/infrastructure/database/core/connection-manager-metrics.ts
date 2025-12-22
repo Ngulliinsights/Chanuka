@@ -1,3 +1,11 @@
+
+// Forward declarations to resolve circular dependencies
+declare module './types' {
+  export interface ForwardDeclaredType {
+    [key: string]: any;
+  }
+}
+
 import { getMonitoringService, MonitoringService } from '@server/infrastructure/database/monitoring.ts';
 import { CircuitBreakerState } from './connection-manager';
 

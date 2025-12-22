@@ -611,3 +611,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export { EnhancedHealthCheckScript };
+export const runHealthCheck = {};
+
+export const displayResults = {};

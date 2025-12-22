@@ -1,60 +1,26 @@
 /**
  * Integration Provider - Orchestrates Orphan Module Integration
- * 
+ *
  * This component implements the Tier 1 integration plan from ORPHAN_VALUE_ANALYSIS.md
  * It safely integrates high-value orphaned modules with proper error handling and rollback.
  */
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { logger } from '@client/utils/logger';
+import React, { useEffect, useState, useCallback } from 'react';
 
-// Import the orphaned modules we're integrating
-import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/utils/security';
+import { TouchHandler } from '@/core/mobile/touch-handler';
+import { DeviceDetector } from '@client/core/mobile';
 import { PrivacyAnalyticsService } from '@client/services/privacyAnalyticsService';
-import { DeviceDetector, TouchHandler } from '@client/core/mobile';
+import { logger } from '@client/utils/logger';
+import {
+  CSPManager,
+  DOMSanitizer,
+  InputValidator,
+  PasswordValidator,
+} from '@client/utils/security';
 
-// ============================================================================
-// TYPES & INTERFACES
-// ============================================================================
-
-interface IntegrationStatus {
-  security: 'pending' | 'loading' | 'success' | 'error';
-  privacy: 'pending' | 'loading' | 'success' | 'error';
-  ui: 'pending' | 'loading' | 'success' | 'error';
-  mobile: 'pending' | 'loading' | 'success' | 'error';
-}
-
-interface IntegrationServices {
-  cspManager?: CSPManager;
-  domSanitizer?: DOMSanitizer;
-  inputValidator?: InputValidator;
-  passwordValidator?: PasswordValidator;
-  privacyAnalytics?: PrivacyAnalyticsService;
-  deviceDetector?: DeviceDetector;
-  touchHandler?: TouchHandler;
-}
-
-interface IntegrationContextValue {
-  status: IntegrationStatus;
-  services: IntegrationServices;
-  isReady: boolean;
-  error?: Error;
-  retry: () => void;
-}
-
-// ============================================================================
-// CONTEXT
-// ============================================================================
-
-const IntegrationContext = createContext<IntegrationContextValue | null>(null);
-
-export function useIntegration() {
-  const context = useContext(IntegrationContext);
-  if (!context) {
-    throw new Error('useIntegration must be used within IntegrationProvider');
-  }
-  return context;
-}
+import { IntegrationContext } from './context/IntegrationContext';
+import { useIntegration } from './hooks/useIntegration';
+import type { IntegrationStatus, IntegrationServices, IntegrationContextValue } from './types';
 
 // ============================================================================
 // INTEGRATION PROVIDER
@@ -105,7 +71,7 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
 
         // Step 1: Initialize Security Utilities (Low Risk, High Impact)
         setStatus(prev => ({ ...prev, security: 'loading' }));
-        
+
         const cspManager = CSPManager.getInstance();
         const domSanitizer = DOMSanitizer.getInstance();
         const inputValidator = InputValidator.getInstance();
@@ -114,7 +80,7 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
         // Configure CSP for current environment
         const environment = process.env.NODE_ENV === 'production' ? 'production' : 'development';
         const cspHeader = cspManager.generateCSPHeader(environment);
-        
+
         // Apply CSP header if we're in a context that supports it
         if (typeof document !== 'undefined' && document.head) {
           const existingMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
@@ -129,9 +95,9 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
         if (isCancelled) return;
         setStatus(prev => ({ ...prev, security: 'success' }));
 
-        // Step 2: Initialize Privacy Analytics (GDPR/CCPA Compliance)
+        // Step 2: Initialize Privacy Analytics (GDPR/California Consumer Privacy Act Compliance)
         setStatus(prev => ({ ...prev, privacy: 'loading' }));
-        
+
         const privacyAnalytics = new PrivacyAnalyticsService({
           enabledCategories: ['navigation', 'engagement', 'performance', 'errors'],
           anonymizeData: true,
@@ -149,15 +115,16 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
 
         // Step 3: UI Components Integration (Design System Integration)
         setStatus(prev => ({ ...prev, ui: 'loading' }));
-        
+
         // Initialize UI recovery strategies
         try {
-          const { initializeUIRecoveryStrategies } = await import('@client/shared/design-system/recovery');
-          initializeUIRecoveryStrategies();
-          
+          // Note: Recovery strategies module not yet implemented
+          // const { initializeUIRecoveryStrategies } = await import('@client/shared/design-system/recovery');
+          // initializeUIRecoveryStrategies();
+
           logger.info('UI component system integrated', {
             component: 'IntegrationProvider',
-            features: ['unified-components', 'responsive-design', 'accessibility', 'error-recovery'],
+            features: ['unified-components', 'responsive-design', 'accessibility'],
           });
         } catch (error) {
           logger.warn('UI recovery strategies initialization failed', {
@@ -172,10 +139,10 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
 
         // Step 4: Mobile Utilities Integration (High Value for Mobile Experience)
         setStatus(prev => ({ ...prev, mobile: 'loading' }));
-        
+
         const deviceDetector = DeviceDetector.getInstance();
         const touchHandler = TouchHandler.getInstance();
-        
+
         // Initialize mobile utilities
         const deviceInfo = deviceDetector.getDeviceInfo();
         logger.info('Mobile utilities initialized', {
@@ -208,13 +175,13 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
             modules: ['security', 'privacy', 'ui', 'mobile'],
           });
         }
-
       } catch (integrationError) {
         if (!isCancelled) {
-          const error = integrationError instanceof Error 
-            ? integrationError 
-            : new Error('Unknown integration error');
-          
+          const error =
+            integrationError instanceof Error
+              ? integrationError
+              : new Error('Unknown integration error');
+
           setError(error);
           setStatus(prev => ({
             ...prev,
@@ -275,12 +242,14 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
           <div className="space-y-2">
             <button
               onClick={retry}
+              type="button"
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
             >
               Retry Integration
             </button>
             <button
               onClick={() => window.location.reload()}
+              type="button"
               className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors ml-2"
             >
               Reload Page
@@ -300,11 +269,7 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
     );
   }
 
-  return (
-    <IntegrationContext.Provider value={contextValue}>
-      {children}
-    </IntegrationContext.Provider>
-  );
+  return <IntegrationContext.Provider value={contextValue}>{children}</IntegrationContext.Provider>;
 }
 
 // ============================================================================
@@ -344,3 +309,11 @@ export function IntegrationStatus() {
 
   return null;
 }
+
+// Re-export from separate modules
+export { useIntegration } from './hooks/useIntegration';
+export type {
+  IntegrationStatus as IntegrationStatusType,
+  IntegrationServices,
+  IntegrationContextValue,
+} from './types';

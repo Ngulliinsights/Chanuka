@@ -16,8 +16,13 @@ export * from './notifications';
 // External Data (server-specific, using shared utilities)
 export * from './external-data';
 
-// WebSocket (server-specific)
-export { WebSocketService } from './websocket';
+// WebSocket (server-specific - consolidated)
+export { 
+  WebSocketService, 
+  createWebSocketService, 
+  createUnifiedWebSocketService,
+  BackwardCompatibleWebSocketService 
+} from './websocket';
 
 // Demo Data (server-specific)
 export { DemoDataService } from './demo-data';

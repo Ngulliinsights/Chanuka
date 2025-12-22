@@ -1,3 +1,11 @@
+
+// Forward declarations to resolve circular dependencies
+declare module './types' {
+  export interface ForwardDeclaredType {
+    [key: string]: any;
+  }
+}
+
 /**
  * User Dashboard State Management with Redux Toolkit
  * 
@@ -8,6 +16,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
+import { useAppSelector, useAppDispatch } from '@client/hooks/store';
 import type {
   UserDashboardData,
   TrackedBill,
@@ -19,9 +28,7 @@ import type {
   TemporalFilter,
   DashboardPreferences
 } from '@client/types/user-dashboard';
-// import { logger } from '@client/utils/logger';
 
-import { useAppSelector, useAppDispatch } from '@client/hooks/store';
 import type { RootState } from '../index';
 
 interface UserDashboardState {
@@ -416,7 +423,11 @@ export const {
 export default userDashboardSlice.reducer;
 
 // Selectors
-export const selectUserDashboardState = (state: RootState) => state.userDashboard;
+export const selectUserDashboardState = (state: RootState) => {
+  // Handle persisted state structure
+  const userDashboard = 'userDashboard' in state ? state.userDashboard : state;
+  return userDashboard as UserDashboardState;
+};
 
 export const selectDashboardData = createSelector(
   [selectUserDashboardState],
@@ -428,7 +439,7 @@ export const selectFilteredEngagementHistory = createSelector(
   (userDashboard) => {
     if (!userDashboard.dashboardData) return [];
     
-    return userDashboard.dashboardData.recentActivity.filter(item => {
+    return userDashboard.dashboardData.recentActivity.filter((item: EngagementHistoryItem) => {
       if (!userDashboard.timeFilter.startDate && !userDashboard.timeFilter.endDate) {
         const now = new Date();
         const itemDate = new Date(item.timestamp);
@@ -465,10 +476,10 @@ export const selectEngagementStats = createSelector(
   [selectFilteredEngagementHistory],
   (filteredHistory) => ({
     totalActivities: filteredHistory.length,
-    commentCount: filteredHistory.filter(item => item.type === 'comment').length,
-    shareCount: filteredHistory.filter(item => item.type === 'share').length,
-    viewCount: filteredHistory.filter(item => item.type === 'view').length,
-    saveCount: filteredHistory.filter(item => item.type === 'save').length
+    commentCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'comment').length,
+    shareCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'share').length,
+    viewCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'view').length,
+    saveCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'save').length
   })
 );
 
@@ -508,11 +519,26 @@ export const useUserDashboardSelectors = () => {
   const dispatch = useAppDispatch();
 
   const dashboardData = useAppSelector(selectDashboardData);
-  const loading = useAppSelector(state => state.userDashboard.loading);
-  const error = useAppSelector(state => state.userDashboard.error);
-  const timeFilter = useAppSelector(state => state.userDashboard.timeFilter);
-  const preferences = useAppSelector(state => state.userDashboard.preferences);
-  const privacyControls = useAppSelector(state => state.userDashboard.privacyControls);
+  const loading = useAppSelector((state: RootState) => {
+    const userDashboard = 'userDashboard' in state ? state.userDashboard : state;
+    return (userDashboard as UserDashboardState).loading;
+  });
+  const error = useAppSelector((state: RootState) => {
+    const userDashboard = 'userDashboard' in state ? state.userDashboard : state;
+    return (userDashboard as UserDashboardState).error;
+  });
+  const timeFilter = useAppSelector((state: RootState) => {
+    const userDashboard = 'userDashboard' in state ? state.userDashboard : state;
+    return (userDashboard as UserDashboardState).timeFilter;
+  });
+  const preferences = useAppSelector((state: RootState) => {
+    const userDashboard = 'userDashboard' in state ? state.userDashboard : state;
+    return (userDashboard as UserDashboardState).preferences;
+  });
+  const privacyControls = useAppSelector((state: RootState) => {
+    const userDashboard = 'userDashboard' in state ? state.userDashboard : state;
+    return (userDashboard as UserDashboardState).privacyControls;
+  });
   const filteredEngagementHistory = useAppSelector(selectFilteredEngagementHistory);
   const engagementStats = useAppSelector(selectEngagementStats);
   const { hasData, isDataStale } = useAppSelector(selectDashboardMeta);
@@ -532,4 +558,10 @@ export const useUserDashboardSelectors = () => {
     setTimeFilter: (filter: TemporalFilter) => dispatch(setTimeFilter(filter)),
     setError: (error: string | null) => dispatch(setError(error))
   };
+};
+
+// Lazy import to break circular dependency
+const getUserDashboardSlice = async () => {
+  const { userDashboardSlice } = await import('./userDashboardSlice');
+  return userDashboardSlice;
 };

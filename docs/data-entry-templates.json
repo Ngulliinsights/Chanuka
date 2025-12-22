@@ -1,0 +1,353 @@
+{
+  "templates": {
+    "legal_precedent": {
+      "id": "UUID_WILL_BE_GENERATED",
+      "case_name": "",
+      "case_number": "",
+      "court_level": "Supreme Court | Court of Appeal | High Court",
+      "judgment_date": "YYYY-MM-DD",
+      "judges": [],
+      "case_summary": "",
+      "legal_principle": "",
+      "constitutional_provisions_involved": [],
+      "precedent_strength": "binding | persuasive | distinguishable",
+      "judgment_url": "",
+      "citation": "",
+      "created_at": "AUTO_GENERATED",
+      "updated_at": "AUTO_GENERATED",
+      "_research_metadata": {
+        "researcher": "",
+        "research_date": "YYYY-MM-DD",
+        "sources": [],
+        "confidence_level": "high | medium | low",
+        "verification_status": "verified | needs_review",
+        "notes": ""
+      }
+    },
+
+    "constitutional_provision": {
+      "id": "UUID_WILL_BE_GENERATED",
+      "chapter_number": 0,
+      "article_number": 0,
+      "section_number": null,
+      "clause_number": null,
+      "title": "",
+      "full_text": "",
+      "summary": "",
+      "is_fundamental_right": false,
+      "is_directive_principle": false,
+      "enforcement_mechanism": "",
+      "related_provisions": [],
+      "keywords": [],
+      "created_at": "AUTO_GENERATED",
+      "updated_at": "AUTO_GENERATED",
+      "_additional_context": {
+        "historical_background": "",
+        "commonly_cited_in_bills": [],
+        "landmark_cases": [],
+        "drafting_guidance": {
+          "must_avoid": [],
+          "must_include": [],
+          "common_pitfalls": []
+        }
+      }
+    },
+
+    "implementation_workaround": {
+      "id": "UUID_WILL_BE_GENERATED",
+      "original_bill_id": "UUID_OF_BILL_IF_IN_DB",
+      "workaround_type": "executive_order | administrative_rule | court_decision | budget_allocation",
+      "workaround_document_id": "",
+      "implementing_body": "",
+      "implementation_date": "YYYY-MM-DD",
+      "provisions_reimplemented": [],
+      "similarity_score": 0,
+      "detection_method": "manual | automated | investigative",
+      "status": "active | challenged | overturned",
+      "workaround_metadata": {
+        "original_bill": {
+          "bill_name": "",
+          "bill_number": "",
+          "year_introduced": 0,
+          "year_failed": 0,
+          "failure_reason": "",
+          "key_provisions": [],
+          "sponsors": []
+        },
+        "workaround_details": {
+          "document_title": "",
+          "legal_basis_claimed": "",
+          "constitutional_concerns": [],
+          "public_awareness_level": "high | medium | low"
+        },
+        "impact": {
+          "beneficiaries": [],
+          "critics": [],
+          "media_coverage": []
+        },
+        "challenges": []
+      },
+      "created_at": "AUTO_GENERATED",
+      "updated_at": "AUTO_GENERATED",
+      "_research_metadata": {
+        "researcher": "",
+        "research_date": "YYYY-MM-DD",
+        "sources": [],
+        "confidence_level": "high | medium | low",
+        "verification_status": "verified | needs_review",
+        "notes": ""
+      }
+    },
+
+    "conflict_detection": {
+      "id": "UUID_WILL_BE_GENERATED",
+      "bill_id": "UUID_OF_BILL",
+      "sponsor_id": "UUID_OF_SPONSOR",
+      "conflict_type": "financial | employment | familial | organizational",
+      "severity_level": "low | medium | high | critical",
+      "confidence_score": 0,
+      "detection_method": "automatic | manual | investigative",
+      "evidence_data": {
+        "financial_interests": [],
+        "bill_impact_on_interests": [],
+        "disclosure_quality": "complete | partial | inadequate | none",
+        "public_sources": []
+      },
+      "reviewed_by_expert": false,
+      "expert_consensus": "confirmed | disputed | unclear | pending",
+      "public_disclosure_quality": "complete | partial | inadequate",
+      "created_at": "AUTO_GENERATED",
+      "updated_at": "AUTO_GENERATED",
+      "_research_metadata": {
+        "researcher": "",
+        "research_date": "YYYY-MM-DD",
+        "sources": [],
+        "confidence_level": "high | medium | low",
+        "verification_status": "verified | needs_review",
+        "notes": ""
+      }
+    },
+
+    "financial_disclosure": {
+      "id": "UUID_WILL_BE_GENERATED",
+      "sponsor_id": "UUID_OF_SPONSOR",
+      "disclosure_year": 0,
+      "disclosure_type": "annual | quarterly | transaction",
+      "source": "official_filing | public_record | investigation",
+      "filing_date": "YYYY-MM-DD",
+      "disclosure_data": {
+        "assets": [],
+        "liabilities": [],
+        "income_sources": [],
+        "business_interests": []
+      },
+      "verification_status": "verified | unverified | disputed",
+      "verified_by": "UUID_OF_VERIFIER",
+      "verified_at": "YYYY-MM-DD",
+      "created_at": "AUTO_GENERATED",
+      "updated_at": "AUTO_GENERATED"
+    },
+
+    "influence_network": {
+      "id": "UUID_WILL_BE_GENERATED",
+      "source_entity_type": "sponsor | organization | industry",
+      "source_entity_id": "UUID",
+      "target_entity_type": "sponsor | organization | industry",
+      "target_entity_id": "UUID",
+      "relationship_type": "financial | employment | board_membership | donation | family | political",
+      "relationship_strength": 0,
+      "evidence_sources": [],
+      "active_from": "YYYY-MM-DD",
+      "active_to": "YYYY-MM-DD | null",
+      "created_at": "AUTO_GENERATED",
+      "updated_at": "AUTO_GENERATED",
+      "_relationship_details": {
+        "description": "",
+        "public_records": [],
+        "investigative_reports": [],
+        "impact_on_legislation": ""
+      }
+    }
+  },
+
+  "example_entries": {
+    "legal_precedent_example": {
+      "case_name": "Speaker of the Senate & another v Attorney-General & 4 others",
+      "case_number": "Constitutional Application No. 2 of 2013",
+      "court_level": "Supreme Court",
+      "judgment_date": "2013-07-18",
+      "judges": [
+        "Willy Mutunga (CJ)",
+        "Kalpana Rawal",
+        "Smokin Wanjala",
+        "Philip Tunoi",
+        "Njoki Ndung'u"
+      ],
+      "case_summary": "Dispute concerning the formula for allocating revenue between national and county governments. The Supreme Court held that the Constitution requires meaningful consultation between the Senate and National Assembly on revenue allocation.",
+      "legal_principle": "Article 218 requires meaningful consultation between Senate and National Assembly on revenue allocation, and the President has constitutional authority to mediate disputes between the two houses.",
+      "constitutional_provisions_involved": [
+        "chapter_12_article_218"
+      ],
+      "precedent_strength": "binding",
+      "judgment_url": "http://kenyalaw.org/caselaw/cases/view/89796/",
+      "citation": "[2013] eKLR",
+      "_research_metadata": {
+        "researcher": "Constitutional Research Team",
+        "research_date": "2024-01-15",
+        "sources": [
+          "Kenya Law Reports",
+          "Supreme Court Registry"
+        ],
+        "confidence_level": "high",
+        "verification_status": "verified",
+        "notes": "Landmark devolution case, frequently cited"
+      }
+    },
+
+    "constitutional_provision_example": {
+      "chapter_number": 4,
+      "article_number": 27,
+      "section_number": null,
+      "clause_number": null,
+      "title": "Equality and freedom from discrimination",
+      "full_text": "(1) Every person is equal before the law and has the right to equal protection and equal benefit of the law.\n(2) Equality includes the full and equal enjoyment of all rights and fundamental freedoms.\n(3) Women and men have the right to equal treatment, including the right to equal opportunities in political, economic, cultural and social spheres.\n(4) The State shall not discriminate directly or indirectly against any person on any ground, including race, sex, pregnancy, marital status, health status, ethnic or social origin, colour, age, disability, religion, conscience, belief, culture, dress, language or birth.\n(5) A person shall not discriminate directly or indirectly against another person on any of the grounds specified or contemplated in clause (4).",
+      "summary": "Establishes comprehensive equality rights and prohibits discrimination on multiple grounds including race, sex, disability, and religion. Includes provisions for affirmative action.",
+      "is_fundamental_right": true,
+      "is_directive_principle": false,
+      "enforcement_mechanism": "Constitutional petition under Article 22; any affected person can move High Court for enforcement",
+      "related_provisions": [],
+      "keywords": [
+        "equality",
+        "discrimination",
+        "marginalization",
+        "affirmative action",
+        "equal opportunity"
+      ],
+      "_additional_context": {
+        "historical_background": "Responds to Kenya's history of ethnic and gender discrimination. Expanded from 2008 draft after extensive public consultations.",
+        "commonly_cited_in_bills": [
+          "Employment Bills",
+          "Education Bills",
+          "Political Representation Bills"
+        ],
+        "landmark_cases": [
+          {
+            "case_name": "Kituo Cha Sheria v Attorney General",
+            "relevance": "Applied Article 27 to housing rights"
+          }
+        ],
+        "drafting_guidance": {
+          "must_avoid": [
+            "Creating different standards without justification",
+            "Perpetuating historical discrimination"
+          ],
+          "must_include": [
+            "Explicit anti-discrimination provisions",
+            "Affirmative action measures where appropriate"
+          ],
+          "common_pitfalls": [
+            "Facially neutral provisions with discriminatory impact",
+            "Insufficient justification for differential treatment"
+          ]
+        }
+      }
+    },
+
+    "implementation_workaround_example": {
+      "workaround_type": "executive_order",
+      "workaround_document_id": "Executive Order No. 1 of 2020",
+      "implementing_body": "Office of the President",
+      "implementation_date": "2020-05-15",
+      "provisions_reimplemented": [
+        "Creation of taskforce on youth employment",
+        "Budget allocation for youth programs",
+        "Inter-ministerial coordination mechanism"
+      ],
+      "similarity_score": 75,
+      "detection_method": "manual",
+      "status": "active",
+      "workaround_metadata": {
+        "original_bill": {
+          "bill_name": "Youth Empowerment Bill, 2019",
+          "bill_number": "National Assembly Bill No. 23 of 2019",
+          "year_introduced": 2019,
+          "year_failed": 2020,
+          "failure_reason": "Expired at end of parliamentary session, never passed second reading",
+          "key_provisions": [
+            "Statutory Youth Empowerment Authority",
+            "Youth Development Fund with guaranteed funding",
+            "Mandatory youth representation in public bodies",
+            "Skills training programs"
+          ],
+          "sponsors": [
+            "Hon. John Kiarie (Dagoretti South)"
+          ]
+        },
+        "workaround_details": {
+          "document_title": "Executive Order on Youth Affairs Coordination",
+          "legal_basis_claimed": "Article 132 - President's coordination powers",
+          "constitutional_concerns": [
+            "Taskforce lacks statutory independence of proposed Authority",
+            "Funding not guaranteed as in original bill",
+            "Limited parliamentary oversight"
+          ],
+          "public_awareness_level": "low"
+        },
+        "impact": {
+          "beneficiaries": [
+            "Executive - avoided legislative process",
+            "Youth programs - immediate action taken"
+          ],
+          "critics": [
+            "Youth organizations - preferred statutory authority",
+            "Parliament - bypassed legislative role"
+          ],
+          "media_coverage": [
+            {
+              "outlet": "Daily Nation",
+              "date": "2020-05-16",
+              "headline": "President launches youth taskforce",
+              "url": "https://www.nation.co.ke/...",
+              "mentions_bill": false
+            }
+          ]
+        },
+        "challenges": []
+      },
+      "_research_metadata": {
+        "researcher": "Workaround Research Team",
+        "research_date": "2024-01-20",
+        "sources": [
+          "Kenya Gazette",
+          "Parliament Hansard",
+          "Media archives"
+        ],
+        "confidence_level": "high",
+        "verification_status": "verified",
+        "notes": "Clear case of executive workaround; original bill sponsors aware but not formally involved"
+      }
+    }
+  },
+
+  "usage_instructions": {
+    "step_1": "Copy the appropriate template from 'templates' section",
+    "step_2": "Fill in all required fields (those without 'AUTO_GENERATED' or 'UUID' placeholders)",
+    "step_3": "Review example entries for guidance on format and detail level",
+    "step_4": "Ensure all metadata fields are completed, especially sources and verification status",
+    "step_5": "Use validation tools to check JSON syntax before submission",
+    "step_6": "UUIDs and timestamps will be generated during database import"
+  },
+
+  "field_notes": {
+    "dates": "Use ISO 8601 format: YYYY-MM-DD",
+    "uuids": "Will be auto-generated by database during import",
+    "arrays": "Use empty arrays [] if no items, not null",
+    "enums": "Use exact values from pipe-separated options (e.g., 'high | medium | low')",
+    "metadata": "Fields starting with underscore (_) are for research context, may not import directly to DB",
+    "confidence_levels": {
+      "high": "Multiple verified sources, primary documents accessed",
+      "medium": "Single credible source or secondary sources only",
+      "low": "Conflicting information or gaps in documentation"
+    }
+  }
+}

@@ -8,19 +8,17 @@ import { formatDistanceToNow } from 'date-fns';
 import { 
   BookOpen, 
   MessageSquare, 
-  Share2, 
   TrendingUp,
   Calendar,
   Award,
-  Users,
   Target
 } from 'lucide-react';
-import React from 'react';
-
-import { UserDashboardData, CivicImpactMetrics } from '@client/types/user-dashboard';
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
+import { UserDashboardData, CivicImpactMetrics } from '@client/types/user-dashboard';
+
+import styles from './DashboardStats.module.css';
 
 
 interface DashboardStatsProps {
@@ -105,16 +103,16 @@ export function DashboardStats({
                   </p>
                   <div className="flex items-center gap-2">
                     <p 
-                      className="text-2xl font-bold"
-                      style={{ color: stat.color }}
+                      className={`text-2xl font-bold ${styles.statValue}`}
+                      data-color={stat.color}
                     >
                       {stat.value}
                     </p>
                     {stat.title === 'Civic Score' && civicMetrics && (
                       <Badge 
                         variant="outline"
-                        className="text-xs"
-                        style={{ borderColor: stat.color }}
+                        className={`text-xs ${styles.badge}`}
+                        data-border-color={stat.color}
                       >
                         {civicMetrics.comparisons.percentile}th %ile
                       </Badge>
@@ -125,10 +123,10 @@ export function DashboardStats({
                   </p>
                 </div>
                 <div 
-                  className="flex items-center justify-center w-12 h-12 rounded-full"
-                  style={{ backgroundColor: `${stat.color}20` }}
+                  className={`flex items-center justify-center w-12 h-12 rounded-full ${styles.iconContainer}`}
+                  data-bg-color={stat.color}
                 >
-                  <div style={{ color: stat.color }}>
+                  <div className={styles.icon} data-color={stat.color}>
                     {stat.icon}
                   </div>
                 </div>

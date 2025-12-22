@@ -4,10 +4,8 @@
  * Type definitions for service configuration and settings
  */
 
+import type { BaseApiConfig, BaseApiRequest, BaseApiResponse, BaseWebSocketMessage, BaseBillData } from './base';
 import type { CacheConfig } from './cache';
-import type { LogLevel } from './common';
-import type { RetryConfig } from './request';
-import type { WebSocketConfig } from './websocket';
 
 // ============================================================================
 // Service Configuration

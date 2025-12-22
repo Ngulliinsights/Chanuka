@@ -455,3 +455,8 @@ export const securityMiddleware = new SecurityMiddleware({
 
 
 
+
+export const createRateLimit = (...args: any[]) => {
+  // Generated function
+  console.warn('createRateLimit is a generated stub - implement actual logic');
+};

@@ -64,6 +64,15 @@ export {
   NavigationConfigurationError,
 } from './classes';
 
+// Dashboard-specific errors
+export {
+  DashboardError,
+  DashboardDataFetchError,
+  DashboardActionError,
+  DashboardTopicError,
+  DashboardConfigurationError,
+} from './dashboard-errors';
+
 // ============================================================================
 // Core Services
 // ============================================================================

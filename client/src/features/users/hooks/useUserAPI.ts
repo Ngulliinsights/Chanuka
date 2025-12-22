@@ -61,7 +61,7 @@ export const userQueryKeys = {
 
 // User Profile Hook - Fetches the authenticated user's profile data
 export function useUserProfile(userId?: string) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -77,7 +77,7 @@ export function useUserProfile(userId?: string) {
 // User Profile Mutation - Updates user profile information
 export function useUpdateUserProfile() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: ({ userId, updates }: { userId: string; updates: Partial<UserProfile> }) =>
@@ -99,7 +99,7 @@ export function useUpdateUserProfile() {
 
 // Dashboard Data Hook - Fetches comprehensive dashboard information
 export function useUserDashboard(userId?: string) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -114,7 +114,7 @@ export function useUserDashboard(userId?: string) {
 
 // Saved Bills Hook - Retrieves paginated list of user's saved bills
 export function useSavedBills(userId?: string, page: number = 1, limit: number = 20) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -132,7 +132,7 @@ export function useSavedBills(userId?: string, page: number = 1, limit: number =
 // Save Bill Mutation - Adds a bill to user's saved collection
 export function useSaveBill() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
@@ -164,7 +164,7 @@ export function useSaveBill() {
 // Unsave Bill Mutation - Removes a bill from user's saved collection
 export function useUnsaveBill() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
@@ -190,7 +190,7 @@ export function useUnsaveBill() {
 // Note: This uses saveBillForUser since trackBill doesn't exist in UserService
 export function useTrackBill() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
@@ -221,7 +221,7 @@ export function useTrackBill() {
 // Note: This uses unsaveBillForUser since untrackBill doesn't exist in UserService
 export function useUntrackBill() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
@@ -247,7 +247,7 @@ export function useEngagementHistory(
   userId?: string,
   options?: EngagementHistoryOptions
 ) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -264,7 +264,7 @@ export function useEngagementHistory(
 // Track Engagement Mutation - Records user interaction with the platform
 export function useTrackEngagement() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
@@ -301,7 +301,7 @@ export function useTrackEngagement() {
 // Civic Metrics Hook - Fetches user's civic engagement statistics
 // Note: Falls back to null if data is not available
 export function useCivicMetrics(userId?: string, timeRange?: string) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -324,7 +324,7 @@ export function useCivicMetrics(userId?: string, timeRange?: string) {
 
 // User Badges Hook - Retrieves earned badges and achievements
 export function useUserBadges(userId?: string) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -339,7 +339,7 @@ export function useUserBadges(userId?: string) {
 
 // User Achievements Hook - Fetches achievement progress and completion status
 export function useUserAchievements(userId?: string) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -355,7 +355,7 @@ export function useUserAchievements(userId?: string) {
 // Recommendations Hook - Gets personalized bill recommendations
 // Note: Falls back to empty array if not available
 export function useRecommendations(userId?: string, limit: number = 10) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -380,7 +380,7 @@ export function useRecommendations(userId?: string, limit: number = 10) {
 // Note: Uses a workaround if dismissRecommendation doesn't exist in the service
 export function useDismissRecommendation() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
@@ -411,7 +411,7 @@ export function useDismissRecommendation() {
 // User Preferences Hook - Fetches user's display and behavior preferences
 // Note: Returns null if preferences are not available separately
 export function useUserPreferences(userId?: string) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -431,7 +431,7 @@ export function useUserPreferences(userId?: string) {
 // Update User Preferences Mutation - Modifies user preferences
 export function useUpdateUserPreferences() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
@@ -455,7 +455,7 @@ export function useUpdateUserPreferences() {
 // Notification Preferences Hook - Retrieves notification settings
 // Note: Returns null if separate notification preferences endpoint doesn't exist
 export function useNotificationPreferences(userId?: string) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -503,7 +503,7 @@ export function useUpdateNotificationPreferences() {
 
 // Privacy Controls Hook - Fetches user's privacy and data sharing settings
 export function usePrivacyControls(userId?: string) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
   return useQuery({
@@ -527,7 +527,7 @@ export function usePrivacyControls(userId?: string) {
 // Update Privacy Controls Mutation - Modifies privacy settings
 export function useUpdatePrivacyControls() {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
@@ -578,7 +578,7 @@ export function useRequestDataExport() {
 
 // Activity Recording Hook - Convenience hook for recording user activities
 export function useRecordActivity() {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const trackEngagement = useTrackEngagement();
 
   return useCallback((activity: EngagementActivity) => {
@@ -601,7 +601,7 @@ export function useRecordActivity() {
 
 // Sync Dashboard Data Hook - Manually refreshes dashboard data
 export function useSyncDashboardData() {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const dashboardQuery = useUserDashboard();
   const dashboardStore = useUserDashboardStore();
@@ -640,7 +640,7 @@ export function useSyncDashboardData() {
 
 // Auto-sync Effect Hook - Automatically syncs dashboard data at intervals
 export function useAutoSyncDashboard(intervalMinutes: number = 15) {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   useEffect(() => {

@@ -66,3 +66,5 @@ export function VirtualBillGrid({
     </div>
   );
 }
+const defaultExport = {};
+export default defaultExport;

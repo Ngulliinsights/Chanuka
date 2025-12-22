@@ -1,26 +1,23 @@
-import { 
-  ArrowRight, 
-  Clock, 
-  Users, 
-  FileText, 
-  Gavel, 
-  Vote,
+import {
+  Clock,
+  Users,
+  BookOpen,
   CheckCircle,
   AlertCircle,
   Info,
   Calendar,
-  MapPin,
-  Phone,
-  Mail,
-  ExternalLink,
-  BookOpen
+  Scale,
 } from 'lucide-react';
-import React, { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
+import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system/typography/Card.tsx';
 
 interface LegislativeStep {
   id: string;
@@ -62,7 +59,7 @@ interface ProcessEducationProps {
   timeline: {
     introduced: string;
     estimatedCompletion: string;
-    keyDeadlines: { date: string; event: string; }[];
+    keyDeadlines: { date: string; event: string }[];
   };
   className?: string;
 }
@@ -71,50 +68,30 @@ interface ProcessEducationProps {
  * ProcessEducation - Explains legislative procedures and timelines
  * Features: Step-by-step process, participation opportunities, committee information
  */
-export function ProcessEducation({ 
-  billId, 
-  billTitle, 
+export function ProcessEducation({
   currentStep,
   steps,
-  committees,
   timeline,
-  className = ""
+  className = '',
 }: ProcessEducationProps) {
-  const [selectedStep, setSelectedStep] = useState<string>(currentStep);
-  const [showCommitteeDetails, setShowCommitteeDetails] = useState<Set<string>>(new Set());
-
-  const toggleCommitteeDetails = (committeeId: string) => {
-    const newShow = new Set(showCommitteeDetails);
-    if (newShow.has(committeeId)) {
-      newShow.delete(committeeId);
-    } else {
-      newShow.add(committeeId);
-    }
-    setShowCommitteeDetails(newShow);
-  };
-
   const getStepIcon = (status: string) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'current': return <Clock className="h-5 w-5 text-blue-600" />;
-      case 'upcoming': return <AlertCircle className="h-5 w-5 text-gray-400" />;
-      case 'conditional': return <Info className="h-5 w-5 text-yellow-600" />;
-      default: return <Info className="h-5 w-5 text-gray-400" />;
-    }
-  };
-
-  const getStepColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'border-green-500 bg-green-50';
-      case 'current': return 'border-blue-500 bg-blue-50';
-      case 'upcoming': return 'border-gray-300 bg-gray-50';
-      case 'conditional': return 'border-yellow-500 bg-yellow-50';
-      default: return 'border-gray-300 bg-gray-50';
+      case 'completed':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'current':
+        return <Clock className="h-5 w-5 text-blue-600" />;
+      case 'upcoming':
+        return <AlertCircle className="h-5 w-5 text-gray-400" />;
+      case 'conditional':
+        return <Info className="h-5 w-5 text-yellow-600" />;
+      default:
+        return <Info className="h-5 w-5 text-gray-400" />;
     }
   };
 
   const currentStepIndex = steps.findIndex(step => step.id === currentStep);
-  const progressPercentage = currentStepIndex >= 0 ? ((currentStepIndex + 1) / steps.length) * 100 : 0;
+  const progressPercentage =
+    currentStepIndex >= 0 ? ((currentStepIndex + 1) / steps.length) * 100 : 0;
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -122,7 +99,7 @@ export function ProcessEducation({
       <Card className="border-l-4 border-l-indigo-500">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Gavel className="h-5 w-5 text-indigo-600" />
+            <Scale className="h-5 w-5 text-indigo-600" />
             Legislative Process
           </CardTitle>
           <CardDescription>
@@ -170,13 +147,43 @@ export function ProcessEducation({
         </CardContent>
       </Card>
 
+      {/* Steps Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Legislative Steps</CardTitle>
+          <CardDescription>Track the bill&apos;s progress through each stage</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {steps.map((step, index) => (
+              <div key={step.id} className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  {getStepIcon(step.status)}
+                  {index < steps.length - 1 && <div className="w-0.5 h-12 bg-gray-200 my-2" />}
+                </div>
+                <div className="flex-1 pb-4">
+                  <h4 className="font-semibold text-sm">{step.title}</h4>
+                  <p className="text-xs text-muted-foreground mt-1">{step.description}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs text-muted-foreground">Duration: {step.duration}</span>
+                    {step.publicParticipation.allowed && (
+                      <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                        Public Input Allowed
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Educational Resources */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Learn More</CardTitle>
-          <CardDescription>
-            Additional resources about the legislative process
-          </CardDescription>
+          <CardDescription>Additional resources about the legislative process</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

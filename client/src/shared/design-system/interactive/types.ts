@@ -3,7 +3,28 @@
  */
 
 export interface DialogValidationProps {
+  title?: string;
+  description?: string;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm?: () => void | Promise<void>;
+  onCancel?: () => void;
+  loading?: boolean;
+  error?: string;
+}
+
+export interface BasicDialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   modal?: boolean;
 }
+
+export interface DateValidationProps {
+  // Generated interface
+  [key: string]: any;
+}
+
+export type ValidationState = {
+  // Generated type
+  [key: string]: any;
+};

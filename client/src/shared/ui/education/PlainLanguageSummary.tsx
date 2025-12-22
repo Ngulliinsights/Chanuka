@@ -2,7 +2,7 @@ import {
   BookOpen, 
   ChevronDown, 
   ChevronRight, 
-  Lightbulb, 
+  Zap, 
   Users, 
   DollarSign, 
   Calendar,
@@ -10,12 +10,12 @@ import {
   CheckCircle,
   Info
 } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 
 interface PlainLanguageSection {
   id: string;
@@ -45,8 +45,6 @@ interface PlainLanguageSummaryProps {
  * Features: Section-by-section breakdown, impact analysis, complexity indicators
  */
 export function PlainLanguageSummary({ 
-  billId, 
-  billTitle, 
   sections,
   className = ""
 }: PlainLanguageSummaryProps) {
@@ -98,7 +96,7 @@ export function PlainLanguageSummary({
       <Card className="border-l-4 border-l-blue-500">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5 text-blue-600" />
+            <Zap className="h-5 w-5 text-blue-600" />
             Plain Language Summary
           </CardTitle>
           <CardDescription>
@@ -176,7 +174,7 @@ export function PlainLanguageSummary({
                     {/* Plain Language Explanation */}
                     <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
                       <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                        <Lightbulb className="h-4 w-4 text-blue-600" />
+                        <Zap className="h-4 w-4 text-blue-600" />
                         What This Means
                       </h4>
                       <p className="text-sm leading-relaxed">{section.plainLanguage}</p>
