@@ -9,8 +9,6 @@
  * user data, saved bills, and activity history.
  */
 
-import React from 'react';
-
 import { useQuery } from '@tanstack/react-query';
 import {
   AlertTriangle,
@@ -19,8 +17,8 @@ import {
   CheckCircle,
   Eye,
   Filter,
-  Globe,
-  Heart,
+  Earth,
+  Home,
   MessageSquare,
   Target,
   TrendingUp,
@@ -156,7 +154,7 @@ function ImpactMetrics({ userLevel }: { userLevel: User['persona'] }) {
     <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Heart className="w-5 h-5 text-red-500" />
+          <Home className="w-5 h-5 text-red-500" />
           {currentLevel.title}
         </CardTitle>
         <p className="text-sm text-muted-foreground">{currentLevel.description}</p>
@@ -213,7 +211,7 @@ function QuickActions({ userLevel }: { userLevel: User['persona'] }) {
     expert: [
       { icon: AlertTriangle, label: "Workaround Analysis", href: "/bill-sponsorship-analysis", color: "bg-red-500" },
       { icon: CheckCircle, label: "Expert Verification", href: "/expert-verification", color: "bg-green-500" },
-      { icon: Globe, label: "Professional Network", href: "/expert-network", color: "bg-blue-500" }
+      { icon: Earth, label: "Professional Network", href: "/expert-network", color: "bg-blue-500" }
     ]
   };
 
@@ -288,7 +286,7 @@ function RecentActivity({ userLevel }: { userLevel: User['persona'] }) {
   // Helper function to get the appropriate icon for each activity type
   const getActivityIcon = (type: Activity['type']) => {
     const icons = {
-      bill_saved: <Heart className="w-4 h-4 text-red-500" />,
+      bill_saved: <Home className="w-4 h-4 text-red-500" />,
       bill_viewed: <Eye className="w-4 h-4 text-blue-500" />,
       comment_posted: <MessageSquare className="w-4 h-4 text-green-500" />,
       analysis_viewed: <TrendingUp className="w-4 h-4 text-purple-500" />,
@@ -383,7 +381,7 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
             </div>
             <div className="hidden md:block">
               <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
-                <Globe className="w-8 h-8 text-white" />
+                <Earth className="w-8 h-8 text-white" />
               </div>
             </div>
           </div>

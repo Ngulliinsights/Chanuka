@@ -8,13 +8,13 @@
  * Tests instant rollback capability via load balancer with connection preservation
  */
 
-import { describe, test, expect, beforeAll, afterAll } from 'vitest';
-import { Server } from 'http';
-import { io as SocketIOClient, Socket as ClientSocket } from 'socket.io-client';
-import * as jwt from 'jsonwebtoken';
 import { logger } from '@shared/core/observability/logging';
 import { BatchingService } from '@shared/infrastructure/batching-service.js';
 import { webSocketService } from '@shared/infrastructure/websocket.js';
+import { Server } from 'http';
+import * as jwt from 'jsonwebtoken';
+import { io as SocketIOClient, Socket as ClientSocket } from 'socket.io-client';
+import { afterAll,beforeAll, describe, expect, test } from 'vitest';
 
 interface PerformanceMetrics {
   messageDeliveryRate: number;

@@ -1,6 +1,7 @@
-import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@shared/events/bill-events';
-import { BillNotificationService } from './bill-notification-service';
 import { logger } from '@shared/core/index';
+import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@shared/events/bill-events';
+
+import { BillNotificationService } from './bill-notification-service';
 
 /**
  * Event handler that connects domain events to notification workflows

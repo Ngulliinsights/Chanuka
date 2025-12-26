@@ -127,30 +127,40 @@ export function getErrorDisplayMessage(error: LoadingError): string {
 }
 
 
-export class LoadingNetworkError extends Error {
+export class LoadingNetworkError extends LoadingError {
   constructor(message: string) {
-    super(message);
+    super(message, LoadingErrorType.LOADING_ERROR, 500);
     this.name = 'LoadingNetworkError';
   }
 }
 
-export class LoadingValidationError extends Error {
+export class LoadingValidationError extends LoadingError {
   constructor(message: string) {
-    super(message);
+    super(message, LoadingErrorType.LOADING_ERROR, 400);
     this.name = 'LoadingValidationError';
   }
 }
 
-export class LoadingOperationFailedError extends Error {
-  constructor(message: string) {
-    super(message);
+export class LoadingOperationFailedError extends LoadingError {
+  constructor(operationId: string, message: string, retryCount?: number) {
+    super(
+      `Operation failed: ${message}`,
+      LoadingErrorType.LOADING_ERROR,
+      500,
+      { operationId, retryCount }
+    );
     this.name = 'LoadingOperationFailedError';
   }
 }
 
-export class LoadingStageError extends Error {
-  constructor(message: string) {
-    super(message);
+export class LoadingStageError extends LoadingError {
+  constructor(stage: string, message: string, details?: Record<string, any>) {
+    super(
+      `Stage error in ${stage}: ${message}`,
+      LoadingErrorType.LOADING_ERROR,
+      400,
+      { stage, ...details }
+    );
     this.name = 'LoadingStageError';
   }
 }

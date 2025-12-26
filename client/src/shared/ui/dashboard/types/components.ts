@@ -4,8 +4,8 @@
  */
 
 import { BaseComponentProps, ErrorInfo } from '../../types';
-import { DashboardConfig, DashboardState } from './core';
-import { WidgetConfig } from './widgets';
+
+import { DashboardConfig, WidgetConfig } from './core';
 
 // ============================================================================
 // Dashboard Component Props

@@ -329,4 +329,5 @@ export const performanceUtils = {
   measurePerformance
 };
 
-export default performanceUtils;
+// Remove duplicate export - keep only the default export
+// export default performanceUtils;

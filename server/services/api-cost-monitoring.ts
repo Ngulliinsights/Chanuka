@@ -5,8 +5,8 @@
  * Part of task 12.3 - Build External API Management
  */
 
-import { EventEmitter } from 'events';
 import { logger   } from '@shared/core';
+import { EventEmitter } from 'events';
 
 // Dynamic import to avoid circular dependencies
 let performanceMonitoring: any = null;

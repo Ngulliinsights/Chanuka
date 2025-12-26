@@ -1,17 +1,19 @@
-import { Bill, BillNumber, BillTitle, BillSummary } from '@shared/domain/entities/bill';
+import { Err,Ok, Result } from '@shared/core';
+import { Bill, BillNumber, BillSummary,BillTitle } from '@shared/domain/entities/bill';
+import { BillServiceError } from '@shared/domain/errors/bill-errors';
+import { DomainEventPublisher } from '@shared/domain/events/bill-events';
 import { BillDomainService } from '@shared/domain/services/bill-domain-service';
 import { BillNotificationService } from '@shared/domain/services/bill-notification-service';
-import { UserService } from '../../users/application/user-service-direct';
-import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
-import { DomainEventPublisher } from '@shared/domain/events/bill-events';
-import { DatabaseService } from '@/infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
-import { Result, Ok, Err } from '@shared/core';
-import { BillServiceError } from '@shared/domain/errors/bill-errors';
-import { eq, and, sql } from 'drizzle-orm';
 import { bills } from '@shared/schema';
+import { and, eq, sql } from 'drizzle-orm';
+
+import { DatabaseService } from '@/infrastructure/database/database-service';
 import { databaseService } from '@/infrastructure/database/database-service';
+import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
+
 import type { IBillRepository } from '../../../../bill-repository.interface';
+import { UserService } from '../../users/application/user-service-direct';
 
 /**
  * Application service for bill operations
@@ -435,9 +437,11 @@ export class BillsApplicationService {
 }
 
 // Export singleton instance with dependencies
-import { UserService as UserServiceClass } from '../../users/application/user-service-direct';
-import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
 import { InMemoryDomainEventPublisher } from '@shared/domain/events/bill-events';
+
+import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
+
+import { UserService as UserServiceClass } from '../../users/application/user-service-direct';
 
 // Create the user service instance
 const userServiceInstance = new UserServiceClass();

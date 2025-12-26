@@ -1,8 +1,8 @@
-import { sponsorService } from '@server/features/sponsors/application/sponsor-service-direct.ts';
 import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts';
-// readDatabase import removed - not used in this service after refactor
-import { getSponsorshipsByBill, getSponsorAffiliations, getSectionConflictsForBill } from '@shared/repositories/sponsorship-repository.js';
+import { sponsorService } from '@server/features/sponsors/application/sponsor-service-direct.ts';
 import { logger  } from '@shared/core';
+// readDatabase import removed - not used in this service after refactor
+import { getSectionConflictsForBill,getSponsorAffiliations, getSponsorshipsByBill } from '@shared/repositories/sponsorship-repository.js';
 
 // ============================================================================
 // TYPE DEFINITIONS FOR BILL-CENTRIC ANALYSIS

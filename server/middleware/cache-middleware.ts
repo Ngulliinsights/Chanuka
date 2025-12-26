@@ -3,7 +3,8 @@
  * Automatic caching for API responses
  */
 
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction,Request, Response } from 'express';
+
 import { serverCache } from '../infrastructure/cache/cache-service';
 
 export interface CacheOptions {

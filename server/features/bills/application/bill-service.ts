@@ -1,13 +1,14 @@
 // cSpell:ignore upvotes downvotes
-import { eq, desc, and, sql, count, or, inArray } from "drizzle-orm";
-import { databaseService } from '../../../infrastructure/database/database-service';
-import { bills, sponsors, Bill } from '@shared/schema.js';
-import { bill_engagement, comments } from '@shared/schema.js';
 import { logger } from '@shared/core';
+import { Bill,bills, sponsors } from '@shared/schema.js';
+import { bill_engagement, comments } from '@shared/schema.js';
+import { and, count, desc, eq, inArray,or, sql } from "drizzle-orm";
+
 import type { AsyncServiceResult } from '../../../../result-adapter';
 import { withResultHandling } from '../../../../result-adapter';
-import { QueryCache, CacheHelpers, Cached } from '../../../infrastructure/cache/query-cache';
 import { serverCache } from '../../../infrastructure/cache/cache-service';
+import { Cached,CacheHelpers, QueryCache } from '../../../infrastructure/cache/query-cache';
+import { databaseService } from '../../../infrastructure/database/database-service';
 
 // ============================================================================
 // Type Definitions

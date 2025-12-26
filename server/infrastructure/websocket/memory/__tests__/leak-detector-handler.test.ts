@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { LeakDetectorHandler, getDefaultRecommendations } from '../leak-detector-handler';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { 
-  MemoryLeakData, 
+  DegradationLevel, 
   IConnectionManager, 
   IProgressiveDegradation,
-  DegradationLevel 
-} from '../../types';
+  MemoryLeakData} from '../../types';
+import { getDefaultRecommendations,LeakDetectorHandler } from '../leak-detector-handler';
 
 describe('LeakDetectorHandler', () => {
   let leakDetectorHandler: LeakDetectorHandler;

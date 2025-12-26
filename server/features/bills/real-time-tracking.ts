@@ -1,9 +1,9 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { authenticateToken } from '@server/middleware/auth.js';
-import type { AuthenticatedRequest } from '@server/middleware/auth.js';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '@shared/core/utils/api';
-import { logger   } from '@shared/core';
 import { webSocketService } from '@server/infrastructure/websocket.js';
+import type { AuthenticatedRequest } from '@server/middleware/auth.js';
+import { authenticateToken } from '@server/middleware/auth.js';
+import { logger   } from '@shared/core';
+import { ApiError, ApiNotFound, ApiSuccess, ApiValidationError  } from '@shared/core/utils/api';
+import { NextFunction,Request, Response, Router } from 'express';
 // import { billService } from '@shared/application/bills';
 const billService = {
   getBills: async () => [] as any[],

@@ -2,8 +2,9 @@
 // Production-grade email service with enhanced security, type safety, and performance
 
 // ---------- Enhanced Types ----------
-import { config } from '../../../config.d';
 import { logger   } from '@shared/core';
+
+import { config } from '../../../config.d';
 
 // ---------- Security Utilities ----------
 const escapeHtml = (unsafe: string): string => {

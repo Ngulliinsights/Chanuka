@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../design-system/interactive/dialog";
+} from "../../design-system/interactive/Dialog";
 import { Label } from "@client/shared/design-system/typography/Label.tsx";
 import { Switch } from "@client/shared/design-system/interactive/Switch.tsx";
 

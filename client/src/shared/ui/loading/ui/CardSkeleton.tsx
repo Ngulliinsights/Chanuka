@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '../../../design-system/lib/utils';
+import { cn } from '@client/shared/design-system/lib/utils';
 
 import { Skeleton } from './Skeleton';
 

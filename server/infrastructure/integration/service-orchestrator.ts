@@ -3,14 +3,14 @@
 // ============================================================================
 // Coordinates interactions between different services and ensures data consistency
 
+import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service.ts';
+import { StructureExtractorService } from '@server/features/argument-intelligence/application/structure-extractor.ts';
+import { ConstitutionalAnalyzer } from '@server/features/constitutional-analysis/application/constitutional-analyzer.ts';
+import { governmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service.ts';
+import { RecommendationService } from '@server/features/recommendation/application/RecommendationService.ts';
+import { searchService } from '@server/features/search/application/search-service.ts';
 import { logger } from '@shared/core';
 import { databaseService } from '@shared/database/database-service.js';
-import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service.ts';
-import { searchService } from '@server/features/search/application/search-service.ts';
-import { RecommendationService } from '@server/features/recommendation/application/RecommendationService.ts';
-import { ConstitutionalAnalyzer } from '@server/features/constitutional-analysis/application/constitutional-analyzer.ts';
-import { StructureExtractorService } from '@server/features/argument-intelligence/application/structure-extractor.ts';
-import { governmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service.ts';
 
 export interface ServiceHealth {
   serviceName: string;

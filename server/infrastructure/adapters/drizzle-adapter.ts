@@ -12,10 +12,10 @@
  * - Edge case validation
  */
 
-import { eq, and, or, sql, desc, asc, count, inArray, SQL } from 'drizzle-orm';
+import { logger  } from '@shared/core';
 import { database as db } from '@shared/database';
 import { databaseService } from '@shared/database/database-service';
-import { logger  } from '@shared/core';
+import { and, asc, count, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';
 
 // Type helper to ensure timestamp fields exist
 type WithTimestamps<T> = T & {

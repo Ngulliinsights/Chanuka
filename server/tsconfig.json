@@ -4,25 +4,18 @@
     "outDir": "./dist",
     "rootDir": "../",
     "composite": true,
+    "baseUrl": ".",
     "ignoreDeprecations": "5.0",
     "paths": {
       "@/*": ["./*"],
       "@server": ["."],
       "@server/*": ["./*"],
-      "@shared": ["../shared"],
-      "@shared/*": ["../shared/*"],
-      "@shared/core": ["../shared/core/src"],
-      "@shared/core/*": ["../shared/core/src/*"],
-      "@shared/database": ["../shared/database"],
-      "@shared/database/*": ["../shared/database/*"],
-      "@shared/schema": ["../shared/schema"],
-      "@shared/schema/*": ["../shared/schema/*"],
-      "@shared/utils": ["../shared/utils"],
-      "@shared/utils/*": ["../shared/utils/*"],
       "@client": ["../client/src"],
       "@client/*": ["../client/src/*"],
       "@tests": ["../tests"],
-      "@tests/*": ["../tests/*"]
+      "@tests/*": ["../tests/*"],
+
+      "@shared/*": ["../shared/*"]
     }
   },
   "references": [

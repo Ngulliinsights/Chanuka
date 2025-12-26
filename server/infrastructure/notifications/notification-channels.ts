@@ -1,10 +1,11 @@
-import { getEmailService } from './email-service';
-import { webSocketService } from '@shared/websocket.js';
-import { logger  } from '@shared/core';
 import { Notification } from '@server/features/notifications/domain/entities/notification';
+import { logger  } from '@shared/core';
 import { database as db } from '@shared/database';
-import { notifications, users, user_profiles } from '@shared/schema';
+import { notifications, user_profiles,users } from '@shared/schema';
+import { webSocketService } from '@shared/websocket.js';
 import { eq } from 'drizzle-orm';
+
+import { getEmailService } from './email-service';
 
 /**
  * Notification Channel Service
@@ -488,7 +489,7 @@ export class NotificationChannelService {
 
     // HTML version
     const priorityColor = this.getPriorityColor(priority);
-    let html = `
+    const html = `
       <!DOCTYPE html>
       <html>
       <head>

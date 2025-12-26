@@ -6,13 +6,17 @@ import { useCallback, useState } from 'react';
 
 import type { RecoveryState } from '../types';
 
-interface UseLoadingRecoveryOptions {
+export interface UseLoadingRecoveryOptions {
   maxRecoveryAttempts: number;
   onRecoverySuccess: () => void;
 }
 
+export interface LoadingRecoveryState extends RecoveryState {
+  // Additional recovery state properties can be added here
+}
+
 export function useLoadingRecovery(options: UseLoadingRecoveryOptions) {
-  const [recoveryState, setRecoveryState] = useState<RecoveryState>({
+  const [recoveryState, setRecoveryState] = useState<LoadingRecoveryState>({
     canRecover: true,
     isRecovering: false,
     attempts: 0,

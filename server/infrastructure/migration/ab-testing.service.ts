@@ -13,7 +13,7 @@
  * - Automated rollout recommendations based on experimental outcomes
  */
 
-import { featureFlagsService, ABTestingMetrics } from './feature-flags.service';
+import { ABTestingMetrics,featureFlagsService } from './feature-flags.service';
 
 /**
  * Represents the aggregated metrics collected from a specific cohort during an experiment.

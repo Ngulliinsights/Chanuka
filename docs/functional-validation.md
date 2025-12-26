@@ -1,8 +1,8 @@
 # Functional Validation Report
 
-**Generated:** 12/22/2025, 7:27:36 PM  
+**Generated:** 12/26/2025, 1:43:46 PM  
 **Target:** http://localhost:3000  
-**Duration:** 10.1s  
+**Duration:** 9.6s  
 **Validator:** v3.0
 
 ## 📊 Executive Summary
@@ -25,13 +25,6 @@
 
 The following routes failed to load or displayed error content:
 
-### /
-- **Status:** N/A
-- **Error:** page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
-Call log:
-[2m  - navigating to "http://localhost:3000/", waiting until "domcontentloaded"[22m
-
-
 ### /about
 - **Status:** N/A
 - **Error:** page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/about
@@ -39,11 +32,11 @@ Call log:
 [2m  - navigating to "http://localhost:3000/about", waiting until "domcontentloaded"[22m
 
 
-### /contact
+### /
 - **Status:** N/A
-- **Error:** page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/contact
+- **Error:** page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
 Call log:
-[2m  - navigating to "http://localhost:3000/contact", waiting until "domcontentloaded"[22m
+[2m  - navigating to "http://localhost:3000/", waiting until "domcontentloaded"[22m
 
 
 ### /dashboard
@@ -51,6 +44,13 @@ Call log:
 - **Error:** page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/dashboard
 Call log:
 [2m  - navigating to "http://localhost:3000/dashboard", waiting until "domcontentloaded"[22m
+
+
+### /contact
+- **Status:** N/A
+- **Error:** page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/contact
+Call log:
+[2m  - navigating to "http://localhost:3000/contact", waiting until "domcontentloaded"[22m
 
 
 ### /signup

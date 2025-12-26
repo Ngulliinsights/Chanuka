@@ -1,4 +1,4 @@
-import type { SearchQuery, SearchFilters, SearchPagination, SearchOptions } from './search.dto';
+import type { SearchFilters, SearchOptions,SearchPagination, SearchQuery } from './search.dto';
 
 export interface ValidationResult {
   isValid: boolean;

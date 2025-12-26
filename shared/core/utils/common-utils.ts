@@ -350,4 +350,5 @@ export const utils = {
   civic
 };
 
-export default utils;
+// Remove duplicate export - keep only named export
+// export default utils;

@@ -5,8 +5,8 @@
  * spam detection, and content quality assessment.
  */
 
-import { logger  } from '@shared/core';
 import { ContentAnalysisResult } from '@server/features/admin/moderation/types.ts';
+import { logger  } from '@shared/core';
 
 export class ContentAnalysisService {
   private static instance: ContentAnalysisService;

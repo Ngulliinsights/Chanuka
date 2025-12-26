@@ -5,11 +5,12 @@
  * to ensure the complete message processing pipeline works correctly.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { AuthenticatedWebSocket, QueueOperation,WebSocketMessage } from '../../types';
 import { MessageHandler } from '../message-handler';
+import { OPERATION_PRIORITIES,OperationQueueManager } from '../operation-queue-manager';
 import { SubscriptionManager } from '../subscription-manager';
-import { OperationQueueManager, OPERATION_PRIORITIES } from '../operation-queue-manager';
-import type { AuthenticatedWebSocket, WebSocketMessage, QueueOperation } from '../../types';
 
 // Mock WebSocket factory
 const createMockWebSocket = (overrides: Partial<AuthenticatedWebSocket> = {}): AuthenticatedWebSocket => {

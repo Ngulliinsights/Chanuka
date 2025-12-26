@@ -1,10 +1,10 @@
+import { logger } from '@shared/core/observability/logging';
 import { db } from '@shared/database/pool.js';
 import {
-  sponsors, bill_cosponsors, bills, sponsor_affiliations, sponsor_transparency,
-  type Sponsor, type InsertSponsor, type Bill
-} from '@shared/schema';
-import { eq, and, sql, desc, asc, count, inArray, like, or, isNull, isNotNull } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging';
+type Bill,
+bill_cosponsors, bills, type InsertSponsor,   type Sponsor, sponsor_affiliations, sponsor_transparency,
+  sponsors} from '@shared/schema';
+import { and, asc, count, desc, eq, inArray, isNotNull,isNull, like, or, sql } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS

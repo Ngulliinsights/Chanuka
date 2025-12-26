@@ -1,5 +1,6 @@
-import type { User } from '@shared/schema';
 import { database as db } from '@shared/database';
+import type { User } from '@shared/schema';
+
 import { logger } from '@/shared/core';
 
 // Define cache service interface locally if the module doesn't exist

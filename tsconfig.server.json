@@ -80,10 +80,10 @@
         "./shared/*"
       ],
       "@shared/core": [
-        "./shared/core/src"
+        "./shared/core"
       ],
       "@shared/core/*": [
-        "./shared/core/src/*"
+        "./shared/core/*"
       ],
       "@shared/schema": [
         "./shared/schema/index.ts"
@@ -117,7 +117,7 @@
     "server/types/**/*",
     "shared/schema.ts",
     "shared/schema/**/*",
-    "shared/core/src/**/*",
+    "shared/core/**/*",
     "shared/database/**/*",
     "db/**/*",
     "drizzle.config.ts",

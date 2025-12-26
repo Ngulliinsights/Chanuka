@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { LoadingStateProps } from '../types';
-import { cn } from '../../../design-system/lib/utils';
+import { cn } from '@client/shared/design-system/lib/utils';
 import { DEFAULT_LOADING_SIZE, LOADING_SIZES } from '../constants';
 
 export interface LoadingIndicatorProps extends LoadingStateProps {

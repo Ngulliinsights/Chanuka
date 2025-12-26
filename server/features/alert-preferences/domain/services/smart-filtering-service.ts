@@ -1,6 +1,6 @@
 import { AlertType } from '../value-objects/alert-type';
-import { SmartFilteringConfig } from '../value-objects/smart-filtering-config';
 import { Priority } from '../value-objects/priority';
+import { SmartFilteringConfig } from '../value-objects/smart-filtering-config';
 
 /**
  * Smart Filtering Service

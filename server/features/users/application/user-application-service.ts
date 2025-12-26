@@ -1,24 +1,23 @@
-import { UserService } from './user-service-direct';
+import { UserAggregate } from '../domain/aggregates/user-aggregate';
+import { CitizenVerification } from '../domain/entities/citizen-verification';
+import { User } from '../domain/entities/user';
+import { UserInterest,UserProfile } from '../domain/entities/user-profile';
+import { Evidence, ExpertiseLevel } from '../domain/entities/value-objects';
+import { ProfileCompletenessScore,ProfileDomainService, ProfileValidationResult } from '../domain/services/profile-domain-service';
+import { UserManagementDomainService } from '../domain/services/user-management-domain-service';
 // Repository pattern removed - using direct service calls
 import { UserVerificationDomainService } from '../domain/services/user-verification-domain-service';
-import { ProfileDomainService, ProfileValidationResult, ProfileCompletenessScore } from '../domain/services/profile-domain-service';
-import { UserAggregate } from '../domain/aggregates/user-aggregate';
-import { User } from '../domain/entities/user';
-import { UserProfile, UserInterest } from '../domain/entities/user-profile';
-import { CitizenVerification } from '../domain/entities/citizen-verification';
-import { Evidence, ExpertiseLevel } from '../domain/entities/value-objects';
-import { UserManagementDomainService } from '../domain/services/user-management-domain-service';
-
-// Import use cases
-import {
-  UserRegistrationUseCase,
-  ProfileManagementUseCase,
-  VerificationOperationsUseCase
-} from './use-cases';
 import type {
   RegisterUserCommand,
   UpdateProfileCommand
 } from './use-cases';
+// Import use cases
+import {
+  ProfileManagementUseCase,
+  UserRegistrationUseCase,
+  VerificationOperationsUseCase
+} from './use-cases';
+import { UserService } from './user-service-direct';
 
 export interface UserProfileData {
   bio?: string;

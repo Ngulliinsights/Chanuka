@@ -24,7 +24,6 @@ export { Progress, progressVariants, type ProgressProps } from './Progress';
 
 export { Toast, type ToastProps, type ToastActionElement } from './Toast';
 export { Toaster } from './Toaster';
-export { Tooltip } from './Tooltip';
 
 // ════════════════════════════════════════════════════════════════════
 // LOADING & ERROR STATES (Async operation feedback)

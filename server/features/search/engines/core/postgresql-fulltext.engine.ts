@@ -10,9 +10,10 @@
 // - Dual-engine integration capabilities
 
 import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
+import { ParsedQuery,searchSyntaxParser } from '@server/utils/search-syntax-parser';
 import { logger } from '@shared/core';
+
 import { databaseService } from '@/infrastructure/database/database-service';
-import { searchSyntaxParser, ParsedQuery } from '@server/utils/search-syntax-parser';
 
 interface QueryExpansionOptions {
   enableSynonyms: boolean;

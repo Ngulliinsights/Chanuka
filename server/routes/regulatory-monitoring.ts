@@ -1,9 +1,9 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { regulatoryChangeMonitoringService } from '@server/features/analytics/regulatory-change-monitoring.ts';
-import { z } from 'zod'; // For runtime validation
 import { errorTracker } from '@server/core/errors/error-tracker.ts';
+import { regulatoryChangeMonitoringService } from '@server/features/analytics/regulatory-change-monitoring.ts';
 import { ApiResponseWrapper   } from '@shared/core';
 import { logger   } from '@shared/core';
+import { NextFunction,Request, Response, Router } from 'express';
+import { z } from 'zod'; // For runtime validation
 
 const router = Router();
 

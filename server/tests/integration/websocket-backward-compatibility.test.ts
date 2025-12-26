@@ -6,12 +6,12 @@
  */
 
 import { createServer, type Server } from 'http';
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as WebSocket from 'ws';
 
 import {
-  createWebSocketService,
   type BackwardCompatibleWebSocketService,
+  createWebSocketService,
 } from '../../infrastructure/websocket/index.js';
 
 describe('WebSocket Service Backward Compatibility', () => {

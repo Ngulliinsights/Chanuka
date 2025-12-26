@@ -1,16 +1,15 @@
+import { logger } from '@shared/core/observability/logging';
 import { db } from '@shared/database/pool.js';
 import {
-  bills,
-  sponsors,
-  comments,
-  users,
   type Bill,
-  type Sponsor,
+  bills,
   type Comment,
-  type User
-} from '@shared/schema';
-import { eq, and, sql, desc, asc, count, inArray, like, or, isNotNull } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging';
+  comments,
+  type Sponsor,
+  sponsors,
+  type User,
+  users} from '@shared/schema';
+import { and, asc, count, desc, eq, inArray, isNotNull,like, or, sql } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS

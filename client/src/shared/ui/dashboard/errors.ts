@@ -31,6 +31,8 @@ export enum DashboardErrorType {
 
 export class DashboardError extends BaseError {
   public readonly dashboardType: DashboardErrorType;
+  public readonly type: DashboardErrorType;
+  public readonly details?: Record<string, unknown>;
 
   constructor(
     message: string,
@@ -51,8 +53,10 @@ export class DashboardError extends BaseError {
         ...context,
       },
     });
-    
+
     this.dashboardType = dashboardType;
+    this.type = dashboardType;
+    this.details = details;
     this.name = 'DashboardError';
   }
 }

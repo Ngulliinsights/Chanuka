@@ -6,13 +6,13 @@
  */
 
 import { logger  } from '@shared/core';
+
 import {
   ConflictAnalysis,
+  ConflictDetectionConfig,
   FinancialConflict,
   ProfessionalConflict,
-  VotingAnomaly,
-  ConflictDetectionConfig
-} from './types.js';
+  VotingAnomaly} from './types.js';
 
 export class ConflictSeverityAnalyzerService {
   private static instance: ConflictSeverityAnalyzerService;

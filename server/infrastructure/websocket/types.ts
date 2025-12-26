@@ -2,8 +2,8 @@
  * WebSocket Service Type Definitions
  */
 
-import { WebSocket } from 'ws';
 import { IncomingMessage } from 'http';
+import { WebSocket } from 'ws';
 
 /**
  * Extended WebSocket interface with authentication and subscription tracking.

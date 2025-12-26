@@ -109,33 +109,33 @@ export function LoadingStateManager({
   );
 }
 
-export function PageLoader({ message = 'Loading page...' }: { size?: 'sm' | 'md' | 'lg', message?: string }) {
+export function PageLoader({ isLoading = true, message = 'Loading page...' }: { isLoading?: boolean, message?: string }) {
   return (
     <LoadingStateManager
       type="page"
-      state="loading"
+      state={isLoading ? "loading" : "idle"}
       message={message}
       className="min-h-screen"
     />
   );
 }
 
-export function ComponentLoader({ message = 'Loading component...' }: { size?: 'sm' | 'md' | 'lg', message?: string }) {
+export function ComponentLoader({ isLoading = true, message = 'Loading component...' }: { isLoading?: boolean, message?: string }) {
   return (
     <LoadingStateManager
       type="component"
-      state="loading"
+      state={isLoading ? "loading" : "idle"}
       message={message}
       className="min-h-[200px]"
     />
   );
 }
 
-export function ConnectionAwareLoader({ message = 'Connecting...', showMessage = true }: { size?: 'sm' | 'md' | 'lg', message?: string, showMessage?: boolean }) {
+export function ConnectionAwareLoader({ isLoading = true, message = 'Connecting...', showMessage = true }: { isLoading: boolean, message?: string, showMessage?: boolean }) {
   return (
     <LoadingStateManager
       type="data"
-      state="loading"
+      state={isLoading ? "loading" : "idle"}
       message={showMessage ? message : undefined}
       className="min-h-[100px]"
     />

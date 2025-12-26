@@ -12,7 +12,7 @@ export interface WidgetConfig {
   title: string;
   position: { x: number; y: number };
   size: { width: number; height: number };
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
   visible?: boolean;
 }
 
@@ -45,7 +45,7 @@ export interface DashboardProps {
 
 export interface WidgetProps {
   config: WidgetConfig;
-  data?: any;
+  data?: unknown;
   loading?: boolean;
   error?: Error | null;
   onUpdate?: (config: WidgetConfig) => void;

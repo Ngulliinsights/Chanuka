@@ -2,11 +2,12 @@
  * MessageHandler Unit Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { MessageHandler, MessageValidationError, MessageProcessingError } from '../message-handler';
-import { SubscriptionManager } from '../subscription-manager';
-import { OperationQueueManager } from '../operation-queue-manager';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { AuthenticatedWebSocket, WebSocketMessage } from '../../types';
+import { MessageHandler, MessageProcessingError,MessageValidationError } from '../message-handler';
+import { OperationQueueManager } from '../operation-queue-manager';
+import { SubscriptionManager } from '../subscription-manager';
 
 // Mock WebSocket
 const createMockWebSocket = (overrides: Partial<AuthenticatedWebSocket> = {}): AuthenticatedWebSocket => {

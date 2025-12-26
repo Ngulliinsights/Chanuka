@@ -5,20 +5,20 @@
  * authentication, rate limiting compliance, and comprehensive error handling.
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { circuitBreakerRequest, retryWithCircuitBreaker } from '@server/middleware/circuit-breaker-middleware';
-import { EventEmitter } from 'events';
 import { logger   } from '@shared/core';
 import { httpUtils } from '@shared/core/utils/http-utils';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { EventEmitter } from 'events';
+
 import {
-  DataSource,
   ApiEndpoint,
   ApiResponse,
   BillData,
-  SponsorData,
+  DataSource,
   DataSourceHealth,
-  HealthIssue
-} from './types';
+  HealthIssue,
+  SponsorData} from './types';
 
 export class GovernmentDataService extends EventEmitter {
   private dataSources: Map<string, DataSource> = new Map();

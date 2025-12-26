@@ -1,9 +1,9 @@
 import { AlertChannel } from '../../domain/value-objects/alert-channel';
+import { AlertConditions } from '../../domain/value-objects/alert-conditions';
 import { AlertType } from '../../domain/value-objects/alert-type';
+import { FrequencyConfig } from '../../domain/value-objects/frequency-config';
 import { Priority } from '../../domain/value-objects/priority';
 import { SmartFilteringConfig } from '../../domain/value-objects/smart-filtering-config';
-import { FrequencyConfig } from '../../domain/value-objects/frequency-config';
-import { AlertConditions } from '../../domain/value-objects/alert-conditions';
 
 /**
  * Command to create a new alert preference

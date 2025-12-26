@@ -5,8 +5,8 @@
  * including validation, community consensus, and reputation management.
  */
 
-import { CitizenVerification, VerificationType } from '../entities/citizen-verification';
 import { UserAggregate } from '../aggregates/user-aggregate';
+import { CitizenVerification, VerificationType } from '../entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '../entities/value-objects';
 
 export interface VerificationValidationResult {

@@ -11,7 +11,8 @@ export const ActionPrioritySchema = z.enum(['High', 'Medium', 'Low']);
 export const TopicCategorySchema = z.enum(['legislative', 'community', 'policy', 'advocacy']);
 export const DashboardSectionSchema = z.enum(['activity', 'actions', 'topics', 'analytics']);
 
-export const ActionItemSchema = z.object({ id: z.string().min(1, 'Action item ID cannot be empty'),
+export const ActionItemSchema = z.object({
+  id: z.string().min(1, 'Action item ID cannot be empty'),
   title: z.string().min(1, 'Title cannot be empty').max(200, 'Title too long'),
   description: z.string().min(1, 'Description cannot be empty').max(1000, 'Description too long'),
   priority: ActionPrioritySchema,
@@ -21,7 +22,7 @@ export const ActionItemSchema = z.object({ id: z.string().min(1, 'Action item ID
   completed: z.boolean().optional(),
   created_at: z.date(),
   updated_at: z.date(),
- });
+});
 
 export const ActivitySummarySchema = z.object({
   billsTracked: z.number().int().min(0, 'Bills tracked cannot be negative'),
@@ -62,11 +63,21 @@ export const DashboardDataSchema = z.object({
   lastRefresh: z.date().nullable(),
 });
 
+// Type definitions derived from schemas
+export type ActionItem = z.infer<typeof ActionItemSchema>;
+export type ActivitySummary = z.infer<typeof ActivitySummarySchema>;
+export type TrackedTopic = z.infer<typeof TrackedTopicSchema>;
+export type DashboardConfig = z.infer<typeof DashboardConfigSchema>;
+export type DashboardData = z.infer<typeof DashboardDataSchema>;
+export type ActionPriority = z.infer<typeof ActionPrioritySchema>;
+export type TopicCategory = z.infer<typeof TopicCategorySchema>;
+export type DashboardSection = z.infer<typeof DashboardSectionSchema>;
+
 /**
  * Validation utility functions
  */
 
-export function validateActionItem(item: unknown): any {
+export function validateActionItem(item: unknown): ActionItem {
   try {
     return ActionItemSchema.parse(item);
   } catch (error) {
@@ -79,7 +90,7 @@ export function validateActionItem(item: unknown): any {
   }
 }
 
-export function validateActivitySummary(summary: unknown): any {
+export function validateActivitySummary(summary: unknown): ActivitySummary {
   try {
     return ActivitySummarySchema.parse(summary);
   } catch (error) {
@@ -92,7 +103,7 @@ export function validateActivitySummary(summary: unknown): any {
   }
 }
 
-export function validateTrackedTopic(topic: unknown): any {
+export function validateTrackedTopic(topic: unknown): TrackedTopic {
   try {
     return TrackedTopicSchema.parse(topic);
   } catch (error) {
@@ -105,7 +116,7 @@ export function validateTrackedTopic(topic: unknown): any {
   }
 }
 
-export function validateDashboardConfig(config: unknown): any {
+export function validateDashboardConfig(config: unknown): DashboardConfig {
   try {
     return DashboardConfigSchema.parse(config);
   } catch (error) {
@@ -118,7 +129,7 @@ export function validateDashboardConfig(config: unknown): any {
   }
 }
 
-export function validateDashboardData(data: unknown): any {
+export function validateDashboardData(data: unknown): DashboardData {
   try {
     return DashboardDataSchema.parse(data);
   } catch (error) {
@@ -135,7 +146,7 @@ export function validateDashboardData(data: unknown): any {
  * Safe validation functions that return validation results
  */
 
-export function safeValidateActionItem(item: unknown): { success: boolean; data?: any; error?: DashboardValidationError } {
+export function safeValidateActionItem(item: unknown): { success: boolean; data?: ActionItem; error?: DashboardValidationError } {
   try {
     const data = validateActionItem(item);
     return { success: true, data };
@@ -144,7 +155,7 @@ export function safeValidateActionItem(item: unknown): { success: boolean; data?
   }
 }
 
-export function safeValidateTrackedTopic(topic: unknown): { success: boolean; data?: any; error?: DashboardValidationError } {
+export function safeValidateTrackedTopic(topic: unknown): { success: boolean; data?: TrackedTopic; error?: DashboardValidationError } {
   try {
     const data = validateTrackedTopic(topic);
     return { success: true, data };
@@ -153,7 +164,7 @@ export function safeValidateTrackedTopic(topic: unknown): { success: boolean; da
   }
 }
 
-export function safeValidateDashboardConfig(config: unknown): { success: boolean; data?: any; error?: DashboardValidationError } {
+export function safeValidateDashboardConfig(config: unknown): { success: boolean; data?: DashboardConfig; error?: DashboardValidationError } {
   try {
     const data = validateDashboardConfig(config);
     return { success: true, data };

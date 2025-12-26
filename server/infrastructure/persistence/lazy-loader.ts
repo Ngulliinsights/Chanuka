@@ -5,8 +5,9 @@
  * by deferring expensive operations until actually needed.
  */
 
-import type { Result, Maybe } from '@shared/core';
-import { Ok, some, none } from '@shared/core';
+import type { Maybe,Result } from '@shared/core';
+import { none,Ok, some } from '@shared/core';
+
 import { performanceMonitor } from '../../../performance-monitor';
 
 export interface LazyLoadOptions {

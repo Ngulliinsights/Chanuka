@@ -7,9 +7,9 @@
 
 import { RuntimeConfig } from '../config/runtime-config';
 import type {
+  DegradationLevel,
   IProgressiveDegradation,
   MemoryPressureData,
-  DegradationLevel,
 } from '../types';
 
 /**

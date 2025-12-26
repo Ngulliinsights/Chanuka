@@ -3,19 +3,18 @@
 // ============================================================================
 // Comprehensive search with multiple engines, fallbacks, and performance optimization
 
-import { logger, cache  } from '@shared/core';
+import { cache,logger  } from '@shared/core';
 import { database } from '@shared/database';
+import { FuseSearchEngine,FuzzyMatchingEngine, PostgreSQLFullTextEngine, SimpleMatchingEngine } from '@shared/engines/core/index.js';
+import {
+  ParsedSearchSyntax,
+  SearchEngine,
+  SearchQualityScore,
+  SearchQuery,
+  SearchResponse,
+  SearchResult} from '@shared/engines/types/search.types.js';
 import { bills, sponsors } from '@shared/schema';
 import { sql } from 'drizzle-orm';
-import {
-  SearchQuery,
-  SearchResult,
-  SearchResponse,
-  SearchEngine,
-  ParsedSearchSyntax,
-  SearchQualityScore
-} from '@shared/engines/types/search.types.js';
-import { PostgreSQLFullTextEngine, FuzzyMatchingEngine, SimpleMatchingEngine, FuseSearchEngine } from '@shared/engines/core/index.js';
 
 // ============================================================================
 // Search Service Implementation

@@ -4,8 +4,8 @@
 // Extracts argumentative structure from informal citizen comments
 
 import { logger  } from '@shared/core';
-import { SentenceClassifier } from '@shared/infrastructure/nlp/sentence-classifier.js';
 import { EntityExtractor } from '@shared/infrastructure/nlp/entity-extractor.js';
+import { SentenceClassifier } from '@shared/infrastructure/nlp/sentence-classifier.js';
 import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator.js';
 
 export interface ExtractionContext {
@@ -114,7 +114,7 @@ export class StructureExtractorService {
     const sentences: Array<{ text: string; start: number; end: number }> = [];
     
     // Normalize text first
-    let normalizedText = text
+    const normalizedText = text
       .replace(/\s+/g, ' ') // Multiple spaces to single space
       .replace(/\.{2,}/g, '.') // Multiple dots to single dot
       .replace(/!{2,}/g, '!') // Multiple exclamations to single

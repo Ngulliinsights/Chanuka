@@ -9,26 +9,70 @@ import {
   BarChart3,
   Target,
   Award,
-  Star
+  Star,
 } from 'lucide-react';
-import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import type {
+  EngagementHistoryItem as ImportedEngagementHistoryItem,
+  UserDashboardData,
+  PrivacyControls as ImportedPrivacyControls,
+  DashboardPreferences,
+} from '@client/types/user-dashboard';
 
 import { ActivitySection } from './sections/ActivitySection';
 import { BillsSection } from './sections/BillsSection';
 import { StatsSection } from './sections/StatsSection';
 import { useDashboardData } from './useDashboardData';
 
-
+// --- Type Definitions ---
 
 export type DashboardVariant = 'full-page' | 'section';
+
+interface UserProfile {
+  name: string;
+  avatar_url?: string;
+  verified?: boolean;
+}
+
+interface BadgeItem {
+  id: string;
+  icon: React.ReactNode;
+  name: string;
+  description: string;
+  earnedAt: string;
+}
+
+interface AchievementItem {
+  id: string;
+  title: string;
+  progress: number;
+  target: number;
+  description: string;
+}
+
+// Use imported types with local extensions where needed
+type DashboardData = UserDashboardData & {
+  achievements?: {
+    badges: BadgeItem[];
+    milestones: AchievementItem[];
+  };
+};
+
+type Preferences = DashboardPreferences;
+type PrivacyControls = ImportedPrivacyControls;
+type EngagementHistoryItem = ImportedEngagementHistoryItem;
 
 interface UserDashboardProps {
   variant: DashboardVariant;
@@ -43,21 +87,14 @@ export function UserDashboard({ variant, className = '' }: UserDashboardProps) {
     error,
     preferences,
     privacyControls,
-    timeFilter,
-    hasData,
     filteredEngagementHistory,
-    engagementStats,
     refreshDashboard,
-    setTimeFilter,
-    showPrivacyModal,
     setShowPrivacyModal,
-    showExportModal,
     setShowExportModal,
-    showPreferencesModal,
-    setShowPreferencesModal
+    setShowPreferencesModal,
   } = useDashboardData({
     autoLoad: true,
-    trackEngagement: variant === 'section'
+    trackEngagement: variant === 'section',
   });
 
   // Don't render if user is not authenticated
@@ -78,7 +115,7 @@ export function UserDashboard({ variant, className = '' }: UserDashboardProps) {
   }
 
   // Loading state
-  if (loading && !hasData) {
+  if (loading && !dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -90,7 +127,7 @@ export function UserDashboard({ variant, className = '' }: UserDashboardProps) {
   }
 
   // Error state
-  if (error && !hasData) {
+  if (error && !dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -108,59 +145,48 @@ export function UserDashboard({ variant, className = '' }: UserDashboardProps) {
     );
   }
 
+  // At this point we can safely cast dashboardData to DashboardData because of the checks above
+  const safeDashboardData = dashboardData as unknown as DashboardData;
+
   if (variant === 'full-page') {
-    return <FullPageDashboard
-      dashboardData={dashboardData}
-      loading={loading}
-      error={error}
-      preferences={preferences}
-      privacyControls={privacyControls}
-      timeFilter={timeFilter}
-      filteredEngagementHistory={filteredEngagementHistory}
-      engagementStats={engagementStats}
-      refreshDashboard={refreshDashboard}
-      setTimeFilter={setTimeFilter}
-      showPrivacyModal={showPrivacyModal}
-      setShowPrivacyModal={setShowPrivacyModal}
-      showExportModal={showExportModal}
-      setShowExportModal={setShowExportModal}
-      showPreferencesModal={showPreferencesModal}
-      setShowPreferencesModal={setShowPreferencesModal}
-      user={user}
-      className={className}
-    />;
+    return (
+      <FullPageDashboard
+        dashboardData={safeDashboardData}
+        loading={loading}
+        preferences={preferences}
+        privacyControls={privacyControls}
+        filteredEngagementHistory={filteredEngagementHistory}
+        refreshDashboard={refreshDashboard}
+        setShowPrivacyModal={setShowPrivacyModal}
+        setShowExportModal={setShowExportModal}
+        setShowPreferencesModal={setShowPreferencesModal}
+        className={className}
+      />
+    );
   }
 
-  return <SectionDashboard
-    dashboardData={dashboardData}
-    loading={loading}
-    error={error}
-    preferences={preferences}
-    refreshDashboard={refreshDashboard}
-    user={user}
-    className={className}
-  />;
+  return (
+    <SectionDashboard
+      dashboardData={safeDashboardData}
+      loading={loading}
+      refreshDashboard={refreshDashboard}
+      user={user}
+      className={className}
+    />
+  );
 }
 
 // Full Page Dashboard Component
 interface FullPageDashboardProps {
-  dashboardData: any;
+  dashboardData: DashboardData;
   loading: boolean;
-  error: string | null;
-  preferences: any;
-  privacyControls: any;
-  timeFilter: any;
-  filteredEngagementHistory: unknown[];
-  engagementStats: any;
+  preferences: Preferences;
+  privacyControls: PrivacyControls;
+  filteredEngagementHistory: EngagementHistoryItem[];
   refreshDashboard: () => void;
-  setTimeFilter: (filter: any) => void;
-  showPrivacyModal: boolean;
   setShowPrivacyModal: (show: boolean) => void;
-  showExportModal: boolean;
   setShowExportModal: (show: boolean) => void;
-  showPreferencesModal: boolean;
   setShowPreferencesModal: (show: boolean) => void;
-  user: any;
   className: string;
 }
 
@@ -169,19 +195,12 @@ function FullPageDashboard({
   loading,
   preferences,
   privacyControls,
-  timeFilter,
   filteredEngagementHistory,
-  engagementStats,
   refreshDashboard,
-  setTimeFilter,
-  showPrivacyModal,
   setShowPrivacyModal,
-  showExportModal,
   setShowExportModal,
-  showPreferencesModal,
   setShowPreferencesModal,
-  user,
-  className
+  className,
 }: FullPageDashboardProps) {
   const visibleSections = preferences.pinnedSections.filter(
     (section: string) => !preferences.hiddenSections.includes(section)
@@ -199,21 +218,12 @@ function FullPageDashboard({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refreshDashboard}
-            disabled={loading}
-          >
+          <Button variant="outline" size="sm" onClick={refreshDashboard} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPreferencesModal(true)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowPreferencesModal(true)}>
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
@@ -224,7 +234,6 @@ function FullPageDashboard({
       <StatsSection
         stats={dashboardData?.stats}
         civicMetrics={dashboardData?.civicMetrics}
-        loading={loading}
         variant="full"
       />
 
@@ -279,9 +288,7 @@ function FullPageDashboard({
           <Card>
             <CardHeader>
               <CardTitle>Civic Impact Metrics</CardTitle>
-              <CardDescription>
-                Your contribution to democratic engagement
-              </CardDescription>
+              <CardDescription>Your contribution to democratic engagement</CardDescription>
             </CardHeader>
             <CardContent>
               {dashboardData?.civicMetrics && (
@@ -321,11 +328,7 @@ function FullPageDashboard({
         </div>
 
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPrivacyModal(true)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowPrivacyModal(true)}>
             {privacyControls.profileVisibility === 'private' ? (
               <EyeOff className="h-4 w-4 mr-2" />
             ) : (
@@ -351,21 +354,14 @@ function FullPageDashboard({
 
 // Section Dashboard Component
 interface SectionDashboardProps {
-  dashboardData: any;
+  dashboardData: DashboardData;
   loading: boolean;
-  error: string | null;
-  preferences: any;
-  refreshDashboard: () => void;
-  user: any;
+  refreshDashboard?: () => void;
+  user: UserProfile;
   className: string;
 }
 
-function SectionDashboard({
-  dashboardData,
-  loading,
-  user,
-  className
-}: SectionDashboardProps) {
+function SectionDashboard({ dashboardData, loading, user, className }: SectionDashboardProps) {
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Dashboard Header */}
@@ -374,14 +370,16 @@ function SectionDashboard({
           <Avatar className="h-16 w-16">
             <AvatarImage src={user.avatar_url} alt={user.name} />
             <AvatarFallback>
-              {user.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+              {user.name
+                ?.split(' ')
+                .map((n: string) => n[0])
+                .join('')
+                .toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-2xl font-bold">{user.name}</h2>
-            <p className="text-muted-foreground">
-              Engaged citizen working for better governance
-            </p>
+            <p className="text-muted-foreground">Engaged citizen working for better governance</p>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="secondary">
                 Civic Score: {dashboardData?.civicMetrics?.personalScore || 0}
@@ -401,7 +399,6 @@ function SectionDashboard({
       <StatsSection
         stats={dashboardData?.stats}
         civicMetrics={dashboardData?.civicMetrics}
-        loading={loading}
         variant="compact"
       />
 
@@ -418,7 +415,7 @@ function SectionDashboard({
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Recent Activity */}
             <ActivitySection
-              activities={dashboardData?.recentActivity?.slice(0, 5) || []}
+              activities={dashboardData?.recentActivity?.slice(0, 5)}
               loading={loading}
               compact={true}
             />
@@ -426,7 +423,7 @@ function SectionDashboard({
             {/* Recommended Bills */}
             <BillsSection
               trackedBills={[]}
-              recommendations={dashboardData?.recommendations?.slice(0, 3) || []}
+              recommendations={dashboardData?.recommendations?.slice(0, 3)}
               loading={loading}
               compact={true}
               showRecommendations={true}
@@ -441,9 +438,7 @@ function SectionDashboard({
                   <BarChart3 className="h-5 w-5" />
                   Civic Engagement Overview
                 </CardTitle>
-                <CardDescription>
-                  Your civic engagement metrics and progress
-                </CardDescription>
+                <CardDescription>Your civic engagement metrics and progress</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid lg:grid-cols-3 gap-4 mb-6">
@@ -481,7 +476,7 @@ function SectionDashboard({
 
         <TabsContent value="activity" className="space-y-4">
           <ActivitySection
-            activities={dashboardData?.recentActivity || []}
+            activities={dashboardData?.recentActivity}
             loading={loading}
             compact={false}
           />
@@ -500,13 +495,14 @@ function SectionDashboard({
               <CardContent>
                 {dashboardData?.achievements?.badges?.length ? (
                   <div className="grid grid-cols-2 gap-4">
-                    {dashboardData.achievements.badges.map((badge: any) => (
+                    {dashboardData.achievements.badges.map((badge: BadgeItem) => (
                       <div key={badge.id} className="text-center p-3 border rounded-lg">
                         <div className="text-2xl mb-2">{badge.icon}</div>
                         <h4 className="font-medium text-sm">{badge.name}</h4>
                         <p className="text-xs text-muted-foreground">{badge.description}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Earned {formatDistanceToNow(new Date(badge.earnedAt), { addSuffix: true })}
+                          Earned{' '}
+                          {formatDistanceToNow(new Date(badge.earnedAt), { addSuffix: true })}
                         </p>
                       </div>
                     ))}
@@ -531,7 +527,7 @@ function SectionDashboard({
               <CardContent>
                 {dashboardData?.achievements?.milestones?.length ? (
                   <div className="space-y-4">
-                    {dashboardData.achievements.milestones.map((achievement: any) => (
+                    {dashboardData.achievements.milestones.map((achievement: AchievementItem) => (
                       <div key={achievement.id} className="space-y-2">
                         <div className="flex items-center justify-between">
                           <h4 className="font-medium text-sm">{achievement.title}</h4>

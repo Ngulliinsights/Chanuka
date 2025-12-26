@@ -5,7 +5,6 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import React from 'react';
 
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
@@ -28,17 +27,11 @@ export function FullPageDashboard({ className = '' }: FullPageDashboardProps) {
     error,
     preferences,
     privacyControls,
-    timeFilter,
     hasData,
     filteredEngagementHistory,
-    engagementStats,
     refreshDashboard,
-    setTimeFilter,
-    showPrivacyModal,
     setShowPrivacyModal,
-    showExportModal,
     setShowExportModal,
-    showPreferencesModal,
     setShowPreferencesModal
   } = useDashboardData({ autoLoad: true });
 
@@ -128,7 +121,6 @@ export function FullPageDashboard({ className = '' }: FullPageDashboardProps) {
       <StatsSection
         stats={dashboardData?.stats}
         civicMetrics={dashboardData?.civicMetrics}
-        loading={loading}
         variant="full"
       />
 

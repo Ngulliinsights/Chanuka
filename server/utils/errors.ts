@@ -1,21 +1,20 @@
-import { NextFunction, Request, Response } from 'express';
 import { logger } from '@shared/core';
 import { 
   BaseError,
-  ErrorDomain,
-  ErrorSeverity,
-  ValidationError,
-  NotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
+  CacheError,
   ConflictError,
   DatabaseError,
+  ErrorDomain,
+  ErrorSeverity,
   ExternalServiceError,
+  ForbiddenError,
   NetworkError,
-  CacheError,
+  NotFoundError,
+  ServiceUnavailableError,
   TooManyRequestsError,
-  ServiceUnavailableError
-} from '@shared/core';
+  UnauthorizedError,
+  ValidationError} from '@shared/core';
+import { NextFunction, Request, Response } from 'express';
 
 // Re-export the unified error classes from shared/core
 export { 

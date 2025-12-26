@@ -15,7 +15,33 @@ import { dashboardConstants } from './dashboard-constants';
 export function createDashboardConfig(
   overrides: Partial<DashboardConfig> = {}
 ): DashboardConfig {
-  const config = {
+  // Create a complete config with required fields
+  const config: DashboardConfig = {
+    id: overrides.id || 'default-dashboard',
+    name: overrides.name || 'Dashboard',
+    title: overrides.title,
+    description: overrides.description,
+    layout: overrides.layout || {
+      id: 'default-layout',
+      name: 'Default Layout',
+      widgets: [],
+      columns: 3,
+      responsive: true
+    },
+    permissions: overrides.permissions || {
+      view: ['user'],
+      edit: ['user'],
+      admin: ['admin']
+    },
+    settings: overrides.settings || {
+      autoRefresh: true,
+      refreshInterval: 30000,
+      theme: 'auto',
+      compactMode: false,
+      showTitles: true,
+      enableAnimations: true
+    },
+    // Apply defaults and overrides
     ...dashboardConstants.DEFAULT_CONFIG,
     ...overrides
   };
@@ -188,27 +214,27 @@ export function getConfigurationRecommendations(usage: {
 
   // Refresh interval recommendations
   if (usage.dataUsageConcern) {
-    (recommendations as DashboardConfig).refreshInterval = dashboardConstants.REFRESH_INTERVALS.VERY_SLOW;
-    (recommendations as DashboardConfig).enableAutoRefresh = false;
+    recommendations.refreshInterval = dashboardConstants.REFRESH_INTERVALS.VERY_SLOW;
+    recommendations.enableAutoRefresh = false;
   } else if (usage.performanceConcern) {
-    (recommendations as DashboardConfig).refreshInterval = dashboardConstants.REFRESH_INTERVALS.SLOW;
+    recommendations.refreshInterval = dashboardConstants.REFRESH_INTERVALS.SLOW;
   } else if (usage.activityLevel === 'high') {
-    (recommendations as DashboardConfig).refreshInterval = dashboardConstants.REFRESH_INTERVALS.FAST;
+    recommendations.refreshInterval = dashboardConstants.REFRESH_INTERVALS.FAST;
   }
 
   // Display limits based on performance concerns
   if (usage.performanceConcern) {
-    (recommendations as DashboardConfig).maxActionItems = 5;
-    (recommendations as DashboardConfig).maxTrackedTopics = 10;
+    recommendations.maxActionItems = 5;
+    recommendations.maxTrackedTopics = 10;
   } else if (usage.activityLevel === 'high') {
-    (recommendations as DashboardConfig).maxActionItems = 20;
-    (recommendations as DashboardConfig).maxTrackedTopics = 30;
+    recommendations.maxActionItems = 20;
+    recommendations.maxTrackedTopics = 30;
   }
 
   // Session-based recommendations
   if (usage.averageSessionDuration && usage.averageSessionDuration < 300000) { // Less than 5 minutes
-    (recommendations as DashboardConfig).enableAutoRefresh = false;
-    (recommendations as DashboardConfig).showCompletedActions = false;
+    recommendations.enableAutoRefresh = false;
+    recommendations.showCompletedActions = false;
   }
 
   return recommendations;

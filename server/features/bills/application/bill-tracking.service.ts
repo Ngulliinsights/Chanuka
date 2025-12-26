@@ -1,14 +1,15 @@
-import { eq, and, desc, asc, sql, count, inArray, or } from 'drizzle-orm';
-import { databaseService } from '@shared/database';
-import { readDatabase } from '@shared/database';
-import { notificationService } from '@/infrastructure/notifications/notification-service.js';
-import { cacheService } from '@/infrastructure/cache';
-import * as schema from '@shared/schema';
-import { Bill } from '@shared/schema'; // Ensure Bill type is correctly imported
-import { z } from 'zod';
-import { logger  } from '@shared/core';
 // Import the status monitor service if it exists at this path
 import { billStatusMonitorService } from '@shared/bill-status-monitor.js'; // Adjust path if needed
+import { logger  } from '@shared/core';
+import { databaseService } from '@shared/database';
+import { readDatabase } from '@shared/database';
+import * as schema from '@shared/schema';
+import { Bill } from '@shared/schema'; // Ensure Bill type is correctly imported
+import { and, asc, count, desc, eq, inArray, or,sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+import { cacheService } from '@/infrastructure/cache';
+import { notificationService } from '@/infrastructure/notifications/notification-service.js';
 
 // --- Type Definitions (Ensure these match shared types if defined there) ---
 // Define allowed enum values explicitly for validation and clarity
@@ -474,7 +475,7 @@ export class BillTrackingService {
         .where(eq(schema.user_interests.user_id, user_id));
       const interests = user_interestsResult.map(ui => ui.interest.toLowerCase()); // Normalize interests
 
-      let recommendations: schema.Bill[] = [];
+      const recommendations: schema.Bill[] = [];
 
       // Strategy 1: Find untracked bills matching user interests (by category or tags)
       if (interests.length > 0) {

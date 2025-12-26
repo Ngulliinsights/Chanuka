@@ -1,9 +1,9 @@
+import { PrivacyPreferences,privacyService } from '@server/features/privacy/privacy-service.ts';
+import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth.js';
+import { logger   } from '@shared/core';
+import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api';
 import { Router } from 'express';
 import { z } from 'zod';
-import { authenticateToken, AuthenticatedRequest } from '@server/middleware/auth.js';
-import { privacyService, PrivacyPreferences } from '@server/features/privacy/privacy-service.ts';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
-import { logger   } from '@shared/core';
 
 export const router = Router();
 

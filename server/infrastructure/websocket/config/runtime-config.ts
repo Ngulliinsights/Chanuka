@@ -6,7 +6,7 @@
  * based on system load, memory pressure, and other runtime conditions.
  */
 
-import type { RuntimeConfigType, DegradationLevel } from '../types';
+import type { DegradationLevel,RuntimeConfigType } from '../types';
 
 /**
  * Default runtime configuration values.

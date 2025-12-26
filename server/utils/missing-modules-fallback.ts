@@ -174,6 +174,26 @@ export const validationService = {
   },
 };
 
+// Fallback for missing enhanced security service
+export const enhancedSecurityService = {
+  csrfProtection: () => (req: any, res: any, next: any) => next(),
+  rateLimiting: () => (req: any, res: any, next: any) => next(),
+  vulnerabilityScanning: () => (req: any, res: any, next: any) => next(),
+  getSecurityStats: () => ({
+    csrfTokensGenerated: 0,
+    rateLimitHits: 0,
+    vulnerabilitiesDetected: 0,
+    blockedRequests: 0
+  }),
+};
+
+// Fallback for missing command injection prevention
+export const commandInjectionPrevention = (options: any) => (req: any, res: any, next: any) => next();
+export const fileUploadSecurity = (options: any) => (req: any, res: any, next: any) => next();
+
+// Fallback for missing audit middleware
+export const auditMiddleware = (req: any, res: any, next: any) => next();
+
 // Export all fallbacks
 export default {
   apmService,

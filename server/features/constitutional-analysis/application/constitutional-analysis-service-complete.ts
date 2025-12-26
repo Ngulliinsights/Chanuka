@@ -1,13 +1,12 @@
+import { logger } from '@shared/core/observability/logging';
 import { db } from '@shared/database/pool.js';
 import {
-  constitutional_provisions,
-  legal_precedents,
+  analysis_audit_trail,
   constitutional_analyses,
+  constitutional_provisions,
   expert_review_queue,
-  analysis_audit_trail
-} from '@shared/schema';
-import { eq, and, sql, desc, asc, like, or } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging';
+  legal_precedents} from '@shared/schema';
+import { and, asc, desc, eq, like, or,sql } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS

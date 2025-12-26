@@ -1,15 +1,16 @@
- import { databaseService } from '@/services/database-service';
  import { readDatabase } from '@shared/database';
-import {
-  bill_engagement,
-  user_interests,
-  bills,
-  bill_tags,
-  bill_cosponsors,
-  sponsors,
-} from '@shared/schema';
-import { eq, and, inArray, or, sql, SQL, gt, desc, count } from 'drizzle-orm';
 import type { PlainBill } from '@shared/domain/recommendation.dto';
+import {
+  bill_cosponsors,
+  bill_engagement,
+  bill_tags,
+  bills,
+  sponsors,
+  user_interests,
+} from '@shared/schema';
+import { and, count,desc, eq, gt, inArray, or, SQL, sql } from 'drizzle-orm';
+
+ import { databaseService } from '@/services/database-service';
 
 export class RecommendationRepository {
   private get db() {

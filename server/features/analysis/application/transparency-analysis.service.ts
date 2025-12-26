@@ -1,7 +1,7 @@
+import { logger  } from '@shared/core';
 import { readDatabase } from '@shared/database';
 import * as schema from '@shared/schema';
 import { eq } from 'drizzle-orm';
-import { logger  } from '@shared/core';
 // Import the result type from sponsor conflict analysis
 // Ensure this path is correct based on your final structure
 // Note: ConflictSummary is defined locally in bill-comprehensive-analysis.service.ts, not exported from sponsor-conflict-analysis.service.ts
@@ -138,7 +138,7 @@ export class TransparencyAnalysisService {
         // *** Needs refinement based on actual available data ***
         // Example: Check if full text URL, summary, sponsor info, vote records are available
         logger.debug("Calculating public accessibility score.");
-         let score = 40;
+         const score = 40;
          // Assume these fields might exist on the bill object or related data
          // if (bills.full_textUrl) score += 25;
          // if (bills.summary) score += 15;

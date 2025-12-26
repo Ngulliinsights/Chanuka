@@ -193,7 +193,7 @@ module.exports = {
       },
     },
     {
-      files: ["**/.eslintrc*.js"],
+      files: ["**/.eslintrc*.js", "**/.eslintrc*.cjs"],
       parserOptions: {
         project: null,
       },

@@ -292,6 +292,7 @@ export {
   expert_profiles,
   user_verification,
   user_activity_log,
+  audit_payloads,
   system_audit_log,
   security_events,
   contentReportsRelations,

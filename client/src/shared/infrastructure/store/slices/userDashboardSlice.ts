@@ -429,7 +429,7 @@ export const selectDashboardData = createSelector(
 
 export const selectFilteredEngagementHistory = createSelector(
   [selectUserDashboardState],
-  (userDashboard) => {
+  (userDashboard): EngagementHistoryItem[] => {
     if (!userDashboard.dashboardData) return [];
     
     return userDashboard.dashboardData.recentActivity.filter((item: EngagementHistoryItem) => {

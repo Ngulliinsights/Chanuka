@@ -1,15 +1,15 @@
+import { errorTracker } from '@server/core/errors/error-tracker.ts';
+import { logger  } from '@shared/core';
 import { database as db } from '@shared/database';
 import { bills } from '@shared/schema';
 import { argumentTable } from '@shared/schema/argument_intelligence';
-import { eq, desc } from 'drizzle-orm';
-import { logger  } from '@shared/core';
-import { errorTracker } from '@server/core/errors/error-tracker.ts';
+import { desc,eq } from 'drizzle-orm';
+
 import type {
   AnalysisResult,
-  SimilarityAnalysis,
+  ComprehensiveAnalysisResult,
   ImplementationWorkaroundDetection,
-  ComprehensiveAnalysisResult
-} from './types';
+  SimilarityAnalysis} from './types';
 
 // New interface for enhanced error handling and logging
 interface AnalysisError {

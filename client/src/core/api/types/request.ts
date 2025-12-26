@@ -4,8 +4,36 @@
  * Core API request and response type definitions
  */
 
-import type { BaseApiConfig, BaseApiRequest, BaseApiResponse, BaseWebSocketMessage, BaseBillData } from './base';
 import { ZodSchema } from 'zod';
+
+// Base types that were imported from './base'
+export interface BaseApiConfig {
+  baseURL: string;
+  timeout: number;
+}
+
+export interface BaseApiRequest {
+  method: string;
+  url: string;
+  data?: any;
+}
+
+export interface BaseApiResponse<T = any> {
+  data: T;
+  status: number;
+}
+
+export interface BaseWebSocketMessage<T = any> {
+  type: string;
+  data: T;
+}
+
+export interface BaseBillData {
+  id: string;
+  title: string;
+}
+
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 
 // ============================================================================

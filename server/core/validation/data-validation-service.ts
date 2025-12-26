@@ -1,5 +1,5 @@
-import type { Pool as PoolType } from 'pg';
 import { validationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
+import type { Pool as PoolType } from 'pg';
 
 export interface ValidationRule {
   name: string;

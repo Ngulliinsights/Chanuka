@@ -1,27 +1,28 @@
 // cspell:words upvotes Upvotes downvotes Downvotes commenters Commenters
-import { Router } from 'express';
-import { databaseService } from '@/infrastructure/database/database-service';
-import { database as db } from '@shared/database';
-// FIXED: Import plural table names and correct type references
-import { comments, users, user_profiles, bills, comment_votes } from '@shared/citizen_participation';
-import { bill_engagement } from '@shared/citizen_participation';
-import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
+// FIXED: Import plural table names and correct type references
+import { bills, comment_votes,comments, user_profiles, users } from '@shared/citizen_participation';
+import { bill_engagement } from '@shared/citizen_participation';
 // FIXED: Import cacheKeys from the correct location
 import { cache, cacheKeys   } from '@shared/core';
-import { buildTimeThreshold } from '@/utils/db-helpers';
-import { authenticateToken, AuthenticatedRequest } from '../../../../AuthAlert';
-import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse   } from '@shared/core';
-import { ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
+import { ApiErrorResponse, ApiSuccessResponse, ApiValidationErrorResponse   } from '@shared/core';
 import { logger   } from '@shared/core';
-import { errorTracker } from '@/core/errors/error-tracker.js';
-import { z } from 'zod';
+import { ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
+import { database as db } from '@shared/database';
 import type {
-  UserEngagementMetrics,
   BillEngagementMetrics,
   CommentEngagementTrends,
-  EngagementLeaderboard
-} from '@shared/types';
+  EngagementLeaderboard,
+  UserEngagementMetrics} from '@shared/types';
+import { and, avg,count, desc, eq, sql, sum } from 'drizzle-orm';
+import { Router } from 'express';
+import { z } from 'zod';
+
+import { errorTracker } from '@/core/errors/error-tracker.js';
+import { databaseService } from '@/infrastructure/database/database-service';
+import { buildTimeThreshold } from '@/utils/db-helpers';
+
+import { AuthenticatedRequest,authenticateToken } from '../../../../AuthAlert';
 
 /**
  * Engagement Analytics Service

@@ -10,39 +10,37 @@
 
 import { Server } from 'http';
 
-// Import all components
-import { WebSocketService } from './core/websocket-service';
-import { ConnectionManager } from './core/connection-manager';
-import { MessageHandler } from './core/message-handler';
-import { SubscriptionManager } from './core/subscription-manager';
-import { OperationQueueManager } from './core/operation-queue-manager';
-import { MemoryManager } from './memory/memory-manager';
-import { LeakDetectorHandler } from './memory/leak-detector-handler';
-import { ProgressiveDegradation } from './memory/progressive-degradation';
-import { StatisticsCollector } from './monitoring/statistics-collector';
-import { HealthChecker } from './monitoring/health-checker';
-import { MetricsReporter } from './monitoring/metrics-reporter';
-import { PriorityQueue } from './utils/priority-queue';
-import { LRUCache } from './utils/lru-cache';
-import { CircularBuffer } from './utils/circular-buffer';
-import { BASE_CONFIG } from './config/base-config';
-import { RuntimeConfig } from './config/runtime-config';
-
+import { NativeWebSocketAdapter, RedisAdapter,SocketIOAdapter, WebSocketAdapter } from './adapters';
 // Import consolidated components
 import { BatchingService } from './batching/batching-service';
-import { WebSocketAdapter, NativeWebSocketAdapter, SocketIOAdapter, RedisAdapter } from './adapters';
-
+import { BASE_CONFIG } from './config/base-config';
+import { RuntimeConfig } from './config/runtime-config';
+import { ConnectionManager } from './core/connection-manager';
+import { MessageHandler } from './core/message-handler';
+import { OperationQueueManager } from './core/operation-queue-manager';
+import { SubscriptionManager } from './core/subscription-manager';
+// Import all components
+import { WebSocketService } from './core/websocket-service';
+import { LeakDetectorHandler } from './memory/leak-detector-handler';
+import { MemoryManager } from './memory/memory-manager';
+import { ProgressiveDegradation } from './memory/progressive-degradation';
+import { HealthChecker } from './monitoring/health-checker';
+import { MetricsReporter } from './monitoring/metrics-reporter';
+import { StatisticsCollector } from './monitoring/statistics-collector';
 // Import types
 import type {
   AuthenticatedWebSocket,
   IConnectionManager,
-  IMessageHandler,
-  ISubscriptionManager,
-  IMemoryManager,
-  IStatisticsCollector,
   IHealthChecker,
+  IMemoryManager,
+  IMessageHandler,
+  IStatisticsCollector,
+  ISubscriptionManager,
   QueueOperation,
 } from './types';
+import { CircularBuffer } from './utils/circular-buffer';
+import { LRUCache } from './utils/lru-cache';
+import { PriorityQueue } from './utils/priority-queue';
 
 // Main service
 export { WebSocketService } from './core/websocket-service';
@@ -467,8 +465,8 @@ export function createWebSocketService(): BackwardCompatibleWebSocketService {
   );
 }
 
-// Export the backward compatible service class
-export { BackwardCompatibleWebSocketService };
+// Export the backward compatible service class (remove duplicate)
+// export { BackwardCompatibleWebSocketService };
 
 /**
  * Unified WebSocket Service Factory
@@ -652,8 +650,8 @@ export function createSocketIOWebSocketService(config: UnifiedServiceConfig = {}
   return socketIOAdapter;
 }
 
-// Export the unified service class
-export { BackwardCompatibleWebSocketService };
+// Export the unified service class (remove duplicate)
+// export { BackwardCompatibleWebSocketService };
 
 // Convenience exports for different service types
 export const UnifiedWebSocketService = BackwardCompatibleWebSocketService;

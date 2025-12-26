@@ -67,6 +67,31 @@
   background-color: hsl(var(--civic-expert));
 }
 
+/* Icon container activity colors */
+.iconContainer[data-activity-type="view"] {
+  background-color: hsl(var(--civic-transparency));
+}
+
+.iconContainer[data-activity-type="comment"] {
+  background-color: hsl(var(--civic-community));
+}
+
+.iconContainer[data-activity-type="share"] {
+  background-color: hsl(var(--civic-community));
+}
+
+.iconContainer[data-activity-type="save"] {
+  background-color: hsl(var(--civic-urgent));
+}
+
+.iconContainer[data-activity-type="vote"] {
+  background-color: hsl(var(--civic-expert));
+}
+
+.iconContainer[data-activity-type="expert_contribution"] {
+  background-color: hsl(var(--civic-expert));
+}
+
 /* Confidence Colors */
 .confidenceHigh {
   border-color: hsl(var(--civic-expert));

@@ -40,9 +40,9 @@ import {
   SelectValue,
 } from '@client/shared/design-system';
 import { copySystem } from '@/content/copy-system';
-import { useBills } from '../model/hooks/useBills';
+import { useBills } from '../hooks';
 import type { Bill, BillsQueryParams } from '../model/types';
-import { useUserPreferences } from '@client/core/auth';
+import { useUserPreferences } from '@client/features/users/hooks/useUserAPI';
 import { useDeviceInfo } from '@/hooks/mobile/useDeviceInfo';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';

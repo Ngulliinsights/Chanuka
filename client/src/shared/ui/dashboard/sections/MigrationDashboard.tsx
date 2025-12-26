@@ -9,7 +9,6 @@ import {
   Layers,
   RefreshCw
 } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

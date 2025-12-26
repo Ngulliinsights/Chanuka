@@ -1,16 +1,16 @@
 // Anomaly Detection Service
 // Handles detection of anomalies and unusual patterns in financial disclosure data
 
+import type {
+  CompletenessReport,
+  FinancialDisclosure} from '@server/types/index.js';
+import { FinancialDisclosureConfig } from '@shared/config';
+import { cache, DatabaseError,logger  } from '@shared/core';
 import { readDatabase } from '@shared/database';
 import { sponsors, sponsorTransparency } from "@shared/foundation";
-import { eq, desc, and, sql, count } from "drizzle-orm";
-import { cache, logger, DatabaseError  } from '@shared/core';
-import { FinancialDisclosureConfig } from '@shared/config';
+import { and, count,desc, eq, sql } from "drizzle-orm";
+
 import { disclosureProcessingService } from './disclosure-processing.service';
-import type {
-  FinancialDisclosure,
-  CompletenessReport
-} from '@server/types/index.js';
 
 export interface AnomalyDetectionResult {
   sponsor_id: number;

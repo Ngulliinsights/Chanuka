@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@client/core/auth';
-import { useUserDashboardSelectors, useUserDashboardStore } from '../../infrastructure/store/slices/userDashboardSlice';
+import type { DataExportRequest } from '@client/types/user-dashboard';
 import { logger } from '@client/utils/logger';
+
+import { useUserDashboardSelectors, useUserDashboardStore } from '../../infrastructure/store/slices/userDashboardSlice';
+
+
 
 export interface UseDashboardDataOptions {
   autoLoad?: boolean;
@@ -38,11 +42,22 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
 
   // Load dashboard data on mount
+  const loadDashboardData = useCallback(async () => {
+    try {
+      // In a real implementation, this would fetch from API
+      // For now, we'll use mock data or trigger store loading
+      await refreshDashboard();
+    } catch (error) {
+      logger.error('Failed to load dashboard data', { error });
+      setError(error instanceof Error ? error.message : 'Failed to load dashboard');
+    }
+  }, [refreshDashboard, setError]);
+
   useEffect(() => {
     if (user && autoLoad && !hasData) {
       loadDashboardData();
     }
-  }, [user, autoLoad, hasData]);
+  }, [user, autoLoad, hasData, loadDashboardData]);
 
   // Auto-refresh based on preferences
   useEffect(() => {
@@ -67,18 +82,7 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
         timestamp: new Date().toISOString()
       });
     }
-  }, [activeTab, user, trackEngagement]);
-
-  const loadDashboardData = async () => {
-    try {
-      // In a real implementation, this would fetch from API
-      // For now, we'll use mock data or trigger store loading
-      await refreshDashboard();
-    } catch (error) {
-      logger.error('Failed to load dashboard data', { error });
-      setError(error instanceof Error ? error.message : 'Failed to load dashboard');
-    }
-  };
+  }, [activeTab, user, trackEngagement, dashboardStore]);
 
   const handleRefresh = async () => {
     try {
@@ -88,15 +92,15 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
     }
   };
 
-  const updatePreferences = (prefs: Partial<typeof preferences>) => {
-    dashboardStore.updatePreferences(prefs);
+  const updatePreferences = (newPreferences: Partial<typeof preferences>) => {
+    dashboardStore.updatePreferences(newPreferences);
   };
 
   const updatePrivacyControls = (controls: Partial<typeof privacyControls>) => {
     dashboardStore.updatePrivacyControls(controls);
   };
 
-  const requestDataExport = async (request: any) => {
+  const requestDataExport = async (request: DataExportRequest) => {
     return await dashboardStore.requestDataExport(request);
   };
 

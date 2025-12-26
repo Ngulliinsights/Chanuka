@@ -1,11 +1,12 @@
-import express from 'express';
 import { sql } from 'drizzle-orm';
-import { database as db } from '../../../shared/database/index';
-import { HealthCheckResponse } from '../../types/api';
+import express from 'express';
+
 import { ResponseHelper } from '../../../shared/core/src/utils/response-helpers';
+import { database as db } from '../../../shared/database/index';
 import { errorTracker } from '../../core/errors/error-tracker';
 import { schemaValidationService } from '../../core/validation/schema-validation-service';
 import { validationMetricsCollector } from '../../core/validation/validation-metrics';
+import { HealthCheckResponse } from '../../types/api';
 
 // Define interfaces for type safety
 interface SchemaIssue {

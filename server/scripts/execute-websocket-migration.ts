@@ -5,10 +5,11 @@
 // Executes the WebSocket migration from custom implementation to Socket.IO
 // For development environment with immediate switch
 
-import { WebSocketMigrationDeployer } from '../../deploy-websocket-migration';
-import { validateSocketIOInitialization, validateSocketIOAuthentication, validateSubscriptionManagement, validateMigrationDeployment, validateZeroDowntimeMigration } from '@server/scripts/validate-connection-migration.ts';
+import { validateMigrationDeployment, validateSocketIOAuthentication, validateSocketIOInitialization, validateSubscriptionManagement, validateZeroDowntimeMigration } from '@server/scripts/validate-connection-migration.ts';
 import { logger } from '@shared/core/observability/logging';
 import { createServer } from 'http';
+
+import { WebSocketMigrationDeployer } from '../../deploy-websocket-migration';
 
 interface ExecutionOptions {
   port?: number;

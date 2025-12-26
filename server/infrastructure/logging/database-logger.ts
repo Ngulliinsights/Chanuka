@@ -5,8 +5,8 @@
  * performance metrics, audit trails, and correlation tracking.
  */
 
-import { logger } from '@shared/core';
 import { errorTracker } from '@server/core/errors/error-tracker';
+import { logger } from '@shared/core';
 
 export interface DatabaseOperationContext {
   operation: 'create' | 'read' | 'update' | 'delete' | 'search' | 'count' | 'batch';

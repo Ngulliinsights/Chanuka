@@ -5,16 +5,18 @@
  * Provides clean API for controllers with proper error handling and dependency injection
  */
 
-import { Bill, BillNumber, BillTitle, BillSummary } from '@shared/domain/entities/bill';
+import { Err,Ok, Result } from '@shared/core';
+import { Bill, BillNumber, BillSummary,BillTitle } from '@shared/domain/entities/bill';
+import { BillServiceError } from '@shared/domain/errors/bill-errors';
+import { DomainEventPublisher } from '@shared/domain/events/bill-events';
 import { BillDomainService } from '@shared/domain/services/bill-domain-service';
 import { BillNotificationService } from '@shared/domain/services/bill-notification-service';
-import { UserService } from '../../users/application/user-service-direct';
-import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
-import { DomainEventPublisher } from '@shared/domain/events/bill-events';
 import { BillStatus, BillVoteType } from '@shared/schema';
-import { Result, Ok, Err } from '@shared/core';
-import { BillServiceError } from '@shared/domain/errors/bill-errors';
+
+import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
+
 import type { IBillRepository } from '../../../../bill-repository.interface';
+import { UserService } from '../../users/application/user-service-direct';
 
 /**
  * Application service for bill operations using repository pattern

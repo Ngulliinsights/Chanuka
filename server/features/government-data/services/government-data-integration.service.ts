@@ -3,11 +3,11 @@
 // ============================================================================
 // Handles data scarcity and API limitations with multiple fallback mechanisms
 
+import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { logger  } from '@shared/core';
 import { cache  } from '@shared/core';
-import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { bills, sponsors } from '@shared/schema';
-import { eq, and, sql, desc, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull,sql } from 'drizzle-orm';
 
 export interface DataSource {
   name: string;

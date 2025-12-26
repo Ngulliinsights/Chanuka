@@ -125,6 +125,7 @@ The archive/ directory contains historical documentation and completed project p
 
 | Document | Description | Status |
 |----------|-------------|--------|
+| [chanuka idea validation.md](chanuka%20idea%20validation.md) | Strategic evaluation and conceptual validation | Current |
 | [chanuka/sustainable_uprising.md](chanuka/sustainable_uprising.md) | Long-term sustainability analysis | Current |
 | [chanuka/global_implications.md](chanuka/global_implications.md) | International impact assessment | Current |
 | [chanuka/strategic-ui-features-analysis.md](chanuka/strategic-ui-features-analysis.md) | Analysis of missing strategic features | Current |
@@ -234,6 +235,7 @@ The archive/ directory contains historical documentation and completed project p
 
 **Stakeholders:**
 - [README.md](../README.md)
+- [chanuka idea validation.md](chanuka%20idea%20validation.md)
 - [sustainable_uprising.md](reference/sustainable_uprising.md)
 - [global_implications.md](reference/global_implications.md)
 

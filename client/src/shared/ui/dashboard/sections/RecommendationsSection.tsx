@@ -1,7 +1,6 @@
 /**
  * Recommendations Section Component
- * 
- * Displays ML-powered bill recommendations with relevance scoring and reasoning.
+ * * Displays ML-powered bill recommendations with relevance scoring and reasoning.
  */
 
 import { 
@@ -12,19 +11,20 @@ import {
   Users,
   Star,
   RefreshCw,
-  Info
+  Info,
+  CheckCircle,
+  Sparkles,
+  Zap,
+  Cpu
 } from 'lucide-react';
-import { LightbulbIcon, PlusIcon, BrainIcon } from 'lucide-react';
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
-
 import { BillRecommendation } from '@client/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
-
 
 interface RecommendationsSectionProps {
   recommendations: BillRecommendation[];
@@ -65,20 +65,8 @@ export function RecommendationsSection({
     }
   };
 
-  const getReasonColor = (type: BillRecommendation['reasons'][0]['type']) => {
-    switch (type) {
-      case 'interest_match':
-        return 'hsl(var(--civic-community))';
-      case 'activity_pattern':
-        return 'hsl(var(--civic-transparency))';
-      case 'expert_recommendation':
-        return 'hsl(var(--civic-expert))';
-      case 'trending':
-        return 'hsl(var(--civic-constitutional))';
-      default:
-        return 'hsl(var(--muted))';
-    }
-  };
+  // Removed unused getReasonColor function to satisfy linter
+  // CSS modules are handling the colors via getReasonClass
 
   const getConfidenceClass = (confidence: number) => {
     if (confidence >= 0.8) return styles.confidenceHigh;
@@ -96,12 +84,8 @@ export function RecommendationsSection({
     }
   };
 
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return 'hsl(var(--civic-expert))';
-    if (confidence >= 0.6) return 'hsl(var(--civic-community))';
-    if (confidence >= 0.4) return 'hsl(var(--status-moderate))';
-    return 'hsl(var(--status-high))';
-  };
+  // Removed unused getConfidenceColor function to satisfy linter
+  // CSS modules are handling the colors via getConfidenceClass
 
   const getConfidenceLabel = (confidence: number) => {
     if (confidence >= 0.8) return 'High';
@@ -110,12 +94,13 @@ export function RecommendationsSection({
     return 'Very Low';
   };
 
-  const handleAcceptRecommendation = (billId: number) => {
-    acceptRecommendation(billId);
+  // Fixed type mismatch: id should be string to match recommendation.bill.id
+  const handleAcceptRecommendation = (billId: string | number) => {
+    acceptRecommendation(String(billId));
   };
 
-  const handleDismissRecommendation = (billId: number) => {
-    dismissRecommendation(billId);
+  const handleDismissRecommendation = (billId: string | number) => {
+    dismissRecommendation(String(billId));
   };
 
   const handleRefreshRecommendations = () => {
@@ -127,7 +112,7 @@ export function RecommendationsSection({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5" />
+            <Zap className="h-5 w-5" />
             Recommendations
           </CardTitle>
         </CardHeader>
@@ -151,13 +136,13 @@ export function RecommendationsSection({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5" />
+            <Zap className="h-5 w-5" />
             Recommendations
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <Brain className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <Cpu className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="font-medium mb-2">No recommendations yet</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Engage with more bills to get personalized recommendations.
@@ -181,7 +166,7 @@ export function RecommendationsSection({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5" />
+            <Zap className="h-5 w-5" />
             Recommendations
             <Badge variant="secondary">{recommendations.length}</Badge>
           </CardTitle>
@@ -281,7 +266,7 @@ export function RecommendationsSection({
               <div className="mb-4 p-2 bg-muted/30 rounded">
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1">
-                    <Brain className="h-3 w-3" />
+                    <Cpu className="h-3 w-3" />
                     AI Confidence
                   </span>
                   <span className={`font-medium ${getConfidenceClass(recommendation.confidence)}`}>
@@ -297,7 +282,7 @@ export function RecommendationsSection({
                   onClick={() => handleAcceptRecommendation(recommendation.bill.id)}
                   className="flex-1"
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <CheckCircle className="h-4 w-4 mr-2" />
                   Track Bill
                 </Button>
                 
@@ -324,7 +309,7 @@ export function RecommendationsSection({
         {!compact && (
           <div className="pt-4 border-t">
             <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg">
-              <Brain className="h-4 w-4 mt-0.5 text-civic-expert" />
+              <Sparkles className="h-4 w-4 mt-0.5 text-civic-expert" />
               <div className="text-xs text-muted-foreground">
                 <p className="font-medium mb-1">How recommendations work:</p>
                 <p>

@@ -5,22 +5,21 @@
  * Provides data access operations for bills with proper error handling and Result types
  */
 
-import type { Result, Maybe } from '@shared/core';
-import { Ok, Err, some, none } from '@shared/core';
-import type { Bill, NewBill } from '@shared/schema';
-import { bills } from '@shared/schema';
-import { eq, and, desc, inArray, sql, or, SQLWrapper } from 'drizzle-orm';
-
 import type { IBillRepository } from '@server/domain/interfaces/bill-repository.interface';
 import { databaseService } from '@server/infrastructure/database/database-service';
 import {
+  billSearchOptionsSchema,
   newBillSchema,
   updateBillSchema,
-  billSearchOptionsSchema,
   uuidParamSchema,
   validateRepositoryInput,
   validateSearchParams
 } from '@server/infrastructure/validation/repository-validation';
+import type { Maybe,Result } from '@shared/core';
+import { Err, none,Ok, some } from '@shared/core';
+import type { Bill, NewBill } from '@shared/schema';
+import { bills } from '@shared/schema';
+import { and, desc, eq, inArray, or, sql, SQLWrapper } from 'drizzle-orm';
 
 export class DrizzleBillRepository implements IBillRepository {
   private get db() {

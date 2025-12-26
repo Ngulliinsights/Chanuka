@@ -14,8 +14,8 @@
  *   node migrate-schema-imports.ts --dry-run # Preview changes only
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
-import { join, extname, relative } from 'path';
+import { readdirSync, readFileSync, statSync,writeFileSync } from 'fs';
+import { extname, join, relative } from 'path';
 
 // Configuration for different import pattern categories
 const IMPORT_MAPPINGS = {

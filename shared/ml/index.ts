@@ -33,9 +33,13 @@ export type {
 export type {
   MLRequest,
   MLResponse,
+} from './services/ml-orchestrator';
+
+export type {
   PipelineConfig,
   PipelineInput,
-} from './services/ml-orchestrator';
+  PipelineResult,
+} from './services/analysis-pipeline';
 
 // Utility functions
 export const ML_UTILS = {

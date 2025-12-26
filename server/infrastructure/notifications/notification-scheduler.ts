@@ -1,8 +1,8 @@
+import { type BillTrackingPreferences,userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
 import { database as db } from '@shared/database';
-import { notifications, users, bills, bill_engagement } from '@shared/schema';
-import { eq, and, lt, gte, sql } from 'drizzle-orm';
+import { bill_engagement,bills, notifications, users } from '@shared/schema';
+import { and, eq, gte, lt, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
-import { userPreferencesService, type BillTrackingPreferences } from '@server/features/users/domain/user-preferences.ts';
 // import { enhancedNotificationService, type EnhancedNotificationData } from './enhanced-notification';
 
 // Temporary stub implementation until enhanced-notification service is created

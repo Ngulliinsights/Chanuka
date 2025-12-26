@@ -1,7 +1,7 @@
-import { database as db, users, sessions, comments, notifications } from '@shared/database';
-import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
-import bcrypt from 'bcrypt';
 import { logger  } from '@shared/core';
+import { comments, database as db, notifications,sessions, users } from '@shared/database';
+import bcrypt from 'bcrypt';
+import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 
 // Type definitions for better code clarity and type safety
 interface UserProfile {
@@ -362,7 +362,7 @@ export class UserManagementService {
   }> {
     try {
       // Filter logs by user if specified, otherwise return all logs
-      let filteredLogs = user_id
+      const filteredLogs = user_id
         ? this.activityLogs.filter(log => log.user_id === user_id)
         : [...this.activityLogs];
 

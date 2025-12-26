@@ -1,9 +1,9 @@
 import { logger  } from '@shared/core';
+
 // Replace with actual import/client for your ML service
 // import { MlApiClient } from 'some-ml-client';
-
 // Import the types expected by your application services
-import { MLStakeholderResult, MLBeneficiaryResult } from '../../application/bill-comprehensive-analysis.service'; // Adjust path
+import { MLBeneficiaryResult,MLStakeholderResult } from '../../application/bill-comprehensive-analysis.service'; // Adjust path
 
 /**
  * Adapter for interacting with the external ML Analysis Service.

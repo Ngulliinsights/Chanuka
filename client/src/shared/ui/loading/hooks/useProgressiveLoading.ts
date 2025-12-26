@@ -99,7 +99,6 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     } catch (err) {
       const validationError = err instanceof LoadingError ? err : new LoadingStageError(
         'unknown',
-        'Stage validation',
         err instanceof Error ? err.message : 'Invalid stage configuration'
       );
       setError(validationError);
@@ -115,7 +114,6 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
 
     const stageError = errorInput instanceof LoadingError ? errorInput : new LoadingStageError(
       currentStage.id,
-      currentStage.message,
       typeof errorInput === 'string' ? errorInput : errorInput.message
     );
 
@@ -144,7 +142,6 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
           onTimeout: () => {
             const timeoutError = new LoadingStageError(
               currentStage.id,
-              currentStage.message,
               `Stage timed out after ${stageTimeout}ms`
             );
             failCurrentStage(timeoutError);

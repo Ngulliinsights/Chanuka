@@ -5,8 +5,8 @@
  * abstracting away direct schema usage while maintaining the same functionality.
  */
 
-import type { Result, Maybe } from '@shared/core';
-import type { Sponsor, NewSponsor } from '@shared/schema';
+import type { Maybe,Result } from '@shared/core';
+import type { NewSponsor,Sponsor } from '@shared/schema';
 
 export interface ISponsorRepository {
   /**

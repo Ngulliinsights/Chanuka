@@ -2,9 +2,9 @@
  * Unit tests for HealthChecker
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { IStatisticsCollector, IConnectionManager, IOperationQueueManager, ConnectionStats } from '../types';
+import { ConnectionStats,IConnectionManager, IOperationQueueManager, IStatisticsCollector } from '../types';
 import { HealthChecker } from './health-checker';
 
 // Mock implementations

@@ -2,17 +2,18 @@
  * Unit tests for MetricsReporter
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { MetricsReporter } from './metrics-reporter';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { 
-  IStatisticsCollector, 
-  IHealthChecker, 
-  IConnectionManager, 
-  IOperationQueueManager,
   ConnectionStats,
   HealthStatus,
+  IConnectionManager, 
+  IHealthChecker, 
+  IOperationQueueManager,
+  IStatisticsCollector, 
   MetricsReport
 } from '../types';
+import { MetricsReporter } from './metrics-reporter';
 
 // Mock implementations
 const createMockStatisticsCollector = (): IStatisticsCollector => ({

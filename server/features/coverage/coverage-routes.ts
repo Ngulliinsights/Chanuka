@@ -1,5 +1,5 @@
-import { Router } from 'express';
 import { CoverageAnalyzer } from '@server/services/coverage-analyzer';
+import { Router } from 'express';
 
 const router = Router();
 

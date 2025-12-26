@@ -5,11 +5,11 @@
  * Provides seamless transition between database systems with fallback mechanisms
  */
 
+import type { IBillRepository } from '@server/domain/interfaces/bill-repository.interface';
 import type { Result } from '@shared/core';
-import { Ok, Err } from '@shared/core';
+import { Err,Ok } from '@shared/core';
 import type { Bill, NewBill } from '@shared/schema';
 
-import type { IBillRepository } from '@server/domain/interfaces/bill-repository.interface';
 import { DrizzleBillRepository } from './drizzle-bill-repository';
 
 export enum DatabasePriority {

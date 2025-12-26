@@ -25,10 +25,10 @@ export type {
 } from '../types';
 
 // Type guards and utilities
-export const isDashboardConfig = (obj: any): obj is DashboardConfig => {
-  return obj && typeof obj.id === 'string' && Array.isArray(obj.widgets);
+export const isDashboardConfig = (obj: unknown): obj is import('./core').DashboardConfig => {
+  return obj && typeof obj === 'object' && obj !== null && 'id' in obj && typeof (obj as Record<string, unknown>).id === 'string' && 'widgets' in obj && Array.isArray((obj as Record<string, unknown>).widgets);
 };
 
-export const isWidgetConfig = (obj: any): obj is WidgetConfig => {
-  return obj && typeof obj.id === 'string' && typeof obj.type === 'string';
+export const isWidgetConfig = (obj: unknown): obj is import('./core').WidgetConfig => {
+  return obj && typeof obj === 'object' && obj !== null && 'id' in obj && typeof (obj as Record<string, unknown>).id === 'string' && 'type' in obj && typeof (obj as Record<string, unknown>).type === 'string';
 };

@@ -5,9 +5,8 @@
  * with the unified WebSocket service interface.
  */
 
-import { Server } from 'http';
-
 import { createAdapter } from '@socket.io/redis-adapter';
+import { Server } from 'http';
 import Redis from 'ioredis';
 import * as jwt from 'jsonwebtoken';
 import { Server as SocketIOServer, Socket } from 'socket.io';
@@ -33,7 +32,6 @@ const logger = {
 };
 
 import type { AdapterConfig } from '../types';
-
 import { WebSocketAdapter } from './websocket-adapter';
 
 interface AuthenticatedSocket extends Socket {

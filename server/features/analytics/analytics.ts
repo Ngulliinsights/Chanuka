@@ -1,15 +1,16 @@
-import { Router } from 'express';
-import { authenticateToken, AuthenticatedRequest } from '@server/middleware/auth.js';
-import { controllerWrapper } from '@server/utils/analytics-controller-wrapper.ts';
+import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSchema } from '@server/features/analytics/controllers/engagement.controller.ts';
 import { analyticsContextMiddleware } from '@server/features/analytics/middleware/analytics-context.ts';
 import { performanceTrackingMiddleware } from '@server/features/analytics/middleware/performance-tracking.ts';
-import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSchema } from '@server/features/analytics/controllers/engagement.controller.ts';
+import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth.js';
 import { engagementAnalyticsService } from '@server/services/engagement.service.ts';
-import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
+import { controllerWrapper } from '@server/utils/analytics-controller-wrapper.ts';
 import { logger   } from '@shared/core';
+import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api';
+import { Router } from 'express';
+import { z } from 'zod';
 
-export const router = Router();
+// Remove the duplicate export - keep only the default export at the end
+// export const router = Router();
 
 /**
  * Validation schema for general analytics queries

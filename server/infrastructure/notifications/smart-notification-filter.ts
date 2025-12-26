@@ -1,10 +1,10 @@
-import { database as db, readDatabase } from '@shared/database';
-import { users, bills, bill_engagement, user_interests, comments, sponsors, bill_cosponsors } from '@shared/schema';
-import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 // Import the *combined* preference type, NOT the global one directly
 import type { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types.ts';
 import { logger   } from '@shared/core';
 import { getDefaultCache  } from '@shared/core/caching';
+import { database as db, readDatabase } from '@shared/database';
+import { bill_cosponsors,bill_engagement, bills, comments, sponsors, user_interests, users } from '@shared/schema';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 
 // Cache key constants (moved from cache-service.ts)
 const CACHE_KEYS = { USER_ENGAGEMENT_PROFILE: (user_id: string) => `user:engagement:${user_id }`,

@@ -8,14 +8,13 @@
 import { BASE_CONFIG } from '../config/base-config';
 import { RuntimeConfig } from '../config/runtime-config';
 import type {
+  IConnectionManager,
+  ILeakDetectorHandler,
   IMemoryManager,
   IProgressiveDegradation,
-  ILeakDetectorHandler,
+  IStatisticsCollector,
   MemoryLeakData,
-  MemoryPressureData,
-  IConnectionManager,
-  IStatisticsCollector
-} from '../types';
+  MemoryPressureData} from '../types';
 
 /**
  * Memory monitoring configuration

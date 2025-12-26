@@ -1,15 +1,14 @@
-import { database as db } from '@shared/database';
-import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
-import { bills } from '@shared/schema';
-import { argumentTable } from '@shared/schema/argument_intelligence';
-import { evaluations, departments } from '@shared/schema/platform_operations';
-import type { DepartmentStat, RadarDatum } from '@shared/schema/platform_operations';
-import { logger   } from '@shared/core';
 import { errorTracker } from '@server/core/errors/error-tracker.ts';
-
 // Security Services
 import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service.js';
 import { inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
+import { logger   } from '@shared/core';
+import { database as db } from '@shared/database';
+import { bills } from '@shared/schema';
+import { argumentTable } from '@shared/schema/argument_intelligence';
+import type { DepartmentStat, RadarDatum } from '@shared/schema/platform_operations';
+import { departments,evaluations } from '@shared/schema/platform_operations';
+import { and, count, desc, eq, ilike,sql } from 'drizzle-orm';
 
 /**
  * Type definitions for domain entities.

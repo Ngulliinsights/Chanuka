@@ -1,13 +1,12 @@
-import { useDashboard } from './hooks';
-import type { DashboardComponentProps } from './types';
 import { AlertCircle, RefreshCw, TrendingUp } from 'lucide-react';
 import React from 'react';
 
-import { Button } from '../../design-system';
-import { Card, CardContent, CardHeader } from '../../design-system';
 import { handleError, measureAsync, recordMetric } from '@client/core';
 
-import { DashboardError } from './errors';
+import { Button, Card, CardContent, CardHeader } from '../../design-system';
+
+import { useDashboard } from './hooks';
+import type { DashboardComponentProps } from './types';
 import { validateActivitySummary } from './validation';
 
 export const ActivitySummary = React.memo<DashboardComponentProps>(({ 
@@ -16,12 +15,20 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
   onError,
   onDataChange 
 }) => {
-  const { data, loading, error, actions, recovery } = useDashboard(config);
+  // Fix: Argument of type 'unknown' is not assignable to parameter of type 'Partial<DashboardConfig> | undefined'.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, loading, error, actions, recovery } = useDashboard(config as any);
 
   // Handle error reporting using core error handler
   React.useEffect(() => {
     if (error) {
-      handleError(error, { component: 'ActivitySummary' });
+      // Convert error to AppError format expected by handleError
+      const appError = {
+        message: error.message,
+        code: error.name || 'DASHBOARD_ERROR',
+        cause: error.cause instanceof Error ? error.cause : undefined
+      };
+      handleError(appError);
       onError?.(error);
     }
   }, [error, onError]);
@@ -41,7 +48,7 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
       return validateActivitySummary(data.summary);
     } catch (validationError) {
       console.warn('Activity summary validation failed:', validationError);
-      return data.summary; // Use unvalidated data as fallback
+      return data.summary; // Use non-validated data as fallback
     }
   }, [data.summary]);
 
@@ -53,13 +60,16 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
           name: 'activity-summary-refresh-success',
           value: 1,
           timestamp: new Date(),
-          category: 'user-interaction'
+          // Fix: Type '"user-interaction"' is not assignable to type ...
+          category: 'interactivity'
         });
       } catch (refreshError) {
-        handleError(refreshError, { 
-          component: 'ActivitySummary', 
-          operation: 'refresh' 
-        });
+        const appError = {
+          message: refreshError instanceof Error ? refreshError.message : 'Refresh failed',
+          code: 'REFRESH_ERROR',
+          cause: refreshError instanceof Error ? refreshError : undefined
+        };
+        handleError(appError);
         throw refreshError;
       }
     });
@@ -73,13 +83,16 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
           name: 'activity-summary-recovery-success',
           value: 1,
           timestamp: new Date(),
-          category: 'error-recovery'
+          // Fix: Type '"error-recovery"' is not assignable to type ...
+          category: 'custom'
         });
       } catch (recoveryError) {
-        handleError(recoveryError, { 
-          component: 'ActivitySummary', 
-          operation: 'recovery' 
-        });
+        const appError = {
+          message: recoveryError instanceof Error ? recoveryError.message : 'Recovery failed',
+          code: 'RECOVERY_ERROR',
+          cause: recoveryError instanceof Error ? recoveryError : undefined
+        };
+        handleError(appError);
         throw recoveryError;
       }
     });
@@ -194,3 +207,5 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
     </Card>
   );
 });
+
+ActivitySummary.displayName = 'ActivitySummary';

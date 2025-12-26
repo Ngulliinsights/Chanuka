@@ -1,12 +1,13 @@
 
+import { cacheService } from '@server/infrastructure/cache/cache-service';
 import { databaseService } from '@server/infrastructure/database/database-service.js';
+import { cacheKeys } from '@shared/core/caching/key-generator';
 import { database as db } from '@shared/database';
 import { comments } from '@shared/schema';
-import { users, user_profiles } from '@shared/schema';
+import { user_profiles,users } from '@shared/schema';
 import { bills } from '@shared/schema';
-import { eq, and, desc, asc, sql, count, isNull, or, inArray } from 'drizzle-orm';
-import { cacheService } from '@server/infrastructure/cache/cache-service';
-import { cacheKeys } from '@shared/core/caching/key-generator';
+import { and, asc, count, desc, eq, inArray,isNull, or, sql } from 'drizzle-orm';
+
 import { logger } from '@/shared/core';
 
 // Types for comment operations
@@ -199,7 +200,7 @@ export class CommentService {
    * Build optimized comment query with proper sorting
    */
   private buildCommentQuery(conditions: any[], sort: string) {
-    let query = db
+    const query = db
       .select({
         comment: {
           id: comments.id,

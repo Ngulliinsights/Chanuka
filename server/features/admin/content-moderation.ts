@@ -9,15 +9,15 @@
  */
 
 import { logger  } from '@shared/core';
+
 import { 
-  moderationOrchestratorService,
-  ContentModerationFilters,
-  ModerationItem,
-  ModerationActionRecord,
-  ContentAnalytics,
   BulkModerationOperation,
-  ContentAnalysisResult
-} from './moderation/index.js';
+  ContentAnalysisResult,
+  ContentAnalytics,
+  ContentModerationFilters,
+  ModerationActionRecord,
+  ModerationItem,
+  moderationOrchestratorService} from './moderation/index.js';
 
 // Re-export types for backward compatibility
 export type {

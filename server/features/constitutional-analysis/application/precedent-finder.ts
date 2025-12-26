@@ -4,8 +4,8 @@
 // Service that finds relevant legal precedents for constitutional analysis
 
 import { logger  } from '@shared/core';
-import { LegalPrecedent } from '@shared/schema/index.js';
 import { LegalPrecedentsRepository } from '@shared/infrastructure/repositories/legal-precedents-repository.js';
+import { LegalPrecedent } from '@shared/schema/index.js';
 
 export interface PrecedentMatch {
   precedent: LegalPrecedent;

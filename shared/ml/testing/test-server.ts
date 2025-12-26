@@ -3,8 +3,8 @@
 // ============================================================================
 // Standalone server for testing ML models externally via HTTP API
 
-import express from 'express';
-import cors from 'cors';
+import express = require('express');
+import cors = require('cors');
 import { mlOrchestrator, analysisPipeline } from '../index';
 
 const app: express.Application = express();
@@ -79,6 +79,8 @@ app.post('/test/:modelType', async (req, res) => {
         priority: 'normal',
         timeout: 60000,
         cacheResults: false,
+        retryOnFailure: false,
+        maxRetries: 1,
         ...options
       }
     });
@@ -113,7 +115,9 @@ app.get('/quick-test/:modelType', async (req, res) => {
         async: false,
         priority: 'normal',
         timeout: 30000,
-        cacheResults: false
+        cacheResults: false,
+        retryOnFailure: false,
+        maxRetries: 1
       }
     });
 

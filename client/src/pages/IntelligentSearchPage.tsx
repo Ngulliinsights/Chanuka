@@ -6,14 +6,14 @@
  */
 
 
-import { AdvancedSearchInterface } from '@client/features/search/components/AdvancedSearchInterface';
-import { IntelligentAutocomplete } from '@client/features/search/components/IntelligentAutocomplete';
-import { SavedSearches } from '@client/features/search/components/SavedSearches';
-import { SearchAnalyticsDashboard } from '@client/features/search/components/SearchAnalyticsDashboard';
-import { SearchFilters } from '@client/features/search/components/SearchFilters';
-import { SearchProgressIndicator } from '@client/features/search/components/SearchProgressIndicator';
-import { SearchResultCard } from '@client/features/search/components/SearchResultCard';
-import { SearchTips } from '@client/features/search/components/SearchTips';
+import { AdvancedSearchInterface } from '@client/features/search/ui/interface/AdvancedSearch';
+import { IntelligentAutocomplete } from '@client/features/search/ui/interface/IntelligentAutocomplete';
+import { SavedSearches } from '@client/features/search/ui/interface/SavedSearches';
+import { SearchAnalyticsDashboard } from '@client/features/search/ui/interface/SearchAnalyticsDashboard';
+import { SearchFilters } from '@client/features/search/ui/filters/SearchFilters';
+import { SearchProgressIndicator } from '@client/features/search/ui/interface/SearchProgressIndicator';
+import { SearchResultCard } from '@client/features/search/ui/results/SearchResultCard';
+import { SearchTips } from '@client/features/search/ui/interface/SearchTips';
 import { Settings, Save, TrendingUp, Target, Clock, BarChart3 } from 'lucide-react';
 import { useState } from 'react';
 

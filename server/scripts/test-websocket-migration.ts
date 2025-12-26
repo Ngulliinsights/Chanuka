@@ -4,9 +4,9 @@
 // ============================================================================
 // Simple test to validate Socket.IO migration without full database setup
 
-import { Server } from 'socket.io';
-import { createServer } from 'http';
 import { logger } from '@shared/core/observability/logging';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 /**
  * Simple Socket.IO WebSocket Service for testing

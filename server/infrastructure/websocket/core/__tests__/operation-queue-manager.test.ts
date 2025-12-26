@@ -5,9 +5,10 @@
  * and overflow protection for the WebSocket operation queue system.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { OperationQueueManager, OPERATION_PRIORITIES } from '../operation-queue-manager';
-import type { QueueOperation, AuthenticatedWebSocket } from '../../types';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { AuthenticatedWebSocket,QueueOperation } from '../../types';
+import { OPERATION_PRIORITIES,OperationQueueManager } from '../operation-queue-manager';
 
 // Mock WebSocket factory
 const createMockWebSocket = (overrides: Partial<AuthenticatedWebSocket> = {}): AuthenticatedWebSocket => {

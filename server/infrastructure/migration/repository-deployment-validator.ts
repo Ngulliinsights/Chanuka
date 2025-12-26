@@ -1,12 +1,12 @@
-import { eq, sql, count, avg, and, desc } from "drizzle-orm";
 import { databaseService } from '@shared/database/database-service';
-import { bills, users, comments, bill_engagement } from '@shared/schema/index.js';
-import { logger } from '@/shared/core';
 import {
   AsyncServiceResult,
-  withResultHandling,
-  ResultAdapter
-} from '@shared/errors/result-adapter.js';
+  ResultAdapter,
+  withResultHandling} from '@shared/errors/result-adapter.js';
+import { bill_engagement,bills, comments, users } from '@shared/schema/index.js';
+import { and, avg, count, desc,eq, sql } from "drizzle-orm";
+
+import { logger } from '@/shared/core';
 
 // Types for deployment validation
 export interface DeploymentValidationConfig {

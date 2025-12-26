@@ -8,13 +8,13 @@
 
 import { verify } from 'jsonwebtoken';
 
+import { BASE_CONFIG } from '../config/base-config';
+import { RuntimeConfig } from '../config/runtime-config';
 import type {
   AuthenticatedWebSocket,
   ConnectionPoolEntry,
   IConnectionManager,
 } from '../types';
-import { RuntimeConfig } from '../config/runtime-config';
-import { BASE_CONFIG } from '../config/base-config';
 
 /**
  * Error types for connection management

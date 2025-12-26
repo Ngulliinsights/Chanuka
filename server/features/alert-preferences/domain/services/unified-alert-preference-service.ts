@@ -1,12 +1,13 @@
-import { eq, and, desc, sql, inArray } from 'drizzle-orm';
-import { databaseService } from '@/infrastructure/database/database-service';
+import { logger   } from '@shared/core';
 import { database as db } from '@shared/database';
+import * as schema from '@shared/schema';
+import { and, desc, eq, inArray,sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+import { cacheService } from '@/infrastructure/cache';
+import { databaseService } from '@/infrastructure/database/database-service';
 import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
 import { user_profileservice } from '@/users/domain/user-profile';
-import { cacheService } from '@/infrastructure/cache';
-import * as schema from '@shared/schema';
-import { z } from 'zod';
-import { logger   } from '@shared/core';
 
 // ============================================================================
 // TYPE DEFINITIONS

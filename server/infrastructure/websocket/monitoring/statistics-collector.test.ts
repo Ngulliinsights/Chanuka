@@ -2,7 +2,8 @@
  * Unit tests for StatisticsCollector
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { StatisticsCollector } from './statistics-collector';
 
 describe('StatisticsCollector', () => {

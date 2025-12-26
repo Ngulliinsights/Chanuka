@@ -6,13 +6,12 @@
  */
 
 import type {
+  AnalysisMethodology,
   BillSection,
-  Sponsor,
   FinancialBreakdown,
-  TimelineEvent,
   ImplementationWorkarounds,
-  AnalysisMethodology
-} from '@server/types/common.js';
+  Sponsor,
+  TimelineEvent} from '@server/types/common.js';
 
 export interface SponsorshipAnalysis { bill_id: number;
   title: string;

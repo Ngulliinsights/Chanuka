@@ -9,7 +9,7 @@ import {
   Eye,
   FileText,
   Heart,
-  Lightning,
+  Zap,
   MessageSquare,
   Search,
   Shield,
@@ -700,7 +700,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Link to="/auth">
                 <Button size="lg" className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                  <Lightning className="mr-2 h-5 w-5" />
+                  <Zap className="mr-2 h-5 w-5" />
                   Get Started Free
                 </Button>
               </Link>

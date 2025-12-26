@@ -1,7 +1,7 @@
 // Repository interfaces removed - using direct service calls
-import { UserVerificationDomainService, VerificationCreationResult, VerificationUpdateResult } from '../../domain/services/user-verification-domain-service';
 import { CitizenVerification, VerificationType } from '../../domain/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '../../domain/entities/value-objects';
+import { UserVerificationDomainService, VerificationCreationResult, VerificationUpdateResult } from '../../domain/services/user-verification-domain-service';
 import { UserService } from '../user-service-direct';
 
 export interface SubmitVerificationCommand { user_id: string;

@@ -1,7 +1,6 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 // import { useWebSocket } from '@client/hooks/useWebSocket';
 import { Bell, AlertCircle, Info, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 import { cn } from '@client/lib/utils';
 // import { logger } from '@client/utils/logger';

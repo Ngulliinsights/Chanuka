@@ -3,9 +3,9 @@
  * This file provides backward compatibility while using the unified caching system
  */
 
-import { cacheFactory } from '@shared/core/caching';
-import type { CacheAdapter } from '@shared/core/caching';
 import { logger } from '@server/utils/shared-core-fallback.ts';
+import type { CacheAdapter } from '@shared/core/caching';
+import { cacheFactory } from '@shared/core/caching';
 
 // Re-export types for backward compatibility
 export interface CacheOptions {

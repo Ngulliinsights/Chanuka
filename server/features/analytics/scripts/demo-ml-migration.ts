@@ -4,9 +4,10 @@
  * Demonstrates the ML service migration functionality
  */
 
-import { RealMLAnalysisService } from '@server/services/real-ml.service.ts';
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import MLMigrationConfigurator from '@server/features/analytics/scripts/configure-ml-migration.ts';
+import { RealMLAnalysisService } from '@server/services/real-ml.service.ts';
+
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 
 async function demonstrateMLMigration() {
     console.log('=== ML Service Migration Demo ===\n');

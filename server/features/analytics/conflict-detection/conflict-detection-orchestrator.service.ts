@@ -5,23 +5,25 @@
  * This service acts as the primary interface for conflict detection operations.
  */
 
-import { database as db } from '@shared/database';
-import {
-  sponsors, sponsorAffiliations, sponsorTransparency, bills,
-  type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
-} from '@/shared/schema';
-import { eq } from 'drizzle-orm';
-import { getDefaultCache } from '@shared/core/caching/index.js';
+import { conflictDetectionEngineService } from '@server/features/analytics/conflict-detection/conflict-detection-engine.service.ts';
+import { conflictResolutionRecommendationService } from '@server/features/analytics/conflict-detection/conflict-resolution-recommendation.service.ts';
+import { conflictSeverityAnalyzerService } from '@server/features/analytics/conflict-detection/conflict-severity-analyzer.service.ts';
+import { stakeholderAnalysisService } from '@server/features/analytics/conflict-detection/stakeholder-analysis.service.ts';
 import { logger  } from '@shared/core';
+import { getDefaultCache } from '@shared/core/caching/index.js';
+import { database as db } from '@shared/database';
+import { eq } from 'drizzle-orm';
+
+import {
+type Bill,
+bills,
+  type Sponsor, type SponsorAffiliation, sponsorAffiliations,   sponsors, type SponsorTransparency, sponsorTransparency} from '@/shared/schema';
+
 import {
   ConflictAnalysis,
   ConflictDetectionError,
   Stakeholder
 } from './types.js';
-import { conflictDetectionEngineService } from '@server/features/analytics/conflict-detection/conflict-detection-engine.service.ts';
-import { stakeholderAnalysisService } from '@server/features/analytics/conflict-detection/stakeholder-analysis.service.ts';
-import { conflictSeverityAnalyzerService } from '@server/features/analytics/conflict-detection/conflict-severity-analyzer.service.ts';
-import { conflictResolutionRecommendationService } from '@server/features/analytics/conflict-detection/conflict-resolution-recommendation.service.ts';
 
 export class ConflictDetectionOrchestratorService {
   private static instance: ConflictDetectionOrchestratorService;

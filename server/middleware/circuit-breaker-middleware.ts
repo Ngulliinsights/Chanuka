@@ -3,8 +3,8 @@
  * Integrates the comprehensive circuit breaker pattern with server-side API calls
  */
 
-import { CircuitBreaker, CircuitBreakerOptions } from '@shared/core/src/observability/error-management/patterns/circuit-breaker';
 import { BaseError, ErrorDomain, ErrorSeverity } from '@shared/core/src/observability/error-management/errors/base-error';
+import { CircuitBreaker, CircuitBreakerOptions } from '@shared/core/src/observability/error-management/patterns/circuit-breaker';
 import { logger } from '@shared/core/src/observability/logging';
 
 // Circuit breaker instances for different services

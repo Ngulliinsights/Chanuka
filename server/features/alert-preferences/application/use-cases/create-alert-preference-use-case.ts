@@ -1,12 +1,12 @@
 import { AlertPreference } from '../../domain/entities/alert-preference';
+import { IAlertPreferenceRepository } from '../../domain/repositories/alert-preference-repository';
 import { AlertChannel } from '../../domain/value-objects/alert-channel';
+import { AlertConditions } from '../../domain/value-objects/alert-conditions';
 import { AlertType } from '../../domain/value-objects/alert-type';
+import { ChannelType } from '../../domain/value-objects/channel-type';
+import { FrequencyConfig } from '../../domain/value-objects/frequency-config';
 import { Priority } from '../../domain/value-objects/priority';
 import { SmartFilteringConfig } from '../../domain/value-objects/smart-filtering-config';
-import { FrequencyConfig } from '../../domain/value-objects/frequency-config';
-import { AlertConditions } from '../../domain/value-objects/alert-conditions';
-import { ChannelType } from '../../domain/value-objects/channel-type';
-import { IAlertPreferenceRepository } from '../../domain/repositories/alert-preference-repository';
 import { CreateAlertPreferenceCommand } from '../commands/create-alert-preference-command';
 
 /**

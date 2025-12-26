@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { logger   } from '@shared/core';
 import { validationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
+import { logger   } from '@shared/core';
+import { z } from 'zod';
 
 // Comprehensive data validation service for government data integration
 export class GovernmentDataValidationService {

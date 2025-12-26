@@ -4,9 +4,10 @@
  * Tests subscription tracking, management, batch operations, and cleanup functionality.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { SubscriptionManager } from '../subscription-manager';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { AuthenticatedWebSocket } from '../../types';
+import { SubscriptionManager } from '../subscription-manager';
 
 // Mock WebSocket factory
 const createMockWebSocket = (overrides: Partial<AuthenticatedWebSocket> = {}): AuthenticatedWebSocket => {

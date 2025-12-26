@@ -1,5 +1,6 @@
 module.exports = {
   extends: ['../.eslintrc.cjs'],
+  plugins: ['simple-import-sort'],
   env: {
     node: true,
     es2022: true,
@@ -16,5 +17,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'no-console': 'warn',
     'import/no-unresolved': 'error',
+    'import/order': 'off',
+    'simple-import-sort/imports': 'error',
   },
 };

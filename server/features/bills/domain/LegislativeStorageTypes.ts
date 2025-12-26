@@ -1,6 +1,6 @@
-import { QueryResult, QueryResultRow } from 'pg';
 import { logger  } from '@shared/core';
-import { InsertUser, User, UserProfile, InsertUserProfile, Bill, InsertBill, BillComment, InsertBillComment, Sponsor, InsertSponsor, Analysis, InsertAnalysis, BillEngagement, Notification, SponsorAffiliation, BillSponsorship, SponsorTransparency, BillSectionConflict } from '@shared/schema';
+import { Analysis, Bill, BillComment, BillEngagement, BillSectionConflict,BillSponsorship, InsertAnalysis, InsertBill, InsertBillComment, InsertSponsor, InsertUser, InsertUserProfile, Notification, Sponsor, SponsorAffiliation, SponsorTransparency, User, UserProfile } from '@shared/schema';
+import { QueryResult, QueryResultRow } from 'pg';
 
 export interface TransactionClient {
   query<T extends QueryResultRow>(queryText: string, values?: any[]): Promise<QueryResult<T>>;

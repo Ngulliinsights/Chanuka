@@ -24,10 +24,11 @@ export enum ErrorDomain {
   NETWORK = 'network',
   EXTERNAL_SERVICE = 'external_service',
   BUSINESS_LOGIC = 'business_logic',
-  INFRASTRUCTURE = 'infrastructure',
-  SECURITY = 'security',
-  DATA = 'data',
-  INTEGRATION = 'integration'
+  // Remove unused enum members
+  // INFRASTRUCTURE = 'infrastructure',
+  // SECURITY = 'security',
+  // DATA = 'data',
+  // INTEGRATION = 'integration'
 }
 
 // Error severity levels
@@ -35,7 +36,8 @@ export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  // Remove unused enum member
+  // CRITICAL = 'critical'
 }
 
 // Recovery strategy interface

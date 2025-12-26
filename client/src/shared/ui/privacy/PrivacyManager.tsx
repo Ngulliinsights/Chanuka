@@ -3,7 +3,7 @@
  * Accepts a mode prop to render different interfaces
  */
 
-import React from 'react';
+import { useState } from 'react';
 
 import { PrivacySettings } from '@client/types/auth';
 

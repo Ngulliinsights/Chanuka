@@ -1,19 +1,18 @@
-import { readDatabase } from '@shared/database';
-import * as schema from '@/shared/schema';
-import { eq, and } from 'drizzle-orm';
-import { logger  } from '@shared/core';
-import { databaseService } from '@/infrastructure/database/database-service.js'; // For storing results
-
-
 // Import individual analysis services and their result types
-import { constitutionalAnalysisService, ConstitutionalAnalysisResult } from '@server/features/analysis/application/constitutional-analysis.service.ts';
-import { stakeholderAnalysisService, StakeholderAnalysisResult } from '@server/features/analysis/application/stakeholder-analysis.service.ts';
-import { transparencyAnalysisService, TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service.ts';
+import { ConstitutionalAnalysisResult,constitutionalAnalysisService } from '@server/features/analysis/application/constitutional-analysis.service.ts';
 import { publicInterestAnalysisService, PublicInterestScoreResult } from '@server/features/analysis/application/public-interest-analysis.service.ts';
+import { StakeholderAnalysisResult,stakeholderAnalysisService } from '@server/features/analysis/application/stakeholder-analysis.service.ts';
+import { transparencyAnalysisService, TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service.ts';
+import type { ConflictDetectionResult } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts'; // Updated path
 // Import sponsor conflict analysis service and its necessary types/functions
 // Adjust path based on final location of sponsor conflict analysis
 import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts'; // Updated path
-import type { ConflictDetectionResult } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts'; // Updated path
+import { logger  } from '@shared/core';
+import { readDatabase } from '@shared/database';
+import { and,eq } from 'drizzle-orm';
+
+import { databaseService } from '@/infrastructure/database/database-service.js'; // For storing results
+import * as schema from '@/shared/schema';
 
 
 // --- Define ConflictSummary type based on sponsor conflict service output ---

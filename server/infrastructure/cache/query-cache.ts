@@ -3,8 +3,9 @@
  * Wraps database queries with caching logic
  */
 
-import { serverCache } from './cache-service';
 import * as crypto from 'crypto';
+
+import { serverCache } from './cache-service';
 
 export interface QueryCacheOptions {
   ttl?: number;

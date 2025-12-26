@@ -4,16 +4,15 @@
  * Handles analytics, statistics, and reporting for the moderation system.
  */
 
+import { ContentAnalytics } from '@server/features/admin/moderation/types.ts';
+import { logger  } from '@shared/core';
 import { database as db } from '@shared/database';
 import { bill, 
   comments, 
-  users, 
   content_report, 
-  moderation_action
- } from '@shared/shared/schema';
-import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
-import { logger  } from '@shared/core';
-import { ContentAnalytics } from '@server/features/admin/moderation/types.ts';
+  moderation_action,
+  users } from '@shared/shared/schema';
+import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 
 export class ModerationAnalyticsService {
   private static instance: ModerationAnalyticsService;

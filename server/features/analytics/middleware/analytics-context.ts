@@ -1,8 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
-import { randomUUID } from 'crypto';
-import { AuthenticatedRequest } from '../../../../AuthAlert';
 import { logger  } from '@shared/core';
+import { randomUUID } from 'crypto';
+import { NextFunction,Request, Response } from 'express';
+
 import { errorTracker } from '@/core/errors/error-tracker.js';
+
+import { AuthenticatedRequest } from '../../../../AuthAlert';
 
 /**
  * Request context interface for analytics operations

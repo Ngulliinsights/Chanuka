@@ -389,7 +389,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         },
 
         // Warning filtering keeps your build output clean and actionable
-        onwarn(warning: any, warn: (warning: unknown) => void) {
+        onwarn(warning: any, warn: any) {
           // Circular dependencies are common in React apps and usually harmless
           if (warning.code === 'CIRCULAR_DEPENDENCY') return
           // This warning appears with some libraries but doesn't affect functionality

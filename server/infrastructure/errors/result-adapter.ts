@@ -5,15 +5,15 @@
  * error handling, maintaining API compatibility while introducing functional error handling.
  */
 
-import { Result, ok, err } from 'neverthrow';
 import * as Boom from '@hapi/boom';
+import { err,ok, Result } from 'neverthrow';
+
 import { 
-  StandardizedError, 
-  ErrorResponse, 
   ErrorCategory, 
+  errorHandler, 
+  ErrorResponse, 
   ErrorSeverity,
-  errorHandler 
-} from './error-standardization.js';
+  StandardizedError} from './error-standardization.js';
 
 // Re-export Result types for convenience
 export { Result, ok, err } from 'neverthrow';

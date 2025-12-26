@@ -5,8 +5,8 @@
  * direct schema usage while maintaining the same functionality.
  */
 
-import type { Result, Maybe } from '@shared/core';
-import type { User, NewUser, UserProfile, NewUserProfile } from '@shared/schema';
+import type { Maybe,Result } from '@shared/core';
+import type { NewUser, NewUserProfile,User, UserProfile } from '@shared/schema';
 
 export interface IUserRepository {
   /**

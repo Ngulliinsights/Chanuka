@@ -1,15 +1,15 @@
-import { bill as bills, users as users, comments as comments, user_profiles as user_profiles, bill_engagement,
-  notification as notifications, analysis, sponsor as sponsors, sponsorAffiliation as sponsorAffiliations,
-  bill_sponsorship as bill_sponsorships, sponsorTransparency, billSectionConflict as billSectionConflicts,
-  type Bill, type InsertBill, type User, type InsertUser,
-  type BillComment, type InsertBillComment, type UserProfile, type InsertUserProfile,
-  type Sponsor, type InsertSponsor, type Analysis, type InsertAnalysis,
-  type BillEngagement, type Notification, type SponsorAffiliation, 
-  type SponsorTransparency, type BillSectionConflict
- } from '@shared/shared/schema';
-import { eq, desc, and, or, like, count, asc, sql } from "drizzle-orm";
-import { readDatabase } from '@shared/database';
 import { logger   } from '@shared/core';
+import { readDatabase } from '@shared/database';
+import { type Analysis, analysis,   type Bill, bill as bills, bill_engagement,
+  bill_sponsorship as bill_sponsorships,   type BillComment,   type BillEngagement, type BillSectionConflict,
+billSectionConflict as billSectionConflicts,
+comments as comments, type InsertAnalysis,
+type InsertBill, type InsertBillComment, type InsertSponsor, type InsertUser,
+type InsertUserProfile,
+type Notification,   notification as notifications,   type Sponsor, sponsor as sponsors, type SponsorAffiliation, 
+sponsorAffiliation as sponsorAffiliations,
+  type SponsorTransparency, sponsorTransparency, type User, user_profiles as user_profiles, type UserProfile, users as users } from '@shared/shared/schema';
+import { and, asc, count, desc, eq, like, or, sql } from "drizzle-orm";
 
 // Enhanced engagement statistics interface with more detailed metrics
 export interface BillEngagementStats {

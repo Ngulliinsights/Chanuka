@@ -5,10 +5,10 @@
  * and visualization data for the migration control interface.
  */
 
-import { monitoringService, type MigrationMetrics } from './monitoring.service';
-import { featureFlagsService } from './feature-flags.service';
-import { rollbackService } from './rollback.service';
 import { abTestingService } from './ab-testing.service';
+import { featureFlagsService } from './feature-flags.service';
+import { type MigrationMetrics,monitoringService } from './monitoring.service';
+import { rollbackService } from './rollback.service';
 import { validationService } from './validation.service';
 
 export interface DashboardMetrics {

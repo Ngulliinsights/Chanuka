@@ -1,7 +1,8 @@
-import { getDbInstance, readDatabase } from '@server/infrastructure/database/index.js';
-import { sql } from 'drizzle-orm';
-import { logger   } from '@shared/core';
 import { validationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
+import { getDbInstance, readDatabase } from '@server/infrastructure/database/index.js';
+import { logger   } from '@shared/core';
+import { sql } from 'drizzle-orm';
+
 import {
   complianceChecks,
   securityAuditLogs,

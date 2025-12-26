@@ -84,3 +84,6 @@ export interface BillsQueryParams extends PaginationParams {
   sortBy?: 'date' | 'relevance' | 'urgency';
   sortOrder?: 'asc' | 'desc';
 }
+
+// Alias for backward compatibility
+export type BillsSearchParams = BillsQueryParams;

@@ -1,9 +1,8 @@
+import { UserService } from '../../application/user-service-direct';
 import { User } from '../entities/user';
-import { UserProfile, UserInterest } from '../entities/user-profile';
- 
+import { UserInterest,UserProfile } from '../entities/user-profile';
 // UserRepository interface removed - using direct service calls
 import { ProfileDomainService } from './profile-domain-service';
-import { UserService } from '../../application/user-service-direct';
 
 export interface UserCreationResult {
   success: boolean;

@@ -3,7 +3,9 @@
  * Essential widget types for dashboard components
  */
 
-import { BaseComponentProps, WidgetConfig, ErrorInfo } from '../../types';
+import { BaseComponentProps, ErrorInfo } from '../../types';
+
+import { WidgetConfig } from './core';
 
 // ============================================================================
 // Widget Component Types
@@ -13,7 +15,7 @@ export type WidgetType = 'analytics' | 'performance' | 'engagement' | 'metrics' 
 
 export interface WidgetProps extends BaseComponentProps {
   config: WidgetConfig;
-  data?: any;
+  data?: unknown;
   loading?: boolean;
   error?: ErrorInfo;
   onUpdate?: (config: Partial<WidgetConfig>) => void;

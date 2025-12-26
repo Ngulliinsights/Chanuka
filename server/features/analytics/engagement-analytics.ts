@@ -1,22 +1,22 @@
-import { Router } from 'express';
-import { database, withTransaction, getDatabase } from '@shared/database';
-import { comments, users, user_profiles, bills } from '@shared/foundation';
-import { comments as comments_cp, bill_engagement } from '@shared/citizen_participation';
-import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
-import { cacheKeys  } from '@shared/core/caching/key-generator';
-import { getDefaultCache  } from '@shared/core/caching';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api-utils';
-import { logger   } from '@shared/core';
-import { AuthenticatedRequest  } from '@shared/core/types/auth.types';
-import { z } from 'zod';
-
 // Security Services
 import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service.js';
 import { inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
+import { bill_engagement,comments as comments_cp } from '@shared/citizen_participation';
+import { logger   } from '@shared/core';
+import { getDefaultCache  } from '@shared/core/caching';
+import { cacheKeys  } from '@shared/core/caching/key-generator';
+import { AuthenticatedRequest  } from '@shared/core/types/auth.types';
+import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { database, getDatabase,withTransaction } from '@shared/database';
+import { bills,comments, user_profiles, users } from '@shared/foundation';
+import { and, avg,count, desc, eq, sql, sum } from 'drizzle-orm';
+import { Router } from 'express';
+import { z } from 'zod';
+
 import type {
-  UserEngagementMetrics,
   BillEngagementMetrics,
   CommentEngagementTrends,
+  UserEngagementMetrics,
 } from './types';
 
 // Helper function to build time thresholds

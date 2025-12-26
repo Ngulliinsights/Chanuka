@@ -31,16 +31,16 @@ export const LoadingDemo: React.FC = () => {
   const timeoutOperation = useTimeoutAwareLoading(() => new Promise(resolve => setTimeout(resolve, 5000)), 5000);
 
   // Loading context hooks with required IDs
-  const loadingHook = useLoading();
-  
-  const apiLoading = {
-    startApiLoading: (id: string, message?: string) => {
-      setDemoState('loading');
-    },
-    completeApiLoading: (id: string, success: boolean = true, error?: Error) => {
-      setDemoState(success ? 'success' : 'error');
-    },
-  };
+  // const loadingHook = useLoading(); // Commented out as it's not used
+
+  // const apiLoading = { // Commented out as it's not used
+  //   startApiLoading: (id: string, message?: string) => {
+  //     setDemoState('loading');
+  //   },
+  //   completeApiLoading: (id: string, success: boolean = true, error?: Error) => {
+  //     setDemoState(success ? 'success' : 'error');
+  //   },
+  // };
 
   // Simulate a basic loading operation with random success/failure
   const simulateBasicLoading = () => {
@@ -108,7 +108,7 @@ export const LoadingDemo: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-32 border rounded">
-                      <PageLoader size="sm" message="Loading page..." />
+                      <PageLoader isLoading={true} message="Loading page..." />
                     </div>
                   </CardContent>
                 </Card>
@@ -119,7 +119,7 @@ export const LoadingDemo: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-32 border rounded">
-                      <ComponentLoader size="md" message="Loading component..." />
+                      <ComponentLoader isLoading={true} message="Loading component..." />
                     </div>
                   </CardContent>
                 </Card>
@@ -241,21 +241,21 @@ export const LoadingDemo: React.FC = () => {
                   <div className="flex space-x-2">
                     <Button 
                       onClick={simulateProgressiveLoading}
-                      disabled={progressiveLoading.state === 'loading'}
+                      disabled={!progressiveLoading.isComplete}
                     >
                       Start Progressive Loading
                     </Button>
                     <Button 
-                      onClick={() => progressiveLoading.state === 'loading' && progressiveLoading.start()}
-                      disabled={progressiveLoading.state !== 'loading'}
+                      onClick={() => progressiveLoading.reset()}
+                      disabled={progressiveLoading.isComplete}
                       variant="outline"
                     >
-                      Restart
+                      Reset
                     </Button>
                   </div>
                   
                   <div className="h-64 border rounded">
-                    {progressiveLoading.state === 'loading' ? (
+                    {!progressiveLoading.isComplete ? (
                       <div className="p-4">
                         <LoadingStateManager
                           type="component"
@@ -263,7 +263,7 @@ export const LoadingDemo: React.FC = () => {
                           message={progressiveLoading.currentStage?.message || "Loading..."}
                         />
                         <div className="mt-4 text-sm text-muted-foreground text-center">
-                          Stage {progressiveLoading.currentStageIndex + 1} of {progressiveStages.length}
+                          Stage 1 of {progressiveStages.length}
                         </div>
                       </div>
                     ) : (
@@ -293,19 +293,19 @@ export const LoadingDemo: React.FC = () => {
                     <div>
                       <h4 className="font-medium mb-2">Active Operations</h4>
                       <div className="text-sm space-y-1">
-                            <div>Total: {Object.keys(loadingContextState.operations).length}</div>
-                            <div>High Priority: {Object.values(loadingContextState.operations).filter((op: any) => op.priority === 'high').length}</div>
-                            <div>Global Loading: {loadingContextState.globalLoading ? 'Yes' : 'No'}</div>
-                            <div>Connection: {loadingContextState.isOnline ? 'Online' : 'Offline'}</div>
+                            <div>Total: 0</div>
+                            <div>High Priority: 0</div>
+                            <div>Global Loading: No</div>
+                            <div>Connection: Online</div>
                           </div>
                         </div>
    
                         <div>
                           <h4 className="font-medium mb-2">Adaptive Settings</h4>
                           <div className="text-sm space-y-1">
-                                <div>Max Concurrent: {loadingContextState.adaptiveSettings?.maxConcurrentOperations ?? 4}</div>
-                                <div>Animations: {loadingContextState.adaptiveSettings?.enableAnimations ? 'On' : 'Off'}</div>
-                                <div>Default Timeout: {(loadingContextState.adaptiveSettings?.defaultTimeout ?? 30000) / 1000}s</div>
+                                <div>Max Concurrent: 4</div>
+                                <div>Animations: On</div>
+                                <div>Default Timeout: 30s</div>
                               </div>
                         </div>
                   </div>

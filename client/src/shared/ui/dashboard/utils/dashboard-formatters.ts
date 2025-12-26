@@ -21,15 +21,17 @@ export function formatActivitySummary(summary: ActivitySummary): {
   completionRate: string;
   lastUpdatedText: string;
 } {
-  const completionRate = summary.completedActions + summary.pendingActions > 0
-    ? Math.round((summary.completedActions / (summary.completedActions + summary.pendingActions)) * 100)
-    : 0;
+  // Since ActivitySummary doesn't have completed/pending actions,
+  // we'll calculate completion rate based on actionsNeeded vs total potential actions
+  const completionRate = summary.actionsNeeded > 0 
+    ? Math.max(0, 100 - Math.min(100, (summary.actionsNeeded / summary.billsTracked) * 100))
+    : 100;
 
   return {
     billsTracked: formatNumber(summary.billsTracked),
     actionsNeeded: formatNumber(summary.actionsNeeded),
     topicsCount: formatNumber(summary.topicsCount),
-    completionRate: `${completionRate}%`,
+    completionRate: `${Math.round(completionRate)}%`,
     lastUpdatedText: formatRelativeTime(summary.lastUpdated)
   };
 }
@@ -58,8 +60,8 @@ export function formatActionItem(item: ActionItem): {
     due_date: dueDateInfo?.text || null,
     dueDateColor: dueDateInfo?.color || 'text-slate-600',
     isOverdue: dueDateInfo?.isOverdue || false,
-    createdText: formatRelativeTime(item.created_at),
-    updatedText: formatRelativeTime(item.updated_at)
+    createdText: formatRelativeTime(item.createdAt),
+    updatedText: formatRelativeTime(item.updatedAt)
   };
 }
 
@@ -83,7 +85,7 @@ export function formatTrackedTopic(topic: TrackedTopic): {
     billCountText: formatBillCount(topic.billCount),
     statusText: topic.is_active ? 'Active' : 'Inactive',
     statusColor: topic.is_active ? 'text-green-600' : 'text-slate-400',
-    createdText: formatRelativeTime(topic.created_at),
+    createdText: formatRelativeTime(topic.createdAt),
     description: topic.description ? truncateText(topic.description, 150) : ''
   };
 }

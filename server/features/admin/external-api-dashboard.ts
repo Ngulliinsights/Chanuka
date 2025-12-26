@@ -8,12 +8,12 @@
  * and detailed configuration management for all external API integrations.
  */
 
-import { Router, Request, Response } from 'express';
-import { ApiSuccess, ApiResponseWrapper  } from '@shared/core/utils/api';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@server/infrastructure/external-data/external-api-manager.js';
 import { performanceMonitor } from '@server/infrastructure/monitoring/performance-monitor.js';
 // import { advancedCachingService } from '@server/infrastructure/cache/advanced-caching.js'; // TODO: Create advanced caching service
 import { logger   } from '@shared/core';
+import { ApiResponseWrapper,ApiSuccess  } from '@shared/core/utils/api';
+import { Request, Response,Router } from 'express';
 
 export const router = Router();
 

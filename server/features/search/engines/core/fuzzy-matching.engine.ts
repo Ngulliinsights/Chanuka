@@ -3,10 +3,10 @@
 // ============================================================================
 // Typo-tolerant search using PostgreSQL's pg_trgm extension for similarity matching
 
+import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
 import { database } from '@shared/database';
 import { bills } from '@shared/schema';
-import { sql, desc } from 'drizzle-orm';
-import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
+import { desc,sql } from 'drizzle-orm';
 
 export class FuzzyMatchingEngine {
 

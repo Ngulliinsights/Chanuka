@@ -169,7 +169,7 @@ export class SearchSyntaxParser {
    */
   private parseBooleanOperators(query: string): { operators: ParsedQuery['booleanOperators']; remaining: string; hasOperators: boolean } {
     const operators: ParsedQuery['booleanOperators'] = { and: [], or: [], not: [] };
-    let remaining = query;
+    const remaining = query;
     let hasOperators = false;
 
     // Handle AND operators

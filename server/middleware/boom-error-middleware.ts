@@ -5,12 +5,12 @@
  * while maintaining backward compatibility with existing error formats.
  */
 
-import { Request, Response, NextFunction } from 'express';
 import * as Boom from '@hapi/boom';
-import { ZodError } from 'zod';
 import { logger  } from '@shared/core';
 import { errorAdapter } from '@shared/infrastructure/errors/error-adapter.js';
 import { ErrorResponse } from '@shared/infrastructure/errors/error-standardization.js';
+import { NextFunction,Request, Response } from 'express';
+import { ZodError } from 'zod';
 
 /**
  * Main Boom error handling middleware

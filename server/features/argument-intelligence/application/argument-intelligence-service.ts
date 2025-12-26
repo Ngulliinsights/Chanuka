@@ -1,20 +1,20 @@
+import { logger } from '@shared/core/observability/logging';
 import { db } from '@shared/database/pool.js';
 import {
-  argumentTable as arguments,
-  claims,
-  evidence,
-  argument_relationships,
-  legislative_briefs,
-  synthesis_jobs,
   type Argument,
-  type Claim,
-  type Evidence,
+  argument_relationships,
   type ArgumentRelationship,
+  argumentTable as arguments,
+  type Claim,
+  claims,
+  type Evidence,
+  evidence,
+  legislative_briefs,
   type LegislativeBrief,
+  synthesis_jobs,
   type SynthesisJob
 } from '@shared/schema';
-import { eq, and, sql, desc, asc, count, inArray, like, or, isNotNull } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging';
+import { and, asc, count, desc, eq, inArray, isNotNull,like, or, sql } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS

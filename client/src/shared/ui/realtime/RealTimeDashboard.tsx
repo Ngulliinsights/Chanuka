@@ -5,7 +5,7 @@
  * using the integrated WebSocket client with polling fallback.
  */
 
-import React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Bell, 
   Activity, 
@@ -16,7 +16,6 @@ import {
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';
-import { useEffect, useState, useCallback } from 'react';
 
 // import { useWebSocket } from '@client/hooks/use-websocket';
 import { cn } from '@client/lib/utils';

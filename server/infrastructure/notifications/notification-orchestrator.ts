@@ -1,11 +1,11 @@
-import { database as db, readDatabase } from '@shared/database';
-import { notifications, users, bill_tracking_preferences, bills } from '@shared/schema';
-import { eq, and } from 'drizzle-orm';
-import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from '@server/infrastructure/notifications/smart-notification-filter.ts';
-import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from '@server/infrastructure/notifications/notification-channels.ts';
-import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '@server/features/users/domain/user-preferences.ts';
+import { type BillTrackingPreferences as GlobalBillTrackingPreferences,type UserNotificationPreferences, userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
+import { type ChannelDeliveryRequest, type DeliveryResult,notificationChannelService } from '@server/infrastructure/notifications/notification-channels.ts';
+import { type FilterCriteria, type FilterResult,smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter.ts';
 import { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types.ts';
 import { logger   } from '@shared/core';
+import { database as db, readDatabase } from '@shared/database';
+import { bill_tracking_preferences, bills,notifications, users } from '@shared/schema';
+import { and,eq } from 'drizzle-orm';
 
 /**
  * Unified Notification Orchestrator Service

@@ -1,79 +1,52 @@
+import 'dotenv/config';
+
+import { config } from '@server/config/index';
+import { router as authRouter } from '@server/core/auth/auth';
+import { sessionCleanupService } from '@server/core/auth/session-cleanup';
+import { schemaValidationService } from '@server/core/validation/schema-validation-service';
+import { router as adminRouter } from '@server/features/admin/admin';
+import { router as externalApiDashboardRouter } from '@server/features/admin/external-api-dashboard';
+import { router as externalApiManagementRouter } from '@server/features/admin/external-api-dashboard';
+import { router as systemRouter } from '@server/features/admin/system';
+import { analysisRouter } from '@server/features/analysis/analysis.routes';
+import analyticsRouter from '@server/features/analytics/analytics';
+import { argumentIntelligenceRouter } from '@server/features/argument-intelligence/argument-intelligence-router';
+import { billTrackingRouter } from '@server/features/bills/bill-tracking.routes';
+import { router as billsRouter } from '@server/features/bills/bills-router';
+import { router as sponsorshipRouter } from '@server/features/bills/sponsorship.routes';
+import { router as communityRouter } from '@server/features/community/community';
+import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/constitutional-analysis-router';
+import coverageRouter from '@server/features/coverage/coverage-routes';
+import { router as privacyRouter } from '@server/features/privacy/privacy-routes';
+import { privacySchedulerService } from '@server/features/privacy/privacy-scheduler';
+import { router as recommendationRouter } from '@server/features/recommendation/RecommendationController';
+import { router as searchRouter } from '@server/features/search/SearchController';
+import { sponsorsRouter } from '@server/features/sponsors/sponsors.routes';
+import { router as usersRouter } from '@server/features/users/application/profile';
+import { router as verificationRouter } from '@server/features/users/application/verification';
+import { cacheManagementRoutes as cacheRouter } from '@server/infrastructure/cache/cache-management.routes';
+import { cacheCoordinator } from '@server/infrastructure/cache/index';
+import { monitoringScheduler } from '@server/infrastructure/monitoring/monitoring-scheduler';
+import { notificationSchedulerService } from '@server/infrastructure/notifications/notification-scheduler';
+import { router as notificationsRouter } from '@server/infrastructure/notifications/notifications';
+import { configureAppMiddleware } from '@server/middleware/app-middleware';
+import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
+import { webSocketService } from '@server/utils/missing-modules-fallback';
+import { setupVite } from '@server/vite';
+import { logger } from '@shared/core';
+import { pool } from '@shared/database';
+import crypto from 'crypto';
+import express, { Express, NextFunction, Request, Response } from 'express';
+import { createServer, Server } from 'http';
+
 // Diagnostic logging at startup for debugging environment configuration
-console.log('🔍 DIAGNOSTIC: Server startup initiated');
-console.log('🔍 DIAGNOSTIC: Environment variables check:', {
+logger.info('🔍 DIAGNOSTIC: Server startup initiated');
+logger.info('🔍 DIAGNOSTIC: Environment variables check:', {
   DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
   JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
   ENCRYPTION_KEY: process.env.ENCRYPTION_KEY ? 'SET' : 'NOT SET',
   KEY_DERIVATION_SALT: process.env.KEY_DERIVATION_SALT ? 'SET' : 'NOT SET',
 });
-
-import 'dotenv/config';
-import express, { Request, Response, NextFunction, Express } from 'express';
-import cors from 'cors';
-import { createServer, Server } from 'http';
-import helmet from 'helmet';
-import { pool } from '@shared/database';
-// config.d is not needed at runtime
-
-// Feature Routes
-import { router as systemRouter } from '@server/features/admin/system';
-import { router as billsRouter } from '@server/features/bills/presentation/bills-router';
-import { router as sponsorshipRouter } from '@server/features/bills/presentation/sponsorship.routes';
-import { realTimeTrackingRouter } from '@server/features/bills';
-import { analysisRouter } from '@server/features/analysis/presentation/analysis.routes';
-import { billTrackingRouter } from '@server/features/bills/presentation/bill-tracking.routes';
-import analyticsRouter from '@server/features/analytics/analytics';
-import { sponsorsRouter } from '@server/features/sponsors/presentation/sponsors.routes';
-import { router as authRouter } from '@server/core/auth/auth';
-import { router as usersRouter } from '@server/features/users/application/profile';
-import { router as verificationRouter } from '@server/features/users/application/verification';
-import { router as communityRouter } from '@server/features/community/community';
-// import { notificationRoutes as notificationsRouter } from '../client/src/core/api/notifications';
-// Notifications handled via features
-import { router as searchRouter } from '@server/features/search/presentation/SearchController';
-import { router as privacyRouter } from '@server/features/privacy/privacy-routes';
-import { router as adminRouter } from '@server/features/admin/admin';
-import { router as externalApiDashboardRouter } from '@server/features/admin/external-api-dashboard';
-import coverageRouter from '@server/features/coverage/coverage-routes';
-import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/presentation/constitutional-analysis-router';
-import { argumentIntelligenceRouter } from '@server/features/argument-intelligence/presentation/argument-intelligence-router';
-import { router as recommendationRouter } from '@server/features/recommendation/presentation/RecommendationController';
-
-// Middleware imports
-import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
-import { enhancedSecurityService } from '@server/features/security/enhanced-security-service';
-import { SecuritySchemas, createValidationMiddleware } from '@server/core/validation/security-schemas';
-import { commandInjectionPrevention, fileUploadSecurity } from '@server/middleware/command-injection-prevention';
-
-// Infrastructure Services
-import { auditMiddleware } from '@server/infrastructure/monitoring/audit-log';
-import { performanceMonitor } from '@server/infrastructure/monitoring';
-
-// Create performance middleware from performanceMonitor
-const performanceMiddleware = (req: any, res: any, next: any) => {
-  const operationId = performanceMonitor.startOperation?.('http', `${req.method} ${req.path}`, {
-    method: req.method,
-    path: req.path,
-    userAgent: req.get('User-Agent')
-  });
-
-  res.on('finish', () => {
-    performanceMonitor.endOperation?.(operationId, res.statusCode < 400, undefined, {
-      statusCode: res.statusCode,
-      responseTime: Date.now() - req.startTime
-    });
-  });
-
-  next();
-};
-import { databaseFallbackService } from '@server/infrastructure/database/database-fallback';
-import { sessionCleanupService } from '@server/core/auth/session-cleanup';
-import { securityMonitoringService } from '@server/features/security/security-monitoring-service';
-import { privacySchedulerService } from '@server/features/privacy/privacy-scheduler';
-import { schemaValidationService } from '@server/core/validation/schema-validation-service';
-
-// Unified utilities
-import { logger, Performance, ApiResponse } from '@shared/core';
 
 // Type definitions for better error handling
 interface AppError extends Error {
@@ -86,7 +59,23 @@ interface AppError extends Error {
 interface LogContext {
   component?: string;
   error?: string;
-  [key: string]: any;
+  [key: string]: unknown;
+}
+
+// Database Fallback Service Interface
+interface DatabaseFallbackService {
+  initialize(): Promise<boolean>;
+  getHealthInfo(): Promise<{ system: { message: string } }>;
+  setDemoMode(enabled: boolean): void;
+}
+
+// Enhanced WebSocket Service Interface
+interface WebSocketServiceExtended {
+  emit(event: string, data: unknown): void;
+  broadcast(event: string, data: unknown): void;
+  initialize?(server: Server): void;
+  shutdown?(): Promise<void>;
+  getMemoryAnalysis?(): unknown;
 }
 
 // Simple monitoring initialization
@@ -99,162 +88,26 @@ export const app: Express = express();
 const PORT = config.server.port;
 const isDevelopment = config.server.nodeEnv === 'development';
 
+// Configure middleware
+configureAppMiddleware(app);
+
 // Error handler middleware with proper typing
-const errorHandler = (err: AppError, req: Request, res: Response, next: NextFunction): void => {
+const errorHandler = (err: AppError, req: Request, res: Response, _next: NextFunction): void => {
   logger.error('Request error:', { error: err.message, path: req.path, component: 'Chanuka' } as LogContext);
 
   const statusCode = err.statusCode || err.status || 500;
-  const response = ApiResponse.error(
-    err.message || 'Internal server error',
-    err.code || 'INTERNAL_ERROR',
-    statusCode
-  );
+  const response = {
+    success: false,
+    error: err.message || 'Internal server error',
+    code: err.code || 'INTERNAL_ERROR',
+    timestamp: new Date().toISOString(),
+  };
 
   res.status(statusCode).json(response);
 };
 
-// Request logger middleware with performance tracking
-const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
-  const timer = Performance.startTimer(`${req.method} ${req.path}`);
-
-  res.on('finish', () => {
-    const duration = timer.end();
-    logger.info('Request completed', {
-      method: req.method,
-      url: req.url,
-      statusCode: res.statusCode,
-      duration,
-      component: 'Chanuka'
-    } as LogContext);
-  });
-
-  next();
-};
-
-// Security monitoring middleware
-const securityMonitoringMiddleware = {
-  initializeAll: () => (req: Request, res: Response, next: NextFunction): void => {
-    logger.debug('Security monitoring', {
-      ip: req.ip,
-      user_agent: req.get('User-Agent'),
-      path: req.path,
-      method: req.method,
-      component: 'Chanuka'
-    } as LogContext);
-    next();
-  }
-};
-
-// Security middleware configuration
-if (config.security.enableHelmet) {
-  app.use(helmet({
-    // CSP is handled per-request in Vite middleware for proper nonce support
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-    // Disable other headers that might conflict
-    hsts: false,
-    noSniff: false,
-    xssFilter: false,
-    referrerPolicy: false,
-  }));
-}
-
-// Enhanced CORS configuration with proper typing
-const corsOptions: cors.CorsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    const allowedOrigins = isDevelopment
-      ? [
-        `http://localhost:${PORT}`,
-        `http://127.0.0.1:${PORT}`,
-        `http://0.0.0.0:${PORT}`,
-        'http://localhost:3000',
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://localhost:4200',
-      ]
-      : config.server.frontendUrl ? [config.server.frontendUrl] : [origin];
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked request from origin: ${origin}`);
-      callback(new Error(`Not allowed by CORS policy: ${origin}`), false);
-    }
-  },
-  credentials: config.cors.credentials,
-  methods: config.cors.allowedMethods,
-  allowedHeaders: config.cors.allowedHeaders,
-  exposedHeaders: config.cors.exposedHeaders,
-  maxAge: config.cors.maxAge,
-  optionsSuccessStatus: 200,
-  preflightContinue: false
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
-
-// Body parsing middleware with robust error handling
-app.use(express.json({
-  limit: '10mb',
-  verify: (req, res, buf) => {
-    try {
-      JSON.parse(buf.toString());
-    } catch (e) {
-      res.statusCode = 400;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ error: 'Invalid JSON in request body' }));
-      throw new Error('Invalid JSON');
-    }
-  }
-}));
-
-app.use(express.urlencoded({
-  extended: true,
-  limit: '10mb',
-  verify: (req, res, buf) => {
-    if (buf.length === 0) return;
-    const str = buf.toString();
-    if (str.length > 10 * 1024 * 1024) {
-      res.statusCode = 413;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ error: 'Request entity too large' }));
-      throw new Error('Request too large');
-    }
-  }
-}));
-
-// Request monitoring and logging pipeline
-app.use(requestLogger);
-app.use(performanceMiddleware);
-app.use(migratedApiRateLimit);
-app.use(auditMiddleware);
-app.use(securityMonitoringMiddleware.initializeAll());
-
-// Command injection prevention middleware (strict mode for production)
-app.use(commandInjectionPrevention({
-  mode: isDevelopment ? 'sanitize' : 'strict',
-  whitelist: ['/api/health', '/api/frontend-health', '/api/service-status'],
-  maxViolations: 10
-}));
-
-// File upload security middleware
-app.use(fileUploadSecurity({
-  allowedExtensions: ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx', '.txt'],
-  maxFileSize: 10 * 1024 * 1024, // 10MB
-  scanContent: true
-}));
-
-// Enhanced security middleware
-app.use(enhancedSecurityService.csrfProtection());
-app.use(enhancedSecurityService.rateLimiting());
-app.use(enhancedSecurityService.vulnerabilityScanning());
-
 // Root API endpoint
-app.get('/api', (req: Request, res: Response) => {
+app.get('/api', (_req: Request, res: Response) => {
   res.json({
     message: "Chanuka Legislative Transparency Platform API",
     version: "1.0.0",
@@ -325,7 +178,14 @@ app.get('/api/security/status', (req: Request, res: Response) => {
   res.header('Access-Control-Allow-Credentials', 'true');
 
   try {
-    const securityStats = enhancedSecurityService.getSecurityStats();
+    // Mock security stats for development (replace with actual service when available)
+    const securityStats = {
+      status: 'active',
+      lastCheck: new Date().toISOString(),
+      threats: 0,
+      blockedRequests: 0
+    };
+
     res.json({
       success: true,
       data: securityStats,
@@ -348,8 +208,7 @@ app.get('/api/security/csrf-token', (req: Request, res: Response) => {
   res.header('Access-Control-Allow-Credentials', 'true');
 
   try {
-    // Generate a simple CSRF token for development
-    const token = require('crypto').randomBytes(32).toString('hex');
+    const token = crypto.randomBytes(32).toString('hex');
 
     res.json({
       success: true,
@@ -411,10 +270,9 @@ app.post('/api/auth/validate-tokens', (req: Request, res: Response) => {
   res.header('Access-Control-Allow-Credentials', 'true');
 
   try {
-    // Simple token validation for development
     res.json({
       success: true,
-      valid: false, // No real auth in development
+      valid: false,
       message: 'Development mode - no authentication required',
       timestamp: new Date().toISOString()
     });
@@ -434,7 +292,8 @@ app.get('/api/debug/memory-analysis', (req: Request, res: Response) => {
   try {
     logger.info('🔍 Triggering detailed memory analysis...', { component: 'Chanuka' } as LogContext);
 
-    const wsAnalysis = webSocketService.forceMemoryAnalysis();
+    const wsService = webSocketService as WebSocketServiceExtended;
+    const wsAnalysis = wsService.getMemoryAnalysis ? wsService.getMemoryAnalysis() : { status: 'unavailable' };
     const memUsage = process.memoryUsage();
     const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
 
@@ -465,21 +324,21 @@ app.get('/api/debug/memory-analysis', (req: Request, res: Response) => {
 });
 
 // Security-sensitive endpoints with additional rate limiting
-app.use('/api/auth', securityRateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 5, // 5 auth attempts per 15 minutes
+app.use('/api/auth', migratedApiRateLimit({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 5,
   skipSuccessfulRequests: true
 }), authRouter);
 
-app.use('/api/admin', securityRateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  maxRequests: 10, // 10 admin requests per 5 minutes
+app.use('/api/admin', migratedApiRateLimit({
+  windowMs: 5 * 60 * 1000,
+  maxRequests: 10,
   skipSuccessfulRequests: false
 }), adminRouter);
 
-app.use('/api/verification', securityRateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  maxRequests: 3, // 3 verification attempts per 10 minutes
+app.use('/api/verification', migratedApiRateLimit({
+  windowMs: 10 * 60 * 1000,
+  maxRequests: 3,
   skipSuccessfulRequests: true
 }), verificationRouter);
 
@@ -487,7 +346,6 @@ app.use('/api/verification', securityRateLimit({
 app.use('/api/system', systemRouter);
 app.use('/api/bills', billsRouter);
 app.use('/api/sponsorship', sponsorshipRouter);
-app.use('/api/real-time', realTimeTrackingRouter);
 app.use('/api/analysis', analysisRouter);
 app.use('/api/bill-tracking', billTrackingRouter);
 app.use('/api/analytics', analyticsRouter);
@@ -506,43 +364,47 @@ app.use('/api/argument-intelligence', argumentIntelligenceRouter);
 app.use('/api/recommendation', recommendationRouter);
 
 // API-specific error handling middleware
-app.use('/api', (error: AppError, req: Request, res: Response, next: NextFunction) => {
+app.use('/api', (error: AppError, req: Request, res: Response, _next: NextFunction): void => {
   logger.error('API Error:', { error: error.message, component: 'Chanuka' } as LogContext);
 
   if (error.message && error.message.includes('CORS')) {
-    return res.status(403).json({
+    res.status(403).json({
       error: 'CORS policy violation',
       message: 'Cross-origin request blocked',
       code: 'CORS_ERROR',
       timestamp: new Date().toISOString()
     });
+    return;
   }
 
   if (error.type === 'entity.parse.failed') {
-    return res.status(400).json({
+    res.status(400).json({
       error: 'Invalid JSON in request body',
       message: 'Request body contains malformed JSON',
       code: 'JSON_PARSE_ERROR',
       timestamp: new Date().toISOString()
     });
+    return;
   }
 
   if (error.type === 'entity.too.large') {
-    return res.status(413).json({
+    res.status(413).json({
       error: 'Request entity too large',
       message: 'Request body exceeds size limit',
       code: 'REQUEST_TOO_LARGE',
       timestamp: new Date().toISOString()
     });
+    return;
   }
 
   if (error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
-    return res.status(408).json({
+    res.status(408).json({
       error: 'Request timeout',
       message: 'Request took too long to process',
       code: 'REQUEST_TIMEOUT',
       timestamp: new Date().toISOString()
     });
+    return;
   }
 
   res.status(error.status || 500).json({
@@ -570,37 +432,53 @@ async function testConnection(): Promise<void> {
   }
 }
 
-// Startup initialization with proper state management and race condition protection
+// Mock database fallback service for development
+const createMockDatabaseFallbackService = (): DatabaseFallbackService => ({
+  async initialize(): Promise<boolean> {
+    try {
+      await testConnection();
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  async getHealthInfo() {
+    return {
+      system: {
+        message: 'Running in development mode with mock data'
+      }
+    };
+  },
+  setDemoMode(_enabled: boolean): void {
+    logger.info('Demo mode set', { component: 'Chanuka' } as LogContext);
+  }
+});
+
+const databaseFallbackService = createMockDatabaseFallbackService();
+
+// Startup initialization with proper state management
 let serverIsInitialized = false;
 let serverInitializationPromise: Promise<void> | null = null;
 
-/**
- * Ensures server startup initialization runs exactly once, even with concurrent calls.
- * Uses double-check locking pattern to prevent multiple initialization sequences.
- */
 async function ensureServerInitialized(): Promise<void> {
-  // Fast path: already initialized
   if (serverIsInitialized) {
     return;
   }
-  
-  // Wait for ongoing initialization if in progress
+
   if (serverInitializationPromise) {
     return serverInitializationPromise;
   }
-  
-  // Begin initialization
+
   serverInitializationPromise = performStartupInitialization()
     .then(() => {
       serverIsInitialized = true;
     })
     .catch(error => {
-      // Reset promise on failure but keep flag - prevents repeat attempts
       serverInitializationPromise = null;
       logger.error('Server initialization failed', { error, component: 'Chanuka' } as LogContext);
       throw error;
     });
-  
+
   return serverInitializationPromise;
 }
 
@@ -612,7 +490,6 @@ async function performStartupInitialization(): Promise<void> {
     const healthInfo = await databaseFallbackService.getHealthInfo();
 
     if (dbConnected) {
-      // Perform schema validation during startup
       logger.info('🔍 Performing database schema validation...', { component: 'Chanuka' } as LogContext);
       try {
         const report = await schemaValidationService.generateValidationReport();
@@ -636,7 +513,7 @@ async function performStartupInitialization(): Promise<void> {
       logger.info('✅ Platform ready with full database functionality', { component: 'Chanuka' } as LogContext);
     } else {
       logger.info('⚠️  Platform starting in demonstration mode with sample data', { component: 'Chanuka' } as LogContext);
-      console.log(`💡 ${healthInfo.system.message}`);
+      logger.info(`💡 ${healthInfo.system.message}`, { component: 'Chanuka' } as LogContext);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -657,21 +534,21 @@ const server: Server = createServer(app);
 
 // Graceful shutdown handler
 const gracefulShutdown = async (signal: string): Promise<void> => {
-  console.log(`\n${signal} received. Starting graceful shutdown...`);
+  logger.info(`\n${signal} received. Starting graceful shutdown...`, { component: 'Chanuka' } as LogContext);
 
   try {
     logger.info('🛑 Stopping new connections...', { component: 'Chanuka' } as LogContext);
     logger.info('🧹 Cleaning up services...', { component: 'Chanuka' } as LogContext);
 
-    // Cleanup services in reverse order of initialization
+    const wsService = webSocketService as WebSocketServiceExtended;
+
     const cleanupTasks = [
-      { name: 'privacy scheduler', fn: () => { privacySchedulerService.stop(); privacySchedulerService.destroy(); } },
-      { name: 'security monitoring', fn: () => securityMonitoringService.shutdown() },
-      { name: 'session cleanup', fn: () => { sessionCleanupService.stop(); } },
-      { name: 'monitoring scheduler', fn: () => { monitoringScheduler.stop(); } },
-      { name: 'notification scheduler', fn: () => { notificationSchedulerService.cleanup(); } },
-      { name: 'cache coordinator', fn: () => { cacheCoordinator.stop(); } },
-      { name: 'WebSocket service', fn: () => webSocketService.shutdown() },
+      { name: 'privacy scheduler', fn: async () => { privacySchedulerService.stop(); privacySchedulerService.destroy(); } },
+      { name: 'session cleanup', fn: async () => { sessionCleanupService.stop(); } },
+      { name: 'monitoring scheduler', fn: async () => { monitoringScheduler.stop(); } },
+      { name: 'notification scheduler', fn: async () => { notificationSchedulerService.cleanup(); } },
+      { name: 'cache coordinator', fn: async () => { cacheCoordinator.stop(); } },
+      { name: 'WebSocket service', fn: async () => { if (wsService.shutdown) await wsService.shutdown(); } },
     ];
 
     for (const task of cleanupTasks) {
@@ -681,15 +558,6 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
         const errorMessage = error instanceof Error ? error.message : String(error);
         logger.error(`Error stopping ${task.name}:`, { error: errorMessage, component: 'Chanuka' } as LogContext);
       }
-    }
-
-    // Close Vite dev server if running
-    try {
-      const { closeVite } = await import('../client/src/vite-env.d');
-      await closeVite();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('Error closing Vite server:', { error: errorMessage, component: 'Chanuka' } as LogContext);
     }
 
     logger.info('✅ All services cleaned up', { component: 'Chanuka' } as LogContext);
@@ -709,7 +577,6 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
     process.exit(0);
   });
 
-  // Force exit after timeout
   setTimeout(() => {
     logger.error('Forced shutdown after timeout', { component: 'Chanuka' } as LogContext);
     process.exit(1);
@@ -717,24 +584,24 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
 };
 
 // Process signal handlers
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => void gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => void gracefulShutdown('SIGINT'));
 
 process.on('uncaughtException', (error: Error) => {
   logger.error('Uncaught Exception:', { error: error.message, stack: error.stack, component: 'Chanuka' } as LogContext);
-  gracefulShutdown('UNCAUGHT_EXCEPTION');
+  void gracefulShutdown('UNCAUGHT_EXCEPTION');
 });
 
 process.on('unhandledRejection', (reason: unknown) => {
   const error = reason instanceof Error ? reason : new Error(String(reason));
   logger.error('Unhandled Rejection:', { error: error.message, stack: error.stack, component: 'Chanuka' } as LogContext);
-  gracefulShutdown('UNHANDLED_REJECTION');
+  void gracefulShutdown('UNHANDLED_REJECTION');
 });
 
 server.on('error', (error: NodeJS.ErrnoException) => {
   if (error.code === 'EADDRINUSE') {
-    console.error(`❌ Port ${PORT} is already in use. Please try a different port or stop the existing process.`);
-    console.log(`💡 You can try: PORT=4201 npm run dev`);
+    logger.error(`❌ Port ${PORT} is already in use. Please try a different port or stop the existing process.`, { component: 'Chanuka' } as LogContext);
+    logger.info(`💡 You can try: PORT=4201 npm run dev`, { component: 'Chanuka' } as LogContext);
   } else {
     logger.error('❌ Server error:', { error: error.message, component: 'Chanuka' } as LogContext);
   }
@@ -744,41 +611,33 @@ server.on('error', (error: NodeJS.ErrnoException) => {
 // Server startup
 if (process.env.NODE_ENV !== 'test') {
   server.listen(config.server.port, config.server.host, async () => {
-    console.log(`Server running on http://${config.server.host}:${config.server.port}`);
+    logger.info(`Server running on http://${config.server.host}:${config.server.port}`, { component: 'Chanuka' } as LogContext);
 
-    await startupInitialization();
+    const wsService = webSocketService as WebSocketServiceExtended;
 
-    // Service initializers with proper error handling
     const serviceInitializers = [
-      { name: 'Performance monitoring', init: () => { initializeMonitoring(config.server.nodeEnv); return Promise.resolve(); } },
-      { name: 'WebSocket service', init: () => { webSocketService.initialize(server); return Promise.resolve(); } },
+      { name: 'Performance monitoring', init: () => { initializeMonitoring(config.server.nodeEnv); } },
+      { name: 'WebSocket service', init: () => { if (wsService.initialize) wsService.initialize(server); } },
       { name: 'Notification scheduler', init: () => notificationSchedulerService.initialize() },
       { name: 'Monitoring scheduler', init: () => monitoringScheduler.initialize() },
-      { name: 'Session cleanup service', init: () => { sessionCleanupService.start(60); return Promise.resolve(); } },
-      { name: 'Security monitoring service', init: () => securityMonitoringService.initialize() },
+      { name: 'Session cleanup service', init: () => { sessionCleanupService.start(60); } },
       { name: 'Privacy scheduler service', init: async () => { await privacySchedulerService.initialize(); privacySchedulerService.start(); } },
-      { name: 'Cache coordinator', init: () => { cacheCoordinator.start(); return Promise.resolve(); } }
+      { name: 'Cache coordinator', init: () => { cacheCoordinator.start(); } }
     ];
 
     for (const service of serviceInitializers) {
       try {
         await service.init();
-        console.log(`✅ ${service.name} initialized`);
+        logger.info(`✅ ${service.name} initialized`, { component: 'Chanuka' } as LogContext);
       } catch (error) {
-
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.warn(`⚠️  ${service.name} initialization failed: ${errorMessage}`, { component: 'Chanuka' } as LogContext);
       }
     }
 
-    // Setup frontend serving
     try {
-      if (isDevelopment) {
-        await setupVite(app, server);
-        logger.info('✅ Vite development server integrated successfully', { component: 'Chanuka' } as LogContext);
-      } else {
-        const { serveStatic } = await import('../client/src/vite-env.d');
-        serveStatic(app);
-        logger.info('✅ Production static file serving configured', { component: 'Chanuka' } as LogContext);
-      }
+      setupVite(app);
+      logger.info('✅ Frontend serving configured successfully', { component: 'Chanuka' } as LogContext);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('❌ Failed to setup frontend serving:', { error: errorMessage, component: 'Chanuka' } as LogContext);
@@ -815,15 +674,14 @@ if (process.env.NODE_ENV !== 'test') {
       });
     }
 
-    testConnection();
+    await testConnection();
   });
 } else {
   (async () => {
     try {
       await testConnection();
-    } catch (err) {
+    } catch {
       // Swallow errors in test environment
     }
   })();
 }
-

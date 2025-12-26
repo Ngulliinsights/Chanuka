@@ -1,15 +1,16 @@
-import { UserService } from './user-service-direct';
-import { UserAggregate } from '../domain/aggregates/user-aggregate';
-import { User } from '../domain/entities/user';
-import { UserProfile, UserInterest } from '../domain/entities/user-profile';
-import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';
-import { Evidence, ExpertiseLevel } from '../domain/entities/value-objects';
 import { databaseService } from '@/infrastructure/database/database-service';
 import {
-  ResultAdapter,
   AsyncServiceResult,
+  ResultAdapter,
   withResultHandling
 } from '@/infrastructure/errors/result-adapter.js';
+
+import { UserAggregate } from '../domain/aggregates/user-aggregate';
+import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';
+import { User } from '../domain/entities/user';
+import { UserInterest,UserProfile } from '../domain/entities/user-profile';
+import { Evidence, ExpertiseLevel } from '../domain/entities/value-objects';
+import { UserService } from './user-service-direct';
 
 // Domain Events
 export interface UserRegisteredEvent {

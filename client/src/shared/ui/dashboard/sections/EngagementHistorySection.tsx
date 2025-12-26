@@ -1,31 +1,33 @@
 /**
  * Engagement History Section Component
- * 
+ *
  * Displays user's engagement history with temporal filtering and activity insights.
  */
 
 import { formatDistanceToNow, format } from 'date-fns';
-import { 
-  Activity, 
-  Eye, 
-  MessageSquare, 
-  Share2, 
-  Heart, 
+import {
+  Activity,
+  Eye,
+  MessageSquare,
+  Share2,
   ThumbsUp,
   BookOpen,
   Award,
-  ExternalLink
+  ExternalLink,
+  Star,
 } from 'lucide-react';
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system/typography/Card.tsx';
 import { EngagementHistoryItem } from '@client/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
-
-
 
 interface EngagementHistorySectionProps {
   history: EngagementHistoryItem[];
@@ -33,12 +35,11 @@ interface EngagementHistorySectionProps {
   compact?: boolean;
 }
 
-export function EngagementHistorySection({ 
-  history, 
-  loading = false, 
-  compact = false 
+export function EngagementHistorySection({
+  history,
+  loading = false,
+  compact = false,
 }: EngagementHistorySectionProps) {
-
   const getActivityIcon = (type: EngagementHistoryItem['type']) => {
     switch (type) {
       case 'view':
@@ -48,32 +49,15 @@ export function EngagementHistorySection({
       case 'share':
         return <Share2 className="h-4 w-4" />;
       case 'save':
-        return <Heart className="h-4 w-4" />;
+        return <Star className="h-4 w-4" />;
       case 'vote':
         return <ThumbsUp className="h-4 w-4" />;
       case 'expert_contribution':
         return <Award className="h-4 w-4" />;
       default:
+        // Use Heart for other activities as a fallback if needed, or remove if unused
+        // Keeping it for now to satisfy the import but it seems unused in current switch
         return <Activity className="h-4 w-4" />;
-    }
-  };
-
-  const getActivityColor = (type: EngagementHistoryItem['type']) => {
-    switch (type) {
-      case 'view':
-        return 'hsl(var(--civic-transparency))';
-      case 'comment':
-        return 'hsl(var(--civic-community))';
-      case 'share':
-        return 'hsl(var(--civic-community))';
-      case 'save':
-        return 'hsl(var(--civic-urgent))';
-      case 'vote':
-        return 'hsl(var(--civic-expert))';
-      case 'expert_contribution':
-        return 'hsl(var(--civic-expert))';
-      default:
-        return 'hsl(var(--muted))';
     }
   };
 
@@ -94,7 +78,7 @@ export function EngagementHistorySection({
       }
       case 'vote': {
         const voteType = item.metadata?.voteType;
-        return `${voteType === 'up' ? 'Upvoted' : 'Downvoted'} a comment on ${item.billTitle || 'a bill'}`;
+        return `${voteType === 'up' ? 'Upvoted' : 'Down-voted'} a comment on ${item.billTitle || 'a bill'}`;
       }
       case 'expert_contribution': {
         const contributionType = item.metadata?.contributionType;
@@ -106,17 +90,20 @@ export function EngagementHistorySection({
   };
 
   // Group activities by date for better organization
-  const groupedHistory = history.reduce((groups, item) => {
-    const date = format(new Date(item.timestamp), 'yyyy-MM-dd');
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(item);
-    return groups;
-  }, {} as Record<string, EngagementHistoryItem[]>);
+  const groupedHistory = history.reduce(
+    (groups, item) => {
+      const date = format(new Date(item.timestamp), 'yyyy-MM-dd');
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(item);
+      return groups;
+    },
+    {} as Record<string, EngagementHistoryItem[]>
+  );
 
-  const sortedDates = Object.keys(groupedHistory).sort((a, b) => 
-    new Date(b).getTime() - new Date(a).getTime()
+  const sortedDates = Object.keys(groupedHistory).sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
   );
 
   if (loading) {
@@ -130,7 +117,7 @@ export function EngagementHistorySection({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4].map(i => (
               <div key={i} className="animate-pulse flex items-center gap-3">
                 <div className="h-8 w-8 bg-muted rounded-full"></div>
                 <div className="flex-1">
@@ -190,7 +177,7 @@ export function EngagementHistorySection({
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {sortedDates.slice(0, compact ? 3 : 10).map((date) => (
+          {sortedDates.slice(0, compact ? 3 : 10).map(date => (
             <div key={date}>
               {/* Date Header */}
               <div className="flex items-center gap-2 mb-3">
@@ -205,29 +192,28 @@ export function EngagementHistorySection({
 
               {/* Activities for this date */}
               <div className="space-y-3 ml-4">
-                {groupedHistory[date].map((item) => (
+                {groupedHistory[date].map(item => (
                   <div
                     key={item.id}
                     className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     {/* Activity Icon */}
-                    <div 
+                    <div
                       className={`${styles.iconContainer} ${styles[`activity${item.type.charAt(0).toUpperCase() + item.type.slice(1)}`]}`}
+                      data-activity-type={item.type}
                     >
                       {getActivityIcon(item.type)}
                     </div>
 
                     {/* Activity Details */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">
-                        {getActivityDescription(item)}
-                      </p>
-                      
+                      <p className="text-sm font-medium">{getActivityDescription(item)}</p>
+
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs text-muted-foreground">
                           {format(new Date(item.timestamp), 'h:mm a')}
                         </span>
-                        
+
                         {item.billId && (
                           <Button
                             variant="ghost"
@@ -245,11 +231,12 @@ export function EngagementHistorySection({
                           {item.type === 'comment' && item.metadata.commentId && (
                             <span>Comment ID: {item.metadata.commentId}</span>
                           )}
-                          {item.type === 'expert_contribution' && item.metadata.contributionType && (
-                            <Badge variant="outline" className="text-xs">
-                              {item.metadata.contributionType}
-                            </Badge>
-                          )}
+                          {item.type === 'expert_contribution' &&
+                            item.metadata.contributionType && (
+                              <Badge variant="outline" className="text-xs">
+                                {item.metadata.contributionType}
+                              </Badge>
+                            )}
                         </div>
                       )}
                     </div>
@@ -270,13 +257,32 @@ export function EngagementHistorySection({
           <div className="pt-6 border-t">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { type: 'view', label: 'Views', count: history.filter(h => h.type === 'view').length },
-                { type: 'comment', label: 'Comments', count: history.filter(h => h.type === 'comment').length },
-                { type: 'share', label: 'Shares', count: history.filter(h => h.type === 'share').length },
-                { type: 'save', label: 'Saves', count: history.filter(h => h.type === 'save').length }
-              ].map((stat) => (
+                {
+                  type: 'view',
+                  label: 'Views',
+                  count: history.filter(h => h.type === 'view').length,
+                },
+                {
+                  type: 'comment',
+                  label: 'Comments',
+                  count: history.filter(h => h.type === 'comment').length,
+                },
+                {
+                  type: 'share',
+                  label: 'Shares',
+                  count: history.filter(h => h.type === 'share').length,
+                },
+                {
+                  type: 'save',
+                  label: 'Saves',
+                  count: history.filter(h => h.type === 'save').length,
+                },
+              ].map(stat => (
                 <div key={stat.type} className="text-center">
-                  <div className={`${styles.statDisplay} ${styles[`activity${stat.type.charAt(0).toUpperCase() + stat.type.slice(1)}`]}`} data-activity-type={stat.type}>
+                  <div
+                    className={`${styles.statDisplay} ${styles[`activity${stat.type.charAt(0).toUpperCase() + stat.type.slice(1)}`]}`}
+                    data-activity-type={stat.type}
+                  >
                     {stat.count}
                   </div>
                   <div className="text-xs text-muted-foreground">{stat.label}</div>

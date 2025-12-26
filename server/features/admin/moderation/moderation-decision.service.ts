@@ -4,21 +4,22 @@
  * Handles decision processing, action application, and content modification.
  */
 
+import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service.ts';
+import { logger  } from '@shared/core';
 import { database as db } from '@shared/database';
 import { comments, 
   content_report, 
   moderation_action,
   users
  } from '@shared/shared/schema';
-import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
-import { logger  } from '@shared/core';
+import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
+
 import { 
-  ModerationItem, 
-  ModerationActionRecord, 
   BulkModerationOperation,
+  ModerationActionRecord, 
+  ModerationItem, 
   PaginationInfo
 } from './types.js';
-import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service.ts';
 
 export class ModerationDecisionService {
   private static instance: ModerationDecisionService;

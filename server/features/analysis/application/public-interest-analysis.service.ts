@@ -1,7 +1,7 @@
-import { logger  } from '@shared/core';
 // Import result types from other analysis services
-import type { StakeholderAnalysisResult, EconomicImpact, SocialImpact } from '@server/features/analysis/application/stakeholder-analysis.service.ts';
+import type { EconomicImpact, SocialImpact,StakeholderAnalysisResult } from '@server/features/analysis/application/stakeholder-analysis.service.ts';
 import type { TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service.ts';
+import { logger  } from '@shared/core';
 
 // --- Interface Definitions ---
 export interface PublicInterestScoreResult {
@@ -63,13 +63,13 @@ export class PublicInterestAnalysisService {
         const baseline = 1_000_000_000; // $1 Billion
         // Calculate raw score based on net impact relative to baseline
         // A net positive impact of $1B gives +50, net negative $1B gives -50 from the midpoint of 50
-        let rawScore = 50 + (economicImpact.netImpact / baseline) * 50;
+        const rawScore = 50 + (economicImpact.netImpact / baseline) * 50;
 
         // Adjust score by confidence level (e.g., reduce score if confidence is low)
         // Simple linear adjustment: score * (confidence / 100)
         // More nuanced: Penalize more heavily for low confidence
         const confidenceFactor = Math.max(0.3, economicImpact.confidence / 100); // Ensure confidence doesn't drop score too low
-        let confidenceAdjustedScore = rawScore * confidenceFactor;
+        const confidenceAdjustedScore = rawScore * confidenceFactor;
 
 
         // Clamp the final score between 0 and 100

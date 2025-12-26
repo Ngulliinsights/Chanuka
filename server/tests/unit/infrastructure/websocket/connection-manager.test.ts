@@ -2,17 +2,18 @@
  * Unit Tests for ConnectionManager
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi, type MockedFunction } from 'vitest';
-import { WebSocket } from 'ws';
 import { verify } from 'jsonwebtoken';
+import { afterEach, beforeEach, describe, expect, it, type MockedFunction,vi } from 'vitest';
+import { WebSocket } from 'ws';
+
+import { RuntimeConfig } from '../../../../infrastructure/websocket/config/runtime-config.js';
 import {
-  ConnectionManager,
-  ConnectionError,
   AuthenticationError,
+  ConnectionError,
   ConnectionLimitError,
+  ConnectionManager,
   createConnectionManager,
 } from '../../../../infrastructure/websocket/core/connection-manager.js';
-import { RuntimeConfig } from '../../../../infrastructure/websocket/config/runtime-config.js';
 import type { AuthenticatedWebSocket } from '../../../../infrastructure/websocket/types.js';
 
 // Mock jsonwebtoken

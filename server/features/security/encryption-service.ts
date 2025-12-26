@@ -1,406 +1,163 @@
-import * as crypto from 'crypto';
+import { logger } from '@shared/core';
 import * as bcrypt from 'bcrypt';
-import { promisify } from 'util';
-import { logger   } from '@shared/core';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 
-/**
- * Comprehensive encryption service for data protection
- * Implements AES-256-GCM encryption for data at rest and secure password handling
- * Provides TLS 1.3 configuration and secure token management
- */
+interface KeyData {
+  masterKey: string;
+  keyDerivationSalt: string;
+}
+
 export class EncryptionService {
   private readonly algorithm = 'aes-256-gcm';
-  private readonly keyLength = 32; // 256 bits
-  private readonly ivLength = 16; // 128 bits
-  private readonly tagLength = 16; // 128 bits
+  private readonly keyLength = 32;
+  private readonly ivLength = 16;
+  private readonly tagLength = 16;
   private readonly saltRounds = 12;
 
-  // Master encryption key from environment or generated
   private readonly masterKey: Buffer;
   private readonly keyDerivationSalt: Buffer;
 
+  private readonly keyFilePath: string;
+
   constructor() {
+    this.keyFilePath = path.join(process.cwd(), '.encryption-keys.json');
+
     const envKey = process.env.ENCRYPTION_KEY;
     const envSalt = process.env.KEY_DERIVATION_SALT;
-    
-    if (envKey && envSalt) {
-      this.masterKey = Buffer.from(envKey, 'hex');
-      this.keyDerivationSalt = Buffer.from(envSalt, 'hex');
-      
-      if (this.masterKey.length !== this.keyLength) {
-        throw new Error('Invalid encryption key length. Must be 32 bytes (64 hex characters)');
-      }
-      if (this.keyDerivationSalt.length !== 32) {
-        throw new Error('Invalid key derivation salt length. Must be 32 bytes (64 hex characters)');
-      }
-    } else {
-      // Generate new keys for development (should be stored securely in production)
-      this.masterKey = crypto.randomBytes(this.keyLength);
-      this.keyDerivationSalt = crypto.randomBytes(32);
-      
-      console.warn('⚠️  No ENCRYPTION_KEY or KEY_DERIVATION_SALT found in environment.');
-      console.warn('🔑 Generated master key (store securely):', this.masterKey.toString('hex'));
-      console.warn('🧂 Generated salt (store securely):', this.keyDerivationSalt.toString('hex'));
+
+    // Enforce strict startup failures in production if keys are missing
+    if (process.env.NODE_ENV === 'production' && (!envKey || !envSalt)) {
+      throw new Error(
+        'FATAL: ENCRYPTION_KEY and KEY_DERIVATION_SALT must be set in production. ' +
+        'Starting without them will result in permanent data loss.'
+      );
     }
+
+    let masterKeyHex: string;
+    let saltHex: string;
+
+    if (envKey && envSalt) {
+      // Validate environment keys
+      if (!this.isValidHex(envKey) || envKey.length !== this.keyLength * 2) {
+        throw new Error(`Invalid ENCRYPTION_KEY: must be ${this.keyLength * 2} character hex string.`);
+      }
+      if (!this.isValidHex(envSalt) || envSalt.length !== 64) { // 32 bytes * 2
+        throw new Error(`Invalid KEY_DERIVATION_SALT: must be 64 character hex string.`);
+      }
+      masterKeyHex = envKey;
+      saltHex = envSalt;
+    } else {
+      // Load or generate keys for development to prevent data loss on restart
+      const keyData = this.loadOrGenerateKeys();
+      masterKeyHex = keyData.masterKey;
+      saltHex = keyData.keyDerivationSalt;
+      logger.info('Loaded persistent keys for development', { component: 'EncryptionService' });
+    }
+
+    this.masterKey = Buffer.from(masterKeyHex, 'hex');
+    this.keyDerivationSalt = Buffer.from(saltHex, 'hex');
   }
 
-  /**
-   * Derive encryption key for specific context
-   */
+  private isValidHex(str: string): boolean {
+    return /^[0-9a-fA-F]+$/.test(str);
+  }
+
+  private loadOrGenerateKeys(): KeyData {
+    try {
+      if (fs.existsSync(this.keyFilePath)) {
+        const data = fs.readFileSync(this.keyFilePath, 'utf8');
+        const keyData: KeyData = JSON.parse(data);
+        // Validate loaded keys
+        if (!this.isValidHex(keyData.masterKey) || keyData.masterKey.length !== this.keyLength * 2) {
+          throw new Error('Invalid master key in key file');
+        }
+        if (!this.isValidHex(keyData.keyDerivationSalt) || keyData.keyDerivationSalt.length !== 64) {
+          throw new Error('Invalid salt in key file');
+        }
+        return keyData;
+      }
+    } catch (error) {
+      logger.warn('Failed to load keys from file, generating new ones', { component: 'EncryptionService', error });
+    }
+
+    // Generate new keys
+    const newKeys: KeyData = {
+      masterKey: crypto.randomBytes(this.keyLength).toString('hex'),
+      keyDerivationSalt: crypto.randomBytes(32).toString('hex'),
+    };
+
+    try {
+      fs.writeFileSync(this.keyFilePath, JSON.stringify(newKeys, null, 2));
+      logger.info('Generated and saved new keys for development', { component: 'EncryptionService' });
+    } catch (error) {
+      logger.error('Failed to save keys to file', { component: 'EncryptionService', error });
+      throw new Error('Unable to persist keys for development');
+    }
+
+    return newKeys;
+  }
+
   private deriveKey(context: string): Buffer {
     return crypto.pbkdf2Sync(this.masterKey, Buffer.concat([this.keyDerivationSalt, Buffer.from(context)]), 100000, 32, 'sha256');
   }
 
-  /**
-   * Encrypt sensitive data at rest with AES-256-GCM
-   */
   async encryptData(plaintext: string, context: string = 'default'): Promise<string> {
     try {
       const iv = crypto.randomBytes(this.ivLength);
       const key = this.deriveKey(context);
       const cipher = crypto.createCipheriv(this.algorithm, key, iv, { authTagLength: this.tagLength });
 
-      // Additional authenticated data
-      const aad = Buffer.from(`legislative-platform-${context}`);
-      cipher.setAAD(aad);
+      cipher.setAAD(Buffer.from(context));
 
-      let encrypted = cipher.update(plaintext, 'utf8', 'hex');
-      encrypted += cipher.final('hex');
-
+      const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
       const tag = cipher.getAuthTag();
 
-      // Combine IV, tag, and encrypted data
-      const result = {
-        iv: iv.toString('hex'),
-        tag: tag.toString('hex'),
-        data: encrypted,
-        context
-      };
-
-      return Buffer.from(JSON.stringify(result)).toString('base64');
+      return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted.toString('hex')}`;
     } catch (error) {
-      logger.error('Encryption failed:', { component: 'Chanuka' }, error);
-      throw new Error('Failed to encrypt data');
+      logger.error('Encryption failed', { component: 'EncryptionService', error });
+      throw new Error('Encryption operation failed');
     }
   }
 
-  /**
-   * Decrypt sensitive data with AES-256-GCM
-   */
-  async decryptData(encryptedData: string): Promise<string> {
+  async decryptData(encryptedString: string, context: string = 'default'): Promise<string> {
     try {
-      const parsed = JSON.parse(Buffer.from(encryptedData, 'base64').toString());
-      const { iv, tag, data, context = 'default' } = parsed;
+      const parts = encryptedString.split(':');
+      if (parts.length !== 3) throw new Error('Invalid ciphertext format');
+
+      const ivHex = parts[0]!;
+      const tagHex = parts[1]!;
+      const encryptedHex = parts[2]!;
+      const iv = Buffer.from(ivHex, 'hex');
+      const tag = Buffer.from(tagHex, 'hex');
+      const encrypted = Buffer.from(encryptedHex, 'hex');
 
       const key = this.deriveKey(context);
-      const decipher = crypto.createDecipheriv(this.algorithm, key, Buffer.from(iv, 'hex'), { authTagLength: this.tagLength });
+      const decipher = crypto.createDecipheriv(this.algorithm, key, iv, { authTagLength: this.tagLength });
 
-      // Set additional authenticated data
-      const aad = Buffer.from(`legislative-platform-${context}`);
-      decipher.setAAD(aad);
-      decipher.setAuthTag(Buffer.from(tag, 'hex'));
+      decipher.setAAD(Buffer.from(context));
+      decipher.setAuthTag(tag);
 
-      let decrypted = decipher.update(data, 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-
-      return decrypted;
+      const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+      return decrypted.toString('utf8');
     } catch (error) {
-      logger.error('Decryption failed:', { component: 'Chanuka' }, error);
-      throw new Error('Failed to decrypt data');
+      logger.error('Decryption failed', { component: 'EncryptionService', error });
+      throw new Error('Decryption operation failed or integrity check failed');
     }
   }
 
-  /**
-   * Hash passwords securely with bcrypt
-   */
   async hashPassword(password: string): Promise<string> {
-    try {
-      return await bcrypt.hash(password, this.saltRounds);
-    } catch (error) {
-      logger.error('Password hashing failed:', { component: 'Chanuka' }, error);
-      throw new Error('Failed to hash password');
-    }
+    return bcrypt.hash(password, this.saltRounds);
   }
 
-  /**
-   * Verify password against hash
-   */
   async verifyPassword(password: string, hash: string): Promise<boolean> {
-    try {
-      return await bcrypt.compare(password, hash);
-    } catch (error) {
-      logger.error('Password verification failed:', { component: 'Chanuka' }, error);
-      return false;
-    }
+    return bcrypt.compare(password, hash);
   }
 
-  /**
-   * Generate secure random tokens
-   */
-  generateSecureToken(length: number = 32): string {
-    return crypto.randomBytes(length).toString('hex');
-  }
-
-  /**
-   * Hash tokens for secure storage
-   */
-  hashToken(token: string): string {
-    return crypto.createHash('sha256').update(token).digest('hex');
-  }
-
-  /**
-   * Generate cryptographically secure random passwords
-   */
-  generateSecurePassword(length: number = 16): string {
-    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    
-    for (let i = 0; i < length; i++) {
-      const randomIndex = crypto.randomInt(0, charset.length);
-      password += charset[randomIndex];
-    }
-    
-    return password;
-  }
-
-  /**
-   * Encrypt PII (Personally Identifiable Information)
-   */
-  async encryptPII(data: Record<string, any>): Promise<Record<string, any>> {
-    const piiFields = ['email', 'phone', 'address', 'ssn', 'taxId', 'bankAccount'];
-    const encrypted = { ...data };
-
-    for (const field of piiFields) {
-      if (encrypted[field] && typeof encrypted[field] === 'string') {
-        encrypted[field] = await this.encryptData(encrypted[field]);
-      }
-    }
-
-    return encrypted;
-  }
-
-  /**
-   * Decrypt PII data
-   */
-  async decryptPII(data: Record<string, any>): Promise<Record<string, any>> {
-    const piiFields = ['email', 'phone', 'address', 'ssn', 'taxId', 'bankAccount'];
-    const decrypted = { ...data };
-
-    for (const field of piiFields) {
-      if (decrypted[field] && typeof decrypted[field] === 'string') {
-        try {
-          decrypted[field] = await this.decryptData(decrypted[field]);
-        } catch (error) {
-          console.warn(`Failed to decrypt field ${field}:`, error);
-          // Keep original value if decryption fails (might not be encrypted)
-        }
-      }
-    }
-
-    return decrypted;
-  }
-
-  /**
-   * Create secure session tokens with expiration
-   */
-  createSessionToken(): { token: string; hash: string; expires_at: Date } {
-    const token = this.generateSecureToken(64);
-    const hash = this.hashToken(token);
-    const expires_at = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    return { token, hash, expires_at };
-  }
-
-  /**
-   * Verify session token
-   */
-  verifySessionToken(token: string, storedHash: string): boolean {
-    const tokenHash = this.hashToken(token);
-    return crypto.timingSafeEqual(
-      Buffer.from(tokenHash, 'hex'),
-      Buffer.from(storedHash, 'hex')
-    );
-  }
-
-  /**
-   * Generate secure JWT signing key
-   */
-  generateJWTSigningKey(): string {
-    return crypto.randomBytes(64).toString('hex');
-  }
-
-  /**
-   * Encrypt database connection strings
-   */
-  async encryptConnectionString(connectionString: string): Promise<string> {
-    return this.encryptData(connectionString, 'database');
-  }
-
-  /**
-   * Decrypt database connection strings
-   */
-  async decryptConnectionString(encryptedConnectionString: string): Promise<string> {
-    return this.decryptData(encryptedConnectionString);
-  }
-
-  /**
-   * Generate secure API keys
-   */
-  generateAPIKey(prefix: string = 'ltp'): string {
-    const timestamp = Date.now().toString(36);
-    const randomPart = crypto.randomBytes(32).toString('hex');
-    return `${prefix}_${timestamp}_${randomPart}`;
-  }
-
-  /**
-   * Validate and sanitize input to prevent injection attacks
-   */
-  sanitizeInput(input: string): string {
-    if (typeof input !== 'string') {
-      throw new Error('Input must be a string');
-    }
-
-    // Remove null bytes and control characters
-    let sanitized = input.replace(/[\x00-\x1F\x7F]/g, '');
-    
-    // Limit length to prevent DoS
-    if (sanitized.length > 10000) {
-      sanitized = sanitized.substring(0, 10000);
-    }
-
-    return sanitized.trim();
-  }
-
-  /**
-   * Validate email format with additional security checks
-   */
-  validateEmail(email: string): boolean {
-    const sanitized = this.sanitizeInput(email);
-    
-    // Basic email regex with security considerations
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    
-    if (!emailRegex.test(sanitized)) {
-      return false;
-    }
-
-    // Additional security checks
-    if (sanitized.length > 254) return false; // RFC 5321 limit
-    if (sanitized.includes('..')) return false; // Consecutive dots
-    if (sanitized.startsWith('.') || sanitized.endsWith('.')) return false;
-
-    return true;
-  }
-
-  /**
-   * Generate secure CSRF tokens
-   */
-  generateCSRFToken(): string {
-    return crypto.randomBytes(32).toString('base64url');
-  }
-
-  /**
-   * Verify CSRF token
-   */
-  verifyCSRFToken(token: string, storedToken: string): boolean {
-    if (!token || !storedToken) return false;
-    return crypto.timingSafeEqual(
-      Buffer.from(token, 'base64url'),
-      Buffer.from(storedToken, 'base64url')
-    );
-  }
-
-  /**
-   * Generate secure nonce for Content Security Policy
-   */
-  generateCSPNonce(): string {
-    return crypto.randomBytes(16).toString('base64');
-  }
-
-  /**
-   * Encrypt sensitive configuration values
-   */
-  async encryptConfig(config: Record<string, any>): Promise<Record<string, any>> {
-    const sensitiveKeys = ['password', 'secret', 'key', 'token', 'api_key', 'private'];
-    const encrypted = { ...config };
-
-    for (const [key, value] of Object.entries(encrypted)) {
-      if (typeof value === 'string' && sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
-        encrypted[key] = await this.encryptData(value, 'config');
-      }
-    }
-
-    return encrypted;
-  }
-
-  /**
-   * Decrypt sensitive configuration values
-   */
-  async decryptConfig(config: Record<string, any>): Promise<Record<string, any>> {
-    const sensitiveKeys = ['password', 'secret', 'key', 'token', 'api_key', 'private'];
-    const decrypted = { ...config };
-
-    for (const [key, value] of Object.entries(decrypted)) {
-      if (typeof value === 'string' && sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
-        try {
-          decrypted[key] = await this.decryptData(value);
-        } catch (error) {
-          console.warn(`Failed to decrypt config key ${key}:`, error);
-          // Keep original value if decryption fails
-        }
-      }
-    }
-
-    return decrypted;
+  generateSecureToken(bytes: number = 32): string {
+    return crypto.randomBytes(bytes).toString('hex');
   }
 }
 
-// Singleton instance
 export const encryptionService = new EncryptionService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

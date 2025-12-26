@@ -4,17 +4,16 @@
  * Handles queue management, filtering, pagination, and report creation.
  */
 
+import { contentAnalysisService } from '@server/features/admin/moderation/content-analysis.service.ts';
+import { ContentModerationFilters, ModerationItem, PaginationInfo } from '@server/features/admin/moderation/types.ts';
+import { logger  } from '@shared/core';
 import { database as db } from '@shared/database';
 import { bill, 
   comments, 
-  users, 
   content_report, 
-  sponsor 
- } from '@shared/shared/schema';
-import { eq, count, desc, sql, and, gte, SQL } from 'drizzle-orm';
-import { logger  } from '@shared/core';
-import { ContentModerationFilters, ModerationItem, PaginationInfo } from '@server/features/admin/moderation/types.ts';
-import { contentAnalysisService } from '@server/features/admin/moderation/content-analysis.service.ts';
+  sponsor, 
+  users } from '@shared/shared/schema';
+import { and, count, desc, eq, gte, SQL,sql } from 'drizzle-orm';
 
 export class ModerationQueueService {
   private static instance: ModerationQueueService;

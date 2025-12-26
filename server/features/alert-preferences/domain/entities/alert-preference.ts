@@ -1,9 +1,9 @@
 import { AlertChannel } from '../value-objects/alert-channel';
+import { AlertConditions } from '../value-objects/alert-conditions';
 import { AlertType } from '../value-objects/alert-type';
+import { FrequencyConfig } from '../value-objects/frequency-config';
 import { Priority } from '../value-objects/priority';
 import { SmartFilteringConfig } from '../value-objects/smart-filtering-config';
-import { FrequencyConfig } from '../value-objects/frequency-config';
-import { AlertConditions } from '../value-objects/alert-conditions';
 
 /**
  * Alert Preference Entity

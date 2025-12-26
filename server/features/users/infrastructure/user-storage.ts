@@ -1,20 +1,20 @@
+import { logger   } from '@shared/core';
 import {
-  readDatabase,
-  writeDatabase,
-  pool,
-  withTransaction,
-  users,
-  user_profiles,
-  userSocialProfiles,
-  type User,
   type InsertUser,
+  type InsertUserProfile,
+  pool,
+  readDatabase,
+  type User,
+  user_profiles,
   type UserProfile,
-  type InsertUserProfile
-} from '@shared/shared/database/connection';
-import { eq, and, or, sql } from 'drizzle-orm';
+  users,
+  userSocialProfiles,
+  withTransaction,
+  writeDatabase} from '@shared/shared/database/connection';
+import { and, eq, or, sql } from 'drizzle-orm';
+
 import type { StorageConfig } from '@/infrastructure/database/base/BaseStorage.js';
 import { BaseStorage } from '@/infrastructure/database/base/BaseStorage.js';
-import { logger   } from '@shared/core';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';

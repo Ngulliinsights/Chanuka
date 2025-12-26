@@ -343,6 +343,13 @@ export {
   type DatabaseOperation,
 } from './connection';
 
+// Re-export actual Drizzle database instances from pool
+export {
+  db,
+  readDb,
+  writeDb,
+} from './pool';
+
 // ============================================================================
 // Legacy Compatibility
 // ============================================================================

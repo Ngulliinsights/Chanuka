@@ -3,7 +3,7 @@
  * Generates and formats metrics reports for monitoring and logging
  */
 
-import { MetricsReport, IMetricsReporter, IStatisticsCollector, IHealthChecker, IConnectionManager, IOperationQueueManager } from '../types';
+import { IConnectionManager, IHealthChecker, IMetricsReporter, IOperationQueueManager,IStatisticsCollector, MetricsReport } from '../types';
 
 /**
  * Report format options

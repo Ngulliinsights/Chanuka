@@ -9,13 +9,13 @@
  * - Run comprehensive data validation checkpoints ensuring error response consistency
  */
 
-import { featureFlagsService } from '@server/infrastructure/migration/feature-flags-service.ts';
+import * as Boom from '@hapi/boom';
 import { abTestingService } from '@server/infrastructure/migration/ab-testing.service.ts';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags-service.ts';
+import { logger  } from '@shared/core';
 import { errorAdapter } from '@shared/errors/error-adapter.js';
 import { errorHandler } from '@shared/errors/error-standardization.js';
-import { logger  } from '@shared/core';
-import * as Boom from '@hapi/boom';
-import { Result, ok, err } from 'neverthrow';
+import { err,ok, Result } from 'neverthrow';
 
 export interface ErrorHandlingMetrics {
   responseTime: number;

@@ -13,7 +13,7 @@ import {
   Monitor,
   Users,
   Zap,
-  Heart,
+  Earth,
   Eye
 } from 'lucide-react';
 import { useState } from 'react';
@@ -363,7 +363,7 @@ export function IntegrationTest() {
                 </>
               ) : (
                 <>
-                  <Heart className="w-4 h-4" />
+                  <Earth className="w-4 h-4" />
                   Run Integration Tests
                 </>
               )}
@@ -429,7 +429,7 @@ export function IntegrationTest() {
       {testResults.length === 0 && !isRunning && (
         <Card>
           <CardContent className="p-6 text-center">
-            <Heart className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+            <Earth className="w-12 h-12 text-blue-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Ready to Test Enhanced UX</h3>
             <p className="text-muted-foreground mb-4">
               Click &quot;Run Integration Tests&quot; to validate all enhanced UX features including:

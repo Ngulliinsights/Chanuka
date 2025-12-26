@@ -6,12 +6,11 @@
  */
 
 import type { 
-  ILeakDetectorHandler, 
-  MemoryLeakData, 
   DegradationLevel,
   IConnectionManager,
-  IProgressiveDegradation 
-} from '../types';
+  ILeakDetectorHandler, 
+  IProgressiveDegradation, 
+  MemoryLeakData} from '../types';
 
 /**
  * Response actions for different memory leak severities

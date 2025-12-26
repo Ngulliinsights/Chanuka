@@ -5,24 +5,24 @@
  * conflict resolution, and comprehensive monitoring and error reporting.
  */
 
-import { EventEmitter } from 'events';
-import * as cron from 'node-cron';
+import { ConflictResolutionService } from '@server/infrastructure/external-data/conflict-resolution-service.ts';
+import { GovernmentDataService } from '@server/infrastructure/external-data/government-data-service.ts';
+import { logger   } from '@shared/core';
 // Import the database instance properly - adjust path as needed
 import { database as db } from '@shared/database/connection';
+import { bill_cosponsors, bills, data_sources,sponsors, sync_jobs } from '@shared/schema';
+import { and, desc,eq, gte } from 'drizzle-orm';
+import { EventEmitter } from 'events';
+import * as cron from 'node-cron';
+
 import {
-  DataSource,
-  SyncJob,
-  SyncError,
-  ConflictResolution,
+  ApiResponse,
   BillData,
+  ConflictResolution,
+  DataSource,
   SponsorData,
-  ApiResponse
-} from './types.js';
-import { GovernmentDataService } from '@server/infrastructure/external-data/government-data-service.ts';
-import { ConflictResolutionService } from '@server/infrastructure/external-data/conflict-resolution-service.ts';
-import { bills, sponsors, bill_cosponsors, sync_jobs, data_sources } from '@shared/schema';
-import { eq, and, gte, desc } from 'drizzle-orm';
-import { logger   } from '@shared/core';
+  SyncError,
+  SyncJob} from './types.js';
 
 export class DataSynchronizationService extends EventEmitter {
   private governmentDataService: GovernmentDataService;

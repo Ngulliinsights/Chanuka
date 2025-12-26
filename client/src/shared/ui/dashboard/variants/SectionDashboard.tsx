@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import {
   BarChart3,
@@ -16,6 +15,15 @@ import { ActivitySection } from '../sections/ActivitySection';
 import { BillsSection } from '../sections/BillsSection';
 import { StatsSection } from '../sections/StatsSection';
 import { useDashboardData } from '../useDashboardData';
+
+// Local interface definition matching the data structure usage in this component
+interface DashboardAchievement {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  earnedAt: string;
+}
 
 interface SectionDashboardProps {
   className?: string;
@@ -70,7 +78,6 @@ export function SectionDashboard({ className = '' }: SectionDashboardProps) {
       <StatsSection
         stats={dashboardData?.stats}
         civicMetrics={dashboardData?.civicMetrics}
-        loading={loading}
         variant="compact"
       />
 
@@ -169,7 +176,7 @@ export function SectionDashboard({ className = '' }: SectionDashboardProps) {
               <CardContent>
                 {dashboardData?.civicMetrics?.achievements?.length ? (
                   <div className="grid grid-cols-2 gap-4">
-                    {dashboardData.civicMetrics.achievements.map((achievement: any) => (
+                    {(dashboardData.civicMetrics.achievements as DashboardAchievement[]).map((achievement) => (
                       <div key={achievement.id} className="text-center p-3 border rounded-lg">
                         <div className="text-2xl mb-2">🏆</div>
                         <h4 className="font-medium text-sm">{achievement.title}</h4>
@@ -200,7 +207,7 @@ export function SectionDashboard({ className = '' }: SectionDashboardProps) {
               <CardContent>
                 {dashboardData?.civicMetrics?.achievements?.length ? (
                   <div className="space-y-4">
-                    {dashboardData.civicMetrics.achievements.map((achievement: any) => (
+                    {(dashboardData.civicMetrics.achievements as DashboardAchievement[]).map((achievement) => (
                       <div key={achievement.id} className="space-y-2">
                         <div className="flex items-center justify-between">
                           <h4 className="font-medium text-sm">{achievement.title}</h4>

@@ -1,10 +1,10 @@
+import { logger } from '@shared/core';
 import database from '@shared/database';
-import { users, bills, sponsors } from '@shared/schema';
-import { notifications, comments, bill_engagement } from '@shared/schema';
+import { bills, sponsors,users } from '@shared/schema';
+import { bill_engagement,comments, notifications } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
-import { logger } from '@shared/core';
 
 export interface TestUser {
   id: string;

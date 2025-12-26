@@ -1,8 +1,8 @@
-import { z } from 'zod';
-import { database as db } from '@shared/database';
-import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@shared/schema';
-import { eq, and, or } from 'drizzle-orm';
 import { logger   } from '@shared/core';
+import { database as db } from '@shared/database';
+import { bill_cosponsors, bills, sponsors as sponsorAffiliations,sponsors } from '@shared/schema';
+import { and, eq, or } from 'drizzle-orm';
+import { z } from 'zod';
 
 // Data source configuration
 interface DataSourceConfig {
@@ -469,7 +469,7 @@ export class GovernmentDataIntegrationService {
       if (!sponsorInfo.name) continue; // Skip if name is missing
 
       // Find or create sponsor
-      let sponsors = await db.select()
+      const sponsors = await db.select()
         .from(sponsors)
         .where(eq(sponsors.name, sponsorInfo.name))
         .limit(1);

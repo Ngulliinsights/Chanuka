@@ -1,15 +1,15 @@
 // Real ML implementation using NLP libraries (TensorFlow.js optional due to native binding issues)
 // import * as tf from '@tensorflow/tfjs-node';
-import * as natural from 'natural';
-import * as compromise from 'compromise';
 import { logger  } from '@shared/core';
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import type {
     AnalysisResult,
-    SimilarityAnalysis,
+    ComprehensiveAnalysisResult,
     ImplementationWorkaroundDetection,
-    ComprehensiveAnalysisResult
-} from '@shared/types/ml.js';
+    SimilarityAnalysis} from '@shared/types/ml.js';
+import * as compromise from 'compromise';
+import * as natural from 'natural';
+
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 
 /**
  * Real ML Analysis Service using simple NLP techniques

@@ -2,26 +2,24 @@
 // Main service that orchestrates the decomposed financial disclosure services
 // Maintains backward compatibility with the original API
 
+import { cache, DatabaseError,logger  } from '@shared/core';
 import { readDatabase } from '@shared/database';
 import { sponsors } from "@shared/foundation";
-import { eq, desc } from "drizzle-orm";
-import { cache, logger, DatabaseError  } from '@shared/core';
-import { FinancialDisclosureConfig } from './config';
-
-// Import decomposed services
-import {
-  disclosureProcessingService,
-  financialAnalysisService,
-  disclosureValidationService,
-  anomalyDetectionService
-} from './services/index';
-
 import type {
+  CompletenessReport,
   FinancialDisclosure,
   RelationshipMapping,
-  CompletenessReport,
   TransparencyDashboard
 } from '@shared/types/index.js';
+import { desc,eq } from "drizzle-orm";
+
+import { FinancialDisclosureConfig } from './config';
+// Import decomposed services
+import {
+  anomalyDetectionService,
+  disclosureProcessingService,
+  disclosureValidationService,
+  financialAnalysisService} from './services/index';
 
 /**
  * Financial Disclosure Orchestrator Service

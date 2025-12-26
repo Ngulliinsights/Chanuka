@@ -5,15 +5,15 @@
  * in relation to bills and legislative processes.
  */
 
+import { Stakeholder, StakeholderInterest } from '@server/features/analytics/conflict-detection/types.ts';
+import { logger  } from '@shared/core';
+import { getDefaultCache } from '@shared/core/caching/index.js';
 import { database as db } from '@shared/database';
 import {
-  bills, sponsors, sponsorAffiliations, bill_sponsorships,
-  type Sponsor, type SponsorAffiliation, type Bill
-} from '@shared/schema';
-import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
-import { getDefaultCache } from '@shared/core/caching/index.js';
-import { logger  } from '@shared/core';
-import { Stakeholder, StakeholderInterest } from '@server/features/analytics/conflict-detection/types.ts';
+type Bill,
+bill_sponsorships,
+  bills,   type Sponsor, type SponsorAffiliation, sponsorAffiliations, sponsors} from '@shared/schema';
+import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
 
 export class StakeholderAnalysisService {
   private static instance: StakeholderAnalysisService;

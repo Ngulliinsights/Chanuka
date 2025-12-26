@@ -44,7 +44,7 @@ export const useHookName = (options: UseHookNameOptions = {}): UseHookNameResult
   const [loading, setLoading] = useState(false);
   
   // Error handling
-  const { error, handleError, clearError } = useErrorHandler('useHookName');
+  const { error, handleError, clearError } = useUIErrorHandler('useHookName');
   
   // Actions
   const refresh = useCallback(async () => {

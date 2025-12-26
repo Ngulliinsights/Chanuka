@@ -4,7 +4,6 @@
  * Shared types and utilities used across multiple modules
  */
 
-import type { BaseApiConfig, BaseApiRequest, BaseApiResponse, BaseWebSocketMessage, BaseBillData } from './base';
 import { ZodSchema } from 'zod';
 
 // ============================================================================
@@ -13,6 +12,41 @@ import { ZodSchema } from 'zod';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+// Base types that were imported from './base'
+export interface BaseApiConfig {
+  baseURL: string;
+  timeout: number;
+  retries: number;
+}
+
+export interface BaseApiRequest {
+  method: HttpMethod;
+  url: string;
+  data?: any;
+  headers?: Record<string, string>;
+}
+
+export interface BaseApiResponse<T = any> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+}
+
+export interface BaseWebSocketMessage<T = any> {
+  type: string;
+  data: T;
+  timestamp: number;
+}
+
+export interface BaseBillData {
+  id: string;
+  title: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
 export type SortOrder = 'asc' | 'desc';
 
 export type ErrorCode = 
@@ -149,6 +183,10 @@ export interface ValidationOptions {
 }
 
 export type RequestPriority = 'low' | 'normal' | 'high' | 'critical';
+
+// Interceptor types
+export type RequestInterceptor = (request: BaseApiRequest) => BaseApiRequest | Promise<BaseApiRequest>;
+export type ResponseInterceptor = (response: BaseApiResponse) => BaseApiResponse | Promise<BaseApiResponse>;
 
 export interface UnifiedApiClient extends ApiClient {
   request<T>(request: ApiRequest): Promise<ApiResponse<T>>;

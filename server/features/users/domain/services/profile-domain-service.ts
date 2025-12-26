@@ -1,5 +1,5 @@
-import { UserProfile, UserInterest } from '../entities/user-profile';
 import { UserAggregate } from '../aggregates/user-aggregate';
+import { UserInterest,UserProfile } from '../entities/user-profile';
 // value-objects imports intentionally omitted because they're not used in this service implementation
 
 export interface ProfileValidationResult {

@@ -3,9 +3,10 @@
  * This shows how to add caching to your existing API endpoints
  */
 
-import { Router } from 'express';
-import { cacheMiddleware, createCacheMiddleware } from '../middleware/cache-middleware';
 import { cachedBillService } from '@server/features/bills/application/bill-service';
+import { Router } from 'express';
+
+import { cacheMiddleware, createCacheMiddleware } from '../middleware/cache-middleware';
 
 const router = Router();
 

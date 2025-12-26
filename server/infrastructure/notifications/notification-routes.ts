@@ -1,12 +1,12 @@
-import { Router, Request, Response } from 'express';
-import { authenticateToken, AuthenticatedRequest } from '@server/middleware/auth.js';
-import { notificationService } from '@server/infrastructure/notifications/notification-service.ts';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
 import { notificationChannelService } from '@server/infrastructure/notifications/notification-channels.ts';
+import { notificationService } from '@server/infrastructure/notifications/notification-service.ts';
 import { smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter.ts';
-import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth.js';
 import { logger   } from '@shared/core';
+import { ApiError, ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { Request, Response,Router } from 'express';
+import { z } from 'zod';
 
 export const router = Router();
 
@@ -332,7 +332,8 @@ router.get('/status', async (req: Request, res: Response) => {
   }
 });
 
-export default router;
+// Remove duplicate export - keep only named export
+// export default router;
 
 
 

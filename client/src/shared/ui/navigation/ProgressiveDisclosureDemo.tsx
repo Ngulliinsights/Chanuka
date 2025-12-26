@@ -1,7 +1,7 @@
 // Remove unused React import
-import { ProgressiveDisclosureNavigation } from './ProgressiveDisclosureNavigation';
+import type { NavigationSection, ReadingPath } from '@client/hooks/useProgressiveDisclosure';
 
-import type { NavigationSection, ReadingPath } from '@client/core/navigation/hooks/useProgressiveDisclosure';
+import { ProgressiveDisclosureNavigation } from './ProgressiveDisclosureNavigation';
 
 // Demo component to test Progressive Disclosure Navigation
 export const ProgressiveDisclosureDemo = () => {
@@ -12,15 +12,15 @@ export const ProgressiveDisclosureDemo = () => {
       complexity: 1,
       estimatedReadTime: 3,
       isRequired: true,
-      content: <div>Overview content</div>
+      content: <div>Overview content</div>,
     },
     {
       id: 'details',
       title: 'Details',
       complexity: 2,
       estimatedReadTime: 5,
-      content: <div>Details content</div>
-    }
+      content: <div>Details content</div>,
+    },
   ];
 
   const demoPaths: ReadingPath[] = [
@@ -29,8 +29,8 @@ export const ProgressiveDisclosureDemo = () => {
       title: 'Quick Read',
       description: 'Essential information only',
       sections: ['overview'],
-      estimatedTotalTime: 3
-    }
+      estimatedTotalTime: 3,
+    },
   ];
 
   return (
@@ -40,7 +40,7 @@ export const ProgressiveDisclosureDemo = () => {
         sections={demoSections}
         readingPaths={demoPaths}
         currentSectionId="overview"
-        onSectionChange={(id) => console.log('Section changed:', id)}
+        onSectionChange={id => console.log('Section changed:', id)}
       />
     </div>
   );

@@ -3,7 +3,7 @@
  * Monitors system health and provides status reporting
  */
 
-import { HealthStatus, IHealthChecker, IStatisticsCollector, IConnectionManager, IOperationQueueManager } from '../types';
+import { HealthStatus, IConnectionManager, IHealthChecker, IOperationQueueManager,IStatisticsCollector } from '../types';
 
 /**
  * Health check thresholds configuration

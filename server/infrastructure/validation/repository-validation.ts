@@ -5,8 +5,8 @@
  * and prevent invalid inputs from reaching database operations.
  */
 
-import { z } from 'zod';
 import { validationService } from '@shared/core/validation';
+import { z } from 'zod';
 
 // ============================================================================
 // COMMON VALIDATION SCHEMAS

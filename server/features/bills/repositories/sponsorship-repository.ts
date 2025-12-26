@@ -7,13 +7,12 @@
 
 import { readDatabase } from '@shared/database';
 import {
-  sponsors,
   bill_sponsorships,
+  billSectionConflicts,
   sponsorAffiliations,
-  sponsorTransparency,
-  billSectionConflicts
-} from '@shared/schema';
-import { eq, inArray, desc } from 'drizzle-orm';
+  sponsors,
+  sponsorTransparency} from '@shared/schema';
+import { desc,eq, inArray } from 'drizzle-orm';
 
 export interface SponsorAffiliation {
   id: number;

@@ -1,14 +1,15 @@
+import { logger } from '@shared/core';
 import { Express } from 'express';
+import fs from 'fs';
+import https from 'https';
+
 import { encryptionService } from './encryption-service';
-// import { inputValidationService } from '@server/core/validation/input-validation-service.ts'; // TODO: Fix missing module
-// import { secureSessionService } from '@server/core/auth/secure-session-service.ts'; // TODO: Fix missing module
 import { securityAuditService } from './security-audit-service';
 import { tlsConfigService } from './tls-config-service';
+// import { inputValidationService } from '@server/core/validation/input-validation-service.ts'; // TODO: Fix missing module
+// import { secureSessionService } from '@server/core/auth/secure-session-service.ts'; // TODO: Fix missing module
 // import { securityMiddleware } from '@shared/middleware/security-middleware.ts'; // TODO: Fix missing module
 // import { authRateLimit, apiRateLimit } from '@shared/middleware/rate-limiter.ts'; // TODO: Fix missing module
-import https from 'https';
-import fs from 'fs';
-import { logger   } from '@shared/core';
 
 /**
  * Security initialization service that sets up all security components
@@ -92,8 +93,8 @@ export class SecurityInitializationService {
     const hasEncryptionKey = process.env.ENCRYPTION_KEY && process.env.KEY_DERIVATION_SALT;
     
     if (!hasEncryptionKey) {
-      console.warn('⚠️  No encryption keys found in environment. Using generated keys for development.');
-      console.warn('🚨 IMPORTANT: Set ENCRYPTION_KEY and KEY_DERIVATION_SALT in production!');
+      logger.warn('⚠️  No encryption keys found in environment. Using generated keys for development.', { component: 'Chanuka' });
+      logger.warn('🚨 IMPORTANT: Set ENCRYPTION_KEY and KEY_DERIVATION_SALT in production!', { component: 'Chanuka' });
     }
 
     // Test encryption functionality
@@ -116,57 +117,29 @@ export class SecurityInitializationService {
   /**
    * Set up security middleware (TODO: Fix missing modules)
    */
-  private async setupSecurityMiddleware(): Promise<void> {
-    logger.info('🛡️  Setting up security middleware... (TODO: Fix missing modules)', { component: 'Chanuka' });
-
-    // TODO: Apply all security middleware when modules are available
-    // const middlewares = securityMiddleware.initializeAll();
-    // for (const middleware of middlewares) {
-    //   this.app.use(middleware);
-    // }
-
-    // TODO: Add rate limiting for specific endpoints when modules are available
-    // this.app.use('/api/auth/login', authRateLimit);
-    // this.app.use('/api/auth/register', authRateLimit);
-    // this.app.use('/api/auth/password-reset', authRateLimit);
-    // this.app.use('/api', apiRateLimit);
-
-    logger.info('✅ Security middleware configured (partial)', { component: 'Chanuka' });
-  }
+  // private async setupSecurityMiddleware(): Promise<void> {
+  //   logger.info('🛡️  Setting up security middleware... (TODO: Fix missing modules)', { component: 'Chanuka' });
+  //   // TODO: Implementation when modules are available
+  //   logger.info('✅ Security middleware configured (partial)', { component: 'Chanuka' });
+  // }
 
   /**
    * Initialize session management (TODO: Fix missing modules)
    */
-  private async initializeSessionManagement(): Promise<void> {
-    logger.info('🎫 Initializing secure session management... (TODO: Fix missing modules)', { component: 'Chanuka' });
-
-    // TODO: Clean up expired sessions on startup when module is available
-    // await secureSessionService.cleanupExpiredSessions();
-
-    logger.info('✅ Session management initialized (partial)', { component: 'Chanuka' });
-  }
+  // private async initializeSessionManagement(): Promise<void> {
+  //   logger.info('🎫 Initializing secure session management... (TODO: Fix missing modules)', { component: 'Chanuka' });
+  //   // TODO: Implementation when modules are available
+  //   logger.info('✅ Session management initialized (partial)', { component: 'Chanuka' });
+  // }
 
   /**
    * Set up input validation (TODO: Fix missing modules)
    */
-  private async setupInputValidation(): Promise<void> {
-    logger.info('🔍 Setting up input validation... (TODO: Fix missing modules)', { component: 'Chanuka' });
-
-    // TODO: Test input validation when module is available
-    // try {
-    //   const testEmail = 'test@example.com';
-    //   const validation = inputValidationService.validateEmail(testEmail);
-    //
-    //   if (!validation.isValid) {
-    //     throw new Error('Input validation test failed');
-    //   }
-
-      logger.info('✅ Input validation configured and tested (partial)', { component: 'Chanuka' });
-    // } catch (error) {
-    //   logger.error('❌ Input validation test failed:', { component: 'Chanuka' }, error as Error);
-    //   throw error;
-    // }
-  }
+  // private async setupInputValidation(): Promise<void> {
+  //   logger.info('🔍 Setting up input validation... (TODO: Fix missing modules)', { component: 'Chanuka' });
+  //   // TODO: Implementation when modules are available
+  //   logger.info('✅ Input validation configured and tested (partial)', { component: 'Chanuka' });
+  // }
 
   /**
    * Initialize security audit logging
@@ -200,91 +173,44 @@ export class SecurityInitializationService {
     try {
       const tlsOptions = tlsConfigService.getHTTPSServerOptions();
 
-      if (tlsConfigService.validateTLSConfig(tlsOptions as any)) {
+      if (tlsConfigService.validateTLSConfig(tlsOptions)) {
         logger.info('✅ TLS configuration validated', { component: 'Chanuka' });
 
         // Store TLS options for server creation
-        (this.app as any).tlsOptions = tlsOptions;
+        (this.app as Express & { tlsOptions?: unknown }).tlsOptions = tlsOptions;
       } else {
-        console.warn('⚠️  TLS configuration validation failed. Using HTTP in development.');
+        logger.warn('⚠️  TLS configuration validation failed. Using HTTP in development.', { component: 'Chanuka' });
       }
     } catch (error) {
-      console.warn('⚠️  TLS setup failed:', (error as Error).message);
-      console.warn('🔄 Continuing with HTTP for development');
+      logger.warn('⚠️  TLS setup failed:', { component: 'Chanuka' }, error as Error);
+      logger.warn('🔄 Continuing with HTTP for development', { component: 'Chanuka' });
     }
   }
 
   /**
    * Initialize security monitoring (TODO: Fix missing modules)
    */
-  private async initializeSecurityMonitoring(): Promise<void> {
-    logger.info('👁️  Initializing security monitoring... (TODO: Fix missing modules)', { component: 'Chanuka' });
-
-    // TODO: Set up periodic security checks when modules are available
-    // setInterval(async () => {
-    //   try {
-    //     // Clean up expired sessions
-    //     await secureSessionService.cleanupExpiredSessions();
-    //
-    //     // Check for security incidents
-    //     // This would integrate with external monitoring tools in production
-    //
-    //   } catch (error) {
-    //     logger.error('Security monitoring error:', { component: 'Chanuka' }, error as Error);
-    //   }
-    // }, 15 * 60 * 1000); // Every 15 minutes
-
-    logger.info('✅ Security monitoring initialized (partial)', { component: 'Chanuka' });
-  }
+  // private async initializeSecurityMonitoring(): Promise<void> {
+  //   logger.info('👁️  Initializing security monitoring... (TODO: Fix missing modules)', { component: 'Chanuka' });
+  //   // TODO: Implementation when modules are available
+  //   logger.info('✅ Security monitoring initialized (partial)', { component: 'Chanuka' });
+  // }
 
   /**
    * Set up automated security tasks (TODO: Fix missing modules)
    */
-  private async setupAutomatedSecurityTasks(): Promise<void> {
-    logger.info('⚙️  Setting up automated security tasks... (TODO: Fix missing modules)', { component: 'Chanuka' });
-
-    // TODO: Daily security cleanup when modules are available
-    // setInterval(async () => {
-    //   try {
-    //     logger.info('🧹 Running daily security cleanup...', { component: 'Chanuka' });
-    //
-    //     // Clean up expired sessions
-    //     await secureSessionService.cleanupExpiredSessions();
-    //
-    //     // Generate security report
-    //     const report = await this.generateSecurityReport();
-    //     logger.info('📊 Daily security report generated:', { component: 'Chanuka' }, report.summary);
-    //
-    //   } catch (error) {
-    //     logger.error('Daily security cleanup error:', { component: 'Chanuka' }, error as Error);
-    //   }
-    // }, 24 * 60 * 60 * 1000); // Every 24 hours
-
-    // TODO: Weekly security audit when modules are available
-    // setInterval(async () => {
-    //   try {
-    //     logger.info('🔍 Running weekly security audit...', { component: 'Chanuka' });
-    //
-    //     const end_date = new Date();
-    //     const start_date = new Date(end_date.getTime() - 7 * 24 * 60 * 60 * 1000);
-    //
-    //     const auditReport = await securityAuditService.generateAuditReport(start_date, end_date);
-    //     logger.info('📋 Weekly audit report:', { component: 'Chanuka' }, auditReport.summary);
-    //
-    //   } catch (error) {
-    //     logger.error('Weekly security audit error:', { component: 'Chanuka' }, error as Error);
-    //   }
-    // }, 7 * 24 * 60 * 60 * 1000); // Every 7 days
-
-    logger.info('✅ Automated security tasks configured (partial)', { component: 'Chanuka' });
-  }
+  // private async setupAutomatedSecurityTasks(): Promise<void> {
+  //   logger.info('⚙️  Setting up automated security tasks... (TODO: Fix missing modules)', { component: 'Chanuka' });
+  //   // TODO: Implementation when modules are available
+  //   logger.info('✅ Automated security tasks configured (partial)', { component: 'Chanuka' });
+  // }
 
   /**
    * Generate security status report (TODO: Fix missing modules)
    */
   async generateSecurityReport(): Promise<{
     status: 'healthy' | 'warning' | 'critical';
-    summary: Record<string, any>;
+    summary: Record<string, unknown>;
     recommendations: string[];
   }> {
     try {
@@ -363,13 +289,13 @@ export class SecurityInitializationService {
    */
   createSecureServer(): https.Server | null {
     try {
-      const tlsOptions = (this.app as any).tlsOptions;
+      const tlsOptions = (this.app as Express & { tlsOptions?: unknown }).tlsOptions;
       
       if (tlsOptions && tlsConfigService.validateTLSConfig(tlsOptions)) {
         const server = https.createServer(tlsOptions, this.app);
         
         // Add security headers to all HTTPS responses
-        server.on('request', (req, res) => {
+        server.on('request', (_req, res) => {
           const securityHeaders = tlsConfigService.getSecurityHeaders();
           for (const [header, value] of Object.entries(securityHeaders)) {
             res.setHeader(header, value);
@@ -379,7 +305,7 @@ export class SecurityInitializationService {
         logger.info('✅ HTTPS server created with TLS configuration', { component: 'Chanuka' });
         return server;
       } else {
-        console.warn('⚠️  TLS configuration invalid. Cannot create HTTPS server.');
+        logger.warn('⚠️  TLS configuration invalid. Cannot create HTTPS server.', { component: 'Chanuka' });
         return null;
       }
     } catch (error) {

@@ -1,8 +1,8 @@
-// import { unifiedAlertPreferenceService } from '@shared/alert-preferences/domain/services/unified-alert-preference-service'; // TODO: Fix missing dependencies
-import { readDatabase as db } from '@shared/database';
-import { users, bills, user_interests } from '@shared/schema'; // Fixed: Added user_interests import
-import { eq } from 'drizzle-orm';
+i// import { unifiedAlertPreferenceService } from '@shared/alert-preferences/domain/services/unified-alert-preference-service'; // TODO: Fix missing dependencies
 import { logger  } from '@shared/core';
+import { database as db } from '@shared/database';
+import { bills, user_interests,users } from '@shared/schema'; // Fixed: Added user_interests import
+import { eq } from 'drizzle-orm';
 
 /**
  * Comprehensive verification suite for the Alert Preference Management System.
@@ -51,7 +51,7 @@ async function createTestData(): Promise<TestContext> {
 
   // Create test user with all required fields
   // Fixed: Corrected property access from TEST_CONFIG.users to TEST_CONFIG.user
-  const [testUser] = await db()
+  const [testUser] = await db
     .insert(users)
     .values({
       email: TEST_CONFIG.user.email,
@@ -66,7 +66,7 @@ async function createTestData(): Promise<TestContext> {
 
   // Create test bill for alert generation
   // Fixed: Corrected property access from TEST_CONFIG.bills to TEST_CONFIG.bill
-  const [testBill] = await db()
+  const [testBill] = await db
     .insert(bills)
     .values({
       title: TEST_CONFIG.bill.title,
@@ -80,7 +80,7 @@ async function createTestData(): Promise<TestContext> {
 
   // Add user interests for smart filtering tests
   // Fixed: Changed user_interests to userInterests (camelCase as per import)
-  await db()
+  await db
     .insert(user_interests)
     .values(
       TEST_CONFIG.interests.map(interest => ({
@@ -119,16 +119,16 @@ async function cleanupTestData(context: TestContext): Promise<void> {
 
     // Delete in reverse order of dependencies
     // Fixed: Changed user_interests to userInterests and removed parseInt for bill_id
-    await db()
+    await db
       .delete(user_interests)
       .where(eq(user_interests.user_id, user_id));
 
     // Fixed: Use bill_id directly as a string (UUID) instead of parseInt
-    await db()
+    await db
       .delete(bills)
       .where(eq(bills.id, bill_id));
 
-    await db()
+    await db
       .delete(users)
       .where(eq(users.id, user_id));
 

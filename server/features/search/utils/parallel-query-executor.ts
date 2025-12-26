@@ -1,5 +1,5 @@
-import { readDatabase } from '@shared/database';
 import { logger } from '@shared/core/index';
+import { readDatabase } from '@shared/database';
 
 export interface QueryTask<T = any> {
   name: string;

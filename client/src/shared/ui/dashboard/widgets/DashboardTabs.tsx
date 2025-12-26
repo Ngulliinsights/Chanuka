@@ -109,7 +109,7 @@ export const DashboardTabs = React.memo<DashboardTabsProps>(({
   // Filter visible sections and sort by order
   const visibleSections = sections
     .filter(section => section.visible)
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 
   // Set default active tab
   const [activeTab, setActiveTab] = useState<string>(

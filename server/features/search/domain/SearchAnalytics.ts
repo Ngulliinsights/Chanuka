@@ -1,7 +1,8 @@
-import type { SearchQuery, SearchResponseDto } from './search.dto';
-import { readDatabase } from '@shared/database';
-import { searchQueries, searchAnalytics } from '@shared/schema/advanced_discovery';
 import { logger } from '@shared/core';
+import { readDatabase } from '@shared/database';
+import { searchAnalytics,searchQueries } from '@shared/schema/advanced_discovery';
+
+import type { SearchQuery, SearchResponseDto } from './search.dto';
 
 export interface SearchAnalyticsEvent {
   id: string;

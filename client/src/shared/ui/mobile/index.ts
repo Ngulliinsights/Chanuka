@@ -47,4 +47,4 @@ export {
   useInfiniteScroll,
   useMobileTabs
 } from './fallbacks.tsx'
-export type { MobileTab as FallbackMobileTab, ChartData } from './fallbacks.tsx'
+export type { MobileTab as FallbackMobileTab, ChartData as MobileChartData } from './fallbacks.tsx'

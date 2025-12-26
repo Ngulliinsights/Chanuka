@@ -1,10 +1,10 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { VotingPatternAnalysisService } from '@server/services/voting-pattern-analysis-service.ts';
-import { authenticateToken } from '@server/middleware/auth.js';
 import type { AuthenticatedRequest } from '@server/middleware/auth.js';
-import { UnifiedApiResponse  } from '@shared/core/utils/api';
+import { authenticateToken } from '@server/middleware/auth.js';
+import { VotingPatternAnalysisService } from '@server/services/voting-pattern-analysis-service.ts';
 import { logger   } from '@shared/core';
+import { UnifiedApiResponse  } from '@shared/core/utils/api';
 import { securityAuditService } from '@shared/security/security-audit-service.js';
+import { NextFunction,Request, Response, Router } from 'express';
 
 // Create singleton instance
 const votingPatternAnalysisService = new VotingPatternAnalysisService();

@@ -9,14 +9,12 @@
 
 import type { 
   AuthenticatedWebSocket, 
-  WebSocketMessage, 
   IMessageHandler,
-  ISubscriptionManager,
   IOperationQueueManager,
-  QueueOperation
-} from '../types';
+  ISubscriptionManager,
+  QueueOperation,
+  WebSocketMessage} from '../types';
 import { LRUCache } from '../utils';
-
 import { OPERATION_PRIORITIES } from './operation-queue-manager';
 
 /**

@@ -257,7 +257,8 @@ export function ApiValidationError(
   sendApiResponse(res, response, 400);
 }
 
-export default UnifiedApiResponse;
+// Remove duplicate export - UnifiedApiResponse is already exported as named export
+// export default UnifiedApiResponse;
 
 
 

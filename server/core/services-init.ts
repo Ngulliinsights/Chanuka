@@ -11,12 +11,11 @@
  * 4. Other core services
  */
 
-import type { Pool as PoolType } from 'pg';
-import { logger } from '@shared/core';
-import { getDbInstance } from '@shared/infrastructure/database/index.js';
-
 // Import initialization modules
 import { initializeValidationServices, type ValidationServicesContainer } from '@server/core/validation/validation-services-init.ts';
+import { logger } from '@shared/core';
+import { getDbInstance } from '@shared/infrastructure/database/index.js';
+import type { Pool as PoolType } from 'pg';
 
 /**
  * Server Services Container

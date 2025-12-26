@@ -5,9 +5,10 @@
  * Handles notification-specific data validation and transformations.
  */
 
-import { notifications } from '@shared/schema';
-import { Notification } from '@/features/notifications/domain/entities/notification';
 import { EntityMapping } from '@shared/drizzle-adapter';
+import { notifications } from '@shared/schema';
+
+import { Notification } from '@/features/notifications/domain/entities/notification';
 
 type NotificationRow = typeof notifications.$inferSelect;
 type NotificationInsert = typeof notifications.$inferInsert;

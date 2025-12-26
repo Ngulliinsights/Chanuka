@@ -5,16 +5,11 @@
  * Provides data access operations for users with proper error handling and Result types
  */
 
-import type { Result, Maybe } from '@shared/core';
-import { Ok, Err, some, none } from '@shared/core';
-import type { User, NewUser, UserProfile, NewUserProfile } from '@shared/schema';
-import { users, user_profiles } from '@shared/schema';
-import { eq, and, desc, sql, or, inArray } from 'drizzle-orm';
-import type { PgDatabase } from 'drizzle-orm/pg-core';
-import type { SQLWrapper } from 'drizzle-orm';
-
 import type { IUserRepository } from '@server/domain/interfaces/user-repository.interface';
+import { queryCache } from '@server/infrastructure/caching/query-cache';
 import { databaseService } from '@server/infrastructure/database/database-service';
+import { databaseLogger } from '@server/infrastructure/logging/database-logger';
+import { performanceMonitor } from '@server/infrastructure/performance/performance-monitor';
 import {
   newUserSchema,
   userProfileSchema,
@@ -23,9 +18,13 @@ import {
   validateRepositoryInput,
   validateSearchParams
 } from '@server/infrastructure/validation/repository-validation';
-import { performanceMonitor } from '@server/infrastructure/performance/performance-monitor';
-import { queryCache } from '@server/infrastructure/caching/query-cache';
-import { databaseLogger } from '@server/infrastructure/logging/database-logger';
+import type { Maybe,Result } from '@shared/core';
+import { Err, none,Ok, some } from '@shared/core';
+import type { NewUser, NewUserProfile,User, UserProfile } from '@shared/schema';
+import { user_profiles,users } from '@shared/schema';
+import type { SQLWrapper } from 'drizzle-orm';
+import { and, desc, eq, inArray,or, sql } from 'drizzle-orm';
+import type { PgDatabase } from 'drizzle-orm/pg-core';
 
 
 export class DrizzleUserRepository implements IUserRepository {

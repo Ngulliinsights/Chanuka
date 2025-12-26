@@ -1,7 +1,7 @@
 // UserRepository interface removed - using direct service calls
-import { UserManagementDomainService, ProfileUpdateResult } from '../../domain/services/user-management-domain-service';
-import { ProfileDomainService, ProfileValidationResult, ProfileCompletenessScore } from '../../domain/services/profile-domain-service';
 import { UserProfile } from '../../domain/entities/user-profile';
+import { ProfileCompletenessScore,ProfileDomainService, ProfileValidationResult } from '../../domain/services/profile-domain-service';
+import { ProfileUpdateResult,UserManagementDomainService } from '../../domain/services/user-management-domain-service';
 import { UserService } from '../user-service-direct';
 
 export interface UpdateProfileCommand { user_id: string;

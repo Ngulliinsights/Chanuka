@@ -1,6 +1,6 @@
 import { AlertType } from '../value-objects/alert-type';
-import { Priority } from '../value-objects/priority';
 import { ChannelType } from '../value-objects/channel-type';
+import { Priority } from '../value-objects/priority';
 
 /**
  * Alert Delivery Log Entity

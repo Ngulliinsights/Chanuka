@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { TimeoutAwareLoaderProps } from '../types';
-import { cn } from '../../../design-system/lib/utils';
+import { cn } from '@client/shared/design-system/lib/utils';
 import { LoadingIndicator } from './LoadingIndicator';
 
 export const TimeoutAwareLoader = React.memo<TimeoutAwareLoaderProps>(({

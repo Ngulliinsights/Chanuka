@@ -12,16 +12,15 @@
  * 5. Data Completeness Service (depends on database and metrics)
  */
 
-import type { Pool as PoolType } from 'pg';
-import { getDbInstance } from '@server/infrastructure/database/index.js';
-import { logger } from '@shared/core';
-
-// Import service classes
-import { ValidationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
+import { DataCompletenessService } from '@server/core/validation/data-completeness.ts';
+import { DataIntegrityValidationService } from '@server/core/validation/data-validation-service.ts';
 import { InputValidationService } from '@server/core/validation/input-validation-service.ts';
 import { SchemaValidationService } from '@server/core/validation/schema-validation-service.ts';
-import { DataIntegrityValidationService } from '@server/core/validation/data-validation-service.ts';
-import { DataCompletenessService } from '@server/core/validation/data-completeness.ts';
+// Import service classes
+import { ValidationMetricsCollector } from '@server/core/validation/validation-metrics.ts';
+import { getDbInstance } from '@server/infrastructure/database/index.js';
+import { logger } from '@shared/core';
+import type { Pool as PoolType } from 'pg';
 
 /**
  * Validation Services Container

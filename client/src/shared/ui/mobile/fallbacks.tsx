@@ -141,4 +141,4 @@ export const SwipeGestures = ({
 );
 
 // Type definitions for fallbacks
-export type { MobileTab, ChartData } from './constants';
+export type { MobileTab, ChartData as MobileChartData } from './constants';

@@ -1,5 +1,5 @@
-import { vi } from 'vitest';
 import { logger  } from '@shared/core';
+import { vi } from 'vitest';
 
 // Global test setup
 beforeAll(async () => {

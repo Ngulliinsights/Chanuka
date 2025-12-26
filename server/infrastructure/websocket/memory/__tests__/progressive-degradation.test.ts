@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { ProgressiveDegradation, getDegradationLevelForPressure } from '../progressive-degradation';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { RuntimeConfig } from '../../config/runtime-config';
 import type { DegradationLevel, MemoryPressureData } from '../../types';
+import { getDegradationLevelForPressure,ProgressiveDegradation } from '../progressive-degradation';
 
 // Mock RuntimeConfig
 vi.mock('../../config/runtime-config');

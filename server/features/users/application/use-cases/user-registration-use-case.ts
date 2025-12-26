@@ -1,6 +1,6 @@
 // UserRepository interface removed - using direct service calls
-import { UserManagementDomainService, UserCreationResult } from '../../domain/services/user-management-domain-service';
 import { User } from '../../domain/entities/user';
+import { UserCreationResult,UserManagementDomainService } from '../../domain/services/user-management-domain-service';
 
 export interface RegisterUserCommand {
   email: string;

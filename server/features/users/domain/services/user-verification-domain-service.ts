@@ -1,12 +1,13 @@
 // Repository interfaces removed - using direct Drizzle queries
+import { UserAggregate } from '@shared/aggregates/user-aggregate';
+import { database as db } from '@shared/database';
 import { CitizenVerification, VerificationType } from '@shared/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '@shared/entities/value-objects';
-import { UserAggregate } from '@shared/aggregates/user-aggregate';
-import { ProfileDomainService } from './profile-domain-service';
-import { UserService } from '../../application/user-service-direct';
-import { database as db } from '@shared/database';
 import { user_verification } from '@shared/schema';
-import { eq, sql, desc } from 'drizzle-orm';
+import { desc,eq, sql } from 'drizzle-orm';
+
+import { UserService } from '../../application/user-service-direct';
+import { ProfileDomainService } from './profile-domain-service';
 
 export interface VerificationCreationResult {
   success: boolean;

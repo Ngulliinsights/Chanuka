@@ -6,8 +6,7 @@
  * Provides a clean interface for service lifecycle management and component integration.
  */
 
-import { Server, IncomingMessage } from 'http';
-
+import { IncomingMessage,Server } from 'http';
 import { WebSocketServer } from 'ws';
 
 import { BatchingService } from '../batching/batching-service';
@@ -15,15 +14,15 @@ import { BASE_CONFIG } from '../config/base-config';
 import { RuntimeConfig } from '../config/runtime-config';
 import type {
   AuthenticatedWebSocket,
-  WebSocketMessage,
-  VerifyClientInfo,
-  IConnectionManager,
-  IMessageHandler,
-  IMemoryManager,
-  IStatisticsCollector,
-  IHealthChecker,
-  HealthStatus,
   ConnectionStats,
+  HealthStatus,
+  IConnectionManager,
+  IHealthChecker,
+  IMemoryManager,
+  IMessageHandler,
+  IStatisticsCollector,
+  VerifyClientInfo,
+  WebSocketMessage,
 } from '../types';
 
 /**

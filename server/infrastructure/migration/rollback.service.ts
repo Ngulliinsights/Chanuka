@@ -6,7 +6,7 @@
  */
 
 import { featureFlagsService } from './feature-flags.service';
-import { monitoringService, AlertEvent } from './monitoring.service';
+import { AlertEvent,monitoringService } from './monitoring.service';
 
 export interface RollbackThreshold {
   component: string;

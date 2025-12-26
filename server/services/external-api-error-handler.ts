@@ -1,5 +1,5 @@
-import { EventEmitter } from 'events';
 import { logger   } from '@shared/core';
+import { EventEmitter } from 'events';
 
 // Error types for external API failures
 export enum ExternalAPIErrorType {

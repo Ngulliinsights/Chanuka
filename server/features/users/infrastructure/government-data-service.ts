@@ -1,6 +1,7 @@
-import { GovernmentDataService } from '@/infrastructure/external-data/government-data-service.js';
-import { DataSource, ApiResponse, BillData, SponsorData } from '@/infrastructure/external-data/types.js';
 import { logger   } from '@shared/core';
+
+import { GovernmentDataService } from '@/infrastructure/external-data/government-data-service.js';
+import { ApiResponse, BillData, DataSource, SponsorData } from '@/infrastructure/external-data/types.js';
 
 export interface UserGovernmentDataQuery { user_id: string;
   queryType: 'bill_search' | 'sponsor_lookup' | 'legislative_tracking' | 'committee_info';

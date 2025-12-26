@@ -1,22 +1,21 @@
-import { eq, and, lt, sql } from "drizzle-orm";
-import { database as db } from '@shared/database';
-import {
-  user,
-  user_profiles,
-  comments,
-  bill_engagement,
-  notification,
-  user_interest,
-  session,
-  userSocialProfile,
-  user_progress,
-  social_share,
-  comment_votes,
-  content_reports,
-  system_audit_log
-} from "@shared/schema";
 import { auditLogger } from '@server/infrastructure/monitoring/index.js';
 import { logger   } from '@shared/core';
+import { database as db } from '@shared/database';
+import {
+  bill_engagement,
+  comment_votes,
+  comments,
+  content_reports,
+  notification,
+  session,
+  social_share,
+  system_audit_log,
+  user,
+  user_interest,
+  user_profiles,
+  user_progress,
+  userSocialProfile} from "@shared/schema";
+import { and, eq, lt, sql } from "drizzle-orm";
 
 export interface UserDataExport {
   user: {

@@ -1,20 +1,20 @@
-import { readDatabase } from '@shared/database';
-import { databaseService } from '@/infrastructure/database/database-service.js';
-import { cacheService } from '@/infrastructure/cache/cache-service.js';
-import { logger  } from '@shared/core';
-import * as schema from "@shared/schema";
-import { eq, desc, and, sql, count, like, or, gte } from "drizzle-orm";
-
-import {
-  SearchSuggestion,
-  AutocompleteFacets,
-  AutocompleteResult,
-  SearchContext,
-  SearchAnalytics
-} from "./types/search.types";
 // Query builder service removed - using direct Drizzle queries
 import { parallelQueryExecutor, QueryTask } from "@server/utils/parallel-query-executor";
-import { suggestionRankingService, type RankingContext } from "./suggestion-ranking.service";
+import { logger  } from '@shared/core';
+import { readDatabase } from '@shared/database';
+import * as schema from "@shared/schema";
+import { and, count, desc, eq, gte,like, or, sql } from "drizzle-orm";
+
+import { cacheService } from '@/infrastructure/cache/cache-service.js';
+import { databaseService } from '@/infrastructure/database/database-service.js';
+
+import { type RankingContext,suggestionRankingService } from "./suggestion-ranking.service";
+import {
+  AutocompleteFacets,
+  AutocompleteResult,
+  SearchAnalytics,
+  SearchContext,
+  SearchSuggestion} from "./types/search.types";
 
 /**
  * Internal type for tracking search history entries

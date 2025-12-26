@@ -3,7 +3,7 @@
  * Following navigation component recovery patterns
  */
 
-import type { DashboardData, DashboardConfig } from '@client/types';
+import type { DashboardData, DashboardConfig } from '@client/shared/types/dashboard';
 
 import { DashboardError, DashboardErrorType } from './errors';
 
@@ -26,7 +26,7 @@ export interface RecoveryContext {
  * Determines recovery strategy based on error type and context
  */
 export function getRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
-  const { error, retryCount = 0 } = context;
+  const { error } = context;
 
   switch (error.type) {
     case DashboardErrorType.DASHBOARD_DATA_FETCH_ERROR:
@@ -117,7 +117,7 @@ function getValidationRecoveryStrategy(context: RecoveryContext): RecoveryStrate
   };
 }
 
-function getConfigurationRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
+function getConfigurationRecoveryStrategy(_context: RecoveryContext): RecoveryStrategy {
   return {
     canRecover: true,
     suggestions: [
@@ -195,7 +195,7 @@ function getTopicRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
   };
 }
 
-function getGenericRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
+function getGenericRecoveryStrategy(_context: RecoveryContext): RecoveryStrategy {
   return {
     canRecover: true,
     suggestions: [
@@ -220,7 +220,7 @@ function getGenericRecoveryStrategy(context: RecoveryContext): RecoveryStrategy 
  */
 export async function executeRecovery(
   strategy: RecoveryStrategy,
-  context: RecoveryContext
+  _context: RecoveryContext
 ): Promise<boolean> {
   if (!strategy.canRecover) {
     return false;

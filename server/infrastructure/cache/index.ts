@@ -19,7 +19,8 @@ const defaultCacheConfig = {
 };
 
 export const cacheService = createCacheService(defaultCacheConfig);
-export const CacheService = cacheService; // For backward compatibility
+// Remove duplicate export - CacheService is the same as cacheService
+// export const CacheService = cacheService; // For backward compatibility
 
 // Remove duplicate CacheService class - use shared/core instead
 

@@ -5,23 +5,23 @@
  * including financial, professional, and voting pattern conflicts.
  */
 
-import { database as db } from '@shared/database';
-import {
-  bills, sponsors, sponsorAffiliations, bill_sponsorships, sponsorTransparency,
-  type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
-} from '@/shared/schema';
-import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
-import { getDefaultCache } from '@shared/core/caching/index.js';
 import { logger  } from '@shared/core';
+import { getDefaultCache } from '@shared/core/caching/index.js';
+import { database as db } from '@shared/database';
+import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
+
 import {
-  FinancialConflict,
-  ProfessionalConflict,
-  VotingAnomaly,
+type Bill,
+bill_sponsorships,   bills,   type Sponsor, type SponsorAffiliation, sponsorAffiliations, sponsors, type SponsorTransparency, sponsorTransparency} from '@/shared/schema';
+
+import {
   ConflictDetectionConfig,
-  ValidatedVote,
   ConflictDetectionError,
-  isValidVote
-} from './types.js';
+  FinancialConflict,
+  isValidVote,
+  ProfessionalConflict,
+  ValidatedVote,
+  VotingAnomaly} from './types.js';
 
 export class ConflictDetectionEngineService {
   private static instance: ConflictDetectionEngineService;

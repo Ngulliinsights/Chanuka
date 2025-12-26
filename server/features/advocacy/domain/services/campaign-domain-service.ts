@@ -2,10 +2,10 @@
 // ADVOCACY COORDINATION - Campaign Domain Service
 // ============================================================================
 
-import { CampaignEntity, Campaign, NewCampaign } from '@shared/entities/campaign.js';
 // Repository interfaces removed - using direct service calls
 import { CampaignMetrics, CoalitionOpportunity } from '@server/types/index.ts';
 import { logger  } from '@shared/core';
+import { Campaign, CampaignEntity, NewCampaign } from '@shared/entities/campaign.js';
 
 export class CampaignDomainService {
   constructor(

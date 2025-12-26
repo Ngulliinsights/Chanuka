@@ -30,7 +30,8 @@
     "kamba",
     "crowdsourced",
     "decidendi",
-    "pgvector"
+    "pgvector",
+    "exfiltration"
   ],
   "ignoreWords": [
     "USSD",

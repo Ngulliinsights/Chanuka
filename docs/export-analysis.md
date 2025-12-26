@@ -1,186 +1,167 @@
-# 📊 Export Validation Report
+# 📊 Strategic Export Analysis Report
 
-**Generated:** 12/17/2025, 8:42:50 AM
-**Validator Version:** v11.0
-**Analysis Duration:** 1.41s
+![Status](https://img.shields.io/badge/status-passing-brightgreen) ![Types](https://img.shields.io/badge/type_safety-warnings-yellow)
 
-![Status](https://img.shields.io/badge/status-failing-red)
+**Generated:** 12/25/2025, 1:56:16 PM  
+**Validator:** v13.0  
+**Mode:** STRICT  
+**Duration:** 2.41s
 
-## 📈 Summary
+## 📈 Executive Summary
 
 | Metric | Value | Status |
 |:-------|------:|:------:|
-| Files Scanned | 1903 | ℹ️ |
-| Successfully Parsed | 1903 | ✅ |
+| Files Scanned | 2078 | ℹ️ |
+| Successfully Parsed | 2078 (100.0%) | ✅ |
 | Parse Errors | 0 | ✅ |
-| Imports Validated | 5907 | ℹ️ |
-| Import Mismatches | 1653 | ❌ |
-| Type Warnings | 204 | ⚠️ |
+| Imports Validated | 0 | ℹ️ |
+| Import Mismatches | 0 | ✅ |
+| Type Warnings | 217 | ⚠️ |
+| Cache Efficiency | 0% | ℹ️ |
 
 
-## ❌ Import/Export Mismatches (1653)
+### ⚡ Performance Breakdown
 
-| File | Import Path | Missing Export | Recommendation |
-|:-----|:------------|:---------------|:---------------|
-| `client\.storybook\main.ts` | `@storybook/react-vite` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\playwright.visual.config.ts` | `@playwright/test` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\migration-helper.js` | `../store/slices/discussionSlice` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\migration-helper.js` | `../store/slices/userDashboardSlice` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\playwright.config.ts` | `@playwright/test` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\.storybook\preview.ts` | `@storybook/react` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\.storybook\preview.ts` | `../src/shared/design-system/theme/theme-provider` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\app\providers\AppProviders.tsx` | `@reduxjs/toolkit` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\app\providers\AppProviders.tsx` | `@tanstack/react-query` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\components\hooks\useDatabaseStatus.ts` | `@tanstack/react-query` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\components\AppProviders.tsx` | `@reduxjs/toolkit` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\components\AppProviders.tsx` | `@tanstack/react-query` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\config\mobile.ts` | `@/core/mobile` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\api\bills.ts` | `../../types` | `Bill` | Did you mean 'isBill'? |
-| `client\src\core\api\bills.ts` | `../../types` | `Sponsor` | Export 'Sponsor' from target module |
-| `client\src\core\api\community.ts` | `../../types/community` | `Comment` | Did you mean 'CommunityComment'? |
-| `client\src\core\api\hooks\use-safe-mutation.ts` | `@tanstack/react-query` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\api\hooks\use-safe-query.ts` | `@tanstack/react-query` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\api\privacy.ts` | `@/utils/logger` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\api\types.ts` | `../../types` | `Bill` | Did you mean 'isBill'? |
-| `client\src\core\api\types.ts` | `../../types` | `Comment` | Did you mean 'isComment'? |
-| `client\src\core\api\types.ts` | `../../types` | `User` | Did you mean 'isUser'? |
-| `client\src\core\auth\config\auth-config.ts` | `../store/auth-middleware` | `AuthMiddlewareConfig` | Did you mean 'authMiddleware'? |
-| `client\src\core\auth\config\auth-init.ts` | `./auth-config` | `type AuthSettings` | Did you mean 'AuthSettings'? |
-| `client\src\core\auth\scripts\init-auth-system.ts` | `../config/auth-init` | `type AuthInitOptions` | Did you mean 'AuthInitOptions'? |
-| `client\src\core\auth\scripts\init-auth-system.ts` | `@/core/auth/scripts/init-auth-system` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\init-auth-system.ts` | `@/core/api` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\init-auth-system.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\init-auth-system.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\init-auth-system.ts` | `@/core/auth/scripts/init-auth-system` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\init-auth-system.ts` | `@/test-utils` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/store/slices/authSlice` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/store/slices/authSlice` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/store/middleware/authMiddleware` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/services/auth-service-init` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/api/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/utils/storage` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/utils/storage` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@client/shared/ui/auth/utils/auth-validation` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\scripts\migration-helper.ts` | `@/core/auth` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\service.ts` | `@client/store/slices/sessionSlice` | `setCurrentSession` | Export 'setCurrentSession' from target module |
-| `client\src\core\auth\service.ts` | `@client/core/auth` | `AuthTokens` | Export 'AuthTokens' from target module |
-| `client\src\core\auth\store\auth-middleware.ts` | `@reduxjs/toolkit` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\auth\store\auth-middleware.ts` | `./auth-slice` | `clearError` | Export 'clearError' from target module |
-| `client\src\core\auth\store\auth-slice.ts` | `@reduxjs/toolkit` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\community\hooks\useUnifiedCommunity.ts` | `@tanstack/react-query` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\community\hooks\useUnifiedDiscussion.ts` | `@tanstack/react-query` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\community\services\state-sync.service.ts` | `@tanstack/react-query` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\dashboard\context.tsx` | `@client/types` | `DashboardState` | Export 'DashboardState' from target module |
-| `client\src\core\dashboard\context.tsx` | `@client/types` | `WidgetConfig` | Export 'WidgetConfig' from target module |
-| `client\src\core\dashboard\context.tsx` | `@client/types` | `DashboardLayout` | Export 'DashboardLayout' from target module |
-| `client\src\core\dashboard\context.tsx` | `@client/types` | `DashboardSettings` | Export 'DashboardSettings' from target module |
-| `client\src\core\dashboard\hooks.ts` | `@client/types` | `WidgetConfig` | Export 'WidgetConfig' from target module |
-| `client\src\core\dashboard\utils.ts` | `@client/types` | `WidgetConfig` | Export 'WidgetConfig' from target module |
-| `client\src\core\dashboard\utils.ts` | `@client/types` | `DashboardLayout` | Export 'DashboardLayout' from target module |
-| `client\src\core\dashboard\utils.ts` | `@client/types` | `WidgetSize` | Export 'WidgetSize' from target module |
-| `client\src\core\dashboard\utils.ts` | `@client/types` | `ChartData` | Export 'ChartData' from target module |
-| `client\src\core\dashboard\widgets.ts` | `@client/types` | `WidgetConfig` | Export 'WidgetConfig' from target module |
-| `client\src\core\dashboard\widgets.ts` | `@client/types` | `WidgetType` | Export 'WidgetType' from target module |
-| `client\src\core\dashboard\widgets.ts` | `@client/types` | `AnalyticsMetrics` | Export 'AnalyticsMetrics' from target module |
-| `client\src\core\dashboard\widgets.ts` | `@client/types` | `PerformanceMetrics` | Export 'PerformanceMetrics' from target module |
-| `client\src\core\dashboard\widgets.ts` | `@client/types` | `EngagementMetrics` | Export 'EngagementMetrics' from target module |
-| `client\src\core\dashboard\reducer.ts` | `@client/types` | `DashboardState` | Export 'DashboardState' from target module |
-| `client\src\core\dashboard\reducer.ts` | `@client/types` | `DashboardAction` | Export 'DashboardAction' from target module |
-| `client\src\core\error\components\ErrorBoundary.tsx` | `@/core/browser` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\error\components\ErrorBoundary.tsx` | `@/core/error` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\error\components\ErrorBoundary.tsx` | `@/core/performance` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\error\components\ErrorBoundary.tsx` | `@/utils/logger` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\error\components\ErrorBoundary.tsx` | `@/utils/tracing` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\error\components\example.tsx` | `./index` | `withErrorBoundary` | Did you mean 'ErrorBoundary'? |
-| `client\src\core\error\components\example.tsx` | `./index` | `useErrorBoundary` | Did you mean 'ErrorBoundary'? |
-| `client\src\core\error\components\utils\contextual-messages.ts` | `@client/core/error` | `AppError` | Export 'AppError' from target module |
-| `client\src\core\error\monitoring.tsx` | `@sentry/browser` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\error\monitoring.tsx` | `@sentry/replay` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\error\monitoring.tsx` | `@sentry/tracing` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\loading\components\LoadingProgress.tsx` | `@client/types` | `LoadingComponentProps` | Export 'LoadingComponentProps' from target module |
-| `client\src\core\loading\components\LoadingSkeleton.tsx` | `@client/types` | `LoadingComponentProps` | Export 'LoadingComponentProps' from target module |
-| `client\src\core\loading\components\LoadingSpinner.tsx` | `@client/types` | `LoadingComponentProps` | Export 'LoadingComponentProps' from target module |
-| `client\src\core\loading\utils\progress-utils.ts` | `@client/types` | `ProgressiveStage` | Export 'ProgressiveStage' from target module |
-| `client\src\core\loading\reducer.ts` | `@client/types` | `LoadingStateData` | Export 'LoadingStateData' from target module |
-| `client\src\core\loading\reducer.ts` | `@client/types` | `LoadingAction` | Export 'LoadingAction' from target module |
-| `client\src\core\loading\reducer.ts` | `@client/types` | `LoadingOperation` | Export 'LoadingOperation' from target module |
-| `client\src\core\loading\reducer.ts` | `@client/types` | `ConnectionInfo` | Export 'ConnectionInfo' from target module |
-| `client\src\core\loading\reducer.ts` | `@client/types` | `AdaptiveSettings` | Export 'AdaptiveSettings' from target module |
-| `client\src\core\loading\reducer.ts` | `@client/types` | `AssetLoadingProgress` | Export 'AssetLoadingProgress' from target module |
-| `client\src\core\loading\reducer.ts` | `@client/types` | `LoadingStats` | Export 'LoadingStats' from target module |
-| `client\src\core\loading\utils\loading-utils.ts` | `@client/types` | `LoadingOperation` | Export 'LoadingOperation' from target module |
-| `client\src\core\loading\utils\loading-utils.ts` | `@client/types` | `LoadingConfig` | Export 'LoadingConfig' from target module |
-| `client\src\core\loading\utils\connection-utils.ts` | `@client/types` | `ConnectionType` | Export 'ConnectionType' from target module |
-| `client\src\core\loading\utils\connection-utils.ts` | `@client/types` | `ConnectionInfo` | Export 'ConnectionInfo' from target module |
-| `client\src\core\mobile\error-handler.ts` | `@/utils/logger` | `(entire module)` | Verify path exists. Check tsconfig paths or file location. |
-| `client\src\core\mobile\error-handler.ts` | `./types` | `MobileErrorContext` | Export 'MobileErrorContext' from target module |
+| Phase | Duration |
+|:------|----------:|
+| Discovery | 0.07s |
+| Parsing | 1.66s |
+| Validation | 0.00s |
+| Type Analysis | 0.57s |
 
-*...and 1553 more issues*
 
-## ⚠️ Type Safety Warnings (204)
+## ✅ Import/Export Validation
+
+All 0 imports successfully resolve to valid exports. No mismatches detected.
+
+## ⚠️ Type Safety Warnings (217)
+
+
+### Async/Await
 
 | File | Line | Issue | Severity |
 |:-----|-----:|:------|:--------:|
-| `client\src\core\api\client.ts` | - | High 'any' usage: 10 occurrences (threshold: 8) | High |
-| `client\src\core\api\config.ts` | - | High 'any' usage: 15 occurrences (threshold: 8) | High |
-| `client\src\core\api\examples\circuit-breaker-usage.ts` | 26 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\examples\circuit-breaker-usage.ts` | 75 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\examples\circuit-breaker-usage.ts` | 182 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\examples\circuit-breaker-usage.ts` | 218 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\interceptors.ts` | 695 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\interceptors.ts` | 726 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\retry-handler.ts` | 352 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\retry.ts` | 235 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\retry.ts` | 246 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\api\search.ts` | - | High 'any' usage: 20 occurrences (threshold: 8) | High |
-| `client\src\core\api\websocket.ts` | - | High 'any' usage: 25 occurrences (threshold: 8) | High |
-| `client\src\core\auth\scripts\init-auth-system.ts` | 70 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\loading\utils\timeout-utils.ts` | 102 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\loading\utils\timeout-utils.ts` | 133 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\loading\utils\timeout-utils.ts` | 144 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\storage\index.ts` | 79 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\storage\index.ts` | 87 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\core\storage\index.ts` | 114 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\features\analytics\services\analytics.ts` | - | High 'any' usage: 20 occurrences (threshold: 8) | High |
-| `client\src\features\bills\services\cache.ts` | - | High 'any' usage: 10 occurrences (threshold: 8) | High |
-| `client\src\features\bills\ui\analysis\conflict-of-interest\HistoricalPatternAnalysis.tsx` | - | High 'any' usage: 9 occurrences (threshold: 8) | High |
-| `client\src\features\community\services\backend.ts` | - | High 'any' usage: 10 occurrences (threshold: 8) | High |
-| `client\src\features\search\services\intelligent-search.ts` | - | High 'any' usage: 11 occurrences (threshold: 8) | High |
-| `client\src\lib\queryClient.ts` | 12 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\monitoring\error-monitoring.ts` | - | High 'any' usage: 15 occurrences (threshold: 8) | High |
-| `client\src\services\errorAnalyticsBridge.ts` | - | High 'any' usage: 37 occurrences (threshold: 8) | High |
-| `client\src\shared\interfaces\unified-interfaces.ts` | - | High 'any' usage: 29 occurrences (threshold: 8) | High |
-| `client\src\shared\lib\queryClient.ts` | 12 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\shared\templates\component-templates.ts` | - | High 'any' usage: 9 occurrences (threshold: 8) | High |
-| `client\src\shared\ui\dashboard\hooks\useDashboard.ts` | - | High 'any' usage: 9 occurrences (threshold: 8) | High |
-| `client\src\shared\ui\dashboard\recovery.ts` | 221 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\shared\ui\dashboard\UserDashboard.tsx` | - | High 'any' usage: 13 occurrences (threshold: 8) | High |
-| `client\src\shared\ui\loading\utils\connection-utils.ts` | 301 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\shared\ui\loading\utils\timeout-utils.ts` | 429 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\shared\ui\loading\validation.ts` | - | High 'any' usage: 9 occurrences (threshold: 8) | High |
-| `client\src\shared\ui\navigation\recovery.ts` | 114 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\shared\ui\navigation\recovery.ts` | 172 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\shared\ui\offline\offline-manager.tsx` | - | High 'any' usage: 12 occurrences (threshold: 8) | High |
-| `client\src\store\index.ts` | - | High 'any' usage: 20 occurrences (threshold: 8) | High |
-| `client\src\types\form.ts` | - | High 'any' usage: 13 occurrences (threshold: 8) | High |
-| `client\src\utils\request-deduplicator.ts` | 135 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\utils\service-recovery.ts` | 251 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\utils\service-recovery.ts` | 276 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `client\src\utils\tracing.ts` | 153 | Async export lacks explicit return type (Promise<T> or void) | Medium |
-| `scripts\database\health-check.ts` | - | High 'any' usage: 10 occurrences (threshold: 8) | High |
-| `scripts\database\migrate.ts` | - | High 'any' usage: 10 occurrences (threshold: 8) | High |
-| `scripts\database\setup.ts` | - | High 'any' usage: 10 occurrences (threshold: 8) | High |
-| `scripts\seeds\seed.ts` | 7 | Async export lacks explicit return type (Promise<T> or void) | Medium |
+| `shared\database\connection.ts` | 214 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\connection.ts` | 412 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\connection.ts` | 434 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\index.ts` | 83 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\index.ts` | 244 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\pool.ts` | 621 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\pool.ts` | 708 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\core\services-init.ts` | 40 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\middleware\auth.ts` | 25 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\middleware\circuit-breaker-middleware.ts` | 100 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\middleware\circuit-breaker-middleware.ts` | 134 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\middleware\circuit-breaker-middleware.ts` | 221 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\middleware\privacy-middleware.ts` | 230 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\services\schema-validation-demo.ts` | 13 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\utils\crypto.ts` | 7 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\utils\crypto.ts` | 13 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\utils\db-init.ts` | 64 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `scripts\seeds\seed.ts` | 7 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `client\src\lib\queryClient.ts` | 12 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `client\src\utils\request-deduplicator.ts` | 135 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `client\src\utils\service-recovery.ts` | 251 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `client\src\utils\service-recovery.ts` | 276 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `client\src\utils\tracing.ts` | 153 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\core\utils\async-utils.ts` | 126 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\core\utils\async-utils.ts` | 341 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\core\utils\performance-utils.ts` | 303 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\core\utils\performance-utils.ts` | 457 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\core\utils\race-condition-prevention.ts` | 111 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\core\observability\correlation.ts` | 366 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\core\connection-manager.ts` | 925 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\core\connection-manager.ts` | 935 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\core\database-orchestrator.ts` | 441 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\core\database-orchestrator.ts` | 459 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\database\utils\base-script.ts` | 414 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\ml\models\index.ts` | 338 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\ml\models\index.ts` | 350 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\ml\models\ml_usage_example.ts` | 73 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `shared\ml\models\ml_usage_example.ts` | 324 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\features\security\security-middleware.ts` | 27 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\infrastructure\errors\migration-example.ts` | 136 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\infrastructure\errors\result-adapter.ts` | 327 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `...nfrastructure\migration\repository-deployment-executor.ts` | 477 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\infrastructure\monitoring\index.ts` | 67 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\infrastructure\notifications\email-service.ts` | 940 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\infrastructure\validation\repository-validation.ts` | 409 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\infrastructure\validation\repository-validation.ts` | 433 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `server\infrastructure\websocket\api-server.ts` | 1062 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `client\src\core\api\interceptors.ts` | 695 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `client\src\core\api\interceptors.ts` | 726 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
+| `client\src\core\api\retry-handler.ts` | 352 | Async export lacks explicit return type annotation (Promise<T>) | 🟡 Medium |
 
-*...and 154 more warnings*
+*...and 60 more in this category*
+
+### Type Safety
+
+| File | Line | Issue | Severity |
+|:-----|-----:|:------|:--------:|
+| `server\middleware\boom-error-middleware.ts` | - | Excessive 'any' usage: 15 occurrences (threshold: 8) | 🟠 High |
+| `server\middleware\migration-wrapper.ts` | - | Excessive 'any' usage: 31 occurrences (threshold: 8) | 🟠 High |
+| `server\middleware\server-error-integration.ts` | - | Excessive 'any' usage: 12 occurrences (threshold: 8) | 🟠 High |
+| `server\scripts\deploy-websocket-migration.ts` | - | Excessive 'any' usage: 12 occurrences (threshold: 8) | 🟠 High |
+| `server\services\external-api-error-handler.ts` | - | Excessive 'any' usage: 15 occurrences (threshold: 8) | 🟠 High |
+| `server\services\managed-government-data-integration.ts` | - | Excessive 'any' usage: 48 occurrences (threshold: 8) | 🟠 High |
+| `server\utils\missing-modules-fallback.ts` | - | Excessive 'any' usage: 37 occurrences (threshold: 8) | 🟠 High |
+| `server\utils\shared-core-fallback.ts` | - | Excessive 'any' usage: 23 occurrences (threshold: 8) | 🟠 High |
+| `scripts\database\health-check.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `scripts\database\migrate.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `scripts\database\setup.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `client\src\services\errorAnalyticsBridge.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `client\src\types\form.ts` | - | Excessive 'any' usage: 13 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\caching\cache-factory.ts` | - | Excessive 'any' usage: 27 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\middleware\factory.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\middleware\index.ts` | - | Excessive 'any' usage: 9 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\utils\browser-logger.ts` | - | Excessive 'any' usage: 14 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\utils\data-utils.ts` | - | Excessive 'any' usage: 12 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\utils\type-guards.ts` | - | Excessive 'any' usage: 30 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\observability\iobservability-stack.ts` | - | Excessive 'any' usage: 12 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\observability\observability-stack-service.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\observability\stack.ts` | - | Excessive 'any' usage: 11 occurrences (threshold: 8) | 🟠 High |
+| `shared\core\observability\telemetry.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\models\constitutional-analyzer.ts` | - | Excessive 'any' usage: 9 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\models\engagement-predictor.ts` | - | Excessive 'any' usage: 13 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\models\influence-mapper.ts` | - | Excessive 'any' usage: 15 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\models\ml_usage_example.ts` | - | Excessive 'any' usage: 11 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\models\real-time-classifier.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\models\transparency-scorer.ts` | - | Excessive 'any' usage: 11 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\testing\test-server.ts` | 235 | Function parameters lack type annotations | 🔵 Low |
+| `shared\ml\services\analysis-pipeline.ts` | - | Excessive 'any' usage: 18 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\services\ml-integration.ts` | - | Excessive 'any' usage: 35 occurrences (threshold: 8) | 🟠 High |
+| `shared\ml\services\ml-orchestrator.ts` | - | Excessive 'any' usage: 18 occurrences (threshold: 8) | 🟠 High |
+| `server\core\errors\error-tracker.ts` | - | Excessive 'any' usage: 36 occurrences (threshold: 8) | 🟠 High |
+| `server\core\validation\data-completeness.ts` | - | Excessive 'any' usage: 9 occurrences (threshold: 8) | 🟠 High |
+| `server\core\validation\data-validation.ts` | - | Excessive 'any' usage: 17 occurrences (threshold: 8) | 🟠 High |
+| `server\features\bills\bills-router-migrated.ts` | - | Excessive 'any' usage: 9 occurrences (threshold: 8) | 🟠 High |
+| `server\features\bills\bills-router.ts` | - | Excessive 'any' usage: 24 occurrences (threshold: 8) | 🟠 High |
+| `server\features\analytics\engagement-analytics.ts` | - | Excessive 'any' usage: 18 occurrences (threshold: 8) | 🟠 High |
+| `server\features\analytics\transparency-dashboard.ts` | - | Excessive 'any' usage: 15 occurrences (threshold: 8) | 🟠 High |
+| `server\features\community\community.ts` | - | Excessive 'any' usage: 9 occurrences (threshold: 8) | 🟠 High |
+| `server\features\community\social-integration.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `server\features\notifications\notification-router.ts` | - | Excessive 'any' usage: 12 occurrences (threshold: 8) | 🟠 High |
+| `server\infrastructure\errors\migration-example.ts` | - | Excessive 'any' usage: 10 occurrences (threshold: 8) | 🟠 High |
+| `...frastructure\external-data\conflict-resolution-service.ts` | - | Excessive 'any' usage: 12 occurrences (threshold: 8) | 🟠 High |
+| `server\infrastructure\external-data\external-api-manager.ts` | - | Excessive 'any' usage: 12 occurrences (threshold: 8) | 🟠 High |
+| `server\infrastructure\integration\service-orchestrator.ts` | - | Excessive 'any' usage: 19 occurrences (threshold: 8) | 🟠 High |
+| `...astructure\migration\error-handling-deployment.service.ts` | - | Excessive 'any' usage: 14 occurrences (threshold: 8) | 🟠 High |
+| `...nfrastructure\migration\phase1-deployment-orchestrator.ts` | - | Excessive 'any' usage: 11 occurrences (threshold: 8) | 🟠 High |
+| `...frastructure\migration\repository-deployment-validator.ts` | - | Excessive 'any' usage: 9 occurrences (threshold: 8) | 🟠 High |
+
+*...and 57 more in this category*
+
+## 💡 Recommendations
+
+### 🛡️ Type Safety Improvements
+
+1. **Reduce 'any' usage**: Add explicit types where possible
+2. **Annotate async functions**: Add Promise<T> return types
+3. **Type function parameters**: Add type annotations to all parameters
+4. **Enable strict mode**: Consider `"strict": true` in tsconfig.json
+
 
 ---
-*Powered by Strategic Export Validator v11.0*
+
+*Generated by Strategic Export Validator v13.0*  
+*For issues or suggestions, review the configuration in the validator script*

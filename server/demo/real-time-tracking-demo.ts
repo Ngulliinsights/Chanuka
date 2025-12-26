@@ -7,13 +7,13 @@
  * implemented for task 7.1 "Real-Time Bill Status Updates"
  */
 
-import { webSocketService } from '@shared/infrastructure/websocket.js';
 // bill-status-monitor exports the singleton instance as `billStatusMonitorService`
 import { billStatusMonitorService as billStatusMonitor } from '@server/features/bills/bill-status-monitor.ts';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
-import { createServer } from 'http';
-import express from 'express';
 import { logger   } from '@shared/core';
+import { webSocketService } from '@shared/infrastructure/websocket.js';
+import express from 'express';
+import { createServer } from 'http';
 
 async function runDemo() {
   logger.info('🚀 Starting Real-Time Bill Tracking Demo...\n', { component: 'Chanuka' });

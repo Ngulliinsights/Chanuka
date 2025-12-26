@@ -3,18 +3,17 @@
 // ============================================================================
 // Demonstrates how to migrate from legacy error handling to Boom + Neverthrow
 
-import { Result } from 'neverthrow';
 import Boom from '@hapi/boom';
+import { Result } from 'neverthrow';
+
 import { 
-  errorAdapter, 
-  createValidationError, 
   createAuthenticationError,
-  createNotFoundError 
-} from './error-adapter.js';
+  createNotFoundError, 
+  createValidationError, 
+  errorAdapter} from './error-adapter.js';
 import { 
-  errorHandler as legacyHandler,
-  ErrorContext 
-} from './error-standardization.js';
+  ErrorContext, 
+  errorHandler as legacyHandler} from './error-standardization.js';
 
 // Example service context
 const serviceContext: Partial<ErrorContext> = {

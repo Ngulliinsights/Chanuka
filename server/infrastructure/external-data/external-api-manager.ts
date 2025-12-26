@@ -11,12 +11,12 @@
  * - Request batching and optimization
  */
 
-import { EventEmitter } from 'events';
+import { APICostMonitoringService } from '@server/services/api-cost-monitoring';
 // Note: ioredis needs to be installed: npm install ioredis @types/ioredis
 // import { Redis } from 'ioredis';
-import { ExternalAPIErrorHandler, ErrorSeverity } from '@server/services/external-api-error-handler';
-import { APICostMonitoringService } from '@server/services/api-cost-monitoring';
+import { ErrorSeverity,ExternalAPIErrorHandler } from '@server/services/external-api-error-handler';
 import { logger   } from '@shared/core';
+import { EventEmitter } from 'events';
 
 // ============================================================================
 // Core Types and Interfaces

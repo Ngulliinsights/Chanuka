@@ -114,7 +114,7 @@ export const DashboardStack = React.memo<DashboardStackProps>(({
   onSectionUpdate,
 }) => {
   // Sort sections by order
-  const sortedSections = [...sections].sort((a, b) => a.order - b.order);
+  const sortedSections = [...sections].sort((a, b) => (a.order || 0) - (b.order || 0));
 
   // Spacing classes
   const spacingClasses = {

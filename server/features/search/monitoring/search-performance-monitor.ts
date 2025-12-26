@@ -5,8 +5,8 @@
  * relevance measurement, and automated alerting for search system validation.
  */
 
-import { logger  } from '@shared/core';
 import { searchService } from '@shared/application/search-service.js';
+import { logger  } from '@shared/core';
 
 export interface SearchMetrics {
   timestamp: Date;

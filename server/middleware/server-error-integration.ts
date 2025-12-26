@@ -5,9 +5,10 @@
  * while maintaining backward compatibility.
  */
 
-import { Express } from 'express';
-import { boomErrorMiddleware, errorContextMiddleware } from '../../boom-error-middleware';
 import { logger  } from '@shared/core';
+import { Express } from 'express';
+
+import { boomErrorMiddleware, errorContextMiddleware } from '../../boom-error-middleware';
 
 /**
  * Configure error handling for the Express app

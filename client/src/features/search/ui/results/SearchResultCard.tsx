@@ -27,7 +27,7 @@ import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
 import { useToast } from '@client/hooks/use-toast.ts';
 import type { SearchResult, SearchHighlight } from '@client/types';
-import { cn } from '@client/core/dashboard/utils.ts';
+import { cn } from '@client/shared/design-system';
 
 interface SearchResultCardProps {
   result: SearchResult;

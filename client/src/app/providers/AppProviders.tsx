@@ -506,4 +506,5 @@ export function AppProviders({
   return <>{composedProviders}</>;
 }
 
-export default AppProviders;
+// Remove duplicate export - keep only named export
+// export default AppProviders;

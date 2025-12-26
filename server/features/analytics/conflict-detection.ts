@@ -9,16 +9,16 @@
  */
 
 import { logger  } from '@shared/core';
+
 import {
-  conflictDetectionOrchestratorService,
   ConflictAnalysis,
-  FinancialConflict,
-  ProfessionalConflict,
-  VotingAnomaly,
   ConflictDetectionConfig,
   ConflictDetectionError,
-  Stakeholder
-} from './conflict-detection/index.js';
+  conflictDetectionOrchestratorService,
+  FinancialConflict,
+  ProfessionalConflict,
+  Stakeholder,
+  VotingAnomaly} from './conflict-detection/index.js';
 
 // Re-export types for backward compatibility
 export type {

@@ -1,13 +1,13 @@
+import { logger } from '@shared/core/observability/logging';
 import { db } from '@shared/database/pool.js';
 import {
-  bills,
-  sponsors,
-  comments,
   bill_engagement,
+  bills,
+  comments,
   constitutional_analyses,
+  sponsors,
 } from '@shared/schema';
-import { eq, and, sql, desc, count } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging';
+import { and, count,desc, eq, sql } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS

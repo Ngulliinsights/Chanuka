@@ -442,14 +442,19 @@ export interface UseDashboardResult {
 export interface DashboardStackProps {
   spacing?: 'tight' | 'normal' | 'loose';
   direction?: 'vertical' | 'horizontal';
-  widgets: AppWidgetConfig[];
-  onUpdate?: (widgets: AppWidgetConfig[]) => void;
+  sections: DashboardSectionConfig[];
+  className?: string;
+  onSectionUpdate?: (sectionId: string, updates: Partial<DashboardSectionConfig>) => void;
 }
 
 export interface DashboardTabsProps {
   sections: DashboardSectionConfig[];
   activeSection?: string;
   onSectionChange?: (sectionId: string) => void;
+  defaultTab?: string;
+  className?: string;
+  onTabChange?: (tabId: string) => void;
+  onSectionUpdate?: (sectionId: string, updates: Partial<DashboardSectionConfig>) => void;
 }
 
 export interface DashboardSectionConfig {
@@ -459,25 +464,43 @@ export interface DashboardSectionConfig {
   widgets: AppWidgetConfig[];
   visible?: boolean;
   order?: number;
+  contentType?: 'widgets' | 'component' | 'custom';
+  component?: string;
+  description?: string;
+  loading?: boolean;
+  error?: string;
 }
 export interface DashboardFrameworkProps {
-  // Generated interface
-  [key: string]: any;
+  config: Partial<DashboardConfig>;
+  headerContent?: React.ReactNode;
+  sidebarContent?: React.ReactNode;
+  footerContent?: React.ReactNode;
+  loading?: boolean;
+  error?: Error | null;
+  className?: string;
+  onWidgetUpdate?: (widgetId: string, updates: unknown) => void;
+  onLayoutChange?: (updates: Partial<DashboardLayoutConfig>) => void;
+  onThemeChange?: (updates: Partial<DashboardThemeConfig>) => void;
 }
 
 export interface DashboardLayoutConfig {
-  // Generated interface
-  [key: string]: any;
+  type?: 'grid' | 'flex' | 'masonry' | 'custom';
+  columns?: number;
+  rows?: number;
+  gap?: number;
+  sidebarPosition?: 'left' | 'right';
+  showFooter?: boolean;
+  layoutMode?: 'grid' | 'stack' | 'tabs';
 }
 
 export interface DashboardThemeConfig {
-  // Generated interface
-  [key: string]: any;
+  colorScheme: 'light' | 'dark' | 'auto';
+  customTokens?: Record<string, string>;
 }
 
 export interface DashboardAccessibilityConfig {
   // Generated interface
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export class ErrorInfo extends Error {

@@ -4,8 +4,53 @@
  * Type definitions for service configuration and settings
  */
 
-import type { BaseApiConfig, BaseApiRequest, BaseApiResponse, BaseWebSocketMessage, BaseBillData } from './base';
 import type { CacheConfig } from './cache';
+
+// Base types that were imported from './base'
+export interface BaseApiConfig {
+  baseURL: string;
+  timeout: number;
+  retries: number;
+}
+
+export interface BaseApiRequest {
+  method: string;
+  url: string;
+  data?: any;
+}
+
+export interface BaseApiResponse<T = any> {
+  data: T;
+  status: number;
+}
+
+export interface BaseWebSocketMessage<T = any> {
+  type: string;
+  data: T;
+}
+
+export interface BaseBillData {
+  id: string;
+  title: string;
+}
+
+// WebSocket configuration
+export interface WebSocketConfig {
+  url: string;
+  reconnectAttempts: number;
+  reconnectDelay: number;
+  heartbeatInterval: number;
+}
+
+// Retry configuration
+export interface RetryConfig {
+  maxRetries: number;
+  baseDelay: number;
+  maxDelay: number;
+  backoffMultiplier: number;
+}
+
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 // ============================================================================
 // Service Configuration

@@ -4,8 +4,8 @@
 // Service that determines when constitutional analyses need expert human review
 
 import { logger  } from '@shared/core';
-import { ConstitutionalAnalysis } from '@shared/schema/index.js';
 import { ExpertReviewQueueRepository } from '@shared/infrastructure/repositories/expert-review-queue-repository.js';
+import { ConstitutionalAnalysis } from '@shared/schema/index.js';
 
 export interface ExpertReviewDecision {
   shouldFlag: boolean;

@@ -4,9 +4,9 @@
  * This maintains backward compatibility while leveraging the new observability system.
  */
 
-import { performance } from 'perf_hooks';
 // import { performanceMonitoring } from '@server/services/performance-monitoring.ts'; // TODO: Fix missing module
 import { logger   } from '@shared/core';
+import { performance } from 'perf_hooks';
 // import { createObservabilityStack   } from '@shared/core'; // TODO: Fix missing export
 
 interface MetricData {

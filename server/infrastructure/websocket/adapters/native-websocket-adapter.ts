@@ -7,8 +7,7 @@
 import { Server } from 'http';
 
 import { WebSocketService } from '../core/websocket-service';
-
-import { WebSocketAdapter, ServiceStats, HealthStatus } from './websocket-adapter';
+import { HealthStatus,ServiceStats, WebSocketAdapter } from './websocket-adapter';
 
 
 // Note: If @shared/core is unavailable, consider using a local logger implementation

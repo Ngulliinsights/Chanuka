@@ -8,7 +8,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 // Import slices
-import authReducer from '../../../core/auth/store/auth-slice';
+import authReducer from '@client/core/auth/store/auth-slice';
 
 import errorHandlingReducer from './slices/errorHandlingSlice';
 import loadingReducer from './slices/loadingSlice';
@@ -71,4 +71,5 @@ export function getStore() {
   return store;
 }
 
-export default store;
+// Remove duplicate export - keep only the default export
+// export default store;

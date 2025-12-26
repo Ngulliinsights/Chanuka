@@ -1,6 +1,6 @@
-import { User } from '../entities/user';
-import { UserProfile, UserInterest } from '../entities/user-profile';
 import { CitizenVerification } from '../entities/citizen-verification';
+import { User } from '../entities/user';
+import { UserInterest,UserProfile } from '../entities/user-profile';
 
 export class UserAggregate {
   private constructor(

@@ -6,7 +6,7 @@ import { cn } from '@client/lib/utils';
 
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system/interactive/DropdownMenu';
 import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 
 // Types for progressive disclosure navigation

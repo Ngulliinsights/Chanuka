@@ -1,19 +1,18 @@
-import * as bcrypt from 'bcryptjs';
-import * as jwt from 'jsonwebtoken';
-import * as crypto from 'crypto';
-import * as speakeasy from 'speakeasy';
-import * as qrcode from 'qrcode';
-import { eq, and, gt, lt, isNotNull, desc, ne } from 'drizzle-orm';
-import { database as db } from '@shared/database';
-
-import { users, sessions, oauth_providers, oauth_tokens, user_sessions } from '@shared/schema';
-import { getEmailService } from '@server/infrastructure/notifications/email-service';
 import { encryptionService } from '@server/features/security/encryption-service.ts';
-import { inputValidationService } from '@shared/validation/input-validation-service.js';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
-import { Request } from 'express';
-import { z } from 'zod';
+import { getEmailService } from '@server/infrastructure/notifications/email-service';
 import { logger } from '@shared/core';
+import { database as db } from '@shared/database';
+import { oauth_providers, oauth_tokens, sessions, user_sessions,users } from '@shared/schema';
+import { inputValidationService } from '@shared/validation/input-validation-service.js';
+import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
+import { and, desc, eq, gt, isNotNull, lt, ne } from 'drizzle-orm';
+import { Request } from 'express';
+import * as jwt from 'jsonwebtoken';
+import * as qrcode from 'qrcode';
+import * as speakeasy from 'speakeasy';
+import { z } from 'zod';
 
 // Validation schemas
 export const registerSchema = z.object({

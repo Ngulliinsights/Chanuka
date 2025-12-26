@@ -1,13 +1,12 @@
+import { logger } from '@shared/core/observability/logging';
 import { db } from '@shared/database/pool.js';
 import {
-  users,
-  notifications,
   alert_preferences,
+  type Notification,
+  notifications,
   type User,
-  type Notification
-} from '@shared/schema';
-import { eq, and, sql, desc, asc, count, inArray, like, or, gte, lte, isNotNull } from 'drizzle-orm';
-import { logger } from '@shared/core/observability/logging';
+  users} from '@shared/schema';
+import { and, asc, count, desc, eq, gte, inArray, isNotNull,like, lte, or, sql } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -414,7 +413,7 @@ export class AlertPreferencesService {
       const offset = (page - 1) * limit;
 
       // Build query conditions
-      let conditions = [eq(notifications.user_id, user_id)];
+      const conditions = [eq(notifications.user_id, user_id)];
 
       if (options.alertType) {
         conditions.push(eq(notifications.type, options.alertType));

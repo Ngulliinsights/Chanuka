@@ -4,17 +4,18 @@
 // Analyzes public sentiment towards bills, comments, and political content
 
 import { z } from 'zod';
+import { TextProcessor, Statistics, Cache } from './shared_utils';
 
 export const SentimentInputSchema = z.object({
   text: z.string().min(1),
   context: z.enum(['bill_comment', 'social_media', 'news_article', 'public_statement', 'parliamentary_debate']),
-  language: z.enum(['en', 'sw']).default('en'), // English or Swahili
+  language: z.enum(['en', 'sw']).default('en'),
   authorType: z.enum(['citizen', 'expert', 'politician', 'journalist', 'organization']).optional(),
 });
 
 export const SentimentOutputSchema = z.object({
   overallSentiment: z.enum(['very_negative', 'negative', 'neutral', 'positive', 'very_positive']),
-  sentimentScore: z.number().min(-1).max(1), // -1 (very negative) to 1 (very positive)
+  sentimentScore: z.number().min(-1).max(1),
   confidence: z.number().min(0).max(1),
   emotions: z.object({
     anger: z.number().min(0).max(1),
@@ -48,68 +49,147 @@ export const SentimentOutputSchema = z.object({
 export type SentimentInput = z.infer<typeof SentimentInputSchema>;
 export type SentimentOutput = z.infer<typeof SentimentOutputSchema>;
 
+interface SentimentLexicon {
+  words: string[];
+  weight: number;
+  intensifiers?: string[];
+}
+
 export class SentimentAnalyzer {
-  private modelVersion = '2.0.0';
+  private modelVersion = '2.1.0';
+  private cache = new Cache<SentimentOutput>(600); // 10 minute cache
 
-  // Sentiment lexicons (simplified)
-  private readonly POSITIVE_WORDS = [
-    'good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'brilliant',
-    'support', 'agree', 'approve', 'endorse', 'commend', 'praise', 'beneficial',
-    'progress', 'improvement', 'success', 'effective', 'efficient', 'valuable',
-    // Swahili positive words
-    'nzuri', 'bora', 'vizuri', 'mzuri', 'kubwa', 'faida', 'maendeleo'
-  ];
-
-  private readonly NEGATIVE_WORDS = [
-    'bad', 'terrible', 'awful', 'horrible', 'disgusting', 'hate', 'despise',
-    'oppose', 'disagree', 'reject', 'condemn', 'criticize', 'harmful', 'dangerous',
-    'failure', 'disaster', 'corrupt', 'ineffective', 'wasteful', 'unfair',
-    // Swahili negative words
-    'mbaya', 'vibaya', 'hatari', 'kasoro', 'upuuzi', 'rushwa'
-  ];
-
-  // Political keywords for lean detection
-  private readonly POLITICAL_KEYWORDS = {
-    left: ['progressive', 'social justice', 'equality', 'welfare', 'public service'],
-    right: ['conservative', 'free market', 'private sector', 'traditional', 'security'],
-    center: ['moderate', 'balanced', 'pragmatic', 'compromise', 'bipartisan'],
+  private readonly SENTIMENT_LEXICONS = {
+    positive: {
+      words: [
+        'good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'brilliant',
+        'support', 'agree', 'approve', 'endorse', 'commend', 'praise', 'beneficial',
+        'progress', 'improvement', 'success', 'effective', 'efficient', 'valuable',
+        'outstanding', 'exceptional', 'remarkable', 'splendid', 'superb', 'impressive',
+        'nzuri', 'bora', 'vizuri', 'mzuri', 'kubwa', 'faida', 'maendeleo', 'mafanikio'
+      ],
+      weight: 1.0,
+      intensifiers: ['very', 'extremely', 'highly', 'absolutely', 'completely']
+    },
+    negative: {
+      words: [
+        'bad', 'terrible', 'awful', 'horrible', 'disgusting', 'hate', 'despise',
+        'oppose', 'disagree', 'reject', 'condemn', 'criticize', 'harmful', 'dangerous',
+        'failure', 'disaster', 'corrupt', 'ineffective', 'wasteful', 'unfair',
+        'poor', 'inadequate', 'disappointing', 'unacceptable', 'atrocious',
+        'mbaya', 'vibaya', 'hatari', 'kasoro', 'upuuzi', 'rushwa', 'ufisadi'
+      ],
+      weight: 1.0,
+      intensifiers: ['very', 'extremely', 'highly', 'absolutely', 'completely']
+    }
   };
 
-  // Aspect categories for political content
+  private readonly NEGATION_WORDS = [
+    'not', 'no', 'never', 'nothing', 'nobody', 'nowhere', 'neither', 'nor',
+    'hardly', 'scarcely', 'barely', 'si', 'hapana', 'kamwe'
+  ];
+
+  private readonly EMOTION_KEYWORDS = {
+    anger: {
+      words: ['angry', 'furious', 'outraged', 'mad', 'irritated', 'enraged', 'livid', 'hasira'],
+      intensity: 1.0
+    },
+    fear: {
+      words: ['afraid', 'scared', 'worried', 'anxious', 'terrified', 'frightened', 'alarmed', 'hofu'],
+      intensity: 0.9
+    },
+    joy: {
+      words: ['happy', 'joyful', 'excited', 'delighted', 'cheerful', 'thrilled', 'pleased', 'furaha'],
+      intensity: 1.0
+    },
+    sadness: {
+      words: ['sad', 'depressed', 'disappointed', 'grief', 'sorrow', 'unhappy', 'miserable', 'huzuni'],
+      intensity: 0.9
+    },
+    surprise: {
+      words: ['surprised', 'shocked', 'amazed', 'astonished', 'stunned', 'startled', 'mshangao'],
+      intensity: 0.8
+    },
+    trust: {
+      words: ['trust', 'confidence', 'faith', 'believe', 'reliable', 'dependable', 'imani'],
+      intensity: 0.8
+    },
+    disgust: {
+      words: ['disgusted', 'revolted', 'sickened', 'appalled', 'repulsed', 'nauseated', 'chuki'],
+      intensity: 0.9
+    },
+    anticipation: {
+      words: ['excited', 'eager', 'hopeful', 'expecting', 'anticipating', 'looking forward', 'matarajio'],
+      intensity: 0.7
+    }
+  };
+
+  private readonly POLITICAL_KEYWORDS = {
+    left: {
+      keywords: ['progressive', 'social justice', 'equality', 'welfare', 'public service', 
+                'redistribution', 'labor rights', 'universal healthcare', 'green'],
+      weight: 1.0
+    },
+    right: {
+      keywords: ['conservative', 'free market', 'private sector', 'traditional', 'security',
+                'deregulation', 'lower taxes', 'individual responsibility', 'business'],
+      weight: 1.0
+    },
+    center: {
+      keywords: ['moderate', 'balanced', 'pragmatic', 'compromise', 'bipartisan',
+                'centrist', 'middle ground', 'practical'],
+      weight: 1.0
+    }
+  };
+
   private readonly POLITICAL_ASPECTS = [
     'economy', 'healthcare', 'education', 'security', 'corruption', 'governance',
-    'human_rights', 'environment', 'infrastructure', 'taxation', 'employment'
+    'human_rights', 'environment', 'infrastructure', 'taxation', 'employment',
+    'justice', 'democracy', 'devolution', 'parliament'
   ];
+
+  private readonly TOXICITY_PATTERNS = {
+    hate_speech: ['hate', 'despise', 'loathe', 'inferior', 'subhuman', 'vermin'],
+    harassment: ['stupid', 'idiot', 'moron', 'fool', 'dumb', 'incompetent', 'useless'],
+    threat: ['kill', 'murder', 'attack', 'destroy', 'eliminate', 'harm', 'violence'],
+    profanity: ['damn', 'hell', 'crap'], // Limited list
+  };
 
   async analyze(input: SentimentInput): Promise<SentimentOutput> {
     const validatedInput = SentimentInputSchema.parse(input);
     
+    // Check cache
+    const cacheKey = this.generateCacheKey(validatedInput);
+    const cached = this.cache.get(cacheKey);
+    if (cached) return cached;
+    
     // Preprocess text
-    const processedText = this.preprocessText(validatedInput.text, validatedInput.language);
+    const processedText = TextProcessor.normalize(validatedInput.text);
+    const tokens = TextProcessor.tokenize(validatedInput.text);
     
     // Calculate overall sentiment
-    const sentimentScore = this.calculateSentimentScore(processedText);
-    const overallSentiment = this.scoresToSentiment(sentimentScore);
+    const sentimentScore = this.calculateSentimentScore(processedText, tokens);
+    const overallSentiment = this.scoreToSentiment(sentimentScore);
     
     // Analyze emotions
-    const emotions = this.analyzeEmotions(processedText);
+    const emotions = this.analyzeEmotions(processedText, tokens);
     
     // Extract aspects and their sentiments
-    const aspects = this.extractAspects(processedText, validatedInput.context);
+    const aspects = this.extractAspects(processedText, tokens, validatedInput.context);
     
     // Extract key phrases
-    const keyPhrases = this.extractKeyPhrases(processedText, sentimentScore);
+    const keyPhrases = this.extractKeyPhrases(processedText, tokens, sentimentScore);
     
     // Analyze toxicity
-    const toxicity = this.analyzeToxicity(processedText);
+    const toxicity = this.analyzeToxicity(processedText, tokens);
     
     // Detect political lean
-    const politicalLean = this.detectPoliticalLean(processedText, validatedInput.context);
+    const politicalLean = this.detectPoliticalLean(processedText, tokens, validatedInput.context);
     
     // Calculate confidence
-    const confidence = this.calculateConfidence(processedText, aspects, emotions);
+    const confidence = this.calculateConfidence(processedText, tokens, aspects, emotions);
 
-    return {
+    const result = {
       overallSentiment,
       sentimentScore,
       confidence,
@@ -119,70 +199,90 @@ export class SentimentAnalyzer {
       toxicity,
       politicalLean,
     };
+    
+    this.cache.set(cacheKey, result);
+    
+    return result;
   }
 
-  private preprocessText(text: string, language: string): string {
-    // Convert to lowercase
-    let processed = text.toLowerCase();
-    
-    // Remove URLs, mentions, hashtags
-    processed = processed.replace(/https?:\/\/[^\s]+/g, '');
-    processed = processed.replace(/@\w+/g, '');
-    processed = processed.replace(/#\w+/g, '');
-    
-    // Remove extra whitespace
-    processed = processed.replace(/\s+/g, ' ').trim();
-    
-    // Language-specific preprocessing
-    if (language === 'sw') {
-      // Swahili-specific preprocessing could go here
-      processed = this.preprocessSwahili(processed);
-    }
-    
-    return processed;
-  }
-
-  private preprocessSwahili(text: string): string {
-    // Basic Swahili preprocessing
-    // Remove common Swahili stopwords, handle prefixes, etc.
-    const swahiliStopwords = ['na', 'ya', 'wa', 'za', 'la', 'kwa', 'ni', 'si'];
-    const words = text.split(' ');
-    return words.filter(word => !swahiliStopwords.includes(word)).join(' ');
-  }
-
-  private calculateSentimentScore(text: string): number {
-    const words = text.split(/\s+/);
+  private calculateSentimentScore(text: string, tokens: string[]): number {
     let score = 0;
     let wordCount = 0;
-
-    for (const word of words) {
-      if (this.POSITIVE_WORDS.includes(word)) {
-        score += 1;
-        wordCount++;
-      } else if (this.NEGATIVE_WORDS.includes(word)) {
-        score -= 1;
+    const window = 3; // Negation window
+    
+    // Create token map with positions
+    const tokenPositions = new Map<string, number[]>();
+    tokens.forEach((token, idx) => {
+      if (!tokenPositions.has(token)) {
+        tokenPositions.set(token, []);
+      }
+      tokenPositions.get(token)!.push(idx);
+    });
+    
+    // Score positive words
+    for (const word of this.SENTIMENT_LEXICONS.positive.words) {
+      const positions = tokenPositions.get(word) || [];
+      for (const pos of positions) {
+        let weight = this.SENTIMENT_LEXICONS.positive.weight;
+        
+        // Check for intensifiers
+        if (pos > 0) {
+          const prevToken = tokens[pos - 1];
+          if (this.SENTIMENT_LEXICONS.positive.intensifiers?.includes(prevToken)) {
+            weight *= 1.5;
+          }
+        }
+        
+        // Check for negation
+        let isNegated = false;
+        for (let i = Math.max(0, pos - window); i < pos; i++) {
+          if (this.NEGATION_WORDS.includes(tokens[i])) {
+            isNegated = true;
+            break;
+          }
+        }
+        
+        score += isNegated ? -weight * 1.5 : weight;
         wordCount++;
       }
     }
-
-    // Handle negations (simplified)
-    const negationPattern = /\b(not|no|never|nothing|nobody|nowhere|neither|nor|hardly|scarcely|barely|si|hapana)\s+(\w+)/g;
-    let match;
-    while ((match = negationPattern.exec(text)) !== null) {
-      const negatedWord = match[2];
-      if (this.POSITIVE_WORDS.includes(negatedWord)) {
-        score -= 2; // Flip and amplify
-      } else if (this.NEGATIVE_WORDS.includes(negatedWord)) {
-        score += 2; // Flip and amplify
+    
+    // Score negative words
+    for (const word of this.SENTIMENT_LEXICONS.negative.words) {
+      const positions = tokenPositions.get(word) || [];
+      for (const pos of positions) {
+        let weight = this.SENTIMENT_LEXICONS.negative.weight;
+        
+        // Check for intensifiers
+        if (pos > 0) {
+          const prevToken = tokens[pos - 1];
+          if (this.SENTIMENT_LEXICONS.negative.intensifiers?.includes(prevToken)) {
+            weight *= 1.5;
+          }
+        }
+        
+        // Check for negation
+        let isNegated = false;
+        for (let i = Math.max(0, pos - window); i < pos; i++) {
+          if (this.NEGATION_WORDS.includes(tokens[i])) {
+            isNegated = true;
+            break;
+          }
+        }
+        
+        score -= isNegated ? -weight * 1.5 : weight;
+        wordCount++;
       }
     }
-
-    // Normalize score
+    
+    // Normalize score to -1 to 1 range
     if (wordCount === 0) return 0;
-    return Math.max(-1, Math.min(1, score / Math.max(wordCount, 5)));
+    
+    // Use tanh for smooth normalization
+    return Math.tanh(score / Math.max(wordCount, 5));
   }
 
-  private scoresToSentiment(score: number): 'very_negative' | 'negative' | 'neutral' | 'positive' | 'very_positive' {
+  private scoreToSentiment(score: number): 'very_negative' | 'negative' | 'neutral' | 'positive' | 'very_positive' {
     if (score <= -0.6) return 'very_negative';
     if (score <= -0.2) return 'negative';
     if (score >= 0.6) return 'very_positive';
@@ -190,55 +290,51 @@ export class SentimentAnalyzer {
     return 'neutral';
   }
 
-  private analyzeEmotions(text: string) {
-    // Simplified emotion detection based on keywords
-    const emotionKeywords = {
-      anger: ['angry', 'furious', 'outraged', 'mad', 'irritated', 'hasira'],
-      fear: ['afraid', 'scared', 'worried', 'anxious', 'terrified', 'hofu'],
-      joy: ['happy', 'joyful', 'excited', 'delighted', 'cheerful', 'furaha'],
-      sadness: ['sad', 'depressed', 'disappointed', 'grief', 'sorrow', 'huzuni'],
-      surprise: ['surprised', 'shocked', 'amazed', 'astonished', 'mshangao'],
-      trust: ['trust', 'confidence', 'faith', 'believe', 'reliable', 'imani'],
-      disgust: ['disgusted', 'revolted', 'sickened', 'appalled', 'chuki'],
-      anticipation: ['excited', 'eager', 'hopeful', 'expecting', 'matarajio'],
-    };
-
+  private analyzeEmotions(text: string, tokens: string[]) {
     const emotions: any = {};
     
-    for (const [emotion, keywords] of Object.entries(emotionKeywords)) {
+    for (const [emotion, { words, intensity }] of Object.entries(this.EMOTION_KEYWORDS)) {
       let score = 0;
-      for (const keyword of keywords) {
-        const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-        const matches = text.match(regex);
-        if (matches) {
-          score += matches.length;
-        }
+      
+      for (const word of words) {
+        const count = tokens.filter(t => t === word || text.includes(word)).length;
+        score += count * intensity;
       }
-      emotions[emotion] = Math.min(1, score * 0.2);
+      
+      // Normalize using sigmoid for smoother distribution
+      emotions[emotion] = 1 / (1 + Math.exp(-score + 2));
     }
 
     return emotions;
   }
 
-  private extractAspects(text: string, context: string) {
+  private extractAspects(text: string, tokens: string[], context: string) {
     const aspects = [];
     
     for (const aspect of this.POLITICAL_ASPECTS) {
       const aspectKeywords = this.getAspectKeywords(aspect);
-      let mentions = [];
+      const mentions = [];
       let aspectSentiment = 0;
       let mentionCount = 0;
 
       for (const keyword of aspectKeywords) {
-        const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-        const matches = text.match(regex);
-        if (matches) {
-          mentions.push(...matches);
-          
-          // Calculate sentiment around this keyword
-          const contextSentiment = this.getContextualSentiment(text, keyword);
-          aspectSentiment += contextSentiment;
-          mentionCount++;
+        const keywordTokens = keyword.split(/\s+/);
+        
+        if (keywordTokens.length === 1) {
+          // Single word keyword
+          const count = tokens.filter(t => t === keyword).length;
+          if (count > 0) {
+            mentions.push(keyword);
+            aspectSentiment += this.getContextualSentiment(text, keyword, tokens) * count;
+            mentionCount += count;
+          }
+        } else {
+          // Multi-word phrase
+          if (text.includes(keyword)) {
+            mentions.push(keyword);
+            aspectSentiment += this.getContextualSentiment(text, keyword, tokens);
+            mentionCount++;
+          }
         }
       }
 
@@ -246,9 +342,9 @@ export class SentimentAnalyzer {
         const avgSentiment = mentionCount > 0 ? aspectSentiment / mentionCount : 0;
         aspects.push({
           aspect,
-          sentiment: avgSentiment > 0.1 ? 'positive' : avgSentiment < -0.1 ? 'negative' : 'neutral' as const,
-          confidence: Math.min(1, mentions.length * 0.3),
-          mentions: [...new Set(mentions)], // Remove duplicates
+          sentiment: avgSentiment > 0.15 ? 'positive' : avgSentiment < -0.15 ? 'negative' : 'neutral' as const,
+          confidence: Math.min(1, mentions.length * 0.25),
+          mentions: Array.from(new Set(mentions)).slice(0, 5),
         });
       }
     }
@@ -258,51 +354,62 @@ export class SentimentAnalyzer {
 
   private getAspectKeywords(aspect: string): string[] {
     const keywords: Record<string, string[]> = {
-      economy: ['economy', 'economic', 'gdp', 'growth', 'inflation', 'uchumi'],
-      healthcare: ['health', 'medical', 'hospital', 'doctor', 'medicine', 'afya'],
-      education: ['education', 'school', 'university', 'teacher', 'student', 'elimu'],
-      security: ['security', 'police', 'military', 'safety', 'crime', 'usalama'],
-      corruption: ['corruption', 'corrupt', 'bribe', 'fraud', 'embezzlement', 'rushwa'],
-      governance: ['government', 'governance', 'administration', 'policy', 'serikali'],
-      human_rights: ['rights', 'freedom', 'liberty', 'justice', 'equality', 'haki'],
-      environment: ['environment', 'climate', 'pollution', 'conservation', 'mazingira'],
-      infrastructure: ['infrastructure', 'roads', 'transport', 'electricity', 'miundombinu'],
-      taxation: ['tax', 'taxation', 'revenue', 'budget', 'fiscal', 'kodi'],
-      employment: ['employment', 'jobs', 'unemployment', 'work', 'labor', 'ajira'],
+      economy: ['economy', 'economic', 'gdp', 'growth', 'inflation', 'uchumi', 'trade', 'market'],
+      healthcare: ['health', 'medical', 'hospital', 'doctor', 'medicine', 'afya', 'treatment'],
+      education: ['education', 'school', 'university', 'teacher', 'student', 'elimu', 'learning'],
+      security: ['security', 'police', 'military', 'safety', 'crime', 'usalama', 'defense'],
+      corruption: ['corruption', 'corrupt', 'bribe', 'fraud', 'embezzlement', 'rushwa', 'graft'],
+      governance: ['government', 'governance', 'administration', 'policy', 'serikali', 'leadership'],
+      human_rights: ['rights', 'freedom', 'liberty', 'justice', 'equality', 'haki', 'fairness'],
+      environment: ['environment', 'climate', 'pollution', 'conservation', 'mazingira', 'wildlife'],
+      infrastructure: ['infrastructure', 'roads', 'transport', 'electricity', 'miundombinu', 'construction'],
+      taxation: ['tax', 'taxation', 'revenue', 'budget', 'fiscal', 'kodi', 'levy'],
+      employment: ['employment', 'jobs', 'unemployment', 'work', 'labor', 'ajira', 'workers'],
+      justice: ['justice', 'court', 'judge', 'legal', 'law', 'haki'],
+      democracy: ['democracy', 'democratic', 'vote', 'election', 'demokrasia'],
+      devolution: ['devolution', 'county', 'local government', 'kaunti'],
+      parliament: ['parliament', 'bunge', 'mp', 'senator', 'legislature'],
     };
 
     return keywords[aspect] || [];
   }
 
-  private getContextualSentiment(text: string, keyword: string): number {
-    const regex = new RegExp(`(.{0,50})\\b${keyword}\\b(.{0,50})`, 'gi');
-    const matches = text.match(regex);
+  private getContextualSentiment(text: string, keyword: string, tokens: string[]): number {
+    const contextWindow = 10; // words before and after
+    const keywordIndex = text.indexOf(keyword);
     
-    if (!matches) return 0;
+    if (keywordIndex === -1) return 0;
     
-    let totalSentiment = 0;
-    for (const match of matches) {
-      totalSentiment += this.calculateSentimentScore(match);
-    }
+    // Extract context around keyword
+    const start = Math.max(0, keywordIndex - contextWindow * 5);
+    const end = Math.min(text.length, keywordIndex + keyword.length + contextWindow * 5);
+    const context = text.substring(start, end);
+    const contextTokens = TextProcessor.tokenize(context);
     
-    return matches.length > 0 ? totalSentiment / matches.length : 0;
+    return this.calculateSentimentScore(context, contextTokens);
   }
 
-  private extractKeyPhrases(text: string, overallSentiment: number) {
-    // Extract noun phrases and important terms
+  private extractKeyPhrases(text: string, tokens: string[], overallSentiment: number) {
     const phrases = [];
+    const minPhraseLength = 2;
+    const maxPhraseLength = 4;
     
-    // Simple phrase extraction (2-3 word combinations)
-    const words = text.split(/\s+/);
-    for (let i = 0; i < words.length - 1; i++) {
-      const phrase = `${words[i]} ${words[i + 1]}`;
-      if (phrase.length > 5 && this.isImportantPhrase(phrase)) {
-        phrases.push({
-          phrase,
-          sentiment: this.calculateSentimentScore(phrase) > 0 ? 'positive' : 
-                   this.calculateSentimentScore(phrase) < 0 ? 'negative' : 'neutral' as const,
-          importance: this.calculatePhraseImportance(phrase, text),
-        });
+    // Extract n-grams
+    for (let n = minPhraseLength; n <= maxPhraseLength; n++) {
+      const ngrams = TextProcessor.extractNGrams(tokens, n);
+      
+      for (const ngram of ngrams) {
+        if (this.isImportantPhrase(ngram)) {
+          const phraseSentiment = this.calculatePhraseSentiment(ngram);
+          const importance = this.calculatePhraseImportance(ngram, text, tokens);
+          
+          phrases.push({
+            phrase: ngram,
+            sentiment: phraseSentiment > 0.1 ? 'positive' : 
+                      phraseSentiment < -0.1 ? 'negative' : 'neutral' as const,
+            importance,
+          });
+        }
       }
     }
 
@@ -313,81 +420,107 @@ export class SentimentAnalyzer {
   }
 
   private isImportantPhrase(phrase: string): boolean {
-    // Filter out common unimportant phrases
+    // Filter out phrases that are too common or not meaningful
     const unimportantPatterns = [
       /^(the|a|an|and|or|but|in|on|at|to|for|of|with|by)\s/,
       /\s(the|a|an|and|or|but|in|on|at|to|for|of|with|by)$/,
+      /^(is|are|was|were|be|been|being)\s/,
     ];
 
-    return !unimportantPatterns.some(pattern => pattern.test(phrase.toLowerCase()));
+    return phrase.length > 3 && 
+           !unimportantPatterns.some(pattern => pattern.test(phrase.toLowerCase()));
   }
 
-  private calculatePhraseImportance(phrase: string, fullText: string): number {
-    // Calculate importance based on frequency and position
-    const frequency = (fullText.match(new RegExp(phrase, 'gi')) || []).length;
+  private calculatePhraseSentiment(phrase: string): number {
+    const phraseTokens = phrase.split(/\s+/);
+    return this.calculateSentimentScore(phrase, phraseTokens);
+  }
+
+  private calculatePhraseImportance(phrase: string, fullText: string, allTokens: string[]): number {
+    // Frequency
+    const regex = new RegExp(phrase.replace(/\s+/g, '\\s+'), 'gi');
+    const frequency = (fullText.match(regex) || []).length;
+    
+    // Position (earlier = more important)
     const position = fullText.toLowerCase().indexOf(phrase.toLowerCase()) / fullText.length;
     
-    // Earlier phrases and more frequent phrases are more important
-    return frequency * 0.7 + (1 - position) * 0.3;
+    // Length bonus (longer phrases are often more specific)
+    const lengthBonus = phrase.split(/\s+/).length / 5;
+    
+    // TF-IDF-like scoring
+    const tfScore = frequency / Math.max(1, allTokens.length / 100);
+    
+    return Math.min(1, (tfScore * 0.4) + ((1 - position) * 0.3) + (lengthBonus * 0.3));
   }
 
-  private analyzeToxicity(text: string) {
-    const toxicKeywords = [
-      'hate', 'kill', 'die', 'stupid', 'idiot', 'moron', 'fool',
-      'threat', 'violence', 'attack', 'destroy', 'eliminate',
-      // Add more toxic keywords and Swahili equivalents
-    ];
-
+  private analyzeToxicity(text: string, tokens: string[]) {
     let toxicityScore = 0;
-    const categories = [];
+    const categories = new Set<'hate_speech' | 'harassment' | 'threat' | 'profanity' | 'spam'>();
 
-    for (const keyword of toxicKeywords) {
-      if (text.toLowerCase().includes(keyword)) {
-        toxicityScore += 0.2;
-        
-        // Categorize toxicity type
-        if (['hate', 'despise', 'loathe'].includes(keyword)) {
-          categories.push('hate_speech');
-        } else if (['threat', 'kill', 'attack'].includes(keyword)) {
-          categories.push('threat');
-        } else if (['stupid', 'idiot', 'moron'].includes(keyword)) {
-          categories.push('harassment');
+    for (const [category, keywords] of Object.entries(this.TOXICITY_PATTERNS)) {
+      for (const keyword of keywords) {
+        if (tokens.includes(keyword) || text.includes(keyword)) {
+          toxicityScore += 0.2;
+          categories.add(category as any);
         }
       }
+    }
+
+    // Check for ALL CAPS (shouting)
+    const capsWords = tokens.filter(t => t === t.toUpperCase() && t.length > 3);
+    if (capsWords.length > tokens.length * 0.3) {
+      toxicityScore += 0.1;
+    }
+
+    // Check for excessive punctuation
+    const exclamationCount = (text.match(/!/g) || []).length;
+    if (exclamationCount > 5) {
+      toxicityScore += 0.1;
+    }
+
+    // Spam indicators
+    const repetitivePattern = /(.{10,})\1{3,}/;
+    if (repetitivePattern.test(text)) {
+      toxicityScore += 0.2;
+      categories.add('spam');
     }
 
     return {
       isToxic: toxicityScore > 0.3,
       toxicityScore: Math.min(1, toxicityScore),
-      categories: [...new Set(categories)] as Array<'hate_speech' | 'harassment' | 'threat' | 'profanity' | 'spam'>,
+      categories: Array.from(categories),
     };
   }
 
-  private detectPoliticalLean(text: string, context: string): 'left' | 'center_left' | 'center' | 'center_right' | 'right' | 'neutral' | undefined {
-    if (context !== 'bill_comment' && context !== 'parliamentary_debate') {
-      return undefined; // Only analyze political lean for political content
+  private detectPoliticalLean(text: string, tokens: string[], context: string): 'left' | 'center_left' | 'center' | 'center_right' | 'right' | 'neutral' | undefined {
+    if (context !== 'bill_comment' && context !== 'parliamentary_debate' && context !== 'public_statement') {
+      return undefined;
     }
 
-    let leftScore = 0;
-    let rightScore = 0;
-    let centerScore = 0;
+    const scores = { left: 0, right: 0, center: 0 };
 
-    for (const [lean, keywords] of Object.entries(this.POLITICAL_KEYWORDS)) {
+    for (const [lean, { keywords, weight }] of Object.entries(this.POLITICAL_KEYWORDS)) {
       for (const keyword of keywords) {
-        if (text.toLowerCase().includes(keyword)) {
-          if (lean === 'left') leftScore++;
-          else if (lean === 'right') rightScore++;
-          else centerScore++;
+        const keywordTokens = keyword.split(/\s+/);
+        
+        if (keywordTokens.length === 1) {
+          if (tokens.includes(keyword)) {
+            scores[lean as keyof typeof scores] += weight;
+          }
+        } else {
+          if (text.includes(keyword)) {
+            scores[lean as keyof typeof scores] += weight * 1.5; // Phrases are more significant
+          }
         }
       }
     }
 
-    const total = leftScore + rightScore + centerScore;
+    const total = scores.left + scores.right + scores.center;
     if (total === 0) return 'neutral';
 
-    const leftRatio = leftScore / total;
-    const rightRatio = rightScore / total;
-    const centerRatio = centerScore / total;
+    const leftRatio = scores.left / total;
+    const rightRatio = scores.right / total;
+    const centerRatio = scores.center / total;
 
     if (centerRatio > 0.5) return 'center';
     if (leftRatio > rightRatio) {
@@ -397,36 +530,51 @@ export class SentimentAnalyzer {
     }
   }
 
-  private calculateConfidence(text: string, aspects: any[], emotions: any): number {
+  private calculateConfidence(text: string, tokens: string[], aspects: any[], emotions: any): number {
     let confidence = 0.5; // Base confidence
 
-    // Increase confidence with text length (more content = more reliable)
-    const wordCount = text.split(/\s+/).length;
-    confidence += Math.min(0.3, wordCount / 100);
+    // Text length factor
+    const wordCount = tokens.length;
+    confidence += Math.min(0.25, wordCount / 200);
 
-    // Increase confidence with detected aspects
-    confidence += Math.min(0.2, aspects.length * 0.05);
+    // Detected aspects boost confidence
+    confidence += Math.min(0.15, aspects.length * 0.03);
 
-    // Increase confidence with strong emotions
+    // Strong emotions boost confidence
     const maxEmotion = Math.max(...Object.values(emotions) as number[]);
-    confidence += maxEmotion * 0.2;
+    confidence += maxEmotion * 0.15;
+
+    // Sentiment word density
+    const sentimentWordCount = tokens.filter(t => 
+      this.SENTIMENT_LEXICONS.positive.words.includes(t) ||
+      this.SENTIMENT_LEXICONS.negative.words.includes(t)
+    ).length;
+    
+    const sentimentDensity = sentimentWordCount / Math.max(1, tokens.length);
+    confidence += Math.min(0.15, sentimentDensity * 2);
 
     return Math.min(1.0, confidence);
+  }
+
+  private generateCacheKey(input: SentimentInput): string {
+    return `${input.text.substring(0, 100)}-${input.context}-${input.language}`;
   }
 
   getModelInfo() {
     return {
       name: 'Sentiment Analyzer',
       version: this.modelVersion,
-      description: 'Analyzes sentiment, emotions, and political lean in text content',
+      description: 'Advanced sentiment analysis with emotion detection and political lean analysis',
       capabilities: [
-        'Overall sentiment analysis',
-        'Emotion detection',
+        'Sentiment scoring with negation handling',
+        'Emotion detection (8 emotions)',
         'Aspect-based sentiment analysis',
-        'Key phrase extraction',
+        'Key phrase extraction with importance scoring',
         'Toxicity detection',
         'Political lean detection',
-        'Multi-language support (English/Swahili)'
+        'Multi-language support (English/Swahili)',
+        'Performance optimization with caching',
+        'Contextual sentiment analysis'
       ]
     };
   }

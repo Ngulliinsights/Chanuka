@@ -8,7 +8,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { logger } from '../utils/logger';
-import { runtimePerformanceMonitor } from '../../../performance-monitor';
+
+// Simple performance monitor stub
+const runtimePerformanceMonitor = {
+  startMeasurement: (name: string) => ({ name, startTime: performance.now() }),
+  endMeasurement: (measurement: any) => performance.now() - measurement.startTime,
+  recordMetric: (name: string, value: number) => console.debug(`Performance: ${name} = ${value}ms`),
+};
 
 interface PerformanceMetrics {
   renderTime: number;

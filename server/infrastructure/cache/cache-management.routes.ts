@@ -3,9 +3,10 @@
  * Administrative endpoints for cache monitoring and management
  */
 
-import { Router } from 'express';
-import { serverCache } from './cache-service';
 import { cacheMiddleware } from '@server/middleware/cache-middleware';
+import { Router } from 'express';
+
+import { serverCache } from './cache-service';
 
 const router = Router();
 

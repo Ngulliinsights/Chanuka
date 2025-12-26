@@ -5,7 +5,7 @@
  * and inter-phase verification data.
  */
 
-import { pgTable, text, integer, timestamp, boolean, jsonb, uuid, decimal } from 'drizzle-orm/pg-core';
+import { boolean, decimal,integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 /**
  * Migration phases tracking table

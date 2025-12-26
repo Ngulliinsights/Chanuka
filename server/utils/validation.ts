@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from 'express';
-import { ZodError, z } from 'zod';
 import { ValidationError } from '@shared/core';
 import { logger } from '@shared/core';
+import { NextFunction, Request, Response } from 'express';
 import DOMPurify from 'isomorphic-dompurify';
+import { z,ZodError } from 'zod';
 
 type ZodSchema<T> = z.ZodType<T>;
 

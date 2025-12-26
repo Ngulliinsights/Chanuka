@@ -5,10 +5,9 @@
  * across multiple server instances.
  */
 
-import { promisify } from 'util';
-import { gzip, gunzip } from 'zlib';
-
 import Redis, { RedisOptions } from 'ioredis';
+import { promisify } from 'util';
+import { gunzip,gzip } from 'zlib';
 
 // Temporary fallback logger until shared/core import is resolved
 const logger = {
@@ -29,7 +28,7 @@ const logger = {
     console.log(`[DEBUG] ${message}`, context || '');
   }
 };
-import type { ServiceStats, AdapterConfig } from '../types';
+import type { AdapterConfig,ServiceStats } from '../types';
 
 // Promisified compression functions
 const compressAsync = promisify(gzip);

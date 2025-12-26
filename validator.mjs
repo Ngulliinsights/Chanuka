@@ -1,16 +1,28 @@
 /**
- * EXPORT VALIDATOR - NODE.JS EDITION (v11.0)
- * CHANGES FROM v10:
- * - Performance: Async file operations with concurrency control
- * - Robustness: Improved regex patterns and comment stripping
- * - Optimization: Lazy content caching (store only what's needed)
- * - Enhancement: Better error messages with context
- * - Feature: Progress indicators for large codebases
- * - Feature: Configurable validation strictness levels
+ * STRATEGIC EXPORT VALIDATOR - v13.0 (Production Edition)
+ * 
+ * ARCHITECTURE:
+ * - Fully async/non-blocking I/O with intelligent concurrency control
+ * - Multi-stage pipeline: Discovery → Parsing → Validation → Analysis → Reporting
+ * - Micro-caching strategy for filesystem operations
+ * - Parallel validation with batched processing
+ * 
+ * PARSING ENGINE:
+ * - Multiline import/export support ([\s\S] patterns)
+ * - Destructuring detection: export const { a, b: c } = obj
+ * - Advanced comment stripping (string-aware)
+ * - Re-export chain resolution
+ * 
+ * FEATURES:
+ * - Configurable strictness levels (strict/relaxed)
+ * - Real-time progress indicators for large codebases
+ * - Type safety analysis with thresholds
+ * - Comprehensive error messages with suggestions
+ * - GitHub Actions compatible output
+ * - Performance metrics and bottleneck detection
  */
 
 import fs from 'fs/promises';
-import fsSync from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -22,35 +34,44 @@ const CONFIG = {
     rootDir: process.cwd(),
     outputFile: 'docs/export-analysis.md',
     
-    // Concurrency control for file operations
-    maxConcurrentFiles: 50,
+    // Performance tuning
+    maxConcurrentFiles: 50,        // Files parsed in parallel
+    maxConcurrentValidations: 100,  // Validation tasks in parallel
+    progressThreshold: 100,         // Show progress bar for N+ files
     
-    // Validation strictness: 'strict' | 'relaxed'
-    strictness: 'strict',
+    // Validation behavior
+    strictness: 'strict', // 'strict' | 'relaxed'
+    // strict: Fails on any mismatch
+    // relaxed: Warns but doesn't fail build
     
-    // Path aliases (automatically sorted by length)
+    // Path aliases (load from tsconfig.json in production)
     aliases: {
         "@/": "./src/",
         "~/": "./src/",
         "@components/": "./src/components/",
         "@utils/": "./src/utils/",
         "@lib/": "./src/lib/",
-        "@client/": "./client/src/",
+        "@hooks/": "./src/hooks/",
+        "@types/": "./src/types/",
         "@server/": "./server/src/",
+        "@client/": "./client/src/",
         "@shared/": "./shared/"
     },
 
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.json'],
+    
     exclude: [
         'node_modules', 'dist', 'build', '.git', 'coverage', '.next', 
-        '__tests__', '.test.', '.spec.', '.d.ts'
+        '__tests__', '__mocks__', '.test.', '.spec.', '.d.ts',
+        'jest.config', 'next.config', 'vite.config', 'rollup.config'
     ],
     
     // Type safety thresholds
     typeChecks: {
-        maxAnyUsage: 8,
-        checkAsyncReturnTypes: true,
-        checkUnusedExports: false // Future feature
+        enabled: true,
+        maxAnyUsage: 8,              // Max 'any' types per file
+        checkAsyncReturnTypes: true, // Require Promise<T> annotations
+        warnOnImplicitAny: true      // Warn on function params without types
     }
 };
 
@@ -59,22 +80,27 @@ const CONFIG = {
 // =============================================================================
 
 const CACHE = {
-    // Store only parsed metadata, not full content
-    files: new Map(), // filePath -> { exports, imports, reExports }
-    resolution: new Map() // importString -> resolvedPath
+    files: new Map(),       // filePath -> { exports, imports, reExports }
+    resolution: new Map(),  // contextPath::importString -> resolvedPath | null
+    fsExists: new Map(),    // filePath -> boolean (micro-cache)
+    effectiveExports: new Map() // filePath -> Set<string> (computed exports cache)
 };
 
 const STATS = {
     filesScanned: 0,
+    filesSuccessful: 0,
+    parseErrors: 0,
     importsChecked: 0,
     importMismatches: 0,
     typeWarnings: 0,
-    parseErrors: 0,
     skippedFiles: 0,
-    startTime: Date.now()
+    resolutionCacheHits: 0,
+    resolutionCacheMisses: 0,
+    startTime: Date.now(),
+    phases: {} // Track time per phase
 };
 
-// Sort aliases by length (longest first) to handle overlapping prefixes
+// Pre-sort aliases for efficient prefix matching
 const SORTED_ALIASES = Object.keys(CONFIG.aliases)
     .sort((a, b) => b.length - a.length)
     .map(alias => ({
@@ -83,61 +109,115 @@ const SORTED_ALIASES = Object.keys(CONFIG.aliases)
     }));
 
 // =============================================================================
-// MAIN EXECUTION
+// MAIN EXECUTION PIPELINE
 // =============================================================================
 
 async function main() {
-    console.log(`\n🔍 Strategic Export Analysis v11.0\n`);
+    console.log(`\n🚀 Strategic Export Validator v13.0\n`);
+    console.log(`📍 Root: ${CONFIG.rootDir}`);
+    console.log(`⚙️  Mode: ${CONFIG.strictness.toUpperCase()}\n`);
 
     try {
         // Phase 1: Discovery
-        console.log(`📁 Discovering source files...`);
+        await runPhase('Discovery', async () => {
+            console.log(`📁 Discovering source files...`);
+            const files = await walkDir(CONFIG.rootDir);
+            STATS.filesScanned = files.length;
+            console.log(`   ✓ Found ${files.length} files to analyze\n`);
+            return files;
+        });
+
         const files = await walkDir(CONFIG.rootDir);
         STATS.filesScanned = files.length;
-        console.log(`   Found ${files.length} files to analyze\n`);
 
-        // Phase 2: Parsing (with concurrency control)
-        console.log(`⚙️  Parsing exports and imports...`);
-        await parseFilesInBatches(files);
-        console.log(`   Parsed ${CACHE.files.size} files successfully`);
-        if (STATS.parseErrors > 0) {
-            console.log(`   ⚠️  ${STATS.parseErrors} files had parse errors\n`);
-        } else {
+        // Phase 2: Parsing
+        await runPhase('Parsing', async () => {
+            console.log(`⚙️  Parsing exports and imports...`);
+            await parseFilesInBatches(files);
+            STATS.filesSuccessful = CACHE.files.size;
+            console.log(`   ✓ Parsed ${STATS.filesSuccessful}/${STATS.filesScanned} files`);
+            if (STATS.parseErrors > 0) {
+                console.log(`   ⚠️  ${STATS.parseErrors} files had parse errors`);
+            }
             console.log('');
-        }
+        });
 
         // Phase 3: Validation
-        console.log(`🔍 Validating import/export relationships...`);
-        const errors = validateImports();
-        console.log(`   Checked ${STATS.importsChecked} imports`);
-        console.log(`   Found ${errors.length} mismatches\n`);
+        const errors = await runPhase('Validation', async () => {
+            console.log(`🔍 Validating import/export relationships...`);
+            const errors = await validateImportsAsync(files);
+            console.log(`   ✓ Validated ${STATS.importsChecked} imports`);
+            console.log(`   ${errors.length === 0 ? '✓' : '✗'} Found ${errors.length} mismatches\n`);
+            return errors;
+        });
 
         // Phase 4: Type Safety Analysis
-        console.log(`🛡️  Analyzing type safety...`);
-        const typeWarnings = await analyzeTypeSafety(files);
-        console.log(`   Generated ${typeWarnings.length} warnings\n`);
+        const typeWarnings = CONFIG.typeChecks.enabled 
+            ? await runPhase('Type Analysis', async () => {
+                console.log(`🛡️  Analyzing type safety...`);
+                const warnings = await analyzeTypeSafety(files);
+                console.log(`   ${warnings.length === 0 ? '✓' : '⚠️'} Generated ${warnings.length} warnings\n`);
+                return warnings;
+            })
+            : [];
 
         // Phase 5: Report Generation
-        console.log(`📝 Generating markdown report...`);
-        await generateMarkdownReport(errors, typeWarnings);
+        await runPhase('Reporting', async () => {
+            console.log(`📝 Generating comprehensive report...`);
+            await generateMarkdownReport(errors, typeWarnings);
+            console.log(`   ✓ Report saved: ${CONFIG.outputFile}\n`);
+        });
+
+        // Summary
+        printSummary(errors, typeWarnings);
         
-        const duration = ((Date.now() - STATS.startTime) / 1000).toFixed(2);
-        console.log(`\n✅ Analysis complete in ${duration}s\n`);
-        
-        if (errors.length > 0) {
-            console.log(`❌ Found ${errors.length} critical issues. Review ${CONFIG.outputFile}\n`);
+        // Exit strategy
+        if (CONFIG.strictness === 'strict' && errors.length > 0) {
             process.exit(1);
         }
         
     } catch (error) {
-        console.error('\n💥 Fatal error:', error.message);
-        if (error.stack) console.error(error.stack);
+        console.error('\n💥 Fatal Error:', error.message);
+        if (error.stack) console.error('\n' + error.stack);
         process.exit(1);
     }
 }
 
+async function runPhase(name, fn) {
+    const start = Date.now();
+    const result = await fn();
+    STATS.phases[name] = Date.now() - start;
+    return result;
+}
+
+function printSummary(errors, warnings) {
+    const duration = ((Date.now() - STATS.startTime) / 1000).toFixed(2);
+    const cacheEfficiency = STATS.resolutionCacheHits + STATS.resolutionCacheMisses > 0
+        ? ((STATS.resolutionCacheHits / (STATS.resolutionCacheHits + STATS.resolutionCacheMisses)) * 100).toFixed(1)
+        : 0;
+    
+    console.log(`═══════════════════════════════════════════════════════`);
+    console.log(`📊 ANALYSIS COMPLETE`);
+    console.log(`═══════════════════════════════════════════════════════`);
+    console.log(`⏱️  Duration: ${duration}s`);
+    console.log(`📦 Files: ${STATS.filesSuccessful}/${STATS.filesScanned} successful`);
+    console.log(`🔗 Imports: ${STATS.importsChecked} checked`);
+    console.log(`⚡ Cache efficiency: ${cacheEfficiency}%`);
+    console.log(`───────────────────────────────────────────────────────`);
+    
+    if (errors.length === 0 && warnings.length === 0) {
+        console.log(`✅ Status: PASSED - No issues detected`);
+    } else {
+        console.log(`❌ Errors: ${errors.length}`);
+        console.log(`⚠️  Warnings: ${warnings.length}`);
+        console.log(`📄 Review: ${CONFIG.outputFile}`);
+    }
+    
+    console.log(`═══════════════════════════════════════════════════════\n`);
+}
+
 // =============================================================================
-// FILE SYSTEM OPERATIONS
+// FILE SYSTEM OPERATIONS (Fully Async)
 // =============================================================================
 
 async function walkDir(dir) {
@@ -148,22 +228,26 @@ async function walkDir(dir) {
         try {
             entries = await fs.readdir(currentDir, { withFileTypes: true });
         } catch (error) {
-            console.warn(`   ⚠️  Cannot read directory: ${path.relative(CONFIG.rootDir, currentDir)}`);
+            STATS.skippedFiles++;
             return;
         }
 
-        for (const entry of entries) {
+        const tasks = entries.map(async (entry) => {
             const fullPath = path.join(currentDir, entry.name);
             
             // Skip excluded paths
-            if (CONFIG.exclude.some(ex => fullPath.includes(ex))) continue;
+            if (CONFIG.exclude.some(ex => fullPath.includes(ex))) {
+                return;
+            }
 
             if (entry.isDirectory()) {
                 await walk(fullPath);
             } else if (CONFIG.extensions.includes(path.extname(entry.name))) {
                 results.push(fullPath);
             }
-        }
+        });
+
+        await Promise.all(tasks);
     }
 
     await walk(dir);
@@ -176,21 +260,27 @@ async function parseFilesInBatches(files) {
         batches.push(files.slice(i, i + CONFIG.maxConcurrentFiles));
     }
 
+    const showProgress = files.length >= CONFIG.progressThreshold;
+
     for (let i = 0; i < batches.length; i++) {
         const batch = batches[i];
         await Promise.all(batch.map(file => parseFileAsync(file)));
         
-        // Progress indicator for large codebases
-        if (files.length > 100) {
-            const progress = Math.round(((i + 1) * batch.length / files.length) * 100);
-            process.stdout.write(`\r   Progress: ${progress}%`);
+        if (showProgress) {
+            const processed = Math.min((i + 1) * CONFIG.maxConcurrentFiles, files.length);
+            const percent = Math.round((processed / files.length) * 100);
+            const bar = '█'.repeat(Math.floor(percent / 2)) + '░'.repeat(50 - Math.floor(percent / 2));
+            process.stdout.write(`\r   [${bar}] ${percent}%`);
         }
     }
-    if (files.length > 100) console.log(''); // New line after progress
+    
+    if (showProgress) console.log('');
 }
 
 async function parseFileAsync(filePath) {
-    if (CACHE.files.has(filePath)) return CACHE.files.get(filePath);
+    if (CACHE.files.has(filePath)) {
+        return CACHE.files.get(filePath);
+    }
 
     try {
         const content = await fs.readFile(filePath, 'utf-8');
@@ -199,64 +289,90 @@ async function parseFileAsync(filePath) {
         return parsed;
     } catch (error) {
         STATS.parseErrors++;
-        // Store empty metadata to avoid repeated attempts
-        CACHE.files.set(filePath, { exports: new Set(), imports: [], reExports: new Set() });
+        // Store empty data to prevent retry
+        const empty = { exports: new Set(), imports: [], reExports: new Set() };
+        CACHE.files.set(filePath, empty);
         return null;
     }
 }
 
 // =============================================================================
-// PARSING ENGINE (OPTIMIZED)
+// PARSING ENGINE (Advanced)
 // =============================================================================
 
 function parseFileContent(content, filePath) {
-    // More robust comment removal that handles edge cases
-    const cleanContent = stripComments(content);
-
+    const cleanContent = stripCommentsAdvanced(content);
     const exports = new Set();
     const imports = [];
     const reExports = new Set();
 
-    // 1. NAMED EXPORTS: export const/function/class/type/interface
-    // Improved pattern that handles 'export type' distinctly
-    const namedExportRegex = /export\s+(?:declare\s+)?(?:async\s+)?(?:const|let|var|function|class|enum|type|interface|namespace)\s+([a-zA-Z0-9_$]+)/g;
-    for (const match of cleanContent.matchAll(namedExportRegex)) {
+    // 1. STANDARD NAMED EXPORTS
+    // export const/let/var/function/class/enum/type/interface
+    const standardExportRegex = /export\s+(?:declare\s+)?(?:async\s+)?(?:const|let|var|function|class|enum|type|interface|namespace)\s+([a-zA-Z0-9_$]+)/g;
+    for (const match of cleanContent.matchAll(standardExportRegex)) {
         exports.add(match[1]);
     }
 
-    // 2. DEFAULT EXPORTS
+    // 2. DESTRUCTURED EXPORTS
+    // export const { a, b: renamedB, c = defaultValue } = obj
+    const destructuredExportRegex = /export\s+(?:const|let|var)\s+\{([^}]+)\}/g;
+    for (const match of cleanContent.matchAll(destructuredExportRegex)) {
+        const destructuredBlock = match[1];
+        destructuredBlock.split(',').forEach(item => {
+            const trimmed = item.trim();
+            if (!trimmed) return;
+            
+            // Handle: { a: b } -> export b, { a } -> export a, { a = 1 } -> export a
+            const aliasMatch = trimmed.match(/(\w+)\s*:\s*(\w+)/);
+            if (aliasMatch) {
+                exports.add(aliasMatch[2]); // The renamed identifier
+            } else {
+                const name = trimmed.split('=')[0].trim(); // Remove default values
+                if (name) exports.add(name);
+            }
+        });
+    }
+
+    // 3. DEFAULT EXPORTS
     if (/export\s+default\s+/.test(cleanContent)) {
         exports.add('default');
     }
 
-    // 3. EXPORT LISTS: export { a, b as c } from '...'
-    const exportListRegex = /export\s*\{([^}]+)\}(?:\s*from\s*['"]([^'"]+)['"])?/g;
+    // 4. EXPORT LISTS (Multiline support)
+    // export { a, b as c, type d } from './module'
+    const exportListRegex = /export\s*\{([\s\S]+?)\}(?:\s*from\s*['"]([^'"]+)['"])?/g;
     for (const match of cleanContent.matchAll(exportListRegex)) {
         const [_, namesBlock, fromSource] = match;
         
-        // Parse each exported name
-        const names = namesBlock.split(',').map(s => s.trim()).filter(Boolean);
-        for (const nameSpec of names) {
-            // Handle 'a as b' - we care about the exported name (after 'as')
-            const parts = nameSpec.split(/\s+as\s+/);
+        namesBlock.split(',').forEach(spec => {
+            const trimmed = spec.trim();
+            if (!trimmed || trimmed === 'type') return;
+            
+            // Handle: "a as b" -> export b, "a" -> export a
+            const parts = trimmed.split(/\s+as\s+/);
             const exportedName = parts[parts.length - 1].trim();
-            exports.add(exportedName);
-        }
+            if (exportedName) exports.add(exportedName);
+        });
 
-        // Track re-exports for validation
         if (fromSource) {
             reExports.add(fromSource);
         }
     }
 
-    // 4. WILDCARD RE-EXPORTS: export * from '...'
-    const wildcardExportRegex = /export\s+\*\s+from\s+['"]([^'"]+)['"]/g;
+    // 5. WILDCARD RE-EXPORTS
+    // export * from './module'
+    // export * as namespace from './module'
+    const wildcardExportRegex = /export\s+\*(?:\s+as\s+(\w+))?\s+from\s+['"]([^'"]+)['"]/g;
     for (const match of cleanContent.matchAll(wildcardExportRegex)) {
-        reExports.add(match[1]);
+        const [_, namespace, source] = match;
+        if (namespace) {
+            exports.add(namespace); // export * as NS creates a named export
+        }
+        reExports.add(source);
     }
 
-    // 5. IMPORT STATEMENTS (Optimized pattern)
-    const importRegex = /import\s+(?:type\s+)?([^;]+?)\s+from\s+['"]([^'"]+)['"]/g;
+    // 6. IMPORT STATEMENTS (Multiline support)
+    const importRegex = /import\s+(?:type\s+)?([\s\S]+?)\s+from\s+['"]([^'"]+)['"]/g;
     for (const match of cleanContent.matchAll(importRegex)) {
         const [_, importBody, source] = match;
         
@@ -271,13 +387,16 @@ function parseFileContent(content, filePath) {
     return { exports, imports, reExports };
 }
 
-function stripComments(content) {
-    // Multi-line comments: /* ... */
-    let result = content.replace(/\/\*[\s\S]*?\*\//g, '');
+function stripCommentsAdvanced(content) {
+    // Strategy: Remove strings first to avoid false positives
+    // Step 1: Replace all strings with placeholders
+    let result = content.replace(/(["'`])(?:(?=(\\?))\2.)*?\1/g, '""');
     
-    // Single-line comments, but preserve URLs (https://)
-    // This improved regex avoids matching // in URLs
-    result = result.replace(/^([^"'`]*?)\/\/.*$/gm, '$1');
+    // Step 2: Remove multi-line comments
+    result = result.replace(/\/\*[\s\S]*?\*\//g, '');
+    
+    // Step 3: Remove single-line comments
+    result = result.replace(/\/\/.*$/gm, '');
     
     return result;
 }
@@ -291,194 +410,217 @@ function parseImportSpecifiers(importBody) {
     const specifiers = [];
     const cleaned = importBody.replace(/\s+/g, ' ').trim();
     
-    // Check for namespace import: * as Something
+    // Handle namespace imports: import * as Something
     if (cleaned.includes('* as')) {
         return ['*'];
     }
     
-    // Extract default import (before any braces)
-    const defaultMatch = cleaned.match(/^([a-zA-Z0-9_$]+)(?:\s*,)?/);
-    if (defaultMatch && !cleaned.startsWith('{')) {
-        specifiers.push('default');
+    // Mixed imports: import Default, { named }
+    const parts = cleaned.split('{');
+    
+    // Default import (appears before braces or standalone)
+    if (!cleaned.startsWith('{')) {
+        const defaultPart = parts[0].split(',')[0].trim();
+        if (defaultPart && defaultPart !== 'type') {
+            specifiers.push('default');
+        }
     }
     
-    // Extract named imports from braces
+    // Named imports: { a, b as c, type d }
     const namedMatch = cleaned.match(/\{([^}]+)\}/);
     if (namedMatch) {
-        const names = namedMatch[1].split(',');
-        for (const name of names) {
-            // Get original name (before 'as')
-            const original = name.trim().split(/\s+as\s+/)[0].trim();
-            if (original && original !== 'type') {
-                specifiers.push(original);
-            }
-        }
+        namedMatch[1].split(',').forEach(spec => {
+            const trimmed = spec.trim();
+            if (!trimmed || trimmed === 'type') return;
+            
+            // "a as b" -> we import 'a' from source
+            const sourceName = trimmed.split(/\s+as\s+/)[0].trim();
+            if (sourceName) specifiers.push(sourceName);
+        });
     }
     
     return specifiers;
 }
 
 // =============================================================================
-// VALIDATION LOGIC
+// VALIDATION ENGINE (Parallel + Caching)
 // =============================================================================
 
-function validateImports() {
+async function validateImportsAsync(files) {
     const errors = [];
-
-    for (const [filePath, fileData] of CACHE.files.entries()) {
-        for (const imp of fileData.imports) {
-            STATS.importsChecked++;
-            
-            if (!imp.isLocal) continue;
-
-            const resolvedPath = resolveModulePath(filePath, imp.source);
-            
-            if (!resolvedPath) {
-                errors.push({
-                    file: filePath,
-                    type: 'MODULE_NOT_FOUND',
-                    importPath: imp.source,
-                    missingExport: '(entire module)',
-                    recommendation: `Verify path exists. Check tsconfig paths or file location.`
-                });
-                continue;
-            }
-
-            const targetFile = CACHE.files.get(resolvedPath);
-            if (!targetFile) continue;
-
-            for (const specifier of imp.specifiers) {
-                if (specifier === '*') continue; // Namespace imports always valid
-
-                const isExported = checkExportExists(resolvedPath, specifier);
-                
-                if (!isExported) {
-                    const suggestion = suggestAlternative(targetFile.exports, specifier);
-                    errors.push({
-                        file: filePath,
-                        type: 'MISSING_EXPORT',
-                        importPath: imp.source,
-                        missingExport: specifier,
-                        recommendation: suggestion || `Export '${specifier}' from target module`
-                    });
-                }
-            }
-        }
+    
+    // Create validation tasks (batched for memory efficiency)
+    const validationBatches = [];
+    for (let i = 0; i < files.length; i += CONFIG.maxConcurrentValidations) {
+        const batch = files.slice(i, i + CONFIG.maxConcurrentValidations);
+        validationBatches.push(batch);
+    }
+    
+    // Process batches
+    for (const batch of validationBatches) {
+        const batchTasks = batch.map(filePath => validateFileImports(filePath));
+        const batchResults = await Promise.all(batchTasks);
+        
+        // Flatten results
+        batchResults.forEach(fileErrors => {
+            if (fileErrors) errors.push(...fileErrors);
+        });
     }
     
     STATS.importMismatches = errors.length;
     return errors;
 }
 
-function checkExportExists(filePath, exportName, visited = new Set()) {
-    if (visited.has(filePath)) return false;
+async function validateFileImports(filePath) {
+    const fileData = CACHE.files.get(filePath);
+    if (!fileData || fileData.imports.length === 0) return [];
+    
+    const errors = [];
+
+    for (const imp of fileData.imports) {
+        STATS.importsChecked++;
+        
+        if (!imp.isLocal) continue;
+
+        const resolvedPath = await resolveModulePathAsync(filePath, imp.source);
+
+        if (!resolvedPath) {
+            errors.push({
+                file: filePath,
+                type: 'MODULE_NOT_FOUND',
+                importPath: imp.source,
+                missingExport: '(entire module)',
+                recommendation: `Verify path exists. Check tsconfig.json path mappings.`,
+                severity: 'Critical'
+            });
+            continue;
+        }
+
+        // Get all effective exports (including re-exports)
+        const availableExports = await getEffectiveExports(resolvedPath);
+
+        for (const specifier of imp.specifiers) {
+            if (specifier === '*') continue; // Namespace imports always valid
+
+            if (!availableExports.has(specifier)) {
+                const suggestion = suggestAlternative(availableExports, specifier);
+                errors.push({
+                    file: filePath,
+                    type: 'MISSING_EXPORT',
+                    importPath: imp.source,
+                    missingExport: specifier,
+                    recommendation: suggestion || `Add 'export ${specifier}' to target module`,
+                    severity: 'High',
+                    availableExports: Array.from(availableExports).slice(0, 5).join(', ')
+                });
+            }
+        }
+    }
+
+    return errors;
+}
+
+async function getEffectiveExports(filePath, visited = new Set()) {
+    // Return cached result if available
+    if (CACHE.effectiveExports.has(filePath)) {
+        return CACHE.effectiveExports.get(filePath);
+    }
+    
+    if (visited.has(filePath)) return new Set();
     visited.add(filePath);
 
     const fileData = CACHE.files.get(filePath);
-    if (!fileData) return false;
+    if (!fileData) return new Set();
 
-    // Direct export
-    if (fileData.exports.has(exportName)) return true;
+    const allExports = new Set(fileData.exports);
 
-    // Check re-exports recursively
-    for (const reExportSource of fileData.reExports) {
-        const resolved = resolveModulePath(filePath, reExportSource);
-        if (resolved && checkExportExists(resolved, exportName, visited)) {
-            return true;
-        }
+    // Recursively gather re-exported items
+    if (fileData.reExports.size > 0) {
+        const reExportTasks = Array.from(fileData.reExports).map(async (source) => {
+            const resolved = await resolveModulePathAsync(filePath, source);
+            if (resolved) {
+                const nested = await getEffectiveExports(resolved, visited);
+                return nested;
+            }
+            return new Set();
+        });
+
+        const nestedExports = await Promise.all(reExportTasks);
+        nestedExports.forEach(exportSet => {
+            exportSet.forEach(exp => allExports.add(exp));
+        });
     }
 
-    return false;
+    // Cache the result
+    CACHE.effectiveExports.set(filePath, allExports);
+    return allExports;
 }
 
 function suggestAlternative(availableExports, requested) {
-    // Simple fuzzy matching for typos
     const available = Array.from(availableExports);
-    const lower = requested.toLowerCase();
+    const lowerRequested = requested.toLowerCase();
     
-    const close = available.find(exp => 
-        exp.toLowerCase() === lower || 
-        exp.toLowerCase().includes(lower) ||
-        lower.includes(exp.toLowerCase())
+    // Exact case-insensitive match
+    let match = available.find(exp => exp.toLowerCase() === lowerRequested);
+    if (match) return `Did you mean '${match}'? (case mismatch)`;
+    
+    // Substring match
+    match = available.find(exp => 
+        exp.toLowerCase().includes(lowerRequested) || 
+        lowerRequested.includes(exp.toLowerCase())
     );
+    if (match) return `Did you mean '${match}'?`;
     
-    return close ? `Did you mean '${close}'?` : null;
-}
-
-// =============================================================================
-// TYPE SAFETY ANALYSIS
-// =============================================================================
-
-async function analyzeTypeSafety(files) {
-    const warnings = [];
-    
-    // Only analyze TypeScript files
-    const tsFiles = files.filter(f => f.match(/\.tsx?$/));
-    
-    for (const file of tsFiles) {
-        try {
-            const content = await fs.readFile(file, 'utf-8');
-            warnings.push(...analyzeFileTypeSafety(file, content));
-        } catch (error) {
-            // Skip files we can't read
-            continue;
+    // Levenshtein distance (simple implementation)
+    if (available.length > 0 && available.length < 50) {
+        const sorted = available
+            .map(exp => ({ name: exp, dist: levenshtein(requested, exp) }))
+            .sort((a, b) => a.dist - b.dist);
+        
+        if (sorted[0].dist <= 3) {
+            return `Did you mean '${sorted[0].name}'?`;
         }
     }
     
-    STATS.typeWarnings = warnings.length;
-    return warnings;
+    return null;
 }
 
-function analyzeFileTypeSafety(filePath, content) {
-    const warnings = [];
+function levenshtein(a, b) {
+    const matrix = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(0));
     
-    // Check 1: Excessive 'any' usage
-    if (CONFIG.typeChecks.maxAnyUsage > 0) {
-        const anyMatches = content.match(/:\s*any\b|<any>|as\s+any\b/g) || [];
-        if (anyMatches.length > CONFIG.typeChecks.maxAnyUsage) {
-            warnings.push({
-                file: filePath,
-                line: 0,
-                issue: `High 'any' usage: ${anyMatches.length} occurrences (threshold: ${CONFIG.typeChecks.maxAnyUsage})`,
-                severity: 'High'
-            });
+    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+    
+    for (let j = 1; j <= b.length; j++) {
+        for (let i = 1; i <= a.length; i++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            matrix[j][i] = Math.min(
+                matrix[j][i - 1] + 1,
+                matrix[j - 1][i] + 1,
+                matrix[j - 1][i - 1] + cost
+            );
         }
     }
     
-    // Check 2: Async functions without return type annotations
-    if (CONFIG.typeChecks.checkAsyncReturnTypes) {
-        const lines = content.split('\n');
-        lines.forEach((line, index) => {
-            if (/export\s+(?:async\s+function|const\s+\w+\s*=\s*async)/.test(line)) {
-                // Check if line contains Promise or explicit void
-                if (!line.includes('Promise') && !line.includes(': void') && !line.includes('=> {')) {
-                    warnings.push({
-                        file: filePath,
-                        line: index + 1,
-                        issue: 'Async export lacks explicit return type (Promise<T> or void)',
-                        severity: 'Medium'
-                    });
-                }
-            }
-        });
-    }
-    
-    return warnings;
+    return matrix[b.length][a.length];
 }
 
 // =============================================================================
-// PATH RESOLUTION (OPTIMIZED)
+// PATH RESOLUTION (Async + Memoized)
 // =============================================================================
 
-function resolveModulePath(sourceFile, importPath) {
+async function resolveModulePathAsync(sourceFile, importPath) {
     const cacheKey = `${sourceFile}::${importPath}`;
+    
     if (CACHE.resolution.has(cacheKey)) {
+        STATS.resolutionCacheHits++;
         return CACHE.resolution.get(cacheKey);
     }
-
+    
+    STATS.resolutionCacheMisses++;
     let targetPath = importPath;
 
-    // 1. Handle path aliases (pre-sorted for efficiency)
+    // 1. Alias resolution (pre-sorted for efficiency)
     for (const { prefix, replacement } of SORTED_ALIASES) {
         if (importPath.startsWith(prefix)) {
             targetPath = importPath.replace(prefix, replacement);
@@ -489,116 +631,258 @@ function resolveModulePath(sourceFile, importPath) {
         }
     }
 
-    // 2. Resolve relative paths
+    // 2. Relative path resolution
     if (targetPath.startsWith('.')) {
         targetPath = path.resolve(path.dirname(sourceFile), targetPath);
     } else if (!path.isAbsolute(targetPath)) {
         // External module (node_modules)
+        CACHE.resolution.set(cacheKey, null);
         return null;
     }
 
-    // 3. Try various extensions and index files
-    const resolved = tryResolveWithExtensions(targetPath);
+    // 3. File existence check with extension resolution
+    const resolved = await tryResolveExtensionsAsync(targetPath);
     
-    if (resolved) {
-        CACHE.resolution.set(cacheKey, resolved);
-    }
-    
+    CACHE.resolution.set(cacheKey, resolved);
     return resolved;
 }
 
-function tryResolveWithExtensions(basePath) {
-    // Try exact match first
-    if (fsSync.existsSync(basePath) && fsSync.statSync(basePath).isFile()) {
+async function tryResolveExtensionsAsync(basePath) {
+    // Try exact path first
+    if (await fileExistsAsync(basePath)) {
         return basePath;
     }
-    
+
     // Try with extensions
     for (const ext of CONFIG.extensions) {
         const withExt = basePath + ext;
-        if (fsSync.existsSync(withExt) && fsSync.statSync(withExt).isFile()) {
+        if (await fileExistsAsync(withExt)) {
             return withExt;
         }
     }
-    
-    // Try index files
+
+    // Try index files in directory
     for (const ext of CONFIG.extensions) {
         const indexPath = path.join(basePath, 'index' + ext);
-        if (fsSync.existsSync(indexPath) && fsSync.statSync(indexPath).isFile()) {
+        if (await fileExistsAsync(indexPath)) {
             return indexPath;
         }
     }
-    
+
     return null;
 }
 
+async function fileExistsAsync(filePath) {
+    if (CACHE.fsExists.has(filePath)) {
+        return CACHE.fsExists.get(filePath);
+    }
+
+    try {
+        const stat = await fs.stat(filePath);
+        const isFile = stat.isFile();
+        CACHE.fsExists.set(filePath, isFile);
+        return isFile;
+    } catch {
+        CACHE.fsExists.set(filePath, false);
+        return false;
+    }
+}
+
 // =============================================================================
-// REPORT GENERATION
+// TYPE SAFETY ANALYSIS
+// =============================================================================
+
+async function analyzeTypeSafety(files) {
+    if (!CONFIG.typeChecks.enabled) return [];
+    
+    const warnings = [];
+    const tsFiles = files.filter(f => /\.tsx?$/.test(f));
+    
+    // Process in batches to avoid memory issues
+    const batchSize = 100;
+    for (let i = 0; i < tsFiles.length; i += batchSize) {
+        const batch = tsFiles.slice(i, i + batchSize);
+        const batchTasks = batch.map(async (file) => {
+            try {
+                const content = await fs.readFile(file, 'utf-8');
+                return analyzeFileTypeSafety(file, content);
+            } catch {
+                return [];
+            }
+        });
+        
+        const batchWarnings = await Promise.all(batchTasks);
+        warnings.push(...batchWarnings.flat());
+    }
+    
+    STATS.typeWarnings = warnings.length;
+    return warnings;
+}
+
+function analyzeFileTypeSafety(filePath, content) {
+    const warnings = [];
+    const cleanContent = stripCommentsAdvanced(content);
+    
+    // Check 1: Excessive 'any' usage
+    if (CONFIG.typeChecks.maxAnyUsage > 0) {
+        const anyMatches = cleanContent.match(/:\s*any\b|<any>|as\s+any\b/g) || [];
+        if (anyMatches.length > CONFIG.typeChecks.maxAnyUsage) {
+            warnings.push({
+                file: filePath,
+                line: 0,
+                issue: `Excessive 'any' usage: ${anyMatches.length} occurrences (threshold: ${CONFIG.typeChecks.maxAnyUsage})`,
+                severity: 'High',
+                category: 'Type Safety'
+            });
+        }
+    }
+    
+    // Check 2: Async functions without Promise return type
+    if (CONFIG.typeChecks.checkAsyncReturnTypes) {
+        const lines = content.split('\n');
+        lines.forEach((line, idx) => {
+            if (/export\s+(?:async\s+function|const\s+\w+\s*=\s*async)/.test(line)) {
+                if (!line.includes('Promise') && !line.includes(': void')) {
+                    warnings.push({
+                        file: filePath,
+                        line: idx + 1,
+                        issue: 'Async export lacks explicit return type annotation (Promise<T>)',
+                        severity: 'Medium',
+                        category: 'Async/Await'
+                    });
+                }
+            }
+        });
+    }
+    
+    // Check 3: Implicit any in function parameters
+    if (CONFIG.typeChecks.warnOnImplicitAny) {
+        const implicitAnyRegex = /function\s+\w+\s*\(([^)]*)\)/g;
+        for (const match of content.matchAll(implicitAnyRegex)) {
+            const params = match[1];
+            if (params && !params.includes(':') && params.trim().length > 0) {
+                const lineNum = content.substring(0, match.index).split('\n').length;
+                warnings.push({
+                    file: filePath,
+                    line: lineNum,
+                    issue: 'Function parameters lack type annotations',
+                    severity: 'Low',
+                    category: 'Type Safety'
+                });
+            }
+        }
+    }
+    
+    return warnings;
+}
+
+// =============================================================================
+// MARKDOWN REPORT GENERATION
 // =============================================================================
 
 async function generateMarkdownReport(errors, typeWarnings) {
     const outputDir = path.dirname(CONFIG.outputFile);
     await fs.mkdir(outputDir, { recursive: true });
 
-    const isSuccess = errors.length === 0;
-    const statusBadge = isSuccess 
+    const statusBadge = errors.length === 0
         ? '![Status](https://img.shields.io/badge/status-passing-brightgreen)'
         : '![Status](https://img.shields.io/badge/status-failing-red)';
+    
+    const typesBadge = typeWarnings.length === 0
+        ? '![Types](https://img.shields.io/badge/type_safety-excellent-blue)'
+        : '![Types](https://img.shields.io/badge/type_safety-warnings-yellow)';
 
-    let report = `# 📊 Export Validation Report\n\n`;
-    report += `**Generated:** ${new Date().toLocaleString()}\n`;
-    report += `**Validator Version:** v11.0\n`;
-    report += `**Analysis Duration:** ${((Date.now() - STATS.startTime) / 1000).toFixed(2)}s\n\n`;
-    report += `${statusBadge}\n\n`;
+    let report = '';
+    
+    // Header
+    report += `# 📊 Strategic Export Analysis Report\n\n`;
+    report += `${statusBadge} ${typesBadge}\n\n`;
+    report += `**Generated:** ${new Date().toLocaleString()}  \n`;
+    report += `**Validator:** v13.0  \n`;
+    report += `**Mode:** ${CONFIG.strictness.toUpperCase()}  \n`;
+    report += `**Duration:** ${((Date.now() - STATS.startTime) / 1000).toFixed(2)}s\n\n`;
 
     // Executive Summary
-    report += `## 📈 Summary\n\n`;
-    report += createSummaryTable();
+    report += `## 📈 Executive Summary\n\n`;
+    report += createDetailedSummaryTable();
+    
+    // Performance Metrics
+    if (STATS.phases && Object.keys(STATS.phases).length > 0) {
+        report += `\n### ⚡ Performance Breakdown\n\n`;
+        report += `| Phase | Duration |\n|:------|----------:|\n`;
+        for (const [phase, duration] of Object.entries(STATS.phases)) {
+            report += `| ${phase} | ${(duration / 1000).toFixed(2)}s |\n`;
+        }
+        report += `\n`;
+    }
 
-    // Import/Export Errors
+    // Critical Issues
     if (errors.length > 0) {
-        report += `\n## ❌ Import/Export Mismatches (${errors.length})\n\n`;
-        report += createErrorTable(errors);
+        report += `\n## 🚨 Critical Issues (${errors.length})\n\n`;
+        report += createEnhancedErrorTable(errors);
     } else {
-        report += `\n## ✅ No Import/Export Issues\n\n`;
-        report += `All imports successfully resolve to valid exports.\n`;
+        report += `\n## ✅ Import/Export Validation\n\n`;
+        report += `All ${STATS.importsChecked} imports successfully resolve to valid exports. No mismatches detected.\n`;
     }
 
     // Type Safety Warnings
     if (typeWarnings.length > 0) {
         report += `\n## ⚠️ Type Safety Warnings (${typeWarnings.length})\n\n`;
         report += createTypeWarningTable(typeWarnings);
-    } else {
-        report += `\n## ✅ No Type Safety Issues\n\n`;
-        report += `All type safety checks passed.\n`;
+    } else if (CONFIG.typeChecks.enabled) {
+        report += `\n## ✅ Type Safety\n\n`;
+        report += `All type safety checks passed. No warnings generated.\n`;
     }
 
-    report += `\n---\n*Powered by Strategic Export Validator v11.0*\n`;
+    // Recommendations
+    if (errors.length > 0 || typeWarnings.length > 0) {
+        report += `\n## 💡 Recommendations\n\n`;
+        report += generateRecommendations(errors, typeWarnings);
+    }
+
+    // Footer
+    report += `\n---\n\n`;
+    report += `*Generated by Strategic Export Validator v13.0*  \n`;
+    report += `*For issues or suggestions, review the configuration in the validator script*\n`;
 
     await fs.writeFile(CONFIG.outputFile, report, 'utf-8');
-    console.log(`   Report saved: ${CONFIG.outputFile}`);
 }
 
-function createSummaryTable() {
+function createDetailedSummaryTable() {
+    const successRate = STATS.filesScanned > 0 
+        ? ((STATS.filesSuccessful / STATS.filesScanned) * 100).toFixed(1)
+        : 0;
+    
+    const cacheEfficiency = STATS.resolutionCacheHits + STATS.resolutionCacheMisses > 0
+        ? ((STATS.resolutionCacheHits / (STATS.resolutionCacheHits + STATS.resolutionCacheMisses)) * 100).toFixed(1)
+        : 0;
+
     return `| Metric | Value | Status |\n` +
            `|:-------|------:|:------:|\n` +
            `| Files Scanned | ${STATS.filesScanned} | ℹ️ |\n` +
-           `| Successfully Parsed | ${CACHE.files.size} | ${STATS.parseErrors === 0 ? '✅' : '⚠️'} |\n` +
+           `| Successfully Parsed | ${STATS.filesSuccessful} (${successRate}%) | ${STATS.parseErrors === 0 ? '✅' : '⚠️'} |\n` +
            `| Parse Errors | ${STATS.parseErrors} | ${STATS.parseErrors === 0 ? '✅' : '⚠️'} |\n` +
            `| Imports Validated | ${STATS.importsChecked} | ℹ️ |\n` +
            `| Import Mismatches | ${STATS.importMismatches} | ${STATS.importMismatches === 0 ? '✅' : '❌'} |\n` +
-           `| Type Warnings | ${STATS.typeWarnings} | ${STATS.typeWarnings === 0 ? '✅' : '⚠️'} |\n\n`;
+           `| Type Warnings | ${STATS.typeWarnings} | ${STATS.typeWarnings === 0 ? '✅' : '⚠️'} |\n` +
+           `| Cache Efficiency | ${cacheEfficiency}% | ${parseFloat(cacheEfficiency) > 80 ? '⚡' : 'ℹ️'} |\n\n`;
 }
 
-function createErrorTable(errors) {
-    let table = `| File | Import Path | Missing Export | Recommendation |\n`;
-    table += `|:-----|:------------|:---------------|:---------------|\n`;
+function createEnhancedErrorTable(errors) {
+    let table = `| File | Issue | Missing | Suggestion | Severity |\n`;
+    table += `|:-----|:------|:--------|:-----------|:--------:|\n`;
     
     const displayCount = Math.min(errors.length, 100);
     for (let i = 0; i < displayCount; i++) {
         const err = errors[i];
         const relPath = path.relative(CONFIG.rootDir, err.file);
-        table += `| \`${relPath}\` | \`${err.importPath}\` | \`${err.missingExport}\` | ${err.recommendation} |\n`;
+        const shortPath = relPath.length > 50 ? '...' + relPath.slice(-47) : relPath;
+        
+        table += `| \`${shortPath}\` `;
+        table += `| Import: \`${err.importPath}\` `;
+        table += `| \`${err.missingExport}\` `;
+        table += `| ${err.recommendation} `;
+        table += `| ${getSeverityEmoji(err.severity)} ${err.severity} |\n`;
     }
     
     if (errors.length > displayCount) {
@@ -609,21 +893,71 @@ function createErrorTable(errors) {
 }
 
 function createTypeWarningTable(warnings) {
-    let table = `| File | Line | Issue | Severity |\n`;
-    table += `|:-----|-----:|:------|:--------:|\n`;
+    // Group by category
+    const byCategory = warnings.reduce((acc, w) => {
+        const cat = w.category || 'General';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(w);
+        return acc;
+    }, {});
     
-    const displayCount = Math.min(warnings.length, 50);
-    for (let i = 0; i < displayCount; i++) {
-        const warn = warnings[i];
-        const relPath = path.relative(CONFIG.rootDir, warn.file);
-        table += `| \`${relPath}\` | ${warn.line || '-'} | ${warn.issue} | ${warn.severity} |\n`;
-    }
+    let table = '';
     
-    if (warnings.length > displayCount) {
-        table += `\n*...and ${warnings.length - displayCount} more warnings*\n`;
+    for (const [category, items] of Object.entries(byCategory)) {
+        table += `\n### ${category}\n\n`;
+        table += `| File | Line | Issue | Severity |\n`;
+        table += `|:-----|-----:|:------|:--------:|\n`;
+        
+        const displayCount = Math.min(items.length, 50);
+        for (let i = 0; i < displayCount; i++) {
+            const warn = items[i];
+            const relPath = path.relative(CONFIG.rootDir, warn.file);
+            const shortPath = relPath.length > 60 ? '...' + relPath.slice(-57) : relPath;
+            
+            table += `| \`${shortPath}\` `;
+            table += `| ${warn.line || '-'} `;
+            table += `| ${warn.issue} `;
+            table += `| ${getSeverityEmoji(warn.severity)} ${warn.severity} |\n`;
+        }
+        
+        if (items.length > displayCount) {
+            table += `\n*...and ${items.length - displayCount} more in this category*\n`;
+        }
     }
     
     return table;
+}
+
+function generateRecommendations(errors, warnings) {
+    let rec = '';
+    
+    if (errors.length > 0) {
+        rec += `### 🔧 Import/Export Issues\n\n`;
+        rec += `1. **Review missing exports**: Check if exports exist in target modules\n`;
+        rec += `2. **Verify path aliases**: Ensure tsconfig.json paths match CONFIG.aliases\n`;
+        rec += `3. **Check file extensions**: Some imports may be missing file extensions\n`;
+        rec += `4. **Re-export chains**: Verify all re-export sources are accessible\n\n`;
+    }
+    
+    if (warnings.length > 0) {
+        rec += `### 🛡️ Type Safety Improvements\n\n`;
+        rec += `1. **Reduce 'any' usage**: Add explicit types where possible\n`;
+        rec += `2. **Annotate async functions**: Add Promise<T> return types\n`;
+        rec += `3. **Type function parameters**: Add type annotations to all parameters\n`;
+        rec += `4. **Enable strict mode**: Consider \`"strict": true\` in tsconfig.json\n\n`;
+    }
+    
+    return rec;
+}
+
+function getSeverityEmoji(severity) {
+    const map = {
+        'Critical': '🔴',
+        'High': '🟠',
+        'Medium': '🟡',
+        'Low': '🔵'
+    };
+    return map[severity] || '⚪';
 }
 
 // =============================================================================

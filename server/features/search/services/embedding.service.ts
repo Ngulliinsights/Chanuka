@@ -4,14 +4,14 @@
 // Handles OpenAI text-embedding-3-small integration with Redis caching
 // Supports batch processing and error handling with fallback mechanisms
 
-import OpenAI from 'openai';
-import { cacheService } from '@shared/infrastructure/cache/cache-service';
-import { database } from '@shared/database';
-import { content_embeddings, ContentType, ProcessingStatus } from '@shared/schema/search_system';
-import { eq, and, sql } from 'drizzle-orm';
 import { logger } from '@shared/core';
-import pLimit from 'p-limit';
+import { database } from '@shared/database';
+import { cacheService } from '@shared/infrastructure/cache/cache-service';
+import { content_embeddings, ContentType, ProcessingStatus } from '@shared/schema/search_system';
 import crypto from 'crypto';
+import { and, eq, sql } from 'drizzle-orm';
+import OpenAI from 'openai';
+import pLimit from 'p-limit';
 
 // Helper function to get error message safely
 const getErrorMessage = (error: unknown): string => {

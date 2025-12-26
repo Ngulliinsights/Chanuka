@@ -1,8 +1,9 @@
 // Import fallback implementations for missing shared modules
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../missing-modules-fallback';
-import { ExternalAPIErrorHandler } from '../../external-api-error-handler';
 import { logger   } from '@shared/core';
 import { z } from 'zod';
+
+import { ExternalAPIErrorHandler } from '../../external-api-error-handler';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../missing-modules-fallback';
 
 /**
  * Enhanced Government Data Integration Service with full API management

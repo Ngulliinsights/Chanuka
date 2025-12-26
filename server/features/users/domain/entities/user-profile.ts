@@ -1,4 +1,4 @@
-import { UserBio, UserLocation, Organization, Interest } from './value-objects';
+import { Interest,Organization, UserBio, UserLocation } from './value-objects';
 
 export class UserProfile {
   private constructor(

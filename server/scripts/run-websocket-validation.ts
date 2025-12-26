@@ -12,9 +12,10 @@
  */
 
 import { WebSocketPerformanceValidator } from '@server/scripts/websocket-performance-validation.ts';
+import { logger } from '@shared/core/observability/logging';
+
 import { FinalMigrationValidator } from '../../final-migration-validation';
 import { LegacyWebSocketCleanup } from '../../legacy-websocket-cleanup';
-import { logger } from '@shared/core/observability/logging';
 
 interface ValidationSummary {
   performance: {

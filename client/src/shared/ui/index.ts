@@ -6,14 +6,9 @@ export * from './dashboard';
 // Privacy components
 export * from './privacy';
 
-// Auth components
-export * from './auth';
-
 // Shared utilities
 export * from './utils';
 
-// Shared types and interfaces
-export * from './types';
 // Additional Shared UI Components
 export * from './loading';
 export * from './notifications';
@@ -32,3 +27,6 @@ export * from './navigation';
 
 // Realtime components
 export * from './realtime';
+
+// Types (avoid duplicate exports by being specific)
+export type { ErrorInfo } from './types/index';

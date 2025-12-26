@@ -1,16 +1,17 @@
 // ============================================================================
-// ENGAGEMENT PREDICTOR - ML Model for Predicting User Engagement
+// ENGAGEMENT PREDICTOR - ML Model for User Engagement Prediction (OPTIMIZED)
 // ============================================================================
 // Predicts user engagement levels and optimizes content delivery
 
 import { z } from 'zod';
+import { TextProcessor, Statistics, DateUtils, Cache } from './shared_utils';
 
 export const EngagementInputSchema = z.object({
   contentType: z.enum(['bill', 'analysis', 'comment', 'news', 'alert']),
   contentMetadata: z.object({
     title: z.string(),
     summary: z.string().optional(),
-    length: z.number(), // Content length in words
+    length: z.number(),
     complexity: z.enum(['low', 'medium', 'high']),
     urgency: z.enum(['low', 'medium', 'high', 'critical']),
     topics: z.array(z.string()),
@@ -22,7 +23,7 @@ export const EngagementInputSchema = z.object({
       totalViews: z.number(),
       totalComments: z.number(),
       totalShares: z.number(),
-      avgSessionDuration: z.number(), // seconds
+      avgSessionDuration: z.number(),
       lastActiveDate: z.string(),
     }),
     preferences: z.object({
@@ -38,8 +39,8 @@ export const EngagementInputSchema = z.object({
     }).optional(),
   }),
   contextualFactors: z.object({
-    timeOfDay: z.number().min(0).max(23), // Hour of day
-    dayOfWeek: z.number().min(0).max(6), // 0 = Sunday
+    timeOfDay: z.number().min(0).max(23),
+    dayOfWeek: z.number().min(0).max(6),
     isWeekend: z.boolean(),
     currentTrendingTopics: z.array(z.string()),
     platformActivity: z.enum(['low', 'medium', 'high']),
@@ -53,8 +54,8 @@ export const EngagementOutputSchema = z.object({
     viewProbability: z.number().min(0).max(1),
     commentProbability: z.number().min(0).max(1),
     shareProbability: z.number().min(0).max(1),
-    timeSpentPrediction: z.number(), // seconds
-    completionProbability: z.number().min(0).max(1), // Will user read/view completely
+    timeSpentPrediction: z.number(),
+    completionProbability: z.number().min(0).max(1),
   }),
   engagementFactors: z.array(z.object({
     factor: z.string(),
@@ -63,7 +64,7 @@ export const EngagementOutputSchema = z.object({
     explanation: z.string(),
   })),
   recommendations: z.object({
-    optimalDeliveryTime: z.string(), // ISO datetime
+    optimalDeliveryTime: z.string(),
     recommendedFormat: z.enum(['full', 'summary', 'alert', 'digest']),
     personalizationSuggestions: z.array(z.string()),
     contentOptimizations: z.array(z.string()),
@@ -82,9 +83,9 @@ export type EngagementInput = z.infer<typeof EngagementInputSchema>;
 export type EngagementOutput = z.infer<typeof EngagementOutputSchema>;
 
 export class EngagementPredictor {
-  private modelVersion = '2.0.0';
+  private modelVersion = '2.1.0';
+  private cache = new Cache<EngagementOutput>(600); // 10 minute cache
 
-  // Engagement weights for different factors
   private readonly ENGAGEMENT_WEIGHTS = {
     topic_interest: 0.25,
     content_complexity: 0.15,
@@ -94,43 +95,69 @@ export class EngagementPredictor {
     trending: 0.10,
   };
 
-  // User segments and their characteristics
   private readonly USER_SEGMENTS = {
     casual: {
-      avgSessionDuration: 120, // 2 minutes
+      avgSessionDuration: 120,
       preferredComplexity: 'low',
       engagementThreshold: 30,
+      commentPropensity: 0.05,
+      sharePropensity: 0.02,
     },
     engaged: {
-      avgSessionDuration: 300, // 5 minutes
+      avgSessionDuration: 300,
       preferredComplexity: 'medium',
       engagementThreshold: 50,
+      commentPropensity: 0.15,
+      sharePropensity: 0.08,
     },
     expert: {
-      avgSessionDuration: 600, // 10 minutes
+      avgSessionDuration: 600,
       preferredComplexity: 'high',
       engagementThreshold: 70,
+      commentPropensity: 0.25,
+      sharePropensity: 0.12,
     },
     activist: {
-      avgSessionDuration: 450, // 7.5 minutes
+      avgSessionDuration: 450,
       preferredComplexity: 'medium',
       engagementThreshold: 80,
+      commentPropensity: 0.35,
+      sharePropensity: 0.25,
     },
     professional: {
-      avgSessionDuration: 900, // 15 minutes
+      avgSessionDuration: 900,
       preferredComplexity: 'high',
       engagementThreshold: 85,
+      commentPropensity: 0.20,
+      sharePropensity: 0.10,
     },
+  };
+
+  private readonly PEAK_HOURS = [
+    { start: 7, end: 9, multiplier: 1.2 },   // Morning
+    { start: 12, end: 14, multiplier: 1.3 }, // Lunch
+    { start: 18, end: 21, multiplier: 1.4 }, // Evening
+  ];
+
+  private readonly COMPLEXITY_MATCH_SCORES = {
+    low: { low: 1.0, medium: 0.7, high: 0.4 },
+    medium: { low: 0.7, medium: 1.0, high: 0.7 },
+    high: { low: 0.4, medium: 0.7, high: 1.0 },
   };
 
   async predict(input: EngagementInput): Promise<EngagementOutput> {
     const validatedInput = EngagementInputSchema.parse(input);
     
+    // Check cache
+    const cacheKey = this.generateCacheKey(validatedInput);
+    const cached = this.cache.get(cacheKey);
+    if (cached) return cached;
+    
     // Classify user segment
     const userSegment = this.classifyUserSegment(validatedInput.userProfile);
     
     // Calculate engagement factors
-    const engagementFactors = this.calculateEngagementFactors(validatedInput);
+    const engagementFactors = this.calculateEngagementFactors(validatedInput, userSegment);
     
     // Calculate overall engagement score
     const engagementScore = this.calculateEngagementScore(engagementFactors, userSegment);
@@ -147,7 +174,7 @@ export class EngagementPredictor {
     // Calculate confidence
     const confidence = this.calculateConfidence(validatedInput, engagementFactors);
 
-    return {
+    const result = {
       engagementScore,
       confidence,
       predictions,
@@ -155,6 +182,11 @@ export class EngagementPredictor {
       recommendations,
       segmentAnalysis,
     };
+    
+    // Cache result
+    this.cache.set(cacheKey, result);
+    
+    return result;
   }
 
   private classifyUserSegment(userProfile: any): keyof typeof this.USER_SEGMENTS {
@@ -164,18 +196,19 @@ export class EngagementPredictor {
     // Calculate engagement metrics
     const totalEngagements = history.totalViews + history.totalComments + history.totalShares;
     const avgSessionDuration = history.avgSessionDuration;
+    const commentRate = history.totalViews > 0 ? history.totalComments / history.totalViews : 0;
     
-    // Classify based on activity level and preferences
+    // Classify based on activity level and behavior
     if (totalEngagements > 1000 && avgSessionDuration > 600) {
       return preferences.preferredComplexity === 'high' ? 'professional' : 'expert';
     } else if (totalEngagements > 500 && avgSessionDuration > 300) {
-      return history.totalComments > history.totalViews * 0.1 ? 'activist' : 'engaged';
+      return commentRate > 0.1 ? 'activist' : 'engaged';
     } else {
       return 'casual';
     }
   }
 
-  private calculateEngagementFactors(input: EngagementInput) {
+  private calculateEngagementFactors(input: EngagementInput, userSegment: keyof typeof this.USER_SEGMENTS) {
     const factors = [];
     
     // Topic interest factor
@@ -187,28 +220,29 @@ export class EngagementPredictor {
       factor: 'Topic Interest',
       impact: this.scoreToImpact(topicInterest),
       weight: this.ENGAGEMENT_WEIGHTS.topic_interest,
-      explanation: `User has ${topicInterest > 0.7 ? 'high' : topicInterest > 0.3 ? 'medium' : 'low'} interest in these topics`,
+      explanation: `${Math.round(topicInterest * 100)}% match with user interests`,
     });
 
     // Content complexity match
-    const complexityMatch = this.calculateComplexityMatch(
-      input.contentMetadata.complexity,
-      input.userProfile.preferences.preferredComplexity
-    );
+    const complexityMatch = this.COMPLEXITY_MATCH_SCORES
+      [input.contentMetadata.complexity as keyof typeof this.COMPLEXITY_MATCH_SCORES]
+      [input.userProfile.preferences.preferredComplexity as keyof typeof this.COMPLEXITY_MATCH_SCORES.low];
+    
     factors.push({
       factor: 'Content Complexity Match',
       impact: this.scoreToImpact(complexityMatch),
       weight: this.ENGAGEMENT_WEIGHTS.content_complexity,
-      explanation: `Content complexity ${complexityMatch > 0.5 ? 'matches' : 'mismatches'} user preference`,
+      explanation: `Content complexity ${complexityMatch > 0.7 ? 'matches' : 'mismatches'} user preference`,
     });
 
     // Urgency factor
-    const urgencyScore = this.calculateUrgencyScore(input.contentMetadata.urgency);
+    const urgencyScores = { low: 0.3, medium: 0.6, high: 0.8, critical: 1.0 };
+    const urgencyScore = urgencyScores[input.contentMetadata.urgency];
     factors.push({
       factor: 'Content Urgency',
       impact: this.scoreToImpact(urgencyScore),
       weight: this.ENGAGEMENT_WEIGHTS.urgency_level,
-      explanation: `${input.contentMetadata.urgency} urgency content tends to drive engagement`,
+      explanation: `${input.contentMetadata.urgency} urgency drives ${urgencyScore > 0.6 ? 'high' : 'moderate'} engagement`,
     });
 
     // User history factor
@@ -217,7 +251,7 @@ export class EngagementPredictor {
       factor: 'User Engagement History',
       impact: this.scoreToImpact(historyScore),
       weight: this.ENGAGEMENT_WEIGHTS.user_history,
-      explanation: `User has ${historyScore > 0.7 ? 'high' : historyScore > 0.3 ? 'medium' : 'low'} historical engagement`,
+      explanation: `User has ${historyScore > 0.7 ? 'high' : historyScore > 0.4 ? 'moderate' : 'low'} historical engagement`,
     });
 
     // Timing factor
@@ -226,7 +260,7 @@ export class EngagementPredictor {
       factor: 'Timing Optimization',
       impact: this.scoreToImpact(timingScore),
       weight: this.ENGAGEMENT_WEIGHTS.timing,
-      explanation: `Current time is ${timingScore > 0.5 ? 'optimal' : 'suboptimal'} for user engagement`,
+      explanation: `Current time is ${timingScore > 0.6 ? 'optimal' : timingScore > 0.4 ? 'acceptable' : 'suboptimal'} for engagement`,
     });
 
     // Trending factor
@@ -238,37 +272,49 @@ export class EngagementPredictor {
       factor: 'Trending Topics',
       impact: this.scoreToImpact(trendingScore),
       weight: this.ENGAGEMENT_WEIGHTS.trending,
-      explanation: `Content ${trendingScore > 0.5 ? 'aligns with' : 'does not align with'} current trends`,
+      explanation: `Content ${trendingScore > 0.5 ? 'aligns with' : 'differs from'} current trends`,
     });
 
     return factors;
   }
 
   private calculateEngagementScore(factors: any[], userSegment: keyof typeof this.USER_SEGMENTS): number {
-    let weightedScore = 0;
+    // Weighted sum of factors
+    const factorScores = factors.map(f => this.impactToScore(f.impact) * f.weight);
+    const weightedScore = Statistics.mean(factorScores) * 100;
     
-    for (const factor of factors) {
-      const impactScore = this.impactToScore(factor.impact);
-      weightedScore += impactScore * factor.weight;
-    }
+    // Apply segment-specific multiplier
+    const segmentMultipliers = {
+      casual: 0.8,
+      engaged: 1.0,
+      expert: 1.1,
+      activist: 1.2,
+      professional: 1.05,
+    };
     
-    // Apply segment-specific adjustments
-    const segmentMultiplier = this.getSegmentMultiplier(userSegment);
-    const finalScore = weightedScore * 100 * segmentMultiplier;
-    
+    const finalScore = weightedScore * segmentMultipliers[userSegment];
     return Math.max(0, Math.min(100, finalScore));
   }
 
   private makePredictions(input: EngagementInput, engagementScore: number, userSegment: keyof typeof this.USER_SEGMENTS) {
     const baseViewProb = Math.min(1, engagementScore / 100);
-    const segmentCharacteristics = this.USER_SEGMENTS[userSegment];
+    const segmentData = this.USER_SEGMENTS[userSegment];
+    
+    // Adjust probabilities based on content complexity
+    const complexityMultiplier = this.COMPLEXITY_MATCH_SCORES
+      [input.contentMetadata.complexity as keyof typeof this.COMPLEXITY_MATCH_SCORES]
+      [input.userProfile.preferences.preferredComplexity as keyof typeof this.COMPLEXITY_MATCH_SCORES.low];
+    
+    // Urgency boost
+    const urgencyMultipliers = { low: 0.8, medium: 1.0, high: 1.3, critical: 1.5 };
+    const urgencyMultiplier = urgencyMultipliers[input.contentMetadata.urgency];
     
     return {
-      viewProbability: baseViewProb,
-      commentProbability: baseViewProb * this.getCommentPropensity(userSegment, input.contentMetadata.complexity),
-      shareProbability: baseViewProb * this.getSharePropensity(userSegment, input.contentMetadata.urgency),
-      timeSpentPrediction: this.predictTimeSpent(engagementScore, segmentCharacteristics, input.contentMetadata.length),
-      completionProbability: this.predictCompletion(engagementScore, input.contentMetadata.complexity, userSegment),
+      viewProbability: Math.min(1, baseViewProb * complexityMultiplier),
+      commentProbability: Math.min(1, baseViewProb * segmentData.commentPropensity * urgencyMultiplier),
+      shareProbability: Math.min(1, baseViewProb * segmentData.sharePropensity * urgencyMultiplier),
+      timeSpentPrediction: this.predictTimeSpent(engagementScore, segmentData, input.contentMetadata.length),
+      completionProbability: Math.min(1, baseViewProb * complexityMultiplier * 0.9),
     };
   }
 
@@ -279,8 +325,8 @@ export class EngagementPredictor {
     return {
       optimalDeliveryTime: optimalTime,
       recommendedFormat: format,
-      personalizationSuggestions: this.generatePersonalizationSuggestions(input.userProfile, userSegment),
-      contentOptimizations: this.generateContentOptimizations(input.contentMetadata, userSegment),
+      personalizationSuggestions: this.generatePersonalizationSuggestions(input.userProfile, userSegment, engagementScore),
+      contentOptimizations: this.generateContentOptimizations(input.contentMetadata, userSegment, engagementScore),
     };
   }
 
@@ -289,7 +335,7 @@ export class EngagementPredictor {
     
     return {
       userSegment,
-      segmentEngagementRate: this.getSegmentEngagementRate(userSegment),
+      segmentEngagementRate: segmentData.engagementThreshold / 100,
       similarUserBehavior: {
         avgEngagementScore: segmentData.engagementThreshold,
         commonActions: this.getCommonActions(userSegment),
@@ -298,99 +344,193 @@ export class EngagementPredictor {
   }
 
   private calculateConfidence(input: EngagementInput, factors: any[]): number {
-    let confidence = 0.6; // Base confidence
+    let confidence = 0.6;
     
-    // Increase confidence with more user history
+    // More user history = higher confidence
     const historyPoints = input.userProfile.engagementHistory.totalViews + 
                          input.userProfile.engagementHistory.totalComments;
-    confidence += Math.min(0.3, historyPoints / 1000);
+    confidence += Math.min(0.25, Math.log10(historyPoints + 1) / 10);
     
-    // Increase confidence with strong factors
-    const strongFactors = factors.filter(f => f.impact === 'very_positive' || f.impact === 'very_negative');
-    confidence += strongFactors.length * 0.05;
+    // Strong factors boost confidence
+    const strongFactors = factors.filter(f => 
+      f.impact === 'very_positive' || f.impact === 'very_negative'
+    );
+    confidence += Math.min(0.15, strongFactors.length * 0.05);
     
     return Math.min(1.0, confidence);
   }
 
   // Helper methods
   private calculateTopicInterest(contentTopics: string[], userInterests: string[]): number {
-    if (userInterests.length === 0) return 0.5; // Neutral if no preferences
+    if (userInterests.length === 0) return 0.5;
     
-    const matches = contentTopics.filter(topic => 
-      userInterests.some(interest => 
-        interest.toLowerCase().includes(topic.toLowerCase()) ||
-        topic.toLowerCase().includes(interest.toLowerCase())
-      )
-    );
+    const contentSet = new Set(contentTopics.map(t => t.toLowerCase()));
+    const userSet = new Set(userInterests.map(t => t.toLowerCase()));
     
-    return matches.length / Math.max(contentTopics.length, 1);
-  }
-
-  private calculateComplexityMatch(contentComplexity: string, userPreference: string): number {
-    const complexityMap = { low: 1, medium: 2, high: 3 };
-    const contentLevel = complexityMap[contentComplexity as keyof typeof complexityMap];
-    const preferredLevel = complexityMap[userPreference as keyof typeof complexityMap];
-    
-    const difference = Math.abs(contentLevel - preferredLevel);
-    return Math.max(0, 1 - (difference / 2));
-  }
-
-  private calculateUrgencyScore(urgency: string): number {
-    const urgencyScores = { low: 0.3, medium: 0.6, high: 0.8, critical: 1.0 };
-    return urgencyScores[urgency as keyof typeof urgencyScores] || 0.5;
+    // Use Jaccard similarity
+    return TextProcessor.jaccardSimilarity(contentSet, userSet);
   }
 
   private calculateHistoryScore(history: any): number {
     const totalActivity = history.totalViews + history.totalComments + history.totalShares;
-    const recencyBonus = this.calculateRecencyBonus(history.lastActiveDate);
+    const recencyScore = DateUtils.recencyScore(history.lastActiveDate, 30); // 30-day half-life
     
-    // Normalize activity (log scale to handle wide ranges)
+    // Log scale for activity (handles wide ranges)
     const activityScore = Math.min(1, Math.log10(totalActivity + 1) / 3);
     
-    return (activityScore + recencyBonus) / 2;
-  }
-
-  private calculateRecencyBonus(lastActiveDate: string): number {
-    const lastActive = new Date(lastActiveDate);
-    const now = new Date();
-    const daysSince = (now.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24);
+    // Average session duration score (normalize to 0-1)
+    const durationScore = Math.min(1, history.avgSessionDuration / 600); // 10 min = max
     
-    if (daysSince <= 1) return 1.0;
-    if (daysSince <= 7) return 0.8;
-    if (daysSince <= 30) return 0.6;
-    return 0.3;
+    // Weighted combination
+    return Statistics.weightedAverage(
+      [activityScore, recencyScore, durationScore],
+      [0.4, 0.4, 0.2]
+    );
   }
 
   private calculateTimingScore(contextualFactors: any): number {
     const { timeOfDay, isWeekend, platformActivity } = contextualFactors;
     
-    // Peak hours: 7-9 AM, 12-2 PM, 6-9 PM
-    let timeScore = 0.5;
-    if ((timeOfDay >= 7 && timeOfDay <= 9) || 
-        (timeOfDay >= 12 && timeOfDay <= 14) || 
-        (timeOfDay >= 18 && timeOfDay <= 21)) {
-      timeScore = 0.8;
+    // Check if current time is in peak hours
+    let timeMultiplier = 0.5; // Base
+    for (const peak of this.PEAK_HOURS) {
+      if (timeOfDay >= peak.start && timeOfDay <= peak.end) {
+        timeMultiplier = peak.multiplier;
+        break;
+      }
     }
     
-    // Weekend adjustment
-    const weekendMultiplier = isWeekend ? 0.7 : 1.0;
+    // Normalize to 0-1 scale
+    let timeScore = (timeMultiplier - 0.5) / 0.9; // 0.5-1.4 → 0-1
     
-    // Platform activity adjustment
-    const activityMultiplier = platformActivity === 'high' ? 1.2 : 
-                              platformActivity === 'medium' ? 1.0 : 0.8;
+    // Weekend adjustment (slight penalty)
+    if (isWeekend) timeScore *= 0.85;
     
-    return Math.min(1, timeScore * weekendMultiplier * activityMultiplier);
+    // Platform activity boost
+    const activityMultipliers = { low: 0.8, medium: 1.0, high: 1.2 };
+    timeScore *= activityMultipliers[platformActivity];
+    
+    return Math.max(0, Math.min(1, timeScore));
   }
 
   private calculateTrendingScore(contentTopics: string[], trendingTopics: string[]): number {
-    const matches = contentTopics.filter(topic => 
-      trendingTopics.some(trending => 
-        trending.toLowerCase().includes(topic.toLowerCase()) ||
-        topic.toLowerCase().includes(trending.toLowerCase())
-      )
-    );
+    if (trendingTopics.length === 0) return 0.5;
     
-    return matches.length / Math.max(contentTopics.length, 1);
+    const contentSet = new Set(contentTopics.map(t => t.toLowerCase()));
+    const trendingSet = new Set(trendingTopics.map(t => t.toLowerCase()));
+    
+    return TextProcessor.jaccardSimilarity(contentSet, trendingSet);
+  }
+
+  private predictTimeSpent(engagementScore: number, segmentData: any, contentLength: number): number {
+    const baseTime = segmentData.avgSessionDuration;
+    const engagementMultiplier = engagementScore / 100;
+    
+    // Reading speed: ~200 words per minute
+    const estimatedReadTime = (contentLength / 200) * 60;
+    const lengthFactor = Math.min(2, estimatedReadTime / baseTime);
+    
+    return baseTime * engagementMultiplier * lengthFactor;
+  }
+
+  private calculateOptimalDeliveryTime(userProfile: any, contextualFactors: any): string {
+    const now = new Date();
+    const currentHour = contextualFactors.timeOfDay;
+    
+    // Find next peak time
+    let nextPeakHour = 7; // Default morning
+    
+    for (const peak of this.PEAK_HOURS) {
+      if (currentHour < peak.start) {
+        nextPeakHour = peak.start;
+        break;
+      }
+    }
+    
+    // If past all peaks, suggest next morning
+    if (currentHour >= 21) {
+      nextPeakHour = 7;
+    }
+    
+    const optimalTime = new Date(now);
+    optimalTime.setHours(nextPeakHour, 0, 0, 0);
+    
+    // If optimal time is in the past today, move to tomorrow
+    if (optimalTime <= now) {
+      optimalTime.setDate(optimalTime.getDate() + 1);
+    }
+    
+    return optimalTime.toISOString();
+  }
+
+  private recommendFormat(userSegment: keyof typeof this.USER_SEGMENTS, contentMetadata: any): 'full' | 'summary' | 'alert' | 'digest' {
+    if (contentMetadata.urgency === 'critical') return 'alert';
+    
+    const formatMap = {
+      casual: 'summary',
+      engaged: 'full',
+      expert: 'full',
+      activist: 'alert',
+      professional: 'digest',
+    };
+    
+    return (formatMap as any)[userSegment] || 'summary';
+  }
+
+  private generatePersonalizationSuggestions(userProfile: any, userSegment: keyof typeof this.USER_SEGMENTS, score: number): string[] {
+    const suggestions = [];
+    
+    if (userProfile.preferences.interestedTopics.length < 3) {
+      suggestions.push('Add more topic interests to improve content relevance');
+    }
+    
+    if (userSegment === 'casual' && score < 40) {
+      suggestions.push('Enable summary mode for easier content consumption');
+    }
+    
+    if (userProfile.engagementHistory.avgSessionDuration < 60) {
+      suggestions.push('Try shorter content formats to match your reading patterns');
+    }
+    
+    const recencyDays = DateUtils.daysBetween(userProfile.engagementHistory.lastActiveDate, new Date());
+    if (recencyDays > 7) {
+      suggestions.push('Your engagement patterns may have changed - update your preferences');
+    }
+    
+    return suggestions;
+  }
+
+  private generateContentOptimizations(contentMetadata: any, userSegment: keyof typeof this.USER_SEGMENTS, score: number): string[] {
+    const optimizations = [];
+    
+    if (contentMetadata.length > 1000 && userSegment === 'casual') {
+      optimizations.push('Consider providing an executive summary for broader appeal');
+    }
+    
+    if (contentMetadata.complexity === 'high' && userSegment !== 'expert' && userSegment !== 'professional') {
+      optimizations.push('Simplify language and add explanatory notes for wider reach');
+    }
+    
+    if (contentMetadata.urgency === 'low' && score < 50) {
+      optimizations.push('Add compelling hooks or relate to trending topics');
+    }
+    
+    if (!contentMetadata.title || contentMetadata.title.length < 10) {
+      optimizations.push('Create a more engaging title to improve click-through rates');
+    }
+    
+    return optimizations;
+  }
+
+  private getCommonActions(userSegment: keyof typeof this.USER_SEGMENTS): string[] {
+    const actionMap = {
+      casual: ['view', 'quick_scan'],
+      engaged: ['view', 'read', 'comment', 'share'],
+      expert: ['view', 'detailed_read', 'comment', 'analyze'],
+      activist: ['view', 'comment', 'share', 'advocate', 'mobilize'],
+      professional: ['view', 'detailed_read', 'save', 'reference', 'cite'],
+    };
+    return actionMap[userSegment];
   }
 
   private scoreToImpact(score: number): 'very_negative' | 'negative' | 'neutral' | 'positive' | 'very_positive' {
@@ -402,170 +542,18 @@ export class EngagementPredictor {
   }
 
   private impactToScore(impact: string): number {
-    const impactScores = {
+    const scoreMap = {
       very_negative: 0.1,
       negative: 0.3,
       neutral: 0.5,
       positive: 0.7,
       very_positive: 0.9,
     };
-    return impactScores[impact as keyof typeof impactScores] || 0.5;
+    return scoreMap[impact as keyof typeof scoreMap] || 0.5;
   }
 
-  private getSegmentMultiplier(segment: keyof typeof this.USER_SEGMENTS): number {
-    const multipliers = {
-      casual: 0.8,
-      engaged: 1.0,
-      expert: 1.1,
-      activist: 1.2,
-      professional: 1.1,
-    };
-    return multipliers[segment];
-  }
-
-  private getCommentPropensity(segment: keyof typeof this.USER_SEGMENTS, complexity: string): number {
-    const basePropensity = {
-      casual: 0.05,
-      engaged: 0.15,
-      expert: 0.25,
-      activist: 0.35,
-      professional: 0.20,
-    };
-    
-    const complexityMultiplier = complexity === 'high' ? 1.2 : complexity === 'low' ? 0.8 : 1.0;
-    return basePropensity[segment] * complexityMultiplier;
-  }
-
-  private getSharePropensity(segment: keyof typeof this.USER_SEGMENTS, urgency: string): number {
-    const basePropensity = {
-      casual: 0.02,
-      engaged: 0.08,
-      expert: 0.12,
-      activist: 0.25,
-      professional: 0.10,
-    };
-    
-    const urgencyMultiplier = urgency === 'critical' ? 2.0 : urgency === 'high' ? 1.5 : 1.0;
-    return Math.min(1, basePropensity[segment] * urgencyMultiplier);
-  }
-
-  private predictTimeSpent(engagementScore: number, segmentCharacteristics: any, contentLength: number): number {
-    const baseTime = segmentCharacteristics.avgSessionDuration;
-    const engagementMultiplier = engagementScore / 100;
-    const lengthFactor = Math.min(2, contentLength / 500); // Longer content = more time, capped at 2x
-    
-    return baseTime * engagementMultiplier * lengthFactor;
-  }
-
-  private predictCompletion(engagementScore: number, complexity: string, segment: keyof typeof this.USER_SEGMENTS): number {
-    let baseCompletion = engagementScore / 100;
-    
-    // Adjust for complexity mismatch
-    const segmentData = this.USER_SEGMENTS[segment];
-    if (complexity !== segmentData.preferredComplexity) {
-      baseCompletion *= 0.8;
-    }
-    
-    return Math.min(1, baseCompletion);
-  }
-
-  private calculateOptimalDeliveryTime(userProfile: any, contextualFactors: any): string {
-    // Simple heuristic: add 2 hours to current time if not optimal
-    const now = new Date();
-    const currentHour = now.getHours();
-    
-    // If current time is not optimal, suggest next peak time
-    if (currentHour < 7 || (currentHour > 9 && currentHour < 12) || 
-        (currentHour > 14 && currentHour < 18) || currentHour > 21) {
-      
-      let optimalHour = 7; // Default to morning peak
-      if (currentHour >= 10 && currentHour < 16) optimalHour = 12; // Lunch peak
-      else if (currentHour >= 16) optimalHour = 18; // Evening peak
-      
-      const optimalTime = new Date(now);
-      optimalTime.setHours(optimalHour, 0, 0, 0);
-      
-      // If optimal time is in the past, move to next day
-      if (optimalTime <= now) {
-        optimalTime.setDate(optimalTime.getDate() + 1);
-      }
-      
-      return optimalTime.toISOString();
-    }
-    
-    return now.toISOString(); // Current time is optimal
-  }
-
-  private recommendFormat(segment: keyof typeof this.USER_SEGMENTS, contentMetadata: any): 'full' | 'summary' | 'alert' | 'digest' {
-    if (contentMetadata.urgency === 'critical') return 'alert';
-    
-    const segmentFormats = {
-      casual: 'summary',
-      engaged: 'full',
-      expert: 'full',
-      activist: 'alert',
-      professional: 'digest',
-    };
-    
-    return segmentFormats[segment];
-  }
-
-  private generatePersonalizationSuggestions(userProfile: any, segment: keyof typeof this.USER_SEGMENTS): string[] {
-    const suggestions = [];
-    
-    if (userProfile.preferences.interestedTopics.length < 3) {
-      suggestions.push('Add more topic interests to improve content relevance');
-    }
-    
-    if (segment === 'casual') {
-      suggestions.push('Consider enabling summary mode for easier consumption');
-    }
-    
-    if (userProfile.engagementHistory.avgSessionDuration < 60) {
-      suggestions.push('Try shorter content formats to match your reading style');
-    }
-    
-    return suggestions;
-  }
-
-  private generateContentOptimizations(contentMetadata: any, segment: keyof typeof this.USER_SEGMENTS): string[] {
-    const optimizations = [];
-    
-    if (contentMetadata.length > 1000 && segment === 'casual') {
-      optimizations.push('Consider providing a shorter summary for casual readers');
-    }
-    
-    if (contentMetadata.complexity === 'high' && segment !== 'expert' && segment !== 'professional') {
-      optimizations.push('Simplify language and add explanations for broader appeal');
-    }
-    
-    if (contentMetadata.urgency === 'low') {
-      optimizations.push('Add compelling hooks to increase engagement');
-    }
-    
-    return optimizations;
-  }
-
-  private getSegmentEngagementRate(segment: keyof typeof this.USER_SEGMENTS): number {
-    const rates = {
-      casual: 0.15,
-      engaged: 0.45,
-      expert: 0.65,
-      activist: 0.75,
-      professional: 0.60,
-    };
-    return rates[segment];
-  }
-
-  private getCommonActions(segment: keyof typeof this.USER_SEGMENTS): string[] {
-    const actions = {
-      casual: ['view', 'quick_scan'],
-      engaged: ['view', 'comment', 'share'],
-      expert: ['view', 'detailed_read', 'comment', 'analyze'],
-      activist: ['view', 'comment', 'share', 'advocate'],
-      professional: ['view', 'detailed_read', 'save', 'reference'],
-    };
-    return actions[segment];
+  private generateCacheKey(input: EngagementInput): string {
+    return `${input.userProfile.userId}-${input.contentType}-${input.contentMetadata.topics.join(',')}-${input.contextualFactors.timeOfDay}`;
   }
 
   getModelInfo() {
@@ -575,11 +563,14 @@ export class EngagementPredictor {
       description: 'Predicts user engagement and optimizes content delivery',
       capabilities: [
         'Engagement score prediction',
-        'User segmentation',
+        'User segmentation (5 segments)',
         'Optimal timing recommendations',
         'Content format optimization',
         'Personalization suggestions',
-        'Behavioral prediction'
+        'Behavioral prediction',
+        'Performance optimization with caching',
+        'Recency scoring with DateUtils',
+        'Statistical analysis with Statistics utilities'
       ]
     };
   }

@@ -1,18 +1,18 @@
 // ============================================================================
-// TRANSPARENCY SCORER - ML Model for Transparency Assessment
+// TRANSPARENCY SCORER - ML Model for Transparency Assessment (OPTIMIZED)
 // ============================================================================
 // Scores transparency levels of bills, sponsors, and processes
 
 import { z } from 'zod';
+import { Statistics, Cache } from './shared_utils';
 
 export const TransparencyInputSchema = z.object({
   entityType: z.enum(['bill', 'sponsor', 'process', 'institution']),
   entityId: z.string().uuid(),
   assessmentData: z.object({
-    // For bills
     billData: z.object({
       hasPublicDrafts: z.boolean(),
-      consultationPeriod: z.number(), // days
+      consultationPeriod: z.number(),
       publicHearings: z.number(),
       amendmentHistory: z.array(z.object({
         date: z.string(),
@@ -30,7 +30,6 @@ export const TransparencyInputSchema = z.object({
       }),
     }).optional(),
     
-    // For sponsors
     sponsorData: z.object({
       financialDisclosures: z.object({
         hasDisclosures: z.boolean(),
@@ -45,17 +44,16 @@ export const TransparencyInputSchema = z.object({
       }),
       votingExplanations: z.object({
         providesExplanations: z.boolean(),
-        frequency: z.number().min(0).max(1), // 0-1 scale
+        frequency: z.number().min(0).max(1),
         quality: z.enum(['poor', 'fair', 'good', 'excellent']).optional(),
       }),
     }).optional(),
     
-    // For processes
     processData: z.object({
       processType: z.enum(['legislative', 'budgetary', 'appointment', 'procurement']),
       publicNotice: z.object({
         provided: z.boolean(),
-        advanceNotice: z.number(), // days
+        advanceNotice: z.number(),
         accessibility: z.enum(['limited', 'moderate', 'wide']),
       }),
       documentation: z.object({
@@ -120,7 +118,7 @@ export const TransparencyOutputSchema = z.object({
     }),
     historicalTrend: z.object({
       direction: z.enum(['improving', 'stable', 'declining']),
-      changeRate: z.number(), // percentage change per period
+      changeRate: z.number(),
     }),
   }),
 });
@@ -129,9 +127,9 @@ export type TransparencyInput = z.infer<typeof TransparencyInputSchema>;
 export type TransparencyOutput = z.infer<typeof TransparencyOutputSchema>;
 
 export class TransparencyScorer {
-  private modelVersion = '2.0.0';
+  private modelVersion = '2.1.0';
+  private cache = new Cache<TransparencyOutput>(600); // 10 minute cache
 
-  // Dimension weights for overall score calculation
   private readonly DIMENSION_WEIGHTS = {
     accessibility: 0.25,
     completeness: 0.25,
@@ -140,7 +138,6 @@ export class TransparencyScorer {
     accountability: 0.15,
   };
 
-  // Scoring thresholds for grades
   private readonly GRADE_THRESHOLDS = {
     A: 85,
     B: 70,
@@ -149,14 +146,28 @@ export class TransparencyScorer {
     F: 0,
   };
 
+  private readonly BENCHMARK_AVERAGES = {
+    bill: 55,
+    sponsor: 45,
+    process: 50,
+    institution: 60,
+  };
+
   async assess(input: TransparencyInput): Promise<TransparencyOutput> {
     const validatedInput = TransparencyInputSchema.parse(input);
     
-    // Calculate dimension scores based on entity type
+    // Check cache
+    const cacheKey = this.generateCacheKey(validatedInput);
+    const cached = this.cache.get(cacheKey);
+    if (cached) return cached;
+    
+    // Calculate dimension scores
     const dimensions = this.calculateDimensionScores(validatedInput);
     
-    // Calculate overall score
-    const overallScore = this.calculateOverallScore(dimensions);
+    // Calculate overall score using weighted average
+    const dimensionScores = Object.values(dimensions).map((d: any) => d.score);
+    const weights = Object.values(this.DIMENSION_WEIGHTS);
+    const overallScore = Math.round(Statistics.weightedAverage(dimensionScores, weights));
     
     // Determine grade
     const grade = this.calculateGrade(overallScore);
@@ -173,7 +184,7 @@ export class TransparencyScorer {
     // Calculate confidence
     const confidence = this.calculateConfidence(validatedInput, dimensions);
 
-    return {
+    const result = {
       overallScore,
       confidence,
       grade,
@@ -183,6 +194,11 @@ export class TransparencyScorer {
       recommendations,
       benchmarking,
     };
+    
+    // Cache result
+    this.cache.set(cacheKey, result);
+    
+    return result;
   }
 
   private calculateDimensionScores(input: TransparencyInput) {
@@ -203,39 +219,43 @@ export class TransparencyScorer {
   private scoreBillTransparency(billData: any) {
     // Accessibility scoring
     const accessibilityFactors = [];
-    let accessibilityScore = 0;
+    const accessibilityScores = [];
     
     if (billData.hasPublicDrafts) {
-      accessibilityScore += 30;
+      accessibilityScores.push(30);
       accessibilityFactors.push('Public drafts available');
     }
     
     if (billData.votingRecord.isPublic) {
-      accessibilityScore += 25;
+      accessibilityScores.push(25);
       accessibilityFactors.push('Voting record is public');
     }
     
     if (billData.votingRecord.individualVotes) {
-      accessibilityScore += 20;
+      accessibilityScores.push(20);
       accessibilityFactors.push('Individual votes disclosed');
     }
     
     if (billData.impactAssessment.exists && billData.impactAssessment.isPublic) {
-      accessibilityScore += 25;
+      accessibilityScores.push(25);
       accessibilityFactors.push('Public impact assessment available');
     }
+    
+    const accessibilityScore = Math.min(100, Statistics.mean(accessibilityScores) * (accessibilityScores.length / 4) * 100);
 
     // Completeness scoring
     const completenessFactors = [];
-    let completenessScore = 0;
+    const completenessScores = [];
     
     if (billData.amendmentHistory.length > 0) {
-      completenessScore += 30;
+      completenessScores.push(30);
       completenessFactors.push('Amendment history documented');
       
       const publicAmendments = billData.amendmentHistory.filter((a: any) => a.isPublic).length;
-      const amendmentTransparency = publicAmendments / billData.amendmentHistory.length;
-      completenessScore += amendmentTransparency * 30;
+      const amendmentTransparency = billData.amendmentHistory.length > 0 
+        ? publicAmendments / billData.amendmentHistory.length 
+        : 0;
+      completenessScores.push(amendmentTransparency * 30);
       
       if (amendmentTransparency > 0.8) {
         completenessFactors.push('Most amendments are public');
@@ -243,18 +263,21 @@ export class TransparencyScorer {
     }
     
     if (billData.impactAssessment.exists) {
-      completenessScore += 20;
+      completenessScores.push(20);
       completenessFactors.push('Impact assessment conducted');
       
-      if (billData.impactAssessment.quality === 'excellent') {
-        completenessScore += 20;
-        completenessFactors.push('High-quality impact assessment');
+      const qualityScores = { poor: 5, fair: 10, good: 15, excellent: 20 };
+      if (billData.impactAssessment.quality) {
+        completenessScores.push(qualityScores[billData.impactAssessment.quality]);
+        completenessFactors.push(`${billData.impactAssessment.quality} quality assessment`);
       }
     }
+    
+    const completenessScore = Math.min(100, Statistics.mean(completenessScores) || 0);
 
     // Timeliness scoring
     const timelinessFactors = [];
-    let timelinessScore = 50; // Base score
+    let timelinessScore = 50;
     
     if (billData.consultationPeriod >= 30) {
       timelinessScore += 30;
@@ -262,151 +285,134 @@ export class TransparencyScorer {
     } else if (billData.consultationPeriod >= 14) {
       timelinessScore += 15;
       timelinessFactors.push('Moderate consultation period (14+ days)');
+    } else if (billData.consultationPeriod > 0) {
+      timelinessScore -= 10;
+      timelinessFactors.push('Short consultation period');
     } else {
-      timelinessScore -= 20;
-      timelinessFactors.push('Insufficient consultation period');
+      timelinessScore -= 30;
+      timelinessFactors.push('No consultation period');
     }
     
     if (billData.consultationPeriod >= 60) {
       timelinessScore += 20;
       timelinessFactors.push('Extended consultation period (60+ days)');
     }
+    
+    timelinessScore = Math.max(0, Math.min(100, timelinessScore));
 
     // Participation scoring
     const participationFactors = [];
-    let participationScore = 0;
+    const participationScores = [];
     
     if (billData.publicHearings > 0) {
-      participationScore += 40;
+      participationScores.push(40);
       participationFactors.push(`${billData.publicHearings} public hearing(s) held`);
       
       if (billData.publicHearings >= 3) {
-        participationScore += 20;
+        participationScores.push(20);
         participationFactors.push('Multiple public hearings');
       }
     }
     
     if (billData.consultationPeriod > 0) {
-      participationScore += 40;
+      participationScores.push(40);
       participationFactors.push('Public consultation period provided');
     }
+    
+    const participationScore = Math.min(100, Statistics.mean(participationScores) || 0);
 
     // Accountability scoring
     const accountabilityFactors = [];
-    let accountabilityScore = 0;
+    const accountabilityScores = [];
     
     if (billData.votingRecord.isPublic && billData.votingRecord.individualVotes) {
-      accountabilityScore += 50;
+      accountabilityScores.push(50);
       accountabilityFactors.push('Full voting transparency');
     }
     
     if (billData.impactAssessment.exists && billData.impactAssessment.isPublic) {
-      accountabilityScore += 30;
+      accountabilityScores.push(30);
       accountabilityFactors.push('Public impact assessment');
     }
     
     if (billData.amendmentHistory.some((a: any) => a.isPublic)) {
-      accountabilityScore += 20;
+      accountabilityScores.push(20);
       accountabilityFactors.push('Amendment transparency');
     }
+    
+    const accountabilityScore = Math.min(100, Statistics.mean(accountabilityScores) || 0);
 
     return {
-      accessibility: { score: Math.min(100, accessibilityScore), factors: accessibilityFactors },
-      completeness: { score: Math.min(100, completenessScore), factors: completenessFactors },
-      timeliness: { score: Math.min(100, timelinessScore), factors: timelinessFactors },
-      participation: { score: Math.min(100, participationScore), factors: participationFactors },
-      accountability: { score: Math.min(100, accountabilityScore), factors: accountabilityFactors },
+      accessibility: { score: Math.round(accessibilityScore), factors: accessibilityFactors },
+      completeness: { score: Math.round(completenessScore), factors: completenessFactors },
+      timeliness: { score: Math.round(timelinessScore), factors: timelinessFactors },
+      participation: { score: Math.round(participationScore), factors: participationFactors },
+      accountability: { score: Math.round(accountabilityScore), factors: accountabilityFactors },
     };
   }
 
   private scoreSponsorTransparency(sponsorData: any) {
     // Accessibility scoring
     const accessibilityFactors = [];
-    let accessibilityScore = 0;
+    const accessibilityScores = [];
     
-    if (sponsorData.financialDisclosures.accessibility === 'public') {
-      accessibilityScore += 50;
-      accessibilityFactors.push('Financial disclosures are public');
-    } else if (sponsorData.financialDisclosures.accessibility === 'restricted') {
-      accessibilityScore += 25;
-      accessibilityFactors.push('Financial disclosures have restricted access');
-    }
+    const accessibilityMap = { public: 50, restricted: 25, private: 0 };
+    accessibilityScores.push(accessibilityMap[sponsorData.financialDisclosures.accessibility]);
+    accessibilityFactors.push(`Financial disclosures: ${sponsorData.financialDisclosures.accessibility}`);
     
     if (sponsorData.votingExplanations.providesExplanations) {
-      accessibilityScore += 30;
+      accessibilityScores.push(30);
       accessibilityFactors.push('Provides voting explanations');
     }
     
     if (sponsorData.conflictDeclarations.hasDeclarations) {
-      accessibilityScore += 20;
+      accessibilityScores.push(20);
       accessibilityFactors.push('Makes conflict declarations');
     }
+    
+    const accessibilityScore = Math.min(100, Statistics.mean(accessibilityScores));
 
     // Completeness scoring
     const completenessFactors = [];
-    let completenessScore = 0;
+    const completenessScores = [];
     
-    switch (sponsorData.financialDisclosures.completeness) {
-      case 'complete':
-        completenessScore += 40;
-        completenessFactors.push('Complete financial disclosures');
-        break;
-      case 'partial':
-        completenessScore += 20;
-        completenessFactors.push('Partial financial disclosures');
-        break;
-      case 'none':
-        completenessFactors.push('No financial disclosures');
-        break;
+    const completenessMap = { complete: 40, partial: 20, none: 0 };
+    completenessScores.push(completenessMap[sponsorData.financialDisclosures.completeness]);
+    completenessFactors.push(`${sponsorData.financialDisclosures.completeness} financial disclosures`);
+    
+    const detailMap = { detailed: 30, basic: 15, vague: 5 };
+    completenessScores.push(detailMap[sponsorData.conflictDeclarations.detail]);
+    completenessFactors.push(`${sponsorData.conflictDeclarations.detail} conflict declarations`);
+    
+    if (sponsorData.votingExplanations.quality) {
+      const qualityMap = { excellent: 30, good: 20, fair: 10, poor: 5 };
+      completenessScores.push(qualityMap[sponsorData.votingExplanations.quality]);
+      completenessFactors.push(`${sponsorData.votingExplanations.quality} explanation quality`);
     }
     
-    if (sponsorData.conflictDeclarations.detail === 'detailed') {
-      completenessScore += 30;
-      completenessFactors.push('Detailed conflict declarations');
-    } else if (sponsorData.conflictDeclarations.detail === 'basic') {
-      completenessScore += 15;
-      completenessFactors.push('Basic conflict declarations');
-    }
-    
-    if (sponsorData.votingExplanations.quality === 'excellent') {
-      completenessScore += 30;
-      completenessFactors.push('High-quality voting explanations');
-    } else if (sponsorData.votingExplanations.quality === 'good') {
-      completenessScore += 20;
-      completenessFactors.push('Good voting explanations');
-    }
+    const completenessScore = Math.min(100, Statistics.mean(completenessScores));
 
     // Timeliness scoring
     const timelinessFactors = [];
-    let timelinessScore = 50; // Base score
+    const timelinessScores = [50]; // Base
     
-    switch (sponsorData.financialDisclosures.timeliness) {
-      case 'early':
-        timelinessScore += 30;
-        timelinessFactors.push('Early financial disclosure filing');
-        break;
-      case 'ontime':
-        timelinessScore += 20;
-        timelinessFactors.push('Timely financial disclosure filing');
-        break;
-      case 'overdue':
-        timelinessScore -= 30;
-        timelinessFactors.push('Overdue financial disclosures');
-        break;
-    }
+    const timelinessMap = { early: 30, ontime: 20, overdue: -30 };
+    timelinessScores.push(50 + timelinessMap[sponsorData.financialDisclosures.timeliness]);
+    timelinessFactors.push(`${sponsorData.financialDisclosures.timeliness} disclosure filing`);
     
-    if (sponsorData.conflictDeclarations.frequency === 'always') {
-      timelinessScore += 20;
-      timelinessFactors.push('Consistent conflict declarations');
-    }
+    const frequencyMap = { always: 20, sometimes: 10, rarely: 5, never: -10 };
+    timelinessScores.push(50 + frequencyMap[sponsorData.conflictDeclarations.frequency]);
+    timelinessFactors.push(`${sponsorData.conflictDeclarations.frequency} declares conflicts`);
+    
+    const timelinessScore = Math.max(0, Math.min(100, Statistics.mean(timelinessScores)));
 
     // Participation scoring
     const participationFactors = [];
-    let participationScore = sponsorData.votingExplanations.frequency * 100;
+    const participationScore = sponsorData.votingExplanations.frequency * 100;
     
-    if (sponsorData.votingExplanations.frequency > 0.8) {
+    if (participationScore > 80) {
       participationFactors.push('Regularly explains voting decisions');
-    } else if (sponsorData.votingExplanations.frequency > 0.5) {
+    } else if (participationScore > 50) {
       participationFactors.push('Sometimes explains voting decisions');
     } else {
       participationFactors.push('Rarely explains voting decisions');
@@ -414,162 +420,147 @@ export class TransparencyScorer {
 
     // Accountability scoring
     const accountabilityFactors = [];
-    let accountabilityScore = 0;
+    const accountabilityScores = [];
     
     if (sponsorData.financialDisclosures.hasDisclosures && 
         sponsorData.financialDisclosures.accessibility === 'public') {
-      accountabilityScore += 40;
+      accountabilityScores.push(40);
       accountabilityFactors.push('Public financial accountability');
     }
     
     if (sponsorData.conflictDeclarations.frequency === 'always') {
-      accountabilityScore += 30;
+      accountabilityScores.push(30);
       accountabilityFactors.push('Consistent conflict disclosure');
     }
     
     if (sponsorData.votingExplanations.providesExplanations) {
-      accountabilityScore += 30;
+      accountabilityScores.push(30);
       accountabilityFactors.push('Voting accountability');
     }
+    
+    const accountabilityScore = Math.min(100, Statistics.mean(accountabilityScores) || 0);
 
     return {
-      accessibility: { score: Math.min(100, accessibilityScore), factors: accessibilityFactors },
-      completeness: { score: Math.min(100, completenessScore), factors: completenessFactors },
-      timeliness: { score: Math.min(100, timelinessScore), factors: timelinessFactors },
-      participation: { score: Math.min(100, participationScore), factors: participationFactors },
-      accountability: { score: Math.min(100, accountabilityScore), factors: accountabilityFactors },
+      accessibility: { score: Math.round(accessibilityScore), factors: accessibilityFactors },
+      completeness: { score: Math.round(completenessScore), factors: completenessFactors },
+      timeliness: { score: Math.round(timelinessScore), factors: timelinessFactors },
+      participation: { score: Math.round(participationScore), factors: participationFactors },
+      accountability: { score: Math.round(accountabilityScore), factors: accountabilityFactors },
     };
   }
 
   private scoreProcessTransparency(processData: any) {
     // Accessibility scoring
     const accessibilityFactors = [];
-    let accessibilityScore = 0;
+    const accessibilityScores = [];
     
-    if (processData.documentation.availability === 'complete') {
-      accessibilityScore += 30;
-      accessibilityFactors.push('Complete documentation available');
-    } else if (processData.documentation.availability === 'partial') {
-      accessibilityScore += 15;
-      accessibilityFactors.push('Partial documentation available');
-    }
+    const availabilityMap = { complete: 30, partial: 15, limited: 8, none: 0 };
+    accessibilityScores.push(availabilityMap[processData.documentation.availability]);
+    accessibilityFactors.push(`${processData.documentation.availability} documentation`);
     
-    if (processData.documentation.format === 'digital_accessible') {
-      accessibilityScore += 25;
-      accessibilityFactors.push('Digitally accessible documentation');
-    }
+    const formatMap = { digital_accessible: 25, digital_limited: 15, paper_only: 5 };
+    accessibilityScores.push(formatMap[processData.documentation.format]);
+    accessibilityFactors.push(`${processData.documentation.format.replace('_', ' ')} format`);
     
-    if (processData.documentation.language.includes('swahili')) {
-      accessibilityScore += 20;
-      accessibilityFactors.push('Documentation in Swahili');
-    }
+    const langScore = processData.documentation.language.length * 10;
+    accessibilityScores.push(Math.min(25, langScore));
+    accessibilityFactors.push(`Available in ${processData.documentation.language.length} language(s)`);
     
-    if (processData.documentation.language.includes('local_languages')) {
-      accessibilityScore += 25;
-      accessibilityFactors.push('Documentation in local languages');
-    }
+    const accessibilityScore = Math.min(100, Statistics.mean(accessibilityScores));
 
     // Completeness scoring
     const completenessFactors = [];
-    let completenessScore = 0;
+    const completenessScores = [];
     
     if (processData.publicNotice.provided) {
-      completenessScore += 30;
+      completenessScores.push(30);
       completenessFactors.push('Public notice provided');
     }
     
     if (processData.participation.allowsPublicInput) {
-      completenessScore += 35;
+      completenessScores.push(35);
       completenessFactors.push('Public input allowed');
     }
     
     if (processData.participation.feedbackProvided) {
-      completenessScore += 35;
+      completenessScores.push(35);
       completenessFactors.push('Feedback provided to participants');
     }
+    
+    const completenessScore = Math.min(100, Statistics.mean(completenessScores) || 0);
 
     // Timeliness scoring
     const timelinessFactors = [];
-    let timelinessScore = 0;
-    
-    if (processData.publicNotice.advanceNotice >= 14) {
-      timelinessScore += 50;
-      timelinessFactors.push('Adequate advance notice (14+ days)');
-    } else if (processData.publicNotice.advanceNotice >= 7) {
-      timelinessScore += 25;
-      timelinessFactors.push('Moderate advance notice (7+ days)');
-    }
+    const timelinessScores = [];
     
     if (processData.publicNotice.advanceNotice >= 30) {
-      timelinessScore += 30;
+      timelinessScores.push(80);
       timelinessFactors.push('Extended advance notice (30+ days)');
+    } else if (processData.publicNotice.advanceNotice >= 14) {
+      timelinessScores.push(50);
+      timelinessFactors.push('Adequate advance notice (14+ days)');
+    } else if (processData.publicNotice.advanceNotice >= 7) {
+      timelinessScores.push(25);
+      timelinessFactors.push('Moderate advance notice (7+ days)');
+    } else {
+      timelinessScores.push(10);
+      timelinessFactors.push('Insufficient advance notice');
     }
     
     if (processData.participation.feedbackProvided) {
-      timelinessScore += 20;
+      timelinessScores.push(20);
       timelinessFactors.push('Timely feedback provided');
     }
+    
+    const timelinessScore = Math.min(100, Statistics.mean(timelinessScores));
 
     // Participation scoring
     const participationFactors = [];
-    let participationScore = 0;
+    const participationScores = [];
     
     if (processData.participation.allowsPublicInput) {
-      participationScore += 40;
+      participationScores.push(40);
       participationFactors.push('Public input mechanisms available');
       
-      const mechanismCount = processData.participation.inputMechanisms.length;
-      participationScore += mechanismCount * 15;
-      participationFactors.push(`${mechanismCount} input mechanism(s) available`);
+      const mechanismScore = processData.participation.inputMechanisms.length * 15;
+      participationScores.push(mechanismScore);
+      participationFactors.push(`${processData.participation.inputMechanisms.length} input mechanism(s)`);
     }
     
-    switch (processData.publicNotice.accessibility) {
-      case 'wide':
-        participationScore += 20;
-        participationFactors.push('Wide public notice accessibility');
-        break;
-      case 'moderate':
-        participationScore += 10;
-        participationFactors.push('Moderate public notice accessibility');
-        break;
-    }
+    const noticeMap = { wide: 20, moderate: 10, limited: 5 };
+    participationScores.push(noticeMap[processData.publicNotice.accessibility]);
+    participationFactors.push(`${processData.publicNotice.accessibility} notice accessibility`);
+    
+    const participationScore = Math.min(100, Statistics.mean(participationScores) || 0);
 
     // Accountability scoring
     const accountabilityFactors = [];
-    let accountabilityScore = 0;
+    const accountabilityScores = [];
     
     if (processData.documentation.availability === 'complete') {
-      accountabilityScore += 40;
+      accountabilityScores.push(40);
       accountabilityFactors.push('Complete process documentation');
     }
     
     if (processData.participation.feedbackProvided) {
-      accountabilityScore += 30;
+      accountabilityScores.push(30);
       accountabilityFactors.push('Feedback accountability');
     }
     
     if (processData.publicNotice.provided) {
-      accountabilityScore += 30;
+      accountabilityScores.push(30);
       accountabilityFactors.push('Public notice accountability');
     }
+    
+    const accountabilityScore = Math.min(100, Statistics.mean(accountabilityScores) || 0);
 
     return {
-      accessibility: { score: Math.min(100, accessibilityScore), factors: accessibilityFactors },
-      completeness: { score: Math.min(100, completenessScore), factors: completenessFactors },
-      timeliness: { score: Math.min(100, timelinessScore), factors: timelinessFactors },
-      participation: { score: Math.min(100, participationScore), factors: participationFactors },
-      accountability: { score: Math.min(100, accountabilityScore), factors: accountabilityFactors },
+      accessibility: { score: Math.round(accessibilityScore), factors: accessibilityFactors },
+      completeness: { score: Math.round(completenessScore), factors: completenessFactors },
+      timeliness: { score: Math.round(timelinessScore), factors: timelinessFactors },
+      participation: { score: Math.round(participationScore), factors: participationFactors },
+      accountability: { score: Math.round(accountabilityScore), factors: accountabilityFactors },
     };
-  }
-
-  private calculateOverallScore(dimensions: any): number {
-    let weightedScore = 0;
-    
-    for (const [dimension, weight] of Object.entries(this.DIMENSION_WEIGHTS)) {
-      weightedScore += dimensions[dimension].score * weight;
-    }
-    
-    return Math.round(weightedScore);
   }
 
   private calculateGrade(score: number): 'F' | 'D' | 'C' | 'B' | 'A' {
@@ -599,151 +590,112 @@ export class TransparencyScorer {
   private generateRecommendations(input: TransparencyInput, dimensions: any) {
     const recommendations = [];
     
-    // Generate recommendations based on weak dimensions
     for (const [dimension, data] of Object.entries(dimensions)) {
       const typedData = data as { score: number; factors: string[] };
       if (typedData.score < 60) {
-        const recs = this.getDimensionRecommendations(dimension, input.entityType, typedData.score);
-        recommendations.push(...recs);
+        const rec = this.getDimensionRecommendation(dimension, input.entityType, typedData.score);
+        if (rec) recommendations.push(rec);
       }
     }
     
     // Sort by priority
     return recommendations.sort((a, b) => {
       const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-      return priorityOrder[b.priority as keyof typeof priorityOrder] - priorityOrder[a.priority as keyof typeof priorityOrder];
+      return priorityOrder[b.priority as keyof typeof priorityOrder] - 
+             priorityOrder[a.priority as keyof typeof priorityOrder];
     });
   }
 
-  private getDimensionRecommendations(dimension: string, entityType: string, score: number) {
-    const recommendations = [];
+  private getDimensionRecommendation(dimension: string, entityType: string, score: number) {
     const priority = score < 30 ? 'critical' : score < 50 ? 'high' : 'medium';
     
-    switch (dimension) {
-      case 'accessibility':
-        recommendations.push({
-          priority: priority as 'low' | 'medium' | 'high' | 'critical',
-          action: 'Improve public access to information and documentation',
-          expectedImprovement: 25,
-          implementationDifficulty: 'moderate' as const,
-        });
-        break;
-        
-      case 'completeness':
-        recommendations.push({
-          priority: priority as 'low' | 'medium' | 'high' | 'critical',
-          action: 'Provide more comprehensive information and documentation',
-          expectedImprovement: 30,
-          implementationDifficulty: 'moderate' as const,
-        });
-        break;
-        
-      case 'timeliness':
-        recommendations.push({
-          priority: priority as 'low' | 'medium' | 'high' | 'critical',
-          action: 'Improve timing of information disclosure and public notice',
-          expectedImprovement: 20,
-          implementationDifficulty: 'easy' as const,
-        });
-        break;
-        
-      case 'participation':
-        recommendations.push({
-          priority: priority as 'low' | 'medium' | 'high' | 'critical',
-          action: 'Enhance public participation mechanisms and opportunities',
-          expectedImprovement: 35,
-          implementationDifficulty: 'moderate' as const,
-        });
-        break;
-        
-      case 'accountability':
-        recommendations.push({
-          priority: priority as 'low' | 'medium' | 'high' | 'critical',
-          action: 'Strengthen accountability and oversight mechanisms',
-          expectedImprovement: 40,
-          implementationDifficulty: 'hard' as const,
-        });
-        break;
-    }
+    const recommendations: Record<string, any> = {
+      accessibility: {
+        action: 'Improve public access to information and documentation',
+        expectedImprovement: 25,
+        implementationDifficulty: 'moderate' as const,
+      },
+      completeness: {
+        action: 'Provide more comprehensive information and documentation',
+        expectedImprovement: 30,
+        implementationDifficulty: 'moderate' as const,
+      },
+      timeliness: {
+        action: 'Improve timing of information disclosure and public notice',
+        expectedImprovement: 20,
+        implementationDifficulty: 'easy' as const,
+      },
+      participation: {
+        action: 'Enhance public participation mechanisms and opportunities',
+        expectedImprovement: 35,
+        implementationDifficulty: 'moderate' as const,
+      },
+      accountability: {
+        action: 'Strengthen accountability and oversight mechanisms',
+        expectedImprovement: 40,
+        implementationDifficulty: 'hard' as const,
+      },
+    };
     
-    return recommendations;
+    const rec = recommendations[dimension];
+    return rec ? { priority: priority as any, ...rec } : null;
   }
 
   private performBenchmarking(input: TransparencyInput, score: number) {
-    // Simplified benchmarking - in practice, this would use historical data
-    const averageScores = {
-      bill: 55,
-      sponsor: 45,
-      process: 50,
-      institution: 60,
-    };
-    
-    const averageScore = averageScores[input.entityType] || 50;
+    const averageScore = this.BENCHMARK_AVERAGES[input.entityType] || 50;
     const percentile = Math.min(100, Math.max(0, (score / 100) * 100));
     
     return {
       peerComparison: {
         percentile,
         averageScore,
-        bestPracticeGap: Math.max(0, 90 - score), // Assume 90 is best practice
+        bestPracticeGap: Math.max(0, 90 - score),
       },
       historicalTrend: {
-        direction: score > averageScore ? 'improving' : score < averageScore ? 'declining' : 'stable' as const,
+        direction: (score > averageScore ? 'improving' : 
+                  score < averageScore ? 'declining' : 'stable') as 'improving' | 'stable' | 'declining',
         changeRate: ((score - averageScore) / averageScore) * 100,
       },
     };
   }
 
   private calculateConfidence(input: TransparencyInput, dimensions: any): number {
-    let confidence = 0.7; // Base confidence
+    let confidence = 0.7;
     
-    // Increase confidence with more complete data
-    const dataCompleteness = this.assessDataCompleteness(input);
-    confidence += dataCompleteness * 0.2;
+    // Check data completeness
+    const hasData = input.entityType === 'bill' && input.assessmentData.billData ||
+                   input.entityType === 'sponsor' && input.assessmentData.sponsorData ||
+                   input.entityType === 'process' && input.assessmentData.processData;
     
-    // Increase confidence with consistent dimension scores
+    if (hasData) confidence += 0.1;
+    
+    // Check consistency of dimension scores
     const scores = Object.values(dimensions).map((d: any) => d.score);
-    const variance = this.calculateVariance(scores);
-    const consistencyBonus = Math.max(0, (1 - variance / 1000) * 0.1);
+    const variance = Statistics.variance(scores);
+    const consistencyBonus = Math.max(0, (1 - variance / 1000) * 0.2);
     confidence += consistencyBonus;
     
     return Math.min(1.0, confidence);
   }
 
-  private assessDataCompleteness(input: TransparencyInput): number {
-    // Simple heuristic for data completeness
-    const { assessmentData } = input;
-    let completeness = 0;
-    
-    if (input.entityType === 'bill' && assessmentData.billData) {
-      completeness = 1.0; // Assume complete if provided
-    } else if (input.entityType === 'sponsor' && assessmentData.sponsorData) {
-      completeness = 1.0;
-    } else if (input.entityType === 'process' && assessmentData.processData) {
-      completeness = 1.0;
-    }
-    
-    return completeness;
-  }
-
-  private calculateVariance(numbers: number[]): number {
-    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
-    const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
-    return squaredDiffs.reduce((sum, diff) => sum + diff, 0) / numbers.length;
+  private generateCacheKey(input: TransparencyInput): string {
+    return `${input.entityType}-${input.entityId}-${input.contextualFactors.urgencyLevel}`;
   }
 
   getModelInfo() {
     return {
       name: 'Transparency Scorer',
       version: this.modelVersion,
-      description: 'Assesses transparency levels across multiple dimensions',
+      description: 'Multi-dimensional transparency assessment and scoring',
       capabilities: [
-        'Multi-dimensional transparency scoring',
+        'Multi-dimensional scoring (5 dimensions)',
         'Entity-specific assessment (bills, sponsors, processes)',
         'Benchmarking and comparison',
-        'Actionable recommendations',
-        'Grade assignment',
-        'Trend analysis'
+        'Actionable recommendations with priority',
+        'Grade assignment (A-F)',
+        'Trend analysis',
+        'Performance optimization with caching',
+        'Statistical analysis with variance checking'
       ]
     };
   }

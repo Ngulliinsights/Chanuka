@@ -1,9 +1,10 @@
-import { Router } from "express";
-import { z } from "zod";
-import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api';
-import { notificationService } from "./notification-service";
 import { authenticateToken as requireAuth } from '@server/middleware/auth';
 import { logger } from '@shared/core';
+import { ApiResponseWrapper,ApiSuccess, ApiValidationError } from '@shared/core/utils/api';
+import { Router } from "express";
+import { z } from "zod";
+
+import { notificationService } from "./notification-service";
 
 export const router: Router = Router();
 

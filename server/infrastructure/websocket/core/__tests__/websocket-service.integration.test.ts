@@ -6,22 +6,23 @@
  * error handling across component boundaries.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi, Mock } from 'vitest';
-import { WebSocketServer } from 'ws';
 import { Server } from 'http';
-import { WebSocketService, WebSocketServiceOptions } from '../websocket-service';
+import { afterEach, beforeEach, describe, expect, it, Mock,vi } from 'vitest';
+import { WebSocketServer } from 'ws';
+
 import { RuntimeConfig } from '../../config/runtime-config';
 import type {
-  IConnectionManager,
-  IMessageHandler,
-  IMemoryManager,
-  IStatisticsCollector,
-  IHealthChecker,
   AuthenticatedWebSocket,
-  WebSocketMessage,
-  HealthStatus,
   ConnectionStats,
+  HealthStatus,
+  IConnectionManager,
+  IHealthChecker,
+  IMemoryManager,
+  IMessageHandler,
+  IStatisticsCollector,
+  WebSocketMessage,
 } from '../../types';
+import { WebSocketService, WebSocketServiceOptions } from '../websocket-service';
 
 // Mock implementations for testing
 class MockConnectionManager implements IConnectionManager {

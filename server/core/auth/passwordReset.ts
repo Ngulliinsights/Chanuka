@@ -1,13 +1,14 @@
 // services/passwordReset.ts
+import { sendTemplatedEmail } from '@server/infrastructure/notifications/email-service.js';
+import { ValidationError } from '@shared/core/observability/error-management/errors/specialized-errors.js';
 import { database as db } from '@shared/database';
 // Import specific tables and functions needed from the consolidated schema
 import { users } from '@shared/schema';
-import { ValidationError } from '@shared/core/observability/error-management/errors/specialized-errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { and, eq, gt } from 'drizzle-orm';
+
 import { config } from '../../../config.d';
-import { sendTemplatedEmail } from '@server/infrastructure/notifications/email-service.js';
 
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;

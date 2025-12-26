@@ -1,10 +1,10 @@
-import { databaseService } from '@server/infrastructure/database/database-service';
-import { db } from '@shared/schema';
-import { comments, comment_votes } from '@shared/schema';
-import { eq, and, sql, desc } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache/cache-service';
+import { databaseService } from '@server/infrastructure/database/database-service';
 import { CACHE_KEYS } from '@shared/core/index';
 import { CACHE_TTL_SHORT } from '@shared/core/primitives';
+import { db } from '@shared/schema';
+import { comment_votes,comments } from '@shared/schema';
+import { and, desc,eq, sql } from 'drizzle-orm';
 
 export interface VoteResult {
   success: boolean;

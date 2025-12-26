@@ -1,10 +1,11 @@
 // Migration wrapper for server middleware
 // Provides gradual migration from legacy middleware to modern middleware
 
-import { authenticateToken, requireRole } from './auth';
-import { createRateLimit, apiRateLimit, authRateLimit, searchRateLimit, legacySponsorRateLimit, legacyPasswordResetRateLimit, legacyRegistrationRateLimit } from './rate-limiter';
 // import { createMiddlewareMigrationAdapter   } from '@shared/core';
 import { logger   } from '@shared/core';
+
+import { authenticateToken, requireRole } from './auth';
+import { apiRateLimit, authRateLimit, createRateLimit, legacyPasswordResetRateLimit, legacyRegistrationRateLimit,legacySponsorRateLimit, searchRateLimit } from './rate-limiter';
 
 // Legacy middleware factory interface
 interface LegacyMiddlewareFactory {

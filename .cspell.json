@@ -33,6 +33,7 @@
     "Mbps",
     "longtask",
     "exceedance",
+    "exfiltration",
     "upvotes",
     "downvotes",
     "requestfailed",
@@ -40,6 +41,22 @@
     "playwright",
     "Deduplicator",
     "deduplicator",
-    "unsub"
+    "unsub",
+    "STOPWORDS",
+    "stopwords",
+    "Stopwords",
+    "TFIDF",
+    "ngrams",
+    "Jaccard",
+    "jaccard",
+    "betweenness",
+    "Brandes",
+    "Betweenness",
+    "coeff",
+    "treemap",
+    "Deoptimization",
+    "onwarn",
+    "nosniff",
+    "untracking"
   ]
 }

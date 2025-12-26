@@ -5,9 +5,10 @@
  * for search system components during deployment validation failures.
  */
 
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
-import { searchPerformanceMonitor } from '@shared/monitoring/search-performance-monitor.js';
 import { logger  } from '@shared/core';
+import { searchPerformanceMonitor } from '@shared/monitoring/search-performance-monitor.js';
+
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 
 export interface RollbackPlan {
   component: string;

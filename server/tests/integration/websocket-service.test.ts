@@ -6,24 +6,23 @@
  */
 
 import { createServer, type Server } from 'http';
-
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import WebSocket from 'ws';
 
 import { RuntimeConfig } from '../../infrastructure/websocket/config/runtime-config.js';
 import { WebSocketService, type WebSocketServiceOptions } from '../../infrastructure/websocket/core/websocket-service.js';
 import type {
-  IConnectionManager,
-  IMessageHandler,
-  IMemoryManager,
-  IStatisticsCollector,
-  IHealthChecker,
   AuthenticatedWebSocket,
-  WebSocketMessage,
   ConnectionStats,
   HealthStatus,
-  MemoryPressureData,
+  IConnectionManager,
+  IHealthChecker,
+  IMemoryManager,
+  IMessageHandler,
+  IStatisticsCollector,
   MemoryLeakData,
+  MemoryPressureData,
+  WebSocketMessage,
 } from '../../infrastructure/websocket/types.js';
 
 

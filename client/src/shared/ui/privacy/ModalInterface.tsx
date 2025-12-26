@@ -3,8 +3,6 @@
  * Modal wrapper for dashboard integration
  */
 
-import React from 'react';
-
 import { PrivacySettings } from '@client/types/auth';
 
 import {

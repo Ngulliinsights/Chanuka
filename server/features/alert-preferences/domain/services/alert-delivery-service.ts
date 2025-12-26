@@ -1,5 +1,5 @@
-import { AlertPreference } from '../entities/alert-preference';
 import { AlertDeliveryLog } from '../entities/alert-delivery-log';
+import { AlertPreference } from '../entities/alert-preference';
 import { AlertType } from '../value-objects/alert-type';
 import { Priority } from '../value-objects/priority';
 import { SmartFilteringService } from './smart-filtering-service';

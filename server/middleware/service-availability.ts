@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
 import { logger } from '@shared/core';
+import { NextFunction,Request, Response } from 'express';
 
 interface ServiceStatus {
   isHealthy: boolean;

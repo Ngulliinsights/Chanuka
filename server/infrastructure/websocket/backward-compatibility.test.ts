@@ -5,11 +5,11 @@
  * and behavior as the original monolithic service.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Server } from 'http';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import WebSocket from 'ws';
 
-import { createWebSocketService, BackwardCompatibleWebSocketService } from './index';
+import { BackwardCompatibleWebSocketService,createWebSocketService } from './index';
 
 // Mock WebSocket for testing
 vi.mock('ws', () => ({

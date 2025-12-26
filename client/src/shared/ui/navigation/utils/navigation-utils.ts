@@ -3,18 +3,42 @@ import { InvalidNavigationPathError } from '@client/core/error';
 import { validateNavigationPath } from '@client/validation';
 
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
-import type { NavigationItem, UserRole } from '../types';
+import type { NavigationItem as SharedNavigationItem, UserRole as SharedUserRole } from '../types';
+import type { NavigationItem, UserRole } from '@client/types/navigation';
+
+// Type conversion helpers
+function convertNavigationItem(item: NavigationItem): SharedNavigationItem {
+  return {
+    ...item,
+    icon: typeof item.icon === 'string' ? (() => null) as any : item.icon as any,
+  };
+}
+
+function convertUserRole(role: SharedUserRole): UserRole {
+  // Map shared roles to navigation roles
+  const roleMap: Record<SharedUserRole, UserRole> = {
+    'public': 'public',
+    'citizen': 'citizen',
+    'expert': 'expert',
+    'admin': 'admin',
+    'journalist': 'journalist',
+    'advocate': 'advocate',
+    'official': 'citizen', // Map official to citizen for compatibility
+    'moderator': 'admin', // Map moderator to admin for compatibility
+  };
+  return roleMap[role] || 'public';
+}
 
 /**
  * Finds a navigation item by its path
  */
-export const findNavigationItemByPath = (path: string): NavigationItem | null => {
+export const findNavigationItemByPath = (path: string): SharedNavigationItem | null => {
   try {
     // Validate the path format
     validateNavigationPath(path);
 
     const item = DEFAULT_NAVIGATION_MAP.find(item => item.href === path);
-    return item || null;
+    return item ? convertNavigationItem(item) : null;
   } catch (error) {
     // For validation errors, return null (invalid path)
     if (error instanceof InvalidNavigationPathError) {
@@ -28,49 +52,52 @@ export const findNavigationItemByPath = (path: string): NavigationItem | null =>
 /**
  * Finds a navigation item by its ID
  */
-export const findNavigationItemById = (id: string): NavigationItem | null => {
+export const findNavigationItemById = (id: string): SharedNavigationItem | null => {
   if (!id || typeof id !== 'string') {
     return null;
   }
 
-  return DEFAULT_NAVIGATION_MAP.find(item => item.id === id) || null;
+  const item = DEFAULT_NAVIGATION_MAP.find(item => item.id === id);
+  return item ? convertNavigationItem(item) : null;
 };
 
 /**
  * Gets all navigation items for a specific section
  */
-export const getNavigationItemsBySection = (section: NavigationItem['section']): NavigationItem[] => {
+export const getNavigationItemsBySection = (section: NavigationItem['section']): SharedNavigationItem[] => {
   if (!section) {
     return [];
   }
 
-  return DEFAULT_NAVIGATION_MAP.filter(item => item.section === section);
+  return DEFAULT_NAVIGATION_MAP.filter(item => item.section === section).map(convertNavigationItem);
 };
 
 /**
  * Gets navigation items accessible to a specific user role
  */
 export const getAccessibleNavigationItems = (
-  user_role: UserRole,
+  user_role: SharedUserRole,
   user: unknown | null
-): NavigationItem[] => {
+): SharedNavigationItem[] => {
   if (!user_role) {
     return [];
   }
 
+  const convertedRole = convertUserRole(user_role);
+
   return DEFAULT_NAVIGATION_MAP.filter(item => {
     try {
-      if (item.adminOnly && user_role !== 'admin') return false;
+      if (item.adminOnly && convertedRole !== 'admin') return false;
       if (item.requiresAuth && !user) return false;
-      if (item.allowedRoles && !item.allowedRoles.includes(user_role)) return false;
-      if (item.condition && !item.condition(user_role, user)) return false;
+      if (item.allowedRoles && !item.allowedRoles.includes(convertedRole)) return false;
+      if (item.condition && !item.condition(convertedRole, user)) return false;
       return true;
     } catch (error) {
       // If there's an error in condition evaluation for this item, exclude it
       console.warn(`Error evaluating navigation item condition for ${item.id}:`, error);
       return false;
     }
-  });
+  }).map(convertNavigationItem);
 };
 
 /**

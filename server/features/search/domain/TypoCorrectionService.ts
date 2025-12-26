@@ -134,7 +134,7 @@ export class TypoCorrectionService {
 
     const words = query.toLowerCase().split(/\s+/);
     const corrections: CorrectionResult['corrections'] = [];
-    let correctedWords = [...words];
+    const correctedWords = [...words];
     let totalConfidence = 0;
     let correctionCount = 0;
 

@@ -5,13 +5,14 @@
 // and existing error response format
 
 import Boom from '@hapi/boom';
-import { Result, ok, err } from 'neverthrow';
 import { logger  } from '@shared/core';
+import { err,ok, Result } from 'neverthrow';
+
 import { 
   ErrorCategory, 
-  ErrorSeverity, 
   ErrorContext, 
   ErrorResponse,
+  ErrorSeverity, 
   StandardizedError 
 } from './error-standardization.js';
 

@@ -1,9 +1,28 @@
 import type { UserRole, RelatedPage } from '@client/types';
+import type { UserRole as SharedUserRole } from '../types';
 
 // Remove unused import
 import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@client/validation';
 
 import { findNavigationItemByPath } from './navigation-utils';
+
+// Type conversion helper
+function convertUserRoleArray(roles: SharedUserRole[] | undefined): UserRole[] | undefined {
+  if (!roles) return undefined;
+  
+  const roleMap: Record<SharedUserRole, UserRole> = {
+    'public': 'public',
+    'citizen': 'citizen',
+    'expert': 'expert',
+    'admin': 'admin',
+    'journalist': 'journalist',
+    'advocate': 'advocate',
+    'official': 'citizen', // Map official to citizen for compatibility
+    'moderator': 'admin', // Map moderator to admin for compatibility
+  };
+  
+  return roles.map(role => roleMap[role] || 'public');
+}
 
 // Define page relationships based on the configuration
 const PAGE_RELATIONSHIPS: Record<string, Record<string, { type: 'parent' | 'child' | 'sibling' | 'related'; weight: number; context: string }>> = {
@@ -122,7 +141,7 @@ export const getPageRelationships = (
           type: rel.type as 'parent' | 'child' | 'sibling' | 'related',
           weight: rel.weight,
           context: rel.context,
-          relevanceScore: calculateRelevanceScore(rel, user_role, preferences, user, navItem?.allowedRoles)
+          relevanceScore: calculateRelevanceScore(rel, user_role, preferences, user, convertUserRoleArray(navItem?.allowedRoles))
         };
 
         // Validate the created related page

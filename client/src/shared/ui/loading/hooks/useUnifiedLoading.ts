@@ -139,8 +139,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
         error : 
         new LoadingOperationFailedError(
           operationData.id || 'unknown',
-          error instanceof Error ? error.message : 'Unknown error',
-          0
+          error instanceof Error ? error.message : 'Unknown error'
         );
       
       options.onError?.(loadingError);
@@ -183,7 +182,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
         
         const loadingError = error instanceof LoadingError ? 
           error : 
-          new LoadingOperationFailedError(operationId, error.message, operation.retryCount);
+          new LoadingOperationFailedError(operationId, error.message);
         
         options.onError?.(loadingError);
       }

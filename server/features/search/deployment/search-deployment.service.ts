@@ -5,11 +5,12 @@
  * detailed A/B testing framework, performance monitoring, and rollback capabilities.
  */
 
-import { abTestingService } from '@/infrastructure/migration/ab-testing.service.js';
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
-import { dashboardService } from '@/infrastructure/migration/dashboard.service.js';
 import { searchService } from '@shared/application/search-service.js';
 import { logger  } from '@shared/core';
+
+import { abTestingService } from '@/infrastructure/migration/ab-testing.service.js';
+import { dashboardService } from '@/infrastructure/migration/dashboard.service.js';
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 
 export interface SearchDeploymentConfig {
   component: string;
@@ -397,7 +398,7 @@ export class SearchDeploymentService {
     const measurements: number[] = [];
     let errorCount = 0;
     let totalQueries = 0;
-    let relevanceScores: number[] = [];
+    const relevanceScores: number[] = [];
 
     logger.info(`📊 Measuring ${component} performance (${context})`);
 

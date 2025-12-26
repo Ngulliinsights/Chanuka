@@ -1,9 +1,10 @@
-import { readDatabase } from '@shared/database';
-import * as schema from '@/shared/schema';
-import { eq } from 'drizzle-orm';
-import { logger  } from '@shared/core';
 // Assuming ML service exists and is properly typed
-import { MLAnalysisService, MLStakeholderResult, MLBeneficiaryResult } from '@server/features/analysis/infrastructure/adapters/ml-service-adapter.ts'; // Adjust path and types
+import { MLAnalysisService, MLBeneficiaryResult,MLStakeholderResult } from '@server/features/analysis/infrastructure/adapters/ml-service-adapter.ts'; // Adjust path and types
+import { logger  } from '@shared/core';
+import { readDatabase } from '@shared/database';
+import { eq } from 'drizzle-orm';
+
+import * as schema from '@/shared/schema';
 
 // --- Interface Definitions ---
 export interface StakeholderGroup {

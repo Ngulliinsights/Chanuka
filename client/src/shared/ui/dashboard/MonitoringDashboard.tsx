@@ -1,7 +1,13 @@
-import { Activity, AlertTriangle, CheckCircle, Database, Server, TrendingUp, TrendingDown, Clock, Users, AlertCircle, RefreshCw } from 'lucide-react';
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp,
+  Clock,
+  AlertCircle,
+  RefreshCw,
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
-
-import { logger } from '@client/utils/logger';
 
 import { Alert, AlertDescription, AlertTitle } from '../../design-system';
 import { Badge } from '../../design-system';
@@ -61,12 +67,39 @@ interface SystemMetrics {
   };
 }
 
+interface PerformanceData {
+  responseTime: number;
+  throughput: number;
+  latency: number;
+}
+
+interface ErrorData {
+  recent: Array<{
+    id: string;
+    message: string;
+    timestamp: Date;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+  }>;
+  patterns: Array<{
+    pattern: string;
+    count: number;
+    lastOccurrence: Date;
+  }>;
+}
+
+interface DatabaseData {
+  status: 'connected' | 'disconnected' | 'degraded';
+  version: string;
+  size: number;
+  backupStatus: 'current' | 'stale' | 'failed';
+}
+
 interface DashboardData {
   health: SystemHealth;
   metrics: SystemMetrics;
-  performance: any;
-  errors: any;
-  database: any;
+  performance: PerformanceData;
+  errors: ErrorData;
+  database: DatabaseData;
 }
 
 export function MonitoringDashboard() {
@@ -148,7 +181,7 @@ export function MonitoringDashboard() {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     if (bytes === 0) return '0 Bytes';
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i];
   };
 
   if (loading) {
@@ -182,16 +215,10 @@ export function MonitoringDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">System Monitoring</h1>
-          <p className="text-muted-foreground">
-            Real-time system health and performance metrics
-          </p>
+          <p className="text-muted-foreground">Real-time system health and performance metrics</p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setAutoRefresh(!autoRefresh)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}>
             <RefreshCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
             Auto Refresh: {autoRefresh ? 'On' : 'Off'}
           </Button>
@@ -211,13 +238,9 @@ export function MonitoringDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <Badge className={getStatusColor(health.status)}>
-                {health.status.toUpperCase()}
-              </Badge>
+              <Badge className={getStatusColor(health.status)}>{health.status.toUpperCase()}</Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Score: {health.score}/100
-            </p>
+            <p className="text-xs text-muted-foreground">Score: {health.score}/100</p>
             <Progress value={health.score} className="mt-2" />
           </CardContent>
         </Card>
@@ -229,9 +252,7 @@ export function MonitoringDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatUptime(metrics.uptime)}</div>
-            <p className="text-xs text-muted-foreground">
-              Since last restart
-            </p>
+            <p className="text-xs text-muted-foreground">Since last restart</p>
           </CardContent>
         </Card>
 
@@ -266,9 +287,7 @@ export function MonitoringDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Health Checks</CardTitle>
-          <CardDescription>
-            Detailed system component health status
-          </CardDescription>
+          <CardDescription>Detailed system component health status</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -392,7 +411,9 @@ export function MonitoringDashboard() {
                 </div>
                 <div className="flex justify-between">
                   <span>Average Query Time</span>
-                  <span className="font-mono">{metrics.database.queryStats.averageQueryTime.toFixed(0)}ms</span>
+                  <span className="font-mono">
+                    {metrics.database.queryStats.averageQueryTime.toFixed(0)}ms
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Slow Queries</span>
@@ -400,7 +421,9 @@ export function MonitoringDashboard() {
                 </div>
                 <div className="flex justify-between">
                   <span>Error Rate</span>
-                  <span className="font-mono">{metrics.database.queryStats.errorRate.toFixed(2)}%</span>
+                  <span className="font-mono">
+                    {metrics.database.queryStats.errorRate.toFixed(2)}%
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -488,4 +511,3 @@ export function MonitoringDashboard() {
     </div>
   );
 }
-

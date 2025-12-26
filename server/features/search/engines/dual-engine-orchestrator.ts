@@ -5,9 +5,10 @@
 // Implements intelligent query classification, failover, and result fusion
 
 import { PostgreSQLFullTextEngine } from '@server/features/search/engines/core/postgresql-fulltext.engine';
-import { semanticSearchEngine, SearchOptions, SearchResponse } from './semantic-search-engine';
-import { searchSyntaxParser, ParsedQuery } from '@server/features/search/utils/search-syntax-parser.ts';
+import { ParsedQuery,searchSyntaxParser } from '@server/features/search/utils/search-syntax-parser.ts';
 import { logger } from '@shared/core';
+
+import { SearchOptions, SearchResponse,semanticSearchEngine } from './semantic-search-engine';
 
 export interface EngineResult {
   engine: 'postgresql' | 'semantic';
@@ -152,7 +153,7 @@ export class DualEngineOrchestrator {
     expectedConfidence: number;
   } {
     // Default balanced approach
-    let strategy = {
+    const strategy = {
       usePostgreSQL: true,
       useSemantic: true,
       priorityEngine: 'balanced' as const,

@@ -1,7 +1,7 @@
+import { logger   } from '@shared/core';
 import { readDatabase } from '@shared/database';
 import { user_profiles } from '@shared/schema';
 import { eq } from 'drizzle-orm';
-import { logger   } from '@shared/core';
 
 // --- Interface Definitions ---
 // Defines the structure of GLOBAL bill tracking preferences stored within users.preferences.

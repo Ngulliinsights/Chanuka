@@ -4,13 +4,14 @@
 // Performs vector similarity search using cosine similarity with hybrid ranking
 // Combines semantic search with traditional search for optimal results
 
+import { logger } from '@shared/core';
 import { database } from '@shared/database';
 import { bills, sponsors } from '@shared/schema';
 import { comments } from '@shared/schema';
-import { content_embeddings, search_queries, SearchQuery, QueryType } from '@shared/schema/search_system';
+import { content_embeddings, QueryType,search_queries, SearchQuery } from '@shared/schema/search_system';
+import { desc,eq, or, sql } from 'drizzle-orm';
+
 import { embeddingService } from './embedding-service';
-import { eq, or, sql, desc } from 'drizzle-orm';
-import { logger } from '@shared/core';
 
 export interface SearchOptions {
   limit?: number;

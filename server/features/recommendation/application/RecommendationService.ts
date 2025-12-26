@@ -1,17 +1,17 @@
-import { and, desc, eq, inArray, or, sql, SQL } from 'drizzle-orm';
-import {
-  bill_engagement,
-  bills,
-  bill_tags,
-  user_interests,
-  type Bill,
-} from '@shared/schema';
-import { readDatabase } from '@shared/database';
 import { logger   } from '@shared/core';
+import { readDatabase } from '@shared/database';
 import { RecommendationEngine } from '@shared/domain/RecommendationEngine';
 import { RecommendationValidator } from '@shared/domain/RecommendationValidator';
-import { RecommendationRepository } from '@shared/infrastructure/RecommendationRepository';
 import { RecommendationCache } from '@shared/infrastructure/RecommendationCache';
+import { RecommendationRepository } from '@shared/infrastructure/RecommendationRepository';
+import {
+  type Bill,
+  bill_engagement,
+  bill_tags,
+  bills,
+  user_interests,
+} from '@shared/schema';
+import { and, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';
 
 /**
  * Recommendation Service

@@ -1,12 +1,13 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { MemoryManager } from '../memory-manager';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { BASE_CONFIG } from '../../config/base-config';
 import type { 
   ILeakDetectorHandler, 
   IProgressiveDegradation,
   MemoryLeakData,
   MemoryPressureData 
 } from '../../types';
-import { BASE_CONFIG } from '../../config/base-config';
+import { MemoryManager } from '../memory-manager';
 
 describe('MemoryManager', () => {
   let memoryManager: MemoryManager;

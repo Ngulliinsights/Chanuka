@@ -1,18 +1,17 @@
 // Disclosure Processing Service
 // Handles core data retrieval, enrichment, and basic processing operations
 
-import {
-  sponsors, sponsorTransparency, sponsorAffiliations
-} from "@shared/foundation";
-import { eq, desc, and, sql, count } from "drizzle-orm";
-import { readDatabase } from '@shared/database';
-import { cache, logger, NotFoundError, DatabaseError  } from '@shared/core';
-import { FinancialDisclosureConfig } from '@shared/config';
 import type {
   FinancialDisclosure,
-  SponsorInfo,
-  SponsorAffiliation
-} from '@server/types/index.js';
+  SponsorAffiliation,
+  SponsorInfo} from '@server/types/index.js';
+import { FinancialDisclosureConfig } from '@shared/config';
+import { cache, DatabaseError,logger, NotFoundError  } from '@shared/core';
+import { readDatabase } from '@shared/database';
+import {
+sponsorAffiliations,
+  sponsors, sponsorTransparency} from "@shared/foundation";
+import { and, count,desc, eq, sql } from "drizzle-orm";
 
 /**
  * Disclosure Processing Service

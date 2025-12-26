@@ -1,4 +1,4 @@
-import { BillStatus, EngagementType, BillVoteType } from '@shared/schema';
+import { BillStatus, BillVoteType,EngagementType } from '@shared/schema';
 
 /**
  * Base domain event class

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Search, AlertCircle, AlertTriangle, Info, Settings, ArrowLeft } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';

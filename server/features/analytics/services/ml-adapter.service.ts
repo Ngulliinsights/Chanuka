@@ -5,15 +5,15 @@
  * Provides seamless migration with A/B testing capabilities
  */
 
-import { logger  } from '@shared/core';
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import { MLAnalysisService } from '@server/features/analytics/services/ml.service.ts';
 import { RealMLAnalysisService } from '@server/features/analytics/services/real-ml.service.ts';
+import { logger  } from '@shared/core';
 import type {
     AnalysisResult,
-    ImplementationWorkaroundDetection,
-    ComprehensiveAnalysisResult
-} from '@shared/types/ml.js';
+    ComprehensiveAnalysisResult,
+    ImplementationWorkaroundDetection} from '@shared/types/ml.js';
+
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 
 export class MLServiceAdapter {
     private static instance: MLServiceAdapter;
