@@ -1,12 +1,12 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, Clock, MapPin, ArrowRight, MenuIcon as Menu } from 'lucide-react';
+import { ChevronDown, ChevronRight, Clock, MapPin, ArrowRight, Menu } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { cn } from '@client/lib/utils';
 
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../dropdown-menu';
 import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 
 // Types for progressive disclosure navigation
@@ -56,8 +56,6 @@ const ComplexityIndicator: React.FC<{ complexity: 1 | 2 | 3; className?: string 
   </div>
 );
 
-function 1(
-
 // Reading time indicator component
 const ReadingTimeIndicator: React.FC<{ minutes: number; className?: string }> = ({ 
   minutes, 
@@ -68,8 +66,6 @@ const ReadingTimeIndicator: React.FC<{ minutes: number; className?: string }> = 
     <span>{minutes} min read</span>
   </div>
 );
-
-function 1(
 
 // Context navigation helper component
 const ContextNavigationHelper: React.FC<{
@@ -108,13 +104,9 @@ const ContextNavigationHelper: React.FC<{
           disabled={!prevSection}
           className="flex items-center gap-2"
         >
-          <ChevronRight className="w-3 h-3 rotate-180" />
+          <ArrowRight className="w-3 h-3 rotate-180" />
           Previous
         </Button>
-        
-        <span className="text-sm text-gray-600">
-          {currentIndex + 1} of {sections.length}
-        </span>
         
         <Button
           variant="outline"
@@ -124,247 +116,15 @@ const ContextNavigationHelper: React.FC<{
           className="flex items-center gap-2"
         >
           Next
-          <ChevronRight className="w-3 h-3" />
+          <ArrowRight className="w-3 h-3" />
         </Button>
       </div>
     </div>
   );
-);
-
-function 1(
 };
 
-// Mobile tab selector dropdown
-const MobileTabSelector: React.FC<{
-  sections: NavigationSection[];
-  currentSectionId?: string;
-  onSectionChange?: (sectionId: string) => void;
-}> = ({ sections, currentSectionId, onSectionChange }) => {
-  const currentSection = sections.find(s => s.id === currentSectionId);
-
-  return (
-    <div className="md:hidden mb-4">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-full justify-between">
-            <div className="flex items-center gap-2">
-              <Menu className="w-4 h-4" />
-              <span>{currentSection?.title || 'Select Section'}</span>
-            </div>
-            <ChevronDown className="w-4 h-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-full">
-          {sections.map((section) => (
-            <DropdownMenuItem
-              key={section.id}
-              onClick={() => onSectionChange?.(section.id)}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center gap-2">
-                <span>{section.title}</span>
-                {section.isRequired && (
-                  <span className="text-xs bg-yellow-100 text-yellow-800 px-1 rounded">
-                    Required
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <ComplexityIndicator complexity={section.complexity} />
-                <ReadingTimeIndicator minutes={section.estimatedReadTime} />
-              </div>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-);
-
-function 1(
-};
-
-// Reading path guidance component
-const ReadingPathGuidance: React.FC<{
-  readingPaths: ReadingPath[];
-  sections: NavigationSection[];
-  onPathSelect?: (path: ReadingPath) => void;
-}> = ({ readingPaths, sections, onPathSelect }) => {
-  const [selectedPath, setSelectedPath] = useState<ReadingPath | null>(null);
-
-  return (
-    <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
-      <h3 className="font-medium text-foreground mb-3 flex items-center gap-2">
-        <ArrowRight className="w-4 h-4 text-primary" />
-        Recommended Reading Paths
-      </h3>
-      
-      <div className="space-y-3">
-        {readingPaths.map((path) => (
-          <div
-            key={path.id}
-            className={cn(
-              "p-3 rounded-md border cursor-pointer transition-colors",
-              selectedPath?.id === path.id
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
-            )}
-            onClick={() => {
-              setSelectedPath(path);
-              onPathSelect?.(path);
-            }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium text-sm">{path.title}</h4>
-              <ReadingTimeIndicator minutes={path.estimatedTotalTime} />
-            </div>
-            <p className="text-sm text-gray-600 mb-2">{path.description}</p>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span>{path.sections.length} sections</span>
-              <span>•</span>
-              <span>Step-by-step guidance</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-);
-
-function 1(
-};
-
-// Progress tracking component
-const ProgressTracker: React.FC<{
-  sections: NavigationSection[];
-  currentSectionId?: string;
-  completedSections: string[];
-  onProgressUpdate?: (completedSections: string[]) => void;
-}> = ({ sections, currentSectionId, completedSections, onProgressUpdate }) => {
-  const totalSections = sections.length;
-  const completedCount = completedSections.length;
-  const progressPercentage = (completedCount / totalSections) * 100;
-
-  const currentIndex = sections.findIndex(s => s.id === currentSectionId);
-  const readingProgress = currentIndex >= 0 ? ((currentIndex + 1) / totalSections) * 100 : 0;
-
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-medium text-gray-900">Reading Progress</h3>
-        <span className="text-sm text-gray-600">
-          {completedCount} of {totalSections} completed
-        </span>
-      </div>
-      
-      <div className="space-y-3">
-        <div>
-          <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-gray-600">Overall Progress</span>
-            <span className="font-medium">{Math.round(progressPercentage)}%</span>
-          </div>
-          <Progress value={progressPercentage} className="h-2" />
-        </div>
-        
-        <div>
-          <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-gray-600">Current Reading</span>
-            <span className="font-medium">{Math.round(readingProgress)}%</span>
-          </div>
-          <Progress value={readingProgress} className="h-2" />
-        </div>
-      </div>
-    </div>
-  );
-);
-
-function 1(
-};
-
-// Collapsible section component
-const CollapsibleSection: React.FC<{
-  section: NavigationSection;
-  isOpen: boolean;
-  onToggle: () => void;
-  isActive: boolean;
-  onSectionClick: (sectionId: string) => void;
-}> = ({ section, isOpen, onToggle, isActive, onSectionClick }) => {
-  return (
-    <div className="border border-gray-200 rounded-lg mb-2 overflow-hidden">
-      <Collapsible open={isOpen} onOpenChange={onToggle}>
-        <CollapsibleTrigger asChild>
-          <div
-            className={cn(
-              "w-full p-4 flex items-center justify-between cursor-pointer transition-colors",
-              isActive 
-                ? "bg-primary/10 border-l-4 border-l-primary" 
-                : "hover:bg-muted/50"
-            )}
-            onClick={() => onSectionClick(section.id)}
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                {isOpen ? (
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
-                )}
-              </div>
-              
-              <div>
-                <h3 className={cn(
-                  "font-medium",
-                  isActive ? "text-primary" : "text-foreground"
-                )}>
-                  {section.title}
-                  {section.isRequired && (
-                    <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-1 rounded">
-                      Required
-                    </span>
-                  )}
-                </h3>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <ComplexityIndicator complexity={section.complexity} />
-              <ReadingTimeIndicator minutes={section.estimatedReadTime} />
-            </div>
-          </div>
-        </CollapsibleTrigger>
-        
-        <CollapsibleContent>
-          {section.content && (
-            <div className="p-4 pt-0 border-t border-gray-100">
-              {section.content}
-            </div>
-          )}
-          
-          {section.subsections && section.subsections.length > 0 && (
-            <div className="pl-8 pb-4">
-              {section.subsections.map((subsection) => (
-                <CollapsibleSection
-                  key={subsection.id}
-                  section={subsection}
-                  isOpen={false}
-                  onToggle={() => {}}
-                  isActive={false}
-                  onSectionClick={onSectionClick}
-                />
-              ))}
-            </div>
-          )}
-        </CollapsibleContent>
-      </Collapsible>
-    </div>
-  );
-);
-
-function 1(
-};
-
-// Main Progressive Disclosure Navigation component
-export const ProgressiveDisclosureNavigation = React.memo(<ProgressiveDisclosureNavigationProps> = ({
+// Main progressive disclosure navigation component
+export const ProgressiveDisclosureNavigation = React.memo<ProgressiveDisclosureNavigationProps>(({
   sections,
   readingPaths = [],
   currentSectionId,
@@ -376,7 +136,7 @@ export const ProgressiveDisclosureNavigation = React.memo(<ProgressiveDisclosure
   const [selectedReadingPath, setSelectedReadingPath] = useState<ReadingPath | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-open current section
+  // Auto-expand current section
   useEffect(() => {
     if (currentSectionId) {
       setOpenSections(prev => {
@@ -402,7 +162,7 @@ export const ProgressiveDisclosureNavigation = React.memo(<ProgressiveDisclosure
   const handleSectionClick = useCallback((sectionId: string) => {
     onSectionChange?.(sectionId);
     
-    // Mark section as completed when visited
+    // Mark as completed if not already
     if (!completedSections.includes(sectionId)) {
       setCompletedSections(prev => [...prev, sectionId]);
     }
@@ -410,63 +170,132 @@ export const ProgressiveDisclosureNavigation = React.memo(<ProgressiveDisclosure
 
   const handlePathSelect = useCallback((path: ReadingPath) => {
     setSelectedReadingPath(path);
-    // Auto-navigate to first section in path
+    
+    // Navigate to first section in path
     if (path.sections.length > 0) {
       onSectionChange?.(path.sections[0]);
     }
   }, [onSectionChange]);
 
-  return (
-    <div ref={containerRef} className={cn("space-y-6", className)}>
-      {/* Mobile tab selector */}
-      <MobileTabSelector
-        sections={sections}
-        currentSectionId={currentSectionId}
-        onSectionChange={onSectionChange}
-      />
+  const renderSection = (section: NavigationSection, level = 0) => {
+    const isOpen = openSections.has(section.id);
+    const isCurrent = currentSectionId === section.id;
+    const isCompleted = completedSections.includes(section.id);
 
-      {/* Reading path guidance */}
+    return (
+      <div key={section.id} className={cn("border-l-2 border-transparent", level > 0 && "ml-4")}>
+        <Collapsible open={isOpen} onOpenChange={() => toggleSection(section.id)}>
+          <div className={cn(
+            "flex items-center gap-2 p-2 rounded-lg transition-colors cursor-pointer",
+            isCurrent && "bg-primary/10 border-l-primary",
+            isCompleted && "text-green-600"
+          )}>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-0 h-auto">
+                {section.subsections && section.subsections.length > 0 ? (
+                  isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            
+            <div 
+              className="flex-1 flex items-center justify-between cursor-pointer"
+              onClick={() => handleSectionClick(section.id)}
+            >
+              <div className="flex items-center gap-3">
+                <span className={cn(
+                  "font-medium",
+                  isCurrent && "text-primary",
+                  isCompleted && "line-through"
+                )}>
+                  {section.title}
+                </span>
+                {section.isRequired && (
+                  <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                    Required
+                  </span>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <ComplexityIndicator complexity={section.complexity} />
+                <ReadingTimeIndicator minutes={section.estimatedReadTime} />
+              </div>
+            </div>
+          </div>
+
+          {section.subsections && (
+            <CollapsibleContent className="ml-6 mt-2">
+              {section.subsections.map(subsection => renderSection(subsection, level + 1))}
+            </CollapsibleContent>
+          )}
+        </Collapsible>
+      </div>
+    );
+  };
+
+  return (
+    <div ref={containerRef} className={cn("space-y-4", className)}>
+      {/* Reading paths selector */}
       {readingPaths.length > 0 && (
-        <ReadingPathGuidance
-          readingPaths={readingPaths}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-3">Choose Your Reading Path</h3>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full justify-between">
+                {selectedReadingPath ? selectedReadingPath.title : "Select a reading path"}
+                <Menu className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-full">
+              {readingPaths.map(path => (
+                <DropdownMenuItem
+                  key={path.id}
+                  onClick={() => handlePathSelect(path)}
+                  className="flex flex-col items-start p-3"
+                >
+                  <div className="font-medium">{path.title}</div>
+                  <div className="text-sm text-muted-foreground">{path.description}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {path.estimatedTotalTime} min total
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+
+      {/* Context helper */}
+      {currentSectionId && (
+        <ContextNavigationHelper
           sections={sections}
-          onPathSelect={handlePathSelect}
+          currentSectionId={currentSectionId}
+          onSectionChange={onSectionChange}
         />
       )}
 
-      {/* Progress tracking */}
-      <ProgressTracker
-        sections={sections}
-        currentSectionId={currentSectionId}
-        completedSections={completedSections}
-        onProgressUpdate={setCompletedSections}
-      />
+      {/* Progress indicator */}
+      {sections.length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+            <span>Progress</span>
+            <span>{completedSections.length} of {sections.length} completed</span>
+          </div>
+          <Progress value={(completedSections.length / sections.length) * 100} className="h-2" />
+        </div>
+      )}
 
-      {/* Context navigation helper */}
-      <ContextNavigationHelper
-        sections={sections}
-        currentSectionId={currentSectionId}
-        onSectionChange={onSectionChange}
-      />
-
-      {/* Collapsible sections */}
+      {/* Navigation sections */}
       <div className="space-y-2">
-        {sections.map((section) => (
-          <CollapsibleSection
-            key={section.id}
-            section={section}
-            isOpen={openSections.has(section.id)}
-            onToggle={() => toggleSection(section.id)}
-            isActive={currentSectionId === section.id}
-            onSectionClick={handleSectionClick}
-          />
-        ))}
+        {sections.map(section => renderSection(section))}
       </div>
     </div>
   );
-);
+});
 
-function 1(
-};
+ProgressiveDisclosureNavigation.displayName = 'ProgressiveDisclosureNavigation';
 
 export default ProgressiveDisclosureNavigation;

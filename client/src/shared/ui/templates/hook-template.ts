@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useErrorHandler } from '../utils/error-handling';
+import { useUIErrorHandler } from '../utils/error-handling';
 
 // ============================================================================
 // Types

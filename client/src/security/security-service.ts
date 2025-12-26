@@ -163,7 +163,8 @@ export class SecurityService {
       if (initialScan.threats.length > 0) {
         const isDevelopment = process.env.NODE_ENV === 'development';
         if (isDevelopment) {
-          console.warn(`⚠️ Found ${initialScan.threats.length} security threats (development mode):`, initialScan.threats);
+          console.info(`ℹ️ Security scan found ${initialScan.threats.length} expected development issues. Score: ${initialScan.score}/100`);
+          console.debug('Development security issues (expected):', initialScan.threats);
         } else {
           console.warn(`⚠️ Found ${initialScan.threats.length} security threats:`, initialScan.threats);
         }

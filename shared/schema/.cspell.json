@@ -22,7 +22,15 @@
     "vote_type",
     "comment_votes",
     "engagement_score",
-    "trendingScore"
+    "trendingScore",
+    "inclusivity",
+    "pastoralists",
+    "luhya",
+    "kalenjin",
+    "kamba",
+    "crowdsourced",
+    "decidendi",
+    "pgvector"
   ],
   "ignoreWords": [
     "USSD",

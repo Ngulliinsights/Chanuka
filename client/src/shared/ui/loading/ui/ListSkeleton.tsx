@@ -13,7 +13,7 @@ interface ListSkeletonProps {
   showActions?: boolean;
 }
 
-export const ListSkeleton = React.memo(<ListSkeletonProps> = ({
+export const ListSkeleton = React.memo<ListSkeletonProps>(({
   className,
   itemCount = 5,
   showAvatar = false,
@@ -53,10 +53,7 @@ export const ListSkeleton = React.memo(<ListSkeletonProps> = ({
       ))}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 export default ListSkeleton;
 

@@ -77,11 +77,24 @@ export {
 } from "./citizen_participation";
 
 // ============================================================================
+// PARTICIPATION OVERSIGHT SCHEMA
+// ============================================================================
+export {
+  participation_quality_audits,
+  participationQualityAuditsRelations,
+  AUDIT_SCORING_WEIGHTS,
+  RED_FLAG_SEVERITY
+} from "./participation_oversight";
+
+// ============================================================================
 // SCHEMA OBJECT - For backward compatibility
 // ============================================================================
 import { users as usersTable, user_profiles as userProfilesTable, sponsors as sponsorsTable, committees as committeesTable, committee_members as committeeMembersTable, parliamentary_sessions as parliamentarySessionsTable, parliamentary_sittings as parliamentarySittingsTable, bills as billsTable, oauth_providers as oauthProvidersTable, oauth_tokens as oauthTokensTable, user_sessions as userSessionsTable } from "./foundation";
 import { user_interests as userInterestsTable, bill_engagement as billEngagementTable, comments as commentsTable } from "./citizen_participation";
+import { participation_quality_audits as participationQualityAuditsTable } from "./participation_oversight";
 import { analysis as analysisTable } from "./analysis";
+import { trojan_bill_analysis as trojanBillAnalysisTable, hidden_provisions as hiddenProvisionsTable, trojan_techniques as trojanTechniquesTable, detection_signals as detectionSignalsTable } from "./trojan_bill_detection";
+import { political_appointments as politicalAppointmentsTable, infrastructure_tenders as infrastructureTendersTable, ethnic_advantage_scores as ethnicAdvantageScoresTable, strategic_infrastructure_projects as strategicInfrastructureProjectsTable } from "./political_economy";
 
 export const schema = {
   users: usersTable,
@@ -98,8 +111,17 @@ export const schema = {
   user_interests: userInterestsTable,
   bill_engagement: billEngagementTable,
   comments: commentsTable,
-  analysis: analysisTable
-};
+  participation_quality_audits: participationQualityAuditsTable,
+  analysis: analysisTable,
+  trojan_bill_analysis: trojanBillAnalysisTable,
+  hidden_provisions: hiddenProvisionsTable,
+  trojan_techniques: trojanTechniquesTable,
+  detection_signals: detectionSignalsTable,
+  political_appointments: politicalAppointmentsTable,
+  infrastructure_tenders: infrastructureTendersTable,
+  ethnic_advantage_scores: ethnicAdvantageScoresTable,
+  strategic_infrastructure_projects: strategicInfrastructureProjectsTable
+  };
 
 // ============================================================================
 // CITIZEN PARTICIPATION SCHEMA (Table Aliases)
@@ -149,11 +171,21 @@ export {
   legal_precedents,
   expert_review_queue,
   analysis_audit_trail,
+  constitutional_vulnerabilities,
+  underutilized_provisions,
+  elite_literacy_assessment,
+  constitutional_loopholes,
+  elite_knowledge_scores,
   constitutionalProvisionsRelations,
   constitutionalAnalysesRelations,
   legalPrecedentsRelations,
   expertReviewQueueRelations,
-  analysisAuditTrailRelations
+  analysisAuditTrailRelations,
+  constitutionalVulnerabilitiesRelations,
+  underutilizedProvisionsRelations,
+  eliteLiteracyAssessmentRelations,
+  constitutionalLoopholesRelations,
+  eliteKnowledgeScoresRelations
 } from "./constitutional_intelligence";
 
 // ============================================================================
@@ -371,6 +403,34 @@ export {
 export { analysis } from "./analysis";
 
 // ============================================================================
+// TROJAN BILL DETECTION SCHEMA
+// ============================================================================
+export {
+  trojan_bill_analysis,
+  hidden_provisions,
+  trojan_techniques,
+  detection_signals,
+  trojanBillAnalysisRelations,
+  hiddenProvisionsRelations,
+  trojanTechniquesRelations,
+  detectionSignalsRelations
+} from "./trojan_bill_detection";
+
+// ============================================================================
+// POLITICAL ECONOMY SCHEMA
+// ============================================================================
+export {
+  political_appointments,
+  infrastructure_tenders,
+  ethnic_advantage_scores,
+  strategic_infrastructure_projects,
+  politicalAppointmentsRelations,
+  infrastructureTendersRelations,
+  ethnicAdvantageScoresRelations,
+  strategicInfrastructureProjectsRelations
+} from "./political_economy";
+
+// ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 
@@ -520,6 +580,87 @@ export type {
   EngagementAnalytics,
   NewEngagementAnalytics
 } from "./real_time_engagement";
+
+// Political Economy types
+export type {
+  PoliticalAppointment,
+  NewPoliticalAppointment,
+  InfrastructureTender,
+  NewInfrastructureTender,
+  EthnicAdvantageScore,
+  NewEthnicAdvantageScore,
+  StrategicInfrastructureProject,
+  NewStrategicInfrastructureProject
+} from "./political_economy";
+
+// Trojan Bill Detection types
+export type {
+  TrojanBillAnalysis,
+  NewTrojanBillAnalysis,
+  HiddenProvision,
+  NewHiddenProvision,
+  TrojanTechnique,
+  NewTrojanTechnique,
+  DetectionSignal,
+  NewDetectionSignal
+} from "./trojan_bill_detection";
+
+// Constitutional Intelligence types
+export type {
+  ConstitutionalProvision,
+  NewConstitutionalProvision,
+  ConstitutionalAnalysis,
+  NewConstitutionalAnalysis,
+  LegalPrecedent,
+  NewLegalPrecedent,
+  ExpertReviewQueue,
+  NewExpertReviewQueue,
+  AnalysisAuditTrail,
+  NewAnalysisAuditTrail,
+  ConstitutionalVulnerability,
+  NewConstitutionalVulnerability,
+  UnderutilizedProvision,
+  NewUnderutilizedProvision,
+  EliteLiteracyAssessment,
+  NewEliteLiteracyAssessment,
+  ConstitutionalLoophole,
+  NewConstitutionalLoophole,
+  EliteKnowledgeScore,
+  NewEliteKnowledgeScore
+} from "./constitutional_intelligence";
+
+// Citizen Participation types
+export type {
+  UserInterest,
+  NewUserInterest,
+  Session,
+  NewSession,
+  Comment,
+  NewComment,
+  CommentVote,
+  NewCommentVote,
+  BillVote,
+  NewBillVote,
+  BillEngagement,
+  NewBillEngagement,
+  BillTrackingPreference,
+  NewBillTrackingPreference,
+  Notification,
+  NewNotification,
+  AlertPreference,
+  NewAlertPreference,
+  UserContactMethod,
+  NewUserContactMethod
+} from "./citizen_participation";
+
+// Participation Oversight types
+export type {
+  ParticipationQualityAudit,
+  NewParticipationQualityAudit,
+  AuditWithRedFlags,
+  AuditSummary,
+  ComplianceStatus
+} from "./participation_oversight";
 
 // Architecture Component type for planning interface
 export interface ArchitectureComponent {

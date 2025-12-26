@@ -25,7 +25,8 @@ declare module 'lucide-react' {
   /**
    * Heart icon - love/favorite representation
    */
-  export const Heart: FC<IconProps>;
+  export const Home: FC<IconProps>;
+  export const Menu: FC<IconProps>;
 
   /**
    * Lightning icon - power/energy representation

@@ -1,4 +1,4 @@
-import React from 'react';
+// Remove unused React import
 import { ProgressiveDisclosureNavigation } from './ProgressiveDisclosureNavigation';
 
 import type { NavigationSection, ReadingPath } from '@client/core/navigation/hooks/useProgressiveDisclosure';

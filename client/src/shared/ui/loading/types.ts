@@ -4,9 +4,10 @@
 
 // Basic loading types
 export type LoadingSize = 'sm' | 'md' | 'lg';
-export type LoadingType = 'page' | 'component' | 'asset' | 'data' | 'network';
+export type LoadingType = 'page' | 'component' | 'asset' | 'data' | 'network' | 'inline' | 'progressive' | 'network-aware' | 'timeout-aware';
 export type LoadingPriority = 'low' | 'medium' | 'high';
 export type LoadingState = 'loading' | 'success' | 'error' | 'timeout' | 'offline';
+export type LoadingPhase = 'initial' | 'loading' | 'complete' | 'error';
 
 // Core loading operation interface
 export interface LoadingOperation {
@@ -18,6 +19,10 @@ export interface LoadingOperation {
   retryCount: number;
   maxRetries: number;
   error?: string;
+  message?: string;
+  progress?: number;
+  stage?: string;
+  connectionAware?: boolean;
 }
 
 // Loading configuration

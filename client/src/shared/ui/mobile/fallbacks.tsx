@@ -7,8 +7,6 @@
 
 import React from 'react';
 
-import type { MobileTab, ChartData } from './constants';
-
 // Re-export hooks from separate files
 export { useBottomSheet } from './hooks/useBottomSheet';
 export { useInfiniteScroll } from './hooks/useInfiniteScroll';

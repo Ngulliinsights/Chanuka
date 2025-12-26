@@ -55,7 +55,7 @@ export type {
   LoadingStats,
   LoadingConfig,
   UseLoadingResult,
-  LoadingIndicatorProps,
+  LoadingIndicator,
 } from '../shared/ui/loading';
 
 // Navigation types

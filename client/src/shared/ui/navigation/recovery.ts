@@ -113,7 +113,7 @@ export function getRecoveryStrategies(error: NavigationError): RecoveryStrategy[
  */
 export async function executeAutomaticRecovery(
   error: NavigationError,
-  context?: NavigationRecoveryContext
+  _context?: NavigationRecoveryContext
 ): Promise<boolean> {
   const strategies = getRecoveryStrategies(error);
   const automaticStrategies = strategies.filter(s => s.automatic);

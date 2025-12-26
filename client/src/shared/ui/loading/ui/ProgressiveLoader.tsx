@@ -8,7 +8,7 @@ import { ProgressiveLoaderProps } from '../types';
 import { cn } from '../../../design-system/lib/utils';
 import { LoadingIndicator } from './LoadingIndicator';
 
-export const ProgressiveLoader = React.memo(<ProgressiveLoaderProps> = ({
+export const ProgressiveLoader = React.memo<ProgressiveLoaderProps>(({
   stages,
   currentStage,
   className,
@@ -58,7 +58,7 @@ export const ProgressiveLoader = React.memo(<ProgressiveLoaderProps> = ({
 
       {/* Stage list */}
       <div className="w-full max-w-md space-y-2">
-        {stages.map((stage, index) => {
+        {stages.map((stage: any, index: number) => {
           const isCompleted = index < currentStage;
           const isCurrent = index === currentStage;
           const isPending = index > currentStage;
@@ -133,9 +133,6 @@ export const ProgressiveLoader = React.memo(<ProgressiveLoaderProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 export default ProgressiveLoader;

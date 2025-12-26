@@ -10,7 +10,7 @@ interface AvatarSkeletonProps {
   shape?: 'circle' | 'square' | 'rounded';
 }
 
-export const AvatarSkeleton = React.memo(<AvatarSkeletonProps> = ({
+export const AvatarSkeleton = React.memo<AvatarSkeletonProps>(({
   className,
   size = 'md',
   shape = 'circle',
@@ -50,10 +50,7 @@ export const AvatarSkeleton = React.memo(<AvatarSkeletonProps> = ({
       aria-hidden="true"
     />
   );
-);
-
-function 1(
-};
+});
 
 export default AvatarSkeleton;
 

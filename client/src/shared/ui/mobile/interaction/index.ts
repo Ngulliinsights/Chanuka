@@ -13,7 +13,7 @@ export { SwipeGestures } from './SwipeGestures';
 export type { SwipeDirection, SwipeGestureData } from './SwipeGestures';
 
 // Scroll interaction components
-export { InfiniteScroll, useInfiniteScroll } from './InfiniteScroll';
+export { InfiniteScroll } from './InfiniteScroll';
 
 // Modal interaction components
 export { MobileBottomSheet } from './MobileBottomSheet';

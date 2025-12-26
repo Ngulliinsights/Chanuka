@@ -35,7 +35,7 @@ interface DashboardGridProps {
 /**
  * Dashboard Grid Component
  */
-export const DashboardGrid = React.memo(<DashboardGridProps> = ({
+export const DashboardGrid = React.memo<DashboardGridProps>(({
   columns = 3,
   rowHeight = 120,
   gap = 24,
@@ -228,9 +228,6 @@ export const DashboardGrid = React.memo(<DashboardGridProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 DashboardGrid.displayName = 'DashboardGrid';

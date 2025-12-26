@@ -23,7 +23,7 @@ interface StatsOverviewProps {
   className?: string;
 }
 
-export const StatsOverview = React.memo(<StatsOverviewProps> = ({ stats, className }) => {
+export const StatsOverview = React.memo<StatsOverviewProps>(({ stats, className }) => {
   // Define the four key metrics we want to display in cards
   const statItems = [
     {
@@ -105,9 +105,6 @@ export const StatsOverview = React.memo(<StatsOverviewProps> = ({ stats, classNa
       </div>
     </div>
   );
-);
-
-function 1(
-};
+});
 
 export default StatsOverview;

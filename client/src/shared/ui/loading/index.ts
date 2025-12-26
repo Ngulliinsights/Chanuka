@@ -14,6 +14,11 @@ export type {
   LoadingPriority,
   LoadingStats,
   LoadingProgress,
+  LoadingPhase,
+  ConnectionType,
+  LoadingStage,
+  LoadingStateProps,
+  UseLoadingResult,
 } from './types';
 
 // Export core hooks only
@@ -59,6 +64,27 @@ export {
   MAX_RETRIES,
   DEFAULT_LOADING_CONFIG,
 } from './constants';
+
+// Export global loading components
+export {
+  GlobalLoadingIndicator,
+  MinimalGlobalLoadingIndicator,
+  type GlobalLoadingIndicatorProps,
+  type MinimalLoadingIndicatorProps,
+  type LoadingIndicatorPosition,
+  type LoadingIndicatorConfig,
+} from './GlobalLoadingIndicator';
+
+export {
+  GlobalLoadingProvider,
+  useGlobalLoading,
+} from './GlobalLoadingProvider';
+
+export {
+  useGlobalLoadingIndicator,
+  type UseGlobalLoadingIndicatorReturn,
+  type ShowLoadingOptions,
+} from './hooks/useGlobalLoadingIndicator';
 
 
 

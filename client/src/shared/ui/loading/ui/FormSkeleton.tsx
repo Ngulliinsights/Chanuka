@@ -12,7 +12,7 @@ interface FormSkeletonProps {
   buttonCount?: number;
 }
 
-export const FormSkeleton = React.memo(<FormSkeletonProps> = ({
+export const FormSkeleton = React.memo<FormSkeletonProps>(({
   className,
   fieldCount = 4,
   showLabels = true,
@@ -49,10 +49,7 @@ export const FormSkeleton = React.memo(<FormSkeletonProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 export default FormSkeleton;
 

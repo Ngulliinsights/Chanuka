@@ -1,210 +1,159 @@
+import React from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useErrorBoundary } from 'react-error-boundary';
+
 /**
- * Example Usage of Unified Error Boundary Components
- *
- * Demonstrates how to use the consolidated error boundary components
- * with different display modes and recovery strategies.
+ * Example error components demonstrating error boundary usage
  */
 
-import React from 'react';
-
-import { ErrorBoundary, ErrorFallback, RecoveryUI, withErrorBoundary, useErrorBoundary, ErrorFallbackProps } from './index';
-
-// Example 1: Basic Error Boundary with default settings
-export const BasicErrorBoundaryExample = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <ErrorBoundary>
-      {children}
-    </ErrorBoundary>
-  );
-);
-
-function 1(
-};
-
-// Example 2: Error Boundary with inline display mode
-export const InlineErrorBoundaryExample = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <ErrorBoundary
-      displayMode="inline"
-      fallbackVariant="user-friendly"
-      recoveryVariant="buttons"
-      enableRecovery={true}
-      enableReporting={true}
-      context="example-component"
-      onError={(error, errorInfo) => {
-        console.log('Error caught:', error, errorInfo);
-      }}
-      onRecovery={(error, strategy) => {
-        console.log('Recovery attempted:', strategy, error);
-      }}
+// Example 1: Simple error fallback component
+const SimpleErrorFallback = React.memo<{ error: Error; resetErrorBoundary: () => void }>(({ 
+  error, 
+  resetErrorBoundary 
+}) => (
+  <div className="error-fallback p-4 border border-red-300 rounded bg-red-50">
+    <h2 className="text-red-800 font-semibold">Something went wrong</h2>
+    <p className="text-red-600 mt-2">{error.message}</p>
+    <button 
+      onClick={resetErrorBoundary}
+      className="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
     >
-      {children}
-    </ErrorBoundary>
-  );
-);
+      Try again
+    </button>
+  </div>
+));
 
-function 1(
-};
+SimpleErrorFallback.displayName = 'SimpleErrorFallback';
 
-// Example 3: Error Boundary with page-level error display
-export const PageErrorBoundaryExample = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <ErrorBoundary
-      displayMode="page"
-      fallbackVariant="detailed"
-      recoveryVariant="modal"
-      maxRetries={2}
-      context="page-level"
-    >
-      {children}
-    </ErrorBoundary>
-  );
-);
+// Example 2: Detailed error fallback with stack trace
+const DetailedErrorFallback = React.memo<{ error: Error; resetErrorBoundary: () => void }>(({ 
+  error, 
+  resetErrorBoundary 
+}) => (
+  <div className="error-fallback p-6 border border-red-300 rounded bg-red-50 max-w-2xl">
+    <h2 className="text-red-800 font-semibold text-lg">Application Error</h2>
+    <p className="text-red-600 mt-2">{error.message}</p>
+    {process.env.NODE_ENV === 'development' && error.stack && (
+      <details className="mt-4">
+        <summary className="cursor-pointer text-red-700 font-medium">Stack Trace</summary>
+        <pre className="mt-2 text-xs bg-red-100 p-3 rounded overflow-auto">
+          {error.stack}
+        </pre>
+      </details>
+    )}
+    <div className="mt-4 flex gap-2">
+      <button 
+        onClick={resetErrorBoundary}
+        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+      >
+        Try again
+      </button>
+      <button 
+        onClick={() => window.location.reload()}
+        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+      >
+        Reload page
+      </button>
+    </div>
+  </div>
+));
 
-function 1(
-};
+DetailedErrorFallback.displayName = 'DetailedErrorFallback';
 
-// Example 4: Using withErrorBoundary HOC
-export const WrappedComponentExample = withErrorBoundary(
-  ({ title }: { title: string }) => {
-    // This component might throw an error
-    if (title === 'error') {
-      throw new Error('Example error from wrapped component');
-    }
-    return <div>{title}</div>;
-  },
-  {
-    displayMode: 'overlay',
-    fallbackVariant: 'technical',
-    context: 'wrapped-component',
+// Example 3: Component that might throw an error
+const ProblematicComponent = React.memo<{ shouldThrow?: boolean }>(({ shouldThrow = false }) => {
+  if (shouldThrow) {
+    throw new Error('This is a test error from ProblematicComponent');
   }
-);
+  
+  return (
+    <div className="p-4 bg-green-50 border border-green-300 rounded">
+      <p className="text-green-800">Component rendered successfully!</p>
+    </div>
+  );
+});
 
-function 1(
+ProblematicComponent.displayName = 'ProblematicComponent';
 
-// Example 5: Using useErrorBoundary hook in functional component
-export const HookExample = React.memo( = () => {
-  const { error, hasError, retry, reportError, resetError } = useErrorBoundary();
+// Example 4: Using ErrorBoundary with custom fallback
+export const ErrorBoundaryExample = React.memo(() => {
+  const [shouldThrow, setShouldThrow] = React.useState(false);
 
-  const throwError = () => {
-    throw new Error('Error from hook example');
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <button 
+          onClick={() => setShouldThrow(!shouldThrow)}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          {shouldThrow ? 'Fix Component' : 'Break Component'}
+        </button>
+      </div>
+      
+      <ErrorBoundary
+        FallbackComponent={SimpleErrorFallback}
+        onError={(error, errorInfo) => {
+          console.error('Error caught by boundary:', error, errorInfo);
+        }}
+        onReset={() => setShouldThrow(false)}
+      >
+        <ProblematicComponent shouldThrow={shouldThrow} />
+      </ErrorBoundary>
+    </div>
+  );
+});
+
+ErrorBoundaryExample.displayName = 'ErrorBoundaryExample';
+
+// Example 5: Using useErrorBoundary hook
+export const ErrorBoundaryHookExample = React.memo(() => {
+  const { showBoundary } = useErrorBoundary();
+
+  const handleError = () => {
+    try {
+      throw new Error('Error triggered by useErrorBoundary hook');
+    } catch (error) {
+      showBoundary(error);
+    }
   };
 
-  if (hasError) {
-    return (
-      <div>
-        <ErrorFallback
-          error={error!}
-          displayMode="inline"
-          variant="user-friendly"
-          onRetry={retry}
-          onReport={reportError}
-          onDismiss={resetError}
-          isDevelopment={process.env.NODE_ENV === 'development'}
-        />
-        <RecoveryUI
-          error={error!}
-          variant="buttons"
-          onRetry={retry}
-          onRefresh={() => window.location.reload()}
-          onGoHome={() => window.location.href = '/'}
-          onReport={reportError}
-          isRecovering={false}
-          retryCount={0}
-          maxRetries={3}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <button type="button" onClick={throwError}>Throw Error</button>
-    </div>
-  );
-);
-
-function 1(
-};
-
-// Example 6: Custom error fallback
-const CustomErrorFallback: React.FC<ErrorFallbackProps> = ({
-  error,
-  onRetry,
-  onReport,
-  onDismiss
-}) => {
-  return (
-    <div style={{ border: '2px solid red', padding: '1rem', margin: '1rem' }}>
-      <h3>🚨 Custom Error!</h3>
-      <p>{error.message}</p>
-      <div>
-        {onRetry && <button type="button" onClick={onRetry}>Retry</button>}
-        {onReport && <button type="button" onClick={onReport}>Report</button>}
-        {onDismiss && <button type="button" onClick={onDismiss}>Dismiss</button>}
-      </div>
-    </div>
-  );
-);
-
-function 1(
-};
-
-export const CustomFallbackExample = React.memo(<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <ErrorBoundary
-      customFallback={CustomErrorFallback}
-      context="custom-fallback"
-    >
-      {children}
-    </ErrorBoundary>
-  );
-);
-
-function 1(
-};
-
-// Example 7: Error prone component for testing
-export const ErrorProneComponent = React.memo(<{ shouldError?: boolean }> = ({ shouldError = false }) => {
-  if (shouldError) {
-    throw new Error('This is a test error for demonstration purposes');
-  }
-
-  return (
-    <div>
-      <p>This component works normally when shouldError is false.</p>
-      <p>Set shouldError to true to see the error boundary in action.</p>
-    </div>
-  );
-);
-
-function 1(
-};
-
-// Example 8: Complete integration example
-export const CompleteExample = React.memo( = () => {
-  const [shouldError, setShouldError] = React.useState(false);
-
-  return (
-    <div>
-      <h2>Unified Error Boundary Examples</h2>
-
-      <button type="button" onClick={() => setShouldError(!shouldError)}>
-        {shouldError ? 'Fix Error' : 'Trigger Error'}
+    <div className="p-4 bg-blue-50 border border-blue-300 rounded">
+      <p className="text-blue-800 mb-3">This component uses the useErrorBoundary hook</p>
+      <button 
+        onClick={handleError}
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        Trigger Error
       </button>
-
-      <InlineErrorBoundaryExample>
-        <ErrorProneComponent shouldError={shouldError} />
-      </InlineErrorBoundaryExample>
-
-      <hr />
-
-      <PageErrorBoundaryExample>
-        <ErrorProneComponent shouldError={false} />
-      </PageErrorBoundaryExample>
     </div>
   );
-);
+});
 
-function 1(
-};
+ErrorBoundaryHookExample.displayName = 'ErrorBoundaryHookExample';
+
+// Example 6: Complete example with multiple error boundaries
+export const CompleteErrorExample = React.memo(() => (
+  <div className="space-y-6 p-6">
+    <h1 className="text-2xl font-bold">Error Boundary Examples</h1>
+    
+    <section>
+      <h2 className="text-lg font-semibold mb-3">Simple Error Boundary</h2>
+      <ErrorBoundaryExample />
+    </section>
+    
+    <section>
+      <h2 className="text-lg font-semibold mb-3">Hook-based Error Handling</h2>
+      <ErrorBoundary
+        FallbackComponent={DetailedErrorFallback}
+        onError={(error) => console.error('Hook error:', error)}
+      >
+        <ErrorBoundaryHookExample />
+      </ErrorBoundary>
+    </section>
+  </div>
+));
+
+CompleteErrorExample.displayName = 'CompleteErrorExample';
+
+export default CompleteErrorExample;

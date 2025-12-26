@@ -62,7 +62,7 @@
     "types": ["vite/client", "vitest/globals", "node"]
   },
 
-  "include": ["src/**/*", "src/types/shims-shared.d.ts", "src/__tests__/integration/react-initialization.test.tsx"],
+  "include": ["src/**/*", "src/types/shims-shared.d.ts", "src/__tests__/integration/react-initialization.test.tsx", "vite.config.ts", "vite.production.config.ts"],
 
   "exclude": [
     "node_modules",

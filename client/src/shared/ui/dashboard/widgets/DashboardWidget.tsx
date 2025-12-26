@@ -36,7 +36,7 @@ interface DashboardWidgetProps {
 /**
  * Dashboard Widget Component
  */
-export const DashboardWidget = React.memo(<DashboardWidgetProps> = ({
+export const DashboardWidget = React.memo<DashboardWidgetProps>(({
   config,
   data,
   children,
@@ -331,9 +331,6 @@ export const DashboardWidget = React.memo(<DashboardWidgetProps> = ({
       )}
     </Card>
   );
-);
-
-function 1(
-};
+});
 
 DashboardWidget.displayName = 'DashboardWidget';

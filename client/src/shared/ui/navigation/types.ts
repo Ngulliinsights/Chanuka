@@ -1,4 +1,4 @@
-export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
+export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate' | 'official' | 'moderator';
 export type NavigationSection = 'legislative' | 'community' | 'tools' | 'user' | 'admin';
 export interface NavigationItem {
   id: string;

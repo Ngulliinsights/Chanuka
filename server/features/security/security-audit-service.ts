@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { database as db } from '@shared/database';
-import { system_audit_log } from '@shared/schema';
+import { system_audit_log, audit_payloads } from '@shared/schema';
 import { eq, and, gte, lte, desc, sql, count, inArray } from 'drizzle-orm';
 import { logger   } from '@shared/core';
 
@@ -63,9 +63,8 @@ export class SecurityAuditService { /**
    */
   async logSecurityEvent(event: SecurityEvent): Promise<void> {
     try {
-      // Drizzle insert expects required fields to be non-undefined.
-      // Coalesce `result` to a sensible default so the insert signature matches.
-      await db.insert(system_audit_log).values({
+      // Insert into system_audit_log (without action_details which is now in audit_payloads)
+      const auditLogResult = await db.insert(system_audit_log).values({
         event_type: event.event_type,
         event_category: 'security', // Required field based on schema
         actor_type: 'user', // Required field
@@ -76,9 +75,36 @@ export class SecurityAuditService { /**
         target_description: event.resource,
         success: event.success,
         severity: event.severity,
-        action_details: event.details || {},
         session_id: event.session_id,
-       });
+       }).returning({ id: system_audit_log.id });
+
+      const auditLogId = auditLogResult[0].id;
+
+      // Insert payload data into audit_payloads table for vertical partitioning
+      const payloadInserts = [];
+
+      if (event.details && Object.keys(event.details).length > 0) {
+        payloadInserts.push({
+          audit_log_id: auditLogId,
+          payload_type: 'action_details',
+          payload_data: event.details,
+        });
+      }
+
+      // Check for resource_usage in details (backward compatibility)
+      if (event.details?.resource_usage) {
+        payloadInserts.push({
+          audit_log_id: auditLogId,
+          payload_type: 'resource_usage',
+          payload_data: event.details.resource_usage,
+        });
+      }
+
+      // Insert all payloads if any exist
+      if (payloadInserts.length > 0) {
+        await db.insert(audit_payloads).values(payloadInserts);
+      }
+
     } catch (error) {
       // Audit logging failures should be logged but should never crash the application
       // This is critical because if audit logging breaks, we don't want to take down
@@ -223,8 +249,46 @@ export class SecurityAuditService { /**
    */
   async queryAuditLogs(options: AuditQueryOptions): Promise<any[]> {
     try {
-      // Build the base query
-      let query = db.select().from(system_audit_log);
+      // Build the base query with left join to audit_payloads for backward compatibility
+      let query = db.select({
+        // Select all system_audit_log fields
+        id: system_audit_log.id,
+        event_type: system_audit_log.event_type,
+        event_category: system_audit_log.event_category,
+        severity: system_audit_log.severity,
+        actor_type: system_audit_log.actor_type,
+        actor_id: system_audit_log.actor_id,
+        actor_role: system_audit_log.actor_role,
+        actor_identifier: system_audit_log.actor_identifier,
+        action: system_audit_log.action,
+        target_type: system_audit_log.target_type,
+        target_id: system_audit_log.target_id,
+        target_description: system_audit_log.target_description,
+        success: system_audit_log.success,
+        status_code: system_audit_log.status_code,
+        error_message: system_audit_log.error_message,
+        error_stack: system_audit_log.error_stack,
+        source_ip: system_audit_log.source_ip,
+        user_agent: system_audit_log.user_agent,
+        session_id: system_audit_log.session_id,
+        request_id: system_audit_log.request_id,
+        processing_time_ms: system_audit_log.processing_time_ms,
+        retention_period_days: system_audit_log.retention_period_days,
+        created_at: system_audit_log.created_at,
+        // Include payload data from audit_payloads (aggregated as JSON)
+        action_details: sql`COALESCE((
+          SELECT payload_data
+          FROM audit_payloads
+          WHERE audit_log_id = ${system_audit_log.id} AND payload_type = 'action_details'
+          LIMIT 1
+        ), '{}')`.as('action_details'),
+        resource_usage: sql`COALESCE((
+          SELECT payload_data
+          FROM audit_payloads
+          WHERE audit_log_id = ${system_audit_log.id} AND payload_type = 'resource_usage'
+          LIMIT 1
+        ), '{}')`.as('resource_usage'),
+      }).from(system_audit_log);
 
       // Build where clause by chaining conditions inline
       // This avoids TypeScript issues with condition arrays
@@ -267,7 +331,20 @@ export class SecurityAuditService { /**
         query = query.offset(options.offset) as any;
       }
 
-      return await query;
+      const results = await query;
+
+      // Transform the results to include details as a combined object for backward compatibility
+      return results.map((row: any) => ({
+        ...row,
+        details: {
+          ...row.action_details,
+          resource_usage: row.resource_usage,
+        },
+        // Keep individual fields for direct access
+        action_details: row.action_details,
+        resource_usage: row.resource_usage,
+      }));
+
     } catch (error) {
       logger.error('Failed to query audit logs:', { component: 'SecurityAudit' }, error);
       throw new Error('Audit log query failed');

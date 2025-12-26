@@ -40,7 +40,7 @@ interface ProgressBarFillProps {
 }
 
 // Component with inline styles for dynamic progress bar width
-const ProgressBarFill: React.FC<ProgressBarFillProps> = ({ score }) => {
+const ProgressBarFill: React.FC<ProgressBarFillProps> = React.memo(({ score }) => {
   const scorePercentage = Math.min(Math.max(score, 0), 100);
   const bgColor = scorePercentage >= 80 ? '#10b981' : scorePercentage >= 60 ? '#eab308' : '#ef4444';
 
@@ -54,10 +54,7 @@ const ProgressBarFill: React.FC<ProgressBarFillProps> = ({ score }) => {
       }}
     />
   );
-);
-
-function 1(
-};
+});
 
 ProgressBarFill.displayName = 'ProgressBarFill';
 
@@ -166,7 +163,7 @@ export function useShouldBlockBrowser(): boolean {
  * Shows a warning if the compatibility score is below 80.
  * Can be placed near the top of the app to inform users of potential issues.
  */
-export const BrowserCompatibilityWarning = React.memo( = () => {
+export const BrowserCompatibilityWarning = React.memo(() => {
   const status = useBrowserCompatibilityStatus();
 
   if (!status || status.compatibilityScore >= 80) {
@@ -211,10 +208,7 @@ export const BrowserCompatibilityWarning = React.memo( = () => {
       </div>
     </div>
   );
-);
-
-function 1(
-};
+});
 
 BrowserCompatibilityWarning.displayName = 'BrowserCompatibilityWarning';
 
@@ -224,7 +218,7 @@ BrowserCompatibilityWarning.displayName = 'BrowserCompatibilityWarning';
  * Shows browser name, version, features, and recommendations.
  * Useful for debugging or detailed compatibility information.
  */
-export const BrowserCompatibilityDetails = React.memo( = () => {
+export const BrowserCompatibilityDetails = React.memo(() => {
   const status = useBrowserCompatibilityStatus();
 
   if (!status) {
@@ -319,10 +313,7 @@ export const BrowserCompatibilityDetails = React.memo( = () => {
       </div>
     </div>
   );
-);
-
-function 1(
-};
+});
 
 BrowserCompatibilityDetails.displayName = 'BrowserCompatibilityDetails';
 

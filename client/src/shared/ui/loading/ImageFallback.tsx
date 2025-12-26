@@ -1,180 +1,160 @@
-import { AlertCircle, Eye } from 'lucide-react';
-import React, { useState, useCallback } from 'react';
-
+import React, { useState, useCallback, useEffect } from 'react';
+import { Image as ImageIcon, AlertCircle } from 'lucide-react';
 import { cn } from '@client/lib/utils';
 
-export interface ImageFallbackProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'onError' | 'onLoad'> {
+/**
+ * Image fallback props
+ */
+export interface ImageFallbackProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  src: string;
   fallbackSrc?: string;
   placeholder?: React.ReactNode;
-  showError?: boolean;
-  errorMessage?: string;
   retryAttempts?: number;
-  onError?: (error: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  retryDelay?: number;
   onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  onError?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  showErrorState?: boolean;
 }
 
 /**
- * ImageFallback component provides graceful degradation when images fail to load.
- * Features:
- * - Automatic fallback to placeholder or alternative image
- * - Retry mechanism for failed loads
- * - Accessible error states
- * - Progressive enhancement
+ * Image fallback component with retry logic
  */
-export const ImageFallback = React.memo(<ImageFallbackProps> = ({
+export const ImageFallback = React.memo<ImageFallbackProps>(({
   src,
-  alt,
   fallbackSrc,
   placeholder,
-  showError = false,
-  errorMessage = 'Image failed to load',
-  retryAttempts = 1,
-  onError,
+  retryAttempts = 2,
+  retryDelay = 1000,
   onLoad,
+  onError,
+  showErrorState = true,
   className,
+  alt = '',
   ...props
 }) => {
   const [currentSrc, setCurrentSrc] = useState(src);
-  const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleLoad = useCallback((event: React.SyntheticEvent<HTMLImageElement, Event>) => {
     setIsLoading(false);
-    setImageLoaded(true);
     setHasError(false);
     onLoad?.(event);
   }, [onLoad]);
 
   const handleError = useCallback((event: React.SyntheticEvent<HTMLImageElement, Event>) => {
     setIsLoading(false);
+    setHasError(true);
 
-    // Try fallback source first
-    if (!hasError && fallbackSrc && currentSrc !== fallbackSrc) {
+    // Try fallback first
+    if (fallbackSrc && currentSrc !== fallbackSrc) {
       setCurrentSrc(fallbackSrc);
+      setIsLoading(true);
       setHasError(false);
       return;
     }
 
-    // Try retry if available
+    // Retry original source
     if (retryCount < retryAttempts && currentSrc === src) {
       setRetryCount(prev => prev + 1);
-      setCurrentSrc(src + `?retry=${retryCount + 1}`);
-      setHasError(false);
+      setTimeout(() => {
+        setCurrentSrc(`${src}?retry=${retryCount + 1}`);
+        setIsLoading(true);
+        setHasError(false);
+      }, retryDelay);
       return;
     }
 
-    // All attempts failed
-    setHasError(true);
     onError?.(event);
-  }, [hasError, fallbackSrc, currentSrc, retryCount, retryAttempts, src, onError]);
+  }, [hasError, fallbackSrc, currentSrc, retryCount, retryAttempts, src, onError, retryDelay]);
 
-  // Reset state when src changes
-  React.useEffect(() => {
+  // Reset when src changes
+  useEffect(() => {
     if (src !== currentSrc) {
       setCurrentSrc(src);
-      setHasError(false);
       setIsLoading(true);
-      setImageLoaded(false);
+      setHasError(false);
       setRetryCount(0);
     }
   }, [src, currentSrc]);
 
-  // Render error state
-  if (hasError && showError) {
+  // Loading state
+  if (isLoading && !hasError) {
     return (
-      <div
-        className={cn(
-          'flex items-center justify-center bg-muted border-2 border-dashed border-muted-foreground/25 rounded-md',
-          className
+      <div className={cn(
+        'flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded',
+        className
+      )}>
+        {placeholder || (
+          <div className="flex flex-col items-center gap-2 p-4">
+            <ImageIcon className="h-8 w-8 text-gray-400" />
+            <span className="text-sm text-gray-500">Loading...</span>
+          </div>
         )}
-        style={{ width: props.width || '100%', height: props.height || '200px' }}
-        role="img"
-        aria-label={`${errorMessage}: ${alt || 'Image'}`}
-      >
-        <div className="flex flex-col items-center space-y-2 text-muted-foreground">
-          <AlertCircle className="h-8 w-8" />
-          <span className="text-sm text-center px-2">{errorMessage}</span>
-          {alt && <span className="text-xs text-center px-2 opacity-75">{alt}</span>}
+      </div>
+    );
+  }
+
+  // Error state
+  if (hasError && showErrorState) {
+    return (
+      <div className={cn(
+        'flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded',
+        className
+      )}>
+        <div className="flex flex-col items-center gap-2 p-4">
+          <AlertCircle className="h-8 w-8 text-red-500" />
+          <span className="text-sm text-gray-500">Failed to load image</span>
         </div>
       </div>
     );
   }
 
-  // Render placeholder while loading
-  if (isLoading && placeholder && !imageLoaded) {
-    return (
-      <div
-        className={cn('flex items-center justify-center', className)}
-        style={{ width: props.width || '100%', height: props.height || '200px' }}
-        role="img"
-        aria-label={`Loading: ${alt || 'Image'}`}
-      >
-        {placeholder}
-      </div>
-    );
-  }
-
-  // Render default placeholder
-  if (hasError && !showError) {
-    return (
-      <div
-        className={cn(
-          'flex items-center justify-center bg-muted rounded-md',
-          className
-        )}
-        style={{ width: props.width || '100%', height: props.height || '200px' }}
-        role="img"
-        aria-label={`${alt || 'Image'} (unavailable)`}
-      >
-        <Eye className="h-8 w-8 text-muted-foreground" />
-      </div>
-    );
-  }
-
-  // Render actual image
+  // Success state
   return (
     <img
       {...props}
       src={currentSrc}
       alt={alt}
-      className={cn(
-        'transition-opacity duration-300',
-        isLoading ? 'opacity-0' : 'opacity-100',
-        className
-      )}
+      className={cn(className)}
       onLoad={handleLoad}
       onError={handleError}
       style={{
         ...props.style,
-        display: isLoading && !imageLoaded ? 'none' : 'block',
+        display: hasError && !showErrorState ? 'none' : undefined
       }}
     />
   );
-);
+});
 
-function 1(
-};
+ImageFallback.displayName = 'ImageFallback';
 
-// Default placeholder component
-export const ImagePlaceholder = React.memo(<{ className?: string }> = ({ className }) => (
-  <div className={cn('animate-pulse bg-muted rounded-md flex items-center justify-center', className)}>
-    <Eye className="h-8 w-8 text-muted-foreground/50" />
+/**
+ * Simple image placeholder component
+ */
+export const ImagePlaceholder = React.memo<{ className?: string }>(({ className }) => (
+  <div className={cn(
+    'flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded',
+    className
+  )}>
+    <ImageIcon className="h-8 w-8 text-gray-400" />
   </div>
-);
+));
 
-function 1(
+ImagePlaceholder.displayName = 'ImagePlaceholder';
 
-// Specialized image component with built-in loading states
-export const SafeImage = React.memo(<ImageFallbackProps> = (props) => (
+/**
+ * Safe image component with built-in fallbacks
+ */
+export const SafeImage = React.memo<ImageFallbackProps>((props) => (
   <ImageFallback
     {...props}
-    placeholder={<ImagePlaceholder className="w-full h-full" />}
+    placeholder={<ImagePlaceholder className={props.className} />}
+    showErrorState={true}
   />
-);
+));
 
-function 1(
+SafeImage.displayName = 'SafeImage';
 
 export default ImageFallback;
-

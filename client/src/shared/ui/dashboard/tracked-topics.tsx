@@ -11,7 +11,7 @@ import { Input } from '../../design-system';
 import type { DashboardComponentProps, TrackedTopic, TopicCategory } from './types';
 import { validateTrackedTopic } from './validation';
 
-export const TrackedTopics = React.memo(<DashboardComponentProps> = ({ 
+export const TrackedTopics = React.memo<DashboardComponentProps>(({ 
   className = '',
   config,
   onError,
@@ -323,8 +323,5 @@ export const TrackedTopics = React.memo(<DashboardComponentProps> = ({
       </CardContent>
     </Card>
   );
-);
-
-function 1(
-};
+});
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { SkeletonProps } from '../types';
 import { cn } from '../../../design-system/lib/utils';
 
-export const Skeleton = React.memo(<SkeletonProps> = ({
+export const Skeleton = React.memo<SkeletonProps>(({
   className,
   width,
   height,
@@ -22,10 +22,7 @@ export const Skeleton = React.memo(<SkeletonProps> = ({
       {...props}
     />
   );
-);
-
-function 1(
-};
+});
 
 export default Skeleton;
 

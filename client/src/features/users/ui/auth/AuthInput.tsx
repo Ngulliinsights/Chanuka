@@ -31,7 +31,7 @@ export interface AuthInputProps {
   autoComplete?: string;
 }
 
-export const AuthInput = React.memo(<AuthInputProps> = ({
+export const AuthInput = React.memo<AuthInputProps>(({
   name,
   label,
   type,
@@ -116,45 +116,36 @@ export const AuthInput = React.memo(<AuthInputProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 // Specialized input components
-export const EmailInput = React.memo(<Omit<AuthInputProps, 'name' | 'type'> & { icon?: React.ComponentType<{ className?: string }> }> = (props) => (
+export const EmailInput = React.memo<Omit<AuthInputProps, 'name' | 'type'> & { icon?: React.ComponentType<{ className?: string }> }>((props) => (
   <AuthInput
     {...props}
     name="email"
     type="email"
   />
-);
+));
 
-function 1(
-
-export const PasswordInput = React.memo(<Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>> = (props) => (
+export const PasswordInput = React.memo<Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>>((props) => (
   <AuthInput
     {...props}
     name="password"
     type="password"
     showPasswordToggle={true}
   />
-);
+));
 
-function 1(
-
-export const ConfirmPasswordInput = React.memo(<Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>> = (props) => (
+export const ConfirmPasswordInput = React.memo<Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>>((props) => (
   <AuthInput
     {...props}
     name="confirmPassword"
     type="password"
     showPasswordToggle={true}
   />
-);
+));
 
-function 1(
-
-export const NameInput = React.memo(<Omit<AuthInputProps, 'type'> & { fieldType: 'first_name' | 'last_name' }> = ({
+export const NameInput = React.memo<Omit<AuthInputProps, 'type'> & { fieldType: 'first_name' | 'last_name' }>(({
   fieldType,
   ...props
 }) => (
@@ -163,6 +154,5 @@ export const NameInput = React.memo(<Omit<AuthInputProps, 'type'> & { fieldType:
     name={fieldType}
     type="text"
   />
-);
+));
 
-function 1(

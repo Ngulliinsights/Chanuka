@@ -1,6 +1,6 @@
-import type { NavigationItem, UserRole, RelatedPage } from '@client/types';
+import type { UserRole, RelatedPage } from '@client/types';
 
-import { NavigationValidationError } from '@client/core/error';
+// Remove unused import
 import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@client/validation';
 
 import { findNavigationItemByPath } from './navigation-utils';
@@ -51,7 +51,7 @@ export const calculateRelevanceScore = (
   relationship: { type: string; weight: number; context: string },
   user_role: UserRole,
   preferences: any,
-  user: unknown | null,
+  _user: unknown | null,
   allowedRoles?: UserRole[]
 ): number => {
   try {
@@ -148,7 +148,7 @@ export const getPageRelationships = (
 export const generateBreadcrumbRelationships = (
   currentPath: string,
   user_role: UserRole,
-  user: unknown | null
+  _user: unknown | null
 ): RelatedPage[] => {
   try {
     // Validate inputs

@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import { cn } from '@client/lib/utils';
-
 /**
- * Font fallback configuration for different font families
+ * Font fallback configuration
  */
 export interface FontFallbackConfig {
   primary: string;
@@ -12,240 +10,108 @@ export interface FontFallbackConfig {
 }
 
 /**
- * Predefined font stacks for common use cases
+ * Font fallback hook options
  */
-export const FONT_STACKS: Record<string, FontFallbackConfig> = {
-  // System font stacks for optimal performance
-  system: {
-    primary: '-apple-system, BlinkMacSystemFont',
-    fallbacks: ['Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial'],
-    generic: 'sans-serif',
-  },
-  sans: {
-    primary: 'Inter',
-    fallbacks: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto'],
-    generic: 'sans-serif',
-  },
-  serif: {
-    primary: 'Georgia',
-    fallbacks: ['Cambria', 'Times New Roman', 'Times'],
-    generic: 'serif',
-  },
-  mono: {
-    primary: 'JetBrains Mono',
-    fallbacks: ['Fira Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono'],
-    generic: 'monospace',
-  },
-  display: {
-    primary: 'Cal Sans',
-    fallbacks: ['Inter', 'SF Pro Display', 'system-ui'],
-    generic: 'sans-serif',
-  },
-);
-
-function 1(
-};
-
-/**
- * Font loading state
- */
-export interface FontLoadState {
-  loaded: boolean;
-  failed: boolean;
-  fallback: boolean;
-}
-
-/**
- * FontFallback component that provides graceful font loading with fallbacks
- */
-export interface FontFallbackProps {
-  fontFamily: string | FontFallbackConfig;
-  children: React.ReactNode;
-  className?: string;
-  onFontLoad?: (state: FontLoadState) => void;
+export interface UseFontFallbackOptions {
   timeout?: number;
   enableSwap?: boolean;
 }
 
-export const FontFallback = React.memo(<FontFallbackProps> = ({
-  fontFamily,
-  children,
-  className,
-  onFontLoad,
-  timeout = 3000,
-  enableSwap = true,
-}) => {
-  const [fontState, setFontState] = useState<FontLoadState>({
-    loaded: false,
-    failed: false,
-    fallback: false,
-  });
-
-  const config = typeof fontFamily === 'string'
-    ? FONT_STACKS[fontFamily] || {
-        primary: fontFamily,
-        fallbacks: [],
-        generic: 'sans-serif' as const
-      }
-    : fontFamily;
-
-  useEffect(() => {
-    if (!enableSwap || typeof window === 'undefined' || !('FontFace' in window)) {
-      return;
-    }
-
-    let mounted = true;
-    const fontFace = new FontFace(config.primary, `local('${config.primary}')`);
-
-    // Check if font is already loaded
-    document.fonts.load(`12px "${config.primary}"`).then((results) => {
-      if (!mounted) return;
-
-      if (results.length > 0) {
-        setFontState({ loaded: true, failed: false, fallback: false });
-        onFontLoad?.({ loaded: true, failed: false, fallback: false });
-        return;
-      }
-
-      // Try to load the font
-      const loadPromise = fontFace.load();
-
-      // Set timeout for fallback
-      const timeoutId = setTimeout(() => {
-        if (!mounted) return;
-        setFontState({ loaded: false, failed: true, fallback: true });
-        onFontLoad?.({ loaded: false, failed: true, fallback: true });
-      }, timeout);
-
-      loadPromise
-        .then(() => {
-          if (!mounted) return;
-          clearTimeout(timeoutId);
-          document.fonts.add(fontFace);
-          setFontState({ loaded: true, failed: false, fallback: false });
-          onFontLoad?.({ loaded: true, failed: false, fallback: false });
-        })
-        .catch(() => {
-          if (!mounted) return;
-          clearTimeout(timeoutId);
-          setFontState({ loaded: false, failed: true, fallback: true });
-          onFontLoad?.({ loaded: false, failed: true, fallback: true });
-        });
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, [config.primary, timeout, enableSwap, onFontLoad]);
-
-  // Build font-family CSS value with fallbacks
-  const fontFamilyValue = [
-    config.primary,
-    ...config.fallbacks,
-    config.generic,
-  ].join(', ');
-
-  return (
-    <div
-      className={cn(className)}
-      style={{
-        fontFamily: fontFamilyValue,
-      } as React.CSSProperties}
-      data-font-loaded={fontState.loaded}
-      data-font-failed={fontState.failed}
-      data-font-fallback={fontState.fallback}
-    >
-      {children}
-    </div>
-  );
-);
-
-function 1(
+/**
+ * Common font stacks with fallbacks
+ */
+export const FONT_STACKS: Record<string, FontFallbackConfig> = {
+  'Inter': {
+    primary: 'Inter',
+    fallbacks: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto'],
+    generic: 'sans-serif'
+  },
+  'Roboto': {
+    primary: 'Roboto',
+    fallbacks: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI'],
+    generic: 'sans-serif'
+  },
+  'system': {
+    primary: '-apple-system',
+    fallbacks: ['BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue'],
+    generic: 'sans-serif'
+  }
 };
 
 /**
- * Hook for managing font loading state
+ * Hook for font fallback with loading states
  */
 export function useFontFallback(
-  fontFamily: string | FontFallbackConfig,
-  options: {
-    timeout?: number;
-    enableSwap?: boolean;
-  } = {}
+  config: FontFallbackConfig | string,
+  options: UseFontFallbackOptions = {}
 ) {
-  const [state, setState] = useState<FontLoadState>({
-    loaded: false,
-    failed: false,
-    fallback: false,
-  });
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const { timeout = 3000, enableSwap = true } = options;
 
-  const config = typeof fontFamily === 'string'
-    ? FONT_STACKS[fontFamily] || {
-        primary: fontFamily,
-        fallbacks: [],
-        generic: 'sans-serif' as const
-      }
-    : fontFamily;
+  const fontConfig = typeof config === 'string' 
+    ? FONT_STACKS[config] || { primary: config, fallbacks: [], generic: 'sans-serif' }
+    : config;
 
   const fontFamilyValue = [
-    config.primary,
-    ...config.fallbacks,
-    config.generic,
+    fontConfig.primary,
+    ...fontConfig.fallbacks,
+    fontConfig.generic
   ].join(', ');
 
   useEffect(() => {
-    if (!options.enableSwap || typeof window === 'undefined' || !('FontFace' in window)) {
+    if (typeof window === 'undefined' || !('FontFace' in window)) {
+      setIsLoaded(true);
       return;
     }
 
     let mounted = true;
-    const fontFace = new FontFace(config.primary, `local('${config.primary}')`);
 
-    document.fonts.load(`12px "${config.primary}"`).then((results) => {
-      if (!mounted) return;
-
-      if (results.length > 0) {
-        setState({ loaded: true, failed: false, fallback: false });
-        return;
-      }
-
-      const loadPromise = fontFace.load();
-      const timeoutId = setTimeout(() => {
-        if (!mounted) return;
-        setState({ loaded: false, failed: true, fallback: true });
-      }, options.timeout || 3000);
-
-      loadPromise
-        .then(() => {
-          if (!mounted) return;
-          clearTimeout(timeoutId);
+    const loadFont = async () => {
+      try {
+        const fontFace = new FontFace(fontConfig.primary, `url(${fontConfig.primary})`);
+        await fontFace.load();
+        
+        if (mounted) {
           document.fonts.add(fontFace);
-          setState({ loaded: true, failed: false, fallback: false });
-        })
-        .catch(() => {
-          if (!mounted) return;
-          clearTimeout(timeoutId);
-          setState({ loaded: false, failed: true, fallback: true });
-        });
-    });
+          setIsLoaded(true);
+        }
+      } catch (error) {
+        if (mounted) {
+          setHasError(true);
+          setIsLoaded(true); // Still set loaded to use fallbacks
+        }
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      if (mounted && !isLoaded) {
+        setHasError(true);
+        setIsLoaded(true);
+      }
+    }, timeout);
+
+    loadFont();
 
     return () => {
       mounted = false;
+      clearTimeout(timeoutId);
     };
-  }, [config.primary, options.timeout, options.enableSwap]);
+  }, [fontConfig.primary, timeout, enableSwap]);
 
   return {
+    isLoaded,
+    hasError,
     fontFamily: fontFamilyValue,
-    state,
     style: {
       fontFamily: fontFamilyValue,
-      fontDisplay: options.enableSwap ? 'swap' : 'auto',
-    },
+      fontDisplay: enableSwap ? 'swap' : 'auto'
+    }
   };
 }
 
 /**
- * Utility function to preload fonts
+ * Preload fonts utility
  */
 export function preloadFonts(fonts: Array<string | FontFallbackConfig>): Promise<void[]> {
   if (typeof window === 'undefined' || !('FontFace' in window)) {
@@ -257,18 +123,18 @@ export function preloadFonts(fonts: Array<string | FontFallbackConfig>): Promise
       ? FONT_STACKS[font] || { primary: font, fallbacks: [], generic: 'sans-serif' }
       : font;
 
-    const fontFace = new FontFace(config.primary, `local('${config.primary}')`);
+    const fontFace = new FontFace(config.primary, `url(${config.primary})`);
+    
     return fontFace.load()
       .then(() => {
         document.fonts.add(fontFace);
       })
       .catch(() => {
-        // Silently fail - fallbacks will handle it
+        // Silently fail for font loading
       });
   });
 
   return Promise.all(promises);
 }
 
-export default FontFallback;
-
+export default useFontFallback;

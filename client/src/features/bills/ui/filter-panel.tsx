@@ -167,9 +167,6 @@ const parseUrlFilters = (searchParams: URLSearchParams): Partial<BillsQueryParam
   }
 
   return urlFilters;
-);
-
-function 1(
 };
 
 /**
@@ -189,16 +186,13 @@ const serializeFiltersToUrl = (filters: ReturnType<typeof normalizeFilters>): UR
   if (filters.dateRange.end) params.set('dateEnd', filters.dateRange.end);
 
   return params;
-);
-
-function 1(
 };
 
 // ============================================================================
 // Main Component
 // ============================================================================
 
-export const FilterPanel = React.memo(<FilterPanelProps> = ({
+export const FilterPanel = React.memo<FilterPanelProps>(({
   filters,
   onFiltersChange,
   isMobile = false,
@@ -724,7 +718,4 @@ export const FilterPanel = React.memo(<FilterPanelProps> = ({
       </CardContent>
     </Card>
   );
-);
-
-function 1(
-};
+});

@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { useErrorHandler } from '../utils/error-handling';
+import { useUIErrorHandler } from '../utils/error-handling';
 
 // ============================================================================
 // Types
@@ -27,14 +27,14 @@ export interface ComponentNameProps {
 // Component
 // ============================================================================
 
-export const ComponentName = React.memo(<ComponentNameProps> = ({
+export const ComponentName = React.memo<ComponentNameProps>(({
   className = '',
   children,
   testId,
   // Add your specific props here
 }) => {
   // Error handling
-  const { error, errorMessage, handleError, clearError } = useErrorHandler('ComponentName');
+  const { error, errorMessage, clearError } = useUIErrorHandler('ComponentName');
   
   // Component logic here
   
@@ -61,10 +61,7 @@ export const ComponentName = React.memo(<ComponentNameProps> = ({
       {/* Component content here */}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 // ============================================================================
 // Default Export

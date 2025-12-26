@@ -119,7 +119,9 @@
     "shared/schema/**/*",
     "shared/core/src/**/*",
     "shared/database/**/*",
-    "db/**/*"
+    "db/**/*",
+    "drizzle.config.ts",
+    "scripts/**/*.ts"
   ],
   "exclude": [
     "node_modules",

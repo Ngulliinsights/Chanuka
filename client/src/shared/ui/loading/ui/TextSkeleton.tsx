@@ -11,7 +11,7 @@ interface TextSkeletonProps {
   width?: string | number;
 }
 
-export const TextSkeleton = React.memo(<TextSkeletonProps> = ({
+export const TextSkeleton = React.memo<TextSkeletonProps>(({
   className,
   lines = 1,
   variant = 'body',
@@ -68,10 +68,7 @@ export const TextSkeleton = React.memo(<TextSkeletonProps> = ({
       ))}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 export default TextSkeleton;
 

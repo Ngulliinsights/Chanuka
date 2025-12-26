@@ -14,7 +14,7 @@ interface CardSkeletonProps {
   lines?: number;
 }
 
-export const CardSkeleton = React.memo(<CardSkeletonProps> = ({
+export const CardSkeleton = React.memo<CardSkeletonProps>(({
   className,
   showAvatar = false,
   showTitle = true,
@@ -66,10 +66,7 @@ export const CardSkeleton = React.memo(<CardSkeletonProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 export default CardSkeleton;
 

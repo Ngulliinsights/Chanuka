@@ -1,51 +1,51 @@
-import { AlertCircle, FileText, RefreshCw } from 'lucide-react';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+// Remove unused import
 
-import { cn } from '@client/lib/utils';
-
+/**
+ * Script fallback props
+ */
 export interface ScriptFallbackProps {
   src: string;
   fallbackSrc?: string;
-  children?: React.ReactNode;
-  onLoad?: () => void;
-  onError?: (error: Error) => void;
   retryAttempts?: number;
   timeout?: number;
   async?: boolean;
   defer?: boolean;
   crossOrigin?: 'anonymous' | 'use-credentials';
   integrity?: string;
-  className?: string;
+  onLoad?: () => void;
+  onError?: (error: Error) => void;
+  children?: React.ReactNode;
+  loadingComponent?: React.ReactNode;
+  errorComponent?: React.ReactNode;
 }
 
 /**
- * ScriptFallback component provides graceful script loading with fallbacks
- * and error recovery mechanisms.
+ * Script fallback component with retry logic
  */
-export const ScriptFallback = React.memo(<ScriptFallbackProps> = ({
+export const ScriptFallback = React.memo<ScriptFallbackProps>(({
   src,
   fallbackSrc,
-  children,
-  onLoad,
-  onError,
   retryAttempts = 2,
   timeout = 10000,
   async = true,
   defer = false,
   crossOrigin,
   integrity,
-  className,
+  onLoad,
+  onError,
+  children,
+  loadingComponent,
+  errorComponent
 }) => {
   const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error' | 'fallback'>('loading');
   const [retryCount, setRetryCount] = useState(0);
   const [error, setError] = useState<Error | null>(null);
 
-  const loadScript = useCallback((
-    scriptSrc: string,
-    _isRetry = false
-  ): Promise<void> => {
+  const loadScript = useCallback((scriptSrc: string, _isFallback = false): Promise<void> => {
     return new Promise((resolve, reject) => {
-      // Check if script is already loaded
+      // Check if script already exists
       const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
       if (existingScript) {
         resolve();
@@ -65,10 +65,9 @@ export const ScriptFallback = React.memo(<ScriptFallbackProps> = ({
         script.integrity = integrity;
       }
 
-      // Set up timeout
       const timeoutId = setTimeout(() => {
         script.remove();
-        reject(new Error(`Script load timeout: ${scriptSrc}`));
+        reject(new Error(`Script loading timeout: ${scriptSrc}`));
       }, timeout);
 
       const cleanup = () => {
@@ -102,39 +101,35 @@ export const ScriptFallback = React.memo(<ScriptFallbackProps> = ({
       onLoad?.();
     } catch (err) {
       const error = err as Error;
+      setError(error);
 
-      // Try fallback if available and not already using it
-      if (fallbackSrc && scriptSrc !== fallbackSrc && attempt === 0) {
+      // Try fallback if available and this is the first attempt
+      if (fallbackSrc && attempt === 0) {
         setLoadState('fallback');
         try {
-          await loadScript(fallbackSrc, true);
+          await loadScript(fallbackSrc);
           setLoadState('loaded');
           onLoad?.();
-          return;
         } catch (fallbackError) {
-          // Fallback also failed - log for debugging
           if (process.env.NODE_ENV === 'development') {
             console.warn('Script fallback failed:', fallbackError);
           }
-          onError?.(fallbackError as Error);
         }
       }
 
-      // Try retry if attempts remaining
+      // Retry if attempts remaining
       if (attempt < retryAttempts) {
         setRetryCount(attempt + 1);
-        // Exponential backoff
         const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+        
         setTimeout(() => {
           attemptLoad(scriptSrc, attempt + 1);
         }, delay);
-        return;
+      } else {
+        // Final failure
+        setLoadState('error');
+        onError?.(error);
       }
-
-      // All attempts failed
-      setLoadState('error');
-      setError(error);
-      onError?.(error);
     }
   }, [loadScript, fallbackSrc, retryAttempts, onLoad, onError]);
 
@@ -142,75 +137,61 @@ export const ScriptFallback = React.memo(<ScriptFallbackProps> = ({
     attemptLoad(src, 0);
   }, [src, attemptLoad]);
 
-  // Render loading state
-  if (loadState === 'loading') {
+  // Loading state
+  if (loadState === 'loading' || loadState === 'fallback') {
     return children ? (
-      <div className={cn('opacity-50 pointer-events-none', className)}>
+      <div className="relative">
         {children}
+        {loadingComponent}
       </div>
-    ) : null;
-  }
-
-  // Render error state with recovery option
-  if (loadState === 'error') {
-    return (
-      <div className={cn('flex items-center space-x-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md', className)}>
-        <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-        <div className="flex-1">
-          <p className="text-sm font-medium text-red-800 dark:text-red-200">
-            Script failed to load
-          </p>
-          <p className="text-xs text-red-600 dark:text-red-300 mt-1">
-            {error?.message || 'Unknown error occurred'}
-          </p>
-          {retryCount > 0 && (
-            <p className="text-xs text-red-500 mt-1">
-              Retried {retryCount} time{retryCount !== 1 ? 's' : ''}
-            </p>
-          )}
+    ) : (
+      loadingComponent || (
+        <div className="flex items-center gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />
+          <span className="text-sm text-blue-700 dark:text-blue-300">
+            Loading script...
+            {loadState === 'fallback' && ' (using fallback)'}
+            {retryCount > 0 && ` (attempt ${retryCount + 1})`}
+          </span>
         </div>
-        <button
-          onClick={() => {
-            setLoadState('loading');
-            setRetryCount(0);
-            setError(null);
-            attemptLoad(src, 0);
-          }}
-          className="inline-flex items-center px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-        >
-          <RefreshCw className="h-3 w-3 mr-1" />
-          Retry
-        </button>
-      </div>
+      )
     );
   }
 
-  // Render fallback state
-  if (loadState === 'fallback') {
+  // Error state
+  if (loadState === 'error') {
     return children ? (
-      <div className={cn('relative', className)}>
+      <div className="relative">
         {children}
-        <div className="absolute top-2 right-2 flex items-center space-x-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 text-xs rounded">
-          <FileText className="h-3 w-3" />
-          <span>Fallback</span>
-        </div>
+        {errorComponent}
       </div>
-    ) : null;
+    ) : (
+      errorComponent || (
+        <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <div className="flex-1">
+            <span className="text-sm text-red-700 dark:text-red-300">
+              Failed to load script
+            </span>
+            {error && (
+              <div className="text-xs text-red-600 dark:text-red-400 mt-1">
+                {error.message}
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    );
   }
 
-  // Render loaded state
-  return children ? (
-    <div className={cn(className)}>
-      {children}
-    </div>
-  ) : null;
-);
+  // Success state
+  return <>{children}</>;
+});
 
-function 1(
-};
+ScriptFallback.displayName = 'ScriptFallback';
 
 /**
- * Hook for managing script loading state
+ * Hook for script loading with fallback
  */
 export function useScriptFallback(
   src: string,
@@ -240,8 +221,8 @@ export function useScriptFallback(
 
         const script = document.createElement('script');
         script.src = scriptSrc;
-        script.async = options.async !== false;
-        script.defer = options.defer || false;
+        script.async = options.async ?? true;
+        script.defer = options.defer ?? false;
 
         if (options.crossOrigin) {
           script.crossOrigin = options.crossOrigin;
@@ -253,7 +234,7 @@ export function useScriptFallback(
 
         const timeoutId = setTimeout(() => {
           script.remove();
-          reject(new Error(`Script load timeout: ${scriptSrc}`));
+          reject(new Error(`Script loading timeout: ${scriptSrc}`));
         }, options.timeout || 10000);
 
         const cleanup = () => {
@@ -288,9 +269,9 @@ export function useScriptFallback(
         }
       } catch (err) {
         const error = err as Error;
+        setError(error);
 
-        // Try fallback
-        if (options.fallbackSrc && scriptSrc !== options.fallbackSrc && attempt === 0) {
+        if (options.fallbackSrc && attempt === 0) {
           if (mounted) {
             setState('fallback');
           }
@@ -299,28 +280,22 @@ export function useScriptFallback(
             if (mounted) {
               setState('loaded');
             }
-            return;
           } catch (fallbackError) {
-            // Continue to retry logic - log for debugging
             if (process.env.NODE_ENV === 'development') {
               console.warn('Script retry fallback failed:', fallbackError);
             }
           }
         }
 
-        // Try retry
         if (attempt < (options.retryAttempts || 2)) {
           const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
           setTimeout(() => {
             attemptLoad(scriptSrc, attempt + 1);
           }, delay);
-          return;
-        }
-
-        // All failed
-        if (mounted) {
-          setState('error');
-          setError(error);
+        } else {
+          if (mounted) {
+            setState('error');
+          }
         }
       }
     };
@@ -336,4 +311,3 @@ export function useScriptFallback(
 }
 
 export default ScriptFallback;
-

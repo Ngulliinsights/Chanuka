@@ -112,4 +112,5 @@ export interface User {
     privacySettings?: PrivacySettings;
     consentGiven?: ConsentRecord[];
 }
+export declare const logger: Console;
 //# sourceMappingURL=core.d.ts.map

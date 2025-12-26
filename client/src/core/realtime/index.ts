@@ -11,6 +11,7 @@ export type { RealTimeHubState } from './hub';
 
 // Core WebSocket infrastructure
 export { UnifiedWebSocketManager } from './manager';
+export { WebSocketClient, createWebSocketClient } from './websocket-client';
 
 // Real-time services
 export { RealTimeService, realTimeService } from './services/realtime-service';

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { useBills } from '@client/features/bills/model/hooks/useBills';
+import { useBills } from '@client/features/bills';
 import { logger } from '@client/utils/logger';
 
 import { Badge } from '@client/shared/design-system';

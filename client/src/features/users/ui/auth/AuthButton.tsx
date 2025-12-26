@@ -7,8 +7,7 @@ import { Loader2 } from 'lucide-react';
 import React from 'react';
 
 import { cn } from '@/lib/utils';
-
-import { Button } from '@client/../../Button';
+import { Button } from '@client/shared/design-system/interactive/Button';
 
 export interface AuthButtonProps {
   type?: 'button' | 'submit' | 'reset';
@@ -21,7 +20,7 @@ export interface AuthButtonProps {
   onClick?: () => void;
 }
 
-export const AuthButton = React.memo(<AuthButtonProps> = ({
+export const AuthButton = React.memo<AuthButtonProps>(({
   type = 'button',
   variant = 'primary',
   size = 'md',
@@ -66,15 +65,14 @@ export const AuthButton = React.memo(<AuthButtonProps> = ({
       {children}
     </Button>
   );
-);
+});
 
-function 1(
-};
+AuthButton.displayName = 'AuthButton';
 
 // Specialized button components
-export const SubmitButton = React.memo(<Omit<AuthButtonProps, 'type'> & {
+export const SubmitButton = React.memo<Omit<AuthButtonProps, 'type'> & {
   mode: 'login' | 'register';
-}> = ({ mode, loading, children, ...props }) => (
+}>(({ mode, loading, children, ...props }) => (
   <AuthButton
     {...props}
     type="submit"
@@ -87,16 +85,16 @@ export const SubmitButton = React.memo(<Omit<AuthButtonProps, 'type'> & {
       : (mode === 'login' ? 'Sign In' : 'Create Account')
     )}
   </AuthButton>
-);
+));
 
-function 1(
+SubmitButton.displayName = 'SubmitButton';
 
-export const ModeToggleButton = React.memo(<{
+export const ModeToggleButton = React.memo<{
   currentMode: 'login' | 'register';
   onToggle: () => void;
   disabled?: boolean;
   className?: string;
-}> = ({ currentMode, onToggle, disabled = false, className }) => (
+}>(({ currentMode, onToggle, disabled = false, className }) => (
   <button
     type="button"
     onClick={onToggle}
@@ -111,16 +109,16 @@ export const ModeToggleButton = React.memo(<{
   >
     {currentMode === 'login' ? 'Sign up' : 'Sign in'}
   </button>
-);
+));
 
-function 1(
+ModeToggleButton.displayName = 'ModeToggleButton';
 
-export const RetryButton = React.memo(<{
+export const RetryButton = React.memo<{
   onRetry: () => void;
   loading?: boolean;
   disabled?: boolean;
   className?: string;
-}> = ({ onRetry, loading = false, disabled = false, className }) => (
+}>(({ onRetry, loading = false, disabled = false, className }) => (
   <AuthButton
     type="button"
     variant="outline"
@@ -132,6 +130,7 @@ export const RetryButton = React.memo(<{
   >
     {loading ? 'Retrying...' : 'Try Again'}
   </AuthButton>
-);
+));
 
-function 1(
+RetryButton.displayName = 'RetryButton';
+

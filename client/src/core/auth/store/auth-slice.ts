@@ -369,8 +369,13 @@ export const validateStoredTokens = createAsyncThunk(
       const result = await authService.validateStoredTokens();
       return result;
     } catch (error) {
-      logger.error('Validate stored tokens failed', { error });
-      return rejectWithValue(error instanceof Error ? error.message : 'Validate stored tokens failed');
+      // In development mode, this is expected - don't log as error
+      if (process.env.NODE_ENV === 'development') {
+        logger.debug('Token validation skipped in development mode');
+      } else {
+        logger.warn('Token validation failed, continuing with guest session', { error });
+      }
+      return rejectWithValue(error instanceof Error ? error.message : 'Token validation failed');
     }
   }
 );

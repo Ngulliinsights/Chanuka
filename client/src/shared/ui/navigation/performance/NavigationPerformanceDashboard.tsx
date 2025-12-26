@@ -5,16 +5,16 @@
  * Implements Phase 2 recommendations for navigation monitoring.
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { navigationUtils } from '@client/shared/ui/navigation/Navigation.tsx';
+// Remove unused import
 import { logger } from '@client/utils/logger';
-import { BarChart3, Clock, Users, Search, TrendingUp, AlertTriangle } from 'lucide-react';
+import { BarChart3, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
 
 interface PerformanceMetrics {
   averageNavigationTime: number;
@@ -92,7 +92,7 @@ export function NavigationPerformanceDashboard({
       setMetrics(mockMetrics);
       setLastUpdated(new Date());
       
-      logger.info('Navigation performance metrics updated', mockMetrics);
+      logger.info('Navigation performance metrics updated', { metrics: mockMetrics });
     } catch (error) {
       logger.error('Failed to fetch navigation performance metrics', { error });
     } finally {

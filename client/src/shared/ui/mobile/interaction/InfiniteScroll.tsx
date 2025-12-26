@@ -24,7 +24,6 @@
 import React from 'react';
 
 import type { InfiniteScrollConfig } from '@client/types/mobile';
-import { INFINITE_SCROLL_DEFAULTS } from '../constants';
 
 interface InfiniteScrollProps extends InfiniteScrollConfig {
   children: React.ReactNode;

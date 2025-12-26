@@ -9,8 +9,8 @@
  * - Data quality monitoring
  */
 
-import { Pool, PoolClient } from 'pg';
 import { logger } from '@shared/core';
+import { Pool, PoolClient } from 'pg';
 
 export interface ValidationRule {
   id: string;
@@ -39,8 +39,8 @@ export interface ValidationResult {
 export interface ValidationViolation {
   rowId?: string;
   column?: string;
-  value?: any;
-  expectedValue?: any;
+  value?: unknown;
+  expectedValue?: unknown;
   message: string;
 }
 
@@ -70,6 +70,11 @@ export interface IntegrityIssue {
   rowId?: string;
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
+}
+
+interface QueryRow {
+  id?: string;
+  [key: string]: unknown;
 }
 
 export class DatabaseValidation {
@@ -109,7 +114,7 @@ export class DatabaseValidation {
           ruleId: rule.id,
           ruleName: rule.name,
           table: rule.table,
-          column: rule.column,
+          ...(rule.column && { column: rule.column }),
           passed: false,
           violationCount: 0,
           violations: [{
@@ -195,7 +200,7 @@ export class DatabaseValidation {
         ruleId: rule.id,
         ruleName: rule.name,
         table: rule.table,
-        column: rule.column,
+        ...(rule.column && { column: rule.column }),
         passed: violations.length === 0,
         violationCount: violations.length,
         violations,
@@ -218,18 +223,19 @@ export class DatabaseValidation {
       throw new Error('Column is required for NOT NULL validation');
     }
 
-    const result = await client.query(`
-      SELECT id, ${rule.column}
+    const column = rule.column;
+    const result = await client.query<QueryRow>(`
+      SELECT id, ${column}
       FROM ${rule.table}
-      WHERE ${rule.column} IS NULL
+      WHERE ${column} IS NULL
       LIMIT 100
     `);
 
     return result.rows.map(row => ({
-      rowId: row.id,
-      column: rule.column,
+      ...(row.id && { rowId: row.id }),
+      column,
       value: null,
-      message: `NULL value found in ${rule.column}`
+      message: `NULL value found in ${column}`
     }));
   }
 
@@ -241,19 +247,20 @@ export class DatabaseValidation {
       throw new Error('Column is required for UNIQUE validation');
     }
 
-    const result = await client.query(`
-      SELECT ${rule.column}, COUNT(*) as count
+    const column = rule.column;
+    const result = await client.query<QueryRow>(`
+      SELECT ${column}, COUNT(*) as count
       FROM ${rule.table}
-      WHERE ${rule.column} IS NOT NULL
-      GROUP BY ${rule.column}
+      WHERE ${column} IS NOT NULL
+      GROUP BY ${column}
       HAVING COUNT(*) > 1
       LIMIT 100
     `);
 
     return result.rows.map(row => ({
-      column: rule.column,
-      value: row[rule.column!],
-      message: `Duplicate value '${row[rule.column!]}' found ${row.count} times`
+      column,
+      value: row[column],
+      message: `Duplicate value '${String(row[column])}' found ${String(row.count)} times`
     }));
   }
 
@@ -271,9 +278,9 @@ export class DatabaseValidation {
       throw new Error('Invalid foreign key constraint format');
     }
 
-    const [, fkColumn, refTable, refColumn] = match;
+    const [, fkColumn, refTable, refColumn] = match as [string, string, string, string];
 
-    const result = await client.query(`
+    const result = await client.query<QueryRow>(`
       SELECT t1.id, t1.${fkColumn}
       FROM ${rule.table} t1
       LEFT JOIN ${refTable} t2 ON t1.${fkColumn} = t2.${refColumn}
@@ -281,12 +288,17 @@ export class DatabaseValidation {
       LIMIT 100
     `);
 
-    return result.rows.map(row => ({
-      rowId: row.id,
-      column: fkColumn,
-      value: row[fkColumn],
-      message: `Foreign key violation: ${row[fkColumn]} not found in ${refTable}.${refColumn}`
-    }));
+    return result.rows.map(row => {
+      const violation: ValidationViolation = {
+        column: fkColumn,
+        value: row[fkColumn],
+        message: `Foreign key violation: ${String(row[fkColumn])} not found in ${refTable}.${refColumn}`
+      };
+      if (row.id) {
+        violation.rowId = row.id;
+      }
+      return violation;
+    });
   }
 
   /**
@@ -297,7 +309,7 @@ export class DatabaseValidation {
       throw new Error('Constraint SQL is required for check validation');
     }
 
-    const result = await client.query(`
+    const result = await client.query<QueryRow>(`
       SELECT id, *
       FROM ${rule.table}
       WHERE NOT (${rule.constraint})
@@ -305,7 +317,7 @@ export class DatabaseValidation {
     `);
 
     return result.rows.map(row => ({
-      rowId: row.id,
+      ...(row.id && { rowId: row.id }),
       message: `Check constraint violation: ${rule.constraint}`
     }));
   }
@@ -318,19 +330,20 @@ export class DatabaseValidation {
       throw new Error('Column and constraint pattern are required for format validation');
     }
 
-    const result = await client.query(`
-      SELECT id, ${rule.column}
+    const column = rule.column;
+    const result = await client.query<QueryRow>(`
+      SELECT id, ${column}
       FROM ${rule.table}
-      WHERE ${rule.column} IS NOT NULL 
-        AND ${rule.column} !~ $1
+      WHERE ${column} IS NOT NULL 
+        AND ${column} !~ $1
       LIMIT 100
     `, [rule.constraint]);
 
     return result.rows.map(row => ({
-      rowId: row.id,
-      column: rule.column,
-      value: row[rule.column!],
-      message: `Format violation: '${row[rule.column!]}' does not match pattern ${rule.constraint}`
+      ...(row.id && { rowId: row.id }),
+      column,
+      value: row[column],
+      message: `Format violation: '${String(row[column])}' does not match pattern ${rule.constraint}`
     }));
   }
 
@@ -342,38 +355,50 @@ export class DatabaseValidation {
       throw new Error('Column and range constraint are required for range validation');
     }
 
-    // Parse range: "min,max" or ">min" or "<max"
+    const column = rule.column;
     let whereClause: string;
-    let params: any[] = [];
+    let params: number[];
 
+    // Parse range: "min,max" or ">min" or "<max"
     if (rule.constraint.includes(',')) {
-      const [min, max] = rule.constraint.split(',').map(v => parseFloat(v.trim()));
-      whereClause = `${rule.column} < $1 OR ${rule.column} > $2`;
+      const parts = rule.constraint.split(',').map(v => parseFloat(v.trim()));
+      const min = parts[0];
+      const max = parts[1];
+      if (min === undefined || max === undefined || isNaN(min) || isNaN(max)) {
+        throw new Error('Invalid range constraint format');
+      }
+      whereClause = `${column} < $1 OR ${column} > $2`;
       params = [min, max];
     } else if (rule.constraint.startsWith('>')) {
       const min = parseFloat(rule.constraint.substring(1));
-      whereClause = `${rule.column} <= $1`;
+      if (isNaN(min)) {
+        throw new Error('Invalid range constraint format');
+      }
+      whereClause = `${column} <= $1`;
       params = [min];
     } else if (rule.constraint.startsWith('<')) {
       const max = parseFloat(rule.constraint.substring(1));
-      whereClause = `${rule.column} >= $1`;
+      if (isNaN(max)) {
+        throw new Error('Invalid range constraint format');
+      }
+      whereClause = `${column} >= $1`;
       params = [max];
     } else {
       throw new Error('Invalid range constraint format');
     }
 
-    const result = await client.query(`
-      SELECT id, ${rule.column}
+    const result = await client.query<QueryRow>(`
+      SELECT id, ${column}
       FROM ${rule.table}
-      WHERE ${rule.column} IS NOT NULL AND (${whereClause})
+      WHERE ${column} IS NOT NULL AND (${whereClause})
       LIMIT 100
     `, params);
 
     return result.rows.map(row => ({
-      rowId: row.id,
-      column: rule.column,
-      value: row[rule.column!],
-      message: `Range violation: '${row[rule.column!]}' is outside allowed range ${rule.constraint}`
+      ...(row.id && { rowId: row.id }),
+      column,
+      value: row[column],
+      message: `Range violation: '${String(row[column])}' is outside allowed range ${rule.constraint}`
     }));
   }
 
@@ -385,14 +410,23 @@ export class DatabaseValidation {
       throw new Error('Custom SQL query is required for custom validation');
     }
 
-    const result = await client.query(rule.constraint);
+    const result = await client.query<QueryRow>(rule.constraint);
 
-    return result.rows.map(row => ({
-      rowId: row.id || row.row_id,
-      column: row.column,
-      value: row.value,
-      message: row.message || `Custom validation failed: ${rule.name}`
-    }));
+    return result.rows.map(row => {
+      const violation: ValidationViolation = {
+        message: (row.message as string | undefined) || `Custom validation failed: ${rule.name}`
+      };
+      if (row.id || row.row_id) {
+        violation.rowId = (row.id || row.row_id) as string;
+      }
+      if (row.column) {
+        violation.column = row.column as string;
+      }
+      if ('value' in row) {
+        violation.value = row.value;
+      }
+      return violation;
+    });
   }
 
   /**
@@ -435,7 +469,7 @@ export class DatabaseValidation {
 
     try {
       // Check for orphaned comments
-      const orphanedComments = await client.query(`
+      const orphanedComments = await client.query<QueryRow>(`
         SELECT c.id, c.bill_id, c.user_id
         FROM comments c
         LEFT JOIN bills b ON c.bill_id = b.id
@@ -449,17 +483,22 @@ export class DatabaseValidation {
         table: 'comments',
         passed: orphanedComments.rows.length === 0,
         issueCount: orphanedComments.rows.length,
-        issues: orphanedComments.rows.map(row => ({
-          type: 'orphaned_record',
-          table: 'comments',
-          rowId: row.id,
-          description: `Comment ${row.id} references non-existent bill ${row.bill_id} or user ${row.user_id}`,
-          severity: 'high' as const
-        }))
+        issues: orphanedComments.rows.map(row => {
+          const issue: IntegrityIssue = {
+            type: 'orphaned_record',
+            table: 'comments',
+            description: `Comment ${String(row.id)} references non-existent bill ${String(row.bill_id)} or user ${String(row.user_id)}`,
+            severity: 'high' as const
+          };
+          if (row.id) {
+            issue.rowId = row.id;
+          }
+          return issue;
+        })
       });
 
       // Check for orphaned bill engagement
-      const orphanedEngagement = await client.query(`
+      const orphanedEngagement = await client.query<QueryRow>(`
         SELECT be.id, be.bill_id, be.user_id
         FROM bill_engagement be
         LEFT JOIN bills b ON be.bill_id = b.id
@@ -473,13 +512,18 @@ export class DatabaseValidation {
         table: 'bill_engagement',
         passed: orphanedEngagement.rows.length === 0,
         issueCount: orphanedEngagement.rows.length,
-        issues: orphanedEngagement.rows.map(row => ({
-          type: 'orphaned_record',
-          table: 'bill_engagement',
-          rowId: row.id,
-          description: `Engagement ${row.id} references non-existent bill ${row.bill_id} or user ${row.user_id}`,
-          severity: 'medium' as const
-        }))
+        issues: orphanedEngagement.rows.map(row => {
+          const issue: IntegrityIssue = {
+            type: 'orphaned_record',
+            table: 'bill_engagement',
+            description: `Engagement ${String(row.id)} references non-existent bill ${String(row.bill_id)} or user ${String(row.user_id)}`,
+            severity: 'medium' as const
+          };
+          if (row.id) {
+            issue.rowId = row.id;
+          }
+          return issue;
+        })
       });
 
     } finally {
@@ -498,7 +542,7 @@ export class DatabaseValidation {
 
     try {
       // Check for bills without sponsors
-      const billsWithoutSponsors = await client.query(`
+      const billsWithoutSponsors = await client.query<QueryRow>(`
         SELECT id, title, sponsor_id
         FROM bills
         WHERE sponsor_id IS NOT NULL 
@@ -511,14 +555,19 @@ export class DatabaseValidation {
         table: 'bills',
         passed: billsWithoutSponsors.rows.length === 0,
         issueCount: billsWithoutSponsors.rows.length,
-        issues: billsWithoutSponsors.rows.map(row => ({
-          type: 'missing_reference',
-          table: 'bills',
-          column: 'sponsor_id',
-          rowId: row.id,
-          description: `Bill "${row.title}" references non-existent sponsor ${row.sponsor_id}`,
-          severity: 'high' as const
-        }))
+        issues: billsWithoutSponsors.rows.map(row => {
+          const issue: IntegrityIssue = {
+            type: 'missing_reference',
+            table: 'bills',
+            column: 'sponsor_id',
+            description: `Bill "${String(row.title)}" references non-existent sponsor ${String(row.sponsor_id)}`,
+            severity: 'high' as const
+          };
+          if (row.id) {
+            issue.rowId = row.id;
+          }
+          return issue;
+        })
       });
 
     } finally {
@@ -537,7 +586,7 @@ export class DatabaseValidation {
 
     try {
       // Get all tables with their primary key columns
-      const tablesResult = await client.query(`
+      const tablesResult = await client.query<QueryRow>(`
         SELECT 
           t.table_name,
           string_agg(c.column_name, ', ') as pk_columns
@@ -550,23 +599,23 @@ export class DatabaseValidation {
       `);
 
       for (const table of tablesResult.rows) {
-        const duplicatesResult = await client.query(`
-          SELECT ${table.pk_columns}, COUNT(*) as count
-          FROM ${table.table_name}
-          GROUP BY ${table.pk_columns}
+        const duplicatesResult = await client.query<QueryRow>(`
+          SELECT ${String(table.pk_columns)}, COUNT(*) as count
+          FROM ${String(table.table_name)}
+          GROUP BY ${String(table.pk_columns)}
           HAVING COUNT(*) > 1
           LIMIT 10
         `);
 
         results.push({
           checkType: 'duplicate_primary_keys',
-          table: table.table_name,
+          table: String(table.table_name),
           passed: duplicatesResult.rows.length === 0,
           issueCount: duplicatesResult.rows.length,
           issues: duplicatesResult.rows.map(row => ({
             type: 'duplicate_key',
-            table: table.table_name,
-            description: `Duplicate primary key found in ${table.table_name}: ${JSON.stringify(row)}`,
+            table: String(table.table_name),
+            description: `Duplicate primary key found in ${String(table.table_name)}: ${JSON.stringify(row)}`,
             severity: 'critical' as const
           }))
         });
@@ -588,7 +637,7 @@ export class DatabaseValidation {
 
     try {
       // Check for bills with invalid status transitions
-      const invalidStatusResult = await client.query(`
+      const invalidStatusResult = await client.query<QueryRow>(`
         SELECT id, title, status
         FROM bills
         WHERE status NOT IN ('drafted', 'introduced', 'committee', 'floor', 'passed', 'signed', 'vetoed', 'failed')
@@ -600,22 +649,27 @@ export class DatabaseValidation {
         table: 'bills',
         passed: invalidStatusResult.rows.length === 0,
         issueCount: invalidStatusResult.rows.length,
-        issues: invalidStatusResult.rows.map(row => ({
-          type: 'invalid_data',
-          table: 'bills',
-          column: 'status',
-          rowId: row.id,
-          description: `Bill "${row.title}" has invalid status: ${row.status}`,
-          severity: 'medium' as const
-        }))
+        issues: invalidStatusResult.rows.map(row => {
+          const issue: IntegrityIssue = {
+            type: 'invalid_data',
+            table: 'bills',
+            column: 'status',
+            description: `Bill "${String(row.title)}" has invalid status: ${String(row.status)}`,
+            severity: 'medium' as const
+          };
+          if (row.id) {
+            issue.rowId = row.id;
+          }
+          return issue;
+        })
       });
 
       // Check for users with invalid email formats
-      const invalidEmailResult = await client.query(`
+      const invalidEmailResult = await client.query<QueryRow>(`
         SELECT id, email
         FROM users
         WHERE email IS NOT NULL 
-          AND email !~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+          AND email !~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$'
         LIMIT 100
       `);
 
@@ -624,18 +678,23 @@ export class DatabaseValidation {
         table: 'users',
         passed: invalidEmailResult.rows.length === 0,
         issueCount: invalidEmailResult.rows.length,
-        issues: invalidEmailResult.rows.map(row => ({
-          type: 'invalid_data',
-          table: 'users',
-          column: 'email',
-          rowId: row.id,
-          description: `User ${row.id} has invalid email format: ${row.email}`,
-          severity: 'medium' as const
-        }))
+        issues: invalidEmailResult.rows.map(row => {
+          const issue: IntegrityIssue = {
+            type: 'invalid_data',
+            table: 'users',
+            column: 'email',
+            description: `User ${String(row.id)} has invalid email format: ${String(row.email)}`,
+            severity: 'medium' as const
+          };
+          if (row.id) {
+            issue.rowId = row.id;
+          }
+          return issue;
+        })
       });
 
       // Check for engagement metrics consistency
-      const inconsistentMetricsResult = await client.query(`
+      const inconsistentMetricsResult = await client.query<QueryRow>(`
         SELECT id, view_count, comment_count, share_count
         FROM bills
         WHERE view_count < 0 OR comment_count < 0 OR share_count < 0
@@ -647,13 +706,18 @@ export class DatabaseValidation {
         table: 'bills',
         passed: inconsistentMetricsResult.rows.length === 0,
         issueCount: inconsistentMetricsResult.rows.length,
-        issues: inconsistentMetricsResult.rows.map(row => ({
-          type: 'invalid_data',
-          table: 'bills',
-          rowId: row.id,
-          description: `Bill ${row.id} has negative metrics: views=${row.view_count}, comments=${row.comment_count}, shares=${row.share_count}`,
-          severity: 'low' as const
-        }))
+        issues: inconsistentMetricsResult.rows.map(row => {
+          const issue: IntegrityIssue = {
+            type: 'invalid_data',
+            table: 'bills',
+            description: `Bill ${String(row.id)} has negative metrics: views=${String(row.view_count)}, comments=${String(row.comment_count)}, shares=${String(row.share_count)}`,
+            severity: 'low' as const
+          };
+          if (row.id) {
+            issue.rowId = row.id;
+          }
+          return issue;
+        })
       });
 
     } finally {
@@ -686,7 +750,7 @@ export class DatabaseValidation {
         table: 'users',
         column: 'email',
         type: 'format',
-        constraint: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$',
+        constraint: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$',
         severity: 'high',
         enabled: true
       },
@@ -765,6 +829,97 @@ export class DatabaseValidation {
         type: 'not_null',
         severity: 'critical',
         enabled: true
+      },
+
+      // Audit payloads validation rules (for vertical partitioning)
+      {
+        id: 'audit_payloads_audit_log_id_not_null',
+        name: 'Audit Payloads Audit Log ID Not Null',
+        description: 'All audit payloads must reference a valid audit log',
+        table: 'audit_payloads',
+        column: 'audit_log_id',
+        type: 'not_null',
+        severity: 'critical',
+        enabled: true
+      },
+      {
+        id: 'audit_payloads_payload_type_valid',
+        name: 'Audit Payloads Type Valid',
+        description: 'Audit payload types must be valid (action_details or resource_usage)',
+        table: 'audit_payloads',
+        type: 'check',
+        constraint: 'payload_type IN (\'action_details\', \'resource_usage\')',
+        severity: 'high',
+        enabled: true
+      },
+      {
+        id: 'audit_payloads_payload_data_not_null',
+        name: 'Audit Payloads Data Not Null',
+        description: 'Audit payload data must not be null',
+        table: 'audit_payloads',
+        column: 'payload_data',
+        type: 'not_null',
+        severity: 'high',
+        enabled: true
+      },
+      {
+        id: 'audit_payloads_unique_constraint',
+        name: 'Audit Payloads Unique Constraint',
+        description: 'Each audit log can have only one payload of each type',
+        table: 'audit_payloads',
+        type: 'custom',
+        constraint: `
+          SELECT ap1.id
+          FROM audit_payloads ap1
+          JOIN audit_payloads ap2 ON ap1.audit_log_id = ap2.audit_log_id
+            AND ap1.payload_type = ap2.payload_type
+            AND ap1.id != ap2.id
+          LIMIT 1
+        `,
+        severity: 'medium',
+        enabled: true
+      },
+
+      // System audit log validation rules (updated for vertical partitioning)
+      {
+        id: 'system_audit_log_event_type_not_null',
+        name: 'System Audit Log Event Type Not Null',
+        description: 'All audit log entries must have an event type',
+        table: 'system_audit_log',
+        column: 'event_type',
+        type: 'not_null',
+        severity: 'critical',
+        enabled: true
+      },
+      {
+        id: 'system_audit_log_event_category_valid',
+        name: 'System Audit Log Event Category Valid',
+        description: 'Audit log event categories must be valid',
+        table: 'system_audit_log',
+        type: 'check',
+        constraint: 'event_category IN (\'security\', \'data\', \'admin\', \'system\', \'compliance\')',
+        severity: 'high',
+        enabled: true
+      },
+      {
+        id: 'system_audit_log_actor_type_valid',
+        name: 'System Audit Log Actor Type Valid',
+        description: 'Audit log actor types must be valid',
+        table: 'system_audit_log',
+        type: 'check',
+        constraint: 'actor_type IN (\'user\', \'system\', \'admin\', \'service\')',
+        severity: 'high',
+        enabled: true
+      },
+      {
+        id: 'system_audit_log_success_not_null',
+        name: 'System Audit Log Success Not Null',
+        description: 'Audit log entries must indicate success/failure status',
+        table: 'system_audit_log',
+        column: 'success',
+        type: 'not_null',
+        severity: 'high',
+        enabled: true
       }
     ];
   }
@@ -824,7 +979,7 @@ export class DatabaseValidation {
    * Add custom validation rule
    */
   addValidationRule(rule: Omit<ValidationRule, 'id'>): string {
-    const id = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = `custom_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     
     this.validationRules.push({
       ...rule,

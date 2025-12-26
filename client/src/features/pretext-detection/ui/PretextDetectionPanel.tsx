@@ -60,12 +60,9 @@ const isPretextIndicator = (value: unknown): value is PretextIndicator => {
     typeof (value as PretextIndicator).description === 'string' &&
     Array.isArray((value as PretextIndicator).evidence)
   );
-);
-
-function 1(
 };
 
-export const PretextDetectionPanel = React.memo(<PretextDetectionPanelProps> = ({ billId }) => {
+export const PretextDetectionPanel = React.memo<PretextDetectionPanelProps>(({ billId }) => {
   // Destructure with the correct property names from the hook
   const {
     analysis: hookAnalysis,
@@ -297,7 +294,4 @@ export const PretextDetectionPanel = React.memo(<PretextDetectionPanelProps> = (
       </Alert>
     </div>
   );
-);
-
-function 1(
-};
+});

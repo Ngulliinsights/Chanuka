@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 
 import {
   useBillSponsorshipAnalysis as useSponsorshipAnalysis
-} from '@client/features/bills/model/hooks/useBills';
+} from '@client/features/bills';
 import { ImplementationWorkarounds } from '@client/features/bills/ui/implementation-workarounds';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

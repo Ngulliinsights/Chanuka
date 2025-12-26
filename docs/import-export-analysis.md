@@ -1,7 +1,7 @@
 # Import/Export Analysis Report
 
-**Generated:** 12/22/2025, 11:51:05 PM
-**Duration:** 2.45s
+**Generated:** 12/23/2025, 1:04:07 AM
+**Duration:** 5.22s
 **Mode:** Full | Normal
 **Status:** ❌ Issues Found
 
@@ -9,14 +9,14 @@
 
 | Metric | Value |
 |--------|------:|
-| Files Analyzed | 2,065 |
-| Imports Checked | 6,502 |
-| Dynamic Imports | 199 |
+| Files Analyzed | 2,066 |
+| Imports Checked | 6,504 |
+| Dynamic Imports | 197 |
 | Re-exports | 464 |
 | Path Aliases | 9 |
 | **Missing Files** | **0** |
 | **Missing Exports** | **24** |
-| **Circular Dependencies** | **7** |
+| **Circular Dependencies** | **6** |
 | Type Warnings | 196 |
 
 ## ⚠️  Missing Exports (24)
@@ -56,19 +56,19 @@
 - Missing: `BaseDatabaseScript`
 - Available: `ScriptOptions`, `ScriptResult`, `ScriptContext`, `DatabaseScriptLogger`, `runDatabaseScript`, `createScriptResult`
 
-### `shared\core\rate-limiting\adapters\sliding-window-adapter.ts`
-
-**`../algorithms/sliding-window`**
-
-- Missing: `SlidingWindowStore`
-- Available: `SlidingWindowConfig`, `SlidingWindow`
-
 ### `shared\core\rate-limiting\adapters\token-bucket-adapter.ts`
 
 **`../algorithms/token-bucket`**
 
 - Missing: `TokenBucketStore`
 - Available: `TokenBucketConfig`, `TokenBucket`
+
+### `shared\core\rate-limiting\adapters\sliding-window-adapter.ts`
+
+**`../algorithms/sliding-window`**
+
+- Missing: `SlidingWindowStore`
+- Available: `SlidingWindowConfig`, `SlidingWindow`
 
 ### `shared\core\caching\cache-factory.ts`
 
@@ -189,7 +189,7 @@
 - Missing: `Comment`
 - Available: `VoteRequest`, `ActivityItem`, `TrendingTopic`, `ExpertInsight`, `Campaign`, `Petition`, `CommunityStats`, `LocalImpactMetrics`, `CommunityComment`, `CommentReport`
 
-## 🔄 Circular Dependencies (7)
+## 🔄 Circular Dependencies (6)
 
 These files form circular dependency chains:
 
@@ -198,7 +198,6 @@ These files form circular dependency chains:
 - server\infrastructure\database\core\connection-manager-metrics.ts → server\infrastructure\database\core\connection-manager-metrics.ts → server\infrastructure\database\core\connection-manager.ts
 - server\infrastructure\database\core\connection-manager-metrics.ts → server\infrastructure\database\core\connection-manager.ts → server\infrastructure\database\core\connection-manager.ts
 - client\src\shared\infrastructure\store\index.ts → client\src\shared\infrastructure\store\slices\userDashboardSlice.ts → client\src\shared\infrastructure\store\slices\userDashboardSlice.ts
-- client\src\shared\infrastructure\store\slices\userDashboardSlice.ts → client\src\shared\infrastructure\store\slices\userDashboardSlice.ts
 - client\src\shared\infrastructure\store\index.ts → client\src\shared\infrastructure\store\index.ts → client\src\shared\infrastructure\store\slices\userDashboardSlice.ts
 
 **Impact:** Circular dependencies can cause:
@@ -219,11 +218,6 @@ These files form circular dependency chains:
 - [Medium] Line 83: Async export lacks explicit return type
 - [Medium] Line 244: Async export lacks explicit return type
 
-### `shared\database\core\database-orchestrator.ts`
-
-- [Medium] Line 441: Async export lacks explicit return type
-- [Medium] Line 459: Async export lacks explicit return type
-
 ### `shared\database\pool.ts`
 
 - [Medium] Line 621: Async export lacks explicit return type
@@ -238,14 +232,19 @@ These files form circular dependency chains:
 - [Medium] Line 925: Async export lacks explicit return type
 - [Medium] Line 935: Async export lacks explicit return type
 
-### `shared\core\utils\async-utils.ts`
+### `shared\database\core\database-orchestrator.ts`
 
-- [Medium] Line 126: Async export lacks explicit return type
-- [Medium] Line 341: Async export lacks explicit return type
+- [Medium] Line 441: Async export lacks explicit return type
+- [Medium] Line 459: Async export lacks explicit return type
 
 ### `shared\core\utils\browser-logger.ts`
 
 - [High] High 'any' usage: 14 occurrences (threshold: 8)
+
+### `shared\core\utils\async-utils.ts`
+
+- [Medium] Line 126: Async export lacks explicit return type
+- [Medium] Line 341: Async export lacks explicit return type
 
 ### `shared\core\utils\data-utils.ts`
 
@@ -315,13 +314,13 @@ These files form circular dependency chains:
 - **Recommendation:** Keep barrel files focused on re-exporting
 - **Severity:** Low
 
-### `shared\database\core\index.ts`
+### `shared\core\index.ts`
 
 - **Issue:** Mixed re-exports and direct exports
 - **Recommendation:** Keep barrel files focused on re-exporting
 - **Severity:** Low
 
-### `shared\core\index.ts`
+### `shared\database\core\index.ts`
 
 - **Issue:** Mixed re-exports and direct exports
 - **Recommendation:** Keep barrel files focused on re-exporting
@@ -513,13 +512,13 @@ These files form circular dependency chains:
 - **Recommendation:** Keep barrel files focused on re-exporting
 - **Severity:** Low
 
-### `server\infrastructure\websocket\batching\index.ts`
+### `server\infrastructure\websocket\adapters\index.ts`
 
 - **Issue:** Mixed re-exports and direct exports
 - **Recommendation:** Keep barrel files focused on re-exporting
 - **Severity:** Low
 
-### `server\infrastructure\websocket\adapters\index.ts`
+### `server\infrastructure\websocket\batching\index.ts`
 
 - **Issue:** Mixed re-exports and direct exports
 - **Recommendation:** Keep barrel files focused on re-exporting
@@ -771,13 +770,13 @@ These files form circular dependency chains:
 - **Recommendation:** Keep barrel files focused on re-exporting
 - **Severity:** Low
 
-### `client\src\shared\ui\offline\index.ts`
+### `client\src\shared\ui\performance\index.ts`
 
 - **Issue:** Mixed re-exports and direct exports
 - **Recommendation:** Keep barrel files focused on re-exporting
 - **Severity:** Low
 
-### `client\src\shared\ui\performance\index.ts`
+### `client\src\shared\ui\offline\index.ts`
 
 - **Issue:** Mixed re-exports and direct exports
 - **Recommendation:** Keep barrel files focused on re-exporting
@@ -1095,6 +1094,12 @@ These files form circular dependency chains:
 - **Recommendation:** Keep barrel files focused on re-exporting
 - **Severity:** Low
 
+### `client\src\features\analysis\ui\conflict-of-interest\index.ts`
+
+- **Issue:** Mixed re-exports and direct exports
+- **Recommendation:** Keep barrel files focused on re-exporting
+- **Severity:** Low
+
 ### `client\src\features\analysis\model\services\index.ts`
 
 - **Issue:** Mixed re-exports and direct exports
@@ -1102,12 +1107,6 @@ These files form circular dependency chains:
 - **Severity:** Low
 
 ### `client\src\features\analysis\model\hooks\index.ts`
-
-- **Issue:** Mixed re-exports and direct exports
-- **Recommendation:** Keep barrel files focused on re-exporting
-- **Severity:** Low
-
-### `client\src\features\analysis\ui\conflict-of-interest\index.ts`
 
 - **Issue:** Mixed re-exports and direct exports
 - **Recommendation:** Keep barrel files focused on re-exporting

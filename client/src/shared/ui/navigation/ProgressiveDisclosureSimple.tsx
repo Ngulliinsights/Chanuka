@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Clock, MapPin, MenuIcon as Menu, CheckCircle, Circle, ArrowRight, BookOpenIcon as BookOpen, Target } from 'lucide-react';
+import { ChevronDown, ChevronRight, Clock, MapPin, Menu, CheckCircle, Circle, ArrowRight, BookOpen, Target } from 'lucide-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 // Enhanced types for progressive disclosure
@@ -170,6 +170,7 @@ const ReadingPathGuidance = ({
   onSectionChange?: (sectionId: string) => void;
 }) => {
   const currentIndex = sections.findIndex(s => s.id === currentSectionId);
+  // currentIndex is available for future use
   const recommendedPath = sections.filter(s => s.isRequired);
   const nextRecommended = recommendedPath.find(s => !s.isCompleted);
 

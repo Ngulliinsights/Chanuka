@@ -1,19 +1,25 @@
 /**
  * Bills Feature - Tracking, Analysis, Legislative Monitoring
- * Feature-Sliced Design barrel exports
+ * Flattened Feature-Sliced Design exports
  */
 
-// Model layer (types and hooks)
-export * from './model';
+// Types
+export * from './types';
 
-// Services layer (business logic)
+// Hooks (React Query)
+export * from './hooks';
+
+// Services (business logic)
 export * from './services';
 
 // UI Components
-export * from './ui';
+export { BillCard } from './BillCard';
+export { BillList } from './BillList';
+export { BillAnalysis } from './BillAnalysis';
+export { BillHeader } from './BillHeader';
 
-// API Layer
-export * from './api';
+// Legacy UI exports for compatibility
+export * from './ui';
 
 
 

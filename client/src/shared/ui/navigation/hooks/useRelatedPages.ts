@@ -54,7 +54,7 @@ export const useRelatedPages = (
 
     // Filter by role access if requested
     if (filterByRole) {
-      relatedPages = relatedPages.filter(page => {
+      relatedPages = relatedPages.filter(_page => {
         // For now, assume all pages in relationships are accessible
         // In a full implementation, this would check against navigation items
         return true;

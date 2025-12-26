@@ -102,11 +102,10 @@ export function validateLoadingProgress(progress: unknown): any {
     return LoadingProgressSchema.parse(progress);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const field = error.errors[0]?.path.join('.') || 'unknown';
       const message = error.errors[0]?.message || 'Invalid loading progress';
-      throw new LoadingValidationError(message, field, progress, { zodError: error });
+      throw new LoadingValidationError(message);
     }
-    throw new LoadingValidationError('Loading progress validation failed', 'progress', progress);
+    throw new LoadingValidationError('Loading progress validation failed');
   }
 }
 
@@ -115,11 +114,10 @@ export function validateLoadingStage(stage: unknown): any {
     return LoadingStageSchema.parse(stage);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const field = error.errors[0]?.path.join('.') || 'unknown';
       const message = error.errors[0]?.message || 'Invalid loading stage';
-      throw new LoadingValidationError(message, field, stage, { zodError: error });
+      throw new LoadingValidationError(message);
     }
-    throw new LoadingValidationError('Loading stage validation failed', 'stage', stage);
+    throw new LoadingValidationError('Loading stage validation failed');
   }
 }
 
@@ -128,11 +126,10 @@ export function validateLoadingOperation(operation: unknown): any {
     return LoadingOperationSchema.parse(operation);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const field = error.errors[0]?.path.join('.') || 'unknown';
       const message = error.errors[0]?.message || 'Invalid loading operation';
-      throw new LoadingValidationError(message, field, operation, { zodError: error });
+      throw new LoadingValidationError(message);
     }
-    throw new LoadingValidationError('Loading operation validation failed', 'operation', operation);
+    throw new LoadingValidationError('Loading operation validation failed');
   }
 }
 
@@ -141,11 +138,10 @@ export function validateLoadingConfig(config: unknown): any {
     return LoadingConfigSchema.parse(config);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const field = error.errors[0]?.path.join('.') || 'unknown';
       const message = error.errors[0]?.message || 'Invalid loading configuration';
-      throw new LoadingValidationError(message, field, config, { zodError: error });
+      throw new LoadingValidationError(message);
     }
-    throw new LoadingValidationError('Loading configuration validation failed', 'config', config);
+    throw new LoadingValidationError('Loading configuration validation failed');
   }
 }
 
@@ -154,11 +150,10 @@ export function validateLoadingStats(stats: unknown): any {
     return LoadingStatsSchema.parse(stats);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const field = error.errors[0]?.path.join('.') || 'unknown';
       const message = error.errors[0]?.message || 'Invalid loading stats';
-      throw new LoadingValidationError(message, field, stats, { zodError: error });
+      throw new LoadingValidationError(message);
     }
-    throw new LoadingValidationError('Loading stats validation failed', 'stats', stats);
+    throw new LoadingValidationError('Loading stats validation failed');
   }
 }
 
@@ -168,9 +163,9 @@ export function validateTimeout(timeout: number): number {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const message = error.errors[0]?.message || 'Invalid timeout value';
-      throw new LoadingValidationError(message, 'timeout', timeout, { zodError: error });
+      throw new LoadingValidationError(message);
     }
-    throw new LoadingValidationError('Timeout validation failed', 'timeout', timeout);
+    throw new LoadingValidationError('Timeout validation failed');
   }
 }
 
@@ -181,10 +176,7 @@ export function validateRetryCount(retryCount: number, maxRetries: number): numb
     
     if (validatedRetryCount > validatedMaxRetries) {
       throw new LoadingValidationError(
-        'Retry count cannot exceed max retries',
-        'retryCount',
-        retryCount,
-        { maxRetries }
+        'Retry count cannot exceed max retries'
       );
     }
     
@@ -195,9 +187,9 @@ export function validateRetryCount(retryCount: number, maxRetries: number): numb
     }
     if (error instanceof z.ZodError) {
       const message = error.errors[0]?.message || 'Invalid retry count';
-      throw new LoadingValidationError(message, 'retryCount', retryCount, { zodError: error });
+      throw new LoadingValidationError(message);
     }
-    throw new LoadingValidationError('Retry count validation failed', 'retryCount', retryCount);
+    throw new LoadingValidationError('Retry count validation failed');
   }
 }
 

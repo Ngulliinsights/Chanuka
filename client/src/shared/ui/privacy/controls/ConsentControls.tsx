@@ -3,7 +3,7 @@
  * GDPR consent management and notification preferences
  */
 
-import React from 'react';
+// Remove unused React import
 import {
   Bell,
   Download,

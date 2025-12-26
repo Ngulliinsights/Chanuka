@@ -62,12 +62,12 @@ export const commentVoteTypeEnum = pgEnum('comment_vote_type', [
 
 // Bill Vote Types
 export const billVoteTypeEnum = pgEnum('bill_vote_type', [
-  'for', 'against', 'abstain'
+  'support', 'oppose', 'abstain'
 ]);
 
 // Engagement Types
 export const engagementTypeEnum = pgEnum('engagement_type', [
-  'view', 'comment', 'vote', 'share', 'track', 'report'
+  'view', 'comment', 'vote', 'share', 'track', 'report', 'download', 'bookmark', 'print'
 ]);
 
 // Notification Types
@@ -143,6 +143,17 @@ export const riskCategoryEnum = pgEnum('risk_category', [
   'legislative', 'executive', 'judicial', 'social', 'economic', 'technological', 'international'
 ]);
 
+// Additional enums for citizen participation
+export const positionEnum = pgEnum('position', ['support', 'oppose', 'neutral', 'question']);
+export const notificationFrequencyEnum = pgEnum('notification_frequency', ['immediate', 'daily_digest', 'weekly_digest']);
+export const digestFrequencyEnum = pgEnum('digest_frequency', ['never', 'immediate', 'hourly', 'daily', 'weekly']);
+export const notificationLanguageEnum = pgEnum('notification_language', ['en', 'sw']);
+export const accessibilityFormatEnum = pgEnum('accessibility_format', ['standard', 'plain_text', 'high_contrast', 'screen_reader']);
+export const priorityEnum = pgEnum('priority', ['low', 'normal', 'high', 'urgent']);
+export const deliveryStatusEnum = pgEnum('delivery_status', ['pending', 'sent', 'delivered', 'failed', 'retrying']);
+export const contactTypeEnum = pgEnum('contact_type', ['email', 'phone', 'whatsapp']);
+export const deviceTypeEnum = pgEnum('device_type', ['mobile', 'tablet', 'desktop']);
+
 // Export all enums for use in schemas
 export type KenyanCounty = typeof kenyanCountyEnum.enumValues[number];
 export type Chamber = typeof chamberEnum.enumValues[number];
@@ -163,5 +174,14 @@ export type ActionStatus = typeof actionStatusEnum.enumValues[number];
 export type AmbassadorStatus = typeof ambassadorStatusEnum.enumValues[number];
 export type SessionType = typeof sessionTypeEnum.enumValues[number];
 export type ParticipationMethod = typeof participationMethodEnum.enumValues[number];
+export type Position = typeof positionEnum.enumValues[number];
+export type NotificationFrequency = typeof notificationFrequencyEnum.enumValues[number];
+export type DigestFrequency = typeof digestFrequencyEnum.enumValues[number];
+export type NotificationLanguage = typeof notificationLanguageEnum.enumValues[number];
+export type AccessibilityFormat = typeof accessibilityFormatEnum.enumValues[number];
+export type Priority = typeof priorityEnum.enumValues[number];
+export type DeliveryStatus = typeof deliveryStatusEnum.enumValues[number];
+export type ContactType = typeof contactTypeEnum.enumValues[number];
+export type DeviceType = typeof deviceTypeEnum.enumValues[number];
 
 

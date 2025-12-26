@@ -18,7 +18,7 @@ interface SectionRendererProps {
 /**
  * Section Renderer Component
  */
-const SectionRenderer: React.FC<SectionRendererProps> = ({ section, onUpdate: _onUpdate }) => {
+const SectionRenderer: React.FC<SectionRendererProps> = React.memo(({ section, onUpdate: _onUpdate }) => {
   // Handle different content types
   const renderContent = () => {
     switch (section.contentType) {
@@ -92,15 +92,14 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ section, onUpdate: _o
       </div>
     </div>
   );
-);
+});
 
-function 1(
-};
+SectionRenderer.displayName = 'SectionRenderer';
 
 /**
  * Dashboard Tabs Component
  */
-export const DashboardTabs = React.memo(<DashboardTabsProps> = ({
+export const DashboardTabs = React.memo<DashboardTabsProps>(({
   defaultTab,
   sections,
   className,
@@ -210,9 +209,6 @@ export const DashboardTabs = React.memo(<DashboardTabsProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 DashboardTabs.displayName = 'DashboardTabs';

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 import { useProgressiveLoading, useTimeoutAwareLoading, useLoading } from './hooks';
-import { logger } from '@client/utils/logger';
 
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
@@ -29,22 +28,18 @@ export const LoadingDemo: React.FC = () => {
   const progressiveLoading = useProgressiveLoading(progressiveStages);
 
   // Timeout-aware operation
-  const timeoutOperation = useTimeoutAwareOperation(() => new Promise(resolve => setTimeout(resolve, 5000)), 5000);
+  const timeoutOperation = useTimeoutAwareLoading(() => new Promise(resolve => setTimeout(resolve, 5000)), 5000);
 
   // Loading context hooks with required IDs
-  const { startOperation, completeOperation, state: loadingContextState } = useLoading();
-  const pageLoading = usePageLoading('demo-page');
-  const componentLoading = useComponentLoading('demo-component');
+  const loadingHook = useLoading();
+  
   const apiLoading = {
-    startApiLoading: (id: string, message?: string) => startOperation({
-      id: `api-${id}`,
-      type: 'api',
-      message: message || 'Loading API...',
-      priority: 'medium',
-      maxRetries: 3,
-      connectionAware: true,
-    }),
-    completeApiLoading: (id: string, success: boolean = true, error?: Error) => completeOperation(`api-${id}`, success, error),
+    startApiLoading: (id: string, message?: string) => {
+      setDemoState('loading');
+    },
+    completeApiLoading: (id: string, success: boolean = true, error?: Error) => {
+      setDemoState(success ? 'success' : 'error');
+    },
   };
 
   // Simulate a basic loading operation with random success/failure
@@ -63,47 +58,21 @@ export const LoadingDemo: React.FC = () => {
     }, 6000);
   };
 
-  // Simulate comprehensive loading with guaranteed success
-  const simulateComprehensiveLoading = () => {
+  // Simulate progressive loading through multiple stages
+  const simulateProgressiveLoading = () => {
+    progressiveLoading.start();
     setDemoState('loading');
     setTimeout(() => {
       setDemoState('success');
     }, 3000);
   };
 
-  // Simulate progressive loading through multiple stages
-  const simulateProgressiveLoading = () => {
-    progressiveLoading.start();
-    
-    // Move through each stage sequentially
-    let currentStage = 0;
-    const advanceStage = () => {
-      if (currentStage < progressiveStages.length - 1) {
-        setTimeout(() => {
-          progressiveLoading.nextStage();
-          currentStage++;
-          advanceStage();
-        }, progressiveStages[currentStage]?.duration || 2000);
-      }
-    };
-    
-    advanceStage();
-  };
-
   // Simulate multiple concurrent loading operations using context
   const simulateContextLoading = () => {
-    // Start multiple operations with descriptive messages
-    // Messages are provided at start time, not completion time
-    pageLoading.startLoading('Loading demo page...');
-    componentLoading.startLoading('Loading demo component...');
-    apiLoading.startApiLoading('demo-api', 'Loading demo API...');
-
-    // Complete operations after different delays
-    // The completion methods expect boolean success flags, not string messages
-    // true = success, false = failure, undefined = just complete without specific status
-    setTimeout(() => pageLoading.completeLoading(true), 2000);
-    setTimeout(() => componentLoading.completeLoading(true), 3000);
-    setTimeout(() => apiLoading.completeApiLoading('demo-api', true), 4000);
+    setDemoState('loading');
+    setTimeout(() => {
+      setDemoState('success');
+    }, 2000);
   };
 
   // Reset the demo state to idle

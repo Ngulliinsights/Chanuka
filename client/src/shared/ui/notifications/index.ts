@@ -4,4 +4,4 @@
 
 export { NotificationCenter } from './NotificationCenter';
 export { NotificationItem } from './NotificationItem';
-export { NotificationPreferences } from './NotificationPreferences';
+export { default as NotificationPreferences } from './NotificationPreferences';

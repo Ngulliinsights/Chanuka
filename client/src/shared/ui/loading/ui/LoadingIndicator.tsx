@@ -13,7 +13,7 @@ export interface LoadingIndicatorProps extends LoadingStateProps {
   color?: 'primary' | 'secondary' | 'accent' | 'muted';
 }
 
-export const LoadingIndicator = React.memo(<LoadingIndicatorProps> = ({
+export const LoadingIndicator = React.memo<LoadingIndicatorProps>(({
   className,
   size = DEFAULT_LOADING_SIZE,
   message,
@@ -21,7 +21,7 @@ export const LoadingIndicator = React.memo(<LoadingIndicatorProps> = ({
   variant = 'spinner',
   color = 'primary',
 }) => {
-  const sizeClass = LOADING_SIZES[size];
+  const sizeClass = LOADING_SIZES[size as keyof typeof LOADING_SIZES] || LOADING_SIZES[DEFAULT_LOADING_SIZE];
   
   const colorClasses = {
     primary: 'text-blue-600',
@@ -135,9 +135,6 @@ export const LoadingIndicator = React.memo(<LoadingIndicatorProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 export default LoadingIndicator;

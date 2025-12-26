@@ -16,7 +16,7 @@ interface SectionRendererProps {
 /**
  * Section Renderer Component
  */
-const SectionRenderer: React.FC<SectionRendererProps> = ({ section, onUpdate }) => {
+const SectionRenderer: React.FC<SectionRendererProps> = React.memo(({ section, onUpdate }) => {
   // Handle different content types
   const renderContent = () => {
     switch (section.contentType) {
@@ -100,15 +100,14 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ section, onUpdate }) 
       </div>
     </section>
   );
-);
+});
 
-function 1(
-};
+SectionRenderer.displayName = 'SectionRenderer';
 
 /**
  * Dashboard Stack Component
  */
-export const DashboardStack = React.memo(<DashboardStackProps> = ({
+export const DashboardStack = React.memo<DashboardStackProps>(({
   spacing = 'normal',
   sections,
   className,
@@ -167,9 +166,6 @@ export const DashboardStack = React.memo(<DashboardStackProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 DashboardStack.displayName = 'DashboardStack';

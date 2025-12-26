@@ -8,7 +8,7 @@ import { TimeoutAwareLoaderProps } from '../types';
 import { cn } from '../../../design-system/lib/utils';
 import { LoadingIndicator } from './LoadingIndicator';
 
-export const TimeoutAwareLoader = React.memo(<TimeoutAwareLoaderProps> = ({
+export const TimeoutAwareLoader = React.memo<TimeoutAwareLoaderProps>(({
   className,
   size = 'md',
   message = 'Loading...',
@@ -152,9 +152,6 @@ export const TimeoutAwareLoader = React.memo(<TimeoutAwareLoaderProps> = ({
       )}
     </div>
   );
-);
-
-function 1(
-};
+});
 
 export default TimeoutAwareLoader;

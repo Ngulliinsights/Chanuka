@@ -1,12 +1,13 @@
-import { defineConfig, loadEnv, type ConfigEnv } from 'vite'
-import react from '@vitejs/plugin-react'
+import crypto from 'crypto'
 import path from 'path'
 import { fileURLToPath } from 'url'
+
+import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { defineConfig, loadEnv, type ConfigEnv, type Plugin } from 'vite'
 import viteCompression from 'vite-plugin-compression'
-import type { Plugin } from 'vite'
+
 import type { MinifyOptions } from 'terser'
-import crypto from 'crypto'
 
 // Environment variable validation function
 function validateEnvironmentVariables(env: Record<string, string>, mode: string) {
@@ -190,9 +191,9 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         '@client/utils/secure-token-manager': path.resolve(rootDir, './src/utils/secure-token-manager.ts'),
         
         // Logger consolidation - redirect all logger imports to unified implementation
-                '@client/utils/logger': path.resolve(rootDir, './src/utils/logger.ts'),
-                '@client/utils/logger-simple': path.resolve(rootDir, './src/utils/logger.ts'),
-              },
+        '@client/utils/logger': path.resolve(rootDir, './src/utils/logger.ts'),
+        '@client/utils/logger-simple': path.resolve(rootDir, './src/utils/logger.ts'),
+      },
       // Extension resolution order affects lookup speed
       // More common extensions first means fewer failed lookups
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
@@ -388,7 +389,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         },
 
         // Warning filtering keeps your build output clean and actionable
-        onwarn(warning: any, warn: (warning: any) => void) {
+        onwarn(warning: any, warn: (warning: unknown) => void) {
           // Circular dependencies are common in React apps and usually harmless
           if (warning.code === 'CIRCULAR_DEPENDENCY') return
           // This warning appears with some libraries but doesn't affect functionality

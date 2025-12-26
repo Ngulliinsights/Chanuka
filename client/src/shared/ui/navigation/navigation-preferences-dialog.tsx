@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from "../../design-system/interactive/dialog";
 import { Label } from "@client/shared/design-system/typography/Label.tsx";
 import { Switch } from "@client/shared/design-system/interactive/Switch.tsx";
 
@@ -18,9 +18,9 @@ interface NavigationPreferencesDialogProps {
   trigger: React.ReactNode;
 }
 
-export const NavigationPreferencesDialog = React.memo(<
+export const NavigationPreferencesDialog = React.memo<
   NavigationPreferencesDialogProps
-> = ({ trigger }) => {
+>(({ trigger }) => {
   const [open, setOpen] = React.useState(false);
   const { preferences, updatePreferences } = useNavigationPreferences();
 
@@ -73,10 +73,7 @@ export const NavigationPreferencesDialog = React.memo(<
       </DialogContent>
     </Dialog>
   );
-);
-
-function 1(
-};
+});
 
 export default NavigationPreferencesDialog;
 

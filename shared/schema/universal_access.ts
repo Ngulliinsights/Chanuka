@@ -86,6 +86,13 @@ export const ambassadors = pgTable("ambassadors", {
   // Contact method validation
   contactMethodCheck: check("ambassadors_contact_method_check",
     sql`${table.contact_phone} IS NOT NULL OR ${table.contact_email} IS NOT NULL`),
+
+  // Foreign key indexes
+  userIdIdx: index("idx_ambassadors_user_id").on(table.user_id),
+  recruitedByIdx: index("idx_ambassadors_recruited_by").on(table.recruited_by_id),
+
+  // Status indexes
+  verificationStatusIdx: index("idx_ambassadors_verification_status").on(table.verification_status),
 }));
 
 // ============================================================================

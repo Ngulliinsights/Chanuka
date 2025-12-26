@@ -8,7 +8,7 @@
  * - Optimization recommendations
  */
 
-import React from 'react';
+// Remove unused React import
 import { NavigationPerformanceDashboard } from '@client/shared/ui/navigation/performance/NavigationPerformanceDashboard';
 
 export function PerformanceDashboard() {

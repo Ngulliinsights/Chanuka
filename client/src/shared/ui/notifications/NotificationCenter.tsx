@@ -5,7 +5,7 @@
  * and real-time updates.
  */
 
-import React from 'react';
+// Remove unused React import
 import { Bell, Filter, Settings, Check, X, Trash } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 

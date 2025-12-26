@@ -10,7 +10,7 @@ import { handleError, measureAsync, recordMetric } from '@client/core';
 import { DashboardError } from './errors';
 import { validateActivitySummary } from './validation';
 
-export const ActivitySummary = React.memo(<DashboardComponentProps> = ({ 
+export const ActivitySummary = React.memo<DashboardComponentProps>(({ 
   className = '',
   config,
   onError,
@@ -193,8 +193,4 @@ export const ActivitySummary = React.memo(<DashboardComponentProps> = ({
       </CardContent>
     </Card>
   );
-);
-
-function 1(
-};
-
+});

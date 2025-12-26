@@ -1,14 +1,7 @@
-/**
- * Bill Types
- * 
- * Type definitions for bill-related domain models
- */
-
-import type { BaseApiConfig, BaseApiRequest, BaseApiResponse, BaseWebSocketMessage, BaseBillData } from './base';
-import type { Sponsor } from './sponsor';
+import { PaginationParams } from './common';
 
 // ============================================================================
-// Bill Status and Urgency
+// Enums
 // ============================================================================
 
 export enum BillStatus {
@@ -39,88 +32,55 @@ export enum ComplexityLevel {
 }
 
 // ============================================================================
-// Bill Models
+// Data Structures
 // ============================================================================
 
-export interface Amendment {
-  readonly id: number;
-  readonly billId: number;
-  readonly number: string;
-  readonly title: string;
-  readonly description: string;
-  readonly proposedDate: string;
-  readonly status: AmendmentStatus;
-  readonly sponsor: Sponsor;
+export interface Sponsor {
+  id: number;
+  name: string;
+  party: string;
+  role: 'primary' | 'co-sponsor';
+  district?: string;
+  avatarUrl?: string;
 }
 
-export type AmendmentStatus = 'proposed' | 'debated' | 'passed' | 'rejected' | 'withdrawn';
-
-export interface ConstitutionalFlag {
-  readonly id: number;
-  readonly type: string;
-  readonly description: string;
-  readonly severity: Severity;
-  readonly article?: string;
-  readonly clause?: string;
-  readonly analysis?: string;
-}
-
-export type Severity = 'low' | 'medium' | 'high' | 'critical';
-
-// ============================================================================
-// Bill Subscription Types
-// ============================================================================
-
-export type BillSubscriptionType =
-  | 'status_change'
-  | 'new_comment'
-  | 'amendment'
-  | 'voting_scheduled'
-  | 'sponsor_change';
-
-export interface BillUpdate {
-  readonly type: BillSubscriptionType;
-  readonly data: BillUpdateData;
-  readonly timestamp: string;
-}
-
-export interface BillUpdateData {
-  readonly billId: number;
-  readonly oldStatus?: BillStatus;
-  readonly newStatus?: BillStatus;
-  readonly title?: string;
-  readonly viewCount?: number;
-  readonly saveCount?: number;
-  readonly commentCount?: number;
-  readonly shareCount?: number;
-  readonly changes?: Readonly<Record<string, unknown>>;
+export interface Bill {
+  id: number;
+  billNumber: string;
+  title: string;
+  summary: string;
+  status: BillStatus;
+  urgency: UrgencyLevel;
+  complexity: ComplexityLevel;
+  introducedDate: string;
+  lastActionDate: string;
+  sponsors: Sponsor[];
+  tags: string[];
+  policyAreas: string[];
+  
+  // Engagement Metrics
+  trackingCount?: number;
+  viewCount?: number;
+  commentCount?: number;
+  
+  // Analysis
+  constitutionalIssues?: string[];
+  financialImpact?: string;
 }
 
 // ============================================================================
-// Query Parameters and Search
+// API Inputs
 // ============================================================================
-
-export interface DateRange {
-  readonly start?: string;
-  readonly end?: string;
-}
-
-export type BillSortField = 'date' | 'title' | 'urgency' | 'engagement' | 'relevance';
 
 export interface BillsQueryParams extends PaginationParams {
-  readonly status?: ReadonlyArray<BillStatus>;
-  readonly urgency?: ReadonlyArray<UrgencyLevel>;
-  readonly policyAreas?: ReadonlyArray<string>;
-  readonly sponsors?: ReadonlyArray<number>;
-  readonly dateRange?: DateRange;
-  readonly sortBy?: BillSortField;
-  readonly sortOrder?: 'asc' | 'desc';
-}
-
-export interface BillsSearchParams extends BillsQueryParams {
-  readonly query?: string;
-  readonly constitutionalFlags?: boolean;
-  readonly controversyLevels?: ReadonlyArray<string>;
-  readonly minComplexity?: ComplexityLevel;
-  readonly maxComplexity?: ComplexityLevel;
+  query?: string;
+  status?: BillStatus[];
+  urgency?: UrgencyLevel[];
+  sponsors?: number[];
+  dateRange?: {
+    start?: string;
+    end?: string;
+  };
+  sortBy?: 'date' | 'relevance' | 'urgency';
+  sortOrder?: 'asc' | 'desc';
 }

@@ -12,12 +12,7 @@ const logger = {
 };
 
 // Simple route preloader mock
-const routePreloader = {
-  preloadComponent: async (component: any, route: string) => {
-    // Simple preload implementation
-    return Promise.resolve();
-  }
-};
+// Remove unused variables - placeholder for future implementation
 
 /**
  * Create a safe lazy component with error handling

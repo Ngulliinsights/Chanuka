@@ -2,13 +2,13 @@
 // ANALYSIS SCHEMA - Drizzle table for analysis records
 // ============================================================================
 import { sql } from "drizzle-orm";
-import { pgTable, integer, numeric, text, jsonb, boolean, timestamp, uuid as uuidType, varchar } from "drizzle-orm/pg-core";
+import { pgTable, numeric, text, jsonb, boolean, timestamp, uuid as uuidType, varchar, index } from "drizzle-orm/pg-core";
 
 import { bills, users } from "./foundation";
 
 export const analysis = pgTable("analysis", {
-  id: integer("id").primaryKey(),
-  bill_id: integer("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
+  id: uuidType("id").primaryKey().default(sql`gen_random_uuid()`),
+  bill_id: uuidType("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   analysis_type: varchar("analysis_type", { length: 50 }).notNull(),
   results: jsonb("results").notNull().default(sql`'{}'::jsonb`),
   confidence: numeric("confidence", { precision: 5, scale: 4 }).default(sql`0`),
@@ -18,7 +18,14 @@ export const analysis = pgTable("analysis", {
   approved_by: uuidType("approved_by").references(() => users.id, { onDelete: "set null" }),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => ({
+  // Performance indexes for common queries
+  billIdIdx: index("idx_analysis_bill_id").on(table.bill_id),
+  analysisTypeIdx: index("idx_analysis_type").on(table.analysis_type),
+  createdAtIdx: index("idx_analysis_created_at").on(table.created_at.desc()),
+  approvedByIdx: index("idx_analysis_approved_by").on(table.approved_by)
+    .where(sql`${table.approved_by} IS NOT NULL`),
+}));
 
 // Types
 export type Analysis = typeof analysis.$inferSelect;

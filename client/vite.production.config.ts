@@ -1,17 +1,17 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import react from '@vitejs/plugin-react';
-import { visualizer } from 'rollup-plugin-visualizer';
-import { compression } from 'vite-plugin-compression';
-import { createHtmlPlugin } from 'vite-plugin-html';
+import { resolve } from 'path'
+
+import react from '@vitejs/plugin-react'
+import { visualizer } from 'rollup-plugin-visualizer'
+import { defineConfig } from 'vite'
+import compression from 'vite-plugin-compression'
+import { createHtmlPlugin } from 'vite-plugin-html'
 
 export default defineConfig({
   plugins: [
     react({
-      // Enable React Fast Refresh in development
-      fastRefresh: process.env.NODE_ENV !== 'production',
+      // React plugin configuration for production
     }),
-    
+
     // HTML optimization
     createHtmlPlugin({
       minify: {
@@ -25,19 +25,19 @@ export default defineConfig({
         minifyJS: true,
       },
     }),
-    
+
     // Gzip compression
     compression({
       algorithm: 'gzip',
       ext: '.gz',
     }),
-    
+
     // Brotli compression
     compression({
       algorithm: 'brotliCompress',
       ext: '.br',
     }),
-    
+
     // Bundle analyzer
     visualizer({
       filename: 'dist/bundle-analysis.html',
@@ -47,13 +47,13 @@ export default defineConfig({
       template: 'treemap',
     }),
   ],
-  
+
   build: {
     // Production optimizations
     target: 'es2020',
     minify: 'terser',
     sourcemap: true,
-    
+
     // Advanced terser options
     terserOptions: {
       compress: {
@@ -69,7 +69,7 @@ export default defineConfig({
         comments: false,
       },
     },
-    
+
     // Chunk splitting strategy
     rollupOptions: {
       output: {
@@ -80,7 +80,7 @@ export default defineConfig({
           'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
           'chart-vendor': ['d3', 'recharts'],
           'utils-vendor': ['lodash', 'date-fns'],
-          
+
           // Feature chunks
           'bills-feature': [
             './src/components/bills',
@@ -97,19 +97,16 @@ export default defineConfig({
             './src/store/slices/errorAnalyticsSlice',
           ],
         },
-        
+
         // Optimize chunk names
-        chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId
-            ? chunkInfo.facadeModuleId.split('/').pop()?.replace('.tsx', '').replace('.ts', '')
-            : 'chunk';
+        chunkFileNames: () => {
           return `js/[name]-[hash].js`;
         },
-        
+
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.') || [];
           const ext = info[info.length - 1];
-          
+
           if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name || '')) {
             return `images/[name]-[hash][extname]`;
           }
@@ -123,12 +120,12 @@ export default defineConfig({
         },
       },
     },
-    
+
     // Performance budgets
     chunkSizeWarningLimit: 1000,
     assetsInlineLimit: 4096,
   },
-  
+
   // Resolve configuration
   resolve: {
     alias: {
@@ -142,7 +139,7 @@ export default defineConfig({
       '@types': resolve(__dirname, './src/types'),
     },
   },
-  
+
   // Server configuration for production preview
   preview: {
     port: 3000,

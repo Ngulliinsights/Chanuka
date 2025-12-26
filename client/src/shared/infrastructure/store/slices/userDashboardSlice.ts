@@ -1,11 +1,4 @@
 
-// Forward declarations to resolve circular dependencies
-declare module './types' {
-  export interface ForwardDeclaredType {
-    [key: string]: any;
-  }
-}
-
 /**
  * User Dashboard State Management with Redux Toolkit
  * 
@@ -558,10 +551,4 @@ export const useUserDashboardSelectors = () => {
     setTimeFilter: (filter: TemporalFilter) => dispatch(setTimeFilter(filter)),
     setError: (error: string | null) => dispatch(setError(error))
   };
-};
-
-// Lazy import to break circular dependency
-const getUserDashboardSlice = async () => {
-  const { userDashboardSlice } = await import('./userDashboardSlice');
-  return userDashboardSlice;
 };

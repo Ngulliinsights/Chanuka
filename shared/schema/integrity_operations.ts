@@ -275,51 +275,70 @@ export const user_activity_log = pgTable("user_activity_log", {
 }));
 
 // ============================================================================
+// AUDIT PAYLOADS - Vertical partitioning for heavy JSONB data
+// ============================================================================
+
+export const audit_payloads = pgTable("audit_payloads", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  audit_log_id: uuid("audit_log_id").notNull().references(() => system_audit_log.id, { onDelete: "cascade" }),
+  payload_type: varchar("payload_type", { length: 50 }).notNull(), // "action_details", "resource_usage"
+  payload_data: jsonb("payload_data").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  // Unique constraint on audit_log_id and payload_type
+  auditLogPayloadTypeIdx: uniqueIndex("idx_audit_payloads_audit_log_payload_type").on(table.audit_log_id, table.payload_type),
+  // Individual indexes
+  auditLogIdIdx: index("idx_audit_payloads_audit_log_id").on(table.audit_log_id),
+  payloadTypeIdx: index("idx_audit_payloads_type").on(table.payload_type),
+  createdAtIdx: index("idx_audit_payloads_created_at").on(table.created_at),
+  // GIN index for payload_data searches
+  payloadGinIdx: index("idx_audit_payloads_payload_gin").using("gin", table.payload_data),
+}));
+
+// ============================================================================
 // SYSTEM AUDIT LOG - System-level audit trail
 // ============================================================================
 
 export const system_audit_log = pgTable("system_audit_log", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // Audit event classification
   event_type: varchar("event_type", { length: 100 }).notNull(),
   event_category: varchar("event_category", { length: 50 }).notNull(), // "security", "data", "admin", "system", "compliance"
   severity: severityEnum("severity").notNull().default("low"),
-  
+
   // Actor information
   actor_type: varchar("actor_type", { length: 50 }).notNull(), // "user", "system", "admin", "service"
   actor_id: uuid("actor_id"),
   actor_role: varchar("actor_role", { length: 50 }),
   actor_identifier: varchar("actor_identifier", { length: 255 }), // Username or service name
-  
-  // Action details
+
+  // Action details - moved to audit_payloads for vertical partitioning
   action: varchar("action", { length: 100 }).notNull(), // "create", "update", "delete", "access", "export"
-  action_details: jsonb("action_details").default(sql`'{}'::jsonb`),
-  
+
   // Target information - what was acted upon
   target_type: varchar("target_type", { length: 50 }),
   target_id: uuid("target_id"),
   target_description: text("target_description"),
-  
+
   // Outcome and error handling
   success: boolean("success").notNull(),
   status_code: integer("status_code"), // HTTP status code or application code
   error_message: text("error_message"),
   error_stack: text("error_stack"), // For debugging failed operations
-  
+
   // Context for troubleshooting
   source_ip: varchar("source_ip", { length: 45 }),
   user_agent: text("user_agent"),
   session_id: varchar("session_id", { length: 255 }),
   request_id: varchar("request_id", { length: 255 }),
-  
-  // Performance metadata
+
+  // Performance metadata - moved to audit_payloads for vertical partitioning
   processing_time_ms: integer("processing_time_ms"),
-  resource_usage: jsonb("resource_usage").default(sql`'{}'::jsonb`), // {cpu, memory, db_queries}
-  
+
   // Compliance and retention
   retention_period_days: integer("retention_period_days").default(2555), // Default 7 years for compliance
-  
+
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
   // Composite indexes for common query patterns

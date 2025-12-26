@@ -1,378 +1,293 @@
-import { GlobalLoadingIndicatorProps } from '@client/types';
-import { Loader2, Network, AlertCircle, Clock, X, RefreshCw } from 'lucide-react';
-import React from 'react';
-import { createPortal } from 'react-dom';
+// File: GlobalLoadingIndicator.tsx
 
-import { useLoading } from './hooks/useLoading';
-import { cn } from '../../design-system/lib/utils';
-import { logger } from '@client/utils/logger';
+import { Loader2, Network } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
-import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
+import { cn } from '@client/lib/utils';
 
-export const GlobalLoadingIndicator = React.memo(<GlobalLoadingIndicatorProps> = ({
-  position = 'top-right',
-  showDetails = true,
-  showProgress = true,
-  showConnectionStatus = true,
-  maxVisible = 3,
-  autoHide = true,
-  autoHideDelay = 3000,
-  className,
-}) => {
-  const {
-    state,
-    cancelOperation,
-    retryOperation,
+import { useGlobalLoading } from './GlobalLoadingProvider';
+import { LoadingOperation, LoadingPriority } from './types';
+
+
+// ============================================================================
+// Types & Interfaces
+// ============================================================================
+
+/**
+ * Position options for the loading indicator
+ */
+export type LoadingIndicatorPosition =
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right'
+  | 'center';
+
+/**
+ * Loading state interface
+ */
+export interface LoadingState {
+  operations: Record<string, LoadingOperation>;
+  isOnline: boolean;
+}
+
+/**
+ * Global loading indicator props
+ */
+export interface GlobalLoadingIndicatorProps {
+  /** Position of the loading indicator */
+  position?: LoadingIndicatorPosition;
+  /** Whether to show detailed operation information */
+  showOperationDetails?: boolean;
+  /** Maximum number of operations to display */
+  maxVisibleOperations?: number;
+  /** Whether to auto-hide after completion */
+  autoHide?: boolean;
+  /** Delay before auto-hiding (in milliseconds) */
+  autoHideDelay?: number;
+  /** Additional CSS classes */
+  className?: string;
+  /** Custom loading message */
+  customMessage?: string;
+}
+
+/**
+ * Minimal loading indicator props
+ */
+export interface MinimalLoadingIndicatorProps {
+  className?: string;
+}
+
+/**
+ * Loading indicator configuration
+ */
+export interface LoadingIndicatorConfig extends Partial<GlobalLoadingIndicatorProps> {
+  enabled: boolean;
+}
+
+// ============================================================================
+// Hooks
+// ============================================================================
+
+/**
+ * Hook to connect to global loading context
+ */
+const useLoadingState = () => {
+  const { operations, isOnline, getOperationsByPriority } = useGlobalLoading();
+  
+  return {
+    state: {
+      operations,
+      isOnline,
+    },
     getOperationsByPriority,
-    shouldShowGlobalLoader,
-  } = useLoading();
+  };
+};
 
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [expandedOperations, setExpandedOperations] = React.useState<Set<string>>(new Set());
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
-  // Show/hide logic
-  React.useEffect(() => {
-    const hasOperations = Object.keys(state.operations).length > 0;
-    const shouldShow = hasOperations && shouldShowGlobalLoader();
-    
-    setIsVisible(shouldShow);
+/**
+ * Get CSS classes for indicator position
+ */
+const getPositionClasses = (position: LoadingIndicatorPosition): string => {
+  const baseClasses = 'fixed z-50';
 
-    if (!shouldShow && autoHide) {
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, autoHideDelay);
-      return () => clearTimeout(timer);
-    }
-    
-    return undefined;
-  }, [state.operations, shouldShowGlobalLoader, autoHide, autoHideDelay]);
+  const positionMap: Record<LoadingIndicatorPosition, string> = {
+    'top-left': `${baseClasses} top-4 left-4`,
+    'top-right': `${baseClasses} top-4 right-4`,
+    'bottom-left': `${baseClasses} bottom-4 left-4`,
+    'bottom-right': `${baseClasses} bottom-4 right-4`,
+    center: `${baseClasses} top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`,
+  };
 
-  const toggleOperationDetails = (operationId: string) => {
-    setExpandedOperations(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(operationId)) {
-        newSet.delete(operationId);
-      } else {
-        newSet.add(operationId);
+  return positionMap[position] || positionMap['top-right'];
+};
+
+/**
+ * Get priority-based operations
+ */
+const getVisibleOperations = (
+  operations: Record<string, LoadingOperation>,
+  maxVisible: number,
+  showDetails: boolean
+): LoadingOperation[] => {
+  if (!showDetails) return [];
+
+  const allOps = Object.values(operations);
+  const priorityOrder: Record<LoadingPriority, number> = { high: 0, medium: 1, low: 2 };
+
+  return allOps
+    .sort((a, b) => {
+      // Sort by priority first
+      const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+      if (priorityDiff !== 0) return priorityDiff;
+      // Then by startTime (most recent first)
+      return b.startTime - a.startTime;
+    })
+    .slice(0, maxVisible);
+};
+
+// ============================================================================
+// Main Component
+// ============================================================================
+
+/**
+ * Global loading indicator component with comprehensive loading state display
+ */
+export const GlobalLoadingIndicator = React.memo<GlobalLoadingIndicatorProps>(
+  ({
+    position = 'top-right',
+    showOperationDetails = false,
+    maxVisibleOperations = 3,
+    autoHide = true,
+    autoHideDelay = 5000,
+    className,
+    customMessage,
+  }) => {
+    const { state } = useLoadingState();
+    const [isVisible, setIsVisible] = useState(false);
+
+    // Calculate visible operations
+    const visibleOperations = useMemo(
+      () => getVisibleOperations(state.operations, maxVisibleOperations, showOperationDetails),
+      [state.operations, maxVisibleOperations, showOperationDetails]
+    );
+
+    const operationCount = Object.keys(state.operations).length;
+    const hasOperations = operationCount > 0;
+
+    // Handle visibility and auto-hide
+    useEffect(() => {
+      setIsVisible(hasOperations);
+
+      if (hasOperations && autoHide) {
+        const timer = setTimeout(() => {
+          setIsVisible(false);
+        }, autoHideDelay);
+
+        return () => clearTimeout(timer);
       }
-      return newSet;
-    });
-  };
+    }, [hasOperations, autoHide, autoHideDelay]);
 
-  const getPositionClasses = () => {
-    const baseClasses = 'fixed z-50';
-    switch (position) {
-      case 'top-left':
-        return `${baseClasses} top-4 left-4`;
-      case 'top-right':
-        return `${baseClasses} top-4 right-4`;
-      case 'bottom-left':
-        return `${baseClasses} bottom-4 left-4`;
-      case 'bottom-right':
-        return `${baseClasses} bottom-4 right-4`;
-      case 'center':
-        return `${baseClasses} top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`;
-      default:
-        return `${baseClasses} top-4 right-4`;
+    if (!isVisible) {
+      return null;
     }
-  };
 
-  const getConnectionIcon = () => {
-    if (!state.isOnline) {
-      return <Network className="h-4 w-4 text-red-500" />;
-    }
-    if (state.connectionInfo?.connectionType === 'slow') {
-      return <Network className="h-4 w-4 text-yellow-500" />;
-    }
-    return <Network className="h-4 w-4 text-green-500" />;
-  };
+    return (
+      <div
+        className={cn(
+          getPositionClasses(position),
+          'bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 min-w-[200px] max-w-[400px]',
+          'transition-all duration-300 ease-in-out',
+          className
+        )}
+        role="status"
+        aria-live="polite"
+        aria-busy={hasOperations}
+      >
+        {/* Main loading indicator */}
+        <div className="flex items-center gap-3">
+          <Loader2 className="h-4 w-4 animate-spin text-blue-600 flex-shrink-0" />
 
-  const getOperationIcon = (operation: any) => {
-    if (operation.error) {
-      return <AlertCircle className="h-4 w-4 text-red-500" />;
-    }
-    return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
-  };
-
-  const getOperationStatusColor = (operation: any) => {
-    if (operation.error) return 'text-red-600';
-    if (operation.priority === 'high') return 'text-primary';
-    return 'text-muted-foreground';
-  };
-
-  const formatTimeElapsed = (startTime: number) => {
-    const elapsed = Date.now() - startTime;
-    const seconds = Math.floor(elapsed / 1000);
-    if (seconds < 60) return `${seconds}s`;
-    const minutes = Math.floor(seconds / 60);
-    return `${minutes}m ${seconds % 60}s`;
-  };
-
-  const getVisibleOperations = () => {
-    const highPriority = getOperationsByPriority('high');
-    const mediumPriority = getOperationsByPriority('medium');
-    const lowPriority = getOperationsByPriority('low');
-    
-    // Show high priority first, then medium, then low
-    const sortedOperations = [...highPriority, ...mediumPriority, ...lowPriority];
-    return sortedOperations.slice(0, maxVisible);
-  };
-
-  if (!isVisible) return null;
-
-  const visibleOperations = getVisibleOperations();
-  const totalOperations = Object.keys(state.operations).length;
-  const hiddenCount = totalOperations - visibleOperations.length;
-
-  const indicator = (
-    <div className={cn(getPositionClasses(), className)}>
-      <Card className="w-80 max-w-sm shadow-lg border bg-background/95 backdrop-blur-sm">
-        <CardContent className="p-4">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              <span className="text-sm font-medium">
-                Loading ({totalOperations})
-              </span>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {customMessage || 'Loading...'}
             </div>
-            <div className="flex items-center space-x-2">
-              {showConnectionStatus && getConnectionIcon()}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsVisible(false)}
-                className="h-6 w-6 p-0"
-              >
-                <X className="h-3 w-3" />
-              </Button>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {showOperationDetails && operationCount > 0
+                ? `${operationCount} operation${operationCount !== 1 ? 's' : ''} in progress`
+                : 'Please wait'}
             </div>
           </div>
 
-          {/* Connection Status */}
-          {showConnectionStatus && !state.isOnline && (
-            <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-700 dark:text-red-300">
-              You're offline. Some operations may be limited.
-            </div>
+          {/* Offline indicator */}
+          {!state.isOnline && (
+            <Network
+              className="h-4 w-4 text-red-500 flex-shrink-0"
+              aria-label="Offline"
+              title="No network connection"
+            />
           )}
+        </div>
 
-          {showConnectionStatus && state.connectionInfo?.connectionType === 'slow' && (
-            <div className="mb-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-xs text-yellow-700 dark:text-yellow-300">
-              Slow connection detected. Operations may take longer.
-            </div>
-          )}
-
-          {/* Operations List */}
-          <div className="space-y-2">
+        {/* Operation details */}
+        {showOperationDetails && visibleOperations.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
             {visibleOperations.map((operation) => (
               <div
                 key={operation.id}
-                className="border rounded-lg p-3 bg-muted/30"
+                className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-2 flex-1 min-w-0">
-                    {getOperationIcon(operation)}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className={cn(
-                          'text-xs font-medium truncate',
-                          getOperationStatusColor(operation)
-                        )}>
-                          {operation.message || `${operation.type} loading`}
-                        </p>
-                        <span className="text-xs text-muted-foreground ml-2">
-                          {formatTimeElapsed(operation.startTime)}
-                        </span>
-                      </div>
-
-                      {/* Progress bar */}
-                      {showProgress && operation.progress !== undefined && (
-                        <div className="mt-1">
-                          <Progress 
-                            value={operation.progress} 
-                            className="h-1"
-                          />
-                        </div>
-                      )}
-
-                      {/* Stage info */}
-                      {operation.stage && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Stage: {operation.stage}
-                        </p>
-                      )}
-
-                      {/* Error message */}
-                      {operation.error && (
-                        <p className="text-xs text-red-500 mt-1">
-                          {operation.error.message}
-                        </p>
-                      )}
-
-                      {/* Retry count */}
-                      {operation.retryCount > 0 && (
-                        <p className="text-xs text-yellow-600 mt-1">
-                          Retry {operation.retryCount}/{operation.maxRetries}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Action buttons */}
-                  <div className="flex items-center space-x-1 ml-2">
-                    {showDetails && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleOperationDetails(operation.id)}
-                        className="h-6 w-6 p-0"
-                      >
-                        <span className="text-xs">
-                          {expandedOperations.has(operation.id) ? '−' : '+'}
-                        </span>
-                      </Button>
-                    )}
-                    
-                    {operation.error && operation.retryCount < operation.maxRetries && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => retryOperation(operation.id)}
-                        className="h-6 px-2 text-xs"
-                      >
-                        Retry
-                      </Button>
-                    )}
-                    
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => cancelOperation(operation.id)}
-                      className="h-6 w-6 p-0"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Expanded details */}
-                {showDetails && expandedOperations.has(operation.id) && (
-                  <div className="mt-2 pt-2 border-t border-muted text-xs text-muted-foreground space-y-1">
-                    <div>ID: {operation.id}</div>
-                    <div>Type: {operation.type}</div>
-                    <div>Priority: {operation.priority}</div>
-                    <div>Started: {new Date(operation.startTime).toLocaleTimeString()}</div>
-                    {operation.timeout && (
-                      <div>Timeout: {operation.timeout / 1000}s</div>
-                    )}
-                    <div>Connection Aware: {operation.connectionAware ? 'Yes' : 'No'}</div>
-                  </div>
-                )}
+                <div
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0',
+                    operation.priority === 'high' && 'bg-red-500',
+                    operation.priority === 'medium' && 'bg-yellow-500',
+                    operation.priority === 'low' && 'bg-blue-500'
+                  )}
+                />
+                <span className="flex-1 truncate">{operation.message || 'Loading...'}</span>
               </div>
             ))}
-          </div>
 
-          {/* Hidden operations indicator */}
-          {hiddenCount > 0 && (
-            <div className="mt-2 text-xs text-muted-foreground text-center">
-              +{hiddenCount} more operation{hiddenCount > 1 ? 's' : ''}
-            </div>
-          )}
-
-          {/* Adaptive settings info */}
-          {showDetails && (
-            <div className="mt-3 pt-2 border-t border-muted text-xs text-muted-foreground">
-              <div className="grid grid-cols-2 gap-1">
-                <div>Max Concurrent: {state.adaptiveSettings.maxConcurrentOperations}</div>
-                <div>Animations: {state.adaptiveSettings.enableAnimations ? 'On' : 'Off'}</div>
-                <div>Default Timeout: {state.adaptiveSettings.defaultTimeout / 1000}s</div>
-                <div>Retry Delay: {state.adaptiveSettings.retryDelay / 1000}s</div>
+            {operationCount > maxVisibleOperations && (
+              <div className="text-xs text-gray-500 dark:text-gray-400 text-center pt-1">
+                +{operationCount - maxVisibleOperations} more
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  // Render to portal for proper z-index handling
-  return createPortal(indicator, document.body);
-);
-
-function 1(
-};
-
-// Simplified version for minimal display
-export const MinimalGlobalLoadingIndicator = React.memo(<{
-  className?: string;
-}> = ({ className }) => {
-  const { state, shouldShowGlobalLoader } = useLoading();
-  const [isVisible, setIsVisible] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsVisible(shouldShowGlobalLoader());
-  }, [shouldShowGlobalLoader]);
-
-  if (!isVisible) return null;
-
-  const operationCount = Object.keys(state.operations).length;
-  const hasHighPriority = state.highPriorityLoading;
-
-  const indicator = (
-    <div className={cn(
-      'fixed top-4 right-4 z-50 bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg',
-      className
-    )}>
-      <div className="flex items-center space-x-2">
-        <Loader2 className={cn(
-          'animate-spin',
-          hasHighPriority ? 'h-5 w-5 text-primary' : 'h-4 w-4 text-muted-foreground'
-        )} />
-        <span className="text-sm text-muted-foreground">
-          Loading{operationCount > 1 ? ` (${operationCount})` : ''}
-        </span>
-        {!state.isOnline && (
-          <Network className="h-4 w-4 text-red-500" />
+            )}
+          </div>
         )}
       </div>
-    </div>
-  );
-
-  return createPortal(indicator, document.body);
+    );
+  }
 );
 
-function 1(
-};
+GlobalLoadingIndicator.displayName = 'GlobalLoadingIndicator';
 
-// Hook for controlling global loading indicator
-export const useGlobalLoadingIndicator = () => {
-  const [config, setConfig] = React.useState<Partial<GlobalLoadingIndicatorProps>>({});
-  const [isEnabled, setIsEnabled] = React.useState(true);
+// ============================================================================
+// Minimal Variant
+// ============================================================================
 
-  const show = (options?: Partial<GlobalLoadingIndicatorProps>) => {
-    setConfig(options || {});
-    setIsEnabled(true);
-  };
+/**
+ * Minimal global loading indicator - compact spinner-only version
+ */
+export const MinimalGlobalLoadingIndicator = React.memo<MinimalLoadingIndicatorProps>(
+  ({ className }) => {
+    const { state } = useLoadingState();
+    const [isVisible, setIsVisible] = useState(false);
 
-  const hide = () => {
-    setIsEnabled(false);
-  };
+    useEffect(() => {
+      setIsVisible(Object.keys(state.operations).length > 0);
+    }, [state.operations]);
 
-  const updateConfig = (updates: Partial<GlobalLoadingIndicatorProps>) => {
-    setConfig(prev => ({ ...prev, ...updates }));
-  };
+    if (!isVisible) {
+      return null;
+    }
 
-  return {
-    config,
-    isEnabled,
-    show,
-    hide,
-    updateConfig,
-  };
+    return (
+      <div
+        className={cn(
+          'fixed top-4 right-4 z-50',
+          'bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg border border-gray-200 dark:border-gray-700',
+          'transition-all duration-200',
+          className
+        )}
+        role="status"
+        aria-live="polite"
+        aria-label="Loading"
+      >
+        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 );
 
-function 1(
-};
+MinimalGlobalLoadingIndicator.displayName = 'MinimalGlobalLoadingIndicator';
 
+// ============================================================================
+// Default Export
+// ============================================================================
+
+export default GlobalLoadingIndicator;

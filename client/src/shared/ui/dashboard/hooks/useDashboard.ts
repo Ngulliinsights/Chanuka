@@ -3,7 +3,7 @@
  * Following navigation component hook patterns
  */
 
-import { useBills } from '@client/features/bills/hooks/useBills';
+import { useBills } from '@client/features/bills';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import {

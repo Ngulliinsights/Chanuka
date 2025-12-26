@@ -493,7 +493,7 @@ export const NotificationFallback: React.FC<NotificationProps> = React.memo(({
     >
       <div className="flex items-start">
         {icon && (
-          <img src={icon} alt="" className="w-8 h-8 mr-3 flex-shrink-0" / alt="" alt="">
+          <img src={icon} alt="" className="w-8 h-8 mr-3 flex-shrink-0" />
         )}
         <div className="flex-1">
           <h3 className="font-medium text-blue-800">{title}</h3>

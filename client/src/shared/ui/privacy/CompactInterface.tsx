@@ -3,7 +3,7 @@
  * Simplified interface for settings pages
  */
 
-import React from 'react';
+// Remove unused React import
 import {
   Shield,
   Settings,

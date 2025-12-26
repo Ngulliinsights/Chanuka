@@ -191,6 +191,14 @@ export class AuthApiService {
    */
   async validateStoredTokens(): Promise<boolean> {
     try {
+      // In development mode, if no server is running, just return false gracefully
+      if (process.env.NODE_ENV === 'development') {
+        const hasLocalTokens = localStorage.getItem('token') || localStorage.getItem('refresh_token');
+        if (!hasLocalTokens) {
+          return false;
+        }
+      }
+
       const response = await this.apiClient.post<{ valid: boolean }>(
         `${this.authEndpoint}/validate-tokens`,
         {},
@@ -199,6 +207,12 @@ export class AuthApiService {
 
       return response.data?.valid ?? false;
     } catch (error) {
+      // In development, connection errors are expected when no server is running
+      if (process.env.NODE_ENV === 'development') {
+        logger.debug('Token validation skipped - no server available (development mode)', { error });
+        return false;
+      }
+      
       logger.warn('Token validation failed', { error });
       return false;
     }
