@@ -225,7 +225,7 @@ export * from './navigation';
 // ============================================================================
 
 // Export core domain types from consolidated locations
-export type { Bill, Comment, User, CommentStatus, Sponsor, BillAnalysis } from '../types/core';
+export type { Bill, Comment, User, CommentStatus, Sponsor, BillAnalysis } from '../shared/types';
 export type { UserProfile, UserPreferences as FeatureUserPreferences } from '../features/users/types';
 export type { SearchQuery, SearchResult, SearchFilters, SearchResponse, SearchMetadata } from '../features/search/types';
 

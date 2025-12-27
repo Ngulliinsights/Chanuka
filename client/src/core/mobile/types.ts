@@ -36,7 +36,7 @@ export type {
   MobileKeyboardEvent,
   ResponsiveBreakpoints,
   MobileErrorContext,
-} from '../../types/mobile';
+} from '../../shared/types/mobile';
 
 // Backward compatibility aliases
 /**

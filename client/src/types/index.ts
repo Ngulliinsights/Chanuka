@@ -1,81 +1,57 @@
 /**
  * DEPRECATED - This directory has been migrated
  * 
- * All types are being consolidated into: client/src/shared/types/
+ * All types are being consolidated into appropriate locations:
+ * - Core domain types: @client/shared/types
+ * - API types: @client/core/api/types  
+ * - Auth types: @client/core/auth/types
+ * - Realtime types: @client/core/realtime/types
  * 
  * Update your imports:
  * OLD: import type { User } from '@client/types';
  * NEW: import type { User } from '@client/shared/types';
  * 
- * Timeline:
- * - Phase 1 (NOW): Both old and new locations work
- * - Phase 2 (1 week): Emit warnings on old imports
- * - Phase 3 (2 weeks): Remove deprecated exports
- * 
- * @deprecated Use @client/shared/types instead
+ * @deprecated Use consolidated type locations instead
  */
 
 'use strict';
 
 if (process.env.NODE_ENV === 'development') {
   console.warn(
-    'Deprecated import: Use @client/shared/types instead of @client/types. ' +
-    'See DIRECTORY_ALIGNMENT_ANALYSIS.md for migration details.'
+    'Deprecated import: Use consolidated type locations instead of @client/types. ' +
+    'See type-consolidation-plan.md for migration details.'
   );
 }
 
-// For backward compatibility during migration - re-export everything
-// Security types
-export type {
-  ThreatLevel,
-  // SecurityEvent, // Duplicate - exported below
-  VulnerabilityReport,
-  CSRFToken,
-  SecurityAudit,
-  SecurityFinding,
-  SecurityPolicy,
-  SecurityRule,
-  SecurityIncident,
-  IncidentTimelineEntry,
-  SecurityMetrics
-} from './security';
+// ============================================================================
+// BACKWARD COMPATIBILITY RE-EXPORTS
+// ============================================================================
 
-// Loading types are now exported from the loading system
+// Core domain types - now in shared/types
 export type {
-  LoadingSize,
-  LoadingType,
-  LoadingState,
-  LoadingPhase,
-  ConnectionType,
-  LoadingPriority,
-  LoadingStateProps,
-  LoadingProgress,
-  LoadingStage,
-  LoadingOperation,
-  LoadingStats,
-  LoadingConfig,
-  UseLoadingResult,
-  LoadingIndicator,
-} from '../shared/ui/loading';
+  Bill,
+  Comment,
+  User,
+  CommentStatus,
+  Sponsor,
+  BillAnalysis,
+  UserPreferences,
+  PrivacySettings,
+  NotificationPreferences,
+  ConsentRecord
+} from '../shared/types';
 
-// Navigation types
+// Dashboard and user dashboard types - now in shared/types
 export type {
-  NavigationItem,
-  BreadcrumbItem,
-  RelatedPage,
-  NavigationSection,
-  UserRole,
-  NavigationPreferences,
-  RecentPage,
-  NavigationState,
-  NavigationContextValue,
-  ResponsiveNavigationState,
-  ResponsiveNavigationContextValue,
-  PageRelationship
-} from './navigation';
-
-// Dashboard types
-export type {
+  TrackedBill,
+  EngagementHistoryItem,
+  CivicImpactMetrics,
+  BillRecommendation,
+  UserDashboardData,
+  PrivacyControls,
+  DataExportRequest,
+  TemporalFilter,
+  DashboardPreferences,
   WidgetConfig,
   WidgetPosition,
   WidgetSize,
@@ -97,9 +73,120 @@ export type {
   DashboardSettings,
   WidgetType,
   ChartData
-} from './dashboard';
+} from '../shared/types';
 
-// Error types
+// Navigation types - now in shared/types
+export type {
+  NavigationItem,
+  BreadcrumbItem,
+  RelatedPage,
+  NavigationSection,
+  UserRole,
+  NavigationPreferences,
+  RecentPage,
+  NavigationState,
+  NavigationContextValue,
+  ResponsiveNavigationState,
+  ResponsiveNavigationContextValue,
+  PageRelationship
+} from '../shared/types';
+
+// Mobile types - now in shared/types
+export type {
+  SwipeDirection,
+  GestureType,
+  GestureEvent,
+  SwipeGestureData,
+  SwipeEvent,
+  GestureConfig,
+  MobileLayoutContextValue,
+  SafeAreaInsets,
+  DeviceInfo,
+  MobileTab,
+  PullToRefreshConfig,
+  BottomSheetConfig,
+  InfiniteScrollConfig,
+  ViewportConfig,
+  ResponsiveBreakpoints,
+  MobileErrorContext,
+  MobileAnimationOptions,
+  HapticFeedbackPattern,
+  HapticFeedbackConfig,
+  ResponsiveBreakpoint,
+  MobileComponentSize,
+  DataPoint,
+  ScrollPosition,
+  ScrollState,
+  MobileKeyboardEvent
+} from '../shared/types';
+
+// Realtime types - now in core/realtime/types
+export type {
+  BillRealTimeUpdate,
+  CommunityRealTimeUpdate,
+  EngagementMetricsUpdate,
+  ExpertActivityUpdate,
+  RealTimeNotification,
+  WebSocketSubscription,
+  CivicWebSocketState,
+  RealTimeHandlers,
+  RealTimeUpdateHandler
+} from '../core/realtime/types';
+
+// API types - now in core/api/types
+export type {
+  ApiResponse,
+  PaginationMeta,
+  ApiListResponse,
+  ApiErrorResponse,
+  Optional,
+  RequiredFields,
+  WithTimestamps,
+  Identifiable
+} from '../core/api/types';
+
+// Auth types - now in core/auth/types
+export type {
+  LoginCredentials,
+  RegisterData,
+  AuthResponse,
+  AuthTokens,
+  TokenInfo,
+  SessionInfo,
+  SessionValidation,
+  TokenValidation,
+  TwoFactorSetup,
+  SecurityEvent,
+  SuspiciousActivityAlert,
+  PasswordRequirements,
+  PasswordValidationResult,
+  DataExportRequest as AuthDataExportRequest,
+  DataDeletionRequest,
+  SocialLoginProvider,
+  AuthContextType,
+  ConsentModalProps,
+  PrivacyDashboardProps
+} from '../core/auth/types';
+
+// Loading types - now in shared/ui/loading
+export type {
+  LoadingSize,
+  LoadingType,
+  LoadingState,
+  LoadingPhase,
+  ConnectionType,
+  LoadingPriority,
+  LoadingStateProps,
+  LoadingProgress,
+  LoadingStage,
+  LoadingOperation,
+  LoadingStats,
+  LoadingConfig,
+  UseLoadingResult,
+  LoadingIndicator,
+} from '../shared/ui/loading';
+
+// Error types - now in shared/ui/types
 export type {
   ErrorInfo,
   ErrorBoundaryProps,
@@ -107,11 +194,11 @@ export type {
   ErrorContextValue,
   ErrorNotification,
   ErrorTrend,
-} from './error';
+} from '../shared/ui/types';
 
 export { AppError } from './error';
 
-// Performance types
+// Performance types - now in core/api/types
 export type {
   WebVitalsMetric,
   PerformanceBudget,
@@ -131,7 +218,7 @@ export type {
   PerformanceObserverEntry,
   PerformanceMark,
   PerformanceMeasure
-} from './performance';
+} from '../core/api/types';
 
 // Browser types
 export type {
@@ -152,6 +239,30 @@ export type {
   BrowserNetwork,
   BrowserAPIs
 } from './browser';
+
+// Security types
+export type {
+  ThreatLevel,
+  VulnerabilityReport,
+  CSRFToken,
+  SecurityAudit,
+  SecurityFinding,
+  SecurityPolicy,
+  SecurityRule,
+  SecurityIncident,
+  IncidentTimelineEntry,
+  SecurityMetrics
+} from './security';
+
+// Community types - now in shared/types
+export type {
+  ActivityItem,
+  TrendingTopic,
+  ExpertInsight,
+  CommunityStats,
+  LocalImpactMetrics,
+  VoteRequest
+} from '../shared/types';
 
 // Engagement Analytics types
 export type {
@@ -185,61 +296,9 @@ export type {
   FormSubmissionError
 } from './form';
 
-// Core unified types
-export type {
-  Bill,
-  Comment,
-  User,
-  CommentStatus,
-  Sponsor,
-  BillAnalysis,
-  UserPreferences,
-  PrivacySettings,
-  NotificationPreferences,
-  ConsentRecord
-} from './core';
-
-// Auth types (re-exported from core/auth for backward compatibility)
-export type {
-  User as AuthUser,
-  LoginCredentials,
-  RegisterData,
-  AuthResponse,
-  AuthTokens,
-  TokenInfo,
-  SessionInfo,
-  SessionValidation,
-  TokenValidation,
-  TwoFactorSetup,
-  SecurityEvent,
-  SuspiciousActivityAlert,
-  PasswordRequirements,
-  PasswordValidationResult,
-  DataExportRequest,
-  DataDeletionRequest,
-  SocialLoginProvider,
-  AuthContextType,
-  ConsentModalProps,
-  PrivacyDashboardProps
-} from '../core/auth';
-
-// Core API types - re-exported from core/api/types
-export * from '../core/api/types';
-
 // Type guards and utilities
 export {
   isBill,
   isComment,
   isUser
-} from './guards';
-
-export type {
-  ApiResponse,
-  PaginationMeta,
-  ApiListResponse,
-  ApiErrorResponse,
-  Optional,
-  RequiredFields,
-  WithTimestamps,
-  Identifiable
 } from './guards';

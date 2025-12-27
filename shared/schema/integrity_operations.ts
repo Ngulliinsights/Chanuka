@@ -12,7 +12,7 @@ import {
 import { comments } from "./citizen_participation";
 import {
   moderationStatusEnum,
-  verificationStatusEnum,
+  verificationLevelEnum,
   severityEnum
 } from "./enum";
 import { users } from "./foundation";
@@ -149,7 +149,7 @@ export const expert_profiles = pgTable("expert_profiles", {
   publications: jsonb("publications").default(sql`'[]'::jsonb`), // [{title, journal, year, doi}]
   
   // Verification workflow
-  verification_status: verificationStatusEnum("verification_status").notNull().default("pending"),
+  verification_status: verificationLevelEnum("verification_status").notNull().default("alleged"),
   verification_date: timestamp("verification_date", { withTimezone: true }),
   verified_by: uuid("verified_by").references(() => users.id, { onDelete: "set null" }),
   verification_expires_at: timestamp("verification_expires_at", { withTimezone: true }), // Added expiry for re-verification
@@ -205,7 +205,7 @@ export const user_verification = pgTable("user_verification", {
   verifier_id: uuid("verifier_id").references(() => users.id, { onDelete: "set null" }),
   
   // Verification outcome
-  verification_status: verificationStatusEnum("verification_status").notNull().default("pending"),
+  verification_status: verificationLevelEnum("verification_status").notNull().default("alleged"),
   verification_notes: text("verification_notes"),
   rejection_reason: text("rejection_reason"), // Specific reason if rejected
   

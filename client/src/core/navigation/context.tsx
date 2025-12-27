@@ -22,7 +22,7 @@ import {
   addToRecentPages,
   clearPersistedState,
 } from '../../shared/infrastructure/store/slices/navigationSlice';
-import { UserRole } from '../../types/navigation';
+import { UserRole } from '../../shared/types/navigation';
 
 import { NavigationContextValue, BreadcrumbItem, RelatedPage } from './types';
 import { generateBreadcrumbs, calculateRelatedPages, determineNavigationSection, isNavigationPathActive } from './utils';

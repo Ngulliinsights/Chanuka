@@ -353,7 +353,7 @@ export const bill_tracking_preferences = pgTable("bill_tracking_preferences", {
   notify_on_voting_opened: boolean("notify_on_voting_opened").notNull().default(true),
   
   // Batching preference: "immediate", "daily_digest", "weekly_digest"
-  notification_frequency: notificationFrequencyEnum("notification_frequency").notNull().default("immediate"),
+  notification_frequency: notificationFrequencyEnum("notification_frequency").notNull().default("realtime"),
   
   // Tracking metadata
   tracking_started_at: timestamp("tracking_started_at", { withTimezone: true }).notNull().defaultNow(),
@@ -501,7 +501,7 @@ export const alert_preferences = pgTable("alert_preferences", {
   constituency_alerts: varchar("constituency_alerts", { length: 100 }).array(),
 
   // Language and accessibility
-  notification_language: notificationLanguageEnum("notification_language").notNull().default('en'),
+  notification_language: notificationLanguageEnum("notification_language").notNull().default('english'),
   // Values: "en", "sw" (English, Swahili)
 
   accessibility_format: accessibilityFormatEnum("accessibility_format"),

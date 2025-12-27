@@ -13,6 +13,8 @@ export default defineConfig({
   schema: [
     "./shared/schema/trojan_bill_detection.ts",
     "./shared/schema/political_economy.ts",
+    "./shared/schema/market_intelligence.ts",
+    "./shared/schema/accountability_ledger.ts",
     "./shared/schema/citizen_participation.ts",
     "./shared/schema/participation_oversight.ts",
     "./shared/schema/constitutional_intelligence.ts",

@@ -434,7 +434,7 @@ export const bills = pgTable("bills", {
 
   // Bill classification and lifecycle
   bill_type: varchar("bill_type", { length: 50 }),
-  status: billStatusEnum("status").notNull().default("drafted"),
+  status: billStatusEnum("status").notNull().default("first_reading"),
 
   // Timeline
   introduced_date: date("introduced_date"),

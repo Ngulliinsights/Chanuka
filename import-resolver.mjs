@@ -1,31 +1,40 @@
 #!/usr/bin/env node
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 /**
- * INTELLIGENT IMPORT RESOLVER - Production Ready
+ * KNIP-BASED IMPORT RESOLVER - Production Ready
  *
- * Advanced import resolution with smart matching and safe file operations.
- * Automatically fixes broken imports using multi-strategy analysis.
+ * Intelligent import fixer that uses knip analysis results as ground truth.
+ * Automatically resolves broken imports identified by knip using smart matching.
  *
  * Features:
+ * - Uses knip's superior analysis (no custom parsing needed)
  * - Multi-strategy intelligent matching (exports, paths, names)
- * - Configurable confidence thresholds
  * - Safe atomic file operations with rollback
  * - Comprehensive backup system
- * - Path alias resolution (TypeScript/Vite/Webpack)
- * - Support for all import styles (ES6, CommonJS, dynamic)
+ * - Path alias resolution support
  * - Detailed diff reporting
  * - Dry-run mode for safe previewing
  *
- * Usage:
- *   node import-resolver.mjs                    # Preview changes
- *   DRY_RUN=false node import-resolver.mjs      # Apply fixes
- *   CONFIDENCE=80 node import-resolver.mjs      # Higher threshold
- *   VERBOSE=true node import-resolver.mjs       # Detailed logging
+ * Prerequisites:
+ *   npm install -g knip
  *
- * @file import-resolver.mjs
+ * Usage:
+ *   # Generate knip report first
+ *   knip --reporter json > knip-report.json
+ *
+ *   # Preview fixes
+ *   node knip-resolver.mjs knip-report.json
+ *   
+ *   # Or pipe directly
+ *   knip --reporter json | node knip-resolver.mjs
+ *
+ *   # Apply fixes
+ *   DRY_RUN=false node knip-resolver.mjs knip-report.json
+ *
+ *   # Adjust confidence threshold
+ *   CONFIDENCE=80 node knip-resolver.mjs knip-report.json
+ *
+ * @file knip-resolver.mjs
  * @type {module}
  */
 
@@ -46,38 +55,13 @@ const CONFIG = {
   outputDir: "docs",
   backupDir: `backup/imports-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5)}`,
 
-  // File patterns
-  extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
-  exclude: [
-    "node_modules",
-    "dist",
-    "build",
-    ".git",
-    "coverage",
-    ".next",
-    "out",
-    "__tests__",
-    "__mocks__",
-    "vendor",
-    ".venv",
-    "venv",
-    "__pycache__",
-    "target",
-    "backup",
-    ".cache",
-    "tmp",
-    "temp",
-  ],
-
   // Processing options
   dryRun: process.env.DRY_RUN !== "false",
   verbose: process.env.VERBOSE === "true",
-  maxConcurrentFiles: 150,
-  enableCache: true,
 
   // Resolution configuration
   minConfidence: parseInt(process.env.CONFIDENCE || "60", 10),
-  maxCandidates: 10,
+  maxCandidates: parseInt(process.env.MAX_CANDIDATES || "10", 10),
 
   // Matching weights
   weights: {
@@ -94,9 +78,8 @@ const CONFIG = {
     exportCount: 10,
   },
 
-  // Resolution strategies (can be disabled)
+  // Strategies
   strategies: {
-    exactMatch: true,
     exportAnalysis: true,
     nameMatching: true,
     pathProximity: true,
@@ -109,16 +92,17 @@ const CONFIG = {
 // =============================================================================
 
 const STATE = {
-  files: new Map(),
+  knipData: null,
+  fileExports: new Map(), // file path -> Set of exported symbols
   pathAliases: new Map(),
   baseUrl: "",
   brokenImports: [],
   fixes: [],
-  fileCache: new Map(),
   stats: {
-    filesScanned: 0,
-    importsFound: 0,
+    totalIssues: 0,
     brokenImports: 0,
+    unusedExports: 0,
+    unusedFiles: 0,
     fixesAttempted: 0,
     fixesSuccessful: 0,
     fixesFailed: 0,
@@ -127,29 +111,6 @@ const STATE = {
     lowConfidence: 0,
     startTime: Date.now(),
   },
-};
-
-// =============================================================================
-// COMPILED PATTERNS
-// =============================================================================
-
-const PATTERNS = {
-  // Imports
-  import: /import\s+(?:type\s+)?([^'"]+?)\s+from\s+['"]([^'"]+)['"]/g,
-  dynamicImport: /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
-  require:
-    /(?:const|let|var)?\s*\w*\s*=?\s*require\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
-
-  // Exports
-  namedExport:
-    /export\s+(?:const|let|var|function|class|enum|type|interface|async\s+function)\s+([a-zA-Z0-9_$]+)/g,
-  exportBlock: /export\s*\{([^}]+)\}/g,
-  defaultExport: /export\s+default\s+/,
-  reExport: /export\s*(?:\{[^}]*\}|\*)?\s*from\s+['"]([^'"]+)['"]/g,
-
-  // Comments
-  singleComment: /\/\/.*$/gm,
-  multiComment: /\/\*[\s\S]*?\*\//g,
 };
 
 // =============================================================================
@@ -162,22 +123,7 @@ const log = {
   warning: (msg) => console.log(`⚠️  ${msg}`),
   error: (msg) => console.log(`❌ ${msg}`),
   debug: (msg) => CONFIG.verbose && console.log(`🔍 ${msg}`),
-  fix: (msg) => console.log(`  ${msg}`),
 };
-
-function stripComments(content) {
-  return content
-    .replace(PATTERNS.multiComment, "")
-    .replace(PATTERNS.singleComment, "");
-}
-
-function normalizeSymbol(symbol) {
-  return symbol
-    .trim()
-    .replace(/^type\s+/, "")
-    .split(/\s+as\s+/)[0]
-    .trim();
-}
 
 function isExternalModule(importPath) {
   return (
@@ -196,8 +142,10 @@ function getRelativePath(from, to) {
 
   relative = relative.replace(/\\/g, "/");
 
+  // Remove extension for import paths
   const ext = path.extname(relative);
-  if (CONFIG.extensions.includes(ext)) {
+  const importExts = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
+  if (importExts.includes(ext)) {
     relative = relative.slice(0, -ext.length);
   }
 
@@ -251,6 +199,115 @@ function calculatePathSimilarity(path1, path2) {
 }
 
 // =============================================================================
+// KNIP DATA LOADING
+// =============================================================================
+
+async function loadKnipData() {
+  log.info("Loading knip analysis...");
+
+  let jsonData;
+  const args = process.argv.slice(2);
+
+  if (args.length > 0 && args[0] !== "-") {
+    // Read from file
+    const filePath = path.resolve(args[0]);
+    log.debug(`Reading from file: ${filePath}`);
+    
+    if (!fsSync.existsSync(filePath)) {
+      log.error(`Knip report not found: ${filePath}`);
+      log.info("\nTo generate a knip report:");
+      log.info("  knip --reporter json > knip-report.json");
+      process.exit(1);
+    }
+
+    const content = await fs.readFile(filePath, "utf-8");
+    jsonData = JSON.parse(content);
+  } else {
+    // Read from stdin
+    log.debug("Reading from stdin...");
+    
+    const chunks = [];
+    for await (const chunk of process.stdin) {
+      chunks.push(chunk);
+    }
+    
+    if (chunks.length === 0) {
+      log.error("No input provided");
+      log.info("\nUsage:");
+      log.info("  knip --reporter json | node knip-resolver.mjs");
+      log.info("  node knip-resolver.mjs knip-report.json");
+      process.exit(1);
+    }
+
+    const content = Buffer.concat(chunks).toString("utf-8");
+    jsonData = JSON.parse(content);
+  }
+
+  STATE.knipData = jsonData;
+
+  // Extract statistics
+  const files = jsonData.files || {};
+  
+  for (const [filePath, fileData] of Object.entries(files)) {
+    const fullPath = path.resolve(CONFIG.rootDir, filePath);
+    
+    // Track exports from this file
+    const exports = new Set();
+    
+    if (fileData.exports) {
+      for (const exp of fileData.exports) {
+        if (exp.symbol) {
+          exports.add(exp.symbol);
+        }
+      }
+    }
+    
+    // Check for default export
+    if (fileData.exports?.some(e => e.symbol === "default")) {
+      exports.add("default");
+    }
+    
+    STATE.fileExports.set(fullPath, exports);
+
+    // Track unused exports
+    if (fileData.exports) {
+      STATE.stats.unusedExports += fileData.exports.filter(e => !e.isReferenced).length;
+    }
+  }
+
+  // Track broken imports
+  if (jsonData.issues) {
+    for (const issue of jsonData.issues) {
+      if (issue.type === "unlisted" || issue.type === "unresolved") {
+        STATE.stats.brokenImports++;
+        
+        STATE.brokenImports.push({
+          sourceFile: path.resolve(CONFIG.rootDir, issue.file),
+          importPath: issue.symbol || issue.specifier,
+          symbols: issue.symbols || [],
+          line: issue.line,
+          column: issue.column,
+        });
+      }
+    }
+  }
+
+  STATE.stats.totalIssues = jsonData.issues?.length || 0;
+
+  log.success(
+    `Loaded knip analysis: ${Object.keys(files).length} files, ${STATE.stats.totalIssues} issues`
+  );
+  
+  if (STATE.stats.brokenImports > 0) {
+    log.warning(`Found ${STATE.stats.brokenImports} broken imports to fix`);
+  } else {
+    log.success("No broken imports found! 🎉");
+  }
+
+  return jsonData;
+}
+
+// =============================================================================
 // PATH ALIASES
 // =============================================================================
 
@@ -260,8 +317,6 @@ async function loadPathAliases() {
   const configs = [
     { file: "tsconfig.json", parser: parseTsConfig },
     { file: "jsconfig.json", parser: parseTsConfig },
-    { file: "vite.config.js", parser: parseViteConfig },
-    { file: "vite.config.ts", parser: parseViteConfig },
   ];
 
   for (const { file, parser } of configs) {
@@ -278,9 +333,7 @@ async function loadPathAliases() {
       }
 
       if (Object.keys(aliases).length > 0) {
-        log.debug(
-          `  Loaded ${Object.keys(aliases).length} aliases from ${file}`
-        );
+        log.debug(`  Loaded ${Object.keys(aliases).length} aliases from ${file}`);
       }
     } catch (error) {
       log.debug(`  Could not parse ${file}: ${error.message}`);
@@ -327,9 +380,7 @@ function parseTsConfig(content) {
     }
 
     if (config.compilerOptions?.paths) {
-      for (const [alias, targets] of Object.entries(
-        config.compilerOptions.paths
-      )) {
+      for (const [alias, targets] of Object.entries(config.compilerOptions.paths)) {
         const cleanAlias = alias.replace(/\/\*$/, "");
         const cleanTarget = (targets[0] || "").replace(/\/\*$/, "");
         if (cleanTarget) {
@@ -341,8 +392,7 @@ function parseTsConfig(content) {
     // Fallback to regex parsing
     const pathsMatch = content.match(/"paths"\s*:\s*\{([^}]+)\}/s);
     if (pathsMatch) {
-      const entries =
-        pathsMatch[1].match(/"([^"]+)"\s*:\s*\["([^"]+)"\]/g) || [];
+      const entries = pathsMatch[1].match(/"([^"]+)"\s*:\s*\["([^"]+)"\]/g) || [];
       for (const entry of entries) {
         const match = entry.match(/"([^"]+)"\s*:\s*\["([^"]+)"\]/);
         if (match) {
@@ -357,355 +407,29 @@ function parseTsConfig(content) {
   return aliases;
 }
 
-function parseViteConfig(content) {
-  const aliases = {};
-  const aliasMatch = content.match(/alias\s*:\s*\{([^}]+)\}/s);
-
-  if (aliasMatch) {
-    const entries =
-      aliasMatch[1].match(/['"]?(@[^'":\s]+|~)['"]?\s*:\s*['"]([^'"]+)['"]/g) ||
-      [];
-    for (const entry of entries) {
-      const match = entry.match(
-        /['"]?(@[^'":\s]+|~)['"]?\s*:\s*['"]([^'"]+)['"]/
-      );
-      if (match) {
-        aliases[match[1]] = match[2];
-      }
-    }
-  }
-
-  return aliases;
-}
-
-// =============================================================================
-// FILE DISCOVERY & PARSING
-// =============================================================================
-
-async function walkDirectory(dir) {
-  const files = [];
-  const stack = [dir];
-
-  while (stack.length > 0) {
-    const currentDir = stack.pop();
-    let entries;
-
-    try {
-      entries = await fs.readdir(currentDir, { withFileTypes: true });
-    } catch {
-      continue;
-    }
-
-    for (const entry of entries) {
-      const fullPath = path.join(currentDir, entry.name);
-      const relativePath = path.relative(CONFIG.rootDir, fullPath);
-
-      if (
-        CONFIG.exclude.some((ex) => {
-          const parts = relativePath.split(path.sep);
-          return parts.includes(ex);
-        })
-      )
-        continue;
-
-      if (entry.isDirectory()) {
-        stack.push(fullPath);
-      } else if (CONFIG.extensions.includes(path.extname(entry.name))) {
-        files.push(fullPath);
-      }
-    }
-  }
-
-  return files;
-}
-
-function extractImportedSymbols(importClause) {
-  const symbols = [];
-  const cleaned = importClause.trim();
-
-  // Default import
-  const defaultMatch = cleaned.match(/^([a-zA-Z0-9_$]+)(?:\s*,)?/);
-  if (defaultMatch && !cleaned.startsWith("{") && !cleaned.includes("* as")) {
-    symbols.push("default");
-  }
-
-  // Namespace import
-  if (cleaned.includes("* as")) {
-    symbols.push("*");
-  }
-
-  // Named imports
-  const namedMatch = cleaned.match(/\{([^}]+)\}/);
-  if (namedMatch) {
-    const names = namedMatch[1]
-      .split(",")
-      .map(normalizeSymbol)
-      .filter((s) => s && s !== "type");
-    symbols.push(...names);
-  }
-
-  return symbols;
-}
-
-function extractExports(content) {
-  const exports = new Set();
-  const reExports = [];
-
-  // Named exports
-  PATTERNS.namedExport.lastIndex = 0;
-  let match;
-  while ((match = PATTERNS.namedExport.exec(content)) !== null) {
-    exports.add(match[1]);
-  }
-
-  // Export blocks
-  PATTERNS.exportBlock.lastIndex = 0;
-  while ((match = PATTERNS.exportBlock.exec(content)) !== null) {
-    const names = match[1]
-      .split(",")
-      .map(normalizeSymbol)
-      .filter((n) => n && n !== "default");
-    names.forEach((name) => exports.add(name));
-  }
-
-  // Default export
-  const hasDefault = PATTERNS.defaultExport.test(content);
-  if (hasDefault) {
-    exports.add("default");
-  }
-
-  // Re-exports
-  PATTERNS.reExport.lastIndex = 0;
-  while ((match = PATTERNS.reExport.exec(content)) !== null) {
-    reExports.push(match[1]);
-    exports.add("*"); // Indicates this file re-exports
-  }
-
-  return { exports, reExports, hasDefault };
-}
-
-function extractImports(content) {
-  const imports = [];
-
-  // Standard imports
-  PATTERNS.import.lastIndex = 0;
-  let match;
-  while ((match = PATTERNS.import.exec(content)) !== null) {
-    imports.push({
-      path: match[2],
-      symbols: extractImportedSymbols(match[1]),
-      statement: match[0],
-    });
-  }
-
-  // Dynamic imports
-  PATTERNS.dynamicImport.lastIndex = 0;
-  while ((match = PATTERNS.dynamicImport.exec(content)) !== null) {
-    imports.push({
-      path: match[1],
-      symbols: ["*"],
-      statement: match[0],
-    });
-  }
-
-  // Require
-  PATTERNS.require.lastIndex = 0;
-  while ((match = PATTERNS.require.exec(content)) !== null) {
-    imports.push({
-      path: match[1],
-      symbols: [],
-      statement: match[0],
-    });
-  }
-
-  return imports;
-}
-
-async function parseFile(filePath) {
-  try {
-    // Check cache
-    if (CONFIG.enableCache && STATE.fileCache.has(filePath)) {
-      const stat = await fs.stat(filePath);
-      const cached = STATE.fileCache.get(filePath);
-      if (cached.mtime === stat.mtimeMs) {
-        return cached.data;
-      }
-    }
-
-    const content = await fs.readFile(filePath, "utf-8");
-    const cleanContent = stripComments(content);
-
-    const { exports, reExports, hasDefault } = extractExports(cleanContent);
-    const imports = extractImports(cleanContent);
-
-    const fileData = {
-      path: filePath,
-      content,
-      exports,
-      reExports,
-      hasDefault,
-      imports,
-    };
-
-    // Cache
-    if (CONFIG.enableCache) {
-      const stat = await fs.stat(filePath);
-      STATE.fileCache.set(filePath, {
-        mtime: stat.mtimeMs,
-        data: fileData,
-      });
-    }
-
-    STATE.files.set(filePath, fileData);
-    STATE.stats.filesScanned++;
-    STATE.stats.importsFound += imports.length;
-
-    return fileData;
-  } catch (error) {
-    log.debug(`Failed to parse ${filePath}: ${error.message}`);
-    return null;
-  }
-}
-
-async function parseAllFiles() {
-  log.info("Discovering source files...");
-  const files = await walkDirectory(CONFIG.rootDir);
-
-  if (files.length === 0) {
-    log.error("No files found to analyze");
-    process.exit(1);
-  }
-
-  log.info(`Found ${files.length.toLocaleString()} files`);
-  log.info("Parsing files...");
-
-  const batches = [];
-  for (let i = 0; i < files.length; i += CONFIG.maxConcurrentFiles) {
-    batches.push(files.slice(i, i + CONFIG.maxConcurrentFiles));
-  }
-
-  for (let i = 0; i < batches.length; i++) {
-    await Promise.all(batches[i].map((file) => parseFile(file)));
-
-    if (files.length > 50 && (i + 1) % 3 === 0) {
-      const progress = Math.round(
-        (((i + 1) * batches[i].length) / files.length) * 100
-      );
-      process.stdout.write(`\r  Progress: ${progress}%`);
-    }
-  }
-
-  if (files.length > 50) console.log("");
-  log.success(`Parsed ${STATE.files.size.toLocaleString()} files`);
-}
-
-// =============================================================================
-// PATH RESOLUTION
-// =============================================================================
-
-function resolveAlias(importPath) {
-  for (const [alias, target] of STATE.pathAliases) {
-    if (importPath === alias || importPath.startsWith(alias + "/")) {
-      const resolved = importPath.replace(alias, target);
-      return STATE.baseUrl ? path.join(STATE.baseUrl, resolved) : resolved;
-    }
-  }
-  return importPath;
-}
-
-function resolveImportPath(sourceFile, importPath) {
-  if (isExternalModule(importPath)) {
-    const resolved = resolveAlias(importPath);
-    if (resolved === importPath || isExternalModule(resolved)) {
-      return null; // External module
-    }
-    importPath = resolved;
-  }
-
-  let targetPath =
-    importPath.startsWith(".") ?
-      path.resolve(path.dirname(sourceFile), importPath)
-    : path.join(CONFIG.rootDir, importPath);
-
-  // Try with extensions
-  for (const ext of ["", ...CONFIG.extensions]) {
-    const fullPath = targetPath + ext;
-    if (fsSync.existsSync(fullPath)) {
-      const stat = fsSync.statSync(fullPath);
-      if (stat.isFile()) return fullPath;
-    }
-  }
-
-  // Try index files
-  if (fsSync.existsSync(targetPath)) {
-    const stat = fsSync.statSync(targetPath);
-    if (stat.isDirectory()) {
-      for (const ext of CONFIG.extensions) {
-        const indexPath = path.join(targetPath, "index" + ext);
-        if (fsSync.existsSync(indexPath)) return indexPath;
-      }
-    }
-  }
-
-  return null;
-}
-
-function validateImports() {
-  log.info("Validating imports...");
-  const broken = [];
-
-  for (const [filePath, fileData] of STATE.files) {
-    for (const importInfo of fileData.imports) {
-      const resolvedPath = resolveImportPath(filePath, importInfo.path);
-
-      if (!resolvedPath && !isExternalModule(importInfo.path)) {
-        broken.push({
-          sourceFile: filePath,
-          importPath: importInfo.path,
-          symbols: importInfo.symbols,
-          statement: importInfo.statement,
-        });
-      }
-    }
-  }
-
-  STATE.stats.brokenImports = broken.length;
-  STATE.brokenImports = broken;
-
-  if (broken.length > 0) {
-    log.warning(
-      `Found ${broken.length} broken import${broken.length === 1 ? "" : "s"}`
-    );
-  } else {
-    log.success("All imports are valid!");
-  }
-
-  return broken;
-}
-
 // =============================================================================
 // INTELLIGENT MATCHING
 // =============================================================================
 
-function scoreCandidate(brokenImport, candidate) {
+function scoreCandidate(brokenImport, candidatePath) {
   const { sourceFile, importPath, symbols } = brokenImport;
-  const candidateData = STATE.files.get(candidate);
+  const candidateExports = STATE.fileExports.get(candidatePath);
+
+  if (!candidateExports) return { score: 0, reasons: [], confidence: 0 };
 
   let score = 0;
   const reasons = [];
 
   // Extract basenames
   const importBasename = path.basename(importPath, path.extname(importPath));
-  const candidateBasename = path.basename(candidate, path.extname(candidate));
+  const candidateBasename = path.basename(candidatePath, path.extname(candidatePath));
 
   // Strategy 1: Export Analysis
   if (CONFIG.strategies.exportAnalysis && symbols.length > 0) {
     const matchedSymbols = symbols.filter((symbol) => {
-      if (symbol === "*") return true;
-      if (symbol === "default") return candidateData.hasDefault;
-      return (
-        candidateData.exports.has(symbol) || candidateData.exports.has("*")
-      );
+      if (symbol === "*") return candidateExports.size > 0;
+      if (symbol === "default") return candidateExports.has("default");
+      return candidateExports.has(symbol);
     });
 
     const matchRatio = matchedSymbols.length / symbols.length;
@@ -715,13 +439,11 @@ function scoreCandidate(brokenImport, candidate) {
       reasons.push(`exports all symbols (${symbols.join(", ")})`);
     } else if (matchedSymbols.length > 0) {
       score += CONFIG.weights.partialExports * matchRatio;
-      reasons.push(
-        `exports ${matchedSymbols.length}/${symbols.length} symbols`
-      );
+      reasons.push(`exports ${matchedSymbols.length}/${symbols.length} symbols`);
     }
 
     // Bonus for exact export count match
-    if (candidateData.exports.size === symbols.length && matchRatio === 1) {
+    if (candidateExports.size === symbols.length && matchRatio === 1) {
       score += CONFIG.weights.exportCount;
     }
   }
@@ -744,7 +466,7 @@ function scoreCandidate(brokenImport, candidate) {
   // Strategy 3: Path Proximity
   if (CONFIG.strategies.pathProximity) {
     const sourceDir = path.dirname(sourceFile);
-    const candidateDir = path.dirname(candidate);
+    const candidateDir = path.dirname(candidatePath);
 
     if (sourceDir === candidateDir) {
       score += CONFIG.weights.sameDirectory;
@@ -773,7 +495,7 @@ function findCandidates(brokenImport) {
   const { sourceFile } = brokenImport;
   const candidates = [];
 
-  for (const [candidatePath] of STATE.files) {
+  for (const [candidatePath] of STATE.fileExports) {
     if (candidatePath === sourceFile) continue;
 
     const result = scoreCandidate(brokenImport, candidatePath);
@@ -795,7 +517,7 @@ function findCandidates(brokenImport) {
 // =============================================================================
 
 async function fixImport(brokenImport) {
-  const { sourceFile, importPath, statement } = brokenImport;
+  const { sourceFile, importPath } = brokenImport;
 
   log.debug(`\nAnalyzing: ${path.relative(CONFIG.rootDir, sourceFile)}`);
   log.debug(`  Import: ${importPath}`);
@@ -834,11 +556,13 @@ async function fixImport(brokenImport) {
 
   if (!CONFIG.dryRun) {
     try {
-      const fileData = STATE.files.get(sourceFile);
+      const content = await fs.readFile(sourceFile, "utf-8");
 
-      // Create regex that escapes special characters
+      // Escape special regex characters
       const escapedPath = importPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const newContent = fileData.content.replace(
+      
+      // Replace import path (handles both single and double quotes)
+      const newContent = content.replace(
         new RegExp(`(['"])${escapedPath}\\1`, "g"),
         `$1${newPath}$1`
       );
@@ -847,9 +571,6 @@ async function fixImport(brokenImport) {
       const tempFile = sourceFile + ".tmp";
       await fs.writeFile(tempFile, newContent, "utf-8");
       await fs.rename(tempFile, sourceFile);
-
-      // Update cache
-      fileData.content = newContent;
 
       STATE.stats.fixesSuccessful++;
 
@@ -877,14 +598,14 @@ async function fixImport(brokenImport) {
   }
 }
 
-async function fixAllImports(brokenImports) {
-  if (brokenImports.length === 0) return;
+async function fixAllImports() {
+  if (STATE.brokenImports.length === 0) return;
 
   log.info(
-    `\nAttempting to fix ${brokenImports.length} broken import${brokenImports.length === 1 ? "" : "s"}...`
+    `\nAttempting to fix ${STATE.brokenImports.length} broken import${STATE.brokenImports.length === 1 ? "" : "s"}...`
   );
 
-  for (const brokenImport of brokenImports) {
+  for (const brokenImport of STATE.brokenImports) {
     const fix = await fixImport(brokenImport);
     if (fix) {
       STATE.fixes.push(fix);
@@ -914,9 +635,8 @@ async function createBackup() {
 
       await fs.mkdir(path.dirname(backupPath), { recursive: true });
 
-      // Read original (before our changes)
-      const original = STATE.files.get(file).content;
-      await fs.writeFile(backupPath, original, "utf-8");
+      // Copy current file to backup
+      await fs.copyFile(file, backupPath);
     }
 
     log.success(
@@ -937,11 +657,9 @@ async function generateReport() {
 
   const duration = ((Date.now() - STATE.stats.startTime) / 1000).toFixed(2);
   const successRate =
-    STATE.stats.fixesAttempted > 0 ?
-      Math.round(
-        (STATE.stats.fixesSuccessful / STATE.stats.fixesAttempted) * 100
-      )
-    : 0;
+    STATE.stats.fixesAttempted > 0
+      ? Math.round((STATE.stats.fixesSuccessful / STATE.stats.fixesAttempted) * 100)
+      : 0;
 
   let report = `# Import Resolution Report\n\n`;
   report += `**Generated:** ${new Date().toLocaleString()}\n`;
@@ -952,9 +670,9 @@ async function generateReport() {
   report += `## 📊 Summary\n\n`;
   report += `| Metric | Value |\n`;
   report += `|--------|------:|\n`;
-  report += `| Files Scanned | ${STATE.stats.filesScanned.toLocaleString()} |\n`;
-  report += `| Total Imports | ${STATE.stats.importsFound.toLocaleString()} |\n`;
+  report += `| Total Knip Issues | ${STATE.stats.totalIssues.toLocaleString()} |\n`;
   report += `| **Broken Imports** | **${STATE.stats.brokenImports}** |\n`;
+  report += `| Unused Exports | ${STATE.stats.unusedExports} |\n`;
   report += `| Fixes Attempted | ${STATE.stats.fixesAttempted} |\n`;
   report += `| ✅ Successful | ${STATE.stats.fixesSuccessful} |\n`;
   report += `| ❌ Failed | ${STATE.stats.fixesFailed} |\n`;
@@ -989,9 +707,7 @@ async function generateReport() {
       report += `### \`${file}\`\n\n`;
       for (const fix of fixes) {
         const emoji =
-          fix.confidence >= 80 ? "🟢"
-          : fix.confidence >= 60 ? "🟡"
-          : "🔴";
+          fix.confidence >= 80 ? "🟢" : fix.confidence >= 60 ? "🟡" : "🔴";
         report += `${emoji} **Confidence: ${fix.confidence}%**\n\n`;
         report += `\`\`\`diff\n`;
         report += `- import ... from '${fix.oldPath}'\n`;
@@ -1039,6 +755,7 @@ async function generateReport() {
   // Configuration
   report += `## ⚙️  Configuration\n\n`;
   report += `- **Min Confidence:** ${CONFIG.minConfidence}%\n`;
+  report += `- **Max Candidates:** ${CONFIG.maxCandidates}\n`;
   report += `- **Path Aliases:** ${STATE.pathAliases.size}\n`;
   report += `- **Strategies:** ${Object.entries(CONFIG.strategies)
     .filter(([, v]) => v)
@@ -1062,14 +779,15 @@ async function generateReport() {
     report += `2. Adjust confidence threshold if needed: \`CONFIDENCE=80\`\n`;
     report += `3. Apply changes:\n\n`;
     report += `\`\`\`bash\n`;
-    report += `DRY_RUN=false node import-resolver.mjs\n`;
+    report += `DRY_RUN=false node knip-resolver.mjs knip-report.json\n`;
     report += `\`\`\`\n\n`;
   } else {
     report += `### Verify Changes\n\n`;
     report += `1. Review changes: \`git diff\`\n`;
     report += `2. Run tests: \`npm test\`\n`;
     report += `3. Check types: \`npm run type-check\`\n`;
-    report += `4. Build project: \`npm run build\`\n\n`;
+    report += `4. Re-run knip: \`knip --reporter json\`\n`;
+    report += `5. Build project: \`npm run build\`\n\n`;
 
     if (STATE.fixes.length > 0) {
       report += `### Backup Location\n\n`;
@@ -1083,11 +801,13 @@ async function generateReport() {
     report += `1. Was the file deleted or moved?\n`;
     report += `2. Is it an external package that needs installing?\n`;
     report += `3. Should it use a different import pattern?\n`;
-    report += `4. Try increasing candidates: \`MAX_CANDIDATES=20\`\n\n`;
+    report += `4. Try increasing candidates: \`MAX_CANDIDATES=20\`\n`;
+    report += `5. Lower confidence: \`CONFIDENCE=50\`\n\n`;
   }
 
   report += `---\n\n`;
-  report += `*Generated by Import Resolver*\n`;
+  report += `*Generated by Knip-Based Import Resolver*\n`;
+  report += `*Using knip for accurate codebase analysis*\n`;
 
   await fs.writeFile(reportPath, report, "utf-8");
   log.success(`Report: ${reportPath}`);
@@ -1099,7 +819,7 @@ async function generateReport() {
 
 async function main() {
   console.log("\n" + "=".repeat(80));
-  console.log("🔧 INTELLIGENT IMPORT RESOLVER - Production Ready");
+  console.log("🔧 KNIP-BASED IMPORT RESOLVER");
   console.log("=".repeat(80) + "\n");
 
   if (CONFIG.dryRun) {
@@ -1111,19 +831,19 @@ async function main() {
   log.info(`Confidence threshold: ${CONFIG.minConfidence}%\n`);
 
   try {
+    await loadKnipData();
     await loadPathAliases();
-    await parseAllFiles();
 
-    const brokenImports = validateImports();
-
-    if (brokenImports.length === 0) {
+    if (STATE.brokenImports.length === 0) {
       console.log("\n" + "=".repeat(80));
-      log.success("Perfect! All imports are valid. No fixes needed. 🎉");
+      log.success("Perfect! No broken imports found. 🎉");
       console.log("=".repeat(80) + "\n");
+      
+      await generateReport();
       return;
     }
 
-    await fixAllImports(brokenImports);
+    await fixAllImports();
 
     if (!CONFIG.dryRun && STATE.fixes.length > 0) {
       await createBackup();
@@ -1132,17 +852,11 @@ async function main() {
     await generateReport();
 
     const duration = ((Date.now() - STATE.stats.startTime) / 1000).toFixed(2);
-    const rate =
-      STATE.stats.filesScanned > 0 ?
-        (STATE.stats.filesScanned / parseFloat(duration)).toFixed(0)
-      : 0;
 
     console.log("\n" + "=".repeat(80));
     console.log("📊 RESOLUTION COMPLETE");
     console.log("=".repeat(80));
-    console.log(
-      `Files scanned:        ${STATE.stats.filesScanned.toLocaleString()}`
-    );
+    console.log(`Total knip issues:    ${STATE.stats.totalIssues}`);
     console.log(`Broken imports:       ${STATE.stats.brokenImports}`);
     console.log(`Fixes attempted:      ${STATE.stats.fixesAttempted}`);
     console.log(`✅ Successful:        ${STATE.stats.fixesSuccessful}`);
@@ -1155,15 +869,17 @@ async function main() {
       console.log(`Success rate:         ${rate}%`);
     }
 
-    console.log(`Duration:             ${duration}s (${rate} files/sec)`);
+    console.log(`Duration:             ${duration}s`);
     console.log("=".repeat(80) + "\n");
 
     if (CONFIG.dryRun) {
-      log.info("To apply: DRY_RUN=false node import-resolver.mjs");
+      log.info("To apply fixes:");
+      log.info("  DRY_RUN=false node knip-resolver.mjs knip-report.json");
     } else if (STATE.stats.fixesSuccessful > 0) {
       log.success("Changes applied!");
       log.info(`Backup: ${CONFIG.backupDir}`);
       log.info("Verify: git diff");
+      log.info("Re-run: knip --reporter json");
     }
 
     console.log("");
@@ -1174,6 +890,10 @@ async function main() {
     if (CONFIG.verbose) {
       console.error(error.stack);
     }
+    
+    log.info("\nMake sure you have generated a knip report:");
+    log.info("  knip --reporter json > knip-report.json");
+    
     process.exit(1);
   }
 }

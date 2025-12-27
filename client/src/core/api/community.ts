@@ -31,14 +31,14 @@
  * - More maintainable code structure
  */
 
-import type { ActivityItem } from '../../types/community';
-import type { Comment } from '../../types/community';
-import type { CommunityStats } from '../../types/community';
-import type { DiscussionThread } from '../../types/community';
-import type { ExpertInsight } from '../../types/community';
-import type { LocalImpactMetrics } from '../../types/community';
-import type { TrendingTopic } from '../../types/community';
-import type { VoteRequest } from '../../types/community';
+import type { ActivityItem } from '../../shared/types';
+import type { Comment } from '../../shared/types';
+import type { CommunityStats } from '../../shared/types';
+import type { DiscussionThread } from '../../shared/types';
+import type { ExpertInsight } from '../../shared/types';
+import type { LocalImpactMetrics } from '../../shared/types';
+import type { TrendingTopic } from '../../shared/types';
+import type { VoteRequest } from '../../shared/types';
 import { logger } from '../../utils/logger';
 
 import { globalApiClient } from './client';

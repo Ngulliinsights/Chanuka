@@ -29,7 +29,7 @@ import type {
   UserDashboardData,
   PrivacyControls as ImportedPrivacyControls,
   DashboardPreferences,
-} from '@client/types/user-dashboard';
+} from '@client/shared/types/user-dashboard';
 
 import { ActivitySection } from './sections/ActivitySection';
 import { BillsSection } from './sections/BillsSection';

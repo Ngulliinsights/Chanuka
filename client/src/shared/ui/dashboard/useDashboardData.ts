@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@client/core/auth';
-import type { DataExportRequest } from '@client/types/user-dashboard';
+import type { DataExportRequest } from '@client/shared/types/user-dashboard';
 import { logger } from '@client/utils/logger';
 
 import { useUserDashboardSelectors, useUserDashboardStore } from '../../infrastructure/store/slices/userDashboardSlice';

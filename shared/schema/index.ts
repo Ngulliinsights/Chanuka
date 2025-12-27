@@ -95,6 +95,8 @@ import { participation_quality_audits as participationQualityAuditsTable } from 
 import { analysis as analysisTable } from "./analysis";
 import { trojan_bill_analysis as trojanBillAnalysisTable, hidden_provisions as hiddenProvisionsTable, trojan_techniques as trojanTechniquesTable, detection_signals as detectionSignalsTable } from "./trojan_bill_detection";
 import { political_appointments as politicalAppointmentsTable, infrastructure_tenders as infrastructureTendersTable, ethnic_advantage_scores as ethnicAdvantageScoresTable, strategic_infrastructure_projects as strategicInfrastructureProjectsTable } from "./political_economy";
+import { market_sectors as marketSectorsTable, economic_impact_assessments as economicImpactAssessmentsTable, market_stakeholders as marketStakeholdersTable, stakeholder_positions as stakeholderPositionsTable, market_trends as marketTrendsTable } from "./market_intelligence";
+import { public_promises as publicPromisesTable, shadow_ledger_entries as shadowLedgerEntriesTable, promise_accountability_tracking as promiseAccountabilityTrackingTable } from "./accountability_ledger";
 
 export const schema = {
   users: usersTable,
@@ -120,7 +122,15 @@ export const schema = {
   political_appointments: politicalAppointmentsTable,
   infrastructure_tenders: infrastructureTendersTable,
   ethnic_advantage_scores: ethnicAdvantageScoresTable,
-  strategic_infrastructure_projects: strategicInfrastructureProjectsTable
+  strategic_infrastructure_projects: strategicInfrastructureProjectsTable,
+  market_sectors: marketSectorsTable,
+  economic_impact_assessments: economicImpactAssessmentsTable,
+  market_stakeholders: marketStakeholdersTable,
+  stakeholder_positions: stakeholderPositionsTable,
+  market_trends: marketTrendsTable,
+  public_promises: publicPromisesTable,
+  shadow_ledger_entries: shadowLedgerEntriesTable,
+  promise_accountability_tracking: promiseAccountabilityTrackingTable
   };
 
 // ============================================================================
@@ -432,6 +442,34 @@ export {
 } from "./political_economy";
 
 // ============================================================================
+// MARKET INTELLIGENCE SCHEMA
+// ============================================================================
+export {
+  market_sectors,
+  economic_impact_assessments,
+  market_stakeholders,
+  stakeholder_positions,
+  market_trends,
+  marketSectorsRelations,
+  economicImpactAssessmentsRelations,
+  marketStakeholdersRelations,
+  stakeholderPositionsRelations,
+  marketTrendsRelations
+} from "./market_intelligence";
+
+// ============================================================================
+// ACCOUNTABILITY LEDGER SCHEMA
+// ============================================================================
+export {
+  public_promises,
+  shadow_ledger_entries,
+  promise_accountability_tracking,
+  publicPromisesRelations,
+  shadowLedgerEntriesRelations,
+  promiseAccountabilityTrackingRelations
+} from "./accountability_ledger";
+
+// ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 
@@ -593,6 +631,30 @@ export type {
   StrategicInfrastructureProject,
   NewStrategicInfrastructureProject
 } from "./political_economy";
+
+// Market Intelligence types
+export type {
+  MarketSector,
+  NewMarketSector,
+  EconomicImpactAssessment,
+  NewEconomicImpactAssessment,
+  MarketStakeholder,
+  NewMarketStakeholder,
+  StakeholderPosition,
+  NewStakeholderPosition,
+  MarketTrend,
+  NewMarketTrend
+} from "./market_intelligence";
+
+// Accountability Ledger types
+export type {
+  PublicPromise,
+  NewPublicPromise,
+  ShadowLedgerEntry,
+  NewShadowLedgerEntry,
+  PromiseTracking,
+  NewPromiseTracking
+} from "./accountability_ledger";
 
 // Trojan Bill Detection types
 export type {
@@ -758,6 +820,8 @@ DOMAIN ORGANIZATION:
 - universal_access.ts: Offline engagement and community facilitation
 - integrity_operations.ts: Content moderation and verification
 - platform_operations.ts: Analytics, metrics, and data sources
+- market_intelligence.ts: Market dynamics, economic impact, and stakeholder analysis
+- accountability_ledger.ts: Promise tracking, violation records, and governance accountability
 
 Each domain has corresponding tests in __tests__/ directory.
 */

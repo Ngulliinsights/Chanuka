@@ -22,7 +22,7 @@ import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import { BillRecommendation } from '@client/types/user-dashboard';
+import { BillRecommendation } from '@client/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
 

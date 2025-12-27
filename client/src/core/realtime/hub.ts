@@ -15,7 +15,7 @@ import {
   RealTimeNotification,
   WebSocketSubscription,
   RealTimeHandlers
-} from '../../types/realtime';
+} from './types';
 import { logger } from '../../utils/logger';
 
 import { getRealTimeConfig } from './config';

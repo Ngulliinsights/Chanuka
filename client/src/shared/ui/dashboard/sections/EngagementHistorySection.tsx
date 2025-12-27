@@ -25,7 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/shared/design-system/typography/Card.tsx';
-import { EngagementHistoryItem } from '@client/types/user-dashboard';
+import { EngagementHistoryItem } from '@client/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
 
