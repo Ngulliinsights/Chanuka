@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 
 import { Badge } from '@client/shared/design-system';
 import { cn } from '@client/lib/utils';
-import { BillRealTimeUpdate } from '@client/types/realtime';
+import { BillRealTimeUpdate } from '@client/core/realtime/types';
 
 // Mock implementation until WebSocket hook is ready
 const useBillRealTime = (_billId: number) => ({

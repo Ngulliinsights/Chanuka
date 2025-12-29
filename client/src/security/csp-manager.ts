@@ -3,7 +3,7 @@
  * Implements CSP with nonce-based script execution and violation reporting
  */
 
-import { SecurityEvent, CSPViolation } from '@client/types';
+import { SecurityEvent, CSPViolation } from '@client/shared/types';
 
 import { logger } from '@client/utils/logger';
 

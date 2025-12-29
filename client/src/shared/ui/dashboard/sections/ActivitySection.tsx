@@ -9,7 +9,7 @@ import {
 
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { EngagementHistoryItem } from '@client/types/user-dashboard';
+import { EngagementHistoryItem } from '@client/shared/types/user-dashboard';
 
 interface ActivitySectionProps {
   activities: EngagementHistoryItem[];

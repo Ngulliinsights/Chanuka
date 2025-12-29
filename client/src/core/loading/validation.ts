@@ -3,7 +3,7 @@
  * Validates loading operations and configurations
  */
 
-import { LoadingOperation, LoadingScenario, ProgressiveStage, LoadingError } from '@client/types';
+import { LoadingOperation, ProgressiveStage, LoadingError } from '@client/shared/types';
 
 export class LoadingValidationError extends LoadingError {
   constructor(message: string, public field?: string, metadata?: Record<string, any>) {

@@ -9,7 +9,7 @@ import { DollarSign, TrendingUp, AlertTriangle, Building, Calendar } from 'lucid
 import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
-import { FinancialInterest, ConflictAnalysis } from '@client/types/conflict-of-interest';
+import { FinancialInterest, ConflictAnalysis } from '@client/features/analysis/types';
 
 import { Badge } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';

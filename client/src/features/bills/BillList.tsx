@@ -1,4 +1,4 @@
-import type { Bill, BillsQueryParams } from '@client/types';
+import type { Bill, BillsQueryParams } from '@client/shared/types';
 import { Loader2, AlertCircle, Filter, LayoutGrid, LayoutList } from 'lucide-react';
 import { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';

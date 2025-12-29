@@ -59,10 +59,11 @@
     },
 
     // Type Definitions
-    "types": ["vite/client", "vitest/globals", "node"]
+    "types": ["vite/client", "vitest/globals", "node"],
+    "typeRoots": ["./node_modules/@types", "../@types"]
   },
 
-  "include": ["src/**/*", "src/types/shims-shared.d.ts", "src/__tests__/integration/react-initialization.test.tsx", "vite.config.ts", "vite.production.config.ts"],
+  "include": ["src/**/*", "../@types/**/*", "src/__tests__/integration/react-initialization.test.tsx", "vite.config.ts", "vite.production.config.ts"],
 
   "exclude": [
     "node_modules",

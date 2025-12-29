@@ -2,9 +2,9 @@
  * Client Loading Utilities - Helper functions for loading operations
  */
 
-import { LoadingType, LoadingPriority, LoadingOperation } from '@client/types';
+import { LoadingType, LoadingPriority, LoadingOperation } from '@client/shared/types';
 
-import { 
+import {
   getAdjustedTimeout,
   calculateRetryDelay as coreCalculateRetryDelay,
   sortOperationsByPriority,
@@ -18,7 +18,7 @@ export const calculateEstimatedTime = (operation: LoadingOperation) => operation
 export const getConnectionMultiplier = (connectionType: string) => connectionType === 'slow' ? 2 : 1;
 export const calculateRetryDelay = coreCalculateRetryDelay;
 export const formatLoadingTime = (ms: number) => `${Math.round(ms / 1000)}s`;
-export const hasOperationTimedOut = (operation: LoadingOperation, currentTime: number) => 
+export const hasOperationTimedOut = (operation: LoadingOperation, currentTime: number) =>
   currentTime - operation.startTime > (operation.timeout || 10000);
 export const shouldShowTimeoutWarning = (operation: LoadingOperation, currentTime: number) =>
   currentTime - operation.startTime > (operation.timeout || 10000) * 0.8;

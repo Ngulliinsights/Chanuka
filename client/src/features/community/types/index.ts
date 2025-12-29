@@ -6,7 +6,7 @@
  */
 
 // Re-export from core types module if it exists
-export type { Comment } from '@client/types/core';
+export type { Comment } from '@client/shared/types';
 
 export interface VoteRequest {
   vote: boolean;

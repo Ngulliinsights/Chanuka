@@ -23,7 +23,7 @@
 import React, { useCallback, useRef } from 'react';
 
 import { GESTURE_CONFIG } from '@client/config/gestures';
-import type { SwipeGestureData } from '@client/types/mobile';
+import type { SwipeGestureData } from '@client/shared/types/mobile';
 
 interface SwipeEvent extends SwipeGestureData {}
 

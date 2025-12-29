@@ -9,7 +9,7 @@ import { useToast } from '@client/hooks/use-toast';
 import type {
   Comment,
   DiscussionThread
-} from '@client/types/community';
+} from '@client/features/community/types';
 
 // Define CommunityFilters interface locally since it's not exported from types
 interface CommunityFilters {

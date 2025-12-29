@@ -22,6 +22,117 @@ export type {
 export { WebSocketClient };
 
 // ============================================================================
+// Connection State Enum
+// ============================================================================
+
+export enum ConnectionState {
+  DISCONNECTED = 'disconnected',
+  CONNECTING = 'connecting',
+  CONNECTED = 'connected',
+  RECONNECTING = 'reconnecting',
+  CLOSED = 'closed',
+  FAILED = 'failed'
+}
+
+// ============================================================================
+// WebSocket Configuration and Protocol Types
+// ============================================================================
+
+export interface WebSocketConfig {
+  url: string;
+  protocols?: string[];
+  heartbeat?: {
+    enabled: boolean;
+    interval: number;
+    timeout: number;
+  };
+  reconnect?: {
+    enabled: boolean;
+    maxAttempts: number;
+    delay: number;
+    backoff: 'linear' | 'exponential';
+  };
+  message?: {
+    compression: boolean;
+    batching: boolean;
+    batchSize?: number;
+    batchInterval?: number;
+  };
+  security?: {
+    validateOrigin: boolean;
+    allowedOrigins?: string[];
+  };
+}
+
+export interface RealTimeConfig {
+  websocket: WebSocketConfig;
+  bills?: {
+    autoReconnect: boolean;
+    maxReconnectAttempts: number;
+    reconnectDelay: number;
+    heartbeatInterval: number;
+    batchUpdateInterval: number;
+    maxBatchSize: number;
+  };
+  community?: {
+    typingIndicatorTimeout: number;
+    maxConcurrentSubscriptions?: number;
+  };
+}
+
+// Subscription type for tracking subscribed topics/entities
+export interface Subscription {
+  id: string;
+  topic: string;
+  filters?: {
+    update_types?: string[];
+    priority_threshold?: 'low' | 'medium' | 'high';
+    expert_only?: boolean;
+  };
+  callback?: MessageHandler;
+  priority?: 'high' | 'medium' | 'low';
+  type?: 'bill' | 'community' | 'expert' | 'user_notifications';
+}
+
+// Message handler types
+export type MessageHandler = (message: WebSocketMessage) => void;
+export type EventListener = (event: Event) => void;
+
+// Type aliases for backward compatibility with service files
+export type BillUpdate = BillRealTimeUpdate;
+export type BillEngagementUpdate = EngagementMetricsUpdate;
+export type CommunityUpdate = CommunityRealTimeUpdate;
+export type TypingIndicator = Record<string, unknown>;
+export type CommentUpdate = Record<string, unknown>;
+export type VoteUpdate = Record<string, unknown>;
+export type WebSocketNotification = RealTimeNotification;
+
+// ============================================================================
+// WebSocket Message Types
+// ============================================================================
+
+export interface HeartbeatMessage {
+  type: 'heartbeat';
+  id?: string;
+  timestamp: string;
+}
+
+export interface SubscriptionMessage {
+  type: 'subscribe' | 'unsubscribe';
+  subscriptions?: Subscription[];
+  topic?: string;
+  id?: string;
+  timestamp: string;
+}
+
+export interface BatchMessage {
+  type: 'batch';
+  messages: WebSocketMessage[];
+  id?: string;
+  timestamp: string;
+}
+
+// ============================================================================
 // Consolidated Client Real-time Domain Types
 // ============================================================================
 
@@ -32,7 +143,7 @@ export { WebSocketClient };
  */
 
 export interface BillRealTimeUpdate {
-  type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' | 
+  type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' |
         'engagement_change' | 'constitutional_flag' | 'expert_analysis';
   data: Record<string, unknown>;
   timestamp: string;
@@ -40,7 +151,7 @@ export interface BillRealTimeUpdate {
 }
 
 export interface CommunityRealTimeUpdate {
-  type: 'new_discussion' | 'comment_added' | 'expert_joined' | 'consensus_change' | 
+  type: 'new_discussion' | 'comment_added' | 'expert_joined' | 'consensus_change' |
         'moderation_action' | 'trending_topic';
   bill_id?: number;
   discussion_id?: string;
@@ -91,22 +202,22 @@ export interface ExpertActivityUpdate {
 
 export interface RealTimeNotification {
   id: string;
-  type: 'bill_status' | 'community_activity' | 'expert_response' | 'trending_bill' | 
+  type: 'bill_status' | 'community_activity' | 'expert_response' | 'trending_bill' |
         'constitutional_alert' | 'engagement_milestone';
   title: string;
   message: string;
   priority: 'low' | 'medium' | 'high' | 'critical';
-  
+
   // Associated data
   bill_id?: number;
   expert_id?: string;
   discussion_id?: string;
-  
+
   // Notification metadata
   created_at: string;
   expires_at?: string;
   read: boolean;
-  
+
   // Action data
   action_url?: string;
   action_text?: string;
@@ -130,13 +241,13 @@ export interface CivicWebSocketState {
   error: string | null;
   lastMessage: Record<string, unknown> | null;
   reconnectAttempts: number;
-  
+
   // Subscription tracking - using arrays for Immer compatibility
   bill_subscriptions: number[];
   community_subscriptions: string[];
   expert_subscriptions: string[];
   notification_subscriptions: boolean;
-  
+
   // Real-time metrics
   connection_quality: 'excellent' | 'good' | 'poor' | 'disconnected';
   last_heartbeat: string | null;

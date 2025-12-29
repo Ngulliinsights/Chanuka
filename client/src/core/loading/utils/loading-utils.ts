@@ -3,7 +3,7 @@
  * Consolidated from multiple implementations
  */
 
-import { LoadingOperation, LoadingConfig } from '@client/types';
+import { LoadingOperation, LoadingConfig } from '@client/shared/types';
 
 // Loading scenario type definition
 export interface LoadingScenario {

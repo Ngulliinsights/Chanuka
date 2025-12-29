@@ -4,7 +4,7 @@
 
 import { useCallback } from 'react';
 
-import { WidgetConfig } from '@client/types';
+import { WidgetConfig } from '@client/shared/types';
 import { useDashboard } from './context';
 
 /**
@@ -18,9 +18,9 @@ export function useDashboardSystem() {
  * Hook for widget management
  */
 export function useWidget(widgetId: string) {
-  const { 
-    refreshWidget, 
-    updateWidget, 
+  const {
+    refreshWidget,
+    updateWidget,
     removeWidget,
     getWidget,
   } = useDashboard();

@@ -9,7 +9,7 @@ import { Eye, Info, ChevronDown, ChevronUp, Shield, AlertCircle, CheckCircle } f
 import React, { useMemo } from 'react';
 import { RadialBarChart, RadialBar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
-import { TransparencyScore, ConflictAnalysis } from '@client/types/conflict-of-interest';
+import { TransparencyScore, ConflictAnalysis } from '@client/features/analysis/types';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

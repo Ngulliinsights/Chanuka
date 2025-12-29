@@ -34,4 +34,4 @@ export type {
   NetworkLink,
   ImplementationWorkaround,
   ConflictOfInterestAnalysisProps
-} from '@client/types/conflict-of-interest';
+} from '@client/features/analysis/types';

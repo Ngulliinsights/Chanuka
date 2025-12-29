@@ -1,3 +1,10 @@
+/**
+ * Loading State and Progress Types
+ *
+ * Types for async operations, loading states, progress tracking,
+ * and connection/network information
+ */
+
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
 export interface LoadingOperation {
@@ -104,7 +111,6 @@ export interface LoadingResult {
   retries: number;
 }
 
-// Additional missing types
 export interface LoadingComponentProps {
   isLoading: boolean;
   error?: string;
@@ -133,9 +139,15 @@ export interface AssetLoadingProgress {
   error?: string;
 }
 
+export interface LoadingStateData {
+  isLoading: boolean;
+  operations: Record<string, LoadingOperation>;
+  stats: LoadingMetrics;
+  error?: string;
+}
+
 export type LoadingType = 'sequential' | 'parallel' | 'lazy' | 'progressive';
 export type LoadingPriority = 'critical' | 'high' | 'normal' | 'low';
-
 export type ConnectionType = 'wifi' | 'cellular' | 'ethernet' | 'bluetooth' | 'none';
 export type LoadingScenario = 'initial' | 'paginated' | 'infinite-scroll' | 'real-time' | 'batch';
 export type ProgressiveStage = 'init' | 'loading' | 'progressive' | 'complete' | 'error';

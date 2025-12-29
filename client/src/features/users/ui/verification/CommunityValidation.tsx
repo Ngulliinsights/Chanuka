@@ -12,7 +12,7 @@ import {
 import React, { useState, useCallback } from 'react';
 
 import { cn } from '@client/lib/utils';
-import { CommunityValidation as CommunityValidationType } from '@client/types/expert';
+import { CommunityValidation as CommunityValidationType } from '@client/features/users/types';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

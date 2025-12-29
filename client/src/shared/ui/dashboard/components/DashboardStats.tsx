@@ -16,7 +16,7 @@ import {
 
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
-import { UserDashboardData, CivicImpactMetrics } from '@client/types/user-dashboard';
+import { UserDashboardData, CivicImpactMetrics } from '@client/shared/types/user-dashboard';
 
 import styles from './DashboardStats.module.css';
 

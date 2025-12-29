@@ -3,7 +3,7 @@
  * Modal wrapper for dashboard integration
  */
 
-import { PrivacySettings } from '@client/types/auth';
+import { PrivacySettings } from '@client/core/auth';
 
 import {
   Dialog,

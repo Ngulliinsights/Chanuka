@@ -1,23 +1,23 @@
 /**
  * Unified WebSocket Manager
- * 
+ *
  * Consolidated WebSocket management for all real-time features.
  * Replaces scattered WebSocket implementations with a single, optimized manager.
  */
 
 import { logger } from '@client/utils/logger';
 
-import { 
-  WebSocketConfig, 
-  ConnectionState, 
-  Subscription, 
+import {
+  WebSocketConfig,
+  ConnectionState,
+  Subscription,
   WebSocketMessage,
   MessageHandler,
   EventListener,
   HeartbeatMessage,
   SubscriptionMessage,
   BatchMessage
-} from '../types';
+} from './types';
 import { EventEmitter } from '../utils/event-emitter';
 
 export class UnifiedWebSocketManager {
@@ -291,9 +291,9 @@ export class UnifiedWebSocketManager {
     this.ws = null;
 
     // Attempt reconnection if enabled and not a clean close
-    if (this.config.reconnect.enabled && 
-        event.code !== 1000 && 
-        wasConnected && 
+    if (this.config.reconnect.enabled &&
+        event.code !== 1000 &&
+        wasConnected &&
         this.reconnectAttempts < this.config.reconnect.maxAttempts) {
       this.scheduleReconnect();
     } else if (this.reconnectAttempts >= this.config.reconnect.maxAttempts) {

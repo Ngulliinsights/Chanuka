@@ -3,7 +3,7 @@
  * Prevents abuse by limiting API requests and user actions
  */
 
-import { SecurityEvent, RateLimitInfo } from '@client/types';
+import { SecurityEvent, RateLimitInfo } from '@client/shared/types';
 
 import { logger } from '@client/utils/logger';
 

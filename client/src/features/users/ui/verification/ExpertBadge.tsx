@@ -2,7 +2,7 @@ import React from 'react';
 import { Shield, Award, CheckCircle, User, Star, Building } from 'lucide-react';
 
 import { cn } from '@client/lib/utils';
-import { ExpertVerificationType } from '@client/types/expert';
+import { ExpertVerificationType } from '@client/features/users/types';
 
 import { GraduationCap } from '../icons/SimpleIcons';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/shared/design-system';

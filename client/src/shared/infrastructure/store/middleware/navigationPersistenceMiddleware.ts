@@ -7,7 +7,7 @@
 
 import { Middleware } from '@reduxjs/toolkit';
 
-import { NavigationState, UserRole } from '@client/types/navigation';
+import { NavigationState, UserRole } from '@client/shared/types/navigation';
 import { logger } from '@client/utils/logger';
 
 // Storage keys

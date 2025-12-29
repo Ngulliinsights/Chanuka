@@ -1,6 +1,6 @@
 /**
  * Mock Analytics Data
- * 
+ *
  * Comprehensive mock data for engagement analytics, sentiment analysis,
  * temporal analytics, and gamification elements.
  */
@@ -20,7 +20,7 @@ import {
   ContributionQualityMetrics,
   CommunityImpactMetrics,
   EngagementTrend
-} from '@client/types/engagement-analytics';
+} from '@client/shared/types';
 
 import { mockExperts, mockOfficialExperts } from './experts';
 import {
@@ -56,7 +56,7 @@ export const generatePersonalEngagementScore = (userId: string): PersonalEngagem
   const quality = faker.number.float({ min: 0.4, max: 1.0, fractionDigits: 2 });
   const expertise = faker.number.float({ min: 0.2, max: 0.9, fractionDigits: 2 });
   const community = faker.number.float({ min: 0.3, max: 1.0, fractionDigits: 2 });
-  
+
   const totalScore = Math.round((participation * 0.3 + quality * 0.25 + expertise * 0.2 + community * 0.25) * 1000);
   const totalUsers = faker.number.int({ min: 10000, max: 50000 });
   const rank = faker.number.int({ min: 1, max: Math.floor(totalUsers * 0.1) });
@@ -169,7 +169,7 @@ export const generateExpertVerificationMetrics = (): ExpertVerificationMetrics =
   const allExperts = [...mockExperts, ...mockOfficialExperts];
   const totalExperts = allExperts.length;
   const activeExperts = faker.number.int({ min: Math.floor(totalExperts * 0.6), max: Math.floor(totalExperts * 0.9) });
-  
+
   const verificationStats = {
     official: allExperts.filter(e => e.verificationType === 'official').length,
     domain: allExperts.filter(e => e.verificationType === 'domain').length,
@@ -266,14 +266,14 @@ export const generateTemporalAnalyticsData = (): TemporalAnalyticsData => {
 export const generateUserEngagementProfile = (userId: string): UserEngagementProfile => {
   const totalScore = faker.number.int({ min: 500, max: 8000 });
   const level = Math.floor(totalScore / 1000) + 1;
-  
+
   const badges = faker.helpers.arrayElements([
-    'First Comment', 'Active Participant', 'Quality Contributor', 
+    'First Comment', 'Active Participant', 'Quality Contributor',
     'Expert Verified', 'Community Leader', 'Policy Advocate'
   ], faker.number.int({ min: 2, max: 5 }));
 
   const achievements = faker.helpers.arrayElements([
-    'civic_champion', 'policy_expert', 'community_leader', 
+    'civic_champion', 'policy_expert', 'community_leader',
     'rising_star', 'engaged_citizen'
   ], faker.number.int({ min: 1, max: 4 }));
 
@@ -334,14 +334,14 @@ export const generateCivicEngagementGoals = (count: number = 5): CivicEngagement
   return faker.helpers.arrayElements(goalTemplates, count).map(template => {
     const targetValue = faker.number.int({ min: 5, max: 100 });
     const currentValue = faker.number.int({ min: 0, max: targetValue });
-    
+
     return {
       id: generateId('goal'),
       ...template,
       targetValue,
       currentValue,
       progress: Math.round((currentValue / targetValue) * 100),
-      deadline: faker.datatype.boolean({ probability: 0.7 }) ? 
+      deadline: faker.datatype.boolean({ probability: 0.7 }) ?
         new Date(Date.now() + faker.number.int({ min: 7, max: 30 }) * 24 * 60 * 60 * 1000).toISOString() :
         undefined
     };
@@ -352,7 +352,7 @@ export const generateCivicEngagementGoals = (count: number = 5): CivicEngagement
  * Generate engagement notifications
  */
 export const generateEngagementNotifications = (count: number = 10): EngagementNotification[] => {
-  const notificationTypes: Array<'achievement' | 'milestone' | 'trending' | 'expert_response' | 'community_update'> = 
+  const notificationTypes: Array<'achievement' | 'milestone' | 'trending' | 'expert_response' | 'community_update'> =
     ['achievement', 'milestone', 'trending', 'expert_response', 'community_update'];
 
   const templates = {
@@ -381,7 +381,7 @@ export const generateEngagementNotifications = (count: number = 10): EngagementN
   return Array.from({ length: count }, () => {
     const type = faker.helpers.arrayElement(notificationTypes);
     const template = faker.helpers.arrayElement(templates[type]);
-    
+
     return {
       id: generateId('notification'),
       type,
@@ -406,7 +406,7 @@ export const generateEngagementTrends = (periods: string[]): EngagementTrend[] =
     const value = faker.number.int({ min: 100, max: 1000 });
     const change = faker.number.int({ min: -50, max: 100 });
     const changePercentage = value > 0 ? Math.round((change / value) * 100) : 0;
-    
+
     return {
       period,
       value,

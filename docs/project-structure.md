@@ -1,6 +1,6 @@
 # Project Structure
 
-**Generated:** 12/29/2025, 1:57:56 PM
+**Generated:** 12/29/2025, 6:29:31 PM
 **Max Depth:** 7 levels
 
 ```
@@ -358,6 +358,8 @@
 │   │   │   │   │   │   ├── conflict-detection.ts
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   └── index.ts
+│   │   │   │   ├── types/
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── conflict-of-interest/
 │   │   │   │   │   │   └── index.ts
@@ -380,6 +382,7 @@
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   └── slices/
+│   │   │   │   ├── types/
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── dashboard/
 │   │   │   │   │   │   ├── AnalyticsDashboard.tsx
@@ -395,6 +398,7 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── pagination.ts
 │   │   │   │   │   └── tracking.ts
+│   │   │   │   ├── types/
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── analysis/
 │   │   │   │   │   │   ├── conflict-of-interest/
@@ -462,6 +466,8 @@
 │   │   │   │   ├── store/
 │   │   │   │   │   └── slices/
 │   │   │   │   │       └── communitySlice.tsx
+│   │   │   │   ├── types/
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── activity/
 │   │   │   │   │   │   ├── ActivityFeed.tsx
@@ -545,6 +551,8 @@
 │   │   │   │   │   └── user-api.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   └── slices/
+│   │   │   │   ├── types/
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── auth/
 │   │   │   │   │   │   ├── AuthAlert.tsx
@@ -922,6 +930,7 @@
 │   │   │   │   ├── analytics.ts
 │   │   │   │   ├── dashboard.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── loading.ts
 │   │   │   │   ├── mobile.ts
 │   │   │   │   ├── navigation.ts
 │   │   │   │   ├── search-response.ts
@@ -1179,37 +1188,6 @@
 │   │   ├── stubs/
 │   │   │   ├── database-stub.ts
 │   │   │   └── middleware-stub.ts
-│   │   ├── types/
-│   │   │   ├── api.ts
-│   │   │   ├── auth.ts
-│   │   │   ├── browser.ts
-│   │   │   ├── community.ts
-│   │   │   ├── conflict-of-interest.ts
-│   │   │   ├── constitutional.ts
-│   │   │   ├── core.d.ts
-│   │   │   ├── core.d.ts.map
-│   │   │   ├── core.js
-│   │   │   ├── core.js.map
-│   │   │   ├── core.ts
-│   │   │   ├── dashboard.ts
-│   │   │   ├── engagement-analytics.ts
-│   │   │   ├── error.ts
-│   │   │   ├── expert.ts
-│   │   │   ├── form.ts
-│   │   │   ├── global.d.ts
-│   │   │   ├── guards.ts
-│   │   │   ├── index.ts
-│   │   │   ├── loading.ts
-│   │   │   ├── lucide.d.ts
-│   │   │   ├── mobile.ts
-│   │   │   ├── navigation.ts
-│   │   │   ├── onboarding.ts
-│   │   │   ├── performance.ts
-│   │   │   ├── realtime.ts
-│   │   │   ├── security.ts
-│   │   │   ├── shims-shared.d.ts
-│   │   │   ├── shims-web-vitals.d.ts
-│   │   │   └── user-dashboard.ts
 │   │   ├── utils/
 │   │   │   ├── assets.ts
 │   │   │   ├── backgroundSyncManager.ts
@@ -1558,6 +1536,7 @@
 │   ├── audit-codebase-utilities.ts
 │   ├── audit-error-handling-sprawl.ts
 │   ├── audit-middleware-sprawl.ts
+│   ├── bulk-migrate-types.sh
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
 │   ├── check-table-structure.ts
@@ -1609,6 +1588,7 @@
 │   ├── fix-remaining-client-issues.sh
 │   ├── fix-remaining-errors.ts
 │   ├── fix-remaining-imports.js
+│   ├── fix-remaining-types.js
 │   ├── fix-schema-imports.ts
 │   ├── fix-schema-references.ts
 │   ├── fix-server-logger-imports.js
@@ -1628,6 +1608,7 @@
 │   ├── immediate-memory-cleanup.cjs
 │   ├── import-resolution-monitor.js
 │   ├── integrate-error-management.ts
+│   ├── migrate_types.py
 │   ├── migrate-api-imports.js
 │   ├── migrate-codebase-utilities.ts
 │   ├── migrate-console-logs.ts
@@ -1637,6 +1618,7 @@
 │   ├── migrate-logging.js
 │   ├── migrate-shared-types.ts
 │   ├── migrate-to-unified-websocket.ts
+│   ├── migrate-types.js
 │   ├── ml-service-demo.ts
 │   ├── optimize-memory.js
 │   ├── performance-budget-enforcer.cjs
@@ -2896,9 +2878,11 @@
 ├── export_validator.sh
 ├── export-fixer.mjs
 ├── extract_errors_monorepo.mjs
+├── extraction_debug.log
 ├── final-cleanup-report-20251220-193413.md
 ├── final-issue-resolver.mjs
 ├── fix-imports.js
+├── FSD_TYPE_MIGRATION_SUMMARY.md
 ├── functional_validator.js
 ├── generate-structure.mjs
 ├── import-export-report.md
@@ -2906,7 +2890,6 @@
 ├── nginx.conf
 ├── nx.json
 ├── package.json
-├── pattern_errors.json
 ├── performance-baselines.json
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
@@ -2916,10 +2899,6 @@
 ├── quality-config-pr.json
 ├── quality-config-production.json
 ├── quality-config-staging.json
-├── quality-gate-report-dev.json
-├── quality-gate-report-pr.json
-├── quality-gate-report-production.json
-├── quality-gate-report-staging.json
 ├── quality-gate-report.json
 ├── race-condition-analyzer.js
 ├── race-condition-tests.spec.js

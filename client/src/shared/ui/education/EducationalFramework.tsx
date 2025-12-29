@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import type { Bill } from '@client/types';
+import type { Bill } from '@client/shared/types';
 
 import { ConstitutionalContext } from './ConstitutionalContext';
 import { EducationalTooltip } from './EducationalTooltip';

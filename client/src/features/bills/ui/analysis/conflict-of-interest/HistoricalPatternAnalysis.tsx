@@ -23,7 +23,7 @@ import {
   AreaChart
 } from 'recharts';
 
-import { VotingPattern, ConflictAnalysis } from '@client/types/conflict-of-interest';
+import { VotingPattern, ConflictAnalysis } from '@client/features/analysis/types';
 
 import { Badge } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';

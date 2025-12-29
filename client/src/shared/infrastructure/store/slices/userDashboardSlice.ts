@@ -20,7 +20,7 @@ import type {
   DataExportRequest,
   TemporalFilter,
   DashboardPreferences
-} from '@client/types/user-dashboard';
+} from '@client/shared/types/user-dashboard';
 
 import type { RootState } from '../index';
 

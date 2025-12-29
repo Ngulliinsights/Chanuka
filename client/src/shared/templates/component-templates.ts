@@ -563,7 +563,7 @@ export * from './use${this.toPascalCase(componentName)}';
     const camelName = this.toCamelCase(componentName);
     
     const content = `import { useState, useEffect, useCallback } from 'react';
-import { ${pascalName}Data, ${pascalName}Error, Use${pascalName}Options, Use${pascalName}Result } from '@client/types';
+import { ${pascalName}Data, ${pascalName}Error, Use${pascalName}Options, Use${pascalName}Result } from '@client/shared/types';
 ${this.config.hasValidation ? `import { validate${pascalName}Data } from '@shared/validation';` : ''}
 ${this.config.hasErrorHandling ? `import { ${camelName}RecoveryManager } from '@shared/recovery';` : ''}
 
@@ -708,7 +708,7 @@ export * from './${this.toCamelCase(componentName)}-utils';
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
     
-    const content = `import { ${pascalName}Data, ${pascalName}Config } from '@client/types';
+    const content = `import { ${pascalName}Data, ${pascalName}Config } from '@client/shared/types';
 
 /**
  * ${pascalName} utility functions
@@ -875,7 +875,7 @@ export * from './${pascalName}UI';
     const pascalName = this.toPascalCase(componentName);
     
     const content = `import React from 'react';
-import { ${pascalName}Props } from '@client/types';
+import { ${pascalName}Props } from '@client/shared/types';
 ${this.config.hasHooks ? `import { use${pascalName} } from '@client/hooks';` : ''}
 
 /**
@@ -1004,7 +1004,7 @@ export default ${pascalName}UI;
     const pascalName = this.toPascalCase(componentName);
     const camelName = this.toCamelCase(componentName);
     
-    const content = `import { ${pascalName}Data, ${pascalName}Config, ${pascalName}Error } from '@client/types';
+    const content = `import { ${pascalName}Data, ${pascalName}Config, ${pascalName}Error } from '@client/shared/types';
 ${this.config.hasValidation ? `import { validate${pascalName}Data, validate${pascalName}Config } from '@shared/validation';` : ''}
 
 /**
@@ -1297,7 +1297,7 @@ describe('use${pascalName} Hook', () => {
   is${pascalName}Loading,
   has${pascalName}Error,
 } from '@shared/utils/${this.toCamelCase(componentName)}-utils';
-import { ${pascalName}Data, ${pascalName}Config } from '@client/types';
+import { ${pascalName}Data, ${pascalName}Config } from '@client/shared/types';
 
 describe('${this.toCamelCase(componentName)}-utils', () => {
   const mockData: ${pascalName}Data = {

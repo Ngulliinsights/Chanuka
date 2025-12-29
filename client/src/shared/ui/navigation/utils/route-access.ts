@@ -1,5 +1,5 @@
 import { InvalidNavigationPathError } from '@client/core/error';
-import type { NavigationItem, UserRole } from '@client/types';
+import type { NavigationItem, UserRole } from '@client/shared/types';
 import { validateNavigationPath, validateUserRole } from '@client/validation';
 
 

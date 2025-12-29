@@ -6,7 +6,7 @@ import {
   CommunityValidation as CommunityValidationType,
   VerificationWorkflow as VerificationWorkflowType,
   ExpertConsensus as ExpertConsensusType
-} from '@client/types/expert';
+} from '@client/features/users/types';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

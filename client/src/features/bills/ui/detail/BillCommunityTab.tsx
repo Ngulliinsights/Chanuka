@@ -1,8 +1,8 @@
 import { MessageCircle, Users, TrendingUp, Award, Plus, Filter, RefreshCw } from 'lucide-react';
 import React, { useState } from 'react';
 
-import type { Bill } from '@client/types/core';
-import type { CommunityComment } from '@client/types/community';
+import type { Bill } from '@client/shared/types';
+import type { CommunityComment } from '@client/features/community/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';

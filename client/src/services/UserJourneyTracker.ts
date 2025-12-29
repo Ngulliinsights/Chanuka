@@ -1,4 +1,4 @@
-import { UserRole, NavigationSection } from '@client/types/navigation';
+import { UserRole, NavigationSection } from '@client/shared/types/navigation';
 
 /**
  * Represents a single step in a user journey

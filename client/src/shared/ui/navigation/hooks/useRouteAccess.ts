@@ -1,4 +1,4 @@
-import type { UserRole } from '@client/types';
+import type { UserRole } from '@client/shared/types';
 import type { AccessDenialReason } from '../types';
 
 import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';

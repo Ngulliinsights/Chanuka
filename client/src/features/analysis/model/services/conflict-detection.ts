@@ -1,4 +1,4 @@
-import { ConflictAnalysis, FinancialInterest } from '@client/types/conflict-of-interest';
+import { ConflictAnalysis, FinancialInterest } from '@client/features/analysis/types';
 
 /**
  * Service interface for conflict detection

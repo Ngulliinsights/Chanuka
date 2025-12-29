@@ -21,7 +21,7 @@ import type {
   CommentFormData,
   ModerationViolationType,
   TypingIndicator
-} from '@client/types/community';
+} from '@client/features/community/types';
 interface UseDiscussionOptions {
   billId: number;
   autoSubscribe?: boolean;

@@ -16,7 +16,7 @@ import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { cn } from '@client/lib/utils';
-import type { Bill } from '@client/types/core';
+import type { Bill } from '@client/shared/types';
 
 interface BillCardProps {
   bill: Bill;

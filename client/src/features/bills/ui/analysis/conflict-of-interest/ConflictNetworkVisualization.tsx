@@ -15,7 +15,7 @@ import {
   NetworkLink, 
   ConflictVisualizationProps,
   AccessibilityFallbackData 
-} from '@client/types/conflict-of-interest';
+} from '@client/features/analysis/types';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

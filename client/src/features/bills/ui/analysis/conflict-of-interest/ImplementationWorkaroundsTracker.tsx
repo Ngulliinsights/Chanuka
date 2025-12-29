@@ -31,7 +31,7 @@ import {
   Cell
 } from 'recharts';
 
-import { ImplementationWorkaround, ConflictAnalysis } from '@client/types/conflict-of-interest';
+import { ImplementationWorkaround, ConflictAnalysis } from '@client/features/analysis/types';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

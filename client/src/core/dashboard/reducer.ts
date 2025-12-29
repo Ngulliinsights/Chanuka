@@ -1,11 +1,11 @@
 /**
  * Dashboard State Reducer - Handles all dashboard state transitions
- * 
+ *
  * Note: This reducer is currently unused in favor of useState-based state management
  * in the DashboardProvider. It's kept here for reference and potential future use.
  */
 
-import { DashboardState, DashboardAction } from '@client/types';
+import { DashboardState, DashboardAction } from '@client/shared/types';
 
 /**
  * Reducer for dashboard state transitions

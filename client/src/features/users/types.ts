@@ -1,6 +1,6 @@
 // Users feature types
-import { User, Bill } from '@client/types/core';
-import { BillRecommendation } from '@client/types/user-dashboard';
+import { User, Bill } from '@client/shared/types';
+import { BillRecommendation } from '@client/shared/types/user-dashboard';
 
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';

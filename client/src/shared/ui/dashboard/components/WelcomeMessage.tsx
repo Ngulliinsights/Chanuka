@@ -12,7 +12,7 @@ import { User } from '@client/core/auth/types';
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
-import { UserDashboardData } from '@client/types/user-dashboard';
+import { UserDashboardData } from '@client/shared/types/user-dashboard';
 
 interface WelcomeMessageProps {
   user: User;

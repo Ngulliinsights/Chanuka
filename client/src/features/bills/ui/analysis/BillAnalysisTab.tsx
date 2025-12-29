@@ -1,7 +1,7 @@
 import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 'lucide-react';
 import React, { useState } from 'react';
 
-import type { Bill } from '@client/types/core';
+import type { Bill } from '@client/shared/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';

@@ -13,7 +13,7 @@ import { useAuth } from '@client/core/auth';
 import {
   PrivacySettings,
   ConsentRecord
-} from '@client/types/auth';
+} from '@client/core/auth';
 import { logger } from '@client/utils/logger';
 
 

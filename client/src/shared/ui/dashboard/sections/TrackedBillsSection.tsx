@@ -24,7 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/shared/design-system/typography/Card.tsx';
-import { TrackedBill } from '@client/types/user-dashboard';
+import { TrackedBill } from '@client/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
 

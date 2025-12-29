@@ -1,7 +1,7 @@
 import { FileText, Download, Search, Copy, BookOpen, Eye, EyeOff } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
-import type { Bill } from '@client/types/core';
+import type { Bill } from '@client/shared/types';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';

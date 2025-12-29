@@ -1,4 +1,4 @@
-import type { RelatedPage, UserRole } from '@client/types';
+import type { RelatedPage, UserRole } from '@client/shared/types';
 
 import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';
 import { useAuth } from '@client/core/auth';

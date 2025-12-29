@@ -11,8 +11,8 @@ import {
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
 import { cn } from '@client/shared/design-system';
-import type { Comment } from '@client/types/core';
-import type { CommunityComment } from '@client/types/community';
+import type { Comment } from '@client/shared/types';
+import type { CommunityComment } from '@client/features/community/types';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';

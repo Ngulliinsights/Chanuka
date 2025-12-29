@@ -16,7 +16,7 @@ import {
   UserRole,
   NavigationPreferences,
   RecentPage
-} from '@client/types/navigation';
+} from '@client/shared/types/navigation';
 import { logger } from '@client/utils/logger';
 
 // Constants for better maintainability

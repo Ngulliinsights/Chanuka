@@ -1,10 +1,10 @@
 /**
  * Security Configuration
- * 
+ *
  * Centralized security configuration for the Chanuka platform
  */
 
-import type { SecurityConfig } from '@client/types/security-types';
+import type { SecurityConfig } from '@client/shared/types';
 
 const isDevelopment = import.meta.env.MODE === 'development';
 const isProduction = import.meta.env.MODE === 'production';

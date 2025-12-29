@@ -4,7 +4,7 @@ import { validateNavigationPath } from '@client/validation';
 
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
 import type { NavigationItem as SharedNavigationItem, UserRole as SharedUserRole } from '../types';
-import type { NavigationItem, UserRole } from '@client/types/navigation';
+import type { NavigationItem, UserRole } from '@client/shared/types/navigation';
 
 // Type conversion helpers
 function convertNavigationItem(item: NavigationItem): SharedNavigationItem {

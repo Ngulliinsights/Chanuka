@@ -1,4 +1,4 @@
-import type { UserRole, RelatedPage } from '@client/types';
+import type { UserRole, RelatedPage } from '@client/shared/types';
 import type { UserRole as SharedUserRole } from '../types';
 
 // Remove unused import

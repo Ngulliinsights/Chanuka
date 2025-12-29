@@ -6,7 +6,7 @@
 
 import { Clock } from 'lucide-react';
 
-import { TemporalFilter } from '@client/types/user-dashboard';
+import { TemporalFilter } from '@client/shared/types/user-dashboard';
 import { 
   Select,
   SelectContent,

@@ -23,7 +23,7 @@
 
 import React from 'react';
 
-import type { InfiniteScrollConfig } from '@client/types/mobile';
+import type { InfiniteScrollConfig } from '@client/shared/types/mobile';
 
 interface InfiniteScrollProps extends InfiniteScrollConfig {
   children: React.ReactNode;

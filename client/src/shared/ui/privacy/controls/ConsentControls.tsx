@@ -11,7 +11,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-import { PrivacySettings } from '@client/types/auth';
+import { PrivacySettings } from '@client/core/auth';
 
 import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
 // import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';

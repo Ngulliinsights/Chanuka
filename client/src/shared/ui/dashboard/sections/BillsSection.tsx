@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/shared/design-system';
-import { TrackedBill, BillRecommendation } from '@client/types/user-dashboard';
+import { TrackedBill, BillRecommendation } from '@client/shared/types/user-dashboard';
 
 interface BillsSectionProps {
   trackedBills?: TrackedBill[];

@@ -3,7 +3,7 @@
  * Comprehensive XSS prevention and input validation
  */
 
-import { SecurityEvent } from '@client/types';
+import { SecurityEvent } from '@client/shared/types';
 import DOMPurify from 'dompurify';
 
 import { logger } from '@client/utils/logger';

@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import { LoadingComponentProps } from '@client/types';
+import { LoadingComponentProps } from '@client/shared/types';
 
 export interface LoadingSkeletonProps extends LoadingComponentProps {
   variant?: 'default' | 'pulse' | 'wave';

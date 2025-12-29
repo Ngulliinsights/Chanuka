@@ -7,7 +7,7 @@ import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
-import type { AnalyticsFilters } from '@client/types';
+import type { AnalyticsFilters } from '@client/shared/types';
 
 // Type definitions for dashboard data structure
 interface DashboardSummary {

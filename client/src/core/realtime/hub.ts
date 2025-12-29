@@ -6,6 +6,13 @@
  * The WebSocket manager serves as the primary engine for all real-time operations.
  */
 
+import { logger } from '../../utils/logger';
+
+import { getRealTimeConfig } from './config';
+import { UnifiedWebSocketManager } from './manager';
+import { BillTrackingService } from './services/bill-tracking';
+import { CommunityService } from './services/community';
+import { NotificationService } from './services/notifications';
 import {
   CivicWebSocketState,
   BillRealTimeUpdate,
@@ -16,13 +23,6 @@ import {
   WebSocketSubscription,
   RealTimeHandlers
 } from './types';
-import { logger } from '../../utils/logger';
-
-import { getRealTimeConfig } from './config';
-import { UnifiedWebSocketManager } from './manager';
-import { BillTrackingService } from './services/bill-tracking';
-import { CommunityService } from './services/community';
-import { NotificationService } from './services/notifications';
 import { ConnectionState } from './types';
 import { EventEmitter } from './utils/event-emitter';
 

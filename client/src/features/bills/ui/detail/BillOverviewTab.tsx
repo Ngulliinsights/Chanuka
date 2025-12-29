@@ -1,7 +1,7 @@
 import { Calendar, Users, FileText, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
-import type { Bill } from '@client/types/core';
+import type { Bill } from '@client/shared/types';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';

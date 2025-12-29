@@ -14,7 +14,7 @@ import {
 import React, { useState } from 'react';
 
 import { cn } from '@client/lib/utils';
-import { ExpertConsensus as ExpertConsensusType } from '@client/types/expert';
+import { ExpertConsensus as ExpertConsensusType } from '@client/features/users/types';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';

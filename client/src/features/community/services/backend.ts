@@ -10,7 +10,7 @@ import { communityApiService } from '@client/core/api/community';
 import type { DiscussionThreadMetadata } from '@client/core/api/community';
 import type { CommentFormData } from '@client/core/api/types/community';
 import { realTimeService } from '@client/core/realtime';
-import type { Comment } from '@client/types/community';
+import type { Comment } from '@client/features/community/types';
 import { logger } from '@client/utils/logger';
 
 // ============================================================================

@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from '@client/shared/design-system/interactive/Select.tsx';
 import { Label } from '@client/shared/design-system/typography/Label.tsx';
-import { DataExportRequest } from '@client/types/user-dashboard';
+import { DataExportRequest } from '@client/shared/types/user-dashboard';
 
 
 interface DataExportModalProps {

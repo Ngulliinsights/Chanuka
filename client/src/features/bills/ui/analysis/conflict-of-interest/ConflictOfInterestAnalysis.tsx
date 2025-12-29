@@ -17,8 +17,8 @@ import {
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
-import type { Bill } from '@client/types';
-import { ConflictAnalysis, NetworkNode, NetworkLink } from '@client/types/conflict-of-interest';
+import type { Bill } from '@client/shared/types';
+import { ConflictAnalysis, NetworkNode, NetworkLink } from '@client/features/analysis/types';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';

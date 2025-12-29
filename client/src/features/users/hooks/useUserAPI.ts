@@ -20,7 +20,7 @@ import type {
   DataExportRequest,
   DashboardPreferences,
   UserDashboardData
-} from '@client/types/user-dashboard';
+} from '@client/shared/types/user-dashboard';
 import { logger } from '@client/utils/logger';
 
 // Types for engagement and activity tracking - matching service expectations

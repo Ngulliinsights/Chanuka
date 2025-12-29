@@ -2,7 +2,7 @@
  * Dashboard Widget Definitions - Consolidated widget configurations
  */
 
-import { WidgetConfig, WidgetType, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from '@client/types';
+import { WidgetConfig, WidgetType, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from '@client/shared/types';
 
 /**
  * Widget factory functions for creating common widget configurations

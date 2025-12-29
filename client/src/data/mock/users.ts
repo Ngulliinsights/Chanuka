@@ -7,7 +7,7 @@
 
 import { faker } from '@faker-js/faker';
 
-import { User, PrivacySettings, SecurityEvent, ConsentRecord } from '@client/types/auth';
+import { User, PrivacySettings, SecurityEvent, ConsentRecord } from '@client/core/auth';
 
 import { generateId, generateDateInRange, generateLocation } from './generators';
 

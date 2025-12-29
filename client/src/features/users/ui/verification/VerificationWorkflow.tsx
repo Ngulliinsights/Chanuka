@@ -12,7 +12,7 @@ import {
 import { useState, useCallback } from 'react';
 
 import { cn } from '@client/lib/utils';
-import { VerificationWorkflow as VerificationWorkflowType, VerificationStatus } from '@client/types/expert';
+import { VerificationWorkflow as VerificationWorkflowType, VerificationStatus } from '@client/features/users/types';
 
 import { Avatar, AvatarFallback } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';

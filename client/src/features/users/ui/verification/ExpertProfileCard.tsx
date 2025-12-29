@@ -13,7 +13,7 @@ import {
 import React, { useState } from 'react';
 
 import { cn } from '@client/lib/utils';
-import { Expert, ExpertCredential, ExpertAffiliation } from '@client/types/expert';
+import { Expert, ExpertCredential, ExpertAffiliation } from '@client/features/users/types';
 
 import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/SimpleIcons';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';

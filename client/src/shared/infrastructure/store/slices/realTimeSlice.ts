@@ -15,7 +15,7 @@ import {
   ExpertActivityUpdate,
   RealTimeNotification,
   WebSocketSubscription
-} from '@client/types/realtime';
+} from '@client/core/realtime/types';
 
 export interface RealTimeState {
   // Connection state

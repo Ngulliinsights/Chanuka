@@ -5,7 +5,7 @@
  * This component is specific to the bills feature.
  */
 
-import { Bill } from '@client/types';
+import { Bill } from '@client/shared/types';
 import {
   Calendar,
   Users,

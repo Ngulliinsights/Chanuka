@@ -1,6 +1,6 @@
 /**
  * Shared Types Module
- * 
+ *
  * Central repository for type definitions used across features
  * Consolidated from client/src/types during FSD migration
  */
@@ -75,6 +75,9 @@ export * from './navigation';
 // Mobile types
 export * from './mobile';
 
+// Loading types
+export * from './loading';
+
 // Community types (re-exported from legacy location)
 export type {
   ActivityItem,
@@ -85,7 +88,7 @@ export type {
   VoteRequest,
   Comment,
   DiscussionThread
-} from '../../types/community';
+} from '@client/features/community/types';
 
 // Core types (re-exported from legacy location)
 export type {
@@ -98,7 +101,7 @@ export type {
   PrivacySettings,
   NotificationPreferences,
   ConsentRecord
-} from '../../types/core';
+} from '@client/shared/types';
 
 // Planned: After migration, specific type exports will be organized here
 // - Analytics types (from features/analytics/model/types)

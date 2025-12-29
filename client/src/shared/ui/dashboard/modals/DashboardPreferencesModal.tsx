@@ -27,7 +27,7 @@ import {
   CardTitle,
 } from '@client/shared/design-system/typography/Card.tsx';
 import { Label } from '@client/shared/design-system/typography/Label.tsx';
-import { DashboardPreferences } from '@client/types/user-dashboard';
+import { DashboardPreferences } from '@client/shared/types/user-dashboard';
 
 interface DashboardPreferencesModalProps {
   open: boolean;

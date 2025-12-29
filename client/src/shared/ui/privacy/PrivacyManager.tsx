@@ -3,7 +3,7 @@
  * Accepts a mode prop to render different interfaces
  */
 
-import { PrivacySettings } from '@client/types/auth';
+import { PrivacySettings } from '@client/core/auth';
 
 import { CompactInterface } from './CompactInterface';
 import { FullInterface } from './FullInterface';

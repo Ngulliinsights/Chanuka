@@ -14,7 +14,7 @@ import {
   ModerationAction,
   ModerationFlag,
   TypingIndicator
-} from '@client/types/community';
+} from '@client/features/community/types';
 
 import { mockExperts, mockOfficialExperts } from './experts';
 import {

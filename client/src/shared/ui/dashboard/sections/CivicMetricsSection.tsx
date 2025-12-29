@@ -27,7 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/shared/design-system/typography/Card.tsx';
-import { CivicImpactMetrics } from '@client/types/user-dashboard';
+import { CivicImpactMetrics } from '@client/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
 

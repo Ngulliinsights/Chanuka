@@ -3,7 +3,7 @@
  * Consolidated type definitions for the bills feature
  */
 
-import { Bill, Comment } from '@client/types';
+import { Bill, Comment } from '@client/shared/types';
 
 export interface Sponsor {
   id: string;

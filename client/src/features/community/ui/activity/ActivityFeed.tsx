@@ -28,7 +28,7 @@ import {
 import { useState, useCallback, memo } from 'react';
 
 import { cn } from '@client/lib/utils';
-import { ActivityItem } from '@client/types/community';
+import { ActivityItem } from '@client/features/community/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

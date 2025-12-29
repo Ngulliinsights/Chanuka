@@ -32,7 +32,7 @@ import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-import { ExpertInsight } from '@client/types/community';
+import { ExpertInsight } from '@client/features/community/types';
 
 interface ExpertInsightsProps {
   insights: ExpertInsight[];

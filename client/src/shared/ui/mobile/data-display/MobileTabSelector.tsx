@@ -25,7 +25,7 @@
 
 import React from 'react';
 
-import type { MobileTab } from '@client/types/mobile';
+import type { MobileTab } from '@client/shared/types/mobile';
 
 interface MobileTabSelectorProps {
   tabs: MobileTab[];

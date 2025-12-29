@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '@client/core/auth';
-import { PrivacySettings } from '@client/types/auth';
+import { PrivacySettings } from '@client/core/auth';
 
 import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';

@@ -24,6 +24,6 @@ export type {
   ImplementationWorkaround,
   ConflictVisualizationProps,
   AccessibilityFallbackData
-} from '@client/types/conflict-of-interest';
+} from '@client/features/analysis/types';
 
 export type { ConflictOfInterestAnalysisProps } from './ConflictOfInterestAnalysis';

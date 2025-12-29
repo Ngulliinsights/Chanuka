@@ -6,7 +6,7 @@
 import { Eye } from 'lucide-react';
 import React from 'react';
 
-import { PrivacySettings } from '@client/types/auth';
+import { PrivacySettings } from '@client/core/auth';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
 import { Label } from '@client/shared/design-system/typography/Label.tsx';

@@ -19,7 +19,7 @@ import {
   RealTimeHandlers,
   BillRealTimeUpdate,
   RealTimeNotification
-} from '@client/types/realtime';
+} from '@client/core/realtime/types';
 import { logger } from '@client/utils/logger';
 
 import {

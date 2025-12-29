@@ -5,7 +5,7 @@
 
 import React, { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { DashboardState, WidgetConfig, DashboardLayout, DashboardSettings } from '@client/types';
+import { DashboardState, WidgetConfig, DashboardLayout, DashboardSettings } from '@client/shared/types';
 import { logger } from '@client/utils/logger';
 
 
@@ -31,22 +31,22 @@ const initialState: DashboardState = {
 
 export interface DashboardContextValue {
   state: DashboardState;
-  
+
   // Config management
   loadDashboard: (dashboardId: string) => Promise<void>;
   saveDashboard: (state: DashboardState) => Promise<void>;
   updateSettings: (settings: Partial<DashboardSettings>) => void;
-  
+
   // Widget management
   addWidget: (widget: WidgetConfig) => void;
   removeWidget: (widgetId: string) => void;
   updateWidget: (widgetId: string, config: Partial<WidgetConfig>) => void;
   refreshWidget: (widgetId: string) => Promise<void>;
   refreshAllWidgets: () => Promise<void>;
-  
+
   // Layout management
   updateLayout: (layout: DashboardLayout) => void;
-  
+
   // Data management
   getWidget: (widgetId: string) => WidgetConfig | undefined;
 }
@@ -151,7 +151,7 @@ export function createDashboardProvider(
     }, [state.widgets]);
 
     const refreshAllWidgets = useCallback(async () => {
-      const refreshPromises = state.widgets.map(widget => 
+      const refreshPromises = state.widgets.map(widget =>
         dashboardService.loadWidgetData(widget.id, widget)
       );
 
