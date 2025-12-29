@@ -1,6 +1,6 @@
 import { authenticateToken as requireAuth } from '@server/middleware/auth';
 import { logger } from '@shared/core';
-import { ApiResponseWrapper,ApiSuccess, ApiValidationError } from '@shared/core/utils/api';
+import { ApiResponseWrapper,ApiSuccess, ApiValidationError } from '@shared/core/utils/api-utils';
 import { Router } from "express";
 import { z } from "zod";
 
@@ -387,3 +387,5 @@ router.get("/contact-methods", requireAuth, async (req, res) => {
     return handleApiError(res, error, "Failed to fetch contact methods", startTime);
   }
 });
+
+

@@ -6,7 +6,7 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { X, TrendingUp, MessageSquare, Award, Calendar, BookOpen, Sparkles } from 'lucide-react';
-import React from 'react';
+import { useEffect, useState } from 'react';
 
 import { User } from '@client/core/auth/types';
 import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';

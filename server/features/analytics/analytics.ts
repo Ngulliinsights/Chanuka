@@ -5,7 +5,7 @@ import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth.
 import { engagementAnalyticsService } from '@server/services/engagement.service.ts';
 import { controllerWrapper } from '@server/utils/analytics-controller-wrapper.ts';
 import { logger   } from '@shared/core';
-import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api';
+import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
 import { Router } from 'express';
 import { z } from 'zod';
 
@@ -663,3 +663,5 @@ router.get('/engagement/leaderboard', authenticateToken, async (req: Authenticat
 });
 
 export default router;
+
+

@@ -166,3 +166,5 @@ export function isValidVote(vote: any): vote is ValidatedVote {
     typeof vote.bill_id === 'number' &&
     typeof vote.billTitle === 'string';
 }
+
+

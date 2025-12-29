@@ -1,6 +1,6 @@
 # Project Structure
 
-**Generated:** 12/26/2025, 5:07:21 PM
+**Generated:** 12/29/2025, 1:57:56 PM
 **Max Depth:** 7 levels
 
 ```
@@ -92,8 +92,7 @@
 │   │   │   │   │   ├── preferences.ts
 │   │   │   │   │   ├── request.ts
 │   │   │   │   │   ├── service.ts
-│   │   │   │   │   ├── sponsor.ts
-│   │   │   │   │   └── websocket.ts
+│   │   │   │   │   └── sponsor.ts
 │   │   │   │   ├── analytics.ts
 │   │   │   │   ├── auth.ts
 │   │   │   │   ├── authenticated-client.ts
@@ -119,8 +118,7 @@
 │   │   │   │   ├── search.ts
 │   │   │   │   ├── system.ts
 │   │   │   │   ├── user.ts
-│   │   │   │   ├── WEBSOCKET_API_README.md
-│   │   │   │   └── websocket-example.ts
+│   │   │   │   └── WEBSOCKET_API_README.md
 │   │   │   ├── auth/
 │   │   │   │   ├── config/
 │   │   │   │   │   ├── auth-config.ts
@@ -873,8 +871,10 @@
 │   │   │   │   └── useService.ts
 │   │   │   ├── infrastructure/
 │   │   │   │   ├── asset-loading/
-│   │   │   │   │   └── AssetLoadingProvider.tsx
+│   │   │   │   │   ├── AssetLoadingProvider.tsx
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── compatibility/
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   ├── middleware/
 │   │   │   │   │   │   ├── apiMiddleware.ts
@@ -895,7 +895,8 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── store-types.ts
 │   │   │   │   ├── system/
-│   │   │   │   │   └── HealthCheck.tsx
+│   │   │   │   │   ├── HealthCheck.tsx
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── data-retention.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── integration-validator.ts
@@ -921,8 +922,11 @@
 │   │   │   │   ├── analytics.ts
 │   │   │   │   ├── dashboard.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── mobile.ts
+│   │   │   │   ├── navigation.ts
 │   │   │   │   ├── search-response.ts
-│   │   │   │   └── search.ts
+│   │   │   │   ├── search.ts
+│   │   │   │   └── user-dashboard.ts
 │   │   │   ├── ui/
 │   │   │   │   ├── accessibility/
 │   │   │   │   │   ├── accessibility-manager.tsx
@@ -2602,11 +2606,6 @@
 │   │   │   ├── services.ts
 │   │   │   └── validation-types.ts
 │   │   ├── utils/
-│   │   │   ├── api/
-│   │   │   │   ├── circuit-breaker.ts
-│   │   │   │   ├── client.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── interceptors.ts
 │   │   │   ├── examples/
 │   │   │   │   └── concurrency-migration-example.ts
 │   │   │   ├── formatting/
@@ -2724,6 +2723,7 @@
 │   │   │       └── anonymity-helper.ts
 │   │   └── index.ts
 │   ├── schema/
+│   │   ├── accountability_ledger.ts
 │   │   ├── advanced_discovery.ts
 │   │   ├── advocacy_coordination.ts
 │   │   ├── analysis.ts
@@ -2736,6 +2736,7 @@
 │   │   ├── impact_measurement.ts
 │   │   ├── index.ts
 │   │   ├── integrity_operations.ts
+│   │   ├── market_intelligence.ts
 │   │   ├── parliamentary_process.ts
 │   │   ├── participation_oversight.ts
 │   │   ├── platform_operations.ts
@@ -2868,12 +2869,18 @@
 │   ├── orphans-metadata.json
 │   ├── TIER_1_INTEGRATION_STATUS.md
 │   └── top-orphans-loc.json
+├── analyzer.js
 ├── CHANGELOG.md
+├── chanuka_error_extractor.py
+├── check-thresholds.js
 ├── circular-dependency-resolver.mjs
 ├── clear-sw.html
 ├── client-fix-report-20251220-180156.md
+├── codebase_errors.json
+├── combined_analysis.json
 ├── CONSOLIDATION_PLAN.md
 ├── CONSOLIDATION_SUMMARY.md
+├── count-websocket-fields.mjs
 ├── cspell.config.yaml
 ├── database-consolidation-analysis.md
 ├── DESIGN_SYSTEM_DELIVERY.md
@@ -2888,6 +2895,7 @@
 ├── export_validator_old_v7.sh
 ├── export_validator.sh
 ├── export-fixer.mjs
+├── extract_errors_monorepo.mjs
 ├── final-cleanup-report-20251220-193413.md
 ├── final-issue-resolver.mjs
 ├── fix-imports.js
@@ -2895,15 +2903,24 @@
 ├── generate-structure.mjs
 ├── import-export-report.md
 ├── import-resolver.mjs
-├── import-validator.mjs
 ├── nginx.conf
 ├── nx.json
 ├── package.json
+├── pattern_errors.json
 ├── performance-baselines.json
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
+├── quality-config-dev.json
+├── quality-config-pr.json
+├── quality-config-production.json
+├── quality-config-staging.json
+├── quality-gate-report-dev.json
+├── quality-gate-report-pr.json
+├── quality-gate-report-production.json
+├── quality-gate-report-staging.json
+├── quality-gate-report.json
 ├── race-condition-analyzer.js
 ├── race-condition-tests.spec.js
 ├── README.md
@@ -2921,14 +2938,22 @@
 ├── testing_strategy.md
 ├── tsconfig.json
 ├── tsconfig.server.json
+├── TYPE_CONSOLIDATION_SUMMARY.md
 ├── type-cleanup.mjs
+├── type-consolidation-plan.md
 ├── type-safety-fixer.mjs
 ├── validate_imports.js
 ├── validator.mjs
 ├── verify-exports.js
 ├── VERSION
 ├── vitest.setup.ts
-└── vitest.workspace.ts
+├── vitest.workspace.ts
+├── websocket-consolidation-final-status.md
+├── websocket-consolidation-status.md
+├── websocket-consolidation-summary.md
+├── websocket-migration-validation.mjs
+├── websocket-type-analysis-report.md
+└── websocket-type-consolidation-plan.md
 ```
 
 ## Excluded

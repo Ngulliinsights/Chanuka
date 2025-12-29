@@ -341,7 +341,7 @@ export const responsiveUtils = {
 export const createResponsiveStyles = (
   styles: Partial<Record<keyof typeof breakpoints, React.CSSProperties>>
 ): React.CSSProperties => {
-  const currentBreakpoint = responsiveUtils.getCurrentBreakpoint();
+  const _currentBreakpoint = responsiveUtils.getCurrentBreakpoint();
   return responsiveUtils.getResponsiveValue(styles) || {};
 };
 

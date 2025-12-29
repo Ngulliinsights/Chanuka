@@ -603,3 +603,5 @@ export class ConstitutionalAnalysisService {
 
 // Export singleton instance for use throughout the application
 export const constitutionalAnalysisService = new ConstitutionalAnalysisService();
+
+

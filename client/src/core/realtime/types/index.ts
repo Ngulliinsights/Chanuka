@@ -1,34 +1,35 @@
 /**
  * Real-time Core Module
- * 
+ *
  * Central entry point for the real-time subsystem.
- * USES SHARED TYPES from @client/core/api/types to ensure consistency.
+ * Uses unified WebSocket types from shared schema for consistency.
  */
 
-// ✅ IMPORT from the Central Truth
+// Import unified types from shared schema
 import type {
-  ConnectionState,
+  ConnectionQuality,
   WebSocketMessage
-} from '@client/core/api/types';
+} from '@shared/schema/websocket';
 
 import { WebSocketClient } from '../websocket-client';
 
-// Re-export the shared types so consumers of this module still find them here
-export {
-  ConnectionState,
-  WebSocketClient
-};
+// Re-export shared types for backward compatibility
+export type {
+  ConnectionQuality,
+  WebSocketMessage
+} from '@shared/schema/websocket';
 
-// Define ConnectionQuality locally since it's not exported from API types
-export interface ConnectionQuality {
-  level: 'excellent' | 'good' | 'poor' | 'disconnected';
-  latency: number;
-  packetLoss?: number;
-}
+export { WebSocketClient };
 
 // ============================================================================
-// Client-specific realtime types (migrated from legacy types/realtime.ts)
+// Consolidated Client Real-time Domain Types
 // ============================================================================
+
+/**
+ * These types represent domain-specific real-time events and updates.
+ * They are separate from WebSocket protocol types and define the business logic
+ * for real-time features in the client application.
+ */
 
 export interface BillRealTimeUpdate {
   type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' | 
@@ -156,7 +157,7 @@ export interface RealTimeHandlers {
 }
 
 // ============================================================================
-// Hook Return Types (These are specific to React, so keep them here)
+// React Hook Return Types
 // ============================================================================
 
 export interface WebSocketHookReturn {
@@ -164,7 +165,6 @@ export interface WebSocketHookReturn {
   isConnecting: boolean;
   connectionQuality: ConnectionQuality['level'];
   error: string | null;
-  // Use proper typing for notifications
   notifications: WebSocketMessage[];
   notificationCount: number;
 

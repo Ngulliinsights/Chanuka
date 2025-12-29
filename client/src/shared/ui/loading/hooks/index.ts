@@ -15,7 +15,7 @@ export const useProgressiveLoading = (stages: any[]) => ({
   reset: () => {}
 });
 
-export const useTimeoutAwareLoading = (operation: () => Promise<any>, timeout: number) => ({
+export const useTimeoutAwareLoading = (operation: () => Promise<any>, _timeout: number) => ({
   execute: operation,
   isLoading: false,
   hasTimedOut: false,

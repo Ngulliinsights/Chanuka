@@ -147,3 +147,5 @@ export interface QueryCondition {
   operator: 'eq' | 'ilike' | 'gt' | 'lt' | 'in';
   value: any;
 }
+
+

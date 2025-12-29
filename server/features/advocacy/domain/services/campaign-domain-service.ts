@@ -471,3 +471,5 @@ export class CampaignDomainService {
     return commonWords.length / totalWords;
   }
 }
+
+

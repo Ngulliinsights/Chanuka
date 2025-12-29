@@ -5,8 +5,8 @@
  * and error correlation for robust external service communication.
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
-import { logger } from '@client/utils/logger';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
+import { logger } from '../../utils/logger';
 
 import { processRequestInterceptors, processResponseInterceptors } from './interceptors';
 import { RetryHandler, createRetryHandler, RetryConfig } from './retry-handler';

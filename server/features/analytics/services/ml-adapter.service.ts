@@ -296,3 +296,5 @@ export async function adaptiveDetectConflictsOfInterest(billContent: string, spo
 export async function adaptiveAnalyzeBeneficiaries(billContent: string, user_id?: string): Promise<AnalysisResult> {
     return mlServiceAdapter.analyzeBeneficiaries(billContent, user_id);
 }
+
+

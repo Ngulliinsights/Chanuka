@@ -303,3 +303,5 @@ export const JURISDICTION_CONFIGS: Record<string, JurisdictionAdvocacyConfig> = 
 export function getJurisdictionAdvocacyConfig(jurisdiction: string = 'generic'): JurisdictionAdvocacyConfig {
   return JURISDICTION_CONFIGS[jurisdiction] || JURISDICTION_CONFIGS.generic;
 }
+
+

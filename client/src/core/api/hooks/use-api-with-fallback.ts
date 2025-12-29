@@ -7,13 +7,12 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import { globalApiClient } from '@client/core/api/client';
-import type { UnifiedError } from '@client/core/api/types/common';
+import { globalApiClient } from '../client';
+import type { UnifiedError } from '../types/common';
 import type {
   ApiResponse,
   RequestOptions
-} from '@client/core/api/types/request';
-import { handleError, ErrorDomain, ErrorSeverity } from '@client/core/error';
+} from '../types/request';
 
 export interface UseApiOptions extends Omit<RequestOptions, 'method'> {
   enabled?: boolean;
@@ -332,7 +331,7 @@ export function useMutation<TData = unknown, TVariables = unknown>(
           retryable: true,
         });
         resultError = safeError;
-        setError(resultError);
+        setError(resultError || null);
         onErrorRef.current?.(resultError, variables);
         throw resultError;
       }

@@ -6,7 +6,7 @@ import { handleError, measureAsync, recordMetric } from '@client/core';
 import { Button, Card, CardContent, CardHeader } from '../../design-system';
 
 import { useDashboard } from './hooks';
-import type { DashboardComponentProps } from './types';
+import type { DashboardComponentProps, DashboardConfig } from './types';
 import { validateActivitySummary } from './validation';
 
 export const ActivitySummary = React.memo<DashboardComponentProps>(({ 
@@ -15,9 +15,8 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
   onError,
   onDataChange 
 }) => {
-  // Fix: Argument of type 'unknown' is not assignable to parameter of type 'Partial<DashboardConfig> | undefined'.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, loading, error, actions, recovery } = useDashboard(config as any);
+  // Fix: Type config properly as Partial<DashboardConfig>
+  const { data, loading, error, actions, recovery } = useDashboard(config as Partial<DashboardConfig>);
 
   // Handle error reporting using core error handler
   React.useEffect(() => {
@@ -60,8 +59,7 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
           name: 'activity-summary-refresh-success',
           value: 1,
           timestamp: new Date(),
-          // Fix: Type '"user-interaction"' is not assignable to type ...
-          category: 'interactivity'
+          category: 'custom'
         });
       } catch (refreshError) {
         const appError = {
@@ -83,7 +81,6 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
           name: 'activity-summary-recovery-success',
           value: 1,
           timestamp: new Date(),
-          // Fix: Type '"error-recovery"' is not assignable to type ...
           category: 'custom'
         });
       } catch (recoveryError) {

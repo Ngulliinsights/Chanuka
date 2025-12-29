@@ -927,3 +927,5 @@ export class CoalitionFinderService {
     return 'Coalition not recommended due to low compatibility and significant conflicts';
   }
 }
+
+

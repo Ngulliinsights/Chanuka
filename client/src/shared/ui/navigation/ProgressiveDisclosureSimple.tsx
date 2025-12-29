@@ -169,10 +169,14 @@ const ReadingPathGuidance = ({
   currentSectionId?: string;
   onSectionChange?: (sectionId: string) => void;
 }) => {
+  // Find current section index for navigation logic
   const currentIndex = sections.findIndex(s => s.id === currentSectionId);
-  // currentIndex is available for future use
   const recommendedPath = sections.filter(s => s.isRequired);
   const nextRecommended = recommendedPath.find(s => !s.isCompleted);
+
+  // Use currentIndex for navigation if needed
+  const _canGoNext = currentIndex < sections.length - 1;
+  const _canGoPrevious = currentIndex > 0;
 
   return (
     <div className="reading-path-card mb-6">

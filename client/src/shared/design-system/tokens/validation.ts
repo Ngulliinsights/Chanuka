@@ -91,7 +91,7 @@ export function getTokenMetadata() {
     }, 0),
     fontFamilies: Object.keys(typographyTokens.fontFamily || {}),
     spacingScale: Object.keys(spacingTokens).filter(k => !k.startsWith('_')),
-    shadowLayers: Object.keys(shadowTokens.semantic || {}),
+    shadowLayers: Object.keys((shadowTokens as any).semantic || {}),
     borderRadii: Object.keys(borderTokens.radius || {}),
     breakpoints: Object.keys(breakpointTokens),
   };

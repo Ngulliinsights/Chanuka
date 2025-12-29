@@ -14,12 +14,22 @@ export const Dialog: React.FC<DialogProps> = ({ children }) => {
   return <div>{children}</div>;
 };
 
-export const DialogTrigger: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export interface DialogTriggerProps {
+  children: React.ReactNode;
+  asChild?: boolean;
+}
+
+export const DialogTrigger: React.FC<DialogTriggerProps> = ({ children }) => {
   return <div>{children}</div>;
 };
 
-export const DialogContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <div className="dialog-content">{children}</div>;
+export interface DialogContentProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const DialogContent: React.FC<DialogContentProps> = ({ children, className }) => {
+  return <div className={`dialog-content ${className || ''}`}>{children}</div>;
 };
 
 export const DialogHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => {

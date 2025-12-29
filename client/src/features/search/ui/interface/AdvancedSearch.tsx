@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { useToast } from '@client/hooks/use-toast.ts';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import {
@@ -43,7 +44,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@client/shared/design-system';
-import { useToast } from '@client/hooks/use-toast.ts';
+
+
 import type { DualSearchRequest } from '../../services/intelligent-search';
 
 // Define types locally

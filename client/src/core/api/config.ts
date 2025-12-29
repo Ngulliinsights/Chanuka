@@ -875,7 +875,11 @@ export class EnvironmentConfigLoader {
           compression: this.getEnvBoolean('REACT_APP_WS_MESSAGE_COMPRESSION', false),
           batching: this.getEnvBoolean('REACT_APP_WS_MESSAGE_BATCHING', true),
           batchSize: this.getEnvNumber('REACT_APP_WS_MESSAGE_BATCH_SIZE') || 10,
-          batchInterval: this.getEnvNumber('REACT_APP_WS_MESSAGE_BATCH_INTERVAL') || 1000
+          batchInterval: this.getEnvNumber('REACT_APP_WS_MESSAGE_BATCH_INTERVAL') || 1000,
+          maxMessageSize: this.getEnvNumber('REACT_APP_WS_MESSAGE_MAX_SIZE') || 1024 * 1024
+        },
+        authentication: {
+          type: 'session'
         }
       },
       features: {

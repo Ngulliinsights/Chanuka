@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Database, AlertCircle, CheckCircle, CircleX as XCircle } from 'lucide-react';
+import { Database, AlertCircle, CheckCircle, X as XCircle } from 'lucide-react';
 import { Badge } from '@client/shared/design-system';
 
 interface DatabaseStatusProps {

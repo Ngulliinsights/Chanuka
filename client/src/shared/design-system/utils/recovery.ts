@@ -3,7 +3,7 @@
  * Simple recovery mechanisms for UI component errors
  */
 
-import { UIComponentError, isUIComponentError } from './errors';
+import { isUIComponentError } from './errors';
 
 export interface RecoveryResult {
   success: boolean;

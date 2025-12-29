@@ -5,8 +5,6 @@
  * for robust API communication with automatic retry and monitoring.
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
-
 import { apiClients, createCircuitBreakerClient } from '../circuit-breaker-client';
 import { 
   circuitBreakerMonitor, 
@@ -34,13 +32,13 @@ export async function basicApiUsage() {
     console.log('User profile:', userResponse.data);
     
   } catch (error) {
-    if (error instanceof BaseError) {
+    if (error instanceof Error) {
       console.error('API Error:', {
-        code: error.code,
         message: error.message,
-        correlationId: error.metadata.correlationId,
-        retryable: error.retryable
+        name: error.name
       });
+    } else {
+      console.error('Unknown error:', error);
     }
   }
 }

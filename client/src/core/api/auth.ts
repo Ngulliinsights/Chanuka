@@ -6,7 +6,8 @@
 
 import { logger } from '../../utils/logger';
 
-import type { UnifiedApiClient, PrivacySettings, DataExportResponse, DataDeletionResponse, UnknownError, AxiosErrorResponse } from './types';
+import type { UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
+import type { PrivacySettings, DataExportResponse, DataDeletionResponse } from './types/error-response';
 
 // ============================================================================
 // Core Authentication Types
@@ -202,19 +203,6 @@ export interface SecurityIncidentReport {
 // ============================================================================
 // Privacy & GDPR Types (Missing from API layer)
 // ============================================================================
-
-export interface PrivacySettings {
-  profile_visibility: 'public' | 'registered' | 'private';
-  email_visibility: 'public' | 'registered' | 'private';
-  activity_tracking: boolean;
-  analytics_consent: boolean;
-  marketing_consent: boolean;
-  data_sharing_consent: boolean;
-  location_tracking: boolean;
-  personalized_content: boolean;
-  third_party_integrations: boolean;
-  notification_preferences: NotificationPreferences;
-}
 
 export interface NotificationPreferences {
   email_notifications: boolean;
@@ -458,7 +446,7 @@ export class AuthApiService {
       );
 
       logger.info('Data export requested successfully');
-      return response.data;
+      return response.data as DataExportResponse;
     } catch (error) {
       logger.error('Data export request failed', { error });
       throw await this.handleAuthError(error, 'Failed to request data export');
@@ -480,7 +468,7 @@ export class AuthApiService {
       );
 
       logger.info('Data deletion requested successfully');
-      return response.data;
+      return response.data as DataDeletionResponse;
     } catch (error) {
       logger.error('Data deletion request failed', { error });
       throw await this.handleAuthError(error, 'Failed to request data deletion');

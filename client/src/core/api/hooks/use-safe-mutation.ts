@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 
-import { globalApiClient } from '@client/core/api';
+import { globalApiClient } from '../index';
 
 /**
  * A wrapper around React Query's useMutation that provides a simplified API for common mutations.

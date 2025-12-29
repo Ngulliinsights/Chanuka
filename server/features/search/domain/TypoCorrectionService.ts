@@ -472,3 +472,5 @@ export class TypoCorrectionService {
 
 // Export singleton instance
 export const typoCorrectionService = TypoCorrectionService.getInstance();
+
+

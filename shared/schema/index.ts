@@ -23,6 +23,91 @@ export {
 export * from "./enum";
 
 // ============================================================================
+// WEBSOCKET TYPES - Unified WebSocket type system
+// ============================================================================
+
+// Enums
+export {
+  ConnectionState,
+  WebSocketErrorCode,
+  SubscriptionPriority,
+  NotificationPriority
+} from "./websocket";
+
+// Core Interfaces
+export type {
+  WebSocketMessage,
+  ConnectionQuality,
+  ConnectionMetrics,
+  WebSocketError
+} from "./websocket";
+
+// Configuration
+export type {
+  ReconnectConfig,
+  HeartbeatConfig,
+  MessageConfig,
+  WebSocketAuthConfig,
+  WebSocketConfig,
+  WebSocketServerConfig
+} from "./websocket";
+
+// Domain Data Types
+export type {
+  BillUpdate,
+  NotificationData,
+  CommunityUpdate
+} from "./websocket";
+
+// Message Types
+export type {
+  AuthMessage,
+  SubscribeMessage,
+  UnsubscribeMessage,
+  HeartbeatMessage,
+  BillUpdateMessage,
+  CommunityUpdateMessage,
+  NotificationMessage,
+  ErrorMessage,
+  ConnectionMessage,
+  SystemMessage
+} from "./websocket";
+
+// Union Types
+export type {
+  ClientToServerMessage,
+  ServerToClientMessage,
+  AnyWebSocketMessage
+} from "./websocket";
+
+// State & Tracking
+export type {
+  ClientInfo,
+  WebSocketStats,
+  Subscription,
+  WebSocketSubscription,
+  WebSocketNotification
+} from "./websocket";
+
+// Handlers
+export type {
+  MessageHandler,
+  ConnectionHandler,
+  ErrorHandler,
+  FilterFunction,
+  RealTimeHandlers,
+  WebSocketEvents
+} from "./websocket";
+
+// Type Guards
+export {
+  isClientToServerMessage,
+  isServerToClientMessage,
+  isHeartbeatMessage,
+  isValidWebSocketMessage
+} from "./websocket";
+
+// ============================================================================
 // FOUNDATION SCHEMA - Core Legislative Entities
 // ============================================================================
 export {

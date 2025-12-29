@@ -13,7 +13,7 @@ import type {
   SearchExportResponse
 } from '@client/shared/types/search-response';
 
-import { globalApiClient as api } from './index';
+import { globalApiClient as api } from './client';
 
 /**
  * Search API Client - Core API wrapper for search endpoints

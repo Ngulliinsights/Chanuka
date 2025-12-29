@@ -689,3 +689,5 @@ export class ConstitutionalAnalysisServiceComplete {
 
 // Export singleton instance for use throughout the application
 export const constitutionalAnalysisServiceComplete = new ConstitutionalAnalysisServiceComplete();
+
+

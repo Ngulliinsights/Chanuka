@@ -110,7 +110,8 @@ export const renderingPerformance = {
    */
   batchDOMUpdates: (updates: (() => void)[]): void => {
     // Use DocumentFragment for multiple DOM insertions
-    const fragment = document.createDocumentFragment();
+    // Create document fragment for performance (unused but kept for future use)
+    document.createDocumentFragment();
     
     updates.forEach(update => {
       try {

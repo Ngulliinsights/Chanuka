@@ -248,7 +248,7 @@ class AuthServiceInitializer {
 
       logger.info('Existing session restored', {
         component: 'AuthServiceInitializer',
-        userId: tokenData.user?.id,
+        userId: tokenData?.user?.id || 'unknown',
         expiresAt: new Date(this.state.expiresAt!)
       });
 
@@ -357,8 +357,8 @@ class AuthServiceInitializer {
       const tokenData = this.parseToken(data.token);
       this.state.token = data.token;
       this.state.refreshToken = data.refreshToken || refreshToken;
-      this.state.expiresAt = tokenData.exp * 1000;
-      this.state.user = tokenData.user;
+      this.state.expiresAt = tokenData?.exp ? tokenData.exp * 1000 : Date.now() + 3600000;
+      this.state.user = tokenData?.user || null;
       this.state.isAuthenticated = true;
 
       logger.info('Token refreshed successfully', {

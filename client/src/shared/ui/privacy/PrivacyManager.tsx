@@ -3,8 +3,6 @@
  * Accepts a mode prop to render different interfaces
  */
 
-import { useState } from 'react';
-
 import { PrivacySettings } from '@client/types/auth';
 
 import { CompactInterface } from './CompactInterface';

@@ -344,7 +344,7 @@ export const typographyUtils = {
    */
   getResponsiveFontSize: (
     baseSize: string,
-    breakpoint: 'mobile' | 'tablet' | 'desktop' = 'desktop'
+    _breakpoint: 'mobile' | 'tablet' | 'desktop' = 'desktop'
   ): string => {
     // Implementation would adjust font size based on breakpoint
     return baseSize;
@@ -376,7 +376,7 @@ export const typographyUtils = {
    */
   meetsReadabilityRequirements: (
     fontSize: string,
-    lineHeight: string,
+    _lineHeight: string,
     contrast: number
   ): boolean => {
     const minFontSize = parseFloat(accessibilityTypography.minimumSizes.body);

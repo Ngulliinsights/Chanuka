@@ -1473,3 +1473,5 @@ export class SuggestionEngineService {
 
 // Export singleton instance for use throughout the application
 export const suggestionEngineService = new SuggestionEngineService();
+
+

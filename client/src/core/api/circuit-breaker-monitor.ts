@@ -5,9 +5,9 @@
  * with the error correlation system for comprehensive observability.
  */
 
-import { getCircuitBreakerStats } from '@client/core/api/interceptors';
-import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
-import { logger } from '@client/utils/logger';
+import { getCircuitBreakerStats } from './interceptors';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
+import { logger } from '../../utils/logger';
 
 export interface CircuitBreakerState {
   state: 'open' | 'closed' | 'half-open';
@@ -311,7 +311,7 @@ export class CircuitBreakerMonitor {
         healthy: state.state === 'closed',
         state: state.state as 'open' | 'closed' | 'half-open',
         lastFailure: state.lastFailureTime ? new Date(state.lastFailureTime) : undefined,
-        lastSuccess: (state as CircuitBreakerState).lastSuccessTime ? new Date((state as CircuitBreakerState).lastSuccessTime) : undefined,
+        lastSuccess: (state as CircuitBreakerState).lastSuccessTime ? new Date((state as CircuitBreakerState).lastSuccessTime!) : undefined,
         failureRate: state.failureRate || 0,
         averageResponseTime: state.averageResponseTime || 0,
         totalRequests: (state.failures || 0) + (state.successes || 0),

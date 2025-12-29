@@ -765,3 +765,5 @@ export class SearchDeploymentService {
 
 // Export singleton instance
 export const searchDeploymentService = new SearchDeploymentService();
+
+

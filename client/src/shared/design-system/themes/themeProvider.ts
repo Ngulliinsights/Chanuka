@@ -257,7 +257,7 @@ export class ThemeProvider {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (prefersHighContrast) {
-      this.setTheme('highContrast');
+      this.setTheme('high-contrast');
     }
 
     if (prefersReducedMotion) {

@@ -61,6 +61,7 @@ export class IntegrationValidator {
     const suggestions: string[] = [];
 
     // Check 1: Core module should export all subsystems
+    // Core subsystems (defined but not used in current implementation)
     const _coreSubsystems = [
       'error', 'browser', 'auth', 'api', 'performance',
       'loading', 'storage', 'mobile', 'community',

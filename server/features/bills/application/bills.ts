@@ -459,3 +459,5 @@ export const billsApplicationService = new BillsApplicationService(
 
 // Legacy compatibility - export the new service as the default export
 export default billsApplicationService;
+
+

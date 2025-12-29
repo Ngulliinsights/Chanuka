@@ -12,41 +12,6 @@ import { ZodSchema } from 'zod';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-
-// Base types that were imported from './base'
-export interface BaseApiConfig {
-  baseURL: string;
-  timeout: number;
-  retries: number;
-}
-
-export interface BaseApiRequest {
-  method: HttpMethod;
-  url: string;
-  data?: any;
-  headers?: Record<string, string>;
-}
-
-export interface BaseApiResponse<T = any> {
-  data: T;
-  status: number;
-  statusText: string;
-  headers: Record<string, string>;
-}
-
-export interface BaseWebSocketMessage<T = any> {
-  type: string;
-  data: T;
-  timestamp: number;
-}
-
-export interface BaseBillData {
-  id: string;
-  title: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-}
 export type SortOrder = 'asc' | 'desc';
 
 export type ErrorCode = 
@@ -89,6 +54,41 @@ export interface PaginatedResponse<T> {
 // ============================================================================
 // API Client Types
 // ============================================================================
+
+// Base types for backward compatibility
+export interface BaseApiConfig {
+  baseURL: string;
+  timeout: number;
+  retries: number;
+}
+
+export interface BaseApiRequest {
+  method: HttpMethod;
+  url: string;
+  data?: any;
+  headers?: Record<string, string>;
+}
+
+export interface BaseApiResponse<T = any> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+}
+
+export interface BaseWebSocketMessage<T = any> {
+  type: string;
+  data: T;
+  timestamp: number;
+}
+
+export interface BaseBillData {
+  id: string;
+  title: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface ApiClient {
   get<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>>;

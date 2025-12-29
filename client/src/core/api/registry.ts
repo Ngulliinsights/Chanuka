@@ -16,7 +16,7 @@
  * @module ServiceRegistry
  */
 
-import { ErrorFactory } from '@client/core/error';
+import { ErrorFactory } from '../error';
 import { logger } from '@client/utils/logger';
 
 import { ApiService } from './types';

@@ -23,3 +23,5 @@ export interface BillAnalysis { id: number;
   lastUpdated: Date;
   created_at: Date;
  }
+
+

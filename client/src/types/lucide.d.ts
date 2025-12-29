@@ -78,6 +78,8 @@ declare module 'lucide-react' {
   export const TrendingUp: FC<IconProps>;
   export const Trophy: FC<IconProps>;
   export const Users: FC<IconProps>;
+  export const Wifi: FC<IconProps>;
+  export const WifiOff: FC<IconProps>;
   export const X: FC<IconProps>;
   export const Zap: FC<IconProps>;
 

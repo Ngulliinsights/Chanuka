@@ -6,25 +6,7 @@
 
 import type { CacheConfig } from './cache';
 
-// Base types that were imported from './base'
-export interface BaseApiConfig {
-  baseURL: string;
-  timeout: number;
-  retries: number;
-}
-
-export interface BaseApiRequest {
-  method: string;
-  url: string;
-  data?: any;
-}
-
-export interface BaseApiResponse<T = any> {
-  data: T;
-  status: number;
-}
-
-export interface BaseWebSocketMessage<T = any> {
+export interface BaseWebSocketMessage<T = unknown> {
   type: string;
   data: T;
 }
@@ -37,9 +19,30 @@ export interface BaseBillData {
 // WebSocket configuration
 export interface WebSocketConfig {
   url: string;
-  reconnectAttempts: number;
-  reconnectDelay: number;
-  heartbeatInterval: number;
+  protocols?: string[];
+  reconnect: {
+    enabled: boolean;
+    maxAttempts: number;
+    baseDelay: number;
+    maxDelay: number;
+    backoffMultiplier: number;
+  };
+  heartbeat: {
+    enabled: boolean;
+    interval: number;
+    timeout: number;
+  };
+  message: {
+    compression: boolean;
+    batching: boolean;
+    batchSize: number;
+    batchInterval: number;
+    maxMessageSize: number;
+  };
+  authentication: {
+    type: 'token' | 'session';
+    tokenProvider?: () => string | Promise<string>;
+  };
 }
 
 // Retry configuration
@@ -48,6 +51,8 @@ export interface RetryConfig {
   baseDelay: number;
   maxDelay: number;
   backoffMultiplier: number;
+  retryableStatusCodes?: ReadonlyArray<number>;
+  retryableErrors?: ReadonlyArray<string>;
 }
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';

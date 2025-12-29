@@ -106,7 +106,7 @@ export function formatErrorMessage(error: LoadingError): string {
   }
   
   const relevantDetails = Object.entries(details)
-    .filter(([key, value]) => 
+    .filter(([_key, value]) => 
       value !== undefined && 
       value !== null
     )

@@ -375,3 +375,5 @@ export class SearchSyntaxParser {
 
 // Export singleton instance
 export const searchSyntaxParser = new SearchSyntaxParser();
+
+

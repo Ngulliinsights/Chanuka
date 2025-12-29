@@ -571,3 +571,5 @@ export class ImpactTracker {
     return relevantActions[impactType] || [];
   }
 }
+
+

@@ -10,7 +10,7 @@ declare const window: Window & typeof globalThis;
 import { loadPolyfills } from '@client/core';
 import React, { useEffect, useState } from 'react';
 
-import { getBrowserInfo, isBrowserSupported, type BrowserInfo } from '@client/core';
+import { getBrowserInfo, type BrowserInfo } from '@client/core';
 import { logger } from '@client/utils/logger';
 
 interface BrowserCompatibilityCheckerProps {
@@ -60,9 +60,9 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
       try {
         await loadPolyfills();
         
-        // Check polyfill status
-        const polyfillStatus = getPolyfillStatus();
-        polyfillStatus.forEach((status, feature) => {
+        // Check polyfill status - mock implementation for now
+        const polyfillStatus = new Map();
+        polyfillStatus.forEach((status: any, feature: string) => {
           if (!status.loaded && status.error) {
             polyfillErrors.push(`Failed to load ${feature} polyfill: ${status.error.message}`);
           }

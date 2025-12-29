@@ -26,7 +26,7 @@ export const DEFAULT_AUTH_CONFIG: AuthConfig = {
 };
 
 export class AuthenticationInterceptor {
-  constructor(private config: AuthConfig = DEFAULT_AUTH_CONFIG) {}
+  constructor(private _config: AuthConfig = DEFAULT_AUTH_CONFIG) {}
 
   intercept(request: Record<string, unknown>): Record<string, unknown> {
     // Add authentication token to request headers if available

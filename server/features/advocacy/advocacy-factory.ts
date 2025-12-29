@@ -96,3 +96,5 @@ export function setAdvocacyService(service: AdvocacyServiceDependencies): void {
 export function resetAdvocacyService(): void {
   advocacyServiceInstance = null;
 }
+
+

@@ -182,3 +182,5 @@ export interface AdvocacyAnalytics {
   geographicDistribution: Record<string, number>;
   demographicBreakdown: Record<string, number>;
 }
+
+

@@ -5,8 +5,8 @@
  * and integrates with the error correlation system.
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
-import { logger } from '@client/utils/logger';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
+import { logger } from '../../utils/logger';
 
 export interface RetryConfig {
   maxAttempts: number;

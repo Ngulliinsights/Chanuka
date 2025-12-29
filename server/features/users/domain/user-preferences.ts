@@ -367,3 +367,5 @@ export class UserPreferencesService {
 // Export singleton instance
 export const userPreferencesService = new UserPreferencesService();
 
+
+

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
-import { globalApiClient } from '@client/core/api';
-import { logger } from '@client/utils/logger';
+import { globalApiClient } from '../index';
+
 
 // Define types locally since they're not exported
 export interface ConnectionInfo {
@@ -522,7 +522,7 @@ export function useConnectionStatus(): {
     window.addEventListener('offline', handleOffline);
 
     // Connection monitor listener with smart updates and mount state checking
-    const _handleConnectionUpdate = (info: ConnectionInfo) => {
+    const __handleConnectionUpdate = (info: ConnectionInfo) => {
       if (!isMountedRef.current) return;
       
       setConnectionInfo(prevInfo => {

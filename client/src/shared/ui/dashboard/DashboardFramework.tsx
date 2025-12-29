@@ -292,6 +292,13 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
       [updateConfig, dashboardConfig.theme, onThemeChange]
     );
 
+    const handleLayoutChange = useCallback(
+      (updates: Partial<ExtendedDashboardLayout>) => {
+        updateConfig?.({ layout: { ...dashboardConfig.layout, ...updates } });
+      },
+      [updateConfig, dashboardConfig.layout]
+    );
+
     // Loading state
     if (loading || !isClient) {
       return <DashboardLoadingSkeleton />;

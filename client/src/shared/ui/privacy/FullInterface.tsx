@@ -41,18 +41,9 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
   const [loading, setLoading] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [consentType, setConsentType] = useState<ConsentRecord['consent_type']>('analytics');
-  const [exportRequests, setExportRequests] = useState<Array<{
-    id: string;
-    type: string;
-    status: string;
-    requestedAt: string;
-  }>>([]);
-  const [deletionRequests, setDeletionRequests] = useState<Array<{
-    id: string;
-    type: string;
-    status: string;
-    requestedAt: string;
-  }>>([]);
+  // Export and deletion requests state for future implementation
+  const [_exportRequests, setExportRequests] = useState<any[]>([]);
+  const [_deletionRequests, setDeletionRequests] = useState<any[]>([]);
 
   const handleSettingChange = useCallback(async (key: keyof PrivacySettings, value: any) => {
     if (!settings) return;

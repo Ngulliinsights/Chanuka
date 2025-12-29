@@ -144,6 +144,7 @@ export class AuthService {
 
       // Create properly typed session info
       const sessionInfo: SessionInfo = {
+        id: crypto.randomUUID(),
         userId: session.user.id,
         sessionId: crypto.randomUUID(),
         token: session.tokens.accessToken,
@@ -151,8 +152,14 @@ export class AuthService {
         createdAt: new Date().toISOString(),
         expiresAt: new Date(Date.now() + session.tokens.expiresIn * 1000).toISOString(),
         lastAccessedAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
         permissions: [],
         roles: [],
+        deviceInfo: {
+          userAgent: navigator.userAgent,
+          platform: navigator.platform,
+          language: navigator.language
+        },
         metadata: {
           ipAddress: currentIP,
           deviceInfo: navigator.userAgent,
@@ -238,6 +245,7 @@ export class AuthService {
 
       // Create session info for Redux store
       const sessionInfo: SessionInfo = {
+        id: crypto.randomUUID(),
         userId: session.user.id,
         sessionId: crypto.randomUUID(),
         token: session.tokens.accessToken,
@@ -245,8 +253,14 @@ export class AuthService {
         createdAt: new Date().toISOString(),
         expiresAt: new Date(Date.now() + session.tokens.expiresIn * 1000).toISOString(),
         lastAccessedAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
         permissions: [],
         roles: [],
+        deviceInfo: {
+          userAgent: navigator.userAgent,
+          platform: navigator.platform,
+          language: navigator.language
+        },
         metadata: {
           deviceInfo: navigator.userAgent,
           ipAddress: '0.0.0.0', // Would be provided by server in production

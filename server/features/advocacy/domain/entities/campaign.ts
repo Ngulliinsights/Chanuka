@@ -200,3 +200,5 @@ export class CampaignEntity {
     return new CampaignEntity(campaign);
   }
 }
+
+

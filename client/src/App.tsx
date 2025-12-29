@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 // Architecture Imports
 import { AppProviders } from '@client/app/providers/AppProviders';
-import AppRouter from '@client/app/shell/AppRouter'; // Connect the real router
+import { AppRouter } from '@client/app/shell/AppRouter'; // Connect the real router
 import { AppShell } from '@client/app/shell/AppShell';
 import { ErrorBoundary } from '@client/core/error/components';
 import { Toaster } from '@client/shared/design-system';

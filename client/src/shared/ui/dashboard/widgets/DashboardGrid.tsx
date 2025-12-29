@@ -52,7 +52,7 @@ export const DashboardGrid = React.memo<DashboardGridProps>(({
 }) => {
   const [currentColumns, setCurrentColumns] = useState(columns);
   const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
+  const [_isResizing, setIsResizing] = useState(false);
 
   // Responsive column calculation
   useEffect(() => {

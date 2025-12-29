@@ -273,3 +273,4 @@ export class IntrusionDetectionService {
 }
 
 export const intrusionDetectionService = IntrusionDetectionService.getInstance();
+

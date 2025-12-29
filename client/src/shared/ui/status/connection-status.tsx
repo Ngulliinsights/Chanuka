@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { WifiIcon as Wifi, WifiOffIcon as WifiOff, AlertCircle } from 'lucide-react';
+import { Wifi, WifiOff, AlertCircle } from 'lucide-react';
 import { Badge } from '@client/shared/design-system';
 
 interface ConnectionStatusProps {

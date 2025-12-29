@@ -12,7 +12,8 @@
  * - Built-in common interceptors (auth, logging, headers)
  */
 
-import { logger, BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+import { logger } from '../../utils/logger';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 
 // Define interceptor types locally since @client/types is not available
 type RequestInterceptor = (config: RequestInit & { url: string }) => Promise<RequestInit & { url: string }> | RequestInit & { url: string };

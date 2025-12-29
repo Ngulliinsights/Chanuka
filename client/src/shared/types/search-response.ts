@@ -85,6 +85,14 @@ export interface SearchResult {
   metadata?: Record<string, unknown>;
 }
 
+export interface SearchRequest {
+  query: string;
+  filters?: Record<string, unknown>;
+  sort?: string;
+  limit?: number;
+  offset?: number;
+}
+
 export interface SavedSearch {
   id: string;
   name: string;

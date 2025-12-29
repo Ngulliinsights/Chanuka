@@ -642,3 +642,5 @@ export function calculateSearchQuality(response: SearchResponse): SearchQualityS
     }
   };
 }
+
+

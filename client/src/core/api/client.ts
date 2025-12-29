@@ -1,8 +1,8 @@
 // Main API Client with HTTP Methods, Retry Logic, and Caching
 // Optimized implementation with enhanced error handling and performance
 
-import { ErrorFactory } from '@client/core/error';
-import globalErrorHandler, { ErrorDomain } from '@client/core/error';
+import { ErrorFactory, ErrorDomain } from '../error';
+import globalErrorHandler from '../error';
 
 import { logger } from '../../utils/logger';
 import { createAuthApiService } from '../auth';
@@ -15,9 +15,9 @@ import {
   RequestOptions,
   ClientConfig,
   UnifiedApiClient,
-  RequestInterceptor,
-  ResponseInterceptor
+  ApiRequest
 } from './types';
+import type { RequestInterceptor, ResponseInterceptor } from './types/common';
 
 // Circuit Breaker State
 enum CircuitState {
@@ -306,19 +306,26 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
   // Convert ApiRequest to FetchConfig and apply interceptors
   private async applyRequestInterceptors(request: ApiRequest): Promise<FetchConfig> {
-    let fetchConfig: FetchConfig = {
-      url: request.url,
+    // Convert to BaseApiRequest for interceptors
+    let baseRequest: BaseApiRequest = {
       method: request.method,
-      headers: request.headers,
-      body: request.body ? JSON.stringify(request.body) : undefined
+      url: request.url,
+      data: request.body,
+      headers: request.headers
     };
 
     // Apply request interceptors sequentially
     for (const interceptor of this.requestInterceptors) {
-      fetchConfig = await interceptor(fetchConfig);
+      baseRequest = await interceptor(baseRequest);
     }
 
-    return fetchConfig;
+    // Convert back to FetchConfig
+    return {
+      url: baseRequest.url,
+      method: baseRequest.method as string,
+      headers: baseRequest.headers || request.headers,
+      body: baseRequest.data ? JSON.stringify(baseRequest.data) : undefined
+    };
   }
 
   // Execute request with full resilience features
@@ -359,36 +366,23 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
   // Apply all response interceptors
   private async applyResponseInterceptors<T>(response: ApiResponse<T>): Promise<ApiResponse<T>> {
-    // Convert ApiResponse to Response for interceptors
-    const nativeResponse = new Response(
-      JSON.stringify(response.data),
-      {
-        status: response.status,
-        statusText: response.statusText,
-        headers: new Headers(response.headers)
-      }
-    );
-
-    let processedResponse: Response = nativeResponse;
+    // Convert to BaseApiResponse for interceptors
+    let baseResponse = {
+      data: response.data,
+      status: response.status
+    };
 
     // Apply response interceptors
     for (const interceptor of this.responseInterceptors) {
-      processedResponse = await interceptor(processedResponse);
+      baseResponse = await interceptor(baseResponse);
     }
 
-    // If the response was modified, update our ApiResponse
-    if (processedResponse !== nativeResponse) {
-      const newData = await this.parseResponse(processedResponse);
-      return {
-        ...response,
-        status: processedResponse.status,
-        statusText: processedResponse.statusText,
-        headers: this.headersToObject(processedResponse.headers),
-        data: newData as T
-      };
-    }
-
-    return response;
+    // Return updated response
+    return {
+      ...response,
+      data: baseResponse.data,
+      status: baseResponse.status
+    };
   }
 
   // Validate response against schema

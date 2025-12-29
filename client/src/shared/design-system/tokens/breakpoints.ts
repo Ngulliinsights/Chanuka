@@ -35,6 +35,7 @@ export const breakpointTokens = {
 
   // Container max-widths
   container: {
+    xs: '100%',
     sm: '640px',
     md: '768px',
     lg: '1024px',

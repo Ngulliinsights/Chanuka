@@ -2,7 +2,7 @@
  * WebSocket Client Module
  * 
  * Client-side WebSocket connection management.
- * NOW UPDATED to use centralized types from @client/core/api/types.
+ * Uses unified WebSocket types from shared schema for consistency.
  */
 
 import { 
@@ -10,7 +10,7 @@ import {
   ConnectionState,
   WebSocketMessage,
   WebSocketError
-} from '@client/core/api/types';
+} from '@shared/schema/websocket';
 import { logger } from '@client/utils/logger';
 
 // Define events specific to the client implementation
@@ -30,9 +30,9 @@ export class WebSocketClient {
   private connectionState: ConnectionState = ConnectionState.DISCONNECTED;
   private eventHandlers = new Map<keyof WebSocketClientEvents, Set<EventHandler<keyof WebSocketClientEvents>>>();
   
-  // Timers
-  private reconnectTimerRef: NodeJS.Timeout | null = null;
-  private heartbeatTimer: NodeJS.Timeout | null = null;
+  // Cross-platform timer handles (browser-compatible)
+  private reconnectTimerRef: number | null = null;
+  private heartbeatTimer: number | null = null;
   private reconnectAttempts = 0;
 
   constructor(config: WebSocketConfig) {
@@ -156,18 +156,18 @@ export class WebSocketClient {
   // Implementation for missing methods
   private stopHeartbeat() { 
     if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
+      window.clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
   }
 
   private startHeartbeat() { 
     if (this.config.heartbeat?.interval) {
-      this.heartbeatTimer = setInterval(() => {
+      this.heartbeatTimer = window.setInterval(() => {
         if (this.ws?.readyState === WebSocket.OPEN) {
           this.send({
             type: 'heartbeat',
-            payload: { type: 'ping', timestamp: Date.now() }
+            data: { type: 'ping', timestamp: Date.now() }
           });
         }
       }, this.config.heartbeat.interval);
@@ -176,7 +176,7 @@ export class WebSocketClient {
 
   private clearReconnectTimer() { 
     if (this.reconnectTimerRef) {
-      clearTimeout(this.reconnectTimerRef);
+      window.clearTimeout(this.reconnectTimerRef);
       this.reconnectTimerRef = null;
     }
   }
@@ -188,7 +188,7 @@ export class WebSocketClient {
         this.config.reconnect?.maxDelay || 30000
       );
       
-      this.reconnectTimerRef = setTimeout(() => {
+      this.reconnectTimerRef = window.setTimeout(() => {
         this.reconnectAttempts++;
         this.connect();
       }, delay);

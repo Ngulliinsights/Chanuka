@@ -190,7 +190,7 @@ export const qualityUtils = {
   /**
    * Validate component styling consistency
    */
-  validateStyling: (componentName: string): { valid: boolean; issues: string[] } => {
+  validateStyling: (_componentName: string): { valid: boolean; issues: string[] } => {
     const issues: string[] = [];
 
     // Check for hardcoded colors
@@ -207,7 +207,7 @@ export const qualityUtils = {
   /**
    * Check component performance
    */
-  checkPerformance: (componentName: string, renderTime: number): { acceptable: boolean; feedback: string } => {
+  checkPerformance: (_componentName: string, renderTime: number): { acceptable: boolean; feedback: string } => {
     const acceptableTime = 16; // 60fps = 16.67ms per frame
     
     return {

@@ -182,9 +182,9 @@ export function validateInputValue(value: string, type?: string): string {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const message = error.errors[0]?.message || 'Invalid input value';
-      throw new UIInputError('input', value, message, { zodError: error, type });
+      throw new UIInputError('input', message, type || 'text');
     }
-    throw new UIInputError('input', value, 'Input validation failed', { type });
+    throw new UIInputError('input', 'Input validation failed', type || 'text');
   }
 }
 
@@ -219,9 +219,9 @@ export function validateFormData(data: Record<string, any>, schema: z.ZodSchema)
         const field = err.path.join('.');
         errors[field] = err.message;
       });
-      throw new UIFormError('form', errors, { zodError: error });
+      throw new UIFormError('form', 'Form validation failed', errors);
     }
-    throw new UIFormError('form', { general: 'Form validation failed' });
+    throw new UIFormError('form', 'Form validation failed', { general: 'Form validation failed' });
   }
 }
 
@@ -232,18 +232,18 @@ export function validateDate(date: Date | string, minDate?: Date, maxDate?: Date
     if (typeof date === 'string') {
       parsedDate = new Date(date);
       if (isNaN(parsedDate.getTime())) {
-        throw new UIDateError('date-picker', date, 'Invalid date format');
+        throw new UIDateError('date-picker', 'Invalid date format', parsedDate);
       }
     } else {
       parsedDate = DateSchema.parse(date);
     }
     
     if (minDate && parsedDate < minDate) {
-      throw new UIDateError('date-picker', date, `Date must be after ${minDate.toLocaleDateString()}`);
+      throw new UIDateError('date-picker', `Date must be after ${minDate.toLocaleDateString()}`, parsedDate);
     }
     
     if (maxDate && parsedDate > maxDate) {
-      throw new UIDateError('date-picker', date, `Date must be before ${maxDate.toLocaleDateString()}`);
+      throw new UIDateError('date-picker', `Date must be before ${maxDate.toLocaleDateString()}`, parsedDate);
     }
     
     return parsedDate;
@@ -253,9 +253,11 @@ export function validateDate(date: Date | string, minDate?: Date, maxDate?: Date
     }
     if (error instanceof z.ZodError) {
       const message = error.errors[0]?.message || 'Invalid date';
-      throw new UIDateError('date-picker', date, message, { zodError: error });
+      const parsedDate = typeof date === 'string' ? new Date(date) : date;
+      throw new UIDateError('date-picker', message, parsedDate);
     }
-    throw new UIDateError('date-picker', date, 'Date validation failed');
+    const parsedDate = typeof date === 'string' ? new Date(date) : date;
+    throw new UIDateError('date-picker', 'Date validation failed', parsedDate);
   }
 }
 
@@ -314,7 +316,7 @@ export function validateTableData(data: unknown[], columns: Array<{ key: string;
     });
     
     if (errors.length > 0) {
-      throw new UIValidationError('Table data validation failed', 'table', data, { errors });
+      throw new UIValidationError('table', 'Table data validation failed', 'data', data);
     }
     
     return validatedData;
@@ -323,9 +325,9 @@ export function validateTableData(data: unknown[], columns: Array<{ key: string;
       throw error;
     }
     if (error instanceof z.ZodError) {
-      throw new UIValidationError('Invalid table data format', 'table', data, { zodError: error });
+      throw new UIValidationError('table', 'Invalid table data format', 'data', data);
     }
-    throw new UIValidationError('Table data validation failed', 'table', data);
+    throw new UIValidationError('table', 'Table data validation failed', 'data', data);
   }
 }
 

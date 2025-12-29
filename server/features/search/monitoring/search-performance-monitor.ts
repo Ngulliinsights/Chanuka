@@ -647,3 +647,5 @@ export class SearchPerformanceMonitor {
 
 // Export singleton instance
 export const searchPerformanceMonitor = new SearchPerformanceMonitor();
+
+

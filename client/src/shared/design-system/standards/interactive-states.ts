@@ -191,7 +191,7 @@ export const interactiveStateUtils = {
     
     if (state === 'default') return baseStyles;
     
-    const stateStyles = interactiveStates[state][component] || interactiveStates[state].default;
+    const stateStyles = (interactiveStates[state] as any)?.[component] || (interactiveStates[state] as any)?.default;
     
     return {
       ...baseStyles,

@@ -320,3 +320,5 @@ export class ContentAnalysisService {
 }
 
 export const contentAnalysisService = ContentAnalysisService.getInstance();
+
+

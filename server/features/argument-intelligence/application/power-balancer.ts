@@ -917,3 +917,5 @@ export class PowerBalancerService {
     return { amplify: false, factor: 1.0, reason: 'No amplification needed' };
   }
 }
+
+

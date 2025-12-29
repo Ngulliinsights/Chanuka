@@ -563,3 +563,5 @@ export class SearchRollbackService {
 
 // Export singleton instance
 export const searchRollbackService = new SearchRollbackService();
+
+

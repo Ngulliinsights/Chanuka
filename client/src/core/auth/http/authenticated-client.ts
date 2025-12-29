@@ -10,9 +10,9 @@ export interface AuthenticatedApiClientConfig {
 }
 
 export class AuthenticatedApiClient {
-  constructor(private config: AuthenticatedApiClientConfig = {}) {
+  constructor(private _config: AuthenticatedApiClientConfig = {}) {
     // Configuration is stored for potential future use
-    this.config = { ...config };
+    this._config = { ..._config };
   }
 
   async get<T>(url: string): Promise<T> {

@@ -1,7 +1,7 @@
 import { PrivacyPreferences,privacyService } from '@server/features/privacy/privacy-service.ts';
 import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth.js';
 import { logger   } from '@shared/core';
-import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api';
+import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
 import { Router } from 'express';
 import { z } from 'zod';
 
@@ -541,6 +541,8 @@ router.post('/withdraw-consent', authenticateToken, async (req: AuthenticatedReq
     }, 500, ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
+
+
 
 
 

@@ -1,32 +1,11 @@
-import type { AuthenticatedRequest } from '@server/middleware/auth.js';
-import { authenticateToken } from '@server/middleware/auth.js';
-import { VotingPatternAnalysisService } from '@server/services/voting-pattern-analysis-service.ts';
-import { logger   } from '@shared/core';
-import { UnifiedApiResponse  } from '@shared/core/utils/api';
-import { securityAuditService } from '@shared/security/security-audit-service.js';
 import { NextFunction,Request, Response, Router } from 'express';
 
-// Create singleton instance
-const votingPatternAnalysisService = new VotingPatternAnalysisService();
+import { VotingPatternAnalysisService } from '@server/features/bills/services/voting-pattern-analysis-service.js';
+import { logger   } from '@shared/core';
+import { UnifiedApiResponse  } from '@shared/core/utils/api-utils';
+import { securityAuditService } from '@server/security/security-audit-service.js';
 
-// Export the service instance
-export { votingPatternAnalysisService };
 
-const router = Router();
-
-/**
- * Utility function to parse and validate integer parameters from route params
- * This reduces code duplication and provides consistent validation across all endpoints
- */
-function parseIntParam(value: string, paramName: string): { valid: true; value: number } | { valid: false; error: string } {
-  const parsed = parseInt(value, 10);
-  if (isNaN(parsed) || parsed <= 0) {
-    return { valid: false, error: `${paramName} must be a valid positive number` };
-  }
-  return { valid: true, value: parsed };
-}
-
-/**
  * Centralized error handler that maps domain errors to appropriate HTTP responses
  * This approach keeps our route handlers clean and maintains consistent error responses
  */
@@ -241,6 +220,8 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 export { router };
+
+
 
 
 

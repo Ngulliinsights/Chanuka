@@ -28,3 +28,5 @@ export interface SponsorshipAnalysis { bill_id: number;
   implementationWorkarounds?: ImplementationWorkarounds;
   methodology: AnalysisMethodology;
  }
+
+

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useProgressiveLoading, useTimeoutAwareLoading, useLoading } from './hooks';
+import { useProgressiveLoading, useTimeoutAwareLoading } from './hooks';
 
 import { Button } from '@client/shared/design-system/interactive/Button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';

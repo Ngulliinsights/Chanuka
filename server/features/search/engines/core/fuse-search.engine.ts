@@ -311,3 +311,5 @@ export class FuseSearchEngine implements SearchEngine {
     return text.substring(0, maxLength - 3) + '...';
   }
 }
+
+

@@ -292,3 +292,5 @@ export const billComprehensiveAnalysisService = new BillComprehensiveAnalysisSer
 export type MLStakeholderResult = any; // Generated type - please implement
 
 export type MLBeneficiaryResult = any; // Generated type - please implement
+
+

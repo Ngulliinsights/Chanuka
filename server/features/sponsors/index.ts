@@ -6,3 +6,5 @@ export { router } from './presentation/sponsors.routes.js';
 // Export analysis types
 export type { SponsorshipAnalysis } from './types/analysis.js';
 
+
+

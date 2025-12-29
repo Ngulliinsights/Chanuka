@@ -1,0 +1,55 @@
+{
+  "global": {
+    "critical": { "max": 0, "blocking": true },
+    "error": { "max": 75, "blocking": true },
+    "warning": { "max": 250, "blocking": false },
+    "info": { "max": 750, "blocking": false }
+  },
+  "modules": {
+    "shared": {
+      "critical": { "max": 0, "blocking": true },
+      "error": { "max": 7, "blocking": true },
+      "warning": { "max": 25, "blocking": true }
+    },
+    "server": {
+      "critical": { "max": 0, "blocking": true },
+      "error": { "max": 25, "blocking": true },
+      "warning": { "max": 60, "blocking": false }
+    },
+    "client": {
+      "critical": { "max": 0, "blocking": true },
+      "error": { "max": 35, "blocking": true },
+      "warning": { "max": 120, "blocking": false }
+    }
+  },
+  "errorTypes": {
+    "TypeScript - any_usage": { "max": 15, "blocking": false },
+    "TypeScript - ts_ignore": { "max": 7, "blocking": true },
+    "TypeScript - non_null_assertion": { "max": 25, "blocking": false },
+    "React - missing_key_prop": { "max": 2, "blocking": true },
+    "React - direct_state_mutation": { "max": 2, "blocking": true },
+    "Code Quality - FIXME": { "max": 12, "blocking": false },
+    "Code Quality - BUG": { "max": 2, "blocking": true },
+    "Code Quality - console.log": { "max": 75, "blocking": false }
+  },
+  "trends": {
+    "enabled": true,
+    "baselineFile": "quality-baseline.json",
+    "maxIncrease": {
+      "critical": 0,
+      "error": 7,
+      "warning": 25,
+      "total": 30
+    }
+  },
+  "build": {
+    "failOnBlocking": true,
+    "createReport": true,
+    "reportFile": "quality-gate-report-staging.json",
+    "exitCode": {
+      "success": 0,
+      "nonBlocking": 0,
+      "blocking": 1
+    }
+  }
+}

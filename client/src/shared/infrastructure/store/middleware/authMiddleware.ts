@@ -120,8 +120,9 @@ function handleLoginSuccess(payload: LoginFulfilledPayload, config: AuthMiddlewa
         if (payload.user) {
             dispatch(setCurrentSession({
                 id: payload.sessionId || crypto.randomUUID(),
+                userId: payload.user.id,
                 createdAt: new Date().toISOString(),
-                lastActive: new Date().toISOString(),
+                lastActivity: new Date().toISOString(),
                 ipAddress: '',
                 deviceInfo: navigator.userAgent,
                 current: true
@@ -266,7 +267,8 @@ async function performTokenRefresh(store: { dispatch: Dispatch }): Promise<void>
                 const jwtTokens = {
                     accessToken: authTokens.accessToken,
                     refreshToken: authTokens.refreshToken,
-                    expiresAt: new Date(Date.now() + (30 * 60 * 1000)), // Default 30 minutes
+                    expiresIn: authTokens.expiresIn,
+                    expiresAt: new Date(Date.now() + (authTokens.expiresIn * 1000)), // Convert seconds to milliseconds
                     tokenType: authTokens.tokenType || 'Bearer'
                 };
 

@@ -20,7 +20,7 @@ interface AssetLoadingProviderProps {
 }
 
 export const AssetLoadingProvider = memo<AssetLoadingProviderProps>(({ children }) => {
-  const { isVisible, config, show, hide } = useAssetLoadingIndicatorState();
+  const { _isVisible, config, show, hide } = useAssetLoadingIndicatorState();
 
   const contextValue = useMemo(
     () => ({

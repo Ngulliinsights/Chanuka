@@ -286,17 +286,3 @@ export const selectRecentActivity = (state: { realTime: RealTimeState }) => {
 
 // Export the slice
 export default realTimeSlice.reducer;
-export type updateConnectionState = {
-  // Generated type
-  [key: string]: any;
-};
-
-export const addBillUpdate = (...args: any[]) => {
-  // Generated function
-  console.warn('addBillUpdate is a generated stub - implement actual logic');
-};
-
-export const addNotification = (...args: any[]) => {
-  // Generated function
-  console.warn('addNotification is a generated stub - implement actual logic');
-};

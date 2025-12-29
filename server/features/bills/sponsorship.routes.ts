@@ -1,4 +1,4 @@
-import { SponsorshipAnalysisService } from '@shared/application/sponsorship-analysis.service';
+import { SponsorshipAnalysisService } from './application/sponsorship-analysis.service';
 import { logger   } from '@shared/core';
 import { asyncHandler } from '@shared/core/observability/error-management/middleware/express-error-middleware';
 import { ApiError, ApiResponseWrapper,ApiSuccess  } from '@shared/core/utils/api-utils.js';
@@ -77,6 +77,8 @@ setupSponsorshipRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
 
 
 

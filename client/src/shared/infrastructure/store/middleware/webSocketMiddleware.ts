@@ -8,7 +8,7 @@
 
 import { Middleware, Dispatch, Action } from '@reduxjs/toolkit';
 
-import { ConnectionState } from '@client/core/api/types';
+import { ConnectionState } from '@shared/schema/websocket';
 import { realTimeService } from '@client/core/realtime';
 import {
   WebSocketSubscription
@@ -41,7 +41,7 @@ interface WebSocketConfig {
 // Polling fallback manager for when WebSocket is unavailable
 class PollingFallbackManager {
   private config: PollingFallbackConfig;
-  private pollingTimers: Map<string, NodeJS.Timeout> = new Map();
+  private pollingTimers: Map<string, number> = new Map();
   private handlers: RealTimeHandlers = {};
   private subscriptions: {
     bills: number[];
@@ -74,7 +74,7 @@ class PollingFallbackManager {
 
     // Poll for bill updates
     if (this.subscriptions.bills.length > 0) {
-      const billTimer = setInterval(() => {
+      const billTimer = window.setInterval(() => {
         this.pollBillUpdates();
       }, this.config.intervals.bills);
 
@@ -82,7 +82,7 @@ class PollingFallbackManager {
     }
 
     // Poll for engagement metrics
-    const engagementTimer = setInterval(() => {
+    const engagementTimer = window.setInterval(() => {
       this.pollEngagementMetrics();
     }, this.config.intervals.engagement);
 
@@ -90,7 +90,7 @@ class PollingFallbackManager {
 
     // Poll for notifications
     if (this.subscriptions.notifications) {
-      const notificationTimer = setInterval(() => {
+      const notificationTimer = window.setInterval(() => {
         this.pollNotifications();
       }, this.config.intervals.notifications);
 
@@ -100,7 +100,7 @@ class PollingFallbackManager {
 
   stopPolling() {
     this.pollingTimers.forEach((timer) => {
-      clearInterval(timer);
+      window.clearInterval(timer);
     });
     this.pollingTimers.clear();
 
@@ -170,7 +170,7 @@ class WebSocketMiddlewareAdapter {
   private subscriptionIds: Map<string, string> = new Map(); // Maps local keys to WS subscription IDs
 
   // Race condition prevention
-  private connectionStateUpdateTimeout: NodeJS.Timeout | null = null;
+  private connectionStateUpdateTimeout: number | null = null;
   private pendingConnectionState: Partial<CivicWebSocketState> | null = null;
   private subscriptionQueue: Array<() => Promise<void>> = [];
   private processingSubscriptions = false;
@@ -297,11 +297,11 @@ class WebSocketMiddlewareAdapter {
 
     // Clear existing timeout to prevent race conditions
     if (this.connectionStateUpdateTimeout) {
-      clearTimeout(this.connectionStateUpdateTimeout);
+      window.clearTimeout(this.connectionStateUpdateTimeout);
     }
 
     // Debounce connection state updates to prevent rapid state changes
-    this.connectionStateUpdateTimeout = setTimeout(() => {
+    this.connectionStateUpdateTimeout = window.setTimeout(() => {
       const isConnected = realTimeService.isConnected();
 
       // Map realTimeService state to CivicWebSocketState
@@ -391,7 +391,7 @@ class WebSocketMiddlewareAdapter {
    */
   cleanup() {
     if (this.connectionStateUpdateTimeout) {
-      clearTimeout(this.connectionStateUpdateTimeout);
+      window.clearTimeout(this.connectionStateUpdateTimeout);
       this.connectionStateUpdateTimeout = null;
     }
     this.subscriptionQueue.length = 0;

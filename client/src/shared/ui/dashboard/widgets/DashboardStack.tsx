@@ -16,7 +16,7 @@ interface SectionRendererProps {
 /**
  * Section Renderer Component
  */
-const SectionRenderer: React.FC<SectionRendererProps> = React.memo(({ section, onUpdate }) => {
+const SectionRenderer: React.FC<SectionRendererProps> = React.memo(({ section, _onUpdate }) => {
   // Handle different content types
   const renderContent = () => {
     switch (section.contentType) {

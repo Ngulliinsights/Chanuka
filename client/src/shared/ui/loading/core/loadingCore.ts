@@ -5,7 +5,7 @@
 
 import { LoadingOperation, LoadingConfig, LoadingStats } from '../types';
 import { DEFAULT_LOADING_CONFIG } from '../constants';
-import { LoadingError } from '../errors';
+
 import { validateLoadingOperation } from '../validation';
 
 export class LoadingCore {

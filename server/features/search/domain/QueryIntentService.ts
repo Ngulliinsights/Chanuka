@@ -434,3 +434,5 @@ export class QueryIntentService {
 
 // Export singleton instance
 export const queryIntentService = QueryIntentService.getInstance();
+
+

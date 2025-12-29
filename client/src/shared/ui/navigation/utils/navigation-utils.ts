@@ -11,6 +11,7 @@ function convertNavigationItem(item: NavigationItem): SharedNavigationItem {
   return {
     ...item,
     icon: typeof item.icon === 'string' ? (() => null) as any : item.icon as any,
+    section: item.section || 'tools', // Provide default section if undefined
   };
 }
 

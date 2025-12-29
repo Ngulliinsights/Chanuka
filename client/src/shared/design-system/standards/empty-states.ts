@@ -282,7 +282,22 @@ export const emptyStates = {
 } as const;
 
 // Empty state utility functions
-export const emptyStateUtils = {
+export const emptyStateUtils: {
+  getEmptyStateClasses: (
+    type?: keyof typeof emptyStates.types,
+    variant?: keyof typeof emptyStates.variants
+  ) => string;
+  getEmptyStateContent: (
+    type: keyof typeof emptyStates.types,
+    context?: string
+  ) => {
+    title: string;
+    description: string;
+    icon: string;
+    action?: string;
+  };
+  getContextualSuggestions: (context: string, _user_role?: string) => string[];
+} = {
   /**
    * Get empty state classes
    */
@@ -561,7 +576,7 @@ export const emptyStateUtils = {
   /**
    * Get contextual empty state suggestions
    */
-  getContextualSuggestions: (context: string, user_role?: string): string[] => {
+  getContextualSuggestions: (context: string, _user_role?: string): string[] => {
     const suggestions: Record<string, string[]> = {
       dashboard: [
         'Add your first widget to get started',

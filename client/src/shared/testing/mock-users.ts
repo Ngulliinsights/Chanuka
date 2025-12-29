@@ -5,7 +5,7 @@
  * Provides realistic mock user data for testing and development
  */
 
-import { logger } from '@client/utils/logger';
+
 
 interface MockUser {
   id: string;
@@ -202,11 +202,51 @@ class MockUserDataService {
    * Generates realistic user interaction data
    */
   generateUserInteractions(userId: string, billIds: number[]): {
-    comments: unknown[];
-    votes: unknown[];
-    follows: unknown[];
+    comments: Array<{
+      id: string;
+      userId: string;
+      billId: number;
+      content: string;
+      timestamp: string;
+      votes: number;
+    }>;
+    votes: Array<{
+      id: string;
+      userId: string;
+      billId: number;
+      position: string;
+      timestamp: string;
+    }>;
+    follows: Array<{
+      id: string;
+      userId: string;
+      billId: number;
+      timestamp: string;
+    }>;
   } {
-    const interactions = {
+    const interactions: {
+      comments: Array<{
+        id: string;
+        userId: string;
+        billId: number;
+        content: string;
+        timestamp: string;
+        votes: number;
+      }>;
+      votes: Array<{
+        id: string;
+        userId: string;
+        billId: number;
+        position: string;
+        timestamp: string;
+      }>;
+      follows: Array<{
+        id: string;
+        userId: string;
+        billId: number;
+        timestamp: string;
+      }>;
+    } = {
       comments: [],
       votes: [],
       follows: []
@@ -415,7 +455,7 @@ class MockUserDataService {
       }
       
       activities.push({
-        type,
+        type: type as 'comment' | 'vote' | 'follow' | 'share',
         billId,
         timestamp,
         description

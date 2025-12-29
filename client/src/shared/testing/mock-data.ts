@@ -218,7 +218,7 @@ class MockDataService {
   /**
    * Get discussion thread by bill ID
    */
-  async getDiscussionThread(billId: number): Promise<DiscussionThread | null> {
+  async getDiscussionThread(_billId: number): Promise<DiscussionThread | null> {
     // Placeholder implementation
     return null;
   }
@@ -236,7 +236,7 @@ class MockDataService {
   /**
    * Get recent real-time events
    */
-  getRecentEvents(count: number = 10): RealTimeEvent[] {
+  getRecentEvents(_count: number = 10): RealTimeEvent[] {
     // Placeholder implementation
     return [];
   }
@@ -269,6 +269,13 @@ class MockDataService {
       valid: true,
       errors: []
     };
+  }
+
+  /**
+   * Validate data (public method for external use)
+   */
+  validateData() {
+    return this.validateDataIntegrity();
   }
 
   /**

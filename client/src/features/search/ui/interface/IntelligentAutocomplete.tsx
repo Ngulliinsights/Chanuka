@@ -1,23 +1,31 @@
 /**
- * Intelligent Autocomplete Component
+ * Intelligent Autocomplete Component (Optimized)
  *
- * Provides advanced autocomplete with recent searches, popular queries,
- * bill title suggestions, and real-time search results.
+ * Features:
+ * - Advanced autocomplete with recent, popular, and bill title suggestions
+ * - Optimized performance with memoization and efficient re-renders
+ * - Full keyboard navigation and accessibility support
+ * - Debounced search with loading states
+ * - Grouped suggestions with visual hierarchy
  */
 
 import { Search, Clock, TrendingUp, FileText, ArrowRight } from 'lucide-react';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
+import { useDebounce } from '@client/hooks/useDebounce';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
-import { useDebounce } from '@client/hooks/useDebounce';
 import { logger } from '@client/utils/logger';
+
 import { intelligentSearch } from '../../services/intelligent-search';
 
-// Define types locally
+// ============================================================================
+// Types
+// ============================================================================
+
 interface SearchSuggestion {
   term: string;
   type: string;
@@ -52,6 +60,7 @@ interface IntelligentAutocompleteProps {
   showBillTitles?: boolean;
   maxSuggestions?: number;
   debounceMs?: number;
+  autoFocus?: boolean;
 }
 
 interface AutocompleteState {
@@ -61,6 +70,71 @@ interface AutocompleteState {
   results: AutocompleteResult | null;
   error: string | null;
 }
+
+type SuggestionType = 'bill_title' | 'popular' | 'recent' | 'completion';
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const MIN_QUERY_LENGTH = 2;
+
+const TYPE_CONFIG: Record<SuggestionType, { label: string; icon: React.ReactNode }> = {
+  bill_title: {
+    label: 'Bills',
+    icon: <FileText className="h-3 w-3" />,
+  },
+  popular: {
+    label: 'Popular Searches',
+    icon: <TrendingUp className="h-3 w-3" />,
+  },
+  recent: {
+    label: 'Recent Searches',
+    icon: <Clock className="h-3 w-3" />,
+  },
+  completion: {
+    label: 'Suggestions',
+    icon: <Search className="h-3 w-3" />,
+  },
+};
+
+const BADGE_LABELS: Record<string, string> = {
+  recent: 'Recent',
+  popular: 'Popular',
+  bill_title: 'Bill',
+  completion: 'Suggestion',
+};
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+const groupSuggestionsByType = (suggestions: SearchSuggestion[]) => {
+  const groups = new Map<string, SearchSuggestion[]>();
+
+  suggestions.forEach(suggestion => {
+    const existing = groups.get(suggestion.type) || [];
+    groups.set(suggestion.type, [...existing, suggestion]);
+  });
+
+  return groups;
+};
+
+const getSuggestionIcon = (type: string) => {
+  return TYPE_CONFIG[type as SuggestionType]?.icon || <Search className="h-3 w-3" />;
+};
+
+const getSuggestionLabel = (type: string) => {
+  return BADGE_LABELS[type] || 'Suggestion';
+};
+
+const getGroupLabel = (type: string) => {
+  return TYPE_CONFIG[type as SuggestionType]?.label || 'Suggestions';
+};
+
+// ============================================================================
+// Main Component
+// ============================================================================
 
 export function IntelligentAutocomplete({
   onSearch,
@@ -72,7 +146,12 @@ export function IntelligentAutocomplete({
   showBillTitles = true,
   maxSuggestions = 10,
   debounceMs = 300,
+  autoFocus = false,
 }: IntelligentAutocompleteProps) {
+  // ============================================================================
+  // State & Refs
+  // ============================================================================
+
   const [query, setQuery] = useState('');
   const [state, setState] = useState<AutocompleteState>({
     isOpen: false,
@@ -86,10 +165,34 @@ export function IntelligentAutocomplete({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debouncedQuery = useDebounce(query, debounceMs);
 
+  // ============================================================================
+  // Memoized Values
+  // ============================================================================
+
+  const totalSuggestions = useMemo(
+    () => state.results?.suggestions.length || 0,
+    [state.results?.suggestions.length]
+  );
+
+  const groupedSuggestions = useMemo(() => {
+    if (!state.results?.suggestions) return null;
+    return groupSuggestionsByType(state.results.suggestions);
+  }, [state.results?.suggestions]);
+
+  const hasValidQuery = useMemo(() => query.trim().length > 0, [query]);
+
+  // ============================================================================
+  // Callbacks
+  // ============================================================================
+
+  const closeDropdown = useCallback(() => {
+    setState(prev => ({ ...prev, isOpen: false, selectedIndex: -1 }));
+  }, []);
+
   const handleSelect = useCallback(
     (suggestion: SearchSuggestion) => {
       setQuery(suggestion.term);
-      setState(prev => ({ ...prev, isOpen: false, selectedIndex: -1 }));
+      closeDropdown();
 
       if (onSelect) {
         onSelect(suggestion);
@@ -97,20 +200,19 @@ export function IntelligentAutocomplete({
         onSearch(suggestion.term);
       }
     },
-    [onSelect, onSearch]
+    [onSelect, onSearch, closeDropdown]
   );
 
   const handleSearch = useCallback(() => {
-    if (query.trim()) {
-      setState(prev => ({ ...prev, isOpen: false, selectedIndex: -1 }));
+    if (hasValidQuery) {
+      closeDropdown();
       onSearch(query.trim());
     }
-  }, [query, onSearch]);
+  }, [hasValidQuery, query, onSearch, closeDropdown]);
 
-  // Fetch autocomplete suggestions
   const fetchSuggestions = useCallback(
     async (searchQuery: string) => {
-      if (searchQuery.length < 2) {
+      if (searchQuery.length < MIN_QUERY_LENGTH) {
         setState(prev => ({ ...prev, results: null, isLoading: false }));
         return;
       }
@@ -148,7 +250,29 @@ export function IntelligentAutocomplete({
     [maxSuggestions, showRecentSearches, showPopularQueries, showBillTitles]
   );
 
-  // Effect to fetch suggestions when query changes
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+
+    if (value.length >= MIN_QUERY_LENGTH) {
+      setState(prev => ({ ...prev, isOpen: true }));
+    } else {
+      setState(prev => ({ ...prev, isOpen: false, results: null }));
+    }
+  }, []);
+
+  const handleInputFocus = useCallback(() => {
+    if (query.length >= MIN_QUERY_LENGTH) {
+      setState(prev => ({ ...prev, isOpen: true }));
+      fetchSuggestions(query);
+    }
+  }, [query, fetchSuggestions]);
+
+  // ============================================================================
+  // Effects
+  // ============================================================================
+
+  // Fetch suggestions when debounced query changes
   useEffect(() => {
     if (state.isOpen && debouncedQuery) {
       fetchSuggestions(debouncedQuery);
@@ -157,17 +281,17 @@ export function IntelligentAutocomplete({
 
   // Keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!state.isOpen || !state.results) return;
+    if (!state.isOpen || !state.results) return;
 
-      const totalItems = state.results.suggestions.length;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const totalItems = state.results!.suggestions.length;
 
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
           setState(prev => ({
             ...prev,
-            selectedIndex: Math.min(prev.selectedIndex + 1, totalItems - 1),
+            selectedIndex: prev.selectedIndex < totalItems - 1 ? prev.selectedIndex + 1 : 0,
           }));
           break;
 
@@ -175,28 +299,29 @@ export function IntelligentAutocomplete({
           e.preventDefault();
           setState(prev => ({
             ...prev,
-            selectedIndex: Math.max(prev.selectedIndex - 1, -1),
+            selectedIndex: prev.selectedIndex > 0 ? prev.selectedIndex - 1 : totalItems - 1,
           }));
           break;
 
         case 'Enter':
           e.preventDefault();
-          if (state.selectedIndex >= 0 && state.results.suggestions[state.selectedIndex]) {
-            handleSelect(state.results.suggestions[state.selectedIndex]);
-          } else if (query.trim()) {
+          if (state.selectedIndex >= 0 && state.results!.suggestions[state.selectedIndex]) {
+            handleSelect(state.results!.suggestions[state.selectedIndex]);
+          } else if (hasValidQuery) {
             handleSearch();
           }
           break;
 
         case 'Escape':
-          setState(prev => ({ ...prev, isOpen: false, selectedIndex: -1 }));
+          e.preventDefault();
+          closeDropdown();
           inputRef.current?.blur();
           break;
 
         case 'Tab':
-          if (state.selectedIndex >= 0 && state.results.suggestions[state.selectedIndex]) {
+          if (state.selectedIndex >= 0 && state.results!.suggestions[state.selectedIndex]) {
             e.preventDefault();
-            setQuery(state.results.suggestions[state.selectedIndex].term);
+            setQuery(state.results!.suggestions[state.selectedIndex].term);
           }
           break;
       }
@@ -204,196 +329,164 @@ export function IntelligentAutocomplete({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [state.isOpen, state.selectedIndex, state.results, query, handleSelect, handleSearch]);
+  }, [state.isOpen, state.selectedIndex, state.results, hasValidQuery, handleSelect, handleSearch, closeDropdown]);
 
   // Click outside to close
   useEffect(() => {
+    if (!state.isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
+        !dropdownRef.current.contains(target) &&
         inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
+        !inputRef.current.contains(target)
       ) {
-        setState(prev => ({ ...prev, isOpen: false, selectedIndex: -1 }));
+        closeDropdown();
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [state.isOpen, closeDropdown]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-
-    if (value.length >= 2) {
-      setState(prev => ({ ...prev, isOpen: true }));
-    } else {
-      setState(prev => ({ ...prev, isOpen: false, results: null }));
+  // Auto focus
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
     }
-  };
+  }, [autoFocus]);
 
-  const handleInputFocus = () => {
-    if (query.length >= 2) {
-      setState(prev => ({ ...prev, isOpen: true }));
-      fetchSuggestions(query);
-    }
-  };
+  // ============================================================================
+  // Render Functions
+  // ============================================================================
 
+  const renderSuggestionItem = useCallback(
+    (suggestion: SearchSuggestion, globalIndex: number) => {
+      const isSelected = state.selectedIndex === globalIndex;
 
-  const getSuggestionIcon = (type: string) => {
-    switch (type) {
-      case 'recent':
-        return <Clock className="h-3 w-3" />;
-      case 'popular':
-        return <TrendingUp className="h-3 w-3" />;
-      case 'bill_title':
-        return <FileText className="h-3 w-3" />;
-      default:
-        return <Search className="h-3 w-3" />;
-    }
-  };
+      return (
+        <button
+          type="button"
+          key={`${suggestion.type}-${suggestion.id || globalIndex}`}
+          id={`suggestion-${globalIndex}`}
+          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 ${
+            isSelected ? 'bg-accent' : 'hover:bg-accent/50'
+          }`}
+          onClick={() => handleSelect(suggestion)}
+          onMouseEnter={() => setState(prev => ({ ...prev, selectedIndex: globalIndex }))}
+          role="option"
+          aria-selected={isSelected}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="font-medium truncate">{suggestion.term}</div>
+              {suggestion.metadata?.description && (
+                <div className="text-xs text-muted-foreground truncate mt-0.5">
+                  {suggestion.metadata.description}
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {suggestion.frequency && suggestion.frequency > 1 && (
+                <Badge variant="secondary" className="text-xs">
+                  {suggestion.frequency}
+                </Badge>
+              )}
+              <Badge variant="outline" className="text-xs">
+                {getSuggestionLabel(suggestion.type)}
+              </Badge>
+              <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            </div>
+          </div>
+        </button>
+      );
+    },
+    [state.selectedIndex, handleSelect]
+  );
 
-  const getSuggestionLabel = (type: string) => {
-    switch (type) {
-      case 'recent':
-        return 'Recent';
-      case 'popular':
-        return 'Popular';
-      case 'bill_title':
-        return 'Bill';
-      default:
-        return 'Suggestion';
-    }
-  };
-
-  const groupSuggestionsByType = (suggestions: SearchSuggestion[]) => {
-    const groups: Record<string, SearchSuggestion[]> = {};
-
-    suggestions.forEach(suggestion => {
-      if (!groups[suggestion.type]) {
-        groups[suggestion.type] = [];
-      }
-      groups[suggestion.type].push(suggestion);
-    });
-
-    return groups;
-  };
-
-  const renderSuggestionGroup = (
-    type: string,
-    suggestions: SearchSuggestion[],
-    startIndex: number
-  ) => {
-    const typeLabels: Record<string, string> = {
-      bill_title: 'Bills',
-      popular: 'Popular Searches',
-      recent: 'Recent Searches',
-      completion: 'Suggestions',
-    };
-
-    return (
-      <div key={type} className="p-2">
-        <div className="text-xs font-medium text-muted-foreground mb-2 flex items-center">
+  const renderSuggestionGroup = useCallback(
+    (type: string, suggestions: SearchSuggestion[], startIndex: number) => (
+      <div key={type} className="p-2" role="group" aria-label={getGroupLabel(type)}>
+        <div className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1 px-1">
           {getSuggestionIcon(type)}
-          <span className="ml-1">{typeLabels[type] || 'Suggestions'}</span>
+          <span>{getGroupLabel(type)}</span>
         </div>
-        {suggestions.map((suggestion, index) => {
-          const globalIndex = startIndex + index;
-          return (
-            <button
-              type="button"
-              key={`${type}-${index}`}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors ${
-                state.selectedIndex === globalIndex ? 'bg-accent' : ''
-              }`}
-              onClick={() => handleSelect(suggestion)}
-              onMouseEnter={() => setState(prev => ({ ...prev, selectedIndex: globalIndex }))}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{suggestion.term}</div>
-                  {suggestion.metadata?.description && (
-                    <div className="text-xs text-muted-foreground truncate mt-1">
-                      {suggestion.metadata.description}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center space-x-2 ml-2">
-                  {suggestion.frequency && suggestion.frequency > 1 && (
-                    <Badge variant="secondary" className="text-xs">
-                      {suggestion.frequency}
-                    </Badge>
-                  )}
-                  <Badge variant="outline" className="text-xs">
-                    {getSuggestionLabel(suggestion.type)}
-                  </Badge>
-                  <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                </div>
-              </div>
-            </button>
-          );
-        })}
+        <div className="space-y-1">
+          {suggestions.map((suggestion, index) =>
+            renderSuggestionItem(suggestion, startIndex + index)
+          )}
+        </div>
       </div>
-    );
+    ),
+    [renderSuggestionItem]
+  );
+
+  const renderDropdownContent = () => {
+    if (state.isLoading) {
+      return (
+        <div className="p-4 text-center text-sm text-muted-foreground">
+          <div className="flex items-center justify-center gap-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
+            <span>Loading suggestions...</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (state.error) {
+      return (
+        <div className="p-4 text-center text-sm text-destructive" role="alert">
+          {state.error}
+        </div>
+      );
+    }
+
+    if (groupedSuggestions && totalSuggestions > 0) {
+      let currentIndex = 0;
+      return (
+        <div className="divide-y" role="listbox" aria-label="Search suggestions">
+          {Array.from(groupedSuggestions.entries()).map(([type, suggestions]) => {
+            const startIndex = currentIndex;
+            currentIndex += suggestions.length;
+            return renderSuggestionGroup(type, suggestions, startIndex);
+          })}
+        </div>
+      );
+    }
+
+    if (state.results && totalSuggestions === 0) {
+      return (
+        <div className="p-4 text-center text-sm text-muted-foreground">
+          No suggestions found
+        </div>
+      );
+    }
+
+    return null;
   };
 
   const renderDropdown = () => {
     if (!state.isOpen) return null;
 
     return (
-      <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-96 overflow-y-auto shadow-lg">
+      <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-96 overflow-y-auto shadow-lg border">
         <CardContent className="p-0">
-          {state.isLoading && (
-            <div className="p-4 text-center text-sm text-muted-foreground">
-              <div className="flex items-center justify-center space-x-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                <span>Loading suggestions...</span>
-              </div>
-            </div>
-          )}
+          {renderDropdownContent()}
 
-          {state.error && (
-            <div className="p-4 text-center text-sm text-destructive">{state.error}</div>
-          )}
-
-          {state.results && state.results.suggestions.length > 0 && (
-            <div className="divide-y">
-              {(() => {
-                const groups = groupSuggestionsByType(state.results.suggestions);
-                let currentIndex = 0;
-
-                return Object.entries(groups).map(([type, suggestions]) => {
-                  const startIndex = currentIndex;
-                  currentIndex += suggestions.length;
-                  return renderSuggestionGroup(type, suggestions, startIndex);
-                });
-              })()}
-            </div>
-          )}
-
-          {state.results &&
-            state.results.suggestions.length === 0 &&
-            !state.isLoading &&
-            !state.error && (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                No suggestions found
-              </div>
-            )}
-
-          {query.trim() && (
+          {hasValidQuery && (
             <>
               <Separator />
               <div className="p-2">
                 <Button
                   type="button"
                   variant="ghost"
-                  className="w-full justify-start text-sm"
+                  className="w-full justify-start text-sm font-normal hover:bg-accent"
                   onClick={handleSearch}
                 >
                   <Search className="h-3 w-3 mr-2" />
-                  Search for "{query}&quot;
+                  Search for &quot;{query}&quot;
                 </Button>
               </div>
             </>
@@ -403,13 +496,18 @@ export function IntelligentAutocomplete({
     );
   };
 
+  // ============================================================================
+  // Main Render
+  // ============================================================================
+
   return (
     <div className={`relative ${className}`}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" aria-hidden="true" />
         <Input
           ref={inputRef}
           type="text"
+          role="combobox"
           placeholder={placeholder}
           value={query}
           onChange={handleInputChange}
@@ -421,10 +519,21 @@ export function IntelligentAutocomplete({
           }}
           className="pl-10"
           autoComplete="off"
+          aria-label="Search input"
+          aria-autocomplete="list"
+          aria-expanded={state.isOpen}
+          aria-controls="autocomplete-dropdown"
+          aria-activedescendant={
+            state.selectedIndex >= 0
+              ? `suggestion-${state.selectedIndex}`
+              : undefined
+          }
         />
       </div>
 
-      <div ref={dropdownRef}>{renderDropdown()}</div>
+      <div ref={dropdownRef} id="autocomplete-dropdown">
+        {renderDropdown()}
+      </div>
     </div>
   );
 }
