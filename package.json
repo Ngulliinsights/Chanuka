@@ -48,12 +48,12 @@
     "quality:baseline:prod": "cp combined_analysis.json quality-baseline-prod.json",
     "quality:status": "npm run analyze:fast && npm run report:summary",
     "quality:full-check": "npm run clean:reports && npm run analyze && npm run quality:check && npm run report:summary",
-    
+
     "analyze": "node analyzer.js full",
     "analyze:fast": "node analyzer.js fast",
     "analyze:code:watch": "nodemon --watch 'client/src/**/*' --watch 'server/**/*' --watch 'shared/**/*' --exec 'npm run analyze:fast'",
     "analyze:compile": "node analyzer.js compile",
-    
+
     "analyze:bundle": "webpack-bundle-analyzer dist/public/assets/*.js",
     "analyze:bundle:ci": "node scripts/bundle-analyzer.js --build --output json,html,markdown --compare-baseline",
 
@@ -71,7 +71,7 @@
     "lint": "nx run-many --target=lint --all",
     "lint:css": "stylelint \"client/src/**/*.css\"",
     "format": "prettier --write .",
-    
+
     "fix:all": "npm run format && npm run lint -- --fix && npm run fix:patterns",
     "fix:patterns": "npm run analyze:code:fast && node auto-fix-patterns.js",
     "fix:imports": "bash import_resolver_script.sh",
@@ -89,7 +89,7 @@
     "// --- DEPLOYMENT ---": "",
     "deploy:production": "node scripts/deploy-production.js --environment production",
     "deploy:staging": "node scripts/deploy-production.js --environment staging",
-    
+
     "// --- CLEANUP ---": "",
     "clean:reports": "rm -f pattern_errors.json codebase_errors.json combined_analysis.json quality-gate-report*.json",
     "clean:baselines": "rm -f quality-baseline*.json",
@@ -224,6 +224,7 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "jsdom": "^26.1.0",
+    "knip": "^5.34.0",
     "lighthouse": "^12.8.2",
     "nodemon": "^3.0.2",
     "nx": "^18.0.0",
